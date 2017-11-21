@@ -19,6 +19,8 @@
 
 #include "IRHeaderWriter.h"
 
+#include "Unused.h"
+
 // stl
 #include <algorithm>
 #include <numeric>
@@ -288,24 +290,9 @@ namespace nodes
             }
         }
 
-        void PushPackedBits(std::vector<uint64_t>& vec, const std::vector<uint64_t>& bits)
-        {
-            vec.insert(vec.end(), bits.begin(), bits.end());
-        }
-
         void PushPackedBits(std::vector<int64_t>& vec, const std::vector<uint64_t>& bits)
         {
             vec.insert(vec.end(), bits.begin(), bits.end());
-        }
-
-        void PushPackedBits(std::vector<uint32_t>& vec, const std::vector<uint64_t>& bits)
-        {
-            // Push each half separately
-            for (auto b : bits)
-            {
-                vec.push_back(static_cast<uint32_t>(b & 0xffffffff));
-                vec.push_back(static_cast<uint32_t>((b >> 32) & 0xffffffff));
-            }
         }
 
         void PushPackedBits(std::vector<int32_t>& vec, const std::vector<uint64_t>& bits)
@@ -910,6 +897,7 @@ namespace nodes
         const auto storedElementNumBits = 8 * storedElementSize;
         const auto numBits = storedElementNumBits; // function.GetModule().GetCompilerParameters().numBits; // for Xnor, use 32 bits in 32-bit environment
         const auto elementSize = numBits / 8;
+        debug_used(elementSize);
         assert(elementSize <= storedElementSize);
         const auto filterWidth = _convolutionalParameters.receptiveField;
         const auto numInputChannels = inputSize[2]; // inputSize is the dimensions of the input to the original layer node

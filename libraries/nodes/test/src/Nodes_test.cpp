@@ -66,11 +66,6 @@ using namespace nodes;
 //
 namespace
 {
-size_t GetShapeSize(const math::IntegerTriplet& shape)
-{
-    return shape[0] * shape[1] * shape[2];
-}
-
 double VectorMagnitudeSquared(const std::vector<double>& vec)
 {
     double sumSq = 0.0;
@@ -78,11 +73,6 @@ double VectorMagnitudeSquared(const std::vector<double>& vec)
         sumSq += (x * x);
 
     return sumSq;
-}
-
-double VectorMagnitude(const std::vector<double>& vec)
-{
-    return std::sqrt(VectorMagnitudeSquared(vec));
 }
 
 double VectorMean(const std::vector<double>& vec)

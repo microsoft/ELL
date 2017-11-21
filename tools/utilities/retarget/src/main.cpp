@@ -79,7 +79,7 @@ bool CutNeuralNetworkUsingLayers(model::DynamicMap& map, ParsedRetargetArguments
         auto inputNode = model.AddNode<model::InputNode<ElementType>>(predictor.GetInputShape());
         auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, predictor);
 
-        map = std::move(model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } }));
+        map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
         found = true;
     }
 
@@ -107,7 +107,7 @@ bool CutNeuralNetworkUsingNode(model::DynamicMap& map, ParsedRetargetArguments& 
         auto input = transformer.GetCorrespondingInputNode(map.GetInput());
         auto output = transformer.GetCorrespondingOutputs(*originalNode->GetOutputPort(0));
 
-        map = std::move(model::DynamicMap(model, {{ "input", input }}, {{ "output", output }}));
+        map = model::DynamicMap(model, {{ "input", input }}, {{ "output", output }});
         found = true;
     }
 

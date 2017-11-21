@@ -57,9 +57,6 @@ namespace nodes
                                         std::array<int, 3> dataOrder,
                                         llvm::Value* valueRow, llvm::Value* valueColumn, llvm::Value* valueChannel)
         {
-            const auto inputHeight = inputLayout.GetActiveSize(0);
-            const auto inputWidth = inputLayout.GetActiveSize(1);
-            const auto inputDepth = inputLayout.GetActiveSize(2);
             const auto rowStride = inputLayout.GetStride(0);
             const auto columnStride = inputLayout.GetStride(1);
             const auto channelStride = inputLayout.GetStride(2);
@@ -198,10 +195,8 @@ namespace nodes
             const auto inputHeight = inputLayout.GetActiveSize(0);
             const auto inputWidth = inputLayout.GetActiveSize(1);
             const auto inputDepth = inputLayout.GetActiveSize(2);
-            const auto inputPadding = inputLayout.GetOffset(0); // a proxy for the padding provided in the input
             const auto fieldVolumeSize = filterWidth * filterWidth * inputDepth;
             const auto numOutputColumns = outputWidth * outputHeight;
-            const auto numOutputRows = filterWidth * filterWidth * inputDepth;
 
             // Input (I): d x h x w (planar)
             // Output (S): (d * k * k) x (outputHeight * outputWidth) ==  fieldVolumeSize x outputImageSize

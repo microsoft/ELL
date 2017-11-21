@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "Unused.h"
+
 namespace ell
 {
 namespace nodes
@@ -47,7 +49,7 @@ namespace nodes
     {
         if (IsPureVector(input) && !compiler.GetCompilerParameters().unrollLoops)
         {
-            int vectorSize = compiler.GetCompilerParameters().vectorWidth;            
+            int vectorSize = compiler.GetCompilerParameters().vectorWidth;
             bool vectorize = compiler.GetCompilerParameters().allowVectorInstructions && (input.Size() > vectorSize);
             if (vectorize)
             {
@@ -123,7 +125,7 @@ namespace nodes
     void SumNode<ValueType>::CompileVectorizedLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         const int size = input.Size();
-        const int vectorSize = compiler.GetCompilerParameters().vectorWidth;            
+        const int vectorSize = compiler.GetCompilerParameters().vectorWidth;
         assert(size >= vectorSize);
 
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
@@ -132,6 +134,7 @@ namespace nodes
         // Get LLVM types
         auto& emitter = function.GetEmitter();
         auto elementType = emitter.Type(emitters::GetVariableType<ValueType>());
+        debug_used(elementType);
         assert(llvm::VectorType::isValidElementType(elementType) && "Invalid element type for LLVM vector");
         auto vectorType = emitter.VectorType(emitters::GetVariableType<ValueType>(), vectorSize);
         auto vectorPointerType = vectorType->getPointerTo();
@@ -154,7 +157,7 @@ namespace nodes
 
         // Accumulate horizontal sum into output
         auto sum = emitters::HorizontalVectorSum<ValueType>(function, function.Load(vectorAccumVar));
-        
+
         // epilogue
         const int epilogueSize = size - (vectorSize * numBlocks);
         if (epilogueSize > 0)

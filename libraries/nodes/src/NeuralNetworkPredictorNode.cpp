@@ -76,7 +76,7 @@ namespace nodes
     bool NeuralNetworkPredictorNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         // TODO:
-        // 
+        //
         // Adjust the padding and data ordering depending on what options were set
         //
         // Constraints:
@@ -84,13 +84,13 @@ namespace nodes
         //   normal conv: planar order, no padding
         //
         // options:
-        // 
+        //
         // - diag vs. normal conv
         // - always use regular 'normal' convolution
         // - always use transposed 'normal' convolution
         // - threshold to switch between regular and transposed 'normal' conv (ratio of # memcopies?)
         //
-        // 
+        //
         // - always revert to interleaved order
         // - always revert to planar order
         // - keep existing order as long as possible
@@ -129,6 +129,7 @@ namespace nodes
         for (const auto& layer : _predictor.GetLayers())
         {
             auto numInputs = GetShapeSize(layer->GetInputShape());
+            debug_used(numInputs);
             assert(prevOutputSize == numInputs);
             auto layerNode = AddLayerNode(transformer, *layer, layerInputs, options, state);
 

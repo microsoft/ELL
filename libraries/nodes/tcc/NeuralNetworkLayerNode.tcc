@@ -23,7 +23,7 @@ namespace nodes
 
     template <typename ValueType>
     NeuralNetworkLayerNodeBase<ValueType>::NeuralNetworkLayerNodeBase(const model::PortElements<ValueType>& input, const NeuralNetworkLayerNodeParameters& parameters, size_t outputSize)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _parameters(parameters), _output(this, outputPortName, outputSize)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, outputSize), _parameters(parameters)
     {
     }
 

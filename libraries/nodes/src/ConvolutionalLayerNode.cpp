@@ -33,7 +33,6 @@ namespace nodes
         const auto outputLayout = this->GetOutputMemoryLayout();
         const auto convParams = this->GetLayer().GetConvolutionalParameters();
         const auto inputPaddingParams = this->GetRequestedInputPadding();
-        const auto outputPaddingParams = this->GetRequestedOutputPadding();
 
         const auto inputHeight = inputLayout.GetActiveSize(0);
         const auto inputWidth = inputLayout.GetActiveSize(1);
@@ -41,13 +40,11 @@ namespace nodes
         const auto inputDataPadding = inputLayout.GetOffset(0);
 
         const auto filterWidth = convParams.receptiveField;
-        const auto fieldVolumeSize = filterWidth * filterWidth * inputDepth;
 
         const auto outputImageHeight = outputLayout.GetActiveSize(0);
         const auto outputImageWidth = outputLayout.GetActiveSize(1);
         const auto outputDataPadding = outputLayout.GetOffset(0);
         const auto numFilters = outputLayout.GetActiveSize(2);
-        const auto shapedInputSize = fieldVolumeSize * outputImageWidth * outputImageHeight;
         const auto outputRows = outputImageWidth * outputImageHeight;
         const auto stride = convParams.stride;
 
@@ -69,7 +66,7 @@ namespace nodes
             const auto ldc = n;
             const std::array<int, 3> rcdOrder = std::array<int, 3>{ 0, 1, 2 };
             const std::array<int, 3> drcOrder = std::array<int, 3>{ 2, 0, 1 };
-            
+
             bool useNewMethod = (stride == 1 && padding == filterWidth/2);
             // Input data is in the canonical RCD order
             // `dataOrder` is the order the we're going to generate the receptive field matrix from
@@ -97,15 +94,15 @@ namespace nodes
             else // reorder input to be channels x rows x columns (then we can use the 'new' receptive field matrix generation)
             {
                 assert(dataOrder == drcOrder);
-                
+
                 // Remove padding and transpose to DRC order
                 model::PortMemoryLayout inputShape({ inputHeight, inputWidth, inputDepth }, { inputDataPadding, inputDataPadding, 0 });
                 model::PortMemoryLayout transposedInputShape({ inputDepth, inputHeight, inputWidth});
                 auto reorderInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, inputShape, transposedInputShape, std::vector<int>{ 2, 0, 1 });
-                
+
                 auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(reorderInputNode->output, inputLayout, convParams.receptiveField, convParams.stride, inputPaddingParams.paddingSize, dataOrder, outputImageWidth, outputImageHeight);
                 auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc);
-                
+
                 // Output of matrix multiply is in (f x h x w) order, need to transpose to (h x w x f)
                 model::PortMemoryLayout outputShape({ numFilters, outputImageHeight, outputImageWidth });
                 model::PortMemoryLayout transposedOutputShape({ outputImageHeight, outputImageWidth, numFilters }, { outputDataPadding, outputDataPadding, 0 });

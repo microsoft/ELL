@@ -20,37 +20,14 @@ namespace nodes
 {
     namespace
     {
-        // Useful aliases for operators
         const auto plus = emitters::TypedOperator::add;
-        const auto minus = emitters::TypedOperator::subtract;
         const auto times = emitters::TypedOperator::multiply;
-        const auto divide = emitters::TypedOperator::divideSigned;
-        const auto modulo = emitters::TypedOperator::moduloSigned;
 
         const auto plusFloat = emitters::TypedOperator::addFloat;
-        const auto minusFloat = emitters::TypedOperator::subtractFloat;
-        const auto timesFloat = emitters::TypedOperator::multiplyFloat;
-        const auto divideFloat = emitters::TypedOperator::divideFloat;
-
-        const auto logicalOr = emitters::TypedOperator::logicalOr;
-        const auto logicalAnd = emitters::TypedOperator::logicalAnd;
-        const auto shiftLeft = emitters::TypedOperator::shiftLeft;
-
-        // comparisons
-        const auto lessThan = emitters::TypedComparison::lessThan;
-        const auto greaterThanOrEqual = emitters::TypedComparison::greaterThanOrEquals;
-        const auto greaterThanFloat = emitters::TypedComparison::greaterThanFloat;
 
         //
         // Functions to emit portions of IR
         //
-
-        size_t GetFilterVolumeSize(const predictors::neural::ConvolutionalParameters& convolutionalParameters, const model::PortMemoryLayout& inputLayout)
-        {
-            const auto inputDepth = inputLayout.GetActiveSize(2);
-            const auto filterWidth = convolutionalParameters.receptiveField;
-            return inputDepth * filterWidth * filterWidth;
-        }
 
         size_t GetDiagonalConvolutionOutputSize(const model::PortMemoryLayout& outputLayout)
         {
@@ -92,17 +69,13 @@ namespace nodes
         auto&& inputLayout = this->GetInputMemoryLayout();
         auto&& outputLayout = this->GetOutputMemoryLayout();
         auto&& convParams = this->GetConvolutionalParameters();
-        const auto inputHeight = inputLayout.GetActiveSize(0);
-        const auto inputWidth = inputLayout.GetActiveSize(1);
         const auto inputDepth = inputLayout.GetActiveSize(2);
         const auto inputPadding = inputLayout.GetOffset(0);
         const auto filterWidth = convParams.receptiveField;
-        const auto fieldVolumeSize = filterWidth * filterWidth * inputDepth;
 
         const auto outputWidth = outputLayout.GetActiveSize(1);
         const auto outputHeight = outputLayout.GetActiveSize(0);
         const auto numFilters = outputLayout.GetActiveSize(2);
-        const auto outputPadding = outputLayout.GetOffset(0);
 
         const auto padding = inputPadding; // ?
 
@@ -129,7 +102,6 @@ namespace nodes
         math::RowMatrixReference<ValueType> inputMatrix(inputData.data(), paddedHeight, numFlattenedMatrixColumns);
         math::RowMatrixReference<ValueType> weightsMatrix(filterWeightsData.data(), filterWidth * inputDepth, filterWidth * numFilters);
         math::RowMatrixReference<ValueType> outputMatrix(output.data(), paddedHeight, paddedWidth * numFilters); //
-        auto scratchData = scratch.data();
 
         for (size_t j = 0; j < numConvolutions; j++) // each pass through this loop computes 1 column of the output image, for all filters
         {
@@ -165,12 +137,6 @@ namespace nodes
     template <typename ValueType>
     void DiagonalConvolutionNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto& context = function.GetModule().GetLLVMContext();
-        auto voidType = llvm::Type::getVoidTy(context);
-        auto int8Type = llvm::Type::getInt8Ty(context);
-        auto voidPtrType = int8Type->getPointerTo();
-        auto nullValue = llvm::ConstantPointerNull::get(voidPtrType);
-
         // input is a d x (w+2p) x (h+2p) array
         // reshaped, it's a d*(w+2p)) x (h+2p) array == d*(w+k-1) x (h+k-1)
         llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
@@ -189,31 +155,20 @@ namespace nodes
         const auto inputHeight = inputLayout.GetActiveSize(0);
         const auto inputWidth = inputLayout.GetActiveSize(1);
         const auto inputDepth = inputLayout.GetActiveSize(2);
-        const auto inputPadding = inputLayout.GetOffset(0);
         const auto filterWidth = convParams.receptiveField;
-        const auto fieldVolumeSize = filterWidth * filterWidth * inputDepth;
         const auto padding = inputLayout.GetOffset(0);
         assert((padding == filterWidth / 2) && "Padding must be filterWidth/2");
 
         // input data parameters
-        // const size_t paddedWidth = inputWidth + (2 * padding);
-        // const size_t paddedHeight = inputHeight + (2 * padding);
         const size_t paddedWidth = inputLayout.GetStride(1);
         const size_t paddedHeight = inputLayout.GetStride(0);
-        const size_t numFlattenedMatrixColumns = inputDepth * paddedWidth;
-
-        const auto outputWidth = outputLayout.GetActiveSize(1);
-        const auto outputHeight = outputLayout.GetActiveSize(0);
-        const auto numFilters = outputLayout.GetActiveSize(2);
-        const auto outputPadding = outputLayout.GetOffset(0);
 
         // output data parameters
-        const size_t outputSize = outputWidth * outputHeight * numFilters;
+        const auto numFilters = outputLayout.GetActiveSize(2);
 
         // computation parameters
         const size_t batchSize = numFilters;
         const size_t stackSize = inputWidth;
-        // const size_t stackSize = 1;
 
         // TODO: check this carefully to make sure it's valid for stackSize != all and stackSize != 1
         const size_t stackedInputHeight = (inputHeight + padding) * stackSize + padding;

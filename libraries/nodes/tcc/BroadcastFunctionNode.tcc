@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "Unused.h"
+
 namespace ell
 {
 namespace nodes
@@ -447,7 +449,7 @@ namespace nodes
                 args.insert(args.end(), { pOutput, begin, end });
             }
             auto tasks = function.StartTasks(taskFunction, taskArgs);
-            tasks.WaitAll(function);                
+            tasks.WaitAll(function);
         }
         else
         {

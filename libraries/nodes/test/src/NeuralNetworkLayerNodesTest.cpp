@@ -79,11 +79,7 @@ ell::predictors::NeuralNetworkPredictor<ElementType> CreateNeuralNetworkPredicto
 
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
-    using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
     using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
-    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
@@ -143,6 +139,7 @@ static void TestArchiveNeuralNetworkPredictorNode()
     {
         auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
         auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
+        unused(predictorNode);
     }
     auto numNodes = model.Size();
 
@@ -194,6 +191,7 @@ static void TestArchiveNeuralNetworkLayerNodes()
     {
         auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
         auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
+        unused(predictorNode);
     }
 
     // Refine the model
@@ -350,7 +348,6 @@ static void TestConvolutionalLayerNode()
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
 
     // Verify ConvolutionalLayer with diagonal method
     TensorType input(3, 4, 2); // Input includes padding
@@ -443,7 +440,6 @@ static void TestBinaryConvolutionalLayerNode()
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
 
     //
     // Verify BinaryConvolutionalLayer with gemm method
@@ -538,7 +534,6 @@ static void TestFullyConnectedLayerNode()
     using TensorType = typename LayerType::TensorType;
     using MatrixType = typename LayerType::MatrixType;
     using Shape = typename LayerType::Shape;
-    using VectorType = typename LayerType::VectorType;
 
     // Set up layer
     TensorType input(2, 2, 2);
@@ -636,7 +631,6 @@ static void TestScalingLayerNode()
 
     using LayerParameters = typename LayerType::LayerParameters;
     using TensorType = typename LayerType::TensorType;
-    using MatrixType = typename LayerType::MatrixType;
     using Shape = typename LayerType::Shape;
     using VectorType = typename LayerType::VectorType;
 

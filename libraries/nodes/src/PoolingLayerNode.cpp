@@ -31,12 +31,6 @@ namespace nodes
             Interval windowBounds;
         };
 
-        std::ostream& operator<<(std::ostream& os, const RegionBounds& bounds)
-        {
-            os << "input: [" << bounds.inputBounds.begin << ", " << bounds.inputBounds.end << "), window: [" << bounds.windowBounds.begin << ", " << bounds.windowBounds.end << ")";
-            return os;
-        }
-
         RegionBounds GetRegionBounds(int regionId, int inputSize, int windowSize, int stride, bool usesPadding)
         {
             RegionBounds result;
@@ -444,6 +438,7 @@ namespace nodes
         int outputRows = outputSize[0];
         int outputColumns = outputSize[1];
         int outputDepth = outputSize[2];
+        unused(outputRows, outputColumns);
 
         if (inputDepth != outputDepth)
         {
