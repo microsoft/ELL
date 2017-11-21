@@ -18,9 +18,10 @@ namespace ell
 {
 namespace data
 {
-    void data::WeightLabel::Print(std::ostream& os) const
+    std::ostream& operator<<(std::ostream& os, const WeightLabel& weightLabel)
     {
-        os << "(" << weight << ", " << label << ")";
+        os << "(" << weightLabel.weight << ", " << weightLabel.label << ")";
+        return os;
     }
 
     WeightLabel LabelParser::Parse(TextLine& textLine)
@@ -34,21 +35,18 @@ namespace data
 
     void LabelParser::HandleErrors(utilities::ParseResult result, const std::string& str)
     {
-        if (result == utilities::ParseResult::success)
+        switch (result)
         {
+        case utilities::ParseResult::success:
             return;
-        }
-
-        if (result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
-        {
+        case utilities::ParseResult::endOfString:
+        case utilities::ParseResult::beginComment:
             throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "premature end-of-std::string or comment in '" + str + "'");
+        case utilities::ParseResult::outOfRange:
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "value out of double precision range in '" + str + "'");
+        default:
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "value out of double precision range in '" + str + "'");
         }
-        else if (result == utilities::ParseResult::outOfRange)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "real value out of double precision range in '" + str + "'");
-        }
-
-        throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "bad format in '" + str + "'");
     }
 
     WeightLabel WeightLabelParser::Parse(TextLine& textLine)

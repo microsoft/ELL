@@ -119,6 +119,18 @@ namespace data
     }
 
     template <typename DatasetExampleType>
+    template <typename otherExampleType>
+    Dataset<otherExampleType> Dataset<DatasetExampleType>::Transform(std::function<otherExampleType(const DatasetExampleType&)> transformationFunction)
+    {
+        Dataset<otherExampleType> dataset;
+        for (auto& example : _examples)
+        {
+            dataset.AddExample(transformationFunction(example));
+        }
+        return dataset;
+    }
+
+    template <typename DatasetExampleType>
     void Dataset<DatasetExampleType>::Reset()
     {
         _examples.clear();

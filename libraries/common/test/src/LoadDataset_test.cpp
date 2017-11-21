@@ -38,6 +38,7 @@ void TestLoadMappedDataset()
 
     auto map = common::LoadMap(args);
     auto stream = utilities::OpenIfstream("test/testData.txt");
-    auto dataset = common::GetMappedDataset(stream, map);
+    auto dataset = common::GetDataset(stream);
+    dataset = common::TransformDataset(dataset, map);
 }
 }

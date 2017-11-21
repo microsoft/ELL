@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     DataLoaders.cpp (common)
-//  Authors:  Ofer Dekel, Chuck Jacobs
+//  Authors:  Ofer Dekel, Chuck Jacobs, Byron Changuion
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,20 +31,25 @@ namespace ell
 {
 namespace common
 {
-    data::AutoSupervisedExampleIterator GetExampleIterator(std::istream& stream)
+
+    data::AutoSupervisedExampleIterator GetAutoSupervisedExampleIterator(std::istream& stream)
     {
-        data::SequentialLineIterator textLineIterator(stream); 
+        return GetExampleIterator<data::SequentialLineIterator, data::LabelParser, data::AutoDataVectorParser<data::GeneralizedSparseParsingIterator>>(stream);
+    }
 
-        data::LabelParser metadataParser;
-
-        data::AutoDataVectorParser<data::GeneralizedSparseParsingIterator> dataVectorParser;
-
-        return data::MakeSingleLineParsingExampleIterator(std::move(textLineIterator), std::move(metadataParser), std::move(dataVectorParser));
+    data::AutoSupervisedMultiClassExampleIterator GetAutoSupervisedMultiClassExampleIterator(std::istream& stream)
+    {
+        return GetExampleIterator<data::SequentialLineIterator, data::ClassIndexParser, data::AutoDataVectorParser<data::GeneralizedSparseParsingIterator>>(stream);
     }
 
     data::AutoSupervisedDataset GetDataset(std::istream& stream)
     {
-        return data::MakeDataset(GetExampleIterator(stream));
+        return data::MakeDataset(GetExampleIterator<data::SequentialLineIterator, data::LabelParser, data::AutoDataVectorParser<data::GeneralizedSparseParsingIterator>>(stream));
+    }
+
+    data::AutoSupervisedMultiClassDataset GetMultiClassDataset(std::istream& stream)
+    {
+        return data::MakeDataset(GetExampleIterator<data::SequentialLineIterator, data::ClassIndexParser, data::AutoDataVectorParser<data::GeneralizedSparseParsingIterator>>(stream));
     }
 }
 }

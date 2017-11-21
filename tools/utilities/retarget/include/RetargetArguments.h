@@ -32,6 +32,7 @@ namespace ell
         bool normalize;
         double regularization;
         bool verbose;
+        bool multiClass;
         common::LossFunctionArguments lossFunctionArguments;
     };
 

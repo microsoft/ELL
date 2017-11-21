@@ -4,6 +4,7 @@
 
 add_subdirectory(apply)
 add_subdirectory(compile)
+add_subdirectory(datasetFromImages)
 add_subdirectory(debugCompiler)
 add_subdirectory(imageConverter)
 add_subdirectory(makeExamples)

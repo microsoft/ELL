@@ -192,6 +192,9 @@ namespace data
     template <typename IndexValueParsingIterator>
     struct AutoDataVectorParser
     {
+        // The return type of the parser so the example iterator knows how to declare an Example<DataParser::type, MetadataParser::type>
+        using type = AutoDataVector;
+
         /// <summary> Parses a given text line and constructs an AutoDataVector. </summary>
         ///
         /// <param name="textLine"> The text line. </param>

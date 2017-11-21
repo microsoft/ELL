@@ -93,7 +93,8 @@ int main(int argc, char* argv[])
         mapLoadArguments.defaultInputSize = dataLoadArguments.parsedDataDimension;
         auto map = common::LoadMap(mapLoadArguments);
         auto stream = utilities::OpenIfstream(dataLoadArguments.inputDataFilename);
-        auto mappedDataset = common::GetMappedDataset(stream, map);
+        auto parsedDataset = common::GetDataset(stream);
+        auto mappedDataset = common::TransformDataset(parsedDataset, map);
 
         // The problem is NumFeatures returns a random number from sparse dataset depending on the number of trailing zeros it
         // has skipped.Is if the user did NOT specify - dd auto and instead provided a real input size like - dd 784 then we use

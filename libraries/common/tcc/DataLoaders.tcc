@@ -6,32 +6,34 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// data
+#include "SingleLineParsingExampleIterator.h"
+
 namespace ell
 {
 namespace common
 {
-    template <typename MapType>
-    data::AutoSupervisedDataset GetMappedDataset(data::AutoSupervisedExampleIterator exampleIterator, const MapType& map)
+    template <typename TextLineIteratorType, typename MetadataParserType, typename DataVectorParserType>
+    auto GetExampleIterator(std::istream& stream)
     {
-        data::AutoSupervisedDataset dataset;
+        TextLineIteratorType textLineIterator(stream);
 
-        // generate mapped dataset
-        while (exampleIterator.IsValid())
-        {
-            auto example = exampleIterator.Get();
-            auto mappedDataVector = map.template Compute<data::DoubleDataVector>(example.GetDataVector());
-            auto mappedExample = data::AutoSupervisedExample(std::move(mappedDataVector), example.GetMetadata());
-            dataset.AddExample(mappedExample);
+        MetadataParserType metadataParser;
 
-            exampleIterator.Next();
-        }
-        return dataset;
+        DataVectorParserType dataVectorParser;
+
+        return data::MakeSingleLineParsingExampleIterator(std::move(textLineIterator), std::move(metadataParser), std::move(dataVectorParser));
     }
 
-    template <typename MapType>
-    data::AutoSupervisedDataset GetMappedDataset(std::istream& stream, const MapType& map)
+
+    template <typename ExampleType, typename MapType>
+    auto TransformDataset(data::Dataset<ExampleType>& input, const MapType& map)
     {
-        return GetMappedDataset(GetExampleIterator(stream), map);
+        return input.template Transform<ExampleType>([map](const ExampleType& example)
+        {
+            auto transformedDataVector = map.template Compute<data::DoubleDataVector>(example.GetDataVector());
+            return ExampleType(std::move(transformedDataVector), example.GetMetadata());
+        });
     }
 }
 }

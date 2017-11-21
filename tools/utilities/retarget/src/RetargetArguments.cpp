@@ -48,8 +48,15 @@ namespace ell
             inputDataFilename,
             "inputDataFilename",
             "idf",
-            "Path to the input data file",
+            "Path to the input dataset file",
             "");
+
+        parser.AddOption(
+            multiClass,
+            "multiClass",
+            "mc",
+            "Indicates whether the input dataset is multi-class or binary.",
+            false);
 
         parser.AddOption(normalize,
             "normalize",

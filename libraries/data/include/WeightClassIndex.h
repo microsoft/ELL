@@ -1,66 +1,62 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     WeightLabel.h (data)
-//  Authors:  Ofer Dekel
+//  File:     WeightClassIndex.h (data)
+//  Authors:  Byron Changuion
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
 #include "TextLine.h"
 
-// stl
-#include <ostream>
-
 // utilities
 #include "CStringParser.h"
-
 
 namespace ell
 {
 namespace data
 {
-    /// <summary> A metadata class that contains a weight and a real valued label. </summary>
-    struct WeightLabel
+    /// <summary> A metadata class that contains a weight and a class index. </summary>
+    struct WeightClassIndex
     {
         double weight;
-        double label;
+        size_t classIndex;
     };
 
-    /// <summary> Adds the weight label pair to the output stream. </summary>
+    /// <summary> Adds the weight class index pair to the output stream. </summary>
     ///
     /// <param name="os"> [in, out] The output stream. </param>
     /// <param name="os"> The weightClassIndex to add to the stream. </param>
     ///
     /// <returns> The output stream. </returns>
-    std::ostream& operator<<(std::ostream& os, const WeightLabel& weightLabel);
+    std::ostream& operator<<(std::ostream& os, const WeightClassIndex& weightClassIndex);
 
     /// <summary> Class that parses a text line into a label </summary>
-    struct LabelParser
+    struct ClassIndexParser
     {
         // The return type of the parser so the example iterator knows how to declare an Example<DataParser::type, MetadataParser::type>
-        using type = WeightLabel;
+        using type = WeightClassIndex;
 
         /// <summary> Parses the given text line. </summary>
         ///
         /// <param name="textLine"> The text line. </param>
         ///
-        /// <returns> A WeightLabel. </returns>
-        static WeightLabel Parse(TextLine& textLine);
+        /// <returns> A WeightClassIndex. </returns>
+        static WeightClassIndex Parse(TextLine& textLine);
 
     protected:
         static void HandleErrors(utilities::ParseResult result, const std::string& str);
     };
 
-    /// <summary> Class that parses a text line into a weight and a label </summary>
-    struct WeightLabelParser : private LabelParser
+    /// <summary> Class that parses a text line into a weight and a class index </summary>
+    struct WeightClassIndexParser : private ClassIndexParser
     {
         /// <summary> Parses the given text line. </summary>
         ///
         /// <param name="textLine"> The text line. </param>
         ///
-        /// <returns> A WeightLabel. </returns>
-        static WeightLabel Parse(TextLine& textLine);
+        /// <returns> A WeightClassIndex. </returns>
+        static WeightClassIndex Parse(TextLine& textLine);
     };
 }
 }

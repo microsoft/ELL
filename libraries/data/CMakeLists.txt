@@ -12,6 +12,7 @@ set (src src/Dataset.cpp
          src/SequentialLineIterator.cpp
          src/SparseDataVector.cpp
          src/TextLine.cpp
+         src/WeightClassIndex.cpp
          src/WeightLabel.cpp)
 
 set (include include/AutoDataVector.h
@@ -31,6 +32,7 @@ set (include include/AutoDataVector.h
              include/TransformedDataVector.h
              include/TransformingIndexValueIterator.h
              include/TextLine.h
+             include/WeightClassIndex.h
              include/WeightLabel.h
              )
 

@@ -86,7 +86,8 @@ int main(int argc, char* argv[])
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto stream = utilities::OpenIfstream(dataLoadArguments.inputDataFilename);
-        auto mappedDataset = common::GetMappedDataset(stream, map);
+        auto parsedDataset = common::GetDataset(stream);
+        auto mappedDataset = common::TransformDataset(parsedDataset, map);
         auto mappedDatasetDimension = map.GetOutput(0).Size();
 
         // get predictor type

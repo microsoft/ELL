@@ -67,7 +67,7 @@ namespace common
             }
 
             auto stream = utilities::OpenIfstream(inputDataFilename);
-            auto exampleIterator = GetExampleIterator(stream);
+            auto exampleIterator = GetAutoSupervisedExampleIterator(stream);
             while (exampleIterator.IsValid())
             {
                 auto size = exampleIterator.Get().GetDataVector().PrefixLength();

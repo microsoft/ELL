@@ -43,7 +43,7 @@ namespace data
     template <typename DataVectorType, typename MetadataType>
     void Example<DataVectorType, MetadataType>::Print(std::ostream& os) const
     {
-        _metadata.Print(os);
+        os << _metadata;
         os << "\t";
         _dataVector->Print(os);
     }

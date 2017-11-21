@@ -61,6 +61,7 @@ namespace data
     };
 
     using AutoSupervisedExampleIterator = ExampleIterator<AutoSupervisedExample>;
+    using AutoSupervisedMultiClassExampleIterator = ExampleIterator<AutoSupervisedMultiClassExample>;
 }
 }
 

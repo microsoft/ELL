@@ -190,8 +190,17 @@ namespace data
         /// <param name="size"> The number of examples to include, a value of zero means all
         /// the way to the end. </param>
         ///
-        /// <returns> The iterator. </returns>
+        /// <returns> The dataset. </returns>
         AnyDataset GetAnyDataset(size_t fromIndex = 0, size_t size = 0) const { return AnyDataset(this, fromIndex, size); }
+
+        /// <summary> Returns an DataSet whose examples have been converted from this dataset. </summary>
+        ///
+        /// <typeparam name="otherExampleType"> Example type returned by the transformation function. </typeparam>
+        /// <param name="transformationFunction"> The function that is called on each example, returning the transformed example. </param>
+        ///
+        /// <returns> The dataset. </returns>
+        template <typename otherExampleType>
+        Dataset<otherExampleType> Transform(std::function<otherExampleType(const DatasetExampleType&)> transformationFunction);
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
@@ -258,8 +267,9 @@ namespace data
         size_t _numFeatures = 0;
     };
 
-    // friendly name
+    // friendly names
     typedef Dataset<AutoSupervisedExample> AutoSupervisedDataset;
+    typedef Dataset<AutoSupervisedMultiClassExample> AutoSupervisedMultiClassDataset;
     typedef Dataset<DenseSupervisedExample> DenseSupervisedDataset;
 
     /// <summary> Prints a data set to an ostream. </summary>

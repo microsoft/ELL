@@ -107,7 +107,8 @@ int main(int argc, char* argv[])
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto stream = utilities::OpenIfstream(dataLoadArguments.inputDataFilename);
-        auto mappedDataset = common::GetMappedDataset(stream, map);
+        auto parsedDataset = common::GetDataset(stream);
+        auto mappedDataset = common::TransformDataset(parsedDataset, map);
         auto mappedDatasetDimension = map.GetOutput(0).Size();
 
         // normalize data
@@ -124,7 +125,8 @@ int main(int argc, char* argv[])
             auto normalizer = predictors::MakeTransformationNormalizer<data::IterationPolicy::skipZeros>(coordinateTransformation);
 
             // apply normalizer to data
-            auto normalizedDataset = common::GetMappedDataset(mappedDataset.GetExampleIterator(), normalizer);
+            auto normalizedDataset = common::TransformDataset(mappedDataset, normalizer);
+
             mappedDataset.Swap(normalizedDataset);
         }
 

@@ -12,6 +12,7 @@
 #include "DataVector.h"
 #include "DenseDataVector.h"
 #include "WeightLabel.h"
+#include "WeightClassIndex.h"
 
 // utilities
 #include "TypeTraits.h"
@@ -71,6 +72,11 @@ namespace data
         /// <returns> The data vector. </returns>
         const DataVectorType& GetDataVector() const { return *_dataVector.get(); }
 
+        /// <summary> Gets a shared_ptr to the data vector. </summary>
+        ///
+        /// <returns> The data vector. </returns>
+        std::shared_ptr<const DataVectorType> GetDataVectorPointer() const { return _dataVector; }
+
         /// <summary> Gets the metadata. </summary>
         ///
         /// <returns> The metadata. </returns>
@@ -123,6 +129,18 @@ namespace data
     // abbreviations
     typedef Example<AutoDataVector, WeightLabel> AutoSupervisedExample;
     typedef Example<FloatDataVector, WeightLabel> DenseSupervisedExample;
+    typedef Example<AutoDataVector, WeightClassIndex> AutoSupervisedMultiClassExample;
+
+    /// <summary>
+    /// An Example is the combination of metadata and data vector, so ParserExample
+    /// is a template alias for the example type that is the combination of
+    /// metadata parser's element type and data vector parser's element type.
+    /// </summary>
+    ///
+    /// <typeparam name="MetadataParserType"> Parser type for the example metadata. </typeparam>
+    /// <typeparam name="DataVectorParserType"> Parser type for the example data. </typeparam>
+    template <typename MetadataParserType, typename DataVectorParserType>
+    using ParserExample = Example<typename MetadataParserType::type, typename DataVectorParserType::type>;
 
     /// <summary> Stream insertion operator. </summary>
     ///

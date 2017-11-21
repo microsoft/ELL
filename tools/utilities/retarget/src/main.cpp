@@ -12,14 +12,17 @@
 #include "CommandLineParser.h"
 #include "Exception.h"
 
-// data
-#include "Dataset.h"
-
 // common
 #include "DataLoaders.h"
 #include "LoadModel.h"
 #include "MakeEvaluator.h"
 #include "MakeTrainer.h"
+
+// data
+#include "Dataset.h"
+
+// evaluators
+#include "Evaluator.h"
 
 // functions
 #include "LogLoss.h"
@@ -35,13 +38,11 @@
 #include "LinearPredictorNode.h"
 #include "NeuralNetworkPredictorNode.h"
 
-// evaluators
-#include "Evaluator.h"
-
 // predictors
 #include "Normalizer.h"
 
 // stl
+#include <algorithm>
 #include <iostream>
 
 using namespace ell;
@@ -218,6 +219,52 @@ void RetargetNetworkUsingLinearPredictor(ParsedRetargetArguments& retargetArgume
     }
 }
 
+std::vector<data::AutoSupervisedDataset> CreateDatasetsForOneVersusRest(data::AutoSupervisedMultiClassDataset& multiclassDataset)
+{
+    std::vector<data::AutoSupervisedDataset> datasets;
+
+    // Get statistics for the multi-class dataset
+    std::map<size_t, size_t> classCounts;
+    for (size_t i = 0; i < multiclassDataset.NumExamples(); ++i)
+    {
+        const auto& example = multiclassDataset.GetExample(i);
+        size_t classIndex = example.GetMetadata().classIndex;
+
+        classCounts[classIndex] += 1;
+    }
+
+    // Create binary classification datasets for each class
+    size_t numClasses = classCounts.size();
+    size_t totalCount = multiclassDataset.NumExamples();
+    datasets.resize(numClasses);
+    for (size_t i = 0; i < numClasses; ++i)
+    {
+        // For any class x, create a binary classification dataset where Example is:
+        //  weight = 1 / number of examples for x, or 1 / number of examples for all classes not x
+        //  label = 1.0 for examples in x, or -1.0 for all examples not in x
+        //  data = shared_ptr to existing
+        size_t positiveCount = classCounts[i];
+        size_t negativeCount = (totalCount - classCounts[i]);
+        double weightPositiveCase = 1.0 / (positiveCount ? positiveCount : 1.0);
+        double weightNegativeCase = 1.0 / (negativeCount ? negativeCount : 1.0);
+        datasets[i] = multiclassDataset.Transform<data::AutoSupervisedExample>([i, weightPositiveCase, weightNegativeCase] (const auto& example)
+        {
+            if (example.GetMetadata().classIndex == i)
+            {
+                // Positive case
+                return data::AutoSupervisedExample(example.GetDataVectorPointer(), data::WeightLabel{ weightPositiveCase, 1.0 });
+            }
+            else
+            {
+                // Negative case
+                return data::AutoSupervisedExample(example.GetDataVectorPointer(), data::WeightLabel{ weightNegativeCase, -1.0 });
+            }
+        });
+    }
+
+    return datasets;
+}
+
 int main(int argc, char* argv[])
 {
     try
@@ -268,26 +315,48 @@ int main(int argc, char* argv[])
 
         // load dataset and map the output
         if (retargetArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto stream = utilities::OpenIfstream(retargetArguments.inputDataFilename);
-        auto mappedDataset = common::GetMappedDataset(stream, map);
-
-        // Train a linear predictor and splice it onto the previously cut neural network
-        using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
-        switch (retargetArguments.lossFunctionArguments.lossFunction)
+        if (retargetArguments.multiClass)
         {
-        case LossFunctionEnum::squared:
-            RetargetNetworkUsingLinearPredictor<functions::SquaredLoss>(retargetArguments, mappedDataset, map);
-            break;
+            // This is a multi-class dataset
+            auto stream = utilities::OpenIfstream(retargetArguments.inputDataFilename);
+            //auto multiclassDataset = common::GetMappedMultiClassDataset(stream, map);
+            auto multiclassDataset = common::GetMultiClassDataset(stream);
+            auto mappedDataset = common::TransformDataset(multiclassDataset, map);
 
-        case LossFunctionEnum::log:
-            RetargetNetworkUsingLinearPredictor<functions::LogLoss>(retargetArguments, mappedDataset, map);
-            break;
+            // Create binary classification datasets for each one versus rest (OVR) case
+            auto datasets = CreateDatasetsForOneVersusRest(multiclassDataset);
+            
+            // Next, train a binary classifier for each case and combine into a
+            // single model.
+            // Append the resulting model to the cut neural network and save the map
+            throw utilities::CommandLineParserErrorException("Multi-class retargetting is not yet supported");
+        }
+        else
+        {
+            // This is a binary classification dataset
+            auto stream = utilities::OpenIfstream(retargetArguments.inputDataFilename);
+            auto binaryDataset = common::GetDataset(stream);
+            auto mappedDataset = common::TransformDataset(binaryDataset, map);
 
-        case LossFunctionEnum::smoothHinge:
-            break; RetargetNetworkUsingLinearPredictor<functions::SmoothHingeLoss>(retargetArguments, mappedDataset, map);
+            // Train a linear predictor and splice it onto the previously cut neural network
+            using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
+            switch (retargetArguments.lossFunctionArguments.lossFunction)
+            {
+            case LossFunctionEnum::squared:
+                RetargetNetworkUsingLinearPredictor<functions::SquaredLoss>(retargetArguments, mappedDataset, map);
+                break;
 
-        default:
-            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+            case LossFunctionEnum::log:
+                RetargetNetworkUsingLinearPredictor<functions::LogLoss>(retargetArguments, mappedDataset, map);
+                break;
+
+            case LossFunctionEnum::smoothHinge:
+                RetargetNetworkUsingLinearPredictor<functions::SmoothHingeLoss>(retargetArguments, mappedDataset, map);
+                break;
+
+            default:
+                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+            }
         }
 
     }

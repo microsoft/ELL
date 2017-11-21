@@ -26,11 +26,6 @@ namespace data
         _textLineIterator.Next();
         ReadExample();
     }
-    template<typename TextLineIteratorType, typename MetadataParserType, typename DataVectorParserType>
-    inline AutoSupervisedExample SingleLineParsingExampleIterator<TextLineIteratorType, MetadataParserType, DataVectorParserType>::Get() const
-    {
-        return _currentExample;
-    }
 
     template<typename TextLineIteratorType, typename MetadataParserType, typename DataVectorParserType>
     void SingleLineParsingExampleIterator<TextLineIteratorType, MetadataParserType, DataVectorParserType>::ReadExample()
@@ -58,15 +53,16 @@ namespace data
         auto dataVector = _dataVectorParser.Parse(line);
         
         // cache the parsed example
-        _currentExample = AutoSupervisedExample(std::move(dataVector), std::move(metaData));
+        _currentExample = ExampleType(std::move(dataVector), std::move(metaData));
     }
 
     template <typename TextLineIteratorType, typename MetadataParserType, typename DataVectorParserType>
-    ExampleIterator<AutoSupervisedExample> MakeSingleLineParsingExampleIterator(TextLineIteratorType textLineIterator, MetadataParserType metadataParser, DataVectorParserType dataVectorParser)
+    auto MakeSingleLineParsingExampleIterator(TextLineIteratorType textLineIterator, MetadataParserType metadataParser, DataVectorParserType dataVectorParser)
     {
+        using ExampleType = ParserExample<DataVectorParserType, MetadataParserType>;
         using IteratorType = SingleLineParsingExampleIterator<TextLineIteratorType, MetadataParserType, DataVectorParserType>;
         auto iterator = std::make_unique<IteratorType>(std::move(textLineIterator), std::move(metadataParser), std::move(dataVectorParser));
-        return ExampleIterator<AutoSupervisedExample>(std::move(iterator));
+        return ExampleIterator<ExampleType>(std::move(iterator));
     }
 }
 }

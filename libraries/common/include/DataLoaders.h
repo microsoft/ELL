@@ -26,44 +26,55 @@ namespace ell
 {
 namespace common
 {
-    /// <summary> Gets a data iterator from an input stream. </summary>
+    /// <summary> Gets an ExampleIterator from an input stream. </summary>
+    ///
+    /// <typeparam name="TextLineIteratorType"> Line iterator type. </typeparam>
+    /// <typeparam name="MetadataParserType"> Metadata parser type. </typeparam>
+    /// <typeparam name="DataVectorParserType"> DataVector parser type. </typeparam>
+    /// <param name="stream"> Input stream to load data from. </param>
+    ///
+    /// <returns> The data iterator. </returns>
+    template <typename TextLineIteratorType, typename MetadataParserType, typename DataVectorParserType>
+    auto GetExampleIterator(std::istream& stream);
+
+    /// <summary> Gets an AutoSupervisedExampleIterator iterator from an input stream. </summary>
     ///
     /// <param name="stream"> Input stream to load data from. </param>
     ///
     /// <returns> The data iterator. </returns>
-    data::AutoSupervisedExampleIterator GetExampleIterator(std::istream& stream);
+    data::AutoSupervisedExampleIterator GetAutoSupervisedExampleIterator(std::istream& stream);
 
-    /// <summary> Gets a dataset from data load arguments. </summary>
+    /// <summary> Gets an AutoSupervisedMultiClassExampleIterator iterator from an input stream. </summary>
     ///
-    /// <typeparam name="DatasetType"> Dataset type. </typeparam>
+    /// <param name="stream"> Input stream to load data from. </param>
+    ///
+    /// <returns> The data iterator. </returns>
+    data::AutoSupervisedMultiClassExampleIterator GetAutoSupervisedMultiClassExampleIterator(std::istream& stream);
+
+    /// <summary> Gets an AutoSupervisedDataset dataset from data load arguments. </summary>
+    ///
     /// <param name="stream"> Input stream to load data from. </param>
     ///
     /// <returns> The dataset. </returns>
     data::AutoSupervisedDataset GetDataset(std::istream& stream);
 
-    /// <summary>
-    /// Gets a dataset by loading it from an example iterator and running it through a map.
-    /// </summary>
+    /// <summary> Gets a dataset from data load arguments. </summary>
     ///
-    /// <typeparam name="MapType"> Map type. </typeparam>
-    /// <param name="exampleIterator"> The example iterator. </param>
-    /// <param name="map"> The map. </param>
-    ///
-    /// <returns> The mapped dataset. </returns>
-    template <typename MapType>
-    data::AutoSupervisedDataset GetMappedDataset(data::AutoSupervisedExampleIterator exampleIterator, const MapType& map);
-
-    /// <summary>
-    /// Gets a dataset by loading it from an input stream and then running it through a map.
-    /// </summary>
-    ///
-    /// <typeparam name="DatasetType"> The Dataset type. </typeparam>
     /// <param name="stream"> Input stream to load data from. </param>
-    /// <param name="map"> The map. </param>
     ///
     /// <returns> The dataset. </returns>
-    template <typename MapType>
-    data::AutoSupervisedDataset GetMappedDataset(std::istream& stream, const MapType& map);
+    data::AutoSupervisedMultiClassDataset GetMultiClassDataset(std::istream& stream);
+
+    /// <summary>
+    /// Gets a new dataset by running an existing dataset through a map.
+    /// </summary>
+    ///
+    /// <typeparam name="ExampleType"> Example type. </typeparam>
+    /// <typeparam name="MapType"> Map type. </typeparam>
+    ///
+    /// <returns> The transformed dataset. </returns>
+    template <typename ExampleType, typename MapType>
+    auto TransformDataset(data::Dataset<ExampleType>& input, const MapType& map);
 }
 }
 

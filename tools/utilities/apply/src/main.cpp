@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 
         // get data iterator
         auto stream = utilities::OpenIfstream(dataLoadArguments.inputDataFilename);
-        auto exampleIterator = common::GetExampleIterator(stream);
+        auto exampleIterator = common::GetAutoSupervisedExampleIterator(stream);
 
         // get output stream
         auto& outputStream = dataSaveArguments.outputDataStream;
