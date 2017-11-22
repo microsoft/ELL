@@ -352,6 +352,7 @@ namespace math
     {
         _pData = _data.data();
         auto numColumns = list.begin()->size();
+        debug_used(numColumns);
 
         size_t i = 0;
         for (auto rowIter = list.begin(); rowIter < list.end(); ++rowIter)

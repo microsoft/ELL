@@ -32,6 +32,7 @@
 #include "OutputStreamImpostor.h"
 #include "RandomEngines.h"
 #include "TypeName.h"
+#include "Unused.h"
 
 // stl
 #include <iomanip>

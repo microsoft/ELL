@@ -124,8 +124,7 @@ namespace nodes
     {
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
-        auto numInputs = input.Size();
-        assert(numInputs == output.Size());
+        assert(input.Size() == output.Size());
 
         // Concatenate the input ports in a similar way as OutputNodes,
         // because SinkNodes are just callback-enabled OutputNodes.

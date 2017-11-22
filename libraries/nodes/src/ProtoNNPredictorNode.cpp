@@ -105,7 +105,6 @@ namespace nodes
 
         // densify the index/value pairs directly into a std::vector, which avoids making a copy via DoubleDataVector.
         std::vector<double> inputData;
-        size_t pos = 0;
         while (indexValueIterator.IsValid())
         {
             auto current = indexValueIterator.Get();

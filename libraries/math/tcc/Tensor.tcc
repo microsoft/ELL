@@ -541,6 +541,7 @@ namespace math
         _pData = _data.data();
         auto numColumns = list.begin()->size();
         auto numChannels = list.begin()->begin()->size();
+        debug_used(numColumns, numChannels);
 
         size_t i = 0;
         for (auto rowIter = list.begin(); rowIter < list.end(); ++rowIter)

@@ -223,9 +223,8 @@ namespace utilities
         _tokenizer.MatchTokens({ "<", "/", EncodedTypeName, ">" });
     }
 
-    bool XmlUnarchiver::HasNextPropertyName(const std::string& name)
+    bool XmlUnarchiver::HasNextPropertyName(const std::string&)
     {
-        unused(name);
         assert(false && "Unimplemented");
         return false;
     }

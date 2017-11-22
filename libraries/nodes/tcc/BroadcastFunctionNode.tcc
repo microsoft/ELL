@@ -199,8 +199,6 @@ namespace nodes
         auto& emitter = module.GetIREmitter();
         auto& context = module.GetLLVMContext();
         auto int32Type = emitter.Type(emitters::VariableType::Int32);
-        auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
-        auto valuePtrType = valueType->getPointerTo();
         auto voidType = llvm::Type::getVoidTy(context);
 
         // ASSUME dimension == 0 --- we're only parallelizing on the outermost loop
@@ -381,6 +379,7 @@ namespace nodes
         auto&& inputLayout = GetInputLayout();
         auto&& inputSize = inputLayout.GetActiveSize();
         auto secondaryInputSize = GetSecondaryInputSize();
+        debug_used(secondaryInputSize);
         assert(secondaryInputSize == 0 || primaryInputSize % secondaryInputSize == 0);
 
         llvm::Value* pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);

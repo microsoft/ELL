@@ -63,6 +63,12 @@ add_library(${library_name} ${src} ${include} ${tcc} ${doc})
 target_include_directories(${library_name} PUBLIC include)
 target_link_libraries(${library_name} math utilities)
 
+# MSVC emits warnings incorrectly when mixing inheritance, templates,
+# and member function definitions outside of class definitions
+if(MSVC)
+target_compile_options(${library_name} PRIVATE /wd4505)
+endif()
+
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 #

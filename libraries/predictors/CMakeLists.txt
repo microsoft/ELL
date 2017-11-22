@@ -87,7 +87,7 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 set (test_name ${library_name}_test)
 
-set (test_src 
+set (test_src
   test/src/main.cpp
   test/src/ForestPredictorTests.cpp
   test/src/ProtoNNPredictorTests.cpp
@@ -119,3 +119,11 @@ set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${test_name} COMMAND ${test_name})
 set_test_library_path(${test_name})
+
+# MSVC emits warnings incorrectly when mixing inheritance, templates,
+# and member function definitions outside of class definitions
+if(MSVC)
+    target_compile_options(${library_name} PRIVATE /wd4505)
+    target_compile_options(${test_name} PRIVATE /wd4505)
+endif()
+

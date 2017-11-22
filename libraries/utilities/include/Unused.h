@@ -34,8 +34,8 @@ constexpr void unused(T1&& t1, Args&&... args)
     unused(std::forward<Args>(args)...);
 }
 
-#if !defined(NDEBUG)
+#if defined(NDEBUG)
 #define debug_used(...) unused(__VA_ARGS__)
 #else
 #define debug_used(...)
-#endif // !defined(NDEBUG)
+#endif // defined(NDEBUG)
