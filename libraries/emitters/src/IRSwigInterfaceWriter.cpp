@@ -50,7 +50,7 @@ namespace emitters
         {
         public:
             PredictInterfaceWriter(IRModuleEmitter& moduleEmitter, llvm::Function& predictFunction)
-                : _moduleEmitter(&moduleEmitter), _function(&predictFunction)
+                : _function(&predictFunction)
             {
                 InitPredictFunctionInfo();
             }
@@ -96,7 +96,6 @@ namespace emitters
             std::string _inputType;
             std::string _outputType;
 
-            IRModuleEmitter* _moduleEmitter;
             llvm::Function* _function;
         };
 

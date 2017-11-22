@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     IRRuntime.cpp (emitters)
-//  Authors:  Umesh Madan
+//  Authors:  Umesh Madan, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -10,6 +10,9 @@
 #include "IRFunctionEmitter.h"
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
+
+// utilities
+#include "Unused.h"
 
 // stl
 #include <iostream>
@@ -46,6 +49,7 @@ namespace emitters
             auto beta = &(*arguments++);
             auto y = &(*arguments++);
             auto incy = &(*arguments++);
+            unused(order, transpose, alpha, beta);
 
             llvm::Value* accum = function.Variable(emitters::GetVariableType<ValueType>(), "accum");
 
@@ -100,6 +104,7 @@ namespace emitters
             auto beta = &(*arguments++);
             auto C = &(*arguments++);
             auto ldc = &(*arguments++);
+            unused(order, transposeA, transposeB, alpha, beta);
 
             // C = A x B, A: mxk, B: kxn, C: mxn
             // A': kxm, B': nxk
@@ -186,7 +191,7 @@ namespace emitters
     {
         auto& context = _module.GetLLVMContext();
         const auto numBits = _module.GetCompilerParameters().targetDevice.numBits;
-        if(numBits != 0)
+        if (numBits != 0)
         {
             return llvm::Type::getIntNTy(context, numBits);
         }
@@ -342,6 +347,7 @@ namespace emitters
             // On non-Windows, we need to make sure the linker links in
             // the clock_gettime function.
             volatile void* temp = (void*)(&clock_gettime);
+            unused(temp);
 #endif
             llvm::FunctionType* gettimeType = llvm::FunctionType::get(intType, { int32Type, timespecType->getPointerTo() }, false);
             _module.DeclareFunction("clock_gettime", gettimeType);
@@ -366,7 +372,6 @@ namespace emitters
             auto& context = _module.GetLLVMContext();
             auto& irBuilder = emitter.GetIRBuilder();
             auto int32Type = llvm::Type::getInt32Ty(context);
-            auto int64Type = llvm::Type::getInt64Ty(context);
 
             llvm::StructType* timespecType = _posixRuntime.GetTimespecType();
             llvm::FunctionType* gettimeType = llvm::FunctionType::get(int32Type, { int32Type, timespecType->getPointerTo() }, false);
@@ -386,6 +391,7 @@ namespace emitters
 #endif
 
                 auto callResult = function.Call(getTimeFunction, { function.Literal(CLOCK_REALTIME), timeStruct });
+                unused(callResult);
 
                 // llvm::Value* timeStructBase = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, function.Literal(0));
                 auto secondsPtr = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, { function.Literal(0), function.Literal(0) });
@@ -622,7 +628,7 @@ namespace emitters
     {
         // int openblas_get_num_threads();
         auto pModule = _module.GetLLVMModule();
-        llvm::FunctionType* functionType = llvm::FunctionType::get(GetIntType(), { }, false);
+        llvm::FunctionType* functionType = llvm::FunctionType::get(GetIntType(), {}, false);
         return static_cast<llvm::Function*>(pModule->getOrInsertFunction("openblas_get_num_threads", functionType));
     }
 

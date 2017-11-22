@@ -8,12 +8,14 @@
 
 #include "IRAsyncTask.h"
 #include "IRFunctionEmitter.h"
+#include "IRModuleEmitter.h"
 #include "IRHeaderWriter.h"
 #include "IRModuleEmitter.h"
 #include "IRThreadUtilities.h"
 
 // utilities
 #include "Exception.h"
+#include "Unused.h"
 
 // stl
 #include <iostream>
@@ -45,7 +47,6 @@ namespace emitters
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
 
         // Allocate a stack variable for the return value
-        _returnValuePtr = function.Variable(int8PtrType, "returnValue");
         _returnType = _taskFunction->getReturnType();
 
         // call function
@@ -55,16 +56,17 @@ namespace emitters
             auto taskArgType = GetTaskArgStructType(module, _taskFunction);
             llvm::ConstantPointerNull* nullAttr = function.NullPointer(int8PtrType);
 
-            // Create stack variables for thread, argument struct, and output status
-            auto taskArg = function.Variable(taskArgType, "taskArg");
+            // Create stack variables for thread and argument struct
             _pthread = function.Variable(pthreadType, "thread");
+            auto taskArg = function.Variable(taskArgType, "taskArg");
             function.FillStruct(taskArg, _arguments);
             auto pthreadWrapperFunction = GetTaskWrapperFunction(module, _taskFunction);
             auto errCode = function.PthreadCreate(_pthread, nullAttr, pthreadWrapperFunction, function.CastPointer(taskArg, int8PtrType));
+            unused(errCode);
         }
         else
         {
-            function.Store(_returnValuePtr, function.Call(_taskFunction, _arguments));
+            _returnValue = function.Call(_taskFunction, _arguments);
         }
     }
 
@@ -72,20 +74,22 @@ namespace emitters
     {
         if (UsePthreads())
         {
-            auto errCode = functionEmitter.PthreadJoin(functionEmitter.Load(_pthread), _returnValuePtr);
-            _returnValue = functionEmitter.Load(_returnValuePtr);
-            auto castReturnValue = functionEmitter.BitCast(_returnValue, _returnType);
+            auto& context = functionEmitter.GetLLVMContext();
+            auto int8PtrType = llvm::Type::getInt8PtrTy(context);
+            auto returnValuePtr = functionEmitter.Variable(int8PtrType, "returnValue");
+            auto errCode = functionEmitter.PthreadJoin(functionEmitter.Load(_pthread), returnValuePtr);
+            unused(errCode);
+            _returnValue = functionEmitter.Load(returnValuePtr);
         }
         else
         {
             Run(functionEmitter);
-            _returnValue = functionEmitter.Load(_returnValuePtr);
         }
     }
 
     llvm::Value* IRAsyncTask::GetReturnValue(IRFunctionEmitter& functionEmitter) const
     {
-        if(_returnType != nullptr)
+        if (_returnType != nullptr)
         {
             return functionEmitter.BitCast(_returnValue, _returnType);
         }

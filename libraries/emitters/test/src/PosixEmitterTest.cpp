@@ -22,6 +22,9 @@
 // testing
 #include "testing.h"
 
+// utilities
+#include "Unused.h"
+
 // stl
 #include <ios>
 #include <iostream>
@@ -122,11 +125,13 @@ void TestPthreadCreate()
     auto errCode1 = mainFunction.PthreadCreate(threadVar1, nullAttr, taskFunction.GetFunction(), nullArg);
     auto errCode2 = mainFunction.PthreadCreate(threadVar2, nullAttr, taskFunction.GetFunction(), nullArg);
     auto errCode3 = mainFunction.PthreadCreate(threadVar3, nullAttr, taskFunction.GetFunction(), nullArg);
+    unused(errCode1, errCode2, errCode3);
 
     // Wait for them to finish (one at a time)
     auto joinErrCode1 = mainFunction.PthreadJoin(mainFunction.Load(threadVar1), statusVar1);
     auto joinErrCode2 = mainFunction.PthreadJoin(mainFunction.Load(threadVar2), statusVar2);
     auto joinErrCode3 = mainFunction.PthreadJoin(mainFunction.Load(threadVar3), statusVar3);
+    unused(joinErrCode1, joinErrCode2, joinErrCode3);
 
     mainFunction.Print("Main end\n");
     mainFunction.Return(selfVal);
@@ -139,4 +144,5 @@ void TestPthreadCreate()
     VoidReturningIntFunction compiledFunction = (VoidReturningIntFunction)executionEngine.ResolveFunctionAddress(mainFunctionName);
 
     auto self = compiledFunction();
+    unused(self);
 }

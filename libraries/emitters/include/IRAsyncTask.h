@@ -73,7 +73,6 @@ namespace emitters
         std::vector<llvm::Value*> _arguments;
         llvm::Type* _returnType = nullptr;
         llvm::Value* _returnValue = nullptr;        
-        llvm::Value* _returnValuePtr = nullptr;
 
         bool UsePthreads() const { return _usePthreads; }
         llvm::Function* GetPthreadWrapper(llvm::StructType* argsStructType);

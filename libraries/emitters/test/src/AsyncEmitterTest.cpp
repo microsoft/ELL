@@ -72,7 +72,6 @@ void TestIRAsyncTask(bool parallel)
     //
     // Task function
     //
-    auto& context = module.GetLLVMContext();
     auto taskFunction = module.BeginFunction("asyncTaskFunction", VariableType::Float, args);
     {
         auto arguments = taskFunction.Arguments().begin();
@@ -131,7 +130,6 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
 
     // Types
     auto& context = module.GetLLVMContext();
-    auto voidType = llvm::Type::getVoidTy(context);
     llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
     llvm::Type* int32PtrType = int32Type->getPointerTo();
 
