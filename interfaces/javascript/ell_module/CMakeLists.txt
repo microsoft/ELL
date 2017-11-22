@@ -26,8 +26,8 @@ set(module_files
     templates/README.md
 )
 
-set(NODE_ABI_VERSION 50)
-set(ELECTRON_VERSION 1.4.4)
+set (NODE_ABI_VERSION 53)
+set (ELECTRON_VERSION 1.7.9)
 
 find_program(NPM_EXECUTABLE npm)
 if(NPM_EXECUTABLE)

@@ -312,6 +312,7 @@ public:
     size_t Size();
     ELL_NodeIterator GetNodes();
     std::string GetJson() const;
+    ELL_Model Refine(int maxIterations);
 #ifndef SWIG
     ELL_Model(ell::model::Model&& other);
     ell::model::Model& GetModel();
@@ -385,6 +386,7 @@ public:
     ell::api::math::TensorShape GetInputShape() const;
     ell::api::math::TensorShape GetOutputShape() const;
     ELL_CompiledMap Compile(const std::string&  targetDevice, const std::string& moduleName, const std::string& functionName) const;
+    ELL_Model GetModel() const;
 #ifndef SWIG
     std::shared_ptr<ell::model::DynamicMap> GetInnerMap() { return _map; }
 #endif

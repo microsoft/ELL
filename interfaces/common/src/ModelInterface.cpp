@@ -513,6 +513,14 @@ std::string ELL_Model::GetJson() const
     return stream.str();
 }
 
+ELL_Model ELL_Model::Refine(int maxIterations) 
+{
+    ell::model::TransformContext context;
+    ell::model::ModelTransformer transformer;
+    ell::model::Model refinedModel = transformer.RefineModel(*_model, context, maxIterations);
+    return ELL_Model(std::move(refinedModel));
+}
+
 
 #ifndef SWIG
 ELL_Model::ELL_Model(ell::model::Model&& other)
@@ -699,6 +707,12 @@ std::vector<double> ELL_Map::ComputeDouble(const AutoDataVector& inputData)
     //return _map->Compute<double>(data);
     _map->SetInputValue(0, data);
     return _map->ComputeOutput<double>(0);
+}
+
+ELL_Model ELL_Map::GetModel() const
+{
+    ell::model::Model model = _map->GetModel();
+    return ELL_Model(std::move(model));
 }
 
 std::vector<double> ELL_Map::ComputeDouble(const std::vector<double>& inputData)

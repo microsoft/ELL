@@ -1,3 +1,6 @@
+import {ELL_CompiledMap} from 'ell'
+
+
 // template collections
 export class DoubleVector {
   size(): number;
@@ -14,10 +17,6 @@ export class DoubleVectorVector {
 //
 // misc
 //
-export class ELL_CompiledMap {
-    GetCodeString(): string;
-    Compute(inputData: DoubleVector) : DoubleVector;
-}
 
 export class ELL_LabeledPrototype {
   constructor(label:number, prototype: DoubleVectorVector);

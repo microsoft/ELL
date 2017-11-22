@@ -36,20 +36,6 @@ short, perhaps even empty once ELL has a nice white-listed API.
 // Definitions from utility libraries that are not in the SWIG XML file.
 //----------------------------------------------------------------------------------
 
-export class CommandLineParser {}
-export class CommandLineParseResult {}
-export class ostream {}
-export class XMLDeserializer {}
-export class XMLSerializer {}
-
-export class StlIterator&lt;T,U&gt; {
-    IsValid(): boolean;
-    HasSize(): boolean;
-    NumIteratesLeft(): number;
-    Next(): void;
-    Get(): T;
-}
-
 export class StdVector&lt;T&gt; {
     constructor();
     constructor(count: number);
@@ -63,48 +49,8 @@ export class StdVector&lt;T&gt; {
     set(index: number, val: T): void;
 }
 
-export class RowDataset&lt;T&gt; {
-    // fill me in
-}
+type vector&lt;T&gt; = StdVector&lt;T&gt;
 
-export class Iterator extends StlIterator&lt;any,any&gt; { 
-    // For now, I'm translating Iterators in a weakly typed way.
-    // If we feel it's important we could put in the work to 
-    // translate C++ templates properly to preserve strong typing.
-}
-
-export class StringVector extends StdVector&lt;string&gt; {}
-
-export class FeatureMap {
-    // fill me in
-}
-
-export class SupervisedExample&lt;T&gt; {
-    // fill me in
-}
-
-export class SparseDataVector&lt;T,U&gt; {
-    // fill me in
-}
-
-export class CompressedIntegerList {
-    // fill me in
-}
-
-export class vector&lt;T&gt; {
-    // fill me in
-}
-
-export class TypeFactory&lt;T&gt; {
-    // fill me in
-}
-
-export class AnyIterator&lt;T&gt; {
-    // fill me in
-}
-
-export type unique_ptr&lt;T&gt; = T; // Is this right?
-export type shared_ptr&lt;T&gt; = T; // Is this right?
 
 //----------------------------------------------------------------------------------
 // Translated definitions below. 
@@ -128,6 +74,12 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
     </xsl:template>
 
 
+    <!-- type aliases in classes -->
+    <xsl:key name="aliases" 
+        match="cdecl/attributelist/attribute[@name='typealias']" 
+        use="../attribute[@name='sym_name']/@value" />
+
+
     <!-- classes -->
     <xsl:template match="class" mode="inside-namespace">
         <xsl:if test="attributelist/attribute[@name='sym_name'] and
@@ -143,13 +95,22 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
     </xsl:template>
 
 
-    <!-- templates: skip for now. I'm not sure SWIG even supports that. -->
+    <!-- templates -->
     <xsl:template match="template" mode="inside-namespace">
-        <xsl:text>// skipping template </xsl:text>
-        <xsl:value-of select="attributelist/attribute[@name='sym_name']/@value"/>
-        <xsl:text> id:</xsl:text>
-        <xsl:value-of select='@id'/>
-        <xsl:text>&#10;&#10;&#10;</xsl:text>
+        <xsl:if test="attributelist/attribute[@name='templatetype']/@value='class'">
+            <xsl:text>export class </xsl:text>
+            <xsl:value-of select="attributelist/attribute[@name='sym_name']/@value"/>
+            <xsl:text>&lt;</xsl:text>
+            <xsl:for-each select="attributelist/templateparms/parm">
+                <xsl:if test="position() != 1"><xsl:text>, </xsl:text></xsl:if>
+                <xsl:value-of select="attributelist/attribute[@name='name']/@value"/>
+            </xsl:for-each>
+            <xsl:text>&gt; { // class id:</xsl:text>
+            <xsl:value-of select='@id'/>
+            <xsl:text>&#10;</xsl:text>
+            <xsl:apply-templates mode="inside-class"/>
+            <xsl:text>}&#10;&#10;&#10;</xsl:text>
+        </xsl:if>
     </xsl:template>
 
 
@@ -221,12 +182,14 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
         <xsl:if test="attribute[@name='sym_name']">
             <xsl:text>export class </xsl:text>
             <xsl:value-of select="attribute[@name='sym_name']/@value"/>
-            <xsl:text> extends </xsl:text>
-            <xsl:call-template name="TranslateType">
-                <xsl:with-param name="value">
-                    <xsl:value-of select="attribute[@name='type']/@value"/>
-                </xsl:with-param>
-            </xsl:call-template>
+            <xsl:if test="not(contains(attribute[@name='type']/@value, concat('::', attribute[@name='sym_name']/@value)))">
+                <xsl:text> extends </xsl:text>
+                <xsl:call-template name="TranslateType">
+                    <xsl:with-param name="value">
+                        <xsl:value-of select="attribute[@name='type']/@value"/>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </xsl:if>
             <xsl:text> { } // typedef id:</xsl:text>
             <xsl:value-of select="@id"/>
             <xsl:text>&#10;&#10;&#10;</xsl:text>
@@ -272,16 +235,16 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
 
 
     <!-- enums -->
-    <xsl:template match="enum" mode="inside-class">
+    <xsl:template match="enum" mode="inside-namespace">
         <xsl:if test="not(attributelist/attribute[@name='access' and @value='private'])">
-        <xsl:text>enum </xsl:text>
+        <xsl:text>export enum </xsl:text>
         <xsl:value-of select="attributelist/attribute[@name='sym_name']/@value"/>
-        <xsl:text>{</xsl:text>
+        <xsl:text> { </xsl:text>
         <xsl:for-each select="enumitem/attributelist">
             <xsl:value-of select="attribute[@name='sym_name']/@value" />
-            <xsl:text>,</xsl:text>
+            <xsl:text>, </xsl:text>
         </xsl:for-each>
-        <xsl:text>}&#10;</xsl:text>
+        <xsl:text>}&#10;&#10;&#10;</xsl:text>
         </xsl:if>
     </xsl:template>
 
@@ -316,6 +279,13 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
             <xsl:when test="$value='nullptr_t'">
                 <xsl:text>any</xsl:text>
             </xsl:when>
+            <xsl:when test="key('aliases', $value)"> <!-- use of a type alias -->
+                <xsl:call-template name="StripDecoration">
+                    <xsl:with-param name="value">
+                        <xsl:value-of select="key('aliases', $value)/../attribute[@name='type']/@value"/>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$value"/>
                 <xsl:apply-templates/>
@@ -328,18 +298,23 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
         <xsl:param name="value"/>
         <xsl:variable name="result">
             <xsl:choose>
+                <!-- encoding of const ref -->
                 <xsl:when test="starts-with($value, 'r.q(const).')">
                     <xsl:value-of select="substring-after($value, 'r.q(const).')"/>
                 </xsl:when>
+                <!-- encoding of const -->
                 <xsl:when test="starts-with($value, 'q(const).')">
                     <xsl:value-of select="substring-after($value, 'q(const).')"/>
                 </xsl:when>
+                <!-- encoding of ref -->
                 <xsl:when test="starts-with($value, 'r.')">
                     <xsl:value-of select="substring-after($value, 'r.')"/>
                 </xsl:when>
-                <xsl:when test="starts-with($value, 'z.')">
-                    <xsl:value-of select="substring-after($value, 'z.')"/>
+                <!-- encoding of pointer -->
+                <xsl:when test="starts-with($value, 'p.')">
+                    <xsl:value-of select="substring-after($value, 'p.')"/>
                 </xsl:when>
+                <!-- encoding of namespaces -->
                 <xsl:when test="contains($value, '::')">
                     <xsl:value-of select="substring-after($value, '::')"/>
                 </xsl:when>
