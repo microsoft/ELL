@@ -3,7 +3,7 @@ import os
 import numpy as np
 from testing import Testing
 import find_ell
-import ELL
+import ell
 
 def exampleTest(example):
     # Now test the IDataVector of the example
@@ -11,7 +11,7 @@ def exampleTest(example):
     l = example.GetLabel()
 
     # test we can copy AutoDataVector to DoubleVector
-    v = ELL.DoubleVector()
+    v = ell.DoubleVector()
     av.CopyTo(v)
 
     x = np.asarray(av.ToArray())
@@ -20,7 +20,7 @@ def exampleTest(example):
 
 def test():
     testing = Testing()
-    dataset = ELL.AutoSupervisedDataset()
+    dataset = ell.AutoSupervisedDataset()
     dataset.Load(os.path.join(find_ell.get_ell_root(), "examples/data/testData.txt"))
     num = dataset.NumExamples()
     print("Number of Examples:", num)

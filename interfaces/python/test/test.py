@@ -10,7 +10,7 @@ tests = []
 
 SkipTests = False
 try:
-    import ELL
+    import ell
     import functions_test
     import model_test
     import modelbuilder_test

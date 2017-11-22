@@ -204,7 +204,12 @@ namespace data
         /// <summary> Takes a vector of values and appends them to the data vector. </summary>
         ///
         /// <param name="list"> The vector. </param>
-        void AppendElements(std::vector<double> vec);
+        void AppendElements(const std::vector<double>& vec);
+
+        /// <summary> Takes a vector of values and appends them to the data vector. </summary>
+        ///
+        /// <param name="list"> The vector. </param>
+        void AppendElements(const std::vector<float>& vec);
 
         /// <summary> Computes the 2-norm of the vector. </summary>
         ///

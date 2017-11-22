@@ -14,7 +14,7 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(script_path, ".."))
 import cntk_to_ell
 from custom_functions import CustomSign, BinaryConvolution
-import ELL
+import ell
 import ell_utilities
 import lib.cntk_converters as cntk_converters
 import lib.cntk_layers as cntk_layers
@@ -162,7 +162,7 @@ class FullModelTest:
     def compare_model(self, layers):
         ellLayers = cntk_layers.convert_cntk_layers_to_ell_layers(layers)
         # Create an ELL neural network predictor from the layers
-        predictor = ELL.FloatNeuralNetworkPredictor(ellLayers)
+        predictor = ell.FloatNeuralNetworkPredictor(ellLayers)
         shape = predictor.GetInputShape()
         self.input_shape = (shape.channels,shape.rows,shape.columns) # to CNTK (channel, rows, coumns) order
         self.data = self.get_input_data()
@@ -215,7 +215,7 @@ class FullModelTest:
 
         self.data = self.get_input_data()
 
-        # execute cntk model and save the output for comparison with ELL.
+        # execute cntk model and save the output for comparison with ell.
         feature = cntk.input_variable(self.data.shape)
         clone = layer.clone_cntk_layer(feature)
         output = clone(self.data)[0]
@@ -228,12 +228,12 @@ class FullModelTest:
 
         ell_layers = []
         # remove output_padding from because CNTK doesn't have output padding.
-        layer.layer.ell_outputPaddingParameters = ELL.PaddingParameters(ELL.PaddingScheme.zeros, 0)
+        layer.layer.ell_outputPaddingParameters = ell.PaddingParameters(ell.PaddingScheme.zeros, 0)
         layer.layer.ell_outputShape = cntk_utilities.get_adjusted_shape(
                 layer.layer.output.shape, layer.layer.ell_outputPaddingParameters)
         layer.process(ell_layers)
         # Create an ELL neural network predictor from the relevant CNTK layers
-        return ELL.FloatNeuralNetworkPredictor(ell_layers)
+        return ell.FloatNeuralNetworkPredictor(ell_layers)
 
 
     def verify_ell(self, op_name, predictor, data, expected):

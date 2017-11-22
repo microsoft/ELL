@@ -160,7 +160,7 @@ endmacro() # generate_interface_module
 # INTERFACE_LIBRARIES (language-independent libraries)
 
 macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INTERFACE)
-  generate_interface_module("ELL_${LANGUAGE_NAME}" "ELL" "${LANGUAGE_NAME}" "${LANGUAGE_DIR}" "${LANGUAGE_LIBRARIES}" "${EXTRA_INTERFACE}")
+  generate_interface_module("ELL_${LANGUAGE_NAME}" "ell" "${LANGUAGE_NAME}" "${LANGUAGE_DIR}" "${LANGUAGE_LIBRARIES}" "${EXTRA_INTERFACE}")
 endmacro()
 
 #

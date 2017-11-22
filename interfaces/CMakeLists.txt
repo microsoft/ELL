@@ -43,7 +43,7 @@ foreach(src ${_sources})
 endforeach()
 
 set(_sources
-    common/ELL.i
+    common/ell.i
 )
 foreach(src ${_sources})
     list(APPEND INTERFACE_MAIN "${CMAKE_CURRENT_LIST_DIR}/${src}")

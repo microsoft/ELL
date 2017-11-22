@@ -1,16 +1,16 @@
 from __future__ import print_function
-import ELL
+import ell
 from testing import Testing
 
 def makeStringVec(strings):
-    v = ELL.StringVector()
+    v = ell.StringVector()
     for s in strings:
         v.push_back(s)
     return v
 
 def testModelBuilder(testing):
-    model = ELL.ELL_Model()
-    mb = ELL.ELL_ModelBuilder()
+    model = ell.ELL_Model()
+    mb = ell.ELL_ModelBuilder()
     inArgs = makeStringVec(["3"])
     inputNode = mb.AddNode(model, "InputNode<double>", inArgs)
     outArgs = makeStringVec([inputNode.GetId()+".output"])

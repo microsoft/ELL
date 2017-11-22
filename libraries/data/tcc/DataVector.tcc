@@ -130,10 +130,20 @@ namespace data
     }
 
     template <class DerivedType>
-    void DataVectorBase<DerivedType>::AppendElements(std::vector<double> vec)
+    void DataVectorBase<DerivedType>::AppendElements(const std::vector<double>& vec)
     {
         size_t index = 0;
         for (double current : vec)
+        {
+            static_cast<DerivedType*>(this)->AppendElement(index++, current);
+        }
+    }
+
+    template <class DerivedType>
+    void DataVectorBase<DerivedType>::AppendElements(const std::vector<float>& vec)
+    {
+        size_t index = 0;
+        for (float current : vec)
         {
             static_cast<DerivedType*>(this)->AppendElement(index++, current);
         }

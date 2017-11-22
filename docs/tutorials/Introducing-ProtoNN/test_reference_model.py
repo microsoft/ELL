@@ -10,7 +10,7 @@ import os
 import sys
 import time
 import find_ell
-import ELL
+import ell
 
 
 class ReferenceTest:
@@ -18,7 +18,7 @@ class ReferenceTest:
         """ Initialize the ReferenceTest class by loading the ELL model 
         and getting the input size and output size """
         print("Loading model: " + model_file)
-        self.mnist = ELL.ELL_Map(model_file)
+        self.mnist = ell.ELL_Map(model_file)
         input_shape = self.mnist.GetInputShape()
         self.input_size = (input_shape.rows * input_shape.columns * 
                           input_shape.channels)
@@ -33,7 +33,7 @@ class ReferenceTest:
         This means the data file contains both the test data and expected 
         labels """
         print("Loading dataset: " + filename)
-        self.dataset = ELL.AutoSupervisedDataset()
+        self.dataset = ell.AutoSupervisedDataset()
         self.dataset.Load(filename)
 
     def run_test(self):
@@ -44,7 +44,7 @@ class ReferenceTest:
         for i in range(total):
             example = self.dataset.GetExample(i)
             result = self.mnist.ComputeDouble(example.GetData())
-            answer = ELL.DoubleArgmax(result)
+            answer = ell.DoubleArgmax(result)
             expected = example.GetLabel()
             if answer == expected:
                 true_positive += 1

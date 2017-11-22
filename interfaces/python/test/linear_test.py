@@ -1,5 +1,5 @@
 from __future__ import print_function
-import ELL
+import ell
 
 def test():
     print("linear_test.test -- TBD")

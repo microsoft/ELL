@@ -23,10 +23,10 @@ catch (e) {
 
 // `array` is a list of lists (a javascript jagged array)
 function ToELLVector(array) {
-  let result = new ELL.DoubleVectorVector();
+  let result = new ell.DoubleVectorVector();
   for (var rowIndex = 0; rowIndex < array.length; rowIndex++) {
     let row = array[rowIndex];
-    let newRow = new ELL.DoubleVector();
+    let newRow = new ell.DoubleVector();
     for (var colIndex = 0; colIndex < row.length; colIndex++) {
       newRow.add(row[colIndex]);
     }
@@ -48,7 +48,7 @@ function PrintResults(map, data) {
 
 
 let prototype = ToELLVector([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
-let map = ELL.GenerateDTWClassifier(prototype);
+let map = ell.GenerateDTWClassifier(prototype);
 console.log('Generated classifier');
 
 let code = map.GetCodeString();

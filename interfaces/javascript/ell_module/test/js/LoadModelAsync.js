@@ -15,14 +15,14 @@ const ELL = require("ell");
 
 
 console.log("Loaded ELL");
-var modelsync = ELL.LoadModel("[1]");
+var modelsync = ell.LoadModel("[1]");
 if(modelsync)
 {
   console.log("Sync Mode Size:" + modelsync.Size());
   tap.pass('Test LoadModel syncronously');
 }
 
-ELL.LoadModelAsync("[1]" ,function(model)
+ell.LoadModelAsync("[1]" ,function(model)
 {
   if(model)
   {

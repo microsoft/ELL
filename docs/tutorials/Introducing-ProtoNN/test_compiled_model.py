@@ -60,7 +60,7 @@ class CompiledTest:
         This means the data file contains both the test data and expected 
         labels """
         print("Loading dataset: " + filename)
-        self.dataset = ELL.AutoSupervisedDataset()
+        self.dataset = ell.AutoSupervisedDataset()
         self.dataset.Load(filename)
 
     def run_test(self):
@@ -68,7 +68,7 @@ class CompiledTest:
         results with the expected label, and return the measured accuracy """
         total = self.dataset.NumExamples()
         true_positive = 0
-        input_vector = ELL.DoubleVector()
+        input_vector = ell.DoubleVector()
         input_vector.resize(self.input_size)
         for i in range(total):
             example = self.dataset.GetExample(i)

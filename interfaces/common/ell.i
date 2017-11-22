@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ELL.i (interfaces)
+//  File:     ell.i (interfaces)
 //  Authors:  Chuck Jacobs, Byron Changuion
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,8 @@
     %include "ELL_javascript_pre.i"
 #endif
 
-%module "ELL"
+%module "ell"
+
 // Generate decent docstrings from types and method signatures
 %feature("autodoc", "3");
 

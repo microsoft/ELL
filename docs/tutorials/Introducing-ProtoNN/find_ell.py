@@ -38,9 +38,9 @@ def find_ell():
 
     sys.path.append(os.path.join(build_dir, "interfaces/python/Release"))
     try:
-        import ELL
+        import ell
     except:
-        print("import ELL failed")
+        print("import ell failed")
         print("Please check that you built the ELL repo at '" + root + "'")
         print("And remember to build the _ELL_python target")
     return root

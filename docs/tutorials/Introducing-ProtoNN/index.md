@@ -136,13 +136,13 @@ import numpy as np
 import time
 ```
 
-Next, import ELL, but in order to do that you need to tell Python
+Next, import `ell`, but in order to do that you need to tell Python
 where to find it, which can be done using `sys.path.append` as follows:
 
 ```python
 sys.path.append("d:/git/ell/ell/build/interfaces/python")
 sys.path.append("d:/git/ell/ell/build/interfaces/python/release")
-import ELL
+import ell
 ```
 
 The above paths will vary depending on your operating system and the location of your ELL git repo.
@@ -150,7 +150,7 @@ The above paths will vary depending on your operating system and the location of
 Ok, now you can load the ProtoNN model produced by the above trainer using ELL as follows:
 
 ```python
-mnist = ELL.ELL_Map("mnist.ell")
+mnist = ell.ELL_Map("mnist.ell")
 ```
 and you can check the expected input size as follows:
 
@@ -165,7 +165,7 @@ You should see it print "784" because MNIST uses 28x28 sized images.
 Next, you can load the Test dataset with the following:
 
 ```python
-dataset = ELL.AutoSupervisedDataset()
+dataset = ell.AutoSupervisedDataset()
 dataset.Load("Test-28x28_cntk_text.ds")
 ```
 
@@ -194,7 +194,7 @@ def run_test(mnist, dataset):
     for i in range(total):
         example = dataset.GetExample(i)
         result = mnist.ComputeDouble(example.GetData())
-        answer = ELL.DoubleArgmax(result)
+        answer = ell.DoubleArgmax(result)
         expected = example.GetLabel()
         if answer == expected:
             true_positive += 1
@@ -236,7 +236,7 @@ copy test_compiled_model.py pi3
 ```
 
 Copy the pi3 folder to your Raspberry Pi, build it then run the same test_compiled_model.py command line.
-Note: you will need to clone and build ELL on the Raspberry Pi to get the same ELL.AutoSupervisedDataset
+Note: you will need to clone and build ELL on the Raspberry Pi to get the same ell.AutoSupervisedDataset
 class that is used by this test.
 
 

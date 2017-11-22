@@ -10,7 +10,7 @@ import sys
 import numpy as np
 import os
 import find_ell
-import ELL
+import ell
 
 def main():
     """ Train a ProtoNN model using the given MNIST dataset """
@@ -22,11 +22,11 @@ def main():
         sys.exit(1)
 
     print("Loading '%s'" % (model_file))
-    dataset = ELL.AutoSupervisedDataset()
+    dataset = ell.AutoSupervisedDataset()
     test_file = model_file
     dataset.Load(test_file)
 
-    args = ELL.ProtoNNTrainerParameters()
+    args = ell.ProtoNNTrainerParameters()
 
     # This Python code is doing the equivalent of the following command line:
     # protoNNTrainer -v --inputDataFilename Train-28x28_sparse.txt -dd 784 -sw 1 
@@ -40,13 +40,13 @@ def main():
     args.sparsityB = 0.3
     args.sparsityZ = 0.8
     args.gamma = -1
-    args.lossFunction = ELL.ProtoNNLossFunction.L4
+    args.lossFunction = ell.ProtoNNLossFunction.L4
     args.numIterations = 20
     args.numInnerIterations = 1
     args.numFeatures = 784
     args.verbose = True
 
-    trainer = ELL.ProtoNNTrainer(args)
+    trainer = ell.ProtoNNTrainer(args)
 
     trainer.SetDataset(dataset)
 

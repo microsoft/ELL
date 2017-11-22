@@ -1,6 +1,6 @@
 from __future__ import print_function
 import functools
-import ELL
+import ell
 
 
 def GetName(node): return node.GetId()
@@ -172,7 +172,7 @@ def GetGraphStats(adj):
 
 
 def testModel(key):
-    model = ELL.ELL_Model(key)
+    model = ell.ELL_Model(key)
     nodes, index = GetNodesAndIndex(model)
     adj = GetAdjacencyList(nodes, index)
     print(key, end="\t")

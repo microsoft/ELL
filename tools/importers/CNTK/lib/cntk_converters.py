@@ -10,7 +10,7 @@
 
 """Converts CNTK data structures to ELL equivalents"""
 
-import ELL
+import ell
 import numpy as np
 
 def get_float_vector_from_constant(constant, size):
@@ -18,11 +18,11 @@ def get_float_vector_from_constant(constant, size):
     array = np.zeros(size, dtype=np.float)
     for i in range(array.size):
         array[i] = constant
-    return ELL.FloatVector(array)
+    return ell.FloatVector(array)
 
 
 def get_float_vector_from_cntk_trainable_parameter(tensorParameter):
-    """Returns an ELL.FloatVector from a trainable parameter
+    """Returns an ell.FloatVector from a trainable parameter
        Note that ELL's ordering is row, column, channel.
        CNTK has them in filter, channel, row, column order.
     """
@@ -35,11 +35,11 @@ def get_float_vector_from_cntk_trainable_parameter(tensorParameter):
         orderedWeights[i] = columnValue
         i += 1
 
-    return ELL.FloatVector(orderedWeights)
+    return ell.FloatVector(orderedWeights)
 
 
 def get_float_vector_from_cntk_array(inputArray):
-    """Returns an ELL.FloatTensor from a 4, 3, 2, or 1 dimensional numpy array.
+    """Returns an ell.FloatTensor from a 4, 3, 2, or 1 dimensional numpy array.
        CNTK has input in filter/parallel, channel, row, column order while
        ELL's ordering is row, column, channel.
     """
@@ -90,7 +90,7 @@ def get_float_vector_from_cntk_array(inputArray):
 
 
 def get_float_tensor_from_cntk_dense_weight_parameter(tensorParameter):
-    """Returns an ELL.FloatTensor from a trainable parameter
+    """Returns an ell.FloatTensor from a trainable parameter
        Note that ELL's ordering is row, column, channel.
        CNTK has them in channel, row, column, filter order.
        4D parameters are converted to ELL Tensor by stacking vertically in the row dimension.
@@ -117,11 +117,11 @@ def get_float_tensor_from_cntk_dense_weight_parameter(tensorParameter):
         orderedWeights = tensorValue.ravel().astype(
             np.float).reshape(1, 1, tensorValue.size)
 
-    return ELL.FloatTensor(orderedWeights)
+    return ell.FloatTensor(orderedWeights)
 
 
 def get_float_tensor_from_cntk_convolutional_weight_parameter(tensorParameter):
-    """Returns an ELL.FloatTensor from a trainable parameter
+    """Returns an ell.FloatTensor from a trainable parameter
        Note that ELL's ordering is row, column, channel.
        4D parameters (e.g. those that represent convolutional weights) are stacked vertically in the row dimension.
        CNTK has them in filter, channel, row, column order.
@@ -132,7 +132,7 @@ def get_float_tensor_from_cntk_convolutional_weight_parameter(tensorParameter):
 
 
 def get_float_tensor_from_cntk_convolutional_weight_value_shape(tensorValue, tensorShape):
-    """Returns an ELL.FloatTensor from a trainable parameter
+    """Returns an ell.FloatTensor from a trainable parameter
        Note that ELL's ordering is row, column, channel.
        4D parameters (e.g. those that represent convolutional weights) are stacked vertically in the row dimension.
        CNTK has them in filter, channel, row, column order.
@@ -152,4 +152,4 @@ def get_float_tensor_from_cntk_convolutional_weight_value_shape(tensorValue, ten
     else:
         orderedWeights = tensorValue.ravel().astype(
             np.float).reshape(1, 1, tensorValue.size)
-    return ELL.FloatTensor(orderedWeights)
+    return ell.FloatTensor(orderedWeights)

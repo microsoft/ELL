@@ -10,7 +10,7 @@
 from __future__ import print_function
 import os
 script_path = os.path.dirname(os.path.abspath(__file__))
-# Try to import CNTK and ELL. If either don't exist it means they have not
+# Try to import CNTK and ell. If either don't exist it means they have not
 # being built, so don't run the tests.
 SkipTests = False
 SkipFullModelTests = False
@@ -22,7 +22,7 @@ try:
     sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
     sys.path.append(os.path.join(script_path, '..'))
     import find_ell
-    import ELL
+    import ell
     import ell_utilities
     import cntk_to_ell
     import demoHelper as dh
@@ -91,7 +91,7 @@ def BatchNormalizationTester(map_rank=1,
 
 def compare_predictor_output(modelFile, labels, modelTestInput=None,
                              maxLayers=None):
-    """Compares an ELL.NeuralNetworkPredictor against its equivalent CNTK
+    """Compares an ell.NeuralNetworkPredictor against its equivalent CNTK
     model.
 
     Parameters:
@@ -120,7 +120,7 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
         layersToConvert)
 
     # Create an ELL neural network predictor from the relevant CNTK layers
-    predictor = ELL.FloatNeuralNetworkPredictor(ellLayers)
+    predictor = ell.FloatNeuralNetworkPredictor(ellLayers)
 
     if not modelTestInput:
         inputShape = predictor.GetInputShape()
@@ -225,15 +225,15 @@ class CntkLayersTestCase(CntkToEllTestBase):
                 denseLayer.parameters[0])
 
         # Create the equivalent ELL predictor
-        layerParameters = ELL.LayerParameters(
+        layerParameters = ell.LayerParameters(
             # Input order for ELL is rows, columns, channels
-            ELL.TensorShape(3, 4, 2),
-            ELL.NoPadding(),
-            ELL.TensorShape(1, 1, 5),
-            ELL.NoPadding())
+            ell.TensorShape(3, 4, 2),
+            ell.NoPadding(),
+            ell.TensorShape(1, 1, 5),
+            ell.NoPadding())
 
-        layer = ELL.FloatFullyConnectedLayer(layerParameters, weightTensor)
-        predictor = ELL.FloatNeuralNetworkPredictor([layer])
+        layer = ell.FloatFullyConnectedLayer(layerParameters, weightTensor)
+        predictor = ell.FloatNeuralNetworkPredictor([layer])
 
         # Get the results for both
         inputValues = np.arange(24, dtype=np.float32).reshape(2, 3, 4)
@@ -285,19 +285,19 @@ class CntkLayersTestCase(CntkToEllTestBase):
             channels = int(inputValues.shape[0])
 
             # Create the equivalent ELL predictor
-            layerParameters = ELL.LayerParameters(
+            layerParameters = ell.LayerParameters(
                 # Input order for ELL is rows, columns, channels
-                ELL.TensorShape(rows, columns, channels),
-                ELL.MinPadding(padding),
-                ELL.TensorShape(
+                ell.TensorShape(rows, columns, channels),
+                ell.MinPadding(padding),
+                ell.TensorShape(
                     outputShape[1], outputShape[2], outputShape[0]),
-                ELL.NoPadding())
+                ell.NoPadding())
 
-            poolingParameters = ELL.PoolingParameters(
+            poolingParameters = ell.PoolingParameters(
                 pool_size, stride_size)
-            layer = ELL.FloatPoolingLayer(
-                layerParameters, poolingParameters, ELL.PoolingType.max)
-            predictor = ELL.FloatNeuralNetworkPredictor([layer])
+            layer = ell.FloatPoolingLayer(
+                layerParameters, poolingParameters, ell.PoolingType.max)
+            predictor = ell.FloatNeuralNetworkPredictor([layer])
 
             # Note that cntk inserts an extra dimension of 1 in the front
             orderedCntkResults = cntk_converters.\
@@ -346,19 +346,19 @@ class CntkLayersTestCase(CntkToEllTestBase):
                 convolutionLayer.parameters[0])
 
         # Create the equivalent ELL predictor
-        layerParameters = ELL.LayerParameters(
+        layerParameters = ell.LayerParameters(
             # Input order for ELL is rows, columns, channels. Account for
             # padding.
-            ELL.TensorShape(3 + 2, 4 + 2, 2),
-            ELL.ZeroPadding(1),
-            ELL.TensorShape(3, 4, 5),
-            ELL.NoPadding())
+            ell.TensorShape(3 + 2, 4 + 2, 2),
+            ell.ZeroPadding(1),
+            ell.TensorShape(3, 4, 5),
+            ell.NoPadding())
 
-        convolutionalParameters = ELL.ConvolutionalParameters(3, 1, 0, 5)
+        convolutionalParameters = ell.ConvolutionalParameters(3, 1, 0, 5)
 
-        layer = ELL.FloatConvolutionalLayer(
+        layer = ell.FloatConvolutionalLayer(
             layerParameters, convolutionalParameters, weightTensor)
-        predictor = ELL.FloatNeuralNetworkPredictor([layer])
+        predictor = ell.FloatNeuralNetworkPredictor([layer])
 
         # Get the results for both
         inputValues = np.arange(24, dtype=np.float32).reshape(2, 3, 4)
@@ -408,22 +408,22 @@ class CntkLayersTestCase(CntkToEllTestBase):
             pad=True, bias=False, init_bias=0, activation=False)(cntkModel)
 
         # Create the equivalent ELL predictor
-        layerParameters = ELL.LayerParameters(
+        layerParameters = ell.LayerParameters(
             # Input order for ELL is rows, columns, channels. Account for
             # padding.
-            ELL.TensorShape(10 + 2, 10 + 2, 2),
-            ELL.ZeroPadding(1),
-            ELL.TensorShape(10, 10, 5),
-            ELL.NoPadding())
+            ell.TensorShape(10 + 2, 10 + 2, 2),
+            ell.ZeroPadding(1),
+            ell.TensorShape(10, 10, 5),
+            ell.NoPadding())
 
-        convolutionalParameters = ELL.BinaryConvolutionalParameters(
-            3, 1, ELL.BinaryConvolutionMethod.bitwise,
-            ELL.BinaryWeightsScale.none)
+        convolutionalParameters = ell.BinaryConvolutionalParameters(
+            3, 1, ell.BinaryConvolutionMethod.bitwise,
+            ell.BinaryWeightsScale.none)
 
-        layer = ELL.FloatBinaryConvolutionalLayer(
+        layer = ell.FloatBinaryConvolutionalLayer(
             layerParameters, convolutionalParameters, weightTensor)
 
-        predictor = ELL.FloatNeuralNetworkPredictor([layer])
+        predictor = ell.FloatNeuralNetworkPredictor([layer])
 
         # Get the results for both
         inputValues = np.random.uniform(
@@ -487,23 +487,23 @@ class CntkLayersTestCase(CntkToEllTestBase):
 
         # Create the equivalent ELL predictor
         layers = []
-        layerParameters = ELL.LayerParameters(
+        layerParameters = ell.LayerParameters(
             # Input order for ELL is rows, columns, channels
-            ELL.TensorShape(10, 10, 16),
-            ELL.NoPadding(),
-            ELL.TensorShape(10, 10, 16),
-            ELL.NoPadding())
+            ell.TensorShape(10, 10, 16),
+            ell.NoPadding(),
+            ell.TensorShape(10, 10, 16),
+            ell.NoPadding())
 
         # CNTK BatchNorm = ELL's BatchNorm + Scaling + Bias
         # 1e-5 is the default epsilon for CNTK's BatchNormalization Layer
         epsilon = 1e-5
-        layers.append(ELL.FloatBatchNormalizationLayer(
+        layers.append(ell.FloatBatchNormalizationLayer(
             layerParameters, meanVector, varianceVector, epsilon,
-            ELL.EpsilonSummand_variance))
-        layers.append(ELL.FloatScalingLayer(layerParameters, scaleVector))
-        layers.append(ELL.FloatBiasLayer(layerParameters, biasVector))
+            ell.EpsilonSummand_variance))
+        layers.append(ell.FloatScalingLayer(layerParameters, scaleVector))
+        layers.append(ell.FloatBiasLayer(layerParameters, biasVector))
 
-        predictor = ELL.FloatNeuralNetworkPredictor(layers)
+        predictor = ell.FloatNeuralNetworkPredictor(layers)
 
         inputValues = np.linspace(
             -5, 5, num=16 * 10 * 10, dtype=np.float32).reshape(16, 10, 10)
@@ -554,14 +554,14 @@ class CntkLayersTestCase(CntkToEllTestBase):
         cntkModel = param_relu(p, x)
 
         # Create the equivalent ELL predictor
-        layerParameters = ELL.LayerParameters(
+        layerParameters = ell.LayerParameters(
             # Input order for ELL is rows, columns, channels
-            ELL.TensorShape(10, 10, 16),
-            ELL.NoPadding(),
-            ELL.TensorShape(10, 10, 16),
-            ELL.NoPadding())
-        layer = ELL.FloatPReLUActivationLayer(layerParameters, alphaTensor)
-        predictor = ELL.FloatNeuralNetworkPredictor([layer])
+            ell.TensorShape(10, 10, 16),
+            ell.NoPadding(),
+            ell.TensorShape(10, 10, 16),
+            ell.NoPadding())
+        layer = ell.FloatPReLUActivationLayer(layerParameters, alphaTensor)
+        predictor = ell.FloatNeuralNetworkPredictor([layer])
 
         cntkResults = cntkModel(inputValues)
         orderedCntkResults = cntk_converters.get_float_vector_from_cntk_array(
@@ -673,7 +673,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             ellMap = ell_utilities.ell_map_from_float_predictor(predictor)
 
             # Load the map from archive
-            ellMapFromArchive = ELL.ELL_Map(modelName + '.ell')
+            ellMapFromArchive = ell.ELL_Map(modelName + '.ell')
 
             inputShape = ellMap.GetInputShape()
             outputShape = ellMap.GetOutputShape()
@@ -807,7 +807,7 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
     def compare_model(self, layers):
         ellLayers = cntk_layers.convert_cntk_layers_to_ell_layers(layers)
         # Create an ELL neural network predictor from the layers
-        predictor = ELL.FloatNeuralNetworkPredictor(ellLayers)
+        predictor = ell.FloatNeuralNetworkPredictor(ellLayers)
         shape = predictor.GetInputShape()
 
         # to CNTK (channel, rows, columns) order

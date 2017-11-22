@@ -17,7 +17,7 @@ import struct
 import getopt
 import numpy as np
 import find_ell
-import ELL
+import ell
 import ell_utilities
 
 
@@ -148,16 +148,16 @@ def parse_cfg(filename):
         if 'padding' not in layer:
             layer['inputPadding'] = 0
             if layer['type'] == 'maxpool':
-                layer['inputPaddingScheme'] = ELL.PaddingScheme.min
+                layer['inputPaddingScheme'] = ell.PaddingScheme.min
             else:
-                layer['inputPaddingScheme'] = ELL.PaddingScheme.zeros
+                layer['inputPaddingScheme'] = ell.PaddingScheme.zeros
         else:
             layer['inputPadding'] = int(layer['padding'])
             if layer['type'] == 'maxpool':
-                layer['inputPaddingScheme'] = ELL.PaddingScheme.min
+                layer['inputPaddingScheme'] = ell.PaddingScheme.min
             else:
-                layer['inputPaddingScheme'] = ELL.PaddingScheme.zeros
-        layer['inputShape'] = ELL.TensorShape(int(layer['h']) + 2 * int(layer['inputPadding']), int(layer['w']) + 2 * int(layer['inputPadding']), int(layer['c']))
+                layer['inputPaddingScheme'] = ell.PaddingScheme.zeros
+        layer['inputShape'] = ell.TensorShape(int(layer['h']) + 2 * int(layer['inputPadding']), int(layer['w']) + 2 * int(layer['inputPadding']), int(layer['c']))
 
         if i < (len(network) - 1):
             nextLayer = network[i + 1]
@@ -167,17 +167,17 @@ def parse_cfg(filename):
                 layer['outputPadding'] = int(nextLayer['padding'])
 
             if nextLayer['type'] == 'maxpool':
-                layer['outputPaddingScheme'] = ELL.PaddingScheme.min
+                layer['outputPaddingScheme'] = ell.PaddingScheme.min
             else:
-                layer['outputPaddingScheme'] = ELL.PaddingScheme.zeros
+                layer['outputPaddingScheme'] = ell.PaddingScheme.zeros
 
-            layer['outputShape'] = ELL.TensorShape(int(layer['out_h']) + 2 * int(layer['outputPadding']), int(layer['out_w']) + 2 * int(layer['outputPadding']), int(layer['out_c']))
-            layer['outputShapeMinusPadding'] = ELL.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
+            layer['outputShape'] = ell.TensorShape(int(layer['out_h']) + 2 * int(layer['outputPadding']), int(layer['out_w']) + 2 * int(layer['outputPadding']), int(layer['out_c']))
+            layer['outputShapeMinusPadding'] = ell.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
         else:
             layer['outputPadding'] = 0
-            layer['outputPaddingScheme'] = ELL.PaddingScheme.zeros
-            layer['outputShape'] = ELL.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
-            layer['outputShapeMinusPadding'] = ELL.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
+            layer['outputPaddingScheme'] = ell.PaddingScheme.zeros
+            layer['outputShape'] = ell.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
+            layer['outputShapeMinusPadding'] = ell.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
 
         print_layer(layer)
 
@@ -185,11 +185,11 @@ def parse_cfg(filename):
 
 
 def create_layer_parameters(inputShape, inputPadding, inputPaddingScheme, outputShape, outputPadding, outputPaddingScheme):
-    """Helper function to return ELL.LayerParameters given input and output shapes/padding/paddingScheme"""
-    inputPaddingParameters = ELL.PaddingParameters(inputPaddingScheme, inputPadding)
-    outputPaddingParameters = ELL.PaddingParameters(outputPaddingScheme, outputPadding)
+    """Helper function to return ell.LayerParameters given input and output shapes/padding/paddingScheme"""
+    inputPaddingParameters = ell.PaddingParameters(inputPaddingScheme, inputPadding)
+    outputPaddingParameters = ell.PaddingParameters(outputPaddingScheme, outputPadding)
 
-    return ELL.LayerParameters(inputShape, inputPaddingParameters, outputShape, outputPaddingParameters)
+    return ell.LayerParameters(inputShape, inputPaddingParameters, outputShape, outputPaddingParameters)
 
 
 def get_weights_tensor(weightsShape, values):
@@ -208,7 +208,7 @@ def get_weights_tensor(weightsShape, values):
         orderedWeights = weights
         orderedWeights = orderedWeights.reshape((1, 1, weightsShape[0]))
 
-    return ELL.FloatTensor(orderedWeights)
+    return ell.FloatTensor(orderedWeights)
 
 
 def process_batch_normalization_layer(layer, apply_padding, mean_vals, variance_vals, scale_vals):
@@ -218,31 +218,31 @@ def process_batch_normalization_layer(layer, apply_padding, mean_vals, variance_
     layers = []
 
     # Create BatchNormalizationLayer
-    layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
-    meanVector = ELL.FloatVector(mean_vals.ravel())
-    varianceVector = ELL.FloatVector(variance_vals.ravel())
+    layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros)
+    meanVector = ell.FloatVector(mean_vals.ravel())
+    varianceVector = ell.FloatVector(variance_vals.ravel())
 
-    layers.append(ELL.FloatBatchNormalizationLayer(layerParameters, meanVector, varianceVector, 1e-6, ELL.EpsilonSummand_sqrtVariance))
+    layers.append(ell.FloatBatchNormalizationLayer(layerParameters, meanVector, varianceVector, 1e-6, ell.EpsilonSummand_sqrtVariance))
 
     # Create Scaling Layer
     if (apply_padding):
-        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
     else:
-        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros)
 
-    layers.append(ELL.FloatScalingLayer(layerParameters, scale_vals.ravel()))
+    layers.append(ell.FloatScalingLayer(layerParameters, scale_vals.ravel()))
 
     return layers
 
 
 def get_activation_type(layer):
-    """Returns an ELL.ActivationType from the layer"""
+    """Returns an ell.ActivationType from the layer"""
     if (layer["activation"] == 'relu'):
-        return ELL.ActivationType.relu
+        return ell.ActivationType.relu
     elif (layer["activation"] == 'sigmoid'):
-        return ELL.ActivationType.sigmoid
+        return ell.ActivationType.sigmoid
     elif (layer["activation"] == 'leaky'):
-        return ELL.ActivationType.leaky
+        return ell.ActivationType.leaky
 
     return None
 
@@ -250,26 +250,26 @@ def get_activation_type(layer):
 def get_activation_layer(layer, apply_padding):
     """Return an ELL activation layer from a darknet activation"""
     if (apply_padding):
-        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
     else:
-        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros)
 
     activationType = get_activation_type(layer)
 
-    return ELL.FloatActivationLayer(layerParameters, activationType)
+    return ell.FloatActivationLayer(layerParameters, activationType)
 
 
 def get_bias_layer(layer, apply_padding, bias_vals):
     """Return an ELL bias layer from a darknet layer"""
 
     if (apply_padding):
-        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
     else:
-        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros)
 
-    biasVector = ELL.FloatVector(bias_vals.ravel())
+    biasVector = ell.FloatVector(bias_vals.ravel())
 
-    return ELL.FloatBiasLayer(layerParameters, biasVector)
+    return ell.FloatBiasLayer(layerParameters, biasVector)
 
 
 def process_convolutional_layer(layer, bin_data, convolution_order):
@@ -304,18 +304,18 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
         weight_vals.append(struct.unpack('f', bin_data.read(4)))
     weight_vals = np.array(weight_vals, dtype=np.float)
 
-    layerParameters = create_layer_parameters(layer['inputShape'], layer['inputPadding'], layer['inputPaddingScheme'], layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
+    layerParameters = create_layer_parameters(layer['inputShape'], layer['inputPadding'], layer['inputPaddingScheme'], layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros)
     convolutionWeightsTensor = get_weights_tensor((int(layer['filters']), layer['c'], int(layer["size"]), int(layer["size"])), weight_vals)
 
     # Create the appropriate convolutional layer
     if 'xnor' not in layer:
         # Create the ELL convolutional layer
-        convolutionalParameters = ELL.ConvolutionalParameters(int(layer["size"]), int(layer["stride"]), ELL.ConvolutionMethod.columnwise, int(layer['filters']))
-        layers.append(ELL.FloatConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
+        convolutionalParameters = ell.ConvolutionalParameters(int(layer["size"]), int(layer["stride"]), ell.ConvolutionMethod.columnwise, int(layer['filters']))
+        layers.append(ell.FloatConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
     else:
         # Create the ELL binary convolutional layer
-        convolutionalParameters = ELL.BinaryConvolutionalParameters(int(layer["size"]), int(layer["stride"]), ELL.BinaryConvolutionMethod.bitwise, ELL.BinaryWeightsScale.mean)
-        layers.append(ELL.FloatBinaryConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
+        convolutionalParameters = ell.BinaryConvolutionalParameters(int(layer["size"]), int(layer["stride"]), ell.BinaryConvolutionMethod.bitwise, ell.BinaryWeightsScale.mean)
+        layers.append(ell.FloatBinaryConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
 
     # Override global ordering with layer-specific ordering
     if 'order' in layers:
@@ -350,9 +350,9 @@ def get_pooling_layer(layer, poolingType):
 
     # Create the ELL pooling layer
     layerParameters = create_layer_parameters(layer['inputShape'], layer['inputPadding'], layer['inputPaddingScheme'], layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
-    poolingParameters = ELL.PoolingParameters(int(layer["size"]), int(layer["stride"]))
+    poolingParameters = ell.PoolingParameters(int(layer["size"]), int(layer["stride"]))
 
-    return ELL.FloatPoolingLayer(layerParameters, poolingParameters, poolingType)
+    return ell.FloatPoolingLayer(layerParameters, poolingParameters, poolingType)
 
 
 def get_softmax_layer(layer):
@@ -361,7 +361,7 @@ def get_softmax_layer(layer):
     # Create the ELL pooling layer
     layerParameters = create_layer_parameters(layer['inputShape'], layer['inputPadding'], layer['inputPaddingScheme'], layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
 
-    return ELL.FloatSoftmaxLayer(layerParameters)
+    return ell.FloatSoftmaxLayer(layerParameters)
 
 
 def process_fully_connected_layer(layer, weightsData):
@@ -373,9 +373,9 @@ def process_fully_connected_layer(layer, weightsData):
     # Create Fully Connected
     activationType = get_activation_type(layer)
     if activationType:
-        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros)
     else:
-        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
 
     bias_vals = []
     for i in range(int(layer['output'])):
@@ -393,9 +393,9 @@ def process_fully_connected_layer(layer, weightsData):
     orderedWeights = np.moveaxis(orderedWeights,-1, 0)
     orderedWeights = orderedWeights.reshape((layer['out_h'] * layer['out_w'] * layer['out_c'] * layer['h'], layer['w'], layer['c']))
 
-    weightsTensor = ELL.FloatTensor(orderedWeights)
+    weightsTensor = ell.FloatTensor(orderedWeights)
 
-    layers.append(ELL.FloatFullyConnectedLayer(layerParameters, weightsTensor))
+    layers.append(ell.FloatFullyConnectedLayer(layerParameters, weightsTensor))
 
     if activationType:
         # Create BiasLayer
@@ -412,16 +412,16 @@ def process_fully_connected_layer(layer, weightsData):
 def get_first_scaling_layer(nextLayerParameters):
     scaleValues = np.ones((nextLayerParameters.inputShape.channels), dtype=np.float) * [1/255]
 
-    inputShape = ELL.TensorShape(nextLayerParameters.inputShape.rows - (2 * nextLayerParameters.inputPaddingParameters.paddingSize),
+    inputShape = ell.TensorShape(nextLayerParameters.inputShape.rows - (2 * nextLayerParameters.inputPaddingParameters.paddingSize),
                                     nextLayerParameters.inputShape.columns - (2 * nextLayerParameters.inputPaddingParameters.paddingSize),
                                     nextLayerParameters.inputShape.channels)
 
-    layerParameters = create_layer_parameters(inputShape, 0, ELL.PaddingScheme.zeros, nextLayerParameters.inputShape, nextLayerParameters.inputPaddingParameters.paddingSize, nextLayerParameters.inputPaddingParameters.paddingScheme)
-    return ELL.FloatScalingLayer(layerParameters, scaleValues.ravel())
+    layerParameters = create_layer_parameters(inputShape, 0, ell.PaddingScheme.zeros, nextLayerParameters.inputShape, nextLayerParameters.inputPaddingParameters.paddingSize, nextLayerParameters.inputPaddingParameters.paddingScheme)
+    return ell.FloatScalingLayer(layerParameters, scaleValues.ravel())
 
 
 def process_network(network, weightsData, convolutionOrder):
-    """Returns an ELL.FloatNeuralNetworkPredictor as a result of parsing the network layers"""
+    """Returns an ell.FloatNeuralNetworkPredictor as a result of parsing the network layers"""
     ellLayers = []
 
     for layer in network:
@@ -432,9 +432,9 @@ def process_network(network, weightsData, convolutionOrder):
         elif layer['type'] == 'connected':
             ellLayers += process_fully_connected_layer(layer, weightsData)
         elif layer['type'] == 'maxpool':
-            ellLayers.append(get_pooling_layer(layer, ELL.PoolingType.max))
+            ellLayers.append(get_pooling_layer(layer, ell.PoolingType.max))
         elif layer['type'] == 'avgpool':
-            ellLayers.append(get_pooling_layer(layer, ELL.PoolingType.mean))
+            ellLayers.append(get_pooling_layer(layer, ell.PoolingType.mean))
         elif layer['type'] == 'softmax':
             ellLayers.append(get_softmax_layer(layer))
         else:
@@ -447,13 +447,13 @@ def process_network(network, weightsData, convolutionOrder):
         parameters = ellLayers[0].parameters
         ellLayers = [get_first_scaling_layer(parameters)] + ellLayers
 
-    predictor = ELL.FloatNeuralNetworkPredictor(ellLayers)
+    predictor = ell.FloatNeuralNetworkPredictor(ellLayers)
     return predictor
 
 
 # Function to import a Darknet model and output the corresponding ELL neural network predictor
 def predictor_from_darknet_model(modelConfigFile, modelWeightsFile, convolutionOrder = 'cnba'):
-    """Loads a Darknet model and returns an ELL.NeuralNetworkPredictor
+    """Loads a Darknet model and returns an ell.NeuralNetworkPredictor
        modelConfigFile - Name of the .cfg file for the Darknet model
        modelWightsFile - Name of the .weights file for the Darknet model
        convolutionOrder - Optional parameter specifying order of operations in a

@@ -14,7 +14,7 @@ console.log("#" + path.relative('.', __dirname));
 const ELL = require("ell");
 
 console.log("Loaded ELL");
-var dataset = ELL.GetDataset("../data/testData.txt");
+var dataset = ell.GetDataset("../data/testData.txt");
 console.log(dataset);
 if(dataset)
 {
@@ -26,7 +26,7 @@ if(dataset)
   console.log("Sync Itearator no. of iterations left:" + dataiter.NumIteratesLeft());
 }
 
-ELL.GetDatasetAsync("../data/testData.txt", function(datasetasync)
+ell.GetDatasetAsync("../data/testData.txt", function(datasetasync)
 {
   if(datasetasync)
   {

@@ -54,6 +54,12 @@ namespace data
     }
 
     template <typename ElementType>
+    DenseDataVector<ElementType>::DenseDataVector(std::vector<float> list)
+    {
+        AppendElements(std::move(list));
+    }
+
+    template <typename ElementType>
     double DenseDataVector<ElementType>::operator[](size_t index) const
     {
         if (index >= _data.size())

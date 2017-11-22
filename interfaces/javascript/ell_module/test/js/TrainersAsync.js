@@ -11,19 +11,19 @@ var tap = require('tap');
 const ELL = require("ell");
 console.log("Loaded ELL");
 
-var lossarg = new ELL.LossArguments();
+var lossarg = new ell.LossArguments();
 lossarg.lossFunction = 0;
 
-var sgdtrainarg = new ELL.SGDIncrementalTrainerParameters();
+var sgdtrainarg = new ell.SGDIncrementalTrainerParameters();
 sgdtrainarg.regularization = .75;
 
 console.log("Done settings Loss and SGD Training Params ...");
 
-var dataset = ELL.GetDataset("../data/testData.txt");
+var dataset = ell.GetDataset("../data/testData.txt");
 console.log(dataset);
 if(dataset)
 {  
-  var sgdIncrementalTrainer = ELL.GetSGDIncrementalTrainer(21, lossarg, sgdtrainarg);
+  var sgdIncrementalTrainer = ell.GetSGDIncrementalTrainer(21, lossarg, sgdtrainarg);
   console.log(sgdIncrementalTrainer);
   
   var trainSetIterator = dataset.GetIterator();
@@ -64,7 +64,7 @@ if(dataset)
   }
 }
 
-/*ELL.GetDatasetAsync("../data/testData.txt", function(datasetasync)
+/*ell.GetDatasetAsync("../data/testData.txt", function(datasetasync)
 {
   if(datasetasync)
   {

@@ -26,7 +26,7 @@ public:
     /// <returns> The std::vector of doubles. </returns>
     std::vector<double> ToArray() const;
 
-    // These methods are about 10 times faster than ELL.DoubleVector(data.ToArray())
+    // These methods are about 10 times faster than ell.DoubleVector(data.ToArray())
     // because of the way that python iterates vectors (wrapping every value in a PYOBJECT).
 
     /// <summary> Copy the data in this vector to the given buffer, resizing the buffer if necessary </summary>

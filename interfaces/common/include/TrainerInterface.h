@@ -17,8 +17,8 @@ namespace ELL_API
 
 /// <summary> The loss function to use durng ProtoNN training. </summary>
 // Note: we are using this weird struct because SWIG doesn't import class enum properly.  
-// It generates ELL.ProtoNNLossFunction_L2 and  ELL.ProtoNNLossFunction_L4, whereas we
-// want  ELL.ProtoNNLossFunction.L2 and  ELL.ProtoNNLossFunction.L2.
+// It generates ell.ProtoNNLossFunction_L2 and ell.ProtoNNLossFunction_L4, whereas we
+// want ell.ProtoNNLossFunction.L2 and ell.ProtoNNLossFunction.L2.
 struct ProtoNNLossFunction
 {
 public:

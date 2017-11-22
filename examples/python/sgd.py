@@ -6,8 +6,8 @@ sys.path.append('../../interfaces/python')
 sys.path.append('../../interfaces/python/Release')
 sys.path.append('../../interfaces/python/Debug')
 
-import ELL
-from ELL import * # pull everything into main namespace
+import ell
+from ell import * # pull everything into main namespace
 
 def getArg(n, missingValue=''):
     if n < len(sys.argv):

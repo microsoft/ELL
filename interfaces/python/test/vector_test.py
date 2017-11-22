@@ -1,25 +1,25 @@
 from __future__ import print_function
 import numpy as np
 import find_ell
-import ELL
+import ell
 from testing import Testing
 
 def test_double():
     testing = Testing()
 
     # empty vector
-    e = ELL.DoubleVector()
+    e = ell.DoubleVector()
     np.testing.assert_equal(e.size(), 0)
 
     # vector from list
     l = [1.1,2.2,3.3,4.4,]
-    e = ELL.DoubleVector(l)
+    e = ell.DoubleVector(l)
     
     np.testing.assert_equal(list(e), l)
 
     # vector from numpy array
     a = np.array(range(10), dtype=float)
-    e = ELL.DoubleVector(a)
+    e = ell.DoubleVector(a)
     
     np.testing.assert_equal(np.asarray(e), a)
 
@@ -28,13 +28,13 @@ def test_double():
     np.testing.assert_equal(a, b)
 
     # copy_from numpy array
-    e = ELL.DoubleVector()
+    e = ell.DoubleVector()
     e.copy_from(a)
     np.testing.assert_equal(np.asarray(e), a)
 
     # convert data types
     a = a.astype(np.float32)
-    e = ELL.DoubleVector(a)
+    e = ell.DoubleVector(a)
     np.testing.assert_equal(np.asarray(e), a)
 
     # enumerating array
@@ -46,7 +46,7 @@ def test_double():
     # auto-ravel numpy arrays
     a = np.ones((10,10), dtype=float)
     a *= range(10)
-    e = ELL.DoubleVector(a)
+    e = ell.DoubleVector(a)
     np.testing.assert_equal(np.asarray(e), a.ravel())
     
     testing.ProcessTest("DoubleVector test", True)
@@ -60,18 +60,18 @@ def test_float():
     testing = Testing()
 
     # empty vector
-    e = ELL.FloatVector()
+    e = ell.FloatVector()
     np.testing.assert_equal(e.size(), 0)
 
     # vector from list of floats
     l = [1.1,2.2,3.3,4.4]
-    e = ELL.FloatVector(l)
+    e = ell.FloatVector(l)
     
     assert_compare_floats(e, l)
 
     # vector from numpy array
     a = np.array(range(10), dtype=np.float32)
-    e = ELL.FloatVector(a)
+    e = ell.FloatVector(a)
     
     np.testing.assert_equal(np.asarray(e), a)
 
@@ -80,13 +80,13 @@ def test_float():
     np.testing.assert_equal(a, b)
 
     # copy_from numpy array
-    e = ELL.FloatVector()
+    e = ell.FloatVector()
     e.copy_from(a)
     np.testing.assert_equal(np.asarray(e), a)
 
     # convert data types
     a = a.astype(np.float)
-    e = ELL.FloatVector(a)
+    e = ell.FloatVector(a)
     np.testing.assert_equal(np.asarray(e), a)
     
     # enumerating array
@@ -98,7 +98,7 @@ def test_float():
     # auto-ravel numpy arrays
     a = np.ones((10,10), dtype=np.float32)
     a *= range(10)
-    e = ELL.FloatVector(a)
+    e = ell.FloatVector(a)
     np.testing.assert_equal(np.asarray(e), a.ravel())
     
     testing.ProcessTest("FloatVector test", True)

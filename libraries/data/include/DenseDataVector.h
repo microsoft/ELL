@@ -69,6 +69,11 @@ namespace data
         /// <param name="list"> The vector of values. </param>
         DenseDataVector(std::vector<double> vec);
 
+        /// <summary> Constructs a data vector from a `std::vector` of values. </summary>
+        ///
+        /// <param name="list"> The vector of values. </param>
+        DenseDataVector(std::vector<float> vec);
+
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the desired element. </param>

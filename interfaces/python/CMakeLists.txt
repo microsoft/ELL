@@ -30,7 +30,7 @@ if (_ELL_python)
 
   add_custom_command(TARGET _ELL_python
       POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${PYTHON_DIR}/ELL.py ${PYTHON_DIR}/package/ell/ELL.py
+      COMMAND ${CMAKE_COMMAND} -E copy ${PYTHON_DIR}/ell.py ${PYTHON_DIR}/package/ell/ell.py
   )
 
   file(GLOB PKGHDR RELATIVE ${CMAKE_SOURCE_DIR}/interfaces ${CMAKE_SOURCE_DIR}/interfaces/common/*.i ${CMAKE_SOURCE_DIR}/interfaces/common/include/*.h)
@@ -53,7 +53,7 @@ if (_ELL_python)
   )
 
   if(WIN32)
-    set(binaries _ELL.exp _ELL.lib _ELL.pyd)
+    set(binaries _ell.exp _ell.lib _ell.pyd)
     foreach(b ${binaries})
       add_custom_command(TARGET _ELL_python
             POST_BUILD

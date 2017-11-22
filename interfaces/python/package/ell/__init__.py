@@ -12,5 +12,5 @@ try:
 except ImportError:
     pass # we're in regular Python, not Jupyter
 
-# Make all the definitions in ELL.py be toplevel in this package
-from .ELL import *
+# Make all the definitions in ell.py be toplevel in this package
+from .ell import *
