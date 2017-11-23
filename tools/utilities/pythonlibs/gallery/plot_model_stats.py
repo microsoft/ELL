@@ -30,7 +30,8 @@ class PlotModelStats:
         # output
         self.output_figure = "model_speed_accuracy.png"
         self.output_format = "png"
-        self.output_json_file = "frontier_models.json"
+        self.output_frontier_json_file = "frontier_models.json"
+        self.output_all_models_json_file = "all_models.json"
 
         # plot
         self.plot_series = []
@@ -69,8 +70,11 @@ class PlotModelStats:
             help="path to an output format for saving the plot",
             default=self.output_format)
         self.arg_parser.add_argument("--output_stats", "-os",
-            help="path to the output file for saving the stats",
-            default=self.output_json_file)
+            help="path to the output file for saving the pareto frontier stats",
+            default=self.output_frontier_json_file)
+        self.arg_parser.add_argument("--output_stats_all", "-osa",
+            help="path to the output file for saving the stats for all models",
+            default=self.output_all_models_json_file)
         self.arg_parser.add_argument("--plot_max_secs_per_frame", "-ps",
             help="when specified, only plot models that at least the specified speed (in seconds/frame)",
             type=float, default=self.plot_max_secs_per_frame)
@@ -94,7 +98,8 @@ class PlotModelStats:
         self.models_root = args.models_root
         self.output_figure = args.output_figure
         self.output_format = args.output_format
-        self.output_json_file = args.output_stats
+        self.output_frontier_json_file = args.output_stats
+        self.output_all_models_json_file = args.output_stats_all
         self.plot_max_secs_per_frame = args.plot_max_secs_per_frame
         self.plot_min_top1_accuracy = args.plot_min_top1_accuracy
         self.plot_targets = dict.fromkeys(args.plot_targets)
@@ -121,17 +126,17 @@ class PlotModelStats:
                     if str(model_properties['image_size']) in self.image_size or self.image_size[0] == 'all':
                         if model_properties['model'] in self.model_name or self.model_name[0] == 'all':
                             accuracy = model_data.get_model_topN_accuracies()
-                            speed = model_data.get_model_seconds_per_frame(self.plot_targets)
-                            self.model_stats.append({"model": model_properties['model'], "accuracy" : accuracy, "secs_per_frame" : speed})
+                            speed = model_data.get_model_seconds_per_frame(self.plot_targets)                 
+                            self.model_stats.append({"name": model_properties['name'], "model": model_properties['model'], "image_size": model_properties['image_size'], "accuracy" : accuracy, "secs_per_frame" : speed})
                 except:
                     print("Could not collect stats for model '{}', skipping".format(model))
 
-    def pareto_frontier(self, x, ytop1, ytop5, models, max_x):
+    def pareto_frontier(self, x, ytop1, ytop5, models, names, image_size, max_x):
         """Takes lists of x and ytop1 values, and return the sorted elements that lie on the Pareto frontier
            reference: http://oco-carbon.com/metrics/find-pareto-frontiers-in-python/
         """
         # sort the values in ascending order, and apply a limit to x
-        values = sorted([[float(x[i]), float(ytop1[i]), float(ytop5[i]), models[i]]
+        values = sorted([[float(x[i]), float(ytop1[i]), float(ytop5[i]), models[i], image_size[i], names[i]]
                  for i in range(len(x)) if float(x[i]) < max_x], reverse=False)
         frontier = [values[0]]
         for pair in values[1:]:
@@ -145,7 +150,9 @@ class PlotModelStats:
         # extra information
         frontier_ytop5 = [pair[2] for pair in frontier]
         frontier_model = [pair[3] for pair in frontier]
-        return frontier_x, frontier_ytop1, frontier_ytop5, frontier_model
+        frontier_image_size = [pair[4] for pair in frontier]
+        frontier_names = [pair[5] for pair in frontier]
+        return frontier_x, frontier_ytop1, frontier_ytop5, frontier_model, frontier_image_size, frontier_names
 
     def compute_series(self):
         """Computes the series to be plotted, including the pareto frontier"""
@@ -164,8 +171,12 @@ class PlotModelStats:
             if add_to_plot:
                 self.plot_series.append(x) # plot the secs/frame
 
+            names = [stat["name"] for stat in self.model_stats if (platform in stat["secs_per_frame"])]
+            models = [stat["model"] for stat in self.model_stats if (platform in stat["secs_per_frame"])]
+            image_size = [int(stat["image_size"]) for stat in self.model_stats if (platform in stat["secs_per_frame"])]
             ytop1 = [float(stat["accuracy"]["top1"]) for stat in self.model_stats if (platform in stat["secs_per_frame"])]
             ytop5 = [float(stat["accuracy"]["top5"]) for stat in self.model_stats if (platform in stat["secs_per_frame"])]
+
             if add_to_plot:
                 self.plot_series.append(ytop1) # plot the top 1 accuracy metric
 
@@ -175,9 +186,8 @@ class PlotModelStats:
             # compute the pareto frontier
             # to compute pareto frontier we need x and top 1
             if x != [] and ytop1 != []:         
-                models = [stat["model"] for stat in self.model_stats if (platform in stat["secs_per_frame"])]
-                fx, ftop1, ftop5, fmodel = self.pareto_frontier(x, ytop1, ytop5, models, max_x=self.plot_max_secs_per_frame)
-                self.frontier_models.append({ 'platform' : platform, 'frontier_models' : list(zip(fmodel, fx, ftop1, ftop5)) })
+                fx, ftop1, ftop5, fmodel, fimsize, fnames = self.pareto_frontier(x, ytop1, ytop5, models, image_size, names, max_x=self.plot_max_secs_per_frame)                
+                self.frontier_models.append({ 'platform' : platform, 'frontier_models' : list(zip(fnames, fmodel, fimsize, fx, ftop1, ftop5)) })
                 if add_to_plot:
                     frontiers = frontiers + [fx, ftop1, self.platforms_lines[platform]] # plot the frontier based on top 1
             else:
@@ -187,10 +197,15 @@ class PlotModelStats:
         if self.plot_series:
             self.plot_series = self.plot_series + frontiers
 
-        # save stats to json
-        with open(self.output_json_file, "w") as outfile:
+        # save frontier model stats to json
+        with open(self.output_frontier_json_file, "w") as outfile:
             json.dump(self.frontier_models, outfile, ensure_ascii=False, indent=2)
-        print("Saved frontier models to {}".format(self.output_json_file))
+        print("Saved frontier models to {}".format(self.output_frontier_json_file))
+
+        # save all model stats to json
+        with open(self.output_all_models_json_file, "w") as outfile:
+            json.dump(self.model_stats, outfile, ensure_ascii=False, indent=2, sort_keys=True)
+        print("Saved all models to {}".format(self.output_all_models_json_file))
 
 
     def plot(self):
