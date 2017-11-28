@@ -9,7 +9,7 @@
   "dependencies": {
     "requirejs": "^2.2.0",
     "nan": "^2.4.0",
-    "ell": "file:../../"
+    "ell": "file:../../ell_module"
   },  
   "scripts": {
     "test": "tap *.js"

@@ -49,6 +49,11 @@ namespace math
         /// <returns> The number of elements in the `TensorShape` </returns>
         size_t Size() const { return rows * columns * channels; }
 
+        TensorShape() : TensorShape(0, 0, 0)
+        {
+            // this is needed by SWIG wrappers.
+        }
+
         TensorShape(size_t rows, size_t columns, size_t channels) :
             rows(rows), columns(columns), channels(channels) 
         {

@@ -80,7 +80,7 @@ if(NPM_EXECUTABLE)
     string(CONCAT MODULE_BLAS_LIBS ${MODULE_BLAS_LIBS})
 
     foreach(src ${INTERFACE_SRC})
-        list(APPEND MODULE_INTERFACE_SRC "'../${src}',\n")
+        list(APPEND MODULE_INTERFACE_SRC "'${src}',\n")
     endforeach()
     string(CONCAT MODULE_INTERFACE_SRC ${MODULE_INTERFACE_SRC})
 
@@ -97,22 +97,29 @@ endif()
 #
 find_program(NODE_EXECUTABLE node)
 if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
+    set(TEST_DEPLOY_DIR ${CMAKE_BINARY_DIR}/interfaces/javascript)
+    
+    file(COPY ${CMAKE_CURRENT_LIST_DIR}/test
+        DESTINATION ${TEST_DEPLOY_DIR}
+        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+        GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
     # set up environment for test
     add_custom_command(TARGET ${module_name}
                     POST_BUILD
                     COMMAND ${NPM_EXECUTABLE} install
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js
+                    WORKING_DIRECTORY ${TEST_DEPLOY_DIR}/test/js
                     VERBATIM)
 
     add_custom_command(TARGET ${module_name}
                     POST_BUILD
                     COMMAND ${NPM_EXECUTABLE} install ell
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js
+                    WORKING_DIRECTORY ${TEST_DEPLOY_DIR}/test/js
                     VERBATIM)
 
     # add test
     set(test_name ${module_name}_test)
     add_test(NAME ${test_name}
             COMMAND ${NODE_EXECUTABLE} TestCompiler.js
-            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js )
+            WORKING_DIRECTORY ${TEST_DEPLOY_DIR}/test/js )
 endif()
