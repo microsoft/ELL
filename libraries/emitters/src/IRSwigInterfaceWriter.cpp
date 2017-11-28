@@ -27,22 +27,10 @@ namespace emitters
     namespace
     {
         // Writes a scoped #ifdef SWIG declaration
-        class DeclareIfndefSwig
+        struct DeclareIfndefSwig : private DeclareIfDefGuard
         {
-        public:
-            DeclareIfndefSwig(std::ostream& os)
-                : _os(&os)
-            {
-                os << "#ifndef SWIG\n";
-            }
-
-            ~DeclareIfndefSwig()
-            {
-                *_os << "#endif // SWIG\n\n";
-            }
-
-        private:
-            std::ostream* _os;
+            DeclareIfndefSwig(std::ostream& os) : DeclareIfDefGuard(os, "SWIG", DeclareIfDefGuard::Type::Negative)
+            { }
         };
 
         // Writes SWIG interfaces for predict
@@ -192,7 +180,6 @@ namespace emitters
 
             virtual ~SteppablePredictorInterfaceWriter() = default;
 
-        public:
             void WriteSwigCode(std::ostream& os)
             {
                 WriteCallbackSwigCode(os);
@@ -572,10 +559,11 @@ namespace emitters
 
             // Rename the first predict function for python
             auto predicts = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
-            os << "#ifdef SWIGPYTHON\n";
-            std::string functionName = (predicts[0].function)->getName();
-            os << "%rename (predict) " << functionName << ";\n";
-            os << "#endif\n";
+            {
+                DeclareIfDefGuard guard(os, "SWIGPYTHON", DeclareIfDefGuard::Type::Positive);
+                std::string functionName = (predicts[0].function)->getName();
+                os << "%rename (predict) " << functionName << ";\n";
+            }
 
             os << "%include \"" << headerName << "\"\n";
             WriteShapeWrappers(os, moduleEmitter);

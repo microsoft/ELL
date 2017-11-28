@@ -53,7 +53,7 @@ namespace emitters
         ///
         /// <param name="parameters"> The settings for the compiler to use </param>
         void SetCompilerParameters(const CompilerParameters& parameters) override;
-                
+
         /// <summary> Returns the module's name. </summary>
         ///
         /// <returns> The module's name. </returns>
@@ -702,6 +702,14 @@ namespace emitters
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const std::initializer_list<VariableType>& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes, bool isPublic = false);
 
+        /// <summary> Associates metadata with a given function. </summary>
+        ///
+        /// <param name="function"> A pointer to the `llvm::Function` instance representing the function. </param>
+        /// <param name="tag"> The metadata tag. </param>
+        /// <param name="content"> Optional metadata value. </param>
+        /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
+        void InsertFunctionMetadata(llvm::Function* function, const std::string& tag, const std::vector<std::string>& value = { "" });
+
         // Get a reference to the thread pool
         IRThreadPool& GetThreadPool() { return _threadPool; }
 
@@ -747,7 +755,7 @@ namespace emitters
     //
 
     /// <summary> Convenience function for creating an `IRModuleEmitter` with the default compiler parameters, set up for the host environment </summary>
-    IRModuleEmitter MakeHostModuleEmitter(const std::string moduleName); 
+    IRModuleEmitter MakeHostModuleEmitter(const std::string moduleName);
 }
 }
 

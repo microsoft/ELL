@@ -103,8 +103,7 @@ namespace emitters
     {
         Log() << "Begin emitting IR for function " << functionName << EOL;
         auto currentPos = _emitter.GetCurrentInsertPoint();
-        // assert(currentBlock != nullptr);
-        IRFunctionEmitter newFunction = Function(functionName, returnType, args, true);
+        IRFunctionEmitter newFunction = Function(functionName, returnType, args, false);
         _functionStack.emplace(newFunction, currentPos);
         return _functionStack.top().first;
     }
@@ -113,8 +112,7 @@ namespace emitters
     {
         Log() << "Begin emitting IR for function " << functionName << EOL;
         auto currentPos = _emitter.GetCurrentInsertPoint();
-        // assert(currentBlock != nullptr);
-        IRFunctionEmitter newFunction = Function(functionName, returnType, argTypes, true);
+        IRFunctionEmitter newFunction = Function(functionName, returnType, argTypes, false);
         _functionStack.emplace(newFunction, currentPos);
         return _functionStack.top().first;
     }
@@ -266,6 +264,19 @@ namespace emitters
     // Function metadata
     void IRModuleEmitter::InsertFunctionMetadata(const std::string& functionName, const std::string& tag, const std::vector<std::string>& values)
     {
+        auto pFunction = GetFunction(functionName);
+        if (pFunction == nullptr)
+        {
+            throw EmitterException(EmitterError::functionNotFound);
+        }
+
+        InsertFunctionMetadata(pFunction, tag, values);
+    }
+
+    void IRModuleEmitter::InsertFunctionMetadata(llvm::Function* function, const std::string& tag, const std::vector<std::string>& values)
+    {
+        assert(function);
+
         std::vector<llvm::Metadata*> metadataElements;
         for (const auto& value : values)
         {
@@ -273,13 +284,7 @@ namespace emitters
         }
 
         auto metadataNode = llvm::MDNode::get(_emitter.GetContext(), metadataElements);
-        auto pFunction = GetFunction(functionName);
-        if (pFunction == nullptr)
-        {
-            throw EmitterException(EmitterError::functionNotFound);
-        }
-
-        pFunction->setMetadata(tag, metadataNode);
+        function->setMetadata(tag, metadataNode);
     }
 
     //
@@ -807,14 +812,14 @@ namespace emitters
     {
         return llvm::verifyModule(*_pModule);
     }
-    
+
     bool IRModuleEmitter::CheckForErrors(std::ostream& stream)
     {
         llvm::raw_os_ostream out(stream);
         return llvm::verifyModule(*_pModule, &out);
     }
-    
-    
+
+
     void IRModuleEmitter::DebugDump()
     {
         GetLLVMModule()->dump();
@@ -857,7 +862,9 @@ namespace emitters
 
     void IRModuleEmitter::IncludeInHeader(const std::string& functionName)
     {
-        InsertFunctionMetadata(functionName, c_declareFunctionInHeaderTagName);
+        auto function = GetFunction(functionName);
+        function->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
+        InsertFunctionMetadata(function, c_declareFunctionInHeaderTagName);
     }
 
     void IRModuleEmitter::IncludeTypeInHeader(const std::string& typeName)
@@ -867,7 +874,13 @@ namespace emitters
 
     void IRModuleEmitter::IncludeInCallbackInterface(const std::string& functionName, const std::string& nodeName)
     {
-        InsertFunctionMetadata(functionName, c_callbackFunctionTagName, { nodeName });
+        // We shouldn't actually have to set this linkage to external because:
+        // * All usages are preceded by IncludeInHeader, which already does external linkage
+        // * We should be using this for just declarations that the user provides as a callback
+        // That said, leaving it in for now until usage proves to be counter-productive.
+        auto function = GetFunction(functionName);
+        function->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
+        InsertFunctionMetadata(function, c_callbackFunctionTagName, { nodeName });
     }
 
     //
@@ -1014,6 +1027,6 @@ namespace emitters
         parameters.targetDevice.deviceName = "host";
         return {moduleName, parameters};
     }
-    
+
 }
 }

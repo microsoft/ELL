@@ -28,93 +28,94 @@ namespace ell
 {
 namespace emitters
 {
-    namespace
+namespace
+{
+    void WriteStructType(std::ostream& os, llvm::StructType* t)
     {
-        void WriteStructType(std::ostream& os, llvm::StructType* t)
+        if (t->hasName()) // && !t->isLiteral() ?
         {
-            if (t->hasName()) // && !t->isLiteral() ?
-            {
-                std::string typeName = t->getName();
-                os << "struct " << typeName;
-            }
-        }
-
-        void WriteArrayType(std::ostream& os, llvm::ArrayType* t)
-        {
-            auto size = t->getNumElements();
-            auto elemType = t->getTypeAtIndex(0u);
-            WriteLLVMType(os, elemType);
-            os << "[" << size << "]";
-        }
-
-        void WritePointerType(std::ostream& os, llvm::PointerType* t)
-        {
-            auto elemType = t->getTypeAtIndex(0u);
-            WriteLLVMType(os, elemType);
-            os << "*";
-        }
-
-        void WriteIntegerType(std::ostream& os, llvm::IntegerType* t)
-        {
-            auto size = t->getBitWidth();
-            os << "int" << size << "_t";
-        }
-
-        void WriteFunctionType(std::ostream& os, llvm::FunctionType* t)
-        {
-            auto returnType = t->getReturnType();
-            WriteLLVMType(os, returnType);
-            os << " (";
-            bool first = true;
-            for (auto pt : t->params())
-            {
-                if (!first)
-                {
-                    os << ", ";
-                }
-                first = false;
-                WriteLLVMType(os, pt);
-            }
-            os << ");";
-        }
-
-        void WriteLLVMVariableDeclaration(std::ostream& os, llvm::Type* t, std::string name)
-        {
-            if (t->isArrayTy())
-            {
-                auto arrType = llvm::cast<llvm::ArrayType>(t);
-                auto size = arrType->getNumElements();
-                auto elemType = arrType->getTypeAtIndex(0u);
-                WriteLLVMType(os, elemType);
-                os << " " << name << "[" << size << "]";
-            }
-            else
-            {
-                WriteLLVMType(os, t);
-                os << " " << name;
-            }
-        }
-
-        void WriteStructDefinition(std::ostream& os, llvm::StructType* t, const std::vector<std::string>& fieldNames)
-        {
-            if (t->hasName()) // && !t->isLiteral() ?
-            {
-                std::string typeName = t->getName();
-                os << "struct " << typeName << "\n";
-                os << "{\n";
-                auto index = 0;
-                for (auto& fieldType : t->elements())
-                {
-                    os << "    ";
-                    std::string fieldName = (index >= fieldNames.size()) ? std::string("param") + std::to_string(index) : fieldNames[index];
-                    WriteLLVMVariableDeclaration(os, fieldType, fieldName);
-                    os << ";\n";
-                    ++index;
-                }
-                os << "};";
-            }
+            std::string typeName = t->getName();
+            os << typeName;
         }
     }
+
+    void WriteArrayType(std::ostream& os, llvm::ArrayType* t)
+    {
+        auto size = t->getNumElements();
+        auto elemType = t->getTypeAtIndex(0u);
+        WriteLLVMType(os, elemType);
+        os << "[" << size << "]";
+    }
+
+    void WritePointerType(std::ostream& os, llvm::PointerType* t)
+    {
+        auto elemType = t->getTypeAtIndex(0u);
+        WriteLLVMType(os, elemType);
+        os << "*";
+    }
+
+    void WriteIntegerType(std::ostream& os, llvm::IntegerType* t)
+    {
+        auto size = t->getBitWidth();
+        os << "int" << size << "_t";
+    }
+
+    void WriteFunctionType(std::ostream& os, llvm::FunctionType* t)
+    {
+        auto returnType = t->getReturnType();
+        WriteLLVMType(os, returnType);
+        os << " (";
+        bool first = true;
+        for (auto pt : t->params())
+        {
+            if (!first)
+            {
+                os << ", ";
+            }
+            first = false;
+            WriteLLVMType(os, pt);
+        }
+        os << ");";
+    }
+
+    void WriteLLVMVariableDeclaration(std::ostream& os, llvm::Type* t, std::string name)
+    {
+        if (t->isArrayTy())
+        {
+            auto arrType = llvm::cast<llvm::ArrayType>(t);
+            auto size = arrType->getNumElements();
+            auto elemType = arrType->getTypeAtIndex(0u);
+            WriteLLVMType(os, elemType);
+            os << " " << name << "[" << size << "]";
+        }
+        else
+        {
+            WriteLLVMType(os, t);
+            os << " " << name;
+        }
+    }
+
+    void WriteStructDefinition(std::ostream& os, llvm::StructType* t, const std::vector<std::string>& fieldNames)
+    {
+        if (t->hasName()) // && !t->isLiteral() ?
+        {
+            std::string typeName = t->getName();
+            DeclareIfDefDefine guard(os, "ELL_" + typeName);
+            os << "typedef struct " << typeName << "\n";
+            os << "{\n";
+            auto index = 0;
+            for (auto& fieldType : t->elements())
+            {
+                os << "    ";
+                std::string fieldName = (index >= fieldNames.size()) ? std::string("param") + std::to_string(index) : fieldNames[index];
+                WriteLLVMVariableDeclaration(os, fieldType, fieldName);
+                os << ";\n";
+                ++index;
+            }
+            os << "} " << typeName << ";\n\n";
+        }
+    }
+}
 
     void WriteLLVMType(std::ostream& os, llvm::Type* t)
     {
@@ -216,13 +217,9 @@ namespace emitters
 
             // preprocessor definitions
             auto defines = moduleEmitter.GetPreprocessorDefinitions();
-            if (defines.size() > 0)
+            for (const auto& def : defines)
             {
-                for (const auto& def : defines)
-                {
-                    os << "#define " << def.first << " " << def.second << "\n";
-                }
-                os << "\n";
+                DeclareIfDefDefine define(os, def.first, def.second);
             }
 
             // First write out type definitions
@@ -250,12 +247,10 @@ namespace emitters
                             }
                         }
                         WriteStructDefinition(os, t, fieldNames);
-                        os << "\n\n";
                     }
                 }
             }
 
-            os << "\n";
             os << "//\n// Functions\n//\n\n";
             // Now write out function signatures
             auto tagValues = GetFunctionsWithTag(moduleEmitter, c_declareFunctionInHeaderTagName);
@@ -273,16 +268,33 @@ namespace emitters
     DeclareExternC::DeclareExternC(std::ostream& os)
         : _os(&os)
     {
-        os << "#ifdef __cplusplus\n";
-        os << "extern \"C\"\n{\n";
-        os << "#endif\n";
+        DeclareIfDefGuard guard(os, "__cplusplus", DeclareIfDefGuard::Type::Positive);
+        *_os << "extern \"C\"\n{\n";
     }
 
     DeclareExternC::~DeclareExternC()
     {
-        *_os << "#ifdef __cplusplus\n";
+        DeclareIfDefGuard guard(*_os, "__cplusplus", DeclareIfDefGuard::Type::Positive);
         *_os << "} // extern \"C\"\n";
-        *_os << "#endif\n\n";
     }
+
+    DeclareIfDefGuard::DeclareIfDefGuard(std::ostream& os, std::string symbol, Type type)
+        : _os(os), _symbol(std::move(symbol)), _type(type)
+    {
+        _os << "#if " << (_type == Type::Negative ? "!" : "") << "defined(" << _symbol << ")\n";
+    }
+
+    DeclareIfDefGuard::~DeclareIfDefGuard()
+    {
+        _os << "#endif // " << (_type == Type::Negative ? "!" : "") << "defined(" << _symbol << ")\n\n";
+    }
+
+
+    DeclareIfDefDefine::DeclareIfDefDefine(std::ostream& os, std::string symbol, const std::string& value /* = "" */)
+        : DeclareIfDefGuard(os, std::move(symbol), Type::Negative)
+    {
+        _os << "#define " << _symbol << (value.empty() ? "" : " ") << value << "\n\n";
+    }
+
 }
 }

@@ -614,8 +614,8 @@ void TestHeader()
     ell::emitters::WriteModuleHeader(out, module);
 
     std::string result = out.str();
-    auto structPos = result.find("struct Shape");
-    auto funcPos = result.find("struct Shape Test_GetInputShape(int32_t");
+    auto structPos = result.find("typedef struct Shape");
+    auto funcPos = result.find("Shape Test_GetInputShape(int32_t");
     testing::ProcessTest("Testing header generation",
                          structPos != std::string::npos && funcPos != std::string::npos);
 }
@@ -658,7 +658,7 @@ void TestStruct()
     auto int32Type = llvm::Type::getInt32Ty(context);
     auto int8PtrType = llvm::Type::getInt8PtrTy(context);
     auto doubleType = llvm::Type::getDoubleTy(context);
-    
+
     llvm::StructType* structType = module.GetOrCreateStruct("MytStruct", { { "intField", int32Type }, { "ptrField", int8PtrType }, { "doubleField", doubleType } });
 
     module.DeclarePrintf();
@@ -684,12 +684,12 @@ void TestDuplicateStructs()
     auto int32Type = llvm::Type::getInt32Ty(context);
     auto int8PtrType = llvm::Type::getInt8PtrTy(context);
     auto doubleType = llvm::Type::getDoubleTy(context);
-    
+
     // These should be fine --- the second GetOrCreateStruct call should return the existing type
     llvm::StructType* struct1TypeA = module.GetOrCreateStruct("MyStruct1", { { "intField", int32Type }, { "ptrField", int8PtrType }, { "doubleField", doubleType } });
     llvm::StructType* struct1TypeB = module.GetOrCreateStruct("MyStruct1", { { "intField", int32Type }, { "ptrField", int8PtrType }, { "doubleField", doubleType } });
     testing::ProcessTest("Testing double-declaration of equivalent structs", struct1TypeA == struct1TypeB);
-    
+
     bool gotException = false;
     try
     {
@@ -703,5 +703,5 @@ void TestDuplicateStructs()
         gotException = true;
     }
 
-    testing::ProcessTest("Testing double-declaration of non-equivalent structs", gotException);    
+    testing::ProcessTest("Testing double-declaration of non-equivalent structs", gotException);
 }

@@ -1212,7 +1212,7 @@ namespace emitters
     }
 
     //
-    // Experimental functions 
+    // Experimental functions
     //
 
     llvm::Value* IRFunctionEmitter::GetCpu()
@@ -1272,38 +1272,44 @@ namespace emitters
     //
     void IRFunctionEmitter::IncludeInHeader()
     {
+        _pFunction->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
         InsertMetadata(c_declareFunctionInHeaderTagName);
     }
 
     void IRFunctionEmitter::IncludeInPredictInterface()
     {
+        _pFunction->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
         InsertMetadata(c_predictFunctionTagName);
     }
 
     void IRFunctionEmitter::IncludeInSwigInterface()
     {
+        _pFunction->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
         InsertMetadata(c_swigFunctionTagName);
     }
 
     void IRFunctionEmitter::IncludeInCallbackInterface()
     {
+        _pFunction->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
         InsertMetadata(c_callbackFunctionTagName);
     }
 
     void IRFunctionEmitter::IncludeInStepInterface(size_t outputSize)
     {
+        _pFunction->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
         InsertMetadata(c_stepFunctionTagName, std::to_string(outputSize));
     }
 
     void IRFunctionEmitter::IncludeInStepTimeInterface(const std::string& functionName)
     {
+        _pFunction->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
         InsertMetadata(c_stepTimeFunctionTagName, functionName);
     }
 
     //
     // Internal functions
     //
-    
+
     llvm::Function* IRFunctionEmitter::ResolveFunction(const std::string& name)
     {
         llvm::Function* pFunction = GetLLVMModule()->getFunction(name);
