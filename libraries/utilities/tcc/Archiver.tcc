@@ -130,6 +130,16 @@ namespace utilities
         }
     }
 
+    template <>
+    template <typename ValueType>
+    void Unarchiver::OptionalPropertyUnarchiver<Unarchiver::NoDefault>::operator>>(ValueType&& value)
+    {
+        if (_unarchiver.HasNextPropertyName(_propertyName))
+        {
+            _unarchiver.Unarchive(_propertyName.c_str(), value);
+        }
+    }
+
     //
     // Unarchiver class
     //
@@ -149,6 +159,12 @@ namespace utilities
     void Unarchiver::Unarchive(const char* name, ValueType&& value)
     {
         UnarchiveItem(name, value);
+    }
+
+    // STYLE: inline to keep next to its sibling overload
+    inline Unarchiver::OptionalPropertyUnarchiver<Unarchiver::NoDefault> Unarchiver::OptionalProperty(const std::string& name)
+    {
+        return OptionalPropertyUnarchiver<Unarchiver::NoDefault>(*this, name, {});
     }
 
     template <typename DefaultValueType>
@@ -318,6 +334,7 @@ namespace utilities
     {
         return ArchiverImpl::GetTypeName<T>(true);
     }
+    
     template <typename T>
     std::string GetArchivedTypeName(const T& value)
     {

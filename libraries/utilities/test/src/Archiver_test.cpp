@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     IArchivable_test.cpp (utilities)
+//  File:     Archiver_test.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "IArchivable_test.h"
+#include "Archiver_test.h"
 
 // utilities
 #include "Archiver.h"
@@ -34,6 +34,9 @@
 
 namespace ell
 {
+    //
+    // Types used in tests
+    //
 struct TestStruct : public utilities::IArchivable
 {
     int a = 0;
@@ -96,6 +99,55 @@ struct OptionalValueStruct : public utilities::IArchivable
         archiver.OptionalProperty("b", -1) >> b;
     }
 };
+
+//
+// Test functions
+//
+
+void TestArchivedObjectInfo()
+{
+    using utilities::ArchivedObjectInfo;
+    using utilities::ArchiveVersionNumbers;
+    
+    ArchivedObjectInfo objInfoA1 {"typeA", ArchiveVersionNumbers::v1};
+    ArchivedObjectInfo objInfoB1 {"typeB", ArchiveVersionNumbers::v1};
+    ArchivedObjectInfo objInfoA2 {"typeA", ArchiveVersionNumbers::v2};
+    ArchivedObjectInfo objInfoB2 {"typeB", ArchiveVersionNumbers::v2};
+    ArchivedObjectInfo objInfoA2_2 {"typeA", ArchiveVersionNumbers::v2};
+    testing::ProcessTest("Testing ArchiveObjectInfo op==", (objInfoA1 == objInfoA1));
+    testing::ProcessTest("Testing ArchiveObjectInfo op==", !(objInfoA1 == objInfoB1));
+    testing::ProcessTest("Testing ArchiveObjectInfo op==", !(objInfoA1 == objInfoA2));
+    testing::ProcessTest("Testing ArchiveObjectInfo op==", !(objInfoA1 == objInfoB2));
+    testing::ProcessTest("Testing ArchiveObjectInfo op==", (objInfoA2 == objInfoA2_2));
+
+    testing::ProcessTest("Testing ArchiveObjectInfo op!=", !(objInfoA1 != objInfoA1));
+    testing::ProcessTest("Testing ArchiveObjectInfo op!=", (objInfoA1 != objInfoB1));
+    testing::ProcessTest("Testing ArchiveObjectInfo op!=", (objInfoA1 != objInfoA2));
+    testing::ProcessTest("Testing ArchiveObjectInfo op!=", (objInfoA1 != objInfoB2));
+    testing::ProcessTest("Testing ArchiveObjectInfo op!=", !(objInfoA2 != objInfoA2_2));
+}
+
+void TestArchiveVersion()
+{
+    using utilities::ArchiveVersion;
+    using utilities::ArchiveVersionNumbers;
+
+    ArchiveVersion v0 = ArchiveVersionNumbers::v0_initial;
+    ArchiveVersion v0_2 = ArchiveVersionNumbers::v0_initial;
+    ArchiveVersion v1 = ArchiveVersionNumbers::v1;
+    ArchiveVersion v2 = ArchiveVersionNumbers::v2;
+    ArchiveVersion v3 = ArchiveVersionNumbers::v3_model_metadata;
+    testing::ProcessTest("Testing ArchiveVersion comparisons", v0 == v0_2);
+    testing::ProcessTest("Testing ArchiveVersion comparisons", v0 <= v0_2);
+    testing::ProcessTest("Testing ArchiveVersion comparisons", v0 >= v0_2);
+    testing::ProcessTest("Testing ArchiveVersion comparisons", v0 < v1);
+    testing::ProcessTest("Testing ArchiveVersion comparisons", v1 <= v2);
+    testing::ProcessTest("Testing ArchiveVersion comparisons", v1 < v3);
+    testing::ProcessTest("Testing ArchiveVersion comparisons", !(v0 > v1));
+    testing::ProcessTest("Testing ArchiveVersion comparisons", !(v1 >= v2));
+    testing::ProcessTest("Testing ArchiveVersion comparisons", v3 > v1);
+    testing::ProcessTest("Testing ArchiveVersion comparisons", v3 >= v1);
+}
 
 template <typename ArchiverType>
 void TestArchiver()

@@ -60,6 +60,7 @@ namespace model
         bool HasState() const override { return false; }
         void SetShape(const ell::math::TensorShape& shape) { _shape = shape; }  // STYLE discrepancy
         ell::utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
     private:
         OutputPortBase& _outputBase;
         ell::math::TensorShape _shape;

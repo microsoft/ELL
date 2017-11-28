@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     IArchivable_test.h (utilities)
+//  File:     Archiver_test.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,6 +10,9 @@
 
 namespace ell
 {
+void TestArchivedObjectInfo();
+void TestArchiveVersion();
+
 void TestJsonArchiver();
 void TestJsonUnarchiver();
 

@@ -22,6 +22,9 @@
 // testing
 #include "testing.h"
 
+// utilities
+#include "JsonArchiver.h"
+
 using namespace ell;
 
 inline bool Equals(double a, double b)

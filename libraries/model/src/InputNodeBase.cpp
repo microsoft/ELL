@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     InputNode.cpp (model)
+//  File:     InputNodeBase.cpp (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,6 +12,14 @@ namespace ell
 {
 namespace model
 {
+    namespace
+    {
+        //
+        // Relevant archive format versions
+        //
+        constexpr utilities::ArchiveVersion currentArchiveVersion = {utilities::ArchiveVersionNumbers::v2};
+    }
+
     InputNodeBase::InputNodeBase(OutputPortBase& output, math::TensorShape shape)
         : CompilableNode({}, { &output }), _outputBase(output), _shape(shape)
     {
@@ -19,7 +27,12 @@ namespace model
 
     ell::utilities::ArchiveVersion InputNodeBase::GetArchiveVersion() const
     {
-        return ell::utilities::ArchiveVersion{ 2 };
+        return std::max(currentArchiveVersion, CompilableNode::GetArchiveVersion());
+    }
+
+    bool InputNodeBase::CanReadArchiveVersion(const utilities::ArchiveVersion& version) const
+    {
+        return version >= currentArchiveVersion && CompilableNode::CanReadArchiveVersion(version);
     }
 }
 }

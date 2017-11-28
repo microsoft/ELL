@@ -16,16 +16,31 @@ namespace ell
 {
 namespace utilities
 {
-    bool operator==(const ArchiveVersion& a, const ArchiveVersion& b)
-    {
-        return a.versionNumber == b.versionNumber;
+    //
+    // SerializationContext
+    //
+
+    GenericTypeFactory& SerializationContext::GetTypeFactory()
+    { 
+        if(_previousContext != nullptr)
+        {
+            return _previousContext->GetTypeFactory();
+        }
+        return _typeFactory; 
     }
 
-    bool operator!=(const ArchiveVersion& a, const ArchiveVersion& b)
-    {
-        return !(a == b);
+    VariantTypeRegistry& SerializationContext::GetVariantTypeRegistry()
+    { 
+        if(_previousContext != nullptr)
+        {
+            return _previousContext->GetVariantTypeRegistry();
+        }
+        return _variantTypeRegistry; 
     }
 
+    //
+    // ArchivedObjectInfo
+    //
     bool operator==(const ArchivedObjectInfo& a, const ArchivedObjectInfo& b)
     {
         return (a.type == b.type) && (a.version == b.version);
@@ -33,10 +48,10 @@ namespace utilities
 
     bool operator!=(const ArchivedObjectInfo& a, const ArchivedObjectInfo& b)
     {
-        return !(a == b);
+        return !(a==b);
     }
 
-    //
+   //
     // PropertyArchiver class
     //
     Archiver::PropertyArchiver::PropertyArchiver(Archiver& archiver, const std::string& name)
@@ -114,8 +129,8 @@ namespace utilities
     {
         auto objInfo = BeginUnarchiveObject(name, GetArchivedTypeName(value));
         _objectInfo.push_back(objInfo);
-        // Check for matching version
-        if (objInfo.version != value.GetArchiveVersion())
+
+        if (!value.CanReadArchiveVersion(objInfo.version))
         {
             throw InputException(InputExceptionErrors::versionMismatch, "Attempting to read incompatible version");
         }

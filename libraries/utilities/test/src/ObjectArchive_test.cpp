@@ -25,6 +25,8 @@
 
 namespace ell
 {
+    using namespace utilities;
+
 class InnerObject : public utilities::IArchivable
 {
 public:
@@ -131,15 +133,15 @@ void PrintDescription(const utilities::ObjectArchive& description, std::string n
 void TestGetTypeDescription()
 {
     InnerObject innerObj;
-    auto innerDescription = innerObj.GetDescription();
+    auto innerDescription = GetDescription(innerObj);
     PrintDescription(innerDescription);
 
     OuterObject outerObj;
-    auto outerDescription = outerObj.GetDescription();
+    auto outerDescription = GetDescription(outerObj);
     PrintDescription(outerDescription);
 
     DerivedObject derivedObj;
-    auto derivedDescription = derivedObj.GetDescription();
+    auto derivedDescription = GetDescription(derivedObj);
     PrintDescription(derivedDescription);
 
     testing::ProcessTest("GetDescription", innerDescription.HasProperty("a"));
@@ -157,17 +159,17 @@ void TestGetTypeDescription()
 void TestGetObjectArchive()
 {
     InnerObject innerObj(3, 4.5);
-    auto innerDescription = innerObj.GetDescription();
+    auto innerDescription = GetDescription(innerObj);
     PrintDescription(innerDescription);
     std::cout << std::endl;
 
     OuterObject outerObj("Outer", 5, 6.5);
-    auto outerDescription = outerObj.GetDescription();
+    auto outerDescription = GetDescription(outerObj);
     PrintDescription(outerDescription);
     std::cout << std::endl;
 
     DerivedObject derivedObj(8, 9.5, "derived");
-    auto derivedDescription = derivedObj.GetDescription();
+    auto derivedDescription = GetDescription(derivedObj);
     PrintDescription(derivedDescription);
     std::cout << std::endl;
 

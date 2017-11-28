@@ -12,6 +12,7 @@
 
 // utilities
 #include "IArchivable.h"
+#include "PropertyBag.h"
 
 // stl
 #include <memory>
@@ -156,10 +157,19 @@ namespace model
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;
 
+        /// <summary> Get this object's metadata object. </summary>
+        ///
+        /// <returns> A reference to the PropertyBag containing the metadata for this object. </returns>
+        utilities::PropertyBag& GetMetadata() { return _metadata; }
+        
+        /// <summary> Get this object's metadata object. </summary>
+        ///
+        /// <returns> A const reference to the PropertyBag containing the metadata for this object. </returns>
+        const utilities::PropertyBag& GetMetadata() const { return _metadata; }
+        
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
-        /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(ModelTransformer& transformer) const;
 
         virtual bool HasState() const { return true; }
@@ -167,11 +177,13 @@ namespace model
         void AddInputPort(InputPortBase* input);
         void AddOutputPort(OutputPortBase* output);
 
+        utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         // We're supplying a base implementation from WriteToArchive and ReadFromArchive, but also
         // declaring them as abstract so that subclasses need to implement this themselves.
         void WriteToArchive(utilities::Archiver& archiver) const override = 0; 
         void ReadFromArchive(utilities::Unarchiver& archiver) override = 0;
-
+        
     private:
         friend class Model;
         friend class ModelTransformer;
@@ -185,6 +197,7 @@ namespace model
         std::vector<OutputPortBase*> _outputs;
 
         mutable std::vector<const Node*> _dependentNodes;
+        utilities::PropertyBag _metadata;
     };
 }
 }

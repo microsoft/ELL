@@ -8,9 +8,10 @@
 
 #include "Format_test.h"
 #include "FunctionUtils_test.h"
-#include "IArchivable_test.h"
+#include "Archiver_test.h"
 #include "Iterator_test.h"
 #include "ObjectArchive_test.h"
+#include "PropertyBag_test.h"
 #include "TypeFactory_test.h"
 #include "TypeName_test.h"
 #include "Variant_test.h"
@@ -61,6 +62,11 @@ int main(int argc, char* argv[])
         TestParseVectorVaraint();
         TestParsePortElementsProxyVariant();
         TestParseObjVariant();
+        TestVariantArchive();
+
+        // Verison number tests
+        TestArchivedObjectInfo();
+        TestArchiveVersion();
 
         // Serialization tests
         TestJsonArchiver();
@@ -89,6 +95,9 @@ int main(int argc, char* argv[])
         // File system tests
         TestStringf();
         TestUnicodePaths(basePath);
+
+        // PropertyBag tests
+        TestPropertyBag();
     }
     catch (const utilities::Exception& exception)
     {

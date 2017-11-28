@@ -15,6 +15,7 @@
 // utilities
 #include "IArchivable.h"
 #include "IIterator.h"
+#include "PropertyBag.h"
 
 // stl
 #include <map>
@@ -189,14 +190,20 @@ namespace model
         /// <param name="outputNode"> The node to be computed. </param>
         void PrintSubset(std::ostream& os, const Node* outputNode) const;
 
-        /// <summary> Gets the current archive format version. </summary>
+        /// <summary> Get this object's metadata object. </summary>
         ///
-        /// <returns> The current archive format version. </summary>
-        static utilities::ArchiveVersion GetCurrentArchiveVersion();
+        /// <returns> A reference to the PropertyBag containing the metadata for this object. </returns>
+        utilities::PropertyBag& GetMetadata() { return _metadata; }
 
+        /// <summary> Get this object's metadata object. </summary>
+        ///
+        /// <returns> A const reference to the PropertyBag containing the metadata for this object. </returns>
+        const utilities::PropertyBag& GetMetadata() const { return _metadata; }
+        
     protected:
         // Serialization-related methods
         utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
@@ -207,6 +214,7 @@ namespace model
         // to look nodes up by id.
         // We keep it sorted by id to make visiting all nodes deterministically ordered
         std::map<Node::NodeId, std::shared_ptr<Node>, std::less<Node::NodeId>> _idToNodeMap;
+        utilities::PropertyBag _metadata;
     };
 
     /// <summary> A serialization context used during model deserialization. Wraps an existing `SerializationContext`
@@ -216,14 +224,8 @@ namespace model
     public:
         /// <summary> Constructor </summary>
         ///
-        /// <param name="previousContext"> The `SerializationContext` to wrap </param>
         /// <param name="model"> The model being constructed </param>
         ModelSerializationContext(utilities::SerializationContext& previousContext, const Model* model);
-
-        /// <summary> Gets the type factory associated with this context. </summary>
-        ///
-        /// <returns> The type factory associated with this context. </returns>
-        utilities::GenericTypeFactory& GetTypeFactory() override { return _previousContext.GetTypeFactory(); }
 
         /// <summary> Sets the model this map is deserializing
         ///
@@ -247,7 +249,6 @@ namespace model
         void MapNode(const Node::NodeId& id, Node* node);
 
     private:
-        utilities::SerializationContext& _previousContext;
         const Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };

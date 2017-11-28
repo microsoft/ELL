@@ -6,14 +6,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// math
+#include "VectorOperations.h"
+
 // testing
 #include "testing.h"
 
+// utilities
+#include "JsonArchiver.h"
+
 // stl
 #include <sstream>
-
-// math
-#include "VectorOperations.h"
 
 template <typename ElementType>
 void TestVectorIndexer()

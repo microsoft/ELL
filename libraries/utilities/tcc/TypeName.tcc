@@ -49,7 +49,7 @@ namespace utilities
     template <typename Type>
     std::string GetTypeName()
     {
-        return TypeName<Type>::GetName();
+        return TypeName<typename std::decay_t<Type>>::GetName();
     }
 
     template <typename... Types>

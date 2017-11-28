@@ -9,6 +9,9 @@
 #include "Model_test.h"
 #include "ModelTestUtilities.h"
 
+// common
+#include "LoadModel.h"
+
 // model
 #include "InputNode.h"
 #include "InputPort.h"
@@ -23,9 +26,6 @@
 #include "ExtremalValueNode.h"
 #include "MovingAverageNode.h"
 #include "ValueSelectorNode.h"
-
-// common
-#include "LoadModel.h"
 
 // testing
 #include "testing.h"
@@ -135,6 +135,68 @@ void TestExampleModel()
 
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     std::cout << "# input nodes: " << inputNodes.size() << std::endl;
+}
+
+void TestModelSerialization()
+{
+    auto model1 = common::LoadModel("[1]");
+    std::stringstream buffer;
+    utilities::JsonArchiver archiver(buffer);
+    archiver << model1;
+
+    // Now unarchive model
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    utilities::JsonUnarchiver unarchiver(buffer, context);
+    model::Model model2;
+    unarchiver >> model2;
+
+    testing::ProcessTest("Testing model serialization", testing::IsEqual(model1.Size(), model2.Size()));
+}
+
+void TestModelMetadata()
+{
+    auto model = common::LoadModel("[1]");
+    auto iter = model.GetNodeIterator();
+    while (iter.IsValid())
+    {
+        auto node = const_cast<model::Node*>(iter.Get());
+        auto typeName = node->GetRuntimeTypeName();
+        node->GetMetadata().SetEntry("visited", std::string("true"));
+        node->GetMetadata().SetEntry("typeName", std::string(typeName));
+        node->GetMetadata().SetEntry("foo", std::string("bar"));
+        node->GetMetadata().SetEntry("foo", std::string("baz"));
+        iter.Next();
+    }
+
+    auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
+    for (auto inputNode : inputNodes)
+    {
+        auto node = const_cast<model::InputNode<double>*>(inputNode);
+        node->GetMetadata().SetEntry("isInput", std::string("true"));
+    }
+
+    // Print archive of model:
+    std::cout << "Model with metadata:" << std::endl;
+    utilities::JsonArchiver printArchiver(std::cout);
+    printArchiver << model;
+
+    std::stringstream buffer;
+    utilities::JsonArchiver archiver(buffer);
+    archiver << model;
+
+    // Now unarchive model
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    utilities::JsonUnarchiver unarchiver(buffer, context);
+    model::Model model2;
+    unarchiver >> model2;
+    auto inputNodes2 = model2.GetNodesByType<model::InputNode<double>>();
+    for (auto inputNode : inputNodes2)
+    {
+        testing::ProcessTest("Testing metadata unarchiving", inputNode->GetMetadata().HasEntry("isInput"));
+        testing::ProcessTest("Testing metadata unarchiving", inputNode->GetMetadata().GetEntry<std::string>("isInput") == "true");
+    }
 }
 
 void TestInputRouting1()

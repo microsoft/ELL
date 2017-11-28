@@ -207,4 +207,24 @@ void TestVariantToString()
     testing::ProcessTest("Variant ToString", v4.ToString() == "0");
 }
 
+void TestVariantArchive()
+{
+    // Serialization
+    utilities::Variant variant(std::string("hello"));
+
+    std::stringstream strstream;
+    {
+        utilities::JsonArchiver archiver(strstream);
+        // archiver << variant;
+    }
+
+    std::cout << "Archived variant:" << std::endl;
+    std::cout << strstream.str() << std::endl;
+
+    utilities::SerializationContext context;
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+    utilities::Variant variant2;
+    // unarchiver >> variant2;
+}
+
 } // end namespace

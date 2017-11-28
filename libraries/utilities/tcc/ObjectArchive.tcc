@@ -44,5 +44,14 @@ namespace utilities
     {
         SetValue(value);
     }
+
+    //
+    // Functions
+    //
+    template <typename ValueType>
+    ValueType CreateObject(const ObjectArchive& archive)
+    {
+        return archive.GetValue<ValueType>();
+    }
 }
 }

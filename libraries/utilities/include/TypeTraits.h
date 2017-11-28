@@ -52,7 +52,11 @@ namespace utilities
 
     /// <summary> Enabled if ValueType is a fundamental value. </summary>
     template <typename ValueType>
-    using IsFundamental = typename std::enable_if_t<std::is_fundamental<std::decay_t<ValueType>>::value, int>;
+    using IsFundamental = typename std::enable_if_t<std::is_fundamental<std::decay_t<ValueType>>::value, bool>;
+
+    /// <summary> Enabled if ValueType is not a fundamental value. </summary>
+    template <typename ValueType>
+    using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<std::decay_t<ValueType>>::value, bool>;
 
     /// <summary> Enabled if ValueType is an integer value. </summary>
     template <typename ValueType>
@@ -62,21 +66,17 @@ namespace utilities
     template <typename ValueType>
     using IsNonBooleanIntegral = typename std::enable_if_t<std::is_integral<std::decay_t<ValueType>>::value && !std::is_same<std::decay_t<ValueType>, bool>::value, bool>;
 
-    /// <summary> Enabled if ValueType is not a fundamental value. </summary>
-    template <typename ValueType>
-    using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<std::decay_t<ValueType>>::value, int>;
-
-    /// <summary> Enabled if ValueType is not a specialization of std::vector. </summary>
-    template <typename ValueType>
-    using IsNotVector = typename std::enable_if_t<!IsVectorType<std::decay_t<ValueType>>::value, int>;
-
     /// <summary> Enabled if the two classes are the same. </summary>
     template <typename T, typename S>
     using IsSame = typename std::enable_if_t<std::is_same<T, S>::value, bool>;
 
     /// <summary> Enabled if ValueType is a specialization of std::vector. </summary>
     template <typename ValueType>
-    using IsVector = typename std::enable_if_t<IsVectorType<std::decay_t<ValueType>>::value, int>;
+    using IsVector = typename std::enable_if_t<IsVectorType<std::decay_t<ValueType>>::value, bool>;
+
+    /// <summary> Enabled if ValueType is not a specialization of std::vector. </summary>
+    template <typename ValueType>
+    using IsNotVector = typename std::enable_if_t<!IsVectorType<std::decay_t<ValueType>>::value, bool>;
 }
 }
 

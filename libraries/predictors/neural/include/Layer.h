@@ -289,17 +289,10 @@ namespace neural
 
     public:
         /// <summary> Constructor </summary>
-        ///
-        /// <param name="previousContext"> The `SerializationContext` to wrap </param>
         LayerSerializationContext(utilities::SerializationContext& previousContext)
-            : _previousContext(previousContext), _outputReference(math::IntegerTriplet{ 0, 0, 0 }) {}
+            : SerializationContext(previousContext, {}), _outputReference(math::IntegerTriplet{ 0, 0, 0 }) {}
 
         ~LayerSerializationContext() override {}
-
-        /// <summary> Gets the type factory associated with this context. </summary>
-        ///
-        /// <returns> The type factory associated with this context. </returns>
-        utilities::GenericTypeFactory& GetTypeFactory() override { return _previousContext.GetTypeFactory(); }
 
         /// <summary> Sets the output reference to be saved in the context.
         ///
@@ -312,7 +305,6 @@ namespace neural
         ConstTensorReferenceType GetPreviousOutputReference() { return _outputReference; }
 
     private:
-        utilities::SerializationContext& _previousContext;
         ConstTensorReferenceType _outputReference;
     };
 }

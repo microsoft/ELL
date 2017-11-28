@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
     }
     catch (const std::exception& exception)
     {
-        std::cerr << "ERROR, got ELL unhandled exception. Message: " << exception.what() << std::endl;
+        std::cerr << "ERROR, got unhandled exception. Message: " << exception.what() << std::endl;
         return 1;
     }
 

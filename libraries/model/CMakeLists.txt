@@ -9,7 +9,7 @@ set (src
     src/CompilableNodeUtilities.cpp
     src/CompiledMap.cpp
     src/DynamicMap.cpp
-    src/InputNode.cpp
+    src/InputNodeBase.cpp
     src/InputPort.cpp
     src/IRCompiledMap.cpp
     src/IRMapCompiler.cpp

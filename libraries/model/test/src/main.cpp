@@ -28,12 +28,14 @@ using namespace ell;
 
 int main()
 {
-    //    try
+    try
     {
         // Model tests
         TestStaticModel();
         TestNodeIterator();
         TestExampleModel();
+        TestModelSerialization();
+        TestModelMetadata();
         TestInputRouting1();
         TestInputRouting2();
 
@@ -80,11 +82,16 @@ int main()
         // Test ModelBuilder::AddNode(string, vector<string>)
         TestVariantAddInputNodesParsedArgs();
     }
-    //    catch (const utilities::Exception& exception)
-    //    {
-    //        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
-    //        throw;
-    //    }
+    catch (const utilities::Exception& exception)
+    {
+        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
+        return 1;
+    }
+    catch (const std::exception& exception)
+    {
+        std::cerr << "ERROR, got unhandled exception. Message: " << exception.what() << std::endl;
+        return 1;
+    }
 
     if (testing::DidTestFail())
     {

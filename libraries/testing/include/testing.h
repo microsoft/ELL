@@ -17,6 +17,26 @@ namespace ell
 /// <summary> testing namespace </summary>
 namespace testing
 {
+    /// <summary> Checks if a value is true </summary>
+    ///
+    /// <param name="a"> The value to check </param>
+    ///
+    /// <returns> The truth value of the value </returns>
+    inline bool IsTrue(bool a)
+    {
+        return a;
+    }
+
+    /// <summary> Checks if a value is false </summary>
+    ///
+    /// <param name="a"> The value to check </param>
+    ///
+    /// <returns> The negated truth value of the value </returns>
+    inline bool IsFalse(bool a)
+    {
+        return !a;
+    }
+
     /// <summary> Checks if two values are exactly equal. </summary>
     ///
     /// <param name="a"> The first value. </param>

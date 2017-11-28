@@ -1,19 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     IArchivable.tcc (utilities)
+//  File:     PropertyBag_test.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma once
+
 namespace ell
 {
-namespace utilities
-{
-    template <typename ValueType>
-    static ValueType CreateObject(const ObjectArchive& archive)
-    {
-        return archive.GetValue<ValueType>();
-    }
-}
+void TestPropertyBag();
 }

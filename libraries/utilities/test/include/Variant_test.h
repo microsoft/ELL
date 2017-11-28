@@ -22,4 +22,5 @@ void TestParsePortElementsProxyVariant();
 void TestParseObjVariant();
 
 void TestVariantToString();
+void TestVariantArchive();
 }

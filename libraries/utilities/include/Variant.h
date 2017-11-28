@@ -11,32 +11,57 @@
 #include "Archiver.h"
 #include "Exception.h"
 #include "FunctionUtils.h"
-#include "TypeName.h"
+#include "IArchivable.h"
 #include "JsonArchiver.h"
+#include "TypeName.h"
 
 // stl
 #include <cassert>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <type_traits>
 #include <typeindex>
+#include <unordered_map>
 #include <utility>
-
-class IArchivable;
 
 namespace ell
 {
 namespace utilities
 {
+    class Variant;
+
     namespace VariantDetail
     {
         class VariantBase;
     }
 
+    /// <summary> Enabled if ValueType is a Variant. </summary>
+    template <typename ValueType>
+    using IsVariant = typename std::enable_if_t<std::is_same<std::decay_t<ValueType>, Variant>::value, bool>;
+
+    /// <summary> Disabled if ValueType is a Variant. </summary>
+    template <typename ValueType>
+    using IsNotVariant = typename std::enable_if_t<!std::is_same<std::decay_t<ValueType>, Variant>::value, bool>;
+
+    /// <summary> </summary>
+    template <typename ValueType>
+    using IsArchivableVariantType = typename std::enable_if_t<(std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value) ||
+                                                                  (std::is_fundamental<typename std::decay<ValueType>::type>::value) ||
+                                                                  (std::is_same<typename std::decay<ValueType>::type, std::string>::value),
+                                                              bool>;
+
+    // TODO: also add std::array of archivable variant types
+    template <typename ValueType>
+    using IsNotArchivableVariantType = typename std::enable_if_t<(!std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value) &&
+                                                                     (!std::is_fundamental<typename std::decay<ValueType>::type>::value) &&
+                                                                     (!std::is_same<typename std::decay<ValueType>::type, std::string>::value),
+                                                                 bool>;
+
     /// <summary> A class that can hold any kind of value and provide a type-safe way to access it </summary>
-    class Variant
+    class Variant : public IArchivable
     {
     public:
         /// <summary> Default Constructor for an empty variant </summary>
@@ -47,7 +72,7 @@ namespace utilities
         Variant();
 
         /// <summary> Constructor from basic (non-variant) types. </summary>
-        template <typename ValueType>
+        template <typename ValueType, IsNotVariant<ValueType> concept = true>
         explicit Variant(ValueType&& value);
 
         /// <summary> Copy constructor. </summary>
@@ -63,7 +88,7 @@ namespace utilities
         Variant& operator=(Variant&& other) = default;
 
         /// <summary> Assignment operator from basic (non-variant) types. </summary>
-        template <typename ValueType>
+        template <typename ValueType, IsNotVariant<ValueType> concept = true>
         Variant& operator=(ValueType&& value);
 
         /// <summary> Gets a string representation of the value. </summary>
@@ -80,7 +105,7 @@ namespace utilities
         ///
         /// <returns> The variant's current value. </returns>
         template <typename ValueType>
-        ValueType GetValue() const;
+        const ValueType& GetValue() const;
 
         /// <summary> Attempt to get a type-safe value from the variant. </summary>
         ///
@@ -136,10 +161,16 @@ namespace utilities
         template <typename ValueType>
         bool TrySetValueFrom(ValueType&& value);
 
-        /// <summary></summary>
+        /// <summary> Set the variant to a value of the same type. </summary>
+        ///
+        /// <param name="value"> The value to set this Variant to </param>
+        /// <returns> `true` if success, `false` if types differ. </returns>
         bool TrySetValueFrom(const Variant& value);
 
-        /// <summary></summary>
+        /// <summary> Set the variant to a value of the same type. </summary>
+        ///
+        /// <param name="value"> The value to set this Variant to </param>
+        /// <returns> `true` if success, `false` if types differ. </returns>
         bool TrySetValueFrom(Variant& value);
 
         /// <summary> Set a Variant's value from a string (preserving its type) </summary>
@@ -200,6 +231,19 @@ namespace utilities
         /// <summary> Gets the name of this type. </summary>
         static std::string GetTypeName() { return "Variant"; }
 
+        /// <summary> Gets the name of this type. </summary>
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Helpful operator overloads for variants </summary>
+        void operator++(); // Prefix increment
+        void operator++(int); // Postfix increment
+        void operator--(); // Prefix decrement
+        void operator--(int); // Postfix decrement
+
+    protected:
+        void WriteToArchive(Archiver& archiver) const override;
+        void ReadFromArchive(Unarchiver& archiver) override;
+
     private:
         friend std::string to_string(const Variant& variant);
         friend class IArchivable;
@@ -208,9 +252,14 @@ namespace utilities
         friend Variant MakeVariant(Args&&... args);
 
         Variant(std::type_index type, std::unique_ptr<VariantDetail::VariantBase> variantValue);
-
-        void ArchiveProperty(const char* name, Archiver& archiver) const;
-        void UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context);
+        void RegisterArchivableVariantTypes(VariantTypeRegistry& registry);
+        template <typename ValueType>
+        void RegisterArchivableVariantType(VariantTypeRegistry& registry);
+        template <typename ValueType>
+        void RegisterArchivableVariantVectorType(VariantTypeRegistry& registry);
+    
+        VariantDetail::VariantBase* GetBasePointer() { return _value.get(); }
+        const VariantDetail::VariantBase* GetBasePointer() const { return _value.get(); }
 
         std::type_index _type;
         std::unique_ptr<VariantDetail::VariantBase> _value;

@@ -13,7 +13,7 @@ namespace ell
 {
 namespace predictors
 {
-    constexpr int c_currentNeuralNetworkPredictorArchiveVersion = 1;
+    constexpr utilities::ArchiveVersion c_currentNeuralNetworkPredictorArchiveVersion = {utilities::ArchiveVersionNumbers::v1};
 
     template <typename ElementType>
     NeuralNetworkPredictor<ElementType>::NeuralNetworkPredictor(InputLayerReference&& inputLayer, Layers&& layers) :
@@ -179,7 +179,7 @@ namespace predictors
     template <typename ElementType>
     utilities::ArchiveVersion NeuralNetworkPredictor<ElementType>::GetCurrentArchiveVersion()
     {
-        return { c_currentNeuralNetworkPredictorArchiveVersion };        
+        return c_currentNeuralNetworkPredictorArchiveVersion;
     }
 
     template <typename ElementType>
@@ -187,7 +187,5 @@ namespace predictors
     {
         return GetCurrentArchiveVersion();
     }
-
-
 }
 }

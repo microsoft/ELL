@@ -23,6 +23,7 @@
 // utilities
 #include "Exception.h"
 #include "IArchivable.h"
+#include "PropertyBag.h"
 #include "StlIndexValueIterator.h"
 #include "TypeTraits.h"
 
@@ -298,6 +299,16 @@ namespace model
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Get this object's metadata object. </summary>
+        ///
+        /// <returns> A reference to the PropertyBag containing the metadata for this object. </returns>
+        utilities::PropertyBag& GetMetadata() { return _metadata; }
+        
+        /// <summary> Get this object's metadata object. </summary>
+        ///
+        /// <returns> A const reference to the PropertyBag containing the metadata for this object. </returns>
+        const utilities::PropertyBag& GetMetadata() const { return _metadata; }
+        
         /// <summary> Swaps the contents of two maps. </summary>
         ///
         /// <param name="a"> One of the maps to swap. </param>
@@ -335,9 +346,11 @@ namespace model
         template<typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         DataVectorType ComputeOutput(const PortElementsBase& elements) const;
 
+        utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
+        
         virtual void SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const;
         virtual void SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const;
         virtual void SetNodeInput(InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const;
@@ -350,8 +363,6 @@ namespace model
         virtual std::vector<float> ComputeFloatOutput(const PortElementsBase& outputs) const;
         virtual std::vector<double> ComputeDoubleOutput(const PortElementsBase& outputs) const;
 
-        ell::utilities::ArchiveVersion GetArchiveVersion() const override;
-
     private:
         Model _model;
 
@@ -362,21 +373,20 @@ namespace model
         std::vector<PortElementsBase> _outputElements;
         std::vector<std::string> _outputNames;
         std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
+        utilities::PropertyBag _metadata;
 
         std::vector<const Node*> GetAllOutputNodes() const;
         std::vector<const Node*> GetDebugSinkNodes() const;
         void FixTransformedIO(ModelTransformer& transformer);
     };
 
-    /// <summary> A serialization context used during model deserialization. Wraps an existing `SerializationContext`
-    /// and adds access to the model being constructed. </summary>
+    /// <summary> A serialization context used during DynamicMap deserialization. Wraps an existing `ModelSerializationContext` </summary>
     class DynamicMapSerializationContext : public ModelSerializationContext
     {
     public:
         /// <summary> Constructor </summary>
         ///
         /// <param name="previousContext"> The `SerializationContext` to wrap </param>
-        /// <param name="model"> The model being constructed </param>
         DynamicMapSerializationContext(utilities::SerializationContext& previousContext);
     };
 }

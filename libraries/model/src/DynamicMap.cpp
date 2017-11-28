@@ -10,6 +10,7 @@
 #include "Exception.h"
 #include "ModelTransformer.h"
 #include "OutputNode.h"
+
 // stl
 #include <algorithm>
 #include <unordered_set>
@@ -21,6 +22,15 @@ namespace ell
 {
 namespace model
 {
+    namespace
+    {
+        //
+        // Relevant archive format versions
+        //
+        constexpr utilities::ArchiveVersion noMetadataArchiveVersion = { utilities::ArchiveVersionNumbers::v2 };
+        constexpr utilities::ArchiveVersion metadataArchiveVersion = { utilities::ArchiveVersionNumbers::v3_model_metadata };
+    }
+
     DynamicMap::DynamicMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs)
     {
         TransformContext context;
@@ -199,7 +209,8 @@ namespace model
         // gather SinkNodes
         std::unordered_set<const Node*> sinkNodes;
         _model.Visit([&](const Node& node) {
-            if (node.GetRuntimeTypeName().find("DebugSinkNode") != std::string::npos) {
+            if (node.GetRuntimeTypeName().find("DebugSinkNode") != std::string::npos)
+            {
                 auto parents = node.GetParentNodes();
                 for (auto ptr = parents.begin(), end = parents.end(); ptr != end; ptr++)
                 {
@@ -208,7 +219,8 @@ namespace model
                     for (auto ptr2 = dependents.begin(), end2 = dependents.end(); ptr2 != end2; ptr2++)
                     {
                         const Node* dep = *ptr2;
-                        if (dep != &node) {
+                        if (dep != &node)
+                        {
                             // then we want to keep this DebugSinkNode, it should not get pruned.
                             sinkNodes.insert(&node);
                             break;
@@ -217,7 +229,7 @@ namespace model
                 }
             }
         });
-        return{ sinkNodes.begin(), sinkNodes.end() };
+        return { sinkNodes.begin(), sinkNodes.end() };
     }
 
     void DynamicMap::FixTransformedIO(ModelTransformer& transformer)
@@ -290,7 +302,8 @@ namespace model
         {
             const Node* node = *iter;
             const OutputNodeBase* outputNode = dynamic_cast<const OutputNodeBase*>(node);
-            if (outputNode != nullptr) {
+            if (outputNode != nullptr)
+            {
                 result.push_back(outputNode);
             }
         }
@@ -300,7 +313,8 @@ namespace model
     math::TensorShape DynamicMap::GetOutputShape() const
     {
         auto outputNodeVec = GetOutputNodes();
-        if (outputNodeVec.size() > 0) {
+        if (outputNodeVec.size() > 0)
+        {
             const OutputNodeBase* node = dynamic_cast<const OutputNodeBase*>(outputNodeVec[0]);
             return node->GetShape();
         }
@@ -346,9 +360,21 @@ namespace model
         _model = std::move(refinedModel);
     }
 
-    ell::utilities::ArchiveVersion DynamicMap::GetArchiveVersion() const
+    utilities::ArchiveVersion DynamicMap::GetArchiveVersion() const
     {
-        return Model::GetCurrentArchiveVersion();
+        if (_metadata.IsEmpty())
+        {
+            return noMetadataArchiveVersion;
+        }
+        else
+        {
+            return metadataArchiveVersion;
+        }
+    }
+
+    bool DynamicMap::CanReadArchiveVersion(const utilities::ArchiveVersion& version) const
+    {
+        return version >= noMetadataArchiveVersion && version <= metadataArchiveVersion;
     }
 
     void DynamicMap::WriteToArchive(utilities::Archiver& archiver) const

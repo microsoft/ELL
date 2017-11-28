@@ -110,16 +110,76 @@ namespace utilities
         return other._type == _type;
     }
 
-    void Variant::ArchiveProperty(const char* name, Archiver& archiver) const
+    void Variant::WriteToArchive(utilities::Archiver& archiver) const
     {
-        _value->ArchiveProperty(name, archiver);
+        archiver["type"] << GetStoredTypeName();
+        archiver["value"] << *_value;
     }
 
-    void Variant::UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context)
+    void Variant::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        _value->UnarchiveProperty(name, archiver, context);
+        auto& context = archiver.GetContext();
+        auto& registry = context.GetVariantTypeRegistry();
+        if (registry.IsEmpty())
+        {
+            RegisterArchivableVariantTypes(registry);
+        }
+
+        std::string type;
+        archiver["type"] >> type;
+        registry.SetVariantType(*this, type);
+        archiver["value"] >> *_value;
+
+        assert(_value);
     }
 
+    void Variant::RegisterArchivableVariantTypes(VariantTypeRegistry& registry)
+    {
+        // Basic types
+        RegisterArchivableVariantType<bool>(registry);
+        RegisterArchivableVariantType<int>(registry);
+        RegisterArchivableVariantType<int32_t>(registry);
+        RegisterArchivableVariantType<int64_t>(registry);
+        RegisterArchivableVariantType<float>(registry);
+        RegisterArchivableVariantType<double>(registry);
+        RegisterArchivableVariantType<std::string>(registry);
+
+        // Vectors of basic types
+        RegisterArchivableVariantVectorType<bool>(registry);
+        RegisterArchivableVariantVectorType<int>(registry);
+        RegisterArchivableVariantVectorType<int32_t>(registry);
+        RegisterArchivableVariantVectorType<int64_t>(registry);
+        RegisterArchivableVariantVectorType<float>(registry);
+        RegisterArchivableVariantVectorType<double>(registry);
+        RegisterArchivableVariantVectorType<std::string>(registry);
+    }
+
+    //
+    // Operators
+    //
+    void Variant::operator++() // Prefix increment
+    {
+        _value->operator++();
+    }
+
+    void Variant::operator++(int) // Postfix increment
+    {
+        _value->operator++(0);
+    }
+
+    void Variant::operator--() // Prefix decrement
+    {
+        _value->operator--();
+    }
+
+    void Variant::operator--(int) // Postfix decrement
+    {
+        _value->operator--(0);
+    }
+
+    //
+    // Functions
+    //
     std::string to_string(const Variant& variant)
     {
         return variant.ToString();

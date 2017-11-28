@@ -367,7 +367,6 @@ namespace nodes
     void BroadcastFunctionNode<ValueType, FunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         const auto& compilerSettings = compiler.GetCompilerParameters();
-        const auto broadcastDimension = GetBroadcastDimension();
 
         auto& module = function.GetModule();
         auto& emitter = module.GetIREmitter();

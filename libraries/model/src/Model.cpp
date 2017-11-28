@@ -21,9 +21,10 @@ namespace model
     namespace
     {
         //
-        // Current Model archive format version
+        // Relevant archive format versions
         //
-        const int c_currentModelArchiveVersion = 2;
+        constexpr utilities::ArchiveVersion noMetadataArchiveVersion = { utilities::ArchiveVersionNumbers::v2 };
+        constexpr utilities::ArchiveVersion metadataArchiveVersion = { utilities::ArchiveVersionNumbers::v3_model_metadata };
     }
 
     //
@@ -60,14 +61,21 @@ namespace model
         return NodeIterator(this, outputNodes);
     }
 
-    utilities::ArchiveVersion Model::GetCurrentArchiveVersion()
-    {
-        return { c_currentModelArchiveVersion };
-    }
-
     utilities::ArchiveVersion Model::GetArchiveVersion() const
     {
-        return GetCurrentArchiveVersion();
+        if (_metadata.IsEmpty())
+        {
+            return noMetadataArchiveVersion;
+        }
+        else
+        {
+            return metadataArchiveVersion;
+        }
+    }
+
+    bool Model::CanReadArchiveVersion(const utilities::ArchiveVersion& version) const
+    {
+        return version >= noMetadataArchiveVersion && version <= metadataArchiveVersion;
     }
 
     void Model::WriteToArchive(utilities::Archiver& archiver) const
@@ -81,6 +89,10 @@ namespace model
         }
 
         archiver["nodes"] << nodes;
+        if (!_metadata.IsEmpty())
+        {
+            archiver["metadata"] << _metadata;
+        }
     }
 
     void Model::ReadFromArchive(utilities::Unarchiver& archiver)
@@ -98,6 +110,10 @@ namespace model
             std::shared_ptr<Node> sharedNode = std::shared_ptr<Node>(node.release());
             sharedNode->RegisterDependencies();
             _idToNodeMap[sharedNode->GetId()] = sharedNode;
+        }
+        if (archiver.HasNextPropertyName("metadata"))
+        {
+            archiver["metadata"] >> _metadata;
         }
         archiver.PopContext();
     }
@@ -190,7 +206,7 @@ namespace model
     // ModelSerializationContext
     //
     ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& previousContext, const Model* model)
-        : _previousContext(previousContext), _model(model)
+        : utilities::SerializationContext(previousContext, {}), _model(model)
     {
         auto mapContext = dynamic_cast<ModelSerializationContext*>(&previousContext);
         if (mapContext != nullptr)
@@ -214,7 +230,7 @@ namespace model
         _oldToNewNodeMap[id] = node;
 
         // if the old context is a ModelSerializationContext, forward the MapNode call to it
-        auto mapContext = dynamic_cast<ModelSerializationContext*>(&_previousContext);
+        auto mapContext = dynamic_cast<ModelSerializationContext*>(GetPreviousContext());
         if (mapContext != nullptr)
         {
             mapContext->MapNode(id, node);
