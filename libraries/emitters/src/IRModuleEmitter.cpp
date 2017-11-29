@@ -396,6 +396,7 @@ namespace emitters
         global->setInitializer(pInitial);
         global->setConstant(isConst);
         global->setExternallyInitialized(false);
+        global->setLinkage(llvm::GlobalValue::LinkageTypes::InternalLinkage);
         assert(llvm::isa<llvm::GlobalVariable>(global));
         return llvm::cast<llvm::GlobalVariable>(global);
     }
