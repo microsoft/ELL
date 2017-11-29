@@ -12,6 +12,7 @@ import sys
 import argparse
 import re
 import subprocess
+import datetime
 
 # local helpers
 import model_info_retriever as mir
@@ -67,8 +68,9 @@ class GenerateMarkdown:
         args = self.arg_parser.parse_args(argv)
 
         self.modeldir = args.modeldir
-        self.model = os.path.basename(self.modeldir)
         self.outfile = args.outfile
+        self.model = os.path.basename(self.outfile)
+        self.model = os.path.splitext(self.model)[0]
         self.printexe = args.printexe
         self.user = " ".join(args.user)
 
@@ -86,7 +88,7 @@ class GenerateMarkdown:
 
     def get_model_info(self):
         """Gathers information about the model"""
-        with mir.ModelInfoRetriever(self.modeldir, self.model) as model_data:
+        with mir. ModelInfoRetriever(self.modeldir, self.model) as model_data:
             self.model_data = {
                 "accuracy" : model_data.get_model_topN_accuracies(),
                 "architecture" : model_data.get_model_architecture(self.printexe),
@@ -148,7 +150,15 @@ class GenerateMarkdown:
         self._set_value("@pi3_SECONDS_PER_FRAME@", self.model_data["timings"].get("pi3", ""))
 
     def save_model_info(self):
-        """Saves information about the model to file"""
+        """Saves information about the model to file
+        Added application name and timestamp so models named the same can be processed at the same time"""
+        split_outfile = os.path.splitext(self.outfile)
+        splitpath_outfile = os.path.split(split_outfile[0])
+        self.outfile = "{}_{}_{}{}".format(
+            os.path.join(splitpath_outfile[0], os.path.basename(self.modeldir)),
+            splitpath_outfile[1],
+            datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
+            split_outfile[1])
         with open(self.outfile, 'w', encoding='utf-8') as of:
             of.write(self.template)
         print("Saved to: " + self.outfile)

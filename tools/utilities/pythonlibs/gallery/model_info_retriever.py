@@ -200,10 +200,13 @@ class ModelInfoRetriever:
         filename = self._get_data_filename("modelargs.json")
         with open(filename, "r") as f:
             results = json.loads(f.read())
-            properties["image_size"] = results["image_size"]
-            properties["num_classes"] = results["num_classes"]
-            properties["model"] = results["model"]
-            properties["name"] = results["name"]
+            properties["image_size"] = results.get("image_size")
+            properties["num_classes"] = results.get("num_classes")
+            properties["model"] = results.get("model")
+            properties["name"] = results.get("name")
+            properties["filter_size"] = results.get("filter_size", 3)
+            properties["increase_factor"] = results.get("increase_factor", 0)
+            self.model = properties["name"] # regardless of the name of the folder, this will get the proper model name (i.e. <modelname>.cntk)
 
             # optional property
             properties["trainer"] = results.get("trainer", "CNTK 2.2")

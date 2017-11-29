@@ -127,32 +127,25 @@ class PlotModelStats:
                         if model_properties['model'] in self.model_name or self.model_name[0] == 'all':
                             accuracy = model_data.get_model_topN_accuracies()
                             speed = model_data.get_model_seconds_per_frame(self.plot_targets)                 
-                            self.model_stats.append({"name": model_properties['name'], "model": model_properties['model'], "image_size": model_properties['image_size'], "accuracy" : accuracy, "secs_per_frame" : speed})
+                            self.model_stats.append({"name": model_properties['name'], "model": model_properties['model'], \
+                             "image_size": model_properties['image_size'], "accuracy" : accuracy, "secs_per_frame" : speed, \
+                             "filter_size": model_properties['filter_size'], "increase_factor": model_properties['increase_factor'], \
+                             "directory": model})
                 except:
                     print("Could not collect stats for model '{}', skipping".format(model))
 
-    def pareto_frontier(self, x, ytop1, ytop5, models, names, image_size, max_x):
+    def pareto_frontier(self, x, ytop1, ytop5, models, names, image_size, filter_size, increase_factor, directory, max_x):
         """Takes lists of x and ytop1 values, and return the sorted elements that lie on the Pareto frontier
            reference: http://oco-carbon.com/metrics/find-pareto-frontiers-in-python/
         """
         # sort the values in ascending order, and apply a limit to x
-        values = sorted([[float(x[i]), float(ytop1[i]), float(ytop5[i]), models[i], image_size[i], names[i]]
+        values = sorted([[float(x[i]), float(ytop1[i]), float(ytop5[i]), models[i], names[i], image_size[i], filter_size[i], increase_factor[i], directory[i]]
                  for i in range(len(x)) if float(x[i]) < max_x], reverse=False)
         frontier = [values[0]]
         for pair in values[1:]:
             if pair[1] >= frontier[-1][1]: # look for higher values of Y...
                 frontier.append(pair) # add them to the Pareto frontier
-
-        # frontier
-        frontier_x = [pair[0] for pair in frontier]
-        frontier_ytop1 = [pair[1] for pair in frontier]
-
-        # extra information
-        frontier_ytop5 = [pair[2] for pair in frontier]
-        frontier_model = [pair[3] for pair in frontier]
-        frontier_image_size = [pair[4] for pair in frontier]
-        frontier_names = [pair[5] for pair in frontier]
-        return frontier_x, frontier_ytop1, frontier_ytop5, frontier_model, frontier_image_size, frontier_names
+        return zip(*frontier)
 
     def compute_series(self):
         """Computes the series to be plotted, including the pareto frontier"""
@@ -176,6 +169,12 @@ class PlotModelStats:
             image_size = [int(stat["image_size"]) for stat in self.model_stats if (platform in stat["secs_per_frame"])]
             ytop1 = [float(stat["accuracy"]["top1"]) for stat in self.model_stats if (platform in stat["secs_per_frame"])]
             ytop5 = [float(stat["accuracy"]["top5"]) for stat in self.model_stats if (platform in stat["secs_per_frame"])]
+            models = [stat["model"] for stat in self.model_stats if (platform in stat["secs_per_frame"])]
+            names = [stat["name"] for stat in self.model_stats if (platform in stat["secs_per_frame"])]
+            image_size = [int(stat["image_size"]) for stat in self.model_stats if (platform in stat["secs_per_frame"])]
+            filter_size = [int(stat["filter_size"]) for stat in self.model_stats if (platform in stat["secs_per_frame"])]
+            increase_factor = [int(stat["increase_factor"]) for stat in self.model_stats if (platform in stat["secs_per_frame"])]
+            directory = [stat["directory"] for stat in self.model_stats if (platform in stat["secs_per_frame"])]
 
             if add_to_plot:
                 self.plot_series.append(ytop1) # plot the top 1 accuracy metric
@@ -185,9 +184,9 @@ class PlotModelStats:
 
             # compute the pareto frontier
             # to compute pareto frontier we need x and top 1
-            if x != [] and ytop1 != []:         
-                fx, ftop1, ftop5, fmodel, fimsize, fnames = self.pareto_frontier(x, ytop1, ytop5, models, image_size, names, max_x=self.plot_max_secs_per_frame)                
-                self.frontier_models.append({ 'platform' : platform, 'frontier_models' : list(zip(fnames, fmodel, fimsize, fx, ftop1, ftop5)) })
+            if x != [] and ytop1 != []:        
+                fx, ftop1, ftop5, fmodel, fnames, fimsize, filsize, fincfac, fdir = self.pareto_frontier(x, ytop1, ytop5, models, names, image_size, filter_size, increase_factor, directory, max_x=self.plot_max_secs_per_frame)                
+                self.frontier_models.append({ 'platform' : platform, 'frontier_models' : list(zip(fnames, fmodel, fdir, fimsize, filsize, fincfac, fx, ftop1, ftop5)) })
                 if add_to_plot:
                     frontiers = frontiers + [fx, ftop1, self.platforms_lines[platform]] # plot the frontier based on top 1
             else:
