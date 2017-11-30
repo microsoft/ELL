@@ -54,6 +54,11 @@ namespace math
         /// <param name="values"> The triplet. </param>
         TensorCoordinateBase(IntegerTriplet values);
 
+        /// <summary> Constructs a TensorCoordinateBase from a vector equivalent of IntegerTriplet. </summary>
+        ///
+        /// <param name="values"> The vector. </param>
+        TensorCoordinateBase(const std::vector<size_t>& values);
+
         /// <summary> Casting operator to an IntegerTriplet. </summary>
         ///
         /// <returns> The result of the cast. </returns>

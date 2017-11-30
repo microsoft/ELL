@@ -1018,19 +1018,25 @@ void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
 }
 
 // C callback (called by emitted code)
+static int lagNotificationCallbackCount = 0;
 extern "C"
 {
 void Test_ClockNode_LagNotificationCallback(double lag)
 {
+    testing::EnableLoggingHelper();
     Log() << "ClockNode Lag Notification Callback " << lag << EOL;
+    lagNotificationCallbackCount++;
 }
 }
 TESTING_FORCE_DEFINE_SYMBOL(Test_ClockNode_LagNotificationCallback, void, double);
 
 void TestCompilableClockNode()
 {
+    using GetTicksUntilNextInterval = nodes::TimeTickType(nodes::TimeTickType);
+
     constexpr short lagThreshold = 5;
     constexpr nodes::TimeTickType interval = 50;
+    constexpr nodes::TimeTickType start = 1511889201834.5767; // timestamp from python: time.time() * 1000
 
     model::Model model;
 
@@ -1045,19 +1051,41 @@ void TestCompilableClockNode()
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
+    auto& jitter = compiledMap.GetJitter();
+    auto getTicksFunction = reinterpret_cast<GetTicksUntilNextInterval*>(jitter.ResolveFunctionAddress("Test_GetTicksUntilNextInterval"));
+
     // compare output
     constexpr nodes::TimeTickType thresholdTicks = lagThreshold * interval;
-    std::vector<std::vector<nodes::TimeTickType>> signal =
+    std::vector<std::vector<nodes::TimeTickType>> signal = 
     {
-        { 0 },
-        { interval*1 + thresholdTicks/2 }, // within threshold
-        { interval*2 }, // on time
-        { interval*3 + thresholdTicks }, // late
-        { interval*4 + thresholdTicks*20 }, // really late
-        { interval*5 } // on time
+        { start },
+        { start + interval*1 + thresholdTicks/2 }, // within threshold
+        { start + interval*2 }, // on time
+        { start + interval*3 + thresholdTicks }, // late (expect notification)
+        { start + interval*4 + thresholdTicks*20 }, // really late (expect notification)
+        { start + interval*5 } // on time
     };
 
-    VerifyCompiledOutput(map, compiledMap, signal, "ClockNode");
+    std::vector<nodes::TimeTickType> getTicksResults;
+    std::vector<nodes::TimeTickType> expectedGetTicksResults =
+    {
+        interval,
+        interval - thresholdTicks/2,
+        interval,
+        interval - thresholdTicks,
+        interval - thresholdTicks*20,
+        interval
+    };
+
+    lagNotificationCallbackCount = 0;
+    for (const auto& input : signal)
+    {
+        // interleave calls to the map and getTicks, so that we can test updates to the last interval state
+        VerifyCompiledOutput(map, compiledMap, std::vector<std::vector<nodes::TimeTickType>>{ input }, "ClockNode");
+        getTicksResults.push_back(getTicksFunction(input[0]));
+    }
+    testing::ProcessTest("Testing compiled GetTicksUntilNextInterval", testing::IsEqual(getTicksResults, expectedGetTicksResults));
+    testing::ProcessTest("Testing lag notification count", testing::IsEqual(lagNotificationCallbackCount, 2));
 }
 
 class BinaryFunctionIRNode : public nodes::IRNode

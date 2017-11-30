@@ -81,7 +81,7 @@ namespace nodes
 
     void ClockNode::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto currentTime = compiler.EnsurePortEmitted(input);
+        auto now = compiler.EnsurePortEmitted(input);
 
         // Constants
         auto interval = function.template Literal<TimeTickType>(_interval);
@@ -108,25 +108,24 @@ namespace nodes
             function.Comparison(equalTime, lastIntervalTime, uninitializedIntervalTime),
             function.Comparison(equalTime, interval, zeroInterval));
 
-        // Use a local scratch value to hold the intermediate computation
-        auto scratch = function.Variable(emitters::GetVariableType<TimeTickType>(), "scratch");
-        function.Store(scratch, lastIntervalTime);
+        auto newLastInterval = function.Variable(emitters::GetVariableType<TimeTickType>(), "newLastInterval");
+        function.Store(newLastInterval, lastIntervalTime);
 
         auto ifEmitter1 = function.If();
         ifEmitter1.If(noLag);
         {
-            function.Store(scratch, currentTime);
+            function.Store(newLastInterval, now);
         }
         ifEmitter1.Else();
         {
-            function.Store(scratch, function.Operator(plusTime, lastIntervalTime, interval));
+            function.Store(newLastInterval, function.Operator(plusTime, lastIntervalTime, interval));
         }
         ifEmitter1.End();
 
         auto if1 = function.If(greaterThanTime, interval, zeroInterval);
         {
             // Notify if the time lag reaches the threshold
-            auto delta = function.Operator(minusTime, currentTime, lastIntervalTime);
+            auto delta = function.Operator(minusTime, now, function.Load(newLastInterval));
             auto if2 = function.If(greaterThanOrEqualTime, delta, thresholdTime);
             {
                 auto pLagFunction = function.GetModule().GetFunction(prefixedName);
@@ -138,14 +137,16 @@ namespace nodes
         if1.End();
 
         // Update _lastInterval state
-        function.Store(pLastIntervalTime, function.Load(scratch));
+        function.Store(pLastIntervalTime, function.Load(newLastInterval));
 
         // Set output
         auto pOutput = compiler.EnsurePortEmitted(output);
-        function.SetValueAt(pOutput, function.Literal(0), function.Load(scratch));
-        function.SetValueAt(pOutput, function.Literal(1), currentTime);
+        function.SetValueAt(pOutput, function.Literal(0), function.Load(newLastInterval));
+        function.SetValueAt(pOutput, function.Literal(1), now);
+
+        EmitGetTicksUntilNextIntervalFunction(compiler, function.GetModule(), pLastIntervalTime);
     }
-    
+
     void ClockNode::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
@@ -157,6 +158,8 @@ namespace nodes
     void ClockNode::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
         archiver["interval"] << _interval;
         archiver["lagThreshold"] << _lagThreshold;
         archiver["lagNotificationFunctionName"] << _lagNotificationFunctionName;
@@ -165,10 +168,65 @@ namespace nodes
     void ClockNode::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
 
         archiver["interval"] >> _interval;
         archiver["lagThreshold"] >> _lagThreshold;
         archiver["lagNotificationFunctionName"] >> _lagNotificationFunctionName;
+    }
+
+    TimeTickType ClockNode::GetTicksUntilNextInterval(TimeTickType now) const
+    {
+        TimeTickType result;
+        if (_lastIntervalTime == UninitializedIntervalTime || _interval == 0)
+        {
+            result = TimeTickType(0);
+        }
+        else
+        {
+            result = _lastIntervalTime + _interval - now;
+        }
+        return result;
+    }
+
+    void ClockNode::EmitGetTicksUntilNextIntervalFunction(model::IRMapCompiler& compiler, emitters::IRModuleEmitter& moduleEmitter, llvm::GlobalVariable* pLastIntervalTime)
+    {
+        std::string functionName = compiler.GetNamespacePrefix() + "_GetTicksUntilNextInterval";
+        const auto timeTickType = emitters::GetVariableType<TimeTickType>();
+        const emitters::VariableTypeList parameters = { timeTickType };
+
+        emitters::IRFunctionEmitter function = moduleEmitter.BeginFunction(functionName, timeTickType, parameters);
+        function.GetModule().DeclareFunction(functionName, timeTickType, parameters);
+        function.GetModule().IncludeInHeader(functionName);
+
+        auto arguments = function.Arguments().begin();
+        auto now = &(*arguments++);
+
+        auto interval = function.template Literal<TimeTickType>(_interval);
+        auto uninitializedIntervalTime = function.template Literal<TimeTickType>(UninitializedIntervalTime);
+        auto zeroInterval = function.template Literal<TimeTickType>(0);
+        auto lastIntervalTime = function.Load(pLastIntervalTime);
+
+        auto result = function.Variable(timeTickType, "result");
+
+        auto noLag = function.LogicalOr(
+            function.Comparison(equalTime, lastIntervalTime, uninitializedIntervalTime),
+            function.Comparison(equalTime, interval, zeroInterval));
+
+        auto ifEmitter1 = function.If();
+        ifEmitter1.If(noLag);
+        {
+            function.Store(result, zeroInterval);
+        }
+        ifEmitter1.Else();
+        {
+            function.Store(result, function.Operator(minusTime, function.Operator(plusTime, lastIntervalTime, interval), now));
+        }
+        ifEmitter1.End();
+
+        function.Return(function.Load(result));
+        moduleEmitter.EndFunction();
     }
 }
 }

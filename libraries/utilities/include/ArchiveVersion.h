@@ -21,6 +21,7 @@ namespace utilities
         v1 = 1,
         v2 = 2,
         v3_model_metadata = 3,
+        v4_source_sink_shapes = 4,
         nextVersion
     };
 

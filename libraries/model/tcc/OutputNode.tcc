@@ -12,14 +12,14 @@ namespace model
 {
     template <typename ValueType>
     OutputNode<ValueType>::OutputNode()
-        : OutputNodeBase(_input, _output, OutputShape{ 0,0,0 }), _input(this, {}, inputPortName), _output(this, outputPortName, 0) {};
+        : OutputNodeBase(_input, _output, OutputShape{ 0, 0, 0 }), _input(this, {}, inputPortName), _output(this, outputPortName, 0) {};
 
     template <typename ValueType>
     OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input)
         : OutputNodeBase(_input, _output, OutputShape{ input.Size(), 1, 1 }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()) {};
 
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input, OutputShape shape)
+    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input, const OutputShape& shape)
         : OutputNodeBase(_input, _output, shape), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()) {};
 
     template <typename ValueType>
@@ -41,8 +41,7 @@ namespace model
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        ell::math::TensorShape shape = GetShape();
-        archiver[shapeName] << std::vector<size_t>({ shape.NumRows(), shape.NumColumns(), shape.NumChannels() });
+        archiver[shapeName] << static_cast<std::vector<size_t>>(GetShape());
     }
 
     template <typename ValueType>
@@ -50,13 +49,12 @@ namespace model
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        std::vector<size_t> shapeVector;
+        std::vector<size_t> shapeVector; 
         archiver[shapeName] >> shapeVector;
         _output.SetSize(_input.Size());
         if (shapeVector.size() >= 3) 
         {
-            OutputShape shape{ shapeVector[0], shapeVector[1], shapeVector[2] };
-            SetShape(shape);
+            SetShape(OutputShape{ shapeVector });
         }
     }
 }

@@ -27,7 +27,6 @@
 
 namespace ell
 {
-/// <summary> model namespace </summary>
 namespace model
 {
     class IRMapCompiler;
@@ -40,17 +39,23 @@ namespace model
         using Node::GetInputPort;
         using Node::GetOutputPort;
 
-        /// <summary></summary>
+        /// <summary> Gets the input port. </summary>
+        ///
+        /// <returns> The input port. </returns>
         const InputPortBase& GetInputPort() const { return _inputBase; }
 
-        /// <summary></summary>
+        /// <summary> Gets the output port. </summary>
+        ///
+        /// <returns> The output port. </returns>
         const OutputPortBase& GetOutputPort() const { return _outputBase; }
 
-        /// <summary></summary>
+        /// <summary> Gets the output shape. </summary>
+        ///
+        /// <returns> The output shpe. </returns>
         OutputShape GetShape() const { return _shape; }
 
     protected:
-        OutputNodeBase(InputPortBase& input, OutputPortBase& output, ell::math::TensorShape shape);
+        OutputNodeBase(InputPortBase& input, OutputPortBase& output, const ell::math::TensorShape& shape);
         bool ShouldCompileInline() const override { return true; }
         bool HasState() const override { return false; }
         void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;

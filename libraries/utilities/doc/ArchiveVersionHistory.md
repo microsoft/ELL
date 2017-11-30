@@ -5,6 +5,7 @@
 |       1 | old               |
 |       2 | current           |
 |       3 | adds metadata to Model, Node, Port, and DynamicMap |
+|       4 | adds shapes to SourceNode and SinkNode |
 
 
 When objects start being able to read different format versions, there

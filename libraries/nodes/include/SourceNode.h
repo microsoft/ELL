@@ -38,6 +38,8 @@ namespace nodes
     template <typename ValueType>
     using SourceFunction = std::function<bool(std::vector<ValueType>&)>;
 
+    using InputShape = ell::math::TensorShape;
+
     /// <summary> A node that provides a source of data through a sampling function callback. </summary>
     template <typename ValueType>
     class SourceNode : public model::CompilableNode
@@ -56,10 +58,18 @@ namespace nodes
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> Port elements for input values (sample time, current time). </param>
-        /// <param name="outputSize"> Output size. </param>
+        /// <param name="shape"> The input shape. </param>
         /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
         /// <param name="source"> The optional source function that will provide input values. </param>
-        SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t outputSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
+        SourceNode(const model::PortElements<nodes::TimeTickType>& input, const InputShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input"> Port elements for input values (sample time, current time). </param>
+        /// <param name="inputVectorSize"> The input vector size. </param>
+        /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
+        /// <param name="source"> The optional source function that will provide input values. </param>
+        SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -90,17 +100,23 @@ namespace nodes
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+
+        utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
-        bool HasState() const override { return true; } // stored state: callback function name
+        bool HasState() const override { return true; } // stored state: callback function name, shape
 
     private:
         void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample);
         void SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample);
+        void SetShape(const InputShape& shape);
+        InputShape GetShape() const { return _shape; }
 
     private:
         model::InputPort<TimeTickType> _input;
         model::OutputPort<ValueType> _output;
+        InputShape _shape;
 
         std::string _sourceFunctionName;
         SourceFunction<ValueType> _source;

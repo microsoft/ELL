@@ -74,6 +74,13 @@ namespace nodes
         /// <param name="threshold"> The threshold to set. </param>
         void SetLagTheshold(uint32_t threshold) { _lagThreshold = threshold; }
 
+        /// <summary> Gets the ticks until the next interval, relative to the current time. </summary>
+        ///
+        /// <param name="now"> The current time. </param>
+        ///
+        /// <returns> Ticks until the next interval. </param>
+        TimeTickType GetTicksUntilNextInterval(TimeTickType now) const;
+
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
@@ -84,6 +91,8 @@ namespace nodes
         bool HasState() const override { return true; } // stored state: interval, lag threshold, lag function name
 
     private:
+        void EmitGetTicksUntilNextIntervalFunction(model::IRMapCompiler& compiler, emitters::IRModuleEmitter& moduleEmitter, llvm::GlobalVariable* pLastIntervalTime);
+
         model::InputPort<TimeTickType> _input;
         model::OutputPort<TimeTickType> _output;
 

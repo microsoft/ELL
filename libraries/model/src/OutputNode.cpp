@@ -14,7 +14,7 @@ namespace ell
 {
 namespace model
 {
-    OutputNodeBase::OutputNodeBase(InputPortBase& input, OutputPortBase& output, math::TensorShape shape)
+    OutputNodeBase::OutputNodeBase(InputPortBase& input, OutputPortBase& output, const math::TensorShape& shape)
         : CompilableNode({ &input }, { &output }), _inputBase(input), _outputBase(output), _shape(shape)
     {
     }

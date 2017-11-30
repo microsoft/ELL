@@ -22,8 +22,6 @@
 #include "LinearPredictorNode.h"
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
-#include "SinkNode.h"
-#include "SourceNode.h"
 
 // predictors
 #include "ForestPredictor.h"
