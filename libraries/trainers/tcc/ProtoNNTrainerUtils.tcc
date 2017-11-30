@@ -38,7 +38,7 @@ namespace trainers
             double label = example.GetMetadata().label;
             const auto& dataVector = example.GetDataVector().ToArray();
 
-            for (int j = 0; j < dataVector.size(); j++)
+            for (size_t j = 0; j < dataVector.size(); j++)
             {
                 X(j, colIdx) = dataVector[j];
             }

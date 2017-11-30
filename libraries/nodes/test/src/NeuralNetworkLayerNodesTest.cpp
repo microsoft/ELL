@@ -139,7 +139,7 @@ static void TestArchiveNeuralNetworkPredictorNode()
     {
         auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
         auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
-        unused(predictorNode);
+        UNUSED(predictorNode);
     }
     auto numNodes = model.Size();
 
@@ -191,7 +191,7 @@ static void TestArchiveNeuralNetworkLayerNodes()
     {
         auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
         auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
-        unused(predictorNode);
+        UNUSED(predictorNode);
     }
 
     // Refine the model

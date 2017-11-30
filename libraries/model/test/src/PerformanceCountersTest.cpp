@@ -43,7 +43,7 @@ std::vector<double> GenerateMatrixValues(size_t m, size_t n)
 
     auto size = m * n;
     std::vector<double> result(size);
-    for (int index = 0; index < size; ++index)
+    for (size_t index = 0; index < size; ++index)
     {
         result[index] = (double)rnd() / (double)(rnd.max() - rnd.min());
     }
@@ -96,7 +96,7 @@ void TestPerformanceCounters()
     }
 
     // Test the functions
-    int numNodes = compiledMap1.GetNumProfiledNodes();
+    size_t numNodes = compiledMap1.GetNumProfiledNodes();
     testing::ProcessTest("ModelProfiler GetNumNodes", numNodes == compiledMap1.GetModel().Size());
 
     // Now print out results
@@ -128,7 +128,7 @@ void TestPerformanceCounters()
     std::cout << std::endl
               << "----------------" << std::endl
               << std::endl;
-    for (int nodeIndex = 0; nodeIndex < numNodes; ++nodeIndex)
+    for (size_t nodeIndex = 0; nodeIndex < numNodes; ++nodeIndex)
     {
         auto nodeInfo = compiledMap1.GetNodeInfo(nodeIndex);
         auto nodeStats = compiledMap1.GetNodePerformanceCounters(nodeIndex);

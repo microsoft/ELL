@@ -80,7 +80,7 @@ namespace nodes
     {
         model::Shape result;
         result.resize(outputLocation.size());
-        for (int index = 0; index < result.size(); ++index)
+        for (size_t index = 0; index < result.size(); ++index)
         {
             result[_outputDimensionOrder[index]] = outputLocation[index];
         }
@@ -92,7 +92,7 @@ namespace nodes
     {
         std::vector<llvm::Value*> result;
         result.resize(outputLocation.size());
-        for (int index = 0; index < result.size(); ++index)
+        for (size_t index = 0; index < result.size(); ++index)
         {
             result[_outputDimensionOrder[index]] = outputLocation[index];
         }
@@ -142,7 +142,8 @@ namespace nodes
         llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output, _paddingValue);
         assert(this->input.Size() > 1);
 
-        int outputSize = _outputMemoryLayout.GetMemorySize(); unused(outputSize);
+        int outputSize = _outputMemoryLayout.GetMemorySize();
+        UNUSED(outputSize);
 
         auto xLoop = function.ForLoop();
         xLoop.Begin(_outputMemoryLayout.GetActiveSize(0));

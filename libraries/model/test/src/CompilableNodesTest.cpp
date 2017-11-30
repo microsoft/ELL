@@ -1089,9 +1089,9 @@ protected:
 
     std::vector<llvm::Value*> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override
     {
-        int inputSize = _input1.Size();
+        size_t inputSize = _input1.Size();
         assert(inputSize == _input2.Size());
-        return { currentFunction.Literal(inputSize) };
+        return { currentFunction.Literal(static_cast<int>(inputSize)) };
     }
 
 private:
@@ -2000,7 +2000,8 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
 
     BinaryConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
     layer.Compute();
-    auto output = layer.GetOutput(); unused(output);
+    auto output = layer.GetOutput();
+    UNUSED(output);
 
     // Create model
     model::Model model;
@@ -2323,7 +2324,8 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename NeuralNetworkPredictor<ElementType>::Layers layers;
     Layer<ElementType>::Shape dataShape = {rows, columns, channels };
-    auto dataSize = rows * columns * channels; unused(dataSize);
+    auto dataSize = rows * columns * channels;
+    UNUSED(dataSize);
 
     // Input layer
     InputParameters inputParams = { dataShape, NoPadding(), dataShape, NoPadding(), 1 };

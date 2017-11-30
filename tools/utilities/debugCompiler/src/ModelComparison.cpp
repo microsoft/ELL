@@ -740,7 +740,7 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
     }
     else // adding compiled
     {
-        int i = _nextIndex++;
+        size_t i = _nextIndex++;
         if (i < _layerOutputData.size())
         {
             LayerCaptureData& layerData = _layerOutputData[i];

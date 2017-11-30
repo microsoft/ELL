@@ -234,9 +234,9 @@ namespace nodes
             // A B C D E F G H I J K L M N O P a b c d e f g h i j k l m n o p
 
             // const int extraPadding = (int)convPadding - (int)inputPadding; // extraPadding is the amount of extra padding we need to do, on top of what's in the input data
-            const int extraPadding = (int)convPadding;
+            const size_t extraPadding = convPadding;
             const bool useNewReshape = dataOrder == std::array<int, 3>({2, 0, 1}); // channel, row, column order
-            if (useNewReshape && stride == 1 && extraPadding >= 0)
+            if (useNewReshape && stride == 1)
             {
                 // assert(inputPadding == 0 && "Input data must not be padded");
                 // Points to the beginning of the input volume
@@ -245,9 +245,9 @@ namespace nodes
                 // Points to the beginning of the outputMatrix
                 llvm::Value* outputPtr = function.PointerOffset(outputMatrix, 0);
 
-                for (int fy = 0; fy < filterWidth; ++fy)
+                for (size_t fy = 0; fy < filterWidth; ++fy)
                 {
-                    for (int fx = 0; fx < filterWidth; ++fx)
+                    for (size_t fx = 0; fx < filterWidth; ++fx)
                     {
                         int outputRow = (fy * filterWidth + fx) * inputDepth; // The row of the output matrix to start writing to. Multiplied by inputDepth, because
                         // we're going to memcpy `inputDepth` rows at once

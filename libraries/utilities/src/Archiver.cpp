@@ -74,19 +74,19 @@ namespace utilities
 
     void Archiver::BeginArchiveObject(const char* name, const IArchivable& value)
     {
-        unused(name, value);
+        UNUSED(name, value);
         // nothing
     }
 
     void Archiver::ArchiveObject(const char* name, const IArchivable& value)
     {
-        unused(name);
+        UNUSED(name);
         value.WriteToArchive(*this);
     }
 
     void Archiver::EndArchiveObject(const char* name, const IArchivable& value)
     {
-        unused(name, value);
+        UNUSED(name, value);
         // nothing
     }
 
@@ -143,36 +143,36 @@ namespace utilities
 
     ArchivedObjectInfo Unarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
-        unused(name);
+        UNUSED(name);
         return { typeName, 0 };
     }
 
     void Unarchiver::UnarchiveObject(const char* name, IArchivable& value)
     {
-        unused(name);
+        UNUSED(name);
         value.ReadFromArchive(*this);
     }
 
     void Unarchiver::UnarchiveObjectAsPrimitive(const char* name, IArchivable& value)
     {
-        unused(name);
+        UNUSED(name);
         // ### Likely wrong
         value.ReadFromArchive(*this);
     }
 
     void Unarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
-        unused(name, typeName);
+        UNUSED(name, typeName);
     }
 
     void Unarchiver::BeginUnarchiveArray(const char* name, const std::string& typeName)
     {
-        unused(name, typeName);
+        UNUSED(name, typeName);
     }
 
     void Unarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
-        unused(name, typeName);
+        UNUSED(name, typeName);
     }
 }
 }

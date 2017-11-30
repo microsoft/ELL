@@ -48,6 +48,9 @@ namespace utilities
         DECLARE_ARCHIVE_VALUE_OVERRIDE(uint32_t);
         DECLARE_ARCHIVE_VALUE_OVERRIDE(int64_t);
         DECLARE_ARCHIVE_VALUE_OVERRIDE(uint64_t);
+#if defined(__APPLE__)
+        DECLARE_ARCHIVE_VALUE_OVERRIDE(unsigned long);
+#endif // defined(__APPLE__)
         DECLARE_ARCHIVE_VALUE_OVERRIDE(float);
         DECLARE_ARCHIVE_VALUE_OVERRIDE(double);
         void ArchiveValue(const char* name, const std::string& value) override;
@@ -59,6 +62,9 @@ namespace utilities
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(uint32_t);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(int64_t);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(uint64_t);
+#if defined(__APPLE__)
+        DECLARE_ARCHIVE_ARRAY_OVERRIDE(unsigned long);
+#endif // defined(__APPLE__)
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(float);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(double);
         void ArchiveArray(const char* name, const std::vector<std::string>& array) override;
@@ -125,6 +131,9 @@ namespace utilities
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(uint32_t);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(int64_t);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(uint64_t);
+#if defined(__APPLE__)
+        DECLARE_UNARCHIVE_VALUE_OVERRIDE(unsigned long);
+#endif // defined(__APPLE__)
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(float);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(double);
         void UnarchiveValue(const char* name, std::string& value) override;
@@ -136,6 +145,9 @@ namespace utilities
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(uint32_t);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(int64_t);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(uint64_t);
+#if defined(__APPLE__)
+        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(unsigned long);
+#endif // defined(__APPLE__)
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(float);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(double);
         void UnarchiveArray(const char* name, std::vector<std::string>& array) override;

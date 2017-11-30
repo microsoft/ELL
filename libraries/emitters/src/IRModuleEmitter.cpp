@@ -325,6 +325,7 @@ namespace emitters
     {
         auto currentFunction = GetCurrentFunction();
         assert(pValue != nullptr);
+        assert(offset >= 0);
         if (var.IsScalar())
         {
             if (offset > 0)
@@ -335,7 +336,7 @@ namespace emitters
             return;
         }
 
-        if (offset >= var.Dimension())
+        if (static_cast<unsigned>(offset) >= var.Dimension())
         {
             throw EmitterException(EmitterError::indexOutOfRange);
         }
@@ -358,8 +359,6 @@ namespace emitters
 
     llvm::GlobalVariable* IRModuleEmitter::Global(VariableType type, const std::string& name)
     {
-        auto pType = _emitter.Type(type);
-        auto initializer = ZeroInitializer(pType);
         return AddGlobal(name, _emitter.Type(type), _emitter.Zero(type), false);
     }
 
@@ -549,7 +548,7 @@ namespace emitters
             }
             else
             {
-                for(int fieldIndex = 0; fieldIndex < fields.size(); ++fieldIndex)
+                for(size_t fieldIndex = 0; fieldIndex < fields.size(); ++fieldIndex)
                 {
                     if(fields[fieldIndex] != structFields[fieldIndex])
                     {

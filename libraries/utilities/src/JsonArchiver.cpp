@@ -41,6 +41,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, uint32_t);
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, int64_t);
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, float);
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, double);
 
@@ -104,6 +107,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, uint32_t);
     IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, int64_t);
     IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, float);
     IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, double);
 
@@ -114,7 +120,7 @@ namespace utilities
 
     void JsonArchiver::ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array)
     {
-        unused(baseTypeName);
+        UNUSED(baseTypeName);
         FinishPreviousLine();
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
@@ -189,6 +195,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, uint32_t);
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, int64_t);
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, float);
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, double);
 
@@ -201,7 +210,7 @@ namespace utilities
     // IArchivable
     ArchivedObjectInfo JsonUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
-        unused(typeName);
+        UNUSED(typeName);
         bool hasName = name != std::string("");
         if (hasName)
         {
@@ -295,7 +304,7 @@ namespace utilities
 
     void JsonUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
-        unused(typeName);
+        UNUSED(typeName);
         bool hasName = name != std::string("");
         _tokenizer.MatchToken("}");
 
@@ -319,6 +328,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, uint32_t);
     IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, int64_t);
     IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, float);
     IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, double);
 
@@ -329,7 +341,7 @@ namespace utilities
 
     void JsonUnarchiver::BeginUnarchiveArray(const char* name, const std::string& typeName)
     {
-        unused(typeName);
+        UNUSED(typeName);
         bool hasName = name != std::string("");
         if (hasName)
         {
@@ -341,7 +353,7 @@ namespace utilities
 
     bool JsonUnarchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
-        unused(typeName);
+        UNUSED(typeName);
         auto maybeEndArray = _tokenizer.PeekNextToken();
         if (maybeEndArray == "]")
         {
@@ -355,7 +367,7 @@ namespace utilities
 
     void JsonUnarchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
-        unused(typeName);
+        UNUSED(typeName);
         if (_tokenizer.PeekNextToken() == ",")
         {
             _tokenizer.ReadNextToken();
@@ -364,7 +376,7 @@ namespace utilities
 
     void JsonUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
-        unused(typeName);
+        UNUSED(typeName);
         bool hasName = name != std::string("");
         _tokenizer.MatchToken("]");
         // eat a comma if it exists

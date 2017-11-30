@@ -59,7 +59,7 @@ std::vector<T> GetInputData(std::string filename, const math::TensorShape& input
         std::vector<T> result(inputSize);
         auto engine = utilities::GetRandomEngine("123");
         std::uniform_real_distribution<double> dist;
-        for (auto index = 0; index < inputSize; ++index)
+        for (size_t index = 0; index < inputSize; ++index)
         {
             result[index] = static_cast<T>(dist(engine));
         }
@@ -244,11 +244,11 @@ void WriteTimingDetail(std::ostream& timingOutputStream, ProfileOutputFormat for
 
     timingOutputStream << beginArray;
     auto numIterations = nodeTimings.size();
-    for (int iter = 0; iter < numIterations; ++iter)
+    for (size_t iter = 0; iter < numIterations; ++iter)
     {
         timingOutputStream << beginArray;
         auto numNodes = nodeTimings[iter].size();
-        for (int nodeIndex = 0; nodeIndex < numNodes; ++nodeIndex)
+        for (size_t nodeIndex = 0; nodeIndex < numNodes; ++nodeIndex)
         {
             auto timing = (iter == 0) ? (nodeTimings[iter][nodeIndex]) : (nodeTimings[iter][nodeIndex] - nodeTimings[iter - 1][nodeIndex]);
             timingOutputStream << timing;

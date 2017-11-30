@@ -20,6 +20,9 @@
 // testing
 #include "testing.h"
 
+// utlities
+#include "Unused.h"
+
 // stl
 #include <iostream>
 #include <memory>
@@ -31,10 +34,6 @@
 using namespace ell;
 using namespace ell::emitters;
 
-
-#ifndef UNUSED
-#define UNUSED(x) (&x)
-#endif
 
 std::string g_outputBasePath = "";
 void SetOutputPathBase(std::string path)

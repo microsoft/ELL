@@ -897,7 +897,7 @@ namespace nodes
         const auto storedElementNumBits = 8 * storedElementSize;
         const auto numBits = storedElementNumBits; // function.GetModule().GetCompilerParameters().numBits; // for Xnor, use 32 bits in 32-bit environment
         const auto elementSize = numBits / 8;
-        debug_used(elementSize);
+        DEBUG_USED(elementSize);
         assert(elementSize <= storedElementSize);
         const auto filterWidth = _convolutionalParameters.receptiveField;
         const auto numInputChannels = inputSize[2]; // inputSize is the dimensions of the input to the original layer node

@@ -42,7 +42,7 @@ public:
         return x + 5.0;
     }
 
-    llvm::Value* Compile(IRFunctionEmitter& function, llvm::Value* x) const override 
+    llvm::Value* Compile(IRFunctionEmitter& function, llvm::Value* x) const override
     {
         llvm::Value* sum = function.Operator(emitters::GetAddForValueType<double>(), x, function.Literal<double>(5.0));
         return sum;
@@ -86,7 +86,7 @@ void TestIRAddFunction()
     std::vector<double> yData({ 10.0, 11.0, 12.0, 13.0, 14.0 });
     std::vector<double> computedResult;
     std::vector<double> compiledResult;
-    for (int index = 0; index < xData.size(); ++index)
+    for (size_t index = 0; index < xData.size(); ++index)
     {
         auto x = xData[index];
         auto y = yData[index];

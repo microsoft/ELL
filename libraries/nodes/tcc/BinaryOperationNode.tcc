@@ -230,7 +230,7 @@ namespace nodes
         llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
         auto count = input1.Size();
-        function.VectorOperator(emitters::GetOperator<ValueType>(GetOperation()), count, pInput1, pInput2, [&pResult, &function, this](llvm::Value* i, llvm::Value* pValue) {
+        function.VectorOperator(emitters::GetOperator<ValueType>(GetOperation()), count, pInput1, pInput2, [&pResult, &function](llvm::Value* i, llvm::Value* pValue) {
             function.SetValueAt(pResult, i, pValue);
         });
     }

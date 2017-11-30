@@ -28,7 +28,7 @@ namespace model
                 {
                     // scalar input
                     auto fn = reinterpret_cast<void(*)(const InputType, bool*)>(functionPointer);
-                    computeFunction = [this, functionPointer, fn](const InputType* input) {
+                    computeFunction = [this, fn](const InputType* input) {
                         fn(*input, (bool*)std::get<utilities::ConformingVector<bool>>(_cachedOutput).data());
                     };
                 }
@@ -36,7 +36,7 @@ namespace model
                 {
                     // vector input
                     auto fn = reinterpret_cast<void(*)(const InputType*, bool*)>(functionPointer);
-                    computeFunction = [this, functionPointer, fn](const InputType* input) {
+                    computeFunction = [this, fn](const InputType* input) {
                         fn(input, (bool*)std::get<utilities::ConformingVector<bool>>(_cachedOutput).data());
                     };
                 }
@@ -50,7 +50,7 @@ namespace model
                 {
                     // scalar input
                     auto fn = reinterpret_cast<void(*)(const InputType, int*)>(functionPointer);
-                    computeFunction = [this, functionPointer, fn](const InputType* input) {
+                    computeFunction = [this, fn](const InputType* input) {
                         fn(*input, std::get<utilities::ConformingVector<int>>(_cachedOutput).data());
                     };
                 }
@@ -58,7 +58,7 @@ namespace model
                 {
                     // vector input
                     auto fn = reinterpret_cast<void(*)(const InputType*, int*)>(functionPointer);
-                    computeFunction = [this, functionPointer, fn](const InputType* input) {
+                    computeFunction = [this, fn](const InputType* input) {
                         fn(input, std::get<utilities::ConformingVector<int>>(_cachedOutput).data());
                     };
                 }
@@ -72,7 +72,7 @@ namespace model
                 {
                     // scalar input
                     auto fn = reinterpret_cast<void(*)(const InputType, int64_t*)>(functionPointer);
-                    computeFunction = [this, functionPointer, fn](const InputType* input) {
+                    computeFunction = [this, fn](const InputType* input) {
                         fn(*input, std::get<utilities::ConformingVector<int64_t>>(_cachedOutput).data());
                     };
                 }
@@ -80,7 +80,7 @@ namespace model
                 {
                     // vector input
                     auto fn = reinterpret_cast<void(*)(const InputType*, int64_t*)>(functionPointer);
-                    computeFunction = [this, functionPointer, fn](const InputType* input) {
+                    computeFunction = [this, fn](const InputType* input) {
                         fn(input, std::get<utilities::ConformingVector<int64_t>>(_cachedOutput).data());
                     };
                 }
@@ -94,7 +94,7 @@ namespace model
                 {
                     // scalar input
                     auto fn = reinterpret_cast<void(*)(const InputType, float*)>(functionPointer);
-                    computeFunction = [this, functionPointer, fn](const InputType* input) {
+                    computeFunction = [this, fn](const InputType* input) {
                         fn(*input, std::get<utilities::ConformingVector<float>>(_cachedOutput).data());
                     };
                 }
@@ -102,7 +102,7 @@ namespace model
                 {
                     // vector input
                     auto fn = reinterpret_cast<void(*)(const InputType*, float*)>(functionPointer);
-                    computeFunction = [this, functionPointer, fn](const InputType* input) {
+                    computeFunction = [this, fn](const InputType* input) {
                         fn(input, std::get<utilities::ConformingVector<float>>(_cachedOutput).data());
                     };
                 }
@@ -116,7 +116,7 @@ namespace model
                 {
                     // scalar input
                     auto fn = reinterpret_cast<void(*)(const InputType, double*)>(functionPointer);
-                    computeFunction = [this, functionPointer, fn](const InputType* input) {
+                    computeFunction = [this, fn](const InputType* input) {
                         fn(*input, std::get<utilities::ConformingVector<double>>(_cachedOutput).data());
                     };
                 }
@@ -124,7 +124,7 @@ namespace model
                 {
                     // vector input
                     auto fn = reinterpret_cast<void(*)(const InputType*, double*)>(functionPointer);
-                    computeFunction = [this, functionPointer, fn](const InputType* input) {
+                    computeFunction = [this, fn](const InputType* input) {
                         fn(input, std::get<utilities::ConformingVector<double>>(_cachedOutput).data());
                     };
                 }
@@ -136,7 +136,7 @@ namespace model
             }
 
             std::get<ComputeFunction<InputType>>(_computeInputFunction) = computeFunction;
-        }    
+        }
     }
 }
 }

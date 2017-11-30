@@ -75,7 +75,7 @@ namespace nodes
 
         const auto outputWidth = outputLayout.GetActiveSize(1);
         const auto outputHeight = outputLayout.GetActiveSize(0);
-        const auto numFilters = outputLayout.GetActiveSize(2);
+        const size_t numFilters = outputLayout.GetActiveSize(2);
 
         const auto padding = inputPadding; // ?
 
@@ -156,7 +156,7 @@ namespace nodes
         const auto inputWidth = inputLayout.GetActiveSize(1);
         const auto inputDepth = inputLayout.GetActiveSize(2);
         const auto filterWidth = convParams.receptiveField;
-        const auto padding = inputLayout.GetOffset(0);
+        const size_t padding = inputLayout.GetOffset(0);
         assert((padding == filterWidth / 2) && "Padding must be filterWidth/2");
 
         // input data parameters
@@ -164,7 +164,7 @@ namespace nodes
         const size_t paddedHeight = inputLayout.GetStride(0);
 
         // output data parameters
-        const auto numFilters = outputLayout.GetActiveSize(2);
+        const size_t numFilters = outputLayout.GetActiveSize(2);
 
         // computation parameters
         const size_t batchSize = numFilters;
@@ -186,7 +186,7 @@ namespace nodes
 
             // Fill in input memory
             // First, the top p rows of zeros (padding):
-            for (int rowIndex = 0; rowIndex < padding; ++rowIndex)
+            for (size_t rowIndex = 0; rowIndex < padding; ++rowIndex)
             {
                 function.MemoryCopy<ValueType>(pInput, rowIndex * inputStride, pStackedInput, rowIndex * stackedInputStride, stackedInputStride);
             }

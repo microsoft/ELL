@@ -49,7 +49,7 @@ namespace nodes
     {
         if (IsPureVector(input) && !compiler.GetCompilerParameters().unrollLoops)
         {
-            int vectorSize = compiler.GetCompilerParameters().vectorWidth;
+            size_t vectorSize = compiler.GetCompilerParameters().vectorWidth;
             bool vectorize = compiler.GetCompilerParameters().allowVectorInstructions && (input.Size() > vectorSize);
             if (vectorize)
             {
@@ -134,7 +134,7 @@ namespace nodes
         // Get LLVM types
         auto& emitter = function.GetEmitter();
         auto elementType = emitter.Type(emitters::GetVariableType<ValueType>());
-        debug_used(elementType);
+        DEBUG_USED(elementType);
         assert(llvm::VectorType::isValidElementType(elementType) && "Invalid element type for LLVM vector");
         auto vectorType = emitter.VectorType(emitters::GetVariableType<ValueType>(), vectorSize);
         auto vectorPointerType = vectorType->getPointerTo();

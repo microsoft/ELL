@@ -32,7 +32,7 @@ void TestIteratorAdapter()
     auto it = utilities::MakeStlContainerReferenceIterator(vec.begin(), vec.end());
 
     bool passed = true;
-    int index = 0;
+    size_t index = 0;
     while (it.IsValid())
     {
         passed = passed && (it.Get() == vec[index]);

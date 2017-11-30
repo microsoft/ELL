@@ -1,4 +1,4 @@
-#ifdef PYTHON_FOUND
+#if defined(PYTHON_FOUND)
 
 #if defined(_DEBUG)
 #undef _DEBUG
@@ -8,15 +8,16 @@
 #include <Python.h>
 #endif
 
+#include <algorithm>
+#include <cstdlib>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
-#include <iostream>
-
 
 #include "InvokePython.h"
 #include "Files.h"
-#include <cstdlib> 
 
 using namespace ell::utilities;
 
@@ -34,7 +35,7 @@ std::vector<std::string> split(const std::string& s, char separator)
 
         prev_pos = ++pos;
     }
-    if (prev_pos < pos) 
+    if (prev_pos < pos)
     {
         output.push_back(s.substr(prev_pos, pos - prev_pos));
     }
@@ -42,7 +43,7 @@ std::vector<std::string> split(const std::string& s, char separator)
 
 }
 
-std::string FindExecutable(const std::string& name) 
+std::string FindExecutable(const std::string& name)
 {
     std::string path = getenv("PATH");
     char separator = ':';
@@ -54,17 +55,17 @@ std::string FindExecutable(const std::string& name)
     {
         std::string fullPath = JoinPaths(*ptr, name);
         if (FileExists(fullPath))
-        {            
+        {
             return *ptr;
         }
     }
     throw std::runtime_error( "Could not find '" + name + "' in your PATH environment");
 }
 
-void ExecutePythonScript(const std::string& script, const std::vector<std::string> args) 
+void ExecutePythonScript(const std::string& script, const std::vector<std::string>& args)
 {
     size_t argc = args.size();
-    wchar_t** argv = new wchar_t*[argc];
+    auto argv = std::make_unique<wchar_t*[]>(argc);
 
     std::string pythonExe = "python";
 #ifdef WIN32
@@ -72,7 +73,7 @@ void ExecutePythonScript(const std::string& script, const std::vector<std::strin
 #endif
     std::string path = FindExecutable(pythonExe);
     std::string tail = GetFileName(path);
-    if (tail == "bin") 
+    if (tail == "bin")
     {
         // on linux python is in a 'bin' dir and we want the parent of that.
         path = GetDirectoryPath(path);
@@ -84,13 +85,10 @@ void ExecutePythonScript(const std::string& script, const std::vector<std::strin
     // set the location of libs so python can initialize correctly
     Py_SetPythonHome((wchar_t*)wide.c_str());
     Py_Initialize();
-    
-    for (size_t i = 0; i < argc; i++)
-    {
-        argv[i] = Py_DecodeLocale(args[i].c_str(), nullptr);
-    }
 
-    PySys_SetArgvEx((int)argc, argv, 0);
+    std::transform(args.begin(), args.end(), argv.get(), [](const auto& s) { return Py_DecodeLocale(s.c_str(), nullptr); });
+
+    PySys_SetArgvEx((int)argc, argv.get(), 0);
     PyRun_SimpleString(script.c_str());
 
     for (size_t i = 0; i < argc; i++)
@@ -98,17 +96,16 @@ void ExecutePythonScript(const std::string& script, const std::vector<std::strin
         PyMem_RawFree(argv[i]);
     }
     Py_Finalize();
-    delete[] argv;
 }
 
-#else
+#else // defined(PYTHON_FOUND)
 
 #include <string>
 #include <vector>
 #include <stdexcept>
 
-void ExecutePythonScript(const std::string& script, const std::vector<std::string> args)
+void ExecutePythonScript(const std::string&, const std::vector<std::string>&)
 {
     throw std::runtime_error("When imageConverter project was built cmake could not find Python.h");
 }
-#endif
+#endif // defined(PYTHON_FOUND)

@@ -51,8 +51,6 @@ namespace trainers
     private:
         size_t _dim;
 
-        size_t _numLabels;
-
         size_t _numPrototypesPerLabel;
 
         // Returns the underlying projection matrix.

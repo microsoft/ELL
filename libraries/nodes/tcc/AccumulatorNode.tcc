@@ -68,7 +68,7 @@ namespace nodes
         llvm::Value* inputVector = compiler.EnsurePortEmitted(input);
         llvm::Value* result = compiler.EnsurePortEmitted(output);
 
-        function.VectorOperator(emitters::GetAddForValueType<ValueType>(), output.Size(), accumulator, inputVector, [&accumulator, &result, &function, this](llvm::Value* i, llvm::Value* value) {
+        function.VectorOperator(emitters::GetAddForValueType<ValueType>(), output.Size(), accumulator, inputVector, [&accumulator, &result, &function](llvm::Value* i, llvm::Value* value) {
             function.SetValueAt(accumulator, i, value);
             function.SetValueAt(result, i, value);
         });

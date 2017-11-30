@@ -418,11 +418,11 @@ namespace neural
         const size_t binarizedFilterVolumeSize = (numWeightsColumns - 1) / _binaryElementSize + 1;
 
         _realValuedWeightsMatrix = { NumOutputChannels(), numWeightsColumns };
-        for (int rowIndex = 0; rowIndex < _binarizedWeights.size(); ++rowIndex)
+        for (size_t rowIndex = 0; rowIndex < _binarizedWeights.size(); ++rowIndex)
         {
-            int colIndex = 0;
+            size_t colIndex = 0;
             assert(binarizedFilterVolumeSize == _binarizedWeights[rowIndex].size());
-            for (int blockIndex = 0; blockIndex < binarizedFilterVolumeSize; blockIndex++)
+            for (size_t blockIndex = 0; blockIndex < binarizedFilterVolumeSize; blockIndex++)
             {
                 const auto bits = _binarizedWeights[rowIndex][blockIndex];
                 const auto filterMean = _filterMeans[rowIndex];
@@ -433,7 +433,7 @@ namespace neural
                     scale = filterMean;
                 }
 
-                for (int bitIndex = 0; bitIndex < _binaryElementSize && colIndex < numWeightsColumns; ++bitIndex, ++colIndex)
+                for (size_t bitIndex = 0; bitIndex < _binaryElementSize && colIndex < numWeightsColumns; ++bitIndex, ++colIndex)
                 {
                     const auto bitVal = (bits >> bitIndex) & 0x01;
                     _realValuedWeightsMatrix(rowIndex, colIndex) = bitVal == 0 ? -scale : scale;

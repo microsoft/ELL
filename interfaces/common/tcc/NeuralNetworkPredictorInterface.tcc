@@ -129,7 +129,6 @@ namespace predictors
     template <typename ElementType>
     void NeuralNetworkPredictor<ElementType>::AddLayer(Layer* layer, const std::unique_ptr<UnderlyingInputLayer>& underlyingInputLayer, UnderlyingLayers& underlyingLayers)
     {
-        using UnderlyingLayer = typename ell::predictors::neural::Layer<ElementType>;
         using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<ElementType>::LayerParameters;
         using TensorType = typename underlying::Layer<ElementType>::TensorType;
         if (layer != nullptr)

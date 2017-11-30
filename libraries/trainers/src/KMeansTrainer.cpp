@@ -20,10 +20,10 @@ namespace ell
 namespace trainers
 {
     KMeansTrainer::KMeansTrainer(size_t dim, size_t numClusters, size_t iterations)
-        : _means(dim, numClusters), _numClusters(numClusters), _iterations(iterations), _isInitialized(false) {}
+        : _means(dim, numClusters), _isInitialized(false), _iterations(iterations), _numClusters(numClusters)  {}
 
     KMeansTrainer::KMeansTrainer(size_t numClusters, size_t iters, math::ColumnMatrix<double> means)
-        : _numClusters(numClusters), _iterations(iters), _means(means), _isInitialized(true) {}
+        : _means(means), _isInitialized(true), _iterations(iters), _numClusters(numClusters) {}
 
     void KMeansTrainer::RunKMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X)
     {
@@ -32,7 +32,7 @@ namespace trainers
 
         math::ColumnVector<size_t> clusterAssignment(X.NumColumns());
         double prevDistance = 0.0;
-        for (int i = 0; i < _iterations; ++i)
+        for (size_t i = 0; i < _iterations; ++i)
         {
             auto totalDistance = assignClosestCenter(X, clusterAssignment);
             if (totalDistance == prevDistance)
@@ -50,7 +50,7 @@ namespace trainers
         _means.GetColumn(0).CopyFrom(X.GetColumn(choice));
 
         math::ColumnVector<double> minimumDistance(X.NumColumns());
-        for (int k = 1; k < _numClusters; ++k)
+        for (size_t k = 1; k < _numClusters; ++k)
         {
             // distance to previously selected mean
             auto D = pairwiseDistance(X, _means.GetSubMatrix(0, k - 1, _means.NumRows(), 1));
@@ -63,8 +63,10 @@ namespace trainers
             else
             {
                 // distance to closest center
-                for (int i = 0; i < minimumDistance.Size(); ++i)
+                for (size_t i = 0; i < minimumDistance.Size(); ++i)
+                {
                     minimumDistance[i] = std::min(minimumDistance[i], distanceToPreviousMean[i]);
+                }
             }
 
             choice = weightedSample(minimumDistance);
@@ -118,7 +120,7 @@ namespace trainers
         auto D = pairwiseDistance(X, _means);
 
         double totalDist = 0;
-        for (int i = 0; i < D.NumRows(); ++i)
+        for (size_t i = 0; i < D.NumRows(); ++i)
         {
             auto dist = D.GetRow(i);
             auto minElement = std::min_element(dist.GetDataPointer(), dist.GetDataPointer() + dist.Size());
@@ -133,14 +135,14 @@ namespace trainers
     {
         math::ColumnMatrix<double> clusterSum(X.NumRows(), _numClusters);
         math::ColumnVector<double> numPointsPerCluster(_numClusters);
-        for (int i = 0; i < X.NumColumns(); ++i)
+        for (size_t i = 0; i < X.NumColumns(); ++i)
         {
             auto idx = clusterAssignment[i];
             clusterSum.GetColumn(idx) += X.GetColumn(i);
             numPointsPerCluster[idx] += 1;
         }
 
-        for (int i = 0; i < _numClusters; i++)
+        for (size_t i = 0; i < _numClusters; i++)
         {
             clusterSum.GetColumn(i) /= numPointsPerCluster[i];
         }

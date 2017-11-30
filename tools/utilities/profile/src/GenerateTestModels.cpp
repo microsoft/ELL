@@ -283,20 +283,14 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using VectorType = typename Layer<ElementType>::VectorType;
     using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
 
     const bool scaleByFilterMeans = true;
 
-    const size_t imageRows = 160;
-    const size_t imageColumns = 160;
-    const size_t numChannels = 3;
     typename predictors::NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename predictors::NeuralNetworkPredictor<ElementType>::Layers layers;
 
     ElementType eps = static_cast<ElementType>(1e-6);
     auto epsVar = EpsilonSummand::Variance;
-
-    Shape inputShape = { imageRows, imageColumns, numChannels };
 
     // Variables for weights, etc:
     VectorType bias;
@@ -305,7 +299,6 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     VectorType bnVar;
     BinaryConvolutionalParameters convParams{ 3, 1, BinaryConvolutionMethod::bitwise, scaleByFilterMeans ? BinaryWeightsScale::mean : BinaryWeightsScale::none };
     ConvolutionalParameters realConvParams{ 3, 1, ConvolutionMethod::columnwise, 1 };
-    
 
     // Input layer:  160x160x3
     InputParameters inputParams = { {160, 160, 3}, NoPadding(), {160, 160, 3}, NoPadding(), 1 };
@@ -314,7 +307,7 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     // BiasLayer<float>(shape=[160,160,3]->[162,162,3], outputPadding=zeros,1)
     bias = GetRandomVector<VectorType>(3);
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, inputLayer, NoPadding(), {162, 162, 3}, ZeroPadding(1), bias);
-    
+
     // BinaryConvolutionalLayer<float>(shape=[162,162,3]->[160,160,16], inputPadding=zeros,1, stride=1, method=columnwise, receptiveField=3, numFilters=16)
     auto convWeights = GetRandomTensor<TensorType>(3 * 16, 3, 3); // k * f, k, ch
     AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {160, 160, 16}, NoPadding(), convParams, convWeights);
@@ -322,19 +315,19 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     // BiasLayer<float>(shape=[160,160,16]->[160,160,16])
     bias = GetRandomVector<VectorType>(16);
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), bias);
-    
+
     // ActivationLayer<float,ReLUActivation>(shape=[160,160,16]->[160,160,16])
     AddLayer<ActivationLayer<ElementType, ReLUActivation>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding());
-    
+
     // BatchNormalizationLayer<float>(shape=[160,160,16]->[160,160,16])
     bnMean = GetRandomVector<VectorType>(16);
     bnVar = GetRandomVector<VectorType>(16);
     AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), bnMean, bnVar, eps, epsVar);
-    
+
     // ScalingLayer<float>(shape=[160,160,16]->[160,160,16])
     scale = GetRandomVector<VectorType>(16);
     AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), scale);
-    
+
     // BiasLayer<float>(shape=[160,160,16]->[160,160,16])
     bias = GetRandomVector<VectorType>(16);
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), bias);
@@ -395,7 +388,7 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     // BiasLayer<float>(shape=[20,20,64]->[22,22,64], outputPadding=zeros,1)
     bias = GetRandomVector<VectorType>(64);
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {22, 22, 64}, ZeroPadding(1), bias);
-    
+
     // BinaryConvolutionalLayer<float>(shape=[22,22,64]->[20,20,128], inputPadding=zeros,1, stride=1, method=bitwise, receptiveField=3, weightsScale=none)
     convWeights = GetRandomTensor<TensorType>(3 * 128, 3, 64); // k * f, k, ch
     AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {20, 20, 128}, NoPadding(), convParams, convWeights);
@@ -433,7 +426,7 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[10,10,256]->[12,12,256], outputPadding=min,1)
     AddLayer<ActivationLayer<ElementType, ReLUActivation>, ElementType>(layers, NoPadding(), {12, 12, 256}, ZeroPadding(1));
-    
+
     // PoolingLayer<float,MaxPoolingFunction>(shape=[12,12,256]->[5,5,256], inputPadding=min,1, function=maxpooling, stride=2, size=3)
     AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {5, 5, 256}, NoPadding(), PoolingParameters{3, 2});
 
@@ -449,7 +442,7 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     // BiasLayer<float>(shape=[5,5,256]->[7,7,256], outputPadding=zeros,1)
     bias = GetRandomVector<VectorType>(256);
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {7, 7, 256}, ZeroPadding(1), bias);
-    
+
     // BinaryConvolutionalLayer<float>(shape=[7,7,256]->[5,5,512], inputPadding=zeros,1, stride=1, method=bitwise, receptiveField=3, weightsScale=none)
     convWeights = GetRandomTensor<TensorType>(3 * 512, 3, 256); // k * f, k, ch
     AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {5, 5, 512}, NoPadding(), convParams, convWeights);
@@ -480,17 +473,17 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     // BinaryConvolutionalLayer<float>(shape=[5,5,512]->[3,3,1024], inputPadding=zeros,1, stride=1, method=bitwise, receptiveField=3, weightsScale=none)
     convWeights = GetRandomTensor<TensorType>(3 * 1024, 3, 512); // k * f, k, ch
     AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {3, 3, 1024}, NoPadding(), convParams, convWeights);
-    
+
     // BiasLayer<float>(shape=[3,3,1024]->[3,3,1024])
     bias = GetRandomVector<VectorType>(1024);
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {3, 3, 1024}, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[3,3,1024]->[5,5,1024], outputPadding=min,1)
     AddLayer<ActivationLayer<ElementType, ReLUActivation>, ElementType>(layers, NoPadding(), {5, 5, 1024}, ZeroPadding(1));
-    
+
     // PoolingLayer<float,MaxPoolingFunction>(shape=[5,5,1024]->[2,2,1024], inputPadding=min,1, function=maxpooling, stride=2, size=3)
     AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {2, 2, 1024}, NoPadding(), PoolingParameters{3, 2});
-    
+
     // BatchNormalizationLayer<float>(shape=[2,2,1024]->[2,2,1024])
     bnMean = GetRandomVector<VectorType>(1024);
     bnVar = GetRandomVector<VectorType>(1024);
@@ -499,11 +492,11 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     // ScalingLayer<float>(shape=[2,2,1024]->[2,2,1024])
     scale = GetRandomVector<VectorType>(1024);
     AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1024}, NoPadding(), scale);
-    
+
     // BiasLayer<float>(shape=[2,2,1024]->[2,2,1024])
     bias = GetRandomVector<VectorType>(1024);
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1024}, NoPadding(), bias);
-    
+
     // ConvolutionalLayer<float>(shape=[2,2,1024]->[2,2,1000], stride=1, method=columnwise, receptiveField=1, numFilters=1000)
     convWeights = GetRandomTensor<TensorType>(3 * 1000, 3, 1024); // k * f, k, ch
     if(lastLayerReal)
@@ -514,7 +507,7 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     {
         AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1000}, NoPadding(), convParams, convWeights);
     }
-    
+
     // BiasLayer<float>(shape=[2,2,1000]->[2,2,1000])
     bias = GetRandomVector<VectorType>(1000);
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1000}, NoPadding(), bias);
@@ -525,10 +518,10 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     // ScalingLayer<float>(shape=[1,1,1000]->[1,1,1000])
     scale = GetRandomVector<VectorType>(1000);
     AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {1, 1, 1000}, NoPadding(), scale);
-    
+
     // SoftmaxLayer<float>(shape=[1,1,1000]->[1,1,1000])
     AddLayer<SoftmaxLayer<ElementType>, ElementType>(layers, NoPadding(), {1, 1, 1000}, NoPadding());
-    
+
     //
     // Create predictor
     //

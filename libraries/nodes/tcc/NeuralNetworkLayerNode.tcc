@@ -77,7 +77,7 @@ namespace nodes
         model::Shape stride{ dataSizeArray.begin(), dataSizeArray.end() };
         model::Shape offset{ static_cast<int>(padding), static_cast<int>(padding), 0 };
         model::Shape size(stride.size());
-        for (int dimensionIndex = 0; dimensionIndex < offset.size(); ++dimensionIndex)
+        for (size_t dimensionIndex = 0; dimensionIndex < offset.size(); ++dimensionIndex)
         {
             if(stride[dimensionIndex] < (2 * offset[dimensionIndex]))
             {

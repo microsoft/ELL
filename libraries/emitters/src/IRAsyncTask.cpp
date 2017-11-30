@@ -62,7 +62,7 @@ namespace emitters
             function.FillStruct(taskArg, _arguments);
             auto pthreadWrapperFunction = GetTaskWrapperFunction(module, _taskFunction);
             auto errCode = function.PthreadCreate(_pthread, nullAttr, pthreadWrapperFunction, function.CastPointer(taskArg, int8PtrType));
-            unused(errCode);
+            UNUSED(errCode);
         }
         else
         {
@@ -78,7 +78,7 @@ namespace emitters
             auto int8PtrType = llvm::Type::getInt8PtrTy(context);
             auto returnValuePtr = functionEmitter.Variable(int8PtrType, "returnValue");
             auto errCode = functionEmitter.PthreadJoin(functionEmitter.Load(_pthread), returnValuePtr);
-            unused(errCode);
+            UNUSED(errCode);
             _returnValue = functionEmitter.Load(returnValuePtr);
         }
         else

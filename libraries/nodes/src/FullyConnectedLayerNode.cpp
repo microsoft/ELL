@@ -45,7 +45,7 @@ namespace nodes
         std::vector<size_t> inputStride = inputShape;
         std::vector<size_t> inputOffset = { inputPaddingSize, inputPaddingSize, 0 };
         std::vector<size_t> inputSize = inputStride;
-        for (int dimensionIndex = 0; dimensionIndex < inputOffset.size(); ++dimensionIndex)
+        for (size_t dimensionIndex = 0; dimensionIndex < inputOffset.size(); ++dimensionIndex)
         {
             inputSize[dimensionIndex] -= 2 * inputOffset[dimensionIndex];
         }

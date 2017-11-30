@@ -41,6 +41,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, uint32_t);
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, int64_t);
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, float);
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, double);
 
@@ -91,6 +94,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, uint32_t);
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, int64_t);
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, float);
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, double);
 
@@ -101,7 +107,7 @@ namespace utilities
 
     void ObjectArchiver::ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array)
     {
-        unused(baseTypeName);
+        UNUSED(baseTypeName);
         if (std::string{ "" } == name)
         {
             _objectDescription.SetValue(array);
@@ -123,6 +129,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, uint32_t);
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, int64_t);
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_UNARCHIVE_VALUE(ObjectUnarchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, float);
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, double);
 
@@ -163,6 +172,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, uint32_t);
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, int64_t);
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_UNARCHIVE_ARRAY(ObjectUnarchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, float);
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, double);
 
@@ -180,13 +192,13 @@ namespace utilities
 
     bool ObjectArchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
-        unused(typeName);
+        UNUSED(typeName);
         return true;
     }
 
     void ObjectArchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
-        unused(typeName);
+        UNUSED(typeName);
     }
 }
 }

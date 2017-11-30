@@ -38,27 +38,27 @@ public:
     ///
     /// <param name="outputDirectory"> The directory the output files will be written to. </param>
     ModelComparison(std::string outputDirectory);
-    
+
     /// <summary> Compares the "reference" output vs. compiled otuput of a map. </summary>
     ///
     /// <param name="input"> The data to evaluate the map with when comparing outputs. </param>
     /// <param name="reference"> The map to compare the reference vs. compiled versions of. </param>
     /// <param name="settings"> The compiler settings to use when compiling the map. </param>
     void Compare(std::vector<float>& input, model::DynamicMap& reference, const model::MapCompilerParameters& settings);
-    
+
     /// <summary> Saves reference and compiled outputs to a file. </summary>
     ///
     /// <param name="name"> The label for the output from with the filename is generated. </param>
     /// <param name="reference"> The output of the reference implementation. </param>
     /// <param name="compiled"> The output of the compiled implementation. </param>
     void SaveOutput(std::string name, const std::vector<float>& reference, const std::vector<float>& compiled);
-    
+
     /// <summary> Gets the output size of a node, given the node's ID. </summary>
     ///
     /// <param name="nodeId"> The ID of the node. </param>
     /// <returns> The size of the node. </returns>
     size_t GetOutputSize(const std::string& nodeId);
-    
+
     /// <summary> Writes a report with summary and detail of differences between reference and compiled outputs. </summary>
     ///
     /// <param name="outputStream"> The stream to write output to. </param>
@@ -66,17 +66,17 @@ public:
     /// <param name="testDataName"> The name of input data file used during evaluation. </param>
     /// <param name="writePrediction"> Indicates whether to write the predicted output (== argmax of the output vector) of the model. </param>
     void WriteReport(std::ostream& outputStream, std::string modelName, std::string testDataName, bool writePrediction);
-    
+
     /// <summary> Writes a DGML file of the model, annotated with differences between reference and compiled outputs. </summary>
     ///
     /// <param name="outputStream"> The stream to write output to. </param>
     void SaveDgml(std::ostream& outputStream);
-    
+
     /// <summary> Writes a DOT graph file of the model, annotated with differences between reference and compiled outputs. </summary>
     ///
     /// <param name="outputStream"> The stream to write output to. </param>
     void SaveDot(std::ostream& outputStream);
-    
+
     /// <summary> Records a layer's output to the internal list of outputs. Used internally, but public because it needs to be called from a callback routine. </summary>
     ///
     /// <param name="label"> The label for the layer. </param>
@@ -123,7 +123,7 @@ private:
     std::string _outputDirectory;
     bool _runningCompiled;
     std::vector<LayerCaptureData> _layerOutputData;
-    int _nextIndex;
+    size_t _nextIndex;
     double _minError;
     double _maxError;
     bool _hasMinMax;

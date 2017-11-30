@@ -126,7 +126,7 @@ namespace math
 
     //
     // ConstTensorReference
-    // 
+    //
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ConstTensorReference(TensorShape shape) : ConstTensorReference<ElementType, dimension0, dimension1, dimension2>(nullptr, shape)
@@ -302,7 +302,7 @@ namespace math
     size_t ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetOffset(TensorCoordinate coordinate) const
     {
         DEBUG_THROW(coordinate.GetRowIndex() >= NumRows() || coordinate.GetColumnIndex() >= NumColumns() || coordinate.GetChannelIndex() >= NumChannels(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor size."));
-        
+
         return coordinate.GetValue<dimension0>() + coordinate.GetValue<dimension1>() * _increment1 + coordinate.GetValue<dimension2>() * _increment2;
     }
 
@@ -357,7 +357,7 @@ namespace math
         DEBUG_THROW(NumColumns() != other.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Tensors must have the same number of columns"));
         DEBUG_THROW(NumChannels() != other.NumChannels(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Tensors must have the same number of channels"));
 
-        for (size_t i = 0; i < NumPrimarySlices(); ++i) 
+        for (size_t i = 0; i < NumPrimarySlices(); ++i)
         {
             auto slice = other.GetPrimarySlice(i);
             GetPrimarySlice(i).CopyFrom(slice);
@@ -379,7 +379,7 @@ namespace math
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
-    void TensorReference<ElementType, dimension0, dimension1, dimension2>::CopyFrom(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other) 
+    void TensorReference<ElementType, dimension0, dimension1, dimension2>::CopyFrom(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other)
     {
         DEBUG_THROW(NumRows() != other.NumRows(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Tensors must have the same number of rows"));
         DEBUG_THROW(NumColumns() != other.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Tensors must have the same number of columns"));
@@ -482,7 +482,7 @@ namespace math
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(size_t numRows, size_t numColumns, size_t numChannels) 
+    Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(size_t numRows, size_t numColumns, size_t numChannels)
         : TensorRef(TensorShape(numRows, numColumns, numChannels)), _data(numRows * numColumns * numChannels)
     {
         _pData = _data.data();
@@ -541,7 +541,7 @@ namespace math
         _pData = _data.data();
         auto numColumns = list.begin()->size();
         auto numChannels = list.begin()->begin()->size();
-        debug_used(numColumns, numChannels);
+        DEBUG_USED(numColumns, numChannels);
 
         size_t i = 0;
         for (auto rowIter = list.begin(); rowIter < list.end(); ++rowIter)

@@ -28,7 +28,6 @@ llvm::StructType* GetTaskArgStructType(IRModuleEmitter& module, llvm::Function* 
 llvm::Function* GetTaskWrapperFunction(IRModuleEmitter& module, llvm::Function* taskFunction)
 {
     auto& context = module.GetLLVMContext();
-    auto& emitter = module.GetIREmitter();
     auto int8PtrType = llvm::Type::getInt8PtrTy(context);
 
     auto taskFunctionName = taskFunction->getGlobalIdentifier();
@@ -43,8 +42,6 @@ llvm::Function* GetTaskWrapperFunction(IRModuleEmitter& module, llvm::Function* 
 
     auto taskWrapperFunction = module.BeginFunction(wrapperFunctionName, int8PtrType, { int8PtrType });
     {
-        auto& threadEmitter = taskWrapperFunction.GetEmitter();
-        auto& threadIrBuilder = threadEmitter.GetIRBuilder();
         auto arguments = taskWrapperFunction.Arguments().begin();
         auto threadArg = &(*arguments);
         auto argStructPtr = taskWrapperFunction.CastPointer(threadArg, taskArgType->getPointerTo());
@@ -53,7 +50,7 @@ llvm::Function* GetTaskWrapperFunction(IRModuleEmitter& module, llvm::Function* 
         auto numFields = taskArgType->getNumElements();
         std::vector<llvm::Value*> taskFunctionArgs;
 
-        for (int fieldIndex = 0; fieldIndex < numFields; ++fieldIndex)
+        for (size_t fieldIndex = 0; fieldIndex < numFields; ++fieldIndex)
         {
             auto fieldPtr = taskWrapperFunction.GetStructFieldPointer(argStructPtr, fieldIndex);
             taskFunctionArgs.push_back(taskWrapperFunction.Load(fieldPtr));

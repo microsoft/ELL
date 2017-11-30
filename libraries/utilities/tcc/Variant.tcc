@@ -32,6 +32,7 @@ namespace utilities
         template <typename ValueType, IsNotIncrementable<ValueType> concept = true>
         void Increment(ValueType& value)
         {
+            UNUSED(value);
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         };
 
@@ -44,6 +45,7 @@ namespace utilities
         template <typename ValueType, IsNotIncrementable<ValueType> concept = true>
         void Decrement(ValueType& value)
         {
+            UNUSED(value);
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
@@ -169,7 +171,7 @@ namespace utilities
         template <typename ValueType>
         auto GetValueStringHelper(const ValueType& value, ...) -> std::string
         {
-            unused(value);
+            UNUSED(value);
             return "";
         }
 
@@ -256,7 +258,7 @@ namespace utilities
         template <typename InputValueType, typename OutputValueType>
         bool TryConvertValueHelper(const InputValueType& input, OutputValueType& output, ...)
         {
-            unused(input, output);
+            UNUSED(input, output);
             return false;
         }
 
@@ -323,7 +325,7 @@ namespace utilities
         template <typename T, CanNotCastToInt<T> = true>
         intmax_t CastToIntMax(T&& value)
         {
-            unused(value);
+            UNUSED(value);
             return 0;
         }
 
@@ -336,7 +338,7 @@ namespace utilities
         template <typename T, IsNotFundamental<T> = true>
         long double CastToLongDouble(T&& value)
         {
-            unused(value);
+            UNUSED(value);
             return 0;
         }
 
@@ -356,14 +358,14 @@ namespace utilities
         template <typename ValueType, IsNotArchivableVariantType<ValueType> concept = true, IsNotVector<ValueType> concept2 = true>
         void ArchiveValue(Archiver& archiver, ValueType&& value)
         {
-            unused(archiver, value);
+            UNUSED(archiver, value);
             throw InputException(InputExceptionErrors::typeMismatch, std::string("VariantBase::ArchiveValue called with unarchivable type: ") + GetTypeName<ValueType>());
         }
 
         template <typename ValueType, IsNotArchivableVariantType<ValueType> concept = true>
         void ArchiveValue(Archiver& archiver, const std::vector<ValueType>& value)
         {
-            unused(archiver, value);
+            UNUSED(archiver, value);
             throw InputException(InputExceptionErrors::typeMismatch, std::string("VariantBase::ArchiveValue called with unarchivable vector type: ") + GetTypeName<ValueType>());
         }
 
@@ -374,27 +376,25 @@ namespace utilities
         void UnarchiveValue(Unarchiver& archiver, ValueType&& value)
         {
             archiver >> value;
-            // archiver.Unarchive(name, value);
         }
 
         template <typename ValueType, IsArchivableVariantType<ValueType> concept = true>
         void UnarchiveValue(Unarchiver& archiver, std::vector<ValueType>& value)
         {
             archiver >> value;
-            // archiver.Unarchive(name, value);
         }
 
         template <typename ValueType, IsNotArchivableVariantType<ValueType> concept = true, IsNotVector<ValueType> concept2 = true>
         void UnarchiveValue(Unarchiver& archiver, ValueType&& value)
         {
-            unused(archiver, value);
+            UNUSED(archiver, value);
             throw InputException(InputExceptionErrors::typeMismatch, std::string("VariantBase::ArchiveValue called with unarchivable type: ") + GetTypeName<ValueType>());
         }
 
         template <typename ValueType, IsNotArchivableVariantType<ValueType> concept = true>
         void UnarchiveValue(Unarchiver& archiver, std::vector<ValueType>& value)
         {
-            unused(archiver, value);
+            UNUSED(archiver, value);
             throw InputException(InputExceptionErrors::typeMismatch, std::string("VariantBase::UnarchiveValue called with unarchivable type: ") + GetTypeName<typename std::decay<ValueType>::type>());
         }
 

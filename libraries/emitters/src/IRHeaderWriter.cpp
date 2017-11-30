@@ -103,7 +103,7 @@ namespace
             DeclareIfDefDefine guard(os, "ELL_" + typeName);
             os << "typedef struct " << typeName << "\n";
             os << "{\n";
-            auto index = 0;
+            size_t index = 0;
             for (auto& fieldType : t->elements())
             {
                 os << "    ";

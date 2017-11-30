@@ -16,6 +16,7 @@
 
 // utilities
 #include "Exception.h"
+#include "Unused.h"
 
 // stl
 #include <iostream>
@@ -83,8 +84,6 @@ namespace emitters
     {
         auto& context = _module.GetLLVMContext();
         auto voidType = llvm::Type::getVoidTy(context);
-        auto int8PtrType = llvm::Type::getInt8PtrTy(context);
-        auto boolType = llvm::Type::getInt1Ty(context);
 
         // Create individual threads (in a global_ctors function)
         auto shutDownThreadPoolFunction = _module.BeginFunction("shutDownThreadPool", voidType);
@@ -215,10 +214,10 @@ namespace emitters
 
         // Initialize the fields
         llvm::ConstantPointerNull* nullAttr = function.NullPointer(int8PtrType);
-        llvm::Value* errCode = nullptr;
-        errCode = function.PthreadMutexInit(queueMutex, nullAttr);
+        llvm::Value* errCode = function.PthreadMutexInit(queueMutex, nullAttr);
         errCode = function.PthreadCondInit(workAvailableCondVar, nullAttr);
         errCode = function.PthreadCondInit(workFinishedCondVar, nullAttr);
+        UNUSED(errCode);
         function.Store(count, function.Literal<int>(0));
         function.Store(unfinishedCount, function.Literal<int>(0));
         function.Store(shutdownFlag, function.FalseBit());
@@ -421,12 +420,14 @@ namespace emitters
     {
         assert(IsInitialized());
         auto errCode = function.PthreadMutexLock(GetQueueMutexPointer(function));
+        UNUSED(errCode);
     }
 
     void IRThreadPoolTaskQueue::UnlockQueueMutex(IRFunctionEmitter& function)
     {
         assert(IsInitialized());
         auto errCode = function.PthreadMutexUnlock(GetQueueMutexPointer(function));
+        UNUSED(errCode);
     }
 
     //
@@ -488,10 +489,6 @@ namespace emitters
         auto& module = function.GetModule();
 
         // Get types
-        auto& context = module.GetLLVMContext();
-        auto int8PtrType = llvm::Type::getInt8PtrTy(context);
-        auto int8PtrPtrType = int8PtrType->getPointerTo();
-        auto int32Type = llvm::Type::getInt32Ty(context);
         auto taskArrayDataType = GetTaskArrayDataType(module);
 
         // Allocate our data struct
@@ -582,7 +579,7 @@ namespace emitters
         SetTaskArgsStructSize(function, function.Literal<int>(argStructSize));
 
         // copy args to taskData struct
-        for (int taskIndex = 0; taskIndex < numTasks; ++taskIndex)
+        for (size_t taskIndex = 0; taskIndex < numTasks; ++taskIndex)
         {
             auto taskData = function.PointerOffset(taskArgStorage, taskIndex);
             function.FillStruct(taskData, taskArgs[taskIndex]);

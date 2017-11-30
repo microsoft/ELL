@@ -1,7 +1,7 @@
 // Macros for exposing operator[] to python / javascript
 #if defined(SWIGPYTHON)
 %define WRAP_OP_AT(Class, ValueType)
-  %extend Class 
+  %extend Class
   {
     ValueType __getitem__(size_t index)
     {
@@ -13,7 +13,7 @@
 #elif defined(SWIGJAVASCRIPT)
 
 %define WRAP_OP_AT(Class, ValueType)
-  %extend Class 
+  %extend Class
   {
     ValueType get(size_t index)
     {
@@ -34,8 +34,8 @@
 %define WRAP_PRINT_TO_STR(Class)
     %extend Class
     {
-        std::string __str__() 
-        {        
+        std::string __str__()
+        {
             std::ostringstream oss(std::ostringstream::out);
             ($self)->Print(oss);
             return oss.str();
@@ -48,8 +48,8 @@
 %define WRAP_PRINT_TO_STR(Class)
     %extend Class
     {
-        std::string toString() 
-        {        
+        std::string toString()
+        {
             std::ostringstream oss(std::ostringstream::out);
             ($self)->Print(oss);
             return oss.str();
@@ -69,7 +69,7 @@
 %define WRAP_OSTREAM_OUT_TO_STR(Class)
     %extend Class
     {
-        std::string __str__() 
+        std::string __str__()
         {
             std::ostringstream oss(std::ostringstream::out);
             oss << *($self);
@@ -83,8 +83,8 @@
 %define WRAP_OSTREAM_OUT_TO_STR(Class)
     %extend Class
     {
-        std::string toString() 
-        {        
+        std::string toString()
+        {
             std::ostringstream oss(std::ostringstream::out);
             oss << *($self);
             return oss.str();
@@ -107,8 +107,8 @@ import numpy as np
 
 %define TYPEMAP_COPY_TO_VECTOR(BUFFER_TYPE)
 %typemap(in) (BUFFER_TYPE* buffer, size_t length)
-             (Py_buffer view_ = {0})
-{    
+             (Py_buffer view_ = {})
+{
     static const char* data_type = "BUFFER_TYPE";
     int res = PyObject_GetBuffer($input, &view_, PyBUF_ANY_CONTIGUOUS | PyBUF_WRITABLE | PyBUF_FORMAT);
     if (res < 0)
@@ -116,13 +116,13 @@ import numpy as np
         PyErr_Clear();
         SWIG_exception_fail(res, "Cannot get a contiguous buffer to write to");
     }
-    if (view_.ndim != 1) 
+    if (view_.ndim != 1)
     {
         PyErr_Clear();
         SWIG_exception_fail(res, "Expected a 1-dimensional array");
     }
 
-    if (view_.format == nullptr || view_.format[0] != data_type[0]) 
+    if (view_.format == nullptr || view_.format[0] != data_type[0])
     {
         PyErr_Clear();
         SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
@@ -135,7 +135,7 @@ import numpy as np
     // free the buffer
     PyBuffer_Release(&view_2);
 }
-%enddef 
+%enddef
 
 %{
 
@@ -239,7 +239,7 @@ def copy_from(self, a):
                 elif (len(numpyArray.shape) == 3):
                     super(TypeName, self).__init__(numpyArray.ravel(), numpyArray.shape[0], numpyArray.shape[1], numpyArray.shape[2])
                 elif (len(numpyArray.shape) == 4):
-                    # Create a stacked 3 dimensional tensor 
+                    # Create a stacked 3 dimensional tensor
                     numpyArrayStacked = numpyArray.reshape(numpyArray.shape[0] * numpyArray.shape[1], numpyArray.shape[2], numpyArray.shape[3])
                     super(TypeName, self).__init__(numpyArrayStacked.ravel(), numpyArrayStacked.shape[0], numpyArrayStacked.shape[1], numpyArrayStacked.shape[2])
                 else:

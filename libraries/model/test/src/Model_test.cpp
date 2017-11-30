@@ -114,7 +114,7 @@ void TestNodeIterator()
 {
     auto model = GetCompoundModel();
     auto size1 = model.Size();
-    auto size2 = 0;
+    size_t size2 = 0;
     auto iter = model.GetNodeIterator();
     while (iter.IsValid())
     {

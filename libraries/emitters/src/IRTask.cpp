@@ -42,6 +42,7 @@ namespace emitters
             _task.threadPoolTask.~IRThreadPoolTask();
             break;
         default:
+            // not throwing since this is a dtor
             assert(false && "Error: illegal value for TaskType");
         }
     }
@@ -57,7 +58,7 @@ namespace emitters
             _task.threadPoolTask.Wait(function);
             break;
         default:
-            assert(false && "Error: illegal value for TaskType");
+            throw std::invalid_argument("illegal value for TaskType");
         }
     }
 
@@ -72,7 +73,7 @@ namespace emitters
             return _task.threadPoolTask.GetReturnValue(function);
             break;
         default:
-            assert(false && "Error: illegal value for TaskType");
+            throw std::invalid_argument("illegal value for TaskType");
         }
     }
 
@@ -85,7 +86,7 @@ namespace emitters
         case TaskType::threadPool:
             return _task.threadPoolTask.IsNull(function);
         default:
-            assert(false && "Error: illegal value for TaskType");
+            throw std::invalid_argument("illegal value for TaskType");
         }
     }
 
@@ -117,6 +118,7 @@ namespace emitters
                 _tasks.threadPoolTasks.~IRThreadPoolTaskArray();
                 break;
             default:
+                // not throwing since this is a dtor
                 assert(false && "Error: illegal value for TaskType");
             }
         }
@@ -136,7 +138,7 @@ namespace emitters
             _tasks.threadPoolTasks.WaitAll(function);
             break;
         default:
-            assert(false && "Error: illegal value for TaskType");
+            throw std::invalid_argument("illegal value for TaskType");
         }
     }
 
@@ -151,7 +153,7 @@ namespace emitters
             return _tasks.threadPoolTasks.GetTask(function, function.Literal<int>(taskIndex));
             break;
         default:
-            assert(false && "Error: illegal value for TaskType");
+            throw std::invalid_argument("illegal value for TaskType");
         }
     }
 }

@@ -30,7 +30,6 @@ namespace ell
     //
     void TestStringf()
     {
-        testing::ProcessTest("Stringf with no args", ell::utilities::FormatString("test") == "test");
         testing::ProcessTest("Stringf with args", ell::utilities::FormatString("test %d is %s", 10, "fun") == "test 10 is fun");
     }
 

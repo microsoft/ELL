@@ -48,7 +48,7 @@ double safe_div(const double& num, const double& den)
 }
 
 ProtoNNTrainer::ProtoNNTrainer(const ProtoNNTrainerParameters& parameters)
-    : _dimemsion(parameters.numFeatures), _parameters(parameters), _X(0, 0), _Y(0, 0), _protoNNPredictor(parameters.numFeatures, parameters.projectedDimension, parameters.numPrototypesPerLabel * parameters.numLabels, parameters.numLabels, parameters.gamma)
+    : _dimemsion(parameters.numFeatures), _parameters(parameters), _protoNNPredictor(parameters.numFeatures, parameters.projectedDimension, parameters.numPrototypesPerLabel * parameters.numLabels, parameters.numLabels, parameters.gamma), _X(0, 0), _Y(0, 0)
 {
 }
 
@@ -245,7 +245,7 @@ double ProtoNNTrainer::ComputeObjective(std::map<ProtoNNParameterIndex, std::sha
     size_t numBatches = (n + batchSize - 1) / batchSize;
 
     // Aggregate loss over the batches
-    for (int i = 0; i < numBatches; ++i)
+    for (size_t i = 0; i < numBatches; ++i)
     {
         size_t idx1 = (i * batchSize) % n;
         size_t idx2 = ((i + 1) * (batchSize) % n);
@@ -301,7 +301,7 @@ void ProtoNNTrainer::AcceleratedProximalGradient(
 
     size_t iters = iters_;
 
-    for (int t = 0; t < iters; ++t)
+    for (size_t t = 0; t < iters; ++t)
     {
         size_t idx1 = (t * batchSize) % n;
         size_t idx2 = ((t + 1) * batchSize) % n;
@@ -401,7 +401,7 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
     // End Initializations
 
     // number of outer SGD iterations
-    for (auto i = 0; i < nIters; ++i)
+    for (size_t i = 0; i < nIters; ++i)
     {
         for (auto parameterIndex : m_OptimizationOrder)
         {
@@ -416,7 +416,7 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
 
             // Step-size estimation: We try out 10 random batches of data, estimate Hessian (H) of the function using each batch.
             // Select median of 1/H as the stepsize.
-            for (auto j = 0; j < eta.Size(); ++j)
+            for (size_t j = 0; j < eta.Size(); ++j)
             {
                 size_t idx1 = (j * sgdBatchSize) % n;
                 size_t idx2 = ((j + 1) * sgdBatchSize) % n;
@@ -517,7 +517,7 @@ Param_W::Param_W(size_t dim1, size_t dim2)
 
 math::ColumnMatrix<double> Param_W::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType)
 {
-    unused(WX);
+    UNUSED(WX);
     assert(end - begin == D.NumRows());
 
     auto W = modelMap[ProtoNNParameterIndex::W]->GetData();
@@ -595,7 +595,7 @@ Param_Z::Param_Z(size_t dim1, size_t dim2)
 
 math::ColumnMatrix<double> Param_Z::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference Similarity, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType)
 {
-    unused(X, WX, gamma);
+    UNUSED(X, WX, gamma);
 
     assert(end - begin == Similarity.NumRows());
 
@@ -644,7 +644,7 @@ Param_B::Param_B(size_t dim1, size_t dim2)
 
 math::ColumnMatrix<double> Param_B::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference Similarity, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType)
 {
-    unused(X, WX);
+    UNUSED(X, WX);
     assert(end - begin == Similarity.NumRows());
 
     auto B = modelMap[ProtoNNParameterIndex::B]->GetData();

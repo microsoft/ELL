@@ -55,7 +55,7 @@ std::vector<InputType> GetInputVector(const math::TensorShape& inputShape, float
     std::vector<InputType> result(inputSize);
     auto engine = utilities::GetRandomEngine("123");
     std::uniform_real_distribution<InputType> dist(0, std::nextafter(255, std::numeric_limits<InputType>::max()));
-    for (auto index = 0; index < inputSize; ++index)
+    for (size_t index = 0; index < inputSize; ++index)
     {
         result[index] = dist(engine) * scale;
     }

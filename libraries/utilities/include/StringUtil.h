@@ -23,12 +23,12 @@ namespace utilities
     /// <summary> A printf-style format string function </summary>
     ///
     /// <returns> A std::string object containing the formatted string </returns>
-    template <typename... Args>
-    std::string FormatString(const char* format, Args&&... args)
+    template <typename Arg1, typename... Args>
+    std::string FormatString(const char* format, Arg1&& arg1, Args&&... args)
     {
-        size_t size = std::snprintf(nullptr, 0, format, std::forward<Args>(args)...) + 1;
-        std::vector<char> buf(size + 1);
-        std::snprintf(buf.data(), buf.size(), format, std::forward<Args>(args)...);
+        size_t size = std::snprintf(nullptr, 0, format, std::forward<Arg1>(arg1), std::forward<Args>(args)...) + 1;
+        std::vector<char> buf(size);
+        std::snprintf(buf.data(), buf.size(), format, std::forward<Arg1>(arg1), std::forward<Args>(args)...);
         return std::string(buf.data());
     }
 

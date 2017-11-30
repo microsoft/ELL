@@ -49,7 +49,7 @@ namespace emitters
             auto beta = &(*arguments++);
             auto y = &(*arguments++);
             auto incy = &(*arguments++);
-            unused(order, transpose, alpha, beta);
+            UNUSED(order, transpose, alpha, beta);
 
             llvm::Value* accum = function.Variable(emitters::GetVariableType<ValueType>(), "accum");
 
@@ -104,7 +104,7 @@ namespace emitters
             auto beta = &(*arguments++);
             auto C = &(*arguments++);
             auto ldc = &(*arguments++);
-            unused(order, transposeA, transposeB, alpha, beta);
+            UNUSED(order, transposeA, transposeB, alpha, beta);
 
             // C = A x B, A: mxk, B: kxn, C: mxn
             // A': kxm, B': nxk
@@ -347,7 +347,7 @@ namespace emitters
             // On non-Windows, we need to make sure the linker links in
             // the clock_gettime function.
             volatile void* temp = (void*)(&clock_gettime);
-            unused(temp);
+            UNUSED(temp);
 #endif
             llvm::FunctionType* gettimeType = llvm::FunctionType::get(intType, { int32Type, timespecType->getPointerTo() }, false);
             _module.DeclareFunction("clock_gettime", gettimeType);
@@ -391,7 +391,7 @@ namespace emitters
 #endif
 
                 auto callResult = function.Call(getTimeFunction, { function.Literal(CLOCK_REALTIME), timeStruct });
-                unused(callResult);
+                UNUSED(callResult);
 
                 // llvm::Value* timeStructBase = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, function.Literal(0));
                 auto secondsPtr = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, { function.Literal(0), function.Literal(0) });

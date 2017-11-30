@@ -71,7 +71,7 @@ namespace functions
         double x = dual * label;
         double b = std::fmin(upperBound, std::fmax(lowerBound, x));
         double f = 0, df = 0;
-        for (int k = 0; k < _conjugateProxMaxIterations; ++k)
+        for (size_t k = 0; k < _conjugateProxMaxIterations; ++k)
         {
             f = b - x + sigma * log((1.0 + b) / (-b));
             if (fabs(f) <= _conjugateProxDesiredPrecision) break;

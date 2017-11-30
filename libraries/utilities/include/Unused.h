@@ -11,6 +11,10 @@
 // stl
 #include <utility>
 
+namespace ell
+{
+namespace utilities
+{
 /// <summary> Suppresses the unused parameter warning on a function parameter </summary>
 ///
 /// <typeparam name="T"> The type of the unused parameter. </param>
@@ -34,8 +38,13 @@ constexpr void unused(T1&& t1, Args&&... args)
     unused(std::forward<Args>(args)...);
 }
 
+}
+}
+
+#define UNUSED(...) ::ell::utilities::unused(__VA_ARGS__)
+
 #if defined(NDEBUG)
-#define debug_used(...) unused(__VA_ARGS__)
+#define DEBUG_USED(...) UNUSED(__VA_ARGS__)
 #else
-#define debug_used(...)
+#define DEBUG_USED(...)
 #endif // defined(NDEBUG)

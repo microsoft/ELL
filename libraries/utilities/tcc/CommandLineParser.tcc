@@ -31,7 +31,7 @@ namespace utilities
     template <typename T, typename U>
     void CommandLineParser::AddOption(T& option, std::string name, std::string shortName, std::string description, const U& defaultValue, std::string emptyValueString)
     {
-        auto callback = [&option, this](std::string optionVal) {
+        auto callback = [&option](std::string optionVal) {
             bool didParse = ParseVal<T>(optionVal, option);
             return didParse;
         };

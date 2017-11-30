@@ -26,12 +26,12 @@ namespace utilities
     //
     void ParsedArgSet::AddArgs(CommandLineParser& parser)
     {
-        unused(parser);
+        UNUSED(parser);
     }
 
     CommandLineParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
     {
-        unused(parser);
+        UNUSED(parser);
         return CommandLineParseResult();
     }
 
@@ -431,7 +431,7 @@ namespace utilities
 
     void CommandLineParser::AddOptionSet(ParsedArgSet& options)
     {
-        AddPostParseCallback([this, &options](CommandLineParser& p) { return options.PostProcess(p); });
+        AddPostParseCallback([&options](CommandLineParser& p) { return options.PostProcess(p); });
         options.AddArgs(*this);
     }
 

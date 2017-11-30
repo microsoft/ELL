@@ -131,13 +131,13 @@ namespace nodes
         function.Store(bestVal, val0);
         function.StoreZero(bestIndex);
 
-        for (int i = 1; i < numInputs; ++i)
+        for (size_t i = 1; i < numInputs; ++i)
         {
             llvm::Value* val = compiler.LoadPortElementVariable(input.GetInputElement(i));
             emitters::IRIfEmitter if1 = function.If(GetComparison(), val, function.Load(bestVal));
             {
                 function.Store(bestVal, val);
-                function.Store(bestIndex, function.Literal(i));
+                function.Store(bestIndex, function.Literal(static_cast<int>(i)));
             }
             if1.End();
         }

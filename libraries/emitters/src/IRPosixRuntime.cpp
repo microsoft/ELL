@@ -58,7 +58,7 @@ namespace emitters
         auto& context = _module.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
         auto int64Type = llvm::Type::getInt64Ty(context);
-        
+
         if (_module.GetCompilerParameters().targetDevice.numBits == 32)
         {
             // These are really time_t and long
@@ -108,7 +108,7 @@ namespace emitters
         if(targetDevice.IsLinux())
         {
             auto triple = targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : targetDevice.triple;
-            
+
             if(triple.find("armv7") != std::string::npos)
             {
                 // Raspbian (32-bit)
@@ -124,13 +124,13 @@ namespace emitters
                 // %"struct.(anonymous union)::__pthread_mutex_s" = type { i32, i32, i32, i32, i32, i32, %struct.__pthread_internal_list }
                 // %struct.__pthread_internal_list = type { %struct.__pthread_internal_list*, %struct.__pthread_internal_list* }
                 auto internalListType = _module.GetAnonymousStructType({GetPointerSizedIntType(), GetPointerSizedIntType()});
-                return _module.GetOrCreateStruct("pthread_mutex_t", {int32Type, int32Type, int32Type, int32Type, int32Type, int32Type, internalListType});                
+                return _module.GetOrCreateStruct("pthread_mutex_t", {int32Type, int32Type, int32Type, int32Type, int32Type, int32Type, internalListType});
             }
             else
             {
                 assert(false && "Unknown Linux architecture");
                 auto internalListType = _module.GetAnonymousStructType({GetPointerSizedIntType(), GetPointerSizedIntType()});
-                return _module.GetOrCreateStruct("pthread_mutex_t", {int32Type, int32Type, int32Type, int32Type, int32Type, int32Type, internalListType});                
+                return _module.GetOrCreateStruct("pthread_mutex_t", {int32Type, int32Type, int32Type, int32Type, int32Type, int32Type, internalListType});
             }
         }
         else if(targetDevice.IsMacOS())
@@ -157,7 +157,7 @@ namespace emitters
         if(targetDevice.IsLinux())
         {
             auto triple = targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : targetDevice.triple;
-            
+
             if(triple.find("armv7") != std::string::npos)
             {
                 // Raspbian (32-bit)
@@ -199,7 +199,7 @@ namespace emitters
         if(targetDevice.IsLinux())
         {
             auto triple = targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : targetDevice.triple;
-            
+
             if(triple.find("armv7") != std::string::npos)
             {
                 // Raspbian (32-bit)
@@ -424,8 +424,7 @@ namespace emitters
 
     llvm::Function* IRPosixRuntime::GetPthreadSpinInitFunction()
     {
-        auto& targetDevice = _module.GetCompilerParameters().targetDevice;
-        assert(targetDevice.IsLinux() && "pthread spinlock only available on Linux");
+        assert(_module.GetCompilerParameters().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
         // Signature: int  pthread_spin_init(pthread_spinlock_t *lock, int pshared);
         auto intType = GetIntType();
@@ -436,20 +435,18 @@ namespace emitters
 
     llvm::Function* IRPosixRuntime::GetPthreadSpinLockFunction()
     {
-        auto& targetDevice = _module.GetCompilerParameters().targetDevice;
-        assert(targetDevice.IsLinux() && "pthread spinlock only available on Linux");
+        assert(_module.GetCompilerParameters().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
         // Signature: int  pthread_spin_lock(pthread_spinlock_t *lock);
         auto intType = GetIntType();
         auto spinlockPtrType = GetPthreadSpinlockType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { spinlockPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_lock", functionType));        
+        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_lock", functionType));
     }
-        
+
     llvm::Function* IRPosixRuntime::GetPthreadSpinTryLockFunction()
     {
-        auto& targetDevice = _module.GetCompilerParameters().targetDevice;
-        assert(targetDevice.IsLinux() && "pthread spinlock only available on Linux");
+        assert(_module.GetCompilerParameters().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
         // Signature: int  pthread_spin_trylock(pthread_spinlock_t *lock);
         auto intType = GetIntType();
@@ -458,11 +455,10 @@ namespace emitters
         return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_trylock", functionType));
 
     }
-        
+
     llvm::Function* IRPosixRuntime::GetPthreadSpinUnlockFunction()
     {
-        auto& targetDevice = _module.GetCompilerParameters().targetDevice;
-        assert(targetDevice.IsLinux() && "pthread spinlock only available on Linux");
+        assert(_module.GetCompilerParameters().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
         // Signature: int  pthread_spin_unlock(pthread_spinlock_t *lock);
         auto intType = GetIntType();
@@ -470,11 +466,10 @@ namespace emitters
         auto functionType = llvm::FunctionType::get(intType, { spinlockPtrType }, false);
         return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_unlock", functionType));
     }
-        
+
     llvm::Function* IRPosixRuntime::GetPthreadSpinDestroyFunction()
     {
-        auto& targetDevice = _module.GetCompilerParameters().targetDevice;
-        assert(targetDevice.IsLinux() && "pthread spinlock only available on Linux");
+        assert(_module.GetCompilerParameters().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
         // Signature: int  pthread_spin_destroy(pthread_spinlock_t *lock);
         auto intType = GetIntType();
@@ -482,7 +477,7 @@ namespace emitters
         auto functionType = llvm::FunctionType::get(intType, { spinlockPtrType }, false);
         return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_destroy", functionType));
     }
-        
+
 
     // Signature: int pthread_once(pthread_once_t * once_init, void (*init_routine)(void)));
 }

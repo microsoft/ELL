@@ -110,7 +110,7 @@ static void TestL2NormSquaredNodeCompute()
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
     auto outputNode = model.AddNode<nodes::L2NormSquaredNode<double>>(inputNode->output);
 
-    for (int index = 0; index < data.size(); ++index)
+    for (size_t index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
         double expectedOutput = VectorMagnitudeSquared(inputValue);
@@ -133,10 +133,10 @@ static void TestAccumulatorNodeCompute()
 
     std::vector<double> accumOutput(data[0].size());
 
-    for (int index = 0; index < data.size(); ++index)
+    for (size_t index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
-        for (int d = 0; d < inputValue.size(); d++)
+        for (size_t d = 0; d < inputValue.size(); d++)
         {
             accumOutput[d] += inputValue[d];
         }
@@ -159,7 +159,7 @@ static void TestDelayNodeCompute()
 
     std::vector<double> outputVec;
 
-    for (int index = 0; index < data.size(); ++index)
+    for (size_t index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
         inputNode->SetInput(inputValue);
@@ -280,14 +280,14 @@ static void TestBinaryOperationNodeCompute()
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
     auto outputNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, inputNode->output, emitters::BinaryOperationType::add);
 
-    for (int index = 0; index < data.size(); ++index)
+    for (size_t index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
 
         inputNode->SetInput(inputValue);
         std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
 
-        for (int d = 0; d < inputValue.size(); ++d)
+        for (size_t d = 0; d < inputValue.size(); ++d)
         {
             auto expectedOutput = 2 * inputValue[d];
             testing::ProcessTest("Testing BinaryOperationNode compute", testing::IsEqual(outputVec[d], expectedOutput));
@@ -636,7 +636,7 @@ static void TestDTWDistanceNodeCompute()
     auto prototypeLength = prototype.size();
     size_t numSamples = 200;
     size_t increment = 3;
-    for (int index = 0; index < numSamples; ++index)
+    for (size_t index = 0; index < numSamples; ++index)
     {
         auto sampleIndex = (index * increment) % prototypeLength;
         auto inputValue = prototype[sampleIndex];

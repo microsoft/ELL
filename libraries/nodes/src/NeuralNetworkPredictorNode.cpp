@@ -123,13 +123,14 @@ namespace nodes
         }
 
         size_t prevOutputSize = GetShapeSize(inputLayer.GetOutputShape()); // With padding
+        UNUSED(prevOutputSize);
         auto layerInputs = model::PortElements<ValueType>(newInputElements);
         NeuralNetworkLayerNodeBase<ValueType>* lastNode = nullptr;
 
         for (const auto& layer : _predictor.GetLayers())
         {
             auto numInputs = GetShapeSize(layer->GetInputShape());
-            debug_used(numInputs);
+            DEBUG_USED(numInputs);
             assert(prevOutputSize == numInputs);
             auto layerNode = AddLayerNode(transformer, *layer, layerInputs, options, state);
 

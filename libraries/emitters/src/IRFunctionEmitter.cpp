@@ -626,7 +626,7 @@ namespace emitters
         auto type = llvm::cast<llvm::PointerType>(pPointer->getType())->getElementType();
 
         auto zero = llvm::Constant::getNullValue(type);
-        llvm::Value* returnValue;
+        llvm::Value* returnValue = nullptr;
 
         for (int index = 0; index < numElements; ++index)
         {
@@ -679,9 +679,9 @@ namespace emitters
     {
         auto& emitter = GetEmitter();
         auto& irBuilder = emitter.GetIRBuilder();
-        for (int index = 0; index < fieldValues.size(); ++index)
+        for (size_t index = 0; index < fieldValues.size(); ++index)
         {
-            auto field = irBuilder.CreateInBoundsGEP(structPtr, { Literal(0), Literal(index) });
+            auto field = irBuilder.CreateInBoundsGEP(structPtr, { Literal(0), Literal(static_cast<int>(index)) });
             Store(field, fieldValues[index]);
         }
     }

@@ -13,7 +13,7 @@ ValueType LargestDifference(const std::vector<ValueType>& a, const std::vector<V
 {
     ValueType largestDifference = 0;
     auto size = a.size();
-    for (int index = 0; index < size; ++index)
+    for (size_t index = 0; index < size; ++index)
     {
         auto difference = a[index] - b[index];
         if (std::fabs(difference) > std::fabs(largestDifference))

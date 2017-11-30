@@ -83,7 +83,7 @@ void TestScalarVariant()
     testing::ProcessTest("Variant check value", v.GetValue<float>() == 3.25);
 
     bool success;
-    float xFloat;
+    float xFloat = 0;
     success = v.TryGetValue(xFloat);
     testing::ProcessTest("Variant TryGetValue on correct type", success);
     testing::ProcessTest("Variant TryGetValue on correct type", xFloat == 3.25f);
@@ -176,11 +176,11 @@ void TestParsePortElementsProxyVariant()
     auto success = v.TryParseInto("10.output");
     testing::ProcessTest("Variant ParseInto PortElementsProxy", success);
     if (!success) return;
-    
+
     auto elements = v.GetValue<model::PortElementsProxy>();
     testing::ProcessTest("Variant ParseInto PortElementsProxy: size", elements.GetRanges().size() == 1);
     if(elements.GetRanges().size() != 1) return;
-    
+
     auto range = elements.GetRanges()[0];
     testing::ProcessTest("Variant ParseInto PortElementsProxy: id", range.GetNodeId() == model::Node::NodeId("10"));
     testing::ProcessTest("Variant ParseInto PortElementsProxy: portName", range.GetPortName() == "output");

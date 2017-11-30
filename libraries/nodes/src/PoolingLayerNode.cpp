@@ -438,7 +438,7 @@ namespace nodes
         int outputRows = outputSize[0];
         int outputColumns = outputSize[1];
         int outputDepth = outputSize[2];
-        unused(outputRows, outputColumns);
+        UNUSED(outputRows, outputColumns);
 
         if (inputDepth != outputDepth)
         {

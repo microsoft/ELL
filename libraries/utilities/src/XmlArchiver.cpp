@@ -56,6 +56,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, uint32_t);
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, int64_t);
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, float);
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, double);
 
@@ -84,7 +87,7 @@ namespace utilities
 
     void XmlArchiver::EndArchiveObject(const char* name, const IArchivable& value)
     {
-        unused(name);
+        UNUSED(name);
         DecrementIndent();
         auto indent = GetCurrentIndent();
         auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName(value));
@@ -102,6 +105,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, uint32_t);
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, int64_t);
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, float);
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, double);
 
@@ -168,6 +174,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, uint32_t);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, int64_t);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, float);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, double);
 
@@ -212,7 +221,7 @@ namespace utilities
 
     void XmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
-        unused(name);
+        UNUSED(name);
         auto EncodedTypeName = XmlUtilities::EncodeTypeName(typeName);
         _tokenizer.MatchTokens({ "<", "/", EncodedTypeName, ">" });
     }
@@ -232,6 +241,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, uint32_t);
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, int64_t);
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, uint64_t);
+#if defined(__APPLE__)
+    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, unsigned long);
+#endif // defined(__APPLE__)
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, float);
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, double);
 
@@ -255,7 +267,7 @@ namespace utilities
 
     bool XmlUnarchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
-        unused(typeName);
+        UNUSED(typeName);
         // check for '</'
         auto token1 = _tokenizer.ReadNextToken();
         auto token2 = _tokenizer.ReadNextToken();
@@ -273,12 +285,12 @@ namespace utilities
 
     void XmlUnarchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
-        unused(typeName);
+        UNUSED(typeName);
     }
 
     void XmlUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
-        unused(name, typeName);
+        UNUSED(name, typeName);
         _tokenizer.MatchTokens({ "<", "/", "Array", ">" });
     }
 

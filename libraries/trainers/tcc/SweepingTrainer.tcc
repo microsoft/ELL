@@ -26,7 +26,7 @@ namespace trainers
     template <typename PredictorType>
     void SweepingTrainer<PredictorType>::Update()
     {
-        for (int i = 0; i < _evaluatingTrainers.size(); ++i)
+        for (size_t i = 0; i < _evaluatingTrainers.size(); ++i)
         {
             _evaluatingTrainers[i].Update();
         }
@@ -37,7 +37,7 @@ namespace trainers
     {
         double bestGoodness = _evaluatingTrainers[0].GetEvaluator()->GetGoodness();
         int bestIndex = 0;
-        for (int i = 1; i < _evaluatingTrainers.size(); ++i)
+        for (size_t i = 1; i < _evaluatingTrainers.size(); ++i)
         {
             double goodness = _evaluatingTrainers[i].GetEvaluator()->GetGoodness();
             if (goodness > bestGoodness)

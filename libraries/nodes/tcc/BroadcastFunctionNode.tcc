@@ -378,7 +378,7 @@ namespace nodes
         auto&& inputLayout = GetInputLayout();
         auto&& inputSize = inputLayout.GetActiveSize();
         auto secondaryInputSize = GetSecondaryInputSize();
-        debug_used(secondaryInputSize);
+        DEBUG_USED(secondaryInputSize);
         assert(secondaryInputSize == 0 || primaryInputSize % secondaryInputSize == 0);
 
         llvm::Value* pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);
@@ -661,7 +661,7 @@ namespace nodes
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Primary input too small");
         }
 
-        if (std::max(secondaryInput1.Size(), secondaryInput2.Size()) != inputLayout.GetActiveSize(dimension))
+        if (std::max(secondaryInput1.Size(), secondaryInput2.Size()) != static_cast<size_t>(inputLayout.GetActiveSize(dimension)))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Broadcast vector size doesn't match input");
         }
@@ -894,7 +894,7 @@ namespace nodes
             scale = prevSecondaryInputs.scaleNode->GetValues(); // scale = s1
             const auto& s2 = thisSecondaryInputs.scaleNode->GetValues();
             assert(s2.size() == scale.size());
-            for (int index = 0; index < scale.size(); ++index)
+            for (size_t index = 0; index < scale.size(); ++index)
             {
                 scale[index] *= s2[index];
             }
@@ -916,7 +916,7 @@ namespace nodes
             {
                 const auto& s2 = thisSecondaryInputs.scaleNode->GetValues();
                 assert(s2.size() == bias.size());
-                for (int index = 0; index < bias.size(); ++index)
+                for (size_t index = 0; index < bias.size(); ++index)
                 {
                     bias[index] *= s2[index];
                 }
@@ -925,7 +925,7 @@ namespace nodes
             if (thisSecondaryInputs.biasNode != nullptr) // b2 == 0, so b' = b1*s2, but perhaps s2 == 1
             {
                 const auto& b2 = thisSecondaryInputs.biasNode->GetValues(); // now add b2
-                for (int index = 0; index < bias.size(); ++index)
+                for (size_t index = 0; index < bias.size(); ++index)
                 {
                     bias[index] += b2[index];
                 }

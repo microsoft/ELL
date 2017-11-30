@@ -251,6 +251,11 @@ namespace utilities
         DECLARE_ARCHIVE_VALUE_BASE(uint32_t);
         DECLARE_ARCHIVE_VALUE_BASE(int64_t);
         DECLARE_ARCHIVE_VALUE_BASE(uint64_t);
+#if defined(__APPLE__)
+        // macOS has size_t aliased to unsigned long while uint64_t is aliased to unsigned long long
+        // we may need long version too at some point in the future
+        DECLARE_ARCHIVE_VALUE_BASE(unsigned long);
+#endif // defined(__APPLE__)
         DECLARE_ARCHIVE_VALUE_BASE(float);
         DECLARE_ARCHIVE_VALUE_BASE(double);
         virtual void ArchiveValue(const char* name, const std::string& value) = 0;
@@ -263,6 +268,9 @@ namespace utilities
         DECLARE_ARCHIVE_ARRAY_BASE(uint32_t);
         DECLARE_ARCHIVE_ARRAY_BASE(int64_t);
         DECLARE_ARCHIVE_ARRAY_BASE(uint64_t);
+#if defined(__APPLE__)
+        DECLARE_ARCHIVE_ARRAY_BASE(unsigned long);
+#endif // defined(__APPLE__)
         DECLARE_ARCHIVE_ARRAY_BASE(float);
         DECLARE_ARCHIVE_ARRAY_BASE(double);
         virtual void ArchiveArray(const char* name, const std::vector<std::string>& array) = 0;
@@ -437,6 +445,9 @@ namespace utilities
         DECLARE_UNARCHIVE_VALUE_BASE(uint32_t);
         DECLARE_UNARCHIVE_VALUE_BASE(int64_t);
         DECLARE_UNARCHIVE_VALUE_BASE(uint64_t);
+#if defined(__APPLE__)
+        DECLARE_UNARCHIVE_VALUE_BASE(unsigned long);
+#endif // defined(__APPLE__)
         DECLARE_UNARCHIVE_VALUE_BASE(float);
         DECLARE_UNARCHIVE_VALUE_BASE(double);
         virtual void UnarchiveValue(const char* name, std::string& value) = 0;
@@ -449,6 +460,9 @@ namespace utilities
         DECLARE_UNARCHIVE_ARRAY_BASE(uint32_t);
         DECLARE_UNARCHIVE_ARRAY_BASE(int64_t);
         DECLARE_UNARCHIVE_ARRAY_BASE(uint64_t);
+#if defined(__APPLE__)
+        DECLARE_UNARCHIVE_ARRAY_BASE(unsigned long);
+#endif // defined(__APPLE__)
         DECLARE_UNARCHIVE_ARRAY_BASE(float);
         DECLARE_UNARCHIVE_ARRAY_BASE(double);
         virtual void UnarchiveArray(const char* name, std::vector<std::string>& array) = 0;

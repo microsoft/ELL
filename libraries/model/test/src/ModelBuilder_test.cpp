@@ -35,24 +35,6 @@
 
 using namespace ell;
 
-namespace
-{
-    //
-    // Utilities
-    //
-    void PrintVariantTypes(const std::vector<utilities::Variant>& args)
-    {
-        std::cout << args.size() << "Args: (";
-        std::string delim = "";
-        for (auto t : args)
-        {
-            std::cout << delim << t.GetStoredTypeName();
-            delim = ", ";
-        }
-        std::cout << ")" << std::endl;
-    }
-}
-
 //
 // Tests
 //

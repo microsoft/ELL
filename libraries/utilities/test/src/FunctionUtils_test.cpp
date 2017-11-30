@@ -58,20 +58,22 @@ bool ManyArgFunction(int a, float b, std::string c)
 
 void TestInOrderFunctionEvaluator()
 {
+    g_Value = 0;
     utilities::InOrderFunctionEvaluator(VoidFunction1, VoidFunction2, VoidFunction3, VoidFunction4);
     testing::ProcessTest("InOrderFunctionEvaluator", g_Value == 4);
 }
 
 void TestApplyToEach()
 {
+    g_Value = 0;
     utilities::ApplyToEach(AddToGlobalValue, 1, 2, 3, 4, 5);
-    testing::ProcessTest("ApplyToEach", g_Value = 1 + 2 + 3 + 4 + 5);
+    testing::ProcessTest("ApplyToEach", testing::IsEqual(g_Value, 1 + 2 + 3 + 4 + 5));
 }
 
 void TestFunctionTraits()
-{    
-    testing::ProcessTest("FunctionTraits", std::is_same<utilities::FunctionReturnType<decltype(ReturnIntFunction)>, int>::value);
-    testing::ProcessTest("FunctionTraits", std::is_same<std::tuple_element_t<0, utilities::FunctionArgTypes<decltype(AddToGlobalValue)>>, int>::value);
+{
+    static_assert(std::is_same<utilities::FunctionReturnType<decltype(ReturnIntFunction)>, int>::value, "FunctionTraits");
+    static_assert(std::is_same<std::tuple_element_t<0, utilities::FunctionArgTypes<decltype(AddToGlobalValue)>>, int>::value, "FunctionTraits");
 }
 
 void TestApplyFunction()

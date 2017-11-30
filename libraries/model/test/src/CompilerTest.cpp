@@ -706,7 +706,7 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
         sourceNode2->output, emitters::BinaryOperationType::subtract);
     auto sinkNode1 = model.AddNode<nodes::SinkNode<double>>(sumNode->output,
         "ResultsCallback_Scalar");
-    auto sinkNode2 = model.AddNode<nodes::SinkNode<double>>(model::PortElements<double>{ sourceNode1->output, sumNode->output },
+    auto sinkNode2 = model.AddNode<nodes::SinkNode<double>>(model::PortElements<double>{ minusNode->output, sumNode->output },
         "ResultsCallback_Vector");
 
     // compiled maps require a single output, so we concatenate the ports for the sink nodes
