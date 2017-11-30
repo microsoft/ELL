@@ -41,32 +41,14 @@ namespace utilities
         XmlArchiver(std::ostream& outputStream);
 
     protected:
-        DECLARE_ARCHIVE_VALUE_OVERRIDE(bool);
-        DECLARE_ARCHIVE_VALUE_OVERRIDE(char);
-        DECLARE_ARCHIVE_VALUE_OVERRIDE(short);
-        DECLARE_ARCHIVE_VALUE_OVERRIDE(int);
-        DECLARE_ARCHIVE_VALUE_OVERRIDE(uint32_t);
-        DECLARE_ARCHIVE_VALUE_OVERRIDE(int64_t);
-        DECLARE_ARCHIVE_VALUE_OVERRIDE(uint64_t);
-#if defined(__APPLE__)
-        DECLARE_ARCHIVE_VALUE_OVERRIDE(unsigned long);
-#endif // defined(__APPLE__)
-        DECLARE_ARCHIVE_VALUE_OVERRIDE(float);
-        DECLARE_ARCHIVE_VALUE_OVERRIDE(double);
+        #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_VALUE_OVERRIDE(t);
+        ARCHIVABLE_TYPES_LIST
+        #undef ARCHIVE_TYPE_OP
         void ArchiveValue(const char* name, const std::string& value) override;
 
-        DECLARE_ARCHIVE_ARRAY_OVERRIDE(bool);
-        DECLARE_ARCHIVE_ARRAY_OVERRIDE(char);
-        DECLARE_ARCHIVE_ARRAY_OVERRIDE(short);
-        DECLARE_ARCHIVE_ARRAY_OVERRIDE(int);
-        DECLARE_ARCHIVE_ARRAY_OVERRIDE(uint32_t);
-        DECLARE_ARCHIVE_ARRAY_OVERRIDE(int64_t);
-        DECLARE_ARCHIVE_ARRAY_OVERRIDE(uint64_t);
-#if defined(__APPLE__)
-        DECLARE_ARCHIVE_ARRAY_OVERRIDE(unsigned long);
-#endif // defined(__APPLE__)
-        DECLARE_ARCHIVE_ARRAY_OVERRIDE(float);
-        DECLARE_ARCHIVE_ARRAY_OVERRIDE(double);
+        #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_ARRAY_OVERRIDE(t);
+        ARCHIVABLE_TYPES_LIST
+        #undef ARCHIVE_TYPE_OP
 
         void ArchiveArray(const char* name, const std::vector<std::string>& array) override;
         void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) override;
@@ -122,32 +104,16 @@ namespace utilities
         bool HasNextPropertyName(const std::string& name) override;
 
     protected:
-        DECLARE_UNARCHIVE_VALUE_OVERRIDE(bool);
-        DECLARE_UNARCHIVE_VALUE_OVERRIDE(char);
-        DECLARE_UNARCHIVE_VALUE_OVERRIDE(short);
-        DECLARE_UNARCHIVE_VALUE_OVERRIDE(int);
-        DECLARE_UNARCHIVE_VALUE_OVERRIDE(uint32_t);
-        DECLARE_UNARCHIVE_VALUE_OVERRIDE(int64_t);
-        DECLARE_UNARCHIVE_VALUE_OVERRIDE(uint64_t);
-#if defined(__APPLE__)
-        DECLARE_UNARCHIVE_VALUE_OVERRIDE(unsigned long);
-#endif // defined(__APPLE__)
-        DECLARE_UNARCHIVE_VALUE_OVERRIDE(float);
-        DECLARE_UNARCHIVE_VALUE_OVERRIDE(double);
+        #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_VALUE_OVERRIDE(t);
+        ARCHIVABLE_TYPES_LIST
+        #undef ARCHIVE_TYPE_OP
+
         void UnarchiveValue(const char* name, std::string& value) override;
 
-        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(bool);
-        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(char);
-        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(short);
-        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(int);
-        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(uint32_t);
-        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(int64_t);
-        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(uint64_t);
-#if defined(__APPLE__)
-        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(unsigned long);
-#endif // defined(__APPLE__)
-        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(float);
-        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(double);
+        #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_OVERRIDE(t);
+        ARCHIVABLE_TYPES_LIST
+        #undef ARCHIVE_TYPE_OP
+
         void UnarchiveArray(const char* name, std::vector<std::string>& array) override;
         void BeginUnarchiveArray(const char* name, const std::string& typeName) override;
         bool BeginUnarchiveArrayItem(const std::string& typeName) override;

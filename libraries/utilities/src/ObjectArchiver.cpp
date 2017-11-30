@@ -34,18 +34,9 @@ namespace utilities
     //
     // Serialization
     //
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, bool);
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, char);
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, short);
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, int);
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, uint32_t);
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, int64_t);
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, float);
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     // strings
     void ObjectArchiver::ArchiveValue(const char* name, const std::string& value)
@@ -87,18 +78,9 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, bool);
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, char);
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, short);
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, int);
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, uint32_t);
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, int64_t);
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, float);
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     void ObjectArchiver::ArchiveArray(const char* name, const std::vector<std::string>& array)
     {
@@ -122,18 +104,9 @@ namespace utilities
     //
     // Deserialization
     //
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, bool);
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, char);
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, short);
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, int);
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, uint32_t);
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, int64_t);
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectUnarchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, float);
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     // strings
     void ObjectArchiver::UnarchiveValue(const char* name, std::string& value)
@@ -165,18 +138,9 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, bool);
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, char);
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, short);
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, int);
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, uint32_t);
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, int64_t);
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectUnarchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, float);
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     void ObjectArchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
     {

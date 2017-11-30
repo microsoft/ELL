@@ -58,7 +58,7 @@ namespace utilities
         void SetVariantType(Variant& variant, const std::string& typeName)
         {
             auto it = _functionMap.find(typeName);
-            if(it != _functionMap.end())
+            if (it != _functionMap.end())
             {
                 (it->second)(variant);
             }
@@ -105,8 +105,9 @@ namespace utilities
         SerializationContext* GetPreviousContext() { return _previousContext; }
 
     protected:
-        struct c_tor{}; // tag struct for calling constructor that stores a previous context
-        SerializationContext(SerializationContext& previousContext, c_tor) : _previousContext(&previousContext) {}
+        struct c_tor {}; // tag struct for calling constructor that stores a previous context
+        SerializationContext(SerializationContext& previousContext, c_tor)
+            : _previousContext(&previousContext) {}
 
     private:
         friend class Variant;
@@ -127,6 +128,34 @@ namespace utilities
     bool operator!=(const ArchivedObjectInfo& a, const ArchivedObjectInfo& b);
 
 /// <summary> Macros to make repetitive boilerplate code in archiver implementations easier to implement. </summary>
+
+// On most platforms, uint64_t is an alias to `unsigned long`. However, on macOS, uint64_t is an alias of `unsigned long long`,
+// so we need to add 'unsigned long' when compiling on the Mac to make sure it is archivable.
+#if defined(__APPLE__)
+#define ARCHIVABLE_TYPES_LIST      \
+    ARCHIVE_TYPE_OP(bool)          \
+    ARCHIVE_TYPE_OP(char)          \
+    ARCHIVE_TYPE_OP(short)         \
+    ARCHIVE_TYPE_OP(int)           \
+    ARCHIVE_TYPE_OP(unsigned int)  \
+    ARCHIVE_TYPE_OP(unsigned long) \
+    ARCHIVE_TYPE_OP(int64_t)       \
+    ARCHIVE_TYPE_OP(uint64_t)      \
+    ARCHIVE_TYPE_OP(float)         \
+    ARCHIVE_TYPE_OP(double)
+#else
+#define ARCHIVABLE_TYPES_LIST     \
+    ARCHIVE_TYPE_OP(bool)         \
+    ARCHIVE_TYPE_OP(char)         \
+    ARCHIVE_TYPE_OP(short)        \
+    ARCHIVE_TYPE_OP(int)          \
+    ARCHIVE_TYPE_OP(unsigned int) \
+    ARCHIVE_TYPE_OP(int64_t)      \
+    ARCHIVE_TYPE_OP(uint64_t)     \
+    ARCHIVE_TYPE_OP(float)        \
+    ARCHIVE_TYPE_OP(double)
+#endif
+
 #define DECLARE_ARCHIVE_VALUE_BASE(type) virtual void ArchiveValue(const char* name, type value, IsFundamental<type> = true) = 0;
 #define DECLARE_ARCHIVE_ARRAY_BASE(type) virtual void ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> = true) = 0;
 #define DECLARE_ARCHIVE_VALUE_OVERRIDE(type) void ArchiveValue(const char* name, type value, IsFundamental<type> = true) override;
@@ -243,36 +272,19 @@ namespace utilities
         PropertyArchiver operator[](const std::string& name);
 
     protected:
-        // These are all the virtual function that need to be implemented by archivers
-        DECLARE_ARCHIVE_VALUE_BASE(bool);
-        DECLARE_ARCHIVE_VALUE_BASE(char);
-        DECLARE_ARCHIVE_VALUE_BASE(short);
-        DECLARE_ARCHIVE_VALUE_BASE(int);
-        DECLARE_ARCHIVE_VALUE_BASE(uint32_t);
-        DECLARE_ARCHIVE_VALUE_BASE(int64_t);
-        DECLARE_ARCHIVE_VALUE_BASE(uint64_t);
-#if defined(__APPLE__)
-        // macOS has size_t aliased to unsigned long while uint64_t is aliased to unsigned long long
-        // we may need long version too at some point in the future
-        DECLARE_ARCHIVE_VALUE_BASE(unsigned long);
-#endif // defined(__APPLE__)
-        DECLARE_ARCHIVE_VALUE_BASE(float);
-        DECLARE_ARCHIVE_VALUE_BASE(double);
+// These are all the virtual function that need to be implemented by archivers
+
+#define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_VALUE_BASE(t);
+        ARCHIVABLE_TYPES_LIST
+#undef ARCHIVE_TYPE_OP
+
         virtual void ArchiveValue(const char* name, const std::string& value) = 0;
         virtual void ArchiveValue(const char* name, const IArchivable& value);
 
-        DECLARE_ARCHIVE_ARRAY_BASE(bool);
-        DECLARE_ARCHIVE_ARRAY_BASE(char);
-        DECLARE_ARCHIVE_ARRAY_BASE(short);
-        DECLARE_ARCHIVE_ARRAY_BASE(int);
-        DECLARE_ARCHIVE_ARRAY_BASE(uint32_t);
-        DECLARE_ARCHIVE_ARRAY_BASE(int64_t);
-        DECLARE_ARCHIVE_ARRAY_BASE(uint64_t);
-#if defined(__APPLE__)
-        DECLARE_ARCHIVE_ARRAY_BASE(unsigned long);
-#endif // defined(__APPLE__)
-        DECLARE_ARCHIVE_ARRAY_BASE(float);
-        DECLARE_ARCHIVE_ARRAY_BASE(double);
+#define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_ARRAY_BASE(t);
+        ARCHIVABLE_TYPES_LIST
+#undef ARCHIVE_TYPE_OP
+
         virtual void ArchiveArray(const char* name, const std::vector<std::string>& array) = 0;
         virtual void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) = 0;
 
@@ -438,33 +450,17 @@ namespace utilities
         ArchivedObjectInfo GetCurrentObjectInfo() const;
 
     protected:
-        DECLARE_UNARCHIVE_VALUE_BASE(bool);
-        DECLARE_UNARCHIVE_VALUE_BASE(char);
-        DECLARE_UNARCHIVE_VALUE_BASE(short);
-        DECLARE_UNARCHIVE_VALUE_BASE(int);
-        DECLARE_UNARCHIVE_VALUE_BASE(uint32_t);
-        DECLARE_UNARCHIVE_VALUE_BASE(int64_t);
-        DECLARE_UNARCHIVE_VALUE_BASE(uint64_t);
-#if defined(__APPLE__)
-        DECLARE_UNARCHIVE_VALUE_BASE(unsigned long);
-#endif // defined(__APPLE__)
-        DECLARE_UNARCHIVE_VALUE_BASE(float);
-        DECLARE_UNARCHIVE_VALUE_BASE(double);
+#define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_VALUE_BASE(t);
+        ARCHIVABLE_TYPES_LIST
+#undef ARCHIVE_TYPE_OP
+
         virtual void UnarchiveValue(const char* name, std::string& value) = 0;
         virtual void UnarchiveValue(const char* name, IArchivable& value);
 
-        DECLARE_UNARCHIVE_ARRAY_BASE(bool);
-        DECLARE_UNARCHIVE_ARRAY_BASE(char);
-        DECLARE_UNARCHIVE_ARRAY_BASE(short);
-        DECLARE_UNARCHIVE_ARRAY_BASE(int);
-        DECLARE_UNARCHIVE_ARRAY_BASE(uint32_t);
-        DECLARE_UNARCHIVE_ARRAY_BASE(int64_t);
-        DECLARE_UNARCHIVE_ARRAY_BASE(uint64_t);
-#if defined(__APPLE__)
-        DECLARE_UNARCHIVE_ARRAY_BASE(unsigned long);
-#endif // defined(__APPLE__)
-        DECLARE_UNARCHIVE_ARRAY_BASE(float);
-        DECLARE_UNARCHIVE_ARRAY_BASE(double);
+#define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_BASE(t);
+        ARCHIVABLE_TYPES_LIST
+#undef ARCHIVE_TYPE_OP
+
         virtual void UnarchiveArray(const char* name, std::vector<std::string>& array) = 0;
 
         // Extra functions needed for deserializing arrays.
