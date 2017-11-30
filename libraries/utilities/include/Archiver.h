@@ -68,10 +68,10 @@ namespace utilities
 
     private:
         friend class Variant;
-    
+
         template <typename ValueType>
-        void SetVariantTypeFunction(std::function<void(Variant&)> f) 
-        { 
+        void SetVariantTypeFunction(std::function<void(Variant&)> f)
+        {
             auto typeName = ::ell::utilities::GetTypeName<ValueType>();
             _functionMap[typeName] = f;
         }
@@ -94,7 +94,7 @@ namespace utilities
         GenericTypeFactory& GetTypeFactory();
 
         /// <summary> Gets the variant type registry associated with this context. </summary>
-        /// Used by Variant to enable deserialization. 
+        /// Used by Variant to enable deserialization.
         ///
         /// <returns> The variant type registry associated with this context. </returns>
         VariantTypeRegistry& GetVariantTypeRegistry();
@@ -107,7 +107,7 @@ namespace utilities
     protected:
         struct c_tor{}; // tag struct for calling constructor that stores a previous context
         SerializationContext(SerializationContext& previousContext, c_tor) : _previousContext(&previousContext) {}
-    
+
     private:
         friend class Variant;
 
@@ -127,11 +127,10 @@ namespace utilities
     bool operator!=(const ArchivedObjectInfo& a, const ArchivedObjectInfo& b);
 
 /// <summary> Macros to make repetitive boilerplate code in archiver implementations easier to implement. </summary>
-#define DECLARE_ARCHIVE_VALUE_BASE(type) virtual void ArchiveValue(const char* name, type value, IsFundamental<type> dummy = 0) = 0;
-#define DECLARE_ARCHIVE_ARRAY_BASE(type) virtual void ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
-
-#define DECLARE_ARCHIVE_VALUE_OVERRIDE(type) virtual void ArchiveValue(const char* name, type value, IsFundamental<type> dummy = 0) override;
-#define DECLARE_ARCHIVE_ARRAY_OVERRIDE(type) virtual void ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) override;
+#define DECLARE_ARCHIVE_VALUE_BASE(type) virtual void ArchiveValue(const char* name, type value, IsFundamental<type> = true) = 0;
+#define DECLARE_ARCHIVE_ARRAY_BASE(type) virtual void ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> = true) = 0;
+#define DECLARE_ARCHIVE_VALUE_OVERRIDE(type) void ArchiveValue(const char* name, type value, IsFundamental<type> = true) override;
+#define DECLARE_ARCHIVE_ARRAY_OVERRIDE(type) void ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> = true) override;
 
     /// <summary>
     /// The Archiver and Unarchiver abstract base classes facilitate serialization and
@@ -249,11 +248,9 @@ namespace utilities
         DECLARE_ARCHIVE_VALUE_BASE(char);
         DECLARE_ARCHIVE_VALUE_BASE(short);
         DECLARE_ARCHIVE_VALUE_BASE(int);
-        DECLARE_ARCHIVE_VALUE_BASE(size_t);
+        DECLARE_ARCHIVE_VALUE_BASE(uint32_t);
         DECLARE_ARCHIVE_VALUE_BASE(int64_t);
-#ifdef __APPLE__
         DECLARE_ARCHIVE_VALUE_BASE(uint64_t);
-#endif
         DECLARE_ARCHIVE_VALUE_BASE(float);
         DECLARE_ARCHIVE_VALUE_BASE(double);
         virtual void ArchiveValue(const char* name, const std::string& value) = 0;
@@ -263,11 +260,9 @@ namespace utilities
         DECLARE_ARCHIVE_ARRAY_BASE(char);
         DECLARE_ARCHIVE_ARRAY_BASE(short);
         DECLARE_ARCHIVE_ARRAY_BASE(int);
-        DECLARE_ARCHIVE_ARRAY_BASE(size_t);
+        DECLARE_ARCHIVE_ARRAY_BASE(uint32_t);
         DECLARE_ARCHIVE_ARRAY_BASE(int64_t);
-#ifdef __APPLE__
         DECLARE_ARCHIVE_ARRAY_BASE(uint64_t);
-#endif
         DECLARE_ARCHIVE_ARRAY_BASE(float);
         DECLARE_ARCHIVE_ARRAY_BASE(double);
         virtual void ArchiveArray(const char* name, const std::vector<std::string>& array) = 0;
@@ -301,10 +296,10 @@ namespace utilities
     };
 
 /// <summary> Macros to make repetitive boilerplate code in unarchiver implementations easier to implement. </summary>
-#define DECLARE_UNARCHIVE_VALUE_BASE(type) virtual void UnarchiveValue(const char* name, type& value, IsFundamental<type> dummy = true) = 0;
-#define DECLARE_UNARCHIVE_ARRAY_BASE(type) virtual void UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy = true) = 0;
-#define DECLARE_UNARCHIVE_VALUE_OVERRIDE(type) virtual void UnarchiveValue(const char* name, type& value, IsFundamental<type> dummy = true) override;
-#define DECLARE_UNARCHIVE_ARRAY_OVERRIDE(type) virtual void UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy = true) override;
+#define DECLARE_UNARCHIVE_VALUE_BASE(type) virtual void UnarchiveValue(const char* name, type& value, IsFundamental<type> = true) = 0;
+#define DECLARE_UNARCHIVE_ARRAY_BASE(type) virtual void UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> = true) = 0;
+#define DECLARE_UNARCHIVE_VALUE_OVERRIDE(type) void UnarchiveValue(const char* name, type& value, IsFundamental<type> = true) override;
+#define DECLARE_UNARCHIVE_ARRAY_OVERRIDE(type) void UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> = true) override;
 
     /// <summary> Unarchiver class </summary>
     class Unarchiver
@@ -381,8 +376,8 @@ namespace utilities
         ///
         /// <param name="name"> The name of the property </param>
         ///
-        /// <returns> 
-        /// An unarchiver object that can unarchive a property with the given name. 
+        /// <returns>
+        /// An unarchiver object that can unarchive a property with the given name.
         /// </returns>
         PropertyUnarchiver operator[](const std::string& name);
 
@@ -390,8 +385,8 @@ namespace utilities
         ///
         /// <param name="name"> The name of the property </param>
         ///
-        /// <returns> 
-        /// An unarchiver object that can unarchive an optional property with the given name, if it exists. 
+        /// <returns>
+        /// An unarchiver object that can unarchive an optional property with the given name, if it exists.
         /// If it is unable to unarchive a property with the given name, it is not an error.
         /// </returns>
         OptionalPropertyUnarchiver<NoDefault> OptionalProperty(const std::string& name);
@@ -402,8 +397,8 @@ namespace utilities
         /// <param name="name"> The name of the property </param>
         /// <param name="defaultValue"> The value to use for the property if it is not present </param>
         ///
-        /// <returns> 
-        /// An unarchiver object that can unarchive an optional property with the given name, if it exists. 
+        /// <returns>
+        /// An unarchiver object that can unarchive an optional property with the given name, if it exists.
         /// If it is unable to unarchive a property with the given name, it is not an error.
         /// </returns>
         template <typename DefaultValueType>
@@ -439,11 +434,9 @@ namespace utilities
         DECLARE_UNARCHIVE_VALUE_BASE(char);
         DECLARE_UNARCHIVE_VALUE_BASE(short);
         DECLARE_UNARCHIVE_VALUE_BASE(int);
-        DECLARE_UNARCHIVE_VALUE_BASE(size_t);
+        DECLARE_UNARCHIVE_VALUE_BASE(uint32_t);
         DECLARE_UNARCHIVE_VALUE_BASE(int64_t);
-#ifdef __APPLE__
         DECLARE_UNARCHIVE_VALUE_BASE(uint64_t);
-#endif
         DECLARE_UNARCHIVE_VALUE_BASE(float);
         DECLARE_UNARCHIVE_VALUE_BASE(double);
         virtual void UnarchiveValue(const char* name, std::string& value) = 0;
@@ -453,11 +446,9 @@ namespace utilities
         DECLARE_UNARCHIVE_ARRAY_BASE(char);
         DECLARE_UNARCHIVE_ARRAY_BASE(short);
         DECLARE_UNARCHIVE_ARRAY_BASE(int);
-        DECLARE_UNARCHIVE_ARRAY_BASE(size_t);
+        DECLARE_UNARCHIVE_ARRAY_BASE(uint32_t);
         DECLARE_UNARCHIVE_ARRAY_BASE(int64_t);
-#ifdef __APPLE__
         DECLARE_UNARCHIVE_ARRAY_BASE(uint64_t);
-#endif
         DECLARE_UNARCHIVE_ARRAY_BASE(float);
         DECLARE_UNARCHIVE_ARRAY_BASE(double);
         virtual void UnarchiveArray(const char* name, std::vector<std::string>& array) = 0;

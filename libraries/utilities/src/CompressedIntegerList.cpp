@@ -85,13 +85,13 @@ namespace utilities
     /// adds an integer at the end of the list
     void CompressedIntegerList::Append(size_t value)
     {
-        assert(value != UINT64_MAX); // special value reserved for initialization
+        assert(value != std::numeric_limits<size_t>::max()); // special value reserved for initialization
 
         // calculate the delta from the previous number pushed
         size_t delta = 0;
 
         // allow the first Append to have a value of zero, but subsequently require an increasing value
-        if (_last < UINT64_MAX)
+        if (_last < std::numeric_limits<size_t>::max())
         {
             assert(value > _last);
         }
@@ -138,7 +138,7 @@ namespace utilities
     void CompressedIntegerList::Reset()
     {
         _data.resize(0);
-        _last = UINT64_MAX;
+        _last = std::numeric_limits<size_t>::max();
         _size = 0;
     }
 }

@@ -53,11 +53,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, char);
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, short);
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, int);
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, size_t);
+    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, uint32_t);
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, int64_t);
-#ifdef __APPLE__
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, uint64_t);
-#endif
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, float);
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, double);
 
@@ -101,11 +99,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, char);
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, short);
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, int);
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, size_t);
+    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, uint32_t);
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, int64_t);
-#ifdef __APPLE__
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, uint64_t);
-#endif
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, float);
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, double);
 
@@ -169,11 +165,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, char);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, short);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, int);
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, size_t);
+    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, uint32_t);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, int64_t);
-#ifdef __APPLE__
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, uint64_t);
-#endif
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, float);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, double);
 
@@ -235,11 +229,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, char);
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, short);
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, int);
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, size_t);
+    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, uint32_t);
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, int64_t);
-#ifdef __APPLE__
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, uint64_t);
-#endif
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, float);
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, double);
 

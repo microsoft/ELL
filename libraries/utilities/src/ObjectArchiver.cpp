@@ -38,11 +38,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, char);
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, short);
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, int);
-    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, size_t);
+    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, uint32_t);
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, int64_t);
-#ifdef __APPLE__
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, uint64_t);
-#endif
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, float);
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, double);
 
@@ -82,7 +80,7 @@ namespace utilities
     {
         return _objectDescription.HasProperty(name);
     }
-    
+
     //
     // Arrays
     //
@@ -90,11 +88,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, char);
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, short);
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, int);
-    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, size_t);
+    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, uint32_t);
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, int64_t);
-#ifdef __APPLE__
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, uint64_t);
-#endif
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, float);
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, double);
 
@@ -124,11 +120,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, char);
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, short);
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, int);
-    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, size_t);
+    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, uint32_t);
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, int64_t);
-#ifdef __APPLE__
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, uint64_t);
-#endif
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, float);
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, double);
 
@@ -166,11 +160,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, char);
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, short);
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, int);
-    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, size_t);
+    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, uint32_t);
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, int64_t);
-#ifdef __APPLE__
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, uint64_t);
-#endif
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, float);
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, double);
 
