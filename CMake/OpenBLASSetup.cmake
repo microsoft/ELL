@@ -51,6 +51,11 @@ set(BLAS_INCLUDE_SEARCH_PATHS )
 set(BLAS_LIB_SEARCH_PATHS )
 set(BLAS_LIB_NAMES cblas openblas libopenblas.dll.a)
 
+# Unless told otherwise, we're going to only look for OpenBLAS since
+# others may not be compatible
+if(NOT BLA_VENDOR)
+    set(BLA_VENDOR "OpenBLAS")
+endif()
 find_package(BLAS QUIET)
 if(BLAS_FOUND)
     message(STATUS "Blas libraries: ${BLAS_LIBRARIES}")
