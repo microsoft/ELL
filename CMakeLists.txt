@@ -28,6 +28,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # (so if we're running cmake from a 'build' directory inside the main directory, do this:
 #      cmake -DBUILD_DOCS=OFF ..  )
 option(BUILD_DOC "Build Doxygen documentation" ON)
+option(STRICT_MODE "Build with 'warnings as errors'" OFF)
 
 set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
 
@@ -44,15 +45,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Apply -fPIC where applicable to the platform
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+if(STRICT_MODE)  
+  message("-- Turning on strict mode with warnings as errors.")
+endif()
+
 if(MSVC)
   # Set Visual Studio-specific options
   add_definitions(-DUNICODE)
   add_compile_options(/MP)
   add_compile_options(/bigobj)
-  add_compile_options(/W4 /WX)
+  add_compile_options(/W4)
+  if(STRICT_MODE)  
+    add_compile_options(/WX)
+  endif()
 else()
   # Set Clang/GCC-specific options
-  add_compile_options(-Wall -Werror)
+  add_compile_options(-Wall)
+  if(STRICT_MODE)
+    add_compile_options(-Werror)
+  endif()
   add_compile_options(-Wno-missing-braces)
   add_compile_options(-Wmissing-field-initializers)
   add_compile_options(-fvisibility-inlines-hidden)

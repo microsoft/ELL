@@ -19,16 +19,13 @@ set UseVs15=0
 set DEBUG=0
 set Vs14Path=
 set Vs15Path=
-
+set STRICT=
 :parse
 if "%1" == "" goto :step2
-if "%1"=="14" (
-  set UseVs14=1
-)
-if "%1"=="15" (
-  set UseVs15=1
-)
+if "%1"=="14" set UseVs14=1
+if "%1"=="15" set UseVs15=1
 if "%1" == "/debug" set DEBUG=1
+if "%1" == "/strict" set STRICT=-DSTRICT_MODE=ON
 shift
 goto :parse
 
@@ -84,7 +81,7 @@ if ERRORLEVEL 1 goto :nodelete
 
 if "!DEBUG!"=="1" dir "%VCToolsInstallDir%\bin\Hostx86\x86\"
 cd build
-cmake -G "!CMakeGenerator!" ..
+cmake -G "!CMakeGenerator!" "!STRICT!" ..
 if ERRORLEVEL 1 goto :cmakerror
 goto :buildit
 
@@ -92,7 +89,7 @@ goto :buildit
 REM try specifying the compiler
 set CPATH=%VCToolsInstallDir:\=/%
 echo %CPATH%
-cmake -G "!CMakeGenerator!" "-DCMAKE_C_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" "-DCMAKE_CXX_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" ..
+cmake -G "!CMakeGenerator!" "!STRICT!" "-DCMAKE_C_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" "-DCMAKE_CXX_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" ..
 if ERRORLEVEL 1 goto :nocmake
 
 :buildit
