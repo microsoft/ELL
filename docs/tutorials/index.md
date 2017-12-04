@@ -17,7 +17,6 @@ permalink: /tutorials/
 * [Boosting classifier accuracy by grouping categories](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/)
 * [Importing models](/ELL/tutorials/Importing-models/)
 * [Comparing image classification models side by side on the Raspberry Pi](/ELL/tutorials/Comparing-image-classification-models-side-by-side-on-the-Raspberry-Pi/)
-* [Introducing ProtoNN](/ELL/tutorials/Introducing-ProtoNN/)
 
 ## Image Classification Tutorials in C++
 
