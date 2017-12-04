@@ -20,5 +20,24 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{{site.baseurl}}/assets/js/ie10-viewport-bug-workaround.js"></script>
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"
+	    integrity="sha384-npxfGiG5C/F5X72RqcKFYSfzr1AXsDiu1YC/ydsOrS+jL554Jh4zFAx9GpQi4lXQ"
+	    crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"
+	    integrity="sha384-Z9D45cp3elqajO+xEyjRTIK1Gr3eYsXiyCPIKNog1sIQzpo2fqFDqFdADGiJjzOv"
+	    crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"
+	    integrity="sha384-7PXRkl4YJnEpP8uU4ev9652TTZSxrqC8uOpcV1ftVEC7LVyLZqqDUAaq+Y+lGgr9"
+	    crossorigin="anonymous"></script>
+
+    <script>
+      $(document).ready(function() {
+        $('.datatable').DataTable({
+          paging: false,
+          order: []
+        });
+      });
+    </script>
     </body>
 </html>

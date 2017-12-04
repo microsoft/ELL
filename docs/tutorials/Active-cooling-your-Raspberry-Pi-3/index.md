@@ -61,23 +61,21 @@ We've seen quite a few recommendations to cool the Pi using only a heatsink, wit
 
 Here are the results we observed:
 
-<style>
-.line {
-  fill: none;
-  stroke-width: 2.5px;
-}
-
-svg {
-  width: 100%;
-}
-</style>
-
-<svg id="plot1" height="600"></svg>
-<!-- for d3 based charting -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.js" integrity="sha256-xOOIPEIJM2Hn3GVaZs+VnM9J3rtaeUuHcHRXuJNO+JU=" crossorigin="anonymous"></script>
-<script src="/ELL/js/multi-line-plot.js"></script>
+<div id='plot'></div>
 <script>
-multi_line_plot("/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Pi-Heating-Data.tsv", "plot1", "Processor Temperature ºC", null, [35,90], 60);
+var spec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+  "description": "Pi temperature during the stress test, under four conditions",
+  "width": 500, "height": 300,
+  "data": { "url": "/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/pi-heating-data-long.tsv" },
+  "mark": "line",
+  "encoding": {
+    "x": { "field": "x", "type": "quantitative", "axis": {"title":""} },
+    "y": { "field": "value", "type": "quantitative", "axis": {"title": "Processor Temperature ºC"} },
+    "color": { "field": "variable", "type": "nominal", "legend":{"title":"Conditions"} }
+  }
+}
+vegaEmbed("#plot", spec, {actions:false})
 </script>
 
 The x-axis represents time in seconds and the y-axis represents the processor temperature in Celsius. The measurement starts with the idle processor temperature, and the stress test begins after 20 seconds.
