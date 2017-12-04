@@ -2,37 +2,58 @@
 layout: default
 title: ELL Gallery
 permalink: /gallery/
+datatable: true
 ---
 
 # The ELL Gallery
 
 Our gallery is a collection of bits and pieces that you can download and use in your projects. 
 
+<div id='plot'></div>
+<script>
+var spec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+  "description": "A plot of accuracy versus performance",
+  "width": 500, "height": 500,
+  "data": {"values": {{site.data.all_models | jsonify}} },
+  "mark": {"type":"point", "filled":true},
+  "encoding": {
+    "x": {"field": "secs_per_frame.pi3", "type": "quantitative", "axis": {"title": "Seconds per frame"} },
+    "y": {"field": "accuracy.top1", "type": "quantitative", "axis": {"title": "Top 1 accuracy"}},
+    "color": {"field": "image_size", "type": "nominal", "legend": {"title": "Image Size"} },
+    "shape": {"field": "image_size", "type": "nominal"},
+    "tooltip": {"field": "directory", "type": "ordinal"},
+    "size": {"value": 100}
+  }
+}
+vegaEmbed("#plot", spec, {actions:false})
+</script>
+
 ## Pretrained Image Classification Models
 
 ### ILSVRC2012
 
-* [64x64x3 Convolutional Neural Network (40.98% top 1 accuracy, 66.43% top 5 accuracy, 0.05s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dsb_I64x64x3CMCMCMCMCCCMC1AS)
-* [64x64x3 Convolutional Neural Network (43.13% top 1 accuracy, 67.96% top 5 accuracy, 0.11s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dst_I64x64x3CCCMCMCMCMCMC1AS)
-* [64x64x3 Convolutional Neural Network (44.67% top 1 accuracy, 69.70% top 5 accuracy, 0.12s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dsf_I64x64x3CCMCCMCCMCMCMC1AS)
-* [64x64x3 Convolutional Neural Network (45.54% top 1 accuracy, 69.99% top 5 accuracy, 0.66s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dcda_I64x64x3CMCMCMCMCMC1AS)
-* [64x64x3 Convolutional Neural Network (46.23% top 1 accuracy, 70.90% top 5 accuracy, 0.76s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dcda_I64x64x3CMCMCMCMCMC1AS_v2)
-* [64x64x3 Convolutional Neural Network (47.22% top 1 accuracy, 71.31% top 5 accuracy, 0.89s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dcda_I64x64x3CMCMCMCMCMC1AS_v3)
-* [64x64x3 Convolutional Neural Network (47.81% top 1 accuracy, 71.91% top 5 accuracy, 1.00s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dcda_I64x64x3CMCMCMCMCMC1AS_v4)
-* [64x64x3 Convolutional Neural Network (48.36% top 1 accuracy, 72.51% top 5 accuracy, 1.14s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dcda_I64x64x3CMCMCMCMCMC1AS_v5)
-* [64x64x3 Convolutional Neural Network (49.14% top 1 accuracy, 73.18% top 5 accuracy, 1.27s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dcda_I64x64x3CMCMCMCMCMC1AS_v6)
-* [128x128x3 Convolutional Neural Network (45.32% top 1 accuracy, 69.63% top 5 accuracy, 0.12s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dscs2_I128x128x3CCCCCCC1AS)
-* [128x128x3 Convolutional Neural Network (48.99% top 1 accuracy, 73.25% top 5 accuracy, 0.26s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/ddcs2_I128x128x3CCCCCCCCCCCCCC1AS)
-* [128x128x3 Convolutional Neural Network (52.06% top 1 accuracy, 76.43% top 5 accuracy, 0.17s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/d_I128x128x3CMCMCMCMCMCMC1AS)
-* [128x128x3 Convolutional Neural Network (56.92% top 1 accuracy, 80.54% top 5 accuracy, 0.30s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dsb_I128x128x3CMCMCMCMCMCCCMC1AS)
-* [128x128x3 Convolutional Neural Network (59.06% top 1 accuracy, 81.71% top 5 accuracy, 0.75s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dst_I128x128x3CCCMCMCMCMCMCMC1AS)
-* [128x128x3 Convolutional Neural Network (59.77% top 1 accuracy, 82.12% top 5 accuracy, 0.52s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dsf_I128x128x3CCMCCMCCMCMCMCMC1AS)
-* [160x160x3 Convolutional Neural Network (35.75% top 1 accuracy, 60.76% top 5 accuracy, 0.26s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMC1AS)
-* [160x160x3 Convolutional Neural Network (58.13% top 1 accuracy, 80.62% top 5 accuracy, 0.30s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS)
-* [192x192x3 Convolutional Neural Network (59.01% top 1 accuracy, 81.74% top 5 accuracy, 0.41s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/d_I192x192x3CMCMCMCMCMCMC1AS)
-* [224x224x3 Convolutional Neural Network (60.21% top 1 accuracy, 82.48% top 5 accuracy, 0.50s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS)
-* [256x256x3 Convolutional Neural Network (55.12% top 1 accuracy, 78.33% top 5 accuracy, 0.56s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/d_I256x256x3CMCMCMCMCMCMCMC1AS)
-* [256x256x3 Convolutional Neural Network (57.60% top 1 accuracy, 80.39% top 5 accuracy, 0.68s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/d_I256x256x3CMCMCMCMCMCMC1AS)
+<table class="table table-striped table-bordered datatable">
+<thead>
+<tr>
+  <th>Image size</th>
+  <th>Top 1 accuracy</th>
+  <th>Top 5 accuracy</th>
+  <th>Sec/frame on a Pi3</th>
+  <th>Model name</th>
+</tr>
+</thead>
+{% assign models = site.data.all_models | sort: 'image_size' %}
+{% for model in models %}
+  <tr>
+    <td>{{model.image_size}} x {{model.image_size}} x 3</td>
+    <td style="text-align: right">{{model.accuracy.top1}}</td>
+    <td style="text-align: right">{{model.accuracy.top5}}</td>
+    <td style="text-align: right">{{model.secs_per_frame.pi3}}</td>
+    <td><a href="/ELL/gallery/{{model.directory}}">{{model.directory}}</a></td>
+  </tr>
+{% endfor %}
+</table>
 
 ## 3D Designs
 

@@ -29,7 +29,17 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.0.7/vega.js"
+	    integrity="sha384-lTiihlzw56u8ddKdySsnIoGvP2wNsnPs8TJROeaYggGaXsoSsmsuwa/LrT9vIgxn"
+	    crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.0.1/vega-lite.js"
+	    integrity="sha384-dQDJ36KolVmnNdVvVW0SpWAA/3wm9z6xCJ2uWHvBsaVn2lOTeS0biBx57HJt6/jV"
+	    crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0-rc7/vega-embed.js"
+	    integrity="sha384-eu4jtlWUO/nh/2m8Km6pA4enzgLFAexBTyAX4ZqLnV6MVT1Y+zlHRuXMhusTaIxa"
+	    crossorigin="anonymous"></script>    
   </head>
   
 <body class="{{ post.title | downcase | replace:' ','-' | replace:',','' | strip_html }}{% if page.category %} category-{{ page.category }}{% endif %}{% if page.layout-class %} layout-{{ page.layout-class }}{% endif %}">
