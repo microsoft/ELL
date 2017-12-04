@@ -50,7 +50,7 @@ vegaEmbed("#plot", spec, {actions:false})
     <td style="text-align: right">{{model.accuracy.top1}}</td>
     <td style="text-align: right">{{model.accuracy.top5}}</td>
     <td style="text-align: right">{{model.secs_per_frame.pi3}}</td>
-    <td><a href="/ELL/gallery/ILSVRC2012/{{model.directory}}.md">{{model.directory}}</a></td>
+    <td><a href="/ELL/gallery/ILSVRC2012/{{model.directory}}.html">{{model.directory}}</a></td>
   </tr>
 {% endfor %}
 </table>
