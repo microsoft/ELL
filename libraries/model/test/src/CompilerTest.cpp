@@ -724,7 +724,8 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
 
     // Compare output
     constexpr nodes::TimeTickType thresholdTicks = lagThreshold * interval;
-    std::vector<std::vector<nodes::TimeTickType>> signal = {
+    std::vector<std::vector<nodes::TimeTickType>> signal =
+    {
         { 0 },
         { interval*1 + thresholdTicks/2 }, // within threshold
         { interval*2 }, // on time

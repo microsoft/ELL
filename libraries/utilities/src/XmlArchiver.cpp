@@ -49,18 +49,9 @@ namespace utilities
         _out << "</ell>\n";
     }
 
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, bool);
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, char);
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, short);
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, int);
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, uint32_t);
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, int64_t);
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, float);
-    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     // strings
     void XmlArchiver::ArchiveValue(const char* name, const std::string& value)
@@ -98,18 +89,9 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, bool);
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, char);
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, short);
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, int);
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, uint32_t);
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, int64_t);
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, float);
-    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     void XmlArchiver::ArchiveArray(const char* name, const std::vector<std::string>& array)
     {
@@ -167,18 +149,9 @@ namespace utilities
         ReadFileHeader();
     }
 
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, bool);
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, char);
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, short);
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, int);
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, uint32_t);
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, int64_t);
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, float);
-    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     void XmlUnarchiver::ReadFileHeader()
     {
@@ -231,21 +204,13 @@ namespace utilities
         assert(false && "Unimplemented");
         return false;
     }
+
     //
     // Arrays
     //
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, bool);
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, char);
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, short);
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, int);
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, uint32_t);
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, int64_t);
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, float);
-    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     void XmlUnarchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
     {

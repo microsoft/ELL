@@ -12,19 +12,26 @@ namespace nodes
 {
     template <typename ValueType>
     SourceNode<ValueType>::SourceNode()
-        : SourceNode({}, 0, "", nullptr)
+        : SourceNode({}, InputShape{ 0, 0, 0 }, "", nullptr)
     {
     }
 
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t outputSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
+    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
+        : SourceNode(input, InputShape{ inputVectorSize, 1, 1 }, sourceFunctionName, source)
+    {
+    }
+
+    template <typename ValueType>
+    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, const InputShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
         : CompilableNode({ &_input }, { &_output }),
         _input(this, input, inputPortName),
-        _output(this, outputPortName, outputSize),
+        _output(this, outputPortName, shape.Size()),
+        _shape(shape),
         _sourceFunctionName(sourceFunctionName),
         _source(source == nullptr ? [](auto&){ return false; } : source)
     {
-        _bufferedSample.resize(outputSize);
+        _bufferedSample.resize(shape.Size());
     }
 
     template <typename ValueType>
@@ -98,9 +105,26 @@ namespace nodes
     void SourceNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<SourceNode<ValueType>>(newPortElements, output.Size(), _sourceFunctionName);
+        auto newNode = transformer.AddNode<SourceNode<ValueType>>(newPortElements, _shape, _sourceFunctionName);
         newNode->_source = _source;
         transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename ValueType>
+    utilities::ArchiveVersion SourceNode<ValueType>::GetArchiveVersion() const
+    {
+        constexpr utilities::ArchiveVersion sourceNodeShapeArchiveVersion = { utilities::ArchiveVersionNumbers::v4_source_sink_shapes };
+        
+        return sourceNodeShapeArchiveVersion;
+    }
+
+    template <typename ValueType>
+    bool SourceNode<ValueType>::CanReadArchiveVersion(const utilities::ArchiveVersion& version) const
+    {
+        constexpr utilities::ArchiveVersion sourceNodeNoShapeArchiveVersion = { utilities::ArchiveVersionNumbers::v0_initial };
+        constexpr utilities::ArchiveVersion sourceNodeShapeArchiveVersion = { utilities::ArchiveVersionNumbers::v4_source_sink_shapes };
+
+        return version >= sourceNodeNoShapeArchiveVersion && version <= sourceNodeShapeArchiveVersion;
     }
 
     template <typename ValueType>
@@ -110,6 +134,7 @@ namespace nodes
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
         archiver["sourceFunctionName"] << _sourceFunctionName;
+        archiver["shape"] << static_cast<std::vector<size_t>>(GetShape());
     }
 
     template <typename ValueType>
@@ -119,6 +144,10 @@ namespace nodes
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
         archiver["sourceFunctionName"] >> _sourceFunctionName;
+
+        std::vector<size_t> shapeVector;
+        archiver["shape"] >> shapeVector;
+        SetShape(InputShape{ shapeVector });
     }
 
     template <typename ValueType>
@@ -154,6 +183,13 @@ namespace nodes
             auto value = function.ValueAt(sample, i);
             function.SetValueAt(pOutput, function.Literal(static_cast<int>(i)), value);
         }
+    }
+
+    template <typename ValueType>
+    void SourceNode<ValueType>::SetShape(const InputShape& shape)
+    {
+        _shape = shape;
+        _output.SetSize(_shape.Size());
     }
 }
 }

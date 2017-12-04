@@ -50,14 +50,6 @@ class ELL_Node;
 class ELL_NodeIterator;
 class ELL_OutputPort;
 
-//
-// ELL_ClockType
-//
-enum class ELL_ClockType
-{
-    steadyClock,
-    systemClock
-};
 
 //
 // ELL_PortType
@@ -340,8 +332,9 @@ public:
     ELL_Node AddInputNode(ELL_Model model, const ell::api::math::TensorShape& shape, ELL_PortType type);
     ELL_Node AddOutputNode(ELL_Model model, const ell::api::math::TensorShape& shape, ELL_PortElements input);
 
-    ELL_Node AddSinkNode(ELL_Model model, ELL_PortElements input, const std::string& sinkFunctionName);
-    ELL_Node AddSourceNode(ELL_Model model, ELL_PortElements input, ELL_PortType outputType, int outputSize, const std::string& sourceFunctionName);
+    ELL_Node AddClockNode(ELL_Model model, ELL_PortElements input, double interval, short lagThreshold, const std::string& lagNotificationName);
+    ELL_Node AddSinkNode(ELL_Model model, ELL_PortElements input, const ell::api::math::TensorShape& shape, const std::string& sinkFunctionName);
+    ELL_Node AddSourceNode(ELL_Model model, ELL_PortElements input, ELL_PortType outputType, const ell::api::math::TensorShape& shape, const std::string& sourceFunctionName);
 
 private:
 #ifndef SWIG

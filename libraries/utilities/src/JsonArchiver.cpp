@@ -34,18 +34,9 @@ namespace utilities
     {
     }
 
-    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, bool);
-    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, char);
-    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, short);
-    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, int);
-    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, uint32_t);
-    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, int64_t);
-    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, float);
-    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     // strings
     void JsonArchiver::ArchiveValue(const char* name, const std::string& value)
@@ -100,18 +91,9 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, bool);
-    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, char);
-    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, short);
-    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, int);
-    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, uint32_t);
-    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, int64_t);
-    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, float);
-    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     void JsonArchiver::ArchiveArray(const char* name, const std::vector<std::string>& array)
     {
@@ -188,18 +170,9 @@ namespace utilities
     {
     }
 
-    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, bool);
-    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, char);
-    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, short);
-    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, int);
-    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, uint32_t);
-    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, int64_t);
-    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, float);
-    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     // strings
     void JsonUnarchiver::UnarchiveValue(const char* name, std::string& value)
@@ -321,18 +294,9 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, bool);
-    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, char);
-    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, short);
-    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, int);
-    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, uint32_t);
-    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, int64_t);
-    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, uint64_t);
-#if defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, unsigned long);
-#endif // defined(__APPLE__)
-    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, float);
-    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, double);
+    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, t);
+    ARCHIVABLE_TYPES_LIST
+    #undef ARCHIVE_TYPE_OP
 
     void JsonUnarchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
     {

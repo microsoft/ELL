@@ -34,6 +34,8 @@ namespace nodes
     template <typename ValueType>
     using SinkFunction = std::function<void(const std::vector<ValueType>&)>;
 
+    using OutputShape = ell::math::TensorShape;
+
     template <typename ValueType>
     class SinkNode : public model::CompilableNode
     {
@@ -54,6 +56,22 @@ namespace nodes
         /// <param name="sinkFunctionName"> The sink function name to be emitted. </param>
         /// <param name="sink"> The optional sink function that will receive output values. </param>
         SinkNode(const model::PortElements<ValueType>& input, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input"> Port elements for input values. </param>
+        /// <param name="shape"> The output shape. </param>
+        /// <param name="sinkFunctionName"> The sink function name to be emitted. </param>
+        /// <param name="sink"> The optional sink function that will receive output values. </param>
+        SinkNode(const model::PortElements<ValueType>& input, const OutputShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input"> Port elements for input values. </param>
+        /// <param name="outputVectorSize"> The output vector size. </param>
+        /// <param name="sinkFunctionName"> The sink function name to be emitted. </param>
+        /// <param name="sink"> The optional sink function that will receive output values. </param>
+        SinkNode(const model::PortElements<ValueType>& input, size_t outputVectorSize, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -83,17 +101,22 @@ namespace nodes
         // and should be forwarded to the sink function.
         virtual bool EvaluateInput() const;
 
+        utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
-        bool HasState() const override { return true; } // stored state: callback function name
+        bool HasState() const override { return true; } // stored state: callback function name, shape
 
     private:
         void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
         void SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+        void SetShape(const OutputShape& shape);
+        OutputShape GetShape() const { return _shape; }
 
     private:
         model::InputPort<ValueType> _input;
         model::OutputPort<ValueType> _output;
+        OutputShape _shape;
 
         std::string _sinkFunctionName;
         SinkFunction<ValueType> _sink;

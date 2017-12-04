@@ -369,8 +369,7 @@ void TestSourceNodeCompute()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(2);
-    auto sourceNode = model.AddNode<nodes::SourceNode<double>>(
-        inputNode->output, data[0].size(),
+    auto sourceNode = model.AddNode<nodes::SourceNode<double>>(inputNode->output, data[0].size(),
         "SourceFunction",
         [&sourceNodeTester] (std::vector<double>& input) -> bool
         {
@@ -794,45 +793,64 @@ static void TestClockNodeCompute()
 {
     constexpr short lagThreshold = 5;
     constexpr nodes::TimeTickType interval = 50;
+    constexpr nodes::TimeTickType start = 1511889201834.5767; // timestamp from python: time.time() * 1000
 
     model::Model model;
 
+    int lagNotificationCallbackCount = 0;
     auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1);
     auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold,
         "LagNotificationCallback",
-        [](nodes::TimeTickType timeLag)
+        [&lagNotificationCallbackCount](nodes::TimeTickType timeLag)
         {
             std::cout << "LagNotificationCallback: " << timeLag << "\n";
+            lagNotificationCallbackCount++;
         });
 
     constexpr nodes::TimeTickType thresholdTicks = lagThreshold * interval;
-    std::vector<std::vector<nodes::TimeTickType>> signal = {
-        { 0 },
-        { interval*1 + thresholdTicks/2 }, // within threshold
-        { interval*2 }, // on time
-        { interval*3 + thresholdTicks }, // late
-        { interval*4 + thresholdTicks*20 }, // really late
-        { interval*5 } // on time
+    std::vector<std::vector<nodes::TimeTickType>> signal =
+    {
+        { start },
+        { start + interval*1 + thresholdTicks/2 }, // within threshold
+        { start + interval*2 }, // on time
+        { start + interval*3 + thresholdTicks }, // late (expect notification)
+        { start + interval*4 + thresholdTicks*20 }, // really late (expect notification)
+        { start + interval*5 } // on time
     };
 
     std::vector<std::vector<nodes::TimeTickType>> expectedResults =
     {
         // lastIntervalTime, currentTime
-        { 0, 0 },
-        { interval*1, interval*1 + thresholdTicks/2},
-        { interval*2, interval*2 },
-        { interval*3, interval*3 + thresholdTicks },
-        { interval*4, interval*4 + thresholdTicks*20 },
-        { interval*5, interval*5 }
+        { start, start },
+        { start + interval*1, start + interval*1 + thresholdTicks/2 },
+        { start + interval*2, start + interval*2 },
+        { start + interval*3, start + interval*3 + thresholdTicks },
+        { start + interval*4, start + interval*4 + thresholdTicks*20 },
+        { start + interval*5, start + interval*5 }
+    };
+
+    std::vector<nodes::TimeTickType> expectedGetTicksResults =
+    {
+        interval,
+        interval - thresholdTicks/2,
+        interval,
+        interval - thresholdTicks,
+        interval - thresholdTicks*20,
+        interval
     };
 
     std::vector<std::vector<nodes::TimeTickType>> results;
+    std::vector<nodes::TimeTickType> getTicksResults;
     for (const auto& input : signal)
     {
         inputNode->SetInput(input);
         results.push_back(model.ComputeOutput(clockNode->output));
+        getTicksResults.push_back(clockNode->GetTicksUntilNextInterval(input[0]));
     }
+
     testing::ProcessTest("Testing ClockNode compute", testing::IsEqual(results, expectedResults));
+    testing::ProcessTest("Testing ClockNode GetTicksUntilNextInterval", testing::IsEqual(getTicksResults, expectedGetTicksResults));
+    testing::ProcessTest("Testing lag notification count", testing::IsEqual(lagNotificationCallbackCount, 2));
 }
 
 void NodesTests()

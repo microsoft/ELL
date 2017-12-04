@@ -27,6 +27,7 @@
 #include "MapLoadArguments.h"
 
 // nodes
+#include "ClockNode.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "SinkNode.h"
 #include "SourceNode.h"
@@ -615,7 +616,18 @@ ELL_Node ELL_ModelBuilder::AddOutputNode(ELL_Model model, const ell::api::math::
     return ELL_Node(newNode);
 }
 
-ELL_Node ELL_ModelBuilder::AddSinkNode(ELL_Model model, ELL_PortElements input, const std::string& sinkFunctionName)
+ELL_Node ELL_ModelBuilder::AddClockNode(ELL_Model model, ELL_PortElements input, double interval, short lagThreshold, const std::string& lagNotificationName)
+{
+    auto elements = input.GetPortElements();
+    auto newNode = model.GetModel().AddNode<ell::nodes::ClockNode>(
+        ell::model::PortElements<ell::nodes::TimeTickType>(elements),
+        ell::nodes::TimeTickType(interval),
+        lagThreshold,
+        lagNotificationName);
+    return ELL_Node(newNode);
+}
+
+ELL_Node ELL_ModelBuilder::AddSinkNode(ELL_Model model, ELL_PortElements input, const ell::api::math::TensorShape& tensorShape, const std::string& sinkFunctionName)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
@@ -624,11 +636,11 @@ ELL_Node ELL_ModelBuilder::AddSinkNode(ELL_Model model, ELL_PortElements input, 
     {
         case ELL_PortType::real:
             newNode = model.GetModel().AddNode<ell::nodes::SinkNode<double>>(
-                ell::model::PortElements<double>(elements), sinkFunctionName);
+                ell::model::PortElements<double>(elements), tensorShape.ToMathTensorShape(), sinkFunctionName);
             break;
         case ELL_PortType::smallReal:
             newNode = model.GetModel().AddNode<ell::nodes::SinkNode<float>>(
-                ell::model::PortElements<float>(elements), sinkFunctionName);
+                ell::model::PortElements<float>(elements), tensorShape.ToMathTensorShape(), sinkFunctionName);
             break;
         default:
             throw std::invalid_argument("Error: could not create node");
@@ -637,7 +649,7 @@ ELL_Node ELL_ModelBuilder::AddSinkNode(ELL_Model model, ELL_PortElements input, 
 }
 
 ELL_Node ELL_ModelBuilder::AddSourceNode(ELL_Model model, ELL_PortElements input, ELL_PortType outputType, 
-    int outputSize, const std::string& sourceFunctionName)
+    const ell::api::math::TensorShape& tensorShape, const std::string& sourceFunctionName)
 {
     auto inputType = input.GetType();
     if (inputType != ELL_PortType::real)
@@ -652,11 +664,11 @@ ELL_Node ELL_ModelBuilder::AddSourceNode(ELL_Model model, ELL_PortElements input
     {
         case ELL_PortType::real:
             newNode = model.GetModel().AddNode<ell::nodes::SourceNode<double>>(
-                ell::model::PortElements<TimeTickType>(inputElements), outputSize, sourceFunctionName);
+                ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMathTensorShape(), sourceFunctionName);
             break;
         case ELL_PortType::smallReal:
             newNode = model.GetModel().AddNode<ell::nodes::SourceNode<float>>(
-                ell::model::PortElements<TimeTickType>(inputElements), outputSize, sourceFunctionName);
+                ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMathTensorShape(), sourceFunctionName);
             break;
         default:
             throw std::invalid_argument("Error: could not create node");

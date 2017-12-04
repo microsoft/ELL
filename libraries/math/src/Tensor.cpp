@@ -8,6 +8,8 @@
 
 #include "Tensor.h"
 
+#include "Exception.h"
+
 namespace ell
 {
 namespace math
@@ -23,6 +25,12 @@ namespace math
     TensorCoordinateBase::TensorCoordinateBase(IntegerTriplet values) :
         _rowValue(values[0]), _columnValue(values[1]), _channelValue(values[2])
     {}
+
+    TensorCoordinateBase::TensorCoordinateBase(const std::vector<size_t>& values) :
+        _rowValue(values[0]), _columnValue(values[1]), _channelValue(values[2])
+    {
+        assert(values.size() == 3);
+    }
 
     template<>
     size_t TensorCoordinateBase::GetValue<Dimension::row>() const 

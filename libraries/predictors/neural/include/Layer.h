@@ -31,39 +31,39 @@ namespace predictors
 {
 namespace neural
 {
+/// <summary> Macro to make adding enum entries with corresponding names more reliable
+#define LAYER_TYPES_LIST \
+    ADD_LAYER_TYPE(base, "Base")\
+    ADD_LAYER_TYPE(activation, "Activation")\
+    ADD_LAYER_TYPE(batchNormalization, "BatchNormalization")\
+    ADD_LAYER_TYPE(bias, "Bias")\
+    ADD_LAYER_TYPE(binaryConvolution, "BinaryConvolution")\
+    ADD_LAYER_TYPE(convolution, "Convolution")\
+    ADD_LAYER_TYPE(fullyConnected, "FullyConnected")\
+    ADD_LAYER_TYPE(gru, "GRU")\
+    ADD_LAYER_TYPE(input, "Input")\
+    ADD_LAYER_TYPE(lstm, "LSTM")\
+    ADD_LAYER_TYPE(pooling, "Pooling")\
+    ADD_LAYER_TYPE(recurrent, "Recurrent")\
+    ADD_LAYER_TYPE(scaling, "Scaling")\
+    ADD_LAYER_TYPE(softmax, "Softmax")
+
+
     /// <summary> Enum that represents the type of neural network layer. </summary>
+    #define ADD_LAYER_TYPE(a, b) a,
     enum class LayerType : int
     {
-        base,
-        activation,
-        batchNormalization,
-        bias,
-        binaryConvolution,
-        convolution,
-        fullyConnected,
-        gru,
-        input,
-        lstm,
-        pooling,
-        recurrent,
-        scaling,
-        softmax,
+        LAYER_TYPES_LIST
     };
+    #undef ADD_LAYER_TYPE
     
-    static const std::string LayerNames[] = { "Base", 
-                                              "Activation", 
-                                              "BatchNormalization",
-                                              "Bias", 
-                                              "BinaryConvolution", 
-                                              "Convolution", 
-                                              "FullyConnected", 
-                                              "GRU", 
-                                              "Input", 
-                                              "LSTM", 
-                                              "Pooling", 
-                                              "Recurrent", 
-                                              "Scaling", 
-                                              "Softmax" };
+    /// <summary> Vector of strings that contains the names of the neural network layer types. </summary>
+    #define ADD_LAYER_TYPE(a, b) b,
+    static const std::string LayerNames[] = 
+    { 
+        LAYER_TYPES_LIST
+    };
+    #undef ADD_LAYER_TYPE
 
     /// <summary> Enum that represents the type of padding values in a neural network layer. </summary>
     enum class PaddingScheme : int
