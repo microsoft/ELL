@@ -22,7 +22,7 @@ include_directories(SYSTEM ${PYTHON_INCLUDE_PATH})
 generate_interface(python ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES} "" ${PYTHON_INCLUDE_PATH})
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS})
 
-if (_ELL_python)
+if (TARGET _ELL_python)
   set(PYTHON_DIR ${CMAKE_BINARY_DIR}/interfaces/python)
   set(COMMON_DIR ${CMAKE_BINARY_DIR}/interfaces/common)
 
@@ -31,6 +31,8 @@ if (_ELL_python)
   add_custom_command(TARGET _ELL_python
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${PYTHON_DIR}/ell.py ${PYTHON_DIR}/package/ell/ell.py
+      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/tools/utilities/pythonlibs/buildtools.py ${PYTHON_DIR}/package/ell/util/buildtools.py
+      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/docs/tutorials/shared/tutorial_helpers.py ${PYTHON_DIR}/package/ell/util/tutorialHelpers.py
   )
 
   file(GLOB PKGHDR RELATIVE ${CMAKE_SOURCE_DIR}/interfaces ${CMAKE_SOURCE_DIR}/interfaces/common/*.i ${CMAKE_SOURCE_DIR}/interfaces/common/include/*.h)
@@ -66,4 +68,4 @@ if (_ELL_python)
           COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:_ELL_python> ${PYTHON_DIR}/package/ell/$<TARGET_FILE_NAME:_ELL_python>
     )
   endif()
-endif(_ELL_python)
+endif(TARGET _ELL_python)

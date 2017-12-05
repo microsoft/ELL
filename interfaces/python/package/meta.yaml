@@ -16,6 +16,7 @@ requirements:
   - llvmdev >=3.9,<4.0
   - swig ==3.0.12
   - opencv
+  - github
 
 about:
   home: https://github.com/Microsoft/ELL

@@ -7,31 +7,27 @@ from ipywidgets import interact
 import ipywidgets as widgets
 from ..pretrained_model import PretrainedModel
 
-class ModelChooser:
-    'Choose models from Github'
+
+class ModelGallery:
+    'Choose models from the Model Gallery on Github'
 
     def __init__(self):
         self.model = None
         repo = Github().get_organization('Microsoft').get_repo('ELL-models')
         model_dirs = repo.get_contents('models/ILSVRC2012')
-        self.model_files = [
-            d.name for d in model_dirs if d.name.lower().find('labels') == -1
-        ]
-        self.modelre = re.compile(
-            '(?P<src>[a-z])_[A-Z](?P<size>\d+x\d+x\d+)(?P<arch>([A-Z]\d*)+)')
-        self.grouped = defaultdict(list)
-        for desc in [self.parse_name(n) for n in self.model_files]:
-            self.grouped[desc['size']].append(desc)
 
-    def parse_name(self, model_name):
-        'Parse the succinct naming convention used for model files'
-        match = self.modelre.match(model_name)
-        return {
+        modelre = re.compile(
+            '(?P<src>[a-z])_[A-Z](?P<size>\d+x\d+x\d+)(?P<arch>([A-Z]\d*)+)')
+        descriptions = [{
             'modelarch': match.group('src'),
             'size': match.group('size'),
             'layers': match.group('arch'),
-            'model_name': model_name
-        }
+            'model_name': match.string
+        } for match in [modelre.match(d.name) for d in model_dirs] if match]
+        
+        self.grouped = defaultdict(list)
+        for desc in descriptions:
+            self.grouped[desc['size']].append(desc)
 
     def choose_model(self):
         'Provide an interactive way to choose between models and call a callback when a choice is made'

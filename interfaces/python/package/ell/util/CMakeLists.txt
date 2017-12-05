@@ -24,5 +24,5 @@ if(${PYTHONLIBS_FOUND})
         COPYONLY
     )
 
-    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/packages/ell/util")
+    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/packages/ell")
 endif()

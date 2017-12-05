@@ -15,7 +15,7 @@ def __is_ell_build_directory(path):
 def __get_ell_build_dir():
     path = os.path.join(__this_file_directory, '..', '..')
     if __is_ell_build_directory(path):
-        return path
+        return os.path.abspath(path)
     return None
 
 

@@ -8,7 +8,7 @@ def choose_subset(labels, path, labels_per_column=100):
         with open(path) as label_file:
             saved_labels = [line.rstrip('\n') for line in label_file.readlines()]
     label_set = set(saved_labels)
-    layout = widgets.Layout(max_width='120px', width='120px', height='20px')
+    layout = widgets.Layout(max_width='120px', width='120px', height='16px')
     
     def make_checkbox(desc):
         c = widgets.Checkbox(description=desc, layout=layout, value=desc in label_set)
@@ -28,4 +28,4 @@ def choose_subset(labels, path, labels_per_column=100):
     return label_set
 
 # improve the layout of checkboxes on the notebook page
-display(HTML("<style>.widget-inline-hbox .widget-label {min-width:100px; max-width:100px} .widget-checkbox input[type='checkbox'] {margin: 0}</style>"))
+display(HTML("<style>.widget-inline-hbox .widget-label {width:0} .widget-checkbox input[type='checkbox'] {margin: 0} .widget-box {overflow: visible}</style>"))

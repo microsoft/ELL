@@ -1,3 +1,5 @@
 recursive-include ell/Release *
+recursive-include ell/deploy *
+recursive-include ell/headers *
 include ell/*.so
 include ell/*.so.*

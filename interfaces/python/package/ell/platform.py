@@ -3,6 +3,7 @@
 MAC = 'mac'
 LINUX = 'linux'
 WINDOWS = 'windows'
+PI0 = 'pi0'
 PI3 = 'pi3'
 PI3_64 = 'pi3_64'
 AARCH64 = 'aarch64'

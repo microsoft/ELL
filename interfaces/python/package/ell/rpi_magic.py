@@ -1,11 +1,15 @@
+"""
+A Jupyter magic to allow code to be copied and deployed on the Raspberry Pi directly 
+from the notebook.
+"""
 import tempfile
 import os
+import sys
 import paramiko
-from IPython.core.magic import Magics, magics_class, cell_magic, line_magic
+from IPython import get_ipython
+from IPython.core.magic import Magics, magics_class, cell_magic
 from IPython.core.display import display
-from ipywidgets import Button, HBox, HTML, Label, Output, Layout
-from .util.commands import run
-
+from ipywidgets import Button, HBox, Label, Output, Layout
 
 @magics_class
 class RaspberryPi(Magics):
@@ -56,11 +60,12 @@ class RaspberryPi(Magics):
 
     def copy_model_to_rpi(self, model, rpi_path):
         pkgdir = os.path.dirname(__file__)
-        files = model.files() + [
+        from .platform import PI3
+        files = model.files(PI3) + [
             pkgdir + '/deploy/OpenBLASSetup.cmake',
             pkgdir + '/deploy/include/CallbackInterface.h',
             pkgdir + '/deploy/tcc/CallbackInterface.tcc',
-            pkgdir + '/vision/demoHelper.py',
+            pkgdir + '/util/tutorialHelpers.py',
         ]
 
         # Compare the mod times, to see if the remote copy is up to date
@@ -89,53 +94,46 @@ class RaspberryPi(Magics):
             result += line.strip('\n')
         return result
 
-    def remote_command(self, command):
-        _, stdout, stderr = self.client.exec_command(command, bufsize=0)
-        for line in stdout:
-            print(line.strip('\n'))
-        for line in stderr:
-            print(line.strip('\n'))
+    def print_output(self, line):
+        line = line.strip('\n')
+        print(line)            
+        sys.stdout.flush()
 
-    def remote_job(self, command):
+    def remote_command(self, command):
         command = 'echo $$; ' + command
         _, stdout, stderr = self.client.exec_command(command, bufsize=0)
-        pid = stdout.readline().strip('\n')
-        self.feedback('PID ' + pid)
+        self.remote_pid = stdout.readline().strip('\n')
+        for line in stdout:
+            self.print_output(line)
+        for line in stderr:
+            self.print_output(line)
 
-        def report_output(stdout, stderr):
-            try:
-                import sys
-                for line in stdout:
-                    print(line.strip('\n'))
-                    sys.stdout.flush()
-                for line in stderr:
-                    print(line.strip('\n'))
-                    sys.stdout.flush()
-                self.remote_pid = None
-            except Exception as e:
-                print(e)
-                import traceback
-                traceback.print_exc()
-                sys.stdout.flush()
+    def remote_command_with_callback(self, command, callback):
+        try:
+            self.remote_command(command)
+        except Exception as e:
+            print("### Remote command failed.")
+            print(e)
+            import traceback
+            traceback.print_exc()
+            sys.stdout.flush()
+        callback()
 
+    def remote_command_async(self, command, callback):
         from IPython.lib import backgroundjobs as bg
         jobs = bg.BackgroundJobManager()
-        # The new() method does an unfortunate print statement.
-        # So we switch the printing context to a detached Output to throw it away.
-        tossout = Output()
-        with tossout:
-            jobs.new(report_output, stdout, stderr)
-        return pid
+        jobs.new(self.remote_command_with_callback, command, callback)
 
     @cell_magic
     def rpi(self, line, cell):
         'provide a user interface for remotely executing code on the RPi'
         opts, _ = self.parse_options(line, '', 'user=', 'ip=', 'model=',
-                                     'rpipath=')
+                                     'rpipath=', 'password=')
         rpi_path = opts['rpipath']
         model = get_ipython().ev(opts['model'])
+        if not self.password and 'password' in opts:
+            self.password = opts['password']
 
-        self.password = 'intelligentDevices'  # TEMPORARY FOR DEBUGGING!
         if not self.password:
             import getpass
             self.password = getpass.getpass(
@@ -147,7 +145,7 @@ class RaspberryPi(Magics):
                 # The second minus sign below kills the whole process group (bash + python).
                 self.remote_command("kill -KILL -" + self.remote_pid)
 
-        stop_button = Button(description='Stop running')
+        stop_button = Button(description='Stop running', disabled=False)
         stop_button.on_click(stop_process)
 
         display(HBox([stop_button, self.status_label]))
@@ -160,22 +158,31 @@ class RaspberryPi(Magics):
             self.remote_copy([actuationpy], rpi_path)
 
             self.status_label.value = 'Running'
-            self.remote_pid = self.remote_job(
+            self.remote_command_async(
                 'cd ' + rpi_path + '; ' +
-                '/home/pi/miniconda3/bin/python3 actuation.py')
+                'source /home/pi/miniconda3/envs/py34/bin/activate py34 > /dev/null 2>&1; ' + 
+                'echo running remote python script...; ' +
+                'python3 actuation.py', 
+                lambda:self.on_job_complete(stop_button))
         except paramiko.AuthenticationException:
             self.feedback(
-                'Authentication failed. Wrong password? Evaluate the cell to try again'
+                'Authentication failed. Wrong password? Evaluate the cell to try again.'
             )
             self.password = None
         except TimeoutError:
-            self.feedback('Timeout. Wrong IP address?')
+            self.feedback('Timeout while trying to reach the Raspberry Pi. Wrong IP address?')
+        except:
+            errorType, value, traceback = sys.exc_info()
+            self.feedback("### Exception: " + str(errorType) + ": " + str(value))
 
+    def on_job_complete(self, stop_button):
+        stop_button.description = "Completed"
+        stop_button.disabled = True
 
 def init_magics():
     try:
         ipy = get_ipython()
-        # ipy.register_magics(Arduino)
-        ipy.register_magics(RaspberryPi)
-    except NameError:
+        if ipy:
+            ipy.register_magics(RaspberryPi)
+    except:
         pass  # We're in regular Python, not Jupyter, so we can't use magics
