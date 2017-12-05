@@ -466,21 +466,6 @@
   },
   {
     "accuracy": {
-      "top1": "68.39",
-      "top5": "88.38"
-    },
-    "directory": "v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S",
-    "filter_size": 3,
-    "image_size": 160,
-    "increase_factor": 0,
-    "model": "v",
-    "name": "v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S",
-    "secs_per_frame": {
-      "pi3": "4.72"
-    }
-  },
-  {
-    "accuracy": {
       "top1": "68.42",
       "top5": "88.38"
     },
@@ -491,21 +476,6 @@
     "model": "v",
     "name": "v_I160x160x3CCMCCMCCCMCCCMCCCMF4096S",
     "secs_per_frame": {}
-  },
-  {
-    "accuracy": {
-      "top1": "63.50",
-      "top5": "85.33"
-    },
-    "directory": "v_I192x192x3CCMCCMCCCMCCCMCCCMF1024F1024S",
-    "filter_size": 3,
-    "image_size": 192,
-    "increase_factor": 0,
-    "model": "v",
-    "name": "v_I192x192x3CCMCCMCCCMCCCMCCCMF1024F1024S",
-    "secs_per_frame": {
-      "pi3": "6.88"
-    }
   },
   {
     "accuracy": {

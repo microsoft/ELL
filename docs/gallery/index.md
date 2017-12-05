@@ -9,6 +9,18 @@ datatable: true
 
 Our gallery is a collection of bits and pieces that you can download and use in your projects. 
 
+## Pretrained Image Classification Models
+
+### ILSVRC2012
+
+We provide a collection of models trained on the dataset from the
+ImageNet Large Scale Visual Recognition Challenge (ILSVRC2012). These
+models use different neural net architectures on different size inputs
+to trade off accuracy and speed. The plot below shows how each of the
+models performs in terms of Top 1 accuracy (how often the most
+confident prediction is right) versus speed (seconds per
+frame).
+
 <div id='plot'></div>
 <script>
 var spec = {
@@ -29,24 +41,25 @@ var spec = {
 vegaEmbed("#plot", spec, {actions:false})
 </script>
 
-## Pretrained Image Classification Models
+Here are the pretrained image classification models we provide. The
+table can be sorted by column. Each model name is a link to a page
+from which the model can be downloaded. The name contains both the
+image size and an abbreviation for the model's architecture.
 
-### ILSVRC2012
-
-<table class="table table-striped table-bordered datatable">
+<table class="table table-striped table-bordered table-auto datatable">
 <thead>
 <tr>
   <th>Image size</th>
-  <th>Top 1 accuracy</th>
-  <th>Top 5 accuracy</th>
-  <th>Sec/frame on a Pi3</th>
+  <th>Top 1<br>accuracy</th>
+  <th>Top 5<br>accuracy</th>
+  <th>Sec/frame<br>on a Pi3</th>
   <th>Model name</th>
 </tr>
 </thead>
 {% assign models = site.data.all_models | sort: 'image_size' %}
 {% for model in models %}
   <tr>
-    <td>{{model.image_size}} x {{model.image_size}} x 3</td>
+    <td>{{model.image_size}} x {{model.image_size}}</td>
     <td style="text-align: right">{{model.accuracy.top1}}</td>
     <td style="text-align: right">{{model.accuracy.top5}}</td>
     <td style="text-align: right">{{model.secs_per_frame.pi3}}</td>
