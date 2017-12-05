@@ -28,11 +28,23 @@ var spec = {
   "description": "A plot of accuracy versus performance",
   "width": 500, "height": 500,
   "data": {"values": {{site.data.all_models | jsonify}} },
+  "selection": {"filter": {
+    "type": "single",
+    "fields": ["image_size"],
+    "bind": {"input": "select", "options": ["", 64, 128, 160, 192, 224, 256]}
+  }},
   "mark": {"type":"point", "filled":true},
   "encoding": {
     "x": {"field": "secs_per_frame.pi3", "type": "quantitative", "axis": {"title": "Seconds per frame"} },
     "y": {"field": "accuracy.top1", "type": "quantitative", "axis": {"title": "Top 1 accuracy"}},
-    "color": {"field": "image_size", "type": "nominal", "legend": {"title": "Image Size"} },
+    "color": {
+      "condition": {
+        "selection": "filter",
+	"field": "image_size",
+	"type": "nominal",
+	"legend": {"title": "Image Size"}
+	},
+      "value": "rgba(100,100,100,0.2)" },
     "shape": {"field": "image_size", "type": "nominal"},
     "tooltip": {"field": "directory", "type": "ordinal"},
     "size": {"value": 100}
@@ -40,6 +52,7 @@ var spec = {
 }
 vegaEmbed("#plot", spec, {actions:false})
 </script>
+<br>
 
 Here are the pretrained image classification models we provide. The
 table can be sorted by column. Each model name is a link to a page
