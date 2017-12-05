@@ -333,7 +333,7 @@ class ConvolutionLayer(BaseLayer):
 
         # Note that a single CNTK Convolutional function block is equivalent to the following 3 ELL layers:
         # - ConvolutionalLayer
-        # - BiasLayer
+        # - BiasLayer. This layer is sometimes missing, depending on whether bias is included.
         # - ActivationLayer. This layer is sometimes missing, depending on activation type.
         #
         # Therefore, make sure the output padding characteristics of the last layer reflect the next layer's
@@ -341,10 +341,16 @@ class ConvolutionLayer(BaseLayer):
 
         weightsTensor = converters.get_float_tensor_from_cntk_convolutional_weight_parameter(
             self.weights_parameter)
-        biasVector = converters.get_float_vector_from_cntk_trainable_parameter(
-            self.bias_parameter)
+
+        internalNodes = utilities.get_model_layers(self.layer.block_root)
+        activationType = utilities.get_ell_activation_type(internalNodes)
+        isSoftmaxActivation = utilities.is_softmax_activation(internalNodes)
+        hasActivation = isSoftmaxActivation or activationType != None
+        hasBias = self.bias_parameter != None
 
         # Create the ell.LayerParameters for the various ELL layers
+        onlyLayerParameters = ell.LayerParameters(
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters)
         firstLayerParameters = ell.LayerParameters(
             self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShapeMinusPadding, ell.NoPadding())
         middleLayerParameters = ell.LayerParameters(self.layer.ell_outputShapeMinusPadding, ell.NoPadding(
@@ -352,7 +358,13 @@ class ConvolutionLayer(BaseLayer):
         lastLayerParameters = ell.LayerParameters(self.layer.ell_outputShapeMinusPadding, ell.NoPadding(
         ), self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters)
 
-        layerParameters = firstLayerParameters
+        # Choose the layer parameters for the convolutional layer. If there is 
+        # bias or activation, then the convolution is the first of two or more,
+        # otherwise it is the only layer
+        if hasActivation or hasBias:
+            layerParameters = firstLayerParameters
+        else:
+            layerParameters = onlyLayerParameters
 
         # Fill in the convolutional parameters
         weightsShape = self.weights_parameter.shape
@@ -360,9 +372,6 @@ class ConvolutionLayer(BaseLayer):
         stride = self.attributes['strides'][2]
 
         filterBatchSize = layerParameters.outputShape.channels
-
-        internalNodes = utilities.get_model_layers(self.layer.block_root)
-        activationType = utilities.get_ell_activation_type(internalNodes)
 
         convolutionalParameters = ell.ConvolutionalParameters(
             receptiveField, stride, self.convolution_method, filterBatchSize)
@@ -372,16 +381,17 @@ class ConvolutionLayer(BaseLayer):
             layerParameters, convolutionalParameters, weightsTensor))
 
         # Create the ELL bias layer
-        isSoftmaxActivation = utilities.is_softmax_activation(internalNodes)
-        hasActivation = isSoftmaxActivation or activationType != None
-        if (hasActivation):
-            layerParameters = middleLayerParameters
-        else:
-            layerParameters = lastLayerParameters
-        ellLayers.append(ell.FloatBiasLayer(layerParameters, biasVector))
+        if hasBias:
+            if hasActivation:
+                layerParameters = middleLayerParameters
+            else:
+                layerParameters = lastLayerParameters
+            biasVector = converters.get_float_vector_from_cntk_trainable_parameter(
+                self.bias_parameter)
+            ellLayers.append(ell.FloatBiasLayer(layerParameters, biasVector))
 
         # Create the ELL activation layer
-        if (hasActivation):
+        if hasActivation:
             layerParameters = lastLayerParameters
 
             # Special case: if this is softmax activation, create an ELL Softmax layer.

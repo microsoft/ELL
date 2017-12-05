@@ -24,7 +24,6 @@ def op_name_equals(node, name):
 
     return result
 
-
 def find_parameter_by_name(parameters, name, index=0):
     for p in parameters:
         if (p.name == name):
@@ -38,8 +37,10 @@ def find_parameter_by_name(parameters, name, index=0):
             return p
     # If no named parameter was found, just return the one at the
     # specified index
-    return parameters[index]
-
+    if index < len(parameters):
+        return parameters[index]
+    # Parameter is missing, so return None.
+    return None
 
 def find_node_by_op_name(parameters, name):
     for p in parameters:
