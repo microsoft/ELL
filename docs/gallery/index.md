@@ -31,7 +31,7 @@ var spec = {
   "selection": {"filter": {
     "type": "single",
     "fields": ["image_size"],
-    "bind": {"input": "select", "options": ["", 64, 128, 160, 192, 224, 256]}
+    "bind": {"input": "select", "name": "Input size to highlight ", "options": ["", 64, 128, 160, 192, 224, 256]}
   }},
   "mark": {"type":"point", "filled":true},
   "encoding": {
