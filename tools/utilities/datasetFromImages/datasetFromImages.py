@@ -18,7 +18,7 @@ import math
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../pythonlibs'))
 import modelHelpers
 
-def get_example_list_from_file(file_name):
+def get_example_list_from_file(file_name, categories_name):
     """
     Parses an example file. Each line in the example file is of the following 
     format:
@@ -29,6 +29,11 @@ def get_example_list_from_file(file_name):
     Returns an array of tuples, where the first element is the label, 
     and the second is a path to the image file.
     """
+    if categories_name:
+        categories = load_categories(categories_name)
+    else:
+        categories = {}
+
     lines = []
 
     with open(file_name, "r") as example_file:
@@ -44,11 +49,11 @@ def get_example_list_from_file(file_name):
         if len(strings) > 1:
             label_number = strings[0]
             image_name = strings[1].strip()
-            examples.append((label_number, image_name))
+            examples.append((label_number, image_name, label_number))
         else:
             raise ValueError("Couldn't parse line number {} in {}".format(line_number, file_name))
 
-    return examples    
+    return examples, categories
 
 def get_example_list_from_folder(folder_name, categories_name, positive_category):
     """
@@ -84,14 +89,17 @@ def get_example_list_from_folder(folder_name, categories_name, positive_category
             for fileEntry in os.scandir(os.path.join(folder_name, entry.name)):
                 if fileEntry.is_file():
                     imageName = os.path.join(folder_name, entry.name, fileEntry.name)
-                    examples.append((label, imageName))
+                    examples.append((label, imageName, entry.name))
     
     if save_categories:
-        with open('categories.txt', mode='w') as f:
+        file_name = "categories.txt"
+        with open(file_name, mode="w") as f:
             for name in class_names:
-                f.write('{}\n'.format(name))            
+                f.write("{}\n".format(name))
+        categories = class_names
+        print("Wrote class category labels to {}".format(file_name))
 
-    return examples
+    return examples, categories
 
 def set_binary_labels(input_examples, positive_label):
     """
@@ -109,25 +117,39 @@ def set_binary_labels(input_examples, positive_label):
             examples.append(("-1.0", example[1]))            
     return examples
 
-def write_examples_to_dataset_file(example_list, width, height, use_bgr_ordering, output_dataset):
+def write_examples_to_dataset_file(example_list, categories, width, height, use_bgr_ordering, output_dataset):
     """
     Saves an array of examples to a dataset file.
     """
     print("Processing {} examples, using image size {}x{}, bgr={}".format(len(example_list), width, height, use_bgr_ordering))
     with open(output_dataset, 'w') as dataset_file:
+        # Write header
+        if categories:
+            dataset_file.write("# Category labels\n")
+            for i, category in enumerate(categories):
+                dataset_file.write("# {} : {}\n".format(i, category))
         for example in example_list:
-            # Write label
-            dataset_file.write("{}".format(example[0]))
-            print("Processing {} | {}".format(example[0], example[1]))
+            # Try to read this as an image
             image = cv2.imread(example[1])
-            resized = modelHelpers.prepare_image_for_model(image, width, height, not use_bgr_ordering)
-            # Write image data
-            valuesWritten = 0
-            for value in resized:
-                dataset_file.write("\t{}".format(value))
-                valuesWritten = valuesWritten + 1
-            dataset_file.write("\n")
-            print("    Wrote {} data values".format(valuesWritten))
+            if image:
+                # Write label
+                dataset_file.write("{}".format(example[0]))
+                print("Processing {0[0]} | {0[1]}".format(example))
+                resized = modelHelpers.prepare_image_for_model(image, width, height, not use_bgr_ordering)
+                # Write image data
+                valuesWritten = 0
+                for value in resized:
+                    dataset_file.write("\t{}".format(value))
+                    valuesWritten = valuesWritten + 1
+                # Write label, source file as comment
+                dataset_file.write("\t# class={0[2]}, source={0[1]}".format(example))
+                dataset_file.write("\n")
+                print("    Wrote {} data values".format(valuesWritten))
+            else:
+                print("Skipping {}, could not open as an image".format(example[1]))
+
+    print()
+    print("Wrote {} examples to {}".format(len(example_list), output_dataset))
 
 def parse_size(image_size):
     """
@@ -176,18 +198,21 @@ def main(argv):
 
     width, height = parse_size(args.imageSize)
 
+    start = time.time()
     if args.exampleList:
         # parse the input file to get list of examples
-        examples = get_example_list_from_file(args.exampleList)
+        examples, categories = get_example_list_from_file(args.exampleList, args.categories)
     elif args.folder:
         # walk the folders looking for image examples
-        examples = get_example_list_from_folder(args.folder, args.categories, args.positiveCategory)
+        examples, categories = get_example_list_from_folder(args.folder, args.categories, args.positiveCategory)
     else:
         arg_parser.print_help()
         return
 
     # process the examples
-    write_examples_to_dataset_file(examples, width, height, args.bgr, args.outputDataset)
+    write_examples_to_dataset_file(examples, categories, width, height, args.bgr, args.outputDataset)
+    end = time.time()
+    print("Total time to create dataset: {:.1f} seconds".format(end - start))
 
 if __name__ == "__main__":
     main(sys.argv[1:])    

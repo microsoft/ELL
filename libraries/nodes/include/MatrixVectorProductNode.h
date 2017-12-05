@@ -52,7 +52,7 @@ namespace nodes
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
             /// <returns> The name of this type. </returns>
-            static std::string GetTypeName() { return "MatrixVectorProductNode"; }
+            static std::string GetTypeName() { return utilities::GetCompositeTypeName("MatrixVectorProductNode", { utilities::GetTypeName<ValueType>(), std::to_string(int(layout)) }); }
 
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///

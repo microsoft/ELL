@@ -35,7 +35,10 @@
 #include "DynamicMap.h"
 
 // nodes
+#include "BinaryOperationNode.h"
+#include "ConstantNode.h"
 #include "LinearPredictorNode.h"
+#include "MatrixVectorProductNode.h"
 #include "NeuralNetworkPredictorNode.h"
 
 // predictors
@@ -51,7 +54,7 @@ using namespace ell;
 using PredictorType = predictors::LinearPredictor<double>;
 
 template <typename ElementType>
-model::DynamicMap AppendTrainedLinearPredictorToMap(const predictors::LinearPredictor<double>& trainedPredictor, model::DynamicMap& map, size_t dimension)
+model::DynamicMap AppendTrainedLinearPredictorToMap(const PredictorType& trainedPredictor, model::DynamicMap& map, size_t dimension)
 {
     predictors::LinearPredictor<ElementType> predictor(trainedPredictor);
     predictor.Resize(dimension);
@@ -68,14 +71,14 @@ model::DynamicMap AppendTrainedLinearPredictorToMap(const predictors::LinearPred
 }
 
 template <typename ElementType>
-bool CutNeuralNetworkUsingLayers(model::DynamicMap& map, ParsedRetargetArguments& retargetArguments)
+bool RedirectNeuralNetworkOutputByLayer(model::DynamicMap& map, size_t numLayersFromEnd)
 {
     bool found = false;
     auto nodes = (map.GetModel()).GetNodesByType<nodes::NeuralNetworkPredictorNode<ElementType>>();
     if (nodes.size() > 0)
     {
         auto predictor = nodes[0]->GetPredictor();
-        predictor.RemoveLastLayers(retargetArguments.removeLastLayers);
+        predictor.RemoveLastLayers(numLayersFromEnd);
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<ElementType>>(predictor.GetInputShape());
         auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, predictor);
@@ -84,21 +87,16 @@ bool CutNeuralNetworkUsingLayers(model::DynamicMap& map, ParsedRetargetArguments
         found = true;
     }
 
-    if (found && retargetArguments.verbose)
-    {
-        std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
-    }
-
     return found;
 }
 
-bool CutNeuralNetworkUsingNode(model::DynamicMap& map, ParsedRetargetArguments& retargetArguments)
+bool RedirectModelOutputByNode(model::DynamicMap& map, const std::string& targetNodeId, size_t refineIterations)
 {
     bool found = false;
 
     // Refine the model
-    map.Refine(retargetArguments.refineIterations);
-    auto originalNode = map.GetModel().GetNode(model::Node::NodeId(retargetArguments.targetNodeId));
+    map.Refine(refineIterations);
+    auto originalNode = map.GetModel().GetNode(model::Node::NodeId(targetNodeId));
     if (originalNode)
     {
         // Find the node
@@ -112,10 +110,6 @@ bool CutNeuralNetworkUsingNode(model::DynamicMap& map, ParsedRetargetArguments& 
         found = true;
     }
 
-    if (found && retargetArguments.verbose)
-    {
-        std::cout << "Cutting Neural Network at output of node " << retargetArguments.targetNodeId << std::endl;
-    }
     return found;
 }
 
@@ -144,7 +138,7 @@ void PrintEvaluation(double dualityGap, double desiredPrecision, evaluators::IEv
 {
     // Print evaluation of training
     os << "Final duality Gap: " << dualityGap << std::endl << std::endl;
-    evaluator->Print(std::cout);
+    evaluator->Print(os);
     os << std::endl << std::endl;
     if (dualityGap < desiredPrecision)
     {
@@ -156,32 +150,8 @@ void PrintEvaluation(double dualityGap, double desiredPrecision, evaluators::IEv
     }
 }
 
-void SaveRetargetedModel(const predictors::LinearPredictor<double>& trainedPredictor, model::DynamicMap& map,  const std::string& filename)
-{
-    auto mappedDatasetDimension = map.GetOutput(0).Size();
-    // Create a new map with the linear predictor appended.
-    switch (map.GetOutputType())
-    {
-    case model::Port::PortType::smallReal:
-        {
-            auto outputMap = AppendTrainedLinearPredictorToMap<float>(trainedPredictor, map, mappedDatasetDimension);
-            common::SaveMap(outputMap, filename);
-        }
-        break;
-    case model::Port::PortType::real:
-        {
-            auto outputMap = AppendTrainedLinearPredictorToMap<double>(trainedPredictor, map, mappedDatasetDimension);
-            common::SaveMap(outputMap, filename);
-        }
-        break;
-    default:
-        std::cerr << "Unexpected output type for model. Should be double or float." << std::endl;
-        break;
-    };
-}
-
 template <typename LossFunctionType>
-void RetargetNetworkUsingLinearPredictor(ParsedRetargetArguments& retargetArguments, data::AutoSupervisedDataset& mappedDataset, model::DynamicMap& map)
+PredictorType RetargetModelUsingLinearPredictor(ParsedRetargetArguments& retargetArguments, data::AutoSupervisedDataset& dataset)
 {
     trainers::SDCATrainerParameters trainerParameters{ retargetArguments.regularization, retargetArguments.desiredPrecision, retargetArguments.maxEpochs, retargetArguments.permute, retargetArguments.randomSeedString };
 
@@ -189,12 +159,12 @@ void RetargetNetworkUsingLinearPredictor(ParsedRetargetArguments& retargetArgume
     if (retargetArguments.verbose) std::cout << "Created linear trainer ..." << std::endl;
 
     // create an evaluator
-    evaluators::EvaluatorParameters evaluatorParameters{1, true};
-    auto evaluator = common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorParameters, retargetArguments.lossFunctionArguments);
+    evaluators::EvaluatorParameters evaluatorParameters{ 1, true };
+    auto evaluator = common::MakeEvaluator<PredictorType>(dataset.GetAnyDataset(), evaluatorParameters, retargetArguments.lossFunctionArguments);
 
     // Train the predictor
     if (retargetArguments.verbose) std::cout << "Training ..." << std::endl;
-    trainer.SetDataset(mappedDataset.GetAnyDataset());
+    trainer.SetDataset(dataset.GetAnyDataset());
     size_t epoch = 0;
     double dualityGap = std::numeric_limits<double>::max();
 
@@ -211,12 +181,31 @@ void RetargetNetworkUsingLinearPredictor(ParsedRetargetArguments& retargetArgume
     evaluator->Evaluate(trainer.GetPredictor());
     PrintEvaluation(dualityGap, retargetArguments.desiredPrecision, evaluator.get(), std::cout);
 
-    // Save new model which has headless neural network followed by the linear predictor
-    if (retargetArguments.outputModelFilename != "")
+    return PredictorType(trainer.GetPredictor());
+}
+
+PredictorType RetargetModelUsingLinearPredictor(ParsedRetargetArguments& retargetArguments, data::AutoSupervisedDataset& dataset)
+{
+    using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
+    PredictorType trainedPredictor;
+    switch (retargetArguments.lossFunctionArguments.lossFunction)
     {
-        if (retargetArguments.verbose) std::cout << "Saving retargeted model to " << retargetArguments.outputModelFilename << std::endl;
-        SaveRetargetedModel(trainer.GetPredictor(), map, retargetArguments.outputModelFilename);
+    case LossFunctionEnum::squared:
+        trainedPredictor = RetargetModelUsingLinearPredictor<functions::SquaredLoss>(retargetArguments, dataset);
+        break;
+
+    case LossFunctionEnum::log:
+        trainedPredictor = RetargetModelUsingLinearPredictor<functions::LogLoss>(retargetArguments, dataset);
+        break;
+
+    case LossFunctionEnum::smoothHinge:
+        trainedPredictor = RetargetModelUsingLinearPredictor<functions::SmoothHingeLoss>(retargetArguments, dataset);
+        break;
+
+    default:
+        throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
     }
+    return trainedPredictor;
 }
 
 std::vector<data::AutoSupervisedDataset> CreateDatasetsForOneVersusRest(data::AutoSupervisedMultiClassDataset& multiclassDataset)
@@ -242,7 +231,7 @@ std::vector<data::AutoSupervisedDataset> CreateDatasetsForOneVersusRest(data::Au
         // For any class x, create a binary classification dataset where Example is:
         //  weight = 1 / number of examples for x, or 1 / number of examples for all classes not x
         //  label = 1.0 for examples in x, or -1.0 for all examples not in x
-        //  data = shared_ptr to existing
+        //  data = shared_ptr to existing data
         size_t positiveCount = classCounts[i];
         size_t negativeCount = (totalCount - classCounts[i]);
         double weightPositiveCase = 1.0 / (positiveCount ? positiveCount : 1.0);
@@ -265,6 +254,97 @@ std::vector<data::AutoSupervisedDataset> CreateDatasetsForOneVersusRest(data::Au
     return datasets;
 }
 
+template <typename ElementType>
+model::DynamicMap GetMultiClassMapFromBinaryPredictors(std::vector<PredictorType>& binaryPredictors, model::DynamicMap& map)
+{
+    if (binaryPredictors.empty())
+    {
+        throw std::invalid_argument("binaryPredictors vector has no elements");
+    }
+    auto inputDimension = map.GetOutput(0).Size();
+    for (auto& binaryPredictor : binaryPredictors)
+    {
+        binaryPredictor.Resize(inputDimension);
+    }
+
+    math::RowMatrix<ElementType> weights(binaryPredictors.size(), inputDimension);
+    math::ColumnVector<ElementType> bias(binaryPredictors.size());
+
+    // Set the weights matrix and bias from the predictors.
+    // Each row in the weights is the learned weights from that predictor.
+    // Each element in the bias is the learned bias from that predictor.
+    for (size_t i = 0; i < binaryPredictors.size(); ++i)
+    {
+        auto predictorWeights = binaryPredictors[i].GetWeights();
+        for (size_t j = 0; j < inputDimension; ++j)
+        {
+            weights(i, j) = predictorWeights[j];
+        }
+        bias[i] = binaryPredictors[i].GetBias();
+    }
+
+    model::Model& model = map.GetModel();
+    auto mapOutput = map.GetOutputElements<ElementType>(0);
+    auto matrixMultiplyNode = model.AddNode<nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::rowMajor>>(mapOutput, weights);
+    auto biasNode = model.AddNode<nodes::ConstantNode<ElementType>>(bias.ToArray());
+    auto addNode = model.AddNode<nodes::BinaryOperationNode<ElementType>>(matrixMultiplyNode->output, biasNode->output, emitters::BinaryOperationType::add);
+
+    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(addNode->output);
+
+    auto& output = outputNode->output;
+    auto outputMap = model::DynamicMap(model, { { "input", map.GetInput() } }, { { "output", output } });
+
+    return outputMap;
+}
+
+model::DynamicMap GetRetargetedModel(std::vector<PredictorType>& binaryPredictors, model::DynamicMap& map)
+{
+    model::DynamicMap result;
+    // Create a new map with the output of the combined linear predictors appended.
+    switch (map.GetOutputType())
+    {
+    case model::Port::PortType::smallReal:
+    {
+        result = GetMultiClassMapFromBinaryPredictors<float>(binaryPredictors, map);
+        break;
+    }
+    case model::Port::PortType::real:
+    {
+        result = GetMultiClassMapFromBinaryPredictors<double>(binaryPredictors, map);
+        break;
+    }
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unexpected output type for model. Should be double or float.");
+        break;
+    };
+    return result;
+}
+
+model::DynamicMap GetRetargetedModel(const PredictorType& trainedPredictor, model::DynamicMap& map)
+{
+    model::DynamicMap result;
+    auto mappedDatasetDimension = map.GetOutput(0).Size();
+    // Create a new map with the output of the linear predictor appended.
+    switch (map.GetOutputType())
+    {
+    case model::Port::PortType::smallReal:
+    {
+        result = AppendTrainedLinearPredictorToMap<float>(trainedPredictor, map, mappedDatasetDimension);
+        break;
+    }
+    case model::Port::PortType::real:
+    {
+        result = AppendTrainedLinearPredictorToMap<double>(trainedPredictor, map, mappedDatasetDimension);
+        break;
+    }
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unexpected output type for model. Should be double or float.");
+        break;
+    };
+
+    return model::DynamicMap();
+}
+
 int main(int argc, char* argv[])
 {
     try
@@ -281,25 +361,28 @@ int main(int argc, char* argv[])
         if (retargetArguments.verbose) std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
 
         // load map
-        if (retargetArguments.verbose) std::cout << "Loading model from " << retargetArguments.neuralNetworkFilename << std::endl;
-        auto map = common::LoadMap(retargetArguments.neuralNetworkFilename);
+        if (retargetArguments.verbose) std::cout << "Loading model from " << retargetArguments.inputModelFilename << std::endl;
+        auto map = common::LoadMap(retargetArguments.inputModelFilename);
 
-        // Cut the map
-        bool cut = false;
+        // Create a map by redirecting a layer or node to be output
+        bool redirected = false;
         if (retargetArguments.removeLastLayers > 0)
         {
             if (map.GetOutputType() == model::Port::PortType::smallReal)
             {
-                cut = CutNeuralNetworkUsingLayers<float>(map, retargetArguments);
+                redirected = RedirectNeuralNetworkOutputByLayer<float>(map, retargetArguments.removeLastLayers);
+                if (redirected && retargetArguments.verbose) std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
             }
             else
             {
-                cut = CutNeuralNetworkUsingLayers<double>(map, retargetArguments);
+                redirected = RedirectNeuralNetworkOutputByLayer<double>(map, retargetArguments.removeLastLayers);
+                if (redirected && retargetArguments.verbose) std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
             }
         }
         else if (retargetArguments.targetNodeId.length() > 0)
         {
-            cut = CutNeuralNetworkUsingNode(map, retargetArguments);
+            redirected = RedirectModelOutputByNode(map, retargetArguments.targetNodeId, retargetArguments.refineIterations);
+            if (redirected && retargetArguments.verbose) std::cout << "Redirected output for Node " << retargetArguments.targetNodeId << " from model" << std::endl;
         }
         else
         {
@@ -307,58 +390,56 @@ int main(int argc, char* argv[])
             return 1;
         }
 
-        if (!cut)
+        if (!redirected)
         {
-            std::cerr << "Could not cut neural network, exiting" << std::endl;
+            std::cerr << "Could not splice model, exiting" << std::endl;
             return 1;
         }
 
         // load dataset and map the output
         if (retargetArguments.verbose) std::cout << "Loading data ..." << std::endl;
+        model::DynamicMap result;
         if (retargetArguments.multiClass)
         {
             // This is a multi-class dataset
             auto stream = utilities::OpenIfstream(retargetArguments.inputDataFilename);
-            //auto multiclassDataset = common::GetMappedMultiClassDataset(stream, map);
             auto multiclassDataset = common::GetMultiClassDataset(stream);
-            auto mappedDataset = common::TransformDataset(multiclassDataset, map);
+            // Obtain a new training dataset for the set of Linear Predictors by running the
+            // multiclassDataset through the modified model
+            auto dataset = common::TransformDataset(multiclassDataset, map);
 
             // Create binary classification datasets for each one versus rest (OVR) case
-            auto datasets = CreateDatasetsForOneVersusRest(multiclassDataset);
-            
+            auto datasets = CreateDatasetsForOneVersusRest(dataset);
+
             // Next, train a binary classifier for each case and combine into a
             // single model.
-            // Append the resulting model to the cut neural network and save the map
-            throw utilities::CommandLineParserErrorException("Multi-class retargetting is not yet supported");
+            std::vector<PredictorType> predictors(datasets.size());
+            for (size_t i = 0; i < datasets.size(); ++i)
+            {
+                if (retargetArguments.verbose) std::cout << std::endl << "=== Training binary classifier for class " << i << " vs Rest ===" << std::endl;
+
+                predictors[i] = RetargetModelUsingLinearPredictor(retargetArguments, datasets[i]);
+            }
+
+            // Save the newly spliced model
+            result = GetRetargetedModel(predictors, map);
         }
         else
         {
             // This is a binary classification dataset
             auto stream = utilities::OpenIfstream(retargetArguments.inputDataFilename);
             auto binaryDataset = common::GetDataset(stream);
-            auto mappedDataset = common::TransformDataset(binaryDataset, map);
+            // Obtain a new training dataset for the Linear Predictor by running the
+            // binaryDataset through the modified model
+            auto dataset = common::TransformDataset(binaryDataset, map);
 
-            // Train a linear predictor and splice it onto the previously cut neural network
-            using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
-            switch (retargetArguments.lossFunctionArguments.lossFunction)
-            {
-            case LossFunctionEnum::squared:
-                RetargetNetworkUsingLinearPredictor<functions::SquaredLoss>(retargetArguments, mappedDataset, map);
-                break;
+            // Train a linear predictor whose input comes from the previous model
+            auto predictor = RetargetModelUsingLinearPredictor(retargetArguments, dataset);
 
-            case LossFunctionEnum::log:
-                RetargetNetworkUsingLinearPredictor<functions::LogLoss>(retargetArguments, mappedDataset, map);
-                break;
-
-            case LossFunctionEnum::smoothHinge:
-                RetargetNetworkUsingLinearPredictor<functions::SmoothHingeLoss>(retargetArguments, mappedDataset, map);
-                break;
-
-            default:
-                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
-            }
+            // Save the newly spliced model
+            result = GetRetargetedModel(predictor, map);
         }
-
+        common::SaveMap(result, retargetArguments.outputModelFilename);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

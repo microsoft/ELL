@@ -81,7 +81,7 @@ namespace nodes
         {
             if(stride[dimensionIndex] < (2 * offset[dimensionIndex]))
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Data size not large enough to accomodate padding");
+                throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Data size not large enough to accommodate padding");
             }
             size[dimensionIndex] = stride[dimensionIndex] - (2 * offset[dimensionIndex]);
         }

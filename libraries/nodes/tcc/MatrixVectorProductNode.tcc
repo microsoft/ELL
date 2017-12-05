@@ -43,7 +43,7 @@ namespace nodes
 
         archiver["w_rows"] << _w.NumRows();
         archiver["w_columns"] << _w.NumColumns();
-        std::vector<double> temp;
+        std::vector<ValueType> temp;
         temp.assign(_w.GetConstDataPointer(), _w.GetConstDataPointer() + (size_t)(_w.NumRows() * _w.NumColumns()));
         archiver["w"] << temp;
 
@@ -60,7 +60,7 @@ namespace nodes
         size_t w_columns = 0;
         archiver["w_rows"] >> w_rows;
         archiver["w_columns"] >> w_columns;
-        std::vector<double> temp;
+        std::vector<ValueType> temp;
         archiver["w"] >> temp;
         _w = math::Matrix<ValueType, layout>(w_rows, w_columns, temp);
 
@@ -72,7 +72,7 @@ namespace nodes
     void MatrixVectorProductNode<ValueType, layout>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<MatrixVectorProductNode<double, layout>>(newPortElements, _w);
+        auto newNode = transformer.AddNode<MatrixVectorProductNode<ValueType, layout>>(newPortElements, _w);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -109,7 +109,7 @@ namespace nodes
         math::ColumnVector<ValueType> result(_w.NumRows());
 
         // result = _w * data
-        math::Multiply(1.0, _w, input, 0.0, result);
+        math::Multiply(static_cast<ValueType>(1.0), _w, input, static_cast<ValueType>(0.0), result);
 
         _output.SetOutput(result.ToArray());
     }

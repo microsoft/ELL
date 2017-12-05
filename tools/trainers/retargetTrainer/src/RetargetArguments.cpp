@@ -14,10 +14,10 @@ namespace ell
     {
         using namespace common;
 
-        parser.AddOption(neuralNetworkFilename,
-            "neuralNetworkFilename",
-            "nn",
-            "Name of the pre-trained neural network ELL map file (e.g. model1.ell) that will be used as a featurizer for a linear predictor",
+        parser.AddOption(inputModelFilename,
+            "inputModelFilename",
+            "imf",
+            "Name of the pre-trained ELL model file (e.g. model1.ell) that will be used as a featurizer for a linear predictor",
             "");
 
         parser.AddOption(outputModelFilename,
@@ -35,13 +35,13 @@ namespace ell
         parser.AddOption(targetNodeId,
             "targetNodeId",
             "tid",
-            "The node id of the pre-trained neural network to use as input to the subsequent linear predictor",
+            "The node id of the pre-trained model to use as input to the subsequent linear predictor",
             "");
 
         parser.AddOption(removeLastLayers,
             "removeLastLayers",
             "rem",
-            "Instead of using a node id, the neural network can be cut by removing the last N layers",
+            "Instead of using a node id, a neural network model can be retargeted by removing the last N layers",
             0);
 
         parser.AddOption(
@@ -79,7 +79,7 @@ namespace ell
         parser.AddOption(maxEpochs,
             "maxEpochs",
             "me",
-            "The maximum number of optimizaiton epochs to run",
+            "The maximum number of optimization epochs to run",
             1000);
 
         parser.AddOption(permute,

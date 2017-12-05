@@ -24,6 +24,7 @@
 #include "ForestPredictorNode.h"
 #include "L2NormSquaredNode.h"
 #include "LinearPredictorNode.h"
+#include "MatrixVectorProductNode.h"
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
 #include "MultiplexerNode.h"
@@ -215,6 +216,11 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<double>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<float, math::MatrixLayout::rowMajor>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<float, math::MatrixLayout::columnMajor>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<int, bool>>();

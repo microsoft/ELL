@@ -19,7 +19,7 @@ namespace ell
     /// <summary> Arguments for retarget. </summary> 
     struct RetargetArguments
     {
-        std::string neuralNetworkFilename;
+        std::string inputModelFilename;
         std::string outputModelFilename;
         std::string inputDataFilename;
         std::string targetNodeId;
