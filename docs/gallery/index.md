@@ -23,7 +23,10 @@ frame).
 
 <div id='plot'></div>
 <script>
-var width = Math.min(600, window.outerWidth-100), height=width-100;
+var windowWidth = window.innerWidth
+  || document.documentElement.clientWidth
+  || document.body.clientWidth;
+var width = Math.min(600, windowWidth-100), height=width-100;
 var spec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
   "description": "A plot of accuracy versus performance",
