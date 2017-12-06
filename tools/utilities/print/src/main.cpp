@@ -12,7 +12,7 @@
 
 // common
 #include "LoadModel.h"
-#include "ModelLoadArguments.h"
+#include "MapLoadArguments.h"
 
 // utilities
 #include "CommandLineParser.h"
@@ -48,9 +48,9 @@ int main(int argc, char* argv[])
         utilities::CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
-        common::ParsedModelLoadArguments modelLoadArguments;
+        common::ParsedMapLoadArguments mapLoadArguments;
         ParsedPrintArguments printArguments;
-        commandLineParser.AddOptionSet(modelLoadArguments);
+        commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
 
@@ -59,29 +59,16 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetHelpString() << std::endl;
             return 1;
         }
-        if (modelLoadArguments.inputModelFile == "")
-        {
 
-            std::cout << "### Error: Please specify a model to print using the -imf argument" << std::endl
-                      << std::endl;
+        // if no input specified, print help and exit
+        if (!mapLoadArguments.HasInputFilename())
+        {
             std::cout << commandLineParser.GetHelpString() << std::endl;
             return 1;
         }
 
-        // open model file
-        model::DynamicMap map;
-        try
-        {
-            model::Model model = common::LoadModel(modelLoadArguments.inputModelFile);
-            std::vector<std::pair<std::string, model::InputNodeBase*>> inputs;
-            std::vector<std::pair<std::string, model::PortElementsBase>> outputs;
-            map = model::DynamicMap(model, inputs, outputs);
-        }
-        catch (const utilities::Exception&)
-        {
-            // perhaps this file is a map
-            map = common::LoadMap(modelLoadArguments.inputModelFile);
-        }
+        // Load model from file
+        model::DynamicMap map = LoadMap(mapLoadArguments);
 
         if (printArguments.refine > 0)
         {

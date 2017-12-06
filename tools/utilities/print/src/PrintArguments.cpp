@@ -18,7 +18,7 @@ void ParsedPrintArguments::AddArgs(utilities::CommandLineParser& parser)
     parser.AddOption(outputFilename, "outputFilename", "of", "Path to the output file", "");
     parser.AddOption(outputFormat, "outputFormat", "fmt", "What output format to generate [text|dgml|dot] (default text)", "text");
 	parser.AddOption(refine, "refineIterations", "ri", "If not 0, the model is refined using the specified the number of refinement iterations", 0);
-    parser.AddOption(includeNodeId, "incldueNodeId", "incid", "Include the node id in the print", false);
+    parser.AddOption(includeNodeId, "includeNodeId", "incid", "Include the node id in the print", false);
 }
 
 utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilities::CommandLineParser& parser)
