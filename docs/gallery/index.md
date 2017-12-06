@@ -23,15 +23,20 @@ frame).
 
 <div id='plot'></div>
 <script>
+var width = Math.min(600, window.outerWidth-100), height=width-100;
 var spec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
   "description": "A plot of accuracy versus performance",
-  "width": 500, "height": 500,
+  "width": width, "height": height,
+  "autosize": {
+    "type": "fit",
+    "resize": true
+  },
   "data": {"values": {{site.data.all_models | jsonify}} },
   "selection": {"filter": {
     "type": "single",
     "fields": ["image_size"],
-    "bind": {"input": "select", "name": "Input size to highlight ", "options": ["", 64, 128, 160, 192, 224, 256]}
+    "bind": {"input": "select", "name": "Input size to highlight ", "options": ["", "64x64", "128x128", "160x160", "192x192", "224x224", "256x256"]}
   }},
   "mark": {"type":"point", "filled":true},
   "encoding": {
@@ -72,7 +77,7 @@ image size and an abbreviation for the model's architecture.
 {% assign models = site.data.all_models | sort: 'image_size' %}
 {% for model in models %}
   <tr>
-    <td>{{model.image_size}} x {{model.image_size}}</td>
+    <td>{{model.image_size}}</td>
     <td style="text-align: right">{{model.accuracy.top1}}</td>
     <td style="text-align: right">{{model.accuracy.top5}}</td>
     <td style="text-align: right">{{model.secs_per_frame.pi3}}</td>
