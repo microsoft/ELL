@@ -70,6 +70,9 @@ namespace trainers
         const predictors::ProtoNNPredictor& GetPredictor() const override { return _protoNNPredictor; }
 
     private:
+        // Initalize parameters in the first iteration
+        void Initialize();
+
         // The Similarity Kernel.
         math::ColumnMatrix<double> SimilarityKernel(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, const size_t begin, const size_t end, bool recomputeWX = false) const;
 
@@ -100,10 +103,21 @@ namespace trainers
         // input dimension
         size_t _dimemsion;
 
+        bool _firstIteration = true;
+
         ProtoNNTrainerParameters _parameters;
 
-        /*std::shared_ptr<const std::shared_ptr<predictors::ProtoNNPredictor>> _protoNNPredictor;*/
         predictors::ProtoNNPredictor _protoNNPredictor;
+
+        // Map holding the model parameters
+        std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> _modelMap;
+
+        // Maps holding the Trainer knobs
+        std::map<ProtoNNParameterIndex, double> _stepSize;
+        std::map<ProtoNNParameterIndex, double> _sparsity;
+        std::map<ProtoNNParameterIndex, bool> _recomputeWX;
+
+        size_t _iteration = 0;
 
         math::ColumnMatrix<double> _X;
         math::ColumnMatrix<double> _Y;
@@ -122,7 +136,7 @@ namespace trainers
         ///
         /// <param name="dimension1"> The first dimension of data matrix. </param>
         /// <param name="dimension2"> The second dimension of data matrix. </param>
-        ProtoNNModelParameter(size_t dim1, size_t dim2);
+        ProtoNNModelParameter(size_t dimension1, size_t dimension2);
 
         /// <summary> Get the underlying data matrix. </summary>
         ///
@@ -134,18 +148,10 @@ namespace trainers
         /// <returns> The underlying data matrix. </returns>
         const math::ColumnMatrix<double>& GetData() const { return _data; }
 
-        /// <summary> Parameter gradient. </summary>
-        ///
-        /// <param name="poolingParameters"> Specifies the interface for gradient computation. </param>
-        ///
-        /// <returns> The gradient. </returns>
+        /// Specifies the interface for gradient computation.
         virtual math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType) = 0;
 
-        /// <summary> Instantiates an instance of a pooling layer. </summary>
-        ///
-        /// <param name="poolingParameters"> Specifies the input and pooling characteristics of the layer. </param>
-        ///
-        /// <returns> Expected size of the input vector. </returns>
+        /// Specifies the interface for gradient computation.
         virtual math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType) = 0;
 
     private:

@@ -32,7 +32,6 @@ def test():
     args.sparsityZ = 1
     args.gamma = -1
     args.lossFunction = ell.ProtoNNLossFunction.L2
-    args.numIterations = 20
     args.numInnerIterations = 1
     args.numFeatures = 0
     args.verbose = True
@@ -48,14 +47,13 @@ def test():
     features = dataset.NumFeatures()
     testing.ProcessTest("Proton dataset loaded", testing.IsEqual(int(total), 200))
     
-    done = False
     trainer.SetDataset(dataset)
 
+    numIterations = 20
+    
     print("Training...")
-    while not done:
+    for i in range(numIterations):
         trainer.Update()
-        # todo: evaluate and see if we're done.
-        done = True
 
     predictor = trainer.GetPredictor()
     
@@ -66,6 +64,10 @@ def test():
     map = predictor.GetMap()
     map.Save("protonnTestData.ell")
     testing.ProcessTest("Saving  protonnTestData.ell", testing.IsEqual(os.path.isfile("protonnTestData.ell"), True))
+
+    if testing.DidTestFail():
+        raise Exception("protonn_trainer_test failed")
+
     return 0
 
 if __name__ == "__main__":

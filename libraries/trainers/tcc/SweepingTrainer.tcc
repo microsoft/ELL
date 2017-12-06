@@ -36,7 +36,7 @@ namespace trainers
     const PredictorType& SweepingTrainer<PredictorType>::GetPredictor() const
     {
         double bestGoodness = _evaluatingTrainers[0].GetEvaluator()->GetGoodness();
-        int bestIndex = 0;
+        size_t bestIndex = 0;
         for (size_t i = 1; i < _evaluatingTrainers.size(); ++i)
         {
             double goodness = _evaluatingTrainers[i].GetEvaluator()->GetGoodness();

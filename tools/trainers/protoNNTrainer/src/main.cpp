@@ -128,7 +128,9 @@ int main(int argc, char* argv[])
         // Train the predictor
         if (protoNNTrainerArguments.verbose) std::cout << "Training ..." << std::endl;
         trainer->SetDataset(mappedDataset.GetAnyDataset(0, mappedDataset.NumExamples()));
-        trainer->Update();
+
+        for (size_t i = 0; i < protoNNTrainerArguments.numIterations; i++)
+            trainer->Update();
 
         predictors::ProtoNNPredictor predictor(trainer->GetPredictor());
 

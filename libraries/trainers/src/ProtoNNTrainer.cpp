@@ -58,9 +58,26 @@ void ProtoNNTrainer::SetDataset(const data::AnyDataset& anyDataset)
     _X = math::ColumnMatrix<double>(_dimemsion, numExamples);
     _Y = math::ColumnMatrix<double>(_parameters.numLabels, numExamples),
         ProtoNNTrainerUtils::GetDatasetAsMatrix(anyDataset, _X, _Y);
+    _firstIteration = true;
 }
 
 void ProtoNNTrainer::Update()
+{
+    if (_firstIteration)
+    {
+        Initialize();
+        _firstIteration = false;
+    }
+
+    SGDWithAlternatingMinimization(_X, _Y, _modelMap, _parameters.gamma, _iteration++);
+
+    _protoNNPredictor.GetProjectionMatrix() = _modelMap[ProtoNNParameterIndex::W]->GetData();
+    _protoNNPredictor.GetPrototypes() = _modelMap[ProtoNNParameterIndex::B]->GetData();
+    _protoNNPredictor.GetLabelEmbeddings() = _modelMap[ProtoNNParameterIndex::Z]->GetData();
+    _protoNNPredictor.GetGamma() = _parameters.gamma;
+}
+
+void ProtoNNTrainer::Initialize()
 {
     auto numPrototypes = _parameters.numLabels * _parameters.numPrototypesPerLabel;
 
@@ -69,7 +86,6 @@ void ProtoNNTrainer::Update()
     size_t n = _X.NumColumns();
     size_t m = numPrototypes; // number of prototypes
     size_t l = _parameters.numLabels; // number of labels
-    size_t nIters = _parameters.numIterations;
 
     math::ColumnMatrix<double> W(d, D);
     std::default_random_engine rng;
@@ -86,15 +102,13 @@ void ProtoNNTrainer::Update()
     math::ColumnMatrix<double> B = protonnInit.GetPrototypeMatrix();
     math::ColumnMatrix<double> Z = protonnInit.GetLabelMatrix();
 
-    std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> modelMap;
+    _modelMap[ProtoNNParameterIndex::W] = std::make_shared<trainers::Param_W>(d, D);
+    _modelMap[ProtoNNParameterIndex::Z] = std::make_shared<trainers::Param_Z>(l, m);
+    _modelMap[ProtoNNParameterIndex::B] = std::make_shared<trainers::Param_B>(d, m);
 
-    modelMap[ProtoNNParameterIndex::W] = std::make_shared<trainers::Param_W>(d, D);
-    modelMap[ProtoNNParameterIndex::Z] = std::make_shared<trainers::Param_Z>(l, m);
-    modelMap[ProtoNNParameterIndex::B] = std::make_shared<trainers::Param_B>(d, m);
-
-    modelMap[ProtoNNParameterIndex::W]->GetData() = W;
-    modelMap[ProtoNNParameterIndex::Z]->GetData() = Z;
-    modelMap[ProtoNNParameterIndex::B]->GetData() = B;
+    _modelMap[ProtoNNParameterIndex::W]->GetData() = W;
+    _modelMap[ProtoNNParameterIndex::Z]->GetData() = Z;
+    _modelMap[ProtoNNParameterIndex::B]->GetData() = B;
 
     // Initializing gamma
     if (-1.0 == _parameters.gamma)
@@ -102,15 +116,24 @@ void ProtoNNTrainer::Update()
         auto gammaInit = 0.01;
         math::ColumnMatrix<double> WXupdate(W.NumRows(), n);
         math::Multiply<double>(1, W, _X, 0, WXupdate);
-        _parameters.gamma = protonnInit.InitializeGamma(SimilarityKernel(modelMap, _X, WXupdate, gammaInit), gammaInit);
+        _parameters.gamma = protonnInit.InitializeGamma(SimilarityKernel(_modelMap, _X, WXupdate, gammaInit), gammaInit);
     }
 
-    SGDWithAlternatingMinimization(_X, _Y, modelMap, _parameters.gamma, nIters);
+    _stepSize[ProtoNNParameterIndex::W] = DefaultStepSize;
+    _stepSize[ProtoNNParameterIndex::Z] = DefaultStepSize;
+    _stepSize[ProtoNNParameterIndex::B] = DefaultStepSize;
 
-    _protoNNPredictor.GetProjectionMatrix() = modelMap[ProtoNNParameterIndex::W]->GetData();
-    _protoNNPredictor.GetPrototypes() = modelMap[ProtoNNParameterIndex::B]->GetData();
-    _protoNNPredictor.GetLabelEmbeddings() = modelMap[ProtoNNParameterIndex::Z]->GetData();
-    _protoNNPredictor.GetGamma() = _parameters.gamma;
+    _sparsity[ProtoNNParameterIndex::W] = _parameters.sparsityW;
+    _sparsity[ProtoNNParameterIndex::Z] = _parameters.sparsityZ;
+    _sparsity[ProtoNNParameterIndex::B] = _parameters.sparsityB;
+
+    for (auto parameterIndex : m_OptimizationOrder)
+    {
+        _recomputeWX[parameterIndex] = false;
+    }
+
+    // For the Projection parameter, recompoute WX is set to true
+    _recomputeWX[m_projectionIndex] = true;
 }
 
 /// S_{ij} = exp{-gamma^2 * || B_j - W*x_i ||^2}
@@ -296,13 +319,12 @@ void ProtoNNTrainer::AcceleratedProximalGradient(
 
     assert(batchSize <= n);
 
-    size_t iters_ = ((uint64_t)n * (uint64_t)epochs) / (uint64_t)batchSize;
-    assert(iters_ < 0x7fffffff);
+    size_t iters = ((uint64_t)n * (uint64_t)epochs) / (uint64_t)batchSize;
+    assert(iters < 0x7fffffff);
 
-    size_t iters = iters_;
-
-    for (size_t t = 0; t < iters; ++t)
+    for (size_t i = 0; i < iters; ++i)
     {
+        int t = static_cast<int>(i); // this algorithm requires signed integer arithmetic
         size_t idx1 = (t * batchSize) % n;
         size_t idx2 = ((t + 1) * batchSize) % n;
         if (idx2 <= idx1) idx2 = n;
@@ -360,7 +382,7 @@ void ProtoNNTrainer::AcceleratedProximalGradient(
 }
 
 //minimize f(W, B, Z) = \sum_{i = 1} ^ numTrainData Loss(Y[i], Z* D[i]) where D[i][j] = exp(-gamma^2 || B[j]-WX[i] || ^ 2) where j = 1:numPrototypes
-void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X, ConstColumnMatrixReference Y, std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, double gamma, size_t nIters)
+void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X, ConstColumnMatrixReference Y, std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, double gamma, size_t iter)
 {
     // Start Initializations
     size_t n = X.NumColumns(); //numTrainPoints
@@ -375,20 +397,6 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
 
     const double smallPerturbation = 0.001; // used to calculate the step size while approximating Hessian
 
-    std::map<ProtoNNParameterIndex, double> stepSize{ { ProtoNNParameterIndex::W, DefaultStepSize },{ ProtoNNParameterIndex::Z, DefaultStepSize },{ ProtoNNParameterIndex::B, DefaultStepSize } };
-
-    std::map<ProtoNNParameterIndex, double> sparsity{ { ProtoNNParameterIndex::W, _parameters.sparsityW },{ ProtoNNParameterIndex::Z, _parameters.sparsityZ },{ ProtoNNParameterIndex::B, _parameters.sparsityB } };
-
-    std::map<ProtoNNParameterIndex, bool> recomputeWX;
-
-    for (auto parameterIndex : m_OptimizationOrder)
-    {
-        recomputeWX[parameterIndex] = false;
-    }
-
-    // For the Projection parameter, recompoute WX is set to true
-    recomputeWX[m_projectionIndex] = true;
-
     double fOld, fCur, paramStepSize;
 
     //Projection onto low-d space
@@ -400,103 +408,98 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
 
     // End Initializations
 
-    // number of outer SGD iterations
-    for (size_t i = 0; i < nIters; ++i)
+    // SGD iterations
+    for (auto parameterIndex : m_OptimizationOrder)
     {
-        for (auto parameterIndex : m_OptimizationOrder)
+        math::RowVector<double> eta(10);
+
+        auto parameter = modelMap[parameterIndex];
+        auto parameterMatrix = parameter->GetData();
+        math::ColumnMatrix<double> currentGradient(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
+
+        if (_parameters.verbose)
+            std::cout << "Iteration " << iter << std::endl;
+
+        // Step-size estimation: We try out 10 random batches of data, estimate Hessian (H) of the function using each batch.
+        // Select median of 1/H as the stepsize.
+        for (size_t j = 0; j < eta.Size(); ++j)
         {
-            math::RowVector<double> eta(10);
+            size_t idx1 = (j * sgdBatchSize) % n;
+            size_t idx2 = ((j + 1) * sgdBatchSize) % n;
+            if (idx2 <= idx1) idx2 = n;
 
-            auto parameter = modelMap[parameterIndex];
-            auto parameterMatrix = parameter->GetData();
-            math::ColumnMatrix<double> currentGradient(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
+            // gradient_paramS at current parameter
+            currentGradient = modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, idx1, idx2, _recomputeWX[parameterIndex]), gamma, idx1, idx2, _parameters.lossFunction);
 
-            if (_parameters.verbose)
-                std::cout << "Iteration " << i << std::endl;
+            math::ColumnMatrix<double> thresholdedGradient(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
 
-            // Step-size estimation: We try out 10 random batches of data, estimate Hessian (H) of the function using each batch.
-            // Select median of 1/H as the stepsize.
-            for (size_t j = 0; j < eta.Size(); ++j)
-            {
-                size_t idx1 = (j * sgdBatchSize) % n;
-                size_t idx2 = ((j + 1) * sgdBatchSize) % n;
-                if (idx2 <= idx1) idx2 = n;
+            thresholdedGradient.CopyFrom(currentGradient);
 
-                // gradient_paramS at current parameter
-                currentGradient = modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, idx1, idx2, recomputeWX[parameterIndex]), gamma, idx1, idx2, _parameters.lossFunction);
+            ProtoNNTrainerUtils::HardThresholding(thresholdedGradient, _sparsity[parameterIndex]);
 
-                math::ColumnMatrix<double> thresholdedGradient(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
+            auto coeff = smallPerturbation * safe_div(ProtoNNTrainerUtils::MaxAbsoluteElement(parameterMatrix), ProtoNNTrainerUtils::MaxAbsoluteElement(currentGradient));
 
-                thresholdedGradient.CopyFrom(currentGradient);
+            // perturb the parameter
+            math::ColumnMatrix<double> perturbedParameter(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
+            math::Add(1.0, parameterMatrix, -1.0 * coeff, thresholdedGradient, perturbedParameter);
 
-                ProtoNNTrainerUtils::HardThresholding(thresholdedGradient, sparsity[parameterIndex]);
+            auto WX_old = WX;
+            modelMap[parameterIndex]->GetData() = perturbedParameter;
 
-                auto coeff = smallPerturbation * safe_div(ProtoNNTrainerUtils::MaxAbsoluteElement(parameterMatrix), ProtoNNTrainerUtils::MaxAbsoluteElement(currentGradient));
-
-                // perturb the parameter
-                math::ColumnMatrix<double> perturbedParameter(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
-                math::Add(1.0, parameterMatrix, -1.0 * coeff, thresholdedGradient, perturbedParameter);
-
-                auto WX_old = WX;
-                modelMap[parameterIndex]->GetData() = perturbedParameter;
-
-                // Compute gradient_paramS with updated parameter
-                math::Multiply<double>(1, modelMap[m_projectionIndex]->GetData(), X, 0, WX);
-
-                math::ColumnMatrix<double> gradientEstimate(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
-                auto grad = modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, idx1, idx2, recomputeWX[parameterIndex]), gamma, idx1, idx2, _parameters.lossFunction);
-                math::Add(1.0, currentGradient, -1.0, grad, gradientEstimate);
-
-                currentGradient = gradientEstimate;
-
-                // revert the old parameter value and projected input
-                modelMap[parameterIndex]->GetData() = parameterMatrix;
-                WX = WX_old;
-
-                if (ProtoNNTrainerUtils::MatrixNorm(currentGradient) <= 1e-20L)
-                {
-                    std::cerr << "Different between consecutive gradients has become really low..\n";
-                    eta[j] = 1;
-                }
-                else
-                {
-                    math::ColumnMatrix<double> deltaParameter(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
-                    math::Add(1.0, perturbedParameter, -1.0, parameterMatrix, deltaParameter);
-                    eta[j] = safe_div(ProtoNNTrainerUtils::MatrixNorm(deltaParameter), ProtoNNTrainerUtils::MatrixNorm(currentGradient));
-                }
-            }
-
-            std::vector<double> etaVector(eta.GetDataPointer(), eta.GetDataPointer() + eta.Size());
-            std::sort(etaVector.begin(), etaVector.end());
-
-            paramStepSize = stepSize[parameterIndex] * etaVector[4];
-
-            // Call the accelerated proximal gradient_paramS method for optimizing this parameter
-            AcceleratedProximalGradient(modelMap, parameterIndex, [&](ConstColumnMatrixReference /*W*/, const size_t begin, const size_t end) -> math::ColumnMatrix<double> {
-                return modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, begin, end, recomputeWX[parameterIndex]), gamma, begin, end, _parameters.lossFunction);
-            },
-                std::bind(ProtoNNTrainerUtils::HardThresholding, std::placeholders::_1, sparsity[parameterIndex]),
-                parameterMatrix,
-                epochs,
-                n,
-                sgdBatchSize,
-                paramStepSize,
-                eta_update);
-
+            // Compute gradient_paramS with updated parameter
             math::Multiply<double>(1, modelMap[m_projectionIndex]->GetData(), X, 0, WX);
-            fOld = fCur;
-            fCur = ComputeObjective(modelMap, X, Y, WX, gamma, recomputeWX[parameterIndex]);
 
-            // Armijo step
-            // If function value has increased, decrease the step size else increase
-            if (
-                fCur >= fOld * (1 + safe_div(armijoStepTolerance * log(3), log(2 + i))))
-                stepSize[parameterIndex] *= 0.7;
-            else if (fCur <= fOld * (1 - safe_div(3 * armijoStepTolerance * log(3), log(2 + i))))
-                stepSize[parameterIndex] *= 1.1;
+            math::ColumnMatrix<double> gradientEstimate(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
+            auto grad = modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, idx1, idx2, _recomputeWX[parameterIndex]), gamma, idx1, idx2, _parameters.lossFunction);
+            math::Add(1.0, currentGradient, -1.0, grad, gradientEstimate);
+
+            currentGradient = gradientEstimate;
+
+            // revert the old parameter value and projected input
+            modelMap[parameterIndex]->GetData() = parameterMatrix;
+            WX = WX_old;
+
+            if (ProtoNNTrainerUtils::MatrixNorm(currentGradient) <= 1e-20L)
+            {
+                if (_parameters.verbose)
+                    std::cerr << "Difference between consecutive gradients has become really low..\n";
+                eta[j] = 1;
+            }
             else
-                ;
+            {
+                math::ColumnMatrix<double> deltaParameter(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
+                math::Add(1.0, perturbedParameter, -1.0, parameterMatrix, deltaParameter);
+                eta[j] = safe_div(ProtoNNTrainerUtils::MatrixNorm(deltaParameter), ProtoNNTrainerUtils::MatrixNorm(currentGradient));
+            }
         }
+
+        std::vector<double> etaVector(eta.GetDataPointer(), eta.GetDataPointer() + eta.Size());
+        std::sort(etaVector.begin(), etaVector.end());
+
+        paramStepSize = _stepSize[parameterIndex] * etaVector[4];
+
+        // Call the accelerated proximal gradient_paramS method for optimizing this parameter
+        AcceleratedProximalGradient(modelMap, parameterIndex, [&](ConstColumnMatrixReference /*W*/, const size_t begin, const size_t end) -> math::ColumnMatrix<double> {
+            return modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, begin, end, _recomputeWX[parameterIndex]), gamma, begin, end, _parameters.lossFunction);
+        },
+            [&](auto arg) { ProtoNNTrainerUtils::HardThresholding(arg, _sparsity[parameterIndex]); },
+            parameterMatrix,
+            epochs,
+            n,
+            sgdBatchSize,
+            paramStepSize,
+            eta_update);
+
+        math::Multiply<double>(1, modelMap[m_projectionIndex]->GetData(), X, 0, WX);
+        fOld = fCur;
+        fCur = ComputeObjective(modelMap, X, Y, WX, gamma, _recomputeWX[parameterIndex]);
+
+        // Armijo step
+        // If function value has increased, decrease the step size else increase
+        if (fCur >= fOld * (1 + safe_div(armijoStepTolerance * log(3), log(2 + iter))))
+            _stepSize[parameterIndex] *= 0.7;
+        else if (fCur <= fOld * (1 - safe_div(3 * armijoStepTolerance * log(3), log(2 + iter))))
+            _stepSize[parameterIndex] *= 1.1;
     }
 }
 
