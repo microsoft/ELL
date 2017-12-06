@@ -106,7 +106,7 @@ namespace common
             "target",
             "t",
             "target name",
-            { { "host" }, { "pi0" }, { "pi3" }, { "pi3_64" }, { "mac" }, { "linux" }, { "windows" }, { "ios" }, { "aarch64" } },
+            { { "host" }, { "pi0" }, { "pi3" }, { "orangepi0" }, { "pi3_64" }, { "mac" }, { "linux" }, { "windows" }, { "ios" }, { "aarch64" } },
             "host");
 
         parser.AddOption(

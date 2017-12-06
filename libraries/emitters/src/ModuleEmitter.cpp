@@ -34,13 +34,14 @@ namespace emitters
         std::string c_macTriple = "x86_64-apple-macosx10.12.0"; // alternate: "x86_64-apple-darwin16.0.0"
         std::string c_linuxTriple = "x86_64-pc-linux-gnu";
         std::string c_windowsTriple = "x86_64-pc-win32";
-        std::string c_pi0Triple = "-arm-linux-gnueabihf"; // was "armv6m-unknown-none-eabi"
-        std::string c_armTriple = "armv7-linux-gnueabihf";
+        std::string c_pi0Triple = "arm-linux-gnueabihf"; // was "armv6m-unknown-none-eabi"
+        std::string c_armTriple = "armv7-linux-gnueabihf"; // raspberry pi 3 and orangepi0
         std::string c_arm64Triple = "aarch64-unknown-linux-gnu"; // DragonBoard
         std::string c_iosTriple = "aarch64-apple-ios"; // alternates: "arm64-apple-ios7.0.0", "thumbv7-apple-ios7.0"
 
         // CPUs
         std::string c_pi3Cpu = "cortex-a53";
+        std::string c_orangePi0Cpu = "cortex-a7";
 
         // clang settings:
         // target=armv7-apple-darwin
@@ -144,6 +145,13 @@ namespace emitters
                 parameters.targetDevice.dataLayout = c_armDataLayout;
                 parameters.targetDevice.numBits = 32;
                 parameters.targetDevice.cpu = c_pi3Cpu; // maybe not necessary
+            }
+            else if (parameters.targetDevice.deviceName == "orangepi0") // orangepi (Raspbian)
+            {
+                parameters.targetDevice.triple = c_armTriple;
+                parameters.targetDevice.dataLayout = c_armDataLayout;
+                parameters.targetDevice.numBits = 32;
+                parameters.targetDevice.cpu = c_orangePi0Cpu; // maybe not necessary
             }
             else if (parameters.targetDevice.deviceName == "pi3_64") // pi3 (openSUSE)
             {

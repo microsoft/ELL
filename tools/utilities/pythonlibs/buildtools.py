@@ -107,6 +107,8 @@ class EllBuildTools:
         # arch processing
         if target == "pi3": # Raspberry Pi 3
             return common + ["-mtriple=armv7-linux-gnueabihf", "-mcpu=cortex-a53", "-relocation-model=pic"]
+        if target == "orangepi0": # Orange Pi Zero
+            return common + ["-mtriple=armv7-linux-gnueabihf", "-mcpu=cortex-a7", "-relocation-model=pic"]
         elif target == "pi0": # Raspberry Pi Zero
             return common + ["-mtriple=arm-linux-gnueabihf", "-relocation-model=pic"]
         elif target == "aarch64" or target == "pi3_64": # arm64 Linux
