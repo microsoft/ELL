@@ -33,24 +33,78 @@ vegaEmbed("#plot", spec, {actions:false})
 
 ### ILSVRC2012
 
-<table class="table table-striped table-bordered datatable">
+We provide a collection of models trained on the dataset from the
+ImageNet Large Scale Visual Recognition Challenge (ILSVRC2012). These
+models use different neural net architectures on different size inputs
+to trade off accuracy and speed. The plot below shows how each of the
+models performs in terms of Top 1 accuracy (how often the most
+confident prediction is right) versus speed (seconds per
+frame).
+
+<div id='plot'></div>
+<script>
+var windowWidth = window.innerWidth
+  || document.documentElement.clientWidth
+  || document.body.clientWidth;
+var width = Math.min(600, windowWidth-100), height=width-100;
+var spec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+  "description": "A plot of accuracy versus performance",
+  "width": width, "height": height,
+  "autosize": {
+    "type": "fit",
+    "resize": true
+  },
+  "data": {"values": {{site.data.all_models | jsonify}} },
+  "selection": {"filter": {
+    "type": "single",
+    "fields": ["image_size"],
+    "bind": {"input": "select", "name": "Input size to highlight ", "options": ["", "64x64", "128x128", "160x160", "192x192", "224x224", "256x256"]}
+  }},
+  "mark": {"type":"point", "filled":true},
+  "encoding": {
+    "x": {"field": "secs_per_frame.pi3", "type": "quantitative", "axis": {"title": "Seconds per frame"} },
+    "y": {"field": "accuracy.top1", "type": "quantitative", "axis": {"title": "Top 1 accuracy"}},
+    "color": {
+      "condition": {
+        "selection": "filter",
+	"field": "image_size",
+	"type": "nominal",
+	"legend": {"title": "Image Size"}
+	},
+      "value": "rgba(100,100,100,0.2)" },
+    "shape": {"field": "image_size", "type": "nominal"},
+    "tooltip": {"field": "directory", "type": "ordinal"},
+    "size": {"value": 100}
+  }
+}
+vegaEmbed("#plot", spec, {actions:false})
+</script>
+<br>
+
+Here are the pretrained image classification models we provide. The
+table can be sorted by column. Each model name is a link to a page
+from which the model can be downloaded. The name contains both the
+image size and an abbreviation for the model's architecture.
+
+<table class="table table-striped table-bordered table-auto datatable">
 <thead>
 <tr>
   <th>Image size</th>
-  <th>Top 1 accuracy</th>
-  <th>Top 5 accuracy</th>
-  <th>Sec/frame on a Pi3</th>
+  <th>Top 1<br>accuracy</th>
+  <th>Top 5<br>accuracy</th>
+  <th>Sec/frame<br>on a Pi3</th>
   <th>Model name</th>
 </tr>
 </thead>
 {% assign models = site.data.all_models | sort: 'image_size' %}
 {% for model in models %}
   <tr>
-    <td>{{model.image_size}} x {{model.image_size}} x 3</td>
+    <td>{{model.image_size}}</td>
     <td style="text-align: right">{{model.accuracy.top1}}</td>
     <td style="text-align: right">{{model.accuracy.top5}}</td>
     <td style="text-align: right">{{model.secs_per_frame.pi3}}</td>
-    <td><a href="/ELL/gallery/{{model.directory}}">{{model.directory}}</a></td>
+    <td><a href="/ELL/gallery/ILSVRC2012/{{model.directory}}.html">{{model.directory}}</a></td>
   </tr>
 {% endfor %}
 </table>

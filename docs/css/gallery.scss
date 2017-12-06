@@ -22,3 +22,7 @@ $arch-table-cell-padding: 3px !default;
         padding: $arch-table-cell-padding;
     }
 }
+
+.table-auto {
+  width: auto !important;
+}
