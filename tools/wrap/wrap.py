@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 ####################################################################################################
 ##
 ##  Project:  Embedded Learning Library (ELL)
 ##  File:     wrap.py
-##  Authors:  Chris Lovett
+##  Authors:  Chris Lovett, Kern Handa
 ##
 ##  Requires: Python 3.x
 ##
@@ -36,14 +37,21 @@ class ModuleBuilder:
         self.tools = None
         self.language = "python"
         self.verbose = False
+        self.llvm_format = None
+        self.no_opt_tool = False
+        self.no_llc_tool = False
         self.profile = False
         self.blas = True
+        self.optimize = True
+        self.optimization_level = None
+        self.fuse_linear_ops = True
+        self.debug = False
         self.model_name = ""
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
 
-    def parse_command_line(self, argv):
+    def parse_command_line(self, args=None):
         arg_parser = argparse.ArgumentParser("This tool wraps a given ELL model in a CMake buildable project that builds a language\n"
             "specific module that can call the ELL model on a given target platform.\n"
             "\nThe supported languages are:\n"
@@ -64,8 +72,16 @@ class ModuleBuilder:
         arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
         arg_parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
         arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
+        arg_parser.add_argument("--llvm-format", help="the format of the emitted code (default 'bc')", choices=["ir", "bc", "asm"], default="bc")
+        arg_parser.add_argument("--no-fuse-linear-ops", help="disable the fusing of sequences of linear operations", action="store_true")
+        arg_parser.add_argument("--no-opt-tool", help="disable the use of LLVM's opt tool", action="store_true")
+        arg_parser.add_argument("--no-llc-tool", help="disable the use of LLVM's llc tool", action="store_true")
+        arg_parser.add_argument("--no-optimize", help="disable ELL's compiler from optimizing emitted code", action="store_true")
+        arg_parser.add_argument("--optimization-level", help=("the optimization level used by LLVM's opt and llc tools. If '0' or 'g', opt "
+            "is not run (default '3')"), choices=["0", "1", "2", "3", "g"], default="3")
+        arg_parser.add_argument("--debug", help="emit debug code", action="store_true")
 
-        args = arg_parser.parse_args(argv)
+        args = arg_parser.parse_args(args)
 
         self.model_file = args.model_file
         _, tail = os.path.split(self.model_file)
@@ -78,6 +94,13 @@ class ModuleBuilder:
             self.output_dir = self.target
         self.profile = args.profile
         self.verbose = args.verbose
+        self.llvm_format = args.llvm_format
+        self.optimization_level = args.optimization_level
+        self.no_opt_tool = args.no_opt_tool or self.optimization_level in ['0', 'g']
+        self.no_llc_tool = args.no_llc_tool
+        self.optimize = not args.no_optimize
+        self.fuse_linear_ops = not args.no_fuse_linear_ops
+        self.debug = args.debug
         self.blas = self.str2bool(args.blas)
 
     def find_files(self):
@@ -134,11 +157,15 @@ class ModuleBuilder:
         self.copy_files(self.files, "")
         self.copy_files(self.includes, "include")
         self.copy_files(self.tcc, "tcc")
-        self.tools.compile(self.model_file, self.func_name, self.model_name, self.target, self.output_dir, self.blas, self.profile)
+        out_file = self.tools.compile(
+            self.model_file, self.func_name, self.model_name, self.target, self.output_dir, self.blas, self.fuse_linear_ops, self.profile,
+            self.llvm_format, self.optimize, self.debug)
         if self.language != "cpp":
             self.tools.swig(self.output_dir, self.model_name, self.language)
-        self.tools.opt(self.output_dir, self.model_name)
-        self.tools.llc(self.output_dir, self.model_name, self.target)
+        if not self.no_opt_tool:
+            out_file = self.tools.opt(self.output_dir, out_file, self.optimization_level)
+        if not self.no_llc_tool:
+            out_file = self.tools.llc(self.output_dir, out_file, self.target, self.optimization_level)
         self.create_cmake_file()
         if self.target == "host":
             print("success, now you can build the '" + self.output_dir + "' folder")
@@ -147,5 +174,5 @@ class ModuleBuilder:
 
 if __name__ == "__main__":
     builder = ModuleBuilder()
-    builder.parse_command_line(sys.argv[1:]) # drop the first argument (program name)
+    builder.parse_command_line()
     builder.run()
