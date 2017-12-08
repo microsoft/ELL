@@ -31,6 +31,51 @@
   },
   {
     "accuracy": {
+      "top1": "59.46",
+      "top5": "81.94"
+    },
+    "directory": "dr_I256x256x3CMCMCMCMCMCMCMC1AS",
+    "filter_size": 3,
+    "image_size": "256x256",
+    "increase_factor": 112,
+    "model": "d_reference",
+    "name": "dr_I256x256x3CMCMCMCMCMCMCMC1AS",
+    "secs_per_frame": {
+      "pi3": "0.49"
+    }
+  },
+  {
+    "accuracy": {
+      "top1": "59.11",
+      "top5": "81.80"
+    },
+    "directory": "dr_I256x256x3CMCMCMCMCMCMCMC1AS_v2",
+    "filter_size": 3,
+    "image_size": "256x256",
+    "increase_factor": 112,
+    "model": "d_reference",
+    "name": "dr_I256x256x3CMCMCMCMCMCMCMC1AS_v2",
+    "secs_per_frame": {
+      "pi3": "0.41"
+    }
+  },
+  {
+    "accuracy": {
+      "top1": "57.57",
+      "top5": "80.64"
+    },
+    "directory": "dr_I256x256x3CMCMCMCMCMCMCMC1AS_v3",
+    "filter_size": 3,
+    "image_size": "256x256",
+    "increase_factor": 112,
+    "model": "d_reference",
+    "name": "dr_I256x256x3CMCMCMCMCMCMCMC1AS_v3",
+    "secs_per_frame": {
+      "pi3": "0.38"
+    }
+  },
+  {
+    "accuracy": {
       "top1": "56.92",
       "top5": "80.54"
     },
@@ -106,21 +151,6 @@
   },
   {
     "accuracy": {
-      "top1": "59.06",
-      "top5": "81.71"
-    },
-    "directory": "dst_I128x128x3CCCMCMCMCMCMCMC1AS",
-    "filter_size": 3,
-    "image_size": "128x128",
-    "increase_factor": 0,
-    "model": "dstackedtop",
-    "name": "dst_I128x128x3CCCMCMCMCMCMCMC1AS",
-    "secs_per_frame": {
-      "pi3": "0.75"
-    }
-  },
-  {
-    "accuracy": {
       "top1": "43.13",
       "top5": "67.96"
     },
@@ -147,36 +177,6 @@
     "name": "d_I128x128x3CMCMCMCMCMCMC1AS",
     "secs_per_frame": {
       "pi3": "0.17"
-    }
-  },
-  {
-    "accuracy": {
-      "top1": "57.60",
-      "top5": "80.39"
-    },
-    "directory": "d_I256x256x3CMCMCMCMCMCMC1AS",
-    "filter_size": 3,
-    "image_size": "256x256",
-    "increase_factor": 0,
-    "model": "d",
-    "name": "d_I256x256x3CMCMCMCMCMCMC1AS",
-    "secs_per_frame": {
-      "pi3": "0.68"
-    }
-  },
-  {
-    "accuracy": {
-      "top1": "55.12",
-      "top5": "78.33"
-    },
-    "directory": "d_I256x256x3CMCMCMCMCMCMCMC1AS",
-    "filter_size": 3,
-    "image_size": "256x256",
-    "increase_factor": 0,
-    "model": "d",
-    "name": "d_I256x256x3CMCMCMCMCMCMCMC1AS",
-    "secs_per_frame": {
-      "pi3": "0.56"
     }
   },
   {
