@@ -28,7 +28,7 @@ These infrared images show a Pi running idle (left) and after a few minutes of r
 
 **Step 1:** Attach the fan to the 3D printed fan mount using the screws and nuts provided with the fan. Make sure that the fan is oriented such that it blows air towards the mount (when installed, it will blow air on the heatsink, rather than sucking air from the heatsink).
 
-![Attach-Fan-to-Mount](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Attach-Fan-to-Mount.jpg) 
+![Attach-Fan-to-Mount](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Attach-Fan-to-Mount.jpg)
 
 **Step 2:** Attach the fan mount to the Pi circuit board using the two M2.5 x 12 machine screws and nuts.
 
@@ -67,6 +67,7 @@ var spec = {
   "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
   "description": "Pi temperature during the stress test, under four conditions",
   "width": 500, "height": 300,
+  "selection": { "grid": { "type": "interval", "bind": "scales" } },
   "data": { "url": "/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/pi-heating-data-long.tsv" },
   "mark": "line",
   "encoding": {
@@ -78,7 +79,7 @@ var spec = {
 vegaEmbed("#plot", spec, {actions:false})
 </script>
 
-The x-axis represents time in seconds and the y-axis represents the processor temperature in Celsius. The measurement starts with the idle processor temperature, and the stress test begins after 20 seconds.
+The x-axis represents time in seconds and the y-axis represents the processor temperature in Celsius. The measurement starts with the idle processor temperature, and the stress test begins after 20 seconds. Click and drag to pan around. Zoom in and out with your mouse's scrollwheel.
 
 The `none` configuration quickly overheats. Within a few minutes, the processor temperature hits 85 degrees, the temperature at which the processor starts protecting itself by throttling down its frequency. The passive cooling configuration, `heat sink`, isn't much better. At first, the heat sink absorbs some of the heat, causing the processor temperature to rise more slowly. However, the heat sink struggles to dissipate that heat and the processor temperature gradually climbs into the 70's. The passive heat sink prevented the processor from reaching the critical temperature of 85 degrees, but came too close for comfort. Processor temperature depends on many factors, such as ambient temperature, processor load, and processor frequency. Moreover, different Raspberry Pi units behave differently. The experiment was conducted in an air conditioned office (room temperature was about 26 degrees Celsius) and we can imagine getting into trouble under different circumstances.
 

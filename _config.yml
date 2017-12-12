@@ -81,4 +81,5 @@ kramdown:
 sass:
     sass_dir: _sass
 
-
+liquid:
+  error_mode: strict
