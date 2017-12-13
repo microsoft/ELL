@@ -61,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output_directory',
         help='Path to output directory (default: input weights file directory)')
 
-    model_options = arg_parser.add_argument_group('model_options')
+    model_options = parser.add_argument_group('model_options')
     model_options.add_argument("--step_interval",
         help="produce a steppable ELL model for a millisecond interval",
         default=0)

@@ -172,7 +172,7 @@ def GetGraphStats(adj):
 
 
 def testModel(key):
-    model = ell.ELL_Model(key)
+    model = ell.model.Model(key)
     nodes, index = GetNodesAndIndex(model)
     adj = GetAdjacencyList(nodes, index)
     print(key, end="\t")

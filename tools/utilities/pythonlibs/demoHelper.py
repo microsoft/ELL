@@ -150,7 +150,7 @@ class DemoHelper:
         ell = __import__("ell")            
         ell_utilities = __import__("ell_utilities")
         print("loading model: " + self.model_file)
-        self.model = ell.ELL_Map(self.model_file)
+        self.model = ell.model.Map(self.model_file)
         self.input_shape = self.model.GetInputShape()
         self.output_shape = self.model.GetOutputShape()
         self.output_size = int(self.output_shape.rows * self.output_shape.columns * self.output_shape.channels)

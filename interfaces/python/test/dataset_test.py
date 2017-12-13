@@ -11,7 +11,7 @@ def exampleTest(example):
     l = example.GetLabel()
 
     # test we can copy AutoDataVector to DoubleVector
-    v = ell.DoubleVector()
+    v = ell.math.DoubleVector()
     av.CopyTo(v)
 
     x = np.asarray(av.ToArray())
@@ -20,7 +20,7 @@ def exampleTest(example):
 
 def test():
     testing = Testing()
-    dataset = ell.AutoSupervisedDataset()
+    dataset = ell.data.AutoSupervisedDataset()
     dataset.Load(os.path.join(find_ell.get_ell_root(), "examples/data/testData.txt"))
     num = dataset.NumExamples()
     print("Number of Examples:", num)

@@ -6,28 +6,53 @@ from github import Github
 from ipywidgets import interact
 import ipywidgets as widgets
 from ..pretrained_model import PretrainedModel
-
+import os
+import time
+import datetime
+import codecs
 
 class ModelGallery:
     'Choose models from the Model Gallery on Github'
 
     def __init__(self):
         self.model = None
-        repo = Github().get_organization('Microsoft').get_repo('ELL-models')
-        model_dirs = repo.get_contents('models/ILSVRC2012')
+        self.cache_file = 'gallery.json'
 
-        modelre = re.compile(
-            '(?P<src>[a-z])_[A-Z](?P<size>\d+x\d+x\d+)(?P<arch>([A-Z]\d*)+)')
-        descriptions = [{
-            'modelarch': match.group('src'),
-            'size': match.group('size'),
-            'layers': match.group('arch'),
-            'model_name': match.string
-        } for match in [modelre.match(d.name) for d in model_dirs] if match]
+        download = True
+        if os.path.isfile(self.cache_file):
+            diff = time.time() - datetime.datetime.fromtimestamp(os.stat(self.cache_file).st_mtime).timestamp()
+            if (diff < 3600):
+                download = False # use our cache then.
         
+        if download:
+            repo = Github().get_organization('Microsoft').get_repo('ELL-models')
+            model_dirs = repo.get_contents('models/ILSVRC2012')
+
+            modelre = re.compile(
+                '(?P<src>[a-z])_[A-Z](?P<size>\d+x\d+x\d+)(?P<arch>([A-Z]\d*)+)')
+            descriptions = [{
+                'modelarch': match.group('src'),
+                'size': match.group('size'),
+                'layers': match.group('arch'),
+                'model_name': match.string
+            } for match in [modelre.match(d.name) for d in model_dirs] if match]        
+            self.save_list(descriptions)
+        else:
+            descriptions = self.load_list()
+
         self.grouped = defaultdict(list)
         for desc in descriptions:
             self.grouped[desc['size']].append(desc)
+
+    def save_list(self, data):
+        import json 
+        with open(self.cache_file, 'w') as outfile:
+            json.dump(data, outfile)
+
+    def load_list(self):
+        import json 
+        with open(self.cache_file) as f:
+            return json.loads(f.read())
 
     def choose_model(self):
         'Provide an interactive way to choose between models and call a callback when a choice is made'

@@ -18,38 +18,38 @@
 namespace ELL_API
 {
 
-class ELL_LogLoss {
+class LogLoss {
 public:
-    ELL_LogLoss() = default;
+    LogLoss() = default;
     double Evaluate(double p, double l) { return _loss(p,l); }
     double GetDerivative(double p, double l) { return _loss.GetDerivative(p, l); }
 #ifndef SWIG
-    ELL_LogLoss(const ell::functions::LogLoss& other) { _loss = other; }
+    LogLoss(const ell::functions::LogLoss& other) { _loss = other; }
 #endif
 private:
     ell::functions::LogLoss _loss;
 };
 
-class ELL_HingeLoss {
+class HingeLoss {
 public:
-    ELL_HingeLoss() = default;
+    HingeLoss() = default;
     double Evaluate(double p, double l) { return _loss(p,l); }
     double GetDerivative(double p, double l) { return _loss.GetDerivative(p, l); }
 #ifndef SWIG
-    ELL_HingeLoss(const ell::functions::HingeLoss& other) { _loss = other; }
+    HingeLoss(const ell::functions::HingeLoss& other) { _loss = other; }
 #endif
 private:
     ell::functions::HingeLoss _loss;
 };
 
-class ELL_SquaredLoss {
+class SquaredLoss {
 public:
-    ELL_SquaredLoss() = default;
+    SquaredLoss() = default;
     double Evaluate(double p, double l) { return _loss(p,l); }
     double GetDerivative(double p, double l) { return _loss.GetDerivative(p, l); }
     double BregmanGenerator(double v) { return _loss.BregmanGenerator(v); }
 #ifndef SWIG
-    ELL_SquaredLoss(const ell::functions::SquaredLoss& other) { _loss = other; }
+    SquaredLoss(const ell::functions::SquaredLoss& other) { _loss = other; }
 #endif
 private:
     ell::functions::SquaredLoss _loss;

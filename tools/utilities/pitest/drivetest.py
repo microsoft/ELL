@@ -40,7 +40,7 @@ class DriveTest:
         self.ipaddress = None
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)
-        self.test_dir = os.path.join(self.build_root, "test", "pitest")
+        self.test_dir = os.path.join(self.build_root, "test", "pitest")        
         self.output_dir = None
         self.target_dir = "/home/pi/pi3"
         self.model_name = None
@@ -57,8 +57,9 @@ class DriveTest:
         self.created_dirs = []
         self.profile = False
         self.test = False
-        if (not os.path.isdir(self.test_dir)):
-            os.makedirs(self.test_dir)
+        if os.path.isdir(self.test_dir):
+            rmtree(self.test_dir)
+        os.makedirs(self.test_dir)
 
     def __enter__(self):
         """Called when this object is instantiated with 'with'"""
@@ -220,7 +221,7 @@ class DriveTest:
         self.copy_files( [ os.path.join(self.ell_root, "tools/utilities/pitest/coffeemug.jpg"),
                            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demo.py"),
                            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py"),
-                           os.path.join(self.test_dir, "categories.txt")], self.output_dir)
+                           self.labels_file], self.output_dir)
         self.configure_runtest(self.output_dir)
 
         # avoid copying over bitcode files (as they are big)
@@ -272,7 +273,8 @@ class DriveTest:
         if found:
             print("Test passed")
         else:
-            print("Test failed")
+            raise Exception("### Test Failed")
+
 
     def run_test(self):
         """Runs the test"""

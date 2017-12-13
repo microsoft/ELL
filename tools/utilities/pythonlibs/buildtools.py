@@ -132,7 +132,7 @@ class EllBuildTools:
                 "-O" + optimization_level
                 ]
         args = args + self.get_llc_options(target)
-        print("running llc...")
+        print("running llc ...")
         self.run(args)
         return out_file
 
@@ -145,7 +145,7 @@ class EllBuildTools:
                 "-o", out_file,
                 "-O" + optimization_level
             ]
-        print("running opt...")
+        print("running opt ...")
         self.run(args)
         return out_file
 
@@ -176,6 +176,8 @@ class EllBuildTools:
         args.append("--blas")
         if not optimize:
             args += ["--optimize", "false"]
+        else:
+            args += ["--optimize", "true"]
         if debug:
             args += ["--debug", "true"]
         hasBlas = bool(useBlas)

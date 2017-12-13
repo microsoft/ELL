@@ -52,12 +52,12 @@ std::vector<double> ProtoNNPredictor::Predict(const std::vector<double>& data) c
     return result.ToArray();
 }
 
-ELL_Map ProtoNNPredictor::GetMap() const
+Map ProtoNNPredictor::GetMap() const
 {
     auto predictor = _impl->_trainer->GetPredictor();
     auto numFeatures = predictor.GetDimension();
 
-    ELL_Map map;
+    Map map;
 
     std::shared_ptr<ell::model::DynamicMap> innerMap = map.GetInnerMap();
     model::Model& model = innerMap->GetModel();

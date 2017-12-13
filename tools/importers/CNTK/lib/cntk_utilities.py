@@ -49,18 +49,18 @@ def find_node_by_op_name(parameters, name):
     return None
 
 def get_ell_activation_type(nodes):
-    """Returns an ell.ActivationType from the list of nodes"""
+    """Returns an ell.neural.ActivationType from the list of nodes"""
     if (find_node_by_op_name(nodes, 'ReLU') != None):
-        return ell.ActivationType.relu
+        return ell.neural.ActivationType.relu
     elif (find_node_by_op_name(nodes, 'Sigmoid') != None):
-        return ell.ActivationType.sigmoid
+        return ell.neural.ActivationType.sigmoid
     elif (find_node_by_op_name(nodes, 'LeakyReLU') != None):
-        return ell.ActivationType.leaky
+        return ell.neural.ActivationType.leaky
 
     return None
 
 def get_cntk_activation_op(nodes):
-    """Returns an ell.ActivationType from the list of nodes"""
+    """Returns an ell.neural.ActivationType from the list of nodes"""
     if (find_node_by_op_name(nodes, 'ReLU') != None):
         return relu
     elif (find_node_by_op_name(nodes, 'Sigmoid') != None):
@@ -71,7 +71,7 @@ def get_cntk_activation_op(nodes):
     return None
 
 def get_cntk_activation_name(nodes):
-    """Returns an ell.ActivationType from the list of nodes"""
+    """Returns an ell.neural.ActivationType from the list of nodes"""
     for name in ['ReLU', 'Sigmoid', 'LeakyReLU']:
         if find_node_by_op_name(nodes, name):
             return name
@@ -83,24 +83,24 @@ def is_softmax_activation(nodes):
 
 
 def ell_activation_type_to_string(type):
-    """Returns the string representation of an ell.ActivationType"""
-    if (type == ell.ActivationType.relu):
+    """Returns the string representation of an ell.neural.ActivationType"""
+    if (type == ell.neural.ActivationType.relu):
         return 'ReLU'
-    elif (type == ell.ActivationType.sigmoid):
+    elif (type == ell.neural.ActivationType.sigmoid):
         return 'Sigmoid'
-    elif (type == ell.ActivationType.leaky):
+    elif (type == ell.neural.ActivationType.leaky):
         return 'LeakyReLU'
 
     return ""
 
 
 def ell_shape_to_string(shape):
-    """Returns the string representation of an ell.TensorShape"""
+    """Returns the string representation of an ell.math.TensorShape"""
     return (str(shape.rows) + "x" + str(shape.columns) + "x" + str(shape.channels))
 
 
 def get_shape(inputShape):
-    """"Returns the ell.TensorShape corresponding to the output shape with no adjustment for padding"""
+    """"Returns the ell.math.TensorShape corresponding to the output shape with no adjustment for padding"""
 
     if (len(inputShape) == 3):
         # CNTK's shape tensor is in channels, rows, columns order
@@ -113,11 +113,11 @@ def get_shape(inputShape):
         rows = 1
         columns = 1
 
-    return ell.TensorShape(rows, columns, channels)
+    return ell.math.TensorShape(rows, columns, channels)
 
 
 def get_adjusted_shape(inputShape, paddingParameters):
-    """"Returns the ell.TensorShape corresponding to the input shape adjusted with padding"""
+    """"Returns the ell.math.TensorShape corresponding to the input shape adjusted with padding"""
 
     if (len(inputShape) == 3):
         # Adjust the input shape to account for padding in the row and column dimensions
@@ -137,7 +137,7 @@ def get_adjusted_shape(inputShape, paddingParameters):
         raise NotImplementedError(
             "Unsupported input shape length: " + str(len(inputShape)))
 
-    return ell.TensorShape(rows, columns, channels)
+    return ell.math.TensorShape(rows, columns, channels)
 
 
 def get_model_layers(root):

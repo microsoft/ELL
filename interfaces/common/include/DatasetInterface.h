@@ -40,7 +40,7 @@ private:
     class AutoDataVectorImpl;
     friend class AutoSupervisedExample;
     friend class ProtoNNPredictor;
-    friend class ELL_Map;
+    friend class Map;
     std::shared_ptr<AutoDataVectorImpl> _impl;
 };
 

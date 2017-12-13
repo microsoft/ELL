@@ -12,7 +12,7 @@ if(${PYTHONLIBS_FOUND})
         configure_file(${FILE} ${FILE} COPYONLY)
     endforeach()
 
-    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/packages")
+    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/package")
 endif()
 
 add_subdirectory(ell)

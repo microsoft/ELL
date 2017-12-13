@@ -36,52 +36,74 @@ class PretrainedModel:
 
     def download(self, local_path, rename=None, cache=True):
         """Download the model from Github and unzip it"""
-        if rename:
-            self.rename(rename)
+        import urllib.request
+        
         self.local_path = local_path
         os.makedirs(local_path, exist_ok=True)
-        local_file = os.path.join(local_path, self.name + '.ell.zip')
+        local_file = os.path.join(local_path, self.name + '.ell')
+        local_zip_file = os.path.join(local_path, self.name + '.ell.zip')
         self.labels_path = os.path.join(local_path, 'categories.txt')
-        if not cache or not os.path.exists(local_file):
-            import urllib.request
+        if not cache or not os.path.exists(self.labels_path):
             urllib.request.urlretrieve(
                 'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt',
                 self.labels_path)
+            
+        if not cache or not os.path.exists(local_file):
+            print('downloading model ' + self.model_name + ' ...', flush=True)
             zip_path, _ = urllib.request.urlretrieve(
                 'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/'
-                + self.model_name + '/' + self.model_name + '.ell.zip', local_file)
+                + self.model_name + '/' + self.model_name + '.ell.zip', local_zip_file)
             import zipfile
             with zipfile.ZipFile(zip_path, 'r') as zipref:
                 ellfiles = [n for n in zipref.namelist() if n[-4:] == '.ell']
                 if not ellfiles:
                     raise Exception("file contains no ell model")
                 zipref.extractall(local_path)
-                os.rename(os.path.join(local_path, ellfiles[0]), os.path.join(local_path, self.name + '.ell'))
+                unzipped_file = os.path.join(local_path, ellfiles[0])
+                if local_file != unzipped_file:
+                    os.rename(unzipped_file, local_file)
+
+        if rename:
+            from shutil import copyfile
+            self.rename(rename)
+            renamed_file = os.path.join(local_path, self.name + '.ell')
+            if local_file != renamed_file:
+                copyfile(local_file, renamed_file)
+            local_file = renamed_file
+
         return local_file
 
     def compile(self, target):
         """Compile the model for a given target platform"""
         if self.local_path is None:
             raise Exception('must call download before compile')
-        print('compiling...', flush=True);
-        from . import ELL_Map
+        print('compiling...', flush=True)
+        from . import model
         inpath = os.path.join(self.local_path, self.name)
         outdir = os.path.join(self.local_path, target)
         if not os.path.exists(outdir):
             os.makedirs(outdir)
         outpath = os.path.join(outdir, self.name)
-        ellmap = ELL_Map(inpath + '.ell')
+        ellmap = model.Map(inpath + '.ell')
         cmakefile = os.path.join(outdir, 'CMakeLists.txt')
-        if not os.path.exists(cmakefile) or _is_file_newer(inpath + '.ell', cmakefile):
-            compiled = ellmap.Compile(target, self.name, 'predict')
+        if not os.path.exists(cmakefile) or _is_file_newer(inpath + '.ell', cmakefile) \
+           or not os.path.exists(outpath + '.bc'):
+            
+            compiled = ellmap.Compile(target, self.name, 'predict', True)
             compiled.WriteBitcode(outpath + '.bc')
             compiled.WriteSwigInterface(outpath + '.i')
 
+            if not os.path.exists(outpath + '.bc'):
+                raise Exception("compile failed to produce output file: " +
+                    os.path.exists(outpath + '.bc')) 
+
             if _buildtools.swig(outdir, self.name, 'python') is None:
                 return None
-            if _buildtools.opt(outdir, self.name) is None:
+            out_file = _buildtools.opt(outdir, outpath + '.bc') 
+            if out_file is None:
                 return None
-            if _buildtools.llc(outdir, self.name, target) is None:
+            out_file = _buildtools.llc(outdir, out_file, target) 
+            if out_file is None:
                 return None
             return self.create_cmake_file(target)
         else:

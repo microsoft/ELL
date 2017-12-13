@@ -18,7 +18,7 @@ data = [
 extensions = ["json"]
 
 def TestModelSize(key, label):
-    model = ell.ELL_Model(key)
+    model = ell.model.Model(key)
     print("%s size: %d" % (label, model.Size()))
 
 def TestModelSizes():
@@ -27,7 +27,7 @@ def TestModelSizes():
 
 def TestLoadModel(fileName):
     print("Loading file %s" % fileName)
-    m = ell.ELL_LoadModel(fileName)
+    m = ell.model.LoadModel(fileName)
 
 def TestLoadModels():
     prefix = "../../../examples/data/"
@@ -37,7 +37,7 @@ def TestLoadModels():
 
 def TestSaveModel(ext, key, prefix):
     fileName = prefix + "." + ext
-    ell.ELL_Model(key).Save(fileName)
+    ell.model.Model(key).Save(fileName)
 
 def TestSaveModelsExt(ext):
     for (key, label, prefix) in data:

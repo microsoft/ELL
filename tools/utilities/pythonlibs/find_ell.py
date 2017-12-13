@@ -25,14 +25,14 @@ def find_ell_build():
     return build_dir
 
 def __is_ell_py_dir(path):
-    ell_py_path = os.path.join(path, "ell.py")
+    ell_py_path = os.path.join(path, "setup.py")
     return os.path.isfile(ell_py_path)
 
 def __get_ell_py_dir():
     # First check if we're in the source tree and have a build directory called 'build', then check if we're in a valid build tree
     candidate_dirs = [
-        os.path.abspath(os.path.join(__this_file_directory, '..', '..', '..', 'build', 'interfaces', 'python')),
-        os.path.abspath(os.path.join(__this_file_directory, '..', '..', '..', 'interfaces', 'python'))
+        os.path.abspath(os.path.join(__this_file_directory, '..', '..', '..', 'build', 'interfaces', 'python', 'package')),
+        os.path.abspath(os.path.join(__this_file_directory, '..', '..', '..', 'interfaces', 'python', 'package'))
     ]
 
     for d in candidate_dirs:
@@ -44,8 +44,9 @@ def __get_ell_py_dir():
 
 ell_py_dir = __get_ell_py_dir()
 if ell_py_dir is None:
-    print("Could not find ell.py, did you follow the ELL Python Binding build instructions?")
+    print("Could not find ell package, did you follow the ELL Python Binding build instructions?")
     sys.exit(1)
 sys.path.append(ell_py_dir)
 import ell
+sys.path.append(os.path.join(ell_py_dir, "ell", "util"))
 import ell_utilities

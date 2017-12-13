@@ -11,3 +11,9 @@
 %}
 
 %include "ModelInterface.h"
+
+#ifdef SWIGPYTHON
+    %include "model_python_post.i"
+#elif SWIGJAVASCRIPT
+    %include "model_javascript_post.i"
+#endif

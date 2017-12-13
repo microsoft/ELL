@@ -23,7 +23,7 @@ def test():
     testing = Testing()
     # -dd auto -sw 1 -sb 1 -sz 1 -pd 10 -l 2 -mp 5 -v --evaluationFrequency 1 -plf L2
     
-    args = ell.ProtoNNTrainerParameters()        
+    args = ell.trainers.ProtoNNTrainerParameters()        
     args.projectedDimension = 10
     args.numPrototypesPerLabel = 5
     args.numLabels = 2
@@ -31,14 +31,14 @@ def test():
     args.sparsityB = 1
     args.sparsityZ = 1
     args.gamma = -1
-    args.lossFunction = ell.ProtoNNLossFunction.L2
+    args.lossFunction = ell.trainers.ProtoNNLossFunction.L2
     args.numInnerIterations = 1
     args.numFeatures = 0
     args.verbose = True
     
-    trainer = ell.ProtoNNTrainer(args)
+    trainer = ell.trainers.ProtoNNTrainer(args)
     
-    dataset = ell.AutoSupervisedDataset()
+    dataset = ell.data.AutoSupervisedDataset()
     testFile = os.path.join(find_ell.get_ell_root(), "examples/data/protonnTestData.txt")
     print("Loading: " + testFile)
     dataset.Load(testFile)

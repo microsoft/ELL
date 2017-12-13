@@ -23,7 +23,7 @@ import lib.cntk_utilities as cntk_utilities
 
 
 def predictor_from_cntk_model(modelFile, plotModel=False):
-    """Loads a CNTK model and returns an ell.NeuralNetworkPredictor"""
+    """Loads a CNTK model and returns an ell.neural.NeuralNetworkPredictor"""
 
     print("Loading...")
     z = load_model(modelFile)
@@ -47,7 +47,7 @@ def predictor_from_cntk_model(modelFile, plotModel=False):
         ellLayers = cntk_layers.convert_cntk_layers_to_ell_layers(
             layersToConvert)
         # Create an ELL neural network predictor from the layers
-        predictor = ell.FloatNeuralNetworkPredictor(ellLayers)
+        predictor = ell.neural.FloatNeuralNetworkPredictor(ellLayers)
     except BaseException as exception:
         print("Error occurred attempting to convert cntk layers to ELL layers")
         raise exception

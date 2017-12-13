@@ -11,7 +11,7 @@ class CondaBuildTools(EllBuildTools):
 
     def swig_header_dirs(self):
         headerdir = self.pkgdir + '/headers'
-        return [headerdir + p for p in ['/common', '/common/include', 'emitters']]
+        return [headerdir + p for p in ['/common', '/common/include', '/emitters']]
 
     def find_tools(self):
         

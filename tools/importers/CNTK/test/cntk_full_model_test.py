@@ -162,7 +162,7 @@ class FullModelTest:
     def compare_model(self, layers):
         ellLayers = cntk_layers.convert_cntk_layers_to_ell_layers(layers)
         # Create an ELL neural network predictor from the layers
-        predictor = ell.FloatNeuralNetworkPredictor(ellLayers)
+        predictor = ell.neural.FloatNeuralNetworkPredictor(ellLayers)
         shape = predictor.GetInputShape()
         self.input_shape = (shape.channels,shape.rows,shape.columns) # to CNTK (channel, rows, coumns) order
         self.data = self.get_input_data()
@@ -228,12 +228,12 @@ class FullModelTest:
 
         ell_layers = []
         # remove output_padding from because CNTK doesn't have output padding.
-        layer.layer.ell_outputPaddingParameters = ell.PaddingParameters(ell.PaddingScheme.zeros, 0)
+        layer.layer.ell_outputPaddingParameters = ell.neural.PaddingParameters(ell.neural.PaddingScheme.zeros, 0)
         layer.layer.ell_outputShape = cntk_utilities.get_adjusted_shape(
                 layer.layer.output.shape, layer.layer.ell_outputPaddingParameters)
         layer.process(ell_layers)
         # Create an ELL neural network predictor from the relevant CNTK layers
-        return ell.FloatNeuralNetworkPredictor(ell_layers)
+        return ell.neural.FloatNeuralNetworkPredictor(ell_layers)
 
 
     def verify_ell(self, op_name, predictor, data, expected):
@@ -260,7 +260,7 @@ class FullModelTest:
     def verify_compiled(self, predictor, input, expectedOutput, module_name, precision=1e-4):
         # now run same over ELL compiled model
         map = ell_utilities.ell_map_from_float_predictor(predictor)
-        compiled = map.Compile("host", module_name, "test" + str(self.method_index))
+        compiled = map.Compile("host", module_name, "test" + str(self.method_index), False)
         self.method_index += 1
         compiledResults = compiled.ComputeFloat(input)
         ca = np.array(compiledResults) # convert back to numpy

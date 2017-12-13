@@ -4,25 +4,10 @@
 
 find_package(PythonInterp)
 if(${PYTHONINTERP_FOUND})
-  set (test_name ell-python-interface-test)
+  set(test_name ell-python-interface-test)
 
-  set (test_src test.py 
-    testing.py 
-    functions_test.py 
-    model_test.py 
-    modelbuilder_test.py 
-    common_test.py
-    trainers_test.py
-    predictors_test.py
-    nodes_test.py
-    linear_test.py
-    evaluators_test.py
-    dataset_test.py
-    vector_test.py
-    sgd_trainer_test.py
-    protonn_trainer_test.py
-    find_ell.py
-    )
+  file(GLOB test_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
+
   add_custom_target(${test_name} DEPENDS ${test_src} SOURCES ${test_src})
   add_dependencies(${test_name} _ELL_python)
   set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
