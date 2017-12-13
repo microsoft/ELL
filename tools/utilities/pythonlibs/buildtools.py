@@ -123,6 +123,8 @@ class EllBuildTools:
     def llc(self, output_dir, input_file, target, optimization_level="3"):
         # llc -filetype=obj _darknetReference.ll -O3 -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53 -relocation-model=pic
         model_name = os.path.splitext(os.path.basename(input_file))[0]
+        if model_name.endswith('.opt'):
+            model_name = model_name[:-4]
         out_file = os.path.join(output_dir, model_name + ".obj")
         args = [self.llcexe,
                 input_file,
@@ -147,7 +149,7 @@ class EllBuildTools:
         self.run(args)
         return out_file
 
-    def compile(self, model_file, func_name, model_name, target, output_dir, useBlas=False, profile=False, fuseLinearOps=True, llvm_format="bc",
+    def compile(self, model_file, func_name, model_name, target, output_dir, useBlas=False, fuseLinearOps=True, profile=False, llvm_format="bc",
                 optimize=True, debug=False):
         format_flag = {
             "bc": "--bitcode",
