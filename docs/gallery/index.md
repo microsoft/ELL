@@ -61,7 +61,7 @@ var spec = {
     "filter": {
         "type": "single",
         "fields": ["image_size"],
-        "bind": {"input": "select", "name": "Input size to highlight ", "options": ["", "64x64", "128x128", "160x160", "192x192", "224x224", "256x256"]},
+        "bind": {"input": "select", "name": "Input size to highlight ", "options": ["", "64x64", "128x128", "256x256"]},
     },
     "grid": { "type": "interval", "bind": "scales" }
   },
