@@ -6,6 +6,12 @@ if(${PYTHONLIBS_FOUND})
 
     set(src __init__.py rpi_magic.py platform.py pretrained_model.py)
 
+    add_subdirectory(data)
+    add_subdirectory(math)
+    add_subdirectory(model)
+    add_subdirectory(neural)
+    add_subdirectory(nodes)
+    add_subdirectory(trainers)
     add_subdirectory(util)
     add_subdirectory(vision)
 
@@ -15,6 +21,6 @@ if(${PYTHONLIBS_FOUND})
         configure_file(${FILE} ${FILE} COPYONLY)
     endforeach()
 
-    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/packages/ell")
+    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/package/ell")
 endif()
 

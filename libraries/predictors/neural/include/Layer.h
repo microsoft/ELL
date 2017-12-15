@@ -143,7 +143,7 @@ namespace neural
         /// <summary> Parameters common to all layers, specifying info related to input and output of the layer. </summary>
         struct LayerParameters
         {
-            /// <summary> Reference to the input tensor. Its size does not include the padding.</summary>
+            /// <summary> Reference to the input tensor. Its size includes the padding.</summary>
             ConstTensorReferenceType input;
 
             /// <summary> The padding requirements for the input. </summary>

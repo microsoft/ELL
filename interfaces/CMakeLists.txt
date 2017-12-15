@@ -42,12 +42,7 @@ foreach(src ${_sources})
     list(APPEND INTERFACE_TCC "${CMAKE_CURRENT_LIST_DIR}/${src}")
 endforeach()
 
-set(_sources
-    common/ell.i
-)
-foreach(src ${_sources})
-    list(APPEND INTERFACE_MAIN "${CMAKE_CURRENT_LIST_DIR}/${src}")
-endforeach()
+set(INTERFACE_MAIN "${CMAKE_CURRENT_LIST_DIR}/common/ell.i")
 
 set(_sources
     common/common.i
@@ -72,6 +67,8 @@ set(_sources
     common/math_python_pre.i
     common/macros.i
     common/model.i
+    common/model_javascript_post.i
+    common/model_python_post.i
     common/nodes.i
     common/noncopyable.i
     common/shape.i

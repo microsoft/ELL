@@ -17,9 +17,7 @@ while not os.path.isdir(os.path.join(_root_dir, expected_dir)):
 if not os.path.isdir(os.path.join(_root_dir, expected_dir)):
     raise Exception("Could not find '%s' dir, please run this script in the ELL repo." % (expected_dir))
 
-sys.path.append(os.path.join(_root_dir, "build/interfaces/python"))
-sys.path.append(os.path.join(_root_dir, "build/interfaces/python/Debug"))
-sys.path.append(os.path.join(_root_dir, "build/interfaces/python/Release"))
+sys.path.append(os.path.join(_root_dir, "build/interfaces/python/package"))
 
 def get_ell_root():
     global _root_dir

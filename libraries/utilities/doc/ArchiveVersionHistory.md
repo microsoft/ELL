@@ -6,7 +6,7 @@
 |       2 | current           |
 |       3 | adds metadata to Model, Node, Port, and DynamicMap |
 |       4 | adds shapes to SourceNode and SinkNode |
-
+|       5 | enabled unarchiving of refined models containing Neural Network layer Nodes, and Broadcast Unary Function Nodes |
 
 When objects start being able to read different format versions, there
 will be notes here about forward/backward compatibility:

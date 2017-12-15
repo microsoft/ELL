@@ -7,7 +7,7 @@ datatable: true
 
 # The ELL Gallery
 
-Our gallery is a collection of bits and pieces that you can download and use in your projects. 
+Our gallery is a collection of bits and pieces that you can download and use in your projects.
 
 <div id='plot'></div>
 <script>
@@ -39,7 +39,8 @@ models use different neural net architectures on different size inputs
 to trade off accuracy and speed. The plot below shows how each of the
 models performs in terms of Top 1 accuracy (how often the most
 confident prediction is right) versus speed (seconds per
-frame).
+frame). Click and drag to pan around. Zoom in and out with your
+mouse's scrollwheel.
 
 <div id='plot'></div>
 <script>
@@ -56,11 +57,14 @@ var spec = {
     "resize": true
   },
   "data": {"values": {{site.data.all_models | jsonify}} },
-  "selection": {"filter": {
-    "type": "single",
-    "fields": ["image_size"],
-    "bind": {"input": "select", "name": "Input size to highlight ", "options": ["", "64x64", "128x128", "160x160", "192x192", "224x224", "256x256"]}
-  }},
+  "selection": {
+    "filter": {
+        "type": "single",
+        "fields": ["image_size"],
+        "bind": {"input": "select", "name": "Input size to highlight ", "options": ["", "64x64", "128x128", "256x256"]},
+    },
+    "grid": { "type": "interval", "bind": "scales" }
+  },
   "mark": {"type":"point", "filled":true},
   "encoding": {
     "x": {"field": "secs_per_frame.pi3", "type": "quantitative", "axis": {"title": "Seconds per frame"} },
@@ -68,11 +72,12 @@ var spec = {
     "color": {
       "condition": {
         "selection": "filter",
-	"field": "image_size",
-	"type": "nominal",
-	"legend": {"title": "Image Size"}
-	},
-      "value": "rgba(100,100,100,0.2)" },
+        "field": "image_size",
+        "type": "nominal",
+        "legend": {"title": "Image Size"}
+      },
+      "value": "rgba(100,100,100,0.2)"
+    },
     "shape": {"field": "image_size", "type": "nominal"},
     "tooltip": {"field": "directory", "type": "ordinal"},
     "size": {"value": 100}

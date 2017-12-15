@@ -45,7 +45,7 @@ if(NPM_EXECUTABLE)
         DEPENDS ${module_files} ell_module_d_ts
         COMMENT "Copying module files"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    set_property(TARGET ${module_name}_files PROPERTY FOLDER "interfaces")
+    set_property(TARGET ${module_name}_files PROPERTY FOLDER "interfaces/javascript")
 
     add_custom_target(${module_name}_install
                     COMMAND ${NPM_EXECUTABLE} install
@@ -53,13 +53,13 @@ if(NPM_EXECUTABLE)
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Installing prerequisites"
                     VERBATIM)
-    set_property(TARGET ${module_name}_install PROPERTY FOLDER "interfaces")
+    set_property(TARGET ${module_name}_install PROPERTY FOLDER "interfaces/javascript")
 
     add_custom_target(${module_name}
         COMMAND ${NPM_EXECUTABLE} run ${MODULE_BUILD_COMMAND}
         COMMENT "Building module"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces")
+    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/javascript")
 
     add_dependencies(${module_name} ${module_name}_files ${module_name}_install ELL_xml)
 

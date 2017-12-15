@@ -9,6 +9,10 @@
 // data
 #include "SingleLineParsingExampleIterator.h"
 
+// Model
+#include "IRMapCompiler.h"
+#include "IRCompiledMap.h" 
+
 namespace ell
 {
 namespace common
@@ -35,5 +39,22 @@ namespace common
             return ExampleType(std::move(transformedDataVector), example.GetMetadata());
         });
     }
+
+    template <typename ExampleType, typename MapType>
+    auto TransformDatasetWithCompiledMap(data::Dataset<ExampleType>& input, const MapType& map)
+    {
+        model::IRMapCompiler compiler;
+        auto compiledMap = compiler.Compile(map);
+
+        return input.template Transform<ExampleType>([&compiledMap](const ExampleType& example)
+        {
+            compiledMap.SetInputValue(0, example.GetDataVector());
+            auto transformedDataVector = compiledMap.template ComputeOutput<typename ExampleType::DataVectorType>(0);
+
+            return ExampleType(std::move(transformedDataVector), example.GetMetadata());
+        });
+    }
+
+
 }
 }

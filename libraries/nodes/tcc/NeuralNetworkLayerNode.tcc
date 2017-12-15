@@ -46,13 +46,13 @@ namespace nodes
     //
     template <typename DerivedType, typename LayerType, typename ValueType>
     NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::NeuralNetworkLayerNode()
-        : NeuralNetworkLayerNodeBase<ValueType>()
+        : NeuralNetworkLayerNodeBase<ValueType>(), _inputShape(0,0,0)
     {
     }
 
     template <typename DerivedType, typename LayerType, typename ValueType>
     NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::NeuralNetworkLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer)
-        : NeuralNetworkLayerNodeBase<ValueType>(input, {}, layer.GetOutput().Size()), _inputTensor(layer.GetInputShape()), _layer(layer)
+        : NeuralNetworkLayerNodeBase<ValueType>(input, {}, layer.GetOutput().Size()), _inputTensor(layer.GetInputShape()), _layer(layer), _inputShape(layer.GetInputShape())
     {
         _layer.GetLayerParameters().input = _inputTensor;
 
@@ -90,23 +90,48 @@ namespace nodes
     }
 
     template <typename DerivedType, typename LayerType, typename ValueType>
+    utilities::ArchiveVersion NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::GetArchiveVersion() const
+    {
+        constexpr utilities::ArchiveVersion archiveVersion = { utilities::ArchiveVersionNumbers::v5_refined_nodes };
+
+        return archiveVersion;
+    }
+
+    template <typename DerivedType, typename LayerType, typename ValueType>
+    bool NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::CanReadArchiveVersion(const utilities::ArchiveVersion& version) const
+    {
+        constexpr utilities::ArchiveVersion archiveVersion = { utilities::ArchiveVersionNumbers::v5_refined_nodes };
+
+        return version >= archiveVersion;
+    }
+
+    template <typename DerivedType, typename LayerType, typename ValueType>
     void NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         NeuralNetworkLayerNodeBase<ValueType>::WriteToArchive(archiver);
-        archiver["layer"] << _layer;
         archiver["inputLayout"] << _inputLayout;
         archiver["outputLayout"] << _outputLayout;
+
+        std::vector<size_t> inputShape = _inputShape;
+        archiver["inputShape"] << inputShape;
+
+        archiver["layer"] << _layer;
     }
 
     template <typename DerivedType, typename LayerType, typename ValueType>
     void NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         NeuralNetworkLayerNodeBase<ValueType>::ReadFromArchive(archiver);
-        archiver["layer"] >> _layer;
-        _inputTensor = typename LayerType::TensorType(_layer.GetInputShape());
-        _layer.GetLayerParameters().input = _inputTensor;
         archiver["inputLayout"] >> _inputLayout;
         archiver["outputLayout"] >> _outputLayout;
+
+        std::vector<size_t> inputShape;
+        archiver["inputShape"] >> inputShape;
+        _inputShape = math::TensorShape{ inputShape };
+
+        _inputTensor = typename LayerType::TensorType(_inputShape);
+        _layer.GetLayerParameters().input = _inputTensor;
+        archiver["layer"] >> _layer;
     }
 
     template <typename DerivedType, typename LayerType, typename ValueType>

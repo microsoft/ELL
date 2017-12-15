@@ -17,5 +17,5 @@ if(${PYTHONLIBS_FOUND})
     configure_file(${PROJECT_SOURCE_DIR}/tools/importers/darknet/darknet_to_ell.py cntk_to_ell.py COPYONLY)
     configure_file(${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/demoHelper.py demoHelper.py COPYONLY)
 
-    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/packages/ell")
+    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/package/ell/vision")
 endif()

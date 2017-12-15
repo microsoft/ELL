@@ -16,6 +16,7 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void XmlArchiver::WriteScalar(const char* name, const ValueType& value)
     {
+        EnsureMaxPrecision<ValueType> precisionScope(_out);
         using std::to_string;
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");

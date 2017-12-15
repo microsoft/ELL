@@ -16,6 +16,7 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void JsonArchiver::WriteScalar(const char* name, const ValueType& value)
     {
+        EnsureMaxPrecision<ValueType> precisionScope(_out);
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? ",\n" : "";

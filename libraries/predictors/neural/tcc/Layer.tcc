@@ -138,7 +138,7 @@ namespace neural
         for (size_t i = 0; (i < numValuesToPrint) && (i < output.Size()); i++)
         {
             size_t channel = i % output.NumChannels();
-            size_t col = i / output.NumChannels();
+            size_t col = (i / output.NumChannels()) % output.NumColumns();
             size_t row = i / (output.NumChannels() * output.NumColumns());
 
             if (i % 10 == 0) os << std::endl;

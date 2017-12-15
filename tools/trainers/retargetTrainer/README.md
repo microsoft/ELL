@@ -2,12 +2,12 @@
 
 Example usage (single class / binary prediction):
 ```shell
-retargetTrainer --inputModelFilename trainedModel.ell  --targetNodeId 1109 --inputDataFilename singleClass.gsdf --outputModelFilename retargetedModel.ell
+retargetTrainer --inputModelFilename trainedModel.ell  --targetPortElements 1109.output --inputDataFilename singleClass.gsdf --outputModelFilename retargetedModel.ell
 ```
 
 Example usage (multi class prediction):
 ```shell
-retarget --inputModelFilename trainedModel.ell  --targetNodeId 1109 --inputDataFilename multiClass.gsdf --multiClass true --outputModelFilename retargetedModel.ell
+retargetTrainer --inputModelFilename trainedModel.ell  --targetPortElements 1109.output --inputDataFilename multiClass.gsdf --multiClass true --outputModelFilename retargetedModel.ell
 ```
 
 Help:
@@ -18,7 +18,7 @@ Usage: retargetTrainer [options]
         --inputModelFilename (-imf) []    Name of the pre-trained ELL model file (e.g. model1.ell) that will be used as a featurizer for a linear predictor
         --outputModelFilename (-omf) []   Name of the output file that will hold the saved retargeted model (e.g. retargetedModel.ell)
         --refineIterations (-ri) [1]      If cutting the neural network using a node id, specifies the maximum number of refinement iterations
-        --targetNodeId (-tid) []          The node id of the pre-trained model to use as input to the subsequent linear predictor
+        --targetPortElements (-tpe) []    The port elements of the pre-trained model to use as input to the subsequent linear predictor e.g. "1115.output" to use the full output from Node 1115
         --removeLastLayers (-rem) [0]     Instead of using a node id, a neural network model can be retargeted by removing the last N layers
         --inputDataFilename (-idf) []     Path to the input dataset file
         --multiClass (-mc) [false]        Indicates whether the input dataset is multi-class or binary.
@@ -41,10 +41,18 @@ The `retargetTrainer` tool trains a new ELL model which is the combination of an
 
 The resulting model can be compiled or wrapped as normal using the [wrap](../../wrap/README.md) tool.
 
-#### --targetNodeId and --refineIterations
-Use the '--targetNodeId' option to specify which node's output should be the input of the linear predictor(s). This has the effect of splicing the linear predictor(s) onto the pre-trained model after the specified node.
+#### --targetPortElements and --refineIterations
+Use the '--targetPortElements' option to specify which node's output should be the input of the linear predictor(s). This has the effect of splicing the linear predictor(s) onto the pre-trained model after the specified node.
 
-The nodeId can be retrieved using the `print` tool. Note that a model's nodes change after every refinement iteration. Using the same '--refineIterations' value in both `print` and `retarget` tools will ensure that the id matches.
+Some example Port elements strings could be:
+* nodeId.output
+  * Takes the full output from Node specified by NodeId
+* {nodeId1.output,nodeId2.output}
+  * Takes the full output from Node1 concatenated with the full output from Node2
+* nodeId.output[5:20]
+  * Takes a range of the output from Node specified by NodeId, starting with element at index 5 and up to, but not including element at index 20.
+
+The nodeId can be retrieved using the `print` tool. Note that a model's nodes change after every refinement iteration. Using the same '--refineIterations' value in both `print` and `retargetTrainer` tools will ensure that the id matches.
 
 #### --removeLastLayers
 As a convenience, if the pretrained model is a neural network, the model can be retargeted by removing the last N layers. This has the same effect as using the node id of the node which precedes the Nth layer.
@@ -54,7 +62,7 @@ By default, this tool trains a single binary class linear predictor. If the data
 
 ### Example Output (single class)
 ```shell
-retargetTrainer --inputModelFilename trainedModel.ell  --targetNodeId 1109 --inputDataFilename singleClass.gsdf --outputModelFilename retargetedModel.ell --verbose
+retargetTrainer --inputModelFilename trainedModel.ell  --targetPortElements 1109.output --inputDataFilename singleClass.gsdf --outputModelFilename retargetedModel.ell --verbose
 
 Loading model from trainedModel.ell
 Found node 1109
@@ -77,7 +85,7 @@ Training completed successfully.
 
 ### Example Output (multi class)
 ```shell
-retargetTrainer --inputModelFilename trainedModel.ell  --targetNodeId 1109 --inputDataFilename multiClass.gsdf --multiClass true --outputModelFilename retargetedModel.ell --verbose
+retargetTrainer --inputModelFilename trainedModel.ell  --targetPortElements 1109.output --inputDataFilename multiClass.gsdf --multiClass true --outputModelFilename retargetedModel.ell --verbose
 
 Loading model from trainedModel.ell
 Found node 1109

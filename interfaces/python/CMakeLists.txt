@@ -15,11 +15,13 @@ endif() # PYTHONLIBS_FOUND
 add_subdirectory(package)
 add_subdirectory(utilities)
 
+set(INTERFACE_MAIN "${CMAKE_CURRENT_LIST_DIR}/../common/ell_py.i")
+
 include (CommonInterfaces)
 
 include_directories(SYSTEM ${PYTHON_INCLUDE_PATH})
 
-generate_interface(python ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES} "" ${PYTHON_INCLUDE_PATH})
+generate_interface(python ell_py ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES} "" ${PYTHON_INCLUDE_PATH})
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS})
 
 if (TARGET _ELL_python)
@@ -30,7 +32,7 @@ if (TARGET _ELL_python)
 
   add_custom_command(TARGET _ELL_python
       POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${PYTHON_DIR}/ell.py ${PYTHON_DIR}/package/ell/ell.py
+      COMMAND ${CMAKE_COMMAND} -E copy ${PYTHON_DIR}/ell_py.py ${PYTHON_DIR}/package/ell/ell_py.py
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/tools/utilities/pythonlibs/buildtools.py ${PYTHON_DIR}/package/ell/util/buildtools.py
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/docs/tutorials/shared/tutorial_helpers.py ${PYTHON_DIR}/package/ell/util/tutorialHelpers.py
   )
@@ -55,7 +57,7 @@ if (TARGET _ELL_python)
   )
 
   if(WIN32)
-    set(binaries _ell.exp _ell.lib _ell.pyd)
+    set(binaries _ell_py.exp _ell_py.lib _ell_py.pyd)
     foreach(b ${binaries})
       add_custom_command(TARGET _ELL_python
             POST_BUILD

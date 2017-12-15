@@ -3,14 +3,14 @@ import ell
 from testing import Testing
 
 def makeStringVec(strings):
-    v = ell.StringVector()
+    v = ell.data.StringVector()
     for s in strings:
         v.push_back(s)
     return v
 
 def testModelBuilder(testing):
-    model = ell.ELL_Model()
-    mb = ell.ELL_ModelBuilder()
+    model = ell.model.Model()
+    mb = ell.model.ModelBuilder()
     inArgs = makeStringVec(["3"])
     inputNode = mb.AddNode(model, "InputNode<double>", inArgs)
     outArgs = makeStringVec([inputNode.GetId()+".output"])

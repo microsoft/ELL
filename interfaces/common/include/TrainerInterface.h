@@ -84,7 +84,7 @@ public:
     std::vector<double> Predict(const std::vector<double>& data) const;
 
     ///<summary> Create an ELL model containing the ProtoNN predictor </summary>
-    ELL_Map GetMap() const;
+    Map GetMap() const;
 private:
     class ProtoNNPredictorImpl;
     std::shared_ptr<ProtoNNPredictorImpl> _impl;

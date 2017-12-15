@@ -73,6 +73,8 @@ namespace nodes
     class LeakyReLUActivationFunction : public BroadcastUnaryFunction<ValueType>
     {
     public:
+        LeakyReLUActivationFunction() = default;
+
         /// <summary> Constructor specifying the leaky factor. </summary>
         ///
         /// <param name="leakyFactor"> The leaky factor. </param>

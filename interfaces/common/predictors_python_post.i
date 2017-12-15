@@ -163,4 +163,24 @@ class ConvolutionMethod:
 del ConvolutionMethod_columnwise
 del ConvolutionMethod_diagonal
 
+# Python friendly class for LayerType
+class LayerType:
+    gru = LayerType_gru
+    lstm = LayerType_lstm
+    recurrent = LayerType_recurrent
+
+
+del LayerType_gru
+del LayerType_lstm
+del LayerType_recurrent
+
+
+# Python friendly class for EpsilonSummand
+class EpsilonSummand:
+    sqrtVariance = EpsilonSummand_sqrtVariance
+    variance = EpsilonSummand_variance
+    
+del EpsilonSummand_sqrtVariance
+del EpsilonSummand_variance
+
 %}

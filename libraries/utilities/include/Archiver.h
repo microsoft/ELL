@@ -523,6 +523,28 @@ namespace utilities
     };
 
     //
+    // Utility classes useful to Archivers
+    //
+
+    /// <summary> A class that manages stream precision for
+    /// floating point numbers, ensuring that maximum precision is
+    /// set after the constructor, and reset to its previous values
+    /// when it goes out of scope.
+    /// </summary>
+    template <typename ValueType>
+    class EnsureMaxPrecision
+    {
+    public:
+        EnsureMaxPrecision(std::ostream& out);
+        ~EnsureMaxPrecision();
+
+    private:
+        std::ios::fmtflags _flags;
+        std::streamsize _precision;
+        std::ostream& _out;
+    };
+
+    //
     // Utility functions useful to archivers and unarchivers
     //
 
