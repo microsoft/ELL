@@ -133,7 +133,11 @@ namespace model
             if (t == "{")
             {
                 tokenizer.MatchToken(t);
-                auto ranges = ParseRangeList(tokenizer);
+                std::vector<PortRangeProxy> ranges;
+                if (tokenizer.PeekNextToken() != "}")
+                {
+                    ranges = ParseRangeList(tokenizer);
+                }
                 tokenizer.MatchToken("}");
                 return PortElementsProxy(ranges);
             }

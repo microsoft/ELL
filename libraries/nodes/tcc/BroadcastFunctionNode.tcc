@@ -461,6 +461,10 @@ namespace nodes
     void BroadcastFunctionNode<ValueType, FunctionType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         model::CompilableNode::WriteToArchive(archiver);
+
+        archiver["inputLayout"] << _inputLayout;
+        archiver["outputLayout"] << _outputLayout;
+        archiver["broadcastDimension"] << _broadcastDimension;
         archiver["paddingValue"] << _paddingValue;
     }
 
@@ -468,6 +472,10 @@ namespace nodes
     void BroadcastFunctionNode<ValueType, FunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         model::CompilableNode::ReadFromArchive(archiver);
+
+        archiver["inputLayout"] >> _inputLayout;
+        archiver["outputLayout"] >> _outputLayout;
+        archiver["broadcastDimension"] >> _broadcastDimension;
         archiver["paddingValue"] >> _paddingValue;
     }
 
@@ -515,6 +523,22 @@ namespace nodes
                                                                                                 this->GetOutputLayout(),
                                                                                                 broadcastFunction);
         transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename ValueType, typename FunctionType>
+    utilities::ArchiveVersion BroadcastUnaryFunctionNode<ValueType, FunctionType>::GetArchiveVersion() const
+    {
+        constexpr utilities::ArchiveVersion archiveVersion = { utilities::ArchiveVersionNumbers::v5_refined_nodes };
+
+        return archiveVersion;
+    }
+
+    template <typename ValueType, typename FunctionType>
+    bool BroadcastUnaryFunctionNode<ValueType, FunctionType>::CanReadArchiveVersion(const utilities::ArchiveVersion& version) const
+    {
+        constexpr utilities::ArchiveVersion archiveVersion = { utilities::ArchiveVersionNumbers::v5_refined_nodes };
+
+        return version >= archiveVersion;
     }
 
     template <typename ValueType, typename FunctionType>

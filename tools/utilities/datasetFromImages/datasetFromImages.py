@@ -131,7 +131,7 @@ def write_examples_to_dataset_file(example_list, categories, width, height, use_
         for example in example_list:
             # Try to read this as an image
             image = cv2.imread(example[1])
-            if image:
+            if image is not None:
                 # Write label
                 dataset_file.write("{}".format(example[0]))
                 print("Processing {0[0]} | {0[1]}".format(example))

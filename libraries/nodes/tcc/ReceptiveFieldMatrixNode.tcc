@@ -453,5 +453,44 @@ namespace nodes
         // Re-shape input
         EmitReceptiveFieldToColumns<ValueType>(function, pInput, inputLayout, _filterWidth, _stride, _convolutionPadding, _dataOrder, _outputWidth, _outputHeight, pOutput);
     }
+
+    template<typename ValueType>
+    void ReceptiveFieldMatrixNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
+        archiver["inputLayout"] << _inputMemoryLayout;
+
+        archiver["filterWidth"] << _filterWidth;
+        archiver["stride"] << _stride;;
+        archiver["convolutionPadding"] << _convolutionPadding;
+
+        std::vector<int> dataOrder(_dataOrder.begin(), _dataOrder.end());
+        archiver["dataOrder"] << dataOrder;
+
+        archiver["outputWidth"] << _outputWidth;
+        archiver["outputHeight"] << _outputHeight;
+    }
+
+    template<typename ValueType>
+    void ReceptiveFieldMatrixNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
+        archiver["inputLayout"] >> _inputMemoryLayout;
+
+        archiver["filterWidth"] >> _filterWidth;
+        archiver["stride"] >> _stride;;
+        archiver["convolutionPadding"] >> _convolutionPadding;
+
+        std::vector<int> dataOrder;
+        archiver["dataOrder"] >> dataOrder;
+        std::copy(dataOrder.begin(), dataOrder.end(), _dataOrder.begin());
+
+        archiver["outputWidth"] >> _outputWidth;
+        archiver["outputHeight"] >> _outputHeight;
+    }
 } // nodes
 } // ell

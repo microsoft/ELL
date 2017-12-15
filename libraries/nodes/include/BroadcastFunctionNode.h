@@ -325,7 +325,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("BroadcastUnaryFunctionNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, FunctionType>("BroadcastUnaryFunctionNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -340,6 +340,8 @@ namespace nodes
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
 
         void Copy(model::ModelTransformer& transformer) const override;
+        utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 

@@ -22,7 +22,7 @@ namespace ell
         std::string inputModelFilename;
         std::string outputModelFilename;
         std::string inputDataFilename;
-        std::string targetNodeId;
+        std::string targetPortElements;
         size_t removeLastLayers;
         double desiredPrecision;
         size_t maxEpochs;

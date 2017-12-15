@@ -36,6 +36,8 @@
 
 // nodes
 #include "BinaryOperationNode.h"
+#include "BroadcastFunctionNode.h"
+#include "CompiledActivationFunctions.h"
 #include "ConstantNode.h"
 #include "LinearPredictorNode.h"
 #include "MatrixVectorProductNode.h"
@@ -90,27 +92,35 @@ bool RedirectNeuralNetworkOutputByLayer(model::DynamicMap& map, size_t numLayers
     return found;
 }
 
-bool RedirectModelOutputByNode(model::DynamicMap& map, const std::string& targetNodeId, size_t refineIterations)
+bool RedirectModelOutputByPortElements(model::DynamicMap& map, const std::string& targetPortElements, size_t refineIterations)
 {
-    bool found = false;
-
     // Refine the model
     map.Refine(refineIterations);
-    auto originalNode = map.GetModel().GetNode(model::Node::NodeId(targetNodeId));
-    if (originalNode)
+
+    try
     {
-        // Find the node
+        // Create a port elements from the target port output
+        auto elementsProxy = model::ParsePortElementsProxy(targetPortElements);
+        auto originalPortElement = model::ProxyToPortElements(map.GetModel(), elementsProxy);
+
+        // Create a copy of the refined model, setting the 
+        // input to be the original input node and the output to be from the target
+        // port elements.
         model::TransformContext context;
         model::ModelTransformer transformer;
         auto model = transformer.CopyModel(map.GetModel(), context);
         auto input = transformer.GetCorrespondingInputNode(map.GetInput());
-        auto output = transformer.GetCorrespondingOutputs(*originalNode->GetOutputPort(0));
+        auto output = transformer.GetCorrespondingOutputs(originalPortElement);
 
-        map = model::DynamicMap(model, {{ "input", input }}, {{ "output", output }});
-        found = true;
+        map = model::DynamicMap(model, { { "input", input } }, { { "output", output } });
+    }
+    catch (const utilities::Exception& exception)
+    {
+        std::cerr << "Couldn't redirect model output from " << targetPortElements << ", error :" << exception.GetMessage() << std::endl;
+        return false;
     }
 
-    return found;
+    return true;
 }
 
 void PrintSDCAPredictorInfoHeader(std::ostream& os)
@@ -285,11 +295,19 @@ model::DynamicMap GetMultiClassMapFromBinaryPredictors(std::vector<PredictorType
 
     model::Model& model = map.GetModel();
     auto mapOutput = map.GetOutputElements<ElementType>(0);
-    auto matrixMultiplyNode = model.AddNode<nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::rowMajor>>(mapOutput, weights);
+    auto concatenationNode = model.AddNode<model::OutputNode<ElementType>>(mapOutput);
+    auto matrixMultiplyNode = model.AddNode<nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::rowMajor>>(concatenationNode->output, weights);
     auto biasNode = model.AddNode<nodes::ConstantNode<ElementType>>(bias.ToArray());
     auto addNode = model.AddNode<nodes::BinaryOperationNode<ElementType>>(matrixMultiplyNode->output, biasNode->output, emitters::BinaryOperationType::add);
 
-    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(addNode->output);
+    // Apply a sigmoid function so that output can be treated as a probability or
+    // confidence score.
+    auto sigmoidNode = model.AddNode<nodes::BroadcastUnaryFunctionNode<ElementType,nodes::SigmoidActivationFunction<ElementType>>>(
+        addNode->output,
+        model::PortMemoryLayout({ static_cast<int>(addNode->output.Size()), 1, 1 }),
+        model::PortMemoryLayout({ static_cast<int>(addNode->output.Size()), 1, 1 }));
+
+    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sigmoidNode->output);
 
     auto& output = outputNode->output;
     auto outputMap = model::DynamicMap(model, { { "input", map.GetInput() } }, { { "output", output } });
@@ -379,14 +397,14 @@ int main(int argc, char* argv[])
                 if (redirected && retargetArguments.verbose) std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
             }
         }
-        else if (retargetArguments.targetNodeId.length() > 0)
+        else if (retargetArguments.targetPortElements.length() > 0)
         {
-            redirected = RedirectModelOutputByNode(map, retargetArguments.targetNodeId, retargetArguments.refineIterations);
-            if (redirected && retargetArguments.verbose) std::cout << "Redirected output for Node " << retargetArguments.targetNodeId << " from model" << std::endl;
+            redirected = RedirectModelOutputByPortElements(map, retargetArguments.targetPortElements, retargetArguments.refineIterations);
+            if (redirected && retargetArguments.verbose) std::cout << "Redirected output for port elements " << retargetArguments.targetPortElements << " from model" << std::endl;
         }
         else
         {
-            std::cerr << "Error: Expected valid arguments for either --removeLastLayers or --targetNodeId" << std::endl;
+            std::cerr << "Error: Expected valid arguments for either --removeLastLayers or --targetPortElements" << std::endl;
             return 1;
         }
 
@@ -406,7 +424,8 @@ int main(int argc, char* argv[])
             auto multiclassDataset = common::GetMultiClassDataset(stream);
             // Obtain a new training dataset for the set of Linear Predictors by running the
             // multiclassDataset through the modified model
-            auto dataset = common::TransformDataset(multiclassDataset, map);
+            if (retargetArguments.verbose) std::cout << std::endl << "Transforming dataset with compiled model..." << std::endl;
+            auto dataset = common::TransformDatasetWithCompiledMap(multiclassDataset, map);
 
             // Create binary classification datasets for each one versus rest (OVR) case
             auto datasets = CreateDatasetsForOneVersusRest(dataset);
@@ -431,7 +450,8 @@ int main(int argc, char* argv[])
             auto binaryDataset = common::GetDataset(stream);
             // Obtain a new training dataset for the Linear Predictor by running the
             // binaryDataset through the modified model
-            auto dataset = common::TransformDataset(binaryDataset, map);
+            if (retargetArguments.verbose) std::cout << std::endl << "Transforming dataset with compiled model..." << std::endl;
+            auto dataset = common::TransformDatasetWithCompiledMap(binaryDataset, map);
 
             // Train a linear predictor whose input comes from the previous model
             auto predictor = RetargetModelUsingLinearPredictor(retargetArguments, dataset);

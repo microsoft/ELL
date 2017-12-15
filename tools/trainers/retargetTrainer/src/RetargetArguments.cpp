@@ -32,10 +32,10 @@ namespace ell
             "If cutting the neural network using a node id, specifies the maximum number of refinement iterations",
             1);
 
-        parser.AddOption(targetNodeId,
-            "targetNodeId",
-            "tid",
-            "The node id of the pre-trained model to use as input to the subsequent linear predictor",
+        parser.AddOption(targetPortElements,
+            "targetPortElements",
+            "tpe",
+            "The port elements of the pre-trained model to use as input to the subsequent linear predictor e.g. \"1115.output\" to use the full output from Node 1115",
             "");
 
         parser.AddOption(removeLastLayers,

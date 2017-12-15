@@ -1199,6 +1199,24 @@ void VerifyLayerMap(const ell::model::DynamicMap& map, const ell::model::Node* c
     VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
 }
 
+template <typename ElementType>
+void VerifyArchiveAndUnarchivingMap(const ell::model::DynamicMap& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
+{
+    // Test archiving / unarchiving produces same result as map before
+    // archiving.
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+
+    archiver << map;
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+    model::DynamicMap unarchivedMap;
+    unarchiver >> unarchivedMap;
+
+    VerifyLayerMap<ElementType>(unarchivedMap, computeNode, inputWithPadding, output);
+}
+
 void TestNeuralNetworkPredictorNode1()
 {
     // Create a simple neural net model with the following layers:
@@ -1240,7 +1258,7 @@ void TestNeuralNetworkPredictorNode1()
     std::vector<std::vector<double>> signal = { input };
     VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_1");
 
-    // Test archiving
+    // Test that archiving / unarchiving produces same results
     utilities::SerializationContext context;
     common::RegisterNodeTypes(context);
     std::stringstream strstream;
@@ -1250,6 +1268,8 @@ void TestNeuralNetworkPredictorNode1()
     utilities::JsonUnarchiver unarchiver(strstream, context);
     model::DynamicMap unarchivedMap;
     unarchiver >> unarchivedMap;
+
+    VerifyCompiledOutput(unarchivedMap, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_1");
 }
 
 void TestNeuralNetworkPredictorNode2()
@@ -1857,7 +1877,7 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     input(1, 0, 1) = 3.0;
     input(1, 1, 1) = -4.0;
     Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
-    LayerParameters layerParameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    LayerParameters layerParameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
 
     ActivationLayer<ElementType, ActivationFunction> layer(layerParameters);
     layer.Compute();
@@ -1869,6 +1889,9 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     auto computeNode = model.AddNode<nodes::ActivationLayerNode<ElementType, ActivationFunction>>(inputNode->output, layer);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
@@ -1902,7 +1925,7 @@ void TestParametricReLUActivationLayerNode(size_t inputPaddingSize, size_t outpu
     input(1, 0, 1) = 3.0;
     input(1, 1, 1) = -4.0;
     Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
-    LayerParameters layerParameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    LayerParameters layerParameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
 
     TensorType alphaWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
     TensorReferenceType alpha = alphaWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
@@ -1922,6 +1945,9 @@ void TestParametricReLUActivationLayerNode(size_t inputPaddingSize, size_t outpu
     auto computeNode = model.AddNode<nodes::ParametricReLUActivationLayerNode<ElementType>>(inputNode->output, layer);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
@@ -1945,7 +1971,7 @@ void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddi
     auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
     auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
     Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
-    LayerParameters layerParameters{ input, inputPadding, outputShape, outputPadding };
+    LayerParameters layerParameters{ inputWithPadding, inputPadding, outputShape, outputPadding };
     VectorType mean({ 5, 10 });
     VectorType variance({ 4.0, 16.0 });
 
@@ -1960,6 +1986,9 @@ void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddi
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
@@ -1998,6 +2027,9 @@ void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, size_t numChannels, size_t numFilters, size_t inputPaddingSize, size_t outputPaddingSize, ell::predictors::neural::PaddingScheme paddingScheme, bool scaleByFilterMeans)
@@ -2048,6 +2080,9 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
 
     auto signal = std::vector<std::vector<ElementType>> {inputWithPadding.ToArray()};
     VerifyCompiledOutput<ElementType>(map, compiledMap, {signal}, computeNode->GetRuntimeTypeName());
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
@@ -2118,6 +2153,9 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
@@ -2184,6 +2222,9 @@ void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPa
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
@@ -2227,6 +2268,9 @@ void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSi
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 template <typename ElementType, template <typename> class PoolingFunction>
@@ -2259,6 +2303,21 @@ void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+
+    archiver << map;
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+    model::DynamicMap unarchivedMap;
+    unarchiver >> unarchivedMap;
+
+    std::vector<std::vector<ElementType>> signal = { inputWithPadding.ToArray() };
+    std::vector<std::vector<ElementType>> expectedOutput = { output.ToArray() };
+    VerifyMapOutput(unarchivedMap, signal, expectedOutput, "Unarchived model with MaxPoolingLayerNode");
 }
 
 void TestMaxPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPaddingSize, size_t outputPaddingSize)
@@ -2291,7 +2350,7 @@ void TestScalingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     input(1, 0, 1) = 3;
     input(1, 1, 1) = 4;
     Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
-    LayerParameters layerParameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    LayerParameters layerParameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
     VectorType scale({ 5, 10 });
 
     LayerType layer(layerParameters, scale);
@@ -2302,11 +2361,12 @@ void TestScalingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::ScalingLayerNode<ElementType>>(inputNode->output, layer);
-
-    inputNode->SetInput(input.ToArray());
-    auto modelOutput = model.ComputeOutput(computeNode->output);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
@@ -2326,7 +2386,7 @@ void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     input(1, 0, 1) = 3.0;
     input(1, 1, 1) = -4.0;
     Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
-    LayerParameters layerParameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    LayerParameters layerParameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
     LayerType layer(layerParameters);
     layer.Compute();
     auto output = layer.GetOutput();
@@ -2336,7 +2396,11 @@ void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::SoftmaxLayerNode<ElementType>>(inputNode->output, layer);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)

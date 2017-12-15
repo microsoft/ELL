@@ -137,6 +137,8 @@ namespace nodes
         model::PortMemoryLayout CalculateMemoryLayout(size_t padding, typename predictors::neural::Layer<ValueType>::Shape dataBufferSize);
         void Copy(model::ModelTransformer& transformer) const override;
         void Compute() const override;
+        utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
         
@@ -150,6 +152,7 @@ namespace nodes
     private:
         model::PortMemoryLayout _inputLayout;
         model::PortMemoryLayout _outputLayout;
+        math::TensorShape _inputShape;
     };
 
     // helper:

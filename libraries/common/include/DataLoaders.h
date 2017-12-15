@@ -75,6 +75,18 @@ namespace common
     /// <returns> The transformed dataset. </returns>
     template <typename ExampleType, typename MapType>
     auto TransformDataset(data::Dataset<ExampleType>& input, const MapType& map);
+
+    /// <summary>
+    /// The map is first compiled, then a new dataset is returned 
+    /// by running an existing dataset through the compiled map.
+    /// </summary>
+    ///
+    /// <typeparam name="ExampleType"> Example type. </typeparam>
+    /// <typeparam name="MapType"> Map type. </typeparam>
+    ///
+    /// <returns> The transformed dataset. </returns>
+    template <typename ExampleType, typename MapType>
+    auto TransformDatasetWithCompiledMap(data::Dataset<ExampleType>& input, const MapType& map);
 }
 }
 

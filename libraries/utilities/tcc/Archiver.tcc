@@ -306,6 +306,24 @@ namespace utilities
     }
 
     //
+    // Utility classes
+    //
+
+    template <typename ValueType>
+    EnsureMaxPrecision<ValueType>::EnsureMaxPrecision(std::ostream& out) :
+        _flags(out.flags()), _precision(out.precision()), _out(out)
+    {
+        _out.precision(std::numeric_limits<ValueType>::digits10 + 1);
+    }
+
+    template <typename ValueType>
+    EnsureMaxPrecision<ValueType>::~EnsureMaxPrecision()
+    {
+        _out.flags(_flags);
+        _out.precision(_precision);
+    }
+
+    //
     // Utility functions
     //
     namespace ArchiverImpl
