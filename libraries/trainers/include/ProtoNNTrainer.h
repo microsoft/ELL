@@ -45,6 +45,8 @@ namespace trainers
 
     class ProtoNNModelParameter;
 
+    using ProtoNNModelMap = std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>;
+
     /// <summary>
     /// Implements the ProtoNN trainer
     /// </summary>
@@ -74,25 +76,25 @@ namespace trainers
         void Initialize();
 
         // The Similarity Kernel.
-        math::ColumnMatrix<double> SimilarityKernel(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, const size_t begin, const size_t end, bool recomputeWX = false) const;
+        math::ColumnMatrixReference<double> SimilarityKernel(ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, const size_t begin, const size_t end, bool recomputeWX = false);
 
         // The Similarity Kernel.
-        math::ColumnMatrix<double> SimilarityKernel(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, bool recomputeWX = false) const;
+        math::ColumnMatrixReference<double> SimilarityKernel(ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, bool recomputeWX = false);
 
         // The Training Loss.
-        double Loss(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference Y, ConstColumnMatrixReference D, const size_t begin, const size_t end) const;
+        double Loss(ConstColumnMatrixReference Y, ConstColumnMatrixReference D, const size_t begin, const size_t end);
 
         // The Training Loss.
-        double Loss(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference Y, ConstColumnMatrixReference D) const;
+        double Loss(ConstColumnMatrixReference Y, ConstColumnMatrixReference D);
 
         // The Objective function value.
-        double ComputeObjective(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, double gamma, bool recomputeWX = false);
+        double ComputeObjective(ConstColumnMatrixReference X, ConstColumnMatrixReference Y, math::ColumnMatrixReference<double> WX, double gamma, bool recomputeWX = false);
 
         // Performs Accelerated Proximal Gradient w.r.t. input model parameter.
-        void AcceleratedProximalGradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ProtoNNParameterIndex parameterIndex, std::function<math::ColumnMatrix<double>(const ConstColumnMatrixReference, const size_t, const size_t)> gradf, std::function<void(math::MatrixReference<double, math::MatrixLayout::columnMajor>)> prox, math::MatrixReference<double, math::MatrixLayout::columnMajor> param, const size_t& epochs, const size_t& n, const size_t& batchSize, const double& eta, const int& eta_update);
+        void AcceleratedProximalGradient(ProtoNNParameterIndex parameterIndex, std::function<math::ColumnMatrix<double>(const ConstColumnMatrixReference, const size_t, const size_t)> gradf, std::function<void(math::MatrixReference<double, math::MatrixLayout::columnMajor>)> prox, math::MatrixReference<double, math::MatrixLayout::columnMajor> param, const size_t& epochs, const size_t& n, const size_t& batchSize, const double& eta, const int& eta_update);
 
         // Optimization using SGD with alternating minimization.
-        void SGDWithAlternatingMinimization(ConstColumnMatrixReference X, ConstColumnMatrixReference Y, std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelParameters, double gamma, size_t nIters);
+        void SGDWithAlternatingMinimization(ConstColumnMatrixReference X, ConstColumnMatrixReference Y, double gamma, size_t nIters);
 
         // Order in which the parameters are optimized
         std::vector<ProtoNNParameterIndex> m_OptimizationOrder{ ProtoNNParameterIndex::W, ProtoNNParameterIndex::Z, ProtoNNParameterIndex::B };
@@ -110,7 +112,7 @@ namespace trainers
         predictors::ProtoNNPredictor _protoNNPredictor;
 
         // Map holding the model parameters
-        std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> _modelMap;
+        ProtoNNModelMap _modelMap;
 
         // Maps holding the Trainer knobs
         std::map<ProtoNNParameterIndex, double> _stepSize;
@@ -149,10 +151,10 @@ namespace trainers
         const math::ColumnMatrix<double>& GetData() const { return _data; }
 
         /// Specifies the interface for gradient computation.
-        virtual math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType) = 0;
+        virtual math::ColumnMatrix<double> gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType) = 0;
 
         /// Specifies the interface for gradient computation.
-        virtual math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType) = 0;
+        virtual math::ColumnMatrix<double> gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType) = 0;
 
     private:
         // The underlying Parameter matrix
@@ -166,10 +168,10 @@ namespace trainers
         Param_W(size_t dimension1, size_t dimension2);
 
         /// <summary></summary>
-        math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType) override;
+        math::ColumnMatrix<double> gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType) override;
 
         /// <summary></summary>
-        math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType) override;
+        math::ColumnMatrix<double> gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType) override;
     };
 
     class Param_B : public ProtoNNModelParameter
@@ -179,10 +181,10 @@ namespace trainers
         Param_B(size_t dimension1, size_t dimension2);
 
         /// <summary></summary>
-        math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType) override;
+        math::ColumnMatrix<double> gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType) override;
 
         /// <summary></summary>
-        math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType) override;
+        math::ColumnMatrix<double> gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType) override;
     };
 
     class Param_Z : public ProtoNNModelParameter
@@ -192,10 +194,10 @@ namespace trainers
         Param_Z(size_t dimension1, size_t dimension2);
 
         /// <summary></summary>
-        math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType) override;
+        math::ColumnMatrix<double> gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType) override;
 
         /// <summary></summary>
-        math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType) override;
+        math::ColumnMatrix<double> gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType) override;
     };
 
     /// <summary> Makes a ProtoNN trainer. </summary>

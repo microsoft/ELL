@@ -17,12 +17,12 @@ namespace common
         parser.AddOption(projectedDimension,
             "projectedDimension",
             "pd",
-            "The projected dimension", 5);
+            "The projected dimension. Decreasing pd will lead to smaller model size but decreasing it beyond a point can lead to loss in accuracy", 5);
 
         parser.AddOption(numPrototypesPerLabel,
             "numPrototypesPerLabel",
             "mp",
-            "The number of prototypes", 10);
+            "The number of prototypes. Increasing mp should lead to bigger model size and higher accuracy, up to a point. Typically, we want to have 10 prototypes per class", 10);
 
         parser.AddOption(numLabels,
             "numLabels",
@@ -32,7 +32,7 @@ namespace common
         parser.AddOption(sparsityW,
             "sparsityW",
             "sw",
-            "The sparsity parameter for W", 1.0);
+            "The sparsity parameter for W, i.e. fraction of non-zeros in the the projection matrix W. Increasing sw leads to increase in model size and accuracy, provided there is no overfitting. So for low-d problems, we can leave sw to be 1 and for high-d problems it should be much smaller", 1.0);
 
         parser.AddOption(sparsityB,
             "sparsityB",

@@ -69,7 +69,7 @@ void ProtoNNTrainer::Update()
         _firstIteration = false;
     }
 
-    SGDWithAlternatingMinimization(_X, _Y, _modelMap, _parameters.gamma, _iteration++);
+    SGDWithAlternatingMinimization(_X, _Y, _parameters.gamma, _iteration++);
 
     _protoNNPredictor.GetProjectionMatrix() = _modelMap[ProtoNNParameterIndex::W]->GetData();
     _protoNNPredictor.GetPrototypes() = _modelMap[ProtoNNParameterIndex::B]->GetData();
@@ -116,7 +116,7 @@ void ProtoNNTrainer::Initialize()
         auto gammaInit = 0.01;
         math::ColumnMatrix<double> WXupdate(W.NumRows(), n);
         math::Multiply<double>(1, W, _X, 0, WXupdate);
-        _parameters.gamma = protonnInit.InitializeGamma(SimilarityKernel(_modelMap, _X, WXupdate, gammaInit), gammaInit);
+        _parameters.gamma = protonnInit.InitializeGamma(SimilarityKernel(_X, WXupdate, gammaInit), gammaInit);
     }
 
     _stepSize[ProtoNNParameterIndex::W] = DefaultStepSize;
@@ -139,12 +139,11 @@ void ProtoNNTrainer::Initialize()
 /// S_{ij} = exp{-gamma^2 * || B_j - W*x_i ||^2}
 /// where S_{ij} is similarity of ith input instance with the jth prototype B_j and W is the projection matrix
 /// Computed as exp(-gamma^2(||B||^2 + ||WX||^2 - 2 *  WX' * B))
-math::ColumnMatrix<double> ProtoNNTrainer::SimilarityKernel(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, const size_t begin, const size_t end, bool recomputeWX) const
+math::ColumnMatrixReference<double> ProtoNNTrainer::SimilarityKernel(ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, const size_t begin, const size_t end, bool recomputeWX)
 {
     assert(begin < end);
-
-    auto B = (modelMap[ProtoNNParameterIndex::B])->GetData();
-    auto W = (modelMap[ProtoNNParameterIndex::W])->GetData();
+    auto B = (_modelMap[ProtoNNParameterIndex::B])->GetData();
+    auto W = (_modelMap[ProtoNNParameterIndex::W])->GetData();
 
     auto wx = WX.GetSubMatrix(0, begin, WX.NumRows(), end - begin);
 
@@ -203,16 +202,16 @@ math::ColumnMatrix<double> ProtoNNTrainer::SimilarityKernel(std::map<ProtoNNPara
     return similarityMatrix;
 }
 
-math::ColumnMatrix<double> ProtoNNTrainer::SimilarityKernel(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, bool recomputeWX) const
+math::ColumnMatrixReference<double> ProtoNNTrainer::SimilarityKernel(ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, bool recomputeWX)
 {
-    return SimilarityKernel(modelMap, X, WX, gamma, 0, X.NumColumns(), recomputeWX);
+    return SimilarityKernel(X, WX, gamma, 0, X.NumColumns(), recomputeWX);
 }
 
-double ProtoNNTrainer::Loss(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference Y, ConstColumnMatrixReference D, const size_t begin, const size_t end) const
+double ProtoNNTrainer::Loss(ConstColumnMatrixReference Y, ConstColumnMatrixReference D, const size_t begin, const size_t end)
 {
     assert(end - begin == D.NumRows());
 
-    auto Z = (modelMap[ProtoNNParameterIndex::Z])->GetData();
+    auto Z = (_modelMap[ProtoNNParameterIndex::Z])->GetData();
 
     // residual = y - ZD'
     math::ColumnMatrix<double> ZD(Z.NumRows(), D.NumRows());
@@ -250,12 +249,12 @@ double ProtoNNTrainer::Loss(std::map<ProtoNNParameterIndex, std::shared_ptr<Prot
     return loss;
 }
 
-double ProtoNNTrainer::Loss(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference Y, ConstColumnMatrixReference D) const
+double ProtoNNTrainer::Loss(ConstColumnMatrixReference Y, ConstColumnMatrixReference D)
 {
-    return Loss(modelMap, Y, D, 0, Y.NumColumns());
+    return Loss(Y, D, 0, Y.NumColumns());
 }
 
-double ProtoNNTrainer::ComputeObjective(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, double gamma, bool recomputeWX)
+double ProtoNNTrainer::ComputeObjective(ConstColumnMatrixReference X, ConstColumnMatrixReference Y, math::ColumnMatrixReference<double> WX, double gamma, bool recomputeWX)
 {
     double objective = 0.0;
 
@@ -277,10 +276,10 @@ double ProtoNNTrainer::ComputeObjective(std::map<ProtoNNParameterIndex, std::sha
         assert(idx1 < idx2);
         assert(idx2 - idx1 <= maxBatchSize);
 
-        auto D = SimilarityKernel(modelMap, X, WX, gamma, idx1, idx2, recomputeWX);
+        auto D = SimilarityKernel(X, WX, gamma, idx1, idx2, recomputeWX);
         auto y = Y.GetSubMatrix(0, idx1, Y.NumRows(), idx2 - idx1);
 
-        objective += Loss(modelMap, y, D);
+        objective += Loss(y, D);
     }
 
     return objective;
@@ -293,7 +292,7 @@ double ProtoNNTrainer::ComputeObjective(std::map<ProtoNNParameterIndex, std::sha
 //paramAvg=running average of all but first burn_period paramS.
 //stepSize is decaying at approximately initialStepSize/(1+t) rate (if decayRate=-1) or initialStepSize/sqrt(1+t) (if decayRate=0)
 void ProtoNNTrainer::AcceleratedProximalGradient(
-    std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ProtoNNParameterIndex parameterIndex,
+    ProtoNNParameterIndex parameterIndex,
     std::function<math::ColumnMatrix<double>(const ConstColumnMatrixReference, const size_t, const size_t)> gradf,
     std::function<void(math::MatrixReference<double, math::MatrixLayout::columnMajor>)> prox,
     math::MatrixReference<double, math::MatrixLayout::columnMajor> param,
@@ -345,7 +344,7 @@ void ProtoNNTrainer::AcceleratedProximalGradient(
         lambda_new = 0.5 + 0.5 * pow(1 + 4 * lambda * lambda, 0.5);
         alpha = safe_div((1 - lambda), lambda_new); // alpha: weight for paramS_new term
 
-        modelMap[parameterIndex]->GetData() = paramS; //paramS
+        _modelMap[parameterIndex]->GetData() = paramS; //paramS
 
         gradient_paramS = gradf(paramS, idx1, idx2);
 
@@ -378,11 +377,11 @@ void ProtoNNTrainer::AcceleratedProximalGradient(
     param.CopyFrom(paramAvg);
     paramS.CopyFrom(paramAvg);
 
-    modelMap[parameterIndex]->GetData() = paramS;
+    _modelMap[parameterIndex]->GetData() = paramS;
 }
 
 //minimize f(W, B, Z) = \sum_{i = 1} ^ numTrainData Loss(Y[i], Z* D[i]) where D[i][j] = exp(-gamma^2 || B[j]-WX[i] || ^ 2) where j = 1:numPrototypes
-void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X, ConstColumnMatrixReference Y, std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, double gamma, size_t iter)
+void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X, ConstColumnMatrixReference Y, double gamma, size_t iter)
 {
     // Start Initializations
     size_t n = X.NumColumns(); //numTrainPoints
@@ -400,11 +399,11 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
     double fOld, fCur, paramStepSize;
 
     //Projection onto low-d space
-    auto projectionMatrix = modelMap[m_projectionIndex]->GetData();
+    auto projectionMatrix = _modelMap[m_projectionIndex]->GetData();
     math::ColumnMatrix<double> WX(projectionMatrix.NumRows(), n);
     math::Multiply<double>(1, projectionMatrix, X, 0, WX);
 
-    fCur = ComputeObjective(modelMap, X, Y, WX, gamma, false);
+    fCur = ComputeObjective(X, Y, WX, gamma, false);
 
     // End Initializations
 
@@ -413,7 +412,7 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
     {
         math::RowVector<double> eta(10);
 
-        auto parameter = modelMap[parameterIndex];
+        auto parameter = _modelMap[parameterIndex];
         auto parameterMatrix = parameter->GetData();
         math::ColumnMatrix<double> currentGradient(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
 
@@ -429,7 +428,7 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
             if (idx2 <= idx1) idx2 = n;
 
             // gradient_paramS at current parameter
-            currentGradient = modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, idx1, idx2, _recomputeWX[parameterIndex]), gamma, idx1, idx2, _parameters.lossFunction);
+            currentGradient = _modelMap[parameterIndex]->gradient(_modelMap, X, Y, WX, SimilarityKernel(X, WX, gamma, idx1, idx2, _recomputeWX[parameterIndex]), gamma, idx1, idx2, _parameters.lossFunction);
 
             math::ColumnMatrix<double> thresholdedGradient(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
 
@@ -444,19 +443,19 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
             math::Add(1.0, parameterMatrix, -1.0 * coeff, thresholdedGradient, perturbedParameter);
 
             auto WX_old = WX;
-            modelMap[parameterIndex]->GetData() = perturbedParameter;
+            _modelMap[parameterIndex]->GetData() = perturbedParameter;
 
             // Compute gradient_paramS with updated parameter
-            math::Multiply<double>(1, modelMap[m_projectionIndex]->GetData(), X, 0, WX);
+            math::Multiply<double>(1, _modelMap[m_projectionIndex]->GetData(), X, 0, WX);
 
             math::ColumnMatrix<double> gradientEstimate(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
-            auto grad = modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, idx1, idx2, _recomputeWX[parameterIndex]), gamma, idx1, idx2, _parameters.lossFunction);
+            auto grad = _modelMap[parameterIndex]->gradient(_modelMap, X, Y, WX, SimilarityKernel(X, WX, gamma, idx1, idx2, _recomputeWX[parameterIndex]), gamma, idx1, idx2, _parameters.lossFunction);
             math::Add(1.0, currentGradient, -1.0, grad, gradientEstimate);
 
             currentGradient = gradientEstimate;
 
             // revert the old parameter value and projected input
-            modelMap[parameterIndex]->GetData() = parameterMatrix;
+            _modelMap[parameterIndex]->GetData() = parameterMatrix;
             WX = WX_old;
 
             if (ProtoNNTrainerUtils::MatrixNorm(currentGradient) <= 1e-20L)
@@ -479,8 +478,8 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
         paramStepSize = _stepSize[parameterIndex] * etaVector[4];
 
         // Call the accelerated proximal gradient_paramS method for optimizing this parameter
-        AcceleratedProximalGradient(modelMap, parameterIndex, [&](ConstColumnMatrixReference /*W*/, const size_t begin, const size_t end) -> math::ColumnMatrix<double> {
-            return modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, begin, end, _recomputeWX[parameterIndex]), gamma, begin, end, _parameters.lossFunction);
+        AcceleratedProximalGradient(parameterIndex, [&](ConstColumnMatrixReference /*W*/, const size_t begin, const size_t end) -> math::ColumnMatrix<double> {
+            return _modelMap[parameterIndex]->gradient(_modelMap, X, Y, WX, SimilarityKernel(X, WX, gamma, begin, end, _recomputeWX[parameterIndex]), gamma, begin, end, _parameters.lossFunction);
         },
             [&](auto arg) { ProtoNNTrainerUtils::HardThresholding(arg, _sparsity[parameterIndex]); },
             parameterMatrix,
@@ -490,9 +489,9 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
             paramStepSize,
             eta_update);
 
-        math::Multiply<double>(1, modelMap[m_projectionIndex]->GetData(), X, 0, WX);
+        math::Multiply<double>(1, _modelMap[m_projectionIndex]->GetData(), X, 0, WX);
         fOld = fCur;
-        fCur = ComputeObjective(modelMap, X, Y, WX, gamma, _recomputeWX[parameterIndex]);
+        fCur = ComputeObjective(X, Y, WX, gamma, _recomputeWX[parameterIndex]);
 
         // Armijo step
         // If function value has increased, decrease the step size else increase
@@ -518,7 +517,7 @@ Param_W::Param_W(size_t dim1, size_t dim2)
 {
 }
 
-math::ColumnMatrix<double> Param_W::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType)
+math::ColumnMatrix<double> Param_W::gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType)
 {
     UNUSED(WX);
     assert(end - begin == D.NumRows());
@@ -586,7 +585,7 @@ math::ColumnMatrix<double> Param_W::gradient(std::map<ProtoNNParameterIndex, std
     return gradient;
 }
 
-math::ColumnMatrix<double> Param_W::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType)
+math::ColumnMatrix<double> Param_W::gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType)
 {
     return gradient(modelMap, X, Y, WX, D, gamma, 0, Y.NumColumns(), lossType);
 }
@@ -596,7 +595,7 @@ Param_Z::Param_Z(size_t dim1, size_t dim2)
 {
 }
 
-math::ColumnMatrix<double> Param_Z::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference Similarity, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType)
+math::ColumnMatrix<double> Param_Z::gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference Similarity, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType)
 {
     UNUSED(X, WX, gamma);
 
@@ -635,7 +634,7 @@ math::ColumnMatrix<double> Param_Z::gradient(std::map<ProtoNNParameterIndex, std
     return gradient;
 }
 
-math::ColumnMatrix<double> Param_Z::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType)
+math::ColumnMatrix<double> Param_Z::gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType)
 {
     return gradient(modelMap, X, Y, WX, D, gamma, 0, Y.NumColumns(), lossType);
 }
@@ -645,7 +644,7 @@ Param_B::Param_B(size_t dim1, size_t dim2)
 {
 }
 
-math::ColumnMatrix<double> Param_B::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference Similarity, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType)
+math::ColumnMatrix<double> Param_B::gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference Similarity, double gamma, size_t begin, size_t end, ProtoNNLossFunction lossType)
 {
     UNUSED(X, WX);
     assert(end - begin == Similarity.NumRows());
@@ -712,7 +711,7 @@ math::ColumnMatrix<double> Param_B::gradient(std::map<ProtoNNParameterIndex, std
     return gradient;
 }
 
-math::ColumnMatrix<double> Param_B::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>>& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType)
+math::ColumnMatrix<double> Param_B::gradient(ProtoNNModelMap& modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossFunction lossType)
 {
     return gradient(modelMap, X, Y, WX, D, gamma, 0, Y.NumColumns(), lossType);
 }
