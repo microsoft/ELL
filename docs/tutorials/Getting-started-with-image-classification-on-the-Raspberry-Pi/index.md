@@ -340,6 +340,12 @@ make
 cd ../..
 ```
 
+If you are running on a Raspberry Pi Zero with your custom installed OpenBLAS under /opt/OpenBLAS, change the above cmake commands to the following to make sure your model is running against correct OpenBLAS package:
+
+```shell
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBLA_VENDOR=OpenBlas -DCMAKE_PREFIX_PATH=/opt/OpenBLAS"
+```
+
 We just created a Python module named `model`, which includes functions that report the model's input and output dimensions and enables us to pass images to the model for classification.
 
 ## Step 8: Classify live video on the Raspberry Pi

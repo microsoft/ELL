@@ -130,7 +130,7 @@ else()
 endif()
 
 if(NOT WIN32)
-    ## Note: libopenblas installs on ubuntu in /usr/lib and /usr/include
+    ## Note: libopenblas installs on ubuntu in /usr/lib and /usr/include or typically /opt if it's customly installed
     ## Note: libopenblas installs on openSUSE in /usr/lib64 and /usr/include/openblas
     set(BLAS_INCLUDE_SEARCH_PATHS
         /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/
@@ -138,10 +138,11 @@ if(NOT WIN32)
         /usr/include
         /usr/local/include
         /usr/include/openblas
+        /opt/
     )
 
     set(BLAS_LIB_SEARCH_PATHS
-        /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
+        /opt /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
     )
 endif()
 
