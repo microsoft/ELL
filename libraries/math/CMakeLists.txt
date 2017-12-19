@@ -2,7 +2,7 @@
 # cmake file
 #
 
-set (library_name math)
+set(library_name math)
 
 include (OpenBLASSetup)
 
@@ -12,11 +12,11 @@ endif()
 
 include (OpenBLASSetup)
 
-set (src src/BlasWrapper.cpp
+set(src src/BlasWrapper.cpp
          src/Tensor.cpp
 )
 
-set (include include/BlasWrapper.h
+set(include include/BlasWrapper.h
              include/Common.h
              include/Matrix.h
              include/MatrixOperations.h
@@ -26,7 +26,7 @@ set (include include/BlasWrapper.h
              include/VectorOperations.h
 )
 
-set (tcc tcc/Matrix.tcc
+set(tcc tcc/Matrix.tcc
          tcc/MatrixOperations.tcc
          tcc/Tensor.tcc
          tcc/TensorOperations.tcc
@@ -34,7 +34,7 @@ set (tcc tcc/Matrix.tcc
          tcc/VectorOperations.tcc
 )
 
-set (doc doc/README.md)
+set(doc doc/README.md)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
@@ -56,16 +56,16 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 # math test
 #
 
-set (test_name ${library_name}_test)
+set(test_name ${library_name}_test)
 
-set (test_src test/src/main.cpp)
+set(test_src test/src/main.cpp)
 
-set (test_include test/include/math_profile.h
+set(test_include test/include/math_profile.h
                   test/include/Matrix_test.h
                   test/include/Tensor_test.h
                   test/include/Vector_test.h)
 
-set (test_tcc test/tcc/math_profile.tcc
+set(test_tcc test/tcc/math_profile.tcc
               test/tcc/Matrix_test.tcc
               test/tcc/Tensor_test.tcc
               test/tcc/Vector_test.tcc)
@@ -88,13 +88,13 @@ set_test_library_path(${test_name})
 # math profile
 #
 
-set (profile_name ${library_name}_profile)
+set(profile_name ${library_name}_profile)
 
-set (profile_src test/src/math_profile_main.cpp)
+set(profile_src test/src/math_profile_main.cpp)
 
-set (profile_include test/include/math_profile.h)
+set(profile_include test/include/math_profile.h)
 
-set (profile_tcc test/tcc/math_profile.tcc)
+set(profile_tcc test/tcc/math_profile.tcc)
 
 source_group("src" FILES ${profile_src})
 source_group("include" FILES ${profile_include})
@@ -107,5 +107,7 @@ copy_shared_libraries(${profile_name})
 
 set_property(TARGET ${profile_name} PROPERTY FOLDER "tests")
 
-add_test(NAME ${profile_name} COMMAND ${profile_name} CONFIGURATION Release)
+if (PROFILING)
+add_test(NAME ${profile_name} COMMAND ${profile_name} CONFIGURATIONS Release)
 set_test_library_path(${profile_name})
+endif()

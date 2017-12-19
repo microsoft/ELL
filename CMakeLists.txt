@@ -29,6 +29,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #      cmake -DBUILD_DOCS=OFF ..  )
 option(BUILD_DOC "Build Doxygen documentation" ON)
 option(STRICT_MODE "Build with 'warnings as errors'" OFF)
+option(PROFILING "Enable performance profiling tests" OFF)
 
 set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
 
