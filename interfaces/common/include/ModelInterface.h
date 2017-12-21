@@ -417,7 +417,6 @@ private:
 // Functions
 //
 
-Model LoadModel(std::string filename);
 Model LoadModelFromString(std::string str);
 
 } // end namespace

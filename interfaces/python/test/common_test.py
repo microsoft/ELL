@@ -27,7 +27,7 @@ def TestModelSizes():
 
 def TestLoadModel(fileName):
     print("Loading file %s" % fileName)
-    m = ell.model.LoadModel(fileName)
+    m = ell.model.Model(fileName)
 
 def TestLoadModels():
     prefix = "../../../examples/data/"

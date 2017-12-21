@@ -817,13 +817,9 @@ void CompiledMap::WriteSwigInterface(const std::string& filePath)
 
 
 //
-// Functions
+// Helper Functions
 //
 
-Model LoadModel(std::string filename)
-{
-    return Model(filename);
-}
 
 Model LoadModelFromString(std::string str)
 {

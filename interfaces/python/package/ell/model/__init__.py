@@ -7,7 +7,6 @@ ELL model classes
 """
 
 from ..ell_py import CompiledMap,\
-LoadModel,\
 LoadModelFromString,\
 Map,\
 Model,\
