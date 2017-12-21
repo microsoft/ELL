@@ -1,36 +1,36 @@
-import {ELL_CompiledMap} from 'ell'
+import {CompiledMap} from 'ell'
 
 
 // template collections
 export class DoubleVector {
-  size(): number;
-  get(index: number): number;
-  add(value: number);
+    size(): number;
+    get(index: number): number;
+    add(value: number);
 }
 
 export class DoubleVectorVector {
-  size(): number;
-  get(index: number): DoubleVector;
-  add(vec: DoubleVector);
+    size(): number;
+    get(index: number): DoubleVector;
+    add(vec: DoubleVector);
 }
 
 //
 // misc
 //
 
-export class ELL_LabeledPrototype {
-  constructor(label:number, prototype: DoubleVectorVector);
-  Label(): number;
-  Dimension(): number;
-  Prototype(): DoubleVectorVector;
+export class LabeledPrototype {
+    constructor(label: number, prototype: DoubleVectorVector);
+    Label(): number;
+    Dimension(): number;
+    Prototype(): DoubleVectorVector;
 }
 
 export class PrototypeList {
-  size(): number;
-  get(index: number): ELL_LabeledPrototype;
-  add(vec: ELL_LabeledPrototype);
+    size(): number;
+    get(index: number): LabeledPrototype;
+    add(vec: LabeledPrototype);
 }
 
-export function GenerateDTWClassifier(prototype: DoubleVectorVector):ELL_CompiledMap;
-export function GenerateMulticlassDTWClassifier(prototype: PrototypeList):ELL_CompiledMap;
+export function GenerateDTWClassifier(prototype: DoubleVectorVector): CompiledMap;
+export function GenerateMulticlassDTWClassifier(prototype: PrototypeList): CompiledMap;
 export function GetDTWClassifierCode(prototype: DoubleVectorVector): string;
