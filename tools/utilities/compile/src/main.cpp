@@ -99,6 +99,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
     }
     if (!outputDirectory.empty())
     {
+        ell::utilities::EnsureDirectoryExists(outputDirectory);
         baseFilename = utilities::JoinPaths(outputDirectory, utilities::GetFileName(baseFilename));
     }
 

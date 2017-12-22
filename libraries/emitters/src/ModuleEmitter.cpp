@@ -173,9 +173,21 @@ namespace emitters
                 parameters.targetDevice.triple = c_iosTriple;
                 parameters.targetDevice.dataLayout = c_iosDataLayout;
             }
-            else
+            else if (parameters.targetDevice.deviceName == "custom")
             {
-                throw EmitterException(EmitterError::targetNotSupported, std::string("Unkonwn target device name: " + parameters.targetDevice.deviceName));
+                // perhaps it is a custom target where triple and cpu were set manually.
+                if (parameters.targetDevice.triple == "")
+                {
+                    throw EmitterException(EmitterError::badFunctionArguments, "Missing 'triple' information");
+                }
+                if (parameters.targetDevice.cpu == "")
+                {
+                    throw EmitterException(EmitterError::badFunctionArguments, "Missing 'cpu' information");
+                }
+            }
+            else 
+            {
+                throw EmitterException(EmitterError::targetNotSupported, std::string("Unknown target device name: " + parameters.targetDevice.deviceName));
             }
         }
         else
@@ -219,7 +231,7 @@ namespace emitters
         {
             return ModuleOutputFormat::assembly;
         }
-        else if (extension == "s" || extension == "asm")
+        else if (extension == "o" || extension == "obj")
         {
             return ModuleOutputFormat::objectCode;
         }

@@ -106,7 +106,7 @@ namespace common
             "target",
             "t",
             "target name",
-            { { "host" }, { "pi0" }, { "pi3" }, { "orangepi0" }, { "pi3_64" }, { "mac" }, { "linux" }, { "windows" }, { "ios" }, { "aarch64" } },
+            { { "host" }, { "pi0" }, { "pi3" }, { "orangepi0" }, { "pi3_64" }, { "mac" }, { "linux" }, { "windows" }, { "ios" }, { "aarch64" }, { "custom" } },
             "host");
 
         parser.AddOption(
@@ -186,6 +186,11 @@ namespace common
         if (target != "")
         {
             settings.compilerSettings.targetDevice.deviceName = target;
+        }
+
+        if (cpu != "")
+        {
+            settings.compilerSettings.targetDevice.cpu = cpu;
         }
 
         if (targetTriple != "")
