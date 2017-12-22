@@ -93,7 +93,7 @@ namespace predictors
             // ---------------    |h|     ----
             //                    |h|
             //                    ---
-            math::Multiply((ElementType)1.0f, _forgetMeWeights, _inputPlusHiddenVector, (ElementType)0.0f, ft);
+            math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _forgetMeWeights, _inputPlusHiddenVector, static_cast<ElementType>(0), ft);
             math::AddUpdate(_forgetMeBias, ft);
             _recurrentActivationFunction.Apply(ft);
 
@@ -108,7 +108,7 @@ namespace predictors
             // ---------------    |h|     ----
             //                    |h|
             //                    ---
-            math::Multiply((ElementType)1.0f, _inputWeights, _inputPlusHiddenVector, (ElementType)0.0f, it);
+            math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _inputWeights, _inputPlusHiddenVector, static_cast<ElementType>(0), it);
             math::AddUpdate(_inputBias, it);
             _recurrentActivationFunction.Apply(it);
 
@@ -123,7 +123,7 @@ namespace predictors
             // ---------------    |h|     -----
             //                    |h|
             //                    ---
-            math::Multiply((ElementType)1.0f, _candidateWeights, _inputPlusHiddenVector, (ElementType)0.0f, ctNew);
+            math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _candidateWeights, _inputPlusHiddenVector, static_cast<ElementType>(0), ctNew);
             math::AddUpdate(_candidateBias, ctNew);
             _activationFunction.Apply(ctNew);
 
@@ -145,7 +145,7 @@ namespace predictors
             // ---------------    |h|     ----
             //                    |h|
             //                    ---
-            math::Multiply((ElementType)1.0f, _outputWeights, _inputPlusHiddenVector, (ElementType)0.0f, ot);
+            math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _outputWeights, _inputPlusHiddenVector, static_cast<ElementType>(0), ot);
             math::AddUpdate(_outputBias, ot);
             _recurrentActivationFunction.Apply(ot);
 

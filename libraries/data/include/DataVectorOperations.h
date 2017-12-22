@@ -41,7 +41,7 @@ namespace data
     ///
     /// <returns> The result of the dot product. </returns>
     template <typename ElementType>
-    ElementType operator*(math::UnorientedConstVectorReference<ElementType> vector, const IDataVector& dataVector);
+    ElementType operator*(math::UnorientedConstVectorBase<ElementType> vector, const IDataVector& dataVector);
 
     /// <summary> Multiplication operator (dot product) for vector and data vector. </summary>
     ///
@@ -49,7 +49,7 @@ namespace data
     /// <param name="vector"> The vector. </param>
     ///
     /// <returns> The result of the dot product. </returns>
-    double operator*(const IDataVector& dataVector, math::UnorientedConstVectorReference<double> vector);
+    double operator*(const IDataVector& dataVector, math::UnorientedConstVectorBase<double> vector);
 
     /// <summary> Elementwise square operation for data vectors. </summary>
     ///

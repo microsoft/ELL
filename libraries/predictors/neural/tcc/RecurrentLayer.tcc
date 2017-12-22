@@ -55,9 +55,9 @@ namespace predictors
             
             // Ht = activationFunction(Wh * [Xt, Ht−1] + Bh)
             
-            // Matrix multiply
+            // Matrix Multiply
             VectorType htNew(outputSize);
-            math::Multiply((ElementType)1.0f, _hiddenWeights, _inputPlusHiddenVector, (ElementType)0.0f, htNew);
+            math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _hiddenWeights, _inputPlusHiddenVector, static_cast<ElementType>(0), htNew);
             math::AddUpdate(_hiddenBias, htNew);
             _activation.Apply(htNew);
 

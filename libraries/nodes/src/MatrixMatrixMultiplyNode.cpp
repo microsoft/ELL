@@ -68,7 +68,7 @@ namespace nodes
         math::RowMatrixReference<ValueType> outputMatrixRef(outputMatrixValues.data(), _m, _n);
 
         // TODO: transpose if necessary
-        math::Multiply(static_cast<ValueType>(1.0), inputMatrix1Ref, inputMatrix2Ref, static_cast<ValueType>(0.0), outputMatrixRef);
+        math::MultiplyScaleAddUpdate(static_cast<ValueType>(1.0), inputMatrix1Ref, inputMatrix2Ref, static_cast<ValueType>(0.0), outputMatrixRef);
 
         _output.SetOutput(outputMatrixValues);
     };

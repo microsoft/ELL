@@ -81,7 +81,7 @@ void RunOrientedVectorTests()
     TestVectorMinusEqualsOperator<ElementType, orientation>();
     TestVectorTimesEqualsOperator<ElementType, orientation>();
     TestVectorDivideEqualsOperator<ElementType, orientation>();
-    TestVectorElementwiseMultiply<ElementType, orientation>();
+    TestVectorElementwiseMultiplySet<ElementType, orientation>();
     TestVectorVectorDot<ElementType, orientation>();
     TestVectorArchiver<ElementType, orientation>();
     TestVectorCumulativeSumUpdate<ElementType, orientation>();
@@ -112,34 +112,56 @@ void RunVectorTests()
     RunVectorImplementationTests<ElementType, math::ImplementationType::openBlas>();
 }
 
-template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
-void RunLayoutMatrixMatrixImplementationTests()
+template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::MatrixLayout layout3, math::ImplementationType implementation>
+void RunTripleLayoutMatrixImplementationTests()
 {
-    TestMatrixGeneralizedMatrixAdd<ElementType, layout1, layout2, implementation>();
-    TestMatrixMatrixMultiply<ElementType, layout1, layout2, implementation>();
+    TestMatrixScaleAddSetScalarMatrixOne<ElementType, layout1, layout2, layout3, implementation>();
+    TestMatrixScaleAddSetOneMatrixScalar<ElementType, layout1, layout2, layout3, implementation>();
+    TestMatrixScaleAddSetScalarMatrixScalar<ElementType, layout1, layout2, layout3,  implementation>();
+}
+
+template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
+void RunDoubleLayoutMatrixImplementationTests()
+{
+    TestMatrixPlusEqualsOperatorMatrix<ElementType, layout1, layout2, implementation>();
+    TestMatrixMinusEqualsOperatorMatrix<ElementType, layout1, layout2, implementation>();
+    TestMatrixAddUpdateMatrix<ElementType, layout1, layout2, implementation>();
+    TestMatrixAddSetScalar<ElementType, layout1, layout2, implementation>();
+    TestMatrixAddSetZero<ElementType, layout1, layout2, implementation>();
+    TestMatrixAddSetMatrix<ElementType, layout1, layout2, implementation>();
+    TestMatrixScaleSet<ElementType, layout1, layout2, implementation>();
+    TestMatrixScaleAddUpdateScalarMatrixOne<ElementType, layout1, layout2, implementation>();
+    TestMatrixScaleAddUpdateOneMatrixScalar<ElementType, layout1, layout2, implementation>();
+    TestMatrixScaleAddUpdateScalarMatrixScalar<ElementType, layout1, layout2, implementation>();
+    TestMatrixMatrixMultiplyScaleAddUpdate<ElementType, layout1, layout2, implementation>();
+
+    RunTripleLayoutMatrixImplementationTests<ElementType, layout1, layout2, layout2, implementation>();
+    RunTripleLayoutMatrixImplementationTests<ElementType, layout1, layout2, math::TransposeMatrixLayout<layout2>::value, implementation>();
 }
 
 template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
 void RunLayoutMatrixImplementationTests()
 {
-    TestMatrixScalarMultiply<ElementType, layout, implementation>();
-    TestMatrixVectorMultiply<ElementType, layout, implementation>();
-    TestVectorMatrixMultiply<ElementType, layout, implementation>();
+    TestMatrixScaleUpdate<ElementType, layout, implementation>();
+    TestMatrixAddUpdateScalar<ElementType, layout, implementation>();
+    TestMatrixAddUpdateZero<ElementType, layout, implementation>();
+    TestMatrixScaleAddUpdateScalarOnesMatrix<ElementType, layout, implementation>();
+    TestMatrixVectorMultiplyScaleAddUpdate<ElementType, layout, implementation>();
+    TestVectorMatrixMultiplyScaleAddUpdate<ElementType, layout, implementation>();
     TestVectorVectorOuter<ElementType, layout, implementation>();
 
-    RunLayoutMatrixMatrixImplementationTests<ElementType, layout, layout, implementation>();
-    RunLayoutMatrixMatrixImplementationTests<ElementType, layout, math::TransposeMatrixLayout<layout>::value, implementation>();
+    RunDoubleLayoutMatrixImplementationTests<ElementType, layout, layout, implementation>();
+    RunDoubleLayoutMatrixImplementationTests<ElementType, layout, math::TransposeMatrixLayout<layout>::value, implementation>();
 }
 
-
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
-void RunMatrixMatrixLayoutTests()
+void RunDoubleLayoutMatrixTests()
 {
     TestMatrixCopyCtor<ElementType, layout1, layout2>();
 }
 
 template <typename ElementType, math::MatrixLayout layout>
-void RunMatrixLayoutTests()
+void RunLayoutMatrixTests()
 {
     TestMatrixNumRows<ElementType, layout>();
     TestMatrixNumColumns<ElementType, layout>();
@@ -164,19 +186,21 @@ void RunMatrixLayoutTests()
     TestMatrixGenerate<ElementType, layout>();
     TestMatrixTransform<ElementType, layout>();
     TestMatrixPrint<ElementType, layout>();
-    TestMatrixScalarAdd<ElementType, layout>();
-    TestMatrixPlusEqualsOperator<ElementType, layout>();
-    TestMatrixMinusEqualsOperator<ElementType, layout>();
-    TestMatrixRowwiseSum<ElementType, layout>();
-    TestMatrixColumnwiseSum<ElementType, layout>();
+    TestMatrixPlusEqualsOperatorScalar<ElementType, layout>();
+    TestMatrixMinusEqualsOperatorScalar<ElementType, layout>();
     TestMatrixTimesEqualsOperator<ElementType, layout>();
     TestMatrixDivideEqualsOperator<ElementType, layout>();
-    TestMatrixScalarMultiplyAdd<ElementType, layout>();
-    TestMatrixElementwiseMultiply<ElementType, layout>();
+    TestMatrixRowwiseSum<ElementType, layout>();
+    TestMatrixColumnwiseSum<ElementType, layout>();
+    TestMatrixElementwiseMultiplySet<ElementType, layout>();
+    TestMatrixRowwiseCumulativeSumUpdate<ElementType, layout>();
+    TestMatrixColumnwiseCumulativeSumUpdate<ElementType, layout>();
+    TestMatrixRowwiseConsecutiveDifferenceUpdate<ElementType, layout>();
+    TestMatrixColumnwiseConsecutiveDifferenceUpdate<ElementType, layout>();
     TestMatrixArchiver<ElementType, layout>();
 
-    RunMatrixMatrixLayoutTests <ElementType, layout, layout>();
-    RunMatrixMatrixLayoutTests <ElementType, layout, math::TransposeMatrixLayout<layout>::value>();
+    RunDoubleLayoutMatrixTests <ElementType, layout, layout>();
+    RunDoubleLayoutMatrixTests <ElementType, layout, math::TransposeMatrixLayout<layout>::value>();
 
     RunLayoutMatrixImplementationTests<ElementType, layout, math::ImplementationType::native>();
     RunLayoutMatrixImplementationTests<ElementType, layout, math::ImplementationType::openBlas>();
@@ -193,14 +217,16 @@ void RunMatrixTests()
     TestMatrixToArray<ElementType>();
     TestMatrixGetMajorVector<ElementType>();
 
-    RunMatrixLayoutTests<ElementType, math::MatrixLayout::columnMajor>();
-    RunMatrixLayoutTests<ElementType, math::MatrixLayout::rowMajor>();
+    RunLayoutMatrixTests<ElementType, math::MatrixLayout::columnMajor>();
+    RunLayoutMatrixTests<ElementType, math::MatrixLayout::rowMajor>();
 }
 
 template <typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2, math::ImplementationType implementation>
 void RunLayoutTensorImplementationTests()
 {
     TestTensorVectorMultiply<ElementType, dimension0, dimension1, dimension2, implementation>();
+    TestTensorVectorAddUpdate<ElementType, dimension0, dimension1, dimension2, implementation>();
+    TestTensorVectorScaleAddUpdate<ElementType, dimension0, dimension1, dimension2, implementation>();
 }
 
 template <typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
@@ -229,13 +255,10 @@ void RunLayoutTensorTests()
     TestTensorTimesEqualsOperator<ElementType, dimension0, dimension1, dimension2>();
     TestTensorDivideEqualsOperator<ElementType, dimension0, dimension1, dimension2>();
     TestTensorArchiver<ElementType, dimension0, dimension1, dimension2>();
-    TestTensorVectorAdd<ElementType, dimension0, dimension1, dimension2>();
-    TestTensorVectorMultiplyAdd<ElementType, dimension0, dimension1, dimension2>();
 
     RunLayoutTensorImplementationTests<ElementType, dimension0, dimension1, dimension2, math::ImplementationType::native>();
     RunLayoutTensorImplementationTests<ElementType, dimension0, dimension1, dimension2, math::ImplementationType::openBlas>();
 }
-
 
 template <typename ElementType>
 void RunTensorTests()

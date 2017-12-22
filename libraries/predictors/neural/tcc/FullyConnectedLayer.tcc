@@ -73,7 +73,7 @@ namespace neural
             }
         }
 
-        math::Multiply((ElementType)1.0f, _weights, _shapedInput, (ElementType)0.0f, _outputVector);
+        math::MultiplyScaleAddUpdate((ElementType)1.0f, _weights, _shapedInput, (ElementType)0.0f, _outputVector);
 
         // Reshape the output
         columnIndex = 0;

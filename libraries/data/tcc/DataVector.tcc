@@ -165,7 +165,7 @@ namespace data
     }
 
     template <class DerivedType>
-    double DataVectorBase<DerivedType>::Dot(const math::UnorientedConstVectorReference<double> vector) const
+    double DataVectorBase<DerivedType>::Dot(math::UnorientedConstVectorBase<double> vector) const
     {
         auto indexValueIterator = GetIterator<DerivedType, IterationPolicy::skipZeros>(*static_cast<const DerivedType*>(this));
 
@@ -185,7 +185,7 @@ namespace data
     }
 
     template <class DerivedType>
-    float DataVectorBase<DerivedType>::Dot(const math::UnorientedConstVectorReference<float> vector) const
+    float DataVectorBase<DerivedType>::Dot(math::UnorientedConstVectorBase<float> vector) const
     {
         auto indexValueIterator = GetIterator<DerivedType, IterationPolicy::skipZeros>(*static_cast<const DerivedType*>(this));
 

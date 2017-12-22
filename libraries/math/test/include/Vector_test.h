@@ -110,7 +110,7 @@ template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorDivideEqualsOperator();
 
 template <typename ElementType, math::VectorOrientation orientation>
-void TestVectorElementwiseMultiply();
+void TestVectorElementwiseMultiplySet();
 
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorVectorDot();

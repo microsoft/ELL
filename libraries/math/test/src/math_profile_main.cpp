@@ -37,29 +37,17 @@ void RunProfile()
     ProfileVectorOuter<ElementType, column>(100, 10 * repetitions);
     ProfileVectorOuter<ElementType, column>(1000, repetitions);
 
-    ProfileMatrixAdd<ElementType, row, row>(10, 10, 100 * repetitions);
-    ProfileMatrixAdd<ElementType, row, row>(100, 100, 10 * repetitions);
-    ProfileMatrixAdd<ElementType, row, row>(1000, 1000, repetitions);
+    ProfileMatrixVectorMultiplyScaleAddUpdate<ElementType, row>(10, 10, 100 * repetitions);
+    ProfileMatrixVectorMultiplyScaleAddUpdate<ElementType, row>(100, 100, 10 * repetitions);
+    ProfileMatrixVectorMultiplyScaleAddUpdate<ElementType, row>(1000, 1000, repetitions);
 
-    ProfileMatrixAdd<ElementType, row, column>(10, 10, 100 * repetitions);
-    ProfileMatrixAdd<ElementType, row, column>(100, 100, 10 * repetitions);
-    ProfileMatrixAdd<ElementType, row, column>(1000, 1000, repetitions);
+    ProfileMatrixMatrixMultiplyScaleAddUpdate<ElementType, row, row>(10, 10, 10, 100 * repetitions);
+    ProfileMatrixMatrixMultiplyScaleAddUpdate<ElementType, row, row>(100, 100, 100, 10 * repetitions);
+    ProfileMatrixMatrixMultiplyScaleAddUpdate<ElementType, row, row>(1000, 1000, 1000, repetitions);
 
-    ProfileMatrixScalarMultiply<ElementType, row>(10, 10, 100 * repetitions);
-    ProfileMatrixScalarMultiply<ElementType, row>(100, 100, 10 * repetitions);
-    ProfileMatrixScalarMultiply<ElementType, row>(1000, 1000, repetitions);
-
-    ProfileMatrixVectorMultiply<ElementType, row>(10, 10, 100 * repetitions);
-    ProfileMatrixVectorMultiply<ElementType, row>(100, 100, 10 * repetitions);
-    ProfileMatrixVectorMultiply<ElementType, row>(1000, 1000, repetitions);
-
-    ProfileMatrixMatrixMultiply<ElementType, row, row>(10, 10, 10, 100 * repetitions);
-    ProfileMatrixMatrixMultiply<ElementType, row, row>(100, 100, 100, 10 * repetitions);
-    ProfileMatrixMatrixMultiply<ElementType, row, row>(1000, 1000, 1000, repetitions);
-
-    ProfileMatrixMatrixMultiply<ElementType, row, column>(10, 10, 10, 100 * repetitions);
-    ProfileMatrixMatrixMultiply<ElementType, row, column>(100, 100, 100, 10 * repetitions);
-    ProfileMatrixMatrixMultiply<ElementType, row, column>(1000, 1000, 1000, repetitions);
+    ProfileMatrixMatrixMultiplyScaleAddUpdate<ElementType, row, column>(10, 10, 10, 100 * repetitions);
+    ProfileMatrixMatrixMultiplyScaleAddUpdate<ElementType, row, column>(100, 100, 100, 10 * repetitions);
+    ProfileMatrixMatrixMultiplyScaleAddUpdate<ElementType, row, column>(1000, 1000, 1000, repetitions);
 }
 
 int main()

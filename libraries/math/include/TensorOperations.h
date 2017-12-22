@@ -24,9 +24,6 @@ namespace ell
 {
 namespace math
 {
-    /// \name Utility Functions
-    /// @{
-
     /// <summary> Prints a tensor in initializer list format. </summary>
     ///
     /// <typeparam name="ElementType"> Tensor element type. </typeparam>
@@ -49,22 +46,6 @@ namespace math
     /// <returns> Reference to the output stream. </returns>
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     std::ostream& operator<<(std::ostream& stream, ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
-
-    /// @}
-
-    /// \name Tensor Scalar Addition
-    /// @{
-
-    /// <summary> Adds a scalar to a tensor, tensor += scalar. </summary>
-    ///
-    /// <typeparam name="ElementType"> The element type. </typeparam>
-    /// <typeparam name="dimension0"> The first dimension in the Tensor layout. </typeparam>
-    /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
-    /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
-    /// <param name="scalar"> The scalar being added. </param>
-    /// <param name="tensor"> The tensor to which the scalar is added. </param>
-    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    void Add(ElementType scalar, TensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
 
     /// <summary> Adds a scalar to a tensor, tensor += scalar. </summary>
     ///
@@ -90,71 +71,6 @@ namespace math
     template <typename TensorElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, typename ScalarType, utilities::IsFundamental<ScalarType> concept = true>
     void operator-=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar);
 
-    /// @}
-
-    /// \name Vector Tensor Addition
-    /// @{
-
-    /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
-    ///
-    /// <typeparam name="vectorOrientation"> The orientation in which to apply the vector. </typeparam>
-    /// <typeparam name="ElementType"> The element type. </typeparam>
-    /// <typeparam name="dimension0"> The first dimension in the Tensor layout. </typeparam>
-    /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
-    /// <param name="vector"> The vector </param>
-    /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension2>
-    void Add(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
-
-    /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
-    ///
-    /// <typeparam name="vectorOrientation"> The orientation in which to apply the vector. </typeparam>
-    /// <typeparam name="ElementType"> The element type. </typeparam>
-    /// <typeparam name="dimension0"> The first dimension in the Tensor layout. </typeparam>
-    /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
-    /// <param name="vector"> The vector </param>
-    /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension1>
-    void Add(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
-
-    /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
-    ///
-    /// <typeparam name="vectorOrientation"> The orientation in which to apply the vector. </typeparam>
-    /// <typeparam name="ElementType"> The element type. </typeparam>
-    /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
-    /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
-    /// <param name="vector"> The vector </param>
-    /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-    void Add(ConstRowVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
-
-    /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
-    ///
-    /// <typeparam name="vectorOrientation"> The orientation in which to apply the vector. </typeparam>
-    /// <typeparam name="ElementType"> The element type. </typeparam>
-    /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
-    /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
-    /// <param name="vector"> The vector </param>
-    /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-    void Add(ConstColumnVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
-
-    /// @}
-
-    /// \name Tensor Scalar Multiplication
-    /// @{
-
-    /// <summary> Multiplies a tensor by a scalar, tensor *= scalar. </summary>
-    ///
-    /// <typeparam name="ElementType"> The element type. </typeparam>
-    /// <typeparam name="dimension0"> The first dimension in the Tensor layout. </typeparam>
-    /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
-    /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
-    /// <param name="scalar"> The scalar that multiplies the tensor. </param>
-    /// <param name="tensor"> The tensor which the scalar multiplies. </param>
-    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    void Multiply(ElementType scalar, TensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
-
     /// <summary> Multiplies a tensor by a scalar, tensor *= scalar. </summary>
     ///
     /// <typeparam name="TensorElementType"> The element type. </typeparam>
@@ -179,10 +95,16 @@ namespace math
     template <typename TensorElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, typename ScalarType, utilities::IsFundamental<ScalarType> concept = true>
     void operator/=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar);
 
-    /// @}
-
-    /// \name Vector Tensor Multiplication
-    /// @{
+    /// <summary> Multiplies a tensor by a scalar, tensor *= scalar. </summary>
+    ///
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension0"> The first dimension in the Tensor layout. </typeparam>
+    /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
+    /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
+    /// <param name="scalar"> The scalar that multiplies the tensor. </param>
+    /// <param name="tensor"> The tensor which the scalar multiplies. </param>
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    void ScaleUpdate(ElementType scalar, TensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
 
     /// <summary> Multiplies each slice in a Tensor with the corresponding vector element. </summary>
     ///
@@ -192,8 +114,8 @@ namespace math
     /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
     /// <param name="vector"> The vector </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-    void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
+    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
+    void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
 
     /// <summary> Multiplies each slice in a Tensor with the corresponding vector element. </summary>
     ///
@@ -203,8 +125,8 @@ namespace math
     /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
     /// <param name="vector"> The vector </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension2>
-    void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
+    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension2>
+    void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
 
     /// <summary> Multiplies each slice in a Tensor with the corresponding vector element. </summary>
     ///
@@ -214,13 +136,63 @@ namespace math
     /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
     /// <param name="vector"> The vector </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension1>
-    void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
+    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1>
+    void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
 
-    /// @}
+    /// <summary> Adds a scalar to a tensor, tensor += scalar. </summary>
+    ///
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension0"> The first dimension in the Tensor layout. </typeparam>
+    /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
+    /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
+    /// <param name="scalar"> The scalar being added. </param>
+    /// <param name="tensor"> The tensor to which the scalar is added. </param>
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    void AddUpdate(ElementType scalar, TensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
 
-    /// \name Vector Tensor Multiply Add
-    /// @{
+    /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
+    ///
+    /// <typeparam name="vectorOrientation"> The orientation in which to apply the vector. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension0"> The first dimension in the Tensor layout. </typeparam>
+    /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
+    /// <param name="vector"> The vector </param>
+    /// <param name="tensor"> The tensor. </param>
+    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension2>
+    void AddUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
+
+    /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
+    ///
+    /// <typeparam name="vectorOrientation"> The orientation in which to apply the vector. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension0"> The first dimension in the Tensor layout. </typeparam>
+    /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
+    /// <param name="vector"> The vector </param>
+    /// <param name="tensor"> The tensor. </param>
+    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1>
+    void AddUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
+
+    /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
+    ///
+    /// <typeparam name="vectorOrientation"> The orientation in which to apply the vector. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
+    /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
+    /// <param name="vector"> The vector </param>
+    /// <param name="tensor"> The tensor. </param>
+    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
+    void AddUpdate(ConstRowVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
+
+    /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
+    ///
+    /// <typeparam name="vectorOrientation"> The orientation in which to apply the vector. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
+    /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
+    /// <param name="vector"> The vector </param>
+    /// <param name="tensor"> The tensor. </param>
+    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
+    void AddUpdate(ConstColumnVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
 
     /// <summary> Applies the transformation M = scale[i] * M + bias[i], where M is the i'th Tensor slice. </summary>
     ///
@@ -231,8 +203,8 @@ namespace math
     /// <param name="scale"> The vector of elements that multiply the Tensor slices </param>
     /// <param name="bias"> The vector of elements to add to the Tensor slices </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-    void MultiplyAdd(UnorientedConstVectorReference<ElementType> scale, UnorientedConstVectorReference<ElementType> bias, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
+    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
+    void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
 
     /// <summary> Applies the transformation M = scale[i] * M + bias[i], where M is the i'th Tensor slice. </summary>
     ///
@@ -243,8 +215,8 @@ namespace math
     /// <param name="scale"> The vector of elements that multiply the Tensor slices </param>
     /// <param name="bias"> The vector of elements to add to the Tensor slices </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension2>
-    void MultiplyAdd(UnorientedConstVectorReference<ElementType> scale, UnorientedConstVectorReference<ElementType> bias, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
+    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension2>
+    void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
 
     /// <summary> Applies the transformation M = scale[i] * M + bias[i], where M is the i'th Tensor slice. </summary>
     ///
@@ -255,56 +227,8 @@ namespace math
     /// <param name="scale"> The vector of elements that multiply the Tensor slices </param>
     /// <param name="bias"> The vector of elements to add to the Tensor slices </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension1>
-    void MultiplyAdd(UnorientedConstVectorReference<ElementType> scale, UnorientedConstVectorReference<ElementType> bias, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
-
-    /// @}
-    
-    namespace Internal
-    {
-        template <ImplementationType type>
-        struct TensorOperations
-        {};
-
-        template <>
-        struct TensorOperations<ImplementationType::native>
-        {
-            static std::string GetImplementationName() { return "Native"; }
-
-            template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension1>
-            static void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
-
-            template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension2>
-            static void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
-
-            template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-            static void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
-        };
-
-#ifdef USE_BLAS
-        template <>
-        struct TensorOperations<ImplementationType::openBlas>
-        {
-            static std::string GetImplementationName() { return "OpenBlas"; }
-
-            template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension1>
-            static void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
-
-            template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension2>
-            static void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
-
-            template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-            static void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
-        };
-
-#else
-        template <>
-        struct TensorOperations<ImplementationType::openBlas> : public TensorOperations<ImplementationType::native>
-        {
-        };
-
-#endif // USE_BLAS
-    }
+    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1>
+    void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
 }
 }
 

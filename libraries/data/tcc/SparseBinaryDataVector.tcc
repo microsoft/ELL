@@ -118,7 +118,7 @@ namespace data
     }
 
     template <typename IndexListType>
-    double SparseBinaryDataVectorBase<IndexListType>::Dot(const math::UnorientedConstVectorReference<double> vector) const
+    double SparseBinaryDataVectorBase<IndexListType>::Dot(math::UnorientedConstVectorBase<double> vector) const
     {
         double value = 0.0;
 

@@ -125,7 +125,7 @@ namespace nodes
         auto norm1sq = input.Norm2Squared();
 
         // result = -2 * _v * input
-        math::Multiply(-2.0, _vectorsAsMatrix, input, 0.0, result);
+        math::MultiplyScaleAddUpdate(-2.0, _vectorsAsMatrix, input, 0.0, result);
 
         for (size_t r = 0; r < _vectorsAsMatrix.NumRows(); r++)
         {

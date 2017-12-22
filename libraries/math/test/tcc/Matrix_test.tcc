@@ -33,7 +33,7 @@ void TestMatrixNumColumns()
 
     auto N = M.GetSubMatrix(0, 1, 2, 2);
 
-    testing::ProcessTest("Matrix::Operator", M.NumColumns() == 4 && N.NumColumns() == 2);
+    testing::ProcessTest("Matrix::NumColumns", M.NumColumns() == 4 && N.NumColumns() == 2);
 }
 
 template <typename ElementType, math::MatrixLayout layout>
@@ -157,7 +157,7 @@ void TestMatrixIndexer()
         { 0, 0, 0, 7 }
     };
 
-    testing::ProcessTest("Matrix::Operator", M == R);
+    testing::ProcessTest("Matrix::Operator()", M == R);
 }
 
 template <typename ElementType, math::MatrixLayout layout>
@@ -171,7 +171,7 @@ void TestMatrixGetDataPointer()
 
     auto S = M.GetSubMatrix(1, 1, 2, 2);
 
-    testing::ProcessTest("Matrix::GetDataPointer", M.GetDataPointer() == &(M(0,0)) && S.GetDataPointer() == &(M(1,1)));
+    testing::ProcessTest("Matrix::GetDataPointer", M.GetDataPointer() == &(M(0,0)) && S.GetDataPointer() == &(M(1,1)) && M.GetConstDataPointer() == &(M(0, 0)) && S.GetConstDataPointer() == &(M(1, 1)));
 }
 
 template <typename ElementType, math::MatrixLayout layout>
@@ -268,7 +268,7 @@ void TestMatrixIsEqual()
 
     auto A = M.GetSubMatrix(0, 1, 2, 2);
 
-    math::Matrix<ElementType, layout> T{
+    math::RowMatrix<ElementType> T{
         { 0, 4 },
         { 0, 0 }
     };
@@ -296,7 +296,7 @@ void TestMatrixEqualityOperator()
 
     auto A = M.GetSubMatrix(0, 1, 2, 2);
 
-    math::Matrix<ElementType, layout> T{
+    math::RowMatrix<ElementType> T{
         { 0, 4 },
         { 0, 0 }
     };
@@ -358,13 +358,13 @@ void TestMatrixGetSubMatrix()
 
     auto S = N.GetSubMatrix(0, 1, 2, 2);
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { 1, 0, 4, 0 },
         { 0, 3, 4, 3 },
         { 0, 3, 3, 3 }
     };
 
-    math::Matrix<ElementType, layout> A{
+    math::RowMatrix<ElementType> A{
         { 4, 3 },
         { 3, 3 }
     };
@@ -389,7 +389,7 @@ void TestMatrixGetColumn()
     auto N = M.GetSubMatrix(1, 1, 2, 3);
     auto v = N.GetColumn(1);
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { 1, 2, 4, 0 },
         { 0, 2, 4, 3 },
         { 0, 8, 5, 6 }
@@ -417,7 +417,7 @@ void TestMatrixGetRow()
     auto N = M.GetSubMatrix(1, 1, 2, 3);
     auto v = N.GetRow(1);
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { 1, 0, 4, 0 },
         { 2, 2, 4, 8 },
         { 0, 3, 5, 6 }
@@ -442,7 +442,7 @@ void TestMatrixGetDiagonal()
     auto N = M.GetSubMatrix(1, 1, 2, 3);
     auto v = N.GetDiagonal();
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { 9, 2, 4, 0 },
         { 0, 9, 4, 3 },
         { 0, 8, 9, 6 }
@@ -469,7 +469,7 @@ void TestMatrixGetMajorVector()
     M.GetMajorVector(1).Fill(8);
     N.GetMajorVector(1).Fill(8);
 
-    math::ColumnMatrix<ElementType> R1{
+    math::RowMatrix<ElementType> R1{
         { 1, 8, 4, 0 },
         { 0, 8, 0, 7 }
     };
@@ -494,14 +494,14 @@ void TestMatrixTranspose()
     auto T = M.Transpose();
     auto N = M.GetSubMatrix(1, 1, 2, 2).Transpose();
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { 9, 0, 0 },
         { 2, 9, 8 },
         { 4, 4, 9 },
         { 0, 3, 6 }
     };
 
-    math::Matrix<ElementType, layout> S{
+    math::RowMatrix<ElementType> S{
         { 9, 8 },
         { 4, 9 }
     };
@@ -528,7 +528,7 @@ void TestMatrixCopyFrom()
     M.CopyFrom(N);
     M.GetSubMatrix(0,2,2,2).CopyFrom(S);
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { 1, 0, 2, 6},
         { 0, 0, 3, 9 }
     };
@@ -552,9 +552,9 @@ void TestMatrixReset()
     M.Reset();
     N.GetSubMatrix(0, 1, 2, 2).Reset();
 
-    math::Matrix<ElementType, layout> R(2, 4);
+    math::RowMatrix<ElementType> R(2, 4);
 
-    math::Matrix<ElementType, layout> T{
+    math::RowMatrix<ElementType> T{
         { 1, 0, 0, 0 },
         { 0, 0, 0, 7 }
     };
@@ -578,12 +578,12 @@ void TestMatrixFill()
     M.Fill(-2);
     N.GetSubMatrix(0, 1, 2, 2).Fill(-2);
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { -2, -2, -2, -2 },
         { -2, -2, -2, -2 }
     };
 
-    math::Matrix<ElementType, layout> T{
+    math::RowMatrix<ElementType> T{
         { 1, -2, -2, 0 },
         { 0, -2, -2, 7 }
     };
@@ -607,17 +607,17 @@ void TestMatrixGenerate()
     M.Generate([]()->ElementType {return -2; });
     N.GetSubMatrix(0, 1, 2, 2).Generate([]()->ElementType {return -2; });
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { -2, -2, -2, -2 },
         { -2, -2, -2, -2 }
     };
 
-    math::Matrix<ElementType, layout> T{
+    math::RowMatrix<ElementType> T{
         { 1, -2, -2, 0 },
         { 0, -2, -2, 7 }
     };
 
-    testing::ProcessTest("Matrix::Fill", M == R && N == T);
+    testing::ProcessTest("Matrix::Generate", M == R && N == T);
 }
 
 template <typename ElementType, math::MatrixLayout layout>
@@ -636,17 +636,32 @@ void TestMatrixTransform()
     M.Transform([](ElementType x) {return 2 * x; });
     N.GetSubMatrix(0, 1, 2, 2).Transform([](ElementType x) {return 2 * x; });
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { 2, 0, 8, 0 },
         { 0, 0, 0, 14 }
     };
 
-    math::Matrix<ElementType, layout> T{
+    math::RowMatrix<ElementType> T{
         { 1, 0, 8, 0 },
         { 0, 0, 0, 7 }
     };
 
     testing::ProcessTest("Matrix::Transform", M == R && N == T);
+}
+
+template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
+void TestMatrixCopyCtor()
+{
+    math::Matrix<ElementType, layout1> M1{
+        { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+    };
+
+    math::Matrix<ElementType, layout2> M2(M1);
+
+    testing::ProcessTest("Matrix(Matrix)", M1 == M2);
 }
 
 template <typename ElementType, math::MatrixLayout layout>
@@ -669,26 +684,7 @@ void TestMatrixPrint()
 }
 
 template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixScalarAdd()
-{
-    math::Matrix<ElementType, layout> M{
-        { 1, 2, 0 },
-        { 0, 3, 7 }
-    };
-
-    math::Add(static_cast<ElementType>(-2), M);
-    math::Add(static_cast<ElementType>(1), M.GetSubMatrix(0,1,2,2));
-
-    math::Matrix<ElementType, layout> R{
-        { -1, 1, -1 },
-        { -2, 2, 6 }
-    };
-
-    testing::ProcessTest("Add(scalar, Matrix)", M == R);
-}
-
-template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixPlusEqualsOperator()
+void TestMatrixPlusEqualsOperatorScalar()
 {
     math::Matrix<ElementType, layout> M{
         { 1, 2, 0 },
@@ -698,16 +694,40 @@ void TestMatrixPlusEqualsOperator()
     M += -2;
     M.GetSubMatrix(0, 1, 2, 2) += 1;
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { -1, 1, -1 },
         { -2, 2, 6 }
     };
 
-    testing::ProcessTest("Matrix::operator+=", M == R);
+    testing::ProcessTest("Matrix::operator+=(scalar)", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixPlusEqualsOperatorMatrix()
+{
+    math::Matrix<ElementType, layoutA> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::Matrix<ElementType, layoutB> N{
+        { 4, 3, 2 },
+        { 1, 2, 1 }
+    };
+
+    M += N;
+    M.GetSubMatrix(0, 1, 2, 2) += N.GetSubMatrix(0, 0, 2, 2);
+
+    math::RowMatrix<ElementType> R{
+        { 5, 9, 5 },
+        { 1, 6, 10 }
+    };
+
+    testing::ProcessTest("Matrix::operator+=(Matrix)", M == R);
 }
 
 template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixMinusEqualsOperator()
+void TestMatrixMinusEqualsOperatorScalar()
 {
     math::Matrix<ElementType, layout> M{
         { 1, 2, 0 },
@@ -717,47 +737,437 @@ void TestMatrixMinusEqualsOperator()
     M -= 2;
     M.GetSubMatrix(0, 1, 2, 2) -= (-1);
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { -1, 1, -1 },
         { -2, 2, 6 }
     };
 
-    testing::ProcessTest("Matrix::operator-=", M == R);
+    testing::ProcessTest("Matrix::operator-=(scalar)", M == R);
 }
 
-template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
-void TestMatrixGeneralizedMatrixAdd()
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixMinusEqualsOperatorMatrix()
+{
+    math::Matrix<ElementType, layoutA> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::Matrix<ElementType, layoutB> N{
+        { -4, -3, -2 },
+        { -1, -2, -1 }
+    };
+
+    M -= N;
+    M.GetSubMatrix(0, 1, 2, 2) -= N.GetSubMatrix(0, 0, 2, 2);
+
+    math::RowMatrix<ElementType> R{
+        { 5, 9, 5 },
+        { 1, 6, 10 }
+    };
+    testing::ProcessTest("Matrix::operator-=(Matrix)", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixTimesEqualsOperator()
+{
+    math::Matrix<ElementType, layout> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    M *= -1;
+    M.GetSubMatrix(0, 1, 2, 2) *= 2;
+
+    math::RowMatrix<ElementType> R{
+        { -1, -4, 0 },
+        { 0, -6, -14 }
+    };
+
+    testing::ProcessTest("Matrix::operator*=", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixDivideEqualsOperator()
+{
+    math::Matrix<ElementType, layout> M{
+        { 2, 4, 0 },
+        { 0, 6, -8 }
+    };
+
+    M /= -2;
+    M.GetSubMatrix(0, 1, 2, 2) /= 0.5;
+
+    math::RowMatrix<ElementType> R{
+        { -1, -4, 0 },
+        { 0, -6, 8 }
+    };
+
+    testing::ProcessTest("Matrix::operator/=", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
+void TestMatrixAddUpdateScalar()
 {
     auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
-    using Ops = math::Internal::MatrixOperations<implementation>;
 
-    math::Matrix<ElementType, layout1> M{
-        { 1, 0 },
-        { 0, 1 },
-        { 2, 2 }
+    math::Matrix<ElementType, layout> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
     };
 
-    math::Matrix<ElementType, layout1> N{
-        { 1, 0 },
-        { 0, 1 },
-        { 0, 0 }
+    math::AddUpdate<implementation>(static_cast<ElementType>(-2), M);
+    math::AddUpdate<implementation>(static_cast<ElementType>(1), M.GetSubMatrix(0, 1, 2, 2));
+
+    math::RowMatrix<ElementType> R{
+        { -1, 1, -1 },
+        { -2, 2, 6 }
     };
 
-    math::Matrix<ElementType, layout2> S{
-        { 1, 0 },
-        { 1, 0 },
-        { 0, 1 }
+    testing::ProcessTest(implementationName + "::AddUpdate(scalar, Matrix)", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
+void TestMatrixAddUpdateZero()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layout> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
     };
 
-    Ops::Add(static_cast<ElementType>(-1), N, static_cast<ElementType>(2), S, M);
+    math::AddUpdate<implementation>(static_cast<ElementType>(0), M);
+    math::AddUpdate<implementation>(static_cast<ElementType>(0), M.GetSubMatrix(0, 1, 2, 2));
 
-    math::Matrix<ElementType, layout1> R{
-        { 2, 0 },
-        { 2, 0 },
-        { 2, 4 }
+    math::RowMatrix<ElementType> R{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
     };
 
-    testing::ProcessTest(implementationName + "::GeneralizedMatrixAdd(scalar, Matrix, scalar, Matrix, Matrix)", M == R);
+    testing::ProcessTest(implementationName + "::AddUpdate(0, Matrix)", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixAddUpdateMatrix()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layoutA> A{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::Matrix<ElementType, layoutB> B{
+        { 4, 3, 2 },
+        { 1, 2, 1 }
+    };
+
+    math::AddUpdate<implementation>(A, B);
+    math::AddUpdate<implementation>(A.GetSubMatrix(0, 1, 2, 2), B.GetSubMatrix(0, 1, 2, 2));
+
+    math::RowMatrix<ElementType> R{
+        { 5, 7, 2 },
+        { 1, 8, 15 }
+    };
+
+    testing::ProcessTest(implementationName + "::AddUpdate(Matrix, Matrix)", B == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixAddSetScalar()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layoutA> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+    math::Matrix<ElementType, layoutB>N(2, 3);
+
+    math::AddSet<implementation>(static_cast<ElementType>(-2), M, N);
+    math::AddSet<implementation>(static_cast<ElementType>(1), M.GetSubMatrix(0, 1, 2, 2), N.GetSubMatrix(0, 1, 2, 2));
+
+    math::RowMatrix<ElementType> R{
+        { -1, 3, 1 },
+        { -2, 4, 8 }
+    };
+
+    testing::ProcessTest(implementationName + "::AddSet(scalar, Matrix, Matrix)", N == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixAddSetZero()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layoutA> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+    math::Matrix<ElementType, layoutB>N(2, 3);
+
+    math::AddSet<implementation>(static_cast<ElementType>(0), M, N);
+    math::AddSet<implementation>(static_cast<ElementType>(0), M.GetSubMatrix(0, 1, 2, 2), N.GetSubMatrix(0, 1, 2, 2));
+
+    testing::ProcessTest(implementationName + "::AddSet(0, Matrix, Matrix)", M == N);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixAddSetMatrix()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layoutA> A{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::Matrix<ElementType, layoutB> B{
+        { 1, 2, 1 },
+        { 0, 1, 6 }
+    };
+
+    math::Matrix<ElementType, layoutB> N(2, 3);
+
+    math::AddSet<implementation>(A, B, N);
+    math::AddSet<implementation>(A.GetSubMatrix(0, 1, 2, 2), B.GetSubMatrix(0, 1, 2, 2), N.GetSubMatrix(0, 1, 2, 2));
+
+    math::Matrix<ElementType, layoutB> R{
+        { 2, 4, 1 },
+        { 0, 4, 13 }
+    };
+
+    testing::ProcessTest(implementationName + "::AddSet(Matrix, Matrix, Matrix)", N == R);
+}
+
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
+void TestMatrixScaleUpdate()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layout> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::ScaleUpdate<implementation>(static_cast<ElementType>(-1), M);
+    math::ScaleUpdate<implementation>(static_cast<ElementType>(2), M.GetSubMatrix(0, 1, 2, 2));
+
+    math::RowMatrix<ElementType> R{
+        { -1, -4, 0 },
+        { 0, -6, -14 }
+    };
+
+    testing::ProcessTest(implementationName + "::ScaleUpdate(scalar, Matrix)", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixScaleSet()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layoutA> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::Matrix<ElementType, layoutB> N(2, 3);
+
+    math::ScaleSet<implementation>(static_cast<ElementType>(0), M, N);
+    math::ScaleSet<implementation>(static_cast<ElementType>(-1), M, N);
+    math::ScaleSet<implementation>(static_cast<ElementType>(2), M.GetSubMatrix(0, 1, 2, 2), N.GetSubMatrix(0, 1, 2, 2));
+
+    math::RowMatrix<ElementType> R{
+        { -1, 4, 0 },
+        { 0, 6, 14 }
+    };
+
+    testing::ProcessTest(implementationName + "::ScaleSet(scalar, Matrix, Matrix)", N == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixScaleAddUpdateScalarMatrixOne()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layoutA> M{
+        { -1, 0, 0 },
+        { -1, 1, 3 }
+    };
+
+    math::Matrix<ElementType, layoutB> N{
+        { 1, 2, 1 },
+        { 0, -3, 4 }
+    };
+
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(0), M, math::One(), N);
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(1), M, math::One(), N);
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(-2), M.GetSubMatrix(0,1,2,2), math::One(), N.GetSubMatrix(0,1,2,2));
+
+    math::RowMatrix<ElementType> R{
+        { 0, 2, 1 },
+        { -1, -4, 1 }
+    };
+
+    testing::ProcessTest(implementationName + "::ScaleAddUpdate(scalar, Matrix, one, Matrix)", N == R);
+}
+
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
+void TestMatrixScaleAddUpdateScalarOnesMatrix()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layout> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(0), math::OnesMatrix(), static_cast<ElementType>(1), M);
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(-1), math::OnesMatrix(), static_cast<ElementType>(2), M);
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(1), math::OnesMatrix(), static_cast<ElementType>(-1), M.GetSubMatrix(0, 1, 2, 2));
+
+    math::RowMatrix<ElementType> R{
+        { 1, -2, 2 },
+        { -1, -4, -12 }
+    };
+
+    testing::ProcessTest(implementationName + "::ScaleAddUpdate(scalar, ones, scalar, Matrix)", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixScaleAddUpdateOneMatrixScalar()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layoutA> M{
+        { 1, 2, -1 },
+        { -1, 3, 7 }
+    };
+
+    math::Matrix<ElementType, layoutB> N{
+        { 1, 0, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::ScaleAddUpdate<implementation>(math::One(), M, static_cast<ElementType>(0), N);
+    math::ScaleAddUpdate<implementation>(math::One(), M, static_cast<ElementType>(-1), N);
+    math::ScaleAddUpdate<implementation>(math::One(), M.GetSubMatrix(0, 1, 2, 2), static_cast<ElementType>(-1), N.GetSubMatrix(0, 1, 2, 2));
+
+    math::RowMatrix<ElementType> R{
+        { 0, 2, -1 },
+        { 0, 3, 7 }
+    };
+
+    testing::ProcessTest(implementationName + "::ScaleAddUpdate(one, Matrix, scale, Matrix)", N == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixScaleAddUpdateScalarMatrixScalar()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layoutA> M{
+        { 1, -2, 0 },
+        { 0, 3, 2 }
+    };
+
+    math::Matrix<ElementType, layoutB> N{
+        { -1, 2, 0 },
+        { 0, -3, 7 }
+    };
+
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(0), M, static_cast<ElementType>(1), N);
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(1), M, static_cast<ElementType>(-1), N);
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(2), M.GetSubMatrix(0, 1, 2, 2), static_cast<ElementType>(2), N.GetSubMatrix(0, 1, 2, 2));
+
+    math::RowMatrix<ElementType> R{
+        { 2, -12, 0 },
+        { 0, 18, -6 }
+    };
+
+    testing::ProcessTest(implementationName + "::ScaleAddUpdate(scalar, Matrix, scalar, Matrix)", N == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::MatrixLayout outputLayout, math::ImplementationType implementation>
+void TestMatrixScaleAddSetScalarMatrixOne()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+    
+    math::Matrix<ElementType, layoutA> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+    
+    math::Matrix<ElementType, layoutB> N{
+        { -1, 1, 3 },
+        { 1, 1, 2 }
+    };
+    
+    math::Matrix<ElementType, outputLayout> O(2, 3);
+    
+    math::ScaleAddSet<implementation>(static_cast<ElementType>(-1), M, math::One(), N, O);
+
+    math::RowMatrix<ElementType> R{
+        { -2, -1, 3 },
+        { 1, -2, -5 }
+    };
+
+    testing::ProcessTest(implementationName + "::ScaleAddSet(scalar, Matrix, one, Matrix, Matrix, Matrix)", O == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::MatrixLayout outputLayout, math::ImplementationType implementation>
+void TestMatrixScaleAddSetOneMatrixScalar()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layoutA> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::Matrix<ElementType, layoutB> N{
+        { -2, 0, 1 },
+        { 2, 1, 0 }
+    };
+
+    math::Matrix<ElementType, outputLayout> O(2, 3);
+
+    math::ScaleAddSet<implementation>(math::One(), M, static_cast<ElementType>(-1), N, O);
+
+    math::RowMatrix<ElementType> R{
+        { 3, 2, -1 },
+        { -2, 2, 7 }
+    };
+
+    testing::ProcessTest(implementationName + "::ScaleAddSet(one, Matrix, scalar, Matrix, Matrix, Matrix)", O == R);
+}
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::MatrixLayout outputLayout, math::ImplementationType implementation>
+void TestMatrixScaleAddSetScalarMatrixScalar()
+{
+    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
+
+    math::Matrix<ElementType, layoutA> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::Matrix<ElementType, layoutB> N{
+        { 1, -1, 2 },
+        { 2, -1, 0 }
+    };
+
+    math::Matrix<ElementType, outputLayout> O(2, 3);
+
+    math::ScaleAddSet<implementation>(static_cast<ElementType>(2), M, static_cast<ElementType>(-1), N, O);
+
+    math::RowMatrix<ElementType> R{
+        { 1, 5, -2 },
+        { -2, 7, 14 }
+    };
+
+    testing::ProcessTest(implementationName + "::ScaleAddSet(scalar, Matrix, scalar, Matrix, Matrix, Matrix)", O == R);
 }
 
 template <typename ElementType, math::MatrixLayout layout>
@@ -793,70 +1203,9 @@ void TestMatrixColumnwiseSum()
 }
 
 template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
-void TestMatrixScalarMultiply()
+void TestMatrixVectorMultiplyScaleAddUpdate()
 {
     auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
-    using Ops = math::Internal::MatrixOperations<implementation>;
-
-    math::Matrix<ElementType, layout> M{
-        { 1, 2, 0 },
-        { 0, 3, 7 }
-    };
-
-    Ops::Multiply(static_cast<ElementType>(-1), M);
-    Ops::Multiply(static_cast<ElementType>(2), M.GetSubMatrix(0,1,2,2));
-
-    math::Matrix<ElementType, layout> R{
-        { -1, -4, 0 },
-        { 0, -6, -14 }
-    };
-
-    testing::ProcessTest(implementationName + "::Multiply(scalar, Matrix)", M == R);
-}
-
-template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixTimesEqualsOperator()
-{
-    math::Matrix<ElementType, layout> M{
-        { 1, 2, 0 },
-        { 0, 3, 7 }
-    };
-
-    M *= -1;
-    M.GetSubMatrix(0, 1, 2, 2) *= 2;
-
-    math::Matrix<ElementType, layout> R{
-        { -1, -4, 0 },
-        { 0, -6, -14 }
-    };
-
-    testing::ProcessTest("Matrix::operator*=", M == R);
-}
-
-template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixDivideEqualsOperator()
-{
-    math::Matrix<ElementType, layout> M{
-        { 2, 4, 0 },
-        { 0, 6, -8 }
-    };
-
-    M /= -2;
-    M.GetSubMatrix(0, 1, 2, 2) /= 0.5;
-
-    math::Matrix<ElementType, layout> R{
-        { -1, -4, 0 },
-        { 0, -6, 8 }
-    };
-
-    testing::ProcessTest("Matrix::operator/=", M == R);
-}
-
-template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
-void TestMatrixVectorMultiply()
-{
-    auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
-    using Ops = math::Internal::MatrixOperations<implementation>;
 
     math::Matrix<ElementType, layout> M{
         { 1, 0 },
@@ -878,19 +1227,18 @@ void TestMatrixVectorMultiply()
     ElementType s = 2;
     ElementType t = 3;
 
-    Ops::Multiply(s, M, v, t, u);
-    Ops::Multiply(s, N.GetSubMatrix(1,1,3,2), v, t, w);
+    math::MultiplyScaleAddUpdate<implementation>(s, M, v, t, u);
+    math::MultiplyScaleAddUpdate<implementation>(s, N.GetSubMatrix(1,1,3,2), v, t, w);
 
     math::ColumnVector<ElementType> r{ 9, 11, 28 };
 
-    testing::ProcessTest(implementationName + "::Multiply(scalar, Matrix, Vector, scalar, Vector)", u == r && w == r);
+    testing::ProcessTest(implementationName + "::MultiplyScaleAddUpdate(scalar, Matrix, Vector, scalar, Vector)", u == r && w == r);
 }
 
 template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
-void TestVectorMatrixMultiply()
+void TestVectorMatrixMultiplyScaleAddUpdate()
 {
     auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
-    using Ops = math::Internal::MatrixOperations<implementation>;
 
     math::Matrix<ElementType, layout> M{
         { 1, 0 },
@@ -912,18 +1260,18 @@ void TestVectorMatrixMultiply()
     ElementType s = 2;
     ElementType t = 3;
 
-    Ops::Multiply(s, u, M, t, v);
-    Ops::Multiply(s, u, N.GetSubMatrix(1,1,3,2), t, w);
+    math::MultiplyScaleAddUpdate<implementation>(s, u, M, t, v);
+    math::MultiplyScaleAddUpdate<implementation>(s, u, N.GetSubMatrix(1,1,3,2), t, w);
+    
     math::RowVector<ElementType> r{ 11, 14 };
 
-    testing::ProcessTest(implementationName + "::Multiply(scalar, Vector, Matrix, scalar, Vector)", v == r && w == r);
+    testing::ProcessTest(implementationName + "::MultiplyScaleAddUpdate(scalar, Vector, Matrix, scalar, Vector)", v == r && w == r);
 }
 
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
-void TestMatrixMatrixMultiply()
+void TestMatrixMatrixMultiplyScaleAddUpdate()
 {
     auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
-    using Ops = math::Internal::MatrixOperations<implementation>;
 
     math::Matrix<ElementType, layout1> A{
         { 1, 2 },
@@ -955,12 +1303,12 @@ void TestMatrixMatrixMultiply()
 
     math::Matrix<ElementType, layout1> C(A.NumRows(), B.NumColumns());
     C.Fill(1);
-    Ops::Multiply(static_cast<ElementType>(1), A, B, static_cast<ElementType>(-1), C);
+    math::MultiplyScaleAddUpdate<implementation>(static_cast<ElementType>(1), A, B, static_cast<ElementType>(-1), C);
 
     math::Matrix<ElementType, layout1> CC(A.NumRows()+2, B.NumColumns()+2);
     CC.Fill(1);
     auto CCC = CC.GetSubMatrix(1, 1, 3, 4);
-    Ops::Multiply(static_cast<ElementType>(1), AA.GetSubMatrix(1,1,3,2), BB.GetSubMatrix(1,1,2,4), static_cast<ElementType>(-1), CCC);
+    math::MultiplyScaleAddUpdate<implementation>(static_cast<ElementType>(1), AA.GetSubMatrix(1,1,3,2), BB.GetSubMatrix(1,1,2,4), static_cast<ElementType>(-1), CCC);
 
     math::Matrix<ElementType, layout1> R{
         { 18, 21, 24, 27 },
@@ -968,29 +1316,11 @@ void TestMatrixMatrixMultiply()
         { 5, 7, 9, 11 }
     };
 
-    testing::ProcessTest(implementationName + "::Multiply(scalar, Matrix, Matrix, scalar, Matrix)", C == R && CCC == R);
+    testing::ProcessTest(implementationName + "::MultiplyScaleAddUpdate(scalar, Matrix, Matrix, scalar, Matrix)", C == R && CCC == R);
 }
 
 template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixScalarMultiplyAdd()
-{
-    math::Matrix<ElementType, layout> M{
-        { 1, 2, 0 },
-        { 0, 3, 7 }
-    };
-
-    math::MultiplyAdd(static_cast<ElementType>(-1), static_cast<ElementType>(2), M);
-
-    math::Matrix<ElementType, layout> R{
-        { 1, 0, 2 },
-        { 2, -1, -5 }
-    };
-
-    testing::ProcessTest("MultiplyAdd(scalar, scalar, Matrix)", M == R);
-}
-
-template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixElementwiseMultiply()
+void TestMatrixElementwiseMultiplySet()
 {
     math::Matrix<ElementType, layout> M{
         { 1, 2, 0 },
@@ -1006,12 +1336,84 @@ void TestMatrixElementwiseMultiply()
 
     math::ElementwiseMultiplySet(M, N, C);
 
-    math::Matrix<ElementType, layout> R{
+    math::RowMatrix<ElementType> R{
         { -1, 2, 0 },
         { 0, 3, 14 }
     };
 
     testing::ProcessTest("ElementwiseMultiplySet(Matrix, Matrix, Matrix)", C == R);
+}
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixRowwiseCumulativeSumUpdate()
+{
+    math::Matrix<ElementType, layout> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::RowwiseCumulativeSumUpdate(M);
+
+    math::Matrix<ElementType, layout> R{
+        { 1, 3, 3 },
+        { 0, 3, 10 }
+    };
+
+    testing::ProcessTest("RowwiseCumulativeSumUpdate(Matrix)", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixColumnwiseCumulativeSumUpdate()
+{
+    math::Matrix<ElementType, layout> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::ColumnwiseCumulativeSumUpdate(M);
+
+    math::Matrix<ElementType, layout> R{
+        { 1, 2, 0 },
+        { 1, 5, 7 }
+    };
+
+    testing::ProcessTest("ColumnwiseCumulativeSumUpdate(Matrix)", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixRowwiseConsecutiveDifferenceUpdate()
+{
+    math::Matrix<ElementType, layout> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::RowwiseConsecutiveDifferenceUpdate(M);
+
+    math::Matrix<ElementType, layout> R{
+        { 1, 1, -2 },
+        { 0, 3, 4 }
+    };
+
+    testing::ProcessTest("RowwiseConsecutiveDifferenceUpdate(Matrix)", M == R);
+}
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixColumnwiseConsecutiveDifferenceUpdate()
+{
+    math::Matrix<ElementType, layout> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::ColumnwiseConsecutiveDifferenceUpdate(M);
+
+    math::Matrix<ElementType, layout> R{
+        { 1, 2, 0 },
+        { -1, 1, 7 }
+    };
+
+    testing::ProcessTest("ColumnwiseConsecutiveDifferenceUpdate(Matrix)", M == R);
 }
 
 template <typename ElementType, math::MatrixLayout layout>
@@ -1035,18 +1437,4 @@ void TestMatrixArchiver()
     testing::ProcessTest("MatrixArchiver", Ma == M);
 }
 
-template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
-void TestMatrixCopyCtor()
-{
-    math::Matrix<ElementType, layout1> M1{
-        { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-        { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-        { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-        { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
-    };
-
-    math::Matrix<ElementType, layout2> M2(M1);
-
-    testing::ProcessTest("Matrix(Matrix)", M1 == M2);
-}
 

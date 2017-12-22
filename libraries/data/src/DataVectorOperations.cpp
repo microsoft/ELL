@@ -13,7 +13,7 @@ namespace ell
 namespace data
 {
 
-    double operator*(const IDataVector& dataVector, math::UnorientedConstVectorReference<double> vector)
+    double operator*(const IDataVector& dataVector, math::UnorientedConstVectorBase<double> vector)
     {
         return vector * dataVector;
     }

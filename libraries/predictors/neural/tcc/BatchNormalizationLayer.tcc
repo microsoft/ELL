@@ -54,7 +54,7 @@ namespace neural
         auto input = _layerParameters.input;
 
         AssignValues(input, output);
-        math::MultiplyAdd<math::Dimension::channel>(_multiplicationValues, _additionValues, output);
+        math::ScaleAddUpdate<math::Dimension::channel>(_multiplicationValues, _additionValues, output);
     }
 
     template <typename ElementType>

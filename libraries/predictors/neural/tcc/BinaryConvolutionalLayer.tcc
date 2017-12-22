@@ -134,7 +134,7 @@ namespace neural
             ReceptiveFieldToColumns(input, _realValuedShapedInputMatrix);
 
             // Multiply reshaped input and weights.
-            math::Multiply(static_cast<ElementType>(1.0), _realValuedWeightsMatrix, _realValuedShapedInputMatrix, static_cast<ElementType>(0.0), _realValuedOutputMatrix);
+            math::MultiplyScaleAddUpdate(static_cast<ElementType>(1.0), _realValuedWeightsMatrix, _realValuedShapedInputMatrix, static_cast<ElementType>(0.0), _realValuedOutputMatrix);
 
             // Re-shape the output into the output tensor
             for (size_t i = 0; i < output.NumRows(); ++i)

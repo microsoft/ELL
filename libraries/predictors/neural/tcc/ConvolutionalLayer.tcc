@@ -59,7 +59,7 @@ namespace neural
             ReceptiveFieldToColumns(input, _shapedInput);
 
             // Multiply reshaped input and weights.
-            math::Multiply(static_cast<ElementType>(1.0), _weightsMatrix, _shapedInput, static_cast<ElementType>(0.0), _outputMatrix);
+            math::MultiplyScaleAddUpdate(static_cast<ElementType>(1.0), _weightsMatrix, _shapedInput, static_cast<ElementType>(0.0), _outputMatrix);
 
             // Re-shape the output into the output tensor
             for (size_t i = 0; i < output.NumRows(); i++)
@@ -103,7 +103,7 @@ namespace neural
 
                     MatrixType A(Vj.NumRows(), _convolutionalParameters.receptiveField * numFiltersToUse);
 
-                    math::Multiply(static_cast<ElementType>(1.0), Vj, Wl, static_cast<ElementType>(0.0), A);
+                    math::MultiplyScaleAddUpdate(static_cast<ElementType>(1.0), Vj, Wl, static_cast<ElementType>(0.0), A);
 
                     for (size_t l = 0; l < numFiltersToUse; l++)
                     {

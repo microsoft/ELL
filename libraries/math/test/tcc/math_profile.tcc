@@ -137,60 +137,8 @@ void ProfileVectorOuter(size_t size, size_t repetitions, std::string seed)
     PrintLine(functionName, native, singleBlas, multiBlas);
 }
 
-template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
-void ProfileMatrixAdd(size_t numRows, size_t numColumns, size_t repetitions, std::string seed)
-{
-    auto engine = utilities::GetRandomEngine(seed);
-    std::uniform_real_distribution<ElementType> uniform(-1, 1);
-    auto generator = [&]() { return uniform(engine); };
-
-    math::Matrix<ElementType, layout1> M(numRows, numColumns);
-    M.Generate(generator);
-
-    math::Matrix<ElementType, layout2> N(numRows, numColumns);
-    N.Generate(generator);
-
-    auto a = generator();
-    auto b = generator();
-
-    math::Matrix<ElementType, layout1> S(numRows, numColumns);
-
-    double native = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::native>::Add(a, M, b, N, S); }, repetitions);
-    math::Blas::SetNumThreads(1);
-    double singleBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::Add(a, M, b, N, S); }, repetitions);
-    math::Blas::SetNumThreads(0);
-    double multiBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::Add(a, M, b, N, S); }, repetitions);
-
-    std::string type = std::string("<") + typeid(ElementType).name() + ">";
-    std::string matrix = "Matrix" + type + "[" + std::to_string(numRows) + ", " + std::to_string(numColumns) + "]";
-    std::string functionName = "Add(scalar, " + matrix + ", scalar, " + matrix + ", " + matrix + ")";
-    PrintLine(functionName, native, singleBlas, multiBlas);
-}
-
 template <typename ElementType, math::MatrixLayout layout>
-void ProfileMatrixScalarMultiply(size_t numRows, size_t numColumns, size_t repetitions, std::string seed)
-{
-    auto engine = utilities::GetRandomEngine(seed);
-    std::uniform_real_distribution<ElementType> uniform(-1, 1);
-    auto generator = [&]() { return uniform(engine); };
-
-    math::Matrix<ElementType, layout> M(numRows, numColumns);
-    M.Generate(generator);
-    auto a = generator();
-
-    double native = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::native>::Multiply(a, M); }, repetitions);
-    math::Blas::SetNumThreads(1);
-    double singleBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::Multiply(a, M); }, repetitions);
-    math::Blas::SetNumThreads(0);
-    double multiBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::Multiply(a, M); }, repetitions);
-
-    std::string type = std::string("<") + typeid(ElementType).name() + ">";
-    std::string functionName = "Multiply(scalar, Matrix" + type + "[" + std::to_string(numRows) + ", " + std::to_string(numColumns) + "])";
-    PrintLine(functionName, native, singleBlas, multiBlas);
-}
-
-template <typename ElementType, math::MatrixLayout layout>
-void ProfileMatrixVectorMultiply(size_t numRows, size_t numColumns, size_t repetitions, std::string seed)
+void ProfileMatrixVectorMultiplyScaleAddUpdate(size_t numRows, size_t numColumns, size_t repetitions, std::string seed)
 {
     auto engine = utilities::GetRandomEngine(seed);
     std::uniform_real_distribution<ElementType> uniform(-1, 1);
@@ -208,22 +156,22 @@ void ProfileMatrixVectorMultiply(size_t numRows, size_t numColumns, size_t repet
     auto s = generator();
     auto t = generator();
 
-    double native = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::native>::Multiply(s, M, v, t, u); }, repetitions);
+    double native = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::native>::MultiplyScaleAddUpdate(s, M, v, t, u); }, repetitions);
     math::Blas::SetNumThreads(1);
-    double singleBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::Multiply(s, M, v, t, u); }, repetitions);
+    double singleBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::MultiplyScaleAddUpdate(s, M, v, t, u); }, repetitions);
     math::Blas::SetNumThreads(0);
-    double multiBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::Multiply(s, M, v, t, u); }, repetitions);
+    double multiBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::MultiplyScaleAddUpdate(s, M, v, t, u); }, repetitions);
 
     std::string type = std::string("<") + typeid(ElementType).name() + ">";
     std::string vector1 = "Vector" + type + "[" + std::to_string(numColumns) + "]";
     std::string vector2 = "Vector" + type + "[" + std::to_string(numRows) + "]";
     std::string matrix = "Matrix" + type + "[" + std::to_string(numRows) + ", " + std::to_string(numColumns) + "]";
-    std::string functionName = "Multiply(scalar, " + matrix + ", " + vector1 + ", scalar, " +vector2 + ")";
+    std::string functionName = "MultiplyScaleAddUpdate(scalar, " + matrix + ", " + vector1 + ", scalar, " +vector2 + ")";
     PrintLine(functionName, native, singleBlas, multiBlas);
 }
 
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
-void ProfileMatrixMatrixMultiply(size_t numRows, size_t numColumns, size_t numColumns2, size_t repetitions, std::string seed)
+void ProfileMatrixMatrixMultiplyScaleAddUpdate(size_t numRows, size_t numColumns, size_t numColumns2, size_t repetitions, std::string seed)
 {
     auto engine = utilities::GetRandomEngine(seed);
     std::uniform_real_distribution<ElementType> uniform(-1, 1);
@@ -241,16 +189,16 @@ void ProfileMatrixMatrixMultiply(size_t numRows, size_t numColumns, size_t numCo
     auto a = generator();
     auto b = generator();
 
-    double native = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::native>::Multiply(a, M, N, b, T); }, repetitions);
+    double native = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::native>::MultiplyScaleAddUpdate(a, M, N, b, T); }, repetitions);
     math::Blas::SetNumThreads(1);
-    double singleBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::Multiply(a, M, N, b, T); }, repetitions);
+    double singleBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::MultiplyScaleAddUpdate(a, M, N, b, T); }, repetitions);
     math::Blas::SetNumThreads(0);
-    double multiBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::Multiply(a, M, N, b, T); }, repetitions);
+    double multiBlas = GetTime([&]() { math::Internal::MatrixOperations<math::ImplementationType::openBlas>::MultiplyScaleAddUpdate(a, M, N, b, T); }, repetitions);
 
     std::string type = std::string("<") + typeid(ElementType).name() + ">";
     std::string matrix1 = "Matrix" + type + "[" + std::to_string(numRows) + ", " + std::to_string(numColumns) + "]";
     std::string matrix2 = "Matrix" + type + "[" + std::to_string(numColumns) + ", " + std::to_string(numColumns2) + "]";
     std::string matrix3 = "Matrix" + type + "[" + std::to_string(numRows) + ", " + std::to_string(numColumns2) + "]";
-    std::string functionName = "Multiply(scalar, " + matrix1 + ", " + matrix2 + ", scalar, " + matrix3 + ")";
+    std::string functionName = "MultiplyScaleAddUpdate(scalar, " + matrix1 + ", " + matrix2 + ", scalar, " + matrix3 + ")";
     PrintLine(functionName, native, singleBlas, multiBlas);
 }

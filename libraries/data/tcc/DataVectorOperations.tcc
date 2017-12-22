@@ -23,7 +23,7 @@ namespace data
     }
 
     template <typename ElementType>
-    ElementType operator*(math::UnorientedConstVectorReference<ElementType> vector, const IDataVector& dataVector)
+    ElementType operator*(math::UnorientedConstVectorBase<ElementType> vector, const IDataVector& dataVector)
     {
         return dataVector.Dot(vector);
     }

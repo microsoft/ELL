@@ -198,7 +198,7 @@ namespace data
         /// <param name="p_other"> The other. </param>
         ///
         /// <returns> A double. </returns>
-        double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
+        double Dot(math::UnorientedConstVectorBase<double> vector) const override;
 
         /// <summary> Adds this data vector to a math::RowVector </summary>
         ///

@@ -109,7 +109,7 @@ namespace nodes
         math::ColumnVector<ValueType> result(_w.NumRows());
 
         // result = _w * data
-        math::Multiply(static_cast<ValueType>(1.0), _w, input, static_cast<ValueType>(0.0), result);
+        math::MultiplyScaleAddUpdate(static_cast<ValueType>(1), _w, input, static_cast<ValueType>(0), result);
 
         _output.SetOutput(result.ToArray());
     }

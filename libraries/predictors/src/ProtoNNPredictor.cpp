@@ -44,7 +44,7 @@ namespace predictors
         auto dimension = GetDimension();
         data.Resize(dimension);
         math::ColumnVector<double> projectedInput(GetProjectedDimension());
-        math::Multiply(1.0, _W, data, 0.0, projectedInput);
+        math::MultiplyScaleAddUpdate(1.0, _W, data, 0.0, projectedInput);
 
         // Similarity to each prototype
         auto numPrototypes = GetNumPrototypes();
@@ -63,7 +63,7 @@ namespace predictors
 
         // Get the prediction label
         math::ColumnVector<double> labels(GetNumLabels());
-        math::Multiply(1.0, GetLabelEmbeddings(), similarityToPrototypes, 0.0, labels);
+        math::MultiplyScaleAddUpdate(1.0, GetLabelEmbeddings(), similarityToPrototypes, 0.0, labels); // TODO due to the zero, there is a more appropriate operation
 
         return labels;
     }

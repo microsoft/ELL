@@ -61,57 +61,113 @@ namespace math
         return stream;
     }
 
-    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    void Add(ElementType scalar, TensorReference<ElementType, dimension0, dimension1, dimension2> tensor)
-    {
-        for (size_t i = 0; i < tensor.NumPrimarySlices(); ++i)
-        {
-            Add(scalar, tensor.GetPrimarySlice(i));
-        }
-    }
-
     template <typename TensorElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, typename ScalarType, utilities::IsFundamental<ScalarType>>
     void operator+=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar)
     {
-        Add(static_cast<TensorElementType>(scalar), tensor);
+        AddUpdate(static_cast<TensorElementType>(scalar), tensor);
     }
 
     template <typename TensorElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, typename ScalarType, utilities::IsFundamental<ScalarType>>
     void operator-=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar)
     {
-        Add(-static_cast<TensorElementType>(scalar), tensor);
+        AddUpdate(-static_cast<TensorElementType>(scalar), tensor);
     }
 
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension1>
-    void Add(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
+    template <typename TensorElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, typename ScalarType, utilities::IsFundamental<ScalarType>>
+    void operator*=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar)
     {
-        DEBUG_THROW(vector.Size() != tensor.GetSize2(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
-        for (size_t i = 0; i < vector.Size(); ++i)
+        ScaleUpdate(static_cast<TensorElementType>(scalar), tensor);
+    }
+
+    template <typename TensorElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, typename ScalarType, utilities::IsFundamental<ScalarType>>
+    void operator/=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar)
+    {
+        DEBUG_THROW(scalar == 0, utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "Divide by zero."));
+
+        ScaleUpdate(static_cast<TensorElementType>(1.0 / scalar), tensor);
+    }
+
+    template <ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    void ScaleUpdate(ElementType scalar, TensorReference<ElementType, dimension0, dimension1, dimension2> tensor)
+    {
+        for (size_t i = 0; i < tensor.NumPrimarySlices(); ++i)
         {
-            tensor.template GetSlice<dimension0, dimension1>(i) += vector[i];
+            ScaleUpdate<implementation>(scalar, tensor.GetPrimarySlice(i));
         }
     }
 
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension2>
-    void Add(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
+    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1>
+    void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
     {
-        DEBUG_THROW(vector.Size() != tensor.GetSize1(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
         for (size_t i = 0; i < vector.Size(); ++i)
         {
-            tensor.template GetSlice<dimension0, dimension2>(i) += vector[i];
+            math::ScaleUpdate<implementation>(vector[i], tensor.template GetSlice<dimension0, dimension1>(i));
         }
     }
 
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-    void Add(ConstRowVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
+    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension2>
+    void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
     {
-        Add<vectorOrientation>(vector.Transpose(), tensor);
+        for (size_t i = 0; i < vector.Size(); ++i)
+        {
+            math::ScaleUpdate<implementation>(vector[i], tensor.template GetSlice<dimension0, dimension2>(i));
+        }
     }
 
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-    void Add(ConstColumnVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
+    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
+    void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
     {
-        DEBUG_THROW(vector.Size() != tensor.GetSize0(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
+        for (size_t i = 0; i < tensor.GetSize2(); ++i)
+        {
+            auto M = tensor.GetPrimarySlice(i);
+            for (size_t j = 0; j < tensor.GetSize0(); ++j)
+            {
+                auto u = M.GetRow(j);
+                math::ScaleUpdate<implementation>(vector[j], u);
+            }
+        }
+    }
+
+    template <ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    void AddUpdate(ElementType scalar, TensorReference<ElementType, dimension0, dimension1, dimension2> tensor)
+    {
+        for (size_t i = 0; i < tensor.NumPrimarySlices(); ++i)
+        {
+            AddUpdate<implementation>(scalar, tensor.GetPrimarySlice(i));
+        }
+    }
+
+    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1>
+    void AddUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
+    {
+        DEBUG_CHECK_SIZES(vector.Size() != tensor.GetSize2(), "vector and tensor dimensions must be the same");
+
+        for (size_t i = 0; i < vector.Size(); ++i)
+        {
+            AddUpdate<implementation>(vector[i], tensor.template GetSlice<dimension0, dimension1>(i));
+        }
+    }
+
+    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension2>
+    void AddUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
+    {
+        DEBUG_CHECK_SIZES(vector.Size() != tensor.GetSize1(), "vector and tensor dimensions must be the same");
+        for (size_t i = 0; i < vector.Size(); ++i)
+        {
+            AddUpdate<implementation>(vector[i], tensor.template GetSlice<dimension0, dimension2>(i));
+        }
+    }
+
+    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
+    void AddUpdate(ConstRowVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
+    {
+        AddUpdate<vectorOrientation, implementation>(vector.Transpose(), tensor);
+    }
+
+    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
+    void AddUpdate(ConstColumnVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
+    {
+        DEBUG_CHECK_SIZES(vector.Size() != tensor.GetSize0(), "vector and tensor dimensions must be the same");
 
         for (size_t i = 0; i < tensor.GetSize2(); ++i)
         {
@@ -119,78 +175,35 @@ namespace math
             for (size_t j = 0; j < tensor.GetSize1(); ++j)
             {
                 auto u = M.GetColumn(j);
-                u += vector;
+                AddUpdate<implementation>(vector, u);
             }
         }
     }
 
-    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    void Multiply(ElementType scalar, TensorReference<ElementType, dimension0, dimension1, dimension2> tensor)
+    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1>
+    void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
     {
-        for (size_t i = 0; i < tensor.NumPrimarySlices(); ++i)
-        {
-            Multiply(scalar, tensor.GetPrimarySlice(i));
-        }
-    }
-
-    template <typename TensorElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, typename ScalarType, utilities::IsFundamental<ScalarType>>
-    void operator*=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar)
-    {
-        Multiply(static_cast<TensorElementType>(scalar), tensor);
-    }
-
-    template <typename TensorElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, typename ScalarType, utilities::IsFundamental<ScalarType>>
-    void operator/=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar)
-    {
-        if (scalar == 0)
-        {
-            throw utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "divide by zero");
-        }
-        Multiply(static_cast<TensorElementType>(1.0/scalar), tensor);
-    }
-
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension1>
-    void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
-    {
-        Internal::TensorOperations<ImplementationType::openBlas>::Multiply<vectorOrientation>(vector, tensor);
-    }
-
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension2>
-    void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
-    {
-        Internal::TensorOperations<ImplementationType::openBlas>::Multiply<vectorOrientation>(vector, tensor);
-    }
-
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-    void Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
-    {
-        Internal::TensorOperations<ImplementationType::openBlas>::Multiply<vectorOrientation>(vector, tensor);
-    }
-
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension1>
-    void MultiplyAdd(UnorientedConstVectorReference<ElementType> scale, UnorientedConstVectorReference<ElementType> bias, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
-    {
-        DEBUG_THROW(scale.Size() != tensor.GetSize2(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
+        DEBUG_CHECK_SIZES(scale.Size() != tensor.GetSize2(), "vector and tensor dimensions must be the same");
         for (size_t i = 0; i < scale.Size(); ++i)
         {
-            math::MultiplyAdd(scale[i], bias[i], tensor.template GetSlice<dimension0, dimension1>(i));
+            ScaleAddUpdate<implementation>(scale[i], OnesMatrix(), bias[i], tensor.template GetSlice<dimension0, dimension1>(i));
         }
     }
 
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension2>
-    void MultiplyAdd(UnorientedConstVectorReference<ElementType> scale, UnorientedConstVectorReference<ElementType> bias, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
+    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension2>
+    void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
     {
-        DEBUG_THROW(scale.Size() != tensor.GetSize1(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
+        DEBUG_CHECK_SIZES(scale.Size() != tensor.GetSize1(), "vector and tensor dimensions must be the same");
         for (size_t i = 0; i < scale.Size(); ++i)
         {
-            math::MultiplyAdd(scale[i], bias[i], tensor.template GetSlice<dimension0, dimension2>(i));
+            ScaleAddUpdate<implementation>(scale[i], OnesMatrix(), bias[i], tensor.template GetSlice<dimension0, dimension2>(i));
         }
     }
 
-    template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-    void MultiplyAdd(UnorientedConstVectorReference<ElementType> scale, UnorientedConstVectorReference<ElementType> bias, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
+    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
+    void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
     {
-        DEBUG_THROW(scale.Size() != tensor.GetSize0() || bias.Size() != tensor.GetSize0(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vectors and tensor dimensions must be the same"));
+        DEBUG_CHECK_SIZES(scale.Size() != tensor.GetSize0() || bias.Size() != tensor.GetSize0(), "vectors and tensor dimensions must be the same");
 
         for (size_t i = 0; i < tensor.GetSize2(); ++i)
         {
@@ -204,91 +217,6 @@ namespace math
                 }
             }
         }
-    }
-
-    namespace Internal
-    {
-        //
-        // native implementations of operations
-        //
-
-        template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension1>
-        void TensorOperations<ImplementationType::native>::Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
-        {
-            DEBUG_THROW(vector.Size() != tensor.GetSize2(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
-            for (size_t i = 0; i < vector.Size(); ++i)
-            {
-                MatrixOperations<ImplementationType::native>::Multiply(vector[i], tensor.template GetSlice<dimension0, dimension1>(i));
-            }
-        }
-
-        template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension2>
-        void TensorOperations<ImplementationType::native>::Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
-        {
-            DEBUG_THROW(vector.Size() != tensor.GetSize1(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
-            for (size_t i = 0; i < vector.Size(); ++i)
-            {
-                MatrixOperations<ImplementationType::native>::Multiply(vector[i], tensor.template GetSlice<dimension0, dimension2>(i));
-            }
-        }
-
-        template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-        void TensorOperations<ImplementationType::native>::Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
-        {
-            DEBUG_THROW(vector.Size() != tensor.GetSize0(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
-
-            for (size_t i = 0; i < tensor.GetSize2(); ++i)
-            {
-                auto M = tensor.GetPrimarySlice(i);
-                for (size_t j = 0; j < tensor.GetSize0(); ++j)
-                {
-                    auto u = M.GetRow(j);
-                    ScaleUpdate(vector[j], u);
-                }
-            }
-        }
-
-#ifdef USE_BLAS
-        //
-        // OpenBLAS implementations of operations
-        //
-
-        template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension1>
-        void TensorOperations<ImplementationType::openBlas>::Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
-        {
-            DEBUG_THROW(vector.Size() != tensor.GetSize2(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
-            for (size_t i = 0; i < vector.Size(); ++i)
-            {
-                MatrixOperations<ImplementationType::openBlas>::Multiply(vector[i], tensor.template GetSlice<dimension0, dimension1>(i));
-            }
-        }
-
-        template<Dimension vectorOrientation, typename ElementType, Dimension dimension0, Dimension dimension2>
-        void TensorOperations<ImplementationType::openBlas>::Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
-        {
-            DEBUG_THROW(vector.Size() != tensor.GetSize1(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
-            for (size_t i = 0; i < vector.Size(); ++i)
-            {
-                MatrixOperations<ImplementationType::openBlas>::Multiply(vector[i], tensor.template GetSlice<dimension0, dimension2>(i));
-            }
-        }
-
-        template<Dimension vectorOrientation, typename ElementType, Dimension dimension1, Dimension dimension2>
-        void TensorOperations<ImplementationType::openBlas>::Multiply(UnorientedConstVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
-        {
-            DEBUG_THROW(vector.Size() != tensor.GetSize0(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
-
-            for (size_t i = 0; i < tensor.GetSize2(); ++i)
-            {
-                auto M = tensor.GetPrimarySlice(i);
-                for (size_t j = 0; j < tensor.GetSize0(); ++j)
-                {
-                    auto u = M.GetRow(j);
-                    ScaleUpdate(vector[j], u);
-                }
-            }
-        }
-#endif
     }
 }
 }

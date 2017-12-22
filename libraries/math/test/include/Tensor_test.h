@@ -93,13 +93,13 @@ void TestTensorDivideEqualsOperator();
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensorArchiver();
 
-template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
-void TestTensorVectorAdd();
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2, math::ImplementationType implementation>
+void TestTensorVectorAddUpdate();
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2, math::ImplementationType implementation>
 void TestTensorVectorMultiply();
 
-template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
-void TestTensorVectorMultiplyAdd();
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2, math::ImplementationType implementation>
+void TestTensorVectorScaleAddUpdate();
 
 #include "../tcc/Tensor_test.tcc"

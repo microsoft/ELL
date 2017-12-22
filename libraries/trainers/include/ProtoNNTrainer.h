@@ -76,10 +76,10 @@ namespace trainers
         void Initialize();
 
         // The Similarity Kernel.
-        math::ColumnMatrixReference<double> SimilarityKernel(ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, const size_t begin, const size_t end, bool recomputeWX = false);
+        math::ColumnMatrix<double> SimilarityKernel(ConstColumnMatrixReference X, math::ColumnMatrixReference<double> WX, const double gamma, const size_t begin, const size_t end, bool recomputeWX = false);
 
         // The Similarity Kernel.
-        math::ColumnMatrixReference<double> SimilarityKernel(ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, bool recomputeWX = false);
+        math::ColumnMatrix<double> SimilarityKernel(ConstColumnMatrixReference X, math::ColumnMatrixReference<double> WX, const double gamma, bool recomputeWX = false);
 
         // The Training Loss.
         double Loss(ConstColumnMatrixReference Y, ConstColumnMatrixReference D, const size_t begin, const size_t end);

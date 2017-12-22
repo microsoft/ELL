@@ -79,12 +79,12 @@ namespace predictors
             // Now, inputPlusHiddenVector = [Xt, Ht−1]
 
             // Zt = recurrentFunction(Wz * [Xt, Ht−1] + Bz)   (where recurrentFunction is usually sigmoid)
-            math::Multiply((ElementType)1.0f, _updateWeights, _inputPlusHiddenVector, (ElementType)0.0f, zt);
+            math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _updateWeights, _inputPlusHiddenVector, static_cast<ElementType>(0), zt);
             math::AddUpdate(_updateBias, zt);
             _recurrentActivationFunction.Apply(zt);
 
             // Rt = recurrentFunction(Wr * [Xt, Ht-1] + Br)   (where recurrentFunction is usually sigmoid)
-            math::Multiply((ElementType)1.0f, _resetWeights, _inputPlusHiddenVector, (ElementType)0.0f, rt);
+            math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _resetWeights, _inputPlusHiddenVector, static_cast<ElementType>(0), rt);
             math::AddUpdate(_resetBias, rt);
             _recurrentActivationFunction.Apply(rt);
 
@@ -92,7 +92,7 @@ namespace predictors
             auto& rtHt = htPart; // reusing htPart with a new name, so the code follows the math in comments
             // Ht~ = activationFunction(Wh * [Xt, Rt * Ht-1] + Bh)   (where activationFunction is typically tanh)
             math::ElementwiseMultiplySet(rt, htOld, rtHt); // rtHt aliases to the last part of _inputPlusHiddenVector
-            math::Multiply((ElementType)1.0f, _hiddenWeights, _inputPlusHiddenVector, (ElementType)0.0f, htNew);
+            math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _hiddenWeights, _inputPlusHiddenVector, static_cast<ElementType>(0), htNew);
             math::AddUpdate(_hiddenBias, htNew);
             _activationFunction.Apply(htNew);
 

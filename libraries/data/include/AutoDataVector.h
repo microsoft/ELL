@@ -100,14 +100,14 @@ namespace data
         /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
+        double Dot(math::UnorientedConstVectorBase<double> vector) const override;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
         /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        float Dot(const math::UnorientedConstVectorReference<float> vector) const override;
+        float Dot(math::UnorientedConstVectorBase<float> vector) const override;
 
         /// <summary> Adds this data vector to a math::RowVector </summary>
         ///

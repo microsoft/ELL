@@ -41,7 +41,6 @@ namespace math
     class TensorCoordinateBase
     {
     public:
-
         /// <summary> Constructs a TensorCoordinateBase from row, column, channel values. </summary>
         ///
         /// <param name="rowValue"> The row value. </param>
@@ -229,6 +228,16 @@ namespace math
         /// <returns> The size of the third dimension. </returns>
         size_t GetSize2() const { return GetSize<2>(); }
 
+        /// <summary> Gets the memory offset needed to advance dimension1. </summary>
+        ///
+        /// <returns> The memory offset. </returns>
+        size_t GetIncrement1() const { return _increment1; }
+
+        /// <summary> Gets the memory offset needed to advance dimension2. </summary>
+        ///
+        /// <returns> The memory offset. </returns>
+        size_t GetIncrement2() const { return _increment2; }
+
         /// <summary> Gets the three dimenions of the tensor in logical order (row, column, channel). </summary>
         ///
         /// <returns> The shape of the Tensor. </returns>
@@ -378,7 +387,7 @@ namespace math
         /// <summary> Flattens a tensor into a row vector. Works only when the tensor dimensions are full </summary>
         ///
         /// <returns> A ConstVectorReference that which includes all of the tensor elements. </returns>
-        ConstVectorReference<ElementType, VectorOrientation::row> ReferenceAsVector() const;
+        ConstRowVectorReference<ElementType> ReferenceAsVector() const;
 
         /// <summary>
         /// Returns a const matrix reference that includes all of the tensor elements, by flattening the first
@@ -388,7 +397,7 @@ namespace math
         /// <returns>
         /// A const reference to a row major matrix, which includes all of the tensor elements.
         /// </returns>
-        ConstMatrixReference<ElementType, MatrixLayout::rowMajor> ReferenceAsMatrix() const;
+        ConstRowMatrixReference<ElementType> ReferenceAsMatrix() const;
 
         /// @}
 
@@ -427,7 +436,7 @@ namespace math
     /// <param name="tensor"> The Tensor. </param>
     /// <param name="index"> Slice index </param>
     ///
-    /// <returns> The number slices. </returns>
+    /// <returns> The requested slice. </returns>
     template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     auto GetSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index);
 
@@ -465,23 +474,12 @@ namespace math
         /// \name Accessor Functions
         /// @{
 
-        using ConstTensorRef::NumRows;
-        using ConstTensorRef::NumColumns;
-        using ConstTensorRef::NumChannels;
-        using ConstTensorRef::Size;
-        using ConstTensorRef::GetSize0;
-        using ConstTensorRef::GetSize1;
-        using ConstTensorRef::GetSize2;
-        using ConstTensorRef::GetShape;
-        using ConstTensorRef::GetConstDataPointer;
-        using ConstTensorRef::NumSlices;
-        using ConstTensorRef::NumPrimarySlices;
         using ConstTensorRef::operator();
 
         /// <summary> Gets a pointer to the underlying data storage. </summary>
         ///
         /// <returns> Pointer to the data. </returns>
-        ElementType* GetDataPointer() { return const_cast<ElementType*>(_pData); }
+        ElementType* GetDataPointer() { return const_cast<ElementType*>(this->_pData); }
 
         /// <summary> Element access operator. </summary>
         ///
@@ -504,22 +502,10 @@ namespace math
         /// \name Utility Functions
         /// @{
 
-        using ConstTensorRef::ToArray;
-        using ConstTensorRef::IsContiguous;
-
         /// <summary> Swaps the contents of this tensor reference with the contents of another tensor reference. </summary>
         ///
         /// <param name="other"> [in,out] The other tensor reference. </param>
         void Swap(TensorReference<ElementType, dimension0, dimension1, dimension2>& other);
-
-        /// @}
-
-        /// \name Comparison Functions
-        /// @{
-
-        using ConstTensorRef::IsEqual;
-        using ConstTensorRef::operator==;
-        using ConstTensorRef::operator!=;
 
         /// @}
 
@@ -575,7 +561,6 @@ namespace math
         /// \name View Functions
         /// @{
 
-        using ConstTensorRef::GetConstReference;
         using ConstTensorRef::GetSubTensor;
         using ConstTensorRef::GetSlice;
         using ConstTensorRef::GetPrimarySlice;
@@ -634,7 +619,7 @@ namespace math
         /// (namely, not a subtensor). </summary>
         ///
         /// <returns> A VectorReference that which includes all of the tensor elements. </returns>
-        VectorReference<ElementType, VectorOrientation::row> ReferenceAsVector();
+        RowVectorReference<ElementType> ReferenceAsVector();
 
         /// <summary>
         /// Returns a matrix reference that includes all of the tensor elements, by flattening the first
@@ -644,17 +629,12 @@ namespace math
         /// <returns>
         /// A reference to a row major matrix, which includes all of the tensor elements.
         /// </returns>
-        MatrixReference<ElementType, MatrixLayout::rowMajor> ReferenceAsMatrix();
+        RowMatrixReference<ElementType> ReferenceAsMatrix();
 
         /// @}
 
     protected:
         TensorReference(ElementType* pData, TensorShape shape, size_t increment1, size_t increment2);
-        using ConstTensorRef::GetOffset;
-        using ConstTensorRef::_pData;
-        using ConstTensorRef::_shape;
-        using ConstTensorRef::_increment1;
-        using ConstTensorRef::_increment2;
     };
 
     /// <summary> Implements a tensor that owns its own memory. </summary>
@@ -720,27 +700,8 @@ namespace math
         /// <param name="list"> A triply nested initalizer list. </param>
         Tensor(std::initializer_list<std::initializer_list<std::initializer_list<ElementType>>> list);
 
-        /// \name Accessor Functions
-        /// @{
-
-        using TensorRef::NumRows;
-        using TensorRef::NumColumns;
-        using TensorRef::NumChannels;
-        using TensorRef::Size;
-        using TensorRef::GetSize0;
-        using TensorRef::GetSize1;
-        using TensorRef::GetSize2;
-        using TensorRef::GetShape;
-        using TensorRef::NumSlices;
-        using TensorRef::NumPrimarySlices;
-        using TensorRef::operator();
-
-        /// @}
-
         /// \name Utility Functions
         /// @{
-
-        using TensorRef::IsContiguous;
 
         /// <summary> Assignment operator. </summary>
         ///
@@ -761,43 +722,8 @@ namespace math
 
         /// @}
 
-        /// \name Comparison Functions
-        /// @{
-
-        using TensorRef::IsEqual;
-        using TensorRef::operator==;
-        using TensorRef::operator!=;
-
-        /// @}
-
-        /// \name  Content Manipulation Functions
-        /// @{
-
-        using TensorRef::CopyFrom;
-        using TensorRef::Reset;
-        using TensorRef::Fill;
-        using TensorRef::Generate;
-        using TensorRef::GetReference;
-
-        /// @}
-
-        /// \name View Functions
-        /// @{
-
-        using TensorRef::GetConstReference;
-        using TensorRef::GetSubTensor;
-        using TensorRef::GetSlice;
-        using TensorRef::GetPrimarySlice;
-        using TensorRef::ReferenceAsVector;
-        using TensorRef::ReferenceAsMatrix;
-
-        /// @}
-
     private:
         using ConstTensorRef = ConstTensorReference<ElementType, dimension0, dimension1, dimension2>;
-        using ConstTensorRef::_pData;
-
-        // the array used to store the tensor
         std::vector<ElementType> _data;
     };
 

@@ -94,7 +94,7 @@ void ProtoNNTrainer::Initialize()
     W.Generate(generator);
 
     math::ColumnMatrix<double> WX(W.NumRows(), n);
-    math::Multiply<double>(1, W, _X, 0, WX);
+    math::MultiplyScaleAddUpdate(1.0, W, _X, 0.0, WX);
 
     ProtoNNInit protonnInit(d, _parameters.numLabels, _parameters.numPrototypesPerLabel);
     protonnInit.Initialize(WX, _Y);
@@ -115,7 +115,7 @@ void ProtoNNTrainer::Initialize()
     {
         auto gammaInit = 0.01;
         math::ColumnMatrix<double> WXupdate(W.NumRows(), n);
-        math::Multiply<double>(1, W, _X, 0, WXupdate);
+        math::MultiplyScaleAddUpdate(1.0, W, _X, 0.0, WXupdate);
         _parameters.gamma = protonnInit.InitializeGamma(SimilarityKernel(_X, WXupdate, gammaInit), gammaInit);
     }
 
@@ -139,7 +139,7 @@ void ProtoNNTrainer::Initialize()
 /// S_{ij} = exp{-gamma^2 * || B_j - W*x_i ||^2}
 /// where S_{ij} is similarity of ith input instance with the jth prototype B_j and W is the projection matrix
 /// Computed as exp(-gamma^2(||B||^2 + ||WX||^2 - 2 *  WX' * B))
-math::ColumnMatrixReference<double> ProtoNNTrainer::SimilarityKernel(ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, const size_t begin, const size_t end, bool recomputeWX)
+math::ColumnMatrix<double> ProtoNNTrainer::SimilarityKernel(ConstColumnMatrixReference X, math::ColumnMatrixReference<double> WX, const double gamma, const size_t begin, const size_t end, bool recomputeWX)
 {
     assert(begin < end);
     auto B = (_modelMap[ProtoNNParameterIndex::B])->GetData();
@@ -152,7 +152,7 @@ math::ColumnMatrixReference<double> ProtoNNTrainer::SimilarityKernel(ConstColumn
     {
         math::ColumnMatrix<double> wxUpdated(W.NumRows(), end - begin);
         auto x = X.GetSubMatrix(0, begin, X.NumRows(), end - begin);
-        math::Multiply<double>(1, W, x, 0, wxUpdated);
+        math::MultiplyScaleAddUpdate(1.0, W, x, 0.0, wxUpdated);
         wx.CopyFrom(wxUpdated);
     }
 
@@ -172,29 +172,29 @@ math::ColumnMatrixReference<double> ProtoNNTrainer::SimilarityKernel(ConstColumn
 
     // wxb = (2.0 * gamma * gamma) * WX.transpose() * B;
     math::RowMatrix<double> wxb(wx.NumColumns(), B.NumColumns());
-    math::Multiply(2 * gamma * gamma, wx.Transpose(), B, 0.0, wxb);
+    math::MultiplyScaleAddUpdate(2 * gamma * gamma, wx.Transpose(), B, 0.0, wxb);
 
     // repmat of bColNormSquare and scaling by -gamma * gamma
     math::RowMatrix<double> gammaSquareCol(end - begin, 1);
     gammaSquareCol.Fill(-gamma * gamma);
     math::RowMatrix<double> bColNormSquareResized(gammaSquareCol.NumRows(), bColNormSquare.NumColumns());
     // S1 = gammaSquareCol * bColSum;
-    math::Multiply<double>(1, gammaSquareCol, bColNormSquare, 0, bColNormSquareResized);
+    math::MultiplyScaleAddUpdate(1.0, gammaSquareCol, bColNormSquare, 0.0, bColNormSquareResized);
 
     // repmat of wxColNormSquare and scaling by -gamma * gamma
     math::RowMatrix<double> gammaSquareRow(B.NumColumns(), 1);
     gammaSquareRow.Fill(-gamma * gamma);
     math::RowMatrix<double> wxColNormSquareResized(gammaSquareRow.NumRows(), wxColNormSquare.NumColumns());
     // S2 = gammaSquareRow * wxColSum;
-    math::Multiply<double>(1, gammaSquareRow, wxColNormSquare, 0, wxColNormSquareResized);
+    math::MultiplyScaleAddUpdate(1.0, gammaSquareRow, wxColNormSquare, 0.0, wxColNormSquareResized);
 
     // D = wxb + bColNormSquareResized
     math::RowMatrix<double> similarityMatrix(wxb.NumRows(), wxb.NumColumns());
-    math::Add(1.0, wxb, 1.0, bColNormSquareResized, similarityMatrix);
+    math::ScaleAddSet(1.0, wxb, 1.0, bColNormSquareResized, similarityMatrix);
 
     // D = D + wxColNormSquareResized'
     math::RowMatrix<double> distance(similarityMatrix.NumRows(), similarityMatrix.NumColumns());
-    math::Add(1.0, similarityMatrix, 1.0, wxColNormSquareResized.Transpose(), distance);
+    math::ScaleAddSet(1.0, similarityMatrix, 1.0, wxColNormSquareResized.Transpose(), distance);
 
     // similarityMatrix = exp(D)
     similarityMatrix = ProtoNNTrainerUtils::MatrixExp(distance);
@@ -202,7 +202,7 @@ math::ColumnMatrixReference<double> ProtoNNTrainer::SimilarityKernel(ConstColumn
     return similarityMatrix;
 }
 
-math::ColumnMatrixReference<double> ProtoNNTrainer::SimilarityKernel(ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, bool recomputeWX)
+math::ColumnMatrix<double> ProtoNNTrainer::SimilarityKernel(ConstColumnMatrixReference X, math::ColumnMatrixReference<double> WX, const double gamma, bool recomputeWX)
 {
     return SimilarityKernel(X, WX, gamma, 0, X.NumColumns(), recomputeWX);
 }
@@ -215,10 +215,10 @@ double ProtoNNTrainer::Loss(ConstColumnMatrixReference Y, ConstColumnMatrixRefer
 
     // residual = y - ZD'
     math::ColumnMatrix<double> ZD(Z.NumRows(), D.NumRows());
-    math::Multiply<double>(1, Z, D.Transpose(), 0, ZD);
+    math::MultiplyScaleAddUpdate(1.0, Z, D.Transpose(), 0.0, ZD);
     auto y = Y.GetSubMatrix(0, begin, Y.NumRows(), end - begin);
     math::ColumnMatrix<double> residual(y.NumRows(), y.NumColumns());
-    math::Add(1.0, y, -1.0, ZD, residual);
+    math::ScaleAddSet(1.0, y, -1.0, ZD, residual);
 
     switch (_parameters.lossFunction)
     {
@@ -349,12 +349,12 @@ void ProtoNNTrainer::AcceleratedProximalGradient(
         gradient_paramS = gradf(paramS, idx1, idx2);
 
         math::ColumnMatrix<double> paramQ_new(paramS.NumRows(), paramS.NumColumns());
-        math::Add(1.0, paramS, -stepSize, gradient_paramS, paramQ_new); //paramQ_new=paramS-stepSize*grad(paramS)
+        math::ScaleAddSet(1.0, paramS, -stepSize, gradient_paramS, paramQ_new); //paramQ_new=paramS-stepSize*grad(paramS)
 
         prox(paramQ_new); //paramQ_new = HardThresholding(paramQ_new)
 
         math::ColumnMatrix<double> paramS_new(paramQ_new.NumRows(), paramQ_new.NumColumns());
-        math::Add(1 - alpha, paramQ_new, alpha, paramQ, paramS_new);
+        math::ScaleAddSet(1 - alpha, paramQ_new, alpha, paramQ, paramS_new);
 
         // paramS_new = (1-alpha)*paramQ_new+alpha*paramQ; paramS=paramS_new
         paramS.CopyFrom(paramS_new);
@@ -364,7 +364,7 @@ void ProtoNNTrainer::AcceleratedProximalGradient(
 
         //Running average of all but first burn_period paramS's; paramAvg_new=(1-1/runningAvgWeight)*paramAvg+ 1/runningAvgWeight*paramS_new
         math::ColumnMatrix<double> paramAvg_new(paramS_new.NumRows(), paramS_new.NumColumns());
-        math::Add(safe_div(1.0, runningAvgWeight), paramS_new, safe_div(runningAvgWeight - 1.0, runningAvgWeight), paramAvg, paramAvg_new);
+        math::ScaleAddSet(safe_div(1.0, runningAvgWeight), paramS_new, safe_div(runningAvgWeight - 1.0, runningAvgWeight), paramAvg, paramAvg_new);
 
         //Initializing parameters for next iteration
         lambda = lambda_new;
@@ -401,7 +401,7 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
     //Projection onto low-d space
     auto projectionMatrix = _modelMap[m_projectionIndex]->GetData();
     math::ColumnMatrix<double> WX(projectionMatrix.NumRows(), n);
-    math::Multiply<double>(1, projectionMatrix, X, 0, WX);
+    math::MultiplyScaleAddUpdate(1.0, projectionMatrix, X, 0.0, WX);
 
     fCur = ComputeObjective(X, Y, WX, gamma, false);
 
@@ -438,19 +438,19 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
 
             auto coeff = smallPerturbation * safe_div(ProtoNNTrainerUtils::MaxAbsoluteElement(parameterMatrix), ProtoNNTrainerUtils::MaxAbsoluteElement(currentGradient));
 
-            // perturb the parameter
-            math::ColumnMatrix<double> perturbedParameter(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
-            math::Add(1.0, parameterMatrix, -1.0 * coeff, thresholdedGradient, perturbedParameter);
+                // perturb the parameter
+                math::ColumnMatrix<double> perturbedParameter(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
+                math::ScaleAddSet(1.0, parameterMatrix, -1.0 * coeff, thresholdedGradient, perturbedParameter);
 
             auto WX_old = WX;
             _modelMap[parameterIndex]->GetData() = perturbedParameter;
 
             // Compute gradient_paramS with updated parameter
-            math::Multiply<double>(1, _modelMap[m_projectionIndex]->GetData(), X, 0, WX);
+            math::MultiplyScaleAddUpdate(1.0, _modelMap[m_projectionIndex]->GetData(), X, 0.0, WX);
 
             math::ColumnMatrix<double> gradientEstimate(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
             auto grad = _modelMap[parameterIndex]->gradient(_modelMap, X, Y, WX, SimilarityKernel(X, WX, gamma, idx1, idx2, _recomputeWX[parameterIndex]), gamma, idx1, idx2, _parameters.lossFunction);
-            math::Add(1.0, currentGradient, -1.0, grad, gradientEstimate);
+            math::ScaleAddSet(1.0, currentGradient, -1.0, grad, gradientEstimate);
 
             currentGradient = gradientEstimate;
 
@@ -467,7 +467,7 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
             else
             {
                 math::ColumnMatrix<double> deltaParameter(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
-                math::Add(1.0, perturbedParameter, -1.0, parameterMatrix, deltaParameter);
+                math::ScaleAddSet(1.0, perturbedParameter, -1.0, parameterMatrix, deltaParameter);
                 eta[j] = safe_div(ProtoNNTrainerUtils::MatrixNorm(deltaParameter), ProtoNNTrainerUtils::MatrixNorm(currentGradient));
             }
         }
@@ -489,7 +489,7 @@ void ProtoNNTrainer::SGDWithAlternatingMinimization(ConstColumnMatrixReference X
             paramStepSize,
             eta_update);
 
-        math::Multiply<double>(1, _modelMap[m_projectionIndex]->GetData(), X, 0, WX);
+        math::MultiplyScaleAddUpdate(1.0, _modelMap[m_projectionIndex]->GetData(), X, 0.0, WX);
         fOld = fCur;
         fCur = ComputeObjective(X, Y, WX, gamma, _recomputeWX[parameterIndex]);
 
@@ -529,11 +529,11 @@ math::ColumnMatrix<double> Param_W::gradient(ProtoNNModelMap& modelMap, ConstCol
     auto y = Y.GetSubMatrix(0, begin, Y.NumRows(), end - begin).Transpose();
 
     math::ColumnMatrix<double> DZ(D.NumRows(), Z.NumRows());
-    math::Multiply<double>(1.0, D, Z.Transpose(), 0, DZ);
+    math::MultiplyScaleAddUpdate(1.0, D, Z.Transpose(), 0.0, DZ);
 
     //diff = Y - D*Z';
     math::RowMatrix<double> residual(y.NumRows(), y.NumColumns());
-    math::Add(1.0, y, -1.0, DZ, residual);
+    math::ScaleAddSet(1.0, y, -1.0, DZ, residual);
 
     switch (lossType)
     {
@@ -557,7 +557,7 @@ math::ColumnMatrix<double> Param_W::gradient(ProtoNNModelMap& modelMap, ConstCol
 
     // T = diff * Z
     math::RowMatrix<double> T(D.NumRows(), D.NumColumns());
-    math::Multiply<double>(1.0, residual, Z, 0, T);
+    math::MultiplyScaleAddUpdate(1.0, residual, Z, 0.0, T);
 
     // T = D .* T
     math::ElementwiseMultiplySet(T, D, T);
@@ -567,7 +567,7 @@ math::ColumnMatrix<double> Param_W::gradient(ProtoNNModelMap& modelMap, ConstCol
 
     auto xSub = X.GetSubMatrix(0, begin, X.NumRows(), end - begin);
     math::ColumnMatrix<double> wxScaled(W.NumRows(), end - begin);
-    math::Multiply<double>(1.0, W, xSub, 0, wxScaled);
+    math::MultiplyScaleAddUpdate(1.0, W, xSub, 0.0, wxScaled);
 
     for (size_t j = 0; j < wxScaled.NumColumns(); j++)
     {
@@ -576,11 +576,11 @@ math::ColumnMatrix<double> Param_W::gradient(ProtoNNModelMap& modelMap, ConstCol
     }
 
     //wx_scaled = wx_scaled - B*T
-    math::Multiply<double>(-1.0, B, T.Transpose(), 1.0, wxScaled);
+    math::MultiplyScaleAddUpdate(-1.0, B, T.Transpose(), 1.0, wxScaled);
 
     // gradient_paramS -= wx_scaled * x_submat'
     math::ColumnMatrix<double> gradient(W.NumRows(), W.NumColumns());
-    math::Multiply<double>(1.0, wxScaled, xSub.Transpose(), 0.0, gradient);
+    math::MultiplyScaleAddUpdate(1.0, wxScaled, xSub.Transpose(), 0.0, gradient);
 
     return gradient;
 }
@@ -607,18 +607,18 @@ math::ColumnMatrix<double> Param_Z::gradient(ProtoNNModelMap& modelMap, ConstCol
 
     // ZD = Z * D'
     math::ColumnMatrix<double> ZD(Z.NumRows(), Similarity.NumRows());
-    math::Multiply(1.0, Z, Similarity.Transpose(), 0.0, ZD);
+    math::MultiplyScaleAddUpdate(1.0, Z, Similarity.Transpose(), 0.0, ZD);
 
     // yMinusZD = y - ZD'
     math::ColumnMatrix<double> residual(y.NumRows(), y.NumColumns());
-    math::Add(1.0, y, -1.0, ZD, residual);
+    math::ScaleAddSet(1.0, y, -1.0, ZD, residual);
 
     math::ColumnMatrix<double> gradient(residual.NumRows(), Similarity.NumColumns());
     switch (lossType)
     {
     case ProtoNNLossFunction::L2:
         // gradient_paramS = -2 * yMinusZD * D
-        math::Multiply<double>(-2, residual, Similarity, 0, gradient);
+        math::MultiplyScaleAddUpdate(-2.0, residual, Similarity, 0.0, gradient);
         break;
 
     case ProtoNNLossFunction::L4:
@@ -627,7 +627,7 @@ math::ColumnMatrix<double> Param_Z::gradient(ProtoNNModelMap& modelMap, ConstCol
             residual.GetColumn(j).Transform([](double x) { return x * x * x; });
         }
         // gradient_paramS = -4 * (yMinusZD .^ 3) * D
-        math::Multiply<double>(-4, residual, Similarity, 0, gradient);
+        math::MultiplyScaleAddUpdate(-4.0, residual, Similarity, 0.0, gradient);
         break;
     }
 
@@ -655,11 +655,11 @@ math::ColumnMatrix<double> Param_B::gradient(ProtoNNModelMap& modelMap, ConstCol
     auto y = Y.GetSubMatrix(0, begin, Y.NumRows(), end - begin).Transpose();
     auto wx = WX.GetSubMatrix(0, begin, WX.NumRows(), end - begin);
     math::ColumnMatrix<double> DZ(Similarity.NumRows(), Z.NumRows());
-    math::Multiply<double>(1, Similarity, Z.Transpose(), 0, DZ);
+    math::MultiplyScaleAddUpdate(1.0, Similarity, Z.Transpose(), 0.0, DZ);
 
     // residual = y - D*Z';
     math::RowMatrix<double> residual(y.NumRows(), y.NumColumns());
-    math::Add(1.0, y, -1.0, DZ, residual);
+    math::ScaleAddSet(1.0, y, -1.0, DZ, residual);
 
     switch (lossType)
     {
@@ -684,7 +684,7 @@ math::ColumnMatrix<double> Param_B::gradient(ProtoNNModelMap& modelMap, ConstCol
 
     // T = residual * Z
     math::RowMatrix<double> T(Similarity.NumRows(), Similarity.NumColumns());
-    math::Multiply<double>(1.0, residual, Z, 0, T);
+    math::MultiplyScaleAddUpdate(1.0, residual, Z, 0.0, T);
 
     // T = D .* T (final output T = residual * Z * Similarity)
     math::ElementwiseMultiplySet(T, Similarity, T);
@@ -706,7 +706,7 @@ math::ColumnMatrix<double> Param_B::gradient(ProtoNNModelMap& modelMap, ConstCol
     }
 
     // gradient_paramS = gradient_paramS - wx * T
-    math::Multiply<double>(-1.0, wx, T, 1.0, gradient);
+    math::MultiplyScaleAddUpdate(-1.0, wx, T, 1.0, gradient);
 
     return gradient;
 }

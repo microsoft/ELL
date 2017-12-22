@@ -96,21 +96,21 @@ namespace trainers
         math::RowMatrix<double> onesMultiplier(k, 1);
         onesMultiplier.Fill(1.0);
         math::RowMatrix<double> distFactor1(k, n);
-        math::Multiply(1.0, onesMultiplier, xSqNorm, 0.0, distFactor1);
+        math::MultiplyScaleAddUpdate(1.0, onesMultiplier, xSqNorm, 0.0, distFactor1);
 
         math::ColumnMatrix<double> onesMultiplier1 = math::ColumnMatrix<double>(n, 1);
         onesMultiplier1.Fill(1.0);
         math::ColumnMatrix<double> distFactor2(n, k);
-        math::Multiply(1.0, onesMultiplier1, muSqNorm, 0.0, distFactor2);
+        math::MultiplyScaleAddUpdate(1.0, onesMultiplier1, muSqNorm, 0.0, distFactor2);
 
         math::RowMatrix<double> muX(n, k);
-        math::Multiply(1.0, X.Transpose(), means, 1.0, muX);
+        math::MultiplyScaleAddUpdate(1.0, X.Transpose(), means, 1.0, muX);
 
         math::ColumnMatrix<double> tempD(n, k);
-        math::Add(1.0, distFactor1.Transpose(), -2.0, muX, tempD);
+        math::ScaleAddSet(1.0, distFactor1.Transpose(), -2.0, muX, tempD);
 
         math::ColumnMatrix<double> distance(n, k);
-        math::Add(1.0, tempD, 1.0, distFactor2, distance);
+        math::ScaleAddSet(1.0, tempD, 1.0, distFactor2, distance);
 
         return distance;
     }

@@ -176,10 +176,10 @@ void TestVectorTranspose()
 {
     math::Vector<ElementType, orientation> v{ 1,2,3,4,5,6,7 };
     auto u = v.Transpose();
-    math::Vector<ElementType, math::VectorBase<orientation>::transposeOrientation> w{ 1,2,3,4,5,6,7 };
+    math::Vector<ElementType, math::TransposeVectorOrientation<orientation>::value> w{ 1,2,3,4,5,6,7 };
 
     auto x = v.GetSubVector(2,3).Transpose();
-    math::Vector<ElementType, math::VectorBase<orientation>::transposeOrientation> z{ 3,4,5 };
+    math::Vector<ElementType, math::TransposeVectorOrientation<orientation>::value> z{ 3,4,5 };
 
     testing::ProcessTest("Vector::Transpose", u == w && x == z);
 }
@@ -262,11 +262,16 @@ void TestVectorTransform()
     math::Vector<ElementType, orientation> v{ 1,2,3,4,5,6,7 };
     v.Transform([](ElementType value) {return value * 2; });
     math::Vector<ElementType, orientation> u{ 2,4,6,8,10,12,14 };
+    
     math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
     M.GetColumn(1).Transform([](ElementType value) {return value * 2; });
     math::ColumnVector<ElementType> w{ 4,10,16 };
 
-    testing::ProcessTest("Vector::Transform", v == u && M.GetColumn(1) == w);
+    math::Vector<ElementType, orientation> z{ 1,-2,3,-4,-5,6,-7 };
+    z.Transform(math::AbsoluteValueTransformation<ElementType>);
+    math::Vector<ElementType, orientation> y{ 1,2,3,4,5,6,7 };
+
+    testing::ProcessTest("Vector::Transform", v == u && M.GetColumn(1) == w && z == y);
 }
 
 template <typename ElementType, math::VectorOrientation orientation>
@@ -324,7 +329,10 @@ void TestVectorSqrt()
     u += Sqrt(v);
     math::Vector<ElementType, orientation> r{ 1, 1, 2, 2, 3 };
 
-    testing::ProcessTest("Sqrt(Vector)", testing::IsEqual(u.ToArray(), r.ToArray()));
+    math::Vector<ElementType, orientation> w{ 1, 1, 4, 4, 9 };
+    math::TransformUpdate(math::SquareRootTransformation<ElementType>, w);
+
+    testing::ProcessTest("Sqrt(Vector)", testing::IsEqual(u.ToArray(), r.ToArray()) && testing::IsEqual(w.ToArray(), r.ToArray()));
 }
 
 template <typename ElementType, math::VectorOrientation orientation>
@@ -335,7 +343,10 @@ void TestVectorAbs()
     u += Abs(v);
     math::Vector<ElementType, orientation> r{ 1, 1, 2, 2, 3 };
 
-    testing::ProcessTest("Abs(Vector)", u == r);
+    math::Vector<ElementType, orientation> w{ 1, -1, 2, -2, 3 };
+    math::TransformUpdate(math::AbsoluteValueTransformation<ElementType>, w);
+
+    testing::ProcessTest("Abs(Vector)", w == r);
 }
 
 template <typename ElementType, math::VectorOrientation orientation>
@@ -379,7 +390,7 @@ void TestVectorDivideEqualsOperator()
 }
 
 template <typename ElementType, math::VectorOrientation orientation>
-void TestVectorElementwiseMultiply()
+void TestVectorElementwiseMultiplySet()
 {
     math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
     math::Vector<ElementType, orientation> v{ 2, 0, -1, 0, 1 };
@@ -404,13 +415,12 @@ template <typename ElementType, math::MatrixLayout layout, math::ImplementationT
 void TestVectorVectorOuter()
 {
     auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
-    using Ops = math::Internal::VectorOperations<implementation>;
 
     math::ColumnVector<ElementType> u{ 1, 2, 3 };
     math::RowVector<ElementType> v{ 1, -1 };
     math::Matrix<ElementType, layout> A(3, 2);
 
-    Ops::OuterProduct(u, v, A);
+    math::OuterProduct<implementation>(u, v, A);
 
     math::ColumnMatrix<ElementType> B{ {1, -1}, {2, -2}, {3, -3} };
     testing::ProcessTest(implementationName + "::OuterProduct(Vector, Vector)", A == B);
@@ -420,12 +430,11 @@ template <typename ElementType, math::ImplementationType implementation>
 void TestVectorVectorInner()
 {
     auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
-    using Ops = math::Internal::VectorOperations<implementation>;
 
     math::RowVector<ElementType> u{ 1, 2, 3, 4, 5 };
     math::ColumnVector<ElementType> v{ 1, -1, 2, -2, 3 };
     ElementType result;
-    Ops::InnerProduct(u, v, result);
+    math::InnerProduct<implementation>(u, v, result);
 
     testing::ProcessTest(implementationName + "::InnerProduct(Vector, Vector)", result == 12);
 }

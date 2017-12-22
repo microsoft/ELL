@@ -98,29 +98,23 @@ void TestMatrixGenerate();
 template <typename ElementType, math::MatrixLayout layout>
 void TestMatrixTransform();
 
+template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
+void TestMatrixCopyCtor();
+
 template <typename ElementType, math::MatrixLayout layout>
 void TestMatrixPrint();
 
 template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixScalarAdd();
+void TestMatrixPlusEqualsOperatorScalar();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixPlusEqualsOperatorMatrix();
 
 template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixPlusEqualsOperator();
+void TestMatrixMinusEqualsOperatorScalar();
 
-template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixMinusEqualsOperator();
-
-template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
-void TestMatrixGeneralizedMatrixAdd();
-
-template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixRowwiseSum();
-
-template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixColumnwiseSum();
-
-template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
-void TestMatrixScalarMultiply();
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixMinusEqualsOperatorMatrix();
 
 template <typename ElementType, math::MatrixLayout layout>
 void TestMatrixTimesEqualsOperator();
@@ -129,24 +123,81 @@ template <typename ElementType, math::MatrixLayout layout>
 void TestMatrixDivideEqualsOperator();
 
 template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
-void TestMatrixVectorMultiply();
+void TestMatrixAddUpdateScalar();
 
 template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
-void TestVectorMatrixMultiply();
+void TestMatrixAddUpdateZero();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixAddUpdateMatrix();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixAddSetScalar();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixAddSetZero();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixAddSetMatrix();
+
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
+void TestMatrixScaleUpdate();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixScaleSet();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::MatrixLayout outputLayout, math::ImplementationType implementation>
+void TestMatrixScaleAddUpdateScalarMatrixOne();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType implementation>
+void TestMatrixScaleAddUpdateScalarOnesMatrix();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::MatrixLayout outputLayout, math::ImplementationType implementation>
+void TestMatrixScaleAddUpdateOneMatrixScalar();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::MatrixLayout outputLayout, math::ImplementationType implementation>
+void TestMatrixScaleAddUpdateScalarMatrixScalar();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::MatrixLayout outputLayout, math::ImplementationType implementation>
+void TestMatrixScaleAddSetScalarMatrixOne();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::MatrixLayout outputLayout, math::ImplementationType implementation>
+void TestMatrixScaleAddSetOneMatrixScalar();
+
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::MatrixLayout outputLayout, math::ImplementationType implementation>
+void TestMatrixScaleAddSetScalarMatrixScalar();
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixRowwiseSum();
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixColumnwiseSum();
+
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
+void TestMatrixVectorMultiplyScaleAddUpdate();
+
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
+void TestVectorMatrixMultiplyScaleAddUpdate();
 
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
-void TestMatrixMatrixMultiply();
+void TestMatrixMatrixMultiplyScaleAddUpdate();
 
 template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixScalarMultiplyAdd();
+void TestMatrixElementwiseMultiplySet();
 
 template <typename ElementType, math::MatrixLayout layout>
-void TestMatrixElementwiseMultiply();
+void TestMatrixRowwiseCumulativeSumUpdate();
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixColumnwiseCumulativeSumUpdate();
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixRowwiseConsecutiveDifferenceUpdate();
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixColumnwiseConsecutiveDifferenceUpdate();
 
 template <typename ElementType, math::MatrixLayout layout>
 void TestMatrixArchiver();
-
-template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
-void TestMatrixCopyCtor();
 
 #include "../tcc/Matrix_test.tcc"
