@@ -91,16 +91,28 @@ endif()
 # Include cmake projects for libraries and executables
 add_subdirectory(libraries)
 add_subdirectory(tools)
-
-if(EXISTS ${CMAKE_SOURCE_DIR}/private AND EXISTS ${CMAKE_SOURCE_DIR}/private/CMakeLists.txt)
-  add_subdirectory(private)
-endif()
-
 include(CommonInterfaces)
 add_subdirectory(interfaces)
-
 # Add examples (has dependencies on SWIG-generated interfaces)
 add_subdirectory(examples)
+
+# Add user directories to ELL build if requested
+if(EXISTS "${CMAKE_SOURCE_DIR}/user")
+  # Add root user directory if it has a CMakeLists.txt file and INCLUDE_IN_ELL_BUILD.txt file
+  if(EXISTS"${CMAKE_SOURCE_DIR}/user/CMakeLists.txt" AND EXISTS "${CMAKE_SOURCE_DIR}/user/INCLUDE_IN_ELL_BUILD.txt")
+    message(STATUS "Adding user directory to ELL build")
+    add_subdirectory(user)
+  endif()
+
+  # Now add all child directories that have CMakeLists.txt files and INCLUDE_IN_ELL_BUILD.txt file
+  file(GLOB children RELATIVE "${CMAKE_SOURCE_DIR}/user" "${CMAKE_SOURCE_DIR}/user/*")
+  foreach(child ${children})
+    if(IS_DIRECTORY "${CMAKE_SOURCE_DIR}/user/${child}" AND EXISTS "${CMAKE_SOURCE_DIR}/user/${child}/CMakeLists.txt" AND EXISTS "${CMAKE_SOURCE_DIR}/user/${child}/INCLUDE_IN_ELL_BUILD.txt")
+      message(STATUS "Adding user directory ${child} to ELL build")
+      add_subdirectory("user/${child}")
+    endif()
+  endforeach()
+endif()
 
 # Add project for solution-level documentation
 set (DOC README.md

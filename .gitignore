@@ -231,6 +231,9 @@ yotta_targets/
 # CMake / CTest stuff
 /Testing/
 
+# ELL user directory
+user/**
+
 # ELL External Dependencies
 external/**
 !external/README.md
