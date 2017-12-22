@@ -103,7 +103,7 @@ namespace model
 
         /// <summary> Returns the shape of the map's input </summary>
         ///
-        /// <returns> The dimensionality of the map's input port </returns>
+        /// <returns> The dimensionality of the map's input </returns>
         math::TensorShape GetInputShape() const;
 
         /// <summary> Returns the shape of the map's output </summary>
@@ -147,6 +147,12 @@ namespace model
         /// <param name="transformFunction"> The function to apply on each node </param>
         /// <param name="context"> The TransformContext to use during the transformation </param>
         void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
+
+        /// <summary> Renames the model callbacks in this map. </summary>
+        ///
+        /// <param name="sourceCallbackName"> The new source callback name. </param>
+        /// <param name="sinkCallbackName"> The new sink callback name. </param>
+        void RenameCallbacks(const std::string& sourceCallbackName, const std::string& sinkCallbackName);
 
         //
         // ELL-Internal routines for getting information about inputs / outputs of the map

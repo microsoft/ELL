@@ -1,15 +1,15 @@
 from __future__ import print_function
-import sys
-
-sys.path.append('.')
-sys.path.append('./..')
-sys.path.append('./../Release')
-sys.path.append('./../Debug')
+import os
+script_path = os.path.dirname(os.path.abspath(__file__))
 
 tests = []
 
 SkipTests = False
 try:
+    import sys
+    sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
+    sys.path.append(os.path.join(script_path, '..'))
+    import find_ell
     import ell
     import functions_test
     import model_test

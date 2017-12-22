@@ -258,11 +258,13 @@ class FullModelTest:
         self.verify_compiled(predictor, ellTestInput, ellArray, op_name)
 
     def verify_compiled(self, predictor, input, expectedOutput, module_name, precision=1e-4):
-        # now run same over ELL compiled model
         map = ell_utilities.ell_map_from_float_predictor(predictor)
-        compiled = map.Compile("host", module_name, "test" + str(self.method_index), False)
+
+        # Note: for testing purposes, callback functions assume the "model" namespace
+        compiled = map.Compile("host", "model", "test" + str(self.method_index), False, dtype=np.float32)
+
         self.method_index += 1
-        compiledResults = compiled.ComputeFloat(input)
+        compiledResults = compiled.Compute(input, dtype=np.float32)
         ca = np.array(compiledResults) # convert back to numpy
         self.compiled_data = ca
         expectedFloats = expectedOutput.astype(dtype=np.float32)

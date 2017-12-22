@@ -25,6 +25,7 @@
 #include "PortElements.h"
 
 // apis
+#include "CallbackInterface.h"
 #include "MathInterface.h"
 #include "NeuralNetworkPredictorInterface.h"
 
@@ -332,7 +333,7 @@ public:
     Node AddInputNode(Model model, const ell::api::math::TensorShape& shape, PortType type);
     Node AddOutputNode(Model model, const ell::api::math::TensorShape& shape, PortElements input);
 
-    Node AddClockNode(Model model, PortElements input, double interval, short lagThreshold, const std::string& lagNotificationName);
+    Node AddClockNode(Model model, PortElements input, double interval, double lagThreshold, const std::string& lagNotificationName);
     Node AddSinkNode(Model model, PortElements input, const ell::api::math::TensorShape& shape, const std::string& sinkFunctionName);
     Node AddSourceNode(Model model, PortElements input, PortType outputType, const ell::api::math::TensorShape& shape, const std::string& sourceFunctionName);
 
@@ -371,19 +372,36 @@ public:
 #ifndef SWIG
     Map(std::shared_ptr<ell::model::DynamicMap>& map);
 #endif
-    std::vector<double> ComputeDouble(const AutoDataVector& inputData);
-    std::vector<double> ComputeDouble(const std::vector<double>& inputData);
-    std::vector<float> ComputeFloat(const std::vector<float>& inputData);
+
     void Save(const std::string& filename) const;
     void Load(const std::string& filename);
     ell::api::math::TensorShape GetInputShape() const;
     ell::api::math::TensorShape GetOutputShape() const;
-    CompiledMap Compile(const std::string&  targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const;
     Model GetModel() const;
+
+    // Note: not templatized because these implement type-specific resolverFunctions
+    CompiledMap CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const;
+    CompiledMap CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const;
+
+    template <typename ElementType>
+    void SetSourceCallback(ell::api::CallbackBase<ElementType>& callback, size_t index);
+    template <typename ElementType>
+    void SetSinkCallback(ell::api::CallbackBase<ElementType>& callback, size_t index);
+    template <typename ElementType>
+    void Step(ell::api::TimeTickType timestamp = 0.0);
+
 #ifndef SWIG
     std::shared_ptr<ell::model::DynamicMap> GetInnerMap() { return _map; }
 #endif
+
 private:
+
+#ifndef SWIG
+    CompiledMap Compile(const std::string&  targetDevice, const std::string& moduleName, const std::string& functionName,
+        const std::string& sourceFunctionName, const std::string& sinkFunctionName,
+        bool useBlas, std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolverFunction) const;
+#endif
+
     std::shared_ptr<ell::model::DynamicMap> _map;
 };
 
@@ -393,25 +411,41 @@ private:
 class CompiledMap
 {
 public:
-    CompiledMap(const CompiledMap& other) = default;
+    ~CompiledMap();
 
     void WriteIR(const std::string& filePath);
     void WriteBitcode(const std::string& filePath);
     void WriteSwigInterface(const std::string& filePath);
-
     std::string GetCodeString();
-    std::vector<double> ComputeDouble(const std::vector<double>& inputData);
-    std::vector<float> ComputeFloat(const std::vector<float>& inputData);
+
+    template <typename ElementType>
+    void RegisterCallbacks(ell::api::CallbackBase<ElementType>& inputCallback, ell::api::CallbackBase<ElementType>& outputCallback);
+
+    template <typename ElementType>
+    void Step(ell::api::TimeTickType timestamp = 0.0);
+
+    template <typename ElementType>
+    void UnregisterCallbacks();
 
 #ifndef SWIG
     CompiledMap() = default;
-    CompiledMap(ell::model::IRCompiledMap map);
+    CompiledMap(ell::model::IRCompiledMap map, ell::api::math::TensorShape inputShape, ell::api::math::TensorShape outputShape);
+
+    template <typename ElementType>
+    static bool InvokeSourceCallback(ElementType* input);
+
+    template <typename ElementType>
+    static void InvokeSinkCallback(ElementType* output);
 #endif
 
 private:
-    std::shared_ptr<ell::model::IRCompiledMap> _map;
-};
+    template <typename ElementType>
+    static ell::api::CallbackForwarder<ElementType, ElementType>& CallbackForwarder();
 
+    std::shared_ptr<ell::model::IRCompiledMap> _map;
+    ell::api::math::TensorShape _inputShape;
+    ell::api::math::TensorShape _outputShape;
+};
 
 //
 // Functions
@@ -420,3 +454,5 @@ private:
 Model LoadModelFromString(std::string str);
 
 } // end namespace
+
+#include "../tcc/ModelInterface.tcc"

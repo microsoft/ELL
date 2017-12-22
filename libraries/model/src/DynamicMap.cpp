@@ -276,7 +276,7 @@ namespace model
 
     size_t DynamicMap::GetInputSize() const
     {
-        return GetInput(0)->Size();
+        return GetInputShape().Size();
     }
 
     size_t DynamicMap::GetOutputSize() const
@@ -286,6 +286,13 @@ namespace model
 
     math::TensorShape DynamicMap::GetInputShape() const
     {
+        auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
+        if (!sourceNodes.empty())
+        {
+            return sourceNodes[0]->GetShape();
+        }
+
+        // no source nodes, fallback to first input node's shape
         return GetInput(0)->GetShape();
     }
 
@@ -313,7 +320,7 @@ namespace model
     math::TensorShape DynamicMap::GetOutputShape() const
     {
         auto outputNodeVec = GetOutputNodes();
-        if (outputNodeVec.size() > 0)
+        if (!outputNodeVec.empty())
         {
             const OutputNodeBase* node = dynamic_cast<const OutputNodeBase*>(outputNodeVec[0]);
             return node->GetShape();
@@ -323,6 +330,12 @@ namespace model
 
     Port::PortType DynamicMap::GetInputType() const
     {
+        auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
+        if (!sourceNodes.empty())
+        {
+            return sourceNodes[0]->GetOutputType();
+        }
+        
         return GetInput()->GetOutputType();
     }
 
@@ -358,6 +371,31 @@ namespace model
         auto refinedModel = transformer.TransformModel(_model, transformFunction, context);
         FixTransformedIO(transformer);
         _model = std::move(refinedModel);
+    }
+
+    void DynamicMap::RenameCallbacks(const std::string& sourceCallbackName, const std::string& sinkCallbackName)
+    {
+        // Look for all source nodes and apply name if it is non-empty.
+        // The callbacks will soon support a context parameter that indicates the originating source node.
+        if (!sourceCallbackName.empty())
+        {
+            auto nodes = _model.GetNodesByType<SourceNodeBase>();
+            for (size_t i = 0; i < nodes.size(); ++i)
+            {
+                nodes[i]->SetCallbackName(sourceCallbackName);
+            }
+        }
+
+        // Look for all sink nodes and apply name if it is non-empty.
+        // The callbacks will soon support a context parameter that indicates the originating sink node.
+        if (!sinkCallbackName.empty())
+        {
+            auto nodes = _model.GetNodesByType<SinkNodeBase>();
+            for (size_t i = 0; i < nodes.size(); ++i)
+            {
+                nodes[i]->SetCallbackName(sinkCallbackName);
+            }
+        }
     }
 
     utilities::ArchiveVersion DynamicMap::GetArchiveVersion() const

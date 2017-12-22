@@ -37,15 +37,15 @@ def main(argv):
         help="produce a steppable ELL model for a millisecond interval",
         default=0)
     model_options.add_argument("--lag_threshold",
-        help="number of step intervals to fall behind before notifying the caller.\n"
+        help="millisecond time lag before notifying the caller.\n"
              "used when step_interval is set\n",
         default=5)
 
     args = vars(arg_parser.parse_args(argv))
 
     model_options = args.get('model_options', {})
-    step_interval = model_options.get('step_interval')
-    lag_threshold = model_options.get('lag_threshold')
+    step_interval = model_options.get('step_interval', 0)
+    lag_threshold = model_options.get('lag_threshold', 0)
 
     # extract the model if it's in an archive
     unzip = ziptools.Extractor(args['cntk_model_file'])

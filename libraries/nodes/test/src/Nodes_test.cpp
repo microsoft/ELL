@@ -791,7 +791,7 @@ static void TestProtoNNPredictorNode()
 
 static void TestClockNodeCompute()
 {
-    constexpr short lagThreshold = 5;
+    constexpr nodes::TimeTickType lagThreshold = 165;
     constexpr nodes::TimeTickType interval = 50;
     constexpr nodes::TimeTickType start = 1511889201834.5767; // timestamp from python: time.time() * 1000
 
@@ -807,14 +807,13 @@ static void TestClockNodeCompute()
             lagNotificationCallbackCount++;
         });
 
-    constexpr nodes::TimeTickType thresholdTicks = lagThreshold * interval;
     std::vector<std::vector<nodes::TimeTickType>> signal =
     {
         { start },
-        { start + interval*1 + thresholdTicks/2 }, // within threshold
+        { start + interval*1 + lagThreshold/2 }, // within threshold
         { start + interval*2 }, // on time
-        { start + interval*3 + thresholdTicks }, // late (expect notification)
-        { start + interval*4 + thresholdTicks*20 }, // really late (expect notification)
+        { start + interval*3 + lagThreshold }, // late (expect notification)
+        { start + interval*4 + lagThreshold*20 }, // really late (expect notification)
         { start + interval*5 } // on time
     };
 
@@ -822,20 +821,20 @@ static void TestClockNodeCompute()
     {
         // lastIntervalTime, currentTime
         { start, start },
-        { start + interval*1, start + interval*1 + thresholdTicks/2 },
+        { start + interval*1, start + interval*1 + lagThreshold/2 },
         { start + interval*2, start + interval*2 },
-        { start + interval*3, start + interval*3 + thresholdTicks },
-        { start + interval*4, start + interval*4 + thresholdTicks*20 },
+        { start + interval*3, start + interval*3 + lagThreshold },
+        { start + interval*4, start + interval*4 + lagThreshold*20 },
         { start + interval*5, start + interval*5 }
     };
 
     std::vector<nodes::TimeTickType> expectedGetTicksResults =
     {
         interval,
-        interval - thresholdTicks/2,
+        interval - lagThreshold/2,
         interval,
-        interval - thresholdTicks,
-        interval - thresholdTicks*20,
+        interval - lagThreshold,
+        interval - lagThreshold*20,
         interval
     };
 

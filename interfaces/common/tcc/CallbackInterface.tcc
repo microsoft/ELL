@@ -24,41 +24,55 @@ namespace api
 
     template <typename InputType, typename OutputType>
     CallbackForwarder<InputType, OutputType>::CallbackForwarder()
-        : _inputCallback(nullptr), _inputBuffer(nullptr), _outputCallback(nullptr)
+        : _inputCallback(nullptr), _outputCallback(nullptr), _lagCallback(nullptr)
     {
     }
 
     template <typename InputType, typename OutputType>
     void CallbackForwarder<InputType, OutputType>::InitializeOnce(CallbackBase<InputType>& inputCallback,
-                                                                  std::vector<InputType>& inputBuffer,
-                                                                  CallbackBase<OutputType>& outputCallback,
-                                                                  size_t outputSize)
+        size_t inputSize,
+        CallbackBase<OutputType>& outputCallback,
+        size_t outputSize,
+        CallbackBase<TimeTickType>& lagCallback)
     {
-        assert(_inputCallback == nullptr);
-        assert(_inputBuffer == nullptr);
-        assert(_outputCallback == nullptr);
+        if (_inputCallback != nullptr || _outputCallback != nullptr || _lagCallback != nullptr)
+        {
+            throw std::invalid_argument("InitializeOnce has already been called");
+        }
 
         _inputCallback = &inputCallback;
-        _inputBuffer = &inputBuffer;
         _outputCallback = &outputCallback;
+        _lagCallback = &lagCallback;
+
+        _inputBuffer.resize(inputSize);
         _outputBuffer.resize(outputSize);
+    }
+
+    template <typename InputType, typename OutputType>
+    void CallbackForwarder<InputType, OutputType>::Uninitialize()
+    {
+        _inputCallback = nullptr;
+        _outputCallback = nullptr;
+        _lagCallback = nullptr;
+
+        _inputBuffer.resize(0);
+        _outputBuffer.resize(0);
     }
 
     template <typename InputType, typename OutputType>
     bool CallbackForwarder<InputType, OutputType>::InvokeInput(InputType* buffer)
     {
-        if (_inputCallback == nullptr || _inputBuffer == nullptr)
+        if (_inputCallback == nullptr)
         {
             throw std::invalid_argument("InitializeOnce has not yet been called");
         }
 
-        bool result = _inputCallback->Run(*_inputBuffer);
+        bool result = _inputCallback->Run(_inputBuffer);
         if (result)
         {
             // EFFICIENCY: any way to avoid the copy?
-            std::copy(_inputBuffer->begin(), _inputBuffer->end(), buffer);
+            std::copy(_inputBuffer.begin(), _inputBuffer.end(), buffer);
         }
-
         return result;
     }
 
@@ -83,13 +97,18 @@ namespace api
             throw std::invalid_argument("InitializeOnce has not yet been called");
         }
 
-        if (_outputBuffer.size() < 1)
+        _outputCallback->Run(value);
+    }
+
+    template <typename InputType, typename OutputType>
+    void CallbackForwarder<InputType, OutputType>::InvokeLagNotification(TimeTickType value)
+    {
+        if (_lagCallback == nullptr)
         {
-            throw std::out_of_range("Output buffer is not initialized correctly");
+            throw std::invalid_argument("InitializeOnce has not yet been called");
         }
 
-        _outputBuffer[0] = value;
-        _outputCallback->Run(_outputBuffer);
+        _lagCallback->Run(value);
     }
 }
 }

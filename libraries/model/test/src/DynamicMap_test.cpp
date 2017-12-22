@@ -172,7 +172,7 @@ void TestDynamicMapSerialization()
 
 void TestDynamicMapClockNode()
 {
-    constexpr short lagThreshold = 2;
+    constexpr nodes::TimeTickType lagThreshold = 75;
     constexpr nodes::TimeTickType interval = 20;
     std::vector<nodes::TimeTickType> lagValues;
     std::vector<std::vector<double>> outputValues;
@@ -207,14 +207,13 @@ void TestDynamicMapClockNode()
     auto map = model::DynamicMap(model, { { "clockInput", in } }, { { "sinkOutput", sink->output } });
     TestMapSerialization(map);
 
-    constexpr nodes::TimeTickType thresholdTicks = lagThreshold * interval;
     std::vector<std::vector<nodes::TimeTickType>> clockValues =
     {
         { 0 },
-        { interval*1 + thresholdTicks/2 }, // within threshold
+        { interval*1 + lagThreshold/2 }, // within threshold
         { interval*2 }, // on time
-        { interval*3 + thresholdTicks }, // late
-        { interval*4 + thresholdTicks*20 }, // really late
+        { interval*3 + lagThreshold }, // late
+        { interval*4 + lagThreshold*20 }, // really late
         { interval*5 } // on time
     };
 
@@ -226,6 +225,6 @@ void TestDynamicMapClockNode()
 
     testing::ProcessTest("Testing source and sink callbacks", testing::IsEqual(inputValues, outputValues));
 
-    std::vector<nodes::TimeTickType> expectedLagValues = { thresholdTicks, thresholdTicks*20 };
+    std::vector<nodes::TimeTickType> expectedLagValues = { lagThreshold, lagThreshold*20 };
     testing::ProcessTest("Testing lag callbacks", testing::IsEqual(lagValues, expectedLagValues));
 }

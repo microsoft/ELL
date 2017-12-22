@@ -68,6 +68,29 @@ namespace model
         OutputShape _shape;
     };
 
+    /// <summary> Base class for a node that represents a sink from the system. </summary>
+    class SinkNodeBase : public OutputNodeBase
+    {
+    public:
+        /// <summary> Gets the callback function name for this node. </summary>
+        ///
+        /// <returns> The callback name. </returns>
+        std::string GetCallbackName() const { return _callbackName; };
+
+        /// <summary> Sets the callback function name for this node. </summary>
+        ///
+        /// <param name="name"> The callback name to set. </param>
+        void SetCallbackName(const std::string& name) { _callbackName = name; };
+
+    protected:
+        SinkNodeBase(InputPortBase& input, OutputPortBase& output, ell::math::TensorShape shape, const std::string& callbackName)
+            : OutputNodeBase(input, output, shape), _callbackName(callbackName)
+        {
+        }
+
+    private:
+        std::string _callbackName;
+    };
 }
 }
 

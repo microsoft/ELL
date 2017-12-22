@@ -39,10 +39,10 @@ namespace nodes
         ///
         /// <param name="input"> Port elements for input value (current time). </param>
         /// <param name="interval"> The time interval. </param>
-        /// <param name="lagThreshold">The number of intervals that the lag should reach before lagFunction is called. </param>
+        /// <param name="lagThreshold">The time lag before lagFunction is called. </param>
         /// <param name="functionName">The lag notification name to be emitted. </param>
         /// <param name="function">The optional lag notification function used in Compute(). </param>
-        ClockNode(const model::PortElements<TimeTickType>& input, TimeTickType interval, short lagThreshold, const std::string& functionName, LagNotificationFunction function = nullptr);
+        ClockNode(const model::PortElements<TimeTickType>& input, TimeTickType interval, TimeTickType lagThreshold, const std::string& functionName, LagNotificationFunction function = nullptr);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -72,7 +72,7 @@ namespace nodes
         /// <summary> Sets the lag threshold for this node. </summary>
         ///
         /// <param name="threshold"> The threshold to set. </param>
-        void SetLagTheshold(uint32_t threshold) { _lagThreshold = threshold; }
+        void SetLagTheshold(TimeTickType threshold) { _lagThreshold = threshold; }
 
         /// <summary> Gets the ticks until the next interval, relative to the current time. </summary>
         ///
@@ -98,7 +98,7 @@ namespace nodes
 
         TimeTickType _interval;
         mutable TimeTickType _lastIntervalTime;
-        short _lagThreshold;
+        TimeTickType _lagThreshold;
         LagNotificationFunction _lagNotificationFunction;
         std::string _lagNotificationFunctionName;
     };

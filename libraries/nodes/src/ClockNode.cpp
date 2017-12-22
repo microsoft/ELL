@@ -31,7 +31,7 @@ namespace nodes
     {
     }
 
-    ClockNode::ClockNode(const model::PortElements<TimeTickType>& input, TimeTickType interval, short lagThreshold, const std::string& functionName, LagNotificationFunction function)
+    ClockNode::ClockNode(const model::PortElements<TimeTickType>& input, TimeTickType interval, TimeTickType lagThreshold, const std::string& functionName, LagNotificationFunction function)
         : CompilableNode({ &_input }, { &_output }),
         _input(this, input, inputPortName),
         _output(this, outputPortName, 2 /*sampleTime, currentTime*/),
@@ -71,7 +71,7 @@ namespace nodes
         {
             // Notify if the time lag reaches the threshold
             auto delta = currentTime - _lastIntervalTime;
-            if (delta >= _lagThreshold * _interval)
+            if (delta >= _lagThreshold)
             {
                 _lagNotificationFunction(delta);
             }
@@ -87,7 +87,7 @@ namespace nodes
         auto interval = function.template Literal<TimeTickType>(_interval);
         auto uninitializedIntervalTime = function.template Literal<TimeTickType>(UninitializedIntervalTime);
         auto zeroInterval = function.template Literal<TimeTickType>(0);
-        auto thresholdTime = function.template Literal<TimeTickType>(_lagThreshold * _interval);
+        auto thresholdTime = function.template Literal<TimeTickType>(_lagThreshold);
 
         // Callback
         const emitters::VariableTypeList parameters = { emitters::GetVariableType<TimeTickType>() };
@@ -136,6 +136,8 @@ namespace nodes
         }
         if1.End();
 
+        DEBUG_EMIT_PRINTF(function, "now %f, last interval %f, new last interval %f\n", now, lastIntervalTime, function.Load(newLastInterval));
+
         // Update _lastInterval state
         function.Store(pLastIntervalTime, function.Load(newLastInterval));
 
@@ -150,8 +152,7 @@ namespace nodes
     void ClockNode::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<ClockNode>(newPortElements, _interval, _lagThreshold, _lagNotificationFunctionName);
-        newNode->_lagNotificationFunction = _lagNotificationFunction;
+        auto newNode = transformer.AddNode<ClockNode>(newPortElements, _interval, _lagThreshold, _lagNotificationFunctionName, _lagNotificationFunction);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -160,6 +161,7 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
+
         archiver["interval"] << _interval;
         archiver["lagThreshold"] << _lagThreshold;
         archiver["lagNotificationFunctionName"] << _lagNotificationFunctionName;
@@ -224,6 +226,8 @@ namespace nodes
             function.Store(result, function.Operator(minusTime, function.Operator(plusTime, lastIntervalTime, interval), now));
         }
         ifEmitter1.End();
+
+        DEBUG_EMIT_PRINTF(function, "GetTicksUntilNextInterval: now %f, last interval %f, delta %f\n", now, lastIntervalTime, function.Load(result));
 
         function.Return(function.Load(result));
         moduleEmitter.EndFunction();

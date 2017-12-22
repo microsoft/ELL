@@ -18,13 +18,20 @@ namespace ell
 {
 namespace api
 {
-    // The base callback interface enabled with the SWIG director feature.
-    // Via cross-language polymorphism, callbacks written in the caller's
-    // language derive from this class and are then called by CallbackForwarder.
+    using TimeTickType = double;
+
+    /// <summary>
+    /// The base callback interface enabled with the SWIG director feature.
+    /// Via cross-language polymorphism, callbacks written in the caller's
+    /// language derive from this class and are then called by CallbackForwarder.
+    /// </summary>
     template <typename ElementType>
     class CallbackBase
     {
     public:
+        // Defining the ctor tells SWIG to not generate duplicate wrappers
+        // (one per template specialization)
+        CallbackBase() = default;
         virtual ~CallbackBase() = default;
 
         /// <summary> Runs the callback. Derived classes should override. </summary>
@@ -33,18 +40,27 @@ namespace api
         /// <returns> The callback status. </param>
         virtual bool Run(std::vector<ElementType>& /*buffer*/)
         {
-            // STYLE this can't be pure virtual in order for SWIG to generate wrappers
-            // so we provide a default implementation that returns false
+            return false;
+        }
+
+        /// <summary> Runs the callback. Derived classes should override. </summary>
+        ///
+        /// <param name="value"> The callback data value. </param>
+        /// <returns> The callback status. </param>
+        virtual bool Run(ElementType /*value*/) const
+        {
             return false;
         }
     };
 
-    // The interface that forwards callback invocations from emitted code
-    // over to the language-specific callback implementations (typically, derived
-    // classes of CallbackBase).
-    // Known limitations:
-    // * Assumes: BOTH in and out callbacks are always present in the model (Ideal: allow any to be optional)
-    // * Assumes: ONE instance per callback type (Ideal: support multiple instances)
+    /// <summary>
+    /// The interface that forwards callback invocations from emitted code
+    /// over to the language-specific callback implementations (typically, derived
+    /// classes of CallbackBase).
+    /// Known limitations:
+    /// * Assumes: BOTH in and out callbacks are always present in the model (Ideal: allow any to be optional)
+    /// * Assumes: ONE instance per callback type (Ideal: support multiple instances)
+    /// </summary>
     template <typename InputType, typename OutputType>
     class CallbackForwarder
     {
@@ -70,26 +86,34 @@ namespace api
         /// <param name="buffer"> The callback scalar value. </param>
         void InvokeOutput(OutputType value);
 
-    protected:
+        /// <summary> Invokes the lag notification callback </summary>
+        ///
+        /// <param name="value"> The time lag. </param>
+        void InvokeLagNotification(TimeTickType value);
+
         /// <summary> Performs a one-time initialization of the forwarder </summary>
         ///
         /// <param name="inputCallback"> The input callback object. </param>
-        /// <param name="inputBuffer"> The buffer used by the input callback object. Caller controls both the lifetime of the buffer and this object. </param>
+        /// <param name="inputSize"> The input size. </param>
         /// <param name="outputCallback"> The output callback object. </param>
-        /// <param name="outputSize"> The number of output values. </param>
-        ///
-        /// STYLE SWIG pythonprepend requires the parameters to be fully qualified </param>
+        /// <param name="outputSize"> The output size. </param>
+        /// <param name="lagCallback"> The lag callback object. </param>
         void InitializeOnce(ell::api::CallbackBase<InputType>& inputCallback,
-                            std::vector<InputType>& inputBuffer,
-                            ell::api::CallbackBase<OutputType>& outputCallback,
-                            size_t outputSize);
+            size_t inputSize,
+            ell::api::CallbackBase<OutputType>& outputCallback,
+            size_t outputSize,
+            ell::api::CallbackBase<TimeTickType>& lagCallback);
+
+        /// <summary> Uninitializes the forwarder so that it can be reused. </summary>
+        void Uninitialize();
 
     private:
         // Raw pointers are used because lifetime management is performed by the caller
         CallbackBase<InputType>* _inputCallback;
-        std::vector<InputType>* _inputBuffer;
         CallbackBase<OutputType>* _outputCallback;
+        CallbackBase<TimeTickType>* _lagCallback;
 
+        std::vector<InputType> _inputBuffer;
         std::vector<OutputType> _outputBuffer;
     };
 }

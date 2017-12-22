@@ -36,6 +36,7 @@ endforeach()
 
 set(_sources
     common/tcc/CallbackInterface.tcc
+    common/tcc/ModelInterface.tcc
     common/tcc/NeuralNetworkPredictorInterface.tcc
 )
 foreach(src ${_sources})

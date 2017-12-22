@@ -183,10 +183,12 @@ class CntkToEllTestBase(unittest.TestCase):
 class CntkLayersTestCase(CntkToEllTestBase):
     def verify_compiled(self, predictor, input, expectedOutput, module_name,
                         method_name, precision=5):
-        # now run same over ELL compiled model
         map = ell_utilities.ell_map_from_float_predictor(predictor)
-        compiled = map.Compile("host", module_name, method_name, False)
-        compiledResults = compiled.ComputeFloat(input)
+
+        # Note: for testing purposes, callback functions assume the "model" namespace
+        compiled = map.Compile("host", "model", method_name, False, dtype=np.float32)
+        compiledResults = compiled.Compute(input, dtype=np.float32)
+
         # Compare compiled results
         if precision > 0:
             np.testing.assert_array_almost_equal(
@@ -603,7 +605,7 @@ class CntkXorModelTestCase(CntkToEllTestBase):
 
         # create a map and save to file
         ell_map = ell_utilities.ell_map_from_float_predictor(predictor,
-            step_interval_msec=500, lag_threshold=2, function_prefix="XorTest")
+            step_interval_msec=500, lag_threshold_msec=750, function_prefix="XorTest")
         ell_map.Save("xor_test_steppable.map")
 
 
@@ -655,8 +657,9 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             self.model_test_impl(modelName)
 
     def compute_ell_map(self, ellMap, ellOrderedInput, cntkResults, modelName):
-        ellMapFromArchiveResults = ellMap.ComputeFloat(
-            ellOrderedInput)
+
+        ellMapFromArchiveResults = ellMap.Compute(
+            ellOrderedInput, dtype=np.float32)
         # Verify CNTK results and unarchived ELL model results match
         np.testing.assert_array_almost_equal(
             cntkResults, ellMapFromArchiveResults, decimal=5,
@@ -684,11 +687,13 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             outputShape = ellMap.GetOutputShape()
 
             # Compile the live map
-            ellCompiledMap = ellMap.Compile('host', modelName, 'predict', False)
+            # Note: for testing purposes, callback functions assume the "model" namespace
+            ellCompiledMap = ellMap.Compile('host', 'model', 'predict', False, dtype=np.float32)
 
             # Compile the unarchived map
+            # Note: for testing purposes, callback functions assume the "model" namespace
             ellCompiledMapFromArchive = ellMapFromArchive.Compile(
-                'host', modelName, 'predict', False)
+                'host', 'model', 'predict', False, dtype=np.float32)
 
             cntkInput = np.random.uniform(
                 high=255, size=(
@@ -720,7 +725,8 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
 
             print('Comparing map output (reference)')
             sys.stdout.flush()
-            ellMapResults = ellMap.ComputeFloat(ellOrderedInput)
+
+            ellMapResults = ellMap.Compute(ellOrderedInput, dtype=np.float32)
 
             # Verify CNTK results and ELL map results match
             np.testing.assert_array_almost_equal(
@@ -732,12 +738,12 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             sys.stdout.flush()
 
             ellMapFromArchiveResults = self.compute_ell_map(ellMapFromArchive, 
-                    ellOrderedInput, cntkResults, modelName)
+                ellOrderedInput, cntkResults, modelName)
 
             print('Comparing map output (compiled)')
             sys.stdout.flush()
-            ellCompiledMapResults = ellCompiledMap.ComputeFloat(
-                ellOrderedInput)
+
+            ellCompiledMapResults = ellCompiledMap.Compute(ellOrderedInput, dtype=np.float32)
 
             # Verify CNTK results and unarchived ELL model results match
             np.testing.assert_array_almost_equal(
@@ -747,8 +753,9 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
 
             print('Comparing unarchived map output (compiled)')
             sys.stdout.flush()
+
             ellCompiledMapFromArchiveResults = ellCompiledMapFromArchive.\
-                ComputeFloat(ellOrderedInput)
+                Compute(ellOrderedInput, dtype=np.float32)
 
             # Verify CNTK results and unarchived ELL model results match
             np.testing.assert_array_almost_equal(
@@ -880,13 +887,13 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
         """Takes the input data and passes it through a compiled ELL model
         and compare it against the CNTK output, `expectedOutput`.
         """
-        # now run same over ELL compiled model
+        # Note: for testing purposes, callback functions assume the "model" namespace
         ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
-        compiled = ell_map.Compile("host", module_name, "test{}".format(
-            self.method_index), False)
+        compiled = ell_map.Compile("host", "model", "test{}".format(
+            self.method_index), False, dtype=np.float32)
         self.method_index += 1
 
-        compiledResults = np.array(compiled.ComputeFloat(inputData))
+        compiledResults = np.array(compiled.Compute(inputData, dtype=np.float32))
 
         # Compare compiled results
         np.testing.assert_array_almost_equal(

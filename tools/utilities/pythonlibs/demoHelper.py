@@ -221,7 +221,7 @@ class DemoHelper:
         if self.model == None:
             self.compiled_func(data, self.results)
         else:
-            self.results = self.model.ComputeFloat(data)
+            self.results = self.model.Compute(data, dtype=np.float32)
         end = time.time()
         diff = end - start
 
@@ -288,7 +288,7 @@ class DemoHelper:
     def compile(self, predictor, platform, path):
         path += '/model'
         prediction_function = self.create_function(predictor)
-        prediction_function.Compile(platform, 'model', 'predict', path)
+        prediction_function.Compile(platform, 'model', 'predict', path, dtype=np.float32)
         from ..util.commands import run_llc, run_swig
         run_swig(path + '.i')
         run_llc(path + '.ll')

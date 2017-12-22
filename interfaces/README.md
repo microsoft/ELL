@@ -109,12 +109,12 @@ For documenting generated code, you can add/prepend docstring comments e.g.
     %}
 
 ## Return types
-Generally, prefer to return value types or new objects, not references. The reason is that the API caller can manage the results, including object lifetime, themselves. If you return a reference like:std::vector<float>& foo() {…}, then when callers do something like 
+Generally, prefer to return value types or new objects, not references. The reason is that the API caller can manage the results, including object lifetime, themselves. If you return a reference like: std::vector<float>& foo() {…}, then when callers do something like this:
 
-    this:result = foo()
-    do_something(result)
-    del result   # Uh, oh
-    
+    result = foo()
+    do_something(result)
+    del result   # Uh, oh
+
 In addition, references don't always show up well in the scripting debugger.
 	
 ### Returning vectors or other multi-value objects

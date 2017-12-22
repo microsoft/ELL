@@ -16,30 +16,28 @@ namespace nodes
 {
     template <typename ValueType>
     SinkNode<ValueType>::SinkNode()
-        : SinkNode({}, OutputShape{ 0, 0, 0 }, "", nullptr)
+        : SinkNode({}, math::TensorShape{ 0, 0, 0 }, "", nullptr)
     {
     }
 
-    // Following the pattern of OutputNode, we provide a constructor override that infers the OutputShape from the input
+    // Following the pattern of OutputNode, we provide a constructor override that infers the shape from the input
     template <typename ValueType>
     SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
-        : SinkNode(input, OutputShape{ input.Size(), 1, 1 }, sinkFunctionName, sink)
+        : SinkNode(input, math::TensorShape{ input.Size(), 1, 1 }, sinkFunctionName, sink)
     {
     }
 
     template <typename ValueType>
     SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, size_t outputVectorSize, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
-        : SinkNode(input, OutputShape{ outputVectorSize, 1, 1 }, sinkFunctionName, sink)
+        : SinkNode(input, math::TensorShape{ outputVectorSize, 1, 1 }, sinkFunctionName, sink)
     {
     }
 
     template <typename ValueType>
-    SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const OutputShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
-        : CompilableNode({ &_input }, { &_output }),
+    SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const math::TensorShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
+        : model::SinkNodeBase(_input, _output, shape, sinkFunctionName),
         _input(this, input, inputPortName),
         _output(this, outputPortName, shape.Size()),
-        _shape(shape),
-        _sinkFunctionName(sinkFunctionName),
         _sink(sink == nullptr ? [](const auto&){} : sink)
     {
     }
@@ -61,7 +59,7 @@ namespace nodes
     void SinkNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        std::string prefixedName(compiler.GetNamespacePrefix() + "_" + _sinkFunctionName);
+        std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
         DEBUG_EMIT_PRINTF(function, prefixedName + "\n");
 
         // EvaluateInput defaults to 'pass through' in base implementation, which means
@@ -104,7 +102,7 @@ namespace nodes
     void SinkNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<SinkNode<ValueType>>(newPortElements, _shape, _sinkFunctionName, _sink);
+        auto newNode = transformer.AddNode<SinkNode<ValueType>>(newPortElements, GetShape(), GetCallbackName(), _sink);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -130,7 +128,7 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver["sinkFunctionName"] << _sinkFunctionName;
+        archiver["sinkFunctionName"] << GetCallbackName();
         archiver["shape"] << static_cast<std::vector<size_t>>(GetShape());
     }
 
@@ -139,11 +137,14 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        archiver["sinkFunctionName"] >> _sinkFunctionName;
+
+        std::string sinkFunctionName;
+        archiver["sinkFunctionName"] >> sinkFunctionName;
+        SetCallbackName(sinkFunctionName);
 
         std::vector<size_t> shapeVector;
         archiver["shape"] >> shapeVector;
-        SetShape(OutputShape{ shapeVector });
+        SetShape(math::TensorShape{ shapeVector });
 
         // _sink needs to be set separately
     }
@@ -200,12 +201,5 @@ namespace nodes
             function.SetValueAt(pOutput, function.Literal(static_cast<int>(i)), value);
         }
     }
-
-    template <typename ValueType>
-    void SinkNode<ValueType>::SetShape(const OutputShape& shape)
-    {
-        _shape = shape;
-        _output.SetSize(_shape.Size());
-    }    
 }
 }

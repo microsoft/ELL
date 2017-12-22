@@ -12,23 +12,21 @@ namespace nodes
 {
     template <typename ValueType>
     SourceNode<ValueType>::SourceNode()
-        : SourceNode({}, InputShape{ 0, 0, 0 }, "", nullptr)
+        : SourceNode({}, math::TensorShape{ 0, 0, 0 }, "", nullptr)
     {
     }
 
     template <typename ValueType>
     SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
-        : SourceNode(input, InputShape{ inputVectorSize, 1, 1 }, sourceFunctionName, source)
+        : SourceNode(input, math::TensorShape{ inputVectorSize, 1, 1 }, sourceFunctionName, source)
     {
     }
 
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, const InputShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
-        : CompilableNode({ &_input }, { &_output }),
+    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, const math::TensorShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
+        : model::SourceNodeBase(_input, _output, shape, sourceFunctionName),
         _input(this, input, inputPortName),
         _output(this, outputPortName, shape.Size()),
-        _shape(shape),
-        _sourceFunctionName(sourceFunctionName),
         _source(source == nullptr ? [](auto&){ return false; } : source)
     {
         _bufferedSample.resize(shape.Size());
@@ -70,7 +68,7 @@ namespace nodes
 
         // Callback function
         const emitters::VariableTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
-        std::string prefixedName(compiler.GetNamespacePrefix() + "_" + _sourceFunctionName);
+        std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
         function.GetModule().DeclareFunction(prefixedName, emitters::GetVariableType<bool>(), parameters);
         function.GetModule().IncludeInHeader(prefixedName);
         function.GetModule().IncludeInCallbackInterface(prefixedName, "SourceNode");
@@ -81,7 +79,7 @@ namespace nodes
         auto sampleTime = function.ValueAt(pInput, function.Literal(0));
 
         // Invoke the callback and optionally interpolate.
-        DEBUG_EMIT_PRINTF(function, _sourceFunctionName + "\n");
+        DEBUG_EMIT_PRINTF(function, GetCallbackName() + "\n");
         function.Call(pSamplingFunction, { function.PointerOffset(pBufferedSample, 0) });
 
         // TODO: Interpolate if there is a sample, and currentTime > sampleTime
@@ -105,8 +103,7 @@ namespace nodes
     void SourceNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<SourceNode<ValueType>>(newPortElements, _shape, _sourceFunctionName);
-        newNode->_source = _source;
+        auto newNode = transformer.AddNode<SourceNode<ValueType>>(newPortElements, GetShape(), GetCallbackName(), _source);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -133,7 +130,7 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
-        archiver["sourceFunctionName"] << _sourceFunctionName;
+        archiver["sourceFunctionName"] << GetCallbackName();
         archiver["shape"] << static_cast<std::vector<size_t>>(GetShape());
     }
 
@@ -143,11 +140,15 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
-        archiver["sourceFunctionName"] >> _sourceFunctionName;
+
+        std::string sourceFunctionName;
+        archiver["sourceFunctionName"] >> sourceFunctionName;
+        SetCallbackName(sourceFunctionName);
 
         std::vector<size_t> shapeVector;
         archiver["shape"] >> shapeVector;
-        SetShape(InputShape{ shapeVector });
+        SetShape(math::TensorShape{ shapeVector });
+        _output.SetSize(GetShape().Size());
     }
 
     template <typename ValueType>
@@ -183,13 +184,6 @@ namespace nodes
             auto value = function.ValueAt(sample, i);
             function.SetValueAt(pOutput, function.Literal(static_cast<int>(i)), value);
         }
-    }
-
-    template <typename ValueType>
-    void SourceNode<ValueType>::SetShape(const InputShape& shape)
-    {
-        _shape = shape;
-        _output.SetSize(_shape.Size());
     }
 }
 }

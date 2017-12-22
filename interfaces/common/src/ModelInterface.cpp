@@ -29,12 +29,45 @@
 // nodes
 #include "ClockNode.h"
 #include "NeuralNetworkPredictorNode.h"
-#include "SinkNode.h"
-#include "SourceNode.h"
 #include "Tensor.h"
 
 // stl
 #include <chrono>
+
+//
+// Callback functions
+//
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+// Note: this currently assumes that there is just 1 source and 1 sink in the map
+// Future: extend this to route to multiple sources + sinks based on extra context parameter.
+bool model_CompiledMap_SourceCallback_Double(double* input)
+{
+    return ELL_API::CompiledMap::InvokeSourceCallback(input);
+}
+
+bool model_CompiledMap_SourceCallback_Float(float* input)
+{
+    return ELL_API::CompiledMap::InvokeSourceCallback(input);
+}
+
+void model_CompiledMap_SinkCallback_Double(double* output)
+{
+    ELL_API::CompiledMap::InvokeSinkCallback(output);
+}
+
+void model_CompiledMap_SinkCallback_Float(float* output)
+{
+    ELL_API::CompiledMap::InvokeSinkCallback(output);
+}
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 namespace ELL_API
 {
@@ -47,12 +80,10 @@ PortType Port::GetOutputType()
     return static_cast<PortType>(_port->GetType());
 }
 
-#ifndef SWIG
 Port::Port(const ell::model::Port* other)
     : _port(other)
 {
 }
-#endif
 
 Node Port::GetNode()
 {
@@ -96,12 +127,10 @@ InputPort InputPortIterator::Get()
     return InputPort(_ports[_i]);
 }
 
-#ifndef SWIG
 InputPortIterator::InputPortIterator(std::vector<ell::model::InputPortBase*> ports)
     : _i(0), _ports(ports)
 {
 }
-#endif
 
 //
 // OutputPortIterator
@@ -125,12 +154,10 @@ OutputPort OutputPortIterator::Get()
     return OutputPort(_ports[_i]);
 }
 
-#ifndef SWIG
 OutputPortIterator::OutputPortIterator(std::vector<ell::model::OutputPortBase*> ports)
     : _i(0), _ports(ports)
 {
 }
-#endif
 
 //
 // NodeIterator
@@ -175,7 +202,6 @@ Node NodeIterator::Get()
     }
 }
 
-#ifndef SWIG
 NodeIterator::NodeIterator(std::vector<const ell::model::Node*> nodes)
     : _i(0), _isVector(true), _nodes(nodes), _iterator()
 {
@@ -185,17 +211,14 @@ NodeIterator::NodeIterator(ell::model::NodeIterator& other)
     : _i(0), _isVector(false), _nodes(0), _iterator(other)
 {
 }
-#endif
 
 //
 // Node
 //
-#ifndef SWIG
 Node::Node(const ell::model::Node* other)
     : _node(other)
 {
 }
-#endif
 
 std::string Node::GetId()
 {
@@ -322,12 +345,10 @@ const ell::model::OutputNodeBase* OutputNode::GetOutputNode() const
 //
 // PortElement
 //
-#ifndef SWIG
 PortElement::PortElement(const ell::model::PortElementBase& other)
     : _port(other)
 {
 }
-#endif
 
 int PortElement::GetIndex()
 {
@@ -385,12 +406,10 @@ PortElement PortElements::GetElement(int index) const
 // InputPort
 //
 
-#ifndef SWIG
 InputPort::InputPort(const ell::model::InputPortBase* other)
     : _port(other)
 {
 }
-#endif
 
 PortType InputPort::GetOutputType()
 {
@@ -430,12 +449,10 @@ PortElements InputPort::GetInputElements()
 //
 // OutputPort
 //
-#ifndef SWIG
 OutputPort::OutputPort(const ell::model::OutputPortBase* other)
     : _port(other)
 {
 }
-#endif
 
 bool OutputPort::IsReferenced() const
 {
@@ -522,8 +539,6 @@ Model Model::Refine(int maxIterations)
     return Model(std::move(refinedModel));
 }
 
-
-#ifndef SWIG
 Model::Model(ell::model::Model&& other)
 {
     _model = std::make_shared<ell::model::Model>(std::move(other));
@@ -533,8 +548,6 @@ ell::model::Model& Model::GetModel()
 {
     return *_model;
 }
-
-#endif
 
 //
 // ModelBuilder
@@ -616,13 +629,13 @@ Node ModelBuilder::AddOutputNode(Model model, const ell::api::math::TensorShape&
     return Node(newNode);
 }
 
-Node ModelBuilder::AddClockNode(Model model, PortElements input, double interval, short lagThreshold, const std::string& lagNotificationName)
+Node ModelBuilder::AddClockNode(Model model, PortElements input, double interval, double lagThreshold, const std::string& lagNotificationName)
 {
     auto elements = input.GetPortElements();
     auto newNode = model.GetModel().AddNode<ell::nodes::ClockNode>(
         ell::model::PortElements<ell::nodes::TimeTickType>(elements),
         ell::nodes::TimeTickType(interval),
-        lagThreshold,
+        ell::nodes::TimeTickType(lagThreshold),
         lagNotificationName);
     return Node(newNode);
 }
@@ -711,30 +724,10 @@ ell::api::math::TensorShape Map::GetOutputShape() const
     return ell::api::math::TensorShape::FromMathTensorShape(_map->GetOutputShape());
 }
 
-
-std::vector<double> Map::ComputeDouble(const AutoDataVector& inputData)
-{
-    const ell::data::AutoDataVector& data = *(inputData._impl->_vector);
-    // not sure why the template can't match these types...
-    //return _map->Compute<double>(data);
-    _map->SetInputValue(0, data);
-    return _map->ComputeOutput<double>(0);
-}
-
 Model Map::GetModel() const
 {
     ell::model::Model model = _map->GetModel();
     return Model(std::move(model));
-}
-
-std::vector<double> Map::ComputeDouble(const std::vector<double>& inputData)
-{
-    return _map->Compute<double>(inputData);
-}
-
-std::vector<float> Map::ComputeFloat(const std::vector<float>& inputData)
-{
-    return _map->Compute<float>(inputData);
 }
 
 void Map::Load(const std::string& filename)
@@ -749,35 +742,95 @@ void Map::Save(const std::string& filename) const
     ell::common::SaveMap(*_map, filename);
 }
 
-CompiledMap Map::Compile(const std::string&  targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const
+CompiledMap Map::CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const
+{
+    auto resolverFunction = [moduleName](llvm::Module* module, ell::emitters::IRExecutionEngine& jitter)
+    {
+        auto func = module->getFunction(moduleName + "_CompiledMap_SourceCallback_Double");
+        if (func != nullptr)
+        {
+            jitter.DefineFunction(func, reinterpret_cast<uint64_t>(&model_CompiledMap_SourceCallback_Double));
+        }
+
+        func = module->getFunction(moduleName + "_CompiledMap_SinkCallback_Double");
+        if (func != nullptr)
+        {
+            jitter.DefineFunction(func, reinterpret_cast<uint64_t>(&model_CompiledMap_SinkCallback_Double));
+        }
+    };
+
+    return Map::Compile(targetDevice, moduleName, functionName,
+        "CompiledMap_SourceCallback_Double",
+        "CompiledMap_SinkCallback_Double",
+        useBlas,
+        resolverFunction);
+}
+
+CompiledMap Map::CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const
+{
+    auto resolverFunction = [moduleName](llvm::Module* module, ell::emitters::IRExecutionEngine& jitter)
+    {
+        auto func = module->getFunction(moduleName + "_CompiledMap_SourceCallback_Float");
+        if (func != nullptr)
+        {
+            jitter.DefineFunction(func, reinterpret_cast<uint64_t>(&model_CompiledMap_SourceCallback_Float));
+        }
+
+        func = module->getFunction(moduleName + "_CompiledMap_SinkCallback_Float");
+        if (func != nullptr)
+        {
+            jitter.DefineFunction(func, reinterpret_cast<uint64_t>(&model_CompiledMap_SinkCallback_Float));
+        }
+    };
+
+    return Map::Compile(targetDevice, moduleName, functionName,
+        "CompiledMap_SourceCallback_Float",
+        "CompiledMap_SinkCallback_Float",
+        useBlas,
+        resolverFunction);
+}
+
+CompiledMap Map::Compile(const std::string& targetDevice,
+    const std::string& moduleName,
+    const std::string& functionName,
+    const std::string& sourceFunctionName,
+    const std::string& sinkFunctionName,
+    bool useBlas,
+    std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolveCallbacks) const
 {
     ell::model::MapCompilerParameters settings;
     settings.moduleName = moduleName;
     settings.mapFunctionName = functionName;
+    settings.sourceFunctionName = sourceFunctionName;
+    settings.sinkFunctionName = sinkFunctionName;
     settings.compilerSettings.targetDevice.deviceName = targetDevice;
     settings.compilerSettings.useBlas = useBlas;
 
     ell::model::IRMapCompiler compiler(settings);
+
+    auto module = compiler.GetModule().GetLLVMModule();
     auto compiledMap = compiler.Compile(*_map);
-    return CompiledMap(std::move(compiledMap));
+    if (!sourceFunctionName.empty() || !sinkFunctionName.empty())
+    {
+        resolveCallbacks(module, compiledMap.GetJitter());
+    }
+
+    return CompiledMap(std::move(compiledMap), GetInputShape(), GetOutputShape());
 }
 
 //
 // CompiledMap
 //
-CompiledMap::CompiledMap(ell::model::IRCompiledMap map) 
+CompiledMap::CompiledMap(ell::model::IRCompiledMap map, ell::api::math::TensorShape inputShape, ell::api::math::TensorShape outputShape) :
+    _inputShape(inputShape), _outputShape(outputShape)
 {
     _map = std::make_shared<ell::model::IRCompiledMap>(std::move(map));
 }
 
-std::vector<double> CompiledMap::ComputeDouble(const std::vector<double>& inputData)
+CompiledMap::~CompiledMap()
 {
-    return _map->Compute<double>(inputData);
-}
-
-std::vector<float> CompiledMap::ComputeFloat(const std::vector<float>& inputData)
-{
-    return _map->Compute<float>(inputData);
+    UnregisterCallbacks<double>();
+    UnregisterCallbacks<float>();
 }
 
 std::string CompiledMap::GetCodeString()
@@ -814,13 +867,25 @@ void CompiledMap::WriteSwigInterface(const std::string& filePath)
     }
 }
 
+// Specializations with type-specific static forwarder instances
+template <>
+ell::api::CallbackForwarder<double, double>& CompiledMap::CallbackForwarder()
+{
+    static ell::api::CallbackForwarder<double, double> forwarderDouble;
+    return forwarderDouble;
+}
 
+// Specializations with type-specific static forwarder instances
+template <>
+ell::api::CallbackForwarder<float, float>& CompiledMap::CallbackForwarder()
+{
+    static ell::api::CallbackForwarder<float, float> forwarderFloat;
+    return forwarderFloat;
+}
 
 //
 // Helper Functions
 //
-
-
 Model LoadModelFromString(std::string str)
 {
     std::stringstream stream(str);
@@ -830,4 +895,5 @@ Model LoadModelFromString(std::string str)
     ar >> model;
     return Model(std::move(model));
 }
+
 }

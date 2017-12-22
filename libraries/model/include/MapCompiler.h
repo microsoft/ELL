@@ -39,6 +39,8 @@ namespace model
         bool fuseLinearFunctionNodes = false;
         bool profile = false;
         emitters::CompilerParameters compilerSettings;
+        std::string sourceFunctionName;
+        std::string sinkFunctionName;
     };
 
     /// <summary> Abstract base class for ELL model compilers. </summary>

@@ -10,6 +10,7 @@
 
 // model
 #include "CompilableNode.h"
+#include "InputNodeBase.h"
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
 
@@ -38,11 +39,9 @@ namespace nodes
     template <typename ValueType>
     using SourceFunction = std::function<bool(std::vector<ValueType>&)>;
 
-    using InputShape = ell::math::TensorShape;
-
     /// <summary> A node that provides a source of data through a sampling function callback. </summary>
     template <typename ValueType>
-    class SourceNode : public model::CompilableNode
+    class SourceNode : public model::SourceNodeBase
     {
     public:
         /// @name Input and Output Ports
@@ -61,7 +60,7 @@ namespace nodes
         /// <param name="shape"> The input shape. </param>
         /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
         /// <param name="source"> The optional source function that will provide input values. </param>
-        SourceNode(const model::PortElements<nodes::TimeTickType>& input, const InputShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
+        SourceNode(const model::PortElements<nodes::TimeTickType>& input, const math::TensorShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
 
         /// <summary> Constructor. </summary>
         ///
@@ -110,15 +109,11 @@ namespace nodes
     private:
         void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample);
         void SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample);
-        void SetShape(const InputShape& shape);
-        InputShape GetShape() const { return _shape; }
 
     private:
         model::InputPort<TimeTickType> _input;
         model::OutputPort<ValueType> _output;
-        InputShape _shape;
 
-        std::string _sourceFunctionName;
         SourceFunction<ValueType> _source;
         
         mutable std::vector<ValueType> _bufferedSample;

@@ -1034,7 +1034,7 @@ void TestCompilableClockNode()
 {
     using GetTicksUntilNextInterval = nodes::TimeTickType(nodes::TimeTickType);
 
-    constexpr short lagThreshold = 5;
+    constexpr nodes::TimeTickType lagThreshold = 125;
     constexpr nodes::TimeTickType interval = 50;
     constexpr nodes::TimeTickType start = 1511889201834.5767; // timestamp from python: time.time() * 1000
 
@@ -1055,14 +1055,13 @@ void TestCompilableClockNode()
     auto getTicksFunction = reinterpret_cast<GetTicksUntilNextInterval*>(jitter.ResolveFunctionAddress("Test_GetTicksUntilNextInterval"));
 
     // compare output
-    constexpr nodes::TimeTickType thresholdTicks = lagThreshold * interval;
     std::vector<std::vector<nodes::TimeTickType>> signal = 
     {
         { start },
-        { start + interval*1 + thresholdTicks/2 }, // within threshold
+        { start + interval*1 + lagThreshold/2 }, // within threshold
         { start + interval*2 }, // on time
-        { start + interval*3 + thresholdTicks }, // late (expect notification)
-        { start + interval*4 + thresholdTicks*20 }, // really late (expect notification)
+        { start + interval*3 + lagThreshold }, // late (expect notification)
+        { start + interval*4 + lagThreshold*20 }, // really late (expect notification)
         { start + interval*5 } // on time
     };
 
@@ -1070,10 +1069,10 @@ void TestCompilableClockNode()
     std::vector<nodes::TimeTickType> expectedGetTicksResults =
     {
         interval,
-        interval - thresholdTicks/2,
+        interval - lagThreshold/2,
         interval,
-        interval - thresholdTicks,
-        interval - thresholdTicks*20,
+        interval - lagThreshold,
+        interval - lagThreshold*20,
         interval
     };
 

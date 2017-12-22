@@ -25,6 +25,11 @@ namespace model
     {
     }
 
+    InputNodeBase::InputNodeBase(InputPortBase& input, OutputPortBase& output, math::TensorShape shape)
+        : CompilableNode({ &input }, { &output }), _outputBase(output), _shape(shape)
+    {
+    }
+
     ell::utilities::ArchiveVersion InputNodeBase::GetArchiveVersion() const
     {
         return std::max(currentArchiveVersion, CompilableNode::GetArchiveVersion());

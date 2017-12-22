@@ -27,8 +27,8 @@ class DarknetImporter:
         self.output_directory = args['output_directory']
 
         model_options = args.get('model_options', {})
-        self.step_interval = model_options.get('step_interval')
-        self.lag_threshold = model_options.get('lag_threshold')
+        self.step_interval = model_options.get('step_interval', 0)
+        self.lag_threshold = model_options.get('lag_threshold', 0)
 
     def run(self):
         predictor = darknet_to_ell.predictor_from_darknet_model(

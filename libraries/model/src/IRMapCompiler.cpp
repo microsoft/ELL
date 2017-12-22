@@ -123,6 +123,12 @@ namespace model
         model::TransformContext context{ this, [this](const model::Node& node) { return node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
         map.Refine(context);
 
+        // Renaming callbacks based on map compiler parameters
+        // Note: a more elegant solution is emit variables which get assigned to
+        // function pointers at runtime (prior to computing the map).
+        Log() << "Renaming callbacks..." << EOL;
+        map.RenameCallbacks(GetMapCompilerParameters().sourceFunctionName, GetMapCompilerParameters().sinkFunctionName);
+
         // Now the model ready for compiling
         if (GetMapCompilerParameters().profile)
         {

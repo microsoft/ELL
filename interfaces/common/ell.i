@@ -14,7 +14,7 @@
     %include "ELL_javascript_pre.i"
 #endif
 
-%module "ell"
+%module(directors="1") "ell"
 
 // Generate decent docstrings from types and method signatures
 %feature("autodoc", "3");
@@ -76,18 +76,14 @@
 // ELL APIs 
 %include "functions.i"
 %include "math.i"
-%include "predictors.i"
+%include "callback.i"
 %include "model.i"
 %include "trainers.i"
 %include "dataset.i"
 
-#if defined(SWIGJAVASCRIPT)
-// Interface for NaN callbacks
-%include callback.i
-
-// Interface ELL Load Model Async
-// %include loadModelAsync.i
-#endif
+// Note: predictors contains rename rules that can affect other interface files
+// include it last until this side effect is fixed
+%include "predictors.i"
 
 // Include language specific SWIG definitions that must be declared after the
 // C++ code has been wrapped by SWIG

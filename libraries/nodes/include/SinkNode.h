@@ -10,6 +10,7 @@
 
 // model
 #include "CompilableNode.h"
+#include "OutputNodeBase.h"
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
 
@@ -34,10 +35,8 @@ namespace nodes
     template <typename ValueType>
     using SinkFunction = std::function<void(const std::vector<ValueType>&)>;
 
-    using OutputShape = ell::math::TensorShape;
-
     template <typename ValueType>
-    class SinkNode : public model::CompilableNode
+    class SinkNode : public model::SinkNodeBase
     {
     public:
         /// @name Input and Output Ports
@@ -63,7 +62,7 @@ namespace nodes
         /// <param name="shape"> The output shape. </param>
         /// <param name="sinkFunctionName"> The sink function name to be emitted. </param>
         /// <param name="sink"> The optional sink function that will receive output values. </param>
-        SinkNode(const model::PortElements<ValueType>& input, const OutputShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
+        SinkNode(const model::PortElements<ValueType>& input, const math::TensorShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
 
         /// <summary> Constructor. </summary>
         ///
@@ -92,7 +91,7 @@ namespace nodes
         ///
         /// <param name="function"> The sink function to set. </param>
         void SetSinkFunction(SinkFunction<ValueType> function) { _sink = function; }
-        
+
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
@@ -110,15 +109,11 @@ namespace nodes
     private:
         void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
         void SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
-        void SetShape(const OutputShape& shape);
-        OutputShape GetShape() const { return _shape; }
 
     private:
         model::InputPort<ValueType> _input;
         model::OutputPort<ValueType> _output;
-        OutputShape _shape;
 
-        std::string _sinkFunctionName;
         SinkFunction<ValueType> _sink;
     };
 }

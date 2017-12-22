@@ -89,7 +89,8 @@ class PretrainedModel:
         if not os.path.exists(cmakefile) or _is_file_newer(inpath + '.ell', cmakefile) \
            or not os.path.exists(outpath + '.bc'):
             
-            compiled = ellmap.Compile(target, self.name, 'predict', True)
+            compiled = ellmap.Compile(target, self.name, 'predict', True,
+                dtype=np.float32)
             compiled.WriteBitcode(outpath + '.bc')
             compiled.WriteSwigInterface(outpath + '.i')
 

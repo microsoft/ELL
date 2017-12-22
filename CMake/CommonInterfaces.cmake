@@ -100,12 +100,7 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
       set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${file})
     endforeach()
 
-    # set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_INCLUDE}) # Doesn't seem to work
-    # set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_FILES}) # Doesn't seem to work
-
-    # set_source_files_properties(${INTERFACE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
     set_source_files_properties(${INTERFACE_MAIN} ${INTERFACE_FILES} PROPERTIES CPLUSPLUS ON)
-    # set_source_files_properties(${INTERFACE_FILES} PROPERTIES SWIG_FLAGS "-includeall") # Don't want this, I think
 
     message(STATUS "Creating wrappers for ${LANGUAGE_NAME}")
     
