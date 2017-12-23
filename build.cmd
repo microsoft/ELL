@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 Setlocal EnableDelayedExpansion
 
 cd %~dp0
@@ -44,14 +44,16 @@ for /f "usebackq tokens=1* delims=: " %%i in (`external\vswhere.2.1.3\tools\vswh
     set installationPath=%%j
   )
 )
-echo Vs14Path=!Vs14Path!
-echo Vs15Path=!Vs15Path!
 
 if "!Vs14! and !Vs15!" == "0 and 0" goto :NoCompatibleVsInstall
 if "!Vs14! and !UseVs14!" == "0 and 1" goto :NoVs14
 if "!Vs15! and !UseVs15!" == "0 and 1" goto :NoVs15
 
 set CMakeGenerator=Visual Studio 14 2015 Win64
+
+if "!UseVs14! and !UseVs15! and !Vs14Path!" == "0 and 0 and " (
+    set UseVs15=1
+) 
 
 if "!UseVs15!" == "1" (
     set CMakeGenerator=Visual Studio 15 2017 Win64
@@ -93,10 +95,16 @@ cmake -G "!CMakeGenerator!" "!STRICT!" "-DCMAKE_C_COMPILER=%CPATH%bin/Hostx86/x8
 if ERRORLEVEL 1 goto :nocmake
 
 :buildit
-cmake --build . --config Release -- /m:4
+set procs=1
+for /f "usebackq tokens=1*"  %%i in (`nproc`) do (
+   set /a procs=%%i - 1
+   echo procs=!procs!
+)
+
+cmake --build . --config Release -- /m:!procs!
 if ERRORLEVEL 1 goto :builderror
 
-cmake --build . --target _ELL_python --config Release -- /m:4
+cmake --build . --target _ELL_python --config Release -- /m:!procs!
 if ERRORLEVEL 1 goto :builderror
 
 goto :eof
