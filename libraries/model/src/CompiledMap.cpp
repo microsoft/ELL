@@ -25,7 +25,7 @@ namespace ell
 {
 namespace model
 {
-    CompiledMap::CompiledMap(model::DynamicMap map, std::string functionName)
-        : DynamicMap(std::move(map)), _functionName(functionName) {}
+    CompiledMap::CompiledMap(model::Map map, std::string functionName)
+        : Map(std::move(map)), _functionName(functionName) {}
 }
 }

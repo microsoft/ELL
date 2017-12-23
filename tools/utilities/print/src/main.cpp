@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         }
 
         // Load model from file
-        model::DynamicMap map = LoadMap(mapLoadArguments);
+        model::Map map = LoadMap(mapLoadArguments);
 
         if (printArguments.refine > 0)
         {

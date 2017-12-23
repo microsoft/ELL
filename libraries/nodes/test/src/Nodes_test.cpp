@@ -309,7 +309,7 @@ static void TestLinearPredictorNodeCompute()
     auto predictorNode = model.AddNode<nodes::LinearPredictorNode<ElementType>>(inputNode->output, predictor);
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(predictorNode->output);
 
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
 
     std::vector<ElementType> input{ 1.0, 2.0, 1.0, -1.0, 0.5 };
     auto result = map.Compute<ElementType>(input);

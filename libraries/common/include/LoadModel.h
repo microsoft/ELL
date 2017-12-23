@@ -11,7 +11,7 @@
 #include "MapLoadArguments.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "Model.h"
 
 namespace ell
@@ -50,25 +50,25 @@ namespace common
     ///
     /// <param name="filename"> The filename. </param>
     /// <returns> The loaded map. </returns>
-    model::DynamicMap LoadMap(const std::string& filename);
+    model::Map LoadMap(const std::string& filename);
 
     /// <summary> Loads a map from a `MapLoadArguments` struct. </summary>
     ///
     /// <param name="mapLoadArguments"> The `MapLoadArguments` struct. </param>
     /// <returns> The loaded map. </returns>
-    model::DynamicMap LoadMap(const MapLoadArguments& mapLoadArguments);
+    model::Map LoadMap(const MapLoadArguments& mapLoadArguments);
 
     /// <summary> Saves a map to a file. </summary>
     ///
     /// <param name="map"> The map. </param>
     /// <param name="filename"> The filename. </param>
-    void SaveMap(const model::DynamicMap& map, const std::string& filename);
+    void SaveMap(const model::Map& map, const std::string& filename);
 
     /// <summary> Saves a map to a stream. </summary>
     ///
     /// <param name="map"> The map. </param>
     /// <param name="outStream"> The stream. </param>
-    void SaveMap(const model::DynamicMap& map, std::ostream& outStream);
+    void SaveMap(const model::Map& map, std::ostream& outStream);
 }
 }
 

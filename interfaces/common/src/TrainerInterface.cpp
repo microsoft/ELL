@@ -11,7 +11,7 @@
 #include "Exception.h"
 #include "Dataset.h"
 #include "DatasetInterfaceImpl.h"
-#include "DynamicMap.h"
+#include "Map.h"
 #include "LoadModel.h"
 #include "MakeTrainer.h"
 #include "MapLoadArguments.h"
@@ -59,7 +59,7 @@ Map ProtoNNPredictor::GetMap() const
 
     Map map;
 
-    std::shared_ptr<ell::model::DynamicMap> innerMap = map.GetInnerMap();
+    std::shared_ptr<ell::model::Map> innerMap = map.GetInnerMap();
     model::Model& model = innerMap->GetModel();
 
     // add the input node.

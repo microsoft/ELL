@@ -12,7 +12,7 @@
 #include "ModuleEmitter.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "Model.h"
 #include "Node.h"
 #include "OutputPort.h"
@@ -34,7 +34,7 @@ namespace ell
 namespace model
 {
     /// <summary> Abstract base class for a map that has been compiled </summary>
-    class CompiledMap : public DynamicMap
+    class CompiledMap : public Map
     {
     public:
         CompiledMap(const CompiledMap& other) = delete;
@@ -96,7 +96,7 @@ namespace model
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        CompiledMap(DynamicMap map, std::string functionName);
+        CompiledMap(Map map, std::string functionName);
         std::string _functionName;
     };
 }

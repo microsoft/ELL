@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     DynamicMap.h (model)
+//  File:     Map.h (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,32 +40,32 @@ namespace model
     class OutputNodeBase;
 
     /// <summary> Class that wraps a model and its designated outputs </summary>
-    class DynamicMap : public utilities::IArchivable
+    class Map : public utilities::IArchivable
     {
     public:
-        DynamicMap() = default;
+        Map() = default;
 
         /// <summary> Copy constructor </summary>
         ///
         /// <param name="other"> The other map. </param>
-        DynamicMap(const DynamicMap& other);
+        Map(const Map& other);
 
-        DynamicMap(DynamicMap&& other) = default;
+        Map(Map&& other) = default;
 
         /// <summary> Assignment operator. </summary>
         ///
         /// <param name="other"> The other map. </param>
         /// <returns> A reference to this map. </returns>
-        DynamicMap& operator=(DynamicMap other);
+        Map& operator=(Map other);
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="model"> The model to wrap </param>
         /// <param name="inputs"> A vector of name/value pairs for the inputs this map uses </param>
         /// <param name="outputs"> A vector of name/value pairs for the outputs this map generates </param>
-        DynamicMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
+        Map(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
 
-        ~DynamicMap() override = default;
+        ~Map() override = default;
 
         /// <summary> Gets the model wrapped by this map </summary>
         ///
@@ -298,7 +298,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "DynamicMap"; }
+        static std::string GetTypeName() { return "DynamicMap"; /* keep compatibility, for now */ }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -319,7 +319,7 @@ namespace model
         ///
         /// <param name="a"> One of the maps to swap. </param>
         /// <param name="b"> The other map to swap. </param>
-        friend void swap(DynamicMap& a, DynamicMap& b);
+        friend void swap(Map& a, Map& b);
 
         /// <summary>Prune away unused parts of internal model. </summary>
         void Prune();
@@ -386,16 +386,16 @@ namespace model
         void FixTransformedIO(ModelTransformer& transformer);
     };
 
-    /// <summary> A serialization context used during DynamicMap deserialization. Wraps an existing `ModelSerializationContext` </summary>
-    class DynamicMapSerializationContext : public ModelSerializationContext
+    /// <summary> A serialization context used during Map deserialization. Wraps an existing `ModelSerializationContext` </summary>
+    class MapSerializationContext : public ModelSerializationContext
     {
     public:
         /// <summary> Constructor </summary>
         ///
         /// <param name="previousContext"> The `SerializationContext` to wrap </param>
-        DynamicMapSerializationContext(utilities::SerializationContext& previousContext);
+        MapSerializationContext(utilities::SerializationContext& previousContext);
     };
 }
 }
 
-#include "../tcc/DynamicMap.tcc"
+#include "../tcc/Map.tcc"

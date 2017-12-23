@@ -30,7 +30,7 @@
 #include "TrainerArguments.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "Model.h"
 
 // nodes
@@ -52,7 +52,7 @@
 using namespace ell;
 
 template <typename ElementType>
-model::DynamicMap AppendTrainedLinearPredictorToMap(const predictors::LinearPredictor<ElementType>& trainedPredictor, model::DynamicMap& map, size_t dimension)
+model::Map AppendTrainedLinearPredictorToMap(const predictors::LinearPredictor<ElementType>& trainedPredictor, model::Map& map, size_t dimension)
 {
     predictors::LinearPredictor<ElementType> predictor(trainedPredictor);
     predictor.Resize(dimension);
@@ -63,7 +63,7 @@ model::DynamicMap AppendTrainedLinearPredictorToMap(const predictors::LinearPred
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(predictorNode->output);
 
     auto& output = outputNode->output;
-    auto outputMap = model::DynamicMap(map.GetModel(), { { "input", map.GetInput() } }, { { "output", output } });
+    auto outputMap = model::Map(map.GetModel(), { { "input", map.GetInput() } }, { { "output", output } });
 
     return outputMap;
 }

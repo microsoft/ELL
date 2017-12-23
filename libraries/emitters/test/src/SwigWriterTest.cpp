@@ -9,7 +9,7 @@
 #include "SwigWriterTest.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "InputNode.h"
 #include "IRCompiledMap.h"
 #include "Model.h"
@@ -59,7 +59,7 @@ model::IRCompiledMap GetCompiledMapWithCallbacks(
         "MyResultsCallback");
 
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
-    auto map = model::DynamicMap(model, { { "time", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "time", inputNode } }, { { "output", outputNode->output } });
 
     model::MapCompilerParameters settings;
     settings.moduleName = moduleName;

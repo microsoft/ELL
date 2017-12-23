@@ -32,7 +32,7 @@
 #include "L2Regularizer.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 
 // nodes
 #include "BinaryOperationNode.h"
@@ -56,7 +56,7 @@ using namespace ell;
 using PredictorType = predictors::LinearPredictor<double>;
 
 template <typename ElementType>
-model::DynamicMap AppendTrainedLinearPredictorToMap(const PredictorType& trainedPredictor, model::DynamicMap& map, size_t dimension)
+model::Map AppendTrainedLinearPredictorToMap(const PredictorType& trainedPredictor, model::Map& map, size_t dimension)
 {
     predictors::LinearPredictor<ElementType> predictor(trainedPredictor);
     predictor.Resize(dimension);
@@ -67,13 +67,13 @@ model::DynamicMap AppendTrainedLinearPredictorToMap(const PredictorType& trained
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(predictorNode->output);
 
     auto& output = outputNode->output;
-    auto outputMap = model::DynamicMap(map.GetModel(), { { "input", map.GetInput() } }, { { "output", output } });
+    auto outputMap = model::Map(map.GetModel(), { { "input", map.GetInput() } }, { { "output", output } });
 
     return outputMap;
 }
 
 template <typename ElementType>
-bool RedirectNeuralNetworkOutputByLayer(model::DynamicMap& map, size_t numLayersFromEnd)
+bool RedirectNeuralNetworkOutputByLayer(model::Map& map, size_t numLayersFromEnd)
 {
     bool found = false;
     auto nodes = (map.GetModel()).GetNodesByType<nodes::NeuralNetworkPredictorNode<ElementType>>();
@@ -85,14 +85,14 @@ bool RedirectNeuralNetworkOutputByLayer(model::DynamicMap& map, size_t numLayers
         auto inputNode = model.AddNode<model::InputNode<ElementType>>(predictor.GetInputShape());
         auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, predictor);
 
-        map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+        map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
         found = true;
     }
 
     return found;
 }
 
-bool RedirectModelOutputByPortElements(model::DynamicMap& map, const std::string& targetPortElements, size_t refineIterations)
+bool RedirectModelOutputByPortElements(model::Map& map, const std::string& targetPortElements, size_t refineIterations)
 {
     // Refine the model
     map.Refine(refineIterations);
@@ -112,7 +112,7 @@ bool RedirectModelOutputByPortElements(model::DynamicMap& map, const std::string
         auto input = transformer.GetCorrespondingInputNode(map.GetInput());
         auto output = transformer.GetCorrespondingOutputs(originalPortElement);
 
-        map = model::DynamicMap(model, { { "input", input } }, { { "output", output } });
+        map = model::Map(model, { { "input", input } }, { { "output", output } });
     }
     catch (const utilities::Exception& exception)
     {
@@ -265,7 +265,7 @@ std::vector<data::AutoSupervisedDataset> CreateDatasetsForOneVersusRest(data::Au
 }
 
 template <typename ElementType>
-model::DynamicMap GetMultiClassMapFromBinaryPredictors(std::vector<PredictorType>& binaryPredictors, model::DynamicMap& map)
+model::Map GetMultiClassMapFromBinaryPredictors(std::vector<PredictorType>& binaryPredictors, model::Map& map)
 {
     if (binaryPredictors.empty())
     {
@@ -310,14 +310,14 @@ model::DynamicMap GetMultiClassMapFromBinaryPredictors(std::vector<PredictorType
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sigmoidNode->output);
 
     auto& output = outputNode->output;
-    auto outputMap = model::DynamicMap(model, { { "input", map.GetInput() } }, { { "output", output } });
+    auto outputMap = model::Map(model, { { "input", map.GetInput() } }, { { "output", output } });
 
     return outputMap;
 }
 
-model::DynamicMap GetRetargetedModel(std::vector<PredictorType>& binaryPredictors, model::DynamicMap& map)
+model::Map GetRetargetedModel(std::vector<PredictorType>& binaryPredictors, model::Map& map)
 {
-    model::DynamicMap result;
+    model::Map result;
     // Create a new map with the output of the combined linear predictors appended.
     switch (map.GetOutputType())
     {
@@ -338,9 +338,9 @@ model::DynamicMap GetRetargetedModel(std::vector<PredictorType>& binaryPredictor
     return result;
 }
 
-model::DynamicMap GetRetargetedModel(const PredictorType& trainedPredictor, model::DynamicMap& map)
+model::Map GetRetargetedModel(const PredictorType& trainedPredictor, model::Map& map)
 {
-    model::DynamicMap result;
+    model::Map result;
     auto mappedDatasetDimension = map.GetOutput(0).Size();
     // Create a new map with the output of the linear predictor appended.
     switch (map.GetOutputType())
@@ -360,7 +360,7 @@ model::DynamicMap GetRetargetedModel(const PredictorType& trainedPredictor, mode
         break;
     };
 
-    return model::DynamicMap();
+    return model::Map();
 }
 
 int main(int argc, char* argv[])
@@ -416,7 +416,7 @@ int main(int argc, char* argv[])
 
         // load dataset and map the output
         if (retargetArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        model::DynamicMap result;
+        model::Map result;
         if (retargetArguments.multiClass)
         {
             // This is a multi-class dataset

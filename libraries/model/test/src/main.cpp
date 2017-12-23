@@ -10,7 +10,7 @@
 // Model tests
 //
 
-#include "DynamicMap_test.h"
+#include "Map_test.h"
 #include "ModelBuilder_test.h"
 #include "Model_test.h"
 #include "PortElements_test.h"
@@ -47,13 +47,13 @@ int main()
         TestAppend();
         TestParsePortElements();
 
-        // DynamicMap tests
-        TestDynamicMapCreate();
-        TestDynamicMapCompute();
-        TestDynamicMapComputeDataVector();
-        TestDynamicMapRefine();
-        TestDynamicMapSerialization();
-        TestDynamicMapClockNode();
+        // Map tests
+        TestMapCreate();
+        TestMapCompute();
+        TestMapComputeDataVector();
+        TestMapRefine();
+        TestMapSerialization();
+        TestMapClockNode();
 
         TestCustomRefine();
 

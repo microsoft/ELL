@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "DynamicMap.h"
+#include "Map.h"
 
 // stl
 #include <string>
@@ -16,8 +16,8 @@
 void SetOutputPathBase(std::string path);
 std::string OutputPath(std::string relPath);
 
-ell::model::DynamicMap MakeSimpleMap();
-ell::model::DynamicMap MakeForestMap();
+ell::model::Map MakeSimpleMap();
+ell::model::Map MakeForestMap();
 
 void TestBinaryVector(bool expanded, bool runJit = false);
 void TestBinaryScalar();

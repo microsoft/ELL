@@ -22,7 +22,7 @@
 #include "MapLoadArguments.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
 #include "OutputNode.h"
@@ -84,7 +84,7 @@ private:
     }
 };
 
-void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMapCompilerArguments& mapCompilerArguments, common::MapLoadArguments& mapLoadArguments, model::DynamicMap& map)
+void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMapCompilerArguments& mapCompilerArguments, common::MapLoadArguments& mapLoadArguments, model::Map& map)
 {
     std::stringstream timingOutput;
 

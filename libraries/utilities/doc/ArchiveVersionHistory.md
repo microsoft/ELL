@@ -4,7 +4,7 @@
 |---------|-------------------|
 |       1 | old               |
 |       2 | current           |
-|       3 | adds metadata to Model, Node, Port, and DynamicMap |
+|       3 | adds metadata to Model, Node, Port, and Map |
 |       4 | adds shapes to SourceNode and SinkNode |
 |       5 | enabled unarchiving of refined models containing Neural Network layer Nodes, and Broadcast Unary Function Nodes |
 

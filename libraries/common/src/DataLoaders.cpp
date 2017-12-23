@@ -20,9 +20,6 @@
 #include "WeightLabel.h"
 #include "GeneralizedSparseParsingIterator.h"
 
-// model
-#include "DynamicMap.h"
-
 // stl
 #include <memory>
 #include <stdexcept>

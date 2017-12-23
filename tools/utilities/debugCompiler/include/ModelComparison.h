@@ -13,7 +13,7 @@
 
 // model
 #include "DebugSinkNode.h"
-#include "DynamicMap.h"
+#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
 #include "InputPort.h"
@@ -44,7 +44,7 @@ public:
     /// <param name="input"> The data to evaluate the map with when comparing outputs. </param>
     /// <param name="reference"> The map to compare the reference vs. compiled versions of. </param>
     /// <param name="settings"> The compiler settings to use when compiling the map. </param>
-    void Compare(std::vector<float>& input, model::DynamicMap& reference, const model::MapCompilerParameters& settings);
+    void Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerParameters& settings);
 
     /// <summary> Saves reference and compiled outputs to a file. </summary>
     ///
@@ -103,7 +103,7 @@ private:
     template <typename ValueType>
     void AddDebugOutputNode(model::ModelTransformer& transformer, const nodes::NeuralNetworkLayerNodeBase<ValueType>* layerNode);
 
-    void SetUpReferenceMap(model::DynamicMap& map);
+    void SetUpReferenceMap(model::Map& map);
     void CreateGraph(const model::Model& model);
     void AddStyles();
     void WriteModelInfo(std::ostream& outputStream, const std::vector<float>& reference, const std::vector<float>& compiled, bool writePrediction);
@@ -117,7 +117,7 @@ private:
     ell::utilities::Graph _graph;
     std::map<std::string, std::string> _nodeMap; // map id of reference node to compiled node.
     std::map<std::string, size_t> _outputSizes;
-    model::DynamicMap _referenceMap;
+    model::Map _referenceMap;
     std::vector<float> _outputReference;
     std::vector<float> _outputCompiled;
     std::string _outputDirectory;

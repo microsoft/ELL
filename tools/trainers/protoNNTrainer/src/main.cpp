@@ -34,7 +34,7 @@
 #include "MatrixOperations.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "InputNode.h"
 #include "Model.h"
 
@@ -54,7 +54,7 @@
 
 using namespace ell;
 
-void CreateMap(predictors::ProtoNNPredictor& predictor, ell::model::DynamicMap& map)
+void CreateMap(predictors::ProtoNNPredictor& predictor, ell::model::Map& map)
 {
     auto numFeatures = predictor.GetDimension();
 
@@ -178,8 +178,8 @@ int main(int argc, char* argv[])
         // Save predictor model
         if (modelSaveArguments.outputModelFilename != "")
         {
-            // Create a DynamicMap
-            model::DynamicMap map;
+            // Create a Map
+            model::Map map;
             CreateMap(predictor, map);
             common::SaveMap(map, modelSaveArguments.outputModelFilename);
         }

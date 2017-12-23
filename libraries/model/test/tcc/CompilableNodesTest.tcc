@@ -10,7 +10,7 @@
 
 // model
 #include "CompiledMap.h"
-#include "DynamicMap.h"
+#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IREmitter.h"
 #include "IRMapCompiler.h"
@@ -33,7 +33,7 @@ void TestCompilableDotProductNode2(int dimension)
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(dimension);
     auto constantNode = model.AddNode<nodes::ConstantNode<ElementType>>(constValue);
     auto dotNode = model.AddNode<nodes::DotProductNode<ElementType>>(inputNode->output, constantNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", dotNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", dotNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);

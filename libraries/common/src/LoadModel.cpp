@@ -9,7 +9,7 @@
 #include "LoadModel.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "InputNode.h"
 #include "Model.h"
 #include "OutputNode.h"
@@ -240,7 +240,7 @@ namespace common
 
     void RegisterMapTypes(utilities::SerializationContext& context)
     {
-        context.GetTypeFactory().AddType<model::DynamicMap, model::DynamicMap>();
+        context.GetTypeFactory().AddType<model::Map, model::Map>();
     }
 
     template <typename UnarchiverType>
@@ -290,7 +290,7 @@ namespace common
     //
     // Map
     //
-    model::DynamicMap LoadMap(const MapLoadArguments& mapLoadArguments)
+    model::Map LoadMap(const MapLoadArguments& mapLoadArguments)
     {
         if (mapLoadArguments.HasMapFilename())
         {
@@ -354,11 +354,11 @@ namespace common
         }
     }
 
-    model::DynamicMap LoadMap(const std::string& filename)
+    model::Map LoadMap(const std::string& filename)
     {
         if (filename == "")
         {
-            return model::DynamicMap{};
+            return model::Map{};
         }
 
         if (!utilities::IsFileReadable(filename))
@@ -370,7 +370,7 @@ namespace common
         return LoadArchivedMap<utilities::JsonUnarchiver>(filestream);
     }
 
-    void SaveMap(const model::DynamicMap& map, const std::string& filename)
+    void SaveMap(const model::Map& map, const std::string& filename)
     {
         if (!utilities::IsFileWritable(filename))
         {
@@ -380,7 +380,7 @@ namespace common
         SaveMap(map, filestream);
     }
 
-    void SaveMap(const model::DynamicMap& map, std::ostream& outStream)
+    void SaveMap(const model::Map& map, std::ostream& outStream)
     {
         SaveArchivedObject<utilities::JsonArchiver>(map, outStream);
     }

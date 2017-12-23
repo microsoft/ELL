@@ -1,19 +1,19 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     DynamicMap_test.cpp (model_test)
+//  File:     Map_test.cpp (model_test)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DynamicMap_test.h"
+#include "Map_test.h"
 #include "ModelTestUtilities.h"
 
 // data
 #include "DenseDataVector.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "InputNode.h"
 #include "Model.h"
 #include "OutputNode.h"
@@ -49,23 +49,23 @@ using namespace ell;
 //
 
 // Returns a model with 1 3-dimensional double input and 1 2-dimensional double output
-void TestDynamicMapCreate()
+void TestMapCreate()
 {
     auto model = GetSimpleModel();
 
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     assert(outputNodes.size() == 1);
-    auto map = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
+    auto map = model::Map(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
 }
 
-void TestDynamicMapCompute()
+void TestMapCompute()
 {
     auto model = GetSimpleModel();
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     assert(outputNodes.size() == 1);
-    auto map = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
+    auto map = model::Map(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
 
     assert(inputNodes.size() == 1);
 
@@ -83,13 +83,13 @@ void TestDynamicMapCompute()
     testing::ProcessTest("Testing map compute 1", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
 }
 
-void TestDynamicMapComputeDataVector()
+void TestMapComputeDataVector()
 {
     auto model = GetSimpleModel();
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     assert(outputNodes.size() == 1);
-    auto map = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
+    auto map = model::Map(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
 
     assert(inputNodes.size() == 1);
 
@@ -108,15 +108,15 @@ void TestDynamicMapComputeDataVector()
     testing::ProcessTest("Testing map compute 2", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
 }
 
-void TestDynamicMapRefine()
+void TestMapRefine()
 {
     auto model = GetSimpleModel();
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     assert(outputNodes.size() == 1);
 
-    auto map1 = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
-    auto map2 = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
+    auto map1 = model::Map(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
+    auto map2 = model::Map(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
 
     model::TransformContext context;
     map2.Refine(context);
@@ -140,7 +140,7 @@ void TestDynamicMapRefine()
     testing::ProcessTest("Testing refined map compute", testing::IsEqual(resultValues1, resultValues2));
 }
 
-void TestMapSerialization(const model::DynamicMap& map)
+void TestMapSerialization(const model::Map& map)
 {
     std::stringstream outStream;
     utilities::JsonArchiver archiver(outStream);
@@ -155,21 +155,21 @@ void TestMapSerialization(const model::DynamicMap& map)
     common::RegisterMapTypes(context);
     std::stringstream inStream(outStream.str());
     utilities::JsonUnarchiver unarchiver(inStream, context);
-    model::DynamicMap map2;
+    model::Map map2;
     unarchiver >> map2;
 }
 
-void TestDynamicMapSerialization()
+void TestMapSerialization()
 {
     auto model = GetSimpleModel();
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
-    auto map = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
+    auto map = model::Map(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
 
     TestMapSerialization(map);
 }
 
-void TestDynamicMapClockNode()
+void TestMapClockNode()
 {
     constexpr nodes::TimeTickType lagThreshold = 75;
     constexpr nodes::TimeTickType interval = 20;
@@ -203,7 +203,7 @@ void TestDynamicMapClockNode()
             outputValues.push_back(values);
         });
 
-    auto map = model::DynamicMap(model, { { "clockInput", in } }, { { "sinkOutput", sink->output } });
+    auto map = model::Map(model, { { "clockInput", in } }, { { "sinkOutput", sink->output } });
     TestMapSerialization(map);
 
     std::vector<std::vector<nodes::TimeTickType>> clockValues =

@@ -371,7 +371,7 @@ public:
     Map(Model model, InputNode inputNode, PortElements output);
     Map(const std::string& filename);
 #ifndef SWIG
-    Map(std::shared_ptr<ell::model::DynamicMap>& map);
+    Map(std::shared_ptr<ell::model::Map>& map);
 #endif
 
     void Save(const std::string& filename) const;
@@ -392,10 +392,7 @@ public:
     void Step(ell::api::TimeTickType timestamp = 0.0);
 
 #ifndef SWIG
-    std::shared_ptr<ell::model::DynamicMap> GetInnerMap()
-    {
-        return _map;
-    }
+    std::shared_ptr<ell::model::Map> GetInnerMap() { return _map; }
 #endif
 
 private:
@@ -405,7 +402,7 @@ private:
                         bool useBlas, std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolverFunction) const;
 #endif
 
-    std::shared_ptr<ell::model::DynamicMap> _map;
+    std::shared_ptr<ell::model::Map> _map;
 };
 
 //

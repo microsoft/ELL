@@ -15,7 +15,7 @@
 #include "ExampleIterator.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 
 
 // stl

@@ -12,7 +12,6 @@
 #include "MapLoadArguments.h"
 
 // model
-#include "DynamicMap.h"
 #include "Model.h"
 
 namespace ell

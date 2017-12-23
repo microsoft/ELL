@@ -21,7 +21,7 @@
 #include "JsonArchiver.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "InputNode.h"
 #include "MapLoadArguments.h"
 #include "OutputNode.h"
@@ -704,17 +704,17 @@ Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outpu
 //
 Map::Map()
 {
-    _map = std::make_shared<ell::model::DynamicMap>();
+    _map = std::make_shared<ell::model::Map>();
 }
 
 Map::Map(Model model, InputNode inputNode, PortElements output)
 {
     std::vector<std::pair<std::string, ell::model::InputNodeBase*>> inputs = { std::pair<std::string, ell::model::InputNodeBase*>{ "input", const_cast<ell::model::InputNodeBase*>(inputNode.GetInputNode()) } };
     auto outputs = std::vector<std::pair<std::string, ell::model::PortElementsBase>>{ { "output", output.GetPortElements() } };
-    _map = std::make_shared<ell::model::DynamicMap>(model.GetModel(), inputs, outputs);
+    _map = std::make_shared<ell::model::Map>(model.GetModel(), inputs, outputs);
 }
 
-Map::Map(std::shared_ptr<ell::model::DynamicMap>& map)
+Map::Map(std::shared_ptr<ell::model::Map>& map)
     : _map(map)
 {
 }
@@ -744,7 +744,7 @@ void Map::Load(const std::string& filename)
 {
     ell::common::MapLoadArguments args;
     args.inputMapFilename = filename;
-    _map = std::make_shared<ell::model::DynamicMap>(ell::common::LoadMap(args));
+    _map = std::make_shared<ell::model::Map>(ell::common::LoadMap(args));
 }
 
 void Map::Save(const std::string& filename) const

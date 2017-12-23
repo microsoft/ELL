@@ -36,7 +36,7 @@ namespace model
     }
 
     // private constructor:
-    IRCompiledMap::IRCompiledMap(DynamicMap map, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module)
+    IRCompiledMap::IRCompiledMap(Map map, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module)
         : CompiledMap(std::move(map), functionName), _module(std::move(module)), _computeFunctionDefined(false)
     {
         _moduleName = _module->GetModuleName();

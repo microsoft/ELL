@@ -8,7 +8,7 @@ set (src
     src/CompilableNode.cpp
     src/CompilableNodeUtilities.cpp
     src/CompiledMap.cpp
-    src/DynamicMap.cpp
+    src/Map.cpp
     src/InputNodeBase.cpp
     src/InputPort.cpp
     src/IRCompiledMap.cpp
@@ -29,7 +29,7 @@ set (src
 set (include
     include/CompilableNodeUtilities.h
     include/CompiledMap.h
-    include/DynamicMap.h
+    include/Map.h
     include/CompilableNode.h
     include/InputNodeBase.h
     include/InputNode.h
@@ -52,7 +52,7 @@ set (include
 )
 
 set (tcc 
-    tcc/DynamicMap.tcc
+    tcc/Map.tcc
     tcc/InputNode.tcc
     tcc/InputPort.tcc
     tcc/IRCompiledMap.tcc
@@ -91,7 +91,7 @@ set (test_name ${library_name}_test)
 
 set (test_src
     test/src/main.cpp
-    test/src/DynamicMap_test.cpp
+    test/src/Map_test.cpp
     test/src/ModelTestUtilities.cpp
     test/src/ModelBuilder_test.cpp
     test/src/Model_test.cpp
@@ -100,7 +100,7 @@ set (test_src
 )
 
 set (test_include 
-    test/include/DynamicMap_test.h
+    test/include/Map_test.h
     test/include/ModelBuilder_test.h
     test/include/ModelTestUtilities.h
     test/include/Model_test.h

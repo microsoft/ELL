@@ -18,7 +18,7 @@
 
 // model
 #include "CompiledMap.h"
-#include "DynamicMap.h"
+#include "Map.h"
 #include "EmitterException.h"
 #include "EmitterTypes.h"
 #include "IRCompiledMap.h"
@@ -215,7 +215,7 @@ void TestCompileIsEqual()
     // Error: passing in a single-element PortElements for the inputs to the BinaryPredicateNode causes us to think it's a scalar and pass in the first value of the port, not the selected one
     auto predicateNode = model.AddNode<nodes::BinaryPredicateNode<double>>(model::PortElements<double>{ inputNode->output, 0 }, model::PortElements<double>{ inputNode->output, 1 }, emitters::BinaryPredicateType::equal);
     auto outputNode = model.AddNode<model::OutputNode<bool>>(predicateNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -230,7 +230,7 @@ void TestCompilableScalarOutputNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
     auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -245,7 +245,7 @@ void TestCompilableVectorOutputNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -260,7 +260,7 @@ void TestCompilableAccumulatorNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", accumNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", accumNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMapA = compiler.Compile(map);
     auto compiledMap = std::move(compiledMapA);
@@ -276,7 +276,7 @@ void TestCompilableConstantNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto dotNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", dotNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", dotNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
@@ -292,7 +292,7 @@ void TestCompilableDotProductNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto dotNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", dotNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", dotNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
@@ -307,7 +307,7 @@ void TestCompilableDelayNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto delayNode = model.AddNode<nodes::DelayNode<double>>(inputNode->output, 8);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", delayNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", delayNode->output } });
     model::IRMapCompiler compiler;
 
     auto compiledMap = compiler.Compile(map);
@@ -324,7 +324,7 @@ void TestCompilableDTWDistanceNode()
     std::vector<std::vector<double>> prototype = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto dtwNode = model.AddNode<nodes::DTWDistanceNode<double>>(inputNode->output, prototype);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", dtwNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", dtwNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -349,7 +349,7 @@ private:
     std::vector<std::vector<double>> _prototype;
 };
 
-model::DynamicMap GenerateMulticlassDTWClassifier(const std::vector<LabeledPrototype>& prototypes)
+model::Map GenerateMulticlassDTWClassifier(const std::vector<LabeledPrototype>& prototypes)
 {
     auto dim = prototypes[0].Dimension();
 
@@ -372,7 +372,7 @@ model::DynamicMap GenerateMulticlassDTWClassifier(const std::vector<LabeledProto
     auto labelsNode = model.AddNode<ell::nodes::ConstantNode<double>>(labels);
     auto argMinNode = model.AddNode<ell::nodes::ArgMinNode<double>>(dtwOutputs); // val, argVal
     auto selectNode = model.AddNode<ell::nodes::MultiplexerNode<double, int>>(labelsNode->output, argMinNode->argVal);
-    model::DynamicMap result(model, { { "input", inputNode } }, { { "output", ell::model::PortElements<double>{ selectNode->output, argMinNode->val } } });
+    model::Map result(model, { { "input", inputNode } }, { { "output", ell::model::PortElements<double>{ selectNode->output, argMinNode->val } } });
     return result;
 }
 
@@ -400,7 +400,7 @@ void TestCompilableScalarSumNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
     auto sumNode = model.AddNode<nodes::SumNode<double>>(inputNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", sumNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", sumNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -417,7 +417,7 @@ void TestCompilableSumNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(signal[0].size());
     auto sumNode = model.AddNode<nodes::SumNode<ElementType>>(inputNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", sumNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", sumNode->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.allowVectorInstructions = true;
     model::IRMapCompiler compiler(settings);
@@ -432,7 +432,7 @@ void TestCompilableUnaryOperationNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto testNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, emitters::UnaryOperationType::sqrt);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -446,7 +446,7 @@ void TestCompilableUnaryOperation_square_Node()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto testNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, emitters::UnaryOperationType::square);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
@@ -463,7 +463,7 @@ void TestL2NormSquaredNodeCompiled()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto testNode = model.AddNode<nodes::L2NormSquaredNode<double>>(inputNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
@@ -489,7 +489,7 @@ void TestMatrixVectorProductNodeCompile()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto testNode = model.AddNode<nodes::MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
     auto outputNode = model.AddNode<model::OutputNode<double>>(testNode->output, model::OutputShape{1, 4, 1});
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = false;
     model::IRMapCompiler compiler(settings);
@@ -507,7 +507,7 @@ void TestCompilableBinaryOperationNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto testNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantNode->output, emitters::BinaryOperationType::add);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -523,7 +523,7 @@ void TestCompilableScalarBinaryPredicateNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 2 });
     auto testNode = model.AddNode<nodes::BinaryPredicateNode<double>>(inputNode->output, constantNode->output, emitters::BinaryPredicateType::equal);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -542,7 +542,7 @@ void TestCompilableBinaryPredicateNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto testNode = model.AddNode<nodes::BinaryPredicateNode<double>>(inputNode->output, constantNode->output, emitters::BinaryPredicateType::equal);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -561,7 +561,7 @@ void TestCompilableMultiplexerNode()
     auto inputNode = model.AddNode<model::InputNode<int>>(1);
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto testNode = model.AddNode<nodes::MultiplexerNode<double, int>>(constantNode->output, inputNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -575,7 +575,7 @@ void TestCompilableTypeCastNode(size_t dimension)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<int>>(dimension);
     auto testNode = model.AddNode<nodes::TypeCastNode<int, double>>(inputNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -612,7 +612,7 @@ void TestReorderDataNode1()
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
     // auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputShape, outputShape);
     auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputShape, outputShape, std::vector<int>{ 2, 0, 1 });
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -653,7 +653,7 @@ void TestReorderDataNode2()
     size_t inputSize = inputShape.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
     auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputShape, outputShape, std::vector<int>{ 2, 0, 1 });
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -745,7 +745,7 @@ void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape)
                                                                                 dataOrder,
                                                                                 outputWidth,
                                                                                 outputHeight);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -789,7 +789,7 @@ void TestCompilableAccumulatorNodeFunction()
     auto accumNode4 = model.AddNode<nodes::AccumulatorNode<double>>(dotNode2->output);
     auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ accumNode4->output, dotNode2->output });
 
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.unrollLoops = true;
     settings.compilerSettings.optimize = true;
@@ -838,7 +838,7 @@ void TestCompilableSourceNode()
             return true;
         });
 
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
     model::MapCompilerParameters settings;
     settings.moduleName = "Test";
@@ -884,7 +884,7 @@ void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionNam
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputSize);
     auto testNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output, sinkFunctionName);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
     model::MapCompilerParameters settings;
     settings.moduleName = "Test";
@@ -918,7 +918,7 @@ void TestFloatNode()
     auto inputNode = model.AddNode<model::InputNode<float>>(3);
     auto accumNode1 = model.AddNode<nodes::AccumulatorNode<float>>(inputNode->output);
 
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", accumNode1->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", accumNode1->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.unrollLoops = true;
     settings.compilerSettings.optimize = true;
@@ -941,7 +941,7 @@ void TestMultipleOutputNodes()
     // this is blocked by IRMapCompiler.cpp line 42 which throws, so uncomment this when we decide to fix that.
     //    auto outputNode2 = model.AddNode<model::OutputNode<double>>(inputNode->output);
 
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } }); // , { "output2", outputNode2->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } }); // , { "output2", outputNode2->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler;
@@ -974,7 +974,7 @@ void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas)
 
     auto matVecMultNode = model.AddNode<nodes::MatrixVectorMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, n, inputVectorNode->output);
 
-    auto map = model::DynamicMap(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matVecMultNode->output } });
+    auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matVecMultNode->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.useBlas = useBlas;
     model::IRMapCompiler compiler(settings);
@@ -1003,7 +1003,7 @@ void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
     int ldc = n;
     auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, k, lda, matrixBNode->output, ldb, ldc);
 
-    auto map = model::DynamicMap(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
+    auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.useBlas = useBlas;
     model::IRMapCompiler compiler(settings);
@@ -1042,7 +1042,7 @@ void TestCompilableClockNode()
 
     auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1);
     auto clockNote = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold, "ClockNode_LagNotificationCallback");
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", clockNote->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", clockNote->output } });
 
     model::MapCompilerParameters settings;
     settings.moduleName = "Test";
@@ -1143,7 +1143,7 @@ void TestIRNode()
     auto inputNode1 = dotNodeModel.AddNode<model::InputNode<double>>(dimension);
     auto constantNode1 = dotNodeModel.AddNode<nodes::ConstantNode<double>>(constValue);
     auto dotNode = dotNodeModel.AddNode<nodes::DotProductNode<double>>(inputNode1->output, constantNode1->output);
-    auto dotNodeMap = model::DynamicMap(dotNodeModel, { { "input", inputNode1 } }, { { "output", dotNode->output } });
+    auto dotNodeMap = model::Map(dotNodeModel, { { "input", inputNode1 } }, { { "output", dotNode->output } });
 
     model::Model irNodeModel;
     auto inputNode2 = irNodeModel.AddNode<model::InputNode<double>>(dimension);
@@ -1155,7 +1155,7 @@ void TestIRNode()
     auto dotProductIR = GetDotProductIR();
     auto dotProductFunctionName = GetDotProductFunctionName();
     auto irNode = irNodeModel.AddNode<BinaryFunctionIRNode>(inputNode2->output, constantNode2->output, dotProductFunctionName, dotProductIR, extraArgs);
-    auto irNodeMap = model::DynamicMap(irNodeModel, { { "input", inputNode2 } }, { { "output", *irNode->GetOutputPort(0) } });
+    auto irNodeMap = model::Map(irNodeModel, { { "input", inputNode2 } }, { { "output", *irNode->GetOutputPort(0) } });
 
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(irNodeMap);
@@ -1182,7 +1182,7 @@ void TestIRNode()
 
 // Helper function
 template <typename ElementType>
-void VerifyLayerMap(const ell::model::DynamicMap& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
+void VerifyLayerMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
 {
     std::vector<std::vector<ElementType>> signal = { inputWithPadding.ToArray() };
     std::vector<std::vector<ElementType>> expectedOutput = { output.ToArray() };
@@ -1199,7 +1199,7 @@ void VerifyLayerMap(const ell::model::DynamicMap& map, const ell::model::Node* c
 }
 
 template <typename ElementType>
-void VerifyArchiveAndUnarchivingMap(const ell::model::DynamicMap& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
+void VerifyArchiveAndUnarchivingMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
 {
     // Test archiving / unarchiving produces same result as map before
     // archiving.
@@ -1210,7 +1210,7 @@ void VerifyArchiveAndUnarchivingMap(const ell::model::DynamicMap& map, const ell
 
     archiver << map;
     utilities::JsonUnarchiver unarchiver(strstream, context);
-    model::DynamicMap unarchivedMap;
+    model::Map unarchivedMap;
     unarchiver >> unarchivedMap;
 
     VerifyLayerMap<ElementType>(unarchivedMap, computeNode, inputWithPadding, output);
@@ -1245,7 +1245,7 @@ void TestNeuralNetworkPredictorNode1()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
@@ -1265,7 +1265,7 @@ void TestNeuralNetworkPredictorNode1()
 
     archiver << map;
     utilities::JsonUnarchiver unarchiver(strstream, context);
-    model::DynamicMap unarchivedMap;
+    model::Map unarchivedMap;
     unarchiver >> unarchivedMap;
 
     VerifyCompiledOutput(unarchivedMap, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_1");
@@ -1325,7 +1325,7 @@ void TestNeuralNetworkPredictorNode2()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.parallelize = false;
@@ -1383,7 +1383,7 @@ void TestNeuralNetworkPredictorNode3()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
@@ -1450,7 +1450,7 @@ void TestNeuralNetworkPredictorNode4()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
@@ -1532,7 +1532,7 @@ void TestNeuralNetworkPredictorNode5()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
@@ -1629,7 +1629,7 @@ void TestNeuralNetworkPredictorNode6()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
@@ -1801,7 +1801,7 @@ void TestNeuralNetworkPredictorNode7()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
@@ -1846,7 +1846,7 @@ void TestInputLayerNode(size_t outputPadding)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
@@ -1886,7 +1886,7 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::ActivationLayerNode<ElementType, ActivationFunction>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
     // Test archiving / unarchiving produces same result
@@ -1942,7 +1942,7 @@ void TestParametricReLUActivationLayerNode(size_t inputPaddingSize, size_t outpu
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::ParametricReLUActivationLayerNode<ElementType>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
     // Test archiving / unarchiving produces same result
@@ -1982,7 +1982,7 @@ void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddi
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::BatchNormalizationLayerNode<double>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -2023,7 +2023,7 @@ void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::BiasLayerNode<double>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -2066,7 +2066,7 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::BinaryConvolutionalLayerNode<ElementType>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     // Compile it
     model::MapCompilerParameters settings;
@@ -2149,7 +2149,7 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<double>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -2218,7 +2218,7 @@ void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPa
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<double>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -2264,7 +2264,7 @@ void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSi
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::FullyConnectedLayerNode<double>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -2299,7 +2299,7 @@ void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::PoolingLayerNode<ElementType, PoolingFunction>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -2311,7 +2311,7 @@ void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size
 
     archiver << map;
     utilities::JsonUnarchiver unarchiver(strstream, context);
-    model::DynamicMap unarchivedMap;
+    model::Map unarchivedMap;
     unarchiver >> unarchivedMap;
 
     std::vector<std::vector<ElementType>> signal = { inputWithPadding.ToArray() };
@@ -2360,7 +2360,7 @@ void TestScalingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::ScalingLayerNode<ElementType>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -2394,7 +2394,7 @@ void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::SoftmaxLayerNode<ElementType>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -2450,7 +2450,7 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
@@ -2522,7 +2522,7 @@ void TestRecurrentNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
     auto computeNode = model.AddNode<nodes::RecurrentLayerNode<ElementType, TanhActivation>>(inputNode->output, recurrent);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     // Compile model
     model::MapCompilerParameters settings;
@@ -2602,7 +2602,7 @@ void TestGRUNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
     auto computeNode = model.AddNode<nodes::GRULayerNode<ElementType, TanhActivation, SigmoidActivation>>(inputNode->output, gru);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     // Compile model
     model::MapCompilerParameters settings;
@@ -2688,7 +2688,7 @@ void TestLSTMNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
     auto computeNode = model.AddNode<nodes::LSTMLayerNode<ElementType, TanhActivation, SigmoidActivation>>(inputNode->output, lstm);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     // Compile model
     model::MapCompilerParameters settings;

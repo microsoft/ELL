@@ -9,7 +9,7 @@
 #pragma once
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "Model.h"
 
 namespace ell
@@ -24,7 +24,7 @@ namespace common
     /// <param name="predictor"> The predictor to wrap in a node and add to the model </param>
     /// <returns> The new model, with the predictor node appended </returns>
     template <typename PredictorNodeType, typename PredictorType>
-    model::Model AppendNodeToModel(model::DynamicMap& map, const PredictorType& predictor);
+    model::Model AppendNodeToModel(model::Map& map, const PredictorType& predictor);
 }
 }
 

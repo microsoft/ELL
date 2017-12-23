@@ -11,7 +11,7 @@
 
 // model
 #include "CompiledMap.h"
-#include "DynamicMap.h"
+#include "Map.h"
 #include "EmitterException.h"
 #include "EmitterTypes.h"
 #include "IRCompiledMap.h"
@@ -68,7 +68,7 @@ void TestPerformanceCounters()
     auto inputNode = model.AddNode<model::InputNode<double>>(m * k);
     auto matrix2Node = model.AddNode<nodes::ConstantNode<double>>(matrix2Values);
     auto matrixMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<double>>(inputNode->output, m, n, k, k, matrix2Node->output, n, n);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", matrixMultNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", matrixMultNode->output } });
 
     model::MapCompilerParameters settings;
     settings.profile = true;

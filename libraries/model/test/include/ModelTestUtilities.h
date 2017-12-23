@@ -8,7 +8,7 @@
 #pragma once
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRDiagnosticHandler.h"
 #include "Port.h"
@@ -53,19 +53,19 @@ model::Model GetSimpleModel();
 model::Model GetComplexModel();
 
 template <typename InputType, typename OutputType>
-void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name);
+void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name);
 
 template <typename InputType>
-void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name);
+void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name);
 
 template <typename InputType, typename OutputType>
-void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon = 1e-5);
+void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon = 1e-5);
 
 template <typename InputType>
-void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon = 1e-5);
+void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon = 1e-5);
 
 template <typename InputType, typename OutputType>
-void VerifyMapOutput(const model::DynamicMap& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name);
+void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name);
 
 void PrintDiagnostics(emitters::IRDiagnosticHandler& handler);
 

@@ -18,7 +18,7 @@ namespace common
 {
     // STYLE internal use only from .tcc, so not declared inside header file
     template <typename UnarchiverType>
-    model::DynamicMap LoadArchivedMap(std::istream& stream)
+    model::Map LoadArchivedMap(std::istream& stream)
     {
         try
         {
@@ -26,7 +26,7 @@ namespace common
             RegisterNodeTypes(context);
             RegisterMapTypes(context);
             UnarchiverType unarchiver(stream, context);
-            model::DynamicMap map;
+            model::Map map;
             unarchiver.Unarchive(map);
             return map;
         }

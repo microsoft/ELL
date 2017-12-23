@@ -51,7 +51,7 @@ namespace model
         _nodeRegions.emplace_back();
     }
 
-    void IRMapCompiler::EnsureValidMap(DynamicMap& map)
+    void IRMapCompiler::EnsureValidMap(Map& map)
     {
         if (map.NumInputPorts() != 1)
         {
@@ -114,7 +114,7 @@ namespace model
         return GetMapCompilerParameters().mapFunctionName;
     }
 
-    IRCompiledMap IRMapCompiler::Compile(DynamicMap map)
+    IRCompiledMap IRMapCompiler::Compile(Map map)
     {
         Log() << "Compile called for map" << EOL;
         EnsureValidMap(map);
@@ -152,7 +152,7 @@ namespace model
         return IRCompiledMap(std::move(map), GetMapCompilerParameters().mapFunctionName, std::move(module));
     }
 
-    void IRMapCompiler::EmitModelAPIFunctions(const DynamicMap& map)
+    void IRMapCompiler::EmitModelAPIFunctions(const Map& map)
     {
         EmitGetInputSizeFunction(map);
         EmitGetOutputSizeFunction(map);
@@ -162,7 +162,7 @@ namespace model
         EmitGetOutputShapeFunction(map);
     }
 
-    void IRMapCompiler::EmitGetInputSizeFunction(const DynamicMap& map)
+    void IRMapCompiler::EmitGetInputSizeFunction(const Map& map)
     {
         auto& context = _moduleEmitter.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
@@ -173,7 +173,7 @@ namespace model
         _moduleEmitter.EndFunction();
     }
 
-    void IRMapCompiler::EmitGetOutputSizeFunction(const DynamicMap& map)
+    void IRMapCompiler::EmitGetOutputSizeFunction(const Map& map)
     {
         auto& context = _moduleEmitter.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
@@ -292,7 +292,7 @@ namespace model
     // }
     //
 
-    void IRMapCompiler::EmitGetInputShapeFunction(const DynamicMap& map)
+    void IRMapCompiler::EmitGetInputShapeFunction(const Map& map)
     {
         // We have to create this interface because LLVM cannot reliably return structures on the stack.
         // void darknet_GetInputShape(struct TensorShape* shape, int index)
@@ -314,7 +314,7 @@ namespace model
         _moduleEmitter.EndFunction();
     }
 
-    void IRMapCompiler::EmitGetOutputShapeFunction(const DynamicMap& map)
+    void IRMapCompiler::EmitGetOutputShapeFunction(const Map& map)
     {
         // We have to create this interface because LLVM cannot reliably return structures on the stack.
         // void darknet_GetInputShape(struct TensorShape* shape, int index)
@@ -336,7 +336,7 @@ namespace model
         _moduleEmitter.EndFunction();
     }
 
-    void IRMapCompiler::EmitGetNumNodesFunction(const DynamicMap& map)
+    void IRMapCompiler::EmitGetNumNodesFunction(const Map& map)
     {
         auto& context = _moduleEmitter.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);

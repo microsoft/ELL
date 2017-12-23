@@ -25,7 +25,7 @@ namespace model
         PushScope();
     }
 
-    void MapCompiler::CompileMap(DynamicMap& map, const std::string& functionName)
+    void MapCompiler::CompileMap(Map& map, const std::string& functionName)
     {
         auto pModuleEmitter = GetModuleEmitter();
 
@@ -101,7 +101,7 @@ namespace model
     //
     // Allocating variables for function arguments
     //
-    emitters::NamedVariableTypeList MapCompiler::AllocateNodeFunctionArguments(DynamicMap& map, emitters::ModuleEmitter& module)
+    emitters::NamedVariableTypeList MapCompiler::AllocateNodeFunctionArguments(Map& map, emitters::ModuleEmitter& module)
     {
         emitters::NamedVariableTypeList functionArguments;
 

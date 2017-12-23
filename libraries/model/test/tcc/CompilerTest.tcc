@@ -10,7 +10,7 @@
 
 // model
 #include "CompiledMap.h"
-#include "DynamicMap.h"
+#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IREmitter.h"
 #include "IRMapCompiler.h"
@@ -36,7 +36,7 @@ void TestLinearPredictor()
     auto predictorNode = model.AddNode<nodes::LinearPredictorNode<ElementType>>(inputNode->output, predictor);
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(predictorNode->output);
 
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
 
     model::MapCompilerParameters settings;
     settings.mapFunctionName = "TestLinear";

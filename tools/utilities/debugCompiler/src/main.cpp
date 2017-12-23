@@ -69,7 +69,7 @@ std::vector<InputType> GetInputImage(std::string filename, const math::TensorSha
 }
 
 template <typename InputType>
-std::vector<InputType> GetInputData(model::DynamicMap& map, const CompareArguments& compareArguments)
+std::vector<InputType> GetInputData(model::Map& map, const CompareArguments& compareArguments)
 {
     auto inputShape = map.GetInputShape();
     if (compareArguments.inputTestFile.empty())
@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 
         // load map file
         std::cout << "loading map..." << std::endl;
-        model::DynamicMap map = common::LoadMap(compareArguments.inputMapFile);
+        model::Map map = common::LoadMap(compareArguments.inputMapFile);
 
         if (compareArguments.outputDirectory != "")
         {

@@ -16,7 +16,7 @@
 #include "ModuleEmitter.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "IRModelProfiler.h"
 #include "InputNode.h"
 #include "Model.h"
@@ -181,7 +181,7 @@ namespace model
     private:
         friend class IRMapCompiler;
     
-        IRCompiledMap(DynamicMap map, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module);
+        IRCompiledMap(Map map, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module);
 
         void EnsureExecutionEngine() const;
         void EnsureValidMap(); // fixes up model if necessary and checks inputs/outputs are compilable

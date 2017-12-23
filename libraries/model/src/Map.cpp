@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     DynamicMap.cpp (model)
+//  File:     Map.cpp (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DynamicMap.h"
+#include "Map.h"
 #include "Exception.h"
 #include "ModelTransformer.h"
 #include "OutputNode.h"
@@ -31,7 +31,7 @@ namespace model
         constexpr utilities::ArchiveVersion metadataArchiveVersion = { utilities::ArchiveVersionNumbers::v3_model_metadata };
     }
 
-    DynamicMap::DynamicMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs)
+    Map::Map(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs)
     {
         TransformContext context;
         ModelTransformer transformer;
@@ -52,7 +52,7 @@ namespace model
         Prune();
     }
 
-    DynamicMap::DynamicMap(const DynamicMap& other)
+    Map::Map(const Map& other)
     {
         TransformContext context;
         ModelTransformer transformer;
@@ -70,114 +70,114 @@ namespace model
         FixTransformedIO(transformer);
     }
 
-    DynamicMap& DynamicMap::operator=(DynamicMap other)
+    Map& Map::operator=(Map other)
     {
         swap(*this, other);
         return *this;
     }
 
-    void DynamicMap::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const
+    void Map::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const
     {
         node->SetInput(inputValues);
     }
 
-    void DynamicMap::SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const
+    void Map::SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const
     {
         node->SetInput(inputValues);
     }
 
-    void DynamicMap::SetNodeInput(InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const
+    void Map::SetNodeInput(InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const
     {
         node->SetInput(inputValues);
     }
 
-    void DynamicMap::SetNodeInput(InputNode<float>* node, const std::vector<float>& inputValues) const
+    void Map::SetNodeInput(InputNode<float>* node, const std::vector<float>& inputValues) const
     {
         node->SetInput(inputValues);
     }
 
-    void DynamicMap::SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues) const
+    void Map::SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues) const
     {
         node->SetInput(inputValues);
     }
 
-    std::vector<bool> DynamicMap::ComputeBoolOutput(const PortElementsBase& outputs) const
+    std::vector<bool> Map::ComputeBoolOutput(const PortElementsBase& outputs) const
     {
         return _model.ComputeOutput<bool>(outputs);
     }
 
-    std::vector<int> DynamicMap::ComputeIntOutput(const PortElementsBase& outputs) const
+    std::vector<int> Map::ComputeIntOutput(const PortElementsBase& outputs) const
     {
         return _model.ComputeOutput<int>(outputs);
     }
 
-    std::vector<int64_t> DynamicMap::ComputeInt64Output(const PortElementsBase& outputs) const
+    std::vector<int64_t> Map::ComputeInt64Output(const PortElementsBase& outputs) const
     {
         return _model.ComputeOutput<int64_t>(outputs);
     }
 
-    std::vector<float> DynamicMap::ComputeFloatOutput(const PortElementsBase& outputs) const
+    std::vector<float> Map::ComputeFloatOutput(const PortElementsBase& outputs) const
     {
         return _model.ComputeOutput<float>(outputs);
     }
 
-    std::vector<double> DynamicMap::ComputeDoubleOutput(const PortElementsBase& outputs) const
+    std::vector<double> Map::ComputeDoubleOutput(const PortElementsBase& outputs) const
     {
         return _model.ComputeOutput<double>(outputs);
     }
 
     template <>
-    std::vector<bool> DynamicMap::ComputeOutput<bool>(const PortElementsBase& elements) const
+    std::vector<bool> Map::ComputeOutput<bool>(const PortElementsBase& elements) const
     {
         return ComputeBoolOutput(elements);
     }
 
     template <>
-    std::vector<int> DynamicMap::ComputeOutput<int>(const PortElementsBase& elements) const
+    std::vector<int> Map::ComputeOutput<int>(const PortElementsBase& elements) const
     {
         return ComputeIntOutput(elements);
     }
 
     template <>
-    std::vector<int64_t> DynamicMap::ComputeOutput<int64_t>(const PortElementsBase& elements) const
+    std::vector<int64_t> Map::ComputeOutput<int64_t>(const PortElementsBase& elements) const
     {
         return ComputeInt64Output(elements);
     }
 
     template <>
-    std::vector<float> DynamicMap::ComputeOutput<float>(const PortElementsBase& elements) const
+    std::vector<float> Map::ComputeOutput<float>(const PortElementsBase& elements) const
     {
         return ComputeFloatOutput(elements);
     }
 
     template <>
-    std::vector<double> DynamicMap::ComputeOutput<double>(const PortElementsBase& elements) const
+    std::vector<double> Map::ComputeOutput<double>(const PortElementsBase& elements) const
     {
         return ComputeDoubleOutput(elements);
     }
 
-    void DynamicMap::AddInput(const std::string& inputName, InputNodeBase* inputNode)
+    void Map::AddInput(const std::string& inputName, InputNodeBase* inputNode)
     {
         _inputNodes.push_back(inputNode);
         _inputNames.push_back(inputName);
         _inputNodeMap.insert({ inputName, inputNode });
     }
 
-    void DynamicMap::AddOutput(const std::string& outputName, PortElementsBase outputElements)
+    void Map::AddOutput(const std::string& outputName, PortElementsBase outputElements)
     {
         _outputElements.push_back(outputElements);
         _outputNames.push_back(outputName);
         _outputElementsMap.insert({ outputName, outputElements });
     }
 
-    void DynamicMap::ResetOutput(size_t index, PortElementsBase outputElements)
+    void Map::ResetOutput(size_t index, PortElementsBase outputElements)
     {
         assert(index <= _outputElements.size() && "Error: Resetting unset output");
         _outputElements[index] = outputElements;
         _outputElementsMap[_outputNames[index]] = outputElements;
     }
 
-    void swap(DynamicMap& a, DynamicMap& b)
+    void swap(Map& a, Map& b)
     {
         using std::swap;
         swap(a._model, b._model);
@@ -189,7 +189,7 @@ namespace model
         swap(a._outputElementsMap, b._outputElementsMap);
     }
 
-    std::vector<const Node*> DynamicMap::GetAllOutputNodes() const
+    std::vector<const Node*> Map::GetAllOutputNodes() const
     {
         // gather output nodes
         std::unordered_set<const Node*> outputNodes;
@@ -204,7 +204,7 @@ namespace model
         return { outputNodes.begin(), outputNodes.end() };
     }
 
-    std::vector<const Node*> DynamicMap::GetDebugSinkNodes() const
+    std::vector<const Node*> Map::GetDebugSinkNodes() const
     {
         // gather SinkNodes
         std::unordered_set<const Node*> sinkNodes;
@@ -232,7 +232,7 @@ namespace model
         return { sinkNodes.begin(), sinkNodes.end() };
     }
 
-    void DynamicMap::FixTransformedIO(ModelTransformer& transformer)
+    void Map::FixTransformedIO(ModelTransformer& transformer)
     {
         for (auto& inputNode : _inputNodes)
         {
@@ -261,7 +261,7 @@ namespace model
         }
     }
 
-    void DynamicMap::Prune()
+    void Map::Prune()
     {
         TransformContext context;
         ModelTransformer transformer;
@@ -274,17 +274,17 @@ namespace model
         _model = std::move(minimalModel);
     }
 
-    size_t DynamicMap::GetInputSize() const
+    size_t Map::GetInputSize() const
     {
         return GetInputShape().Size();
     }
 
-    size_t DynamicMap::GetOutputSize() const
+    size_t Map::GetOutputSize() const
     {
         return GetOutput(0).Size();
     }
 
-    math::TensorShape DynamicMap::GetInputShape() const
+    math::TensorShape Map::GetInputShape() const
     {
         auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
         if (!sourceNodes.empty())
@@ -296,7 +296,7 @@ namespace model
         return GetInput(0)->GetShape();
     }
 
-    std::vector<const InputNodeBase*> DynamicMap::GetInputNodes() const
+    std::vector<const InputNodeBase*> Map::GetInputNodes() const
     {
         auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
         if (!sourceNodes.empty())
@@ -308,7 +308,7 @@ namespace model
         return std::vector<const InputNodeBase*>(_inputNodes.begin(), _inputNodes.end());
     }
 
-    std::vector<const OutputNodeBase*> DynamicMap::GetOutputNodes() const
+    std::vector<const OutputNodeBase*> Map::GetOutputNodes() const
     {
         std::vector<const OutputNodeBase*> result;
         auto allOutputs = GetAllOutputNodes();
@@ -324,7 +324,7 @@ namespace model
         return result;
     }
 
-    math::TensorShape DynamicMap::GetOutputShape() const
+    math::TensorShape Map::GetOutputShape() const
     {
         auto outputNodeVec = GetOutputNodes();
         if (!outputNodeVec.empty())
@@ -335,7 +335,7 @@ namespace model
         return math::TensorShape(0, 0, 0);
     }
 
-    Port::PortType DynamicMap::GetInputType() const
+    Port::PortType Map::GetInputType() const
     {
         auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
         if (!sourceNodes.empty())
@@ -346,18 +346,18 @@ namespace model
         return GetInput()->GetOutputType();
     }
 
-    Port::PortType DynamicMap::GetOutputType() const
+    Port::PortType Map::GetOutputType() const
     {
         return GetOutput().GetPortType();
     }
 
-    void DynamicMap::Refine(int maxIterations)
+    void Map::Refine(int maxIterations)
     {
         TransformContext context;
         return Refine(context, maxIterations);
     }
 
-    void DynamicMap::Refine(const TransformContext& context, int maxIterations)
+    void Map::Refine(const TransformContext& context, int maxIterations)
     {
         if (maxIterations == 0)
         {
@@ -372,7 +372,7 @@ namespace model
         Prune();
     }
 
-    void DynamicMap::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
+    void Map::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
     {
         ModelTransformer transformer;
         auto refinedModel = transformer.TransformModel(_model, transformFunction, context);
@@ -380,7 +380,7 @@ namespace model
         _model = std::move(refinedModel);
     }
 
-    void DynamicMap::RenameCallbacks(const std::string& sourceCallbackName, const std::string& sinkCallbackName)
+    void Map::RenameCallbacks(const std::string& sourceCallbackName, const std::string& sinkCallbackName)
     {
         // Look for all source nodes and apply name if it is non-empty.
         // The callbacks will soon support a context parameter that indicates the originating source node.
@@ -405,7 +405,7 @@ namespace model
         }
     }
 
-    utilities::ArchiveVersion DynamicMap::GetArchiveVersion() const
+    utilities::ArchiveVersion Map::GetArchiveVersion() const
     {
         if (_metadata.IsEmpty())
         {
@@ -417,12 +417,12 @@ namespace model
         }
     }
 
-    bool DynamicMap::CanReadArchiveVersion(const utilities::ArchiveVersion& version) const
+    bool Map::CanReadArchiveVersion(const utilities::ArchiveVersion& version) const
     {
         return version >= noMetadataArchiveVersion && version <= metadataArchiveVersion;
     }
 
-    void DynamicMap::WriteToArchive(utilities::Archiver& archiver) const
+    void Map::WriteToArchive(utilities::Archiver& archiver) const
     {
         // Archive the model
         archiver["model"] << _model;
@@ -438,9 +438,9 @@ namespace model
         archiver["outputElements"] << _outputElements;
     }
 
-    void DynamicMap::ReadFromArchive(utilities::Unarchiver& archiver)
+    void Map::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        DynamicMapSerializationContext mapContext(archiver.GetContext());
+        MapSerializationContext mapContext(archiver.GetContext());
         archiver.PushContext(mapContext);
 
         // Unarchive the model
@@ -478,7 +478,7 @@ namespace model
         archiver.PopContext();
     }
 
-    InputNodeBase* DynamicMap::GetInput(size_t index) const
+    InputNodeBase* Map::GetInput(size_t index) const
     {
         if (index >= _inputNodes.size())
         {
@@ -488,7 +488,7 @@ namespace model
         return _inputNodes[index];
     }
 
-    InputNodeBase* DynamicMap::GetInput(const std::string& inputName) const
+    InputNodeBase* Map::GetInput(const std::string& inputName) const
     {
         auto iter = _inputNodeMap.find(inputName);
         if (iter == _inputNodeMap.end())
@@ -499,7 +499,7 @@ namespace model
         return iter->second;
     }
 
-    PortElementsBase DynamicMap::GetOutput(size_t index) const
+    PortElementsBase Map::GetOutput(size_t index) const
     {
         if (index >= _outputElements.size())
         {
@@ -509,7 +509,7 @@ namespace model
         return _outputElements[index];
     }
 
-    PortElementsBase DynamicMap::GetOutput(const std::string& outputName) const
+    PortElementsBase Map::GetOutput(const std::string& outputName) const
     {
         auto iter = _outputElementsMap.find(outputName);
         if (iter == _outputElementsMap.end())
@@ -521,9 +521,9 @@ namespace model
     }
 
     //
-    // DynamicMapSerializationContext
+    // MapSerializationContext
     //
-    DynamicMapSerializationContext::DynamicMapSerializationContext(utilities::SerializationContext& previousContext)
+    MapSerializationContext::MapSerializationContext(utilities::SerializationContext& previousContext)
         : ModelSerializationContext(previousContext, nullptr)
     {
     }

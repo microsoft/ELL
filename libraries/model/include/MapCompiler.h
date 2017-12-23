@@ -16,7 +16,7 @@
 
 // model
 #include "CompilableNodeUtilities.h"
-#include "DynamicMap.h"
+#include "Map.h"
 #include "Model.h"
 #include "Node.h"
 #include "OutputPort.h"
@@ -53,7 +53,7 @@ namespace model
         ///
         /// <param name="map"> The map to compile. </param>
         /// <param name="functionName"> The name of the function to create. </param>
-        void CompileMap(DynamicMap& map, const std::string& functionName);
+        void CompileMap(Map& map, const std::string& functionName);
 
         /// <summary> Gets the model-specific compiler parameters being used by the map compiler. </summary>
         ///
@@ -112,7 +112,7 @@ namespace model
         /// <summary>
         /// Allocate variables for the map function arguments, based on the input and output nodes.
         /// </summary>
-        emitters::NamedVariableTypeList AllocateNodeFunctionArguments(DynamicMap& map, emitters::ModuleEmitter& emitter);
+        emitters::NamedVariableTypeList AllocateNodeFunctionArguments(Map& map, emitters::ModuleEmitter& emitter);
 
         //
         // These methods may be implemented by specific compilers

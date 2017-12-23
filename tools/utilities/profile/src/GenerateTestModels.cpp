@@ -124,13 +124,13 @@ predictors::SimpleForestPredictor CreateForest(size_t numSplits)
     return forest;
 }
 
-model::DynamicMap GenerateTreeModel(size_t numSplits)
+model::Map GenerateTreeModel(size_t numSplits)
 {
     auto forest = CreateForest(numSplits);
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto computeNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     return map;
 }
 
@@ -138,7 +138,7 @@ model::DynamicMap GenerateTreeModel(size_t numSplits)
 // Neural nets
 //
 
-model::DynamicMap GenerateBinaryConvolutionModel(size_t imageRows, size_t imageColumns, size_t numChannels, size_t numFilters)
+model::Map GenerateBinaryConvolutionModel(size_t imageRows, size_t imageColumns, size_t numChannels, size_t numFilters)
 {
     using namespace predictors::neural;
 
@@ -179,11 +179,11 @@ model::DynamicMap GenerateBinaryConvolutionModel(size_t imageRows, size_t imageC
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
     return map;
 }
 
-model::DynamicMap GenerateBinaryConvolutionPlusDenseModel(size_t imageRows, size_t imageColumns, size_t numChannels, size_t numFilters, size_t numOutputs)
+model::Map GenerateBinaryConvolutionPlusDenseModel(size_t imageRows, size_t imageColumns, size_t numChannels, size_t numFilters, size_t numOutputs)
 {
     using ElementType = float;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
@@ -228,7 +228,7 @@ model::DynamicMap GenerateBinaryConvolutionPlusDenseModel(size_t imageRows, size
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
     return map;
 }
 
@@ -277,7 +277,7 @@ TensorType GetRandomTensor(size_t rows, size_t columns, size_t channels)
     return tensor;
 }
 
-model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
+model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
 {
     using ElementType = float;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
@@ -531,7 +531,7 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
     return map;
 }
 }

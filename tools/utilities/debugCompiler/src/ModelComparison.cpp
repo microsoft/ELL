@@ -160,7 +160,7 @@ bool IsNeuralNetworkLayerNode(const ell::model::Node* node)
 // Getting map output
 //
 template <typename InputType, typename OutputType>
-std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<float>& input)
+std::vector<float> GetMapOutput(const model::Map& map, const std::vector<float>& input)
 {
     std::vector<InputType> typedInput(input.begin(), input.end());
     auto result = map.Compute<InputType>(typedInput);
@@ -168,7 +168,7 @@ std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<
 }
 
 template <typename InputType>
-std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<float>& input)
+std::vector<float> GetMapOutput(const model::Map& map, const std::vector<float>& input)
 {
     switch (map.GetOutputType())
     {
@@ -189,7 +189,7 @@ std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<
     }
 }
 
-std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<float>& input)
+std::vector<float> GetMapOutput(const model::Map& map, const std::vector<float>& input)
 {
     switch (map.GetInputType())
     {
@@ -223,7 +223,7 @@ ModelComparison::ModelComparison(std::string outputDirectory)
     _hasMinMax = false;
 }
 
-void ModelComparison::SetUpReferenceMap(model::DynamicMap& map)
+void ModelComparison::SetUpReferenceMap(model::Map& map)
 {
     _addingReference = true;
 
@@ -251,7 +251,7 @@ void ModelComparison::SetUpReferenceMap(model::DynamicMap& map)
     _referenceMap.Transform(transformFunc, addSinkNodeContext);
 }
 
-void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference, const model::MapCompilerParameters& settings)
+void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerParameters& settings)
 {
     SetUpReferenceMap(reference);
     _addingReference = false;
@@ -640,7 +640,7 @@ void ModelComparison::CreateGraph(const model::Model& model)
         std::string typeName = node.GetRuntimeTypeName();
         if (IsDebugSinkNode(node))
         {
-            // During the process of compilation the DynamicMap Model is cloned a few times which
+            // During the process of compilation the Map Model is cloned a few times which
             // causes the node id's to change, so this creates a map from the original id to the new id
             auto oldLabel = GetDebugSinkNodeLabel(node);
 

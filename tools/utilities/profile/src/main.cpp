@@ -20,7 +20,7 @@
 #include "Tensor.h"
 
 // model
-#include "DynamicMap.h"
+#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
 
@@ -68,7 +68,7 @@ std::vector<T> GetInputData(std::string filename, const math::TensorShape& input
 }
 
 template <typename InputType>
-std::vector<InputType> GetModelInput(model::DynamicMap& map, const ProfileArguments& profileArguments)
+std::vector<InputType> GetModelInput(model::Map& map, const ProfileArguments& profileArguments)
 {
     auto inputShape = map.GetInputShape();
     std::vector<InputType> input = GetInputData<InputType>(profileArguments.inputTestFile, inputShape, 1.0f, true);
@@ -287,7 +287,7 @@ void WarmUpModel(model::IRCompiledMap& map, const std::vector<InputType>& input,
 }
 
 template <typename InputType, typename OutputType>
-void TimeModel(model::DynamicMap& map, const std::vector<InputType>& input, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
+void TimeModel(model::Map& map, const std::vector<InputType>& input, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
 {
     // Get output stream
     auto outputStream = GetOutputStream(profileArguments.outputFilename);
@@ -328,7 +328,7 @@ void TimeModel(model::DynamicMap& map, const std::vector<InputType>& input, cons
 }
 
 template <typename InputType, typename OutputType>
-void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
+void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
 {
     const bool printTimingChart = profileArguments.timingOutputFilename != "";
     auto profileOutputStream = GetOutputStream(profileArguments.outputFilename);
@@ -413,7 +413,7 @@ void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArgumen
 }
 
 template <typename InputType>
-void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
+void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
 {
     switch (map.GetOutputType())
     {
@@ -437,7 +437,7 @@ void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArgumen
 //
 // Load the map and process it
 //
-void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
+void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
 {
     switch (map.GetInputType())
     {

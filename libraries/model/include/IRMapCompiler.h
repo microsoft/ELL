@@ -52,7 +52,7 @@ namespace model
         ///
         /// <param name="map"> The map to compile </param>
         /// <param name="functionName"> The name of the function to evaluate the map </param>
-        IRCompiledMap Compile(DynamicMap map);
+        IRCompiledMap Compile(Map map);
 
         /// <summary> Gets the compiler parameters being used by the IR emitter. </summary>
         ///
@@ -161,9 +161,9 @@ namespace model
         void PushScope() override;
         void PopScope() override;
         emitters::ModuleEmitter* GetModuleEmitter() override { return &_moduleEmitter; }
-        void EnsureValidMap(DynamicMap& map);
+        void EnsureValidMap(Map& map);
         virtual std::string GetPredictFunctionName() const;
-        virtual void EmitModelAPIFunctions(const DynamicMap& map);
+        virtual void EmitModelAPIFunctions(const Map& map);
         emitters::Variable* GetPortVariable(const InputPortBase& port);
         emitters::Variable* GetPortElementVariable(const PortElementBase& element);
 
@@ -176,13 +176,13 @@ namespace model
         const Node* GetUniqueParent(const Node& node);
         bool TryMergeNodeIntoRegion(emitters::IRBlockRegion* pDestination, const Node& src);
 
-        void EmitGetInputSizeFunction(const DynamicMap& map);
-        void EmitGetOutputSizeFunction(const DynamicMap& map);
-        void EmitGetNumNodesFunction(const DynamicMap& map);
+        void EmitGetInputSizeFunction(const Map& map);
+        void EmitGetOutputSizeFunction(const Map& map);
+        void EmitGetNumNodesFunction(const Map& map);
 
         void EmitShapeEnum();
-        void EmitGetInputShapeFunction(const DynamicMap& map);
-        void EmitGetOutputShapeFunction(const DynamicMap& map);
+        void EmitGetInputShapeFunction(const Map& map);
+        void EmitGetOutputShapeFunction(const Map& map);
         void EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<ell::math::TensorShape> shapes);
 
         // stack of node regions

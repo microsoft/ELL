@@ -12,7 +12,7 @@
 
 // model
 #include "CompilableNode.h"
-#include "DynamicMap.h"
+#include "Map.h"
 #include "IRCompiledMap.h"
 #include "Model.h"
 
@@ -77,17 +77,17 @@ std::string OutputPath(std::string relPath)
 // Helper functions for constructing example models/maps
 //
 
-model::DynamicMap MakeSimpleMap()
+model::Map MakeSimpleMap()
 {
     // make a model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto sumNode = model.AddNode<nodes::SumNode<double>>(inputNode->output);
 
-    return model::DynamicMap{ model, { { "input", inputNode } }, { { "output", sumNode->output } } };
+    return model::Map{ model, { { "input", inputNode } }, { { "output", sumNode->output } } };
 }
 
-model::DynamicMap MakeForestMap()
+model::Map MakeForestMap()
 {
     // define some abbreviations
     using SplitAction = predictors::SimpleForestPredictor::SplitAction;
@@ -126,7 +126,7 @@ void TestSimpleMap(bool optimize)
     auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
     auto accumNode2 = model.AddNode<nodes::AccumulatorNode<double>>(accumNode->output);
     // auto outputNode = model.AddNode<model::OutputNode<double>>(accumNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", accumNode2->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", accumNode2->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = optimize;
     model::IRMapCompiler compiler(settings);
@@ -150,7 +150,7 @@ void TestSqEuclideanDistanceMap()
         { -.4, 0.2, -.7 }
     };
     auto sqEuclidDistNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
-    auto map = model::DynamicMap{ model, { { "input", inputNode } }, { { "output", sqEuclidDistNode->output } } };
+    auto map = model::Map{ model, { { "input", inputNode } }, { { "output", sqEuclidDistNode->output } } };
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
@@ -207,7 +207,7 @@ void TestProtoNNPredictorMap()
     auto inputNode = model.AddNode<model::InputNode<double>>(dim);
     auto protonnPredictorNode = model.AddNode<nodes::ProtoNNPredictorNode>(inputNode->output, protonnPredictor);
     auto outputNode = model.AddNode<model::OutputNode<double>>(protonnPredictorNode->output);
-    auto map = model::DynamicMap{ model, { { "input", inputNode } }, { { "output", outputNode->output } } };
+    auto map = model::Map{ model, { { "input", inputNode } }, { { "output", outputNode->output } } };
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = false;
@@ -250,7 +250,7 @@ void TestMultiOutputMap()
     auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
     auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ inputNode->output, accumNode->output });
 
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerParameters settings;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
@@ -271,7 +271,7 @@ void TestMultiOutputMap2()
     auto dotNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, inputNode->output);
     auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ sumNode->output, dotNode->output });
 
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
@@ -286,7 +286,7 @@ void TestCompiledMapMove()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", accumNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", accumNode->output } });
     model::IRMapCompiler compiler1;
     auto compiledMap1 = compiler1.Compile(map);
 
@@ -327,7 +327,7 @@ void TestBinaryVector(bool expanded, bool runJit)
     settings.mapFunctionName = modelFunctionName;
     model::IRMapCompiler compiler(settings);
 
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", multiplyNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", multiplyNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
 
     std::vector<double> testInput = { 1, 1, 1, 1 };
@@ -367,7 +367,7 @@ void TestBinaryScalar()
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", addNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", addNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
@@ -383,7 +383,7 @@ void TestDotProduct(model::MapCompilerParameters& settings)
     auto outputNode = mb.Outputs<double>(dotProduct->output);
 
     model::IRMapCompiler compiler(settings);
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
@@ -418,7 +418,7 @@ void TestSimpleSum(bool expanded, bool optimized)
     settings.compilerSettings.optimize = optimized;
     model::IRMapCompiler compiler(settings);
 
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", sumNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", sumNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
     PrintDiagnostics(compiledMap.GetModule().GetDiagnosticHandler());
@@ -438,7 +438,7 @@ void TestSum(bool expanded, bool optimized)
     settings.compilerSettings.unrollLoops = expanded;
     settings.compilerSettings.optimize = optimized;
     model::IRMapCompiler compiler(settings);
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", sumNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", sumNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 
@@ -460,7 +460,7 @@ void TestAccumulator(bool expanded)
     model::MapCompilerParameters settings;
     settings.compilerSettings.unrollLoops = expanded;
     model::IRMapCompiler compiler(settings);
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
@@ -473,7 +473,7 @@ void TestDelay()
     auto outputNode = mb.Outputs<double>(delay->output);
 
     model::IRMapCompiler compiler;
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
@@ -486,7 +486,7 @@ void TestSqrt()
     auto outputNode = mb.Outputs<double>(sqrt->output);
 
     model::IRMapCompiler compiler;
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
@@ -502,7 +502,7 @@ void TestBinaryPredicate(bool expanded)
     auto outputNode = mb.Outputs<bool>(eq->output);
 
     model::IRMapCompiler compiler;
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
@@ -518,7 +518,7 @@ void TestMultiplexer()
     auto outputNode = mb.Outputs<double>(selector->output);
 
     model::IRMapCompiler compiler;
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
@@ -537,7 +537,7 @@ void TestSlidingAverage()
     settings.mapFunctionName = "TestSlidingAverage";
     model::IRMapCompiler compiler(settings);
 
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
 
     auto& module = compiledMap.GetModule();
@@ -573,7 +573,7 @@ void TestDotProductOutput()
     auto outputNode = mb.Outputs<double>(dotProduct->output);
 
     model::IRMapCompiler compiler(settings);
-    model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
 
     auto mainFunction = compiledMap.GetModule().BeginMainDebugFunction();
@@ -710,7 +710,7 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
 
     // compiled maps require a single output, so we concatenate the ports for the sink nodes
     auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ sinkNode1->output, sinkNode2->output });
-    auto map = model::DynamicMap(model, { { "time", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "time", inputNode } }, { { "output", outputNode->output } });
 
     // Compile the map
     model::MapCompilerParameters settings;
