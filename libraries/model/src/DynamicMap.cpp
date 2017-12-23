@@ -298,6 +298,13 @@ namespace model
 
     std::vector<const InputNodeBase*> DynamicMap::GetInputNodes() const
     {
+        auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
+        if (!sourceNodes.empty())
+        {
+            return std::vector<const InputNodeBase*>(sourceNodes.begin(), sourceNodes.end());
+        }
+
+        // no source nodes, fallback to regular input nodes
         return std::vector<const InputNodeBase*>(_inputNodes.begin(), _inputNodes.end());
     }
 

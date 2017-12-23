@@ -11,7 +11,6 @@
 #include "TypeTraits.h"
 
 // stl
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -354,26 +353,6 @@ namespace utilities
         ///
         /// <returns> The serialization name. </returns>
         static std::string GetName() { return "IArchivable"; }
-    };
-
-    /// <summary> Class used to get information about the std::chrono::steady_clock type. </summary>
-    template <>
-    struct TypeName<std::chrono::steady_clock>
-    {
-        /// <summary> Gets the serialization name of the type. </summary>
-        ///
-        /// <returns> The serialization name. </returns>
-        static std::string GetName() { return "std::chrono::steady_clock"; }
-    };
-
-    /// <summary> Class used to get information about the std::chrono::system_clock type. </summary>
-    template <>
-    struct TypeName<std::chrono::system_clock>
-    {
-        /// <summary> Gets the serialization name of the type. </summary>
-        ///
-        /// <returns> The serialization name. </returns>
-        static std::string GetName() { return "std::chrono::system_clock"; }
     };
 }
 }

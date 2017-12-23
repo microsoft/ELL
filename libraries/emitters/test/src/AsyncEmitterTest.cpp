@@ -23,7 +23,6 @@
 #include "testing.h"
 
 // stl
-#include <chrono>
 #include <iostream>
 #include <memory>
 #include <ostream>

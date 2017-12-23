@@ -521,12 +521,6 @@ namespace emitters
         /// <summary> Emit declaration of extern free. </summary>
         void DeclareFree();
 
-        /// <summary> Emit declaration of GetXXClockMilliseconds. </summary>
-        ///
-        /// <typeparam name="ClockType"> The clock type. </typeparam>
-        template <typename ClockType>
-        void DeclareGetClockMilliseconds();
-
         /// <summary> Add a main function into which you will inject debugging code. </summary>
         IRFunctionEmitter BeginMainDebugFunction();
 

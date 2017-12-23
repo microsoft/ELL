@@ -1,0 +1,50 @@
+u8R"(// Predictor class
+class @@PREDICTOR_CLASS@@ : public ell::api::CallbackForwarder<@@SOURCE_TYPE@@, @@SINK_TYPE@@>
+{
+public:
+    @@PREDICTOR_CLASS@@() = default;
+    virtual ~@@PREDICTOR_CLASS@@() = default;
+    static @@PREDICTOR_CLASS@@& GetInstance(
+        ell::api::CallbackBase<@@SOURCE_TYPE@@>& inputCallback,
+        size_t inputSize,
+        ell::api::CallbackBase<@@SINK_TYPE@@>& outputCallback,
+        size_t outputSize,
+        ell::api::CallbackBase<@@TIMETICK_TYPE@@>& lagCallback);
+};
+
+#ifndef SWIG
+static @@PREDICTOR_CLASS@@ _predictor;
+
+extern "C"
+{
+
+int8_t @@SOURCE_CALLBACK@@(@@SOURCE_TYPE@@* input)
+{
+    return static_cast<int8_t>(_predictor.InvokeInput(input));
+}
+
+void @@SINK_CALLBACK@@(@@SINK_TYPE@@* output)
+{
+    _predictor.InvokeOutput(output);
+}
+
+void @@LAG_CALLBACK@@(@@TIMETICK_TYPE@@ lag)
+{
+    _predictor.InvokeLagNotification(lag);
+}
+
+} // extern "C"
+
+@@PREDICTOR_CLASS@@& @@PREDICTOR_CLASS@@::GetInstance(
+    ell::api::CallbackBase<@@SOURCE_TYPE@@>& inputCallback,
+    size_t inputSize,
+    ell::api::CallbackBase<@@SINK_TYPE@@>& outputCallback,
+    size_t outputSize,
+    ell::api::CallbackBase<@@TIMETICK_TYPE@@>& lagCallback)
+{
+    _predictor.InitializeOnce(inputCallback, inputSize, outputCallback, outputSize, lagCallback);
+    return _predictor;
+}
+
+#endif // SWIG
+)"

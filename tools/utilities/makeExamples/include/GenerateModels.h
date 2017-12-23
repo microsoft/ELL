@@ -11,9 +11,6 @@
 // model
 #include "Model.h"
 
-// stl
-#include <chrono>
-
 namespace ell
 {
 model::Model GenerateIdentityModel(size_t dimension);

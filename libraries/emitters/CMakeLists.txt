@@ -76,7 +76,6 @@ set (tcc
     tcc/CompilableIRFunction.tcc
     tcc/EmitterTypes.tcc
     tcc/IRFunctionEmitter.tcc
-    tcc/IRLoopEmitter.tcc
     tcc/IRModuleEmitter.tcc
     tcc/IRRuntime.tcc
     tcc/ScalarVariable.tcc
@@ -85,12 +84,20 @@ set (tcc
     tcc/Variable.tcc
 )
 
+set (templates
+    templates/SwigPredictFunction.in
+    templates/SwigPredictorClass.in
+    templates/SwigPredictorPython.in
+    templates/SwigShapeWrappers.in
+)
+
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
+source_group("templates" FILES ${templates})
 
 add_library(${library_name} ${src} ${include} ${tcc})
-target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} PUBLIC include templates)
 target_include_directories(${library_name} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_link_libraries(${library_name} utilities ${LLVM_LIBS})
 target_compile_definitions(${library_name} PUBLIC ${LLVM_DEFINITIONS})
@@ -114,6 +121,7 @@ set (test_src
   test/src/IREmitterTest.cpp
   test/src/IRFunctionTest.cpp
   test/src/PosixEmitterTest.cpp
+  test/src/SwigWriterTest.cpp
 )
 
 set (test_include
@@ -121,6 +129,7 @@ set (test_include
   test/include/IREmitterTest.h
   test/include/IRFunctionTest.h
   test/include/PosixEmitterTest.h
+  test/include/SwigWriterTest.h
 )
 
 source_group("src" FILES ${test_src})

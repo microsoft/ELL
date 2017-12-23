@@ -51,7 +51,6 @@
 #include "JsonArchiver.h"
 
 // stl
-#include <chrono>
 #include <cstdint>
 
 namespace ell

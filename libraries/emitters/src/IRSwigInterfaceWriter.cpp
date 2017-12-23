@@ -15,8 +15,10 @@
 
 // utilities
 #include "Debug.h"
+#include "StringUtil.h"
 
 // stl
+#include <regex>
 #include <sstream>
 #include <string>
 
@@ -26,6 +28,37 @@ namespace emitters
 {
     namespace
     {
+        // Utilities
+        void ReplaceDelimiter(std::string& text, const std::string& delimiter, const std::string& replacement)
+        {
+            std::string actualDelimiter = "@@" + delimiter + "@@";
+            text = std::regex_replace(text, std::regex(actualDelimiter), replacement);
+        }
+
+        std::string AsVectorType(const std::string& type)
+        {
+            return type == "float" ? "FloatVector" : "DoubleVector";
+        }
+
+        std::string AsNumpyType(const std::string& type)
+        {
+            return type == "float" ? "float32" : "float";
+        }
+
+        void WriteCommaSeparatedList(std::ostream& os, const std::vector<std::string>& list)
+        {
+            bool first = true;
+            for (const auto& item : list)
+            {
+                if (!first)
+                {
+                    os << ", ";
+                }
+                os << item;
+                first = false;
+            }
+        }
+
         // Writes a scoped #ifdef SWIG declaration
         struct DeclareIfndefSwig : private DeclareIfDefGuard
         {
@@ -45,31 +78,54 @@ namespace emitters
 
             void WriteHeaderCode(std::ostream& os)
             {
-                // Write header for SWIG to generate a wrapper
-                std::ostringstream osHeader;
-                osHeader << "void " << _functionName << "(const std::vector<" << _inputType << ">& input, std::vector<" << _outputType << ">& output)";
-                os << osHeader.str() << ";\n\n";
-
+                std::string inputType = _inputType;
+                std::string inputArgument = "input";
+                if (!_inputIsScalar)
                 {
-                    DeclareIfndefSwig ifndefSwig(os);
+                    std::ostringstream osType;
+                    osType << "const std::vector<" << _inputType << ">&";
+                    inputType = osType.str();
 
-                    // Write implementation
-                    os << osHeader.str() << "\n{\n";
-                    os << "    " << _functionName << "(const_cast<" << _inputType << "*>(&input[0]), &output[0]);\n";
-                    os << "}\n";
+                    std::ostringstream osArgument;
+                    osArgument << "const_cast<" << _inputType << "*>(&input[0])";
+                    inputArgument = osArgument.str();
                 }
-            }
+
+                // Write header for SWIG to generate a wrapper
+                // (Note: newlines are part of the syntax for #include)
+                std::string predictFunctionCode(
+                    #include "SwigPredictFunction.in"
+                );
+
+                ReplaceDelimiter(predictFunctionCode, "FUNCTION", _functionName);
+                ReplaceDelimiter(predictFunctionCode, "INPUT_TYPE", inputType);
+                ReplaceDelimiter(predictFunctionCode, "INPUT_ARGUMENT", inputArgument);
+                ReplaceDelimiter(predictFunctionCode, "OUTPUT_TYPE", _outputType);
+
+                os << predictFunctionCode << "\n";
+             }
 
         private:
             void InitPredictFunctionInfo()
             {
                 _functionName = _function->getName();
 
-                // Two pointer arguments
+                // Two arguments (input may be a scalar or pointer)
                 auto it = _function->args().begin();
                 {
                     std::ostringstream os;
-                    WriteLLVMType(os, (*it).getType()->getPointerElementType());
+                    auto& argument = *it;
+                    auto type = argument.getType();
+                    if (type->isPointerTy())
+                    {
+                        _inputIsScalar = false;
+                        WriteLLVMType(os, argument.getType()->getPointerElementType());
+                    }
+                    else
+                    {
+                        _inputIsScalar = true;
+                        WriteLLVMType(os, argument.getType());
+                    }
                     _inputType = os.str();
                 }
 
@@ -83,6 +139,7 @@ namespace emitters
             std::string _functionName;
             std::string _inputType;
             std::string _outputType;
+            bool _inputIsScalar;
 
             llvm::Function* _function;
         };
@@ -93,7 +150,7 @@ namespace emitters
             {
                 functionName = f.getName();
 
-                // Callbacks have a pointer parameter and a return (which can be void)
+                // Callbacks have one input parameter and a return (which can be void)
                 {
                     std::ostringstream os;
                     auto& argument = *(f.args().begin());
@@ -128,54 +185,41 @@ namespace emitters
             bool inputIsScalar;
         };
 
-        struct TimeFunctionSignature
-        {
-            TimeFunctionSignature(llvm::Function& f, const std::string& apiName)
-                : apiName(apiName), functionName(f.getName())
-            {
-                // Time functions have no parameters and a non-void return
-                std::ostringstream os;
-                WriteLLVMType(os, f.getReturnType());
-                returnType = os.str();
-            }
-
-            std::string apiName;
-            std::string functionName;
-            std::string returnType;
-        };
-
         // Writes SWIG interfaces for predictors with step support
         class SteppablePredictorInterfaceWriter
         {
         public:
-            SteppablePredictorInterfaceWriter(IRModuleEmitter& moduleEmitter, const std::vector<FunctionTagValues>& callbacks)
-                : _moduleEmitter(&moduleEmitter)
+            SteppablePredictorInterfaceWriter(IRModuleEmitter& moduleEmitter, const std::string& predictFunctionName, const std::vector<FunctionTagValues>& callbacks)
+                : _predictFunctionName(predictFunctionName)
             {
-                InitStepFunctionInfo();
-                InitTimeFunctionsInfo();
-
-                std::string moduleName = moduleEmitter.GetLLVMModule()->getName();
-                _className = moduleName + "Predictor";
+                _moduleName = moduleEmitter.GetLLVMModule()->getName();
+                _className = _moduleName + "_Predictor";
 
                 for (const auto& c : callbacks)
                 {
-                    if (c.values.size())
+                    if (!c.values.empty())
                     {
-                        if (c.values[0] == "SourceNode")
+                        auto nodeType = c.values[0];
+                        if (nodeType == "SourceNode")
                         {
                             _inputCallbacks.push_back(CallbackSignature(*c.function));
                         }
-                        else if (c.values[0] == "SinkNode")
+                        else if (nodeType == "SinkNode")
                         {
                             _outputCallbacks.push_back(CallbackSignature(*c.function));
+                        }
+                        else if (nodeType == "ClockNode")
+                        {
+                            _lagCallbacks.push_back(CallbackSignature(*c.function));
                         }
                     }
                 }
 
                 // Eventually we'd support multiple sources and sinks.
                 // For now, assert that we're only going to look at the first ones of each.
-                DEBUG_THROW(_inputCallbacks.size() > 1, EmitterException(EmitterError::badFunctionDefinition, "At most one input callback function will be generated"));
-                DEBUG_THROW(_outputCallbacks.size() > 1, EmitterException(EmitterError::badFunctionDefinition, "At most one output callback function will be generated"));
+                DEBUG_THROW(_inputCallbacks.size() != 1, EmitterException(EmitterError::badFunctionDefinition, "Only one input callback function will be generated"));
+                DEBUG_THROW(_outputCallbacks.size() != 1, EmitterException(EmitterError::badFunctionDefinition, "Only one output callback function will be generated"));
+                DEBUG_THROW(_lagCallbacks.size() != 1, EmitterException(EmitterError::badFunctionDefinition, "Only one lag callback function will be generated"));
             }
 
             virtual ~SteppablePredictorInterfaceWriter() = default;
@@ -183,314 +227,98 @@ namespace emitters
             void WriteSwigCode(std::ostream& os)
             {
                 WriteCallbackSwigCode(os);
+                WritePythonCode(os);
             }
 
             void WriteHeaderCode(std::ostream& os)
             {
-                // Wrapper class declaration
-                WriteForwarderClassHeader(os);
+                // Load the template, which declares a C++ predictor class
+                // for forwarding actuator callbacks to the predictor.
+                // (Note: newlines are part of the syntax for #include)
+                std::string predictorCode(
+                    #include "SwigPredictorClass.in"
+                );
 
-                {
-                    DeclareIfndefSwig ifndefSwig(os);
-                    WriteForwarderClassInstance(os);
+                ReplaceDelimiter(predictorCode, "PREDICTOR_CLASS", _className);
 
-                    // Callback C definition
-                    {
-                        DeclareExternC externC(os);
-                        for (const auto& cs : _inputCallbacks)
-                        {
-                            WriteCallbackFunction(os, cs, false);
-                        }
+                ReplaceDelimiter(predictorCode, "LAG_CALLBACK", _lagCallbacks[0].functionName);
+                ReplaceDelimiter(predictorCode, "SINK_CALLBACK", _outputCallbacks[0].functionName);
+                ReplaceDelimiter(predictorCode, "SOURCE_CALLBACK", _inputCallbacks[0].functionName);
 
-                        for (const auto& cs : _outputCallbacks)
-                        {
-                            WriteCallbackFunction(os, cs, true);
-                        }
-                    }
+                ReplaceDelimiter(predictorCode, "SINK_TYPE", _outputCallbacks[0].inputType);
+                ReplaceDelimiter(predictorCode, "SOURCE_TYPE", _inputCallbacks[0].inputType);
+                ReplaceDelimiter(predictorCode, "TIMETICK_TYPE", "double");
 
-                    // Wrapper class definition
-                    WriteForwarderClassBody(os);
-                }
+                os << predictorCode << "\n";
             }
 
         private:
-            //
-            // Callback writers
-            //
-            void WriteCallbackFunction(std::ostream& os, const CallbackSignature& cs, bool isOutputCallback) const
-            {
-                std::string inputType = cs.inputType;
-                std::string predictorFunction = (isOutputCallback) ? "InvokeOutput" : "InvokeInput";
-
-                if (!cs.inputIsScalar)
-                {
-                    // Emitted function takes a pointer input, fix the parameter signature accordingly
-                    inputType.append("*");
-                }
-                else
-                {
-                    // Detect internal logic errors (i.e. only output callbacks can have scalar inputs)
-                    assert(isOutputCallback);
-                }
-
-                os << cs.returnType << " " << cs.functionName << " (" << inputType << " input)\n{\n";
-                if (cs.returnType == "void")
-                {
-                    os << "    _predictor." << predictorFunction << "(input);\n";
-                }
-                else
-                {
-                    os << "    return static_cast<" << cs.returnType << ">("
-                       << "_predictor." << predictorFunction << "(input));\n";
-                }
-                os << "}\n";
-            }
-
             void WriteCallbackSwigCode(std::ostream& os) const
             {
-                std::vector<std::string> parameters;
-
-                // Note: assumes at most 1 input and output callback (see debug throw in the constructor)
-                if (_inputCallbacks.size() > 0)
+                os << "WRAP_CALLABLES_AS_CALLBACKS(" << _className << ", ";
+                WriteCommaSeparatedList(os,
                 {
-                    parameters.push_back(_inputCallbacks[0].className);
-                    parameters.push_back(_inputCallbacks[0].inputType);
-                }
+                    _inputCallbacks[0].className,
+                    _inputCallbacks[0].inputType,
+                    _outputCallbacks[0].className,
+                    _outputCallbacks[0].inputType,
+                    _lagCallbacks[0].className
+                });
+                os << ")\n\n";
+            } 
 
-                if (_outputCallbacks.size() > 0)
-                {
-                    parameters.push_back(_outputCallbacks[0].className);
-                    parameters.push_back(_outputCallbacks[0].inputType);
-                }
-
-                if (parameters.size() > 0)
-                {
-                    os << "WRAP_CALLABLES_AS_CALLBACKS(" << _className << ", ";
-                    WriteCommaSeparatedList(os, parameters);
-                    os << ")\n\n";
-                }
-            }
-
-            void WriteCallbackParameterList(std::ostream& os) const
+            void WritePythonCode(std::ostream& os) const
             {
-                std::vector<std::string> parameters;
+                // Load the template, which declares the Python base class derived
+                // by actuator code to implement callbacks.
+                // (Note: newlines are part of the syntax for #include)
+                std::string pythonCode(
+                    #include "SwigPredictorPython.in"
+                );
 
-                // Note: assumes at most 1 input and output callback (see debug throw in the constructor)
-                if (_inputCallbacks.size() > 0)
-                {
-                    parameters.push_back("ell::api::CallbackBase<" + _inputCallbacks[0].inputType + ">& inputCallback");
-                    parameters.push_back("std::vector<" + _inputCallbacks[0].inputType + ">& inputBuffer");
-                }
+                ReplaceDelimiter(pythonCode, "MODULE", _moduleName);
+                ReplaceDelimiter(pythonCode, "PREDICTOR_CLASS", _className);
+                ReplaceDelimiter(pythonCode, "PREDICT_FUNCTION", _predictFunctionName);
+                ReplaceDelimiter(pythonCode, "PREDICT_FUNCTION_PY", AsPythonMethod(_predictFunctionName));
 
-                if (_outputCallbacks.size() > 0)
-                {
-                    parameters.push_back("ell::api::CallbackBase<" + _outputCallbacks[0].inputType + ">& outputCallback");
-                }
+                ReplaceDelimiter(pythonCode, "LAG_CALLBACK", AsPythonMethod(_lagCallbacks[0].functionName));
+                ReplaceDelimiter(pythonCode, "SINK_CALLBACK", AsPythonMethod(_outputCallbacks[0].functionName));
+                ReplaceDelimiter(pythonCode, "SOURCE_CALLBACK", AsPythonMethod(_inputCallbacks[0].functionName));
 
-                WriteCommaSeparatedList(os, parameters);
+                ReplaceDelimiter(pythonCode, "SINK_VECTOR_TYPE", AsVectorType(_outputCallbacks[0].inputType));
+                ReplaceDelimiter(pythonCode, "SOURCE_VECTOR_TYPE", AsVectorType(_inputCallbacks[0].inputType));
+                ReplaceDelimiter(pythonCode, "SOURCE_NUMPY_TYPE", AsNumpyType(_inputCallbacks[0].inputType));
+
+                os << "%pythoncode %{\n"
+                   << pythonCode
+                   << "\n%}\n";
             }
-
-            void WriteCallbackVariableList(std::ostream& os) const
-            {
-                std::vector<std::string> list;
-
-                // Note: assumes at most 1 input and output callback (see debug throw in the constructor)
-                if (_inputCallbacks.size() > 0)
-                {
-                    list.push_back("inputCallback");
-                    list.push_back("inputBuffer");
-                }
-
-                if (_outputCallbacks.size() > 0)
-                {
-                    list.push_back("outputCallback");
-                    list.push_back("_outputSize");
-                }
-
-                WriteCommaSeparatedList(os, list);
-            }
-
-            void WriteCallbackVariableTypeList(std::ostream& os) const
-            {
-                std::vector<std::string> list;
-
-                // Note: assumes at most 1 input and output callback (see debug throw in the constructor)
-                if (_inputCallbacks.size() > 0)
-                {
-                    list.push_back(_inputCallbacks[0].inputType);
-                }
-
-                if (_outputCallbacks.size() > 0)
-                {
-                    list.push_back(_outputCallbacks[0].inputType);
-                }
-
-                WriteCommaSeparatedList(os, list);
-            }
-
-            //
-            // Time functions
-            //
-            void WriteTimeFunctionsHeader(std::ostream& os) const
-            {
-                for (const auto& tf : _timeFunctions)
-                {
-                    os << "    " << tf.returnType << " " << tf.apiName << "();\n";
-                }
-            }
-
-            void WriteTimeFunctionsCode(std::ostream& os) const
-            {
-                for (const auto& tf : _timeFunctions)
-                {
-                    os << tf.returnType << " " << _className << "::" << tf.apiName << "()\n";
-                    os << "{\n";
-                    os << "    return " << tf.functionName << "();\n";
-                    os << "}\n\n";
-                }
-            }
-
-            //
-            // Forwarder class writers
-            //
-            void WriteForwarderClassHeader(std::ostream& os) const
-            {
-                os << "class " << _className << " : public ell::api::CallbackForwarder<";
-                WriteCallbackVariableTypeList(os);
-                os << ">\n";
-                os << "{\npublic:\n";
-
-                // Constructor
-                os << "    " << _className << "() = default;\n";
-
-                // Destructor
-                os << "    virtual ~" << _className << "() = default;\n";
-
-                // Step
-                os << "    std::vector<" << _stepOutputType << "> Step();\n";
-
-                // Time functions
-                WriteTimeFunctionsHeader(os);
-
-                // GetInstance
-                os << "    static " << _className << "& GetInstance(";
-                WriteCallbackParameterList(os);
-                os << ");\n\n";
-
-                os << "private:\n";
-                os << "    static constexpr size_t _inputSize = " << _stepInputSize << ";\n";
-                os << "    static constexpr size_t _outputSize = " << _stepOutputSize << ";\n";
-                os << "    " << _stepInputType << " _input[_inputSize];\n";
-                os << "    " << _stepOutputType << " _output[_outputSize];\n";
-                os << "};\n\n";
-            }
-
-            void WriteForwarderClassBody(std::ostream& os) const
-            {
-                // Step
-                os << "std::vector<" << _stepOutputType << "> " << _className << "::Step()\n";
-                os << "{\n";
-                os << "    " << _stepFunctionName << "(_input, _output);\n";
-                os << "    return std::vector<" << _stepOutputType << ">(_output, _output + _outputSize);\n";
-                os << "}\n\n";
-
-                // Time functions
-                WriteTimeFunctionsCode(os);
-
-                // GetInstance
-                os << _className << "& " << _className << "::GetInstance(";
-                WriteCallbackParameterList(os);
-                os << ")\n{\n";
-                os << "    _predictor.InitializeOnce(";
-                WriteCallbackVariableList(os);
-                os << ");\n";
-                os << "    return _predictor;\n";
-                os << "}\n\n";
-            }
-
-            void WriteForwarderClassInstance(std::ostream& os) const
-            {
-                os << "static " << _className << " _predictor;\n";
-            }
-
-            //
-            // Initializers
-            //
-            void InitStepFunctionInfo()
-            {
-                auto functions = GetFunctionsWithTag(*_moduleEmitter, c_stepFunctionTagName);
-                DEBUG_THROW(functions.size() > 1, EmitterException(EmitterError::badFunctionDefinition, "At most one Step function may be emitted"));
-
-                if (functions.size() > 0)
-                {
-                    auto stepFunction = functions[0];
-                    llvm::Function* f = stepFunction.function;
-                    _stepFunctionName = f->getName();
-                    _stepOutputSize = std::stoul(stepFunction.values[0]);
-
-                    // Step functions have two pointer arguments
-                    auto it = f->args().begin();
-                    {
-                        std::ostringstream os;
-                        WriteLLVMType(os, (*it).getType()->getPointerElementType());
-                        _stepInputType = os.str();
-                    }
-
-                    {
-                        std::ostringstream os;
-                        WriteLLVMType(os, (*(++it)).getType()->getPointerElementType());
-                        _stepOutputType = os.str();
-                    }
-                }
-            }
-
-            void InitTimeFunctionsInfo()
-            {
-                auto functions = GetFunctionsWithTag(*_moduleEmitter, c_stepTimeFunctionTagName);
-
-                for (const auto& f : functions)
-                {
-                    if (f.values.size() > 0)
-                    {
-                        _timeFunctions.push_back(TimeFunctionSignature(*f.function, f.values[0]));
-                    }
-                }
-            }
-
+ 
             //
             // Utilities
             //
-            void WriteCommaSeparatedList(std::ostream& os, const std::vector<std::string>& list) const
-            {
-                bool first = true;
-                for (const auto& item : list)
-                {
-                    if (!first)
-                    {
-                        os << ", ";
-                    }
-                    os << item;
-                    first = false;
-                }
-            }
 
-            // Step
-            std::string _stepFunctionName;
-            std::string _stepInputType;
-            std::string _stepOutputType;
-            const size_t _stepInputSize = 2; // time signal
-            size_t _stepOutputSize;
+            std::string AsPythonMethod(const std::string& functionName) const
+            {
+                // remove module name prefix because these are method names
+                std::string result = std::regex_replace(functionName, std::regex(_moduleName + "_"), "");
+
+                // convert to snake case
+                // (i.e. insert _ before a capitalized letter that's not preceeded by a non-capitalized letter)
+                result = std::regex_replace(result, std::regex("([^A-Z])([A-Z])"), "$1_$2");
+
+                // convert to lower case
+                return utilities::ToLowercase(result);
+            }
 
             // Callbacks
             std::vector<CallbackSignature> _outputCallbacks;
             std::vector<CallbackSignature> _inputCallbacks;
+            std::vector<CallbackSignature> _lagCallbacks;
 
-            // Time functions
-            std::vector<TimeFunctionSignature> _timeFunctions;
-
-            // The name of the class we are emitting
+            std::string _predictFunctionName;
+            std::string _moduleName;
             std::string _className;
-            IRModuleEmitter* _moduleEmitter;
         };
 
         void WriteCommonSwigCode(std::ostream& os, IRModuleEmitter& moduleEmitter)
@@ -513,33 +341,25 @@ namespace emitters
             auto pModule = moduleEmitter.GetLLVMModule();
             std::string moduleName = pModule->getName();
 
-            os << "%include \"shape.i\"\n";
-
             /*
-            * Wrap the darknet_GetInputShape "C" function so we return the TensorShape on the stack
+            * Wrap the module_GetInputShape "C" function so we return the TensorShape on the stack
             * as a conveniently wrapped Python type.
 
             %inline %{
                 ell::api::math::TensorShape get_default_input_shape() {
                     TensorShape  s;
-                    darknet_GetInputShape(index, &s);
+                    module_GetInputShape(index, &s);
                     return ell::api::math::TensorShape{s.rows, s.columns, s.channels};
                 }
             %} */
 
-            os << "%inline %{\n"
-                  "  ell::api::math::TensorShape get_default_input_shape() {\n"
-                  "    TensorShape  s;\n"
-                  "    " << moduleName << "_GetInputShape(0, &s);\n"
-                  "    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };\n"
-                  "  }\n"
-                  "  ell::api::math::TensorShape get_default_output_shape() {\n"
-                  "    TensorShape  s;\n"
-                  "    " << moduleName << "_GetOutputShape(0, &s);\n"
-                  "    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };\n"
-                  "  }\n"
-                  "%}\n";
+            std::string shapeWrappers(
+                #include "SwigShapeWrappers.in"
+            );
 
+            ReplaceDelimiter(shapeWrappers, "MODULE", moduleName);
+
+            os << shapeWrappers << "\n";
         }
 
         void WriteModuleSwigCode(std::ostream& os, IRModuleEmitter& moduleEmitter, const std::string& headerName)
@@ -549,26 +369,27 @@ namespace emitters
                   "#include \"" << headerName << "\"\n"
                   "%}\n\n";
 
+            auto predicts = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
+            std::string predictFunctionName = (predicts[0].function)->getName();
+
             // Module callback macros
             auto callbacks = GetFunctionsWithTag(moduleEmitter, c_callbackFunctionTagName);
-            if (callbacks.size() > 0)
+            if (!callbacks.empty())
             {
-                SteppablePredictorInterfaceWriter writer(moduleEmitter, callbacks);
+                SteppablePredictorInterfaceWriter writer(moduleEmitter, predictFunctionName, callbacks);
                 writer.WriteSwigCode(os);
             }
-
-            // Rename the first predict function for python
-            auto predicts = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
+            else
             {
+                // No callbacks, this is an older model that only supports the raw predict function.
+                // Rename the first predict function for python
                 DeclareIfDefGuard guard(os, "SWIGPYTHON", DeclareIfDefGuard::Type::Positive);
-                std::string functionName = (predicts[0].function)->getName();
-                os << "%rename (predict) " << functionName << ";\n";
+                os << "%rename (predict) " << predictFunctionName << ";\n";
             }
 
             os << "%include \"" << headerName << "\"\n";
             WriteShapeWrappers(os, moduleEmitter);
         }
-
     }
 
     void WriteModuleSwigHeader(std::ostream& os, IRModuleEmitter& moduleEmitter)
@@ -587,7 +408,7 @@ namespace emitters
             DeclareIfndefSwig ifndefSwig(os);
 
             // Callbacks, if present
-            if (callbacks.size() > 0)
+            if (!callbacks.empty())
             {
                 os << "#include \"CallbackInterface.h\"\n";
             }
@@ -604,9 +425,11 @@ namespace emitters
         }
 
         // Callbacks
-        if (callbacks.size() > 0)
+        if (!callbacks.empty())
         {
-            SteppablePredictorInterfaceWriter writer(moduleEmitter, callbacks);
+            std::string predictFunctionName = (predicts[0].function)->getName();
+
+            SteppablePredictorInterfaceWriter writer(moduleEmitter, predictFunctionName, callbacks);
             writer.WriteHeaderCode(os);
         }
 

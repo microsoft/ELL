@@ -29,9 +29,6 @@
 #include <llvm/Support/raw_os_ostream.h>
 #include <llvm/Transforms/Utils/ModuleUtils.h>
 
-// stl
-#include <chrono>
-
 namespace ell
 {
 namespace emitters
@@ -783,18 +780,6 @@ namespace emitters
     void IRModuleEmitter::DeclareFree()
     {
         DeclareFunction("free", VariableType::Void, { VariableType::BytePointer });
-    }
-
-    template <>
-    void IRModuleEmitter::DeclareGetClockMilliseconds<std::chrono::steady_clock>()
-    {
-        DeclareFunction("ELL_GetSteadyClockMilliseconds", VariableType::Double);
-    }
-
-    template <>
-    void IRModuleEmitter::DeclareGetClockMilliseconds<std::chrono::system_clock>()
-    {
-        DeclareFunction("ELL_GetSystemClockMilliseconds", VariableType::Double);
     }
 
     IRFunctionEmitter IRModuleEmitter::BeginMainDebugFunction()

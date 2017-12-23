@@ -53,7 +53,6 @@
 #include "testing.h"
 
 // stl
-#include <chrono>
 #include <iostream>
 #include <ostream>
 #include <string>

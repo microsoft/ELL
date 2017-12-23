@@ -183,7 +183,6 @@ class DemoHelper:
             self.output_shape = outputShapeGetter()
 
             self.output_size = int(self.output_shape.rows * self.output_shape.columns * self.output_shape.channels)
-            self.results = self.compiled_module.FloatVector(self.output_size)
             try:
                 self.compiled_func = getattr(self.compiled_module, func_name)
             except AttributeError:
@@ -219,7 +218,15 @@ class DemoHelper:
             self.iterations = self.iterations - 1
         start = time.time()
         if self.model == None:
-            self.compiled_func(data, self.results)
+            # check the signature of compiled_func to determine which type of predict function to call
+            import inspect
+            if len(inspect.getfullargspec(self.compiled_func)[0]) == 2:
+                # predict(input, output : FloatVector)
+                self.results = self.compiled_module.FloatVector(self.output_size)
+                self.compiled_func(data, self.results)
+            else:
+                # output = predict(input), where output is a np.ndarray
+                self.results = self.compiled_func(data)
         else:
             self.results = self.model.Compute(data, dtype=np.float32)
         end = time.time()
@@ -288,7 +295,7 @@ class DemoHelper:
     def compile(self, predictor, platform, path):
         path += '/model'
         prediction_function = self.create_function(predictor)
-        prediction_function.Compile(platform, 'model', 'predict', path, dtype=np.float32)
+        prediction_function.Compile(platform, 'model', 'step', path, dtype=np.float32)
         from ..util.commands import run_llc, run_swig
         run_swig(path + '.i')
         run_llc(path + '.ll')

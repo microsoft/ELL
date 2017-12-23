@@ -19,7 +19,6 @@
 #include "Logger.h"
 
 // stl
-#include <chrono>
 #include <iostream>
 
 // llvm
@@ -35,8 +34,6 @@ namespace emitters
     const std::string PrintfFnName = "printf";
     const std::string MallocFnName = "malloc";
     const std::string FreeFnName = "free";
-    const std::string GetSystemClockFnName = "ELL_GetSystemClockMilliseconds";
-    const std::string GetSteadyClockFnName = "ELL_GetSteadyClockMilliseconds";
 
     IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, llvm::Function* pFunction, const std::string& name)
         : _pModuleEmitter(pModuleEmitter), _pEmitter(pEmitter), _pFunction(pFunction), _name(name)
@@ -1318,18 +1315,6 @@ namespace emitters
             throw EmitterException(EmitterError::functionNotFound);
         }
         return pFunction;
-    }
-
-    template <>
-    llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::steady_clock>()
-    {
-        return Call(GetSteadyClockFnName, nullptr /*no arguments*/);
-    }
-
-    template <>
-    llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::system_clock>()
-    {
-        return Call(GetSystemClockFnName, nullptr /*no arguments*/);
     }
 
     bool IRFunctionEmitter::CanUseBlas() const

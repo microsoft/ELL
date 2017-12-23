@@ -422,68 +422,6 @@ void TestForLoop(bool runJit)
     }
 }
 
-void TestMutableConditionForLoop(bool runJit)
-{
-    auto module = MakeHostModuleEmitter("MutableConditionForLoop");
-    module.DeclarePrintf();
-
-    auto add = GetOperator<double>(BinaryOperationType::add);
-    auto varType = GetVariableType<double>();
-    auto fn = module.BeginFunction("TestMutableConditionForLoop", VariableType::Void, { varType, varType, varType });
-    auto args = fn.Arguments().begin();
-    llvm::Argument& start = *args++;
-    llvm::Argument& increment = *args++;
-    llvm::Argument& end = *args++;
-
-    // Initialize the test value to start + increment
-    auto pTest = fn.Variable(varType, 1);
-    fn.Store(fn.PointerOffset(pTest, 0), fn.Operator(add, &start, &increment));
-
-    IRForLoopEmitter forLoop(fn);
-    fn.Print("Begin ForLoop\n");
-    forLoop.Begin<double, BinaryPredicateType::less>(&start, &increment, pTest);
-    {
-        auto i = forLoop.LoadIterationVariable();
-        auto test = fn.Load(fn.PointerOffset(pTest, fn.Literal(0)));
-        fn.Printf({ fn.Literal("i: %f, test: %f\n"), i, test });
-
-        // Update the test value incrementally
-        auto ife = fn.If(GetComparison<double>(BinaryPredicateType::less), test, &end);
-        {
-            auto newTest = fn.Operator(add, test, &increment);
-            fn.Store(fn.PointerOffset(pTest, fn.Literal(0)), newTest);
-            fn.Printf({ fn.Literal("Updating test value to: %f\n"), newTest });
-        }
-        ife.End();
-    }
-    forLoop.End();
-
-    fn.Printf({ fn.Literal("Done ForLoop: start = %f, increment = %f, test = %f\n"), &start, &increment, fn.Load(fn.PointerOffset(pTest, fn.Literal(0))) });
-    fn.Return();
-    module.EndFunction();
-
-    auto fnMain = module.BeginMainFunction();
-    fnMain.Call("TestMutableConditionForLoop", { fnMain.Literal<double>(0), fnMain.Literal<double>(5), fnMain.Literal<double>(20) });
-    fnMain.Return();
-
-    if (runJit)
-    {
-        IRExecutionEngine jit(std::move(module));
-        jit.RunMain();
-    }
-    else
-    {
-        module.DebugDump();
-        module.WriteToFile(OutputPath("mutableConditionForLoop.bc"));
-    }
-}
-
-void TestMutableConditionForLoop()
-{
-    TestMutableConditionForLoop(true);
-    TestMutableConditionForLoop(false);
-}
-
 void TestWhileLoop()
 {
     auto module = MakeHostModuleEmitter("WhileLoop");

@@ -42,11 +42,6 @@ def main():
     # images appropriately.
     input_shape = model.get_default_input_shape()
 
-    # Get the model's output shape and create an array to hold the model's
-    # output predictions
-    output_shape = model.get_default_output_shape()
-    predictions = model.FloatVector(output_shape.Size())
-
     # Declare a variable to hold the prediction times
     prediction_times = []
     mean_time_to_predict = 0.0
@@ -64,10 +59,10 @@ def main():
         input_data = helpers.prepare_image_for_model(
             image, input_shape.columns, input_shape.rows)
 
-        # Send the image to the compiled model and fill the predictions vector
+        # Send the image to the compiled model and get the predictions numpy array
         # with scores, measure how long it takes
         start = time.time()
-        model.predict(input_data, predictions)
+        predictions = model.predict(input_data)
         end = time.time()
 
         # Get the value of the top 5 predictions

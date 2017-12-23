@@ -155,11 +155,7 @@ Model input shape: [224, 224, 3]
 Model output shape: [1, 1, 1000]
 ```
 
-The input to the model is a 3-channel image of height 224 and width 224, which can also be represented as an array of size 224 * 224 * 3 = 150528. The shape of the output is 1 x 1 x 1000, which can be represented as an array of 1000 elements. Allocate an array to store the model's output.
-
-```python
-predictions = model.FloatVector(output_shape.Size())
-```
+The input to the model is a 3-channel image of height 224 and width 224, which can also be represented as an array of size 224 * 224 * 3 = 150528. The shape of the output is 1 x 1 x 1000, which can be represented as an array of 1000 elements. The model's `predict` method will receive the input array and return the output array.
 
 Choose an image file to send to the model. For example, use this [coffee mug image](/ELL/tutorials/shared/coffeemug.jpg). Use OpenCV to read the image.
 
@@ -177,7 +173,7 @@ input_data = helpers.prepare_image_for_model(sample_image, input_shape.columns,
 Finally, invoke the model by calling its `predict` method.
 
 ```python
-model.predict(input_data, predictions)
+predictions = model.predict(input_data)
 ```
 
 The `predict` method fills the `predictions` array with non-negative scores that sum to 1. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Print the index of the highest confidence category.
@@ -272,13 +268,6 @@ The model expects its input in a certain shape. Get this shape and store it for 
     input_shape = model.get_default_input_shape()
 ```
 
-Create a float array of the model's output.
-
-```python
-    output_shape = model.get_default_output_shape()
-    predictions = model.FloatVector(output_shape.Size())
-```
-
 Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user hits any key. At the start of each iteration, read an image from the camera.
 
 ```python
@@ -296,7 +285,7 @@ As mentioned above, the image stored in the `image` variable cannot be sent to t
 With the processed image input handy, call the `predict` method to invoke the model.
 
 ```python
-        model.predict(input_data, predictions)
+        predictions = model.predict(input_data)
 ```
 
 As before, the `predict` method fills the `predictions` array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n`.

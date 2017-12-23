@@ -10,6 +10,7 @@
 #include "IREmitterTest.h"
 #include "IRFunctionTest.h"
 #include "PosixEmitterTest.h"
+#include "SwigWriterTest.h"
 
 // testing
 #include "testing.h"
@@ -31,7 +32,6 @@ void TestIR()
     TestIfElseBlockRegions(true);
     TestLogical();
     TestForLoop();
-    TestMutableConditionForLoop();
     TestWhileLoop();
     TestMetadata();
     TestHeader();
@@ -60,11 +60,18 @@ void TestPosixEmitter()
     TestPthreadCreate();
 }
 
+void TestSwigWriter()
+{
+    TestSwigCallbackInterfaces();
+    TestSwigCallbackHeader();
+}
+
 int main()
 {
     TestIR();
     TestPosixEmitter();
     TestAsyncEmitter();
+    TestSwigWriter();
 
     if (testing::DidTestFail())
     {

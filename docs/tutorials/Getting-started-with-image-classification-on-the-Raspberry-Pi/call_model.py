@@ -27,9 +27,6 @@ print("Model input shape: [{0.rows}, {0.columns}, {0.channels}]".format(
 print("Model output shape: [{0.rows}, {0.columns}, {0.channels}]".format(
     output_shape))
 
-# Create a blank output of the appropriate size to hold the predictions
-predictions = model.FloatVector(output_shape.Size())
-
 # Read in the sample image
 sample_image = cv2.imread("coffeemug.jpg")
 
@@ -38,7 +35,7 @@ input_data = helpers.prepare_image_for_model(sample_image, input_shape.columns,
                                              input_shape.rows)
 
 # Send the input to the predict function and get the prediction result
-model.predict(input_data, predictions)
+predictions = model.predict(input_data)
 
 # Print the index of the highest confidence prediction
 prediction_index = int(np.argmax(predictions))

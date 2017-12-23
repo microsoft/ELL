@@ -97,19 +97,6 @@ namespace emitters
         }
     }
 
-    void IRForLoopEmitter::EmitMutableCondition(TypedComparison type, llvm::Value* pTestValuePointer)
-    {
-        _functionEmitter.Branch(_pConditionBlock);
-        _functionEmitter.SetCurrentBlock(_pConditionBlock);
-        {
-            _functionEmitter.Branch(type,
-                                    _functionEmitter.Load(_pIterationVariable),
-                                    _functionEmitter.Load(_functionEmitter.PointerOffset(pTestValuePointer, _functionEmitter.Literal(0))),
-                                    _pBodyBlock,
-                                    _pAfterBlock);
-        }
-    }
-
     void IRForLoopEmitter::EmitIncrement(VariableType type, llvm::Value* pIncrementValue)
     {
         _functionEmitter.SetCurrentBlock(_pIncrementBlock);

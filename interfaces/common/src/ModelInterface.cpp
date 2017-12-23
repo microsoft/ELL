@@ -31,9 +31,6 @@
 #include "NeuralNetworkPredictorNode.h"
 #include "Tensor.h"
 
-// stl
-#include <chrono>
-
 //
 // Callback functions
 //

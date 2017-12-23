@@ -1,0 +1,175 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     SwigWriterTest.cpp (emitters_test)
+//  Authors:  Lisa Ong
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "SwigWriterTest.h"
+
+// model
+#include "DynamicMap.h"
+#include "InputNode.h"
+#include "IRCompiledMap.h"
+#include "Model.h"
+#include "OutputNode.h"
+
+// emitters
+#include "IRMapCompiler.h"
+#include "IRModuleEmitter.h"
+#include "IRSwigInterfaceWriter.h"
+
+// nodes
+#include "ClockNode.h"
+#include "SinkNode.h"
+#include "SourceNode.h"
+#include "SumNode.h"
+
+// testing
+#include "testing.h"
+
+// stl
+#include <ostream>
+#include <string>
+#include <sstream>
+
+using namespace ell;
+using namespace ell::emitters;
+
+template <typename ElementType>
+model::IRCompiledMap GetCompiledMapWithCallbacks(
+    const std::string& moduleName,
+    const std::string& mapFunctionName)
+{
+    // Create the map
+    constexpr nodes::TimeTickType lagThreshold = 200;
+    constexpr nodes::TimeTickType interval = 40;
+    constexpr size_t inputSize = 1000;
+
+    model::Model model;
+
+    auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1 /*currentTime*/);
+    auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold,
+        "MyLagNotificationCallback");
+    auto sourceNode = model.AddNode<nodes::SourceNode<ElementType>>(clockNode->output, inputSize,
+        "MyDataCallback");
+    auto sumNode = model.AddNode<nodes::SumNode<ElementType>>(sourceNode->output);
+    auto sinkNode = model.AddNode<nodes::SinkNode<ElementType>>(sumNode->output,
+        "MyResultsCallback");
+
+    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
+    auto map = model::DynamicMap(model, { { "time", inputNode } }, { { "output", outputNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.moduleName = moduleName;
+    settings.mapFunctionName = mapFunctionName;
+    settings.compilerSettings.optimize = true;
+
+    model::IRMapCompiler compiler(settings);
+    return compiler.Compile(map);
+}
+
+// Empty class used for type information only
+template <typename ElementType>
+struct CallbackBase { };
+
+// Not using typeid because returns compiler-specific names, but we need well-known names here
+template <typename ElementType>
+const char* ToTypeString();
+template <>
+const char* ToTypeString<double>() { return "double"; }
+template <>
+const char* ToTypeString<float>() { return "float"; }
+template <>
+const char* ToTypeString<std::vector<double>>() { return "DoubleVector"; }
+template <>
+const char* ToTypeString<std::vector<float>>() { return "FloatVector"; }
+template <>
+const char* ToTypeString<CallbackBase<double>>() { return "DoubleCallbackBase"; }
+template <>
+const char* ToTypeString<CallbackBase<float>>() { return "FloatCallbackBase"; }
+
+template <typename ElementType>
+void TestSwigCallbackInterfaces()
+{
+    auto compiledMap = GetCompiledMapWithCallbacks<ElementType>("TestModuleWithCallbacks", "step");
+    auto& module = compiledMap.GetModule();
+
+    std::stringstream ss;
+    WriteModuleSwigInterface(ss, module, "TestModuleWithCallbacks.h");
+    auto result = ss.str();
+    std::string typeString = ToTypeString<ElementType>();
+    std::string vectorTypeString = ToTypeString<std::vector<ElementType>>();
+    std::string callbackTypeString = ToTypeString<CallbackBase<ElementType>>();
+
+    // Sanity tests
+    testing::ProcessTest("Testing generated python code 1", testing::IsTrue(std::string::npos != result.find("%pythoncode %{\nclass Model:")));
+    testing::ProcessTest("Testing generated python code 2", testing::IsTrue(std::string::npos != result.find("self.predictor = TestModuleWithCallbacks_Predictor.GetInstance(self._my_data_callback,")));
+    testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("def _my_data_callback(self, data: '" + vectorTypeString + "') -> \"bool\":")));
+    testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("def my_data_callback(self) -> \"numpy.ndarray\":")));
+    testing::ProcessTest("Testing generated python code 4", testing::IsTrue(std::string::npos != result.find(std::string("def my_results_callback(self, output: '" + vectorTypeString + "'):"))));
+    testing::ProcessTest("Testing generated python code 5", testing::IsTrue(std::string::npos != result.find("def my_lag_notification_callback(self, lag):")));
+    testing::ProcessTest("Testing generated python code 6", testing::IsTrue(std::string::npos != result.find("def step(self, current_time=0):")));
+
+    testing::ProcessTest("Testing shape wrappers 1", testing::IsTrue(std::string::npos != result.find("ell::api::math::TensorShape get_default_input_shape() {")));
+    testing::ProcessTest("Testing shape wrappers 2", testing::IsTrue(std::string::npos != result.find("TestModuleWithCallbacks_GetInputShape(0, &s);")));
+    testing::ProcessTest("Testing shape wrappers 3", testing::IsTrue(std::string::npos != result.find("ell::api::math::TensorShape get_default_output_shape() {")));
+    testing::ProcessTest("Testing shape wrappers 4", testing::IsTrue(std::string::npos != result.find("TestModuleWithCallbacks_GetOutputShape(0, &s);")));
+
+    testing::ProcessTest("Testing wrapper macro", testing::IsTrue(std::string::npos != result.find(std::string("TestModuleWithCallbacks_Predictor, " + 
+        callbackTypeString + ", " + typeString + ", " + callbackTypeString + ", " + typeString + ", " + ToTypeString<CallbackBase<nodes::TimeTickType>>()))));
+
+    testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
+
+    if (testing::DidTestFail())
+    {
+        std::cout << result << std::endl;
+    }
+}
+
+template <typename ElementType>
+void TestSwigCallbackHeader()
+{
+    auto compiledMap = GetCompiledMapWithCallbacks<ElementType>("TestModuleWithCallbacks", "step");
+    auto& module = compiledMap.GetModule();
+
+    std::stringstream ss;
+    WriteModuleSwigHeader(ss, module);
+    auto result = ss.str();
+
+    std::string typeString = ToTypeString<ElementType>();
+    std::string timeTypeString = ToTypeString<nodes::TimeTickType>();
+
+    // Sanity tests
+    testing::ProcessTest("Testing generated C++ class 1", testing::IsTrue(std::string::npos != result.find(std::string("class TestModuleWithCallbacks_Predictor : public ell::api::CallbackForwarder<" + typeString + ", " + typeString + ">"))));
+    testing::ProcessTest("Testing generated C++ class 2", testing::IsTrue(std::string::npos != result.find(std::string("ell::api::CallbackBase<" + typeString + ">& inputCallback"))));
+    testing::ProcessTest("Testing generated C++ class 3", testing::IsTrue(std::string::npos != result.find(std::string("ell::api::CallbackBase<" + typeString + ">& outputCallback"))));
+    testing::ProcessTest("Testing generated C++ class 4", testing::IsTrue(std::string::npos != result.find(std::string("ell::api::CallbackBase<" + timeTypeString + ">& lagCallback"))));
+
+    testing::ProcessTest("Testing generated callback definitions 1", testing::IsTrue(std::string::npos != result.find(std::string("int8_t TestModuleWithCallbacks_MyDataCallback(" + typeString + "* input"))));
+    testing::ProcessTest("Testing generated callback definitions 2", testing::IsTrue(std::string::npos != result.find(std::string("void TestModuleWithCallbacks_MyResultsCallback(" + typeString + "* output"))));
+    testing::ProcessTest("Testing generated callback definitions 3", testing::IsTrue(std::string::npos != result.find(std::string("void TestModuleWithCallbacks_MyLagNotificationCallback(" + timeTypeString + " lag"))));
+
+    testing::ProcessTest("Testing step function wrapper 1", testing::IsTrue(std::string::npos != result.find(std::string("void step(" + timeTypeString + " input, std::vector<" + typeString + ">& output)"))));
+    testing::ProcessTest("Testing step function wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("step(input, &output[0]);"))));
+
+    testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
+
+    if (testing::DidTestFail())
+    {
+        std::cout << result << std::endl;
+    }
+}
+
+void TestSwigCallbackHeader()
+{
+    TestSwigCallbackHeader<double>();
+    TestSwigCallbackHeader<float>();
+}
+
+void TestSwigCallbackInterfaces()
+{
+    TestSwigCallbackInterfaces<double>();
+    TestSwigCallbackInterfaces<float>();
+}

@@ -1,0 +1,9 @@
+u8R"(void @@FUNCTION@@(@@INPUT_TYPE@@ input, std::vector<@@OUTPUT_TYPE@@>& output);
+
+#if !defined(SWIG)
+void @@FUNCTION@@(@@INPUT_TYPE@@ input, std::vector<@@OUTPUT_TYPE@@>& output)
+{
+    @@FUNCTION@@(@@INPUT_ARGUMENT@@, &output[0]);
+}
+#endif // !defined(SWIG)
+)"

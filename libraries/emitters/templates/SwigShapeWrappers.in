@@ -1,0 +1,14 @@
+u8R"(%include "shape.i";
+%inline %{
+  ell::api::math::TensorShape get_default_input_shape() {
+    TensorShape  s;
+    @@MODULE@@_GetInputShape(0, &s);
+    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };
+  }
+  ell::api::math::TensorShape get_default_output_shape() {
+    TensorShape  s;
+    @@MODULE@@_GetOutputShape(0, &s);
+    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };
+  }
+%}
+)"

@@ -77,18 +77,6 @@ namespace emitters
         /// <returns> Pointer to the llvm::BasicBlock that represents the for loop. </returns>
         llvm::BasicBlock* Begin(llvm::Value* iStartAt, llvm::Value* iMaxValue, llvm::Value* stepSize);
 
-        /// <summary> Emits the beginning of a for loop that uses a mutable test value. </summary>
-        ///
-        /// <typeparam name="ValueType"> The C++ type for pStart, pIncrement, and the value referenced by pTestValuePointer. </param>
-        /// <typeparam name="predicate"> The comparison to perform as the loop condition. </param>
-        /// <param name="pStart"> Pointer to an llvm::Value that contains the start. </param>
-        /// <param name="pIncrement"> Pointer to an llvm::Value that contains the increment. </param>
-        /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
-        ///
-        /// <returns> Pointer to the llvm::BasicBlock that represents the for loop. </returns>
-        template <typename ValueType, BinaryPredicateType predicate>
-        llvm::BasicBlock* Begin(llvm::Value* pStart, llvm::Value* pIncrement, llvm::Value* pTestValuePointer);
-
         /// <summary> Emits the end of this for loop. </summary>
         void End();
 
@@ -96,7 +84,6 @@ namespace emitters
         void CreateBlocks();
         void EmitIterationVariable(VariableType type, llvm::Value* pStartValue);
         void EmitCondition(TypedComparison type, llvm::Value* pTestValue);
-        void EmitMutableCondition(TypedComparison type, llvm::Value* pTestValuePointer);
         void EmitIncrement(VariableType type, llvm::Value* pIncrementValue);
         llvm::BasicBlock* PrepareBody();
 
@@ -147,5 +134,3 @@ namespace emitters
     };
 }
 }
-
-#include "../tcc/IRLoopEmitter.tcc"

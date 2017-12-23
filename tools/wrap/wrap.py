@@ -32,7 +32,7 @@ class ModuleBuilder:
         self.includes = []
         self.tcc = []
         self.tools = None
-        self.func_name = "Predict"
+        self.func_name = "Step"
         self.objext = "obj"
         self.tools = None
         self.language = "python"

@@ -22,7 +22,6 @@ void TestIfElseComplex();
 void TestIfElseBlockRegions(bool runJit = false);
 void TestLogical();
 void TestForLoop(bool runJit = false);
-void TestMutableConditionForLoop(bool runJit = false);
 void TestWhileLoop();
 void TestMetadata();
 void TestHeader();
