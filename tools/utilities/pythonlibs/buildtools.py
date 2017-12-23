@@ -174,16 +174,17 @@ class EllBuildTools:
                 "--fuseLinearOps", str(fuseLinearOps)
                 ]
         args.append("--blas")
+        hasBlas = bool(useBlas)
+        if target == "host" and hasBlas and not self.blas:
+            hasBlas = False
+        args.append(str(hasBlas).lower())
+
         if not optimize:
             args += ["--optimize", "false"]
         else:
             args += ["--optimize", "true"]
         if debug:
             args += ["--debug", "true"]
-        hasBlas = bool(useBlas)
-        if target == "host" and hasBlas and not self.blas:
-            hasBlas = False
-        args.append(str(hasBlas).lower())
 
         if profile:
             args.append("--profile")

@@ -2,7 +2,7 @@
 # Example files
 #
 
-set (DATA_FILES testData.txt tinyTestData.txt)
+set (DATA_FILES testData.txt tinyTestData.txt protonnTestData.txt)
 
 set (MODEL_FILES
     arg_max.model
@@ -27,7 +27,7 @@ set (MODEL_FILES
 #
 # Example data files
 #
-add_custom_target(dataFiles DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
+add_custom_target(dataFiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
 add_dependencies(dataFiles makeExamples)
 set_property(TARGET dataFiles PROPERTY FOLDER "examples")
 
@@ -42,7 +42,8 @@ endforeach()
 #
 # Example model files
 #
-add_custom_target(modelFiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
+add_custom_target(modelFiles ALL DEPENDS ${MODEL_FILES} SOURCES ${MODEL_FILES})
+add_dependencies(modelFiles makeExamples)
 set_property(TARGET modelFiles PROPERTY FOLDER "examples")
 
 # copy example models

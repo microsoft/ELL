@@ -14,25 +14,29 @@ from __future__ import print_function
 SkipTests = False
 try:
     import sys
-    sys.path.append('./..')
-    sys.path.append('./../../../../interfaces/python')
-    sys.path.append('./../../../../interfaces/python/Release')
-    sys.path.append('./../../../../interfaces/python/Debug')
-    sys.path.append('./../../../../interfaces/python/utilities')
-    import unittest
-    import getopt
     import os
+    import unittest
+    script_path = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
+    sys.path.append(os.path.join(script_path, '..'))
+    import find_ell
+    import ell
+    import getopt
     import configparser
     import re
     import struct
     import traceback
     import inspect
     import numpy as np
-    import ELL
     import ell_utilities
     import darknet_to_ell
-except Exception:
-    SkipTests = True
+except ImportError:
+    errorType, value, traceback = sys.exc_info()
+    if "Could not find ell package" in str(value):
+        print("Python was not built, so skipping test")
+        SkipTests = True
+    else:
+        raise value
 
 
 # Load a test darknet model and verify its output.

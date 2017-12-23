@@ -12,6 +12,17 @@ import os
 
 __this_file_directory = os.path.dirname(os.path.abspath(__file__))
 
+# find the root of the ELL git repo
+def get_ell_root():
+    expected_dir = "external" 
+    root_dir = __this_file_directory
+    while not os.path.isdir(os.path.join(root_dir, expected_dir)):
+        parent = os.path.dirname(root_dir)
+        if parent == root_dir:
+            break
+        root_dir = parent
+    return root_dir
+
 # find the ELL build directory relative to this file
 def find_ell_build():
     build_dir = ""
@@ -25,7 +36,7 @@ def find_ell_build():
     return build_dir
 
 def __is_ell_py_dir(path):
-    ell_py_path = os.path.join(path, "setup.py")
+    ell_py_path = os.path.join(path, "ell", "ell_py.py")
     return os.path.isfile(ell_py_path)
 
 def __get_ell_py_dir():
@@ -41,12 +52,12 @@ def __get_ell_py_dir():
 
     return None
 
-
 ell_py_dir = __get_ell_py_dir()
 if ell_py_dir is None:
-    print("Could not find ell package, did you follow the ELL Python Binding build instructions?")
-    sys.exit(1)
+    raise ImportError("Could not find ell package, did you follow the ELL Python Binding build instructions?")
+
 sys.path.append(ell_py_dir)
+
 import ell
 sys.path.append(os.path.join(ell_py_dir, "ell", "util"))
 import ell_utilities

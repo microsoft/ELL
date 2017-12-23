@@ -50,8 +50,13 @@ try:
     import math
     from itertools import product
     from download_helper import *
-except Exception:
-    SkipTests = True
+except ImportError:
+    errorType, value, traceback = sys.exc_info()
+    if "Could not find ell package" in str(value):
+        print("Python was not built, so skipping test")
+        SkipTests = True
+    else:
+        raise value
 
 
 def BatchNormalizationTester(map_rank=1,
