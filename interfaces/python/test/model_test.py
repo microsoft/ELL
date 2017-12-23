@@ -171,11 +171,11 @@ def GetGraphStats(adj):
     return stats
 
 
-def testModel(key):
-    model = ell.model.Model(key)
+def testModel(filename):
+    model = ell.model.Model(filename)
     nodes, index = GetNodesAndIndex(model)
     adj = GetAdjacencyList(nodes, index)
-    print(key, end="\t")
+    print(filename, end="\t")
     stats = GetGraphStats(adj)
     n = len(stats)
     if n == 0:
@@ -193,10 +193,10 @@ def testModel(key):
 
 
 def test():
-    keys = ['[1]', '[2]', '[3]', '[tree_0]',
-            '[tree_1]', '[tree_2]', '[tree_3]']
-    for key in keys:
-        testModel(key)
+    prefix = "../../../examples/data/"
+    fileNames = ["model_1.model", "model_2.model"]
+    for name in fileNames:
+        testModel(prefix + name)
     return 0
 
 

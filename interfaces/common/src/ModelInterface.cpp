@@ -21,10 +21,10 @@
 #include "JsonArchiver.h"
 
 // model
-#include "InputNode.h"
-#include "OutputNode.h"
 #include "DynamicMap.h"
+#include "InputNode.h"
 #include "MapLoadArguments.h"
+#include "OutputNode.h"
 
 // nodes
 #include "ClockNode.h"
@@ -39,31 +39,30 @@
 //
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-// Note: this currently assumes that there is just 1 source and 1 sink in the map
-// Future: extend this to route to multiple sources + sinks based on extra context parameter.
-bool model_CompiledMap_SourceCallback_Double(double* input)
-{
-    return ELL_API::CompiledMap::InvokeSourceCallback(input);
-}
+    // Note: this currently assumes that there is just 1 source and 1 sink in the map
+    // Future: extend this to route to multiple sources + sinks based on extra context parameter.
+    bool model_CompiledMap_SourceCallback_Double(double* input)
+    {
+        return ELL_API::CompiledMap::InvokeSourceCallback(input);
+    }
 
-bool model_CompiledMap_SourceCallback_Float(float* input)
-{
-    return ELL_API::CompiledMap::InvokeSourceCallback(input);
-}
+    bool model_CompiledMap_SourceCallback_Float(float* input)
+    {
+        return ELL_API::CompiledMap::InvokeSourceCallback(input);
+    }
 
-void model_CompiledMap_SinkCallback_Double(double* output)
-{
-    ELL_API::CompiledMap::InvokeSinkCallback(output);
-}
+    void model_CompiledMap_SinkCallback_Double(double* output)
+    {
+        ELL_API::CompiledMap::InvokeSinkCallback(output);
+    }
 
-void model_CompiledMap_SinkCallback_Float(float* output)
-{
-    ELL_API::CompiledMap::InvokeSinkCallback(output);
-}
+    void model_CompiledMap_SinkCallback_Float(float* output)
+    {
+        ELL_API::CompiledMap::InvokeSinkCallback(output);
+    }
 
 #ifdef __cplusplus
 } // extern "C"
@@ -504,12 +503,26 @@ Model::Model()
 }
 Model::Model(const std::string& filename)
 {
+    Load(filename);
+}
+
+void Model::Load(const std::string& filename)
+{
     _model = std::make_shared<ell::model::Model>(ell::common::LoadModel(filename));
 }
 
 void Model::Save(const std::string& filename)
 {
     ell::common::SaveModel(*_model, filename);
+}
+
+void Model::LoadFromString(const std::string& str)
+{
+    _model = std::make_shared<ell::model::Model>();
+    std::stringstream stream(str);
+    ell::utilities::SerializationContext context;
+    ell::utilities::JsonUnarchiver ar(stream, context);
+    ar >> *_model;
 }
 
 size_t Model::Size()
@@ -531,7 +544,7 @@ std::string Model::GetJson() const
     return stream.str();
 }
 
-Model Model::Refine(int maxIterations) 
+Model Model::Refine(int maxIterations)
 {
     ell::model::TransformContext context;
     ell::model::ModelTransformer transformer;
@@ -586,20 +599,20 @@ Node ModelBuilder::AddInputNode(Model model, const ell::api::math::TensorShape& 
     ell::model::Node* newNode = nullptr;
     switch (type)
     {
-        case PortType::boolean:
-            newNode = model.GetModel().AddNode<ell::model::InputNode<bool>>(tensorShape.ToMathTensorShape());
-            break;
-        case PortType::integer:
-            newNode = model.GetModel().AddNode<ell::model::InputNode<int>>(tensorShape.ToMathTensorShape());
-            break;
-        case PortType::real:
-            newNode = model.GetModel().AddNode<ell::model::InputNode<double>>(tensorShape.ToMathTensorShape());
-            break;
-        case PortType::smallReal:
-            newNode = model.GetModel().AddNode<ell::model::InputNode<float>>(tensorShape.ToMathTensorShape());
-            break;
-        default:
-            throw std::invalid_argument("Error: could not create node");
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::model::InputNode<bool>>(tensorShape.ToMathTensorShape());
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::model::InputNode<int>>(tensorShape.ToMathTensorShape());
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::model::InputNode<double>>(tensorShape.ToMathTensorShape());
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::model::InputNode<float>>(tensorShape.ToMathTensorShape());
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create node");
     }
     return Node(newNode);
 }
@@ -611,20 +624,20 @@ Node ModelBuilder::AddOutputNode(Model model, const ell::api::math::TensorShape&
     ell::model::Node* newNode = nullptr;
     switch (type)
     {
-        case PortType::boolean:
-            newNode = model.GetModel().AddNode<ell::model::OutputNode<bool>>(ell::model::PortElements<bool>(elements), tensorShape.ToMathTensorShape());
-            break;
-        case PortType::integer:
-            newNode = model.GetModel().AddNode<ell::model::OutputNode<int>>(ell::model::PortElements<int>(elements), tensorShape.ToMathTensorShape());
-            break;
-        case PortType::real:
-            newNode = model.GetModel().AddNode<ell::model::OutputNode<double>>(ell::model::PortElements<double>(elements), tensorShape.ToMathTensorShape());
-            break;
-        case PortType::smallReal:
-            newNode = model.GetModel().AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements), tensorShape.ToMathTensorShape());
-            break;
-        default:
-            throw std::invalid_argument("Error: could not create node");
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::model::OutputNode<bool>>(ell::model::PortElements<bool>(elements), tensorShape.ToMathTensorShape());
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::model::OutputNode<int>>(ell::model::PortElements<int>(elements), tensorShape.ToMathTensorShape());
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::model::OutputNode<double>>(ell::model::PortElements<double>(elements), tensorShape.ToMathTensorShape());
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements), tensorShape.ToMathTensorShape());
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create node");
     }
     return Node(newNode);
 }
@@ -647,21 +660,21 @@ Node ModelBuilder::AddSinkNode(Model model, PortElements input, const ell::api::
     ell::model::Node* newNode = nullptr;
     switch (type)
     {
-        case PortType::real:
-            newNode = model.GetModel().AddNode<ell::nodes::SinkNode<double>>(
-                ell::model::PortElements<double>(elements), tensorShape.ToMathTensorShape(), sinkFunctionName);
-            break;
-        case PortType::smallReal:
-            newNode = model.GetModel().AddNode<ell::nodes::SinkNode<float>>(
-                ell::model::PortElements<float>(elements), tensorShape.ToMathTensorShape(), sinkFunctionName);
-            break;
-        default:
-            throw std::invalid_argument("Error: could not create node");
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::SinkNode<double>>(
+            ell::model::PortElements<double>(elements), tensorShape.ToMathTensorShape(), sinkFunctionName);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::SinkNode<float>>(
+            ell::model::PortElements<float>(elements), tensorShape.ToMathTensorShape(), sinkFunctionName);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create node");
     }
     return Node(newNode);
 }
 
-Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outputType, 
+Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outputType,
     const ell::api::math::TensorShape& tensorShape, const std::string& sourceFunctionName)
 {
     auto inputType = input.GetType();
@@ -669,22 +682,22 @@ Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outpu
     {
         throw std::invalid_argument("Only PortType::real is supported for time signal input");
     }
- 
+
     using TimeTickType = double;
     auto inputElements = input.GetPortElements();
     ell::model::Node* newNode = nullptr;
     switch (outputType)
     {
-        case PortType::real:
-            newNode = model.GetModel().AddNode<ell::nodes::SourceNode<double>>(
-                ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMathTensorShape(), sourceFunctionName);
-            break;
-        case PortType::smallReal:
-            newNode = model.GetModel().AddNode<ell::nodes::SourceNode<float>>(
-                ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMathTensorShape(), sourceFunctionName);
-            break;
-        default:
-            throw std::invalid_argument("Error: could not create node");
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::SourceNode<double>>(
+            ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMathTensorShape(), sourceFunctionName);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::SourceNode<float>>(
+            ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMathTensorShape(), sourceFunctionName);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create node");
     }
     return Node(newNode);
 }
@@ -744,8 +757,7 @@ void Map::Save(const std::string& filename) const
 
 CompiledMap Map::CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const
 {
-    auto resolverFunction = [moduleName](llvm::Module* module, ell::emitters::IRExecutionEngine& jitter)
-    {
+    auto resolverFunction = [moduleName](llvm::Module* module, ell::emitters::IRExecutionEngine& jitter) {
         auto func = module->getFunction(moduleName + "_CompiledMap_SourceCallback_Double");
         if (func != nullptr)
         {
@@ -759,17 +771,12 @@ CompiledMap Map::CompileDouble(const std::string& targetDevice, const std::strin
         }
     };
 
-    return Map::Compile(targetDevice, moduleName, functionName,
-        "CompiledMap_SourceCallback_Double",
-        "CompiledMap_SinkCallback_Double",
-        useBlas,
-        resolverFunction);
+    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Double", "CompiledMap_SinkCallback_Double", useBlas, resolverFunction);
 }
 
 CompiledMap Map::CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const
 {
-    auto resolverFunction = [moduleName](llvm::Module* module, ell::emitters::IRExecutionEngine& jitter)
-    {
+    auto resolverFunction = [moduleName](llvm::Module* module, ell::emitters::IRExecutionEngine& jitter) {
         auto func = module->getFunction(moduleName + "_CompiledMap_SourceCallback_Float");
         if (func != nullptr)
         {
@@ -783,11 +790,7 @@ CompiledMap Map::CompileFloat(const std::string& targetDevice, const std::string
         }
     };
 
-    return Map::Compile(targetDevice, moduleName, functionName,
-        "CompiledMap_SourceCallback_Float",
-        "CompiledMap_SinkCallback_Float",
-        useBlas,
-        resolverFunction);
+    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Float", "CompiledMap_SinkCallback_Float", useBlas, resolverFunction);
 }
 
 CompiledMap Map::Compile(const std::string& targetDevice,
@@ -821,8 +824,8 @@ CompiledMap Map::Compile(const std::string& targetDevice,
 //
 // CompiledMap
 //
-CompiledMap::CompiledMap(ell::model::IRCompiledMap map, ell::api::math::TensorShape inputShape, ell::api::math::TensorShape outputShape) :
-    _inputShape(inputShape), _outputShape(outputShape)
+CompiledMap::CompiledMap(ell::model::IRCompiledMap map, ell::api::math::TensorShape inputShape, ell::api::math::TensorShape outputShape)
+    : _inputShape(inputShape), _outputShape(outputShape)
 {
     _map = std::make_shared<ell::model::IRCompiledMap>(std::move(map));
 }
@@ -882,18 +885,4 @@ ell::api::CallbackForwarder<float, float>& CompiledMap::CallbackForwarder()
     static ell::api::CallbackForwarder<float, float> forwarderFloat;
     return forwarderFloat;
 }
-
-//
-// Helper Functions
-//
-Model LoadModelFromString(std::string str)
-{
-    std::stringstream stream(str);
-    ell::utilities::SerializationContext context;
-    ell::utilities::JsonUnarchiver ar(stream, context);
-    ell::model::Model model;
-    ar >> model;
-    return Model(std::move(model));
-}
-
 }

@@ -6,7 +6,7 @@
 #include "LoadModel_test.h"
 
 // common
-#include "LoadModel.h"
+#include "LoadTestModels.h"
 
 // model
 #include "Model.h"
@@ -21,9 +21,9 @@ namespace ell
 {
 void TestLoadSampleModels()
 {
-    auto model1 = common::LoadModel("[1]");
-    auto model2 = common::LoadModel("[2]");
-    auto model3 = common::LoadModel("[3]");
+    auto model1 = common::LoadTestModel("[1]");
+    auto model2 = common::LoadTestModel("[2]");
+    auto model3 = common::LoadTestModel("[3]");
 
     std::cout << "Model 1 size: " << model1.Size() << std::endl;
     std::cout << "Model 2 size: " << model2.Size() << std::endl;
@@ -32,10 +32,10 @@ void TestLoadSampleModels()
 
 void TestLoadTreeModels()
 {
-    auto model0 = common::LoadModel("[tree_0]");
-    auto model1 = common::LoadModel("[tree_1]");
-    auto model2 = common::LoadModel("[tree_2]");
-    auto model3 = common::LoadModel("[tree_3]");
+    auto model0 = common::LoadTestModel("[tree_0]");
+    auto model1 = common::LoadTestModel("[tree_1]");
+    auto model2 = common::LoadTestModel("[tree_2]");
+    auto model3 = common::LoadTestModel("[tree_3]");
 
     std::cout << "Tree 0 size: " << model0.Size() << std::endl;
     std::cout << "Tree 1 size: " << model1.Size() << std::endl;
@@ -53,13 +53,13 @@ void TestLoadSavedModels()
 void TestSaveModels()
 {
     std::string ext = "model";
-    auto model1 = common::LoadModel("[1]");
-    auto model2 = common::LoadModel("[2]");
-    auto model3 = common::LoadModel("[3]");
-    auto tree0 = common::LoadModel("[tree_0]");
-    auto tree1 = common::LoadModel("[tree_1]");
-    auto tree2 = common::LoadModel("[tree_2]");
-    auto tree3 = common::LoadModel("[tree_3]");
+    auto model1 = common::LoadTestModel("[1]");
+    auto model2 = common::LoadTestModel("[2]");
+    auto model3 = common::LoadTestModel("[3]");
+    auto tree0 = common::LoadTestModel("[tree_0]");
+    auto tree1 = common::LoadTestModel("[tree_1]");
+    auto tree2 = common::LoadTestModel("[tree_2]");
+    auto tree3 = common::LoadTestModel("[tree_3]");
 
     common::SaveModel(model1, "model_1." + ext);
     common::SaveModel(model2, "model_2." + ext);

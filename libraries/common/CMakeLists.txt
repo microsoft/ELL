@@ -90,7 +90,7 @@ set(test_data
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
-add_executable(${test_name} ${test_src} ${test_include} ${include})
+add_executable(${test_name} ${test_src} ${test_include})
 target_include_directories(${test_name} PRIVATE test/include)
 target_link_libraries(${test_name} common data testing utilities functions predictors trainers model nodes)
 copy_shared_libraries(${test_name})

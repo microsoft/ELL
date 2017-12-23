@@ -11,6 +11,7 @@
 
 // common
 #include "LoadModel.h"
+#include "LoadTestModels.h"
 
 // model
 #include "InputNode.h"
@@ -130,7 +131,7 @@ void TestNodeIterator()
 
 void TestExampleModel()
 {
-    auto model = common::LoadModel("[1]");
+    auto model = common::LoadTestModel("[1]");
     PrintModel(model);
 
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
@@ -139,7 +140,7 @@ void TestExampleModel()
 
 void TestModelSerialization()
 {
-    auto model1 = common::LoadModel("[1]");
+    auto model1 = common::LoadTestModel("[1]");
     std::stringstream buffer;
     utilities::JsonArchiver archiver(buffer);
     archiver << model1;
@@ -156,7 +157,7 @@ void TestModelSerialization()
 
 void TestModelMetadata()
 {
-    auto model = common::LoadModel("[1]");
+    auto model = common::LoadTestModel("[1]");
     auto iter = model.GetNodeIterator();
     while (iter.IsValid())
     {

@@ -51,7 +51,6 @@ class Node;
 class NodeIterator;
 class OutputPort;
 
-
 //
 // PortType
 //
@@ -301,6 +300,8 @@ class Model
 public:
     Model();
     Model(const std::string& filename);
+    void Load(const std::string& filename);
+    void LoadFromString(const std::string& str);
     void Save(const std::string& filename);
     size_t Size();
     NodeIterator GetNodes();
@@ -391,15 +392,17 @@ public:
     void Step(ell::api::TimeTickType timestamp = 0.0);
 
 #ifndef SWIG
-    std::shared_ptr<ell::model::DynamicMap> GetInnerMap() { return _map; }
+    std::shared_ptr<ell::model::DynamicMap> GetInnerMap()
+    {
+        return _map;
+    }
 #endif
 
 private:
-
 #ifndef SWIG
-    CompiledMap Compile(const std::string&  targetDevice, const std::string& moduleName, const std::string& functionName,
-        const std::string& sourceFunctionName, const std::string& sinkFunctionName,
-        bool useBlas, std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolverFunction) const;
+    CompiledMap Compile(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName,
+                        const std::string& sourceFunctionName, const std::string& sinkFunctionName,
+                        bool useBlas, std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolverFunction) const;
 #endif
 
     std::shared_ptr<ell::model::DynamicMap> _map;
@@ -446,12 +449,6 @@ private:
     ell::api::math::TensorShape _inputShape;
     ell::api::math::TensorShape _outputShape;
 };
-
-//
-// Functions
-//
-
-Model LoadModelFromString(std::string str);
 
 } // end namespace
 
