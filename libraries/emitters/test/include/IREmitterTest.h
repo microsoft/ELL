@@ -28,3 +28,7 @@ void TestHeader();
 void TestTwoEmitsInOneSession();
 void TestStruct();
 void TestDuplicateStructs();
+
+void TestScopedIf();
+void TestScopedIfElse();
+void TestScopedIfElse2();

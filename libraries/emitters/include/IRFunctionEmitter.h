@@ -798,7 +798,76 @@ namespace emitters
         llvm::Value* GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex);
 
         //
-        // Expressions
+        // Control flow
+        //
+
+        // Type aliases for lambda functions that define body regions
+
+        /// <summary> Type alias for for-loop body lambda. </summary>
+        using ForLoopBodyFunction = std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)>;
+
+        /// <summary> Type alias for while-loop body lambda. </summary>
+        using WhileLoopBodyFunction = std::function<void(IRFunctionEmitter& function)>;
+
+        /// <summary> Type alias for if-else body lambda. </summary>
+        using IfElseBodyFunction = std::function<void(IRFunctionEmitter& function)>;
+
+        /// <summary> Emits a for loop counting from zero to a constant end value. </summary>
+        ///
+        /// <param name="count"> The number of iterations to make. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(size_t count, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from zero to a constant end value. </summary>
+        ///
+        /// <param name="count"> The number of iterations to make. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(llvm::Value* count, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value. </summary>
+        ///
+        /// <param name="beginValue"> The starting value of the loop iterator. </param>
+        /// <param name="endValue"> The ending value of the loop iterator. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(size_t beginValue, size_t endValue, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value. </summary>
+        ///
+        /// <param name="beginValue"> The starting value of the loop iterator. </param>
+        /// <param name="endValue"> The ending value of the loop iterator. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(llvm::Value* beginValue, llvm::Value* endValue, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value with a given increment. </summary>
+        ///
+        /// <param name="beginValue"> The starting value of the loop iterator. </param>
+        /// <param name="endValue"> The ending value of the loop iterator. </param>
+        /// <param name="increment"> The increment for the iterator. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(size_t beginValue, size_t endValue, size_t increment, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value with a given increment. </summary>
+        ///
+        /// <param name="beginValue"> The starting value of the loop iterator. </param>
+        /// <param name="endValue"> The ending value of the loop iterator. </param>
+        /// <param name="increment"> The increment for the iterator. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(llvm::Value* beginValue, llvm::Value* endValue, llvm::Value* increment, ForLoopBodyFunction body);
+
+        /// <summary> Emits a while loop. </summary>
+        ///
+        /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void While(llvm::Value* pTestValuePointer, WhileLoopBodyFunction body);
+
+        /// <summary> Emits an if statement. </summary>
+        ///
+        /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
+        /// <param name="body"> A function that emits the body of the "if true" block. </param>
+        IRIfEmitter If(llvm::Value* pTestValuePointer, IfElseBodyFunction body);
+
+        //
+        // Deprecated loop emitter functions
         //
 
         /// <summary> Gets a for loop emitter. </summary>

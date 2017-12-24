@@ -804,10 +804,72 @@ namespace emitters
         return SetValueAt(pPointer, Literal(offset), pValue);
     }
 
+    // Control flow constructs
+    void IRFunctionEmitter::For(size_t count, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    {
+        auto loop = IRForLoopEmitter(*this);
+        loop.Begin(count);
+        body(*this, loop.LoadIterationVariable());
+        loop.End();
+    }
+
+    void IRFunctionEmitter::For(llvm::Value* count, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    {
+        auto loop = IRForLoopEmitter(*this);
+        loop.Begin(count);
+        body(*this, loop.LoadIterationVariable());
+        loop.End();
+    }
+
+    void IRFunctionEmitter::For(size_t beginValue, size_t endValue, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    {
+        For(beginValue, endValue, 1, body);
+    }
+
+    void IRFunctionEmitter::For(llvm::Value* beginValue, llvm::Value* endValue, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    {
+        For(beginValue, endValue, Literal<int>(1), body);
+    }
+
+    void IRFunctionEmitter::For(size_t beginValue, size_t endValue, size_t increment, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    {
+        auto loop = IRForLoopEmitter(*this);
+        loop.Begin(beginValue, endValue, increment);
+        body(*this, loop.LoadIterationVariable());
+        loop.End();
+    }
+
+    void IRFunctionEmitter::For(llvm::Value* beginValue, llvm::Value* endValue, llvm::Value* increment, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    {
+        auto loop = IRForLoopEmitter(*this);
+        loop.Begin(beginValue, endValue, increment);
+        body(*this, loop.LoadIterationVariable());
+        loop.End();
+    }
+
+    void IRFunctionEmitter::While(llvm::Value* pTestValuePointer, std::function<void(IRFunctionEmitter& function)> body)
+    {
+        auto loop = IRWhileLoopEmitter(*this);
+        loop.Begin(pTestValuePointer);
+        body(*this);
+        loop.End();
+    }
+
+    IRIfEmitter IRFunctionEmitter::If(llvm::Value* pTestValuePointer, std::function<void(IRFunctionEmitter& function)> body)
+    {
+        auto ifEmitter = IRIfEmitter(*this, true);
+        ifEmitter.If(pTestValuePointer);
+        {
+            body(*this);
+        }
+        return ifEmitter;
+    }
+
+    // Deprecated versions
     IRForLoopEmitter IRFunctionEmitter::ForLoop()
     {
         return IRForLoopEmitter(*this);
-    }
+    }    
 
     IRWhileLoopEmitter IRFunctionEmitter::WhileLoop()
     {

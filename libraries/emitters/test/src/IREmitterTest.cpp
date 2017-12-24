@@ -34,7 +34,6 @@
 using namespace ell;
 using namespace ell::emitters;
 
-
 std::string g_outputBasePath = "";
 void SetOutputPathBase(std::string path)
 {
@@ -410,7 +409,6 @@ void TestForLoop(bool runJit)
     fnMain.Call("TestForLoop");
     fnMain.Return();
 
-
     if (runJit)
     {
         IRExecutionEngine jit(std::move(module));
@@ -635,10 +633,71 @@ void TestDuplicateStructs()
         UNUSED(struct2TypeA);
         UNUSED(struct2TypeB);
     }
-    catch(EmitterException&)
+    catch (EmitterException&)
     {
         gotException = true;
     }
 
     testing::ProcessTest("Testing double-declaration of non-equivalent structs", gotException);
+}
+
+void TestScopedIf()
+{
+    auto module = MakeHostModuleEmitter("If");
+    module.DeclarePrintf();
+
+    auto fn = module.BeginMainFunction();
+    auto cmp = fn.Comparison(TypedComparison::lessThanFloat, fn.Literal(10.0), fn.Literal(15.0));
+    fn.If(cmp, [](IRFunctionEmitter& fn) {
+        fn.Print("TrueBlock\n");
+    });
+    fn.Return();
+    module.EndFunction();
+    IRExecutionEngine iee(std::move(module));
+    iee.RunMain();
+}
+
+void TestScopedIfElse()
+{
+    auto module = MakeHostModuleEmitter("IfElse");
+    module.DeclarePrintf();
+
+    auto fn = module.BeginMainFunction();
+    fn.For(10, [](IRFunctionEmitter& fn, llvm::Value* index) {
+        fn.Printf("index: ", { index });
+        auto cmp = fn.Comparison(TypedComparison::lessThan, index, fn.Literal<int>(3));
+        fn.If(cmp, [](IRFunctionEmitter& fn) {
+              fn.Print("< 3\n");
+          }).Else([](IRFunctionEmitter& fn) {
+            fn.Print("not < 3\n");
+        });
+    });
+    fn.Return();
+    module.EndFunction();
+    IRExecutionEngine iee(std::move(module));
+    iee.RunMain();
+}
+
+void TestScopedIfElse2()
+{
+    auto module = MakeHostModuleEmitter("IfElse2");
+    module.DeclarePrintf();
+
+    auto fn = module.BeginMainFunction();
+    fn.For(10, [](IRFunctionEmitter& fn, llvm::Value* index) {
+        fn.Printf("Index: ", { index });
+        auto cmp1 = fn.Comparison(TypedComparison::lessThan, index, fn.Literal<int>(3));
+        auto cmp2 = fn.Comparison(TypedComparison::greaterThan, index, fn.Literal<int>(6));
+        fn.If(cmp1, [](IRFunctionEmitter& fn) {
+              fn.Print("< 3\n");
+          }).ElseIf(cmp2, [](IRFunctionEmitter& fn) {
+            fn.Print("> 6\n");
+          }).Else([](IRFunctionEmitter& fn) {
+            fn.Print("neither < 3 or > 6\n");
+        });
+    });
+    fn.Return();
+    module.EndFunction();
+    IRExecutionEngine iee(std::move(module));
+    iee.RunMain();
 }

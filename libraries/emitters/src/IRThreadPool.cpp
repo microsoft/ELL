@@ -48,33 +48,28 @@ namespace emitters
 
     void IRThreadPool::AddGlobalInitializer()
     {
+        // Create individual threads (in a global_ctors function)
         auto& context = _module.GetLLVMContext();
         auto voidType = llvm::Type::getVoidTy(context);
-        auto int8PtrType = llvm::Type::getInt8PtrTy(context);
         auto boolType = llvm::Type::getInt1Ty(context);
+        auto int8PtrType = llvm::Type::getInt8PtrTy(context);
+        auto isInitedVar = _module.Global(boolType, "isInitialized"); // initialized to false
 
-        // Create individual threads (in a global_ctors function)
         auto initThreadPoolFunction = _module.BeginFunction("initThreadPool", voidType);
         {
-            auto isInitedVar = _module.Global(boolType, "isInitialized"); // initialized to false
-            auto ife = initThreadPoolFunction.If(); // check if task OK
-            ife.If(initThreadPoolFunction.LogicalNot(initThreadPoolFunction.Load(isInitedVar)));
-            {
+            // Check if task not initialized
+            auto notInited = initThreadPoolFunction.LogicalNot(initThreadPoolFunction.Load(isInitedVar));
+            initThreadPoolFunction.If(notInited, [this, int8PtrType, &isInitedVar](auto& initThreadPoolFunction) {
                 initThreadPoolFunction.Store(isInitedVar, initThreadPoolFunction.TrueBit());
                 _taskQueue.Initialize(initThreadPoolFunction);
 
-                auto workerThreadFunction = GetWorkerThreadFunction();
+                auto workerThreadFunction = this->GetWorkerThreadFunction(); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
                 llvm::ConstantPointerNull* nullAttr = initThreadPoolFunction.NullPointer(int8PtrType);
-                auto loop = initThreadPoolFunction.ForLoop();
-                loop.Begin(_maxThreads);
-                {
-                    auto index = loop.LoadIterationVariable();
+                initThreadPoolFunction.For(_maxThreads, [this, int8PtrType, nullAttr, workerThreadFunction](auto& initThreadPoolFunction, llvm::Value* index) {
                     auto threadPtr = initThreadPoolFunction.PointerOffset(_threads, index);
                     initThreadPoolFunction.PthreadCreate(threadPtr, nullAttr, workerThreadFunction, initThreadPoolFunction.CastPointer(_taskQueue.GetDataStruct(), int8PtrType));
-                }
-                loop.End();
-            }
-            ife.End();
+                });
+            });
         }
         _module.EndFunction();
         _module.AddInitializationFunction(initThreadPoolFunction);
@@ -115,14 +110,10 @@ namespace emitters
         _taskQueue.ShutDown(function);
 
         // Now wait for the worker threads to finish
-        auto loop = function.ForLoop();
-        loop.Begin(_maxThreads);
-        {
-            auto index = loop.LoadIterationVariable();
+        function.For(_maxThreads, [=](auto& function, auto index) {
             auto threadPtr = function.PointerOffset(_threads, index);
             function.PthreadJoin(function.Load(threadPtr), function.NullPointer(int8PtrType->getPointerTo()));
-        }
-        loop.End();
+        });
     }
 
     llvm::Function* IRThreadPool::GetWorkerThreadFunction()
@@ -137,35 +128,26 @@ namespace emitters
         {
             auto notDoneVar = workerThreadFunction.Variable(boolType, "notDone");
             workerThreadFunction.Store(notDoneVar, workerThreadFunction.TrueBit());
-            auto loop = workerThreadFunction.WhileLoop();
-            loop.Begin(notDoneVar);
-            {
+            workerThreadFunction.While(notDoneVar, [this, notDoneVar](IRFunctionEmitter& workerThreadFunction) {
                 auto task = _taskQueue.PopNextTask(workerThreadFunction);
-                auto ife = workerThreadFunction.If(); // check for a poison "null" task, indicating we should break out of the loop and terminate the thread
-                ife.If(task.IsNull(workerThreadFunction));
-                {
-                    workerThreadFunction.Store(notDoneVar, workerThreadFunction.FalseBit());
-                }
-                ife.Else();
-                {
-                    task.Run(workerThreadFunction);
+                // check for a poison "null" task, indicating we should break out of the loop and terminate the thread
+                workerThreadFunction.If(task.IsNull(workerThreadFunction), [notDoneVar](auto& workerThreadFunction) {
+                                        workerThreadFunction.Store(notDoneVar, workerThreadFunction.FalseBit());
+                                    })
+                    .Else([this, &task](IRFunctionEmitter& workerThreadFunction) {
+                        task.Run(workerThreadFunction);
 
-                    // Decrement count of unfinished tasks
-                    _taskQueue.LockQueueMutex(workerThreadFunction);
-                    auto unfinishedCount = _taskQueue.DecrementUnfinishedTasks(workerThreadFunction);
-                    _taskQueue.UnlockQueueMutex(workerThreadFunction);
+                        // Decrement count of unfinished tasks
+                        _taskQueue.LockQueueMutex(workerThreadFunction);
+                        auto unfinishedCount = _taskQueue.DecrementUnfinishedTasks(workerThreadFunction);
+                        _taskQueue.UnlockQueueMutex(workerThreadFunction);
 
-                    // if zero, signal client cond var
-                    auto isDoneIf = workerThreadFunction.If();
-                    isDoneIf.If(TypedComparison::equals, unfinishedCount, workerThreadFunction.Literal<int>(0));
-                    {
-                        _taskQueue.NotifyWaitingClients(workerThreadFunction);
-                    }
-                    isDoneIf.End();
-                }
-                ife.End();
-            }
-            loop.End();
+                        // if zero, signal client cond var
+                        workerThreadFunction.If(workerThreadFunction.Comparison(TypedComparison::equals, unfinishedCount, workerThreadFunction.Literal<int>(0)), [this](auto& workerThreadFunction) {
+                            _taskQueue.NotifyWaitingClients(workerThreadFunction);
+                        });
+                    });
+            });
 
             workerThreadFunction.Return(workerThreadFunction.NullPointer(int8PtrType));
         }
@@ -190,7 +172,7 @@ namespace emitters
 
     void IRThreadPoolTaskQueue::Initialize(IRFunctionEmitter& function)
     {
-        if(_queueData != nullptr)
+        if (_queueData != nullptr)
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: initializing thread pool task queue more than once");
         }
@@ -314,13 +296,10 @@ namespace emitters
 
         LockQueueMutex(function);
         function.Store(isNotDoneVar, function.Operator(UnaryOperationType::logicalNot, IsFinished(function)));
-        IRWhileLoopEmitter whileLoop(function);
-        whileLoop.Begin(isNotDoneVar);
-        {
+        function.While(isNotDoneVar, [=](auto& function) {
             function.PthreadCondWait(workFinishedCondVar, mutex);
-            function.Store(isNotDoneVar, function.Operator(UnaryOperationType::logicalNot, IsFinished(function)));
-        }
-        whileLoop.End();
+            function.Store(isNotDoneVar, function.Operator(UnaryOperationType::logicalNot, this->IsFinished(function))); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
+        });
         UnlockQueueMutex(function);
     }
 
@@ -379,12 +358,10 @@ namespace emitters
     {
         auto count = function.Load(fieldPtr);
         auto newCount = function.Operator(TypedOperator::subtract, count, function.Literal<int>(1));
-        auto ife = function.If();
-        ife.If(TypedComparison::notEquals, count, function.Literal<int>(0));
-        {
+        auto isNotZero = function.Comparison(TypedComparison::notEquals, count, function.Literal<int>(0));
+        function.If(isNotZero, [=](auto& function) {
             function.Store(fieldPtr, newCount);
-        }
-        ife.End();
+        });
         return newCount;
     }
 
@@ -612,16 +589,15 @@ namespace emitters
         llvm::Value* taskDataVar = function.Variable(int8PtrType, "taskArgStorage");
         llvm::Value* taskReturnValueVar = function.Variable(int8PtrPtrType, "taskReturnValue");
 
-        auto ife = function.If();
-        ife.If(TypedComparison::greaterThanOrEquals, taskIndex, function.Literal<int>(0));
-        {
+        auto isNotNegative = function.Comparison(TypedComparison::greaterThanOrEquals, taskIndex, function.Literal<int>(0));
+        function.If(isNotNegative, [=](auto& function) {
             // Get pointers into struct fields
-            auto returnValuesStoragePtr = GetReturnValuesStoragePointer(function);
-            auto taskArgStoragePtr = GetTaskArgsStoragePointer(function);
+            auto returnValuesStoragePtr = this->GetReturnValuesStoragePointer(function); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
+            auto taskArgStoragePtr = this->GetTaskArgsStoragePointer(function); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
 
-            auto taskFunctionPtr = function.CastPointer(GetTaskFunctionPointer(function), taskFunctionType->getPointerTo()->getPointerTo());
+            auto taskFunctionPtr = function.CastPointer(this->GetTaskFunctionPointer(function), taskFunctionType->getPointerTo()->getPointerTo()); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
             auto taskFunction = function.Load(taskFunctionPtr);
-            auto taskArgStructSize = GetTaskArgsStructSize(function);
+            auto taskArgStructSize = this->GetTaskArgsStructSize(function); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
             auto taskReturnValuesStorage = function.Load(returnValuesStoragePtr);
             auto taskArgStorage = function.Load(taskArgStoragePtr);
 
@@ -632,14 +608,11 @@ namespace emitters
             function.Store(taskFunctionVar, function.CastPointer(taskFunction, int8PtrType));
             function.Store(taskDataVar, taskData);
             function.Store(taskReturnValueVar, taskReturnValue);
-        }
-        ife.Else(); // index < 0 -- return null task
-        {
+        }).Else([=](auto& function) {  // index < 0 -- return null task
             function.Store(taskFunctionVar, function.NullPointer(int8PtrType));
             function.Store(taskDataVar, function.NullPointer(int8PtrType));
             function.Store(taskReturnValueVar, function.NullPointer(int8PtrPtrType));
-        }
-        ife.End();
+        });
 
         return { function.Load(taskFunctionVar), function.Load(taskDataVar), function.Load(taskReturnValueVar), this };
     }

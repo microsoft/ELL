@@ -21,15 +21,43 @@ namespace emitters
     const std::string IfAfterBlockName = "if.after";
 
     IRIfEmitter::IRIfEmitter(IRFunctionEmitter& functionEmitter, llvm::BasicBlock* pPrevBlock)
-        : _functionEmitter(functionEmitter), _pEndBlock(pPrevBlock)
+        : IRIfEmitter(functionEmitter, false, pPrevBlock)
     {
-        _pAfterBlock = _functionEmitter.BlockAfter(GetParentBlock(), IfAfterBlockName);
     }
 
     IRIfEmitter::IRIfEmitter(IRFunctionEmitter& functionEmitter, TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue)
         : IRIfEmitter(functionEmitter)
     {
         If(comparison, pValue, pTestValue);
+    }
+
+    IRIfEmitter::IRIfEmitter(IRFunctionEmitter& functionEmitter, bool endOnDestruct, llvm::BasicBlock* pPrevBlock)
+        : _functionEmitter(functionEmitter), _pEndBlock(pPrevBlock), _endOnDestruct(endOnDestruct)
+    {
+        _pAfterBlock = _functionEmitter.BlockAfter(GetParentBlock(), IfAfterBlockName);
+    }
+
+    IRIfEmitter::~IRIfEmitter()
+    {
+        if (_endOnDestruct)
+        {
+            End();
+        }
+    }
+
+    IRIfEmitter& IRIfEmitter::Else(std::function<void(IRFunctionEmitter& function)> body)
+    {
+        Else();
+        body(_functionEmitter);
+        return *this;
+    }
+
+    IRIfEmitter& IRIfEmitter::ElseIf(llvm::Value* pValue, std::function<void(IRFunctionEmitter& function)> body)
+    {
+        auto elseBlock = If(pValue);
+        elseBlock->setName(IfElseBlockName);
+        body(_functionEmitter);
+        return *this;
     }
 
     llvm::BasicBlock* IRIfEmitter::If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue)
@@ -83,6 +111,7 @@ namespace emitters
 
         EndPrev();
         _pThenBlock = _pEndBlock;
+        _pThenBlock->setName(IfElseBlockName);
         _pEndBlock = nullptr;
         _functionEmitter.SetCurrentBlock(_pThenBlock);
         return _pThenBlock;

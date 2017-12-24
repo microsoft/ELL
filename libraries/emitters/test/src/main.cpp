@@ -39,6 +39,11 @@ void TestIR()
     TestStruct();
     TestDuplicateStructs();
 
+    // New if constructs
+    TestScopedIf();
+    TestScopedIfElse();
+    TestScopedIfElse2();
+
     // From IRFunctionTest.h
     TestIRAddFunction();
     TestIRFunction();
