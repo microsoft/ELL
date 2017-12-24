@@ -33,7 +33,9 @@ namespace ell
 {
 namespace emitters
 {
-    using namespace logging;
+    using namespace utilities::logging;
+    using utilities::logging::Log;
+
     //
     // Public methods
     //

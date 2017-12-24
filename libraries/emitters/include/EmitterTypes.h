@@ -63,7 +63,21 @@ namespace emitters
         //
     };
 
-    /// <summary> Types of coordinatewise operations supported by this node type. </summary>
+    /// <summary> Untyped unary operations. </summary>
+    enum class UnaryOperationType
+    {
+        none,
+        exp, // real only
+        log, // real only
+        sqrt, // real only
+        logicalNot, // bool only
+        tanh, // real only
+        square, // real only
+        sin, // real only
+        cos, // real only
+    };
+
+    /// <summary> Untyped binary operations. </summary>
     enum class BinaryOperationType
     {
         none,
@@ -79,7 +93,7 @@ namespace emitters
         arithmeticShiftRight
     };
 
-    /// <summary> Types of coordinatewise operations supported by this node type. </summary>
+    /// <summary> Untyped binary predicates. </summary>
     enum class BinaryPredicateType
     {
         none,
@@ -91,19 +105,7 @@ namespace emitters
         greaterOrEqual
     };
 
-    /// <summary> Types of unary operations supported by this node type. </summary>
-    enum class UnaryOperationType
-    {
-        none,
-        exp, // real only
-        log, // real only
-        sqrt, // real only
-        logicalNot, // bool only
-        tanh, // real only
-        square // real only
-    };
-
-    ///<summary> An enumeration of strongly TYPED operations on numbers </summary>
+    ///<summary> An enumeration of strongly-typed operations on numbers </summary>
     enum class TypedOperator
     {
         none = 0,
@@ -113,7 +115,7 @@ namespace emitters
         subtract,
         ///<summary> Integer multiplication </summary>
         multiply,
-        ///<summary> Signed division - returns an integer </summary>
+        ///<summary> Integer signed division - returns an integer </summary>
         divideSigned,
         ///<summary> modulo </summary>
         moduloSigned,
@@ -170,16 +172,59 @@ namespace emitters
     };
 
     /// <summary> Translate the unary operation operator into a strongly typed operator for LLVM </summary>
+    ///
+    /// <typeparam name="T"> The type of the value to operate on. </param>
+    /// <param name="operation"> The (untyped) unary operation. </param>
+    ///
+    /// <returns> The typed version of the operation for the given type. </param>
     template <typename T>
     TypedOperator GetOperator(emitters::UnaryOperationType operation);
 
     /// <summary> Translate the binary operation operator into a strongly typed operator for LLVM </summary>
+    ///
+    /// <typeparam name="T"> The type of the values to operate on. </param>
+    /// <param name="operation"> The (untyped) binary operation. </param>
+    ///
+    /// <returns> The typed version of the operation for the given type. </param>
     template <typename T>
     TypedOperator GetOperator(emitters::BinaryOperationType operation);
 
+    /// <summary> Translate the binary operation operator into a strongly typed operator for LLVM </summary>
+    ///
+    /// <param name="operation"> The (untyped) binary operation. </param>
+    ///
+    /// <returns> The typed version of the operation for floating-point types. </param>
+    TypedOperator GetFloatOperator(emitters::BinaryOperationType operation);
+
+    /// <summary> Translate the binary operation operator into a strongly typed operator for LLVM </summary>
+    ///
+    /// <param name="operation"> The (untyped) binary operation. </param>
+    ///
+    /// <returns> The typed version of the operation for integral types. </param>
+    TypedOperator GetIntegerOperator(emitters::BinaryOperationType operation);
+
     /// <summary> Translate the binary predicate operator into a more strongly typed operator for LLVM </summary>
+    ///
+    /// <typeparam name="T"> The type of the values to compare. </param>
+    /// <param name="predicate"> The (untyped) binary comparison. </param>
+    ///
+    /// <returns> The typed version of the comparison for the given type. </param>
     template <typename T>
     TypedComparison GetComparison(emitters::BinaryPredicateType predicate);
+
+    /// <summary> Translate the binary predicate operator into a more strongly typed operator for LLVM </summary>
+    ///
+    /// <param name="predicate"> The (untyped) binary comparison. </param>
+    ///
+    /// <returns> The typed version of the comparison for floating-point types. </param>
+    TypedComparison GetFloatComparison(emitters::BinaryPredicateType predicate);
+
+    /// <summary> Translate the binary predicate operator into a more strongly typed operator for LLVM </summary>
+    ///
+    /// <param name="predicate"> The (untyped) binary comparison. </param>
+    ///
+    /// <returns> The typed version of the comparison for integral types. </param>
+    TypedComparison GetIntegerComparison(emitters::BinaryPredicateType predicate);
 
     ///<summary> Commonly used to create named fields, arguments, variables </summary>
     using NamedVariableType = std::pair<std::string, VariableType>;

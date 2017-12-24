@@ -16,6 +16,9 @@
 #include "ReLUActivation.h"
 #include "SigmoidActivation.h"
 
+// emitters
+#include "IRLocalValue.h"
+
 namespace ell
 {
 namespace nodes
@@ -69,10 +72,11 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* ReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const
+    llvm::Value* ReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
     {
-        auto cmp = function.Comparison(emitters::TypedComparison::greaterThanFloat, x, function.Literal<ValueType>(0.0));
-        auto result = function.Select(cmp, x, function.Literal<ValueType>(0.0));
+        auto x = function.LocalScalar(xValue);
+        auto zero = function.LocalScalar<ValueType>(0);
+        auto result = function.Select(x >= zero, x, zero);
         return result;
     }
 
@@ -86,10 +90,11 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* LeakyReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const
+    llvm::Value* LeakyReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
     {
-        auto cmp = function.Comparison(emitters::TypedComparison::greaterThanFloat, x, function.Literal<ValueType>(0.0));
-        auto result = function.Select(cmp, x, function.Operator(emitters::TypedOperator::multiplyFloat, x, function.Literal<ValueType>(GetLeakyFactor())));
+        auto x = function.LocalScalar(xValue);
+        auto zero = function.LocalScalar<ValueType>(0.0);
+        auto result = function.Select(x >= zero, x, x * function.LocalScalar(GetLeakyFactor()));
         return result;
     }
 
@@ -112,25 +117,23 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* SigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const
+    llvm::Value* SigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
     {
-        auto expFunc = function.GetModule().GetRuntime().GetExpFunction<ValueType>();
+        auto x = function.LocalScalar(xValue);
+        auto zero = function.LocalScalar<ValueType>(0.0);
+        auto one = function.LocalScalar<ValueType>(1.0);
 
         llvm::Value* result = function.Variable(emitters::GetVariableType<ValueType>(), "result");
         auto ifEmitter = function.If();
-        ifEmitter.If(emitters::TypedComparison::greaterThanFloat, x, function.Literal(static_cast<ValueType>(0.0)));
+        ifEmitter.If(x > zero);
         {
-            auto negatedInput = function.Operator(emitters::TypedOperator::multiplyFloat, x, function.Literal(static_cast<ValueType>(-1.0)));
-            auto expNegInput = function.Call(expFunc, { negatedInput });
-            auto expNegPlusOne = function.Operator(emitters::TypedOperator::addFloat, expNegInput, function.Literal(static_cast<ValueType>(1.0)));
-            auto sigmoid = function.Operator(emitters::TypedOperator::divideFloat, function.Literal(static_cast<ValueType>(1.0)), expNegPlusOne);
+            auto sigmoid = one / (Exp(-x) + one);
             function.Store(result, sigmoid);
         }
         ifEmitter.Else();
         {
-            auto expInput = function.Call(expFunc, { x });
-            auto expPlusOne = function.Operator(emitters::TypedOperator::addFloat, expInput, function.Literal(static_cast<ValueType>(1.0)));
-            auto sigmoid = function.Operator(emitters::TypedOperator::divideFloat, expInput, expPlusOne);
+            auto expInput = Exp(x);
+            auto sigmoid = expInput / (expInput + one);
             function.Store(result, sigmoid);
         }
         ifEmitter.End();
@@ -147,14 +150,16 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* TanhActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const
+    llvm::Value* TanhActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
     {
+        auto x = function.LocalScalar(xValue);
+        auto one = function.LocalScalar<ValueType>(1.0);
+        auto two = function.LocalScalar<ValueType>(2.0);
         // tanh = (exp(x) - exp(-x)) / (exp(x) + exp(-x))
-        //      = 2*sigmoid(2*x) - 1    
+        //      = 2*sigmoid(2*x) - 1
         auto sigmoidFunction = SigmoidActivationFunction<ValueType>();
-        auto twoX = function.Operator(emitters::TypedOperator::multiplyFloat, x, function.Literal(static_cast<ValueType>(2.0)));
-        auto sig2x = sigmoidFunction.Compile(function, twoX);
-        return function.Operator(emitters::TypedOperator::subtractFloat, function.Operator(emitters::TypedOperator::multiplyFloat, sig2x, function.Literal(static_cast<ValueType>(2.0))), function.Literal(static_cast<ValueType>(1.0)));
+        auto sig2x = function.LocalScalar(sigmoidFunction.Compile(function, two * x));
+        return (two * sig2x) - one;
     }
 
     //
@@ -167,23 +172,26 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* ParametricReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* a) const
+    llvm::Value* ParametricReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue, llvm::Value* aValue) const
     {
+        auto x = function.LocalScalar(xValue);
+        auto a = function.LocalScalar(aValue);
+        auto zero = function.LocalScalar<ValueType>(0.0);
+
         // ((x[i] > 0) ? x[i] : a[i] * x[i])
         llvm::Value* result = function.Variable(emitters::GetVariableType<ValueType>(), "result");
         auto ifEmitter = function.If();
-        ifEmitter.If(emitters::GetComparison<ValueType>(emitters::BinaryPredicateType::greater), x, function.Literal<ValueType>(0));
+        ifEmitter.If(x > zero);
         {
             function.Store(result, x);
         }
         ifEmitter.Else();
         {
-            function.Store(result, function.Operator(emitters::GetMultiplyForValueType<ValueType>(), x, a));
+            function.Store(result, x * a);
         }
         ifEmitter.End();
         return function.Load(result);
     }
-
 
     // Explicit instantiation
     template class ReLUActivationFunction<float>;

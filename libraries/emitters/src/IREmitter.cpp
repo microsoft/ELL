@@ -240,6 +240,11 @@ namespace emitters
         return nullptr;
     }
 
+    llvm::Constant* IREmitter::Zero(llvm::Type* type)
+    {
+        return llvm::Constant::getNullValue(type);
+    }
+
     llvm::Constant* IREmitter::True()
     {
         return Literal(true);

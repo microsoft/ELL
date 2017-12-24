@@ -12,6 +12,7 @@
 #include "IRAsyncTask.h"
 #include "IREmitter.h"
 #include "IRIfEmitter.h"
+#include "IRLocalValue.h"
 #include "IRLoopEmitter.h"
 #include "IROptimizer.h"
 #include "IRTask.h"
@@ -45,6 +46,17 @@ namespace emitters
 
         /// <summary> Gets the name of the function being emitted. </summary>
         std::string GetFunctionName() { return _name; }
+
+        /// <summary> Gets an `IRLocalScalar` wrapper for an LLVM value object. </summary>
+        ///
+        /// <param name="value"> The value to wrap. </param>
+        IRLocalScalar LocalScalar(llvm::Value* value);
+
+        /// <summary> Gets an `IRLocalScalar` wrapper for a literal constant. </summary>
+        ///
+        /// <param name="value"> The literal value to wrap. </param>
+        template <typename ValueType, utilities::IsFundamental<ValueType> = true>
+        IRLocalScalar LocalScalar(ValueType value);
 
         /// <summary> Gets an emitted variable by scope and name. </summary>
         ///

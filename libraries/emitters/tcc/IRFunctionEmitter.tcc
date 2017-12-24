@@ -10,6 +10,12 @@ namespace ell
 {
 namespace emitters
 {
+    template <typename ValueType, utilities::IsFundamental<ValueType>>
+    IRLocalScalar IRFunctionEmitter::LocalScalar(ValueType value)
+    {
+        return IRLocalScalar(*this, Literal(value));
+    }
+
     template <typename ValueType>
     llvm::Value* IRFunctionEmitter::Literal(ValueType value)
     {

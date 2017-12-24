@@ -434,8 +434,19 @@ namespace emitters
         return _module.GetIntrinsic(llvm::Intrinsic::log, { argType });
     }
 
+    llvm::Function* IRRuntime::GetSinFunction(VariableType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::sin, { argType });
+    }
+
+    llvm::Function* IRRuntime::GetCosFunction(VariableType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::cos, { argType });
+    }
+
     llvm::Function* IRRuntime::GetTanhFunction(VariableType argType)
     {
+        // This assumes a standard C runtime library is linked
         switch (argType)
         {
         case VariableType::Float:
@@ -451,6 +462,36 @@ namespace emitters
         auto tanhProto = llvm::FunctionType::get(valueType, { valueType }, false);
         _module.DeclareFunction(funcName, tanhProto);
         return _module.GetFunction(funcName);
+    }
+
+    llvm::Function* IRRuntime::GetSqrtFunction(llvm::Type* argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::sqrt, { argType });
+    }
+
+    llvm::Function* IRRuntime::GetAbsFunction(llvm::Type* argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::fabs, { argType });
+    }
+
+    llvm::Function* IRRuntime::GetExpFunction(llvm::Type* argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::exp, { argType });
+    }
+
+    llvm::Function* IRRuntime::GetLogFunction(llvm::Type* argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::log, { argType });
+    }
+
+    llvm::Function* IRRuntime::GetSinFunction(llvm::Type* argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::sin, { argType });
+    }
+
+    llvm::Function* IRRuntime::GetCosFunction(llvm::Type* argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::cos, { argType });
     }
 
     //

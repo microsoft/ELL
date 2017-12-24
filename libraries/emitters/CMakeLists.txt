@@ -22,6 +22,7 @@ set (src
     src/IRHeaderWriter.cpp
     src/IRIfEmitter.cpp
     src/IRLoader.cpp
+    src/IRLocalValue.cpp
     src/IRLoopEmitter.cpp
     src/IRMetadata.cpp
     src/IRModuleEmitter.cpp
@@ -52,6 +53,7 @@ set (include
     include/IRHeaderWriter.h
     include/IRIfEmitter.h
     include/IRLoader.h
+    include/IRLocalValue.h
     include/IRLoopEmitter.h
     include/IRModuleEmitter.h
     include/IRMetadata.h

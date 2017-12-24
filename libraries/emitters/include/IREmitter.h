@@ -236,6 +236,13 @@ namespace emitters
         /// <returns> Pointer to an llvm::Constant that represents the zero. </returns>
         llvm::Constant* Zero(VariableType type);
 
+        /// <summary> Emit a Zero value of the given type. </summary>
+        ///
+        /// <param name="type"> The type. </param>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents the zero. </returns>
+        llvm::Constant* Zero(llvm::Type* type);
+
         /// <summary> Emit a true value in a byte. </summary>
         ///
         /// <returns> Pointer to an llvm::Constant that represents true. </returns>

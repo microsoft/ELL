@@ -29,7 +29,8 @@ namespace ell
 {
 namespace emitters
 {
-    using namespace logging;
+    using namespace utilities::logging;
+    using utilities::logging::Log;
 
     const std::string PrintfFnName = "printf";
     const std::string MallocFnName = "malloc";
@@ -85,6 +86,11 @@ namespace emitters
         AddRegion(pBlock);
         _pEmitter->SetCurrentBlock(pBlock); // if/when we get our own IREmitter, this statefulness won't be so objectionable
         _entryBlock = pBlock;
+    }
+
+    IRLocalScalar IRFunctionEmitter::LocalScalar(llvm::Value* value)
+    {
+        return IRLocalScalar(*this, value);
     }
 
     llvm::Value* IRFunctionEmitter::GetEmittedVariable(const VariableScope scope, const std::string& name)
@@ -485,6 +491,7 @@ namespace emitters
 
     void IRFunctionEmitter::ConcatRegions(IRBlockRegion* pTop, IRBlockRegion* pBottom, bool moveBlocks)
     {
+        // using utilities::logging::Log;
         assert(pTop != nullptr && pBottom != nullptr);
 
         Log() << "Concatenating block regions";

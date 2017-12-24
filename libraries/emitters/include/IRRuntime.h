@@ -59,11 +59,40 @@ namespace emitters
         template <typename ValueType>
         llvm::Function* GetLogFunction();
 
+        /// <summary> Get the sin function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
+        template <typename ValueType>
+        llvm::Function* GetSinFunction();
+
+        /// <summary> Get the cos function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
+        template <typename ValueType>
+        llvm::Function* GetCosFunction();
+        
         /// <summary> Get the tanh function </summary>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
         llvm::Function* GetTanhFunction();
+
+        // emitter types
+        llvm::Function* GetSqrtFunction(VariableType argType);
+        llvm::Function* GetAbsFunction(VariableType argType);
+        llvm::Function* GetExpFunction(VariableType argType);
+        llvm::Function* GetLogFunction(VariableType argType);
+        llvm::Function* GetTanhFunction(VariableType argType);
+        llvm::Function* GetSinFunction(VariableType argType);
+        llvm::Function* GetCosFunction(VariableType argType);
+
+        // llvm types
+        llvm::Function* GetSqrtFunction(llvm::Type* argType);
+        llvm::Function* GetAbsFunction(llvm::Type* argType);
+        llvm::Function* GetExpFunction(llvm::Type* argType);
+        llvm::Function* GetLogFunction(llvm::Type* argType);
+        llvm::Function* GetSinFunction(llvm::Type* argType);
+        llvm::Function* GetCosFunction(llvm::Type* argType);
 
         //
         // Dot product
@@ -127,12 +156,6 @@ namespace emitters
         llvm::Function* ResolveCurrentTimeFunction(llvm::StructType* timespecType);
 
         // math
-        llvm::Function* GetSqrtFunction(VariableType argType);
-        llvm::Function* GetAbsFunction(VariableType argType);
-        llvm::Function* GetExpFunction(VariableType argType);
-        llvm::Function* GetLogFunction(VariableType argType);
-        llvm::Function* GetTanhFunction(VariableType argType);
-
         llvm::Function* GetDotProductIntFunction();
         llvm::Function* GetDotProductFloatFunction();
 
