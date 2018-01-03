@@ -484,7 +484,7 @@ namespace nodes
     //
     template <typename ValueType, typename FunctionType>
     BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode()
-        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, { &_output }), _primaryInput(this, {}, primaryInputPortName), _output(this, outputPortName, 0)
+        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, { &_output }), _primaryInput(this, {}, primaryInputPortName), _output(this, ell::model::Node::defaultOutputPortName, 0)
     {
     }
 
@@ -503,7 +503,7 @@ namespace nodes
                                                                                     ValueType paddingValue)
         : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, inputLayout, 0, { &_output }, outputLayout, function, paddingValue)
         , _primaryInput(this, primaryInput, primaryInputPortName)
-        , _output(this, outputPortName, model::NumElements(outputLayout.GetStride()))
+        , _output(this, ell::model::Node::defaultOutputPortName, model::NumElements(outputLayout.GetStride()))
     {
         // Verify sizes are compatible
         size_t totalInputSize = inputLayout.GetMemorySize();
@@ -568,7 +568,7 @@ namespace nodes
     //
     template <typename ValueType, typename FunctionType>
     BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode()
-        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput }, { &_output }), _primaryInput(this, {}, primaryInputPortName), _secondaryInput(this, {}, secondaryInputPortName), _output(this, outputPortName, 0)
+        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput }, { &_output }), _primaryInput(this, {}, primaryInputPortName), _secondaryInput(this, {}, secondaryInputPortName), _output(this, ell::model::Node::defaultOutputPortName, 0)
     {
     }
 
@@ -592,7 +592,7 @@ namespace nodes
                                                          { &_output }, outputLayout, function, paddingValue)
         , _primaryInput(this, primaryInput, primaryInputPortName)
         , _secondaryInput(this, secondaryInput, secondaryInputPortName)
-        , _output(this, outputPortName, model::NumElements(outputLayout.GetStride()))
+        , _output(this, ell::model::Node::defaultOutputPortName, model::NumElements(outputLayout.GetStride()))
     {
         // Verify sizes are compatible
         size_t totalInputSize = inputLayout.GetMemorySize();
@@ -650,7 +650,7 @@ namespace nodes
     //
     template <typename ValueType, typename FunctionType>
     BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode()
-        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput1, &_secondaryInput2 }, { &_output }), _primaryInput(this, {}, primaryInputPortName), _secondaryInput1(this, {}, secondaryInput1PortName), _secondaryInput2(this, {}, secondaryInput2PortName), _output(this, outputPortName, 0)
+        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput1, &_secondaryInput2 }, { &_output }), _primaryInput(this, {}, primaryInputPortName), _secondaryInput1(this, {}, secondaryInput1PortName), _secondaryInput2(this, {}, secondaryInput2PortName), _output(this, ell::model::Node::defaultOutputPortName, 0)
     {
     }
 
@@ -676,7 +676,7 @@ namespace nodes
         , _primaryInput(this, primaryInput, primaryInputPortName)
         , _secondaryInput1(this, secondaryInput1, secondaryInput1PortName)
         , _secondaryInput2(this, secondaryInput2, secondaryInput2PortName)
-        , _output(this, outputPortName, model::NumElements(outputLayout.GetStride()))
+        , _output(this, ell::model::Node::defaultOutputPortName, model::NumElements(outputLayout.GetStride()))
     {
         // Verify sizes are compatible
         size_t totalInputSize = inputLayout.GetMemorySize();

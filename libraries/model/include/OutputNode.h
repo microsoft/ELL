@@ -37,8 +37,6 @@ namespace model
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr const char* inputPortName = "input";
-        static constexpr const char* outputPortName = "output";
         static constexpr const char* shapeName = "shape";
         const model::InputPort<ValueType>& input = _input;
         const model::OutputPort<ValueType>& output = _output;

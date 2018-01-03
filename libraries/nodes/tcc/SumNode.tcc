@@ -14,13 +14,13 @@ namespace nodes
 {
     template <typename ValueType>
     SumNode<ValueType>::SumNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1)
     {
     }
 
     template <typename ValueType>
     SumNode<ValueType>::SumNode(const model::PortElements<ValueType>& input)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1)
     {
     }
 
@@ -188,14 +188,14 @@ namespace nodes
     void SumNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
     }
 
     template <typename ValueType>
     void SumNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
     }
 }
 }

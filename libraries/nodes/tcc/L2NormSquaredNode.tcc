@@ -15,13 +15,13 @@ namespace nodes
 {
     template <typename ValueType>
     L2NormSquaredNode<ValueType>::L2NormSquaredNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
+        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1)
     {
     }
 
     template <typename ValueType>
     L2NormSquaredNode<ValueType>::L2NormSquaredNode(const model::PortElements<ValueType>& input)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1)
+        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1)
     {
     }
 
@@ -61,14 +61,14 @@ namespace nodes
     void L2NormSquaredNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
     }
 
     template <typename ValueType>
     void L2NormSquaredNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
     }
 }
 }

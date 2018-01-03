@@ -12,13 +12,13 @@ namespace nodes
 {
     template <typename ValueType, typename SelectorType>
     DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode()
-        : Node({ &_input, &_selector }, { &_output }), _input(this, {}, inputPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 0), _defaultValue(0)
+        : Node({ &_input, &_selector }, { &_output }), _input(this, {}, defaultInputPortName), _selector(this, {}, selectorPortName), _output(this, defaultOutputPortName, 0), _defaultValue(0)
     {
     }
 
     template <typename ValueType, typename SelectorType>
     DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue)
-        : Node({ &_input, &_selector }, { &_output }), _input(this, input, inputPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, outputSize), _defaultValue(defaultValue)
+        : Node({ &_input, &_selector }, { &_output }), _input(this, input, defaultInputPortName), _selector(this, selector, selectorPortName), _output(this, defaultOutputPortName, outputSize), _defaultValue(defaultValue)
     {
         if (selector.Size() != 1)
         {
@@ -43,7 +43,7 @@ namespace nodes
     void DemultiplexerNode<ValueType, SelectorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver[selectorPortName] << _selector;
         archiver["size"] << _output.Size();
         archiver["defaultValue"] << _defaultValue;
@@ -53,7 +53,7 @@ namespace nodes
     void DemultiplexerNode<ValueType, SelectorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
         archiver[selectorPortName] >> _selector;
         size_t size;
         archiver["size"] >> size;

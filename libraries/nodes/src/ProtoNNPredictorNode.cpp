@@ -34,12 +34,12 @@ namespace ell
 namespace nodes
 {
     ProtoNNPredictorNode::ProtoNNPredictorNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
+        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
     {
     }
 
     ProtoNNPredictorNode::ProtoNNPredictorNode(const model::PortElements<double>& input, const predictors::ProtoNNPredictor& predictor)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, predictor.GetNumLabels()), _predictor(predictor)
+        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, predictor.GetNumLabels()), _predictor(predictor)
     {
         assert(input.Size() == predictor.GetDimension());
     }
@@ -47,16 +47,16 @@ namespace nodes
     void ProtoNNPredictorNode::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
+        archiver[defaultInputPortName] << _input;
+        archiver[defaultOutputPortName] << _output;
         archiver["predictor"] << _predictor;
     }
 
     void ProtoNNPredictorNode::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
+        archiver[defaultInputPortName] >> _input;
+        archiver[defaultOutputPortName] >> _output;
         archiver["predictor"] >> _predictor;
     }
 

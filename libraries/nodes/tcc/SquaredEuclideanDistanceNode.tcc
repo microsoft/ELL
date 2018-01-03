@@ -30,13 +30,13 @@ namespace nodes
 {
     template <typename ValueType, math::MatrixLayout layout>
     SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _vectorsAsMatrix(0, 0)
+        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1), _vectorsAsMatrix(0, 0)
     {
     }
 
     template <typename ValueType, math::MatrixLayout layout>
     SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& vectorsAsMatrix)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, vectorsAsMatrix.NumRows()), _vectorsAsMatrix(vectorsAsMatrix)
+        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, vectorsAsMatrix.NumRows()), _vectorsAsMatrix(vectorsAsMatrix)
     {
         assert(input.Size() == vectorsAsMatrix.NumColumns());
     }
@@ -47,8 +47,8 @@ namespace nodes
         Node::WriteToArchive(archiver);
 
         math::MatrixArchiver::Write(_vectorsAsMatrix, "vectorsAsMatrix", archiver);
-        archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
+        archiver[defaultInputPortName] << _input;
+        archiver[defaultOutputPortName] << _output;
     }
 
     template <typename ValueType, math::MatrixLayout layout>
@@ -57,8 +57,8 @@ namespace nodes
         Node::ReadFromArchive(archiver);
 
         math::MatrixArchiver::Read(_vectorsAsMatrix, "vectorsAsMatrix", archiver);
-        archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
+        archiver[defaultInputPortName] >> _input;
+        archiver[defaultOutputPortName] >> _output;
     }
 
     template <typename ValueType, math::MatrixLayout layout>

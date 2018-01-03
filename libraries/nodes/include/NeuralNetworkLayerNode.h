@@ -40,8 +40,6 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr const char* inputPortName = "input";
-        static constexpr const char* outputPortName = "output";
         const model::InputPort<ValueType>& input = _input;
         const model::OutputPort<ValueType>& output = _output;
         /// @}
@@ -95,8 +93,6 @@ namespace nodes
 
         /// @name Input and Output Ports
         /// @{
-        using NeuralNetworkLayerNodeBase<ValueType>::inputPortName; // "input"
-        using NeuralNetworkLayerNodeBase<ValueType>::outputPortName; // "output"
         using NeuralNetworkLayerNodeBase<ValueType>::input;
         using NeuralNetworkLayerNodeBase<ValueType>::output;
         /// @}

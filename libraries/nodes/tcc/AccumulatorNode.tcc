@@ -12,13 +12,13 @@ namespace nodes
 {
     template <typename ValueType>
     AccumulatorNode<ValueType>::AccumulatorNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType>
     AccumulatorNode<ValueType>::AccumulatorNode(const model::PortElements<ValueType>& input)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size())
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size())
     {
         auto dimension = input.Size();
         _accumulator = std::vector<ValueType>(dimension);
@@ -92,14 +92,14 @@ namespace nodes
     void AccumulatorNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
     }
 
     template <typename ValueType>
     void AccumulatorNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
 
         auto dimension = _input.Size();
         _accumulator = std::vector<ValueType>(dimension);

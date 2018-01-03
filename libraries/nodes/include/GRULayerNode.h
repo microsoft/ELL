@@ -38,8 +38,6 @@ namespace nodes
 
         /// @name Input and Output Ports
         /// @{
-        using BaseType::inputPortName; // "input"
-        using BaseType::outputPortName; // "output"
         using BaseType::input;
         using BaseType::output;
         /// @}
@@ -80,14 +78,12 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr const char* inputPortName = "input";
         static constexpr const char* updateWeightsPortName = "updateWeights";
         static constexpr const char* resetWeightsPortName = "resetWeights";
         static constexpr const char* hiddenWeightsPortName = "hiddenWeights";
         static constexpr const char* updateBiasPortName = "updateBias";
         static constexpr const char* resetBiasPortName = "resetBias";
         static constexpr const char* hiddenBiasPortName = "hiddenBias";
-        static constexpr const char* outputPortName = "output";
         const model::InputPort<ValueType>& input = _input;
         const model::InputPort<ValueType>& updateWeights = _updateWeights;
         const model::InputPort<ValueType>& resetWeights = _resetWeights;

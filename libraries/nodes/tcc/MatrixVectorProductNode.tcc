@@ -25,13 +25,13 @@ namespace nodes
 {
     template <typename ValueType, math::MatrixLayout layout>
     MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _w(0, 0)
+        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1), _w(0, 0)
     {
     }
 
     template <typename ValueType, math::MatrixLayout layout>
     MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& w)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, w.NumRows()), _w(w)
+        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, w.NumRows()), _w(w)
     {
         assert(input.Size() == w.NumColumns());
     }
@@ -47,8 +47,8 @@ namespace nodes
         temp.assign(_w.GetConstDataPointer(), _w.GetConstDataPointer() + (size_t)(_w.NumRows() * _w.NumColumns()));
         archiver["w"] << temp;
 
-        archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
+        archiver[defaultInputPortName] << _input;
+        archiver[defaultOutputPortName] << _output;
     }
 
     template <typename ValueType, math::MatrixLayout layout>
@@ -64,8 +64,8 @@ namespace nodes
         archiver["w"] >> temp;
         _w = math::Matrix<ValueType, layout>(w_rows, w_columns, temp);
 
-        archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
+        archiver[defaultInputPortName] >> _input;
+        archiver[defaultOutputPortName] >> _output;
     }
 
     template <typename ValueType, math::MatrixLayout layout>

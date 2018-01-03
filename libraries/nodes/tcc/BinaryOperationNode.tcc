@@ -140,13 +140,13 @@ namespace nodes
 
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode()
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(emitters::BinaryOperationType::none)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, defaultInput1PortName), _input2(this, {}, defaultInput2PortName), _output(this, defaultOutputPortName, 0), _operation(emitters::BinaryOperationType::none)
     {
     }
 
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, emitters::BinaryOperationType operation)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, _input1.Size()), _operation(operation)
     {
         if (input1.Size() != input2.Size())
         {
@@ -254,8 +254,8 @@ namespace nodes
     void BinaryOperationNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[input1PortName] << _input1;
-        archiver[input2PortName] << _input2;
+        archiver[defaultInput1PortName] << _input1;
+        archiver[defaultInput2PortName] << _input2;
         archiver["operation"] << BinaryOperations::to_string(_operation);
     }
 
@@ -263,8 +263,8 @@ namespace nodes
     void BinaryOperationNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[input1PortName] >> _input1;
-        archiver[input2PortName] >> _input2;
+        archiver[defaultInput1PortName] >> _input1;
+        archiver[defaultInput2PortName] >> _input2;
         std::string operation;
         archiver["operation"] >> operation;
         _operation = BinaryOperations::from_string(operation);

@@ -12,13 +12,13 @@ namespace nodes
 {
     template <typename ValueType, typename SelectorType>
     MultiplexerNode<ValueType, SelectorType>::MultiplexerNode()
-        : CompilableNode({ &_elements, &_selector }, { &_output }), _elements(this, {}, elementsPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 1)
+        : CompilableNode({ &_elements, &_selector }, { &_output }), _elements(this, {}, elementsPortName), _selector(this, {}, selectorPortName), _output(this, defaultOutputPortName, 1)
     {
     }
 
     template <typename ValueType, typename SelectorType>
     MultiplexerNode<ValueType, SelectorType>::MultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector)
-        : CompilableNode({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, 1)
+        : CompilableNode({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, defaultOutputPortName, 1)
     {
         if (selector.Size() != 1)
         {

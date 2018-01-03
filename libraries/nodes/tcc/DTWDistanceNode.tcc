@@ -35,13 +35,13 @@ namespace nodes
 
     template <typename ValueType>
     DTWDistanceNode<ValueType>::DTWDistanceNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _sampleDimension(0), _prototypeLength(0), _prototypeVariance(0)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1), _sampleDimension(0), _prototypeLength(0), _prototypeVariance(0)
     {
     }
 
     template <typename ValueType>
     DTWDistanceNode<ValueType>::DTWDistanceNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _prototype(prototype)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _prototype(prototype)
     {
         _sampleDimension = input.Size();
         _prototypeLength = prototype.size();
@@ -226,8 +226,8 @@ namespace nodes
     void DTWDistanceNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
+        archiver[defaultInputPortName] << _input;
+        archiver[defaultOutputPortName] << _output;
         // archiver["prototype"] << _prototype;
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
@@ -236,8 +236,8 @@ namespace nodes
     void DTWDistanceNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
+        archiver[defaultInputPortName] >> _input;
+        archiver[defaultOutputPortName] >> _output;
         // archiver["prototype"] >> _prototype;
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }

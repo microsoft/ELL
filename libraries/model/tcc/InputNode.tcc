@@ -12,16 +12,16 @@ namespace model
 {
     template <typename ValueType>
     InputNode<ValueType>::InputNode()
-        : InputNodeBase(_output, InputShape{ 0,0,0 }), _output(this, outputPortName, 0) {};
+        : InputNodeBase(_output, InputShape{ 0,0,0 }), _output(this, defaultOutputPortName, 0) {};
 
     template <typename ValueType>
     InputNode<ValueType>::InputNode(size_t size)
-        : InputNodeBase(_output, InputShape{ size,1,1 }), _output(this, outputPortName, size) {};
+        : InputNodeBase(_output, InputShape{ size,1,1 }), _output(this, defaultOutputPortName, size) {};
 
 
     template <typename ValueType>
     InputNode<ValueType>::InputNode(InputShape shape)
-        : InputNodeBase(_output, shape), _output(this, outputPortName, shape.Size()) {};
+        : InputNodeBase(_output, shape), _output(this, defaultOutputPortName, shape.Size()) {};
 
     template <typename ValueType>
     void InputNode<ValueType>::SetInput(ValueType inputValue)

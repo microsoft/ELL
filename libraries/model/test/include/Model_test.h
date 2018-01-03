@@ -22,3 +22,4 @@ void TestCopyModel();
 
 void TestRefineSplitOutputs();
 void TestCustomRefine();
+void TestEveryNodeType();

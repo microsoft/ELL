@@ -18,13 +18,13 @@ namespace nodes
 {
     template <typename ValueType>
     MatrixVectorMultiplyNode<ValueType>::MatrixVectorMultiplyNode()
-        : CompilableNode({ &_inputMatrix, &_inputVector }, { &_output }), _inputMatrix(this, {}, inputMatrixPortName), _inputVector(this, {}, inputVectorPortName), _output(this, outputPortName, 0), _m(0), _n(0), _lda(0), _incx(0)
+        : CompilableNode({ &_inputMatrix, &_inputVector }, { &_output }), _inputMatrix(this, {}, inputMatrixPortName), _inputVector(this, {}, inputVectorPortName), _output(this, defaultOutputPortName, 0), _m(0), _n(0), _lda(0), _incx(0)
     {
     }
 
     template <typename ValueType>
     MatrixVectorMultiplyNode<ValueType>::MatrixVectorMultiplyNode(const model::PortElements<ValueType>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::PortElements<ValueType>& inputVector)
-        : CompilableNode({ &_inputMatrix, &_inputVector }, { &_output }), _inputMatrix(this, inputMatrix, inputMatrixPortName), _inputVector(this, inputVector, inputVectorPortName), _output(this, outputPortName, m), _m(m), _n(n), _lda(matrixStride), _incx(1)
+        : CompilableNode({ &_inputMatrix, &_inputVector }, { &_output }), _inputMatrix(this, inputMatrix, inputMatrixPortName), _inputVector(this, inputVector, inputVectorPortName), _output(this, defaultOutputPortName, m), _m(m), _n(n), _lda(matrixStride), _incx(1)
     {
         if (inputMatrix.Size() != m * n)
         {
@@ -80,7 +80,7 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[inputMatrixPortName] << _inputMatrix;
         archiver[inputVectorPortName] << _inputVector;
-        archiver[outputPortName] << _output;
+        archiver[defaultOutputPortName] << _output;
         archiver["m"] << _m;
         archiver["n"] << _n;
         archiver["lda"] << _lda;
@@ -93,7 +93,7 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[inputMatrixPortName] >> _inputMatrix;
         archiver[inputVectorPortName] >> _inputVector;
-        archiver[outputPortName] >> _output;
+        archiver[defaultOutputPortName] >> _output;
         archiver["m"] >> _m;
         archiver["n"] >> _n;
         archiver["lda"] >> _lda;

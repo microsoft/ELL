@@ -12,13 +12,13 @@ namespace nodes
 {
     template <typename ValueType>
     DotProductNode<ValueType>::DotProductNode()
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 1)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, defaultInput1PortName), _input2(this, {}, defaultInput2PortName), _output(this, defaultOutputPortName, 1)
     {
     }
 
     template <typename ValueType>
     DotProductNode<ValueType>::DotProductNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, 1)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, 1)
     {
     }
 
@@ -105,16 +105,16 @@ namespace nodes
     void DotProductNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[input1PortName] << _input1;
-        archiver[input2PortName] << _input2;
+        archiver[defaultInput1PortName] << _input1;
+        archiver[defaultInput2PortName] << _input2;
     }
 
     template <typename ValueType>
     void DotProductNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[input1PortName] >> _input1;
-        archiver[input2PortName] >> _input2;
+        archiver[defaultInput1PortName] >> _input1;
+        archiver[defaultInput2PortName] >> _input2;
     }
 }
 }

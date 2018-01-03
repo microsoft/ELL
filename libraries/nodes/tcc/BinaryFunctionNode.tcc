@@ -12,14 +12,14 @@ namespace nodes
 {
     template <typename ValueType, typename FunctionType>
     BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode()
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _paddingValue(0)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, defaultInput1PortName), _input2(this, {}, defaultInput2PortName), _output(this, defaultOutputPortName, 0), _paddingValue(0)
     {
     }
 
     template <typename ValueType, typename FunctionType>
     BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2,
         const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _inputLayout(inputLayout), _output(this, outputPortName, model::NumElements(outputLayout.GetStride())), _outputLayout(outputLayout), _function(std::move(function)), _paddingValue(padding)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _inputLayout(inputLayout), _output(this, defaultOutputPortName, model::NumElements(outputLayout.GetStride())), _outputLayout(outputLayout), _function(std::move(function)), _paddingValue(padding)
     {
         if (input1.Size() != input2.Size())
         {
@@ -198,8 +198,8 @@ namespace nodes
     void BinaryFunctionNode<ValueType, FunctionType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         model::CompilableNode::WriteToArchive(archiver);
-        archiver[input1PortName] << _input1;
-        archiver[input2PortName] << _input2;
+        archiver[defaultInput1PortName] << _input1;
+        archiver[defaultInput2PortName] << _input2;
         archiver["paddingValue"] << _paddingValue;
     }
 
@@ -207,8 +207,8 @@ namespace nodes
     void BinaryFunctionNode<ValueType, FunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         model::CompilableNode::ReadFromArchive(archiver);
-        archiver[input1PortName] >> _input1;
-        archiver[input2PortName] >> _input2;
+        archiver[defaultInput1PortName] >> _input1;
+        archiver[defaultInput2PortName] >> _input2;
         archiver["paddingValue"] >> _paddingValue;
     }
 }

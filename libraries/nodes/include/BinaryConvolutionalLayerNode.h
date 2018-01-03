@@ -36,8 +36,6 @@ namespace nodes
 
         /// @name Input and Output Ports
         /// @{
-        using BaseType::inputPortName; // "input"
-        using BaseType::outputPortName; // "output"
         using BaseType::input;
         using BaseType::output;
         /// @}
@@ -90,8 +88,6 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr const char* inputPortName = "input";
-        static constexpr const char* outputPortName = "output";
         const model::InputPort<ValueType>& input = _input;
         const model::OutputPort<PackedBitsType>& output = _output;
         /// @}
@@ -158,12 +154,10 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr const char* inputPortName = "input";
         static constexpr const char* inputPaddingMasksPortName = "inputPaddingMasks";
         static constexpr const char* inputPaddingMaskSumsPortName = "inputPaddingMaskSums";
         static constexpr const char* filterWeightsPortName = "filterWeights";
         static constexpr const char* filterMeansPortName = "filterMeans";
-        static constexpr const char* outputPortName = "output";
         const model::InputPort<PackedBitsType>& input = _input;
         const model::InputPort<PackedBitsType>& inputPaddingMasks = _inputPaddingMasks;
         const model::InputPort<int>& inputPaddingMaskSums = _inputPaddingMaskSums;

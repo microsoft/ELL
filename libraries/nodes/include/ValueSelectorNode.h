@@ -33,9 +33,6 @@ namespace nodes
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* conditionPortName = "condition";
-        static constexpr const char* input1PortName = "input1";
-        static constexpr const char* input2PortName = "input2";
-        static constexpr const char* outputPortName = "output";
         const model::InputPort<bool>& condition = _condition;
         const model::InputPort<ValueType>& input1 = _input1;
         const model::InputPort<ValueType>& input2 = _input2;

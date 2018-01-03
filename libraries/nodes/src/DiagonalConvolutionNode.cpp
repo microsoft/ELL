@@ -41,13 +41,13 @@ namespace nodes
 
     template <typename ValueType>
     DiagonalConvolutionNode<ValueType>::DiagonalConvolutionNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _filterWeights(this, {}, filterWeightsPortName), _output(this, outputPortName, 0)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _filterWeights(this, {}, filterWeightsPortName), _output(this, defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType>
     DiagonalConvolutionNode<ValueType>::DiagonalConvolutionNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortElements<ValueType>& filterWeights, const model::PortMemoryLayout& outputMemoryLayout, const predictors::neural::ConvolutionalParameters& convolutionalParameters)
-        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, inputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, outputPortName, GetDiagonalConvolutionOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _convolutionalParameters(convolutionalParameters)
+        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, GetDiagonalConvolutionOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _convolutionalParameters(convolutionalParameters)
     {
     }
 

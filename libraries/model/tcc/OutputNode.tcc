@@ -12,15 +12,15 @@ namespace model
 {
     template <typename ValueType>
     OutputNode<ValueType>::OutputNode()
-        : OutputNodeBase(_input, _output, OutputShape{ 0, 0, 0 }), _input(this, {}, inputPortName), _output(this, outputPortName, 0) {};
+        : OutputNodeBase(_input, _output, OutputShape{ 0, 0, 0 }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0) {};
 
     template <typename ValueType>
     OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input)
-        : OutputNodeBase(_input, _output, OutputShape{ input.Size(), 1, 1 }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()) {};
+        : OutputNodeBase(_input, _output, OutputShape{ input.Size(), 1, 1 }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size()) {};
 
     template <typename ValueType>
     OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input, const OutputShape& shape)
-        : OutputNodeBase(_input, _output, shape), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()) {};
+        : OutputNodeBase(_input, _output, shape), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size()) {};
 
     template <typename ValueType>
     void OutputNode<ValueType>::Compute() const
@@ -40,7 +40,7 @@ namespace model
     void OutputNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver[shapeName] << static_cast<std::vector<size_t>>(GetShape());
     }
 
@@ -48,7 +48,7 @@ namespace model
     void OutputNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
         std::vector<size_t> shapeVector; 
         archiver[shapeName] >> shapeVector;
         _output.SetSize(_input.Size());

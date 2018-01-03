@@ -24,13 +24,13 @@ namespace nodes
 {
     template <typename SplitRuleType, typename EdgePredictorType>
     ForestPredictorNode<SplitRuleType, EdgePredictorType>::ForestPredictorNode(const model::PortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest)
-        : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
+        : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
     {
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
     ForestPredictorNode<SplitRuleType, EdgePredictorType>::ForestPredictorNode()
-        : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, 0), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, 0)
+        : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1), _treeOutputs(this, treeOutputsPortName, 0), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, 0)
     {
     }
 
@@ -38,7 +38,7 @@ namespace nodes
     void ForestPredictorNode<SplitRuleType, EdgePredictorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver["forest"] << _forest;
     }
 
@@ -46,7 +46,7 @@ namespace nodes
     void ForestPredictorNode<SplitRuleType, EdgePredictorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
         archiver["forest"] >> _forest;
 
         _treeOutputs.SetSize(_forest.NumTrees());

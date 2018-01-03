@@ -36,13 +36,13 @@ namespace nodes
 
     template <typename ValueType>
     NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
+        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType>
     NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode(const model::PortElements<ValueType>& input, const PredictorType& predictor)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, GetShapeSize(predictor.GetOutputShape())), _predictor(predictor)
+        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetShapeSize(predictor.GetOutputShape())), _predictor(predictor)
     {
         assert(input.Size() == GetShapeSize(_predictor.GetInputShape()));
     }
@@ -51,7 +51,7 @@ namespace nodes
     void NeuralNetworkPredictorNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver["predictor"] << _predictor;
     }
 
@@ -60,7 +60,7 @@ namespace nodes
     {
         PredictorType::RegisterNeuralNetworkPredictorTypes(archiver.GetContext());
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
         archiver["predictor"] >> _predictor;
     }
 

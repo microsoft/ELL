@@ -35,8 +35,6 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr const char* inputPortName = "input";
-        static constexpr const char* outputPortName = "output";
         static constexpr const char* treeOutputsPortName = "treeOutputs";
         static constexpr const char* edgeIndicatorVectorPortName = "edgeIndicatorVector";
         const model::InputPort<double>& input = _input;

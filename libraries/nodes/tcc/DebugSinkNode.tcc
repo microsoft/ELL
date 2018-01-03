@@ -16,13 +16,13 @@ namespace ell
     {
         template <typename ValueType>
         DebugSinkNode<ValueType>::DebugSinkNode()
-            : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _userData(nullptr)
+            : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _userData(nullptr)
         {
         }
 
         template <typename ValueType>
         DebugSinkNode<ValueType>::DebugSinkNode(const model::PortElements<ValueType>& input, DebugSinkFunction<ValueType> sink, const std::string& label, void* userData, const std::string& sinkFunctionName)
-            : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _label(label), _userData(userData), _sinkFunctionName(sinkFunctionName), _sink(std::move(sink))
+            : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _label(label), _userData(userData), _sinkFunctionName(sinkFunctionName), _sink(std::move(sink))
         {
         }
 
@@ -92,7 +92,7 @@ namespace ell
         void DebugSinkNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
         {
             Node::WriteToArchive(archiver);
-            archiver[inputPortName] << _input;
+            archiver[defaultInputPortName] << _input;
             archiver["sinkFunctionName"] << _sinkFunctionName;
         }
 
@@ -100,7 +100,7 @@ namespace ell
         void DebugSinkNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
         {
             Node::ReadFromArchive(archiver);
-            archiver[inputPortName] >> _input;
+            archiver[defaultInputPortName] >> _input;
             archiver["sinkFunctionName"] >> _sinkFunctionName;
             // _sink needs to be set separately
         }

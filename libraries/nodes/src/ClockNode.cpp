@@ -33,8 +33,8 @@ namespace nodes
 
     ClockNode::ClockNode(const model::PortElements<TimeTickType>& input, TimeTickType interval, TimeTickType lagThreshold, const std::string& functionName, LagNotificationFunction function)
         : CompilableNode({ &_input }, { &_output }),
-        _input(this, input, inputPortName),
-        _output(this, outputPortName, 2 /*sampleTime, currentTime*/),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, 2 /*sampleTime, currentTime*/),
         _interval(interval),
         _lastIntervalTime(UninitializedIntervalTime),
         _lagThreshold(lagThreshold),
@@ -159,8 +159,8 @@ namespace nodes
     void ClockNode::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
+        archiver[defaultInputPortName] << _input;
+        archiver[defaultOutputPortName] << _output;
 
         archiver["interval"] << _interval;
         archiver["lagThreshold"] << _lagThreshold;
@@ -170,8 +170,8 @@ namespace nodes
     void ClockNode::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
+        archiver[defaultInputPortName] >> _input;
+        archiver[defaultOutputPortName] >> _output;
 
         archiver["interval"] >> _interval;
         archiver["lagThreshold"] >> _lagThreshold;

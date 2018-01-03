@@ -95,14 +95,14 @@ namespace nodes
                                                                                                        const model::PortMemoryLayout& outputMemoryLayout)
         : CompilableNode({ &_input, &_updateWeights, &_resetWeights, &_hiddenWeights, &_updateBias, &_resetBias, &_hiddenBias },
                          { &_output }),
-          _input(this, input, inputPortName),
+          _input(this, input, defaultInputPortName),
           _updateWeights(this, updateWeights, updateWeightsPortName),
           _resetWeights(this, resetWeights, resetWeightsPortName),
           _hiddenWeights(this, hiddenWeights, hiddenWeightsPortName),
           _updateBias(this, updateBias, updateBiasPortName),
           _resetBias(this, resetBias, resetBiasPortName),
           _hiddenBias(this, hiddenBias, hiddenBiasPortName),
-          _output(this, outputPortName, updateBias.Size())
+          _output(this, defaultOutputPortName, updateBias.Size())
     {
     }
 

@@ -294,7 +294,6 @@ namespace nodes
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* primaryInputPortName = "primaryInput";
-        static constexpr const char* outputPortName = "output";
         const model::InputPort<ValueType>& primaryInput = _primaryInput;
         const model::OutputPort<ValueType>& output = _output;
         /// @}
@@ -371,7 +370,6 @@ namespace nodes
         /// @{
         static constexpr const char* primaryInputPortName = "primaryInput";
         static constexpr const char* secondaryInputPortName = "secondaryInput";
-        static constexpr const char* outputPortName = "output";
         const model::InputPort<ValueType>& primaryInput = _primaryInput;
         const model::InputPort<ValueType>& secondaryInput = _secondaryInput;
         const model::OutputPort<ValueType>& output = _output;
@@ -452,7 +450,6 @@ namespace nodes
         static constexpr const char* primaryInputPortName = "primaryInput";
         static constexpr const char* secondaryInput1PortName = "secondaryInput1";
         static constexpr const char* secondaryInput2PortName = "secondaryInput2";
-        static constexpr const char* outputPortName = "output";
         const model::InputPort<ValueType>& primaryInput = _primaryInput;
         const model::InputPort<ValueType>& secondaryInput1 = _secondaryInput1;
         const model::InputPort<ValueType>& secondaryInput2 = _secondaryInput2;

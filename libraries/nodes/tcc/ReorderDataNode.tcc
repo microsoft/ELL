@@ -22,13 +22,13 @@ namespace nodes
     //
     template <typename ValueType>
     ReorderDataNode<ValueType>::ReorderDataNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType>
     ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, outputMemoryLayout.GetMemorySize()), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _outputDimensionOrder({}), _paddingValue(paddingValue)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout.GetMemorySize()), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _outputDimensionOrder({}), _paddingValue(paddingValue)
     {
         assert(_inputMemoryLayout.NumDimensions() == _outputMemoryLayout.NumDimensions());
         int numDimensions = _outputMemoryLayout.NumDimensions();
@@ -41,7 +41,7 @@ namespace nodes
 
     template <typename ValueType>
     ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const std::vector<int>& order, ValueType paddingValue)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, outputMemoryLayout.GetMemorySize()), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _outputDimensionOrder(order), _paddingValue(paddingValue)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout.GetMemorySize()), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _outputDimensionOrder(order), _paddingValue(paddingValue)
     {
         assert(_inputMemoryLayout.NumDimensions() == _outputMemoryLayout.NumDimensions());
         assert(_inputMemoryLayout.NumDimensions() == _outputDimensionOrder.size());
@@ -176,7 +176,7 @@ namespace nodes
     void ReorderDataNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         CompilableNode::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver["inputLayout"] << _inputMemoryLayout;
         archiver["outputLayout"] << _outputMemoryLayout;
         archiver["order"] << _outputDimensionOrder;
@@ -187,7 +187,7 @@ namespace nodes
     void ReorderDataNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         CompilableNode::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
         archiver["inputLayout"] >> _inputMemoryLayout;
         archiver["outputLayout"] >> _outputMemoryLayout;
         archiver["order"] >> _outputDimensionOrder;

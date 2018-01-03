@@ -36,8 +36,8 @@ namespace nodes
     template <typename ValueType>
     SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const math::TensorShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
         : model::SinkNodeBase(_input, _output, shape, sinkFunctionName),
-        _input(this, input, inputPortName),
-        _output(this, outputPortName, shape.Size()),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, shape.Size()),
         _sink(sink == nullptr ? [](const auto&){} : sink)
     {
     }
@@ -127,7 +127,7 @@ namespace nodes
     void SinkNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver["sinkFunctionName"] << GetCallbackName();
         archiver["shape"] << static_cast<std::vector<size_t>>(GetShape());
     }
@@ -136,7 +136,7 @@ namespace nodes
     void SinkNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
 
         std::string sinkFunctionName;
         archiver["sinkFunctionName"] >> sinkFunctionName;

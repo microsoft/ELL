@@ -35,6 +35,11 @@ namespace model
     class Node : public utilities::IArchivable
     {
     public:
+        static constexpr const char* defaultOutputPortName = "output";
+        static constexpr const char* defaultInputPortName = "input";
+        static constexpr const char* defaultInput1PortName = "input1";
+        static constexpr const char* defaultInput2PortName = "input2";
+
         Node() = default;
         ~Node() override = default;
 

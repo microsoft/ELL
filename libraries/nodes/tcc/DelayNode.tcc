@@ -12,7 +12,7 @@ namespace nodes
 {
     template <typename ValueType>
     DelayNode<ValueType>::DelayNode(const model::PortElements<ValueType>& input, size_t windowSize)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _windowSize(windowSize)
     {
         auto dimension = input.Size();
         for (size_t index = 0; index < windowSize; ++index)
@@ -23,7 +23,7 @@ namespace nodes
 
     template <typename ValueType>
     DelayNode<ValueType>::DelayNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _windowSize(0)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _windowSize(0)
     {
     }
 
@@ -72,7 +72,7 @@ namespace nodes
     void DelayNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver["windowSize"] << _windowSize;
     }
 
@@ -80,7 +80,7 @@ namespace nodes
     void DelayNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
         archiver["windowSize"] >> _windowSize;
 
         auto dimension = _input.Size();

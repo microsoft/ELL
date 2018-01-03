@@ -12,13 +12,13 @@ namespace nodes
 {
     template <typename ValueType>
     MovingVarianceNode<ValueType>::MovingVarianceNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _windowSize(0)
+        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _windowSize(0)
     {
     }
 
     template <typename ValueType>
     MovingVarianceNode<ValueType>::MovingVarianceNode(const model::PortElements<ValueType>& input, size_t windowSize)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
+        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _windowSize(windowSize)
     {
         auto dimension = _input.Size();
         for (size_t index = 0; index < _windowSize; ++index)
@@ -61,7 +61,7 @@ namespace nodes
     void MovingVarianceNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver["windowSize"] << _windowSize;
     }
 
@@ -69,7 +69,7 @@ namespace nodes
     void MovingVarianceNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
         archiver["windowSize"] >> _windowSize;
 
         auto dimension = _input.Size();

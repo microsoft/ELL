@@ -417,13 +417,13 @@ namespace nodes
     //
     template <typename ValueType>
     ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _filterWidth(0), _stride(0), _convolutionPadding(0), _dataOrder({0, 1, 2}), _outputWidth(0), _outputHeight(0)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filterWidth(0), _stride(0), _convolutionPadding(0), _dataOrder({0, 1, 2}), _outputWidth(0), _outputHeight(0)
     {
     }
 
     template <typename ValueType>
     ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, size_t filterWidth, size_t stride, size_t convolutionPadding, std::array<int, 3> dataOrder, size_t outputWidth, size_t outputHeight)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, filterWidth * filterWidth * inputMemoryLayout.GetActiveSize(2) * outputWidth * outputHeight), _inputMemoryLayout(inputMemoryLayout), _filterWidth(filterWidth), _stride(stride), _convolutionPadding(convolutionPadding), _dataOrder(dataOrder), _outputWidth(outputWidth), _outputHeight(outputHeight)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, filterWidth * filterWidth * inputMemoryLayout.GetActiveSize(2) * outputWidth * outputHeight), _inputMemoryLayout(inputMemoryLayout), _filterWidth(filterWidth), _stride(stride), _convolutionPadding(convolutionPadding), _dataOrder(dataOrder), _outputWidth(outputWidth), _outputHeight(outputHeight)
     {
     }
 
@@ -458,8 +458,8 @@ namespace nodes
     void ReceptiveFieldMatrixNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
+        archiver[defaultInputPortName] << _input;
+        archiver[defaultOutputPortName] << _output;
         archiver["inputLayout"] << _inputMemoryLayout;
 
         archiver["filterWidth"] << _filterWidth;
@@ -477,8 +477,8 @@ namespace nodes
     void ReceptiveFieldMatrixNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
+        archiver[defaultInputPortName] >> _input;
+        archiver[defaultOutputPortName] >> _output;
         archiver["inputLayout"] >> _inputMemoryLayout;
 
         archiver["filterWidth"] >> _filterWidth;

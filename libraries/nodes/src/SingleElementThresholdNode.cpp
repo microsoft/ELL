@@ -18,12 +18,12 @@ namespace ell
 namespace nodes
 {
     SingleElementThresholdNode::SingleElementThresholdNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
+        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1)
     {
     }
 
     SingleElementThresholdNode::SingleElementThresholdNode(const model::PortElements<double>& input, const SingleElementThresholdPredictor& predictor)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
+        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _predictor(predictor)
     {
         assert(input.Size() > predictor.GetElementIndex());
     }
@@ -31,14 +31,14 @@ namespace nodes
     void SingleElementThresholdNode::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver["predictor"] << _predictor;
     }
 
     void SingleElementThresholdNode::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
         archiver["predictor"] >> _predictor;
     }
 

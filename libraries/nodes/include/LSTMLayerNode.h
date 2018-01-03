@@ -37,9 +37,7 @@ namespace nodes
         /// @name Input and Output Ports
         /// @{
         using BaseType::input;
-        using BaseType::inputPortName; // "input"
         using BaseType::output;
-        using BaseType::outputPortName; // "output"
         /// @}
 
         LSTMLayerNode() = default;
@@ -78,7 +76,6 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr const char* inputPortName = "input";
         static constexpr const char* inputWeightsPortName = "inputWeights";
         static constexpr const char* forgetMeWeightsPortName = "forgetMeWeights";
         static constexpr const char* candidateWeightsPortName = "candidateWeights";
@@ -87,7 +84,6 @@ namespace nodes
         static constexpr const char* forgetMeBiasPortName = "forgetMeBias";
         static constexpr const char* candidateBiasPortName = "candidateBias";
         static constexpr const char* outputBiasPortName = "outputBias";
-        static constexpr const char* outputPortName = "output";
         const model::InputPort<ValueType>& input = _input;
         const model::InputPort<ValueType>& inputWeights = _inputWeights;
         const model::InputPort<ValueType>& forgetMeWeights = _forgetMeWeights;

@@ -30,8 +30,6 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr const char* inputPortName = "input";
-        static constexpr const char* outputPortName = "output";
         static constexpr const char* weightedElementsPortName = "weightedElements";
         const model::InputPort<ElementType>& input = _input;
         const model::OutputPort<ElementType>& output = _output;

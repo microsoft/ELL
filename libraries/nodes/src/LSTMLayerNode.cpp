@@ -84,7 +84,7 @@ namespace nodes
     LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::LSTMNode()
         : CompilableNode({ &_input, &_inputWeights, &_forgetMeWeights, &_candidateWeights, &_outputWeights, &_inputBias, &_forgetMeBias, &_candidateBias, &_outputBias },
                          { &_output }),
-          _input(this, {}, inputPortName),
+          _input(this, {}, defaultInputPortName),
           _inputWeights(this, {}, inputWeightsPortName),
           _forgetMeWeights(this, {}, forgetMeWeightsPortName),
           _candidateWeights(this, {}, candidateWeightsPortName),
@@ -93,7 +93,7 @@ namespace nodes
           _forgetMeBias(this, {}, forgetMeBiasPortName),
           _candidateBias(this, {}, candidateBiasPortName),
           _outputBias(this, {}, outputBiasPortName),
-          _output(this, outputPortName, 0)
+          _output(this, defaultOutputPortName, 0)
     {
     }
 
@@ -111,7 +111,7 @@ namespace nodes
                                                                                                          const model::PortMemoryLayout& outputMemoryLayout)
         : CompilableNode({ &_input, &_inputWeights, &_forgetMeWeights, &_candidateWeights, &_outputWeights, &_inputBias, &_forgetMeBias, &_candidateBias, &_outputBias },
                          { &_output }),
-          _input(this, input, inputPortName),
+          _input(this, input, defaultInputPortName),
           _inputWeights(this, inputWeights, inputWeightsPortName),
           _forgetMeWeights(this, forgetMeWeights, forgetMeWeightsPortName),
           _candidateWeights(this, candidateWeights, candidateWeightsPortName),
@@ -120,7 +120,7 @@ namespace nodes
           _forgetMeBias(this, forgetMeBias, forgetMeBiasPortName),
           _candidateBias(this, candidateBias, candidateBiasPortName),
           _outputBias(this, outputBias, outputBiasPortName),
-          _output(this, outputPortName, inputBias.Size())
+          _output(this, defaultOutputPortName, inputBias.Size())
     {
     }
 

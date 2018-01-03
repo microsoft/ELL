@@ -124,13 +124,13 @@ namespace nodes
 
     template <typename ValueType>
     UnaryOperationNode<ValueType>::UnaryOperationNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _operation(emitters::UnaryOperationType::none)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _operation(emitters::UnaryOperationType::none)
     {
     }
 
     template <typename ValueType>
     UnaryOperationNode<ValueType>::UnaryOperationNode(const model::PortElements<ValueType>& input, emitters::UnaryOperationType operation)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _operation(operation)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _operation(operation)
     {
     }
 
@@ -272,7 +272,7 @@ namespace nodes
     void UnaryOperationNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver["operation"] << UnaryOperations::to_string(_operation);
     }
 
@@ -280,7 +280,7 @@ namespace nodes
     void UnaryOperationNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
         std::string operation;
         archiver["operation"] >> operation;
         _operation = UnaryOperations::from_string(operation);

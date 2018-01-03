@@ -87,13 +87,13 @@ namespace nodes
 
     template <typename ValueType>
     BinaryPredicateNode<ValueType>::BinaryPredicateNode()
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _predicate(emitters::BinaryPredicateType::none)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, defaultInput1PortName), _input2(this, {}, defaultInput2PortName), _output(this, defaultOutputPortName, 0), _predicate(emitters::BinaryPredicateType::none)
     {
     }
 
     template <typename ValueType>
     BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, emitters::BinaryPredicateType predicate)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _predicate(predicate)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, _input1.Size()), _predicate(predicate)
     {
         if (input1.Size() != input2.Size())
         {
@@ -207,8 +207,8 @@ namespace nodes
     void BinaryPredicateNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[input1PortName] << _input1;
-        archiver[input2PortName] << _input2;
+        archiver[defaultInput1PortName] << _input1;
+        archiver[defaultInput2PortName] << _input2;
         archiver["predicate"] << BinaryPredicates::to_string(_predicate);
     }
 
@@ -216,8 +216,8 @@ namespace nodes
     void BinaryPredicateNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[input1PortName] >> _input1;
-        archiver[input2PortName] >> _input2;
+        archiver[defaultInput1PortName] >> _input1;
+        archiver[defaultInput2PortName] >> _input2;
         std::string predicate;
         archiver["predicate"] >> predicate;
         _predicate = BinaryPredicates::from_string(predicate);

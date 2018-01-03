@@ -64,7 +64,7 @@ namespace nodes
     //
     template <typename ValueType, template <typename> class ActivationFunctionType>
     RecurrentNode<ValueType, ActivationFunctionType>::RecurrentNode()
-        : CompilableNode({ &_input, &_hiddenWeights, &_hiddenBias }, { &_output }), _input(this, {}, inputPortName), _hiddenWeights(this, {}, hiddenWeightsPortName), _hiddenBias(this, {}, hiddenBiasPortName), _output(this, outputPortName, 0)
+        : CompilableNode({ &_input, &_hiddenWeights, &_hiddenBias }, { &_output }), _input(this, {}, defaultInputPortName), _hiddenWeights(this, {}, hiddenWeightsPortName), _hiddenBias(this, {}, hiddenBiasPortName), _output(this, defaultOutputPortName, 0)
     {
     }
 
@@ -75,10 +75,10 @@ namespace nodes
                                                                                   const model::PortMemoryLayout& inputMemoryLayout,
                                                                                   const model::PortMemoryLayout& outputMemoryLayout)
         : CompilableNode({ &_input, &_hiddenWeights, &_hiddenBias }, { &_output }),
-          _input(this, input, inputPortName),
+          _input(this, input, defaultInputPortName),
           _hiddenWeights(this, hiddenWeights, hiddenWeightsPortName),
           _hiddenBias(this, hiddenBias, hiddenBiasPortName),
-          _output(this, outputPortName, hiddenBias.Size())
+          _output(this, defaultOutputPortName, hiddenBias.Size())
     {
     }
 

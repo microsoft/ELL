@@ -39,7 +39,6 @@ namespace nodes
         /// @{
         static constexpr const char* elementsPortName = "elements";
         static constexpr const char* selectorPortName = "selector";
-        static constexpr const char* outputPortName = "output";
         const model::InputPort<ValueType>& elements = _elements;
         const model::InputPort<SelectorType>& selector = _selector;
         const model::OutputPort<ValueType>& output = _output;

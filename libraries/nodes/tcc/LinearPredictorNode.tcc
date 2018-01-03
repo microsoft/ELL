@@ -28,13 +28,13 @@ namespace nodes
 {
     template <typename ElementType>
     LinearPredictorNode<ElementType>::LinearPredictorNode()
-        : Node({ &_input }, { &_output, &_weightedElements }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _weightedElements(this, weightedElementsPortName, 0)
+        : Node({ &_input }, { &_output, &_weightedElements }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1), _weightedElements(this, weightedElementsPortName, 0)
     {
     }
 
     template <typename ElementType>
     LinearPredictorNode<ElementType>::LinearPredictorNode(const model::PortElements<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor)
-        : Node({ &_input }, { &_output, &_weightedElements }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _weightedElements(this, weightedElementsPortName, input.Size()), _predictor(predictor)
+        : Node({ &_input }, { &_output, &_weightedElements }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _weightedElements(this, weightedElementsPortName, input.Size()), _predictor(predictor)
     {
         assert(input.Size() == predictor.Size());
     }
@@ -43,7 +43,7 @@ namespace nodes
     void LinearPredictorNode<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
+        archiver[defaultInputPortName] << _input;
         archiver["weightedElements"] << _weightedElements;
         archiver["predictor"] << _predictor;
     }
@@ -52,7 +52,7 @@ namespace nodes
     void LinearPredictorNode<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
+        archiver[defaultInputPortName] >> _input;
         archiver["weightedElements"] >> _weightedElements;
         archiver["predictor"] >> _predictor;
     }
