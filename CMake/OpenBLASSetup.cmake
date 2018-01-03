@@ -130,7 +130,7 @@ else()
 endif()
 
 if(NOT WIN32)
-    ## Note: libopenblas installs on ubuntu in /usr/lib and /usr/include or typically /opt if it's customly installed
+    ## Note: libopenblas installs on ubuntu in /usr/lib and /usr/include or typically /opt if it's manually installed
     ## Note: libopenblas installs on openSUSE in /usr/lib64 and /usr/include/openblas
     set(BLAS_INCLUDE_SEARCH_PATHS
         /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/

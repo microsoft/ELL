@@ -12,14 +12,32 @@ This is a tutorial for those of you who really want to run ELL on a Raspberry Pi
 
 ## Basic Pi Setup
 
-### Power Adapter and Power Cable
-AI workloads guzzle power, so be sure to use a high quality power supply. If you use a USB power adapter and micro USB cable, choose an adapter rated for at least 12 Watts (2.4 Amps) per USB port. We've had good experience with 12W-per-port USB power adapters from Apple, Anker, and Amazon Basics. Long and thin micro USB cables will often result in a noticeable voltage drop and fail to provide sufficient power to the Raspberry Pi. For a few extra dollars you can get a nice name-brand cable, like the Anker PowerLine, and save yourself a lot of frustration.
-
 ### Operating System
 Our tutorials assume that the operating system running on your Pi is *Raspbian Jessie* ([NOOBS](https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2017-07-05/) or [image](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/)), not the more recent *Raspbian Stretch*.
 
 ### Network
 Connect your Pi to the network, either over Wifi or with an Ethernet cable. We will use the network both to download required software to the Pi and to transfer compiled ELL models from your computer to the Pi. Raspberry Pi Zero has a Wifi module on board which makes it easy to connect over Wifi. If you are using a Raspberry Pi Zero with no integrated Wifi module, you may have to connect your board via a Ethernet cable or install a third part wifi dongle.
+
+### Increase swap file size on Raspberry Pi Zero
+We will build a few packages from source on our Raspberry Pi Zero. It's suggested to increase the swap file size on your Raspberry Pi Zero to avoid memory issue during your installation. 
+Start this by editing the swap space configuration file:
+
+```shell
+sudo nano /etc/dphys-swapfile
+```
+
+Add the following line to the opened configuration file:
+
+```shell
+CONF_SWAPSIZE=1024
+```
+
+Save the file and reload the swap space configuration by type the following commands:
+
+```shell
+sudo /etc/init.d/dphys-swapfile stop
+sudo /etc/init.d/dphys-swapfile start
+```
 
 ### CMake
 We use CMake on the Raspberry Pi to create Python modules that can be called from our tutorial code. To install CMake on your Pi, connect to the network, open a terminal window, and type
@@ -30,9 +48,9 @@ sudo apt-get install -y cmake
 ```
 
 ### Python 3.4 installation
-Our tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). Since the last Conda support for ARMV6 is not actively maintained, here we install python 3.4 directly into our system path. We will also install pip3 which is a python package management tool.
+Our tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). Since the last Conda support for ARMV6 is not actively maintained, here we install Python 3.4 directly into our system path. We will also install pip3 which is a python package management tool.
 
-To install python 3.4 on your Raspbian Jessie, type the following:
+To install Python 3.4 on your Raspbian Jessie, type the following:
 
 ```shell
 sudo apt-get install python3 python3-dev
@@ -41,9 +59,11 @@ sudo python3 get-pip.py
 ```
 
 ### OpenBLAS
-OpenBLAS is a library for fast linear algebra operations, which can significantly increase the speed of your models. It is optional, but highly recommended. To install OpenBLAS, type the following.
+OpenBLAS is a library for fast linear algebra operations, which can significantly increase the speed of your models. It is optional, but highly recommended.
 
 You should not use the libopenblas-dev from the Raspbian distribution channel. Instead, build it from the source to make sure it's built for ARMV6 which is our Raspberry Pi Zero runs on. 
+
+To install OpenBLAS, type the following.
 
 ```shell
 git clone https://github.com/xianyi/OpenBLAS.git OpenBLAS
@@ -58,6 +78,7 @@ The whole build process will take about 4-5 hours. The above steps will install 
 Numpy is a numerical processing package required by OpenCV and our tutorial. Here we will install a copy of Numpy package which uses the OpenBlas we installed in the last step:
 
 ```shell
+cd ~
 git clone https://github.com/numpy/numpy.git numpy
 cd numpy
 ```
@@ -78,12 +99,16 @@ lapack_libs = openblas
 library_dirs = /opt/OpenBLAS/lib
 ```
 
-now still under the same directory, runt he following commands:
+now still under the same directory, run the following commands:
 
 ```shell
+sudo pip3 install cython -v
+sudo apt-get install -y gfortran
 python3 setup.py build --fcompiler=gnu95
-python3 setup.py install
+sudo python3 setup.py install
 ```
+
+The cython will take a while to install on Raspberry Pi Zero W, so keep patient.
 
 ### curl
 `curl` is a command line tool used to transfer data via URL. When files are required to be downloaded from a URL, the instructions assume you have `curl` available to perform the download. To install `curl`, type the following:
@@ -94,12 +119,12 @@ sudo apt-get install -y curl
 Remember to run `python3 xxxx.py` when you run any python scripts from ELL tutorial.
 
 ### OpenCV
-[OpenCV](http://opencv.org/) is a computer vision library that enables us to read images from a camera, resize them, and prepare them for processing by ELL. We cannot install it easily through Conda like we do for Raspberry Pi 3 since we don't have a conda tool here, so we have to install it manually again. Now take a deep breath, this will take you lots of time.
+[OpenCV](http://opencv.org/) is a computer vision library that enables us to read images from a camera, resize them, and prepare them for processing by ELL. We cannot install it easily through Anaconda like we do for Raspberry Pi 3 since we don't have a Anaconda tool here, so we have to install it manually again. Now take a deep breath, this will take you lots of time.
 
 Before we start building OpenCV source, we need to install a few tools. Install them by following the steps below:
 
 ```shell
-sudo apt-get install build-essential pkg-config
+sudo apt-get install build-essential pkg-config -y
 sudo apt-get install libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev
 sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
 sudo apt-get install libxvidcore-dev libx264-dev
