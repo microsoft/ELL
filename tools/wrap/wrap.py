@@ -58,6 +58,7 @@ class ModuleBuilder:
             "    python   (default)\n"
             "    cpp\n"
             "\nThe supported target platforms are:\n"
+            "    pi0      Raspberry Pi 0\n"
             "    pi3      Raspberry Pi 3\n"
             "    aarch64  arm64 Linux, works on Qualcomm DragonBoards\n"
             "    host     (default) your host computer architecture\n")
@@ -67,7 +68,7 @@ class ModuleBuilder:
 
         # optional arguments
         arg_parser.add_argument("--language", "-lang", help="the language for the ELL module", choices=["python", "cpp"], default=self.language)
-        arg_parser.add_argument("--target", "-target", help="the target platform", choices=["pi3", "orangepi0", "pi3_64", "aarch64", "host"], default=self.target)
+        arg_parser.add_argument("--target", "-target", help="the target platform", choices=["pi3", "pi0", "orangepi0", "pi3_64", "aarch64", "host"], default=self.target)
         arg_parser.add_argument("--outdir", "-outdir", help="the output directory")
         arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
         arg_parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
