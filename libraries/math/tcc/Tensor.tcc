@@ -387,7 +387,9 @@ namespace math
 
         for (size_t i = 0; i < math::NumSlices<dimension0, otherDimension0>(*this); ++i)
         {
-            GetSlice<dimension0, otherDimension0>(i).CopyFrom(GetSlice<dimension0, otherDimension0>(other, i));
+            auto thisSlice = GetSlice<dimension0, otherDimension0>(i);
+            auto otherSlice = other.template GetSlice<dimension0, otherDimension0>(i);
+            thisSlice.CopyFrom(otherSlice);
         }
     }
 
@@ -521,17 +523,8 @@ namespace math
     Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other)
         : TensorRef(TensorShape{ other.NumRows(), other.NumColumns(), other.NumChannels() }), _data(other.Size())
     {
-         this->_pData = _data.data();
-        for (size_t i = 0; i < this->NumRows(); ++i)
-        {
-            for (size_t j = 0; j < this->NumColumns(); ++j)
-            {
-                for (size_t k = 0; k < this->NumChannels(); ++k)
-                {
-                    (*this)(i, j, k) = other(i, j, k);
-                }
-            }
-        }
+        this->_pData = _data.data();
+        this->CopyFrom(other);
     }
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>

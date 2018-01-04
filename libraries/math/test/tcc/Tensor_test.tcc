@@ -339,6 +339,9 @@ void TestTensorCopyFrom()
     math::Tensor<ElementType, dimension0, dimension1, dimension2> S(2, 3, 4);
     S.CopyFrom(T);
 
+    math::Tensor<ElementType, math::Dimension::column, math::Dimension::row, math::Dimension::channel> S2(2, 3, 4);
+    S2.CopyFrom(T);
+
     auto M = math::Tensor<ElementType, dimension0, dimension1, dimension2>
     {
         { { 1,2,3,4 },{ 5,6,7,8 },{ 9,0,1,2 } },
@@ -359,7 +362,7 @@ void TestTensorCopyFrom()
         { { 3,4,5,6 },{ 7,8,4,5 },{ 1,2,7,8 } }
     };
 
-    testing::ProcessTest("TensorReference::CopyFrom", S == T && M == R);
+    testing::ProcessTest("TensorReference::CopyFrom", S == T &&  S2 == T && M == R);
 }
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
