@@ -3,7 +3,6 @@
 #
 include(CommonInterfaces)
 
-find_package(PythonInterp)
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(OBJECT_EXTENSION obj)
     set(ADDITIONAL_DISTUTILS_FLAGS "--plat-name=win-amd64 install")

@@ -2,8 +2,7 @@
 # cmake file
 #
 
-find_package(PythonInterp)
-if(${PYTHONINTERP_FOUND})
+if(${PYTHON_ENABLED})
   set(test_name ell-python-interface-test)
 
   file(GLOB test_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
@@ -23,4 +22,5 @@ if(${PYTHONINTERP_FOUND})
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMAND ${PYTHON_EXECUTABLE} test.py)
   set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
-endif()
+
+endif()  # PYTHON_ENABLED

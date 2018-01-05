@@ -2,9 +2,7 @@
 # cmake file
 #
 
-find_package(PythonInterp)
-find_package(PythonLibs)
-if(${PYTHONLIBS_FOUND})
+if(${PYTHON_ENABLED})
 
     set(module_name "darknet_importer")
 
@@ -20,4 +18,4 @@ if(${PYTHONLIBS_FOUND})
     endforeach()
 
     add_subdirectory(test)
-endif()  # PYTHONLIBS_FOUND
+endif()  # PYTHON_ENABLED

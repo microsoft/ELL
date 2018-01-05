@@ -6,8 +6,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(PYTHON_EXECUTABLE python)
 endif()
 
-find_package(PythonInterp 3.5 QUIET)
-if(${PYTHONINTERP_FOUND})
+if(${PYTHON_ENABLED})
     # test project
 
     set (test_name ${module_name}_test)
@@ -32,4 +31,5 @@ if(${PYTHONINTERP_FOUND})
     endforeach()
 
     add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} -m unittest ${test_src})
-endif()
+
+endif()  # PYTHON_ENABLED

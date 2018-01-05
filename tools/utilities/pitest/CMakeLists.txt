@@ -2,8 +2,7 @@
 # CMake file for Raspberry Pi test tools
 #
 
-find_package(PythonInterp)
-if(${PYTHONINTERP_FOUND})
+if(${PYTHON_ENABLED})
 
     set(module_name "pitest")
     set(test_name ${module_name}_test)
@@ -25,4 +24,4 @@ if(${PYTHONINTERP_FOUND})
         add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${test_src} --cluster ${RPI_CLUSTER} )
     endif(RPI_CLUSTER)
 
-endif(${PYTHONINTERP_FOUND})
+endif()  # PYTHON_ENABLED

@@ -30,8 +30,36 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(BUILD_DOC "Build Doxygen documentation" ON)
 option(STRICT_MODE "Build with 'warnings as errors'" OFF)
 option(PROFILING "Enable performance profiling tests" OFF)
+option(DISABLE_PYTHON "Explicitly disable building python modules" OFF)
 
 set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
+
+if(DISABLE_PYTHON)
+  message(STATUS "Python has been explicitly disabled")
+else()
+  find_package(PythonInterp 3.6 QUIET)
+
+  message(STATUS "PYTHONINTERP_FOUND=${PYTHONINTERP_FOUND}")
+  message(STATUS "PYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}")
+  message(STATUS "PYTHON_VERSION_STRING=${PYTHON_VERSION_STRING}")
+  message(STATUS "PYTHON_VERSION_MAJOR=${PYTHON_VERSION_MAJOR}")
+
+  find_package(PythonLibs 3.6 QUIET)
+
+  message(STATUS "PYTHONLIBS_FOUND=${PYTHONLIBS_FOUND}")
+  message(STATUS "PYTHON_LIBRARIES=${PYTHON_LIBRARIES}")
+  message(STATUS "PYTHON_INCLUDE_PATH=${PYTHON_INCLUDE_PATH}")
+  message(STATUS "PYTHON_INCLUDE_DIRS=${PYTHON_INCLUDE_DIRS}")
+  message(STATUS "PYTHON_DEBUG_LIBRARIES=${PYTHON_DEBUG_LIBRARIES}")
+  message(STATUS "PYTHONLIBS_VERSION_STRING=${PYTHONLIBS_VERSION_STRING}")
+
+  if(${PYTHONLIBS_FOUND})
+    set(PYTHON_ENABLED ON)
+  else()
+    set(PYTHON_ENABLED OFF)
+    message(STATUS "### Python 3.6 or later not found, so python features will be disabled")
+  endif()
+endif()
 
 # Include modules in the CMake directory.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")

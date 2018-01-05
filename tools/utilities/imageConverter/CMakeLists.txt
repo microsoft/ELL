@@ -1,8 +1,6 @@
 #
 # cmake file for compare project
 #
-find_package(PythonInterp 3.5 )
-find_package(PythonLibs 3.5 )
 
 # define project
 set (library_name imageConverter)
@@ -16,9 +14,9 @@ set (include include/LoadImage.h
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 
-if(${PYTHONLIBS_FOUND})
-include_directories(${PYTHON_INCLUDE_PATH})
-endif()
+if(${PYTHON_ENABLED})
+	include_directories(${PYTHON_INCLUDE_PATH})
+endif()  # PYTHON_ENABLED
 
 include_directories(../../../libraries/utilities/include)
 
@@ -32,9 +30,9 @@ endif()
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "tools/utilities")
 
-if(${PYTHONLIBS_FOUND})
-target_link_libraries(${library_name} ${PYTHON_LIBRARIES})
-target_compile_options(${library_name} PRIVATE -DPYTHON_FOUND)
+if(${PYTHON_ENABLED})
+	target_link_libraries(${library_name} ${PYTHON_LIBRARIES})
+	target_compile_options(${library_name} PRIVATE -DPYTHON_FOUND)
 else()
-message(WARNING "Since PYTHONLIBS_FOUND is false, the imageConverter will not function, it will just be a stub")
-endif()  # PYTHONLIBS_FOUND
+	message(WARNING "Python build is disabled, so the imageConverter will not function, it will just be a stub")
+endif()  # PYTHON_ENABLED

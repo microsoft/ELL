@@ -1,6 +1,4 @@
-find_package(PythonInterp)
-find_package(PythonLibs)
-if(${PYTHONLIBS_FOUND})
+if(${PYTHON_ENABLED})
 
     set(module_name "pythonpackage_ell_vision")
 
@@ -18,4 +16,5 @@ if(${PYTHONLIBS_FOUND})
     configure_file(${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/demoHelper.py demoHelper.py COPYONLY)
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/package/ell/vision")
-endif()
+
+endif()  # PYTHON_ENABLED

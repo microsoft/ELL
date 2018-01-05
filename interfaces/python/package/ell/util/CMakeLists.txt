@@ -1,6 +1,4 @@
-find_package(PythonInterp)
-find_package(PythonLibs)
-if(${PYTHONLIBS_FOUND})
+if(${PYTHON_ENABLED})
 
     set(module_name "pythonpackage_ell_util")
 
@@ -25,4 +23,5 @@ if(${PYTHONLIBS_FOUND})
     )
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/package/ell/util")
-endif()
+
+endif()  # PYTHON_ENABLED

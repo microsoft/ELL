@@ -2,8 +2,7 @@
 # cmake file for python model gallery utilities
 #
 
-find_package(PythonInterp)
-if(${PYTHONINTERP_FOUND})
+if(${PYTHON_ENABLED})
 
     set(module_name "pythonlibs_gallery")
 
@@ -25,4 +24,4 @@ if(${PYTHONINTERP_FOUND})
         configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
     endforeach()
 
-endif()  # PYTHONINTERP_FOUND
+endif()  # PYTHON_ENABLED

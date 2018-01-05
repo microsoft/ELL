@@ -1,6 +1,4 @@
-find_package(PythonInterp)
-find_package(PythonLibs)
-if(${PYTHONLIBS_FOUND})
+if(${PYTHON_ENABLED})
 
     set(module_name "pythonpackage")
     
@@ -13,6 +11,7 @@ if(${PYTHONLIBS_FOUND})
     endforeach()
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/package")
-endif()
+
+endif()  # PYTHON_ENABLED
 
 add_subdirectory(ell)

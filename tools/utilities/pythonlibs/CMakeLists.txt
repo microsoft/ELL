@@ -2,8 +2,7 @@
 # cmake file for python utilities
 #
 
-find_package(PythonInterp)
-if(${PYTHONINTERP_FOUND})
+if(${PYTHON_ENABLED})
 
     set(module_name "pythonlibs")
 
@@ -31,4 +30,4 @@ if(${PYTHONINTERP_FOUND})
 
     add_subdirectory(gallery)
 
-endif()  # PYTHONINTERP_FOUND
+endif()  # PYTHON_ENABLED

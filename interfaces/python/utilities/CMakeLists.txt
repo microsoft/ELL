@@ -2,11 +2,7 @@
 # cmake file
 #
 
-find_package(PythonInterp)
-find_package(PythonLibs)
-if(${PYTHONLIBS_FOUND})
-    find_package(PythonInterp)
-
+if(${PYTHON_ENABLED})
     set(module_name "ell_python_utilities")
 
     set(src ell_utilities.py)
@@ -20,4 +16,4 @@ if(${PYTHONLIBS_FOUND})
         configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
     endforeach()
 
-endif()  # PYTHONLIBS_FOUND
+endif()  # PYTHON_ENABLED

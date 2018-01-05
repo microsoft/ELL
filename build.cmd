@@ -19,6 +19,7 @@ set UseVs15=0
 set DEBUG=0
 set Vs14Path=
 set Vs15Path=
+set NOPYTHON=
 set STRICT=
 :parse
 if "%1" == "" goto :step2
@@ -26,6 +27,7 @@ if "%1"=="14" set UseVs14=1
 if "%1"=="15" set UseVs15=1
 if "%1" == "/debug" set DEBUG=1
 if "%1" == "/strict" set STRICT=-DSTRICT_MODE=ON
+if "%1" == "/nopython" set NOPYTHON=-DDISABLE_PYTHON=ON
 shift
 goto :parse
 
@@ -83,7 +85,8 @@ if ERRORLEVEL 1 goto :nodelete
 
 if "!DEBUG!"=="1" dir "%VCToolsInstallDir%\bin\Hostx86\x86\"
 cd build
-cmake -G "!CMakeGenerator!" "!STRICT!" ..
+echo cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" ..
+cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" ..
 if ERRORLEVEL 1 goto :cmakerror
 goto :buildit
 
@@ -103,6 +106,8 @@ for /f "usebackq tokens=1*"  %%i in (`nproc`) do (
 
 cmake --build . --config Release -- /m:!procs!
 if ERRORLEVEL 1 goto :builderror
+
+if NOT "!NOPYTHON!" == "" goto :eof
 
 cmake --build . --target _ELL_python --config Release -- /m:!procs!
 if ERRORLEVEL 1 goto :builderror

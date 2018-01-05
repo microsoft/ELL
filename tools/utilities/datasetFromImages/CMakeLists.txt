@@ -2,8 +2,7 @@
 # CMake file for datasetFromImages utility script
 #
 
-find_package(PythonInterp)
-if(${PYTHONINTERP_FOUND})
+if(${PYTHON_ENABLED})
 
     set(tool_name "datasetFromImages")
 
@@ -20,4 +19,4 @@ if(${PYTHONINTERP_FOUND})
     # put this project in the tools/utilities folder in the IDE 
     set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")
 
-endif()
+endif()  # PYTHON_ENABLED

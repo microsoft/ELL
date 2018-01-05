@@ -2,8 +2,7 @@
 # CMake file for Raspberry Pi test tools
 #
 
-find_package(PythonInterp)
-if(${PYTHONINTERP_FOUND})
+if(${PYTHON_ENABLED})
 
     set(module_name "remoterun")
 
@@ -18,4 +17,4 @@ if(${PYTHONINTERP_FOUND})
         configure_file(${FILE} ${FILE} COPYONLY)
     endforeach()
   
-endif()  # PYTHONINTERP_FOUND
+endif()  # PYTHON_ENABLED
