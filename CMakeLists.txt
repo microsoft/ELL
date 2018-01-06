@@ -28,6 +28,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # (so if we're running cmake from a 'build' directory inside the main directory, do this:
 #      cmake -DBUILD_DOCS=OFF ..  )
 option(BUILD_DOC "Build Doxygen documentation" ON)
+option(USE_COMPILER_CACHE "Use a compiler cache (ccache) to speed up build times" $ENV{CMAKE_COMPILER_CACHE})
 option(STRICT_MODE "Build with 'warnings as errors'" OFF)
 option(PROFILING "Enable performance profiling tests" OFF)
 option(DISABLE_PYTHON "Explicitly disable building python modules" OFF)
@@ -110,6 +111,11 @@ include(LLVMSetup)
 include(SWIGSetup)
 include(CopySharedLibraries)
 include(AddPrecompiledHeader)
+include(CompilerCache)
+
+if(USE_COMPILER_CACHE)
+  use_compiler_cache()
+endif()
 
 # Print helpful message if LLVM not found on Windows
 if(NOT LLVM_FOUND AND WIN32)
