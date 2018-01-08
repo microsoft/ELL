@@ -183,12 +183,10 @@ The models expect input in a certain shape. For each model, get this shape and s
     input_shapes = [model.get_default_input_shape() for model in models]
 ```
 
-Create arrays for each model's output.
+Create an array to hold each model's output.
 
 ```python
-    prediction_arrays = [
-        model.FloatVector(model.get_default_output_shape().Size()) for model in
-        models]
+    prediction_arrays = []
 ```
 
 Create a tiled image that will be used to display the two frames side-by-side. This function is provided by the helper module that we imported earlier.
@@ -225,10 +223,10 @@ For each model, prepare the image as input to the model's predict function.
 With the processed image input handy, call the `predict` method to invoke the model.
 
 ```python
-            model.predict(input_data, prediction_arrays[model_index])
+            prediction_arrays[model_index] = model.predict(input_data)
 ```
 
-As before, the `predict` method fills the `predictionsArray[modelIndex]` array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n`, selecting predictions with a 10% or higher confidence. A threshold of 10% will show more predictions from the binarized model for comparison purposes.
+As before, the `predict` method stores an array at `predictions_array[modelIndex]` with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n`, selecting predictions with a 10% or higher confidence. A threshold of 10% will show more predictions from the binarized model for comparison purposes.
 
 ```python
             top_5 = helpers.get_top_n(

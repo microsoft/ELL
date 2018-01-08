@@ -221,15 +221,7 @@ class DemoHelper:
             self.iterations = self.iterations - 1
         start = time.time()
         if self.model == None:
-            # check the signature of compiled_func to determine which type of predict function to call
-            import inspect
-            if len(inspect.getfullargspec(self.compiled_func)[0]) == 2:
-                # predict(input, output : FloatVector)
-                self.results = self.compiled_module.FloatVector(self.output_size)
-                self.compiled_func(data, self.results)
-            else:
-                # output = predict(input), where output is a np.ndarray
-                self.results = self.compiled_func(data)
+            self.results = self.compiled_func(data)
         else:
             self.results = self.model.Compute(data, dtype=np.float32)
         end = time.time()

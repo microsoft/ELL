@@ -69,6 +69,8 @@ void TestSwigWriter()
 {
     TestSwigCallbackInterfaces();
     TestSwigCallbackHeader();
+    TestSwigNoCallbackInterfaces();
+    TestSwigNoCallbackHeader();
 }
 
 int main()

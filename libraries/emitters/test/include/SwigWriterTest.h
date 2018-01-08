@@ -8,5 +8,6 @@
 #pragma once
 
 void TestSwigCallbackInterfaces();
-
 void TestSwigCallbackHeader();
+void TestSwigNoCallbackInterfaces();
+void TestSwigNoCallbackHeader();

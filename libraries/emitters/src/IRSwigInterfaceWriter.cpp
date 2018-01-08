@@ -76,7 +76,7 @@ namespace emitters
                 InitPredictFunctionInfo();
             }
 
-            void WriteHeaderCode(std::ostream& os)
+            void WriteHeaderCode(std::ostream& os) const
             {
                 std::string inputType = _inputType;
                 std::string inputArgument = "input";
@@ -103,6 +103,22 @@ namespace emitters
                 ReplaceDelimiter(predictFunctionCode, "OUTPUT_TYPE", _outputType);
 
                 os << predictFunctionCode << "\n";
+             }
+
+             void WriteSwigCode(std::ostream& os) const
+             {
+                DeclareIfDefGuard guard(os, "SWIGPYTHON", DeclareIfDefGuard::Type::Positive);
+
+                std::string predictPythonCode(
+                    #include "SwigRawPredictPython.in"
+                );
+
+                ReplaceDelimiter(predictPythonCode, "PREDICT_FUNCTION", _functionName);
+                ReplaceDelimiter(predictPythonCode, "OUTPUT_VECTOR_TYPE", AsVectorType(_outputType));
+
+                os << "%pythoncode %{\n"
+                   << predictPythonCode
+                   << "\n%}\n";
              }
 
         private:
@@ -224,13 +240,13 @@ namespace emitters
 
             virtual ~SteppablePredictorInterfaceWriter() = default;
 
-            void WriteSwigCode(std::ostream& os)
+            void WriteSwigCode(std::ostream& os) const
             {
                 WriteCallbackSwigCode(os);
                 WritePythonCode(os);
             }
 
-            void WriteHeaderCode(std::ostream& os)
+            void WriteHeaderCode(std::ostream& os) const
             {
                 // Load the template, which declares a C++ predictor class
                 // for forwarding actuator callbacks to the predictor.
@@ -381,10 +397,8 @@ namespace emitters
             }
             else
             {
-                // No callbacks, this is an older model that only supports the raw predict function.
-                // Rename the first predict function for python
-                DeclareIfDefGuard guard(os, "SWIGPYTHON", DeclareIfDefGuard::Type::Positive);
-                os << "%rename (predict) " << predictFunctionName << ";\n";
+                PredictInterfaceWriter writer(moduleEmitter, *(predicts[0].function));
+                writer.WriteSwigCode(os);
             }
 
             os << "%include \"" << headerName << "\"\n";

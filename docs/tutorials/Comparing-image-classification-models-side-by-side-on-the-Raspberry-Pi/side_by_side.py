@@ -46,10 +46,8 @@ def main():
     # resize images appropriately.
     input_shapes = [model.get_default_input_shape() for model in models]
 
-    # Create vectors to hold the models' output predictions
-    prediction_arrays = [
-        model.FloatVector(model.get_default_output_shape().Size()) for model in
-        models]
+    # Create an array to hold the models' output predictions
+    prediction_arrays = []
 
     # Declare a value to hold the prediction times
     prediction_times = [list(), list()]
@@ -85,7 +83,7 @@ def main():
             # with the probability that the image # contains the class
             # represented by that index.
             start = time.time()
-            model.predict(input_data, prediction_arrays[model_index])
+            prediction_arrays[model_index] = model.predict(input_data)
             end = time.time()
 
             # Let's grab the value of the top 5 predictions and their index,

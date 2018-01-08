@@ -70,6 +70,30 @@ model::IRCompiledMap GetCompiledMapWithCallbacks(
     return compiler.Compile(map);
 }
 
+template <typename ElementType>
+model::IRCompiledMap GetCompiledMapNoCallbacks(
+    const std::string& moduleName,
+    const std::string& mapFunctionName)
+{
+    // Create the map
+    constexpr size_t inputSize = 1000;
+
+    model::Model model;
+
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    auto sumNode = model.AddNode<nodes::SumNode<ElementType>>(inputNode->output);
+    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sumNode->output);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.moduleName = moduleName;
+    settings.mapFunctionName = mapFunctionName;
+    settings.compilerSettings.optimize = true;
+
+    model::IRMapCompiler compiler(settings);
+    return compiler.Compile(map);
+}
+
 // Empty class used for type information only
 template <typename ElementType>
 struct CallbackBase { };
@@ -172,4 +196,71 @@ void TestSwigCallbackInterfaces()
 {
     TestSwigCallbackInterfaces<double>();
     TestSwigCallbackInterfaces<float>();
+}
+
+template <typename ElementType>
+void TestSwigNoCallbackInterfaces()
+{
+    auto compiledMap = GetCompiledMapNoCallbacks<ElementType>("TestModule", "TestModule_predict");
+    auto& module = compiledMap.GetModule();
+
+    std::stringstream ss;
+    WriteModuleSwigInterface(ss, module, "TestModule.h");
+    auto result = ss.str();
+    std::string vectorTypeString = ToTypeString<std::vector<ElementType>>();
+
+    // Sanity tests
+    testing::ProcessTest("Testing generated python code 1", testing::IsTrue(std::string::npos != result.find("def predict(inputData: 'numpy.ndarray') -> \"numpy.ndarray\":")));
+    testing::ProcessTest("Testing generated python code 2", testing::IsTrue(std::string::npos != result.find(
+        std::string("results = " + vectorTypeString + "(get_default_output_shape().Size())"))));
+    testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("TestModule_predict(inputData, results)")));
+
+    testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
+
+    if (testing::DidTestFail())
+    {
+        std::cout << result << std::endl;
+    }
+}
+
+template <typename ElementType>
+void TestSwigNoCallbackHeader()
+{
+    auto compiledMap = GetCompiledMapNoCallbacks<ElementType>("TestModule", "TestModule_predict");
+    auto& module = compiledMap.GetModule();
+
+    std::stringstream ss;
+    WriteModuleSwigHeader(ss, module);
+    auto result = ss.str();
+    std::string typeString = ToTypeString<ElementType>();
+
+    // Sanity tests
+    testing::ProcessTest("Testing predict function 1", testing::IsTrue(std::string::npos != result.find(
+        std::string("void TestModule_predict(" + typeString + "*, " + typeString + "*);"))));
+    testing::ProcessTest("Testing predict function 2", testing::IsTrue(std::string::npos != result.find(
+        std::string("void TestModule_predict(const std::vector<" + typeString + ">& input, std::vector<" + typeString + ">& output)"))));
+    testing::ProcessTest("Testing predict function 3", testing::IsTrue(std::string::npos != result.find(
+        std::string("TestModule_predict(const_cast<" + typeString + "*>(&input[0]), &output[0]);"))));
+
+    testing::ProcessTest("Testing shape function 1", testing::IsTrue(std::string::npos != result.find("void TestModule_GetInputShape(int32_t, TensorShape*)")));
+    testing::ProcessTest("Testing shape function 2", testing::IsTrue(std::string::npos != result.find("void TestModule_GetOutputShape(int32_t, TensorShape*)")));
+
+    testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
+
+    if (testing::DidTestFail())
+    {
+        std::cout << result << std::endl;
+    }
+}
+
+void TestSwigNoCallbackInterfaces()
+{
+    TestSwigNoCallbackInterfaces<double>();
+    TestSwigNoCallbackInterfaces<float>();
+}
+
+void TestSwigNoCallbackHeader()
+{
+    TestSwigNoCallbackHeader<double>();
+    TestSwigNoCallbackHeader<float>();
 }

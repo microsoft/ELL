@@ -107,12 +107,10 @@ Read the category names from `categories.txt`, the list of dog breed categories 
         cats = cats_file.read().splitlines()
 ```
 
-Get the model input and output shapes and allocate an array to hold the model output.
+Get the model input shape, which we will use to prepare the input data.
 
 ```python
     input_shape = model.get_default_input_shape()
-
-    predictions = model.FloatVector(model.get_default_output_shape().Size())
 ```
 
 Declare a loop where we get an image from the camera and prepare it to be used as input to the model.
@@ -128,10 +126,10 @@ floats so that it can be provided as input to the model.
             image, input_shape.columns, input_shape.rows)
 ```
 
-Send the processed image to the model get and its array of predictions.
+Send the processed image to the model to get a `numpy` array of predictions.
 
 ```python
-        model.predict(input_data, predictions)
+        predictions = model.predict(input_data)
 ```
 
 Use the helper function to get the top prediction. The `threshold` parameter selects predictions with a 5% or higher confidence.

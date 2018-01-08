@@ -176,7 +176,7 @@ Finally, invoke the model by calling its `predict` method.
 predictions = model.predict(input_data)
 ```
 
-The `predict` method fills the `predictions` array with non-negative scores that sum to 1. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Print the index of the highest confidence category.
+The `predict` method returns a `predictions` array with non-negative scores that sum to 1. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Print the index of the highest confidence category.
 
 ```python
 prediction_index = int(np.argmax(predictions))

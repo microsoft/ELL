@@ -90,6 +90,7 @@ set (templates
     templates/SwigPredictFunction.in
     templates/SwigPredictorClass.in
     templates/SwigPredictorPython.in
+    templates/SwigRawPredictPython.in
     templates/SwigShapeWrappers.in
 )
 

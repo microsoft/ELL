@@ -65,9 +65,6 @@ def main():
     # resize images appropriately.
     input_shape = model.get_default_input_shape()
 
-    # Create a vector to hold the model's output predictions
-    predictions = model.FloatVector(model.get_default_output_shape().Size())
-
     while (cv2.waitKey(1) & 0xFF) == 0xFF:
         # Get an image from the camera. If you'd like to use a different image,
         # load the image from some other source.
@@ -82,10 +79,10 @@ def main():
             image, input_shape.columns, input_shape.rows)
 
         # Get the predicted classes using the model's predict function on the
-        # image input data. The predictions are returned as a vector with the
+        # image input data. The predictions are returned as a numpy array with the
         # probability that the image # contains the class represented by that
         # index.
-        model.predict(input_data, predictions)
+        predictions = model.predict(input_data)
 
         # Let's grab the value of the top prediction and its index, which
         # represents the top most confident match and the class or category it
