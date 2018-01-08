@@ -1,6 +1,8 @@
 #!/bin/bash
-export PATH="/home/pi/miniconda3/bin:$PATH"
-source activate py34 > /dev/null 2>&1
+if [ -f "/home/pi/miniconda3/bin/activate" ]; then
+  export PATH="/home/pi/miniconda3/bin:$PATH"
+  source activate py34 > /dev/null 2>&1
+fi
 cd @TARGET_DIR@
 if [ -d "build" ]; then
     rm -rf build
@@ -10,7 +12,7 @@ cmake ..
 make
 cd ..
 export DISPLAY=:0
-echo running python demo.py @LABELS@ --compiledModel @COMPILED_MODEL@ --image coffeemug.jpg --iterations @ITERATIONS@
-python demo.py @LABELS@ --compiledModel @COMPILED_MODEL@ --image coffeemug.jpg --iterations @ITERATIONS@
+echo running python3 demo.py @LABELS@ --compiledModel @COMPILED_MODEL@ --image coffeemug.jpg --iterations @ITERATIONS@ --nogui
+python3 demo.py @LABELS@ --compiledModel @COMPILED_MODEL@ --image coffeemug.jpg --iterations @ITERATIONS@ --nogui
 echo ==== runtest.sh is finished ===
 

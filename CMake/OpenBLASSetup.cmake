@@ -49,7 +49,24 @@ endmacro()
 
 set(BLAS_INCLUDE_SEARCH_PATHS )
 set(BLAS_LIB_SEARCH_PATHS )
-set(BLAS_LIB_NAMES cblas openblas libopenblas.dll.a)
+set(BLAS_LIB_NAMES libopenblas.dll.a libopenblas.a openblas cblas)
+
+if(NOT WIN32)
+    ## Note: libopenblas installs on ubuntu in /usr/lib and /usr/include or /opt/OpenBLAS if it's manually built
+    ## Note: libopenblas installs on openSUSE in /usr/lib64 and /usr/include/openblas
+    set(BLAS_INCLUDE_SEARCH_PATHS
+        /opt/OpenBLAS/include
+        /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/
+        /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers/
+        /usr/include
+        /usr/local/include
+        /usr/include/openblas
+    )
+
+    set(BLAS_LIB_SEARCH_PATHS
+        /opt/OpenBLAS/lib /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
+    )
+endif()
 
 # Unless told otherwise, we're going to only look for OpenBLAS since
 # others may not be compatible
@@ -129,21 +146,6 @@ else()
     endif()
 endif()
 
-if(NOT WIN32)
-    ## Note: libopenblas installs on ubuntu in /usr/lib and /usr/include
-    ## Note: libopenblas installs on openSUSE in /usr/lib64 and /usr/include/openblas
-    set(BLAS_INCLUDE_SEARCH_PATHS
-        /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/
-        /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers/
-        /usr/include
-        /usr/local/include
-        /usr/include/openblas
-    )
-
-    set(BLAS_LIB_SEARCH_PATHS
-        /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
-    )
-endif()
 
 find_path(BLAS_INCLUDE_DIRS cblas.h
     PATHS ${BLAS_INCLUDE_SEARCH_PATHS} ${BLAS_INCLUDE_DIRS}

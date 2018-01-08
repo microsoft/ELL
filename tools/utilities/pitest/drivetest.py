@@ -89,7 +89,7 @@ class DriveTest:
         model_group.add_argument("--labels", help="path to the labels file for evaluating the model")
 
         self.arg_parser.add_argument("--target", help="the target platform.\n"
-            "Choices are pi3 (Raspberry Pi 3) and aarch64 (Dragonboard)", choices=["pi3", "pi3_64", "aarch64"], default=self.target)
+            "Choices are pi3 (Raspberry Pi 3) and aarch64 (Dragonboard)", choices=["pi0", "pi3", "pi3_64", "aarch64"], default=self.target)
         self.arg_parser.add_argument("--target_dir", help="the directory on the target device for running the test", default=self.target_dir)
         self.arg_parser.add_argument("--username", help="the username for the target device", default=self.username)
         self.arg_parser.add_argument("--password", help="the password for the target device", default=self.password)
@@ -159,9 +159,9 @@ class DriveTest:
 
     def extract_model_info(self, ell_model, labels_file):
         """Extracts information about a model"""
-        if (ell_model is None or labels_file is None):
+        if (ell_model is None):
             self.model_name = "d_I160x160x3CMCMCMCMCMCMC1AS"
-            self.labels_file = os.path.join(self.test_dir, "categories.txt")
+            self.ell_model = self.model_name + ".ell"
         else:
             self.ell_model = ell_model
             name,ext = os.path.splitext(ell_model)
@@ -179,7 +179,12 @@ class DriveTest:
             self.model_name, ext = os.path.splitext(basename(self.ell_model))
             if ext.lower() == ".zip":
                 self.model_name, ext = os.path.splitext(self.model_name)
+
+        if (labels_file is None):
+            self.labels_file = None
+        else:
             self.labels_file = os.path.abspath(labels_file)
+
 
     def copy_files(self, filelist, folder):
         """Copies a list of files to a folder"""
@@ -232,20 +237,23 @@ class DriveTest:
     def get_default_model(self):
         """Downloads the default model"""
         self.ell_model = os.path.join(self.test_dir, self.model_name + '.ell')
-        if (not os.path.isfile(self.ell_model)) or (not os.path.isfile(self.labels_file)) :
+        if (not os.path.isfile(self.ell_model)) :
             print("downloading default model...")
             download_and_extract_model(
-                "https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.ell.zip",
+                "https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/" + self.model_name + "/" + self.model_name + ".ell.zip",
                 model_extension=".ell",
                 local_folder=self.test_dir)
+
+    def get_default_labels(self):
+        if (not self.labels_file or not os.path.isfile(self.labels_file)):
             print("downloading default categories.txt...")
             self.labels_file = download_file("https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt",
                 local_folder=self.test_dir)
 
     def get_model(self):
         """Initializes the user-specified model or picks the default one"""
-        if self.model_name == "d_I160x160x3CMCMCMCMCMCMC1AS":
-            self.get_default_model()
+        self.get_default_model()
+        self.get_default_labels()
         print("using ELL model: " + self.model_name)
 
     def make_project(self):
@@ -256,7 +264,7 @@ class DriveTest:
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
         builder_args = [self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v",
-            "--blas", str(self.blas) ]
+            "--blas", str(self.blas)]
         if self.profile:
             builder_args.append("-profile")
         builder.parse_command_line(builder_args)

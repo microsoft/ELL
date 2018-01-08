@@ -59,12 +59,12 @@ def main(args):
             lastPrediction = text
 
         # Draw the text on the frame
-        frameToShow = frame
-        helper.draw_label(frameToShow, text)
-        helper.draw_fps(frameToShow)
-
-        # Show the new frame
-        helper.show_image(frameToShow, save)
+        if not helper.nogui:
+            frameToShow = frame
+            helper.draw_label(frameToShow, text)
+            helper.draw_fps(frameToShow)
+            # Show the new frame
+            helper.show_image(frameToShow, save)
 
     helper.report_times()
 

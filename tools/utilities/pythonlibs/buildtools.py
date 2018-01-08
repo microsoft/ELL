@@ -114,7 +114,7 @@ class EllBuildTools:
         if target == "orangepi0": # Orange Pi Zero
             return common + ["-mtriple=armv7-linux-gnueabihf", "-mcpu=cortex-a7", "-relocation-model=pic"]
         elif target == "pi0": # Raspberry Pi Zero
-            return common + ["-mtriple=arm-linux-gnueabihf", "-relocation-model=pic"]
+            return common + ["-mtriple=arm-linux-gnueabihf", "-mcpu=arm1176jzf-s", "-relocation-model=pic"]
         elif target == "aarch64" or target == "pi3_64": # arm64 Linux
             return common + ["-mtriple=aarch64-unknown-linux-gnu", "-relocation-model=pic"]
         else: # host

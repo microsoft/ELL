@@ -59,6 +59,7 @@ class DemoHelper:
         self.output_size = 0
         self.bgr = False
         self.results = None
+        self.nogui = False
     
     def add_arguments(self, arg_parser):
         """
@@ -74,6 +75,7 @@ class DemoHelper:
         arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
         arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
         arg_parser.add_argument("--bgr", help="specify True if input data should be in BGR format (default False)", default = self.bgr)
+        arg_parser.add_argument("--nogui", help="disable GUI to enable remote testing", action='store_true')
 
         # mutually exclusive options
         group = arg_parser.add_mutually_exclusive_group()
@@ -111,6 +113,7 @@ class DemoHelper:
         self.image_filename = self.value_from_arg(args.image, None)
         self.image_folder = self.value_from_arg(args.folder, None)
         self.bgr = args.bgr
+        self.nogui = args.nogui
 
         # process image source options
         if (args.camera):

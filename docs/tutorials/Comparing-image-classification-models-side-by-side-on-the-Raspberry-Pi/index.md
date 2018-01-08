@@ -273,13 +273,13 @@ Log into your Raspberry Pi, find the directory you just copied over, and build t
 cd model1
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake .. -D CMAKE_BUILD_TYPE=Release
 make
 cd ../..
 cd model2
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake .. -D CMAKE_BUILD_TYPE=Release
 make
 cd ../..
 ```
