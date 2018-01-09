@@ -147,11 +147,12 @@ unzip opencv_contrib.zip
 cd ~/opencv-3.3.0/
 mkdir build
 cd build
-cmake -D CMAKE_BUILD_TYPE=RELEASE \
-    -D CMAKE_INSTALL_PREFIX=/usr/local \
-    -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib-3.3.0/modules \
-    -D BUILD_EXAMPLES=OFF \
-    -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF \
+cmake -DCMAKE_BUILD_TYPE=RELEASE \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DOPENCV_EXTRA_MODULES_PATH=~/opencv_contrib-3.3.0/modules \
+    -DBUILD_EXAMPLES=OFF \
+    -DBUILD_TESTS=OFF \
+    -DBUILD_PERF_TESTS=OFF \
     ..
 ```
 **Note:** the ".." at the end of this command line is important, it is 

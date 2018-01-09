@@ -99,7 +99,7 @@ cd build
 To finish creating the Python wrapper, build the `cmake` project.
 
 ```shell
-[Linux/macOS] cmake .. -D CMAKE_BUILD_TYPE=Release && make && cd ../..
+[Linux/macOS] cmake .. -DCMAKE_BUILD_TYPE=Release && make && cd ../..
 [Windows] cmake -G "Visual Studio 14 2015 Win64" .. && cmake --build . --config release && cd ..\..
 ```
 
@@ -324,7 +324,7 @@ Log into your Raspberry Pi, find the directory you just copied from your compute
 cd pi3
 mkdir build
 cd build
-cmake .. -D CMAKE_BUILD_TYPE=Release
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 cd ../..
 ```
