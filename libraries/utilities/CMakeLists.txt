@@ -4,7 +4,7 @@
 
 set(library_name utilities)
 
-set(src 
+set(src
   src/Archiver.cpp
   src/ArchiveVersion.cpp
   src/CommandLineParser.cpp
@@ -33,7 +33,7 @@ set(src
   src/Variant.cpp
   src/XmlArchiver.cpp)
 
-set(include 
+set(include
   include/AbstractInvoker.h
   include/AnyIterator.h
   include/Archiver.h
@@ -76,7 +76,7 @@ set(include
   include/Variant.h
   include/XmlArchiver.h)
 
-set(tcc 
+set(tcc
   tcc/AbstractInvoker.tcc
   tcc/AnyIterator.tcc
   tcc/Archiver.tcc
@@ -105,10 +105,7 @@ source_group("tcc" FILES ${tcc})
 
 add_library(${library_name} ${src} ${include} ${tcc})
 target_include_directories(${library_name} PUBLIC include)
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  target_link_libraries(${library_name} -pthread)
-endif()
+target_link_libraries(${library_name} Threads::Threads)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
@@ -121,8 +118,8 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 #
 set (test_name ${library_name}_test)
 
-set(test_src 
-  test/src/main.cpp 
+set(test_src
+  test/src/main.cpp
   test/src/Format_test.cpp
   test/src/FunctionUtils_test.cpp
   test/src/Archiver_test.cpp
@@ -135,7 +132,7 @@ set(test_src
   test/src/Files_test.cpp
 )
 
-set(test_include 
+set(test_include
   test/include/Format_test.h
   test/include/FunctionUtils_test.h
   test/include/Archiver_test.h
@@ -155,9 +152,7 @@ add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
 
 target_link_libraries(${test_name} utilities testing data model nodes)
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  target_link_libraries(${test_name} -pthread)
-endif()
+target_link_libraries(${test_name} Threads::Threads)
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 add_test(NAME ${test_name} COMMAND ${test_name})

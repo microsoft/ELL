@@ -75,7 +75,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Apply -fPIC where applicable to the platform
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-if(STRICT_MODE)  
+# Find the platform-specific way of working with threads
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+set(CMAKE_THREAD_PREFER_PTHREAD ON)
+find_package(Threads REQUIRED)
+
+if(STRICT_MODE)
   message("-- Turning on strict mode with warnings as errors.")
 endif()
 
@@ -85,7 +90,7 @@ if(MSVC)
   add_compile_options(/MP)
   add_compile_options(/bigobj)
   add_compile_options(/W4)
-  if(STRICT_MODE)  
+  if(STRICT_MODE)
     add_compile_options(/WX)
   endif()
 else()

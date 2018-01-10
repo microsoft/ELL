@@ -23,10 +23,7 @@ include_directories(../../../libraries/utilities/include)
 # create executable in build\bin
 add_library(${library_name} ${src} ${include})
 target_include_directories(${library_name} PUBLIC include)
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-	target_link_libraries(${library_name} -pthread)
-endif()
+target_link_libraries(${library_name} Threads::Threads)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "tools/utilities")
 
