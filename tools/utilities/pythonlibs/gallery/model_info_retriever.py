@@ -36,7 +36,7 @@ class BaseLayer:
 
         matches = re.search(r"shape=\[(.+)\]\->\[(.+)\]", parameters)
         output_shape = matches.group(2)
-        self.output_shape = re.sub(r",", "x", output_shape)
+        self.output_shape = re.sub(r",", "\u00d7", output_shape)
         self.parameters = {}
 
     def as_dict(self):
@@ -76,7 +76,7 @@ class ConvolutionalLayer(BaseLayer):
 
         matches = re.search(r"receptiveField=(\d+)", parameters)
         size = matches.group(1)
-        self.parameters["size"] = "{}x{}".format(size, size)
+        self.parameters["size"] = "{}\u00d7{}".format(size, size)
 
         matches = re.search(r"stride=(\d+)", parameters)
         self.parameters["stride"] = matches.group(1)
@@ -108,7 +108,7 @@ class PoolingLayer(BaseLayer):
 
         matches = re.search(r"size=(\d+)", parameters)
         size = matches.group(1)
-        self.parameters["size"] = "{}x{}".format(size, size)
+        self.parameters["size"] = "{}\u00d7{}".format(size, size)
 
         matches = re.search(r"stride=(\d+)", parameters)
         self.parameters["stride"] = matches.group(1)

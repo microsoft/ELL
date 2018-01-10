@@ -27,7 +27,7 @@ permalink: /gallery/ILSVRC2012/@PERMALINK@
     </tr>
     <tr>
         <td> Input </td>
-        <td colspan="3"> @IMAGE_SIZE@ x @IMAGE_SIZE@ x {B,G,R} </td>
+        <td colspan="3"> @IMAGE_SIZE@ &times; @IMAGE_SIZE@ &times; {B,G,R} </td>
     </tr>
     <tr>
         <td> Architecture </td>
