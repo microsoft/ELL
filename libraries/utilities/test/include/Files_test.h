@@ -10,5 +10,6 @@
 namespace ell
 {
     void TestStringf();
-    void TestUnicodePaths(std::string& basePath);
+    void TestJoinPaths(const std::string& basePath);
+    void TestUnicodePaths(const std::string& basePath);
 }

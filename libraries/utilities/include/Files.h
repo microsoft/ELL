@@ -11,6 +11,7 @@
 // stl
 #include <fstream>
 #include <string>
+#include <vector>
 
 namespace ell
 {
@@ -21,28 +22,28 @@ namespace utilities
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> The stream. </returns>
-    std::ifstream OpenIfstream(std::string filepath);
+    std::ifstream OpenIfstream(const std::string& filepath);
 
     /// <summary> Opens an std::ofstream and throws an exception if a problem occurs. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> The stream. </returns>
-    std::ofstream OpenOfstream(std::string filepath);
+    std::ofstream OpenOfstream(const std::string& filepath);
 
     /// <summary> Returns true if the file exists and can be opened for reading. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> true if the file exists and is readable. </returns>
-    bool IsFileReadable(std::string filepath);
+    bool IsFileReadable(const std::string& filepath);
 
     /// <summary> Returns true if the file exists and can be opened for writing. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> true if the file exists and is readable. </returns>
-    bool IsFileWritable(std::string filepath);
+    bool IsFileWritable(const std::string& filepath);
 
 
     /// <summary> Use this method to check if file exists. This might be necessary instead of
@@ -53,56 +54,80 @@ namespace utilities
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> true if the file exists. </returns>
-    bool FileExists(std::string filepath);
+    bool FileExists(const std::string& filepath);
 
     /// <summary> Returns the file extension, optionally converted to lower-case. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> The file extension, not including the ".". </returns>
-    std::string GetFileExtension(std::string filepath, bool toLowercase = false);
+    std::string GetFileExtension(const std::string& filepath, bool toLowercase = false);
 
     /// <summary> Returns the file path minus extension. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> The filepath with extension. </returns>
-    std::string RemoveFileExtension(std::string filepath);
+    std::string RemoveFileExtension(const std::string& filepath);
 
     /// <summary> Returns the filename from a path. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> The filename. </returns>
-    std::string GetFileName(std::string filepath);
+    std::string GetFileName(const std::string& filepath);
 
     /// <summary> Returns the directory name minus the file name from a path. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> The path to the file. </returns>
-    std::string GetDirectoryPath(std::string filepath);
+    std::string GetDirectoryPath(const std::string& filepath);
 
     /// <summary> Returns true if the given directory exists. </summary>
     ///
     /// <param name="path"> The path. </param>
     ///
     /// <returns> The path to the directory. </returns>
-    bool DirectoryExists(std::string path);
+    bool DirectoryExists(const std::string& path);
 
     /// <summary> Returns true if the given directory exists or was created. </summary>
     ///
     /// <param name="path"> The path. </param>
     ///
     /// <returns> The path to the directory. </returns>
-    void EnsureDirectoryExists(std::string path);
+    void EnsureDirectoryExists(const std::string& path);
 
-    /// <summary> Returns the filename from a path. </summary>
+    /// <summary> Returns the combined filename from joining two or more paths. </summary>
     ///
-    /// <param name="filepath"> The path. </param>
+    /// <param name="path"> The starting path. </param>
     ///
-    /// <returns> The filename. </returns>
-    std::string JoinPaths(std::string path1, std::string path2);
+    /// <returns> The combined filename. </returns>
+    std::string JoinPaths(const std::string& path1, const std::string& path2);
+
+    /// <summary> Returns the combined filename from joining two or more paths. </summary>
+    ///
+    /// <param name="path"> The starting path. </param>
+    /// <param name="toAdd"> The paths to append. </param>
+    ///
+    /// <returns> The combined filename. </returns>
+    std::string JoinPaths(const std::string& path, std::initializer_list<std::string> toAdd);
+
+    /// <summary> Returns the combined filename from joining two or more paths. </summary>
+    ///
+    /// <param name="path"> The starting path. </param>
+    /// <param name="toAdd"> The paths to append. </param>
+    ///
+    /// <returns> The combined filename. </returns>
+    std::string JoinPaths(const std::string& path, std::vector<std::string> toAdd);
+
+
+    /// <summary> Split a file path into it's parts using OS specific path separator. </summary>
+    ///
+    /// <param name="paths"> The path. </param>
+    ///
+    /// <returns> The parts of the path. </returns>
+    std::vector<std::string> SplitPath(const std::string& path);
 
     /// <summary> Returns the current working directory. </summary>
     ///

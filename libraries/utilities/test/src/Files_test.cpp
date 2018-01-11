@@ -17,6 +17,7 @@
 #include "testing.h"
 
 // stl
+#include <algorithm>
 #include <string>
 #include <cstring>
 #include <codecvt>
@@ -33,7 +34,22 @@ namespace ell
         testing::ProcessTest("Stringf with args", ell::utilities::FormatString("test %d is %s", 10, "fun") == "test 10 is fun");
     }
 
-    std::string GetUnicodeTestPath(std::string& basePath)
+    void TestJoinPaths(const std::string& basePath)
+    {
+        std::vector<std::string> parts = ell::utilities::SplitPath(basePath);
+        std::string result = ell::utilities::JoinPaths("", parts);
+
+        // normalize path for platform differences (just for testing)
+        std::string norm = basePath;
+        std::replace(norm.begin(), norm.end(), '\\', '/');
+        std::replace(result.begin(), result.end(), '\\', '/');
+
+        std::cout << "TestJoinPaths: basePath=" << norm << std::endl;
+        std::cout << "TestJoinPaths: result=" << result << std::endl;
+        testing::ProcessTest("JoinPaths", norm == result);
+    }
+
+    std::string GetUnicodeTestPath(const std::string& basePath)
     {
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
         std::string testing = ell::utilities::JoinPaths(basePath, "Testing");
@@ -47,7 +63,7 @@ namespace ell
         return testdir;
     }
 
-    void TestUnicodePaths(std::string& basePath)
+    void TestUnicodePaths(const std::string& basePath)
     {
         auto testdir = GetUnicodeTestPath(basePath);
         std::cout << "writing test output to " << testdir << std::endl;

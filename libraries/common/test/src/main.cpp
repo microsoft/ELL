@@ -15,29 +15,37 @@
 
 // utilities
 #include "Exception.h"
+#include "Files.h"
 
 // stl
 #include <iostream>
 
 /// Runs all tests
 ///
-int main()
+int main(int argc, char* argv[])
 {
     using namespace ell;
 
     try
     {
+        std::string basePath = ell::utilities::GetDirectoryPath(argv[0]);
+        std::string examplePath = ell::utilities::JoinPaths(basePath, { "..", "..", "..", "examples" });
+        if (argc > 1) 
+        {
+            examplePath = argv[1];
+        }
+        std::cout << "using model path: " << examplePath << std::endl;
         TestLoadSampleModels();
         TestLoadTreeModels();
-        TestLoadSavedModels();
+        TestLoadSavedModels(examplePath);
 
         TestSaveModels();
 
-        TestLoadMapWithDefaultArgs();
-        TestLoadMapWithPorts();
+        TestLoadMapWithDefaultArgs(examplePath);
+        TestLoadMapWithPorts(examplePath);
 
-        TestLoadDataset();
-        TestLoadMappedDataset();
+        TestLoadDataset(examplePath);
+        TestLoadMappedDataset(examplePath);
     }
     catch (const utilities::Exception& exception)
     {

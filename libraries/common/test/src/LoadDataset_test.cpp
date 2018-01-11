@@ -23,21 +23,21 @@
 namespace ell
 {
 
-void TestLoadDataset()
+void TestLoadDataset(const std::string& examplePath)
 {
-    auto stream = utilities::OpenIfstream("../../../examples/data/testData.txt");
+    auto stream = utilities::OpenIfstream(utilities::JoinPaths(examplePath, { "data", "testData.txt" }));
     auto dataset = common::GetDataset(stream);
 }
 
-void TestLoadMappedDataset()
+void TestLoadMappedDataset(const std::string& examplePath)
 {
     common::MapLoadArguments args;
-    args.inputModelFilename = "../../../examples/models/model_1.model";
+    args.inputModelFilename = utilities::JoinPaths(examplePath, { "models", "model_1.model" });
     args.modelInputsString = "";
     args.modelOutputsString = "1026.output";
 
     auto map = common::LoadMap(args);
-    auto stream = utilities::OpenIfstream("../../../examples/data/testData.txt");
+    auto stream = utilities::OpenIfstream(utilities::JoinPaths(examplePath, { "data", "testData.txt" }));
     auto dataset = common::GetDataset(stream);
     dataset = common::TransformDataset(dataset, map);
 }

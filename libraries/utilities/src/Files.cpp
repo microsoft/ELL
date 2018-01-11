@@ -25,7 +25,7 @@ namespace ell
 {
 namespace utilities
 {
-    std::ifstream OpenIfstream(std::string filepath)
+    std::ifstream OpenIfstream(const std::string& filepath)
     {
 #ifdef WIN32
         // open file
@@ -46,7 +46,7 @@ namespace utilities
         return fs;
     }
 
-    std::ofstream OpenOfstream(std::string filepath)
+    std::ofstream OpenOfstream(const std::string& filepath)
     {
 #ifdef WIN32
         // open file
@@ -66,7 +66,7 @@ namespace utilities
         return fs;
     }
 
-    bool IsFileReadable(std::string filepath)
+    bool IsFileReadable(const std::string& filepath)
     {
 #ifdef WIN32
         // open file
@@ -86,7 +86,7 @@ namespace utilities
         return false;
     }
 
-    bool IsFileWritable(std::string filepath)
+    bool IsFileWritable(const std::string& filepath)
     {
 #ifdef WIN32
         // open file
@@ -106,7 +106,7 @@ namespace utilities
         return false;
     }
 
-    bool FileExists(std::string filepath)
+    bool FileExists(const std::string& filepath)
     {
 #ifdef WIN32
         struct _stat64i32 buf;
@@ -124,7 +124,7 @@ namespace utilities
         return false;
     }
 
-    bool DirectoryExists(std::string path)
+    bool DirectoryExists(const std::string& path)
     {
 #ifdef WIN32
         struct _stat64i32 buf;
@@ -142,7 +142,7 @@ namespace utilities
         return false;
     }
 
-    std::string GetFileExtension(std::string filepath, bool toLowercase)
+    std::string GetFileExtension(const std::string& filepath, bool toLowercase)
     {
         auto dotPos = filepath.find_last_of('.');
         if (dotPos == std::string::npos)
@@ -163,7 +163,7 @@ namespace utilities
         }
     }
 
-    std::string RemoveFileExtension(std::string filepath)
+    std::string RemoveFileExtension(const std::string& filepath)
     {
         auto filename = filepath.substr(filepath.find_last_of("/\\") + 1);
         auto dotPos = filename.find_last_of('.');
@@ -178,15 +178,22 @@ namespace utilities
         }
     }
 
-    std::string GetFileName(std::string filepath)
+    // PORTABILITY should be replaced by C++17 filesystem when available
+#ifdef WIN32
+    std::string path_separator = "\\";
+#else
+    std::string path_separator = "/";
+#endif
+
+    std::string GetFileName(const std::string& filepath)
     {
         // PORTABILITY should be replaced by C++17 filesystem when available
-        return filepath.substr(filepath.find_last_of("/\\") + 1);
+        return filepath.substr(filepath.find_last_of(path_separator) + 1);
     }
 
-    std::string GetDirectoryPath(std::string filepath)
+    std::string GetDirectoryPath(const std::string& filepath)
     {
-        size_t pos = filepath.find_last_of("/\\");
+        size_t pos = filepath.find_last_of(path_separator);
         if (pos == std::string::npos)
         {
             return "";
@@ -195,27 +202,67 @@ namespace utilities
         return path;
     }
 
-    std::string JoinPaths(std::string path1, std::string path2)
+
+    std::string JoinPaths(const std::string& path1, const std::string& path2)
     {
-        if (path1 == "")
-        {
-            return path2;
-        }
-
-        if (path2 == "")
-        {
-            return path1;
-        }
-
-// PORTABILITY should be replaced by C++17 filesystem when available
-#ifdef WIN32
-        return path1 + "\\" + path2;
-#else
-        return path1 + "/" + path2;
-#endif
+        return JoinPaths(path1, { path2 });
     }
 
-    void EnsureDirectoryExists(std::string path)
+    std::string JoinPaths(const std::string& path, std::initializer_list<std::string> toAdd)
+    {
+        std::vector<std::string> list(toAdd.begin(), toAdd.end());
+        return JoinPaths(path, list);
+    }
+
+    inline bool ends_with(std::string const & value, std::string const & ending)
+    {
+        if (ending.size() > value.size()) return false;
+        return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+    }
+
+    std::string JoinPaths(const std::string& path, std::vector<std::string> toAdd)
+    {
+        std::string result = path;
+        for (const auto& current : toAdd)
+        {
+            if (current.length() == 0 && result.length() == 0)
+            {
+                // special case for paths that start with a slash.
+                result = path_separator;
+            }
+            else if (current.length() > 0)
+            {
+                if (result.length() > 0 && !ends_with(result, path_separator))
+                {
+                    result += path_separator;
+                }
+                result += current;
+            }
+        }
+        return result;
+    }
+
+    std::vector<std::string> SplitPath(const std::string& path)
+    {
+        std::vector<std::string> result;
+        size_t start = 0;
+        size_t pos = path.find_first_of(path_separator, start);
+        while (pos != std::string::npos)
+        {
+            auto part = path.substr(start, pos - start);
+            result.push_back(part);
+            start = pos + path_separator.size();
+            pos = path.find_first_of(path_separator, start);
+        }
+        if (start < path.length()) 
+        {
+            auto part = path.substr(start, path.length() - start);
+            result.push_back(part);
+        }
+        return result;
+    }
+
+    void EnsureDirectoryExists(const std::string& path)
     {
 
         if (!DirectoryExists(path))

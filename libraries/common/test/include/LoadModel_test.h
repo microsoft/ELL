@@ -9,6 +9,6 @@ namespace ell
 {
 void TestLoadSampleModels();
 void TestLoadTreeModels();
-void TestLoadSavedModels();
+void TestLoadSavedModels(const std::string& examplePath);
 void TestSaveModels();
 }

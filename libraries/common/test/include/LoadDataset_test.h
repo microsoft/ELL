@@ -7,6 +7,6 @@
 
 namespace ell
 {
-void TestLoadDataset();
-void TestLoadMappedDataset();
+void TestLoadDataset(const std::string& examplePath);
+void TestLoadMappedDataset(const std::string& examplePath);
 }

@@ -23,6 +23,7 @@ struct ModelGenerateArguments
         map
     };
     OutputType outputType;
+    std::string outputPath;
 };
 
 /// <summary> A version of ModelGenerateArguments that adds its members to the command line parser. </summary>

@@ -19,5 +19,12 @@ void ParsedModelGenerateArguments::AddArgs(utilities::CommandLineParser& parser)
         "Choice of output type: model, map",
         { { "model", OutputType::model }, { "map", OutputType::map } },
         "model");
+
+    parser.AddOption(
+        outputPath,
+        "outputPath",
+        "p",
+        "The output path",
+        "");
 }
 }

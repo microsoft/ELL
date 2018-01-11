@@ -82,27 +82,17 @@ set(test_include
     test/include/LoadModel_test.h
 )
 
-set(test_data
-    ../../examples/data/testData.txt
-    ../../examples/models/model_1.model
-)
-
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include})
+add_dependencies(${test_name} makeExamples)
 target_include_directories(${test_name} PRIVATE test/include)
 target_link_libraries(${test_name} common data testing utilities functions predictors trainers model nodes)
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
-add_test(NAME ${test_name} COMMAND ${test_name})
+add_test(NAME ${test_name} COMMAND ${test_name} ${CMAKE_BINARY_DIR}/examples)
 set_test_library_path(${test_name})
 
-foreach(file ${test_data})
-    if(EXISTS ${file})
-        get_filename_component(filename ${file} NAME)
-        configure_file(${file} test/${filename} COPYONLY)
-    endif()
-endforeach()

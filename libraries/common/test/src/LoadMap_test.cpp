@@ -8,6 +8,7 @@
 // common
 #include "LoadModel.h"
 #include "MapLoadArguments.h"
+#include "Files.h"
 
 // model
 #include "Model.h"
@@ -20,10 +21,10 @@
 
 namespace ell
 {
-void TestLoadMapWithDefaultArgs()
+void TestLoadMapWithDefaultArgs(const std::string& examplePath)
 {
     common::MapLoadArguments args;
-    args.inputModelFilename = "../../../examples/models/model_1.model";
+    args.inputModelFilename = utilities::JoinPaths(examplePath, { "models", "model_1.model" });
     args.modelInputsString = "";
     args.modelOutputsString = "1026.output"; // the LinearPredictorNode
 
@@ -36,10 +37,10 @@ void TestLoadMapWithDefaultArgs()
     testing::ProcessTest("Testing map load", map.GetOutput(0).Size() == 1);
 }
 
-void TestLoadMapWithPorts()
+void TestLoadMapWithPorts(const std::string& examplePath)
 {
     common::MapLoadArguments args;
-    args.inputModelFilename = "../../../examples/models/model_1.model";
+    args.inputModelFilename = utilities::JoinPaths(examplePath, { "models", "model_1.model" });
     args.modelInputsString = "";
     args.modelOutputsString = "{1026.weightedElements[0:2], 1026.weightedElements[4:6]}";
 

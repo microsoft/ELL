@@ -95,6 +95,7 @@ int main(int argc, char* argv[])
 
         // File system tests
         TestStringf();
+        TestJoinPaths(basePath);
         TestUnicodePaths(basePath);
 
         // PropertyBag tests

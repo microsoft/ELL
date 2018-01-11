@@ -37,7 +37,7 @@ set_test_library_path(${test_name})
 set (test_name ${tool_name}_test_1)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt --inputModelFilename ${CMAKE_SOURCE_DIR}/examples/models/model_3.model --modelInputs 1047 --modelOutputs 1054.output -dd 3 -r 0.01 --outputModelFilename linearTrainer_model_3.model -v -ne 20 --lossFunction log)
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt --inputModelFilename ${CMAKE_BINARY_DIR}/examples/models/model_3.model --modelInputs 1047 --modelOutputs 1054.output -dd 3 -r 0.01 --outputModelFilename linearTrainer_model_3.model -v -ne 20 --lossFunction log)
 set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_2)

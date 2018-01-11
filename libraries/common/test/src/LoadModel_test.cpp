@@ -7,6 +7,7 @@
 
 // common
 #include "LoadTestModels.h"
+#include "Files.h"
 
 // model
 #include "Model.h"
@@ -43,10 +44,10 @@ void TestLoadTreeModels()
     std::cout << "Tree 3 size: " << model3.Size() << std::endl;
 }
 
-void TestLoadSavedModels()
+void TestLoadSavedModels(const std::string& examplePath)
 {
     std::cout << "Testing loading of saved model" << std::endl;
-    auto model1 = common::LoadModel("../../../examples/models/model_1.model");
+    auto model1 = common::LoadModel(utilities::JoinPaths(examplePath, { "models", "model_1.model" }));
     std::cout << "Model 1 size: " << model1.Size() << std::endl;
 }
 

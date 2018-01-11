@@ -14,36 +14,39 @@
 
 // utilities
 #include "CommandLineParser.h"
+#include "Files.h"
 
 // stl
 #include <iostream>
 
 using namespace ell;
 
-void SaveModels(const std::string& ext)
+void SaveModels(const std::string& ext, const std::string& outputPath)
 {
-    common::SaveModel(GenerateIdentityModel(3), "identity." + ext);
-    common::SaveModel(GenerateTimesTwoModel(3), "times_two." + ext);
-    common::SaveModel(GenerateIsEqualModel(), "is_equal." + ext);
-    common::SaveModel(GenerateArgMaxModel(3), "arg_max." + ext);
+    ell::utilities::EnsureDirectoryExists(outputPath);
+
+    common::SaveModel(GenerateIdentityModel(3), outputPath + "/identity." + ext);
+    common::SaveModel(GenerateTimesTwoModel(3), outputPath + "/times_two." + ext);
+    common::SaveModel(GenerateIsEqualModel(), outputPath + "/is_equal." + ext);
+    common::SaveModel(GenerateArgMaxModel(3), outputPath + "/arg_max." + ext);
     
-    common::SaveModel(GenerateModel1(), "model_1." + ext);
-    common::SaveModel(GenerateModel2(), "model_2." + ext);
-    common::SaveModel(GenerateModel3(), "model_3." + ext);
+    common::SaveModel(GenerateModel1(), outputPath + "/model_1." + ext);
+    common::SaveModel(GenerateModel2(), outputPath + "/model_2." + ext);
+    common::SaveModel(GenerateModel3(), outputPath + "/model_3." + ext);
 
-    common::SaveModel(GenerateTreeModel(0), "tree_0." + ext);
-    common::SaveModel(GenerateTreeModel(1), "tree_1." + ext);
-    common::SaveModel(GenerateTreeModel(2), "tree_2." + ext);
-    common::SaveModel(GenerateTreeModel(3), "tree_3." + ext);
+    common::SaveModel(GenerateTreeModel(0), outputPath + "/tree_0." + ext);
+    common::SaveModel(GenerateTreeModel(1), outputPath + "/tree_1." + ext);
+    common::SaveModel(GenerateTreeModel(2), outputPath + "/tree_2." + ext);
+    common::SaveModel(GenerateTreeModel(3), outputPath + "/tree_3." + ext);
 
-    common::SaveModel(GenerateRefinedTreeModel(0), "refined_tree_0." + ext);
-    common::SaveModel(GenerateRefinedTreeModel(1), "refined_tree_1." + ext);
-    common::SaveModel(GenerateRefinedTreeModel(2), "refined_tree_2." + ext);
-    common::SaveModel(GenerateRefinedTreeModel(3), "refined_tree_3." + ext);
+    common::SaveModel(GenerateRefinedTreeModel(0), outputPath + "/refined_tree_0." + ext);
+    common::SaveModel(GenerateRefinedTreeModel(1), outputPath + "/refined_tree_1." + ext);
+    common::SaveModel(GenerateRefinedTreeModel(2), outputPath + "/refined_tree_2." + ext);
+    common::SaveModel(GenerateRefinedTreeModel(3), outputPath + "/refined_tree_3." + ext);
 
-    common::SaveModel(GenerateMultiOutModel(3), "multi_out." + ext);
+    common::SaveModel(GenerateMultiOutModel(3), outputPath + "/multi_out." + ext);
 
-    common::SaveModel(GenerateBroadcastTimesTwoModel<float>(256), "broadcast_times_two." + ext);
+    common::SaveModel(GenerateBroadcastTimesTwoModel<float>(256), outputPath + "broadcast_times_two." + ext);
 }
 
 int main(int argc, char* argv[])
@@ -62,7 +65,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // generate models
-        SaveModels("model");
+        SaveModels("model", arguments.outputPath);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
