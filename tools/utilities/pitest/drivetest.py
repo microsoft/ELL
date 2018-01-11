@@ -61,6 +61,8 @@ class DriveTest:
         self.verbose = verbose
         if timeout:
             self.timeout = int(timeout)
+        else:
+            self.timeout = None
         self.iterations = iterations
         # local state.
         self.model_name = None
