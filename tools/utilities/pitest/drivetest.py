@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 ####################################################################################################
 ##
 ##  Project:  Embedded Learning Library (ELL)
@@ -27,7 +28,8 @@ import requests
 
 current_script = os.path.basename(__file__)
 
-# this script may be called from a different location, so we need the path relative to it
+# this script may be called from a different location, so we need the path 
+# relative to it
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_path, "../pythonlibs"))
 import find_ell
@@ -35,31 +37,52 @@ import picluster
 from download_helper import download_file, download_and_extract_model
 from remoterunner import RemoteRunner
 
+
 class DriveTest:
-    def __init__(self):
-        self.ipaddress = None
+    def __init__(self, ipaddress=None, cluster=None, outdir=None, profile=False, 
+            model=None, labels=None, target="pi3", target_dir="/home/pi/pi3", 
+            username="pi", password="raspberry", iterations=1, expected=None, 
+            blas=True, test=False, verbose=True, timeout=None):
+        self.ipaddress = ipaddress
         self.build_root = find_ell.find_ell_build()
-        self.ell_root = os.path.dirname(self.build_root)
-        self.test_dir = os.path.join(self.build_root, "test", "pitest")        
-        self.output_dir = None
-        self.target_dir = "/home/pi/pi3"
+        self.ell_root = os.path.dirname(self.build_root)   
+        self.output_dir = outdir
+        self.target_dir = target_dir
+        self.labels_file = labels
+        self.ell_model = model
+        self.username = username
+        self.password = password
+        self.target = target
+        self.cluster = cluster
+        self.blas = blas
+        self.expected = expected
+        self.profile = profile
+        self.test = test
+        self.verbose = verbose
+        if timeout:
+            self.timeout = int(timeout)
+        self.iterations = iterations
+        # local state.
         self.model_name = None
-        self.labels_file = None
-        self.ell_model = None
-        self.ell_json = None
-        self.username = "pi"
-        self.password = "raspberry"
-        self.target = "pi3"
         self.machine = None
-        self.cluster = None
-        self.blas = True
-        self.expression = None
+        self.ell_json = None
         self.created_dirs = []
-        self.profile = False
-        self.test = False
+        self.gallery_url = "https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/"
+
+        # initialize state from the args
+        if not self.output_dir:
+            self.output_dir = "test"
+        self.test_dir = os.path.abspath(self.output_dir)
+        
         if os.path.isdir(self.test_dir):
             rmtree(self.test_dir)
         os.makedirs(self.test_dir)
+
+        self.extract_model_info(self.ell_model, self.labels_file)
+        self.output_dir = os.path.join(self.test_dir, self.target, self.model_name)
+        self.resolve_address(self.ipaddress, self.cluster)
+        if not os.path.isdir(self.output_dir):
+            os.makedirs(self.output_dir)
 
     def __enter__(self):
         """Called when this object is instantiated with 'with'"""
@@ -68,39 +91,6 @@ class DriveTest:
     def __exit__(self, exc_type, exc_value, traceback):
         """Called on cleanup of this object that was instantiated with 'with'"""
         self.cleanup()
-
-    def parse_command_line(self, argv):
-        """Parses command line arguments"""
-        
-        self.arg_parser = argparse.ArgumentParser(
-            "This script uses ELL to create a demo project for a model (default is d_I160x160x3CMCMCMCMCMCMC1AS from the ELL gallery)\n"
-            "on a target device (default is Raspberry Pi 3), pushes it to the given\n"
-            "device's ip address using ssh and scp, then executes the test.\n"
-            "The test also measures the accuracy and performance of evaluating the model.\n")
-
-        # options
-        self.arg_parser.add_argument("--ipaddress", default=None, help="IP address of the target devices")
-        self.arg_parser.add_argument("--cluster", default=None, help="http address of the cluster server that controls access to the target devices")
-        self.arg_parser.add_argument("--outdir", default=self.test_dir)
-        self.arg_parser.add_argument("--profile", help="enable profiling functions in the ELL module", action="store_true")
-
-        model_group = self.arg_parser.add_argument_group("model", "options for loading a non-default model. All 3 must be specified for a non-default model to be used.")
-        model_group.add_argument("--model", help="path to an ELL model file, the filename (without extension) will be used as the model name")
-        model_group.add_argument("--labels", help="path to the labels file for evaluating the model")
-
-        self.arg_parser.add_argument("--target", help="the target platform.\n"
-            "Choices are pi3 (Raspberry Pi 3) and aarch64 (Dragonboard)", choices=["pi0", "pi3", "pi3_64", "aarch64"], default=self.target)
-        self.arg_parser.add_argument("--target_dir", help="the directory on the target device for running the test", default=self.target_dir)
-        self.arg_parser.add_argument("--username", help="the username for the target device", default=self.username)
-        self.arg_parser.add_argument("--password", help="the password for the target device", default=self.password)
-        self.arg_parser.add_argument("--iterations", "-i", type=int, help="the number of iterations for each predict (default 1)", default=1)
-        self.arg_parser.add_argument("--expression", "-e", help="the string to search for to verify test passed (default 'coffee mug')", default="coffee mug")
-        self.arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
-        self.arg_parser.add_argument("--test", help="test only, assume the outdir has already been built (default 'False')", action="store_true")
-
-        args = self.arg_parser.parse_args(argv)
-
-        self._init(args)
 
     def cleanup(self):
         """Unlocks the target device if it is part of a cluster"""
@@ -111,32 +101,10 @@ class DriveTest:
                 print("Failed to free the machine at " + self.machine.ip_address)
             else:
                 print("Freed machine at " + self.machine.ip_address)
-
-        print("Exiting DriveTest.cleanup")
         
-    def str2bool(self, v):
-        """Converts a string to a bool"""
-        return v.lower() in ("yes", "true", "t", "1")
-
-    def _init(self, args):
-        self.test_dir = os.path.abspath(args.outdir)
-        self.profile = args.profile
-        self.target = args.target
-        self.target_dir = args.target_dir
-        self.username = args.username
-        self.password = args.password
-        self.iterations = args.iterations
-        self.expression = args.expression
-        self.blas = self.str2bool(args.blas)
-        self.test = args.test
-        self.extract_model_info(args.model, args.labels)
-        self.output_dir = os.path.join(self.test_dir, self.target, self.model_name)
-        self.resolve_address(args.ipaddress, args.cluster)
-        if not os.path.isdir(self.output_dir):
-            os.makedirs(self.output_dir)
-
     def resolve_address(self, ipaddress, cluster):
-        """Resolves the ip address of the target device and locks it if it is part of a cluster"""
+        """Resolves the ip address of the target device and locks it if it is
+        part of a cluster"""
         if cluster:
             self.cluster = picluster.PiBoardTable(cluster)
             task = " ".join((current_script, self.model_name))
@@ -192,7 +160,8 @@ class DriveTest:
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
         for path in filelist:
-            print("Copying file: " + path + " to " + target_dir)
+            if self.verbose:
+                print("Copying file: " + path + " to " + target_dir)
             if not os.path.isfile(path):
                 raise Exception("expected file not found: " + path)
             head, file_name = os.path.split(path)
@@ -209,7 +178,8 @@ class DriveTest:
         template = template.replace("@ITERATIONS@", str(self.iterations))
         output_template = os.path.join(dest, "runtest.sh")
 
-        # raspberry pi requires runtest to use 0xa for newlines, so fix autocrlf that happens on windows.
+        # raspberry pi requires runtest to use 0xa for newlines, so fix autocrlf 
+        # that happens on windows.
         with open(output_template, "w", newline="\n") as of:
             of.write(template)
 
@@ -223,10 +193,11 @@ class DriveTest:
 
     def get_bash_files(self):
         """Copies demo files needed to run the test"""
-        self.copy_files( [ os.path.join(self.ell_root, "tools/utilities/pitest/coffeemug.jpg"),
-                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demo.py"),
-                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py"),
-                           self.labels_file], self.output_dir)
+        self.copy_files( 
+            [ os.path.join(self.ell_root, "tools/utilities/pitest/coffeemug.jpg"),
+            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demo.py"),
+            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py"),
+            self.labels_file], self.output_dir)
         self.configure_runtest(self.output_dir)
 
         # avoid copying over bitcode files (as they are big)
@@ -236,18 +207,24 @@ class DriveTest:
 
     def get_default_model(self):
         """Downloads the default model"""
-        self.ell_model = os.path.join(self.test_dir, self.model_name + '.ell')
-        if (not os.path.isfile(self.ell_model)) :
-            print("downloading default model...")
-            download_and_extract_model(
-                "https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/" + self.model_name + "/" + self.model_name + ".ell.zip",
-                model_extension=".ell",
-                local_folder=self.test_dir)
+        if (os.path.isfile(self.ell_model)):
+            # a full path was already provided to a local model, no need for download.
+            pass
+        else:
+            self.ell_model = os.path.join(self.test_dir, self.model_name + '.ell')
+            if (not os.path.isfile(self.ell_model)) :
+                print("downloading default model...")
+                download_and_extract_model(
+                    self.gallery_url + self.model_name + "/" + self.model_name + ".ell.zip",
+                    model_extension=".ell",
+                    local_folder=self.test_dir)
 
     def get_default_labels(self):
-        if (not self.labels_file or not os.path.isfile(self.labels_file)):
+        if not self.labels_file:
+            self.labels_file = "categories.txt"
+        if (not os.path.isfile(self.labels_file)):
             print("downloading default categories.txt...")
-            self.labels_file = download_file("https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt",
+            self.labels_file = download_file(self.gallery_url + "/categories.txt",
                 local_folder=self.test_dir)
 
     def get_model(self):
@@ -263,8 +240,10 @@ class DriveTest:
         sys.path.append(os.path.join(current_path, "../../wrap"))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
-        builder_args = [self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v",
-            "--blas", str(self.blas)]
+        builder_args = [self.ell_model, "-target", self.target, "-outdir", 
+            self.output_dir, "--blas", str(self.blas)]
+        if self.verbose:
+            builder_args.append("-v")
         if self.profile:
             builder_args.append("-profile")
         builder.parse_command_line(builder_args)
@@ -274,12 +253,29 @@ class DriveTest:
         """Verifies the remote test results and prints a pass or fail"""
         print("==========================================================")
         found = False
+        prediction_time = 0
+        prompt = "Average prediction time:"
+        previous = None
+        prediction = "not found"
         for line in output:
-            if self.expression in line:
-                found = True
+            if prompt in line:
+                prediction_time = float(line[len(prompt):])
+                prediction = previous
+            if "socket.timeout" in line:
+                raise Exception("### Test failed due to timeout")
+            previous = line
+
+        if self.expected:
+            found = (self.expected in prediction)
+        else:
+            found = True
 
         if found:
-            print("Test passed")
+            print("### Test passed")
+            print("Prediction=%s, time=%f" % (prediction, prediction_time))
+        elif self.expected:
+            raise Exception("### Test Failed, expecting %s, but found %s in time=%f" 
+                % (self.expected, prediction, prediction_time))
         else:
             raise Exception("### Test Failed")
 
@@ -292,6 +288,7 @@ class DriveTest:
                 self.make_project()
                 self.get_bash_files()
 
+            start_time = time.time()
             runner = RemoteRunner(cluster=self.cluster,
                                   ipaddress=self.ipaddress,
                                   username=self.username,
@@ -299,10 +296,15 @@ class DriveTest:
                                   source_dir=self.output_dir,
                                   target_dir=self.target_dir,
                                   command="runtest.sh",
-                                  verbose=True,
+                                  verbose=self.verbose,
+                                  start_clean=not self.test,
+                                  timeout=self.timeout,
                                   cleanup=False)
             output = runner.run_command()
             self.verify_remote_test(output)
+            end_time = time.time()
+            print("Remote test time: %f seconds" % (end_time - start_time))
+
         except:
             errorType, value, traceback = sys.exc_info()
             print("### Exception: " + str(errorType) + ": " + str(value))
@@ -310,6 +312,47 @@ class DriveTest:
 
 
 if __name__ == "__main__":
-    with DriveTest() as tester:
-        tester.parse_command_line(sys.argv[1:]) # drop the first argument (program name)
+        
+    """Parses command line arguments"""
+    arg_parser = argparse.ArgumentParser(
+        "This script uses ELL to create a demo project for a model "
+        "(default is d_I160x160x3CMCMCMCMCMCMC1AS from the ELL gallery)\n"
+        "on a target device (default is Raspberry Pi 3), pushes it to the given\n"
+        "device's ip address using ssh and scp, then executes the test.\n"
+        "The test also measures the accuracy and performance of evaluating the model.\n")
+
+    # options
+    arg_parser.add_argument("--ipaddress", default=None, help="IP address of the target devices")
+    arg_parser.add_argument("--cluster", default=None, help="http address of the cluster server that controls access to the target devices")
+    arg_parser.add_argument("--outdir", default=".", help="where to store local working files as a staging area (default '.')")
+    arg_parser.add_argument("--profile", help="enable profiling functions in the ELL module", action="store_true")
+
+    model_group = arg_parser.add_argument_group("model", "options for loading a non-default model. All 3 must be specified for a non-default model to be used.")
+    model_group.add_argument("--model", help="path to an ELL model file, the filename (without extension) will be used as the model name")
+    model_group.add_argument("--labels", help="path to the labels file for evaluating the model")
+
+    arg_parser.add_argument("--target", help="the target platform.\n"
+        "Choices are pi3 (Raspberry Pi 3) and aarch64 (Dragonboard)", choices=["pi0", "pi3", "pi3_64", "aarch64"], default="pi3")
+    arg_parser.add_argument("--target_dir", help="the directory on the target device for running the test", default="/home/pi/pi3")
+    arg_parser.add_argument("--username", help="the username for the target device", default="pi")
+    arg_parser.add_argument("--password", help="the password for the target device", default="raspberry")
+    arg_parser.add_argument("--iterations", "-i", type=int, help="the number of iterations for each predict (default 1)", default=1)
+    arg_parser.add_argument("--expected", "-e", help="the string to search for to verify test passed (default '')", default=None)
+    arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
+    arg_parser.add_argument("--test", help="test only, assume the outdir has already been built (default 'False')", action="store_true")
+    arg_parser.add_argument("--verbose", help="enable or disable verbose print output (default 'True')", default="True")
+    arg_parser.add_argument("--timeout", help="set remote test run timeout in seconds (default '300')", default="300")
+
+    argv = sys.argv
+    argv.pop(0)
+    args = arg_parser.parse_args(argv)
+
+    def str2bool(v):
+        """Converts a string to a bool"""
+        return v.lower() in ("yes", "true", "t", "1")
+
+    with DriveTest(args.ipaddress,  args.cluster, args.outdir, args.profile, 
+        args.model, args.labels, args.target, args.target_dir, args.username, 
+        args.password, args.iterations, args.expected, str2bool(args.blas), 
+        args.test, str2bool(args.verbose), args.timeout) as tester:
         tester.run_test()

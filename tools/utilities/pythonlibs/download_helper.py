@@ -14,7 +14,10 @@ def download_file(url, local_folder=None):
         filename = os.path.join(local_folder, filename)
 
     # Download the file
+    print("downloading: " + url)
     response = requests.get(url, stream=True)
+    if response.status_code != 200:
+        raise Exception("download file failed with status code: %d, fetching url '%s'" % (response.status_code, url))
 
     # Write the file to disk
     with open(filename, "wb") as handle:
@@ -49,4 +52,3 @@ def download_and_extract_model(url, model_extension='.cntk', local_folder=None):
         print("non-zipped model: " + filename)
 
     return model_name
-

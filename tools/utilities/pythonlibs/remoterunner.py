@@ -8,14 +8,18 @@
 ##
 ####################################################################################################
 
+import argparse
+import logging
+import io
 import os
 import sys
-import argparse
+from threading import Thread
 
 import paramiko
 
 sys.path += ["../pythonlibs"]
 import picluster
+
 
 # 
 # If no source_dir or source_files, don't copy
@@ -25,8 +29,8 @@ import picluster
 class RemoteRunner:
     def __init__(self, cluster=None, ipaddress=None, username=None, password=None,
         source_dir=None, target_dir=None, copyback_files=None, copyback_dir=None,
-        command=None, logfile=None, verbose=True, start_clean=True, cleanup=True, timeout=None,
-        all=None, source_files=None):
+        command=None, logfile=None, verbose=True, start_clean=True, cleanup=True, 
+        timeout=None, all=None, source_files=None):
 
         if cluster:
             self.cluster = picluster.PiBoardTable(cluster)
@@ -51,6 +55,7 @@ class RemoteRunner:
         self.all = all
         self.machine = None
         self.ssh = None
+        self.buffer = None
 
         # Sanity-check parameters
         if os.path.pathsep in self.target_dir:
@@ -81,19 +86,53 @@ class RemoteRunner:
     def close_ssh(self):
         self.ssh.close()
 
+    def logstream(self, stream, loggercb):
+        try:
+            while True:
+                out = stream.readline()
+                if out:
+                    msg = out.rstrip('\n')
+                    self.print(msg)
+                else:
+                    break
+        except:
+            errorType, value, traceback = sys.exc_info()
+            msg = "### Exception: %s: %s" % (str(errorType), str(value))
+            self.print(msg)
+
     def exec_remote_command(self, cmd):
         self.print("remote: " + cmd)
         output = []
-        stdin, stdout, stderr = self.ssh.exec_command(cmd, timeout=self.timeout)
-        for line in stdout:
-            output.append(line.rstrip("\n"))
-            self.print("... " + line.rstrip("\n"))
-        for line in stderr:
-            output.append(line.rstrip("\n"))
-            self.print("... " + line.rstrip("\n"))
-        return output
+        self.buffer = io.StringIO()
+        try:
+            stdin, stdout, stderr = self.ssh.exec_command(cmd, timeout=self.timeout)
+
+            logging.basicConfig(level=logging.INFO, format="%(message)s")
+            logger = logging.getLogger('root')
+
+            stdout_thread = Thread(target=self.logstream,
+                args=(stdout,lambda s: logger.log(logging.INFO, s)))
+
+            stderr_thread = Thread(target=self.logstream,
+                args=(stderr,lambda s: logger.log(logging.INFO, s)))
+
+            stdout_thread.start()
+            stderr_thread.start()
+
+            while stdout_thread.isAlive() and stderr_thread.isAlive():
+                pass
+        
+        except:
+            errorType, value, traceback = sys.exc_info()
+            msg = "### Exception: %s: %s" % (str(errorType), str(value))
+            self.print(msg)
+
+        result = self.buffer.getvalue().split('\n')
+        self.buffer = None
+        return result
 
     def clean_target(self):
+        print("clean_target")
         self.exec_remote_command("rm -rf {}".format(os.path.basename(self.target_dir)))
 
     def linux_join(self, path, name):
@@ -160,9 +199,11 @@ class RemoteRunner:
     def print(self, output):
         if self.verbose:
             print(output)
+        if self.buffer:        
+            self.buffer.write(output + "\n")
 
     def run_command(self):
-        output = ""
+        output = []
         try:
             self.lock_machine()
             self.connect_ssh()
@@ -170,8 +211,10 @@ class RemoteRunner:
                 self.clean_target()
             self.publish_bits()
             if self.command:
-                self.exec_remote_command("cd {} && chmod u+x ./{}".format(self.target_dir, self.command.split(" ")[0]))
-                output = self.exec_remote_command("cd {} && ./{}".format(self.target_dir, self.command))
+                self.exec_remote_command("cd {} && chmod u+x ./{}".format(
+                    self.target_dir, self.command.split(" ")[0]))
+                output = self.exec_remote_command("cd {} && ./{}".format(
+                    self.target_dir, self.command))
             self.copy_files()
             if self.cleanup:
                 self.clean_target()
@@ -179,7 +222,11 @@ class RemoteRunner:
             self.log_output(output)
         except:
             errorType, value, traceback = sys.exc_info()
-            self.print("### Exception: {}: {}".format(errorType, value))
+            msg = "### Exception: %s: %s" % (str(errorType), str(value))
+            self.print(msg)
+            if self.buffer:                
+                output = self.buffer.getvalue().split('\n')
+            output += [ msg ]
         finally:
             self.free_machine()
         return output
@@ -191,5 +238,4 @@ class RemoteRunner:
                 self.run_command()
             except:
                 errorType, value, traceback = sys.exc_info()
-                print("### cannot lock machine " + str(machine.ip_address))
-                print("### Exception: " + str(errorType) + ": " + str(value))
+                print("### Unexpected Exception: " + str(errorType) + ": " + str(value))

@@ -14,5 +14,5 @@ cd ..
 export DISPLAY=:0
 echo running python3 demo.py @LABELS@ --compiledModel @COMPILED_MODEL@ --image coffeemug.jpg --iterations @ITERATIONS@ --nogui
 python3 demo.py @LABELS@ --compiledModel @COMPILED_MODEL@ --image coffeemug.jpg --iterations @ITERATIONS@ --nogui
-echo ==== runtest.sh is finished ===
+echo ==== runtest.sh is finished ====
 
