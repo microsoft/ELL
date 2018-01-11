@@ -24,18 +24,13 @@ import buildtools
 
 class ModuleBuilder:
     def __init__(self):
-        self.target = "host"
         self.config = None
-        self.model_file = None
-        self.output_dir = None
         self.files = []
         self.includes = []
         self.tcc = []
         self.tools = None
-        self.func_name = "Step"
-        self.objext = "obj"
-        self.tools = None
         self.language = "python"
+        self.target = "host"
         self.verbose = False
         self.llvm_format = None
         self.no_opt_tool = False
@@ -47,12 +42,14 @@ class ModuleBuilder:
         self.fuse_linear_ops = True
         self.debug = False
         self.model_name = ""
+        self.func_name = "Predict"
+        self.objext = "obj"
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
 
     def parse_command_line(self, args=None):
-        arg_parser = argparse.ArgumentParser("This tool wraps a given ELL model in a CMake buildable project that builds a language\n"
+        arg_parser = argparse.ArgumentParser(prog="wrap", description="This tool wraps a given ELL model in a CMake buildable project that builds a language\n"
             "specific module that can call the ELL model on a given target platform.\n"
             "\nThe supported languages are:\n"
             "    python   (default)\n"
@@ -70,6 +67,7 @@ class ModuleBuilder:
         # optional arguments
         arg_parser.add_argument("--language", "-lang", help="the language for the ELL module", choices=["python", "cpp"], default=self.language)
         arg_parser.add_argument("--target", "-target", help="the target platform", choices=["pi3", "pi0", "orangepi0", "pi3_64", "aarch64", "host"], default=self.target)
+        arg_parser.add_argument("--modulename", "-modulename", help="the name of the output module (by default, the same as the name of the model file)", default=None)
         arg_parser.add_argument("--outdir", "-outdir", help="the output directory")
         arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
         arg_parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
@@ -87,8 +85,11 @@ class ModuleBuilder:
 
         self.model_file = args.model_file
         _, tail = os.path.split(self.model_file)
-        self.model_name = os.path.splitext(tail)[0]
-
+        self.model_file_base = os.path.splitext(tail)[0]
+        if args.modulename:
+            self.model_name = args.modulename
+        else:
+            self.model_name = self.model_file_base
         self.language = args.language
         self.target = args.target
         self.output_dir = args.outdir
@@ -105,10 +106,17 @@ class ModuleBuilder:
         self.debug = args.debug
         self.blas = self.str2bool(args.blas)
 
+    def str2bool(self, v):
+        return v.lower() in ("yes", "true", "t", "1")
+
     def find_files(self):
         self.cmake_template = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates/CMakeLists.%s.txt.in" % (self.language))
         if (not os.path.isfile(self.cmake_template)):
             raise Exception("Could not find CMakeLists template: %s" % (self.cmake_template))
+        if self.language == "python":
+            self.module_init_template = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates/__init__.py.in")
+            if not os.path.isfile(self.module_init_template):
+                raise Exception("Could not find __init__.py template: %s" % (self.module_init_template))
         self.files.append(os.path.join(self.ell_root, "CMake/OpenBLASSetup.cmake"))
         self.includes.append(os.path.join(self.ell_root, "interfaces/common/include/CallbackInterface.h"))
         self.tcc.append(os.path.join(self.ell_root, "interfaces/common/tcc/CallbackInterface.tcc"))
@@ -128,17 +136,24 @@ class ModuleBuilder:
                 print("copy \"%s\" \"%s\"" % (path, dest))
             copyfile(path, dest)
 
-    def create_cmake_file(self):
-        with open(self.cmake_template) as f:
+    def create_template_file(self, template_filename, output_filename):
+        with open(template_filename) as f:
             template = f.read()
 
-        template = template.replace("@ELL_model@", self.model_name)
+        template = template.replace("@ELL_model@", self.model_file_base)
+        template = template.replace("@ELL_model_name@", self.model_name)
         template = template.replace("@Arch@", self.target)
         template = template.replace("@OBJECT_EXTENSION@", self.objext)
         template = template.replace("@ELL_ROOT@", os.path.join(self.ell_root, "external").replace("\\","/"))
-        output_template = os.path.join(self.output_dir, "CMakeLists.txt")
+        output_template = os.path.join(self.output_dir, output_filename)
         with open(output_template, 'w') as f:
             f.write(template)
+
+    def create_cmake_file(self):
+        self.create_template_file(self.cmake_template, "CMakeLists.txt")
+
+    def create_module_init_file(self):
+        self.create_template_file(self.module_init_template, "__init__.py")
 
     def save_config(self):
         self.config['model'] = self.model_name
@@ -162,13 +177,16 @@ class ModuleBuilder:
         out_file = self.tools.compile(
             self.model_file, self.func_name, self.model_name, self.target, self.output_dir, self.blas, self.fuse_linear_ops, self.profile,
             self.llvm_format, self.optimize, self.debug)
+
         if self.language != "cpp":
-            self.tools.swig(self.output_dir, self.model_name, self.language)
+            self.tools.swig(self.output_dir, self.model_file_base, self.language)
         if not self.no_opt_tool:
             out_file = self.tools.opt(self.output_dir, out_file, self.optimization_level)
         if not self.no_llc_tool:
             out_file = self.tools.llc(self.output_dir, out_file, self.target, self.optimization_level)
         self.create_cmake_file()
+        if self.language == "python":
+            self.create_module_init_file()
         if self.target == "host":
             print("success, now you can build the '" + self.output_dir + "' folder")
         else:

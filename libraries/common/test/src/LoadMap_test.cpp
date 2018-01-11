@@ -23,7 +23,7 @@ namespace ell
 void TestLoadMapWithDefaultArgs()
 {
     common::MapLoadArguments args;
-    args.inputModelFilename = "../../../examples/data/model_1.model";
+    args.inputModelFilename = "../../../examples/models/model_1.model";
     args.modelInputsString = "";
     args.modelOutputsString = "1026.output"; // the LinearPredictorNode
 
@@ -39,7 +39,7 @@ void TestLoadMapWithDefaultArgs()
 void TestLoadMapWithPorts()
 {
     common::MapLoadArguments args;
-    args.inputModelFilename = "../../../examples/data/model_1.model";
+    args.inputModelFilename = "../../../examples/models/model_1.model";
     args.modelInputsString = "";
     args.modelOutputsString = "{1026.weightedElements[0:2], 1026.weightedElements[4:6]}";
 

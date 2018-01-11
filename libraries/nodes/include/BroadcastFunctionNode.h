@@ -520,7 +520,7 @@ namespace nodes
     };
 
     //
-    // Special case of BroadcastTernaryFuncitonNode, using a linear function
+    // Special case of BroadcastTernaryFunctionNode, using a linear function
     //
     template<typename ValueType>
     class BroadcastLinearFunctionNode : public BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>

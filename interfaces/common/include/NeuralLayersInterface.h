@@ -21,7 +21,9 @@
 #include "BinaryConvolutionalLayer.h"
 #include "ConvolutionalLayer.h"
 #include "FullyConnectedLayer.h"
+#include "GRULayer.h"
 #include "InputLayer.h"
+#include "LSTMLayer.h"
 #include "PoolingLayer.h"
 #include "ScalingLayer.h"
 
@@ -106,6 +108,8 @@ namespace neural
         relu,
         leaky,
         sigmoid,
+        tanh,
+        softmax,
         prelu
     };
 
@@ -224,6 +228,58 @@ namespace neural
         }
 
         LayerType GetLayerType() const override { return LayerType::fullyConnected; }
+
+        API_READONLY(ell::api::math::Tensor<ElementType> weights);
+    };
+
+    // Api projections for GRULayer
+    template <typename ElementType>
+    class GRULayer : public Layer<ElementType>
+    {
+    public:
+        GRULayer(const LayerParameters& layerParameters, 
+                 const ell::api::math::Tensor<ElementType>& updateWeightsTensor,
+                 const ell::api::math::Tensor<ElementType>& resetWeightsTensor,
+                 const ell::api::math::Tensor<ElementType>& hiddenWeightsTensor,
+                 const ell::api::math::Tensor<ElementType>& updateBiasTensor,
+                 const ell::api::math::Tensor<ElementType>& resetBiasTensor,
+                 const ell::api::math::Tensor<ElementType>& hiddenBiasTensor,
+                 ActivationType activation,
+                 ActivationType recurrentActivation)
+            : Layer<ElementType>(layerParameters), 
+            updateWeights(updateWeightsTensor),
+            resetWeights(resetWeightsTensor),
+            hiddenWeights(hiddenWeightsTensor),
+            updateBias(updateBiasTensor),
+            resetBias(resetBiasTensor),
+            hiddenBias(hiddenBiasTensor),
+            activation(activation), recurrentActivation(recurrentActivation)
+        {
+        }
+
+        LayerType GetLayerType() const override { return LayerType::gru; }
+
+        API_READONLY(ell::api::math::Tensor<ElementType> updateWeights);
+        API_READONLY(ell::api::math::Tensor<ElementType> resetWeights);
+        API_READONLY(ell::api::math::Tensor<ElementType> hiddenWeights);
+        API_READONLY(ell::api::math::Tensor<ElementType> updateBias);
+        API_READONLY(ell::api::math::Tensor<ElementType> resetBias);
+        API_READONLY(ell::api::math::Tensor<ElementType> hiddenBias);
+        ActivationType activation;
+        ActivationType recurrentActivation;
+    };
+
+    // Api projections for LSTMLayer
+    template <typename ElementType>
+    class LSTMLayer : public Layer<ElementType>
+    {
+    public:
+        LSTMLayer(const LayerParameters& layerParameters, const ell::api::math::Tensor<ElementType>& weightsTensor)
+            : Layer<ElementType>(layerParameters), weights(weightsTensor.data, weightsTensor.shape.rows, weightsTensor.shape.columns, weightsTensor.shape.channels)
+        {
+        }
+
+        LayerType GetLayerType() const override { return LayerType::lstm; }
 
         API_READONLY(ell::api::math::Tensor<ElementType> weights);
     };

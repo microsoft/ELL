@@ -12,8 +12,8 @@
 %inline %{
 
 namespace ell {
-namespace api{
-namespace math{
+namespace api {
+namespace math {
     typedef struct TensorShape 
     {
         int rows;

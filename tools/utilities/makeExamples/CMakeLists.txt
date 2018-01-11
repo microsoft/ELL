@@ -32,9 +32,10 @@ set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")
 #
 # Add build command to generate the examples
 #
-set(EXAMPLE_DIR ${CMAKE_SOURCE_DIR}/examples/data)
+set(EXAMPLE_DIR ${CMAKE_SOURCE_DIR}/examples/models)
 
 set(MODEL_FILES
+    arg_max.model
     identity.model
     is_equal.model
     model_1.model
@@ -50,10 +51,12 @@ set(MODEL_FILES
     tree_1.model
     tree_2.model
     tree_3.model
+    broadcast_times_two.model
 )
 
 add_custom_command(TARGET ${tool_name}
   POST_BUILD
-  COMMAND makeExamples
+  COMMAND ${tool_name}
   COMMAND ${CMAKE_COMMAND} -E copy ${MODEL_FILES} ${EXAMPLE_DIR}
-  COMMENT "Generating example models")
+  COMMENT "Generating example models"
+)

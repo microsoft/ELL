@@ -13,6 +13,7 @@
 
 // nodes
 #include "BinaryOperationNode.h"
+#include "BroadcastFunctionNode.h"
 #include "ConstantNode.h"
 #include "DelayNode.h"
 #include "DotProductNode.h"
@@ -49,6 +50,18 @@ model::Model GenerateTimesTwoModel(size_t dimension)
     auto constantTwoNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 2.0));
     auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
     model.AddNode<model::OutputNode<double>>(timesNode->output);
+    return model;
+}
+
+template <typename ElementType>
+model::Model GenerateBroadcastTimesTwoModel(size_t dimension)
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(dimension);
+    auto constantTwoNode = model.AddNode<nodes::ConstantNode<ElementType>>(std::vector<ElementType>(1, 2.0));
+    model::PortMemoryLayout layout({static_cast<int>(dimension), 1});
+    auto timesNode = model.AddNode<nodes::BroadcastLinearFunctionNode<ElementType>>(inputNode->output, layout, constantTwoNode->output, model::PortElements<ElementType>{}, 1, layout);
+    model.AddNode<model::OutputNode<ElementType>>(timesNode->output);
     return model;
 }
 
@@ -185,4 +198,14 @@ model::Model GenerateRefinedTreeModel(size_t numSplits)
     auto refinedModel = transformer.RefineModel(model, context);
     return refinedModel;
 }
+
+// explicit instantiations
+template 
+model::Model GenerateBroadcastTimesTwoModel<int>(size_t dimension);
+
+template 
+model::Model GenerateBroadcastTimesTwoModel<float>(size_t dimension);
+
+template 
+model::Model GenerateBroadcastTimesTwoModel<double>(size_t dimension);
 }

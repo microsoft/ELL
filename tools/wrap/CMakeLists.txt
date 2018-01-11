@@ -13,6 +13,7 @@ endif()
 
 set (module_name wrap)
 set (builder_src
+    templates/__init__.py.in
     templates/CMakeLists.cpp.txt.in
     templates/CMakeLists.python.txt.in
     wrap.py
@@ -21,7 +22,7 @@ set (builder_src
 add_custom_target(${module_name} DEPENDS ${builder_src} SOURCES ${builder_src})
 set_property(TARGET ${module_name} PROPERTY FOLDER "tools")
 
-# copy tutorial files
+# copy source files
 foreach(PY_FILE ${builder_src})
     configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
 endforeach()

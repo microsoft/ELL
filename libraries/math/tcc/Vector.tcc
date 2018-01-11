@@ -61,7 +61,7 @@ namespace math
     template <typename ElementType>
     ElementType UnorientedConstVectorBase<ElementType>::Norm2Squared() const
     {
-        return Aggregate([](ElementType x) { return x*x; });
+        return Aggregate([](ElementType x) { return x * x; });
     }
 
     template <typename ElementType>
@@ -265,9 +265,6 @@ namespace math
         return VectorReference<ElementType, orientation>(GetDataPointer() + offset * this->GetIncrement(), size, this->GetIncrement());
     }
 
-    
-    
-
     //
     // Vector
     //
@@ -302,9 +299,26 @@ namespace math
 
     template <typename ElementType, VectorOrientation orientation>
     Vector<ElementType, orientation>::Vector(const Vector<ElementType, orientation>& other)
-        : VectorReference<ElementType, orientation>(nullptr, other.Size(), other.GetIncrement()), _data(other._data)
+        : VectorReference<ElementType, orientation>(nullptr, other.Size(), 1), _data(other.Size())
     {
-        this->_pData = _data.data();
+        _pData = _data.data();
+        this->CopyFrom(other);
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    Vector<ElementType, orientation>::Vector(ConstVectorReference<ElementType, orientation>& other)
+        : VectorReference<ElementType, orientation>(nullptr, other.Size(), 1), _data(other.Size())
+    {
+        _pData = _data.data();
+        this->CopyFrom(other);
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    Vector<ElementType, orientation>::Vector(ConstVectorReference<ElementType, TransposeVectorOrientation<orientation>::value>& other)
+        : VectorReference<ElementType, orientation>(nullptr, other.Size(), 1), _data(other.Size())
+    {
+        _pData = _data.data();
+        this->CopyFrom(other);
     }
 
     template <typename ElementType, VectorOrientation orientation>
@@ -329,6 +343,33 @@ namespace math
         std::swap(_data, other._data);
     }
 
+    template <typename ElementType, VectorOrientation orientation>
+    utilities::StlStridedIterator<typename std::vector<ElementType>::iterator> begin(Vector<ElementType, orientation>& vector)
+    {
+        return { vector._data.begin(), static_cast<ptrdiff_t>(vector.GetIncrement()) };
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    utilities::StlStridedIterator<typename std::vector<ElementType>::const_iterator> begin(const Vector<ElementType, orientation>& vector)
+    {
+        return { vector._data.cbegin(), static_cast<ptrdiff_t>(vector.GetIncrement()) };
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    utilities::StlStridedIterator<typename std::vector<ElementType>::iterator> end(Vector<ElementType, orientation>& vector)
+    {
+        return { vector._data.end(), static_cast<ptrdiff_t>(vector.GetIncrement()) };
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    utilities::StlStridedIterator<typename std::vector<ElementType>::const_iterator> end(const Vector<ElementType, orientation>& vector)
+    {
+        return { vector._data.cend(), static_cast<ptrdiff_t>(vector.GetIncrement()) };
+    }
+
+    //
+    // VectorArchiver
+    //
     template <typename ElementType, VectorOrientation orientation>
     void VectorArchiver::Write(const Vector<ElementType, orientation>& vector, const std::string& name, utilities::Archiver& archiver)
     {

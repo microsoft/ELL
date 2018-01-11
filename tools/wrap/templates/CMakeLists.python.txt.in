@@ -43,7 +43,11 @@ if(${PYTHONLIBS_FOUND})
     # build the python module
     set(module_prefix _)
 
-    add_library(${module_prefix}@ELL_model@ SHARED
+    set(target_name ${module_prefix}@ELL_model_name@)
+
+    set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+    set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+    add_library(${target_name} SHARED
         @ELL_model@.@OBJECT_EXTENSION@
         @ELL_model@PYTHON_wrap.cxx
         @ELL_model@PYTHON_wrap.h
@@ -51,17 +55,17 @@ if(${PYTHONLIBS_FOUND})
         tcc/CallbackInterface.tcc)
 
     if(WIN32)
-        set_property(TARGET ${module_prefix}@ELL_model@ PROPERTY SUFFIX ".pyd")
+        set_property(TARGET ${target_name} PROPERTY SUFFIX ".pyd")
     else()
-        set_property(TARGET ${module_prefix}@ELL_model@ PROPERTY PREFIX "")
+        set_property(TARGET ${target_name} PROPERTY PREFIX "")
     endif()
 
     if(APPLE)
-        set_property(TARGET ${module_prefix}@ELL_model@ PROPERTY SUFFIX ".so")
+        set_property(TARGET ${target_name} PROPERTY SUFFIX ".so")
     endif()
 
-    target_include_directories(${module_prefix}@ELL_model@ PRIVATE include ${PYTHON_INCLUDE_PATH} ${BLAS_INCLUDE_DIRS})
-    target_link_libraries(${module_prefix}@ELL_model@ PRIVATE ${PYTHON_LIBRARIES} ${BLAS_LIBS})
+    target_include_directories(${target_name} PRIVATE include ${PYTHON_INCLUDE_PATH} ${BLAS_INCLUDE_DIRS})
+    target_link_libraries(${target_name} PRIVATE ${PYTHON_LIBRARIES} ${BLAS_LIBS})
 else()
   message(WARNING "Couldn't find Python libraries 3.4 or later, python module will not be created")
 endif() # PYTHONLIBS_FOUND

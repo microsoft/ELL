@@ -72,40 +72,40 @@ namespace emitters
     {
         switch (type)
         {
-            case VariableType::Void:
-                return GetVariableType(type);
-            case VariableType::VoidPointer:
-                return GetVariableType(VariableType::Void)->getPointerTo();
-            case VariableType::Byte:
-                return GetVariableType(type);
-            case VariableType::BytePointer:
-                return GetVariableType(VariableType::Byte)->getPointerTo();
-            case VariableType::Short:
-                return GetVariableType(type);
-            case VariableType::ShortPointer:
-                return GetVariableType(VariableType::Short)->getPointerTo();
-            case VariableType::Int32:
-                return GetVariableType(type);
-            case VariableType::Int32Pointer:
-                return GetVariableType(VariableType::Int32)->getPointerTo();
-            case VariableType::Int64:
-                return GetVariableType(type);
-            case VariableType::Int64Pointer:
-                return GetVariableType(VariableType::Int64)->getPointerTo();
-            case VariableType::Float:
-                return GetVariableType(type);
-            case VariableType::FloatPointer:
-                return GetVariableType(VariableType::Float)->getPointerTo();
-            case VariableType::Double:
-                return GetVariableType(type);
-            case VariableType::DoublePointer:
-                return GetVariableType(VariableType::Double)->getPointerTo();
-            case VariableType::Char8:
-                return GetVariableType(type);
-            case VariableType::Char8Pointer:
-                return GetVariableType(VariableType::Char8)->getPointerTo();
-            default:
-                throw EmitterException(EmitterError::valueTypeNotSupported);
+        case VariableType::Void:
+            return GetVariableType(type);
+        case VariableType::VoidPointer:
+            return GetVariableType(VariableType::Void)->getPointerTo();
+        case VariableType::Byte:
+            return GetVariableType(type);
+        case VariableType::BytePointer:
+            return GetVariableType(VariableType::Byte)->getPointerTo();
+        case VariableType::Short:
+            return GetVariableType(type);
+        case VariableType::ShortPointer:
+            return GetVariableType(VariableType::Short)->getPointerTo();
+        case VariableType::Int32:
+            return GetVariableType(type);
+        case VariableType::Int32Pointer:
+            return GetVariableType(VariableType::Int32)->getPointerTo();
+        case VariableType::Int64:
+            return GetVariableType(type);
+        case VariableType::Int64Pointer:
+            return GetVariableType(VariableType::Int64)->getPointerTo();
+        case VariableType::Float:
+            return GetVariableType(type);
+        case VariableType::FloatPointer:
+            return GetVariableType(VariableType::Float)->getPointerTo();
+        case VariableType::Double:
+            return GetVariableType(type);
+        case VariableType::DoublePointer:
+            return GetVariableType(VariableType::Double)->getPointerTo();
+        case VariableType::Char8:
+            return GetVariableType(type);
+        case VariableType::Char8Pointer:
+            return GetVariableType(VariableType::Char8)->getPointerTo();
+        default:
+            throw EmitterException(EmitterError::valueTypeNotSupported);
         }
     }
 
@@ -226,16 +226,16 @@ namespace emitters
     {
         switch (type)
         {
-            case VariableType::Byte:
-            case VariableType::Short:
-            case VariableType::Int32:
-            case VariableType::Int64:
-                return Integer(type, 0);
-            case VariableType::Float:
-            case VariableType::Double:
-                return Literal(0.0);
-            default:
-                break;
+        case VariableType::Byte:
+        case VariableType::Short:
+        case VariableType::Int32:
+        case VariableType::Int64:
+            return Integer(type, 0);
+        case VariableType::Float:
+        case VariableType::Double:
+            return Literal(0.0);
+        default:
+            break;
         }
         return nullptr;
     }
@@ -438,7 +438,7 @@ namespace emitters
     {
         assert(pValue != nullptr);
         auto valueType = pValue->getType();
-        
+
         // We can't do a bit cast if the types don't have the same size
         if (!llvm::CastInst::isBitCastable(valueType, destinationType))
         {
@@ -452,7 +452,7 @@ namespace emitters
                 // unequal sizes: need to bitcast to an int, truncate, then bitcast to destination type
                 auto intType1 = llvm::Type::getIntNTy(_llvmContext, size1);
                 auto intType2 = llvm::Type::getIntNTy(_llvmContext, size2);
-                
+
                 auto intValue1 = _irBuilder.CreateBitOrPointerCast(pValue, intType1);
                 auto resizedIntValue = _irBuilder.CreateZExtOrTrunc(intValue1, intType2);
                 return _irBuilder.CreateBitOrPointerCast(resizedIntValue, destinationType);
@@ -473,12 +473,12 @@ namespace emitters
         assert(pValue != nullptr);
         return _irBuilder.CreatePointerCast(pValue, destinationType);
     }
-    
+
     llvm::Value* IREmitter::CastPointer(llvm::Value* pValue, VariableType destinationType)
     {
         return CastPointer(pValue, Type(destinationType));
     }
-    
+
     llvm::Value* IREmitter::CastIntToPointer(llvm::Value* pValue, llvm::Type* destinationType)
     {
         assert(pValue != nullptr);
@@ -489,7 +489,7 @@ namespace emitters
     {
         assert(pValue != nullptr);
         return _irBuilder.CreatePtrToInt(pValue, destinationType);
-    }    
+    }
 
     llvm::Value* IREmitter::CastIntToFloat(llvm::Value* pValue, VariableType destinationType, bool isSigned)
     {
@@ -509,12 +509,12 @@ namespace emitters
         assert(pValue != nullptr);
 
         auto type = Type(destinationType);
-        if(!type->isIntegerTy())
+        if (!type->isIntegerTy())
         {
             throw EmitterException(EmitterError::notSupported);
         }
 
-        if(isSigned)
+        if (isSigned)
         {
             return _irBuilder.CreateFPToSI(pValue, type);
         }
@@ -551,7 +551,7 @@ namespace emitters
     }
 
     //
-    // Operations / Comparisons
+    // Native LLVM operations / comparisons
     //
     llvm::Value* IREmitter::UnaryOperation(const UnaryOperationType type, llvm::Value* value, const std::string& variableName)
     {
@@ -559,13 +559,13 @@ namespace emitters
 
         switch (type)
         {
-            case UnaryOperationType::logicalNot:
-                return _irBuilder.CreateNot(value, variableName);
-            default:
-                throw EmitterException(EmitterError::operatorTypeNotSupported, "logicalNot is the only supported unary operator");
+        case UnaryOperationType::logicalNot:
+            return _irBuilder.CreateNot(value, variableName);
+        default:
+            throw EmitterException(EmitterError::operatorTypeNotSupported, "Unsupported unary operator");
         }
     }
-    
+
     llvm::Value* IREmitter::BinaryOperation(const TypedOperator type, llvm::Value* pLeftValue, llvm::Value* pRightValue, const std::string& variableName)
     {
         assert(pLeftValue != nullptr);
@@ -573,38 +573,38 @@ namespace emitters
 
         switch (type)
         {
-            case TypedOperator::add:
-                return _irBuilder.CreateAdd(pLeftValue, pRightValue, variableName);
-            case TypedOperator::subtract:
-                return _irBuilder.CreateSub(pLeftValue, pRightValue, variableName);
-            case TypedOperator::multiply:
-                return _irBuilder.CreateMul(pLeftValue, pRightValue, variableName);
-            case TypedOperator::divideSigned:
-                return _irBuilder.CreateSDiv(pLeftValue, pRightValue, variableName);
-            case TypedOperator::moduloSigned:
-                return _irBuilder.CreateSRem(pLeftValue, pRightValue, variableName);
-            case TypedOperator::addFloat:
-                return _irBuilder.CreateFAdd(pLeftValue, pRightValue, variableName);
-            case TypedOperator::subtractFloat:
-                return _irBuilder.CreateFSub(pLeftValue, pRightValue, variableName);
-            case TypedOperator::multiplyFloat:
-                return _irBuilder.CreateFMul(pLeftValue, pRightValue, variableName);
-            case TypedOperator::divideFloat:
-                return _irBuilder.CreateFDiv(pLeftValue, pRightValue, variableName);
-            case TypedOperator::logicalAnd:
-                return _irBuilder.CreateAnd(pLeftValue, pRightValue, variableName);
-            case TypedOperator::logicalOr:
-                return _irBuilder.CreateOr(pLeftValue, pRightValue, variableName);
-            case TypedOperator::logicalXor:
-                return _irBuilder.CreateXor(pLeftValue, pRightValue, variableName);
-            case TypedOperator::shiftLeft:
-                return _irBuilder.CreateShl(pLeftValue, pRightValue, variableName);
-            case TypedOperator::logicalShiftRight:
-                return _irBuilder.CreateLShr(pLeftValue, pRightValue, variableName);
-            case TypedOperator::arithmeticShiftRight:
-                return _irBuilder.CreateAShr(pLeftValue, pRightValue, variableName);
-            default:
-                throw EmitterException(EmitterError::operatorTypeNotSupported);
+        case TypedOperator::add:
+            return _irBuilder.CreateAdd(pLeftValue, pRightValue, variableName);
+        case TypedOperator::subtract:
+            return _irBuilder.CreateSub(pLeftValue, pRightValue, variableName);
+        case TypedOperator::multiply:
+            return _irBuilder.CreateMul(pLeftValue, pRightValue, variableName);
+        case TypedOperator::divideSigned:
+            return _irBuilder.CreateSDiv(pLeftValue, pRightValue, variableName);
+        case TypedOperator::moduloSigned:
+            return _irBuilder.CreateSRem(pLeftValue, pRightValue, variableName);
+        case TypedOperator::addFloat:
+            return _irBuilder.CreateFAdd(pLeftValue, pRightValue, variableName);
+        case TypedOperator::subtractFloat:
+            return _irBuilder.CreateFSub(pLeftValue, pRightValue, variableName);
+        case TypedOperator::multiplyFloat:
+            return _irBuilder.CreateFMul(pLeftValue, pRightValue, variableName);
+        case TypedOperator::divideFloat:
+            return _irBuilder.CreateFDiv(pLeftValue, pRightValue, variableName);
+        case TypedOperator::logicalAnd:
+            return _irBuilder.CreateAnd(pLeftValue, pRightValue, variableName);
+        case TypedOperator::logicalOr:
+            return _irBuilder.CreateOr(pLeftValue, pRightValue, variableName);
+        case TypedOperator::logicalXor:
+            return _irBuilder.CreateXor(pLeftValue, pRightValue, variableName);
+        case TypedOperator::shiftLeft:
+            return _irBuilder.CreateShl(pLeftValue, pRightValue, variableName);
+        case TypedOperator::logicalShiftRight:
+            return _irBuilder.CreateLShr(pLeftValue, pRightValue, variableName);
+        case TypedOperator::arithmeticShiftRight:
+            return _irBuilder.CreateAShr(pLeftValue, pRightValue, variableName);
+        default:
+            throw EmitterException(EmitterError::operatorTypeNotSupported);
         }
     }
 
@@ -615,32 +615,32 @@ namespace emitters
 
         switch (type)
         {
-            case TypedComparison::equals:
-                return _irBuilder.CreateICmpEQ(pLeftValue, pRightValue);
-            case TypedComparison::lessThan:
-                return _irBuilder.CreateICmpSLT(pLeftValue, pRightValue);
-            case TypedComparison::lessThanOrEquals:
-                return _irBuilder.CreateICmpSLE(pLeftValue, pRightValue);
-            case TypedComparison::greaterThan:
-                return _irBuilder.CreateICmpSGT(pLeftValue, pRightValue);
-            case TypedComparison::greaterThanOrEquals:
-                return _irBuilder.CreateICmpSGE(pLeftValue, pRightValue);
-            case TypedComparison::notEquals:
-                return _irBuilder.CreateICmpNE(pLeftValue, pRightValue);
-            case TypedComparison::equalsFloat:
-                return _irBuilder.CreateFCmpOEQ(pLeftValue, pRightValue);
-            case TypedComparison::lessThanFloat:
-                return _irBuilder.CreateFCmpOLT(pLeftValue, pRightValue);
-            case TypedComparison::lessThanOrEqualsFloat:
-                return _irBuilder.CreateFCmpOLE(pLeftValue, pRightValue);
-            case TypedComparison::greaterThanFloat:
-                return _irBuilder.CreateFCmpOGT(pLeftValue, pRightValue);
-            case TypedComparison::greaterThanOrEqualsFloat:
-                return _irBuilder.CreateFCmpOGE(pLeftValue, pRightValue);
-            case TypedComparison::notEqualsFloat:
-                return _irBuilder.CreateFCmpONE(pLeftValue, pRightValue);
-            default:
-                throw EmitterException(EmitterError::comparisonTypeNotSupported);
+        case TypedComparison::equals:
+            return _irBuilder.CreateICmpEQ(pLeftValue, pRightValue);
+        case TypedComparison::lessThan:
+            return _irBuilder.CreateICmpSLT(pLeftValue, pRightValue);
+        case TypedComparison::lessThanOrEquals:
+            return _irBuilder.CreateICmpSLE(pLeftValue, pRightValue);
+        case TypedComparison::greaterThan:
+            return _irBuilder.CreateICmpSGT(pLeftValue, pRightValue);
+        case TypedComparison::greaterThanOrEquals:
+            return _irBuilder.CreateICmpSGE(pLeftValue, pRightValue);
+        case TypedComparison::notEquals:
+            return _irBuilder.CreateICmpNE(pLeftValue, pRightValue);
+        case TypedComparison::equalsFloat:
+            return _irBuilder.CreateFCmpOEQ(pLeftValue, pRightValue);
+        case TypedComparison::lessThanFloat:
+            return _irBuilder.CreateFCmpOLT(pLeftValue, pRightValue);
+        case TypedComparison::lessThanOrEqualsFloat:
+            return _irBuilder.CreateFCmpOLE(pLeftValue, pRightValue);
+        case TypedComparison::greaterThanFloat:
+            return _irBuilder.CreateFCmpOGT(pLeftValue, pRightValue);
+        case TypedComparison::greaterThanOrEqualsFloat:
+            return _irBuilder.CreateFCmpOGE(pLeftValue, pRightValue);
+        case TypedComparison::notEqualsFloat:
+            return _irBuilder.CreateFCmpONE(pLeftValue, pRightValue);
+        default:
+            throw EmitterException(EmitterError::comparisonTypeNotSupported);
         }
     }
 
@@ -962,12 +962,18 @@ namespace emitters
         return _irBuilder.CreateInBoundsGEP(pArray, derefArguments);
     }
 
-    llvm::Value* IREmitter::GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex)
+    llvm::Value* IREmitter::GetStructFieldPointer(llvm::Value* structPtr, size_t fieldIndex)
     {
         auto structPtrType = llvm::dyn_cast<llvm::PointerType>(structPtr->getType());
         assert(structPtrType && "Error: must pass pointer to GetStructFieldPointer");
         assert(structPtrType->getElementType()->isStructTy() && "Error: must pass pointer to a struct type to GetStructFieldPointer");
         return _irBuilder.CreateStructGEP(structPtrType->getElementType(), structPtr, fieldIndex);
+    }
+
+    llvm::Value* IREmitter::ExtractStructField(llvm::Value* structValue, size_t fieldIndex)
+    {
+        assert(structValue->getType()->isStructTy() && "Error: must pass a struct type to ExtractStructField");
+        return _irBuilder.CreateExtractValue(structValue, {static_cast<unsigned int>(fieldIndex)});
     }
 
     llvm::LoadInst* IREmitter::Load(llvm::Value* pPointer)
@@ -1091,24 +1097,24 @@ namespace emitters
     {
         switch (type)
         {
-            case VariableType::Void:
-                return _irBuilder.getVoidTy();
-            case VariableType::Byte:
-                return _irBuilder.getInt8Ty();
-            case VariableType::Short:
-                return _irBuilder.getInt16Ty();
-            case VariableType::Int32:
-                return _irBuilder.getInt32Ty();
-            case VariableType::Int64:
-                return _irBuilder.getInt64Ty();
-            case VariableType::Float:
-                return _irBuilder.getFloatTy();
-            case VariableType::Double:
-                return _irBuilder.getDoubleTy();
-            case VariableType::Char8:
-                return _irBuilder.getInt8Ty();
-            default:
-                throw EmitterException(EmitterError::valueTypeNotSupported);
+        case VariableType::Void:
+            return _irBuilder.getVoidTy();
+        case VariableType::Byte:
+            return _irBuilder.getInt8Ty();
+        case VariableType::Short:
+            return _irBuilder.getInt16Ty();
+        case VariableType::Int32:
+            return _irBuilder.getInt32Ty();
+        case VariableType::Int64:
+            return _irBuilder.getInt64Ty();
+        case VariableType::Float:
+            return _irBuilder.getFloatTy();
+        case VariableType::Double:
+            return _irBuilder.getDoubleTy();
+        case VariableType::Char8:
+            return _irBuilder.getInt8Ty();
+        default:
+            throw EmitterException(EmitterError::valueTypeNotSupported);
         }
     }
 
@@ -1116,23 +1122,23 @@ namespace emitters
     {
         switch (type)
         {
-            // Are these correct for the int types??
-            case VariableType::Byte:
-                return 8;
-            case VariableType::Short:
-                return 16;
-            case VariableType::Int32:
-                return 32;
-            case VariableType::Int64:
-                return 64;
-            case VariableType::Float:
-                return 4;
-            case VariableType::Double:
-                return 8;
-            case VariableType::Char8:
-                return 8;
-            default:
-                throw EmitterException(EmitterError::valueTypeNotSupported);
+        // Are these correct for the int types??
+        case VariableType::Byte:
+            return 8;
+        case VariableType::Short:
+            return 16;
+        case VariableType::Int32:
+            return 32;
+        case VariableType::Int64:
+            return 64;
+        case VariableType::Float:
+            return 4;
+        case VariableType::Double:
+            return 8;
+        case VariableType::Char8:
+            return 8;
+        default:
+            throw EmitterException(EmitterError::valueTypeNotSupported);
         }
     }
 

@@ -87,6 +87,7 @@ void TestIRCompiler()
     TestCompilableSourceNode();
     TestCompilableSinkNode();
     TestCompilableClockNode();
+    TestCompilableFFTNode();
 
     TestPerformanceCounters();
     TestCompilableDotProductNode2<float>(3); // uses IR

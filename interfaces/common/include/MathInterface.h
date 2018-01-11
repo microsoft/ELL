@@ -37,24 +37,23 @@ namespace math
         return static_cast<long>(index);
     }
 
-
     struct TensorShape
     {
-        size_t rows;
-        size_t columns;
-        size_t channels;
+        int rows;
+        int columns;
+        int channels;
 
         /// <summary> Gets the number of elements. </summary>
         ///
         /// <returns> The number of elements in the `TensorShape` </returns>
-        size_t Size() const { return rows * columns * channels; }
+        int Size() const { return rows * columns * channels; }
 
         TensorShape() : TensorShape(0, 0, 0)
         {
             // this is needed by SWIG wrappers.
         }
 
-        TensorShape(size_t rows, size_t columns, size_t channels) :
+        TensorShape(int rows, int columns, int channels) :
             rows(rows), columns(columns), channels(channels) 
         {
         }
@@ -76,7 +75,7 @@ namespace math
     class Tensor
     {
     public:
-        Tensor(const std::vector<ElementType>& data, size_t rows, size_t columns, size_t channels) :
+        Tensor(const std::vector<ElementType>& data, int rows, int columns, int channels) :
             shape{ rows, columns, channels }, data(data)
         {
         }

@@ -83,44 +83,44 @@ namespace nodes
     template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
     LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::LSTMNode()
         : CompilableNode({ &_input, &_inputWeights, &_forgetMeWeights, &_candidateWeights, &_outputWeights, &_inputBias, &_forgetMeBias, &_candidateBias, &_outputBias },
-                         { &_output }),
-          _input(this, {}, defaultInputPortName),
-          _inputWeights(this, {}, inputWeightsPortName),
-          _forgetMeWeights(this, {}, forgetMeWeightsPortName),
-          _candidateWeights(this, {}, candidateWeightsPortName),
-          _outputWeights(this, {}, outputWeightsPortName),
-          _inputBias(this, {}, inputBiasPortName),
-          _forgetMeBias(this, {}, forgetMeBiasPortName),
-          _candidateBias(this, {}, candidateBiasPortName),
-          _outputBias(this, {}, outputBiasPortName),
-          _output(this, defaultOutputPortName, 0)
+                         { &_output })
+        , _input(this, {}, defaultInputPortName)
+        , _inputWeights(this, {}, inputWeightsPortName)
+        , _forgetMeWeights(this, {}, forgetMeWeightsPortName)
+        , _candidateWeights(this, {}, candidateWeightsPortName)
+        , _outputWeights(this, {}, outputWeightsPortName)
+        , _inputBias(this, {}, inputBiasPortName)
+        , _forgetMeBias(this, {}, forgetMeBiasPortName)
+        , _candidateBias(this, {}, candidateBiasPortName)
+        , _outputBias(this, {}, outputBiasPortName)
+        , _output(this, defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
     LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::LSTMNode(const model::PortElements<ValueType>& input,
-                                                                                                         const model::PortElements<ValueType>& inputWeights,
-                                                                                                         const model::PortElements<ValueType>& forgetMeWeights,
-                                                                                                         const model::PortElements<ValueType>& candidateWeights,
-                                                                                                         const model::PortElements<ValueType>& outputWeights,
-                                                                                                         const model::PortElements<ValueType>& inputBias,
-                                                                                                         const model::PortElements<ValueType>& forgetMeBias,
-                                                                                                         const model::PortElements<ValueType>& candidateBias,
-                                                                                                         const model::PortElements<ValueType>& outputBias,
-                                                                                                         const model::PortMemoryLayout& inputMemoryLayout,
-                                                                                                         const model::PortMemoryLayout& outputMemoryLayout)
+                                                                                           const model::PortElements<ValueType>& inputWeights,
+                                                                                           const model::PortElements<ValueType>& forgetMeWeights,
+                                                                                           const model::PortElements<ValueType>& candidateWeights,
+                                                                                           const model::PortElements<ValueType>& outputWeights,
+                                                                                           const model::PortElements<ValueType>& inputBias,
+                                                                                           const model::PortElements<ValueType>& forgetMeBias,
+                                                                                           const model::PortElements<ValueType>& candidateBias,
+                                                                                           const model::PortElements<ValueType>& outputBias,
+                                                                                           const model::PortMemoryLayout& inputMemoryLayout,
+                                                                                           const model::PortMemoryLayout& outputMemoryLayout)
         : CompilableNode({ &_input, &_inputWeights, &_forgetMeWeights, &_candidateWeights, &_outputWeights, &_inputBias, &_forgetMeBias, &_candidateBias, &_outputBias },
-                         { &_output }),
-          _input(this, input, defaultInputPortName),
-          _inputWeights(this, inputWeights, inputWeightsPortName),
-          _forgetMeWeights(this, forgetMeWeights, forgetMeWeightsPortName),
-          _candidateWeights(this, candidateWeights, candidateWeightsPortName),
-          _outputWeights(this, outputWeights, outputWeightsPortName),
-          _inputBias(this, inputBias, inputBiasPortName),
-          _forgetMeBias(this, forgetMeBias, forgetMeBiasPortName),
-          _candidateBias(this, candidateBias, candidateBiasPortName),
-          _outputBias(this, outputBias, outputBiasPortName),
-          _output(this, defaultOutputPortName, inputBias.Size())
+                         { &_output })
+        , _input(this, input, defaultInputPortName)
+        , _inputWeights(this, inputWeights, inputWeightsPortName)
+        , _forgetMeWeights(this, forgetMeWeights, forgetMeWeightsPortName)
+        , _candidateWeights(this, candidateWeights, candidateWeightsPortName)
+        , _outputWeights(this, outputWeights, outputWeightsPortName)
+        , _inputBias(this, inputBias, inputBiasPortName)
+        , _forgetMeBias(this, forgetMeBias, forgetMeBiasPortName)
+        , _candidateBias(this, candidateBias, candidateBiasPortName)
+        , _outputBias(this, outputBias, outputBiasPortName)
+        , _output(this, defaultOutputPortName, inputBias.Size())
     {
     }
 

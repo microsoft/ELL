@@ -20,16 +20,27 @@
 // utilities
 #include "JsonArchiver.h"
 
+// math
+#include "FilterBank.h"
+
 // model
-#include "Map.h"
 #include "InputNode.h"
+#include "Map.h"
 #include "MapLoadArguments.h"
 #include "OutputNode.h"
 
 // nodes
+#include "BinaryOperationNode.h"
+#include "BufferNode.h"
 #include "ClockNode.h"
+#include "DCTNode.h"
+#include "FFTNode.h"
+#include "FilterBankNode.h"
+#include "HammingWindowNode.h"
+#include "IIRFilterNode.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "Tensor.h"
+#include "UnaryOperationNode.h"
 
 //
 // Callback functions
@@ -39,27 +50,27 @@
 extern "C" {
 #endif
 
-    // Note: this currently assumes that there is just 1 source and 1 sink in the map
-    // Future: extend this to route to multiple sources + sinks based on extra context parameter.
-    bool model_CompiledMap_SourceCallback_Double(double* input)
-    {
-        return ELL_API::CompiledMap::InvokeSourceCallback(input);
-    }
+// Note: this currently assumes that there is just 1 source and 1 sink in the map
+// Future: extend this to route to multiple sources + sinks based on extra context parameter.
+bool model_CompiledMap_SourceCallback_Double(double* input)
+{
+    return ELL_API::CompiledMap::InvokeSourceCallback(input);
+}
 
-    bool model_CompiledMap_SourceCallback_Float(float* input)
-    {
-        return ELL_API::CompiledMap::InvokeSourceCallback(input);
-    }
+bool model_CompiledMap_SourceCallback_Float(float* input)
+{
+    return ELL_API::CompiledMap::InvokeSourceCallback(input);
+}
 
-    void model_CompiledMap_SinkCallback_Double(double* output)
-    {
-        ELL_API::CompiledMap::InvokeSinkCallback(output);
-    }
+void model_CompiledMap_SinkCallback_Double(double* output)
+{
+    ELL_API::CompiledMap::InvokeSinkCallback(output);
+}
 
-    void model_CompiledMap_SinkCallback_Float(float* output)
-    {
-        ELL_API::CompiledMap::InvokeSinkCallback(output);
-    }
+void model_CompiledMap_SinkCallback_Float(float* output)
+{
+    ELL_API::CompiledMap::InvokeSinkCallback(output);
+}
 
 #ifdef __cplusplus
 } // extern "C"
@@ -67,6 +78,15 @@ extern "C" {
 
 namespace ELL_API
 {
+
+namespace
+{
+    template <typename OutputType, typename InputType>
+    std::vector<OutputType> CastVector(const std::vector<InputType>& vector)
+    {
+        return { vector.begin(), vector.end() };
+    }
+}
 
 //
 // Port
@@ -243,20 +263,22 @@ OutputPort Node::GetOutputPort(const std::string& portName)
 
 InputPort Node::GetInputPort(const std::string& portName)
 {
+    using namespace std::string_literals;
     auto port = _node->GetInputPort(portName);
     if (port == nullptr)
     {
-        throw std::invalid_argument("no port named '" + portName + "'");
+        throw std::invalid_argument("no port named '"s + portName + "'");
     }
     return InputPort(port);
 }
 
 Port Node::GetPort(const std::string& portName)
 {
+    using namespace std::string_literals;
     auto port = _node->GetPort(portName);
     if (port == nullptr)
     {
-        throw std::invalid_argument("no port named '" + portName + "'");
+        throw std::invalid_argument("no port named '"s + portName + "'");
     }
     return Port(port);
 }
@@ -593,6 +615,7 @@ Node ModelBuilder::AddNeuralNetworkPredictorNode(Model model, PortElements input
 
 Node ModelBuilder::AddInputNode(Model model, const ell::api::math::TensorShape& tensorShape, PortType type)
 {
+    using namespace std::string_literals;
     ell::model::Node* newNode = nullptr;
     switch (type)
     {
@@ -609,7 +632,7 @@ Node ModelBuilder::AddInputNode(Model model, const ell::api::math::TensorShape& 
         newNode = model.GetModel().AddNode<ell::model::InputNode<float>>(tensorShape.ToMathTensorShape());
         break;
     default:
-        throw std::invalid_argument("Error: could not create node");
+        throw std::invalid_argument("Error: could not create InputNode of the requested type");
     }
     return Node(newNode);
 }
@@ -634,7 +657,7 @@ Node ModelBuilder::AddOutputNode(Model model, const ell::api::math::TensorShape&
         newNode = model.GetModel().AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements), tensorShape.ToMathTensorShape());
         break;
     default:
-        throw std::invalid_argument("Error: could not create node");
+        throw std::invalid_argument("Error: could not create OutputNode of the requested type");
     }
     return Node(newNode);
 }
@@ -666,13 +689,13 @@ Node ModelBuilder::AddSinkNode(Model model, PortElements input, const ell::api::
             ell::model::PortElements<float>(elements), tensorShape.ToMathTensorShape(), sinkFunctionName);
         break;
     default:
-        throw std::invalid_argument("Error: could not create node");
+        throw std::invalid_argument("Error: could not create SinkNode of the requested type");
     }
     return Node(newNode);
 }
 
 Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outputType,
-    const ell::api::math::TensorShape& tensorShape, const std::string& sourceFunctionName)
+                                 const ell::api::math::TensorShape& tensorShape, const std::string& sourceFunctionName)
 {
     auto inputType = input.GetType();
     if (inputType != PortType::real)
@@ -694,7 +717,234 @@ Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outpu
             ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMathTensorShape(), sourceFunctionName);
         break;
     default:
-        throw std::invalid_argument("Error: could not create node");
+        throw std::invalid_argument("Error: could not create SourceNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, PortType type)
+{
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<bool>>(CastVector<bool>(values));
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<int>>(CastVector<int>(values));
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<double>>(CastVector<double>(values));
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<float>>(CastVector<float>(values));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create ConstantNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddUnaryOperationNode(Model model, PortElements input, UnaryOperationType op)
+{
+    auto operation = static_cast<ell::emitters::UnaryOperationType>(op);
+
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::nodes::UnaryOperationNode<bool>>(ell::model::PortElements<bool>(elements), operation);
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::nodes::UnaryOperationNode<int>>(ell::model::PortElements<int>(elements), operation);
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::UnaryOperationNode<double>>(ell::model::PortElements<double>(elements), operation);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::UnaryOperationNode<float>>(ell::model::PortElements<float>(elements), operation);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create UnaryOperationNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddBinaryOperationNode(Model model, PortElements input1, PortElements input2, BinaryOperationType op)
+{
+    auto operation = static_cast<ell::emitters::BinaryOperationType>(op);
+
+    auto type = input1.GetType();
+    if (type != input2.GetType())
+    {
+        throw std::invalid_argument("Error: BinaryOperationNode requires both arguments to be of the same type");
+    }
+    auto elements1 = input1.GetPortElements();
+    auto elements2 = input2.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<bool>>(ell::model::PortElements<bool>(elements1), ell::model::PortElements<bool>(elements2), operation);
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<int>>(ell::model::PortElements<int>(elements1), ell::model::PortElements<int>(elements2), operation);
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<double>>(ell::model::PortElements<double>(elements1), ell::model::PortElements<double>(elements2), operation);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<float>>(ell::model::PortElements<float>(elements1), ell::model::PortElements<float>(elements2), operation);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create BinaryOperationNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddIIRFilterNode(Model model, PortElements input, std::vector<double> bCoeffs, std::vector<double> aCoeffs)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::IIRFilterNode<double>>(ell::model::PortElements<double>(elements), bCoeffs, aCoeffs);
+        break;
+    case PortType::smallReal:
+    {
+        std::vector<float> bFloatCoeffs(bCoeffs.begin(), bCoeffs.end());
+        std::vector<float> aFloatCoeffs(aCoeffs.begin(), aCoeffs.end());
+        newNode = model.GetModel().AddNode<ell::nodes::IIRFilterNode<float>>(ell::model::PortElements<float>(elements), bFloatCoeffs, aFloatCoeffs);
+    }
+    break;
+    default:
+        throw std::invalid_argument("Error: could not create IIRFilterNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddBufferNode(Model model, PortElements input, int windowSize)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::nodes::BufferNode<bool>>(ell::model::PortElements<bool>(elements), windowSize);
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::nodes::BufferNode<int>>(ell::model::PortElements<int>(elements), windowSize);
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::BufferNode<double>>(ell::model::PortElements<double>(elements), windowSize);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::BufferNode<float>>(ell::model::PortElements<float>(elements), windowSize);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create BufferNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddHammingWindowNode(Model model, PortElements input)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::HammingWindowNode<double>>(ell::model::PortElements<double>(elements));
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::HammingWindowNode<float>>(ell::model::PortElements<float>(elements));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create HammingWindowNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFFTNode(Model model, PortElements input)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::FFTNode<double>>(ell::model::PortElements<double>(elements));
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::FFTNode<float>>(ell::model::PortElements<float>(elements));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create FFTNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddLinearFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    auto windowSize = elements.Size();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::LinearFilterBankNode<double>>(ell::model::PortElements<double>(elements), ell::dsp::LinearFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse));
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::LinearFilterBankNode<float>>(ell::model::PortElements<float>(elements), ell::dsp::LinearFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create LinearFilterBankNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    auto windowSize = elements.Size();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::MelFilterBankNode<double>>(ell::model::PortElements<double>(elements), ell::dsp::MelFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse));
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::MelFilterBankNode<float>>(ell::model::PortElements<float>(elements), ell::dsp::MelFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create MelFilterBankNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddDCTNode(Model model, PortElements input)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::DCTNode<double>>(ell::model::PortElements<double>(elements));
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::DCTNode<float>>(ell::model::PortElements<float>(elements));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create DCTNode of the requested type");
     }
     return Node(newNode);
 }
@@ -791,12 +1041,12 @@ CompiledMap Map::CompileFloat(const std::string& targetDevice, const std::string
 }
 
 CompiledMap Map::Compile(const std::string& targetDevice,
-    const std::string& moduleName,
-    const std::string& functionName,
-    const std::string& sourceFunctionName,
-    const std::string& sinkFunctionName,
-    bool useBlas,
-    std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolveCallbacks) const
+                         const std::string& moduleName,
+                         const std::string& functionName,
+                         const std::string& sourceFunctionName,
+                         const std::string& sinkFunctionName,
+                         bool useBlas,
+                         std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolveCallbacks) const
 {
     ell::model::MapCompilerParameters settings;
     settings.moduleName = moduleName;

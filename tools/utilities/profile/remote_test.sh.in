@@ -1,9 +1,10 @@
 #!/bin/sh
 
-#
-# Usage: remote_test.sh <ip address> <username> [<password>]
-#
-
+all_args=("$@")
+if [ "${all_args}" == "" ] ; then
+  echo "Usage: remote_test.sh <ip address> <username> [<password>]"
+  exit
+fi
 
 cleanup=false
 

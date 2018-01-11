@@ -6,7 +6,8 @@
 ELL nodes
 """
 
-from ..ell_py import InputNode,\
+from ..ell_py import BinaryOperationType,\
+InputNode,\
 InputPort,\
 InputPortIterator, \
 Node,\
@@ -17,4 +18,5 @@ OutputPortIterator,\
 Port,\
 PortElement,\
 PortElements,\
-PortType
+PortType,\
+UnaryOperationType

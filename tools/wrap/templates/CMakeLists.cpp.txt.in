@@ -27,6 +27,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(@ELL_model@)
 
+set(target_name @ELL_model_name@)
+
 # dependencies
 if(WIN32)
     # path to the OpenBLAS Nuget
@@ -34,11 +36,11 @@ if(WIN32)
 endif()
 include(OpenBLASSetup.cmake)
 
-add_library(@ELL_model@ STATIC IMPORTED GLOBAL)
+add_library(${target_name} STATIC IMPORTED GLOBAL)
 
-set_property(TARGET @ELL_model@ APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_SOURCE_DIR}/include")
-set_target_properties(@ELL_model@ PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/@ELL_model@.@OBJECT_EXTENSION@)
+set_property(TARGET ${target_name} APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_SOURCE_DIR}/include")
+set_target_properties(${target_name} PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/@ELL_model@.@OBJECT_EXTENSION@)
 if(BLAS_LIBS)
-    target_link_libraries(@ELL_model@ INTERFACE ${BLAS_LIBS})
+    target_link_libraries(${target_name} INTERFACE ${BLAS_LIBS})
 endif()
 

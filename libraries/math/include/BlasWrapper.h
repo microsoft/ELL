@@ -8,10 +8,10 @@
 
 #pragma once
 
+#include "Matrix.h"
+
 // stl
 #include <cstddef> // size_t
-
-#include "Matrix.h"
 
 namespace ell
 {

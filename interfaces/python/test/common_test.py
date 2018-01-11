@@ -13,7 +13,7 @@ def TestLoadSaveModel(fileName):
     m.Save(path)
 
 def TestLoadSaveModels():
-    prefix = "../../../examples/data/"
+    prefix = "../../../examples/models/"
     fileNames = ["model_1.model", "model_2.model"]
     for fileName in fileNames:
         TestLoadSaveModel(prefix + fileName)

@@ -736,7 +736,17 @@ namespace emitters
         return _pEmitter->PointerOffset(pGlobal, pOffset, pFieldOffset);
     }
 
-    llvm::Value* IRFunctionEmitter::GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex)
+    llvm::Value* IRFunctionEmitter::ExtractStructField(llvm::Value* structValue, size_t fieldIndex)
+    {
+        return _pEmitter->ExtractStructField(structValue, fieldIndex);
+    }
+
+    llvm::Value* IRFunctionEmitter::GetStructFieldValue(llvm::Value* structPtr, size_t fieldIndex)
+    {
+        return Load(GetStructFieldPointer(structPtr, fieldIndex));
+    }
+
+    llvm::Value* IRFunctionEmitter::GetStructFieldPointer(llvm::Value* structPtr, size_t fieldIndex)
     {
         return _pEmitter->GetStructFieldPointer(structPtr, fieldIndex);
     }
@@ -876,11 +886,6 @@ namespace emitters
     IRForLoopEmitter IRFunctionEmitter::ForLoop()
     {
         return IRForLoopEmitter(*this);
-    }    
-
-    IRWhileLoopEmitter IRFunctionEmitter::WhileLoop()
-    {
-        return IRWhileLoopEmitter(*this);
     }
 
     IRIfEmitter IRFunctionEmitter::If()
@@ -891,6 +896,11 @@ namespace emitters
     IRIfEmitter IRFunctionEmitter::If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue)
     {
         return IRIfEmitter(*this, comparison, pValue, pTestValue);
+    }
+
+    IRWhileLoopEmitter IRFunctionEmitter::WhileLoop()
+    {
+        return IRWhileLoopEmitter(*this);
     }
 
     //

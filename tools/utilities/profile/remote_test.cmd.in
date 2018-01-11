@@ -1,10 +1,12 @@
 @ECHO OFF
 SETLOCAL ENABLEEXTENSIONS
 
-REM Usage: remote_test.cmd <ip address> <username> [<password>]
+if "%1"=="" (
+  echo "Usage: remote_test.sh <ip address> <username> [<password>]"
+  goto :eof
+)
 
 set cleanup=false
-
 set target=pi3
 set ip=%1
 set username=%2

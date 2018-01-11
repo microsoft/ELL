@@ -12,7 +12,7 @@ namespace ell
 {
 namespace emitters
 {
-    ///<summary>A list of error codes thrown by code emitters</summary>
+    ///<summary> A list of error codes thrown by code emitters </summary>
     enum class EmitterError
     {
         // Unexpected error

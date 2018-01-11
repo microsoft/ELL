@@ -712,13 +712,21 @@ namespace emitters
         /// <returns> Pointer to a value that represents that field. </returns>
         llvm::Value* PointerOffset(llvm::AllocaInst* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset);
 
-        /// <summary> Get a pointer to a fields in a struct. </summary>
+        /// <summary> Extract an element from a struct held by value. </summary>
         ///
-        /// <param name="structPtr"> Pointer to the struct. </param>
+        /// <param name="structValue"> Pointer to the struct value. </param>
         /// <param name="fieldIndex"> The index of the field to get. </param>
         ///
         /// <returns> A pointer the specified field in the struct. </returns>
-        llvm::Value* GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex);
+        llvm::Value* ExtractStructField(llvm::Value* structValue, size_t fieldIndex);
+
+        /// <summary> Get a pointer to a fields in a struct. </summary>
+        ///
+        /// <param name="structPtr"> Pointer to the struct pointer. </param>
+        /// <param name="fieldIndex"> The index of the field to get. </param>
+        ///
+        /// <returns> A pointer the specified field in the struct. </returns>
+        llvm::Value* GetStructFieldPointer(llvm::Value* structPtr, size_t fieldIndex);
 
         /// <summary> Emits an instruction to load a value referenced by a pointer into a register. </summary>
         ///

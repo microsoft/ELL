@@ -2,9 +2,9 @@
 # cmake file
 #
 
-set (library_name model)
+set(library_name model)
 
-set (src 
+set(src 
     src/CompilableNode.cpp
     src/CompilableNodeUtilities.cpp
     src/CompiledMap.cpp
@@ -26,7 +26,7 @@ set (src
     src/PortMemoryLayout.cpp
 )
 
-set (include
+set(include
     include/CompilableNodeUtilities.h
     include/CompiledMap.h
     include/Map.h
@@ -51,7 +51,7 @@ set (include
     include/PortMemoryLayout.h
 )
 
-set (tcc 
+set(tcc 
     tcc/Map.tcc
     tcc/InputNode.tcc
     tcc/InputPort.tcc
@@ -68,7 +68,7 @@ set (tcc
     tcc/PortElements.tcc
 )
 
-set (doc 
+set(doc 
     doc/CompileAsFunction.md
     doc/README.md)
 
@@ -87,9 +87,9 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 # test project
 #
 
-set (test_name ${library_name}_test)
+set(test_name ${library_name}_test)
 
-set (test_src
+set(test_src
     test/src/main.cpp
     test/src/Map_test.cpp
     test/src/ModelTestUtilities.cpp
@@ -99,7 +99,7 @@ set (test_src
     test/src/PortElements_test.cpp
 )
 
-set (test_include 
+set(test_include 
     test/include/Map_test.h
     test/include/ModelBuilder_test.h
     test/include/ModelTestUtilities.h
@@ -108,7 +108,7 @@ set (test_include
     test/include/ModelTestUtilities.h
 )
 
-set (test_tcc
+set(test_tcc
     test/tcc/ModelTestUtilities.tcc
 )
 
@@ -128,9 +128,9 @@ set_test_library_path(${test_name})
 #
 # compiler-specific tests
 #
-set (compiler_test_name ${library_name}_compiler_test)
+set(compiler_test_name ${library_name}_compiler_test)
 
-set (compiler_test_src
+set(compiler_test_src
     test/src/model_compiler_test_main.cpp
     test/src/CompilableNodesTest.cpp
     test/src/CompilerTest.cpp
@@ -139,7 +139,7 @@ set (compiler_test_src
     test/src/PerformanceCountersTest.cpp
 )
 
-set (compiler_test_include
+set(compiler_test_include
     test/include/CompilableNodesTest.h
     test/include/CompilerTest.h
     test/include/ModelMaker.h
@@ -147,7 +147,7 @@ set (compiler_test_include
     test/include/PerformanceCountersTest.h
 )
 
-set (compiler_test_tcc
+set(compiler_test_tcc
     test/tcc/CompilableNodesTest.tcc
     test/tcc/CompilerTest.tcc
     test/tcc/ModelMaker.tcc

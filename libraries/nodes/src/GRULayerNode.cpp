@@ -85,14 +85,14 @@ namespace nodes
 
     template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
     GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::GRUNode(const model::PortElements<ValueType>& input,
-                                                                                                       const model::PortElements<ValueType>& updateWeights,
-                                                                                                       const model::PortElements<ValueType>& resetWeights,
-                                                                                                       const model::PortElements<ValueType>& hiddenWeights,
-                                                                                                       const model::PortElements<ValueType>& updateBias,
-                                                                                                       const model::PortElements<ValueType>& resetBias,
-                                                                                                       const model::PortElements<ValueType>& hiddenBias,
-                                                                                                       const model::PortMemoryLayout& inputMemoryLayout,
-                                                                                                       const model::PortMemoryLayout& outputMemoryLayout)
+                                                                                         const model::PortElements<ValueType>& updateWeights,
+                                                                                         const model::PortElements<ValueType>& resetWeights,
+                                                                                         const model::PortElements<ValueType>& hiddenWeights,
+                                                                                         const model::PortElements<ValueType>& updateBias,
+                                                                                         const model::PortElements<ValueType>& resetBias,
+                                                                                         const model::PortElements<ValueType>& hiddenBias,
+                                                                                         const model::PortMemoryLayout& inputMemoryLayout,
+                                                                                         const model::PortMemoryLayout& outputMemoryLayout)
         : CompilableNode({ &_input, &_updateWeights, &_resetWeights, &_hiddenWeights, &_updateBias, &_resetBias, &_hiddenBias },
                          { &_output }),
           _input(this, input, defaultInputPortName),

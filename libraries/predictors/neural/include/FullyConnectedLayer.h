@@ -27,7 +27,7 @@ namespace neural
         using LayerParameters = typename Layer<ElementType>::LayerParameters;
         using VectorType = typename Layer<ElementType>::VectorType;
         using MatrixType = typename Layer<ElementType>::MatrixType;
-        using MatrixReferenceType = typename Layer<ElementType>::MatrixReferenceType;
+        using ConstMatrixReferenceType = typename Layer<ElementType>::ConstMatrixReferenceType;
         using ConstTensorReferenceType = typename Layer<ElementType>::ConstTensorReferenceType;
         using Layer<ElementType>::GetOutputMinusPadding;
         using Layer<ElementType>::NumOutputRowsMinusPadding;
@@ -39,7 +39,7 @@ namespace neural
         /// <param name="layerParameters"> The parameters common to every layer. </param>
         /// <param name="weights"> The weights to apply as a matrix in rowMajor order, where number of rows equals output neurons
         /// and columns represent input (in logical Tensor order: row, column, channel).  </param>
-        FullyConnectedLayer(const LayerParameters& layerParameters, MatrixReferenceType& weights);
+        FullyConnectedLayer(const LayerParameters& layerParameters, ConstMatrixReferenceType& weights);
 
         /// <summary> Instantiates an instance of a fully connected layer. </summary>
         ///

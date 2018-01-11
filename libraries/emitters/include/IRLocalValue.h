@@ -94,6 +94,7 @@ namespace emitters
     //
     // Convenience overloads for common operators
     //
+    
     // Basic arithmetic
     IRLocalScalar operator+(IRLocalScalar a, IRLocalScalar b);
     IRLocalScalar operator-(IRLocalScalar a, IRLocalScalar b);

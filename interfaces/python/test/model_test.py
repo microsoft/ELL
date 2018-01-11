@@ -1,5 +1,7 @@
 from __future__ import print_function
+import os
 import functools
+
 import ell
 
 
@@ -193,10 +195,10 @@ def testModel(filename):
 
 
 def test():
-    prefix = "../../../examples/data/"
+    prefix = "../../../examples/models"
     fileNames = ["model_1.model", "model_2.model"]
     for name in fileNames:
-        testModel(prefix + name)
+        testModel(os.path.join(prefix, name))
     return 0
 
 

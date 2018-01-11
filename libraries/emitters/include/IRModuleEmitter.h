@@ -245,15 +245,7 @@ namespace emitters
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
         llvm::GlobalVariable* GlobalArray(const std::string& name, llvm::Type* pType, const size_t size);
 
-        /// <summary> Emit a named global array of doubles. </summary>
-        ///
-        /// <param name="name"> The name of the variable. </param>
-        /// <param name="value"> The value of the array. </param>
-        ///
-        /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
-        llvm::GlobalVariable* GlobalArray(const std::string& name, const std::vector<double>& value);
-
-        /// <summary> Emit a named, module scoped array constant of a template type. </summary>
+        /// <summary> Emit a named, module scoped array of a template type. </summary>
         ///
         /// <typeparam name="ValueType"> Type of each array entry. </typeparam>
         /// <param name="value"> The value of the array. </param>

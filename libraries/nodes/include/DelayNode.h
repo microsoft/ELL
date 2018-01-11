@@ -31,7 +31,7 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> A node that returns a delayed sample of the input signal. </summary>
+    /// <summary> A node that returns a delayed sample of the input. </summary>
     template <typename ValueType>
     class DelayNode : public model::CompilableNode
     {
@@ -47,8 +47,8 @@ namespace nodes
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="input"> The signal to delay </param>
-        /// <param name="windowSize"> The number of samples to delay the signal </param>
+        /// <param name="input"> The input to delay. </param>
+        /// <param name="windowSize"> The number of samples of delay to apply to the input data. </param>
         DelayNode(const model::PortElements<ValueType>& input, size_t windowSize);
 
         /// <summary> Gets the name of this type (for serialization). </summary>

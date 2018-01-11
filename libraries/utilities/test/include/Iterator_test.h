@@ -11,4 +11,6 @@ namespace ell
 void TestIteratorAdapter();
 void TestTransformIterator();
 void TestParallelTransformIterator();
+
+void TestStlStridedIterator();
 }

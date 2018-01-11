@@ -28,5 +28,5 @@ set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")
 set (test_name ${tool_name}_test)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${tool_name} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -imf ${CMAKE_SOURCE_DIR}/examples/data/times_two.model -odf null)
+         COMMAND ${tool_name} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -imf ${CMAKE_SOURCE_DIR}/examples/models/times_two.model -odf null)
 set_test_library_path(${test_name})

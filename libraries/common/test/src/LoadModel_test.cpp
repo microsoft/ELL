@@ -46,7 +46,7 @@ void TestLoadTreeModels()
 void TestLoadSavedModels()
 {
     std::cout << "Testing loading of saved model" << std::endl;
-    auto model1 = common::LoadModel("../../../examples/data/model_1.model");
+    auto model1 = common::LoadModel("../../../examples/models/model_1.model");
     std::cout << "Model 1 size: " << model1.Size() << std::endl;
 }
 

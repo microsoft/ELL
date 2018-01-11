@@ -14,15 +14,18 @@
 #include "BatchNormalizationLayerNode.h"
 #include "BiasLayerNode.h"
 #include "BinaryOperationNode.h"
+#include "BufferNode.h"
 #include "ClockNode.h"
 #include "DTWDistanceNode.h"
 #include "DelayNode.h"
 #include "DemultiplexerNode.h"
-#include "SquaredEuclideanDistanceNode.h"
+#include "FFTNode.h"
 #include "ForestPredictorNode.h"
+#include "IIRFilterNode.h"
 #include "L2NormSquaredNode.h"
 #include "LinearPredictorNode.h"
 #include "MatrixVectorProductNode.h"
+#include "FilterBankNode.h"
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
 #include "NeuralNetworkLayerNode.h"
@@ -30,7 +33,12 @@
 #include "ProtoNNPredictorNode.h"
 #include "SinkNode.h"
 #include "SourceNode.h"
+#include "SquaredEuclideanDistanceNode.h"
+#include "TypeCastNode.h"
 #include "UnaryOperationNode.h"
+
+// math
+#include "MathConstants.h"
 
 // model
 #include "InputNode.h"
@@ -49,6 +57,9 @@
 
 // testing
 #include "testing.h"
+
+// utilities
+#include "RandomEngines.h"
 
 // stl
 #include <chrono>
@@ -96,6 +107,47 @@ double VectorVariance(const std::vector<double>& vec, double mean)
     }
     return var / vec.size();
 }
+
+template <typename ValueType>
+std::ostream& operator<<(std::ostream& os, const std::vector<ValueType>& vec)
+{
+    os << "[";
+    for(auto x: vec)
+    {
+        os << x << " ";
+    }
+    os << "]";
+    return os;
+}
+
+
+template <typename ValueType>
+class Uniform
+{
+public:
+    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
+        : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal - minVal) {}
+
+    ValueType operator()()
+    {
+        double uniform = static_cast<double>(_rng()) / _range;
+        return static_cast<ValueType>((uniform * _outputRange) + _minOutput);
+    }
+
+private:
+    std::default_random_engine _rng;
+    double _range;
+    ValueType _minOutput;
+    ValueType _outputRange;
+};
+
+template <typename ElementType>
+void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
+{
+    Uniform<ElementType> rand(min, max);
+    std::generate(vector.begin(), vector.end(), rand);
+}
+
 }
 
 //
@@ -268,7 +320,7 @@ static void TestUnaryOperationNodeCompute()
     TestUnaryOperationNodeCompute(emitters::UnaryOperationType::log, std::log);
     TestUnaryOperationNodeCompute(emitters::UnaryOperationType::sqrt, std::sqrt);
     TestUnaryOperationNodeCompute(emitters::UnaryOperationType::logicalNot, [](bool b) { return !b; });
-    TestUnaryOperationNodeCompute(emitters::UnaryOperationType::square, [](double d) { return d*d; });
+    TestUnaryOperationNodeCompute(emitters::UnaryOperationType::square, [](double d) { return d * d; });
     TestUnaryOperationNodeCompute(emitters::UnaryOperationType::tanh, std::tanh);
 }
 
@@ -399,10 +451,10 @@ static void TestSinkNodeCompute()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
     auto sinkNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output,
-        "SinkFunction",
-        [&results](const std::vector<double>& values) {
-            results.push_back(values);
-        });
+                                                           "SinkFunction",
+                                                           [&results](const std::vector<double>& values) {
+                                                               results.push_back(values);
+                                                           });
 
     for (const auto& inputValue : data)
     {
@@ -415,8 +467,8 @@ static void TestSinkNodeCompute()
 static void TestSquaredEuclideanDistanceNodeCompute()
 {
     math::RowMatrix<double> m{
-        {1.0, 0.2, 0.3},
-        {0.3, 0.7, 0.5}
+        { 1.0, 0.2, 0.3 },
+        { 0.3, 0.7, 0.5 }
     };
 
     std::vector<double> input = { 1, 2, 3 };
@@ -424,13 +476,59 @@ static void TestSquaredEuclideanDistanceNodeCompute()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(input.size());
+    auto sqEuclideanDistanceNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
 
     inputNode->SetInput(input);
-
-    auto sqEuclideanDistanceNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
     auto computeOutput = model.ComputeOutput(sqEuclideanDistanceNode->output);
 
     testing::ProcessTest("Testing squared Euclidean distance node compute", testing::IsEqual(output, computeOutput));
+}
+
+static void TestFFTNodeCompute()
+{
+    using ValueType = double;
+    const size_t N = 32;
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ValueType>>(N);
+    auto fftNode = model.AddNode<nodes::FFTNode<ValueType>>(inputNode->output);
+
+    // FFT of constant value
+    std::vector<ValueType> signal(N, 1.0);
+    inputNode->SetInput(signal);
+    auto computeOutput = model.ComputeOutput(fftNode->output);
+    for (size_t index = 0; index < computeOutput.size(); ++index)
+    {
+        auto x = computeOutput[index];
+        testing::ProcessTest("Testing real-valued FFT of DC signal", testing::IsEqual(x, static_cast<ValueType>(index == 0 ? N : 0)));
+    }
+
+    // FFT of impulse signal
+    signal.assign(N, 0);
+    signal[0] = 1.0;
+    inputNode->SetInput(signal);
+    computeOutput = model.ComputeOutput(fftNode->output);
+    for (size_t index = 0; index < computeOutput.size(); ++index)
+    {
+        auto x = computeOutput[index];
+        testing::ProcessTest("Testing real-valued FFT of impulse signal", testing::IsEqual(x, static_cast<ValueType>(1)));
+    }
+
+    // FFT of some arbitrary sine waves
+    for (size_t freq : { 1, 3, 6, 11 })
+    {
+        for (size_t index = 0; index < N; ++index)
+        {
+            signal[index] = std::sin(2 * math::Constants<ValueType>::pi * index * freq / N);
+        }
+        inputNode->SetInput(signal);
+        computeOutput = model.ComputeOutput(fftNode->output);
+        for (size_t index = 0; index < computeOutput.size(); ++index)
+        {
+            auto x = computeOutput[index];
+            bool isPeak = (index == freq) || (index == (N - freq));
+            testing::ProcessTest("Testing real-valued FFT of sine wave", testing::IsEqual(x, static_cast<ValueType>(isPeak ? N / 2 : 0)));
+        }
+    }
 }
 
 //
@@ -537,8 +635,8 @@ static void TestSimpleForestPredictorNodeRefine()
 static void TestSquaredEuclideanDistanceNodeRefine()
 {
     math::RowMatrix<double> m{
-      {1.0, 0.2, 0.3},
-      {0.3, 0.7, 0.5}
+        { 1.0, 0.2, 0.3 },
+        { 0.3, 0.7, 0.5 }
     };
 
     std::vector<double> input = { 1, 2, 3 };
@@ -778,7 +876,7 @@ static void TestProtoNNPredictorNode()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedScoreOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ protonnPredictorNode->output});
+    auto refinedScoreOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ protonnPredictorNode->output });
 
     refinedInputNode->SetInput(input);
 
@@ -852,6 +950,225 @@ static void TestClockNodeCompute()
     testing::ProcessTest("Testing lag notification count", testing::IsEqual(lagNotificationCallbackCount, 2));
 }
 
+//
+// Combined tests
+//
+
+template <typename ValueType>
+static void TestIIRFilterNode1()
+{
+    const ValueType epsilon = static_cast<ValueType>(1e-6);
+
+    std::vector<std::vector<ValueType>> data = { { 1 }, { 0 }, { 0 }, { 0 } };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ValueType>>(data[0].size());
+    auto outputNode = model.AddNode<nodes::IIRFilterNode<ValueType>>(inputNode->output, std::vector<ValueType>{ static_cast<ValueType>(1.0) }, std::vector<ValueType>{ static_cast<ValueType>(-0.95) });
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::MapCompilerParameters settings;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    std::vector<std::vector<ValueType>> expectedOutput = { { static_cast<ValueType>(1.0) }, { static_cast<ValueType>(0.95) }, { static_cast<ValueType>(0.95 * 0.95) }, { static_cast<ValueType>(0.95 * 0.95 * 0.95) } };
+    for (size_t index = 0; index < data.size(); ++index)
+    {
+        auto input = data[index];
+
+        map.SetInputValue(0, input);
+        auto computedResult = map.ComputeOutput<ValueType>(0);
+
+        compiledMap.SetInputValue(0, input);
+        auto compiledResult = compiledMap.ComputeOutput<ValueType>(0);
+
+        testing::ProcessTest("Testing IIRFilterNode compute", testing::IsEqual(computedResult, expectedOutput[index], epsilon));
+        testing::ProcessTest("Testing IIRFilterNode compile", testing::IsEqual(compiledResult, expectedOutput[index], epsilon));
+        // std::cout << "Computed: " << computedResult << "\nCompiled: " << compiledResult << std::endl;
+    }
+}
+
+template <typename ValueType>
+static void TestIIRFilterNode2()
+{
+    const ValueType epsilon = static_cast<ValueType>(1e-6);
+
+    std::vector<std::vector<ValueType>> data = { { 1, 0, 0, 0 } };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ValueType>>(data[0].size());
+    auto outputNode = model.AddNode<nodes::IIRFilterNode<ValueType>>(inputNode->output, std::vector<ValueType>{ static_cast<ValueType>(1.0) }, std::vector<ValueType>{ static_cast<ValueType>(-0.95) });
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::MapCompilerParameters settings;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    std::vector<std::vector<ValueType>> expectedOutput = { { static_cast<ValueType>(1.0), static_cast<ValueType>(0.95), static_cast<ValueType>(0.95 * 0.95), static_cast<ValueType>(0.95 * 0.95 * 0.95) } };
+    for (size_t index = 0; index < data.size(); ++index)
+    {
+        auto input = data[index];
+
+        map.SetInputValue(0, input);
+        auto computedResult = map.ComputeOutput<ValueType>(0);
+
+        compiledMap.SetInputValue(0, input);
+        auto compiledResult = compiledMap.ComputeOutput<ValueType>(0);
+
+        testing::ProcessTest("Testing IIRFilterNode compute 2", testing::IsEqual(computedResult, expectedOutput[index], epsilon));
+        testing::ProcessTest("Testing IIRFilterNode compile 2", testing::IsEqual(compiledResult, expectedOutput[index], epsilon));
+        // std::cout << "Computed: " << computedResult << "\nCompiled: " << compiledResult << std::endl;
+    }
+}
+
+template <typename ValueType>
+static void TestIIRFilterNode3()
+{
+    const ValueType epsilon = static_cast<ValueType>(1e-6);
+
+    std::vector<ValueType> datapoint(128);
+    datapoint[0] = 1.0;
+    std::vector<std::vector<ValueType>> data = { datapoint };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ValueType>>(data[0].size());
+    std::vector<ValueType> aCoeffs = { static_cast<ValueType>(0.0125), static_cast<ValueType>(-0.0125) };
+    std::vector<ValueType> bCoeffs = { static_cast<ValueType>(1.0), static_cast<ValueType>(0.25), static_cast<ValueType>(-0.125) };
+    auto outputNode = model.AddNode<nodes::IIRFilterNode<ValueType>>(inputNode->output, bCoeffs, aCoeffs);
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::MapCompilerParameters settings;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    for (size_t index = 0; index < data.size(); ++index)
+    {
+        auto input = data[index];
+
+        map.SetInputValue(0, input);
+        auto computedResult = map.ComputeOutput<ValueType>(0);
+
+        compiledMap.SetInputValue(0, input);
+        auto compiledResult = compiledMap.ComputeOutput<ValueType>(0);
+
+        testing::ProcessTest("Testing IIRFilterNode compile 3", testing::IsEqual(compiledResult, computedResult, epsilon));
+    }
+}
+
+template <typename ValueType>
+static void TestIIRFilterNode4()
+{
+    const ValueType epsilon = static_cast<ValueType>(1e-6);
+
+    std::vector<std::vector<ValueType>> data = { { 1, 0, 0, 0, 0, 0, 0 } };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ValueType>>(data[0].size());
+    std::vector<ValueType> aCoeffs = { 0 };
+    std::vector<ValueType> bCoeffs = { static_cast<ValueType>(1.0), static_cast<ValueType>(0.25), static_cast<ValueType>(-0.125) };
+    auto outputNode = model.AddNode<nodes::IIRFilterNode<ValueType>>(inputNode->output, bCoeffs, aCoeffs);
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::MapCompilerParameters settings;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    std::vector<std::vector<ValueType>> expectedOutput = { bCoeffs };
+    expectedOutput.resize(data.size());
+    for (size_t index = 0; index < data.size(); ++index)
+    {
+        auto input = data[index];
+
+        map.SetInputValue(0, input);
+        auto computedResult = map.ComputeOutput<ValueType>(0);
+
+        compiledMap.SetInputValue(0, input);
+        auto compiledResult = compiledMap.ComputeOutput<ValueType>(0);
+
+        testing::ProcessTest("Testing IIRFilterNode compute 4", testing::IsEqual(computedResult, expectedOutput[index], epsilon));
+        testing::ProcessTest("Testing IIRFilterNode compile 4", testing::IsEqual(compiledResult, expectedOutput[index], epsilon));
+    }
+}
+
+template <typename ValueType>
+static void TestMelFilterBankNode()
+{
+    const ValueType epsilon = static_cast<ValueType>(1e-6);
+    const size_t numFilters = 13;
+    const size_t windowSize = 512;
+    const double sampleRate = 16000;
+    
+    std::vector<ValueType> signal(windowSize);
+    FillRandomVector(signal);
+    std::vector<std::vector<ValueType>> data = {signal};
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ValueType>>(windowSize);
+    auto filters = dsp::MelFilterBank(windowSize, sampleRate, numFilters);
+    auto outputNode = model.AddNode<nodes::MelFilterBankNode<ValueType>>(inputNode->output, filters);
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::MapCompilerParameters settings;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    for (size_t index = 0; index < data.size(); ++index)
+    {
+        auto input = data[index];
+
+        map.SetInputValue(0, input);
+        auto computedResult = map.ComputeOutput<ValueType>(0);
+
+        compiledMap.SetInputValue(0, input);
+        auto compiledResult = compiledMap.ComputeOutput<ValueType>(0);
+
+        testing::ProcessTest("Testing MelFilterBankNode compile", testing::IsEqual(compiledResult, computedResult, epsilon));
+    }
+}
+
+template <typename ValueType>
+static void TestBufferNode()
+{
+    const ValueType epsilon = static_cast<ValueType>(1e-7);
+    const size_t inputSize = 16;
+    const size_t windowSize = 32;
+    
+    std::vector<std::vector<ValueType>> data;
+    const int numEntries = 8;
+    for(int index = 0; index < numEntries; ++index)
+    {
+        std::vector<ValueType> item(inputSize);
+        std::iota(item.begin(), item.end(), inputSize*index);
+        data.push_back(item);
+    }
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ValueType>>(inputSize);
+    auto outputNode = model.AddNode<nodes::BufferNode<ValueType>>(inputNode->output, windowSize);
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = false;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    
+    for (size_t index = 0; index < data.size(); ++index)
+    {
+        auto input = data[index];
+
+        map.SetInputValue(0, input);
+        auto computedResult = map.ComputeOutput<ValueType>(0);
+
+        compiledMap.SetInputValue(0, input);
+        auto compiledResult = compiledMap.ComputeOutput<ValueType>(0);
+        // std::cout << "Computed result: " << computedResult << std::endl;
+        // std::cout << "Compiled result: " << compiledResult << std::endl;
+        testing::ProcessTest("Testing BufferNode compile", testing::IsEqual(compiledResult, computedResult, epsilon));
+    }
+}
+
+//
+// Main driver function to call all the tests
+//
 void NodesTests()
 {
     //
@@ -872,6 +1189,7 @@ void NodesTests()
     TestSourceNodeCompute();
     TestSquaredEuclideanDistanceNodeCompute();
     TestUnaryOperationNodeCompute();
+    TestFFTNodeCompute();
 
     //
     // Refine tests
@@ -886,4 +1204,17 @@ void NodesTests()
     TestEuclideanDistanceNodeRefine();
     TestProtoNNPredictorNode();
     TestSquaredEuclideanDistanceNodeRefine();
+
+    //
+    // Combined tests
+    //
+    TestIIRFilterNode1<float>();
+    TestIIRFilterNode2<float>();
+    TestIIRFilterNode3<float>();
+    TestIIRFilterNode4<float>();
+
+    TestMelFilterBankNode<float>();
+    TestMelFilterBankNode<double>();
+
+    TestBufferNode<float>();
 }

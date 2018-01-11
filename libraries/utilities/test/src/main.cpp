@@ -48,6 +48,7 @@ int main(int argc, char* argv[])
         TestIteratorAdapter();
         TestTransformIterator();
         TestParallelTransformIterator();
+        TestStlStridedIterator();
 
         // TypeFactory tests
         TypeFactoryTest();

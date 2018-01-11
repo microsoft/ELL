@@ -45,6 +45,7 @@ void TestCompilableDotProductNode2(int dimension);
 void TestFloatNode();
 void TestMultipleOutputNodes();
 void TestCompilableClockNode();
+void TestCompilableFFTNode();
 
 //
 // mathy nodes

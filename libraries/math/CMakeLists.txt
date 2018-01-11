@@ -4,8 +4,6 @@
 
 set(library_name math)
 
-include (OpenBLASSetup)
-
 if(MSVC)
   add_compile_options(-D_SCL_SECURE_NO_WARNINGS)
 endif()
@@ -18,6 +16,7 @@ set(src src/BlasWrapper.cpp
 
 set(include include/BlasWrapper.h
              include/Common.h
+             include/MathConstants.h
              include/Matrix.h
              include/MatrixOperations.h
              include/Tensor.h

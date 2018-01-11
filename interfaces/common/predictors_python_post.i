@@ -121,11 +121,17 @@ class ActivationType:
     relu = ActivationType_relu
     leaky = ActivationType_leaky
     sigmoid = ActivationType_sigmoid
+    tanh = ActivationType_tanh
+    softmax = ActivationType_softmax
+    prelu = ActivationType_prelu
 
 # Remove flat defines so callers only see the class above
 del ActivationType_relu
 del ActivationType_leaky
 del ActivationType_sigmoid
+del ActivationType_tanh
+del ActivationType_softmax
+del ActivationType_prelu
 
 # Python friendly class for PoolingType
 class PoolingType:

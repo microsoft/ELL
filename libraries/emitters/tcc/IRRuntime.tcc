@@ -41,6 +41,18 @@ namespace emitters
     }
 
     template <typename ValueType>
+    llvm::Function* IRRuntime::GetSinFunction()
+    {
+        return GetSinFunction(GetVariableType<ValueType>());
+    }
+
+    template <typename ValueType>
+    llvm::Function* IRRuntime::GetCosFunction()
+    {
+        return GetCosFunction(GetVariableType<ValueType>());
+    }
+
+    template <typename ValueType>
     llvm::Function* IRRuntime::GetDotProductFunction()
     {
         if (std::is_integral<std::decay_t<ValueType>>::value)

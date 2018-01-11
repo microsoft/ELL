@@ -14,6 +14,7 @@
 #include "LoadModel.h" // for RegisterNodeTypes
 
 // math
+#include "MathConstants.h"
 #include "Tensor.h"
 
 // model
@@ -42,6 +43,7 @@
 #include "DelayNode.h"
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
+#include "FFTNode.h"
 #include "FullyConnectedLayerNode.h"
 #include "GRULayerNode.h"
 #include "IRNode.h"
@@ -1085,6 +1087,35 @@ void TestCompilableClockNode()
     }
     testing::ProcessTest("Testing compiled GetTicksUntilNextInterval", testing::IsEqual(getTicksResults, expectedGetTicksResults));
     testing::ProcessTest("Testing lag notification count", testing::IsEqual(lagNotificationCallbackCount, 2));
+}
+
+void TestCompilableFFTNode()
+{
+    using ValueType = float;
+    const int N = 8;
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ValueType>>(N);
+    auto fftNode = model.AddNode<nodes::FFTNode<ValueType>>(inputNode->output);
+
+    std::vector<ValueType> input1(N, 1.0); // DC
+    std::vector<ValueType> input2(N, 0); // impulse
+    input2[0] = 1.0;
+    std::vector<ValueType> input3(N, 0);
+    for(int index = 0; index < N; ++index)
+    {
+        input3[index] = std::sin(2 * math::Constants<ValueType>::pi * index / N);
+    }
+    std::vector<std::vector<ValueType>> signal = { input1, input2, input3 };
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", fftNode->output } });
+    model::MapCompilerParameters settings;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    // PrintIR(compiledMap);
+    // compiledMap.WriteCode("FFTNode.ll", emitters::ModuleOutputFormat::ir);
+
+    // compare output
+    VerifyCompiledOutput(map, compiledMap, signal, "FFTNode");
 }
 
 class BinaryFunctionIRNode : public nodes::IRNode

@@ -42,7 +42,8 @@ namespace predictors
 
             if (_updateBias.Size() != outputSize || _resetBias.Size() != outputSize || _hiddenBias.Size() != outputSize)
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Dimensionality of the biases must conform to the output shape of the network.");
+                using namespace std::string_literals;
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Dimensionality of the biases must conform to the output shape of the network (bias: "s + std::to_string(_updateBias.Size()) + ", output: " + std::to_string(outputSize) + ")");
             }
         }
 

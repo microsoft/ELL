@@ -30,8 +30,8 @@ namespace nodes
                 ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, logicalAnd);
                 ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, logicalOr);
                 ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, logicalXor);
-                default:
-                    throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
             }
         }
 
@@ -173,29 +173,29 @@ namespace nodes
         std::vector<ValueType> output;
         switch (_operation)
         {
-            case emitters::BinaryOperationType::add:
-                output = ComputeOutput(BinaryOperations::Add<ValueType>);
-                break;
-            case emitters::BinaryOperationType::subtract:
-                output = ComputeOutput(BinaryOperations::Subtract<ValueType>);
-                break;
-            case emitters::BinaryOperationType::coordinatewiseMultiply:
-                output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
-                break;
-            case emitters::BinaryOperationType::coordinatewiseDivide:
-                output = ComputeOutput(BinaryOperations::Divide<ValueType>);
-                break;
-            case emitters::BinaryOperationType::logicalAnd:
-                output = ComputeOutput(BinaryOperations::LogicalAnd<ValueType>);
-                break;
-            case emitters::BinaryOperationType::logicalOr:
-                output = ComputeOutput(BinaryOperations::LogicalOr<ValueType>);
-                break;
-            case emitters::BinaryOperationType::logicalXor:
-                output = ComputeOutput(BinaryOperations::LogicalXor<ValueType>);
-                break;
-            default:
-                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
+        case emitters::BinaryOperationType::add:
+            output = ComputeOutput(BinaryOperations::Add<ValueType>);
+            break;
+        case emitters::BinaryOperationType::subtract:
+            output = ComputeOutput(BinaryOperations::Subtract<ValueType>);
+            break;
+        case emitters::BinaryOperationType::coordinatewiseMultiply:
+            output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
+            break;
+        case emitters::BinaryOperationType::coordinatewiseDivide:
+            output = ComputeOutput(BinaryOperations::Divide<ValueType>);
+            break;
+        case emitters::BinaryOperationType::logicalAnd:
+            output = ComputeOutput(BinaryOperations::LogicalAnd<ValueType>);
+            break;
+        case emitters::BinaryOperationType::logicalOr:
+            output = ComputeOutput(BinaryOperations::LogicalOr<ValueType>);
+            break;
+        case emitters::BinaryOperationType::logicalXor:
+            output = ComputeOutput(BinaryOperations::LogicalXor<ValueType>);
+            break;
+        default:
+            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
         }
         _output.SetOutput(output);
     };
@@ -246,7 +246,7 @@ namespace nodes
             llvm::Value* inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
             llvm::Value* inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
             llvm::Value* pOpResult = function.Operator(emitters::GetOperator<ValueType>(GetOperation()), inputValue1, inputValue2);
-            function.SetValueAt(pResult, function.Literal((int)i), pOpResult);
+            function.SetValueAt(pResult, function.Literal<int>(i), pOpResult);
         }
     }
 

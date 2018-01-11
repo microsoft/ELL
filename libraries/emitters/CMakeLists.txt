@@ -21,6 +21,7 @@ set (src
     src/IRFunctionEmitter.cpp
     src/IRHeaderWriter.cpp
     src/IRIfEmitter.cpp
+    src/IRLocalValue.cpp
     src/IRLoader.cpp
     src/IRLocalValue.cpp
     src/IRLoopEmitter.cpp

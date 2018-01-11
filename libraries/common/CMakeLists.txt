@@ -84,7 +84,7 @@ set(test_include
 
 set(test_data
     ../../examples/data/testData.txt
-    ../../examples/data/model_1.model
+    ../../examples/models/model_1.model
 )
 
 source_group("src" FILES ${test_src})
@@ -101,6 +101,8 @@ add_test(NAME ${test_name} COMMAND ${test_name})
 set_test_library_path(${test_name})
 
 foreach(file ${test_data})
-    get_filename_component(filename ${file} NAME)
-    configure_file(${file} test/${filename} COPYONLY)
+    if(EXISTS ${file})
+        get_filename_component(filename ${file} NAME)
+        configure_file(${file} test/${filename} COPYONLY)
+    endif()
 endforeach()

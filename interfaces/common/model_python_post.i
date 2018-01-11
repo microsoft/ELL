@@ -27,6 +27,58 @@ del PortType_none
 del PortType_real
 del PortType_smallReal
 
+
+# Python friendly class for UnaryOperationType
+class UnaryOperationType:
+    none = UnaryOperationType_none
+    exp = UnaryOperationType_exp
+    log = UnaryOperationType_log
+    sqrt = UnaryOperationType_sqrt
+    logicalNot = UnaryOperationType_logicalNot
+    tanh = UnaryOperationType_tanh
+    square = UnaryOperationType_square
+    sin = UnaryOperationType_sin
+    cos = UnaryOperationType_cos
+
+# Remove flat defines so callers only see the class above
+del UnaryOperationType_none
+del UnaryOperationType_exp
+del UnaryOperationType_log
+del UnaryOperationType_sqrt
+del UnaryOperationType_logicalNot
+del UnaryOperationType_tanh
+del UnaryOperationType_square
+del UnaryOperationType_sin
+del UnaryOperationType_cos
+
+
+# Python friendly class for BinaryOperationType
+class BinaryOperationType:
+    none = BinaryOperationType_none
+    add = BinaryOperationType_add
+    subtract = BinaryOperationType_subtract
+    coordinatewiseMultiply = BinaryOperationType_coordinatewiseMultiply
+    coordinatewiseDivide = BinaryOperationType_coordinatewiseDivide
+    logicalAnd = BinaryOperationType_logicalAnd
+    logicalOr = BinaryOperationType_logicalOr
+    logicalXor = BinaryOperationType_logicalXor
+    shiftLeft = BinaryOperationType_shiftLeft
+    logicalShiftRight = BinaryOperationType_logicalShiftRight
+    arithmeticShiftRight = BinaryOperationType_arithmeticShiftRight
+
+del BinaryOperationType_none
+del BinaryOperationType_add
+del BinaryOperationType_subtract
+del BinaryOperationType_coordinatewiseMultiply
+del BinaryOperationType_coordinatewiseDivide
+del BinaryOperationType_logicalAnd
+del BinaryOperationType_logicalOr
+del BinaryOperationType_logicalXor
+del BinaryOperationType_shiftLeft
+del BinaryOperationType_logicalShiftRight
+del BinaryOperationType_arithmeticShiftRight
+
+
 # Compute wrappers for always available (aka. synchronous) inputs
 # CompiledMap.Compute, parameterized on numpy.dtype
 def CompiledMap_Compute(self, inputData: 'Vector', dtype: 'numpy.dtype') -> "std::vector< double,std::allocator< double > >":

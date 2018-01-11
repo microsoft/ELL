@@ -78,6 +78,5 @@ namespace emitters
     // TODO:
     // template <typename... ArgTypes>
     // std::vector<LLVMType> GetLLVMTypes(ArgTypes... args);
-
 }
 }

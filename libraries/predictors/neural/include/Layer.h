@@ -132,12 +132,19 @@ namespace neural
     {
     public:
         using Shape = math::TensorShape;
+        
         using VectorType = math::ColumnVector<ElementType>;
+        using VectorReferenceType = math::ColumnVectorReference<ElementType>;
+        using ConstVectorReferenceType = math::ConstColumnVectorReference<ElementType>;
+        
         using MatrixType = math::RowMatrix<ElementType>;
         using MatrixReferenceType = math::ConstMatrixReference<ElementType, math::MatrixLayout::rowMajor>;
+        using ConstMatrixReferenceType = math::ConstMatrixReference<ElementType, math::MatrixLayout::rowMajor>;
+        
         using TensorType = math::Tensor<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
         using TensorReferenceType = math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
         using ConstTensorReferenceType = math::ConstTensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
+        
         using DataVectorType = data::DenseDataVector<ElementType>;
 
         /// <summary> Parameters common to all layers, specifying info related to input and output of the layer. </summary>

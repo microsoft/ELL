@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 ####################################################################################################
 ##
 ##  Project:  Embedded Learning Library (ELL)
@@ -248,3 +249,4 @@ if __name__ == "__main__":
     program = PlotModelStats()
     program.parse_command_line(sys.argv[1:]) # drop the first argument (program name)
     program.run()
+    

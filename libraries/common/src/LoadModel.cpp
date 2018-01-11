@@ -18,14 +18,21 @@
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
 #include "BroadcastFunctionNode.h"
+#include "BufferNode.h"
+#include "ClockNode.h"
+#include "DCTNode.h"
 #include "ClockNode.h"
 #include "CompiledActivationFunctions.h"
 #include "DelayNode.h"
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
+#include "FFTNode.h"
 #include "ForestPredictorNode.h"
+#include "HammingWindowNode.h"
+#include "IIRFilterNode.h"
 #include "L2NormSquaredNode.h"
 #include "LinearPredictorNode.h"
+#include "FilterBankNode.h"
 #include "MatrixMatrixMultiplyNode.h"
 #include "MatrixVectorProductNode.h"
 #include "MovingAverageNode.h"
@@ -92,6 +99,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<double>>();
 
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<double>>();
 
@@ -102,6 +110,12 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<float, nodes::SigmoidActivationFunction<float>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<double, nodes::SigmoidActivationFunction<double>>>();
 
+        context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<int64_t>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<double>>();
+
         context.GetTypeFactory().AddType<model::Node, nodes::ClockNode>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<bool>>();
@@ -109,6 +123,9 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<int64_t>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::DCTNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DCTNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<int>>();
@@ -121,12 +138,27 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<double>>();
 
+        context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<double>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::HammingWindowNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::HammingWindowNode<double>>();
+
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormSquaredNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormSquaredNode<float>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::IIRFilterNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::IIRFilterNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<double>>();
 
+        context.GetTypeFactory().AddType<model::Node, nodes::LinearFilterBankNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LinearFilterBankNode<double>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::MelFilterBankNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MelFilterBankNode<double>>();
+        
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<float, math::MatrixLayout::rowMajor>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<float, math::MatrixLayout::columnMajor>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>();
@@ -205,6 +237,7 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
+        
         context.GetTypeFactory().AddType<model::Node, nodes::ProtoNNPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<float>>();

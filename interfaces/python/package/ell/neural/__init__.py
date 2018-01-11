@@ -18,8 +18,10 @@ DoubleBiasLayer,\
 DoubleBinaryConvolutionalLayer,\
 DoubleConvolutionalLayer,\
 DoubleFullyConnectedLayer,\
+DoubleGRULayer,\
 DoubleLayer,\
 DoubleLayerVector,\
+DoubleLSTMLayer,\
 DoubleNeuralNetworkPredictor,\
 DoublePReLUActivationLayer,\
 DoublePoolingLayer,\
@@ -32,8 +34,10 @@ FloatBiasLayer,\
 FloatBinaryConvolutionalLayer,\
 FloatConvolutionalLayer,\
 FloatFullyConnectedLayer,\
+FloatGRULayer,\
 FloatLayer,\
 FloatLayerVector,\
+FloatLSTMLayer,\
 FloatNeuralNetworkPredictor,\
 FloatPReLUActivationLayer,\
 FloatPoolingLayer,\

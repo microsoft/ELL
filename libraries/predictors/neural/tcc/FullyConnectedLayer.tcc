@@ -14,7 +14,7 @@ namespace neural
 {
 
     template <typename ElementType>
-    FullyConnectedLayer<ElementType>::FullyConnectedLayer(const LayerParameters& layerParameters, MatrixReferenceType& weights) :
+    FullyConnectedLayer<ElementType>::FullyConnectedLayer(const LayerParameters& layerParameters, ConstMatrixReferenceType& weights) :
         Layer<ElementType>(layerParameters),
         _weights(weights.NumRows(), weights.NumColumns()),
         _shapedInput(layerParameters.input.Size()),

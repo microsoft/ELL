@@ -59,6 +59,12 @@ namespace nodes
         node = TryAddLayerNode<predictors::neural::FullyConnectedLayer<ValueType>, FullyConnectedLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
 
+        node = TryAddLayerNode<predictors::neural::GRULayer<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>, GRULayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>>(transformer, layer, layerInputs, options, state);
+        if (node != nullptr) return node;
+        
+        node = TryAddLayerNode<predictors::neural::LSTMLayer<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>, LSTMLayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>>(transformer, layer, layerInputs, options, state);
+        if (node != nullptr) return node;
+
         node = TryAddLayerNode<predictors::neural::PoolingLayer<ValueType, predictors::neural::MaxPoolingFunction>, PoolingLayerNode<ValueType, predictors::neural::MaxPoolingFunction>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
 

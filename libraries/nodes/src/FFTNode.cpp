@@ -1,0 +1,586 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     FFTNode.cpp (nodes)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "FFTNode.h"
+
+// emitters
+#include "EmitterException.h"
+#include "EmitterTypes.h"
+#include "IRLocalValue.h"
+
+// math
+#include "MathConstants.h"
+
+// dsp
+#include "FFT.h"
+
+// stl
+#include <cmath>
+
+#define USE_STORED_TWIDDLE_FACTORS 1
+#define USE_FIXED_SMALL_FFT 1
+#define USE_REAL_FFT 0 // The real-valued FFT is slower than the complex one. Disable it for now.
+
+namespace ell
+{
+namespace nodes
+{
+    namespace detail
+    {
+        //
+        // Complex functions for emitters
+        //
+        template <typename ValueType>
+        llvm::StructType* GetComplexType(emitters::IRModuleEmitter& module)
+        {
+            auto& emitter = module.GetIREmitter();
+            auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
+            return module.GetAnonymousStructType({ valueType, valueType }, true);
+        }
+
+        inline llvm::StructType* GetComplexType(emitters::IRModuleEmitter& module, llvm::Type* valueType)
+        {
+            return module.GetAnonymousStructType({ valueType, valueType }, true);
+        }
+
+        inline emitters::IRLocalValue ComplexAdd(emitters::IRLocalValue a, emitters::IRLocalValue b)
+        {
+            if (!(a.value->getType()->isStructTy() && a.value->getType()->getNumContainedTypes() == 2 && a.value->getType() == b.value->getType()))
+            {
+                throw emitters::EmitterException(emitters::EmitterError::valueTypeNotSupported);
+            }
+
+            // c.re = a.re + b.re
+            // c.im = a.im + b.im
+            auto& function = a.function;
+            auto a_re = function.LocalScalar(function.ExtractStructField(a, 0));
+            auto a_im = function.LocalScalar(function.ExtractStructField(a, 1));
+            auto b_re = function.LocalScalar(function.ExtractStructField(b, 0));
+            auto b_im = function.LocalScalar(function.ExtractStructField(b, 1));
+            auto result = function.Variable(a.value->getType(), "c_add");
+            function.FillStruct(result, { a_re + b_re, a_im + b_im });
+            return { function, function.Load(result) };
+        }
+
+        inline emitters::IRLocalValue RealComplexAdd(emitters::IRLocalScalar a_re, emitters::IRLocalValue b)
+        {
+            if (!(b.value->getType()->isStructTy() && b.value->getType()->getNumContainedTypes() == 2 && a_re.value->getType() == b.value->getType()->getContainedType(0)))
+            {
+                throw emitters::EmitterException(emitters::EmitterError::valueTypeNotSupported);
+            }
+
+            // c.re = a.re + b.re
+            // c.im = b.im
+            auto& function = a_re.function;
+            auto b_re = function.LocalScalar(function.ExtractStructField(b, 0));
+            auto b_im = function.LocalScalar(function.ExtractStructField(b, 1));
+            auto result = function.Variable(b.value->getType(), "rc_add");
+            function.FillStruct(result, { a_re + b_re, b_im });
+            return { function, function.Load(result) };
+        }
+
+        inline emitters::IRLocalValue ComplexSubtract(emitters::IRLocalValue a, emitters::IRLocalValue b)
+        {
+            if (!(a.value->getType()->isStructTy() && a.value->getType()->getNumContainedTypes() == 2 && a.value->getType() == b.value->getType()))
+            {
+                throw emitters::EmitterException(emitters::EmitterError::valueTypeNotSupported);
+            }
+
+            // c.re = a.re - b.re
+            // c.im = a.im - b.im
+            auto& function = a.function;
+            auto a_re = function.LocalScalar(function.ExtractStructField(a, 0));
+            auto a_im = function.LocalScalar(function.ExtractStructField(a, 1));
+            auto b_re = function.LocalScalar(function.ExtractStructField(b, 0));
+            auto b_im = function.LocalScalar(function.ExtractStructField(b, 1));
+            auto result = function.Variable(a.value->getType(), "c_sub");
+            function.FillStruct(result, { a_re - b_re, a_im - b_im });
+            return { function, function.Load(result) };
+        }
+
+        inline emitters::IRLocalValue RealComplexSubtract(emitters::IRLocalScalar a_re, emitters::IRLocalValue b)
+        {
+            if (!(b.value->getType()->isStructTy() && b.value->getType()->getNumContainedTypes() == 2 && a_re.value->getType() == b.value->getType()->getContainedType(0)))
+            {
+                throw emitters::EmitterException(emitters::EmitterError::valueTypeNotSupported);
+            }
+
+            // c.re = a.re - b.re
+            // c.im = b.im
+            auto& function = a_re.function;
+            auto b_re = function.LocalScalar(function.ExtractStructField(b, 0));
+            auto b_im = function.LocalScalar(function.ExtractStructField(b, 1));
+            auto result = function.Variable(b.value->getType(), "rc_sub");
+            function.FillStruct(result, { a_re - b_re, b_im });
+            return { function, function.Load(result) };
+        }
+
+        inline emitters::IRLocalValue ComplexMultiply(emitters::IRLocalValue a, emitters::IRLocalValue b)
+        {
+            if (!(a.value->getType()->isStructTy() && a.value->getType()->getNumContainedTypes() == 2 && a.value->getType() == b.value->getType()))
+            {
+                throw emitters::EmitterException(emitters::EmitterError::valueTypeNotSupported);
+            }
+
+            // c.re = a.re * b.re - a.im * b.im
+            // c.im = a.im * b.re + a.re * b.im
+            auto& function = a.function;
+            auto a_re = function.LocalScalar(function.ExtractStructField(a, 0));
+            auto a_im = function.LocalScalar(function.ExtractStructField(a, 1));
+            auto b_re = function.LocalScalar(function.ExtractStructField(b, 0));
+            auto b_im = function.LocalScalar(function.ExtractStructField(b, 1));
+            auto result = function.Variable(a.value->getType(), "c_mul");
+            function.FillStruct(result, { (a_re * b_re) - (a_im * b_im), (a_im * b_re) + (a_re * b_im) });
+            return { function, function.Load(result) };
+        }
+
+        inline emitters::IRLocalValue ComplexRealMultiply(emitters::IRLocalValue a, emitters::IRLocalScalar b_re)
+        {
+            if (!(a.value->getType()->isStructTy() && a.value->getType()->getNumContainedTypes() == 2 && a.value->getType()->getContainedType(0) == b_re.value->getType()))
+            {
+                throw emitters::EmitterException(emitters::EmitterError::valueTypeNotSupported);
+            }
+
+            // c.re = a.re * b
+            // c.im = a.im * b
+            auto& function = a.function;
+            auto a_re = function.LocalScalar(function.ExtractStructField(a, 0));
+            auto a_im = function.LocalScalar(function.ExtractStructField(a, 1));
+            auto result = function.Variable(a.value->getType(), "rc_mul");
+            function.FillStruct(result, { (a_re * b_re), (a_im * b_re) });
+            return { function, function.Load(result) };
+        }
+
+        inline emitters::IRLocalValue ComplexAbs(emitters::IRLocalValue a)
+        {
+            if (!(a.value->getType()->isStructTy() && a.value->getType()->getNumContainedTypes() == 2))
+            {
+                throw emitters::EmitterException(emitters::EmitterError::valueTypeNotSupported);
+            }
+            auto& function = a.function;
+            auto a_re = function.LocalScalar(function.ExtractStructField(a, 0));
+            auto a_im = function.LocalScalar(function.ExtractStructField(a, 1));
+            // result = sqrt(real^2 + imag^2)
+            // Note, this is more accurately computed as std::hypot(std::real(z), std::imag(z))
+            auto magSquared = (a_re * a_re) + (a_im * a_im);
+            return { function, Sqrt(magSquared) };
+        }
+
+        inline emitters::IRLocalValue ImaginaryExp(emitters::IRLocalScalar x)
+        {
+            auto& function = x.function;
+            auto& module = function.GetModule();
+            auto type = x.value->getType();
+            auto complexType = GetComplexType(module, type);
+            // returns e ^ ix == cos(x) + isin(x)
+            auto result = function.Variable(complexType, "i_exp");
+            function.FillStruct(result, { Cos(x), Sin(x) });
+            return { function, function.Load(result) };
+        }
+
+        //
+        // FFT stuff
+        //
+        template <typename ValueType>
+        std::vector<std::complex<ValueType>> GetTwiddleFactors(size_t size)
+        {
+            // size == FFT length / 2
+            const auto pi = math::Constants<ValueType>::pi;
+            std::vector<std::complex<ValueType>> result(size);
+            for (size_t k = 0; k < size; ++k)
+            {
+                result[k] = std::exp(std::complex<ValueType>(0, pi * k / size));
+            }
+            return result;
+        }
+
+        template <typename ValueType>
+        std::vector<llvm::Type*> GetFFTFunctionArguments(emitters::IRModuleEmitter& module)
+        {
+            auto complexType = detail::GetComplexType<ValueType>(module);
+            auto complexPtrType = complexType->getPointerTo();
+            return { complexPtrType, complexPtrType };
+        }
+
+        template <typename ValueType>
+        std::vector<llvm::Type*> GetRealFFTFunctionArguments(emitters::IRModuleEmitter& module)
+        {
+            auto& emitter = module.GetIREmitter();
+            auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
+            auto valuePtrType = valueType->getPointerTo();
+            auto complexType = detail::GetComplexType(module, valueType);
+            auto complexPtrType = complexType->getPointerTo();
+            return { valuePtrType, valuePtrType, complexPtrType };
+        }
+    }
+
+    template <typename ValueType>
+    FFTNode<ValueType>::FFTNode()
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+    {
+    }
+
+    template <typename ValueType>
+    FFTNode<ValueType>::FFTNode(const model::PortElements<ValueType>& input)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size() / 2)
+    {
+    }
+
+    inline void Deinterleave(emitters::IRFunctionEmitter& function, llvm::Value* array, llvm::Value* halfLength, llvm::Value* scratch)
+    {
+        auto halfN = function.LocalScalar(halfLength);
+        function.For(halfN, [&scratch, &array](emitters::IRFunctionEmitter& function, llvm::Value* indexVar) 
+        {
+            auto index = function.LocalScalar(indexVar);
+            auto evenIndex = index * function.LocalScalar(2);
+            auto oddIndex = evenIndex + function.LocalScalar(1);
+            function.SetValueAt(scratch, index, function.ValueAt(array, oddIndex));
+            function.SetValueAt(array, index, function.ValueAt(array, evenIndex));
+        });
+
+        function.For(halfN, [&scratch, &array, halfN](emitters::IRFunctionEmitter& function, llvm::Value* indexVar) {
+            auto index = function.LocalScalar(indexVar);
+            function.SetValueAt(array, index + halfN, function.ValueAt(scratch, index));
+        });
+    }
+
+    inline void Deinterleave(emitters::IRFunctionEmitter& function, llvm::Value* array, int halfN, llvm::Value* scratch)
+    {
+        Deinterleave(function, array, function.Literal(halfN), scratch);
+    }
+
+    template <typename ValueType>
+    llvm::Function* FFTNode<ValueType>::GetFFTFunction_2(emitters::IRModuleEmitter& module)
+    {
+        auto& context = module.GetLLVMContext();
+        auto voidType = llvm::Type::getVoidTy(context);
+
+        // function name: FFTC_<T>_<N>  (e.g., FFT_float_2)
+        // function signature: void FFTC(complex<T>*, complex<T>*)
+        const auto length = 2;
+        std::string functionName = std::string("FFTC_") + utilities::GetTypeName<ValueType>() + "_" + std::to_string(length);
+        auto argumentTypes = detail::GetFFTFunctionArguments<ValueType>(module);
+        emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+        {
+            // FFT of length 2: x' = [x0+x1, x0-x1]
+            auto arguments = function.Arguments().begin();
+            auto input = function.LocalScalar(&(*arguments++));
+
+            auto x0 = function.LocalScalar(function.ValueAt(input, 0));
+            auto x1 = function.LocalScalar(function.ValueAt(input, 1));
+            function.SetValueAt(input, 0, detail::ComplexAdd(x0, x1));
+            function.SetValueAt(input, 1, detail::ComplexSubtract(x0, x1));
+        }
+        module.EndFunction();
+        return function.GetFunction();
+    }
+
+    template <typename ValueType>
+    llvm::Function* FFTNode<ValueType>::GetFFTFunction_4(emitters::IRModuleEmitter& module)
+    {
+        auto& context = module.GetLLVMContext();
+        auto voidType = llvm::Type::getVoidTy(context);
+
+        // function name: FFTC_<T>_<N>  (e.g., FFT_float_4)
+        // function signature: void FFTC(complex<T>*, complex<T>*)
+        const auto length = 4;
+        std::string functionName = std::string("FFTC_") + utilities::GetTypeName<ValueType>() + "_" + std::to_string(length);
+        auto argumentTypes = detail::GetFFTFunctionArguments<ValueType>(module);
+        emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+        {
+            // FFT of length 4: X = [(x0+x2)+(x1+x3), (x0-x2)+(x3-x1), (x0+x2)-(x1+x3), (x0-x2)+(x3-x1)]
+            auto arguments = function.Arguments().begin();
+            auto input = function.LocalScalar(&(*arguments++));
+
+            // Input x = {x0, x1, x2, x3}
+            auto x0 = function.LocalScalar(function.ValueAt(input, 0));
+            auto x1 = function.LocalScalar(function.ValueAt(input, 1));
+            auto x2 = function.LocalScalar(function.ValueAt(input, 2));
+            auto x3 = function.LocalScalar(function.ValueAt(input, 3));
+
+            // deinterleave -> {x0, x2, x1, x3}
+            // call fft2 on each half:
+            //   -> {x0+x2, x0-x2, x1+x3, x1-x3}
+            // apply twiddle factor w_0 = 1:
+            //  -> { (x0+x2) + (x1+x3), ..., (x0+x2) - (x1+x3), ...}
+            // apply twiddle factor w_1 = -1:
+            //  -> { (x0+x2) + (x1+x3), (x0-x2) - (x1-x3), (x0+x2) - (x1+x3), (x0-x2) + (x1-x3)}
+
+            auto x0px2 = detail::ComplexAdd(x0, x2);
+            auto x0mx2 = detail::ComplexSubtract(x0, x2);
+            auto x1px3 = detail::ComplexAdd(x1, x3);
+            auto x1mx3 = detail::ComplexSubtract(x1, x3);
+            function.SetValueAt(input, 0, detail::ComplexAdd(x0px2, x1px3));
+            function.SetValueAt(input, 1, detail::ComplexSubtract(x0mx2, x1mx3));
+            function.SetValueAt(input, 2, detail::ComplexSubtract(x0px2, x1px3));
+            function.SetValueAt(input, 3, detail::ComplexAdd(x0mx2, x1mx3));
+        }
+        module.EndFunction();
+        return function.GetFunction();
+    }
+
+    // Fixed-size FFT function implementation: size is known at compile time
+    template <typename ValueType>
+    llvm::Function* FFTNode<ValueType>::GetFFTFunction(emitters::IRModuleEmitter& module, size_t length)
+    {
+#if (USE_FIXED_SMALL_FFT)
+        if (length == 2)
+        {
+            return GetFFTFunction_2(module);
+        }
+#endif // USE_FIXED_SMALL_FFT
+
+        // TODO: assert(bitcount(length) == 1)  (i.e., length is a power of 2)
+        auto& context = module.GetLLVMContext();
+        auto& emitter = module.GetIREmitter();
+        auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
+        auto complexType = detail::GetComplexType(module, valueType);
+        auto complexPtrType = complexType->getPointerTo();
+        auto voidType = llvm::Type::getVoidTy(context);
+
+        const auto pi = math::Constants<ValueType>::pi;
+
+        // function name: FFTC_<T>_<N>  (e.g., FFT_float_32)
+        // function signature: void FFT(complex<T>*, complex<T>*)
+        std::string functionName = std::string("FFTC_") + utilities::GetTypeName<ValueType>() + "_" + std::to_string(length);
+        auto argumentTypes = detail::GetFFTFunctionArguments<ValueType>(module);
+        emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+        {
+            auto arguments = function.Arguments().begin();
+            auto input = function.LocalScalar(&(*arguments++));
+            auto scratch = function.LocalScalar(&(*arguments++));
+
+            auto halfN = length / 2;
+            assert(halfN >= 1);
+
+            Deinterleave(function, input, halfN, scratch);
+            auto evens = input;
+            auto odds = function.PointerOffset(evens, halfN);
+
+            if (halfN > 1) // call recursive case if necessary
+            {
+                auto fftFunction = GetFFTFunction(module, halfN);
+                function.Call(fftFunction, { evens, scratch });
+                function.Call(fftFunction, { odds, scratch });
+            }
+
+#if (USE_STORED_TWIDDLE_FACTORS)
+            auto twiddleFactors = detail::GetTwiddleFactors<ValueType>(halfN);
+            std::vector<ValueType> twiddleFactorsUnwrapped(twiddleFactors.size() * 2);
+            ValueType* dataPtr = reinterpret_cast<ValueType*>(twiddleFactors.data());
+            std::copy(dataPtr, dataPtr + twiddleFactorsUnwrapped.size(), twiddleFactorsUnwrapped.begin());
+            auto twiddleFactorsUnwrappedVar = module.ConstantArray(std::string("twiddles_") + std::to_string(halfN), twiddleFactorsUnwrapped);
+            auto twiddleFactorsVar = function.CastPointer(twiddleFactorsUnwrappedVar, complexPtrType);
+#else
+            bool twiddleFactorsVar = false;
+#endif
+
+            function.For(halfN, [pi, halfN, &evens, &odds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
+                auto k = function.LocalScalar(kVar);
+
+#if (USE_STORED_TWIDDLE_FACTORS)
+                auto w = function.LocalScalar(function.ValueAt(twiddleFactorsVar, k));
+#else
+                // w = e^i(2*pi*k/N)
+                auto kValue = function.LocalScalar(function.CastValue<int, ValueType>(k));
+                auto w = detail::ImaginaryExp(function.LocalScalar(pi / halfN) * kValue);
+#endif
+
+                auto e = function.LocalScalar(function.ValueAt(evens, k));
+                auto o = function.LocalScalar(function.ValueAt(odds, k));
+                auto wo = detail::ComplexMultiply(w, o); // wo = w*o
+                function.SetValueAt(evens, k, detail::ComplexAdd(e, wo)); // even
+                function.SetValueAt(odds, k, detail::ComplexSubtract(e, wo)); // odd
+            });
+        }
+        module.EndFunction();
+        return function.GetFunction();
+    }
+
+    // Real-valued fixed-size FFT function implementation: size is known at compile time
+    template <typename ValueType>
+    llvm::Function* FFTNode<ValueType>::GetRealFFTFunction(emitters::IRModuleEmitter& module, size_t length)
+    {
+        // TODO: assert(bitcount(length) == 1)  (i.e., length is a power of 2)
+        auto& context = module.GetLLVMContext();
+        auto complexType = detail::GetComplexType<ValueType>(module);
+        auto complexPtrType = complexType->getPointerTo();
+        auto voidType = llvm::Type::getVoidTy(context);
+
+        const auto pi = math::Constants<ValueType>::pi;
+
+        // function name: FFTR_<T>_<N>  (e.g., FFT_float_32)
+        // function signature: void FFT(T*, T*, complex<T>*)
+        std::string functionName = std::string("FFTR_") + utilities::GetTypeName<ValueType>() + "_" + std::to_string(length);
+        auto argumentTypes = detail::GetRealFFTFunctionArguments<ValueType>(module);
+        emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+        {
+            auto arguments = function.Arguments().begin();
+            auto input = function.LocalScalar(&(*arguments++));
+            auto scratch = function.LocalScalar(&(*arguments++));
+            auto complexInput = function.LocalScalar(&(*arguments++));
+
+            auto halfN = length / 2;
+            assert(halfN >= 1);
+
+            Deinterleave(function, input, halfN, scratch);
+            auto evens = input;
+            auto odds = function.PointerOffset(evens, halfN);
+            auto complexEvens = complexInput;
+            auto complexOdds = function.PointerOffset(complexEvens, halfN);
+
+            if (halfN > 1) // call recursive case if necessary
+            {
+                auto fftFunction = GetRealFFTFunction(module, halfN);
+                function.Call(fftFunction, { evens, scratch, complexEvens });
+                function.Call(fftFunction, { odds, scratch, complexOdds });
+            }
+            else // here halfN == 1
+            {
+                // Base case: copy from real to complex
+                function.FillStruct(complexEvens, { function.Load(evens), function.Literal<ValueType>(0) });
+                function.FillStruct(complexOdds, { function.Load(odds), function.Literal<ValueType>(0) });
+            }
+
+#if (USE_STORED_TWIDDLE_FACTORS)
+            auto twiddleFactors = detail::GetTwiddleFactors<ValueType>(halfN);
+            std::vector<ValueType> twiddleFactorsUnwrapped(twiddleFactors.size() * 2);
+            ValueType* dataPtr = reinterpret_cast<ValueType*>(twiddleFactors.data());
+            std::copy(dataPtr, dataPtr + twiddleFactorsUnwrapped.size(), twiddleFactorsUnwrapped.begin());
+            auto twiddleFactorsUnwrappedVar = module.ConstantArray(std::string("twiddles_") + std::to_string(halfN), twiddleFactorsUnwrapped);
+            auto twiddleFactorsVar = function.CastPointer(twiddleFactorsUnwrappedVar, complexPtrType);
+#else
+            bool twiddleFactorsVar = false; // Just here to appease the compiler
+#endif
+
+            function.For(halfN, [pi, halfN, &evens, &odds, &complexEvens, complexOdds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
+                auto k = function.LocalScalar(kVar);
+
+#if (USE_STORED_TWIDDLE_FACTORS)
+                auto w = function.LocalScalar(function.ValueAt(twiddleFactorsVar, k));
+#else
+                // w = e^i(2*pi*k/N)
+                auto kValue = function.LocalScalar(function.CastValue<int, ValueType>(k));
+                auto w = detail::ImaginaryExp(function.LocalScalar(pi / halfN) * kValue);
+#endif
+
+                auto e = function.LocalScalar(function.ValueAt(evens, k));
+                auto o = function.LocalScalar(function.ValueAt(odds, k));
+                auto wo = detail::ComplexRealMultiply(w, o); // wo = w*o
+                function.SetValueAt(complexEvens, k, detail::RealComplexAdd(e, wo)); // even
+                function.SetValueAt(complexOdds, k, detail::RealComplexSubtract(e, wo)); // odd
+            });
+        }
+        module.EndFunction();
+        return function.GetFunction();
+    }
+
+    // Dynamic-size FFT function implementation: size is not known at compile time
+    template <typename ValueType>
+    llvm::Function* FFTNode<ValueType>::GetFFTFunction(emitters::IRModuleEmitter& module)
+    {
+        assert(false && "Not implemented");
+        return nullptr;
+    }
+
+    template <typename ValueType>
+    void FFTNode<ValueType>::Compute() const
+    {
+        auto inputSize = input.Size();
+        auto outputSize = output.Size();
+
+        std::vector<ValueType> temp(inputSize);
+        for (size_t index = 0; index < inputSize; ++index)
+        {
+            temp[index] = _input[index];
+        }
+        dsp::FFT(temp);
+
+        std::vector<ValueType> output(outputSize);
+        for (size_t index = 0; index < outputSize; ++index)
+        {
+            output[index] = temp[index];
+        }
+        _output.SetOutput(output);
+    };
+
+    template <typename ValueType>
+    void FFTNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto newNode = transformer.AddNode<FFTNode<ValueType>>(newPortElements);
+        transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename ValueType>
+    void FFTNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    {
+        auto& module = function.GetModule();
+        auto& emitter = module.GetIREmitter();
+        auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
+        auto complexType = detail::GetComplexType(module, valueType);
+
+        auto inputSize = input.Size();
+        auto outputSize = output.Size();
+
+        // Get port variables
+        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+
+        // Buffer for complex data
+        llvm::Value* complexBuffer = function.Variable(complexType, inputSize);
+
+#if (USE_REAL_FFT)
+
+        llvm::Value* scratch = function.Variable(valueType, inputSize / 2);
+        auto fftFunction = GetRealFFTFunction(module, inputSize);
+        function.Call(fftFunction, { pInput, scratch, complexBuffer });
+
+#else // Complex-input FFT
+
+        llvm::Value* scratch = function.Variable(complexType, inputSize / 2);
+        llvm::Value* temp = function.Variable(complexType, "temp");
+
+        // Convert real-valued data to complex
+        function.For(inputSize, [pInput, complexBuffer, temp](emitters::IRFunctionEmitter& function, llvm::Value* index) {
+            function.FillStruct(temp, { function.ValueAt(pInput, index), function.Literal<ValueType>(0) });
+            function.SetValueAt(complexBuffer, index, function.Load(temp));
+        });
+
+        auto fftFunction = GetFFTFunction(module, inputSize);
+        function.Call(fftFunction, { complexBuffer, scratch });
+
+#endif // USE_REAL_FFT
+
+        function.For(outputSize, [pOutput, complexBuffer](emitters::IRFunctionEmitter& function, llvm::Value* index) {
+            auto complexValue = function.LocalScalar(function.ValueAt(complexBuffer, index));
+            auto absValue = detail::ComplexAbs(complexValue);
+            function.SetValueAt(pOutput, index, absValue);
+        });
+    }
+
+    template <typename ValueType>
+    void FFTNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        Node::WriteToArchive(archiver);
+        archiver[defaultInputPortName] << _input;
+    }
+
+    template <typename ValueType>
+    void FFTNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        Node::ReadFromArchive(archiver);
+        archiver[defaultInputPortName] >> _input;
+        _output.SetSize(_input.Size() / 2);
+    }
+
+    // Explicit instantiations
+    template class FFTNode<float>;
+    template class FFTNode<double>;
+} // nodes
+} // ell

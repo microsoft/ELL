@@ -301,8 +301,11 @@ namespace math
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     size_t ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetOffset(TensorCoordinate coordinate) const
     {
-        DEBUG_THROW(coordinate.GetRowIndex() >= NumRows() || coordinate.GetColumnIndex() >= NumColumns() || coordinate.GetChannelIndex() >= NumChannels(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor size."));
-        
+        DEBUG_THROW(coordinate.GetRowIndex() >= NumRows() || coordinate.GetColumnIndex() >= NumColumns() || coordinate.GetChannelIndex() >= NumChannels(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, 
+            std::string("index exceeds tensor size in ConstTensorReference::GetOffset().") +
+            " Tensor size: (" + std::to_string(NumRows()) + " x " + std::to_string(NumColumns()) + " x " + std::to_string(NumChannels()) + "), "
+            " index: (" + std::to_string(coordinate.GetRowIndex()) + ", " + std::to_string(coordinate.GetColumnIndex()) + ", " + std::to_string(coordinate.GetChannelIndex()) + ")" ));
+
         return coordinate.GetValue<dimension0>() + coordinate.GetValue<dimension1>() * GetIncrement1() + coordinate.GetValue<dimension2>() * GetIncrement2();
     }
 

@@ -48,7 +48,7 @@ namespace predictors
             using LayerParameters = typename Layer<ElementType>::LayerParameters;
             using VectorType = typename Layer<ElementType>::VectorType;
             using MatrixType = typename Layer<ElementType>::MatrixType;
-            using MatrixReferenceType = typename Layer<ElementType>::MatrixReferenceType;
+            using ConstMatrixReferenceType = typename Layer<ElementType>::ConstMatrixReferenceType;
             using ConstTensorReferenceType = typename Layer<ElementType>::ConstTensorReferenceType;
             using Layer<ElementType>::GetOutputMinusPadding;
             using Layer<ElementType>::NumOutputRowsMinusPadding;

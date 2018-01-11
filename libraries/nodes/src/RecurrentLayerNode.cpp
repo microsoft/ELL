@@ -50,10 +50,10 @@ namespace nodes
         ActivationFunctionType<ValueType> layerActivationFunction;
         auto activationFunction = GetNodeActivationFunction(layerActivationFunction);
         auto recurrentNode = transformer.AddNode<RecurrentNode<ValueType, ActivationFunctionType>>(newInput,
-                                                                                                          hiddenWeightsNode->output,
-                                                                                                          hiddenBiasNode->output,
-                                                                                                          this->GetInputMemoryLayout(),
-                                                                                                          this->GetOutputMemoryLayout());
+                                                                                                   hiddenWeightsNode->output,
+                                                                                                   hiddenBiasNode->output,
+                                                                                                   this->GetInputMemoryLayout(),
+                                                                                                   this->GetOutputMemoryLayout());
 
         transformer.MapNodeOutput(this->output, recurrentNode->output);
         return true;
@@ -70,15 +70,11 @@ namespace nodes
 
     template <typename ValueType, template <typename> class ActivationFunctionType>
     RecurrentNode<ValueType, ActivationFunctionType>::RecurrentNode(const model::PortElements<ValueType>& input,
-                                                                                  const model::PortElements<ValueType>& hiddenWeights,
-                                                                                  const model::PortElements<ValueType>& hiddenBias,
-                                                                                  const model::PortMemoryLayout& inputMemoryLayout,
-                                                                                  const model::PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input, &_hiddenWeights, &_hiddenBias }, { &_output }),
-          _input(this, input, defaultInputPortName),
-          _hiddenWeights(this, hiddenWeights, hiddenWeightsPortName),
-          _hiddenBias(this, hiddenBias, hiddenBiasPortName),
-          _output(this, defaultOutputPortName, hiddenBias.Size())
+                                                                    const model::PortElements<ValueType>& hiddenWeights,
+                                                                    const model::PortElements<ValueType>& hiddenBias,
+                                                                    const model::PortMemoryLayout& inputMemoryLayout,
+                                                                    const model::PortMemoryLayout& outputMemoryLayout)
+        : CompilableNode({ &_input, &_hiddenWeights, &_hiddenBias }, { &_output }), _input(this, input, defaultInputPortName), _hiddenWeights(this, hiddenWeights, hiddenWeightsPortName), _hiddenBias(this, hiddenBias, hiddenBiasPortName), _output(this, defaultOutputPortName, hiddenBias.Size())
     {
     }
 

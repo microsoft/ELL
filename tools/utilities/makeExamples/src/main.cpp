@@ -26,7 +26,7 @@ void SaveModels(const std::string& ext)
     common::SaveModel(GenerateTimesTwoModel(3), "times_two." + ext);
     common::SaveModel(GenerateIsEqualModel(), "is_equal." + ext);
     common::SaveModel(GenerateArgMaxModel(3), "arg_max." + ext);
-
+    
     common::SaveModel(GenerateModel1(), "model_1." + ext);
     common::SaveModel(GenerateModel2(), "model_2." + ext);
     common::SaveModel(GenerateModel3(), "model_3." + ext);
@@ -42,6 +42,8 @@ void SaveModels(const std::string& ext)
     common::SaveModel(GenerateRefinedTreeModel(3), "refined_tree_3." + ext);
 
     common::SaveModel(GenerateMultiOutModel(3), "multi_out." + ext);
+
+    common::SaveModel(GenerateBroadcastTimesTwoModel<float>(256), "broadcast_times_two." + ext);
 }
 
 int main(int argc, char* argv[])

@@ -149,8 +149,9 @@ class EllBuildTools:
         self.run(args)
         return out_file
 
-    def compile(self, model_file, func_name, model_name, target, output_dir, useBlas=False, fuseLinearOps=True, profile=False, llvm_format="bc",
-                optimize=True, debug=False):
+    def compile(self, model_file, func_name, model_name, target, output_dir, use_blas=False, fuse_linear_ops=True, profile=False, llvm_format="bc",
+                optimize=True, debug=False, is_model_file=False):
+        file_arg = "-imf" if is_model_file else "-imap"
         format_flag = {
             "bc": "--bitcode",
             "ir": "--ir",
@@ -161,20 +162,20 @@ class EllBuildTools:
             "ir": ".ll",
             "asm": ".s"
         }[llvm_format]
-        out_file = os.path.join(output_dir, model_name + output_ext)
+        model_file_base = os.path.splitext(os.path.basename(model_file))[0]
+        out_file = os.path.join(output_dir, model_file_base + output_ext)
         args = [self.compiler,
-                "-imap",
-                model_file,
+                file_arg, model_file,
                 "-cfn", func_name,
                 "-cmn", model_name,
                 format_flag,
                 "--swig",
                 "--target", target,
                 "-od", output_dir,
-                "--fuseLinearOps", str(fuseLinearOps)
+                "--fuseLinearOps", str(fuse_linear_ops)
                 ]
         args.append("--blas")
-        hasBlas = bool(useBlas)
+        hasBlas = bool(use_blas)
         if target == "host" and hasBlas and not self.blas:
             hasBlas = False
         args.append(str(hasBlas).lower())

@@ -9,6 +9,9 @@
 
 #ifndef SWIG
 
+// emitters
+#include "EmitterTypes.h"
+
 // math
 #include "Tensor.h"
 
@@ -317,6 +320,37 @@ private:
 };
 
 //
+// Operation types for operation nodes
+//
+enum class UnaryOperationType
+{
+    none = (int)ell::emitters::UnaryOperationType::none,
+    exp = (int)ell::emitters::UnaryOperationType::exp,
+    log = (int)ell::emitters::UnaryOperationType::log,
+    sqrt = (int)ell::emitters::UnaryOperationType::sqrt,
+    logicalNot = (int)ell::emitters::UnaryOperationType::logicalNot,
+    tanh = (int)ell::emitters::UnaryOperationType::tanh,
+    square = (int)ell::emitters::UnaryOperationType::square,
+    sin = (int)ell::emitters::UnaryOperationType::sin,
+    cos = (int)ell::emitters::UnaryOperationType::cos
+};
+
+enum class BinaryOperationType
+{
+    none = (int)ell::emitters::BinaryOperationType::none,
+    add = (int)ell::emitters::BinaryOperationType::add,
+    subtract = (int)ell::emitters::BinaryOperationType::subtract,
+    coordinatewiseMultiply = (int)ell::emitters::BinaryOperationType::coordinatewiseMultiply,
+    coordinatewiseDivide = (int)ell::emitters::BinaryOperationType::coordinatewiseDivide,
+    logicalAnd = (int)ell::emitters::BinaryOperationType::logicalAnd,
+    logicalOr = (int)ell::emitters::BinaryOperationType::logicalOr,
+    logicalXor = (int)ell::emitters::BinaryOperationType::logicalXor,
+    shiftLeft = (int)ell::emitters::BinaryOperationType::shiftLeft,
+    logicalShiftRight = (int)ell::emitters::BinaryOperationType::logicalShiftRight,
+    arithmeticShiftRight = (int)ell::emitters::BinaryOperationType::arithmeticShiftRight
+};
+
+//
 // ModelBuilder
 //
 class ModelBuilder
@@ -328,15 +362,23 @@ public:
     Node AddNode(Model model, const std::string& nodeType, const std::vector<std::string>& args);
 
     // Specific methods per node type
-    Node AddDoubleNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<double> predictor);
-    Node AddFloatNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<float> predictor);
-
-    Node AddInputNode(Model model, const ell::api::math::TensorShape& shape, PortType type);
-    Node AddOutputNode(Model model, const ell::api::math::TensorShape& shape, PortElements input);
-
+    Node AddBinaryOperationNode(Model model, PortElements input1, PortElements input2, BinaryOperationType operation);
+    Node AddBufferNode(Model model, PortElements input, int windowSize);
     Node AddClockNode(Model model, PortElements input, double interval, double lagThreshold, const std::string& lagNotificationName);
+    Node AddConstantNode(Model model, std::vector<double> values, PortType type);
+    Node AddDCTNode(Model model, PortElements input);
+    Node AddDoubleNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<double> predictor);
+    Node AddFFTNode(Model model, PortElements input);
+    Node AddFloatNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<float> predictor);
+    Node AddHammingWindowNode(Model model, PortElements input);
+    Node AddIIRFilterNode(Model model, PortElements input, std::vector<double> bCoeffs, std::vector<double> aCoeffs);
+    Node AddInputNode(Model model, const ell::api::math::TensorShape& shape, PortType type);
+    Node AddLinearFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse);
+    Node AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse);
+    Node AddOutputNode(Model model, const ell::api::math::TensorShape& shape, PortElements input);
     Node AddSinkNode(Model model, PortElements input, const ell::api::math::TensorShape& shape, const std::string& sinkFunctionName);
     Node AddSourceNode(Model model, PortElements input, PortType outputType, const ell::api::math::TensorShape& shape, const std::string& sourceFunctionName);
+    Node AddUnaryOperationNode(Model model, PortElements input, UnaryOperationType operation);
 
 private:
 #ifndef SWIG

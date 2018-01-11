@@ -14,6 +14,11 @@ pushd .
 # Capture all arguments into a bash array
 all_args=("$@")
 
+if [ "${all_args}" == "" ] ; then
+  echo "Usage make_profiler.sh model_file.ell [output_directory] <compile options>"
+  exit
+fi
+
 # Set some defaults
 parallel="false"
 target="host"
@@ -36,6 +41,11 @@ echo "Parallel: ${parallel}"
 
 model_file=$1
 model_name="${model_file%.*}"
+if [ ${model_file: -6} == ".model" ] ; then
+    model_option="-imf"
+else
+    model_option="-imap"
+fi
 shift
 
 profiler_directory=$model_name"_profiler"
@@ -53,10 +63,10 @@ if [ ${target} == 'pi3' ] ; then
     llc_opts=$pi3_llc_opts
 fi
 
-echo "Compiling model profilers"
+echo "Compiling model profilers to ${profiler_directory}"
 mkdir -p $profiler_directory
-@COMPILE_EXECUTABLE@ -imap $model_file --profile --ir --objectCode --header -od $profiler_directory -ob compiled_model $@
-@COMPILE_EXECUTABLE@ -imap $model_file --ir --objectCode --header -od $profiler_directory -ob compiled_model_noprofile $@
+@COMPILE_EXECUTABLE@ $model_option $model_file --profile --ir --objectCode --header -od $profiler_directory -ob compiled_model $@
+@COMPILE_EXECUTABLE@ $model_option $model_file --ir --objectCode --header -od $profiler_directory -ob compiled_model_noprofile $@
 
 cd $profiler_directory
 @OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3 -S

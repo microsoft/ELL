@@ -31,7 +31,8 @@ set(src
   src/TypeName.cpp
   src/UniqueId.cpp
   src/Variant.cpp
-  src/XmlArchiver.cpp)
+  src/XmlArchiver.cpp
+)
 
 set(include
   include/AbstractInvoker.h
@@ -63,7 +64,9 @@ set(include
   include/PropertyBag.h
   include/PPMImageParser.h
   include/RandomEngines.h
+  include/RingBuffer.h
   include/StlContainerIterator.h
+  include/StlStridedIterator.h
   include/StringUtil.h
   include/Tokenizer.h
   include/TransformIterator.h
@@ -74,7 +77,8 @@ set(include
   include/UniqueId.h
   include/Unused.h
   include/Variant.h
-  include/XmlArchiver.h)
+  include/XmlArchiver.h
+)
 
 set(tcc
   tcc/AbstractInvoker.tcc
@@ -91,13 +95,16 @@ set(tcc
   tcc/OutputStreamImpostor.tcc
   tcc/ParallelTransformIterator.tcc
   tcc/PropertyBag.tcc
+  tcc/RingBuffer.tcc
   tcc/StlContainerIterator.tcc
+  tcc/StlStridedIterator.tcc
   tcc/TransformIterator.tcc
   tcc/TypeFactory.tcc
   tcc/TypeName.tcc
   tcc/TypeTraits.tcc
   tcc/Variant.tcc
-  tcc/XmlArchiver.tcc)
+  tcc/XmlArchiver.tcc
+)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})

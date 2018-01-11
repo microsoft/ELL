@@ -801,13 +801,29 @@ namespace emitters
         /// <returns> Pointer to a value that represents that field. </returns>
         llvm::Value* PointerOffset(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pFieldOffset);
 
-        /// <summary> Get a pointer to a fields in a struct. </summary>
+        /// <summary> Extract a field from a struct held by value. </summary>
+        ///
+        /// <param name="structValue"> The struct value. </param>
+        /// <param name="fieldIndex"> The index of the field to get. </param>
+        ///
+        /// <returns> The value of the specified field in the struct. </returns>
+        llvm::Value* ExtractStructField(llvm::Value* structValue, size_t fieldIndex);
+
+        /// <summary> Extract a field from a struct referenced by a pointer. </summary>
+        ///
+        /// <param name="structPtr"> A pointer to the struct. </param>
+        /// <param name="fieldIndex"> The index of the field to get. </param>
+        ///
+        /// <returns> The value of the specified field in the struct. </returns>
+        llvm::Value* GetStructFieldValue(llvm::Value* structPtr, size_t fieldIndex);
+
+        /// <summary> Get a pointer to a field in a struct. </summary>
         ///
         /// <param name="structPtr"> Pointer to the struct. </param>
         /// <param name="fieldIndex"> The index of the field to get. </param>
         ///
         /// <returns> A pointer the specified field in the struct. </returns>
-        llvm::Value* GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex);
+        llvm::Value* GetStructFieldPointer(llvm::Value* structPtr, size_t fieldIndex);
 
         //
         // Control flow

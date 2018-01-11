@@ -68,9 +68,9 @@ namespace nodes
 
     template <typename ValueType, typename FunctionType>
     void BinaryFunctionNode<ValueType, FunctionType>::ComputeDimensionLoop(size_t dimension,
-        std::vector<ValueType>& output,
-        size_t prevInputDimensionOffset,
-        size_t prevOutputDimensionOffset) const
+                                                                           std::vector<ValueType>& output,
+                                                                           size_t prevInputDimensionOffset,
+                                                                           size_t prevOutputDimensionOffset) const
     {
         const auto numDimensions = _inputLayout.NumDimensions();
         auto&& inputStride = _inputLayout.GetStride();
@@ -109,7 +109,7 @@ namespace nodes
 
     template <typename ValueType, typename FunctionType>
     void BinaryFunctionNode<ValueType, FunctionType>::Compile(model::IRMapCompiler& compiler,
-        emitters::IRFunctionEmitter& function)
+                                                              emitters::IRFunctionEmitter& function)
     {
         llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
         llvm::Value* pInput2 = compiler.EnsurePortEmitted(input2);
@@ -123,13 +123,13 @@ namespace nodes
 
     template <typename ValueType, typename FunctionType>
     void BinaryFunctionNode<ValueType, FunctionType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler,
-        emitters::IRFunctionEmitter& function,
-        size_t dimension,
-        llvm::Value* input1,
-        llvm::Value* input2,
-        llvm::Value* output,
-        llvm::Value* prevInputDimensionOffset,
-        llvm::Value* prevOutputDimensionOffset) const
+                                                                               emitters::IRFunctionEmitter& function,
+                                                                               size_t dimension,
+                                                                               llvm::Value* input1,
+                                                                               llvm::Value* input2,
+                                                                               llvm::Value* output,
+                                                                               llvm::Value* prevInputDimensionOffset,
+                                                                               llvm::Value* prevOutputDimensionOffset) const
     {
         const auto numDimensions = _inputLayout.NumDimensions();
         auto&& inputStride = _inputLayout.GetStride();

@@ -13,9 +13,13 @@ set(src
     src/CompiledActivationFunctions.cpp
     src/ConstantNode.cpp
     src/ConvolutionalLayerNode.cpp
+    src/DCTNode.cpp
     src/DiagonalConvolutionNode.cpp
+    src/FFTNode.cpp
+    src/FilterBankNode.cpp
     src/FullyConnectedLayerNode.cpp
     src/GRULayerNode.cpp
+    src/IIRFilterNode.cpp
     src/IRNode.cpp
     src/LSTMLayerNode.cpp
     src/MatrixMatrixMultiplyNode.cpp
@@ -39,10 +43,12 @@ set(include
     include/BinaryOperationNode.h
     include/BinaryPredicateNode.h
     include/BroadcastFunctionNode.h
+    include/BufferNode.h
     include/ClockNode.h
     include/CompiledActivationFunctions.h
     include/ConstantNode.h
     include/ConvolutionalLayerNode.h
+    include/DCTNode.h
     include/DebugSinkNode.h
     include/DelayNode.h
     include/DemultiplexerNode.h
@@ -50,9 +56,13 @@ set(include
     include/DotProductNode.h
     include/DTWDistanceNode.h
     include/ExtremalValueNode.h
+    include/FFTNode.h
+    include/FilterBankNode.h
     include/ForestPredictorNode.h
     include/FullyConnectedLayerNode.h
     include/GRULayerNode.h
+    include/HammingWindowNode.h
+    include/IIRFilterNode.h
     include/IRNode.h
     include/LinearPredictorNode.h
     include/LSTMLayerNode.h
@@ -88,6 +98,7 @@ set (tcc
     tcc/BinaryOperationNode.tcc
     tcc/BinaryPredicateNode.tcc
     tcc/BroadcastFunctionNode.tcc
+    tcc/BufferNode.tcc
     tcc/ConstantNode.tcc
     tcc/DebugSinkNode.tcc
     tcc/DelayNode.tcc
@@ -96,6 +107,7 @@ set (tcc
     tcc/DTWDistanceNode.tcc
     tcc/ExtremalValueNode.tcc
     tcc/ForestPredictorNode.tcc
+    tcc/HammingWindowNode.tcc
     tcc/L2NormSquaredNode.tcc
     tcc/LinearPredictorNode.tcc
     tcc/MatrixVectorProductNode.tcc
@@ -130,6 +142,7 @@ target_include_directories(${library_name}
 target_link_libraries(${library_name}
     model
     predictors
+    dsp
     utilities
 )
 

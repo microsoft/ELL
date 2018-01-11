@@ -10,6 +10,8 @@
 
 // utilities
 #include "IArchivable.h"
+#include "StlStridedIterator.h"
+
 // stl
 #include <cmath>
 #include <vector>
@@ -350,6 +352,16 @@ namespace math
         /// <param name="other"> The vector being copied. </param>
         Vector(const Vector<ElementType, orientation>& other);
 
+        /// <summary> Copy Constructor. </summary>
+        ///
+        /// <param name="other"> The vector being copied. </param>
+        Vector(ConstVectorReference<ElementType, orientation>& other);
+
+        /// <summary> Copies a vector of the opposite orientation. </summary>
+        ///
+        /// <param name="other"> The vector being copied. </param>
+        Vector(ConstVectorReference<ElementType, TransposeVectorOrientation<orientation>::value>& other);
+
         /// <summary> Assignment operator. </summary>
         ///
         /// <param name="other"> The other vector. </param>
@@ -368,9 +380,57 @@ namespace math
         void Swap(Vector<ElementType, orientation>& other);
 
     private:
+        using ConstVectorReference<ElementType, orientation>::_pData;
+        using ConstVectorReference<ElementType, orientation>::_size;
+        using ConstVectorReference<ElementType, orientation>::_increment;
+
+        template <typename T, VectorOrientation o>
+        friend auto begin(Vector<T, o>& vector) -> utilities::StlStridedIterator<typename std::vector<T>::iterator>;
+        
+        template <typename T, VectorOrientation o>
+        friend auto end(Vector<T, o>& vector) -> utilities::StlStridedIterator<typename std::vector<T>::iterator>;
+
+        template <typename T, VectorOrientation o>
+        friend auto begin(const Vector<T, o>& vector) -> utilities::StlStridedIterator<typename std::vector<T>::const_iterator>;
+        
+        template <typename T, VectorOrientation o>
+        friend auto end(const Vector<T, o>& vector) -> utilities::StlStridedIterator<typename std::vector<T>::const_iterator>;
+
         // member variables
         std::vector<ElementType> _data;
     };
+
+    /// <summary> Get iterator to the beginning of a Vector </summary>
+    ///
+    /// <param name="vector"> The vector to get an iterator to. </param>
+    ///
+    /// <returns> A stl iterator to the beginning of the vector. </returns>
+    template <typename ElementType, VectorOrientation orientation>
+    auto begin(Vector<ElementType, orientation>& vector) -> utilities::StlStridedIterator<typename std::vector<ElementType>::iterator>;
+
+    /// <summary> Get a const stl iterator to the beginning of a Vector </summary>
+    ///
+    /// <param name="vector"> The vector to get an iterator to. </param>
+    ///
+    /// <returns> A stl iterator to the beginning of the vector. </returns>
+    template <typename ElementType, VectorOrientation orientation>
+    auto begin(const Vector<ElementType, orientation>& vector) -> utilities::StlStridedIterator<typename std::vector<ElementType>::const_iterator>;
+
+    /// <summary> Get iterator to the end of a Vector </summary>
+    ///
+    /// <param name="vector"> The vector to get an iterator to. </param>
+    ///
+    /// <returns> A stl iterator to the end of the vector. </returns>
+    template <typename ElementType, VectorOrientation orientation>
+    auto end(Vector<ElementType, orientation>& vector) -> utilities::StlStridedIterator<typename std::vector<ElementType>::iterator>;
+
+    /// <summary> Get a const stl iterator to the end of a Vector </summary>
+    ///
+    /// <param name="vector"> The vector to get an iterator to. </param>
+    ///
+    /// <returns> A stl iterator to the end of the vector. </returns>
+    template <typename ElementType, VectorOrientation orientation>
+    auto end(const Vector<ElementType, orientation>& vector) -> utilities::StlStridedIterator<typename std::vector<ElementType>::const_iterator>;
 
     /// <summary> A class that implements helper functions for archiving/unarchiving Vector instances. </summary>
     class VectorArchiver
