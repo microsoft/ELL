@@ -149,7 +149,7 @@ class ModelInfoRetriever:
 
     def __init__(self, modeldir, model):
         if not os.path.isdir(modeldir):
-            raise FileNotFoundError("{} is not a folder".format(modeldir))
+            raise NotADirectoryError("{} is not a folder".format(modeldir))
 
         self.modeldir = modeldir
         self.model = model
@@ -257,7 +257,7 @@ class ModelInfoRetriever:
             raise FileNotFoundError("{} does not exist".format(print_exe_path))
 
         self._ensure_model_file()
-        command = [print_exe_path, "-imf", self.model_file]
+        command = [print_exe_path, "-imap", self.model_file]
 
         proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             bufsize=0, universal_newlines = True)

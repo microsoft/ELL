@@ -68,13 +68,13 @@ void CompiledMap::RegisterCallbacks(
     ell::api::CallbackBase<ElementType>& outputCallback)
 {
     ell::api::CallbackBase<ell::api::TimeTickType> unusedLagCallback;
-    CallbackForwarder<ElementType>().InitializeOnce(inputCallback, _inputShape.Size(), outputCallback, _outputShape.Size(), unusedLagCallback);
+    CallbackForwarder<ElementType>().Register(inputCallback, _inputShape.Size(), outputCallback, _outputShape.Size(), unusedLagCallback);
 }
 
 template <typename ElementType>
 void CompiledMap::UnregisterCallbacks()
 {
-    CallbackForwarder<ElementType>().Uninitialize();
+    CallbackForwarder<ElementType>().Clear();
 }
 
 template <typename ElementType>

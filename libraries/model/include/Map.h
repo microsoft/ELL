@@ -298,7 +298,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "DynamicMap"; /* keep compatibility, for now */ }
+        static std::string GetTypeName() { return "Map"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

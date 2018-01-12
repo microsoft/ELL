@@ -11,6 +11,7 @@ u8R"(class Model:
         self.result = @@SINK_VECTOR_TYPE@@(get_default_output_shape().Size())
 
     def _@@SOURCE_CALLBACK@@(self, data: '@@SOURCE_VECTOR_TYPE@@') -> "bool":
+        import numpy as np
         data.copy_from(self.@@SOURCE_CALLBACK@@().astype(np.@@SOURCE_NUMPY_TYPE@@).ravel())
         return True
 
@@ -60,6 +61,7 @@ def predict(inputData: 'numpy.ndarray') -> "numpy.ndarray":
 
         def @@SINK_CALLBACK@@(self, output: '@@SINK_VECTOR_TYPE@@'):
             "Callback when output is available"
+            import numpy as np
             self.results = np.asarray(output)
 
         def get_results(self) -> "numpy.ndarray":

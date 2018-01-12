@@ -14,7 +14,9 @@ import sys
 import argparse
 from shutil import copyfile
 
-current_script = os.path.basename(__file__)
+_current_script = os.path.basename(__file__)
+_current_script_directory = os.path.dirname(os.path.abspath(__file__))
+
 sys.path += ["../"] # pythonlibs
 import picluster
 from remoterunner import RemoteRunner
@@ -39,7 +41,7 @@ class RunValidation:
         self.target = "pi3"
         self.truth = "/home/pi/validation/val_map.txt"
         self.images = "/home/pi/validation"
-        self.test_dir = "test"
+        self.test_dir = None
         self.output_dir = None
         self.machine = None
 
@@ -67,6 +69,7 @@ class RunValidation:
         self.arg_parser.add_argument("--target", default=self.target, choices=['pi3', 'pi3_64', 'aarch64'], help="type of target device")
         self.arg_parser.add_argument("--images", default=self.images, help="path to the validation images on the target device")
         self.arg_parser.add_argument("--truth", default=self.truth, help="path to a tsv file on the target device, each line contains two values, the file name of the image and the integer classification value")
+        self.arg_parser.add_argument("--test_dir", help="the folder on the host to collect model files", default="test")
 
         args = self.arg_parser.parse_args(argv)
 
@@ -82,6 +85,7 @@ class RunValidation:
         self.target_dir = args.target_dir
         self.truth = args.truth
         self.images = args.images
+        self.test_dir = args.test_dir
 
         self.output_dir = os.path.join(self.test_dir, self.target, self.model_name)
         if not os.path.isdir(self.output_dir):
@@ -102,7 +106,7 @@ class RunValidation:
         "Resolves the ip address of the target device and locks it if it is part of a cluster"
         if cluster:
             # lock the machine in the cluster
-            task = " ".join((current_script, self.model_name))
+            task = " ".join((_current_script, self.model_name))
             self.cluster = picluster.PiBoardTable(cluster)
             self.machine = self.cluster.lock(ipaddress, task)
             print("Locked machine at " + self.machine.ip_address)
@@ -112,7 +116,7 @@ class RunValidation:
 
     def _configure_script(self, output):
         "Creates the remote bash script"
-        with open("validate.sh.in", 'r') as f:
+        with open(os.path.join(_current_script_directory, "validate.sh.in"), 'r') as f:
             template = f.read()
         template = template.replace("@LABELS@", self.labels)
         template = template.replace("@COMPILED_MODEL@", self.model_name)
@@ -130,9 +134,9 @@ class RunValidation:
         self._configure_script(os.path.join(self.output_dir, "validate.sh"))
 
         # Other files are copied by drivetest.py
-        for f in ["../procmon.py",
-                  "../dependency_installer.py",
-                  "validate.py"]:
+        for f in [os.path.join(_current_script_directory, "..", "procmon.py"),
+                  os.path.join(_current_script_directory, "..", "dependency_installer.py"),
+                  os.path.join(_current_script_directory, "validate.py")]:
             copyfile(f, os.path.join(self.output_dir, os.path.basename(f)))
 
         runner = RemoteRunner(cluster=self.cluster,

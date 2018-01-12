@@ -91,21 +91,21 @@ namespace api
         /// <param name="value"> The time lag. </param>
         void InvokeLagNotification(TimeTickType value);
 
-        /// <summary> Performs a one-time initialization of the forwarder </summary>
+        /// <summary> Registers callbacks with the forwarder </summary>
         ///
         /// <param name="inputCallback"> The input callback object. </param>
         /// <param name="inputSize"> The input size. </param>
         /// <param name="outputCallback"> The output callback object. </param>
         /// <param name="outputSize"> The output size. </param>
         /// <param name="lagCallback"> The lag callback object. </param>
-        void InitializeOnce(ell::api::CallbackBase<InputType>& inputCallback,
+        void Register(ell::api::CallbackBase<InputType>& inputCallback,
             size_t inputSize,
             ell::api::CallbackBase<OutputType>& outputCallback,
             size_t outputSize,
             ell::api::CallbackBase<TimeTickType>& lagCallback);
 
-        /// <summary> Uninitializes the forwarder so that it can be reused. </summary>
-        void Uninitialize();
+        /// <summary> Clears callbacks with the forwarder. </summary>
+        void Clear();
 
     private:
         // Raw pointers are used because lifetime management is performed by the caller

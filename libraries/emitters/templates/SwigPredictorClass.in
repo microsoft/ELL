@@ -42,7 +42,7 @@ void @@LAG_CALLBACK@@(@@TIMETICK_TYPE@@ lag)
     size_t outputSize,
     ell::api::CallbackBase<@@TIMETICK_TYPE@@>& lagCallback)
 {
-    _predictor.InitializeOnce(inputCallback, inputSize, outputCallback, outputSize, lagCallback);
+    _predictor.Register(inputCallback, inputSize, outputCallback, outputSize, lagCallback);
     return _predictor;
 }
 

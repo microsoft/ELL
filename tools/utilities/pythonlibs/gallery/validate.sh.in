@@ -4,7 +4,7 @@ source activate py34 > /dev/null 2>&1
 
 # ensure dependencies are installed
 # On Pi3, use the pip version of psutil, which is more recent (5.x) that Anaconda's (3.x)
-python dependency_installer.py --environment py34 --pip_packages 'psutil>=5' 
+nohup python dependency_installer.py --environment py34 --pip_packages 'psutil>=5' 
 
 cd @TARGET_DIR@
 

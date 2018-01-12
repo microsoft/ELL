@@ -29,17 +29,13 @@ namespace api
     }
 
     template <typename InputType, typename OutputType>
-    void CallbackForwarder<InputType, OutputType>::InitializeOnce(CallbackBase<InputType>& inputCallback,
+    void CallbackForwarder<InputType, OutputType>::Register(CallbackBase<InputType>& inputCallback,
         size_t inputSize,
         CallbackBase<OutputType>& outputCallback,
         size_t outputSize,
         CallbackBase<TimeTickType>& lagCallback)
     {
-        if (_inputCallback != nullptr || _outputCallback != nullptr || _lagCallback != nullptr)
-        {
-            throw std::invalid_argument("InitializeOnce has already been called");
-        }
-
+        // Caller owns the lifetime of these objects
         _inputCallback = &inputCallback;
         _outputCallback = &outputCallback;
         _lagCallback = &lagCallback;
@@ -49,7 +45,7 @@ namespace api
     }
 
     template <typename InputType, typename OutputType>
-    void CallbackForwarder<InputType, OutputType>::Uninitialize()
+    void CallbackForwarder<InputType, OutputType>::Clear()
     {
         _inputCallback = nullptr;
         _outputCallback = nullptr;
@@ -64,7 +60,7 @@ namespace api
     {
         if (_inputCallback == nullptr)
         {
-            throw std::invalid_argument("InitializeOnce has not yet been called");
+            throw std::invalid_argument("Register has not yet been called");
         }
 
         bool result = _inputCallback->Run(_inputBuffer);
@@ -81,7 +77,7 @@ namespace api
     {
         if (_outputCallback == nullptr)
         {
-            throw std::invalid_argument("InitializeOnce has not yet been called");
+            throw std::invalid_argument("Register has not yet been called");
         }
 
         // EFFICIENCY: any way to avoid the copy?
@@ -94,7 +90,7 @@ namespace api
     {
         if (_outputCallback == nullptr)
         {
-            throw std::invalid_argument("InitializeOnce has not yet been called");
+            throw std::invalid_argument("Register has not yet been called");
         }
 
         _outputCallback->Run(value);
@@ -105,7 +101,7 @@ namespace api
     {
         if (_lagCallback == nullptr)
         {
-            throw std::invalid_argument("InitializeOnce has not yet been called");
+            throw std::invalid_argument("Register has not yet been called");
         }
 
         _lagCallback->Run(value);

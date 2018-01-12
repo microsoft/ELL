@@ -14,6 +14,7 @@ import os
 import argparse
 import demoHelper as d
 import json
+import numpy as np
 import psutil
 import subprocess
 from itertools import islice
@@ -59,7 +60,7 @@ def run_validation(args):
 
         # write Windows line endings
         with open('validation.json', 'w', encoding='utf-8', newline='\r\n') as outfile:
-            json.dump(results, outfile, ensure_ascii=False, indent=2)
+            json.dump(results, outfile, ensure_ascii=False, indent=2, sort_keys=True)
 
 def validate_image(args, filename):
     """Evaluates a single image to get predictions"""
@@ -92,7 +93,9 @@ def validate_image(args, filename):
             [str(element[0]) + "(" + str(int(100 * element[1])) + "%)  " for element in top5])
 
         print("\tPrediction: " + text)
-        result["predictions"] = top5
+
+        # Ensure that numbers are JSON serializable
+        result["predictions"] = [(element[0], np.float(element[1])) for element in top5]
 
     result["avg_time"] = helper.get_times()
     helper.report_times(node_level=False)

@@ -11,6 +11,7 @@
 import os
 import sys
 import argparse
+import glob
 import json
 import matplotlib.pyplot as plt
 
@@ -24,7 +25,7 @@ class PlotModelStats:
             "that can be used to select the 'best' models")
         # model
         self.models_root = None
-        self.models = []
+        self.model_paths = []
         self.model_stats = []
         self.frontier_models = []
 
@@ -94,7 +95,7 @@ class PlotModelStats:
 
         args = self.arg_parser.parse_args(argv)
         if not os.path.isdir(args.models_root):
-            raise FileNotFoundError("{} is not a folder".format(args.models_root))
+            raise NotADirectoryError("{} is not a folder".format(args.models_root))
 
         self.models_root = args.models_root
         self.output_figure = args.output_figure
@@ -109,19 +110,14 @@ class PlotModelStats:
 
     def find_models(self):
         """Finds the model files from the root folder"""
-        # Walk the children of the root folder to find all available model folders
-        # The hierachy is assumed to be:
-        # models_root/
-        #    model1/
-        #    model2/
-        # where model1, model2 contain model metadata files, and are also the names of the models
-        children = [os.path.basename(child[0]) for child in os.walk(self.models_root)]
-        self.models = [model for model in children if os.path.isdir(os.path.join(self.models_root, model))]
+        self.model_paths = glob.glob("{}/**/*.{}".format(self.models_root, "ell.zip"), recursive=True)
 
     def get_stats(self):
         """Collects the statistics from the models"""
-        for model in self.models:
-            with mir.ModelInfoRetriever(os.path.join(self.models_root, model), model) as model_data:
+        for model_path in self.model_paths:
+            model = os.path.basename(model_path)
+            model_dir = os.path.join(self.models_root, os.path.dirname(model_path))
+            with mir.ModelInfoRetriever(model_dir, model) as model_data:
                 try:
                     model_properties = model_data.get_model_properties()
                     if str(model_properties['image_size']) in self.image_size or self.image_size[0] == 'all':
@@ -131,7 +127,7 @@ class PlotModelStats:
                             self.model_stats.append({"name": model_properties['name'], "model": model_properties['model'], \
                              "image_size": model_properties['image_size'], "accuracy" : accuracy, "secs_per_frame" : speed, \
                              "filter_size": model_properties['filter_size'], "increase_factor": model_properties['increase_factor'], \
-                             "directory": model})
+                             "directory": model_path})
                 except:
                     print("Could not collect stats for model '{}', skipping".format(model))
 

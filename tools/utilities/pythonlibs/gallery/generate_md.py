@@ -18,6 +18,8 @@ import datetime
 # local helpers
 import model_info_retriever as mir
 
+CURRENT_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 def disable_text_wrapping(text):
     """Convert spaces to non-breaking spaces so that columns don't wrap"""
     return re.sub(r" ", "&nbsp;", text)
@@ -35,7 +37,7 @@ def _get_default_user():
     if errors:
         return "Juan Lema"
     else:
-        return " ".join(result)
+        return result.strip()
 
 class GenerateMarkdown:
     """Generates the gallery markdown for a model"""
@@ -63,8 +65,10 @@ class GenerateMarkdown:
         self.arg_parser.add_argument("printexe", help="path to the print executable that dumps raw model architecture")
 
         # optional arguments
-        self.arg_parser.add_argument("--template", help="path to the input markdown template file", default="vision_model.md.in")
-        self.arg_parser.add_argument("--user", help="user who trained the model (for attribution purposes)", nargs="+", default=self.user)
+        self.arg_parser.add_argument("--template", help="path to the input markdown template file",
+            default=os.path.join(CURRENT_SCRIPT_DIR, "vision_model.md.in"))
+        self.arg_parser.add_argument("--user", help="user who trained the model (for attribution purposes)",
+            nargs="+", default=self.user)
 
         args = self.arg_parser.parse_args(argv)
 
@@ -73,9 +77,11 @@ class GenerateMarkdown:
         self.model = os.path.basename(self.outfile)
         self.model = os.path.splitext(self.model)[0]
         self.printexe = args.printexe
-        self.user = " ".join(args.user)
 
-        if (not os.path.isfile(args.template)):
+        if isinstance(args.user, list):
+            self.user = " ".join(args.user)
+
+        if not os.path.isfile(args.template):
             raise FileNotFoundError("Template file not found: " + args.template)
         with open(args.template, 'r') as f:
             self.template = f.read()
