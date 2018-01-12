@@ -14,6 +14,7 @@ import argparse
 import re
 import subprocess
 import datetime
+import logging
 
 # local helpers
 import model_info_retriever as mir
@@ -56,6 +57,7 @@ class GenerateMarkdown:
             "aarch64" : "DragonBoard 410c @ 1.2GHz"
         }
         self.user = _get_default_user()
+        self.logger = logging.getLogger(__name__)
 
     def parse_command_line(self, argv):
         """Parses command line arguments"""
@@ -168,7 +170,7 @@ class GenerateMarkdown:
             split_outfile[1])
         with open(self.outfile, 'w', encoding='utf-8') as of:
             of.write(self.template)
-        print("Saved to: " + self.outfile)
+        self.logger.info("Saved to: " + self.outfile)
 
     def run(self):
         """Main run method"""
@@ -177,6 +179,7 @@ class GenerateMarkdown:
         self.save_model_info()
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     program = GenerateMarkdown()
     program.parse_command_line(sys.argv[1:]) # drop the first argument (program name)
     program.run()

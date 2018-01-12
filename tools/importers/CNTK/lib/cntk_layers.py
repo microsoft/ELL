@@ -9,7 +9,7 @@
 ####################################################################################################
 
 """Imports CNTK layers to ELL equivalents"""
-
+import logging
 import ell
 from cntk.initializer import glorot_uniform, he_normal
 from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
@@ -23,6 +23,8 @@ from custom_functions import CustomSign, BinaryConvolution
 import lib.cntk_converters as converters
 import lib.cntk_utilities as utilities
 from custom_functions import BinaryConvolution, CustomSign
+
+_logger = logging.getLogger(__name__)
 
 class BaseLayer:
     """Base class with common layer processing functionality"""
@@ -946,11 +948,11 @@ class LayerFactory():
             elif (cntkLayer.op_name == 'Softmax'):
                 return SoftmaxLayer(cntkLayer)
             else:
-                print("\nWill not process", cntkLayer.op_name,
+                _logger.warning("Will not process " + cntkLayer.op_name +
                       "- skipping this layer as irrelevant.")
         except (ValueError, AttributeError) as e:
             # raised if a layer contains invalid characteristics
-            print("\nWill not process", cntkLayer.op_name, "-", str(e))
+            _logger.info("\nWill not process", cntkLayer.op_name, "-", str(e))
 
         return None
 
@@ -958,7 +960,8 @@ class LayerFactory():
     def has_inputs(cntkLayer):
         return ((len(cntkLayer.arguments) > 0 and len(cntkLayer.arguments[0].shape) > 0) or
                 # special case for Binary Convolution
-                (cntkLayer.op_name == 'Convolution' and len(cntkLayer.inputs) > 0 and len(cntkLayer.inputs[0].shape) > 0))
+                (cntkLayer.op_name == 'Convolution' and len(cntkLayer.inputs) > 0 and 
+                len(cntkLayer.inputs[0].shape) > 0))
 
 
 def get_filtered_layers_list(modelLayers, maxLayerCount=None):
@@ -980,8 +983,8 @@ def get_filtered_layers_list(modelLayers, maxLayerCount=None):
                     # because the input is connected to it (it's used for evaluating training)
                     lastSoftmaxLayer = SoftmaxLayer(currentLayer)
             else:
-                print("\nWill not process", currentLayer.op_name,
-                      "- empty input shape.")
+                _logger.warning("Will not process " + currentLayer.op_name + 
+                                " - empty input shape.")
 
     if (lastSoftmaxLayer is not None):
         # Retroactively insert a softmax layer
@@ -1004,7 +1007,7 @@ def get_filtered_layers_list(modelLayers, maxLayerCount=None):
         else:
             # This is the last layer, so the output characteristics are known
             currentLayer.set_output_characteristics(None)
-        print(currentLayer)
+        _logger.info(currentLayer)
 
     return relevantLayers
 

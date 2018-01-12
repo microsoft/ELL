@@ -15,7 +15,9 @@ from cntk import parameter, constant, load_model
 from cntk.layers.typing import *
 from cntk.ops import *
 import cntk.logging.graph as graph
+import logging
 
+_logger = logging.getLogger(__name__)
 
 def op_name_equals(node, name):
     result = False
@@ -182,4 +184,4 @@ def plot_model(root, output_file="model.png"):
     """
 
     text = graph.plot(root, output_file)
-    print(text)
+    _logger.info(text)

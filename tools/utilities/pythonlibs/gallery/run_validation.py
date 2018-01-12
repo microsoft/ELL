@@ -12,6 +12,7 @@
 import os
 import sys
 import argparse
+import logging
 from shutil import copyfile
 
 _current_script = os.path.basename(__file__)
@@ -44,6 +45,7 @@ class RunValidation:
         self.test_dir = None
         self.output_dir = None
         self.machine = None
+        self.logger = logging.getLogger(__name__)
 
     def __enter__(self):
         """Called when this object is instantiated with 'with'"""
@@ -98,9 +100,9 @@ class RunValidation:
         if self.machine:
             f = self.cluster.unlock(self.machine.ip_address)
             if f.current_user_name:
-                print("Failed to free the machine at " + self.machine.ip_address)
+                self.logger.error("Failed to free the machine at " + self.machine.ip_address)
             else:
-                print("Freed machine at " + self.machine.ip_address)
+                self.logger.info("Freed machine at " + self.machine.ip_address)
 
     def _resolve_address(self, ipaddress, cluster):
         "Resolves the ip address of the target device and locks it if it is part of a cluster"
@@ -109,7 +111,7 @@ class RunValidation:
             task = " ".join((_current_script, self.model_name))
             self.cluster = picluster.PiBoardTable(cluster)
             self.machine = self.cluster.lock(ipaddress, task)
-            print("Locked machine at " + self.machine.ip_address)
+            self.logger.info("Locked machine at " + self.machine.ip_address)
             self.ipaddress = self.machine.ip_address
         else:
             self.ipaddress = ipaddress
@@ -152,9 +154,10 @@ class RunValidation:
                               start_clean=False, # reuse what drivetest.py already setup
                               cleanup=False)
         output = runner.run_command()
-        print(output)
+        #self.logger.info(output) this has already been logged by remote runner.
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     with RunValidation() as program:
         program.parse_command_line(sys.argv[1:]) # drop the first argument (program name)
         program.run()

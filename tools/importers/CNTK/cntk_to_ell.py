@@ -10,6 +10,7 @@
 
 import sys
 import os
+import logging
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import find_ell
 import ell
@@ -21,24 +22,25 @@ from cntk import load_model
 import lib.cntk_layers as cntk_layers
 import lib.cntk_utilities as cntk_utilities
 
+_logger = logging.getLogger(__name__)
 
 def predictor_from_cntk_model(modelFile, plotModel=False):
     """Loads a CNTK model and returns an ell.neural.NeuralNetworkPredictor"""
 
-    print("Loading...")
+    _logger.info("Loading...")
     z = load_model(modelFile)
-    print("\nFinished loading.")
+    _logger.info("\nFinished loading.")
 
     if plotModel:
         filename = os.path.join(os.path.dirname(modelFile), os.path.basename(modelFile) + ".png")
         cntk_utilities.plot_model(z, filename)
 
-    print("Pre-processing...")
+    _logger.info("Pre-processing...")
     modelLayers = cntk_utilities.get_model_layers(z)
 
     # Get the relevant CNTK layers that we will convert to ELL
     layersToConvert = cntk_layers.get_filtered_layers_list(modelLayers)
-    print("\nFinished pre-processing.")
+    _logger.info("\nFinished pre-processing.")
 
     predictor = None
 
@@ -49,7 +51,7 @@ def predictor_from_cntk_model(modelFile, plotModel=False):
         # Create an ELL neural network predictor from the layers
         predictor = ell.neural.FloatNeuralNetworkPredictor(ellLayers)
     except BaseException as exception:
-        print("Error occurred attempting to convert cntk layers to ELL layers")
+        _logger.error("Error occurred attempting to convert cntk layers to ELL layers")
         raise exception
 
     return predictor

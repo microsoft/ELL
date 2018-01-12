@@ -57,6 +57,13 @@ class RemoteRunner:
         self.ssh = None
         self.buffer = None
 
+        # global logger is hooked up to parent modules by module name and this
+        # logger can see all the remote command output from all commands, which
+        # will be formatted differently with "ThreadId: " prefix so user can 
+        # make sense of the combined output when remote commands are running in 
+        # parallel.
+        self.logger = logging.getLogger(__name__)
+
         # Sanity-check parameters
         if os.path.pathsep in self.target_dir:
             raise Exception("Error: multilevel target directories not supported")
@@ -86,7 +93,7 @@ class RemoteRunner:
     def close_ssh(self):
         self.ssh.close()
 
-    def logstream(self, stream, loggercb):
+    def logstream(self, stream):
         try:
             while True:
                 out = stream.readline()
@@ -107,14 +114,8 @@ class RemoteRunner:
         try:
             stdin, stdout, stderr = self.ssh.exec_command(cmd, timeout=self.timeout)
 
-            logging.basicConfig(level=logging.INFO, format="%(message)s")
-            logger = logging.getLogger('root')
-
-            stdout_thread = Thread(target=self.logstream,
-                args=(stdout,lambda s: logger.log(logging.INFO, s)))
-
-            stderr_thread = Thread(target=self.logstream,
-                args=(stderr,lambda s: logger.log(logging.INFO, s)))
+            stdout_thread = Thread(target=self.logstream, args=(stdout,))
+            stderr_thread = Thread(target=self.logstream, args=(stderr,))
 
             stdout_thread.start()
             stderr_thread.start()
@@ -132,7 +133,7 @@ class RemoteRunner:
         return result
 
     def clean_target(self):
-        print("clean_target")
+        self.print("cleaning target folder: " + os.path.basename(self.target_dir))
         self.exec_remote_command("rm -rf {}".format(os.path.basename(self.target_dir)))
 
     def linux_join(self, path, name):
@@ -188,7 +189,7 @@ class RemoteRunner:
                 for src_filename in self.copyback_files:
                     src_file = self.linux_join(self.target_dir, src_filename)
                     dest_file = os.path.join(self.copyback_dir, src_filename)
-                    print("Copying remote file from {} to {}".format(src_file, dest_file))
+                    self.print("Copying remote file from {} to {}".format(src_file, dest_file))
                     sftp.get(src_file, dest_file)
     
     def log_output(self, output):
@@ -198,7 +199,7 @@ class RemoteRunner:
 
     def print(self, output):
         if self.verbose:
-            print(output)
+            self.logger.info(output)
         if self.buffer:        
             self.buffer.write(output + "\n")
 

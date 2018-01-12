@@ -9,17 +9,19 @@
 ##
 ####################################################################################################
 
-import sys
-import os
 import argparse
+import json
+import logging
+import os
+import sys
+
 import numpy as np
 import cv2
+
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import find_ell
 import darknet_to_ell
 import ell_utilities
-import json
-
 
 class DarknetImporter:
     def __init__(self, args):
@@ -30,6 +32,7 @@ class DarknetImporter:
         model_options = args.get('model_options', {})
         self.step_interval = model_options.get('step_interval', 0)
         self.lag_threshold = model_options.get('lag_threshold', 0)
+        self.logger = logging.getLogger(__name__)
 
     def run(self):
         predictor = darknet_to_ell.predictor_from_darknet_model(
@@ -46,11 +49,14 @@ class DarknetImporter:
         model_file_path = os.path.join(output_directory, model_file_name)
         ell_map = ell_utilities.ell_map_from_float_predictor(predictor,
             self.step_interval, self.lag_threshold)
-        print("Saving model file: '" + model_file_name + "'")
+        self.logger.info("Saving model file: '" + model_file_name + "'")
         ell_map.Save(model_file_path)
 
 
 if __name__ == "__main__":
+    
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description='Converts darknet model to ELL model',

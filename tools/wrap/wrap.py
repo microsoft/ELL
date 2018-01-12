@@ -8,15 +8,17 @@
 ##  Requires: Python 3.x
 ##
 ####################################################################################################
+import argparse
 import os
+import json
+import logging
+import operator
+import subprocess
 import sys
+from shutil import copyfile
+
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../utilities/pythonlibs'))
 import find_ell
-import argparse
-import subprocess
-import json
-import operator
-from shutil import copyfile
 import buildtools
 
 # This script creates a compilable Python project for executing a given ELL model on a target platform.
@@ -44,6 +46,7 @@ class ModuleBuilder:
         self.model_name = ""
         self.func_name = "Predict"
         self.objext = "obj"
+        self.logger = logging.getLogger(__name__)
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
@@ -133,7 +136,7 @@ class ModuleBuilder:
             _, file_name = os.path.split(path)
             dest = os.path.join(target_dir, file_name)
             if self.verbose:
-                print("copy \"%s\" \"%s\"" % (path, dest))
+                self.logger.info("copy \"%s\" \"%s\"" % (path, dest))
             copyfile(path, dest)
 
     def create_template_file(self, template_filename, output_filename):
@@ -161,7 +164,7 @@ class ModuleBuilder:
         config_json = json.dumps(self.config, indent=2, sort_keys=True)
         _, tail = os.path.split(self.config_file)
         outputFile = os.path.join(self.output_dir, tail)
-        print("creating config file: '" + outputFile + "'")
+        self.logger.info("creating config file: '" + outputFile + "'")
         with open(outputFile, 'w') as f:
             f.write(config_json)
             f.close()
@@ -188,11 +191,12 @@ class ModuleBuilder:
         if self.language == "python":
             self.create_module_init_file()
         if self.target == "host":
-            print("success, now you can build the '" + self.output_dir + "' folder")
+            self.logger.info("success, now you can build the '" + self.output_dir + "' folder")
         else:
-            print("success, now copy the '" + self.output_dir + "' folder to your target machine and build it there")
+            self.logger.info("success, now copy the '" + self.output_dir + "' folder to your target machine and build it there")
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     builder = ModuleBuilder()
     builder.parse_command_line()
     builder.run()

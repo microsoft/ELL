@@ -8,9 +8,10 @@
 ##  Requires: Python 3.x
 ##
 ####################################################################################################
+import argparse
+import logging
 import os
 import sys
-import argparse
 from itertools import islice
 
 current_script = os.path.basename(__file__)
@@ -34,6 +35,7 @@ class CopyValidationSet:
         self.created_dirs = []
         self.target_dir = "/home/pi/validation"
         self.machine = None
+        self.logger = logging.getLogger(__name__)
 
     def __enter__(self):
         """Called when this object is instantiated with 'with'"""
@@ -76,16 +78,16 @@ class CopyValidationSet:
             # try to lock the machine in the cluster
             self.cluster = picluster.PiBoardTable(args.cluster)
             self.machine = self.cluster.lock(self.ipaddress, current_script)
-            print("Locked machine at " + self.machine.ip_address)
+            self.logger.info("Locked machine at " + self.machine.ip_address)
 
     def _cleanup(self):
         "Unlocks the target device if it is part of a cluster"
         if self.machine:
             f = self.cluster.unlock(self.machine.ip_address)
             if f.current_user_name:
-                print("Failed to free the machine at " + self.machine.ip_address)
+                self.logger.error("Failed to free the machine at " + self.machine.ip_address)
             else:
-                print("Freed machine at " + self.machine.ip_address)
+                self.logger.info("Freed machine at " + self.machine.ip_address)
 
     def _get_validation_set(self):
         "Gets the validation set based on the input requirements like maxfiles"
@@ -128,6 +130,7 @@ class CopyValidationSet:
         self._publish(files)
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     with CopyValidationSet() as program:
         program.parse_command_line(sys.argv[1:]) # drop the first argument (program name)
         program.run()

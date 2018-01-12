@@ -8,15 +8,16 @@
 ##
 ####################################################################################################
 
-import os
-import requests
+import datetime
+from dateutil.parser import parse
 import json
+import logging
+import os
+import random
+import requests
 import socket
 import time
-from dateutil.parser import parse
-import datetime
 import uuid
-import random
 
 class PiBoardEntity(): 
     def __init__(self, values = None):
@@ -54,6 +55,7 @@ class PiBoardEntity():
 
 class PiBoardTable:
     def __init__(self, endpoint, username = None):
+        self.logger = logging.getLogger(__name__)
         self.endpoint = endpoint
         self.username = username
         if self.username is None:
@@ -152,7 +154,7 @@ class PiBoardTable:
                 try:
                     heartbeat = parse(e.last_heartbeat)
                     if not self.heartbeat_is_valid(heartbeat):
-                        print("note: machine at %s is not sending heartbeats" % (e.ip_address))
+                        self.logger.info("note: machine at %s is not sending heartbeats" % (e.ip_address))
                     elif e.command != 'Lock':
                         result = self.lock(e.ip_address, jobName)
                         # no exception, so we got it
@@ -160,5 +162,5 @@ class PiBoardTable:
                 except:
                     pass
 
-            print("All machines are busy, sleeping 10 seconds and trying again...")
+            self.logger("All machines are busy, sleeping 10 seconds and trying again...")
             time.sleep(10)

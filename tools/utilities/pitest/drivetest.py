@@ -17,6 +17,7 @@ import glob
 import subprocess
 import json
 import operator
+import logging
 from shutil import copyfile
 from shutil import rmtree
 import zipfile
@@ -59,6 +60,7 @@ class DriveTest:
         self.profile = profile
         self.test = test
         self.verbose = verbose
+        self.logger = logging.getLogger(__name__)
         if timeout:
             self.timeout = int(timeout)
         else:
@@ -97,12 +99,12 @@ class DriveTest:
     def cleanup(self):
         """Unlocks the target device if it is part of a cluster"""
         if self.machine:
-            print("Unlocking machine: " + self.machine.ip_address)
+            self.logger.info("Unlocking machine: " + self.machine.ip_address)
             f = self.cluster.unlock(self.machine.ip_address)
             if f.current_user_name:
-                print("Failed to free the machine at " + self.machine.ip_address)
+                self.logger.error("Failed to free the machine at " + self.machine.ip_address)
             else:
-                print("Freed machine at " + self.machine.ip_address)
+                self.logger.info("Freed machine at " + self.machine.ip_address)
         
     def resolve_address(self, ipaddress, cluster):
         """Resolves the ip address of the target device and locks it if it is
@@ -114,11 +116,11 @@ class DriveTest:
             if ipaddress:
                 # A specific machine is requested, try to lock it
                 self.machine = self.cluster.lock(ipaddress, task)
-                print("Locked requested machine at " + self.machine.ip_address)
+                self.logger.info("Locked requested machine at " + self.machine.ip_address)
             else:
                 # No specific machine requested, find a free machine
                 self.machine = self.cluster.wait_for_free_machine(task)
-                print("Locked machine at " + self.machine.ip_address)
+                self.logger.info("Locked machine at " + self.machine.ip_address)
 
             # if any of the above fails, this line should throw
             self.ipaddress = self.machine.ip_address
@@ -140,7 +142,7 @@ class DriveTest:
                     filename = myzip.extract(myzip.filelist[0])
 
                 if filename != "":
-                    print("extracted: " + filename)
+                    self.logger.info("extracted: " + filename)
                     self.ell_model = filename
                 else:
                     # not a zip archive
@@ -163,7 +165,7 @@ class DriveTest:
             os.makedirs(target_dir)
         for path in filelist:
             if self.verbose:
-                print("Copying file: " + path + " to " + target_dir)
+                self.logger.info("Copying file: " + path + " to " + target_dir)
             if not os.path.isfile(path):
                 raise Exception("expected file not found: " + path)
             head, file_name = os.path.split(path)
@@ -215,7 +217,7 @@ class DriveTest:
         else:
             self.ell_model = os.path.join(self.test_dir, self.model_name + '.ell')
             if (not os.path.isfile(self.ell_model)) :
-                print("downloading default model...")
+                self.logger.info("downloading default model...")
                 download_and_extract_model(
                     self.gallery_url + self.model_name + "/" + self.model_name + ".ell.zip",
                     model_extension=".ell",
@@ -225,7 +227,7 @@ class DriveTest:
         if not self.labels_file:
             self.labels_file = "categories.txt"
         if (not os.path.isfile(self.labels_file)):
-            print("downloading default categories.txt...")
+            self.logger.info("downloading default categories.txt...")
             self.labels_file = download_file(self.gallery_url + "/categories.txt",
                 local_folder=self.test_dir)
 
@@ -233,7 +235,7 @@ class DriveTest:
         """Initializes the user-specified model or picks the default one"""
         self.get_default_model()
         self.get_default_labels()
-        print("using ELL model: " + self.model_name)
+        self.logger.info("using ELL model: " + self.model_name)
 
     def make_project(self):
         """Creates a project for the model and target"""
@@ -253,7 +255,7 @@ class DriveTest:
 
     def verify_remote_test(self, output):
         """Verifies the remote test results and prints a pass or fail"""
-        print("==========================================================")
+        self.logger.info("==========================================================")
         found = False
         prediction_time = 0
         prompt = "Average prediction time:"
@@ -273,12 +275,15 @@ class DriveTest:
             found = True
 
         if found:
-            print("### Test passed")
-            print("Prediction=%s, time=%f" % (prediction, prediction_time))
+            self.logger.info("### Test passed")
+            self.logger.info("Prediction=%s, time=%f" % (prediction, prediction_time))
         elif self.expected:
-            raise Exception("### Test Failed, expecting %s, but found %s in time=%f" 
-                % (self.expected, prediction, prediction_time))
+            msg = "### Test Failed, expecting %s, but found %s in time=%f" \
+                % (self.expected, prediction, prediction_time)
+            self.logger.error(msg)
+            raise Exception(msg)
         else:
+            self.logger.error("### Test Failed")
             raise Exception("### Test Failed")
 
 
@@ -305,16 +310,18 @@ class DriveTest:
             output = runner.run_command()
             self.verify_remote_test(output)
             end_time = time.time()
-            print("Remote test time: %f seconds" % (end_time - start_time))
+            self.logger.info("Remote test time: %f seconds" % (end_time - start_time))
 
         except:
             errorType, value, traceback = sys.exc_info()
-            print("### Exception: " + str(errorType) + ": " + str(value))
+            self.logger.error("### Exception: " + str(errorType) + ": " + str(value))
             raise Exception("### Test Failed")
 
 
 if __name__ == "__main__":
         
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    
     """Parses command line arguments"""
     arg_parser = argparse.ArgumentParser(
         "This script uses ELL to create a demo project for a model "

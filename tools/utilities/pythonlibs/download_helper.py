@@ -3,7 +3,9 @@
 import os
 import requests
 import ziptools
+import logging
 
+_logger = logging.getLogger(__name__)
 
 def download_file(url, local_folder=None):
     """Downloads file pointed to by `url`.
@@ -14,7 +16,7 @@ def download_file(url, local_folder=None):
         filename = os.path.join(local_folder, filename)
 
     # Download the file
-    print("downloading: " + url)
+    _logger.info("Downloading: " + url)
     response = requests.get(url, stream=True)
     if response.status_code != 200:
         raise Exception("download file failed with status code: %d, fetching url '%s'" % (response.status_code, url))
@@ -47,8 +49,8 @@ def download_and_extract_model(url, model_extension='.cntk', local_folder=None):
     unzip = ziptools.Extractor(filename)
     success, model_filename = unzip.extract_file(model_extension)
     if success:
-        print("extracted zipped model: " + model_filename)
+        _logger.info("Extracted zipped model: " + model_filename)
     else:
-        print("non-zipped model: " + filename)
+        _logger.info("Non-zipped model: " + filename)
 
     return model_name

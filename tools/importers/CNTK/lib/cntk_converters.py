@@ -9,9 +9,11 @@
 ####################################################################################################
 
 """Converts CNTK data structures to ELL equivalents"""
-
+import logging
 import ell
 import numpy as np
+
+_logger = logging.getLogger(__name__)
 
 def get_float_vector_from_constant(constant, size):
     # Workaround: For some reason, np.full is not returning a type that SWIG can parse. So just manually walk the array setting the scalar
@@ -83,7 +85,7 @@ def get_float_vector_from_cntk_array(inputArray):
         # Reshape to (1, 1, channels)
         orderedWeights = orderedWeights.reshape(1, 1, inputArray.size)
     else:
-        print("Error: Input array has incorrect dimensions")
+        _logger.error("Error: Input array has incorrect dimensions")
         return None
 
     return np.ravel(orderedWeights)

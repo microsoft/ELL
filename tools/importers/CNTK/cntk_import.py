@@ -9,11 +9,14 @@
 ##
 ####################################################################################################
 
-import sys
-import os
-import numpy as np
-import cv2
 import argparse
+import logging
+import os
+import sys
+
+import cv2
+import numpy as np
+
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import find_ell
 import cntk_to_ell
@@ -22,6 +25,7 @@ import json
 import ziptools
 
 def main(argv):
+    logger = logging.getLogger(__name__)
     arg_parser = argparse.ArgumentParser(
         "Converts CNTK model to ELL model\n"
         "Example:\n"
@@ -52,7 +56,7 @@ def main(argv):
     unzip = ziptools.Extractor(args['cntk_model_file'])
     success, filename = unzip.extract_file(".cntk")
     if success:
-        print("extracted: " + filename)
+        logger.info("Extracted: " + filename)
     else:
         # not a zip archive
         filename = args['cntk_model_file']
@@ -64,14 +68,15 @@ def main(argv):
     ell_map = ell_utilities.ell_map_from_float_predictor(predictor,
         step_interval, lag_threshold)
 
-    print("Saving model file: '" + model_file_name + "'")
+    logger.info("Saving model file: '" + model_file_name + "'")
     ell_map.Save(model_file_name)
 
     if args['zip_ell_model']:
-        print("Zipping model file: '" + model_file_name + ".zip'")
+        logger.info("Zipping model file: '" + model_file_name + ".zip'")
         zipper = ziptools.Zipper()
         zipper.zip_file(model_file_name, model_file_name + ".zip")
         os.remove(model_file_name)
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     main(sys.argv[1:]) # drop the first argument (program name)

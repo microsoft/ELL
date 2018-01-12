@@ -7,9 +7,10 @@
 ##  Requires: Python 3.x
 ##
 ####################################################################################################
-import subprocess
-import os
 import json
+import os
+import logging
+import subprocess
 
 class EllBuildToolsRunException(Exception):
     def __init__(self, cmd, output=""):
@@ -27,6 +28,7 @@ class EllBuildTools:
         self.llcexe = None
         self.optexe = None
         self.blas = None
+        self.logger = logging.getLogger(__name__)
         self.find_tools()
 
     def find_tools(self):
@@ -62,7 +64,7 @@ class EllBuildTools:
     def run(self, command, print_output=True, shell=False):
         cmdstr = command if isinstance(command, str) else " ".join(command)
         if self.verbose:
-            print(cmdstr, flush=True)
+            self.logger.info(cmdstr)
         try:
             with subprocess.Popen(
                 command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0, universal_newlines = True, shell=shell
@@ -71,11 +73,11 @@ class EllBuildTools:
                 for line in proc.stdout:
                     output += line
                     if print_output or self.verbose:
-                        print(line.strip("\n"), flush=True)
+                        self.logger.info(line.strip("\n"))
                 for line in proc.stderr:
                     output += line
                     if print_output or self.verbose:
-                        print(line.strip("\n"), flush=True)
+                        self.logger.info(line.strip("\n"), flush=True)
                 if proc.returncode:
                     raise EllBuildToolsRunException(cmdstr, output)
                 return output
@@ -103,7 +105,7 @@ class EllBuildTools:
             '-o', os.path.join(output_dir, model_name + language.upper() + '_wrap.cxx'),
             os.path.join(output_dir, model_name + ".i")
         ]
-        print("generating " + language + " interfaces for " + model_name + " in " + output_dir)
+        self.logger.info("generating " + language + " interfaces for " + model_name + " in " + output_dir)
         return self.run(args)
 
     def get_llc_options(self, target):
@@ -132,7 +134,7 @@ class EllBuildTools:
                 "-O" + optimization_level
                 ]
         args = args + self.get_llc_options(target)
-        print("running llc ...")
+        self.logger.info("running llc ...")
         self.run(args)
         return out_file
 
@@ -145,7 +147,7 @@ class EllBuildTools:
                 "-o", out_file,
                 "-O" + optimization_level
             ]
-        print("running opt ...")
+        self.logger.info("running opt ...")
         self.run(args)
         return out_file
 
@@ -190,7 +192,7 @@ class EllBuildTools:
         if profile:
             args.append("--profile")
 
-        print("compiling model...")
+        self.logger.info("compiling model...")
         self.run(args)
         return out_file
 

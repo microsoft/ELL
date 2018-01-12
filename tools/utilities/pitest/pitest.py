@@ -12,6 +12,7 @@ import argparse
 import drivetest
 import sys
 import unittest
+import logging
 
 # Try to import CNTK and ELL. If either don't exist it means they have not
 # being built, so don't run the tests.
@@ -34,6 +35,8 @@ class PiTestBase(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    
     parser = argparse.ArgumentParser(
         description="ELL python unit tests for Raspberry Pi",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)

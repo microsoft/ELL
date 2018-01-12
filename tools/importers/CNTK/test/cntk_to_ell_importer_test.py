@@ -15,9 +15,24 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 SkipTests = False
 SkipFullModelTests = False
 
+import getopt
+import configparser
+import inspect
+import logging
+import math
+import os
+import re
+import requests
+import struct
+import traceback
+import unittest
+import sys
+
+import numpy as np
+_logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+
 try:
-    import unittest
-    import sys
 
     sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
     sys.path.append(os.path.join(script_path, '..'))
@@ -38,22 +53,12 @@ try:
     import cntk.layers.blocks
     from cntk.ops import *
     from custom_functions import BinaryConvolution, CustomSign
-    import getopt
-    import os
-    import configparser
-    import re
-    import struct
-    import numpy as np
-    import traceback
-    import inspect
-    import requests
-    import math
     from itertools import product
     from download_helper import *
 except ImportError:
     errorType, value, traceback = sys.exc_info()
     if "Could not find ell package" in str(value):
-        print("Python was not built, so skipping test")
+        _logger.info("Python was not built, so skipping test")
         SkipTests = True
     else:
         raise value
@@ -120,7 +125,7 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
         raise RuntimeError("No layers are converted, nothing to test")
 
     # Create a list of ELL layers from the relevant CNTK layers
-    print("\nCreating ELL predictor...")
+    _logger.info("\nCreating ELL predictor...")
     ellLayers = cntk_layers.convert_cntk_layers_to_ell_layers(
         layersToConvert)
 
@@ -143,7 +148,7 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
 
     # Get the equivalent CNTK model
     if not maxLayers:
-        print("\nRunning original CNTK model...")
+        _logger.info("\nRunning original CNTK model...")
 
         _, out = z.forward(
            {z.arguments[0]: [cntkTestInput],
@@ -158,7 +163,7 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
             cntkResults, ellResults, 5,
             'prediction outputs do not match! (for model ' + modelFile + ')')
     else:
-        print("\nRunning partial CNTK model...")
+        _logger.info("\nRunning partial CNTK model...")
 
         if (layersToConvert[-1].layer.op_name == 'CrossEntropyWithSoftmax' and
                 len(layersToConvert) > 2):
@@ -274,7 +279,7 @@ class CntkLayersTestCase(CntkToEllTestBase):
 
         for pool_size, stride_size in product(range(2, 4), range(2, 3)):
             count += 1
-            print("test pooling size ({0},{0}) and stride {1}".format(
+            _logger.info("test pooling size ({0},{0}) and stride {1}".format(
                 pool_size, stride_size))
 
             # Create a MaxPooling CNTK layer
@@ -648,7 +653,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             self.assertTrue(
                 os.path.exists(modelName + '.ell'),
                 'Failed to successfully import model: ' + modelName + '.cntk')
-            print('Successfully imported ' + modelName + '.cntk')
+            _logger.info('Successfully imported ' + modelName + '.cntk')
 
     def test_model(self):
         """Test the model against the CNTK output for the following cases:
@@ -676,7 +681,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
 
     def model_test_impl(self, modelName):
         with self.subTest(modelName=modelName):
-            print('Testing {0}.cntk vs ELL ({0})'.format(modelName))
+            _logger.info('Testing {0}.cntk vs ELL ({0})'.format(modelName))
             # Load the cntk model
             cntkModel = load_model(modelName + '.cntk')
 
@@ -717,7 +722,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
                     out = out[output]
             cntkResults = softmax(out[0]).eval()
 
-            print('Comparing predictor output (reference)')
+            _logger.info('Comparing predictor output (reference)')
             sys.stdout.flush()
 
             ellPredictorResults = predictor.Predict(ellOrderedInput)
@@ -728,7 +733,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
                 err_msg=('results for CNTK and ELL predictor (' + modelName +
                          ') do not match!'))
 
-            print('Comparing map output (reference)')
+            _logger.info('Comparing map output (reference)')
             sys.stdout.flush()
 
             ellMapResults = ellMap.Compute(ellOrderedInput, dtype=np.float32)
@@ -739,13 +744,13 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
                 err_msg=('results for CNTK and ELL map reference (' +
                          modelName + ') do not match!'))
 
-            print('Comparing unarchived map output (reference)')
+            _logger.info('Comparing unarchived map output (reference)')
             sys.stdout.flush()
 
             ellMapFromArchiveResults = self.compute_ell_map(ellMapFromArchive, 
                 ellOrderedInput, cntkResults, modelName)
 
-            print('Comparing map output (compiled)')
+            _logger.info('Comparing map output (compiled)')
             sys.stdout.flush()
 
             ellCompiledMapResults = ellCompiledMap.Compute(ellOrderedInput, dtype=np.float32)
@@ -756,7 +761,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
                 err_msg=('results for CNTK and ELL map compiled (' +
                          modelName + ') do not match!'))
 
-            print('Comparing unarchived map output (compiled)')
+            _logger.info('Comparing unarchived map output (compiled)')
             sys.stdout.flush()
 
             ellCompiledMapFromArchiveResults = ellCompiledMapFromArchive.\
@@ -768,7 +773,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
                 err_msg=('results for CNTK and ELL unarchived map compiled (' +
                          modelName + ') do not match!'))
 
-            print((
+            _logger.info((
                 'Testing output of {0}.cntk vs ELL for model {0}'
                 ' passed!').format(modelName))
 
@@ -790,11 +795,11 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
 
     def print_top_result(self):
         if self.data is not None:
-            print("cntk picks: %s" % (self.get_label(np.argmax(self.data))))
+            _logger.info("cntk picks: %s" % (self.get_label(np.argmax(self.data))))
         if self.ell_data is not None:
-            print("ell picks: %s" % (self.get_label(np.argmax(self.ell_data))))
+            _logger.info("ell picks: %s" % (self.get_label(np.argmax(self.ell_data))))
         if self.compiled_data is not None:
-            print("ell compiled picks: %s" %
+            _logger.info("ell compiled picks: %s" %
                   (self.get_label(np.argmax(self.compiled_data))))
 
     def test_models(self):

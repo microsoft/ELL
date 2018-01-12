@@ -12,12 +12,15 @@ import os
 import sys
 import argparse
 import json
+import logging
 import re
 import subprocess
 
 # ELL utilities
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../"))
 import ziptools
+
+_logger = logging.getLogger(__name__)
 
 def _format_float(value):
     return "{0:.2f}".format(value)
@@ -141,7 +144,7 @@ class LayerFactory:
             else:
                 return None
         except:
-            print("Skipping line: {}".format(line))
+            _logger.warning("Skipping line: {}".format(line))
             return None
 
 class ModelInfoRetriever:
@@ -186,7 +189,7 @@ class ModelInfoRetriever:
             unzip = ziptools.Extractor(filename)
             success, temp = unzip.extract_file(".ell")
             if (success):
-                print("extracted: " + temp)
+                _logger.info("Extracted: " + temp)
                 self.model_file = temp
                 self.cleanup_model_file = True
             else:

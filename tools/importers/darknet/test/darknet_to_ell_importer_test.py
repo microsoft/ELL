@@ -9,31 +9,36 @@
 ####################################################################################################
 from __future__ import print_function
 
+import sys
+import os
+import unittest
+import getopt
+import configparser
+import re
+import struct
+import traceback
+import inspect
+import logging
+
+import numpy as np
+_logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+
 # Try to import ELL. If it doesn't exist it means it has not been built,
 # so don't run the tests.
 SkipTests = False
 try:
-    import sys
-    import os
-    import unittest
     script_path = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
+    sys.path.append(os.path.join(script_path, "..", "..", "..", "utilities", "pythonlibs"))
     sys.path.append(os.path.join(script_path, '..'))
     import find_ell
     import ell
-    import getopt
-    import configparser
-    import re
-    import struct
-    import traceback
-    import inspect
-    import numpy as np
     import ell_utilities
     import darknet_to_ell
 except ImportError:
     errorType, value, traceback = sys.exc_info()
     if "Could not find ell package" in str(value):
-        print("Python was not built, so skipping test")
+        _logger.info("Python was not built, so skipping test")
         SkipTests = True
     else:
         raise value

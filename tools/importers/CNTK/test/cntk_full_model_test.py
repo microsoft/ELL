@@ -9,6 +9,7 @@
 ####################################################################################################
 import cntk
 import sys
+import logging
 import os
 script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(script_path, ".."))
@@ -25,6 +26,8 @@ import cv2
 import math
 import argparse
 
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+
 class FullModelTest:
     def __init__(self, args):
         self.image_file = args.image
@@ -40,6 +43,7 @@ class FullModelTest:
         self.report = None
         self.layer_index = 1
         self.layers = args.layers # whether to test the whole model or layer by layer
+        self.logger = logging.getLogger(__name__)
 
     def compare_arrays(self, a, b, msg, precision=1e-4):
         a = a.astype(dtype=np.float32).ravel()
@@ -54,22 +58,22 @@ class FullModelTest:
         mean_diff = abs(np.mean(a) - np.mean(b))
 
         if not np.allclose(a, b, atol=precision):
-            print("  " + msg)
+            self.logger.info("  " + msg)
 
         if min_diff > precision:
-            print("    min %f versus %f, diff is %.10f" % (min(a), min(b), min_diff))
+            self.logger.info("    min %f versus %f, diff is %.10f" % (min(a), min(b), min_diff))
 
         if max_diff > precision:
-            print("    max %f versus %f, diff is %.10f" % (max(a), max(b), max_diff))
+            self.logger.info("    max %f versus %f, diff is %.10f" % (max(a), max(b), max_diff))
 
         if mean_diff > precision:
-            print("    mean %f versus %f, diff is %.10f" % (np.mean(a), np.mean(b), mean_diff))
+            self.logger.info("    mean %f versus %f, diff is %.10f" % (np.mean(a), np.mean(b), mean_diff))
 
         if std_dev_diff > precision:
-            print("    stddev %f versus %f, diff is %.10f" % (np.std(a), np.std(b), std_dev_diff))
+            self.logger.info("    stddev %f versus %f, diff is %.10f" % (np.std(a), np.std(b), std_dev_diff))
 
         if largest_diff > precision:
-            print("    largest individual diff=%.10f" % (largest_diff))
+            self.logger.info("    largest individual diff=%.10f" % (largest_diff))
 
     def load_image(self, filename):
         image = cv2.imread(filename)
@@ -105,11 +109,11 @@ class FullModelTest:
 
     def print_top_result(self):
         if type(self.data) != type(None):
-            print("cntk picks: %s" % (self.get_label(np.argmax(self.data))))
+            self.logger.info("cntk picks: %s" % (self.get_label(np.argmax(self.data))))
         if type(self.ell_data) != type(None):
-            print("ell picks: %s" % (self.get_label(np.argmax(self.ell_data))))
+            self.logger.info("ell picks: %s" % (self.get_label(np.argmax(self.ell_data))))
         if type(self.compiled_data) != type(None):
-            print("ell compiled picks: %s" % (self.get_label(np.argmax(self.compiled_data))))
+            self.logger.info("ell compiled picks: %s" % (self.get_label(np.argmax(self.compiled_data))))
 
     def run(self):
         self.report = open("report.md", "w")
@@ -123,7 +127,7 @@ class FullModelTest:
         modelLayers = cntk_utilities.get_model_layers(self.cntk_model)
         # Get the relevant CNTK layers that we will convert to ELL
         layersToConvert = cntk_layers.get_filtered_layers_list(modelLayers)
-        print("----------------------------------------------------------------------------------")
+        self.logger.info("----------------------------------------------------------------------------------")
         if self.layers:
             for layer in layersToConvert:
                 self.compare_layer(layer)
@@ -204,7 +208,7 @@ class FullModelTest:
         return data
 
     def compare_layer(self, layer):
-        print("Comparing layer " + str(layer))
+        self.logger.info("Comparing layer " + str(layer))
 
         if self.input_shape is None:
             for node_input in layer.layer.inputs:

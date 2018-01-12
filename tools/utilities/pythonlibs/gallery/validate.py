@@ -15,6 +15,7 @@ import argparse
 import demoHelper as d
 import json
 import numpy as np
+import logging
 import psutil
 import subprocess
 from itertools import islice
@@ -64,6 +65,9 @@ def run_validation(args):
 
 def validate_image(args, filename):
     """Evaluates a single image to get predictions"""
+    
+    logger = logging.getLogger(__name__)
+
     helper = d.DemoHelper()
     helper.parse_arguments(args, helpString="Evaluates a series of images to get predictions and performance metrics")
 
@@ -72,7 +76,7 @@ def validate_image(args, filename):
 
     result = {}
     result["input"] = basename(filename)
-    print(result["input"])
+    logger.info(result["input"])
 
     while (not helper.done()):
         # Grab next frame
@@ -92,7 +96,7 @@ def validate_image(args, filename):
         text = "".join(
             [str(element[0]) + "(" + str(int(100 * element[1])) + "%)  " for element in top5])
 
-        print("\tPrediction: " + text)
+        logger.info("\tPrediction: " + text)
 
         # Ensure that numbers are JSON serializable
         result["predictions"] = [(element[0], np.float(element[1])) for element in top5]
@@ -114,6 +118,7 @@ def monitor_resource_usage():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     parser = argparse.ArgumentParser()
 
     # required arguments

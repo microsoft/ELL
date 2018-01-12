@@ -13,6 +13,7 @@ import sys
 import argparse
 import glob
 import json
+import logging
 import matplotlib.pyplot as plt
 
 # local helpers
@@ -20,6 +21,7 @@ import model_info_retriever as mir
 
 class PlotModelStats:
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
         self.arg_parser = argparse.ArgumentParser(
             "This script takes a path to an ELL-models model folder hierarchy and plots cost-accuracy curves\n"
             "that can be used to select the 'best' models")
@@ -129,7 +131,7 @@ class PlotModelStats:
                              "filter_size": model_properties['filter_size'], "increase_factor": model_properties['increase_factor'], \
                              "directory": model_path})
                 except:
-                    print("Could not collect stats for model '{}', skipping".format(model))
+                    self.logger.warning("Could not collect stats for model '{}', skipping".format(model))
 
     def pareto_frontier(self, x, ytop1, ytop5, models, names, image_size, filter_size, increase_factor, directory, max_x):
         """Takes lists of x and ytop1 values, and return the sorted elements that lie on the Pareto frontier
@@ -187,7 +189,7 @@ class PlotModelStats:
                 if add_to_plot:
                     frontiers = frontiers + [fx, ftop1, self.platforms_lines[platform]] # plot the frontier based on top 1
             else:
-                print('Could not retrieve secs per frame or top 1 accuracy metric from this model.')
+                self.logger.warning('Could not retrieve secs per frame or top 1 accuracy metric from this model.')
 
         # put the frontiers after the series, so that we only need to specify legend once per platform
         if self.plot_series:
@@ -196,12 +198,12 @@ class PlotModelStats:
         # save frontier model stats to json
         with open(self.output_frontier_json_file, "w") as outfile:
             json.dump(self.frontier_models, outfile, ensure_ascii=False, indent=2)
-        print("Saved frontier models to {}".format(self.output_frontier_json_file))
+        self.logger.info("Saved frontier models to {}".format(self.output_frontier_json_file))
 
         # save all model stats to json
         with open(self.output_all_models_json_file, "w") as outfile:
             json.dump(self.model_stats, outfile, ensure_ascii=False, indent=2, sort_keys=True)
-        print("Saved all models to {}".format(self.output_all_models_json_file))
+        self.logger.info("Saved all models to {}".format(self.output_all_models_json_file))
 
 
     def plot(self):
@@ -230,7 +232,7 @@ class PlotModelStats:
         # plt.show() reclaims memory, so savefig() must be called before it
         plt.savefig(self.output_figure, format=self.output_format, dpi="figure",
             orientation="landscape")
-        print("Saved plot as {} to {}".format(self.output_format, self.output_figure))
+        self.logger.info("Saved plot as {} to {}".format(self.output_format, self.output_figure))
 
         plt.show()
 
@@ -242,6 +244,7 @@ class PlotModelStats:
         self.plot()
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     program = PlotModelStats()
     program.parse_command_line(sys.argv[1:]) # drop the first argument (program name)
     program.run()

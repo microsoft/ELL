@@ -12,6 +12,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import configparser
+import logging
 import re
 import struct
 import getopt
@@ -20,6 +21,7 @@ import find_ell
 import ell
 import ell_utilities
 
+_logger = logging.getLogger(__name__)
 
 def convolutional_out_height(layer):
     return (int(layer['h']) + 2*int(layer['padding']) - int(layer['size'])) / int(layer['stride']) + 1
@@ -57,7 +59,7 @@ def parse_cfg(filename):
         pretty_type = PRETTY_TYPE_MAP.get(layer.get("type"))
         if not pretty_type:
             return
-        print(("{} :  {h}x{w}x{c}  ->  {out_h}x{out_w}x{out_c}"
+        _logger.info(("{} :  {h}x{w}x{c}  ->  {out_h}x{out_w}x{out_c}"
                " | input padding {inputPadding}  output padding {outputPadding}"
                ).format(pretty_type, **layer))
 
@@ -438,8 +440,7 @@ def process_network(network, weightsData, convolutionOrder):
         elif layer['type'] == 'softmax':
             ellLayers.append(get_softmax_layer(layer))
         else:
-            print("Skipping, ", layer['type'], "layer")
-            print()
+            _logger.warning("Skipping, ", layer['type'], "layer")
 
     if ellLayers:
         # Darknet expects the input to be between 0 and 1, so prepend
