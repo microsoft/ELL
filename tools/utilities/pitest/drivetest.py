@@ -131,7 +131,7 @@ class DriveTest:
 
     def extract_model_info(self, ell_model, labels_file):
         """Extracts information about a model"""
-        if (ell_model is None):
+        if not ell_model:
             self.model_name = "d_I160x160x3CMCMCMCMCMCMC1AS"
             self.ell_model = self.model_name + ".ell"
         else:
@@ -139,7 +139,7 @@ class DriveTest:
             name,ext = os.path.splitext(ell_model)
             if ext.lower() == ".zip":
                 with zipfile.ZipFile(ell_model) as myzip:
-                    filename = myzip.extract(myzip.filelist[0])
+                    filename = myzip.extract(myzip.filelist[0], self.test_dir)
 
                 if filename != "":
                     self.logger.info("extracted: " + filename)
@@ -152,7 +152,7 @@ class DriveTest:
             if ext.lower() == ".zip":
                 self.model_name, ext = os.path.splitext(self.model_name)
 
-        if (labels_file is None):
+        if not labels_file:
             self.labels_file = None
         else:
             self.labels_file = os.path.abspath(labels_file)
