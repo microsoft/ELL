@@ -12,6 +12,7 @@
 #include "NeuralNetworkPredictorInterface.h"
 
 // neural predictor
+#include "HardSigmoidActivation.h"
 #include "LeakyReLUActivation.h"
 #include "MaxPoolingFunction.h"
 #include "MeanPoolingFunction.h"
@@ -48,6 +49,8 @@ namespace api
             {
             case api::ActivationType::relu:
                 return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ReLUActivation>>(parameters);
+            case api::ActivationType::hardSigmoid:
+                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::HardSigmoidActivation>>(parameters);
             case api::ActivationType::leaky:
                 return std::make_unique<underlying::ActivationLayer<ElementType, underlying::LeakyReLUActivation>>(parameters);
             case api::ActivationType::sigmoid:
@@ -97,6 +100,8 @@ namespace api
                 return CreateGRULayer<ActivationFunctionType, underlying::LeakyReLUActivation>(layer, parameters);
             case api::ActivationType::sigmoid:
                 return CreateGRULayer<ActivationFunctionType, underlying::SigmoidActivation>(layer, parameters);
+            case api::ActivationType::hardSigmoid:
+                return CreateGRULayer<ActivationFunctionType, underlying::HardSigmoidActivation>(layer, parameters);
             case api::ActivationType::tanh:
                 return CreateGRULayer<ActivationFunctionType, underlying::TanhActivation>(layer, parameters);
             case api::ActivationType::prelu:
@@ -126,6 +131,8 @@ namespace api
                 return CreateGRULayer<underlying::LeakyReLUActivation>(layer, parameters);
             case api::ActivationType::sigmoid:
                 return CreateGRULayer<underlying::SigmoidActivation>(layer, parameters);
+            case api::ActivationType::hardSigmoid:
+                return CreateGRULayer<underlying::HardSigmoidActivation>(layer, parameters);
             case api::ActivationType::tanh:
                 return CreateGRULayer<underlying::TanhActivation>(layer, parameters);
             case api::ActivationType::prelu:

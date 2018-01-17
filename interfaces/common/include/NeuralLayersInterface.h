@@ -110,7 +110,8 @@ namespace neural
         sigmoid,
         tanh,
         softmax,
-        prelu
+        prelu,
+        hardSigmoid
     };
 
     template <typename ElementType>
