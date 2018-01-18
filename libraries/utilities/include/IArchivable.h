@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "ArchiveVersion.h"
 #include "Archiver.h"
 #include "Exception.h"
 #include "TypeName.h"
@@ -47,7 +48,7 @@ namespace utilities
         friend ObjectArchive GetDescription(const IArchivable& object);
         template <typename ValueType>
         friend ValueType CreateObject(const ObjectArchive& archive);
-    
+
         /// <summary> Gets the archive version of the object. </summary>
         ///
         /// <returns> The archive version of the object. </summary>

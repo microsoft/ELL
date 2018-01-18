@@ -10,8 +10,6 @@
 #include "TargetDevice.h"
 
 // llvm
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/Module.h"
 #include "llvm/Support/CodeGen.h" // for CodeGenOpt::Level enum
 #include "llvm/Target/TargetMachine.h" // for CodeGenFileType
 #include "llvm/Target/TargetOptions.h" // for FloatABI::ABIType and FPOpFusion::FpOpFusionMode

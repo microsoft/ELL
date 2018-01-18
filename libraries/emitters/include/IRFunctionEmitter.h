@@ -10,14 +10,26 @@
 
 #include "EmitterTypes.h"
 #include "IRAsyncTask.h"
+#include "IRBlockRegion.h"
 #include "IREmitter.h"
 #include "IRIfEmitter.h"
 #include "IRLocalValue.h"
 #include "IRLoopEmitter.h"
 #include "IROptimizer.h"
 #include "IRTask.h"
-#include "LLVMInclude.h"
 #include "Variable.h"
+
+// llvm
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
 
 // stl
 #include <functional>
@@ -1381,9 +1393,6 @@ namespace emitters
         //
         // Serialization
         //
-
-        /// <summary> Dump out function to std::out. </summary>
-        void Dump();
 
         /// <summary> Output the function to the given stream. </summary>
         ///

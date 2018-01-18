@@ -7,10 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IRHeaderWriter.h"
-
-// emitters
 #include "EmitterException.h"
 #include "IRMetadata.h"
+#include "IRModuleEmitter.h"
 
 // llvm
 #include "llvm/IR/Attributes.h"
@@ -28,94 +27,94 @@ namespace ell
 {
 namespace emitters
 {
-namespace
-{
-    void WriteStructType(std::ostream& os, llvm::StructType* t)
+    namespace
     {
-        if (t->hasName()) // && !t->isLiteral() ?
+        void WriteStructType(std::ostream& os, llvm::StructType* t)
         {
-            std::string typeName = t->getName();
-            os << typeName;
-        }
-    }
-
-    void WriteArrayType(std::ostream& os, llvm::ArrayType* t)
-    {
-        auto size = t->getNumElements();
-        auto elemType = t->getTypeAtIndex(0u);
-        WriteLLVMType(os, elemType);
-        os << "[" << size << "]";
-    }
-
-    void WritePointerType(std::ostream& os, llvm::PointerType* t)
-    {
-        auto elemType = t->getTypeAtIndex(0u);
-        WriteLLVMType(os, elemType);
-        os << "*";
-    }
-
-    void WriteIntegerType(std::ostream& os, llvm::IntegerType* t)
-    {
-        auto size = t->getBitWidth();
-        os << "int" << size << "_t";
-    }
-
-    void WriteFunctionType(std::ostream& os, llvm::FunctionType* t)
-    {
-        auto returnType = t->getReturnType();
-        WriteLLVMType(os, returnType);
-        os << " (";
-        bool first = true;
-        for (auto pt : t->params())
-        {
-            if (!first)
+            if (t->hasName()) // && !t->isLiteral() ?
             {
-                os << ", ";
+                std::string typeName = t->getName();
+                os << typeName;
             }
-            first = false;
-            WriteLLVMType(os, pt);
         }
-        os << ");";
-    }
 
-    void WriteLLVMVariableDeclaration(std::ostream& os, llvm::Type* t, std::string name)
-    {
-        if (t->isArrayTy())
+        void WriteArrayType(std::ostream& os, llvm::ArrayType* t)
         {
-            auto arrType = llvm::cast<llvm::ArrayType>(t);
-            auto size = arrType->getNumElements();
-            auto elemType = arrType->getTypeAtIndex(0u);
+            auto size = t->getNumElements();
+            auto elemType = t->getTypeAtIndex(0u);
             WriteLLVMType(os, elemType);
-            os << " " << name << "[" << size << "]";
+            os << "[" << size << "]";
         }
-        else
-        {
-            WriteLLVMType(os, t);
-            os << " " << name;
-        }
-    }
 
-    void WriteStructDefinition(std::ostream& os, llvm::StructType* t, const std::vector<std::string>& fieldNames)
-    {
-        if (t->hasName()) // && !t->isLiteral() ?
+        void WritePointerType(std::ostream& os, llvm::PointerType* t)
         {
-            std::string typeName = t->getName();
-            DeclareIfDefDefine guard(os, "ELL_" + typeName);
-            os << "typedef struct " << typeName << "\n";
-            os << "{\n";
-            size_t index = 0;
-            for (auto& fieldType : t->elements())
+            auto elemType = t->getTypeAtIndex(0u);
+            WriteLLVMType(os, elemType);
+            os << "*";
+        }
+
+        void WriteIntegerType(std::ostream& os, llvm::IntegerType* t)
+        {
+            auto size = t->getBitWidth();
+            os << "int" << size << "_t";
+        }
+
+        void WriteFunctionType(std::ostream& os, llvm::FunctionType* t)
+        {
+            auto returnType = t->getReturnType();
+            WriteLLVMType(os, returnType);
+            os << " (";
+            bool first = true;
+            for (auto pt : t->params())
             {
-                os << "    ";
-                std::string fieldName = (index >= fieldNames.size()) ? std::string("param") + std::to_string(index) : fieldNames[index];
-                WriteLLVMVariableDeclaration(os, fieldType, fieldName);
-                os << ";\n";
-                ++index;
+                if (!first)
+                {
+                    os << ", ";
+                }
+                first = false;
+                WriteLLVMType(os, pt);
             }
-            os << "} " << typeName << ";\n\n";
+            os << ");";
+        }
+
+        void WriteLLVMVariableDeclaration(std::ostream& os, llvm::Type* t, std::string name)
+        {
+            if (t->isArrayTy())
+            {
+                auto arrType = llvm::cast<llvm::ArrayType>(t);
+                auto size = arrType->getNumElements();
+                auto elemType = arrType->getTypeAtIndex(0u);
+                WriteLLVMType(os, elemType);
+                os << " " << name << "[" << size << "]";
+            }
+            else
+            {
+                WriteLLVMType(os, t);
+                os << " " << name;
+            }
+        }
+
+        void WriteStructDefinition(std::ostream& os, llvm::StructType* t, const std::vector<std::string>& fieldNames)
+        {
+            if (t->hasName()) // && !t->isLiteral() ?
+            {
+                std::string typeName = t->getName();
+                DeclareIfDefDefine guard(os, "ELL_" + typeName);
+                os << "typedef struct " << typeName << "\n";
+                os << "{\n";
+                size_t index = 0;
+                for (auto& fieldType : t->elements())
+                {
+                    os << "    ";
+                    std::string fieldName = (index >= fieldNames.size()) ? std::string("param") + std::to_string(index) : fieldNames[index];
+                    WriteLLVMVariableDeclaration(os, fieldType, fieldName);
+                    os << ";\n";
+                    ++index;
+                }
+                os << "} " << typeName << ";\n\n";
+            }
         }
     }
-}
 
     void WriteLLVMType(std::ostream& os, llvm::Type* t)
     {
@@ -238,10 +237,10 @@ namespace
                         // Get struct field names
                         auto tagName = GetStructFieldsTagName(t);
                         std::vector<std::string> fieldNames;
-                        if(moduleEmitter.HasMetadata(tagName))
+                        if (moduleEmitter.HasMetadata(tagName))
                         {
                             auto fieldNameMetadata = moduleEmitter.GetMetadata(tagName);
-                            if(fieldNameMetadata.size() > 0)
+                            if (!fieldNameMetadata.empty())
                             {
                                 fieldNames = fieldNameMetadata[0];
                             }
@@ -289,12 +288,10 @@ namespace
         _os << "#endif // " << (_type == Type::Negative ? "!" : "") << "defined(" << _symbol << ")\n\n";
     }
 
-
     DeclareIfDefDefine::DeclareIfDefDefine(std::ostream& os, std::string symbol, const std::string& value /* = "" */)
         : DeclareIfDefGuard(os, std::move(symbol), Type::Negative)
     {
         _os << "#define " << _symbol << (value.empty() ? "" : " ") << value << "\n\n";
     }
-
 }
 }

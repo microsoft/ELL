@@ -11,17 +11,12 @@
 #include "Archiver.h"
 #include "Exception.h"
 #include "ObjectArchive.h"
-#include "TypeFactory.h"
 #include "TypeName.h"
 
 // stl
 #include <cstddef>
 #include <cstdint>
-#include <memory>
-#include <ostream>
-#include <sstream>
 #include <string>
-#include <type_traits>
 #include <vector>
 
 namespace ell

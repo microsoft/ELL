@@ -7,11 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ObjectArchive.h"
+#include "Exception.h"
 #include "IArchivable.h"
 #include "ObjectArchiver.h"
-
-// utiliites
-#include "Exception.h"
 
 // stl
 #include <memory>

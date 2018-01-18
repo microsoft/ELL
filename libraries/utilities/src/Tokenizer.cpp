@@ -13,7 +13,8 @@
 // stl
 #include <cassert>
 #include <cctype>
-#include <iostream>
+#include <istream>
+#include <ostream>
 #include <sstream>
 
 // Note: BUFFER_SIZE must be larger than the largest readable token
@@ -149,14 +150,14 @@ namespace utilities
         _peekedTokens.push(token);
     }
 
-    void Tokenizer::PrintTokens()
+    void Tokenizer::PrintTokens(std::ostream& os)
     {
         while (true)
         {
             auto token = ReadNextToken();
             if (token == "")
                 break;
-            std::cout << "Token: " << token << std::endl;
+            os << "Token: " << token << std::endl;
         }
     }
 

@@ -9,20 +9,18 @@
 #pragma once
 
 #include "CompiledMap.h"
+#include "IRModelProfiler.h"
+#include "InputNode.h"
+#include "Map.h"
+#include "Model.h"
+#include "Node.h"
+#include "OutputPort.h"
+#include "PortElements.h"
 
 // emitters
 #include "IRExecutionEngine.h"
 #include "IRModuleEmitter.h"
 #include "ModuleEmitter.h"
-
-// model
-#include "Map.h"
-#include "IRModelProfiler.h"
-#include "InputNode.h"
-#include "Model.h"
-#include "Node.h"
-#include "OutputPort.h"
-#include "PortElements.h"
 
 // utilities
 #include "ConformingVector.h"
@@ -33,6 +31,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 namespace ell
@@ -120,35 +119,34 @@ namespace model
         /// <summary> Reset the performance summary for the model to zero. </summary>
         void ResetModelProfilingInfo();
 
-        /// <summary> Get the number of nodes that have profiling information. </summary>        
+        /// <summary> Get the number of nodes that have profiling information. </summary>
         int GetNumProfiledNodes();
 
-        /// <summary> Get a pointer to the info struct for a node. </summary>        
+        /// <summary> Get a pointer to the info struct for a node. </summary>
         ///
         /// <param name="nodeIndex"> the index of the node. </param>
         NodeInfo* GetNodeInfo(int nodeIndex);
 
-        /// <summary> Get a pointer to the performance counters struct for a node. </summary>        
+        /// <summary> Get a pointer to the performance counters struct for a node. </summary>
         ///
         /// <param name="nodeIndex"> the index of the node. </param>
         PerformanceCounters* GetNodePerformanceCounters(int nodeIndex);
 
         /// <summary> Print a summary of the performance for the nodes. </summary>
         void PrintNodeProfilingInfo();
-        
+
         /// <summary> Reset the performance counters for all the nodes to zero. </summary>
         void ResetNodeProfilingInfo();
 
-
-        /// <summary> Get the number of node types that have profiling information. </summary>        
+        /// <summary> Get the number of node types that have profiling information. </summary>
         int GetNumProfiledNodeTypes();
 
-        /// <summary> Get a pointer to the info struct for a node type. </summary>        
+        /// <summary> Get a pointer to the info struct for a node type. </summary>
         ///
         /// <param name="nodeIndex"> the index of the node type. </param>
         NodeInfo* GetNodeTypeInfo(int nodeIndex);
 
-        /// <summary> Get a pointer to the aggregated performance counters struct for a node type. </summary>        
+        /// <summary> Get a pointer to the aggregated performance counters struct for a node type. </summary>
         ///
         /// <param name="nodeIndex"> the index of the node type. </param>
         PerformanceCounters* GetNodeTypePerformanceCounters(int nodeIndex);
@@ -180,7 +178,7 @@ namespace model
 
     private:
         friend class IRMapCompiler;
-    
+
         IRCompiledMap(Map map, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module);
 
         void EnsureExecutionEngine() const;

@@ -8,19 +8,14 @@
 
 #pragma once
 
+#include "CompilableNodeUtilities.h"
+#include "OutputPort.h"
+#include "PortElements.h"
+
 // emitters
 #include "EmitterTypes.h"
 #include "ModuleEmitter.h"
-#include "TargetDevice.h"
 #include "Variable.h"
-
-// model
-#include "CompilableNodeUtilities.h"
-#include "Map.h"
-#include "Model.h"
-#include "Node.h"
-#include "OutputPort.h"
-#include "PortElements.h"
 
 // stl
 #include <stack>
@@ -31,6 +26,10 @@ namespace ell
 {
 namespace model
 {
+    class Map;
+    class Model;
+    class Node;
+    
     struct MapCompilerParameters
     {
         std::string moduleName = "ELL";

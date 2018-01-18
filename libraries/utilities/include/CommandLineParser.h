@@ -12,7 +12,7 @@
 // stl
 #include <cstddef>
 #include <functional>
-#include <iostream>
+#include <initializer_list>
 #include <map>
 #include <set>
 #include <stdexcept>
@@ -313,6 +313,7 @@ namespace utilities
         /// <summary></summary>
         CommandLineParserErrorException(const char* message, std::vector<ParseError> errors)
             : CommandLineParserException(message), _errors(errors) {}
+
     private:
         std::vector<ParseError> _errors;
     };

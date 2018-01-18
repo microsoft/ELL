@@ -8,9 +8,12 @@
 
 #pragma once
 
-#include "IREmitter.h"
+// llvm
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
 
-#include <string>
+// stl
 #include <vector>
 
 namespace ell

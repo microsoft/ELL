@@ -9,11 +9,9 @@
 #pragma once
 
 #include "ArchiveVersion.h"
-#include "Exception.h"
 #include "TypeFactory.h"
 #include "TypeName.h"
 #include "TypeTraits.h"
-#include "Unused.h"
 
 // stl
 #include <cstddef>
@@ -21,6 +19,7 @@
 #include <functional>
 #include <limits>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <type_traits>
 #include <vector>

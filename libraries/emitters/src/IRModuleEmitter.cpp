@@ -24,6 +24,7 @@
 #include <llvm/Bitcode/ReaderWriter.h>
 #include <llvm/IR/TypeBuilder.h>
 #include <llvm/IR/Verifier.h>
+#include <llvm/Support/FileSystem.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/ToolOutputFile.h>
 #include <llvm/Support/raw_os_ostream.h>

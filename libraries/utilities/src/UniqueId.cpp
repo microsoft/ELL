@@ -8,8 +8,6 @@
 
 #include "UniqueId.h"
 
-#include <string>
-
 namespace ell
 {
 namespace utilities

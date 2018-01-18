@@ -10,6 +10,12 @@
 
 #include "IREmitter.h"
 
+// llvm
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+
 // stl
 #include <string>
 #include <vector>

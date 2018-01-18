@@ -7,15 +7,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ObjectArchiver.h"
-#include "Archiver.h"
 #include "IArchivable.h"
 #include "Unused.h"
 
-#include <cassert>
-#include <cctype>
-#include <iostream>
-#include <sstream>
+// stl
 #include <string>
+#include <vector>
 
 namespace ell
 {

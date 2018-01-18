@@ -13,10 +13,12 @@
 
 // model
 #include "InputPort.h"
-#include "ModelTransformer.h"
 #include "Node.h"
 #include "Port.h"
 #include "PortElements.h"
+
+// stl
+#include <string>
 
 namespace ell
 {

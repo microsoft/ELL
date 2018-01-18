@@ -8,7 +8,6 @@
 #pragma once
 
 #include "EmitterTypes.h"
-#include "Exception.h"
 #include "LLVMUtilities.h"
 #include "SymbolTable.h"
 

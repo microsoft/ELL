@@ -66,7 +66,9 @@ namespace utilities
         std::string PeekNextToken();
 
         /// <summary> Consumes entire stream, printing tokens as they're read. For debugging. </summary>
-        void PrintTokens();
+        ///
+        /// <param name="os"> The stream to print the tokens to. </param>
+        void PrintTokens(std::ostream& os);
 
     private:
         std::istream& _in;

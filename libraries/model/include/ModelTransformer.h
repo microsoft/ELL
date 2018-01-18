@@ -32,8 +32,7 @@ namespace model
     // Forward declarations
     class InputNodeBase;
 
-    template <typename ValueType>
-    class InputNode;
+    template <typename ValueType> class InputNode;
 
     class MapCompiler;
 

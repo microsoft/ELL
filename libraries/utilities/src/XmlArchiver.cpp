@@ -9,6 +9,7 @@
 #include "XmlArchiver.h"
 #include "Archiver.h"
 #include "IArchivable.h"
+#include "Unused.h"
 
 // stl
 #include <algorithm>

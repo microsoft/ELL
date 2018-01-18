@@ -7,8 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IRModelProfiler.h"
-
-// emitters
+#include "IRFunctionEmitter.h"
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 #include "LLVMUtilities.h"
@@ -176,11 +175,11 @@ namespace model
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
 
         // NodeInfo struct fields
-        emitters::NamedLLVMTypeList infoFields = {{"nodeName", int8PtrType}, {"nodeType", int8PtrType}};
+        emitters::NamedLLVMTypeList infoFields = { { "nodeName", int8PtrType }, { "nodeType", int8PtrType } };
         _nodeInfoType = _module->GetOrCreateStruct(GetNamespacePrefix() + "_NodeInfo", infoFields);
         _module->IncludeTypeInHeader(_nodeInfoType->getName());
 
-        emitters::NamedLLVMTypeList countersFields = {{"count", int64Type}, {"totalTime", doubleType}};
+        emitters::NamedLLVMTypeList countersFields = { { "count", int64Type }, { "totalTime", doubleType } };
         _performanceCountersType = _module->GetOrCreateStruct(GetNamespacePrefix() + "_PerformanceCounters", countersFields);
         _module->IncludeTypeInHeader(_performanceCountersType->getName());
     }
@@ -294,6 +293,11 @@ namespace model
         // Note: We're grossly overallocating global array for types
         _nodeTypeInfoArray = _module->GlobalArray(GetNamespacePrefix() + "_NodeTypeInfoArray", _nodeInfoType, numNodes);
         _nodeTypePerformanceCountersArray = _module->GlobalArray(GetNamespacePrefix() + "_NodeTypePerformanceCountersArray", _performanceCountersType, numNodes);
+    }
+
+    std::string ModelProfiler::GetNamespacePrefix() const
+    {
+        return _module->GetModuleName();
     }
 
     void ModelProfiler::EmitGetModelPerformanceCountersFunction()

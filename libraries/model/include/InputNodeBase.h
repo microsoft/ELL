@@ -10,26 +10,26 @@
 
 #include "CompilableNode.h"
 #include "InputPort.h"
-#include "ModelTransformer.h"
-#include "Node.h"
 #include "OutputPort.h"
+#include "Port.h"
 
 // math
 #include "Tensor.h"
 
 // utilities
-#include "IArchivable.h"
+#include "ArchiveVersion.h"
 #include "TypeName.h"
 
-#include <memory>
+// stl
 #include <string>
 #include <vector>
 
 namespace ell
 {
-/// <summary> model namespace </summary>
 namespace model
 {
+    using InputShape = ell::math::TensorShape;
+
     /// <summary> Base class for a node that represents an input to the system. </summary>
     class InputNodeBase : public CompilableNode
     {
@@ -52,22 +52,23 @@ namespace model
         /// <summary> Gets the output shape </summary>
         ///
         /// <returns> The output shape </returns>
-        math::TensorShape GetShape() const { return _shape; }
+        InputShape GetShape() const { return _shape; }
 
     protected:
-        InputNodeBase(OutputPortBase& output, ell::math::TensorShape shape);
+        InputNodeBase(OutputPortBase& output, InputShape shape);
 
         // Constructor for derived classes that need to set the input port on CompilableNode.
-        InputNodeBase(InputPortBase& input, OutputPortBase& output, ell::math::TensorShape shape);
+        InputNodeBase(InputPortBase& input, OutputPortBase& output, InputShape shape);
 
         bool ShouldCompileInline() const override { return true; }
         bool HasState() const override { return false; }
-        void SetShape(const ell::math::TensorShape& shape) { _shape = shape; }  // STYLE discrepancy
+        void SetShape(const InputShape& shape) { _shape = shape; } // STYLE discrepancy
         ell::utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
+
     private:
         OutputPortBase& _outputBase;
-        ell::math::TensorShape _shape;
+        InputShape _shape;
     };
 
     /// <summary> Base class for a node that represents a source to the system. </summary>
@@ -87,7 +88,7 @@ namespace model
     protected:
         // Note: Source nodes still receive timestamps as input, even though data is retrieved through callbacks.
         // Therefore, they have input ports.
-        SourceNodeBase(InputPortBase& input, OutputPortBase& output, ell::math::TensorShape shape, const std::string& callbackName)
+        SourceNodeBase(InputPortBase& input, OutputPortBase& output, InputShape shape, const std::string& callbackName)
             : InputNodeBase(input, output, shape), _callbackName(callbackName)
         {
         }

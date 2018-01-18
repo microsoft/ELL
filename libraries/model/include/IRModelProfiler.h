@@ -13,10 +13,9 @@
 
 // emitters
 #include "EmitterTypes.h"
-#include "IRFunctionEmitter.h"
-#include "IRModuleEmitter.h"
 
 // llvm
+#include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Value.h"
 
 // stl
@@ -42,6 +41,12 @@ struct PerformanceCounters
 
 namespace ell
 {
+namespace emitters
+{
+    class IRFunctionEmitter;
+    class IRModuleEmitter;
+}
+
 namespace model
 {
     // import NodeInfo and PerformanceCounters into our namespace
@@ -73,7 +78,7 @@ namespace model
     {
     public:
         // Note: the default constructor is only necessary because we store instances in a std::map
-        PerformanceCountersEmitter() = default; 
+        PerformanceCountersEmitter() = default;
 
     private:
         friend class ModelProfiler;
@@ -98,7 +103,7 @@ namespace model
     {
     public:
         // Note: the default constructor is only necessary because we store instances in a std::map
-        NodePerformanceEmitter() = default; 
+        NodePerformanceEmitter() = default;
 
     private:
         void Init(emitters::IRFunctionEmitter& function);
@@ -134,48 +139,48 @@ namespace model
         /// <returns> true if profiling is enabled, false if disabled. </returns>
         bool IsProfilingEnabled() const { return _profilingEnabled; }
 
-        /// <summary> Emit static initialization code to allocate and initialize info and perf counter data. </summary> 
-        void EmitInitialization(); 
+        /// <summary> Emit static initialization code to allocate and initialize info and perf counter data. </summary>
+        void EmitInitialization();
 
-        /// <summary> Emit performance code at beginning of model predictor function. </summary> 
+        /// <summary> Emit performance code at beginning of model predictor function. </summary>
         ///
         /// <param name="function"> The model function. </param>
         /// <param name="startTime"> The time that the model function started. </param>
         void StartModel(emitters::IRFunctionEmitter& function);
 
-        /// <summary> Emit performance code at end of model predictor function. </summary> 
+        /// <summary> Emit performance code at end of model predictor function. </summary>
         ///
         /// <param name="function"> The model function. </param>
         /// <param name="startTime"> The time that the model function exited. </param>
         void EndModel(emitters::IRFunctionEmitter& function);
-        
-        /// <summary> Emit static node performance initialization code at the beginning of a node. </summary> 
+
+        /// <summary> Emit static node performance initialization code at the beginning of a node. </summary>
         ///
         /// <param name="function"> The model function. </param>
         /// <param name="node"> The node being evaluated. </param>
         void InitNode(emitters::IRFunctionEmitter& function, const Node& node);
 
-        /// <summary> Emit node performance start code at the beginning of a node's execution. </summary> 
+        /// <summary> Emit node performance start code at the beginning of a node's execution. </summary>
         ///
         /// <param name="function"> The model function. </param>
         /// <param name="node"> The node being evaluated. </param>
         /// <param name="startTime"> The time that the node evaluation started. </param>
         void StartNode(emitters::IRFunctionEmitter& function, const Node& node);
 
-        /// <summary> Emit node performance start code at the end of a node's execution. </summary> 
+        /// <summary> Emit node performance start code at the end of a node's execution. </summary>
         ///
         /// <param name="function"> The model function. </param>
         /// <param name="node"> The node being evaluated. </param>
         /// <param name="endTime"> The time that the node evaluation ended. </param>
         void EndNode(emitters::IRFunctionEmitter& function, const Node& node);
 
-        /// <summary> Emit the runtime API functions for querying model performance. </summary> 
+        /// <summary> Emit the runtime API functions for querying model performance. </summary>
         void EmitModelProfilerFunctions();
 
     private:
         void CreateStructTypes();
         void AllocateNodeData();
-        std::string GetNamespacePrefix() const { return _module->GetModuleName(); }
+        std::string GetNamespacePrefix() const;
 
         NodePerformanceEmitter& GetPerformanceCountersForNode(const Node& node);
         NodePerformanceEmitter& GetTypePerformanceCountersForNode(const Node& node);

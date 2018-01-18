@@ -10,10 +10,14 @@
 
 #include "EmitterTypes.h"
 #include "IRPosixRuntime.h"
-#include "LLVMInclude.h"
 
 // utilities
 #include "Exception.h"
+
+// llvm
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
 
 namespace ell
 {

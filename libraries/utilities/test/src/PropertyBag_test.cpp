@@ -17,6 +17,7 @@
 #include "testing.h"
 
 // stl
+#include <iostream>
 #include <string>
 #include <vector>
 

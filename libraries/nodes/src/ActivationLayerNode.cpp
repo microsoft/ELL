@@ -7,8 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ActivationLayerNode.h"
-#include "CompiledActivationFunctions.h"
 #include "BinaryFunctionNode.h"
+#include "BroadcastFunctionNode.h"
+#include "CompiledActivationFunctions.h"
 #include "ConstantNode.h"
 
 // predictors

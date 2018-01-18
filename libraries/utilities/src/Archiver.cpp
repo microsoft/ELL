@@ -7,9 +7,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Archiver.h"
+#include "Exception.h"
 #include "Format.h"
 #include "IArchivable.h"
+#include "Unused.h"
 
+// stl
 #include <string>
 
 namespace ell
@@ -21,21 +24,21 @@ namespace utilities
     //
 
     GenericTypeFactory& SerializationContext::GetTypeFactory()
-    { 
-        if(_previousContext != nullptr)
+    {
+        if (_previousContext != nullptr)
         {
             return _previousContext->GetTypeFactory();
         }
-        return _typeFactory; 
+        return _typeFactory;
     }
 
     VariantTypeRegistry& SerializationContext::GetVariantTypeRegistry()
-    { 
-        if(_previousContext != nullptr)
+    {
+        if (_previousContext != nullptr)
         {
             return _previousContext->GetVariantTypeRegistry();
         }
-        return _variantTypeRegistry; 
+        return _variantTypeRegistry;
     }
 
     //
@@ -48,10 +51,10 @@ namespace utilities
 
     bool operator!=(const ArchivedObjectInfo& a, const ArchivedObjectInfo& b)
     {
-        return !(a==b);
+        return !(a == b);
     }
 
-   //
+    //
     // PropertyArchiver class
     //
     Archiver::PropertyArchiver::PropertyArchiver(Archiver& archiver, const std::string& name)

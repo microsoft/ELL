@@ -8,11 +8,10 @@
 
 #pragma once
 
-#include "NeuralNetworkLayerNode.h"
-
 // model
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
+#include "NeuralNetworkLayerNode.h"
 #include "PortElements.h"
 
 // predictors

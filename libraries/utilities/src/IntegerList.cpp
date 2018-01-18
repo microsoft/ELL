@@ -7,8 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IntegerList.h"
-
-// utilities
 #include "Exception.h"
 
 // stl
@@ -32,7 +30,7 @@ namespace utilities
     {
         if (_list.size() == 0)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can't get max of empty list");
+            throw LogicException(LogicExceptionErrors::illegalState, "Can't get max of empty list");
         }
 
         return _list[Size() - 1];

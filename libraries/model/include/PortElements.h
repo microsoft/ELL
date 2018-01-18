@@ -18,7 +18,6 @@
 // utilities
 #include "Exception.h"
 #include "IArchivable.h"
-#include "Tokenizer.h"
 
 // stl
 #include <algorithm>
@@ -32,7 +31,6 @@ namespace ell
 namespace model
 {
     class Model;
-    class Node;
 
     /// <summary> Represents a single value from an output port </summary>
     class PortElementBase

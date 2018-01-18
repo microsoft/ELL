@@ -56,7 +56,7 @@ namespace nodes
         /// <param name="function"> The function to apply coordinate-wise. </param>
         /// <param name="padding"> The padding value. </param>
         BinaryFunctionNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2,
-            const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding = 0);
+                           const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding = 0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -80,18 +80,18 @@ namespace nodes
 
     private:
         void ComputeDimensionLoop(size_t dimension,
-            std::vector<ValueType>& output,
-            size_t prevInputDimensionOffset,
-            size_t prevOutputDimensionOffset) const;
+                                  std::vector<ValueType>& output,
+                                  size_t prevInputDimensionOffset,
+                                  size_t prevOutputDimensionOffset) const;
 
         void EmitComputeDimensionLoop(model::IRMapCompiler& compiler,
-            emitters::IRFunctionEmitter& function,
-            size_t dimension,
-            llvm::Value* input1,
-            llvm::Value* input2,
-            llvm::Value* output,
-            llvm::Value* prevInputDimensionOffset,
-            llvm::Value* prevOutputDimensionOffset) const;
+                                      emitters::IRFunctionEmitter& function,
+                                      size_t dimension,
+                                      llvm::Value* input1,
+                                      llvm::Value* input2,
+                                      llvm::Value* output,
+                                      llvm::Value* prevInputDimensionOffset,
+                                      llvm::Value* prevOutputDimensionOffset) const;
 
         // Inputs
         model::InputPort<ValueType> _input1;

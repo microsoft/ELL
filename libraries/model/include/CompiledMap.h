@@ -13,21 +13,10 @@
 
 // model
 #include "Map.h"
-#include "Model.h"
-#include "Node.h"
-#include "OutputPort.h"
-#include "PortElements.h"
-
-// utilities
-#include "ConformingVector.h"
-#include "TypeName.h"
 
 // stl
-#include <functional>
-#include <memory>
 #include <ostream>
 #include <string>
-#include <vector>
 
 namespace ell
 {

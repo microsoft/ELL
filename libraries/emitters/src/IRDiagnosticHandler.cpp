@@ -8,8 +8,10 @@
 
 #include "IRDiagnosticHandler.h"
 
+// llvm
 #include "llvm/IR/DiagnosticInfo.h"
 #include "llvm/IR/DiagnosticPrinter.h"
+#include "llvm/IR/LLVMContext.h"
 #include "llvm/Support/raw_os_ostream.h"
 
 // stl
@@ -47,16 +49,16 @@ namespace emitters
         auto severity = info.getSeverity();
         switch (severity)
         {
-            case llvm::DS_Error:
-                _hadError = true;
-                break;
+        case llvm::DS_Error:
+            _hadError = true;
+            break;
 
-            case llvm::DS_Warning:
-            case llvm::DS_Remark:
-            case llvm::DS_Note:
-            default:
-                // nothing
-                break;
+        case llvm::DS_Warning:
+        case llvm::DS_Remark:
+        case llvm::DS_Note:
+        default:
+            // nothing
+            break;
         }
 
         const char* prefix = llvm::LLVMContext::getDiagnosticMessagePrefix(severity);

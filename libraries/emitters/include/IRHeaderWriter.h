@@ -7,15 +7,20 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "IRModuleEmitter.h"
+// llvm
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Type.h"
 
 // stl
 #include <ostream>
+#include <string>
 
 namespace ell
 {
 namespace emitters
 {
+    class IRModuleEmitter;
+
     /// <summary> Write a C / C++ header file for the given module. </summary>
     ///
     /// <param name="os"> The output stream to write to. </param>

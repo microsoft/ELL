@@ -8,9 +8,6 @@
 
 #pragma once
 
-// stl
-#include <utility>
-
 namespace ell
 {
 namespace utilities

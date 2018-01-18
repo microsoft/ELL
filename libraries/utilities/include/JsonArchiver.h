@@ -11,13 +11,11 @@
 #include "Archiver.h"
 #include "Exception.h"
 #include "Tokenizer.h"
-#include "TypeFactory.h"
-#include "TypeName.h"
 
 // stl
 #include <cstddef>
 #include <cstdint>
-#include <memory>
+#include <istream>
 #include <ostream>
 #include <sstream>
 #include <string>

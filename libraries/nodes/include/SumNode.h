@@ -13,7 +13,6 @@
 #include "CompilableNodeUtilities.h"
 #include "IRMapCompiler.h"
 #include "InputPort.h"
-#include "MapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"

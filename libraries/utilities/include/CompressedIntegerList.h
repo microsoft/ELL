@@ -10,7 +10,7 @@
 
 // stl
 #include <cstddef>
-#include <iterator>
+#include <cstdint>
 #include <vector>
 
 namespace ell
@@ -22,7 +22,7 @@ namespace utilities
     class CompressedIntegerList
     {
     public:
-        /// <summary> A read-only forward std::iterator for the CompressedIntegerList. </summary>
+        /// <summary> A read-only forward iterator for the CompressedIntegerList. </summary>
         class Iterator
         {
         public:
@@ -31,8 +31,6 @@ namespace utilities
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;
-
-            // Returns true if the std::iterator is currently pointing to a valid iterate
 
             /// <summary> Query if this object input stream valid. </summary>
             ///

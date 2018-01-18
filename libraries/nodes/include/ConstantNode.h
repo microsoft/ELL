@@ -14,17 +14,15 @@
 #include "IRMapCompiler.h"
 #include "MapCompiler.h"
 #include "ModelTransformer.h"
-#include "Node.h"
 #include "OutputPort.h"
 
 // emitters
-#include "VectorVariable.h"
+#include "IRFunctionEmitter.h"
 
 // predictors
 #include "ConstantPredictor.h"
 
 // utilities
-#include "Exception.h"
 #include "IArchivable.h"
 #include "TypeName.h"
 

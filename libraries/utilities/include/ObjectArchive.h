@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Exception.h"
+#include "Unused.h"
 #include "Variant.h"
 
 // stl

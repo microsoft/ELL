@@ -14,12 +14,10 @@
 #include "InputPort.h"
 #include "MapCompiler.h"
 #include "ModelTransformer.h"
-#include "Node.h"
 #include "OutputPort.h"
 #include "PortElements.h"
 
 // utilities
-#include "Exception.h"
 #include "IArchivable.h"
 #include "TypeName.h"
 

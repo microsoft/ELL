@@ -8,9 +8,8 @@
 
 #include "IIterator.h"
 
-#include <iostream>
+// stl
 #include <memory>
-#include <stdexcept>
 #include <utility>
 
 namespace ell
@@ -54,7 +53,7 @@ namespace utilities
         if (_iterator == nullptr)
         {
             std::string funcName = __func__;
-            throw ell::utilities::Exception(funcName + ": invalid iterator");
+            throw Exception(funcName + ": invalid iterator");
         }
         return _iterator->IsValid();
     }
@@ -65,7 +64,7 @@ namespace utilities
         if (_iterator == nullptr)
         {
             std::string funcName = __func__;
-            throw ell::utilities::Exception(funcName + ": invalid iterator");
+            throw Exception(funcName + ": invalid iterator");
         }
         return _iterator->HasSize();
     }
@@ -76,7 +75,7 @@ namespace utilities
         if (_iterator == nullptr)
         {
             std::string funcName = __func__;
-            throw ell::utilities::Exception(funcName + ": invalid iterator");
+            throw Exception(funcName + ": invalid iterator");
         }
         return _iterator->NumItemsLeft();
     }
@@ -87,7 +86,7 @@ namespace utilities
         if (_iterator == nullptr)
         {
             std::string funcName = __func__;
-            throw ell::utilities::Exception(funcName + ": invalid iterator");
+            throw Exception(funcName + ": invalid iterator");
         }
         _iterator->Next();
     }
@@ -98,7 +97,7 @@ namespace utilities
         if (_iterator == nullptr)
         {
             std::string funcName = __func__;
-            throw ell::utilities::Exception(funcName + ": invalid iterator");
+            throw Exception(funcName + ": invalid iterator");
         }
         return _iterator->Get();
     }

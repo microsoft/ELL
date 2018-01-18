@@ -9,10 +9,13 @@
 
 #include "EmitterTypes.h"
 #include "IRFunctionEmitter.h"
-#include "LLVMInclude.h"
 
 // utilities
 #include "TypeTraits.h"
+
+// llvm
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
 
 namespace ell
 {

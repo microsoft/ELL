@@ -9,7 +9,8 @@
 #pragma once
 
 // stl
-#include <iostream>
+#include <ostream>
+#include <string>
 
 namespace ell
 {

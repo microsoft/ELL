@@ -8,6 +8,9 @@
 
 #include "PortMemoryLayout.h"
 
+// emitters
+#include "IRFunctionEmitter.h"
+
 // stl
 #include <numeric>
 

@@ -6,9 +6,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Logger.h"
+
+// stl
 #include <iostream>
 #include <fstream>
-#include "Logger.h"
 
 namespace ell
 {

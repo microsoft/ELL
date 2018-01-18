@@ -8,14 +8,7 @@
 
 #include "IArchivable.h"
 #include "Archiver.h"
-#include "ObjectArchive.h"
 #include "ObjectArchiver.h"
-
-// utiliites
-#include "Exception.h"
-
-// stl
-#include <memory>
 
 namespace ell
 {

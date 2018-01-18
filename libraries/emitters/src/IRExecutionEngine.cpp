@@ -13,7 +13,8 @@
 #include "llvm/Support/TargetSelect.h"
 
 // stl
-#include <sstream>
+#include <memory>
+#include <string>
 
 namespace ell
 {

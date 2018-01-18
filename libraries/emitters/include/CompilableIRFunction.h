@@ -10,7 +10,6 @@
 
 #include "EmitterTypes.h"
 #include "IRFunctionEmitter.h"
-#include "Variable.h"
 
 // llvm
 #include "llvm/IR/Value.h"
@@ -31,13 +30,13 @@ namespace emitters
         using Value = llvm::Value*;
 
         /// <summary> Computes the return value of the function </summary>
-        /// 
+        ///
         /// <param name="args"> The arguments for the function </param>
         /// <returns> The result of applying the function to the input arguments </returns>
         virtual ReturnType Compute(ArgTypes... args) const = 0;
 
         /// <summary> Emits LLVM IR that computes the function </summary>
-        /// 
+        ///
         /// <param name="function"> The function currently being emitted </param>
         /// <param name="args"> The arguments for the function </param>
         /// <returns> The result of applying the function to the input arguments </returns>
@@ -55,14 +54,14 @@ namespace emitters
     {
     public:
         /// <summary> Computes the sum of the input arguments </summary>
-        /// 
+        ///
         /// <param name="x"> One of the values to add </param>
         /// <param name="y"> The other value to add </param>
         /// <returns> The sum x+y </returns>
         ValueType Compute(ValueType x, ValueType y) const override;
 
         /// <summary> Emits LLVM IR that computes the sum of two values </summary>
-        /// 
+        ///
         /// <param name="x"> One of the values to add </param>
         /// <param name="y"> The other value to add </param>
         /// <returns> The sum x+y </returns>

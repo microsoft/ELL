@@ -8,13 +8,9 @@
 
 #pragma once
 
-#include "CompilableNode.h"
-#include "CompilableNodeUtilities.h"
 #include "ModelTransformer.h"
-#include "Node.h"
 #include "OutputNodeBase.h"
 #include "OutputPort.h"
-#include "Tensor.h"
 
 // utilities
 #include "IArchivable.h"

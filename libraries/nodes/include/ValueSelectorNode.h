@@ -17,7 +17,6 @@
 
 // stl
 #include <exception>
-#include <memory>
 #include <vector>
 
 namespace ell

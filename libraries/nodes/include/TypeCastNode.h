@@ -18,7 +18,6 @@
 #include "OutputPort.h"
 
 // stl
-#include <memory>
 #include <string>
 #include <vector>
 

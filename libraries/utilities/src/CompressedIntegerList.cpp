@@ -7,15 +7,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompressedIntegerList.h"
-
-// utilities
 #include "Exception.h"
 
 // stl
 #include <cassert>
 #include <cstring>
 #include <limits>
-#include <stdexcept>
 
 namespace ell
 {

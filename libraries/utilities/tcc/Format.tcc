@@ -6,15 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Exception.h"
 #include "CStringParser.h"
+#include "Exception.h"
 
 // stl
 #include <cctype>
 #include <iomanip>
-#include <iostream>
 #include <sstream>
-#include <stdexcept>
 #include <type_traits>
 
 namespace ell
@@ -143,22 +141,22 @@ namespace utilities
 
         switch (result)
         {
-            case MatchResult::earlyEndOfContent:
-                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "content ended before format near: \"" + formatSnippet + "\"");
+        case MatchResult::earlyEndOfContent:
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "content ended before format near: \"" + formatSnippet + "\"");
 
-            case MatchResult::mismatch:
-                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "mismatch between content and format near: " + snippets);
+        case MatchResult::mismatch:
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "mismatch between content and format near: " + snippets);
 
-            case MatchResult::parserError:
-                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "parser error near: " + snippets);
+        case MatchResult::parserError:
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "parser error near: " + snippets);
 
-            case MatchResult::missingArgument:
-                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "missing argument near: " + snippets);
+        case MatchResult::missingArgument:
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "missing argument near: " + snippets);
 
-            case MatchResult::unexpectedPercentSymbol:
-                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "unexpected symbol '" + std::to_string(substitutionSymbol) + "' in string argument near: " + snippets);
+        case MatchResult::unexpectedPercentSymbol:
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "unexpected symbol '" + std::to_string(substitutionSymbol) + "' in string argument near: " + snippets);
 
-            case MatchResult::success:; // nothing
+        case MatchResult::success:; // nothing
         }
     }
 }

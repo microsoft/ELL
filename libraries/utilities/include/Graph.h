@@ -6,8 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include <fstream>
-#include <iostream>
+
+// stl
+#include <ostream>
 #include <map>
 #include <string>
 #include <vector>
@@ -105,6 +106,7 @@ namespace utilities
 
         void SetIsGroup(bool isGroup) { _is_group = isGroup; }
         bool GetIsGroup() { return _is_group; }
+
     private:
         std::map<std::string, std::string> _properties;
         bool _isGroup = false;
@@ -133,6 +135,7 @@ namespace utilities
         GraphNode& GetTarget() { return _target; }
         /// <summary> Get the optional Category defined on this link</summary>
         std::string GetCategory() { return _category; }
+
     private:
         GraphNode _source;
         GraphNode _target;
@@ -157,6 +160,7 @@ namespace utilities
         const std::string& GetValue() { return _value; }
         /// <summary> Get the expression value</summary>
         const std::string& GetExpression() { return _expression; }
+
     private:
         std::string _property;
         std::string _value;
@@ -175,6 +179,7 @@ namespace utilities
         GraphStyleCondition(const GraphStyleCondition& other);
         /// <summary> Get the value of the expression</summary>
         const std::string& GetExpression() { return _expression; }
+
     private:
         std::string _expression;
     };
@@ -200,6 +205,7 @@ namespace utilities
         GraphStyleCondition GetCondition() { return _condition; }
         /// <summary> Get the the editable list of setters in this GraphStyle</summary>
         std::vector<GraphStyleSetter>& GetSetters() { return _setters; }
+
     private:
         std::string _targetType;
         std::string _groupLabel;
@@ -226,6 +232,7 @@ namespace utilities
         const std::string& GetDescription() { return _description; }
         /// <summary> Get the data type defined on this property</summary>
         const std::string& GetDataType() { return _dataType; }
+
     private:
         std::string _id;
         std::string _label;

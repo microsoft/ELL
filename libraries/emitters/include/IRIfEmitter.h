@@ -8,13 +8,20 @@
 
 #pragma once
 
-#include "IRBlockRegion.h"
-#include "IREmitter.h"
+#include "EmitterTypes.h"
+
+// llvm
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Value.h"
+
+// stl
+#include <functional>
 
 namespace ell
 {
 namespace emitters
 {
+    class IRBlockRegion;
     class IRFunctionEmitter;
 
     ///<summary>Class that helps with emitting If, Then, Else blocks.</summary>

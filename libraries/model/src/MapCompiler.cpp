@@ -10,7 +10,11 @@
 #include "CompilableNode.h"
 #include "CompilableNodeUtilities.h" // for PortTypeToVariableType
 #include "EmitterException.h"
+#include "Map.h"
+#include "Model.h"
+#include "Node.h"
 
+// utilities
 #include "Logger.h"
 
 namespace ell

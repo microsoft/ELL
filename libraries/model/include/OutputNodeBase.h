@@ -9,10 +9,7 @@
 #pragma once
 
 #include "CompilableNode.h"
-#include "CompilableNodeUtilities.h"
-#include "ModelTransformer.h"
 #include "Node.h"
-#include "OutputPort.h"
 
 // math
 #include "Tensor.h"
@@ -21,15 +18,14 @@
 #include "IArchivable.h"
 
 // stl
-#include <memory>
 #include <string>
-#include <vector>
 
 namespace ell
 {
 namespace model
 {
     class IRMapCompiler;
+
     using OutputShape = ell::math::TensorShape;
 
     /// <summary> A node that represents an output from the system. </summary>

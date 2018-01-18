@@ -8,14 +8,12 @@
 
 #pragma once
 
-#include "UniqueId.h"
-
 // utilities
 #include "IArchivable.h"
 #include "PropertyBag.h"
+#include "UniqueId.h"
 
 // stl
-#include <memory>
 #include <string>
 #include <vector>
 #include <ostream>

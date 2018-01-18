@@ -7,8 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IRSwigInterfaceWriter.h"
-
-// emitters
 #include "EmitterException.h"
 #include "IRHeaderWriter.h"
 #include "IRMetadata.h"
@@ -62,8 +60,10 @@ namespace emitters
         // Writes a scoped #ifdef SWIG declaration
         struct DeclareIfndefSwig : private DeclareIfDefGuard
         {
-            DeclareIfndefSwig(std::ostream& os) : DeclareIfDefGuard(os, "SWIG", DeclareIfDefGuard::Type::Negative)
-            { }
+            DeclareIfndefSwig(std::ostream& os)
+                : DeclareIfDefGuard(os, "SWIG", DeclareIfDefGuard::Type::Negative)
+            {
+            }
         };
 
         // Writes SWIG interfaces for predict
@@ -94,8 +94,8 @@ namespace emitters
                 // Write header for SWIG to generate a wrapper
                 // (Note: newlines are part of the syntax for #include)
                 std::string predictFunctionCode(
-                    #include "SwigPredictFunction.in"
-                );
+#include "SwigPredictFunction.in"
+                    );
 
                 ReplaceDelimiter(predictFunctionCode, "FUNCTION", _functionName);
                 ReplaceDelimiter(predictFunctionCode, "INPUT_TYPE", inputType);
@@ -103,15 +103,15 @@ namespace emitters
                 ReplaceDelimiter(predictFunctionCode, "OUTPUT_TYPE", _outputType);
 
                 os << predictFunctionCode << "\n";
-             }
+            }
 
-             void WriteSwigCode(std::ostream& os) const
-             {
+            void WriteSwigCode(std::ostream& os) const
+            {
                 DeclareIfDefGuard guard(os, "SWIGPYTHON", DeclareIfDefGuard::Type::Positive);
 
                 std::string predictPythonCode(
-                    #include "SwigRawPredictPython.in"
-                );
+#include "SwigRawPredictPython.in"
+                    );
 
                 ReplaceDelimiter(predictPythonCode, "PREDICT_FUNCTION", _functionName);
                 ReplaceDelimiter(predictPythonCode, "OUTPUT_VECTOR_TYPE", AsVectorType(_outputType));
@@ -119,7 +119,7 @@ namespace emitters
                 os << "%pythoncode %{\n"
                    << predictPythonCode
                    << "\n%}\n";
-             }
+            }
 
         private:
             void InitPredictFunctionInfo()
@@ -252,8 +252,8 @@ namespace emitters
                 // for forwarding actuator callbacks to the predictor.
                 // (Note: newlines are part of the syntax for #include)
                 std::string predictorCode(
-                    #include "SwigPredictorClass.in"
-                );
+#include "SwigPredictorClass.in"
+                    );
 
                 ReplaceDelimiter(predictorCode, "PREDICTOR_CLASS", _className);
 
@@ -273,15 +273,13 @@ namespace emitters
             {
                 os << "WRAP_CALLABLES_AS_CALLBACKS(" << _className << ", ";
                 WriteCommaSeparatedList(os,
-                {
-                    _inputCallbacks[0].className,
-                    _inputCallbacks[0].inputType,
-                    _outputCallbacks[0].className,
-                    _outputCallbacks[0].inputType,
-                    _lagCallbacks[0].className
-                });
+                                        { _inputCallbacks[0].className,
+                                          _inputCallbacks[0].inputType,
+                                          _outputCallbacks[0].className,
+                                          _outputCallbacks[0].inputType,
+                                          _lagCallbacks[0].className });
                 os << ")\n\n";
-            } 
+            }
 
             void WritePythonCode(std::ostream& os) const
             {
@@ -289,8 +287,8 @@ namespace emitters
                 // by actuator code to implement callbacks.
                 // (Note: newlines are part of the syntax for #include)
                 std::string pythonCode(
-                    #include "SwigPredictorPython.in"
-                );
+#include "SwigPredictorPython.in"
+                    );
 
                 ReplaceDelimiter(pythonCode, "MODULE", _moduleName);
                 ReplaceDelimiter(pythonCode, "PREDICTOR_CLASS", _className);
@@ -309,7 +307,7 @@ namespace emitters
                    << pythonCode
                    << "\n%}\n";
             }
- 
+
             //
             // Utilities
             //
@@ -370,8 +368,8 @@ namespace emitters
             %} */
 
             std::string shapeWrappers(
-                #include "SwigShapeWrappers.in"
-            );
+#include "SwigShapeWrappers.in"
+                );
 
             ReplaceDelimiter(shapeWrappers, "MODULE", moduleName);
 

@@ -6,11 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Exception.h"
-
 // utilities
 #include "Debug.h"
 #include "Exception.h"
+#include "Unused.h"
 
 // stl
 #include <algorithm> // for std::generate
@@ -212,12 +211,14 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     MatrixReference<ElementType, layout>::MatrixReference(ElementType* pData, size_t numRows, size_t numColumns, size_t increment)
         : ConstMatrixReference<ElementType, layout>(pData, numRows, numColumns, increment)
-    {}
+    {
+    }
 
     template <typename ElementType, MatrixLayout layout>
     MatrixReference<ElementType, layout>::MatrixReference(ElementType* pData, size_t numRows, size_t numColumns)
         : ConstMatrixReference<ElementType, layout>(pData, numRows, numColumns)
-    {}
+    {
+    }
 
     template <typename ElementType, MatrixLayout layout>
     ElementType& MatrixReference<ElementType, layout>::operator()(size_t rowIndex, size_t columnIndex)

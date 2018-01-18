@@ -8,12 +8,10 @@
 
 #pragma once
 
-#include "BroadcastFunctionNode.h"
-#include "NeuralNetworkLayerNode.h"
-
 // model
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
+#include "NeuralNetworkLayerNode.h"
 #include "PortElements.h"
 
 // predictors
@@ -80,9 +78,9 @@ namespace nodes
     /// <summary> A node that wraps a neural net parametric ReLU ActivationLayer. </summary>
     template <typename ValueType>
     class ParametricReLUActivationLayerNode : public NeuralNetworkLayerNode<
-                                              ParametricReLUActivationLayerNode<ValueType>,
-                                              predictors::neural::ActivationLayer<ValueType, ell::predictors::neural::ParametricReLUActivation>,
-                                              ValueType>
+                                                  ParametricReLUActivationLayerNode<ValueType>,
+                                                  predictors::neural::ActivationLayer<ValueType, ell::predictors::neural::ParametricReLUActivation>,
+                                                  ValueType>
     {
     public:
         using LayerType = predictors::neural::ActivationLayer<ValueType, ell::predictors::neural::ParametricReLUActivation>;

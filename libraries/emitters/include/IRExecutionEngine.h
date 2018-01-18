@@ -8,8 +8,8 @@
 #pragma once
 
 // llvm
-#include "llvm/ADT/Triple.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/IR/Function.h"
 #include "llvm/IR/Module.h"
 
 namespace ell
@@ -31,13 +31,13 @@ namespace emitters
         ///
         /// <param name="module"> The module. </param>
         /// <param name="verify"> Indicates if the execution engine should run a verification pass before running the code. </param>
-        IRExecutionEngine(IRModuleEmitter&& module, bool verify=false);
+        IRExecutionEngine(IRModuleEmitter&& module, bool verify = false);
 
         /// <summary> Inject the primary "owner" module into the execution engine. </summary>
         ///
         /// <param name="pModule"> The module. </param>
         /// <param name="verify"> Indicates if the execution engine should run a verification pass before running the code. </param>
-        IRExecutionEngine(std::unique_ptr<llvm::Module> pModule, bool verify=false);
+        IRExecutionEngine(std::unique_ptr<llvm::Module> pModule, bool verify = false);
 
         /// <summary> Destructor </summary>
         ~IRExecutionEngine();
@@ -89,7 +89,7 @@ namespace emitters
         void EnsureClockGetTime();
         void PerformInitialization();
         void PerformFinalization();
-        
+
         std::unique_ptr<llvm::EngineBuilder> _pBuilder;
         std::unique_ptr<llvm::ExecutionEngine> _pEngine;
     };

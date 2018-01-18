@@ -10,13 +10,13 @@
 
 #include "IArchivable.h"
 
+// stl
 #include <functional>
 #include <ostream>
 #include <string>
 
 namespace ell
 {
-/// <summary> model namespace </summary>
 namespace utilities
 {
     /// <summary> UniqueId: A placeholder for a real GUID-type class </summary>

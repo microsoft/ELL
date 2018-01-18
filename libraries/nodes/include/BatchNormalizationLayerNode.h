@@ -8,11 +8,10 @@
 
 #pragma once
 
-#include "NeuralNetworkLayerNode.h"
-
 // model
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
+#include "NeuralNetworkLayerNode.h"
 #include "PortElements.h"
 
 // predictors
@@ -40,7 +39,7 @@ namespace nodes
         /// @}
 
         BatchNormalizationLayerNode() = default;
-        
+
         /// <summary> Constructor from a layer. </summary>
         ///
         /// <param name="input"> </param>

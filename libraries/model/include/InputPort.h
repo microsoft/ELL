@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "Node.h"
 #include "OutputPort.h"
 #include "Port.h"
 #include "PortElements.h"
@@ -16,11 +17,8 @@
 #include "Exception.h"
 #include "IArchivable.h"
 
-// data
-#include "IndexValue.h"
-
 // stl
-#include <cassert>
+#include <string>
 #include <vector>
 
 namespace ell

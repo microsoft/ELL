@@ -11,7 +11,7 @@
 #include "Files.h"
 
 // stl
-#include <iostream>
+#include <istream>
 
 namespace ell
 {

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     IRPosix.h (emitters)
+//  File:     IRPosixRuntime.h (emitters)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,7 +9,10 @@
 #pragma once
 
 #include "EmitterTypes.h"
-#include "LLVMInclude.h"
+
+// llvm
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Type.h"
 
 namespace ell
 {

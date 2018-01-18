@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "EmitterException.h"
-#include "EmitterTypes.h"
-#include "IREmitter.h"
+// llvm
+#include "llvm/IR/BasicBlock.h"
 
+// stl
 #include <memory>
+#include <vector>
 
 namespace ell
 {

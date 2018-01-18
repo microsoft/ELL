@@ -8,38 +8,29 @@
 
 #pragma once
 
-#include "CompilableNode.h"
 #include "InputNodeBase.h"
 #include "InputPort.h"
 #include "ModelTransformer.h"
-#include "Node.h"
 #include "OutputPort.h"
-
-// math
-#include "Tensor.h"
 
 // utilities
 #include "IArchivable.h"
 #include "TypeName.h"
 
-#include <memory>
 #include <string>
 #include <vector>
 
 namespace ell
 {
-/// <summary> model namespace </summary>
 namespace model
 {
-    using InputShape = ell::math::TensorShape;
-
     /// <summary> A node that represents an input to the system. </summary>
-    template<typename ValueType>
+    template <typename ValueType>
     class InputNode : public InputNodeBase
     {
     public:
         /// @name Input and Output Ports
-        /// @{        
+        /// @{
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
@@ -87,6 +78,7 @@ namespace model
         void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
     private:
         std::vector<ValueType> _inputValues;
         OutputPort<ValueType> _output;

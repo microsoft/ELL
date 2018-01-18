@@ -7,19 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompiledMap.h"
-#include "EmitterException.h"
-
-// model
-#include "ModelTransformer.h"
-#include "OutputNode.h"
-#include "Port.h"
-
-// utilities
-#include "Exception.h"
-#include "Files.h"
-
-// stl
-#include <sstream>
 
 namespace ell
 {

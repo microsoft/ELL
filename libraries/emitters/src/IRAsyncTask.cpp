@@ -8,9 +8,6 @@
 
 #include "IRAsyncTask.h"
 #include "IRFunctionEmitter.h"
-#include "IRModuleEmitter.h"
-#include "IRHeaderWriter.h"
-#include "IRModuleEmitter.h"
 #include "IRThreadUtilities.h"
 
 // utilities

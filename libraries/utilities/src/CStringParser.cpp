@@ -10,8 +10,6 @@
 
 // stl
 #include <cctype>
-#include <cstdlib>
-#include <stdexcept>
 
 namespace ell
 {

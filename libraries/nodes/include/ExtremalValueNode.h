@@ -21,7 +21,6 @@
 #include "TypeName.h"
 
 #include <algorithm>
-#include <memory>
 #include <vector>
 
 namespace ell

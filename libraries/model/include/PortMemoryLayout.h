@@ -11,22 +11,25 @@
 // utilities
 #include "IArchivable.h"
 
-// emitters
-#include "IRFunctionEmitter.h"
-
 // llvm
 #include <llvm/IR/Value.h>
 
 // stl
+#include <string>
 #include <vector>
 
 namespace ell
 {
+namespace emitters
+{
+    class IRFunctionEmitter;
+}
+
 namespace model
 {
     /// <summary> A vector of numbers representing shape (extent) information of a multidimensional array. </summary>
     using Shape = std::vector<int>;
-        
+
     /// <summary> Checks if two shapes are equal. </summary>
     ///
     /// <param name="shape1"> The first shape. </param>
@@ -46,20 +49,19 @@ namespace model
     class PortMemoryLayout : public utilities::IArchivable
     {
     public:
-
         PortMemoryLayout() = default;
-        
+
         /// <summary> Constructor from size only (no padding). </summary>
         ///
         /// <param name="size"> The extent of the active are of the memory region. </param>
         PortMemoryLayout(const Shape& size);
-        
+
         /// <summary> Constructor from size and padding. </summary>
         ///
         /// <param name="size"> The extent of the active are of the memory region. </param>
         /// <param name="padding"> The amount of padding to apply to the beginning and end of each dimension </param>
         /// <param name="offset"> The offset into memory to the active area of the memory region. </param>
-        PortMemoryLayout(const Shape& size, const Shape& padding);        
+        PortMemoryLayout(const Shape& size, const Shape& padding);
 
         /// <summary> General constructor. </summary>
         ///
@@ -95,7 +97,7 @@ namespace model
         ///
         /// <returns> The number of elements </summary>
         size_t NumEntries() const;
-        
+
         /// <summary> Returns the number of total (active plus extra stride) elements in this memory layout </summary>
         ///
         /// <returns> The number of elements </summary>
@@ -147,7 +149,7 @@ namespace model
         size_t GetDataOffset() const; // offset for logical entry {0,0,0...}
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
-    
+
     private:
         Shape _size; // the "active" area of the memory
         Shape _stride; // the allocated size along each dimension

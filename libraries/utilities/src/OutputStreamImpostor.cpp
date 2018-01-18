@@ -44,7 +44,7 @@ namespace utilities
     OutputStreamImpostor::OutputStreamImpostor(std::ostream& stream) : _outputStream(stream) {}
 
     OutputStreamImpostor::OutputStreamImpostor(const std::string& filename) :
-        _fileStream(std::make_shared<std::ofstream>(utilities::OpenOfstream(filename))),
+        _fileStream(std::make_shared<std::ofstream>(OpenOfstream(filename))),
         _outputStream(*_fileStream)
     {}
 }

@@ -7,10 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ProtoNNTrainer.h"
-
-// stl
-#include <cassert>
-#include <cmath>
+#include "ProtoNNInit.h"
+#include "ProtoNNTrainerUtils.h"
 
 // math
 #include "MatrixOperations.h"
@@ -19,14 +17,13 @@
 // data
 #include "Dataset.h"
 
-// utils
-#include "ProtoNNTrainerUtils.h"
+// utilities 
+#include "Unused.h"
 
-// time
+// stl
+#include <cassert>
+#include <cmath>
 #include <ctime>
-
-// Init
-#include <ProtoNNInit.h>
 
 namespace ell
 {

@@ -9,19 +9,8 @@
 #pragma once
 
 #include "IRCompiledMap.h"
-#include "MapCompiler.h"
-
-// emitters
-#include "EmitterException.h"
-#include "IRBlockRegion.h"
-#include "IRMetadata.h"
-#include "IRModuleEmitter.h"
-
-// math
-#include "Tensor.h"
-
-// model
 #include "InputPort.h"
+#include "MapCompiler.h"
 #include "Node.h"
 #include "NodeMap.h"
 #include "OutputPort.h"
@@ -29,9 +18,16 @@
 
 // stl
 #include <string>
+#include <vector>
 
 namespace ell
 {
+namespace emitters
+{
+    class IRBlockRegion;
+    class IRModuleEmitter;
+}
+
 namespace model
 {
     /// <summary> Compiles ELL Models to LLVM IR </summary>
@@ -183,7 +179,7 @@ namespace model
         void EmitShapeEnum();
         void EmitGetInputShapeFunction(const Map& map);
         void EmitGetOutputShapeFunction(const Map& map);
-        void EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<ell::math::TensorShape> shapes);
+        void EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<InputShape> shapes);
 
         // stack of node regions
         std::vector<NodeMap<emitters::IRBlockRegion*>> _nodeRegions;

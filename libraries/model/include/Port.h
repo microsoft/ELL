@@ -13,9 +13,7 @@
 #include "PropertyBag.h"
 
 // stl
-#include <memory>
 #include <string>
-#include <vector>
 
 namespace ell
 {

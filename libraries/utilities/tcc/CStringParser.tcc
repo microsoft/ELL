@@ -10,7 +10,6 @@
 #include <cctype>
 #include <cerrno>
 #include <cstdlib>
-#include <stdexcept>
 #include <string>
 
 namespace ell

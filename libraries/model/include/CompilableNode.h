@@ -25,6 +25,7 @@
 
 // stl
 #include <string>
+#include <vector>
 
 namespace ell
 {

@@ -10,9 +10,7 @@
 
 // stl
 #include <algorithm>
-#include <cstdarg>
-#include <memory>
-#include <stdio.h>
+#include <cstdio>
 
 namespace ell
 {

@@ -7,13 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CommandLineParser.h"
-#include "StringUtil.h"
 #include "Unused.h"
 
 // stl
 #include <algorithm>
-#include <iostream>
-#include <locale>
 #include <sstream>
 
 namespace ell

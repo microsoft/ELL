@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "ConstantNode.h"
+
 // emitters
 #include "IRAsyncTask.h"
 #include "IREmitter.h"
@@ -22,9 +24,6 @@
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "PortMemoryLayout.h"
-
-// nodes
-#include "ConstantNode.h"
 
 // utilities
 #include "Exception.h"
@@ -59,13 +58,13 @@ namespace nodes
     /// There are no secondary inputs.
     ///
     /// </summary>
-    template<typename ValueType, typename FunctionType>
+    template <typename ValueType, typename FunctionType>
     class BroadcastFunctionNode;
 
     //
     // Base class for unary function types
     //
-    template<typename ValueType>
+    template <typename ValueType>
     class BroadcastUnaryFunction
     {
     public:
@@ -106,7 +105,7 @@ namespace nodes
     //
     // Base class for binary function types
     //
-    template<typename ValueType>
+    template <typename ValueType>
     class BroadcastBinaryFunction
     {
     public:
@@ -149,7 +148,7 @@ namespace nodes
     //
     // Base class for ternary function types
     //
-    template<typename ValueType>
+    template <typename ValueType>
     class BroadcastTernaryFunction
     {
     public:
@@ -194,7 +193,7 @@ namespace nodes
     //
     // Special type of ternary function: the linear function  y = x*a + b
     //
-    template<typename ValueType>
+    template <typename ValueType>
     class BroadcastLinearFunction : public BroadcastTernaryFunction<ValueType>
     {
     public:
@@ -226,7 +225,7 @@ namespace nodes
     //
     // Base class for broadcast nodes
     //
-    template<typename ValueType, typename FunctionType>
+    template <typename ValueType, typename FunctionType>
     class BroadcastFunctionNode : public model::CompilableNode
     {
     public:
@@ -287,7 +286,7 @@ namespace nodes
     //
     // BroadcastUnaryFunctionNode
     //
-    template<typename ValueType, typename FunctionType>
+    template <typename ValueType, typename FunctionType>
     class BroadcastUnaryFunctionNode : public BroadcastFunctionNode<ValueType, FunctionType>
     {
     public:
@@ -362,7 +361,7 @@ namespace nodes
     //
     // BroadcastBinaryFunctionNode
     //
-    template<typename ValueType, typename FunctionType>
+    template <typename ValueType, typename FunctionType>
     class BroadcastBinaryFunctionNode : public BroadcastFunctionNode<ValueType, FunctionType>
     {
     public:
@@ -441,7 +440,7 @@ namespace nodes
     //
     // BroadcastTernaryFunctionNode
     //
-    template<typename ValueType, typename FunctionType>
+    template <typename ValueType, typename FunctionType>
     class BroadcastTernaryFunctionNode : public BroadcastFunctionNode<ValueType, FunctionType>
     {
     public:
@@ -522,7 +521,7 @@ namespace nodes
     //
     // Special case of BroadcastTernaryFunctionNode, using a linear function
     //
-    template<typename ValueType>
+    template <typename ValueType>
     class BroadcastLinearFunctionNode : public BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>
     {
     public:

@@ -14,6 +14,7 @@
 #include "IArchivable.h"
 #include "JsonArchiver.h"
 #include "TypeName.h"
+#include "Unused.h"
 
 // stl
 #include <cassert>

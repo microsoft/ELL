@@ -13,6 +13,7 @@
 #include "llvm/Support/SourceMgr.h"
 
 // stl
+#include <memory>
 #include <string>
 
 namespace ell

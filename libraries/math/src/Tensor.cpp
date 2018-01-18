@@ -8,7 +8,8 @@
 
 #include "Tensor.h"
 
-#include "Exception.h"
+// stl
+#include <cassert>
 
 namespace ell
 {
