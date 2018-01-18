@@ -152,7 +152,7 @@ class EllBuildTools:
         return out_file
 
     def compile(self, model_file, func_name, model_name, target, output_dir, use_blas=False, fuse_linear_ops=True, profile=False, llvm_format="bc",
-                optimize=True, debug=False, is_model_file=False):
+                optimize=True, debug=False, is_model_file=False, swig=True, header=False):
         file_arg = "-imf" if is_model_file else "-imap"
         format_flag = {
             "bc": "--bitcode",
@@ -171,11 +171,14 @@ class EllBuildTools:
                 "-cfn", func_name,
                 "-cmn", model_name,
                 format_flag,
-                "--swig",
                 "--target", target,
                 "-od", output_dir,
                 "--fuseLinearOps", str(fuse_linear_ops)
                 ]
+        if swig:
+            args.append("--swig")
+        if header:
+            args.append("--header")
         args.append("--blas")
         hasBlas = bool(use_blas)
         if target == "host" and hasBlas and not self.blas:

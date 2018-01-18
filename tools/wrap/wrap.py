@@ -109,6 +109,8 @@ class ModuleBuilder:
         self.fuse_linear_ops = not args.no_fuse_linear_ops
         self.debug = args.debug
         self.blas = self.str2bool(args.blas)
+        self.swig = self.language != "cpp"
+        self.cpp_header = self.language == "cpp"
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
@@ -180,9 +182,9 @@ class ModuleBuilder:
         self.copy_files(self.tcc, "tcc")
         out_file = self.tools.compile(
             self.model_file, self.func_name, self.model_name, self.target, self.output_dir, self.blas, self.fuse_linear_ops, self.profile,
-            self.llvm_format, self.optimize, self.debug)
+            self.llvm_format, self.optimize, self.debug, False, self.swig, self.cpp_header)
 
-        if self.language != "cpp":
+        if self.swig:
             self.tools.swig(self.output_dir, self.model_file_base, self.language)
         if not self.no_opt_tool:
             out_file = self.tools.opt(self.output_dir, out_file, self.optimization_level)
