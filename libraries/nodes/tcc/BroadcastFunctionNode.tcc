@@ -476,6 +476,7 @@ namespace nodes
         archiver["inputLayout"] >> _inputLayout;
         archiver["outputLayout"] >> _outputLayout;
         archiver["broadcastDimension"] >> _broadcastDimension;
+        archiver["paddingValue"] >> _paddingValue;
     }
 
     //

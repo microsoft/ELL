@@ -77,7 +77,7 @@ class EllBuildTools:
                 for line in proc.stderr:
                     output += line
                     if print_output or self.verbose:
-                        self.logger.info(line.strip("\n"), flush=True)
+                        self.logger.info(line.strip("\n"))
                 if proc.returncode:
                     raise EllBuildToolsRunException(cmdstr, output)
                 return output

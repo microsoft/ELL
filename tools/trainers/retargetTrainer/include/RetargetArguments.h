@@ -34,6 +34,7 @@ namespace ell
         bool verbose;
         bool multiClass;
         common::LossFunctionArguments lossFunctionArguments;
+        bool useBlas;
     };
 
     /// <summary> Parsed version of RetargetArguments. </summary>

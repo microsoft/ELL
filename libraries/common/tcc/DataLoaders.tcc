@@ -41,9 +41,11 @@ namespace common
     }
 
     template <typename ExampleType, typename MapType>
-    auto TransformDatasetWithCompiledMap(data::Dataset<ExampleType>& input, const MapType& map)
+    auto TransformDatasetWithCompiledMap(data::Dataset<ExampleType>& input, const MapType& map, bool useBlas)
     {
-        model::IRMapCompiler compiler;
+        ell::model::MapCompilerParameters settings;
+        settings.compilerSettings.useBlas = useBlas;
+        model::IRMapCompiler compiler(settings);
         auto compiledMap = compiler.Compile(map);
 
         return input.template Transform<ExampleType>([&compiledMap](const ExampleType& example)
@@ -54,7 +56,6 @@ namespace common
             return ExampleType(std::move(transformedDataVector), example.GetMetadata());
         });
     }
-
 
 }
 }

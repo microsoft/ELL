@@ -108,5 +108,12 @@ namespace ell
             "Choice of loss function",
             { { "squared", LossFunctionArguments::LossFunction::squared }, { "log", LossFunctionArguments::LossFunction::log }, {"smoothHinge", LossFunctionArguments::LossFunction::smoothHinge} },
             "log");
+
+        parser.AddOption(
+            useBlas,
+            "blas",
+            "",
+            "Emit code that calls BLAS, used when compiling the input model to create mapped datasets",
+            true);
     }
 }

@@ -71,6 +71,8 @@ namespace common
     ///
     /// <typeparam name="ExampleType"> Example type. </typeparam>
     /// <typeparam name="MapType"> Map type. </typeparam>
+    /// <param name="input"> Input dataset. </param>
+    /// <param name="map"> Map to run input dataset on. </param>
     ///
     /// <returns> The transformed dataset. </returns>
     template <typename ExampleType, typename MapType>
@@ -83,10 +85,13 @@ namespace common
     ///
     /// <typeparam name="ExampleType"> Example type. </typeparam>
     /// <typeparam name="MapType"> Map type. </typeparam>
+    /// <param name="input"> Input dataset. </param>
+    /// <param name="map"> Map to run input dataset on. </param>
+    /// <param name="useBlas"> Use BLAS in the emitted code to speed up linear algerbra operations. </param>
     ///
     /// <returns> The transformed dataset. </returns>
     template <typename ExampleType, typename MapType>
-    auto TransformDatasetWithCompiledMap(data::Dataset<ExampleType>& input, const MapType& map);
+    auto TransformDatasetWithCompiledMap(data::Dataset<ExampleType>& input, const MapType& map, bool useBlas = true);
 }
 }
 
