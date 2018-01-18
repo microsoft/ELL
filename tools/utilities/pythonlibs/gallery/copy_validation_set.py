@@ -9,13 +9,13 @@
 ##
 ####################################################################################################
 import argparse
-import logging
 import os
 import sys
 from itertools import islice
 
-current_script = os.path.basename(__file__)
+_current_script = os.path.basename(__file__)
 sys.path += [".."] # pythonlibs
+import logger
 import picluster
 from remoterunner import RemoteRunner
 
@@ -35,7 +35,7 @@ class CopyValidationSet:
         self.created_dirs = []
         self.target_dir = "/home/pi/validation"
         self.machine = None
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.get()
 
     def __enter__(self):
         """Called when this object is instantiated with 'with'"""
@@ -77,7 +77,7 @@ class CopyValidationSet:
         if args.cluster:
             # try to lock the machine in the cluster
             self.cluster = picluster.PiBoardTable(args.cluster)
-            self.machine = self.cluster.lock(self.ipaddress, current_script)
+            self.machine = self.cluster.lock(self.ipaddress, _current_script)
             self.logger.info("Locked machine at " + self.machine.ip_address)
 
     def _cleanup(self):

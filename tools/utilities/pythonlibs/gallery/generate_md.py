@@ -14,12 +14,13 @@ import argparse
 import re
 import subprocess
 import datetime
-import logging
 
 # local helpers
 import model_info_retriever as mir
 
-CURRENT_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_current_script_directory = os.path.dirname(os.path.abspath(__file__))
+sys.path += ["../"] # pythonlibs
+import logger
 
 def disable_text_wrapping(text):
     """Convert spaces to non-breaking spaces so that columns don't wrap"""
@@ -57,7 +58,7 @@ class GenerateMarkdown:
             "aarch64" : "DragonBoard 410c @ 1.2GHz"
         }
         self.user = _get_default_user()
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.get()
 
     def parse_command_line(self, argv):
         """Parses command line arguments"""
@@ -68,7 +69,7 @@ class GenerateMarkdown:
 
         # optional arguments
         self.arg_parser.add_argument("--template", help="path to the input markdown template file",
-            default=os.path.join(CURRENT_SCRIPT_DIR, "vision_model.md.in"))
+            default=os.path.join(_current_script_directory, "vision_model.md.in"))
         self.arg_parser.add_argument("--user", help="user who trained the model (for attribution purposes)",
             nargs="+", default=self.user)
 

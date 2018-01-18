@@ -11,13 +11,14 @@
 import datetime
 from dateutil.parser import parse
 import json
-import logging
 import os
 import random
 import requests
 import socket
 import time
 import uuid
+
+import logger
 
 class PiBoardEntity(): 
     def __init__(self, values = None):
@@ -55,7 +56,7 @@ class PiBoardEntity():
 
 class PiBoardTable:
     def __init__(self, endpoint, username = None):
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.get()
         self.endpoint = endpoint
         self.username = username
         if self.username is None:

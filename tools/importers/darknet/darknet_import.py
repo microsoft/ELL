@@ -11,7 +11,6 @@
 
 import argparse
 import json
-import logging
 import os
 import sys
 
@@ -22,6 +21,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../
 import find_ell
 import darknet_to_ell
 import ell_utilities
+import logger
 
 class DarknetImporter:
     def __init__(self, args):
@@ -32,7 +32,7 @@ class DarknetImporter:
         model_options = args.get('model_options', {})
         self.step_interval = model_options.get('step_interval', 0)
         self.lag_threshold = model_options.get('lag_threshold', 0)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.get()
 
     def run(self):
         predictor = darknet_to_ell.predictor_from_darknet_model(

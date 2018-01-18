@@ -13,15 +13,17 @@ import sys
 import argparse
 import glob
 import json
-import logging
 import matplotlib.pyplot as plt
 
 # local helpers
 import model_info_retriever as mir
 
+sys.path += ["../"] # pythonlibs
+import logger
+
 class PlotModelStats:
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.get()
         self.arg_parser = argparse.ArgumentParser(
             "This script takes a path to an ELL-models model folder hierarchy and plots cost-accuracy curves\n"
             "that can be used to select the 'best' models")
@@ -112,7 +114,7 @@ class PlotModelStats:
 
     def find_models(self):
         """Finds the model files from the root folder"""
-        self.model_paths = glob.glob("{}/**/*.{}".format(self.models_root, "ell.zip"), recursive=True)
+        self.model_paths = sorted(glob.glob("{}/**/*.{}".format(self.models_root, "ell.zip"), recursive=True))
 
     def get_stats(self):
         """Collects the statistics from the models"""

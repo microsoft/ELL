@@ -13,6 +13,7 @@ if(${PYTHON_ENABLED})
         dependency_installer.py
         download_helper.py
         find_ell.py 
+        logger.py
         modelHelpers.py
         picluster.py
         procmon.py 

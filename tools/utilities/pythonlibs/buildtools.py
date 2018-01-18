@@ -9,7 +9,7 @@
 ####################################################################################################
 import json
 import os
-import logging
+import logger
 import subprocess
 
 class EllBuildToolsRunException(Exception):
@@ -28,7 +28,7 @@ class EllBuildTools:
         self.llcexe = None
         self.optexe = None
         self.blas = None
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.get()
         self.find_tools()
 
     def find_tools(self):

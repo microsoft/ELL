@@ -17,7 +17,6 @@ import glob
 import subprocess
 import json
 import operator
-import logging
 from shutil import copyfile
 from shutil import rmtree
 import zipfile
@@ -37,7 +36,7 @@ import find_ell
 import picluster
 from download_helper import download_file, download_and_extract_model
 from remoterunner import RemoteRunner
-
+import logger
 
 class DriveTest:
     def __init__(self, ipaddress=None, cluster=None, outdir=None, profile=False, 
@@ -60,7 +59,7 @@ class DriveTest:
         self.profile = profile
         self.test = test
         self.verbose = verbose
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.get()
         if timeout:
             self.timeout = int(timeout)
         else:
@@ -83,7 +82,8 @@ class DriveTest:
         os.makedirs(self.test_dir)
 
         self.extract_model_info(self.ell_model, self.labels_file)
-        self.output_dir = os.path.join(self.test_dir, self.target, self.model_name)
+        self.output_dir = os.path.join(self.test_dir, self.target)
+
         self.resolve_address(self.ipaddress, self.cluster)
         if not os.path.isdir(self.output_dir):
             os.makedirs(self.output_dir)

@@ -12,7 +12,6 @@
 import os
 import sys
 import argparse
-import logging
 from shutil import copyfile
 
 _current_script = os.path.basename(__file__)
@@ -21,6 +20,7 @@ _current_script_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path += ["../"] # pythonlibs
 import picluster
 from remoterunner import RemoteRunner
+import logger
 
 class RunValidation:
     def __init__(self):
@@ -45,7 +45,7 @@ class RunValidation:
         self.test_dir = None
         self.output_dir = None
         self.machine = None
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.get()
 
     def __enter__(self):
         """Called when this object is instantiated with 'with'"""

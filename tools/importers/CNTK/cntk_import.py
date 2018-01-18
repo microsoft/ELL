@@ -10,7 +10,6 @@
 ####################################################################################################
 
 import argparse
-import logging
 import os
 import sys
 
@@ -22,10 +21,11 @@ import find_ell
 import cntk_to_ell
 import ell_utilities
 import json
+import logger as log
 import ziptools
 
 def main(argv):
-    logger = logging.getLogger(__name__)
+    logger = log.get()
     arg_parser = argparse.ArgumentParser(
         "Converts CNTK model to ELL model\n"
         "Example:\n"

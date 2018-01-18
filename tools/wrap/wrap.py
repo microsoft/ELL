@@ -17,9 +17,10 @@ import subprocess
 import sys
 from shutil import copyfile
 
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../utilities/pythonlibs'))
+sys.path += ["../utilities/pythonlibs"]
 import find_ell
 import buildtools
+import logger
 
 # This script creates a compilable Python project for executing a given ELL model on a target platform.
 # Compilation of the resulting project will require a C++ compiler.
@@ -46,7 +47,7 @@ class ModuleBuilder:
         self.model_name = ""
         self.func_name = "Predict"
         self.objext = "obj"
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.get()
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")

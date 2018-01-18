@@ -8,8 +8,6 @@
 ##
 ####################################################################################################
 
-import argparse
-import logging
 import io
 import os
 import sys
@@ -19,9 +17,10 @@ import paramiko
 
 sys.path += ["../pythonlibs"]
 import picluster
+import logger
 
 
-# 
+#
 # If no source_dir or source_files, don't copy
 # If no target_dir, don't copy
 # If no command, copy only
@@ -29,7 +28,7 @@ import picluster
 class RemoteRunner:
     def __init__(self, cluster=None, ipaddress=None, username=None, password=None,
         source_dir=None, target_dir=None, copyback_files=None, copyback_dir=None,
-        command=None, logfile=None, verbose=True, start_clean=True, cleanup=True, 
+        command=None, logfile=None, verbose=True, start_clean=True, cleanup=True,
         timeout=None, all=None, source_files=None):
 
         if cluster:
@@ -59,10 +58,10 @@ class RemoteRunner:
 
         # global logger is hooked up to parent modules by module name and this
         # logger can see all the remote command output from all commands, which
-        # will be formatted differently with "ThreadId: " prefix so user can 
-        # make sense of the combined output when remote commands are running in 
+        # will be formatted differently with "ThreadId: " prefix so user can
+        # make sense of the combined output when remote commands are running in
         # parallel.
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.get(self.logfile)
 
         # Sanity-check parameters
         if os.path.pathsep in self.target_dir:
@@ -122,7 +121,7 @@ class RemoteRunner:
 
             while stdout_thread.isAlive() and stderr_thread.isAlive():
                 pass
-        
+
         except:
             errorType, value, traceback = sys.exc_info()
             msg = "### Exception: %s: %s" % (str(errorType), str(value))
@@ -172,7 +171,7 @@ class RemoteRunner:
                 self.print("copying {} to {}".format(src_file, dest_file))
                 sftp.put(src_file, dest_file)
 
-    def publish_bits(self):  
+    def publish_bits(self):
         if self.source_dir:
             with paramiko.SFTPClient.from_transport(self.ssh.get_transport()) as sftp:
                 self.sftp_copy_dir(sftp, self.source_dir, self.target_dir)
@@ -182,7 +181,7 @@ class RemoteRunner:
                 self.sftp_copy_files(sftp, src=None, dirname=None,
                     filenames=self.source_files, dest=self.target_dir)
 
-    def copy_files(self):  
+    def copy_files(self):
         if self.target_dir and self.copyback_files:
             os.makedirs(self.copyback_dir, exist_ok=True)
             with paramiko.SFTPClient.from_transport(self.ssh.get_transport()) as sftp:
@@ -191,16 +190,11 @@ class RemoteRunner:
                     dest_file = os.path.join(self.copyback_dir, src_filename)
                     self.print("Copying remote file from {} to {}".format(src_file, dest_file))
                     sftp.get(src_file, dest_file)
-    
-    def log_output(self, output):
-        if self.logfile:
-            with open(self.logfile, "w", encoding = "utf-8") as f:
-                f.writelines([line+"\n" for line in output])
 
     def print(self, output):
         if self.verbose:
             self.logger.info(output)
-        if self.buffer:        
+        if self.buffer:
             self.buffer.write(output + "\n")
 
     def run_command(self):
@@ -220,12 +214,11 @@ class RemoteRunner:
             if self.cleanup:
                 self.clean_target()
             self.close_ssh()
-            self.log_output(output)
         except:
             errorType, value, traceback = sys.exc_info()
             msg = "### Exception: %s: %s" % (str(errorType), str(value))
             self.print(msg)
-            if self.buffer:                
+            if self.buffer:
                 output = self.buffer.getvalue().split('\n')
             output += [ msg ]
         finally:
@@ -234,7 +227,7 @@ class RemoteRunner:
 
     def run_all(self):
         for machine in self.cluster.get_all():
-            try:       
+            try:
                 self.ipaddress = machine.ip_address
                 self.run_command()
             except:
