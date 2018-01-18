@@ -24,6 +24,7 @@
 
 #define USE_STORED_TWIDDLE_FACTORS 1
 #define USE_FIXED_SMALL_FFT 1
+#define MAX_INLINE_FFT_SIZE 0 // 0 to disable inlining FFT code
 #define USE_REAL_FFT 0 // The real-valued FFT is slower than the complex one. Disable it for now.
 
 namespace ell
@@ -139,6 +140,24 @@ namespace nodes
             return { function, function.Load(result) };
         }
 
+        template <typename ValueType>
+        inline emitters::IRLocalValue TimesI(emitters::IRLocalValue a)
+        {
+            if (!(a.value->getType()->isStructTy() && a.value->getType()->getNumContainedTypes() == 2))
+            {
+                throw emitters::EmitterException(emitters::EmitterError::valueTypeNotSupported);
+            }
+
+            // c.re = -a.im
+            // c.im = i*a.re
+            auto& function = a.function;
+            auto a_re = function.LocalScalar(function.ExtractStructField(a, 0));
+            auto a_im = function.LocalScalar(function.ExtractStructField(a, 1));
+            auto result = function.Variable(a.value->getType(), "c_times_i");
+            function.FillStruct(result, { -a_im, a_re });
+            return { function, function.Load(result) };
+        }
+
         inline emitters::IRLocalValue ComplexRealMultiply(emitters::IRLocalValue a, emitters::IRLocalScalar b_re)
         {
             if (!(a.value->getType()->isStructTy() && a.value->getType()->getNumContainedTypes() == 2 && a.value->getType()->getContainedType(0) == b_re.value->getType()))
@@ -184,7 +203,7 @@ namespace nodes
         }
 
         //
-        // FFT stuff
+        // FFT-specific functions
         //
         template <typename ValueType>
         std::vector<std::complex<ValueType>> GetTwiddleFactors(size_t size)
@@ -197,6 +216,22 @@ namespace nodes
                 result[k] = std::exp(std::complex<ValueType>(0, pi * k / size));
             }
             return result;
+        }
+
+        template <typename ValueType>
+        std::string GetFFTFunctionName(size_t length)
+        {
+            // function name: FFTC_<T>_<N>  (e.g., FFTC_float_2)
+            // function signature: void FFTC(complex<T>*, complex<T>*)
+            return std::string("FFTC_") + utilities::GetTypeName<ValueType>() + "_" + std::to_string(length);
+        }
+
+        template <typename ValueType>
+        std::string GetRealFFTFunctionName(size_t length)
+        {
+            // function name: FFTR_<T>_<N>  (e.g., FFT_float_32)
+            // function signature: void FFTR(T*, T*, complex<T>*)
+            return std::string("FFTR_") + utilities::GetTypeName<ValueType>() + "_" + std::to_string(length);
         }
 
         template <typename ValueType>
@@ -217,6 +252,31 @@ namespace nodes
             auto complexPtrType = complexType->getPointerTo();
             return { valuePtrType, valuePtrType, complexPtrType };
         }
+
+        template <typename ValueType>
+        emitters::IRFunctionEmitter GetFFTFunctionEmitter(emitters::IRModuleEmitter& module, size_t length)
+        {
+            auto& context = module.GetLLVMContext();
+            auto voidType = llvm::Type::getVoidTy(context);
+
+            std::string functionName = GetFFTFunctionName<ValueType>(length);
+            auto argumentTypes = detail::GetFFTFunctionArguments<ValueType>(module);
+            emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+            return function;
+        }
+
+        template <typename ValueType>
+        emitters::IRFunctionEmitter GetRealFFTFunctionEmitter(emitters::IRModuleEmitter& module, size_t length)
+        {
+            auto& context = module.GetLLVMContext();
+            auto voidType = llvm::Type::getVoidTy(context);
+
+            std::string functionName = GetRealFFTFunctionName<ValueType>(length);
+            auto argumentTypes = detail::GetRealFFTFunctionArguments<ValueType>(module);
+            emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+            return function;
+        }
+
     }
 
     template <typename ValueType>
@@ -254,74 +314,157 @@ namespace nodes
         Deinterleave(function, array, function.Literal(halfN), scratch);
     }
 
+    // FFT1 twiddle factors: [1]
+    // FFT2 twiddle factors: [1, -1]
+    // FFT4 twiddle factors: [1, i, -1, -i]
+    // FFT8 twiddle factors: [1, sqrt2/2+i*sqrt2/2, i, -sqrt2/2+i*sqrt2/2, -1, -sqrt2/2-i*sqrt2/2, -i, sqrt2/2-i*sqrt2/2]
+
+    template <typename ValueType>
+    void FFTNode<ValueType>::EmitFFT_2(emitters::IRFunctionEmitter& function, llvm::Value* input)
+    {
+        // FFT of length 2: x' = [x0+x1, x0-x1]
+        auto x0 = function.LocalScalar(function.ValueAt(input, 0));
+        auto x1 = function.LocalScalar(function.ValueAt(input, 1));
+        function.SetValueAt(input, 0, detail::ComplexAdd(x0, x1));
+        function.SetValueAt(input, 1, detail::ComplexSubtract(x0, x1));
+    }
+
     template <typename ValueType>
     llvm::Function* FFTNode<ValueType>::GetFFTFunction_2(emitters::IRModuleEmitter& module)
     {
-        auto& context = module.GetLLVMContext();
-        auto voidType = llvm::Type::getVoidTy(context);
-
-        // function name: FFTC_<T>_<N>  (e.g., FFT_float_2)
-        // function signature: void FFTC(complex<T>*, complex<T>*)
         const auto length = 2;
-        std::string functionName = std::string("FFTC_") + utilities::GetTypeName<ValueType>() + "_" + std::to_string(length);
-        auto argumentTypes = detail::GetFFTFunctionArguments<ValueType>(module);
-        emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+        auto functionName = detail::GetFFTFunctionName<ValueType>(length);
+        auto existingFunction = module.GetFunction(functionName);
+        if (existingFunction != nullptr)
         {
-            // FFT of length 2: x' = [x0+x1, x0-x1]
+            return existingFunction;
+        }
+
+        emitters::IRFunctionEmitter function = detail::GetFFTFunctionEmitter<ValueType>(module, length);
+        {
             auto arguments = function.Arguments().begin();
             auto input = function.LocalScalar(&(*arguments++));
-
-            auto x0 = function.LocalScalar(function.ValueAt(input, 0));
-            auto x1 = function.LocalScalar(function.ValueAt(input, 1));
-            function.SetValueAt(input, 0, detail::ComplexAdd(x0, x1));
-            function.SetValueAt(input, 1, detail::ComplexSubtract(x0, x1));
+            EmitFFT_2(function, input);
         }
         module.EndFunction();
         return function.GetFunction();
     }
 
     template <typename ValueType>
+    void FFTNode<ValueType>::EmitFFT_4(emitters::IRFunctionEmitter& function, llvm::Value* input)
+    {
+        // FFT of length 4: X = [x0+x1+x2+x3, x0+ix1-x2-ix3, x0-x1+x2-x3, x0-ix1-x2+ix3]
+        // Input x = {x0, x1, x2, x3}
+        auto x0 = function.LocalScalar(function.ValueAt(input, 0));
+        auto x1 = function.LocalScalar(function.ValueAt(input, 1));
+        auto x2 = function.LocalScalar(function.ValueAt(input, 2));
+        auto x3 = function.LocalScalar(function.ValueAt(input, 3));
+
+        // deinterleave -> {x0, x2, x1, x3}
+        // call fft2 on each half:
+        //   -> {x0+x2, x0-x2, x1+x3, x1-x3}
+        // apply twiddle factor w_0 = 1:
+        //  -> { (x0+x2) + (x1+x3), ..., (x0+x2) - (x1+x3), ...}
+        // apply twiddle factor w_1 = i:
+        //  -> { (x0+x2) + (x1+x3), (x0-x2) + i(x1-x3), (x0+x2) - (x1+x3), (x0-x2) - i(x1-x3)}
+
+        auto x0px2 = detail::ComplexAdd(x0, x2);
+        auto x0mx2 = detail::ComplexSubtract(x0, x2);
+        auto x1px3 = detail::ComplexAdd(x1, x3);
+        auto x1mx3 = detail::ComplexSubtract(x1, x3);
+        function.SetValueAt(input, 0, detail::ComplexAdd(x0px2, x1px3));
+        function.SetValueAt(input, 1, detail::ComplexAdd(x0mx2, detail::TimesI<ValueType>(x1mx3)));
+        function.SetValueAt(input, 2, detail::ComplexSubtract(x0px2, x1px3));
+        function.SetValueAt(input, 3, detail::ComplexSubtract(x0mx2, detail::TimesI<ValueType>(x1mx3)));
+    }
+
+    template <typename ValueType>
     llvm::Function* FFTNode<ValueType>::GetFFTFunction_4(emitters::IRModuleEmitter& module)
     {
-        auto& context = module.GetLLVMContext();
-        auto voidType = llvm::Type::getVoidTy(context);
-
-        // function name: FFTC_<T>_<N>  (e.g., FFT_float_4)
-        // function signature: void FFTC(complex<T>*, complex<T>*)
         const auto length = 4;
-        std::string functionName = std::string("FFTC_") + utilities::GetTypeName<ValueType>() + "_" + std::to_string(length);
-        auto argumentTypes = detail::GetFFTFunctionArguments<ValueType>(module);
-        emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+        auto functionName = detail::GetFFTFunctionName<ValueType>(length);
+        auto existingFunction = module.GetFunction(functionName);
+        if (existingFunction != nullptr)
         {
-            // FFT of length 4: X = [(x0+x2)+(x1+x3), (x0-x2)+(x3-x1), (x0+x2)-(x1+x3), (x0-x2)+(x3-x1)]
+            return existingFunction;
+        }
+
+        emitters::IRFunctionEmitter function = detail::GetFFTFunctionEmitter<ValueType>(module, length);
+        {
             auto arguments = function.Arguments().begin();
             auto input = function.LocalScalar(&(*arguments++));
 
-            // Input x = {x0, x1, x2, x3}
-            auto x0 = function.LocalScalar(function.ValueAt(input, 0));
-            auto x1 = function.LocalScalar(function.ValueAt(input, 1));
-            auto x2 = function.LocalScalar(function.ValueAt(input, 2));
-            auto x3 = function.LocalScalar(function.ValueAt(input, 3));
-
-            // deinterleave -> {x0, x2, x1, x3}
-            // call fft2 on each half:
-            //   -> {x0+x2, x0-x2, x1+x3, x1-x3}
-            // apply twiddle factor w_0 = 1:
-            //  -> { (x0+x2) + (x1+x3), ..., (x0+x2) - (x1+x3), ...}
-            // apply twiddle factor w_1 = -1:
-            //  -> { (x0+x2) + (x1+x3), (x0-x2) - (x1-x3), (x0+x2) - (x1+x3), (x0-x2) + (x1-x3)}
-
-            auto x0px2 = detail::ComplexAdd(x0, x2);
-            auto x0mx2 = detail::ComplexSubtract(x0, x2);
-            auto x1px3 = detail::ComplexAdd(x1, x3);
-            auto x1mx3 = detail::ComplexSubtract(x1, x3);
-            function.SetValueAt(input, 0, detail::ComplexAdd(x0px2, x1px3));
-            function.SetValueAt(input, 1, detail::ComplexSubtract(x0mx2, x1mx3));
-            function.SetValueAt(input, 2, detail::ComplexSubtract(x0px2, x1px3));
-            function.SetValueAt(input, 3, detail::ComplexAdd(x0mx2, x1mx3));
+            EmitFFT_4(function, input);
         }
         module.EndFunction();
         return function.GetFunction();
+    }
+
+    // Fixed-size FFT function implementation: size is known at compile time
+    template <typename ValueType>
+    void FFTNode<ValueType>::EmitFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch)
+    {
+#if (USE_FIXED_SMALL_FFT)
+        if (length == 2)
+        {
+            EmitFFT_2(function, input);
+        }
+        if (length == 4)
+        {
+            EmitFFT_4(function, input);
+        }
+#endif // USE_FIXED_SMALL_FFT
+
+        // TODO: assert(bitcount(length) == 1)  (i.e., length is a power of 2)
+        auto& module = function.GetModule();
+        auto& emitter = module.GetIREmitter();
+        auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
+        auto complexType = detail::GetComplexType(module, valueType);
+        auto complexPtrType = complexType->getPointerTo();
+
+        const auto pi = math::Constants<ValueType>::pi;
+
+        auto halfN = length / 2;
+        assert(halfN >= 1);
+
+        Deinterleave(function, input, halfN, scratch);
+        auto evens = input;
+        auto odds = function.PointerOffset(evens, halfN);
+
+        if (halfN > 1) // call recursive case if necessary
+        {
+            DoFFT(function, halfN, evens, scratch);
+            DoFFT(function, halfN, odds, scratch);
+        }
+
+#if (USE_STORED_TWIDDLE_FACTORS)
+        auto twiddleFactors = detail::GetTwiddleFactors<ValueType>(halfN);
+        std::vector<ValueType> twiddleFactorsUnwrapped(twiddleFactors.size() * 2);
+        ValueType* dataPtr = reinterpret_cast<ValueType*>(twiddleFactors.data());
+        std::copy(dataPtr, dataPtr + twiddleFactorsUnwrapped.size(), twiddleFactorsUnwrapped.begin());
+        auto twiddleFactorsUnwrappedVar = module.ConstantArray(std::string("twiddles_") + std::to_string(halfN), twiddleFactorsUnwrapped); // TODO: encode type name in variable name
+        auto twiddleFactorsVar = function.CastPointer(twiddleFactorsUnwrappedVar, complexPtrType);
+#else
+        bool twiddleFactorsVar = false;
+#endif
+
+        function.For(halfN, [pi, halfN, &evens, &odds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
+            auto k = function.LocalScalar(kVar);
+
+#if (USE_STORED_TWIDDLE_FACTORS)
+            auto w = function.LocalScalar(function.ValueAt(twiddleFactorsVar, k));
+#else
+            // w = e^i(2*pi*k/N)
+            auto kValue = function.LocalScalar(function.CastValue<int, ValueType>(k));
+            auto w = detail::ImaginaryExp(function.LocalScalar(pi / halfN) * kValue);
+#endif
+
+            auto e = function.LocalScalar(function.ValueAt(evens, k));
+            auto o = function.LocalScalar(function.ValueAt(odds, k));
+            auto wo = detail::ComplexMultiply(w, o); // wo = w*o
+            function.SetValueAt(evens, k, detail::ComplexAdd(e, wo)); // even
+            function.SetValueAt(odds, k, detail::ComplexSubtract(e, wo)); // odd
+        });
     }
 
     // Fixed-size FFT function implementation: size is known at compile time
@@ -333,70 +476,27 @@ namespace nodes
         {
             return GetFFTFunction_2(module);
         }
+        if (length == 4)
+        {
+            return GetFFTFunction_4(module);
+        }
 #endif // USE_FIXED_SMALL_FFT
 
+        auto functionName = detail::GetFFTFunctionName<ValueType>(length);
+        auto existingFunction = module.GetFunction(functionName);
+        if (existingFunction != nullptr)
+        {
+            return existingFunction;
+        }
+
         // TODO: assert(bitcount(length) == 1)  (i.e., length is a power of 2)
-        auto& context = module.GetLLVMContext();
-        auto& emitter = module.GetIREmitter();
-        auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
-        auto complexType = detail::GetComplexType(module, valueType);
-        auto complexPtrType = complexType->getPointerTo();
-        auto voidType = llvm::Type::getVoidTy(context);
-
-        const auto pi = math::Constants<ValueType>::pi;
-
-        // function name: FFTC_<T>_<N>  (e.g., FFT_float_32)
-        // function signature: void FFT(complex<T>*, complex<T>*)
-        std::string functionName = std::string("FFTC_") + utilities::GetTypeName<ValueType>() + "_" + std::to_string(length);
-        auto argumentTypes = detail::GetFFTFunctionArguments<ValueType>(module);
-        emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+        emitters::IRFunctionEmitter function = detail::GetFFTFunctionEmitter<ValueType>(module, length);
         {
             auto arguments = function.Arguments().begin();
             auto input = function.LocalScalar(&(*arguments++));
             auto scratch = function.LocalScalar(&(*arguments++));
 
-            auto halfN = length / 2;
-            assert(halfN >= 1);
-
-            Deinterleave(function, input, halfN, scratch);
-            auto evens = input;
-            auto odds = function.PointerOffset(evens, halfN);
-
-            if (halfN > 1) // call recursive case if necessary
-            {
-                auto fftFunction = GetFFTFunction(module, halfN);
-                function.Call(fftFunction, { evens, scratch });
-                function.Call(fftFunction, { odds, scratch });
-            }
-
-#if (USE_STORED_TWIDDLE_FACTORS)
-            auto twiddleFactors = detail::GetTwiddleFactors<ValueType>(halfN);
-            std::vector<ValueType> twiddleFactorsUnwrapped(twiddleFactors.size() * 2);
-            ValueType* dataPtr = reinterpret_cast<ValueType*>(twiddleFactors.data());
-            std::copy(dataPtr, dataPtr + twiddleFactorsUnwrapped.size(), twiddleFactorsUnwrapped.begin());
-            auto twiddleFactorsUnwrappedVar = module.ConstantArray(std::string("twiddles_") + std::to_string(halfN), twiddleFactorsUnwrapped);
-            auto twiddleFactorsVar = function.CastPointer(twiddleFactorsUnwrappedVar, complexPtrType);
-#else
-            bool twiddleFactorsVar = false;
-#endif
-
-            function.For(halfN, [pi, halfN, &evens, &odds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
-                auto k = function.LocalScalar(kVar);
-
-#if (USE_STORED_TWIDDLE_FACTORS)
-                auto w = function.LocalScalar(function.ValueAt(twiddleFactorsVar, k));
-#else
-                // w = e^i(2*pi*k/N)
-                auto kValue = function.LocalScalar(function.CastValue<int, ValueType>(k));
-                auto w = detail::ImaginaryExp(function.LocalScalar(pi / halfN) * kValue);
-#endif
-
-                auto e = function.LocalScalar(function.ValueAt(evens, k));
-                auto o = function.LocalScalar(function.ValueAt(odds, k));
-                auto wo = detail::ComplexMultiply(w, o); // wo = w*o
-                function.SetValueAt(evens, k, detail::ComplexAdd(e, wo)); // even
-                function.SetValueAt(odds, k, detail::ComplexSubtract(e, wo)); // odd
-            });
+            EmitFFT(function, length, input, scratch);            
         }
         module.EndFunction();
         return function.GetFunction();
@@ -404,88 +504,122 @@ namespace nodes
 
     // Real-valued fixed-size FFT function implementation: size is known at compile time
     template <typename ValueType>
-    llvm::Function* FFTNode<ValueType>::GetRealFFTFunction(emitters::IRModuleEmitter& module, size_t length)
+    void FFTNode<ValueType>::EmitRealFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch, llvm::Value* complexInput)
     {
         // TODO: assert(bitcount(length) == 1)  (i.e., length is a power of 2)
-        auto& context = module.GetLLVMContext();
+        auto& module = function.GetModule();
         auto complexType = detail::GetComplexType<ValueType>(module);
         auto complexPtrType = complexType->getPointerTo();
-        auto voidType = llvm::Type::getVoidTy(context);
 
         const auto pi = math::Constants<ValueType>::pi;
 
-        // function name: FFTR_<T>_<N>  (e.g., FFT_float_32)
-        // function signature: void FFT(T*, T*, complex<T>*)
-        std::string functionName = std::string("FFTR_") + utilities::GetTypeName<ValueType>() + "_" + std::to_string(length);
-        auto argumentTypes = detail::GetRealFFTFunctionArguments<ValueType>(module);
-        emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+        auto halfN = length / 2;
+        assert(halfN >= 1);
+
+        Deinterleave(function, input, halfN, scratch);
+        auto evens = input;
+        auto odds = function.PointerOffset(evens, halfN);
+        auto complexEvens = complexInput;
+        auto complexOdds = function.PointerOffset(complexEvens, halfN);
+
+        if (halfN > 1) // call recursive case if necessary
+        {
+            DoRealFFT(function, halfN, evens, scratch, complexEvens);
+            DoRealFFT(function, halfN, odds, scratch, complexOdds);
+        }
+        else // here halfN == 1
+        {
+            // Base case: copy from real to complex
+            function.FillStruct(complexEvens, { function.Load(evens), function.Literal<ValueType>(0) });
+            function.FillStruct(complexOdds, { function.Load(odds), function.Literal<ValueType>(0) });
+        }
+
+#if (USE_STORED_TWIDDLE_FACTORS)
+        auto twiddleFactors = detail::GetTwiddleFactors<ValueType>(halfN);
+        std::vector<ValueType> twiddleFactorsUnwrapped(twiddleFactors.size() * 2);
+        ValueType* dataPtr = reinterpret_cast<ValueType*>(twiddleFactors.data());
+        std::copy(dataPtr, dataPtr + twiddleFactorsUnwrapped.size(), twiddleFactorsUnwrapped.begin());
+        auto twiddleFactorsUnwrappedVar = module.ConstantArray(std::string("twiddles_") + std::to_string(halfN), twiddleFactorsUnwrapped);
+        auto twiddleFactorsVar = function.CastPointer(twiddleFactorsUnwrappedVar, complexPtrType);
+#else
+        bool twiddleFactorsVar = false; // Just here to appease the compiler
+#endif
+
+        function.For(halfN, [pi, halfN, &evens, &odds, &complexEvens, complexOdds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
+            auto k = function.LocalScalar(kVar);
+
+#if (USE_STORED_TWIDDLE_FACTORS)
+            auto w = function.LocalScalar(function.ValueAt(twiddleFactorsVar, k));
+#else
+            // w = e^i(2*pi*k/N)
+            auto kValue = function.LocalScalar(function.CastValue<int, ValueType>(k));
+            auto w = detail::ImaginaryExp(function.LocalScalar(pi / halfN) * kValue);
+#endif
+
+            auto e = function.LocalScalar(function.ValueAt(evens, k));
+            auto o = function.LocalScalar(function.ValueAt(odds, k));
+            auto wo = detail::ComplexRealMultiply(w, o); // wo = w*o
+            function.SetValueAt(complexEvens, k, detail::RealComplexAdd(e, wo)); // even
+            function.SetValueAt(complexOdds, k, detail::RealComplexSubtract(e, wo)); // odd
+        });
+    }
+
+    // Real-valued fixed-size FFT function implementation: size is known at compile time
+    template <typename ValueType>
+    llvm::Function* FFTNode<ValueType>::GetRealFFTFunction(emitters::IRModuleEmitter& module, size_t length)
+    {
+        auto functionName = detail::GetRealFFTFunctionName<ValueType>(length);
+        auto existingFunction = module.GetFunction(functionName);
+        if (existingFunction != nullptr)
+        {
+            return existingFunction;
+        }
+
+        emitters::IRFunctionEmitter function = detail::GetFFTFunctionEmitter<ValueType>(module, length);
         {
             auto arguments = function.Arguments().begin();
             auto input = function.LocalScalar(&(*arguments++));
             auto scratch = function.LocalScalar(&(*arguments++));
             auto complexInput = function.LocalScalar(&(*arguments++));
 
-            auto halfN = length / 2;
-            assert(halfN >= 1);
-
-            Deinterleave(function, input, halfN, scratch);
-            auto evens = input;
-            auto odds = function.PointerOffset(evens, halfN);
-            auto complexEvens = complexInput;
-            auto complexOdds = function.PointerOffset(complexEvens, halfN);
-
-            if (halfN > 1) // call recursive case if necessary
-            {
-                auto fftFunction = GetRealFFTFunction(module, halfN);
-                function.Call(fftFunction, { evens, scratch, complexEvens });
-                function.Call(fftFunction, { odds, scratch, complexOdds });
-            }
-            else // here halfN == 1
-            {
-                // Base case: copy from real to complex
-                function.FillStruct(complexEvens, { function.Load(evens), function.Literal<ValueType>(0) });
-                function.FillStruct(complexOdds, { function.Load(odds), function.Literal<ValueType>(0) });
-            }
-
-#if (USE_STORED_TWIDDLE_FACTORS)
-            auto twiddleFactors = detail::GetTwiddleFactors<ValueType>(halfN);
-            std::vector<ValueType> twiddleFactorsUnwrapped(twiddleFactors.size() * 2);
-            ValueType* dataPtr = reinterpret_cast<ValueType*>(twiddleFactors.data());
-            std::copy(dataPtr, dataPtr + twiddleFactorsUnwrapped.size(), twiddleFactorsUnwrapped.begin());
-            auto twiddleFactorsUnwrappedVar = module.ConstantArray(std::string("twiddles_") + std::to_string(halfN), twiddleFactorsUnwrapped);
-            auto twiddleFactorsVar = function.CastPointer(twiddleFactorsUnwrappedVar, complexPtrType);
-#else
-            bool twiddleFactorsVar = false; // Just here to appease the compiler
-#endif
-
-            function.For(halfN, [pi, halfN, &evens, &odds, &complexEvens, complexOdds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
-                auto k = function.LocalScalar(kVar);
-
-#if (USE_STORED_TWIDDLE_FACTORS)
-                auto w = function.LocalScalar(function.ValueAt(twiddleFactorsVar, k));
-#else
-                // w = e^i(2*pi*k/N)
-                auto kValue = function.LocalScalar(function.CastValue<int, ValueType>(k));
-                auto w = detail::ImaginaryExp(function.LocalScalar(pi / halfN) * kValue);
-#endif
-
-                auto e = function.LocalScalar(function.ValueAt(evens, k));
-                auto o = function.LocalScalar(function.ValueAt(odds, k));
-                auto wo = detail::ComplexRealMultiply(w, o); // wo = w*o
-                function.SetValueAt(complexEvens, k, detail::RealComplexAdd(e, wo)); // even
-                function.SetValueAt(complexOdds, k, detail::RealComplexSubtract(e, wo)); // odd
-            });
+            EmitRealFFT(function, length, input, scratch, complexInput);
         }
         module.EndFunction();
         return function.GetFunction();
     }
 
-    // Dynamic-size FFT function implementation: size is not known at compile time
+    // Perform fixed-size FFT: size is known at compile time
     template <typename ValueType>
-    llvm::Function* FFTNode<ValueType>::GetFFTFunction(emitters::IRModuleEmitter& module)
+    void FFTNode<ValueType>::DoFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch)
     {
-        assert(false && "Not implemented");
-        return nullptr;
+        const bool inlineFFT = length <= MAX_INLINE_FFT_SIZE;
+        if (inlineFFT)
+        {
+            EmitFFT(function, length, input, scratch);
+        }
+        else
+        {
+            auto& module = function.GetModule();
+            auto fftFunction = GetFFTFunction(module, length);
+            function.Call(fftFunction, { input, scratch });
+        }
+    }
+
+    // Fixed-size FFT function implementation: size is known at compile time
+    template <typename ValueType>
+    void FFTNode<ValueType>::DoRealFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch, llvm::Value* complexInput)
+    {
+        const bool inlineFFT = length <= MAX_INLINE_FFT_SIZE;
+        if (inlineFFT)
+        {
+            EmitRealFFT(function, length, input, scratch, complexInput);
+        }
+        else
+        {
+            auto& module = function.GetModule();
+            auto fftFunction = GetRealFFTFunction(module, length);
+            function.Call(fftFunction, { input, scratch, complexInput });
+        }
     }
 
     template <typename ValueType>
@@ -538,8 +672,7 @@ namespace nodes
 #if (USE_REAL_FFT)
 
         llvm::Value* scratch = function.Variable(valueType, inputSize / 2);
-        auto fftFunction = GetRealFFTFunction(module, inputSize);
-        function.Call(fftFunction, { pInput, scratch, complexBuffer });
+        DoRealFFT(function, inputSize, pInput, scratch, complexBuffer);
 
 #else // Complex-input FFT
 
@@ -552,8 +685,7 @@ namespace nodes
             function.SetValueAt(complexBuffer, index, function.Load(temp));
         });
 
-        auto fftFunction = GetFFTFunction(module, inputSize);
-        function.Call(fftFunction, { complexBuffer, scratch });
+        DoFFT(function, inputSize, complexBuffer, scratch);
 
 #endif // USE_REAL_FFT
 

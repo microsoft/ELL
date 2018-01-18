@@ -298,7 +298,7 @@ namespace emitters
         ///
         /// <param name="name"> The function name. </param>
         ///
-        /// <returns> Pointer to an llvm::Function that represents the requested function. </returns>
+        /// <returns> Pointer to an llvm::Function that represents the requested function, or nullptr if it doesn't exist. </returns>
         llvm::Function* GetFunction(const std::string& name);
 
         /// <summary> Get an LLVM intrinsic function with the given id and signature. </summary>

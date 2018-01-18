@@ -39,7 +39,7 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 # dsp test
 #
 
-set(test_name signalProcessing_test)
+set(test_name ${library_name}_test)
 
 set(test_src 
   test/src/main.cpp
