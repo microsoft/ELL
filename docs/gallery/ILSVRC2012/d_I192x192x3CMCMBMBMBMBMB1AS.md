@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/d_I192x192x3CMCMBMBMBMBMB1AS
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 192x192x3 Convolutional Neural Network (39.32% top 1 accuracy, 64.55% top 5 accuracy, 0.38s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 192x192x3 Convolutional Neural Network (39.32% top 1 accuracy, 64.55% top 5 accuracy, 0.42s/frame on Raspberry Pi 3)
 
 <table class="table table-striped table-bordered">
     <tr>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/d_I192x192x3CMCMBMBMBMBMB1AS
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.38s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.32s/frame<br>DragonBoard 410c @ 1.2GHz: 0.21s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.42s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.32s/frame<br>DragonBoard 410c @ 1.2GHz: 0.21s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
@@ -127,7 +127,8 @@ permalink: /gallery/ILSVRC2012/d_I192x192x3CMCMBMBMBMBMB1AS
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Chuck Jacobs using CNTK 2.1 </td>
+        <td colspan="3">Trained by Juan Lema
+ using CNTK 2.2 </td>
     </tr>
 </table>
 

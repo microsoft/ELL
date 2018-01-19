@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF4096S
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 4.40s/frame<br>DragonBoard 410c @ 1.2GHz: 5.91s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (OpenSUSE) @ 600MHz: 4.40s/frame<br>DragonBoard 410c @ 1.2GHz: 5.91s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
@@ -137,7 +137,8 @@ permalink: /gallery/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF4096S
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Chuck Jacobs using CNTK 2.1 </td>
+        <td colspan="3">Trained by Juan Lema
+ using CNTK 2.2 </td>
     </tr>
 </table>
 

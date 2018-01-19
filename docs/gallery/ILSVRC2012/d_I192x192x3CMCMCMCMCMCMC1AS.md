@@ -122,7 +122,8 @@ permalink: /gallery/ILSVRC2012/d_I192x192x3CMCMCMCMCMCMC1AS
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Chuck Jacobs using CNTK 2.1 </td>
+        <td colspan="3">Trained by Juan Lema
+ using CNTK 2.2 </td>
     </tr>
 </table>
 

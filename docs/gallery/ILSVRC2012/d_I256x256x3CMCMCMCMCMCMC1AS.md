@@ -122,7 +122,8 @@ permalink: /gallery/ILSVRC2012/d_I256x256x3CMCMCMCMCMCMC1AS
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Juan Lema using CNTK 2.1 </td>
+        <td colspan="3">Trained by Juan Lema
+ using CNTK 2.2 </td>
     </tr>
 </table>
 

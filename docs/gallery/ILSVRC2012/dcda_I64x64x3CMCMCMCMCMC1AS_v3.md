@@ -107,7 +107,8 @@ permalink: /gallery/ILSVRC2012/dcda_I64x64x3CMCMCMCMCMC1AS_v3
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3">Trained by Juan Lema using CNTK 2.2</td>
+        <td colspan="3">Trained by Juan Lema
+ using CNTK 2.2 </td>
     </tr>
 </table>
 
