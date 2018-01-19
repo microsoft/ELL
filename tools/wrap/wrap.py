@@ -17,7 +17,9 @@ import subprocess
 import sys
 from shutil import copyfile
 
-sys.path += ["../utilities/pythonlibs"]
+__script_path = os.path.dirname(os.path.abspath(__file__))
+
+sys.path += [os.path.join(__script_path, "..", "utilities", "pythonlibs")]
 import find_ell
 import buildtools
 import logger
@@ -71,7 +73,7 @@ class ModuleBuilder:
         # optional arguments
         arg_parser.add_argument("--language", "-lang", help="the language for the ELL module", choices=["python", "cpp"], default=self.language)
         arg_parser.add_argument("--target", "-target", help="the target platform", choices=["pi3", "pi0", "orangepi0", "pi3_64", "aarch64", "host"], default=self.target)
-        arg_parser.add_argument("--modulename", "-modulename", help="the name of the output module (by default, the same as the name of the model file)", default=None)
+        arg_parser.add_argument("--module_name", "-module_name", help="the name of the output module (by default, the same as the name of the model file)", default=None)
         arg_parser.add_argument("--outdir", "-outdir", help="the output directory")
         arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
         arg_parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
@@ -90,9 +92,8 @@ class ModuleBuilder:
         self.model_file = args.model_file
         _, tail = os.path.split(self.model_file)
         self.model_file_base = os.path.splitext(tail)[0]
-        if args.modulename:
-            self.model_name = args.modulename
-        else:
+        self.model_name = args.module_name 
+        if not self.model_name:
             self.model_name = self.model_file_base
         self.language = args.language
         self.target = args.target

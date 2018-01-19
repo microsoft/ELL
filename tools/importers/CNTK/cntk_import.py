@@ -12,7 +12,7 @@
 import argparse
 import os
 import sys
-
+import logging
 import cv2
 import numpy as np
 

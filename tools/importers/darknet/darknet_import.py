@@ -13,7 +13,7 @@ import argparse
 import json
 import os
 import sys
-
+import logging
 import numpy as np
 import cv2
 
