@@ -40,14 +40,14 @@ def main():
         categories = categories_file.read().splitlines()
 
     # Define the models we'll be using
-    models = [model1, model2]
+    models = [model1.model1, model2.model2]
 
     # Get the models' input dimensions. We'll use this information later to
     # resize images appropriately.
     input_shapes = [model.get_default_input_shape() for model in models]
 
     # Create an array to hold the models' output predictions
-    prediction_arrays = []
+    prediction_arrays = [None, None]
 
     # Declare a value to hold the prediction times
     prediction_times = [list(), list()]

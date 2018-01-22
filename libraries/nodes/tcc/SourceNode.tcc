@@ -79,7 +79,6 @@ namespace nodes
         auto sampleTime = function.ValueAt(pInput, function.Literal(0));
 
         // Invoke the callback and optionally interpolate.
-        DEBUG_EMIT_PRINTF(function, GetCallbackName() + "\n");
         function.Call(pSamplingFunction, { function.PointerOffset(pBufferedSample, 0) });
 
         // TODO: Interpolate if there is a sample, and currentTime > sampleTime

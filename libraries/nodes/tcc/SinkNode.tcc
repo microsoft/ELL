@@ -60,7 +60,6 @@ namespace nodes
     {
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
-        DEBUG_EMIT_PRINTF(function, prefixedName + "\n");
 
         // EvaluateInput defaults to 'pass through' in base implementation, which means
         // we always call the sink function

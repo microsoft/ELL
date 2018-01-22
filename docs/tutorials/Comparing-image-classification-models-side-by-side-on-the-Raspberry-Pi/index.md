@@ -117,13 +117,6 @@ We are ready to move to the Raspberry Pi. If your Pi is accessible over the netw
 
 We will write a Python script that reads images from the camera, invokes the models one at a time, and displays the two frames side-by-side. If you just want the full script, copy it from [here](/ELL/tutorials/Comparing-image-classification-models-side-by-side-on-the-Raspberry-Pi/side_by_side.py). Otherwise, create an empty text file named `side_by_side.py` and copy in the code snippets below.
 
-Before writing the script that will use the compiled model, we also want to copy over some Python helper code:
-
-```shell
-[Linux/macOS] cp <ELL-root>/docs/tutorials/shared/tutorial_helpers.py .
-[Windows] copy <ELL-root>\docs\tutorials\shared\tutorial_helpers.py .
-```
-
 First, import a few dependencies, including system utilities, OpenCV, and NumPy.
 ```python
 import time
@@ -174,7 +167,7 @@ Read the file of category names.
 Define an array to hold the models.
 
 ```python
-    models = [model1, model2]
+    models = [model1.model1, model2.model2]
 ```
 
 The models expect input in a certain shape. For each model, get this shape and store it for use later on.
@@ -183,10 +176,10 @@ The models expect input in a certain shape. For each model, get this shape and s
     input_shapes = [model.get_default_input_shape() for model in models]
 ```
 
-Create an array to hold each model's output.
+Define an array to hold each model's output.
 
 ```python
-    prediction_arrays = []
+    prediction_arrays = [None, None]
 ```
 
 Create a tiled image that will be used to display the two frames side-by-side. This function is provided by the helper module that we imported earlier.

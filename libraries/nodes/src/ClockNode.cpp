@@ -129,14 +129,11 @@ namespace nodes
             auto if2 = function.If(greaterThanOrEqualTime, delta, thresholdTime);
             {
                 auto pLagFunction = function.GetModule().GetFunction(prefixedName);
-                DEBUG_EMIT_PRINTF(function, prefixedName + "\n");
                 function.Call(pLagFunction, { delta });
             }
             if2.End();
         }
         if1.End();
-
-        DEBUG_EMIT_PRINTF(function, "now %f, last interval %f, new last interval %f\n", now, lastIntervalTime, function.Load(newLastInterval));
 
         // Update _lastInterval state
         function.Store(pLastIntervalTime, function.Load(newLastInterval));
@@ -226,8 +223,6 @@ namespace nodes
             function.Store(result, function.Operator(minusTime, function.Operator(plusTime, lastIntervalTime, interval), now));
         }
         ifEmitter1.End();
-
-        DEBUG_EMIT_PRINTF(function, "GetTicksUntilNextInterval: now %f, last interval %f, delta %f\n", now, lastIntervalTime, function.Load(result));
 
         function.Return(function.Load(result));
         moduleEmitter.EndFunction();
