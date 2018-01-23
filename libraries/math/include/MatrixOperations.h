@@ -221,7 +221,7 @@ namespace math
     /// <param name="scalarB"> The scalar that multiplies the second matrix: either a real number or One() </param>
     /// <param name="matrixB"> The second matrix, which is updated. </param>
     /// <param name="output"> A matrix used to store the result. </param>
-    
+
     // output = scalarA * matrixA + matrixB
     template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB, MatrixLayout outputLayout>
     void ScaleAddSet(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, One, ConstMatrixReference<ElementType, layoutB> matrixB, MatrixReference<ElementType, outputLayout> output);
@@ -361,7 +361,7 @@ namespace math
         template <>
         struct MatrixOperations<ImplementationType::openBlas>
         {
-            static std::string GetImplementationName() { return "OpenBlas"; }
+            static std::string GetImplementationName() { return "OpenBLAS"; }
 
             template <typename ElementType, MatrixLayout layout>
             static void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layout> matrix, ConstColumnVectorReference<ElementType> vectorA, ElementType scalarB, ColumnVectorReference<ElementType> vectorB);

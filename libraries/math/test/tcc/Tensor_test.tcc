@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     Tensor_test.tcc (math_test)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -92,7 +92,7 @@ void TestTensorNumSlices()
     math::ColumnRowChannelTensor<ElementType> T(10, 20, 30);
     math::ChannelColumnRowTensor<ElementType> S(10, 20, 30);
 
-    testing::ProcessTest("Tensor::NumSlices", 
+    testing::ProcessTest("Tensor::NumSlices",
         math::NumSlices<math::Dimension::column, math::Dimension::row>(T) == 30
         && math::NumSlices<math::Dimension::row, math::Dimension::column>(T) == 30
         && math::NumSlices<math::Dimension::column, math::Dimension::channel>(T) == 10
@@ -101,6 +101,16 @@ void TestTensorNumSlices()
         && math::NumSlices<math::Dimension::row, math::Dimension::channel>(S) == 20
         && math::NumSlices<math::Dimension::column, math::Dimension::channel>(S) == 10
         && math::NumSlices<math::Dimension::channel, math::Dimension::column>(S) == 10);
+
+    auto test1DNumSlices = [](auto T)
+    {
+        testing::ProcessTest("Tensor::NumSlices",
+            math::NumSlices<math::Dimension::channel>(T) == (10 * 20)
+            && math::NumSlices<math::Dimension::column>(T) == (10 * 30)
+            && math::NumSlices<math::Dimension::row>(T) == (20 * 30));
+    };
+    test1DNumSlices(T);
+    test1DNumSlices(S);
 }
 
 template<typename ElementType>
@@ -208,7 +218,7 @@ void TestTensorGetSubTensor()
     testing::ProcessTest("TestGetSubTensor()", T == S);
 }
 
-template<typename ElementType>
+template <typename ElementType>
 void TestTensorGetSlice()
 {
     math::ColumnRowChannelTensor<ElementType> T1(3, 4, 5);
@@ -217,31 +227,23 @@ void TestTensorGetSlice()
     T1(0, 3, 3) = 3;
     T1(2, 2, 4) = 3;
 
-    auto M11 = math::GetSlice<math::Dimension::column, math::Dimension::row>(T1, 3);
-    testing::ProcessTest("TensorReference::GetSlice()", M11(2, 1) == 2 && M11(3, 0) == 3);
+    auto T1Test2DSlice = [](auto T)
+    {
+        auto M1 = math::GetSlice<math::Dimension::column, math::Dimension::row>(T, 3);
+        testing::ProcessTest("TensorReference::GetSlice()", M1(2, 1) == 2 && M1(3, 0) == 3);
 
-    auto M12 = math::GetSlice<math::Dimension::row, math::Dimension::column>(T1, 3);
-    testing::ProcessTest("TensorReference::GetSlice()", M12(1, 2) == 2 && M12(0, 3) == 3);
+        auto M2 = math::GetSlice<math::Dimension::row, math::Dimension::column>(T, 3);
+        testing::ProcessTest("TensorReference::GetSlice()", M2(1, 2) == 2 && M2(0, 3) == 3);
 
-    auto M13 = math::GetSlice<math::Dimension::column, math::Dimension::channel>(T1, 0);
-    testing::ProcessTest("TensorReference::GetSlice()", M13(0, 0) == 1 && M13(3, 3) == 3);
+        auto M3 = math::GetSlice<math::Dimension::column, math::Dimension::channel>(T, 0);
+        testing::ProcessTest("TensorReference::GetSlice()", M3(0, 0) == 1 && M3(3, 3) == 3);
 
-    auto M14 = math::GetSlice<math::Dimension::channel, math::Dimension::column>(T1, 0);
-    testing::ProcessTest("TensorReference::GetSlice()", M14(0, 0) == 1 && M14(3, 3) == 3);
+        auto M4 = math::GetSlice<math::Dimension::channel, math::Dimension::column>(T, 0);
+        testing::ProcessTest("TensorReference::GetSlice()", M4(0, 0) == 1 && M4(3, 3) == 3);
+    };
 
-    auto T1c = T1.GetConstReference();
-
-    auto M11c = math::GetSlice<math::Dimension::column, math::Dimension::row>(T1c, 3);
-    testing::ProcessTest("ConstTensorReference::GetSlice()", M11c(2, 1) == 2 && M11c(3, 0) == 3);
-
-    auto M12c = math::GetSlice<math::Dimension::row, math::Dimension::column>(T1c, 3);
-    testing::ProcessTest("ConstTensorReference::GetSlice()", M12c(1, 2) == 2 && M12c(0, 3) == 3);
-
-    auto M13c = math::GetSlice<math::Dimension::column, math::Dimension::channel>(T1c, 0);
-    testing::ProcessTest("ConstTensorReference::GetSlice()", M13c(0, 0) == 1 && M13c(3, 3) == 3);
-
-    auto M14c = math::GetSlice<math::Dimension::channel, math::Dimension::column>(T1c, 0);
-    testing::ProcessTest("ConstTensorReference::GetSlice()", M14c(0, 0) == 1 && M14c(3, 3) == 3);
+    T1Test2DSlice(T1);
+    T1Test2DSlice(T1.GetConstReference());
 
     math::ChannelColumnRowTensor<ElementType> T2(3, 4, 5);
     T2(0, 0, 0) = 1;
@@ -249,31 +251,85 @@ void TestTensorGetSlice()
     T2(0, 3, 3) = 3;
     T2(2, 2, 4) = 4;
 
-    auto M23 = math::GetSlice<math::Dimension::column, math::Dimension::channel>(T2, 0);
-    testing::ProcessTest("TensorReference::GetSlice()", M23(0, 0) == 1 && M23(3, 3) == 3);
+    auto T2Test2DSlice = [](auto T)
+    {
+        auto M1 = math::GetSlice<math::Dimension::column, math::Dimension::channel>(T, 0);
+        testing::ProcessTest("TensorReference::GetSlice()", M1(0, 0) == 1 && M1(3, 3) == 3);
 
-    auto M24 = math::GetSlice<math::Dimension::channel, math::Dimension::column>(T2, 0);
-    testing::ProcessTest("TensorReference::GetSlice()", M24(0, 0) == 1 && M24(3, 3) == 3);
+        auto M2 = math::GetSlice<math::Dimension::channel, math::Dimension::column>(T, 0);
+        testing::ProcessTest("TensorReference::GetSlice()", M2(0, 0) == 1 && M2(3, 3) == 3);
 
-    auto M25 = math::GetSlice<math::Dimension::row, math::Dimension::channel>(T2, 2);
-    testing::ProcessTest("TensorReference::GetSlice()", M25(1, 3) == 2 && M25(2, 4) == 4);
+        auto M3 = math::GetSlice<math::Dimension::row, math::Dimension::channel>(T, 2);
+        testing::ProcessTest("TensorReference::GetSlice()", M3(1, 3) == 2 && M3(2, 4) == 4);
 
-    auto M26 = math::GetSlice<math::Dimension::channel, math::Dimension::row>(T2, 2);
-    testing::ProcessTest("TensorReference::GetSlice()", M26(3, 1) == 2 && M26(4, 2) == 4);
+        auto M4 = math::GetSlice<math::Dimension::channel, math::Dimension::row>(T, 2);
+        testing::ProcessTest("TensorReference::GetSlice()", M4(3, 1) == 2 && M4(4, 2) == 4);
+    };
 
-    auto T2c = T2.GetConstReference();
+    T2Test2DSlice(T2);
+    T2Test2DSlice(T2.GetConstReference());
 
-    auto M23c = math::GetSlice<math::Dimension::column, math::Dimension::channel>(T2c, 0);
-    testing::ProcessTest("ConstTensorReference::GetSlice()", M23c(0, 0) == 1 && M23c(3, 3) == 3);
+    auto vectorSliceTest = [](auto _)
+    {
+        using TensorType = decltype(_);
 
-    auto M24c = math::GetSlice<math::Dimension::channel, math::Dimension::column>(T2c, 0);
-    testing::ProcessTest("ConstTensorReference::GetSlice()", M24c(0, 0) == 1 && M24c(3, 3) == 3);
+        // T = numpy.arange(5 * 7 * 11).reshape(5, 7, 11)
+        TensorType T(5, 7, 11);
+        for (unsigned i = 0; i < 5; ++i)
+        {
+            for (unsigned j = 0; j < 7; ++j)
+            {
+                for (unsigned k = 0; k < 11; ++k)
+                {
+                    T(i, j, k) = k + j * 11 + i * 77;
+                }
+            }
+        }
 
-    auto M25c = math::GetSlice<math::Dimension::row, math::Dimension::channel>(T2c, 2);
-    testing::ProcessTest("ConstTensorReference::GetSlice()", M25c(1, 3) == 2 && M25c(2, 4) == 4);
+        auto test1DGetSlice = [](auto T)
+        {
+            // equivalent of NumPy's T[4, 6, ...]
+            auto V1 = math::GetSlice<math::Dimension::channel>(T, 4, 6);
+            testing::ProcessTest("TensorReference::GetSlice()", V1 == math::ColumnVector<ElementType>({ 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384 }));
 
-    auto M26c = math::GetSlice<math::Dimension::channel, math::Dimension::row>(T2c, 2);
-    testing::ProcessTest("ConstTensorReference::GetSlice()", M26c(3, 1) == 2 && M26c(4, 2) == 4);
+            // equivalent of NumPy's T[4, ..., 8]
+            auto V2 = math::GetSlice<math::Dimension::column>(T, 4, 8);
+            testing::ProcessTest("TensorReference::GetSlice()", V2 == math::ColumnVector<ElementType>({ 316, 327, 338, 349, 360, 371, 382 }));
+
+            // equivalent of NumPy's T[..., 6, 8]
+            auto V3 = math::GetSlice<math::Dimension::row>(T, 6, 8);
+            testing::ProcessTest("TensorReference::GetSlice()", V3 == math::ColumnVector<ElementType>({ 74, 151, 228, 305, 382 }));
+        };
+
+        test1DGetSlice(T);
+        test1DGetSlice(T.GetConstReference());
+
+        typename TensorType::TensorElementType originalElementVal = 0;
+
+        // T[..., 6, 8][0] = 0
+        auto V1 = math::GetSlice<math::Dimension::channel>(T, 4, 6);
+        std::swap(originalElementVal, V1[0]);
+        testing::ProcessTest("TensorReference::GetSlice() after modification", V1 == math::ColumnVector<ElementType>({ 0, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384 }));
+        testing::ProcessTest("T(4, 6, 0) == 0", T(4, 6, 0) == 0);
+        std::swap(originalElementVal, V1[0]);
+
+        // T[4..., 8][0] = 0
+        auto V2 = math::GetSlice<math::Dimension::column>(T, 4, 8);
+        std::swap(originalElementVal, V2[0]);
+        testing::ProcessTest("TensorReference::GetSlice() after modification", V2 == math::ColumnVector<ElementType>({ 0, 327, 338, 349, 360, 371, 382 }));
+        testing::ProcessTest("T(4, 0, 8) == 0", T(4, 0, 8) == 0);
+        std::swap(originalElementVal, V2[0]);
+
+        // T[4, 6, ...][0] = 0
+        auto V3 = math::GetSlice<math::Dimension::row>(T, 6, 8);
+        std::swap(originalElementVal, V3[0]);
+        testing::ProcessTest("TensorReference::GetSlice() after modification", V3 == math::ColumnVector<ElementType>({ 0, 151, 228, 305, 382 }));
+        testing::ProcessTest("T(0, 6, 8) == 0", T(0, 6, 8) == 0);
+        std::swap(originalElementVal, V3[0]);
+    };
+
+    vectorSliceTest(math::ChannelColumnRowTensor<ElementType>{});
+    vectorSliceTest(math::ColumnRowChannelTensor<ElementType>{});
 }
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
@@ -312,16 +368,16 @@ void TestTensorReferenceAsMatrix()
     auto N = S.ReferenceAsMatrix();
 
     math::RowMatrix<ElementType> R1
-    { 
+    {
         { 1, 2, 3, 4, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0 } 
+        { 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
     math::RowMatrix<ElementType> R2
     {
         { 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } 
+        { 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
     testing::ProcessTest("TensorReference::ReferenceAsMatrix", M == R1 && N == R2);

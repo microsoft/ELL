@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     Tensor.h (math)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
@@ -151,9 +151,13 @@ namespace math
         inline size_t GetChannelIndex() const { return _channelValue; }
     };
 
-    /// <summary> TensorSlicer is a helper class in lieu of the ability to specialize the GetSlice() function </summary>
+    /// <summary> TensorMatrixSlicer is a helper class in lieu of the ability to specialize the GetSlice() function </summary>
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, Dimension rowDimension, Dimension columnDimension>
-    struct TensorSlicer;
+    struct TensorMatrixSlicer;
+
+    /// <summary> TensorVectorSlicer is a helper class in lieu of the ability to specialize the GetSlice() function </summary>
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, Dimension vectorDimension>
+    struct TensorVectorSlicer;
 
     /// <summary>
     /// A const reference to a tensor. This class implements all the operations that do not modify tensor
@@ -166,7 +170,7 @@ namespace math
     /// <typeparam name="dimension1"> Identity of the tensor dimension with a minor memory increment. </typeparam>
     /// <typeparam name="dimension2"> Identity of the tensor dimension with a major memory increment. </typeparam>
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    class ConstTensorReference 
+    class ConstTensorReference
     {
     public:
         using TensorElementType = ElementType;
@@ -175,7 +179,7 @@ namespace math
         ///
         /// <param name="shape"> The tensor shape (always given in logical coordinates: row, column, channel). </param>
         ConstTensorReference(TensorShape shape);
-        
+
         /// <summary> Constructs an instance of ConstTensorReference. </summary>
         ///
         /// <param name="pData"> A pointer to the data to reference. </param>
@@ -249,15 +253,25 @@ namespace math
         const ElementType* GetConstDataPointer() const { return _pData; }
 
         /// <summary>
-        /// Gets the number of slices that can be returned by GetSlice.
+        /// Gets the number of 2D slices that can be returned by GetSlice.
         /// </summary>
         ///
         /// <typeparam name="rowDimension"> Which tensor dimension to use for the rows of the matrix. </typeparam>
         /// <typeparam name="columnDimension"> Which tensor dimension to use for the columns of the
         /// matrix. </typeparam>
         ///
-        /// <returns> The number of slices. </returns>
+        /// <returns> The number of 2D slices. </returns>
         template<Dimension rowDimension, Dimension columnDimension>
+        size_t NumSlices() const;
+
+        /// <summary>
+        /// Gets the number of 1D slices that can be returned by GetSlice.
+        /// </summary>
+        ///
+        /// <typeparam name="dimension"> Which tensor dimension to use for the slice. </typeparam>
+        ///
+        /// <returns> The number of 1D slices. </returns>
+        template<Dimension dimension>
         size_t NumSlices() const;
 
         /// <summary> Gets the number of primary slices. </summary>
@@ -375,14 +389,27 @@ namespace math
         ///
         /// <returns> The resulting slice. </returns>
         template<Dimension rowDimension, Dimension columnDimension>
-        auto GetSlice(size_t index) const -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::ConstSliceType;
+        auto GetSlice(size_t index) const -> typename TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::ConstSliceType;
+
+        /// <summary>
+        /// Gets a reference to a slice of the tensor. Note that the order of the indices is always
+        /// in the logical order (row, col, channel), despite the memory order layout of the tensor.
+        /// </summary>
+        ///
+        /// <typeparam name="dimension"> Which tensor dimension to use for the vector. </typeparam>
+        /// <param name="index1"> Slice index for the first dimension. </param>
+        /// <param name="index2"> Slice index for the second dimension. </param>
+        ///
+        /// <returns> The resulting slice. </returns>
+        template <Dimension dimension>
+        auto GetSlice(size_t index1, size_t index2) const -> typename TensorVectorSlicer<ElementType, dimension0, dimension1, dimension2, dimension>::ConstSliceType;
 
         /// <summary> Gets a slice of the tensor with repsect to its primary dimensions. </summary>
         ///
         /// <param name="index"> Slice index. </param>
         ///
         /// <returns> The primary slice. </returns>
-        auto GetPrimarySlice(size_t index) const -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::ConstSliceType;
+        auto GetPrimarySlice(size_t index) const -> typename TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::ConstSliceType;
 
         /// <summary> Flattens a tensor into a row vector. Works only when the tensor dimensions are full </summary>
         ///
@@ -411,34 +438,62 @@ namespace math
         size_t _increment2;
     };
 
-    /// <summary> Helper function to get the number of slices in a Tensor. </summary>
+    /// <summary> Helper function to get the number of 2D slices along a dimension of a tensor. </summary>
     ///
     /// <typeparam name="rowDimension"> Which tensor dimension to use for the rows of the matrix. </typeparam>
-    /// <typeparam name="columnDimension"> Which tensor dimension to use for the columns of the
+    /// <typeparam name="columnDimension"> Which tensor dimension to use for the columns of the matrix. </typeparam>
     /// <typeparam name="ElementType"> The element type. </typeparam>
     /// <typeparam name="dimension0"> Tensor dimension 0. </typeparam>
     /// <typeparam name="dimension1"> Tensor dimension 1. </typeparam>
     /// <typeparam name="dimension2"> Tensor dimension 2. </typeparam>
-    /// <param name="tensor"> The Tensor. </param>
+    /// <param name="tensor"> The tensor. </param>
     ///
-    /// <returns> The number slices. </returns>
+    /// <returns> The number of 2D slices. </returns>
     template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    size_t NumSlices(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
+
+    /// <summary> Helper function to get the number of 1D slices along two dimensions of a tensor. </summary>
+    ///
+    /// <typeparam name="dimension"> Which tensor dimension to use for the slice of the matrix. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension0"> Tensor dimension 0. </typeparam>
+    /// <typeparam name="dimension1"> Tensor dimension 1. </typeparam>
+    /// <typeparam name="dimension2"> Tensor dimension 2. </typeparam>
+    /// <param name="tensor"> The tensor. </param>
+    ///
+    /// <returns> The number of 1D slices. </returns>
+    template <Dimension dimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     size_t NumSlices(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
 
     /// <summary> Helper function to get a const tensor slice. </summary>
     ///
     /// <typeparam name="rowDimension"> Which tensor dimension to use for the rows of the matrix. </typeparam>
-    /// <typeparam name="columnDimension"> Which tensor dimension to use for the columns of the
+    /// <typeparam name="columnDimension"> Which tensor dimension to use for the columns of the matrix. </typeparam>
     /// <typeparam name="ElementType"> The element type. </typeparam>
     /// <typeparam name="dimension0"> Tensor dimension 0. </typeparam>
     /// <typeparam name="dimension1"> Tensor dimension 1. </typeparam>
     /// <typeparam name="dimension2"> Tensor dimension 2. </typeparam>
-    /// <param name="tensor"> The Tensor. </param>
+    /// <param name="tensor"> The tensor. </param>
     /// <param name="index"> Slice index </param>
     ///
     /// <returns> The requested slice. </returns>
     template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     auto GetSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index);
+
+    /// <summary> Helper function to get a const tensor slice. </summary>
+    ///
+    /// <typeparam name="dimension"> Which tensor dimension to use for the slice of the matrix. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension0"> Tensor dimension 0. </typeparam>
+    /// <typeparam name="dimension1"> Tensor dimension 1. </typeparam>
+    /// <typeparam name="dimension2"> Tensor dimension 2. </typeparam>
+    /// <param name="tensor"> The tensor. </param>
+    /// <param name="index1"> Slice index for the first dimension. </param>
+    /// <param name="index2"> Slice index for the second dimension. </param>
+    ///
+    /// <returns> The requested slice. </returns>
+    template <Dimension dimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    auto GetSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index1, size_t index2);
 
     /// <summary>
     /// A reference to a tensor. This class implements all the operations that modify tensor
@@ -606,14 +661,27 @@ namespace math
         ///
         /// <returns> The resulting slice. </returns>
         template<Dimension rowDimension, Dimension columnDimension>
-        auto GetSlice(size_t index) -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::SliceType;
+        auto GetSlice(size_t index) -> typename TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::SliceType;
+
+        /// <summary>
+        /// Gets a reference to a slice of the tensor. Note that the order of the indices is always
+        /// in the logical order (row, col, channel), despite the memory order layout of the tensor.
+        /// </summary>
+        ///
+        /// <typeparam name="dimension"> Which tensor dimension to use for the vector. </typeparam>
+        /// <param name="index1"> Slice index for the first dimension. </param>
+        /// <param name="index2"> Slice index for the second dimension. </param>
+        ///
+        /// <returns> The resulting slice. </returns>
+        template <Dimension dimension>
+        auto GetSlice(size_t index1, size_t index2) -> typename TensorVectorSlicer<ElementType, dimension0, dimension1, dimension2, dimension>::SliceType;
 
         /// <summary> Gets a slice of the tensor with repsect to its primary dimensions. </summary>
         ///
         /// <param name="index"> Slice index. </param>
         ///
         /// <returns> The primary slice. </returns>
-        auto GetPrimarySlice(size_t index) -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::SliceType;
+        auto GetPrimarySlice(size_t index) -> typename TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::SliceType;
 
         /// <summary> Flattens a tensor into a row vector. Works only when the tensor dimensions are full
         /// (namely, not a subtensor). </summary>
@@ -636,6 +704,62 @@ namespace math
     protected:
         TensorReference(ElementType* pData, TensorShape shape, size_t increment1, size_t increment2);
     };
+
+    /// <summary> Helper function to get the number of 2D slices along a dimension of a tensor. </summary>
+    ///
+    /// <typeparam name="rowDimension"> Which tensor dimension to use for the rows of the matrix. </typeparam>
+    /// <typeparam name="columnDimension"> Which tensor dimension to use for the columns of the matrix. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension0"> Tensor dimension 0. </typeparam>
+    /// <typeparam name="dimension1"> Tensor dimension 1. </typeparam>
+    /// <typeparam name="dimension2"> Tensor dimension 2. </typeparam>
+    /// <param name="tensor"> The tensor. </param>
+    ///
+    /// <returns> The number of 2D slices. </returns>
+    template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    size_t NumSlices(TensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
+
+    /// <summary> Helper function to get the number of 1D slices along two dimensions of a tensor. </summary>
+    ///
+    /// <typeparam name="dimension"> Which tensor dimension to use for the slice of the matrix. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension0"> Tensor dimension 0. </typeparam>
+    /// <typeparam name="dimension1"> Tensor dimension 1. </typeparam>
+    /// <typeparam name="dimension2"> Tensor dimension 2. </typeparam>
+    /// <param name="tensor"> The tensor. </param>
+    ///
+    /// <returns> The number of 1D slices. </returns>
+    template <Dimension dimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    size_t NumSlices(TensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
+
+    /// <summary> Helper function to get a tensor slice. </summary>
+    ///
+    /// <typeparam name="rowDimension"> Which tensor dimension to use for the rows of the matrix. </typeparam>
+    /// <typeparam name="columnDimension"> Which tensor dimension to use for the columns of the matrix. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension0"> Tensor dimension 0. </typeparam>
+    /// <typeparam name="dimension1"> Tensor dimension 1. </typeparam>
+    /// <typeparam name="dimension2"> Tensor dimension 2. </typeparam>
+    /// <param name="tensor"> The tensor. </param>
+    /// <param name="index"> Slice index </param>
+    ///
+    /// <returns> The requested slice. </returns>
+    template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    auto GetSlice(TensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index);
+
+    /// <summary> Helper function to get a tensor slice. </summary>
+    ///
+    /// <typeparam name="dimension"> Which tensor dimension to use for the slice of the matrix. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="dimension0"> Tensor dimension 0. </typeparam>
+    /// <typeparam name="dimension1"> Tensor dimension 1. </typeparam>
+    /// <typeparam name="dimension2"> Tensor dimension 2. </typeparam>
+    /// <param name="tensor"> The tensor. </param>
+    /// <param name="index"> Slice index </param>
+    ///
+    /// <returns> The requested slice. </returns>
+    template <Dimension dimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    auto GetSlice(TensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index1, size_t index2);
 
     /// <summary> Implements a tensor that owns its own memory. </summary>
     ///

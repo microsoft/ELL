@@ -19,7 +19,7 @@ namespace ell
 namespace math
 {
     namespace Blas
-    {   
+    {
         int GetCBlasMatrixOrder(MatrixLayout order)
         {
             switch (order) {
@@ -27,7 +27,7 @@ namespace math
 #if USE_BLAS
                 return CBLAS_ORDER::CblasRowMajor;
 #else
-                // We still want to be able to generate code for another platform (like Raspberry Pi) that can use OpenBlas
+                // We still want to be able to generate code for another platform (like Raspberry Pi) that can use OpenBLAS
                 // even the the machine we are building on doesn't have cblas.h.
                 return 101;
 #endif
@@ -136,7 +136,7 @@ namespace math
         {
             cblas_sger(static_cast<CBLAS_ORDER>(GetCBlasMatrixOrder(order)), m, n, alpha, x, incx, y, incy, M, lda);
         }
-        
+
         void Ger(MatrixLayout order, int m, int n, double alpha, const double* x, int incx, const double* y, int incy, double* M, int lda)
         {
             cblas_dger(static_cast<CBLAS_ORDER>(GetCBlasMatrixOrder(order)), m, n, alpha, x, incx, y, incy, M, lda);

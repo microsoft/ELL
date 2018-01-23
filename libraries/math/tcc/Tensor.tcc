@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     Tensor.tcc (math)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -14,15 +14,14 @@ namespace ell
 namespace math
 {
     //
-    // TensorSlicers
+    // TensorMatrixSlicers
     //
 
-    /// <summary> TensorSlicer is a helper class in lieu of the ability to specialize the GetSlice() function </summary>
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, Dimension rowDimension, Dimension columnDimension>
-    struct TensorSlicer;
+    struct TensorMatrixSlicer;
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>
+    struct TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>
     {
         using SliceType = ColumnMatrixReference<ElementType>;
         using ConstSliceType = ConstColumnMatrixReference<ElementType>;
@@ -48,7 +47,7 @@ namespace math
     };
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension2>
+    struct TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension2>
     {
         using SliceType = ColumnMatrixReference<ElementType>;
         using ConstSliceType = ConstColumnMatrixReference<ElementType>;
@@ -61,6 +60,7 @@ namespace math
         static ConstSliceType GetConstSlice(const ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index)
         {
             DEBUG_THROW(index >= NumSlices(shape), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+
             return ConstSliceType(pData + index * increment1, shape.GetValue<dimension0>(), shape.GetValue<dimension2>(), increment2);
         }
 
@@ -73,7 +73,7 @@ namespace math
     };
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension1, dimension0>
+    struct TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, dimension1, dimension0>
     {
         using SliceType = RowMatrixReference<ElementType>;
         using ConstSliceType = ConstRowMatrixReference<ElementType>;
@@ -99,7 +99,7 @@ namespace math
     };
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension2, dimension0>
+    struct TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, dimension2, dimension0>
     {
         using SliceType = RowMatrixReference<ElementType>;
         using ConstSliceType = ConstRowMatrixReference<ElementType>;
@@ -121,6 +121,127 @@ namespace math
             DEBUG_THROW(index >= NumSlices(shape), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
 
             return SliceType(pData + index * increment1, shape.GetValue<dimension2>(), shape.GetValue<dimension0>(), increment2);
+        }
+    };
+
+    //
+    // TensorVectorSlicers
+    //
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, Dimension vectorDimension>
+    struct TensorVectorSlicer;
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    struct TensorVectorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0>
+    {
+        using SliceType = ColumnVectorReference<ElementType>;
+        using ConstSliceType = ConstColumnVectorReference<ElementType>;
+
+        static inline size_t NumSlices(TensorShape shape)
+        {
+            return shape.GetValue<dimension1>() * shape.GetValue<dimension2>();
+        }
+
+        static ConstSliceType GetConstSlice(const ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
+        {
+            if /*constexpr*/ (dimension1 > dimension2)
+            {
+                std::swap(index1, index2);
+            }
+
+            DEBUG_THROW(index1 >= shape.GetValue<dimension1>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index1 exceeds tensor dimensions."));
+            DEBUG_THROW(index2 >= shape.GetValue<dimension2>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index2 exceeds tensor dimensions."));
+
+            return ConstSliceType(pData + index1 * increment1 + index2 * increment2, shape.GetValue<dimension0>(), 1);
+        }
+
+        static SliceType GetSlice(ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
+        {
+            if /*contexpr*/ (dimension1 > dimension2)
+            {
+                std::swap(index1, index2);
+            }
+
+            DEBUG_THROW(index1 >= shape.GetValue<dimension1>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index1 exceeds tensor dimensions."));
+            DEBUG_THROW(index2 >= shape.GetValue<dimension2>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index2 exceeds tensor dimensions."));
+
+            return SliceType(pData + index1 * increment1 + index2 * increment2, shape.GetValue<dimension0>(), 1);
+        }
+    };
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    struct TensorVectorSlicer<ElementType, dimension0, dimension1, dimension2, dimension1>
+    {
+        using SliceType = ColumnVectorReference<ElementType>;
+        using ConstSliceType = ConstColumnVectorReference<ElementType>;
+
+        static inline size_t NumSlices(TensorShape shape)
+        {
+            return shape.GetValue<dimension0>() * shape.GetValue<dimension2>();
+        }
+
+        static ConstSliceType GetConstSlice(const ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
+        {
+            if /*constexpr*/ (dimension0 > dimension2)
+            {
+                std::swap(index1, index2);
+            }
+
+            DEBUG_THROW(index1 >= shape.GetValue<dimension0>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index1 exceeds tensor dimensions."));
+            DEBUG_THROW(index2 >= shape.GetValue<dimension2>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index2 exceeds tensor dimensions."));
+
+            return ConstSliceType(pData + index1 + index2 * increment2, shape.GetValue<dimension1>(), increment1);
+        }
+
+        static SliceType GetSlice(ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
+        {
+            if /*constexpr*/ (dimension0 > dimension2)
+            {
+                std::swap(index1, index2);
+            }
+
+            DEBUG_THROW(index1 >= shape.GetValue<dimension0>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index1 exceeds tensor dimensions."));
+            DEBUG_THROW(index2 >= shape.GetValue<dimension2>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index2 exceeds tensor dimensions."));
+
+            return SliceType(pData + index1 + index2 * increment2, shape.GetValue<dimension1>(), increment1);
+        }
+    };
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    struct TensorVectorSlicer<ElementType, dimension0, dimension1, dimension2, dimension2>
+    {
+        using SliceType = ColumnVectorReference<ElementType>;
+        using ConstSliceType = ConstColumnVectorReference<ElementType>;
+
+        static inline size_t NumSlices(TensorShape shape)
+        {
+            return shape.GetValue<dimension0>() * shape.GetValue<dimension1>();
+        }
+
+        static ConstSliceType GetConstSlice(const ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
+        {
+            if /*constexpr*/ (dimension0 > dimension1)
+            {
+                std::swap(index1, index2);
+            }
+
+            DEBUG_THROW(index1 >= shape.GetValue<dimension0>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index1 exceeds tensor dimensions."));
+            DEBUG_THROW(index2 >= shape.GetValue<dimension1>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index2 exceeds tensor dimensions."));
+
+            return ConstSliceType(pData + index1 + index2 * increment1, shape.GetValue<dimension2>(), increment2);
+        }
+
+        static SliceType GetSlice(ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
+        {
+            if /*constexpr*/ (dimension0 > dimension1)
+            {
+                std::swap(index1, index2);
+            }
+
+            DEBUG_THROW(index1 >= shape.GetValue<dimension0>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index1 exceeds tensor dimensions."));
+            DEBUG_THROW(index2 >= shape.GetValue<dimension1>(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index2 exceeds tensor dimensions."));
+
+            return SliceType(pData + index1 + index2 * increment1, shape.GetValue<dimension2>(), increment2);
         }
     };
 
@@ -152,7 +273,14 @@ namespace math
     template<Dimension rowDimension, Dimension columnDimension>
     size_t ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::NumSlices() const
     {
-        return TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::NumSlices(_shape);
+        return TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::NumSlices(_shape);
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template<Dimension dimension>
+    size_t ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::NumSlices() const
+    {
+        return TensorVectorSlicer<ElementType, dimension0, dimension1, dimension2, dimension>::NumSlices(_shape);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
@@ -271,15 +399,22 @@ namespace math
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     template <Dimension rowDimension, Dimension columnDimension>
-    auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index) const -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::ConstSliceType
+    auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index) const -> typename TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::ConstSliceType
     {
-        return TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::GetConstSlice(GetConstDataPointer(), GetShape(), GetIncrement1(), GetIncrement2(), index);
+        return TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::GetConstSlice(GetConstDataPointer(), GetShape(), GetIncrement1(), GetIncrement2(), index);
+    }
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <Dimension dimension>
+    auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index1, size_t index2) const -> typename TensorVectorSlicer<ElementType, dimension0, dimension1, dimension2, dimension>::ConstSliceType
+    {
+        return TensorVectorSlicer<ElementType, dimension0, dimension1, dimension2, dimension>::GetConstSlice(GetConstDataPointer(), GetShape(), GetIncrement1(), GetIncrement2(), index1, index2);
     }
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2> // pData -> GetDataPointer
-    auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetPrimarySlice(size_t index) const -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::ConstSliceType
+    auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetPrimarySlice(size_t index) const -> typename TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::ConstSliceType
     {
-        return TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::GetConstSlice(GetConstDataPointer(), GetShape(), GetIncrement1(), GetIncrement2(), index);
+        return TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::GetConstSlice(GetConstDataPointer(), GetShape(), GetIncrement1(), GetIncrement2(), index);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
@@ -301,7 +436,7 @@ namespace math
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     size_t ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetOffset(TensorCoordinate coordinate) const
     {
-        DEBUG_THROW(coordinate.GetRowIndex() >= NumRows() || coordinate.GetColumnIndex() >= NumColumns() || coordinate.GetChannelIndex() >= NumChannels(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, 
+        DEBUG_THROW(coordinate.GetRowIndex() >= NumRows() || coordinate.GetColumnIndex() >= NumColumns() || coordinate.GetChannelIndex() >= NumChannels(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange,
             std::string("index exceeds tensor size in ConstTensorReference::GetOffset().") +
             " Tensor size: (" + std::to_string(NumRows()) + " x " + std::to_string(NumColumns()) + " x " + std::to_string(NumChannels()) + "), "
             " index: (" + std::to_string(coordinate.GetRowIndex()) + ", " + std::to_string(coordinate.GetColumnIndex()) + ", " + std::to_string(coordinate.GetChannelIndex()) + ")" ));
@@ -320,10 +455,22 @@ namespace math
         return tensor.template NumSlices<rowDimension, columnDimension>();
     }
 
+    template <Dimension dimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    size_t NumSlices(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor)
+    {
+        return tensor.template NumSlices<dimension>();
+    }
+
     template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     auto GetSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index)
     {
         return tensor.template GetSlice<rowDimension, columnDimension>(index);
+    }
+
+    template <Dimension dimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    auto GetSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index1, size_t index2)
+    {
+        return tensor.template GetSlice<dimension>(index1, index2);
     }
 
     //
@@ -360,7 +507,7 @@ namespace math
         DEBUG_CHECK_SIZES(this->NumColumns() != other.NumColumns(), "Tensors must have the same number of columns");
         DEBUG_CHECK_SIZES(this->NumChannels() != other.NumChannels(), "Tensors must have the same number of channels");
 
-        for (size_t i = 0; i < this->NumPrimarySlices(); ++i) 
+        for (size_t i = 0; i < this->NumPrimarySlices(); ++i)
         {
             auto slice = other.GetPrimarySlice(i);
             GetPrimarySlice(i).CopyFrom(slice);
@@ -444,15 +591,22 @@ namespace math
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     template<Dimension rowDimension, Dimension columnDimension>
-    auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index) -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::SliceType
+    auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index) -> typename TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::SliceType
     {
-        return TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::GetSlice(GetDataPointer(), this->GetShape(), this->GetIncrement1(), this->GetIncrement2(), index);
+        return TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::GetSlice(GetDataPointer(), this->GetShape(), this->GetIncrement1(), this->GetIncrement2(), index);
+    }
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <Dimension dimension>
+    auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index1, size_t index2) -> typename TensorVectorSlicer<ElementType, dimension0, dimension1, dimension2, dimension>::SliceType
+    {
+        return TensorVectorSlicer<ElementType, dimension0, dimension1, dimension2, dimension>::GetSlice(GetDataPointer(), this->GetShape(), this->GetIncrement1(), this->GetIncrement2(), index1, index2);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetPrimarySlice(size_t index) -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::SliceType
+    auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetPrimarySlice(size_t index) -> typename TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::SliceType
     {
-        return TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::GetSlice(GetDataPointer(), this->GetShape(), this->GetIncrement1(), this->GetIncrement2(), index);
+        return TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::GetSlice(GetDataPointer(), this->GetShape(), this->GetIncrement1(), this->GetIncrement2(), index);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
@@ -475,6 +629,30 @@ namespace math
     TensorReference<ElementType, dimension0, dimension1, dimension2>::TensorReference(ElementType* pData, TensorShape shape, size_t increment1, size_t increment2)
         : ConstTensorRef(pData, shape, increment1, increment2)
     {}
+
+    template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    size_t NumSlices(TensorReference<ElementType, dimension0, dimension1, dimension2> tensor)
+    {
+        return tensor.template NumSlices<rowDimension, columnDimension>();
+    }
+
+    template <Dimension dimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    size_t NumSlices(TensorReference<ElementType, dimension0, dimension1, dimension2> tensor)
+    {
+        return tensor.template NumSlices<dimension>();
+    }
+
+    template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    auto GetSlice(TensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index)
+    {
+        return tensor.template GetSlice<rowDimension, columnDimension>(index);
+    }
+
+    template <Dimension dimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    auto GetSlice(TensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index1, size_t index2)
+    {
+        return tensor.template GetSlice<dimension>(index1, index2);
+    }
 
     //
     // Tensor

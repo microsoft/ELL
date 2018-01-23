@@ -115,7 +115,7 @@ namespace math
         /// <summary> Computes the squared 2-norm of the vector </summary>
         ///
         /// <returns> The squared norm. </returns>
-        ElementType Norm2Squared() const; 
+        ElementType Norm2Squared() const;
 
         /// @}
 
@@ -281,7 +281,7 @@ namespace math
         void Generate(GeneratorType generator);
 
         /// <summary>
-        /// Applies an inplace transformation to each of the vector elements. 
+        /// Applies an inplace transformation to each of the vector elements.
         /// </summary>
         ///
         /// <typeparam name="TransformationType"> Type of lambda or functor to use as a transformation. </typeparam>
@@ -339,7 +339,7 @@ namespace math
 
         /// <summary> Constructs a vector from an initializer list. </summary>
         ///
-        /// <param name="list"> The initalizer list. </param>
+        /// <param name="list"> The initializer list. </param>
         Vector(std::initializer_list<ElementType> list);
 
         /// <summary> Move Constructor. </summary>
@@ -386,13 +386,13 @@ namespace math
 
         template <typename T, VectorOrientation o>
         friend auto begin(Vector<T, o>& vector) -> utilities::StlStridedIterator<typename std::vector<T>::iterator>;
-        
+
         template <typename T, VectorOrientation o>
         friend auto end(Vector<T, o>& vector) -> utilities::StlStridedIterator<typename std::vector<T>::iterator>;
 
         template <typename T, VectorOrientation o>
         friend auto begin(const Vector<T, o>& vector) -> utilities::StlStridedIterator<typename std::vector<T>::const_iterator>;
-        
+
         template <typename T, VectorOrientation o>
         friend auto end(const Vector<T, o>& vector) -> utilities::StlStridedIterator<typename std::vector<T>::const_iterator>;
 

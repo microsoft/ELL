@@ -19,12 +19,12 @@ namespace math
 {
     namespace Blas
     {
-        /// <summary> Map the given enum value to OpenBlas's definition of CBLAS_ORDER.</summary>
+        /// <summary> Map the given enum value to OpenBLAS's definition of CBLAS_ORDER.</summary>
         ///
         /// <param name="order">The ELL definition of MatrixLayout to be mapped. </param>
         int GetCBlasMatrixOrder(MatrixLayout order);
 
-        /// <summary> Map the given enum value to OpenBlas's definition of CBLAS_TRANSPOSE.</summary>
+        /// <summary> Map the given enum value to OpenBLAS's definition of CBLAS_TRANSPOSE.</summary>
         ///
         /// <param name="order">The ELL definition of MatrixTranspose to be mapped. </param>
         int GetCBlasMatrixTranspose(MatrixTranspose transpose);
@@ -129,7 +129,7 @@ namespace math
         void Ger(MatrixLayout order, int m, int n, float alpha, const float* x, int incx, const float* y, int incy, float* M, int lda);
         void Ger(MatrixLayout order, int m, int n, double alpha, const double* x, int incx, const double* y, int incy, double* M, int lda);
         /// @}
-        
+
         /// @{
         /// <summary> Wraps the BLAS GEMV function, which implements generalized matrix vector multiplication, y = alpha*M*x + beta*y. </summary>
         ///

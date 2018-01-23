@@ -395,7 +395,7 @@ namespace math
     ///
     /// <typeparam name="ElementType"> The element type. </typeparam>
     /// <typeparam name="orientation"> The vector orientation. </typeparam>
-    /// <param name="transformation"> The elementwose transformation. </param>
+    /// <param name="transformation"> The elementwise transformation. </param>
     /// <param name="vector"> The vector. </param>
     template <typename ElementType, VectorOrientation orientation, typename TransformationType>
     void TransformUpdate(TransformationType transformation, VectorReference<ElementType, orientation> vector);
@@ -404,7 +404,7 @@ namespace math
     ///
     /// <typeparam name="ElementType"> The element type. </typeparam>
     /// <typeparam name="orientation"> The vector orientation. </typeparam>
-    /// <param name="transformation"> The elementwose transformation. </param>
+    /// <param name="transformation"> The elementwise transformation. </param>
     /// <param name="vector"> The input vector, whose elements are the input of the transformation. </param>
     /// <param name="output"> The output vector. </param>
     template <typename ElementType, VectorOrientation orientation, typename TransformationType>
@@ -414,7 +414,7 @@ namespace math
     ///
     /// <typeparam name="ElementType"> The element type. </typeparam>
     /// <typeparam name="orientation"> The vector orientation. </typeparam>
-    /// <param name="transformation"> The elementwose transformation. </param>
+    /// <param name="transformation"> The elementwise transformation. </param>
     /// <param name="vectorA"> The input vector, whose elements are the input of the transformation. </param>
     /// <param name="vectorB"> The output vector. </param>
     template <typename ElementType, VectorOrientation orientation, typename TransformationType>
@@ -498,7 +498,7 @@ namespace math
         template<>
         struct VectorOperations<ImplementationType::openBlas>
         {
-            static std::string GetImplementationName() { return "OpenBlas"; }
+            static std::string GetImplementationName() { return "OpenBLAS"; }
 
             template <typename ElementType>
             static void InnerProduct(ConstRowVectorReference<ElementType> vectorA, ConstColumnVectorReference<ElementType> vectorB, ElementType& result);
