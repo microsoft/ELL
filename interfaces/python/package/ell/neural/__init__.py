@@ -6,12 +6,13 @@
 ELL neural network classes
 """
 
-from ..ell_py import ActivationType,\
-BinaryConvolutionMethod,\
+from ..ell_py import \
+ActivationType,\
 BinaryConvolutionalParameters,\
+BinaryConvolutionMethod,\
 BinaryWeightsScale,\
-ConvolutionMethod,\
 ConvolutionalParameters,\
+ConvolutionMethod,\
 DoubleActivationLayer,\
 DoubleBatchNormalizationLayer,\
 DoubleBiasLayer,\
@@ -23,8 +24,9 @@ DoubleLayer,\
 DoubleLayerVector,\
 DoubleLSTMLayer,\
 DoubleNeuralNetworkPredictor,\
-DoublePReLUActivationLayer,\
 DoublePoolingLayer,\
+DoublePReLUActivationLayer,\
+DoubleRegionDetectionLayer,\
 DoubleScalingLayer,\
 DoubleSoftmaxLayer,\
 EpsilonSummand,\
@@ -39,8 +41,9 @@ FloatLayer,\
 FloatLayerVector,\
 FloatLSTMLayer,\
 FloatNeuralNetworkPredictor,\
-FloatPReLUActivationLayer,\
 FloatPoolingLayer,\
+FloatPReLUActivationLayer,\
+FloatRegionDetectionLayer,\
 FloatScalingLayer,\
 FloatSoftmaxLayer,\
 HasPadding,\

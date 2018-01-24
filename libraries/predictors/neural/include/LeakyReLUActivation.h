@@ -25,21 +25,28 @@ namespace neural
     class LeakyReLUActivation
     {
     public:
-        /// <summary> Instantiates an instance of this class with appropriate leaky factor. 
+        /// <summary> Instantiates an instance of this class with appropriate leaky factor.
         /// Typical values are 0.1 and 0.01.
         /// </summary>
         ///
         /// <param name="leakyFactor"> The value to multiply the input by if it is less than zero. </param>
         LeakyReLUActivation(ElementType leakyFactor = static_cast<ElementType>(0.1)) : _leakyFactor(leakyFactor) {}
 
-        /// <summary> Sets the output as a function of the input. </summary>
+        /// <summary> Returns the output as a function of the input. </summary>
+        ///
+        /// <param name="input"> The input value. </param>
+        ///
+        /// <returns> The computed output. </param>
+        ElementType operator()(const ElementType input) const;
+
+        /// <summary> Returns the output as a function of the input. </summary>
         ///
         /// <param name="input"> The input value. </param>
         ///
         /// <returns> The computed output. </param>
         ElementType Apply(const ElementType input) const;
 
-        /// <summary> Sets the output as a function of the input. </summary>
+        /// <summary> Returns the output as a function of the input. </summary>
         ///
         /// <param name="input"> The input value. </param>
         /// <param name="index"> The input index. </param>

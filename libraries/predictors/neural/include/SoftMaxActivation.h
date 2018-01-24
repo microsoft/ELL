@@ -29,7 +29,12 @@ namespace neural
         /// <summary> Applies the activation to the input vector in-place. </summary>
         ///
         /// <param name="input"> The input value. </param>
-        void Apply(math::ColumnVector<ElementType>& input) const;
+        void operator()(math::ColumnVectorReference<ElementType>& input) const;
+
+        /// <summary> Applies the activation to the input vector in-place. </summary>
+        ///
+        /// <param name="input"> The input value. </param>
+        void Apply(math::ColumnVectorReference<ElementType>& input) const;
 
         /// <summary> Typename used for serialization. </summary>
         /// Note: In the future, this will change to include the templated element type

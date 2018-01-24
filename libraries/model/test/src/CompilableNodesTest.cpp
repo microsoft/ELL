@@ -57,6 +57,7 @@
 #include "PoolingLayerNode.h"
 #include "ReceptiveFieldMatrixNode.h"
 #include "RecurrentLayerNode.h"
+#include "RegionDetectionLayerNode.h"
 #include "ReorderDataNode.h"
 #include "SinkNode.h"
 #include "SoftmaxLayerNode.h"
@@ -1057,7 +1058,7 @@ void TestCompilableClockNode()
     auto getTicksFunction = reinterpret_cast<GetTicksUntilNextInterval*>(jitter.ResolveFunctionAddress("Test_GetTicksUntilNextInterval"));
 
     // compare output
-    std::vector<std::vector<nodes::TimeTickType>> signal = 
+    std::vector<std::vector<nodes::TimeTickType>> signal =
     {
         { start },
         { start + interval*1 + lagThreshold/2 }, // within threshold
@@ -2626,7 +2627,8 @@ void TestGRUNode()
     GRUParameters<ElementType> gruParams{ updateWeights, resetWeights, hiddenWeights, updateBias, resetBias, hiddenBias };
     GRULayer<ElementType, TanhActivation, SigmoidActivation> gru(parameters, gruParams);
     gru.Compute();
-    TensorType output = gru.GetOutput();
+    auto output = gru.GetOutput();
+    UNUSED(output);
     gru.Reset();
 
     // Create model
@@ -2712,7 +2714,8 @@ void TestLSTMNode()
 
     LSTMLayer<ElementType, TanhActivation, SigmoidActivation> lstm(parameters, lstmParams);
     lstm.Compute();
-    TensorType output = lstm.GetOutput();
+    auto output = lstm.GetOutput();
+    UNUSED(output);
     lstm.Reset();
 
     // Create model
@@ -2730,4 +2733,93 @@ void TestLSTMNode()
     // compare computed vs. compiled output
     std::vector<std::vector<ElementType>> signal = { input.ToArray() };
     VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
+}
+
+void TestRegionDetectionNode()
+{
+    using ElementType = double;
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+
+    // Input created by running
+    // ./darknet detector test cfg/voc.data cfg/tiny-yolo-voc.cfg tiny-yolo-voc.weights data/dog.jpg
+    // from commit 80d9bec20f0a44ab07616215c6eadb2d633492fe in https://github.com/pjreddie/darknet
+    // setting a breakpoint in src/region_layer.c:162, and dumping the contents of l.output to a file,
+    // using gdb:
+    // dump binary memory data.bin l.output (l.output + l.outputs * l.batch)
+    // loading the contents of said file in numpy, followed by reordering and reshaping into a 13x13x125 tensor
+    // raw_data = np.fromfile('./data.bin', dtype=np.float32)
+    // data = np.zeros(13, 13, 125)
+    // for i, j, k in itertools.product(range(13), range(13), range(125)):
+    //    data[i, j, ...] = raw_data[k * 13 * 13 : (k + 1) * 13 * 13]
+    // data = data.reshape(13, 13, 125)
+    // Creating the brace-formatted output for C++ requires the following snippet:
+    // s = '{'
+    // for i in range(13):
+    //     s += '\n{'
+    //     for j in range(13):
+    //         s += '\n{' + ', '.join(np.char.mod('%f', data[i, j, ...])) + '},'
+    //     s += '\n},'
+    // s += '\n}'
+    // with open('data.inc', 'w') as f: f.write(s)
+    // clang-format off
+    TensorType input =
+    {
+        #include "TestRegionDetectionNode_input.inc"
+    };
+    // clang-format on
+    testing::ProcessTest("Verifying input dimensions", testing::IsEqual(input.GetShape(), math::TensorShape{13, 13, 125}));
+
+    // Expected output created by running the following operation for every 1D slice in aforementioned
+    // input in the channel dimension in numpy:
+    // for c in range(5):
+    //   boxOffset = c * 25
+    //   expected[boxOffset + 0] = sigmoid(input[boxOffset + 0])
+    //   expected[boxOffset + 1] = sigmoid(input[boxOffset + 1])
+    //   expected[boxOffset + 2] = math.exp(input[boxOffset + 2])
+    //   expected[boxOffset + 3] = math.exp(input[boxOffset + 3])
+    //   expected[boxOffset + 4] = sigmoid(input[boxOffset + 4])
+    //   expected[boxOffset + 5 : boxOffset + 5 + 20] = softmax(input[boxOffset + 5 : boxOffset + 5 + 20])
+    // clang-format off
+    TensorType expectedOutput =
+    {
+        #include "TestRegionDetectionNode_expectedOutput.inc"
+    };
+    // clang-format on
+    testing::ProcessTest("Verifying expected output dimensions", testing::IsEqual(expectedOutput.GetShape(), math::TensorShape{13, 13, 125}));
+
+    Shape outputShape = { 13, 13, 125 };
+    LayerParameters layerParams{ input, NoPadding(), outputShape, NoPadding() };
+
+    RegionDetectionParameters detectionParams{ 13, 13, 5, 20, 4 };
+
+    RegionDetectionLayer<ElementType> detectionLayer(layerParams, detectionParams);
+    detectionLayer.Compute();
+    auto output = detectionLayer.GetOutput();
+    testing::ProcessTest("Layer output == expectedOutput", testing::IsEqual(output.ToArray(), expectedOutput.ToArray(), 1e-5));
+
+     // Create model
+     model::Model model;
+     auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+     auto computeNode = model.AddNode<nodes::RegionDetectionLayerNode<ElementType>>(inputNode->output, detectionLayer);
+     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+     // Make a copy to ensure remaining tests aren't affected
+     auto mapCopy = map;
+     mapCopy.SetInputValue(0, input.ToArray());
+     auto mapOutput = mapCopy.ComputeOutput<ElementType>(0);
+     testing::ProcessTest("Map output == expectedOutput", testing::IsEqual(mapOutput, expectedOutput.ToArray(), 1e-5));
+
+     // Compile model
+     model::MapCompilerParameters settings;
+     settings.compilerSettings.useBlas = true;
+     model::IRMapCompiler compiler(settings);
+     auto compiledMap = compiler.Compile(map);
+
+     // compare computed vs. compiled output
+     std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+     VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName(), 1e-5);
 }

@@ -17,7 +17,7 @@ namespace predictors
 namespace neural
 {
     template <typename ElementType>
-    void SoftMaxActivation<ElementType>::Apply(math::ColumnVector<ElementType>& input) const
+    void SoftMaxActivation<ElementType>::Apply(math::ColumnVectorReference<ElementType>& input) const
     {
         ElementType maxVal = std::numeric_limits<ElementType>::lowest();
         for (size_t i = 0; i < input.Size(); ++i)
@@ -33,13 +33,19 @@ namespace neural
             sum += eulerVal;
         }
 
-        const ElementType epsilon = 1e-7;
+        const ElementType epsilon = static_cast<ElementType>(1e-7);
         if (sum < epsilon)
         {
             sum = 1.0;
         }
-        
+
         input.Transform([sum](ElementType value){ return value / sum; });
+    }
+
+    template <typename ElementType>
+    void SoftMaxActivation<ElementType>::operator()(math::ColumnVectorReference<ElementType>& input) const
+    {
+        return Apply(input);
     }
 }
 }

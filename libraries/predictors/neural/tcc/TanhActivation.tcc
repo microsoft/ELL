@@ -19,6 +19,12 @@ namespace neural
     }
 
     template <typename ElementType>
+    ElementType TanhActivation<ElementType>::operator()(const ElementType input) const
+    {
+        return Apply(input);
+    }
+
+    template <typename ElementType>
     ElementType TanhActivation<ElementType>::Apply(const ElementType input, const math::IntegerTriplet&) const
     {
         return Apply(input);

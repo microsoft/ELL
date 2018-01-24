@@ -4,7 +4,7 @@
 
 set(library_name nodes)
 
-set(src 
+set(src
     src/ActivationLayerNode.cpp
     src/BatchNormalizationLayerNode.cpp
     src/BiasLayerNode.cpp
@@ -24,16 +24,17 @@ set(src
     src/LSTMLayerNode.cpp
     src/MatrixMatrixMultiplyNode.cpp
     src/MatrixVectorMultiplyNode.cpp
-    src/ProtoNNPredictorNode.cpp
     src/NeuralNetworkPredictorNode.cpp
     src/PoolingLayerNode.cpp
+    src/ProtoNNPredictorNode.cpp
     src/RecurrentLayerNode.cpp
+    src/RegionDetectionLayerNode.cpp
     src/ScalingLayerNode.cpp
     src/SingleElementThresholdNode.cpp
     src/SoftmaxLayerNode.cpp
 )
-  
-set(include 
+
+set(include
     include/AccumulatorNode.h
     include/ActivationLayerNode.h
     include/BatchNormalizationLayerNode.h
@@ -54,7 +55,6 @@ set(include
     include/DemultiplexerNode.h
     include/DiagonalConvolutionNode.h
     include/DotProductNode.h
-    include/DTWDistanceNode.h
     include/ExtremalValueNode.h
     include/FFTNode.h
     include/FilterBankNode.h
@@ -64,13 +64,13 @@ set(include
     include/HammingWindowNode.h
     include/IIRFilterNode.h
     include/IRNode.h
-    include/LinearPredictorNode.h
-    include/LSTMLayerNode.h
     include/L2NormSquaredNode.h
-    include/MovingAverageNode.h
+    include/LSTMLayerNode.h
+    include/LinearPredictorNode.h
     include/MatrixMatrixMultiplyNode.h
     include/MatrixVectorMultiplyNode.h
     include/MatrixVectorProductNode.h
+    include/MovingAverageNode.h
     include/MovingVarianceNode.h
     include/MultiplexerNode.h
     include/NeuralNetworkLayerNode.h
@@ -79,6 +79,7 @@ set(include
     include/ProtoNNPredictorNode.h
     include/ReceptiveFieldMatrixNode.h
     include/RecurrentLayerNode.h
+    include/RegionDetectionLayerNode.h
     include/ReorderDataNode.h
     include/ScalingLayerNode.h
     include/SingleElementThresholdNode.h
@@ -92,7 +93,7 @@ set(include
     include/ValueSelectorNode.h
 )
 
-set (tcc 
+set (tcc
     tcc/AccumulatorNode.tcc
     tcc/BinaryFunctionNode.tcc
     tcc/BinaryOperationNode.tcc
@@ -100,11 +101,11 @@ set (tcc
     tcc/BroadcastFunctionNode.tcc
     tcc/BufferNode.tcc
     tcc/ConstantNode.tcc
+    tcc/DTWDistanceNode.tcc
     tcc/DebugSinkNode.tcc
     tcc/DelayNode.tcc
     tcc/DemultiplexerNode.tcc
     tcc/DotProductNode.tcc
-    tcc/DTWDistanceNode.tcc
     tcc/ExtremalValueNode.tcc
     tcc/ForestPredictorNode.tcc
     tcc/HammingWindowNode.tcc
@@ -115,17 +116,16 @@ set (tcc
     tcc/MovingVarianceNode.tcc
     tcc/MultiplexerNode.tcc
     tcc/NeuralNetworkLayerNode.tcc
-    tcc/NeuralNetworkPredictorNode.tcc         
+    tcc/NeuralNetworkPredictorNode.tcc
     tcc/ReceptiveFieldMatrixNode.tcc
     tcc/ReorderDataNode.tcc
     tcc/SinkNode.tcc
     tcc/SourceNode.tcc
+    tcc/SquaredEuclideanDistanceNode.tcc
     tcc/SumNode.tcc
     tcc/TypeCastNode.tcc
     tcc/UnaryOperationNode.tcc
     tcc/ValueSelectorNode.tcc
-    tcc/SourceNode.tcc
-    tcc/SquaredEuclideanDistanceNode.tcc
 )
 
 source_group("src" FILES ${src})

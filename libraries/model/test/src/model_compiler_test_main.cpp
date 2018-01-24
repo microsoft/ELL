@@ -191,6 +191,8 @@ void TestIRCompiler()
     TestGRUNode();
     TestLSTMNode();
 
+    TestRegionDetectionNode();
+
     TestMatrixVectorProductNodeCompile();
 }
 

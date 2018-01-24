@@ -49,10 +49,13 @@ namespace emitters
         IRIfEmitter(IRFunctionEmitter& functionEmitter, TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue);
 
         IRIfEmitter(const IRIfEmitter&) = delete;
-        IRIfEmitter(IRIfEmitter&&) = default;
-
         IRIfEmitter& operator=(const IRIfEmitter&) = delete;
-        IRIfEmitter& operator=(IRIfEmitter&&) = default;
+
+        /// <summary> Move constructor </summary>
+        IRIfEmitter(IRIfEmitter&& other);
+
+        /// <summary> Move assignment operator </summary>
+        IRIfEmitter& operator=(IRIfEmitter&& other);
 
         /// <summary> Destructor </summary>
         ~IRIfEmitter();
@@ -164,12 +167,12 @@ namespace emitters
         void EndPrev();
 
         llvm::BasicBlock* GetParentBlock();
-        IRFunctionEmitter& _functionEmitter; // Function we are emitting into
+        IRFunctionEmitter* _functionEmitter = nullptr; // Function we are emitting into
         llvm::BasicBlock* _pConditionBlock = nullptr; // Block into which the conditional instructions are emitted -- the "if"
         llvm::BasicBlock* _pThenBlock = nullptr; // Block into which the "Then" instructions are being emitted
         llvm::BasicBlock* _pEndBlock = nullptr; // The end block.
         llvm::BasicBlock* _pAfterBlock = nullptr; // Block where code subsequent to the "if, else" will be emitted. The end block always branches here
-        bool _endOnDestruct = true;
+        bool _endOnDestruct = false;
     };
 }
 }

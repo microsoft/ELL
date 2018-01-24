@@ -31,6 +31,7 @@
 #include "NeuralNetworkLayerNode.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "ProtoNNPredictorNode.h"
+#include "RegionDetectionLayerNode.h"
 #include "SinkNode.h"
 #include "SourceNode.h"
 #include "SquaredEuclideanDistanceNode.h"
@@ -1096,7 +1097,7 @@ static void TestMelFilterBankNode()
     const size_t numFilters = 13;
     const size_t windowSize = 512;
     const double sampleRate = 16000;
-    
+
     std::vector<ValueType> signal(windowSize);
     FillRandomVector(signal);
     std::vector<std::vector<ValueType>> data = {signal};
@@ -1131,7 +1132,7 @@ static void TestBufferNode()
     const ValueType epsilon = static_cast<ValueType>(1e-7);
     const size_t inputSize = 16;
     const size_t windowSize = 32;
-    
+
     std::vector<std::vector<ValueType>> data;
     const int numEntries = 8;
     for(int index = 0; index < numEntries; ++index)
@@ -1150,7 +1151,7 @@ static void TestBufferNode()
     settings.compilerSettings.optimize = false;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    
+
     for (size_t index = 0; index < data.size(); ++index)
     {
         auto input = data[index];

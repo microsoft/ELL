@@ -35,7 +35,7 @@ namespace neural
         AssignValues(input, output);
 
         ElementType sum = 0;
-        ElementType maxValue = -std::numeric_limits<ElementType>::max();
+        ElementType maxValue = std::numeric_limits<ElementType>::lowest();
 
         // Find the max
         for (size_t i = 0; i < input.NumRows(); i++)

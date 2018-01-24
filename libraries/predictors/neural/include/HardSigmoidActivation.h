@@ -27,6 +27,13 @@ namespace neural
         /// <param name="input"> The input value. </param>
         ///
         /// <returns> The computed output. </param>
+        ElementType operator()(const ElementType input) const;
+
+        /// <summary> Applies the activation function to a value. </summary>
+        ///
+        /// <param name="input"> The input value. </param>
+        ///
+        /// <returns> The computed output. </param>
         ElementType Apply(const ElementType input) const;
 
         /// <summary> Applies the activation function to a value. </summary>
@@ -44,7 +51,7 @@ namespace neural
 
         /// <summary> Typename used for serialization. </summary>
         /// Note: In the future, this will change to include the templated element type
-        static std::string GetTypeName() { return "SigmoidActivation"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("HardSigmoidActivation"); }
 
         /// <summary> Archives this object. </summary>
         ///

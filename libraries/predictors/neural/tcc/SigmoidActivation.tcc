@@ -33,6 +33,12 @@ namespace predictors
         }
 
         template <typename ElementType>
+        ElementType SigmoidActivation<ElementType>::operator()(const ElementType input) const
+        {
+            return Apply(input);
+        }
+
+        template <typename ElementType>
         ElementType SigmoidActivation<ElementType>::Apply(const ElementType input, const math::IntegerTriplet& /*index*/) const
         {
             return Apply(input);

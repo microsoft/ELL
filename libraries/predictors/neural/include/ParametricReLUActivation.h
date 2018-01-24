@@ -32,7 +32,7 @@ namespace neural
         /// <param name="alpha"> The learned alpha parameters. </param>
         ParametricReLUActivation(TensorType alpha);
 
-        /// <summary> Sets the output as a function of the input. </summary>
+        /// <summary> Returns the output as a function of the input. </summary>
         ///
         /// <param name="input"> The input value. </param>
         /// <param name="index"> The input index. </param>

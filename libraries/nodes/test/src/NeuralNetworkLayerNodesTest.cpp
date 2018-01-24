@@ -38,6 +38,7 @@
 #include "InputLayer.h"
 #include "PoolingLayer.h"
 #include "ReLUActivation.h"
+#include "RegionDetectionLayer.h"
 #include "ScalingLayer.h"
 #include "SoftmaxLayer.h"
 

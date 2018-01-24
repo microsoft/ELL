@@ -1,18 +1,17 @@
-from __future__ import print_function
-import sys
-import os
-
-sys.path.append('.')
-sys.path.append('./..')
-
+#!/usr/bin/env python3
 tests = []
 
 
 SkipTests = False
 try:
+    import os
     import sys
     script_path = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.join(script_path, '../../../tools/utilities/pythonlibs'))
+    sys.path += [
+        os.path.join(script_path, '..', '..', '..', 'tools', 'utilities',
+            'pythonlibs'),
+        '.',
+        '..']
     import find_ell
     import ell
     import functions_test

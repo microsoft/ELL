@@ -294,7 +294,7 @@ namespace nodes
     inline void Deinterleave(emitters::IRFunctionEmitter& function, llvm::Value* array, llvm::Value* halfLength, llvm::Value* scratch)
     {
         auto halfN = function.LocalScalar(halfLength);
-        function.For(halfN, [&scratch, &array](emitters::IRFunctionEmitter& function, llvm::Value* indexVar) 
+        function.For(halfN, [&scratch, &array](emitters::IRFunctionEmitter& function, llvm::Value* indexVar)
         {
             auto index = function.LocalScalar(indexVar);
             auto evenIndex = index * function.LocalScalar(2);
@@ -422,8 +422,6 @@ namespace nodes
         auto complexType = detail::GetComplexType(module, valueType);
         auto complexPtrType = complexType->getPointerTo();
 
-        const auto pi = math::Constants<ValueType>::pi;
-
         auto halfN = length / 2;
         assert(halfN >= 1);
 
@@ -448,7 +446,7 @@ namespace nodes
         bool twiddleFactorsVar = false;
 #endif
 
-        function.For(halfN, [pi, halfN, &evens, &odds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
+        function.For(halfN, [&evens, &odds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
             auto k = function.LocalScalar(kVar);
 
 #if (USE_STORED_TWIDDLE_FACTORS)
@@ -496,7 +494,7 @@ namespace nodes
             auto input = function.LocalScalar(&(*arguments++));
             auto scratch = function.LocalScalar(&(*arguments++));
 
-            EmitFFT(function, length, input, scratch);            
+            EmitFFT(function, length, input, scratch);
         }
         module.EndFunction();
         return function.GetFunction();
@@ -510,8 +508,6 @@ namespace nodes
         auto& module = function.GetModule();
         auto complexType = detail::GetComplexType<ValueType>(module);
         auto complexPtrType = complexType->getPointerTo();
-
-        const auto pi = math::Constants<ValueType>::pi;
 
         auto halfN = length / 2;
         assert(halfN >= 1);
@@ -545,7 +541,7 @@ namespace nodes
         bool twiddleFactorsVar = false; // Just here to appease the compiler
 #endif
 
-        function.For(halfN, [pi, halfN, &evens, &odds, &complexEvens, complexOdds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
+        function.For(halfN, [&evens, &odds, &complexEvens, complexOdds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
             auto k = function.LocalScalar(kVar);
 
 #if (USE_STORED_TWIDDLE_FACTORS)

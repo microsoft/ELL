@@ -35,6 +35,7 @@
 #include "ParametricReLUActivation.h"
 #include "PoolingLayer.h"
 #include "RecurrentLayer.h"
+#include "RegionDetectionLayer.h"
 #include "ReLUActivation.h"
 #include "ScalingLayer.h"
 #include "SigmoidActivation.h"
@@ -66,7 +67,7 @@ namespace predictors
 
         /// <summary> A unique_ptr to the input layer for this predictor. </summary>
         using InputLayerReference = std::shared_ptr<neural::InputLayer<ElementType>>;
-        
+
         /// <summary> A vector of layers. </summary>
         using Layers = std::vector<std::shared_ptr<neural::Layer<ElementType>>>;
 

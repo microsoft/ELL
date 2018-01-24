@@ -273,8 +273,6 @@ namespace model
         /// <param name="ranges"> The ranges to construct this PortElements from. </param>
         PortElementsBase(const std::vector<PortRange>& ranges);
 
-        ~PortElementsBase() override = default;
-
         /// <summary> Returns the type of the values referenced </summary>
         ///
         /// <returns> The type of the values referenced </returns>
@@ -351,10 +349,6 @@ namespace model
     {
     public:
         PortElements() = default;
-        PortElements(const PortElements<ValueType>&) = default;
-        PortElements(PortElements<ValueType>&&) = default;
-        PortElements<ValueType>& operator=(const PortElements<ValueType>&) = default;
-        PortElements<ValueType>& operator=(PortElements<ValueType>&&) = default;
 
         /// <summary> Creates a PortElements representing a single element from a given port </summary>
         ///

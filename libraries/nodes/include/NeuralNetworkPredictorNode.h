@@ -23,6 +23,7 @@
 #include "GRULayerNode.h"
 #include "LSTMLayerNode.h"
 #include "PoolingLayerNode.h"
+#include "RegionDetectionLayerNode.h"
 #include "ScalingLayerNode.h"
 #include "SoftmaxLayerNode.h"
 
@@ -94,7 +95,7 @@ public:
 
     /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
     void Copy(model::ModelTransformer& transformer) const override;
-    
+
     /// <summary> Options to control how the network is compiled into nodes </summary>
     struct NetworkCompileOptions
     {
@@ -107,13 +108,13 @@ public:
         /// <summary> When using im2col-based convolution, construct the transpose of the receptive field matrix </summary>
         bool transposeReceptiveFieldMatrix;
     };
-    
+
     struct NetworkCompileState
     {
         /// <summary> Indicates the current order of input data. If `true`, it's in the canonical row, column, channel order. </summary>
         bool isInterleavedOrder;
     };
-    
+
 protected:
     void Compute() const override;
     bool Refine(model::ModelTransformer& transformer) const override;

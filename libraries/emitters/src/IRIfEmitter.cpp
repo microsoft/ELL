@@ -32,9 +32,33 @@ namespace emitters
     }
 
     IRIfEmitter::IRIfEmitter(IRFunctionEmitter& functionEmitter, bool endOnDestruct, llvm::BasicBlock* pPrevBlock)
-        : _functionEmitter(functionEmitter), _pEndBlock(pPrevBlock), _endOnDestruct(endOnDestruct)
+        : _functionEmitter(&functionEmitter), _pEndBlock(pPrevBlock), _endOnDestruct(endOnDestruct)
     {
-        _pAfterBlock = _functionEmitter.BlockAfter(GetParentBlock(), IfAfterBlockName);
+        assert(_functionEmitter);
+
+        _pAfterBlock = _functionEmitter->BlockAfter(GetParentBlock(), IfAfterBlockName);
+    }
+
+    // Move ctor and assignment op are needed to explicitly swap out values,
+    // since the default behavior for "moving" fundamental types (aka, pointers) is to do a bitwise-copy
+    IRIfEmitter::IRIfEmitter(IRIfEmitter&& other)
+    {
+        *this = std::move(other);
+    }
+
+    IRIfEmitter& IRIfEmitter::operator=(IRIfEmitter&& other)
+    {
+        if (this != &other)
+        {
+            std::swap(this->_endOnDestruct, other._endOnDestruct);
+            std::swap(this->_functionEmitter, other._functionEmitter);
+            std::swap(this->_pAfterBlock, other._pAfterBlock);
+            std::swap(this->_pConditionBlock, other._pConditionBlock);
+            std::swap(this->_pEndBlock, other._pEndBlock);
+            std::swap(this->_pThenBlock, other._pThenBlock);
+        }
+
+        return *this;
     }
 
     IRIfEmitter::~IRIfEmitter()
@@ -48,7 +72,7 @@ namespace emitters
     IRIfEmitter& IRIfEmitter::Else(std::function<void(IRFunctionEmitter& function)> body)
     {
         Else();
-        body(_functionEmitter);
+        body(*_functionEmitter);
         return *this;
     }
 
@@ -56,7 +80,7 @@ namespace emitters
     {
         auto elseBlock = If(pValue);
         elseBlock->setName(IfElseBlockName);
-        body(_functionEmitter);
+        body(*_functionEmitter);
         return *this;
     }
 
@@ -72,11 +96,11 @@ namespace emitters
     {
         EndPrev();
         PrepareBlocks();
-        _functionEmitter.SetCurrentBlock(_pConditionBlock);
+        _functionEmitter->SetCurrentBlock(_pConditionBlock);
         {
-            _functionEmitter.Branch(comparison(), _pThenBlock, _pEndBlock);
+            _functionEmitter->Branch(comparison(), _pThenBlock, _pEndBlock);
         }
-        _functionEmitter.SetCurrentBlock(_pThenBlock);
+        _functionEmitter->SetCurrentBlock(_pThenBlock);
         return _pThenBlock;
     }
 
@@ -89,9 +113,9 @@ namespace emitters
     {
         EndPrev();
         PrepareBlocks();
-        _functionEmitter.SetCurrentBlock(_pConditionBlock);
-        _functionEmitter.Branch(pValue, _pThenBlock, _pEndBlock);
-        _functionEmitter.SetCurrentBlock(_pThenBlock);
+        _functionEmitter->SetCurrentBlock(_pConditionBlock);
+        _functionEmitter->Branch(pValue, _pThenBlock, _pEndBlock);
+        _functionEmitter->SetCurrentBlock(_pThenBlock);
         return _pThenBlock;
     }
 
@@ -99,9 +123,9 @@ namespace emitters
     {
         EndPrev();
         PrepareBlocks();
-        _functionEmitter.SetCurrentBlock(_pConditionBlock);
-        _functionEmitter.Branch(pValue, testValue, _pThenBlock, _pEndBlock);
-        _functionEmitter.SetCurrentBlock(_pThenBlock);
+        _functionEmitter->SetCurrentBlock(_pConditionBlock);
+        _functionEmitter->Branch(pValue, testValue, _pThenBlock, _pEndBlock);
+        _functionEmitter->SetCurrentBlock(_pThenBlock);
         return _pThenBlock;
     }
 
@@ -113,7 +137,7 @@ namespace emitters
         _pThenBlock = _pEndBlock;
         _pThenBlock->setName(IfElseBlockName);
         _pEndBlock = nullptr;
-        _functionEmitter.SetCurrentBlock(_pThenBlock);
+        _functionEmitter->SetCurrentBlock(_pThenBlock);
         return _pThenBlock;
     }
 
@@ -122,10 +146,10 @@ namespace emitters
         EndPrev();
         if (_pEndBlock != nullptr)
         {
-            _functionEmitter.SetCurrentBlock(_pEndBlock);
-            _functionEmitter.Branch(_pAfterBlock);
+            _functionEmitter->SetCurrentBlock(_pEndBlock);
+            _functionEmitter->Branch(_pAfterBlock);
         }
-        _functionEmitter.SetCurrentBlock(_pAfterBlock);
+        _functionEmitter->SetCurrentBlock(_pAfterBlock);
     }
 
     llvm::BasicBlock* IRIfEmitter::IfThenElse(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
@@ -136,12 +160,12 @@ namespace emitters
         IfThen(comparison, pValue, pTestValue);
         {
             // To branch the Then to the "after" block, first remove any dangling terminating branches in the "else" block
-            _functionEmitter.DeleteTerminatingBranch();
+            _functionEmitter->DeleteTerminatingBranch();
         }
         Else();
         {
             // To branch the else to the "after" block, first remove any dangling terminating branches in the "else" block
-            _functionEmitter.DeleteTerminatingBranch();
+            _functionEmitter->DeleteTerminatingBranch();
         }
         End();
         return _pConditionBlock;
@@ -157,7 +181,7 @@ namespace emitters
         IfThen(comparison, pValue, pTestValue);
         {
             _pThenBlock = pThenRegion->End();
-            _functionEmitter.SetCurrentBlock(_pThenBlock);
+            _functionEmitter->SetCurrentBlock(_pThenBlock);
         }
         _pEndBlock = pElseRegion->End();
         Else();
@@ -169,33 +193,33 @@ namespace emitters
     {
         if (_pThenBlock != nullptr)
         {
-            auto pCurrentBlock = _functionEmitter.GetCurrentBlock();
-            _functionEmitter.SetCurrentBlock((pCurrentBlock == _pThenBlock) ? _pThenBlock : pCurrentBlock);
+            auto pCurrentBlock = _functionEmitter->GetCurrentBlock();
+            _functionEmitter->SetCurrentBlock((pCurrentBlock == _pThenBlock) ? _pThenBlock : pCurrentBlock);
             {
-                _functionEmitter.Branch(_pAfterBlock);
+                _functionEmitter->Branch(_pAfterBlock);
             }
         }
     }
 
     void IRIfEmitter::IfThen(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue)
     {
-        _functionEmitter.SetCurrentBlock(_pConditionBlock);
-        _functionEmitter.Branch(comparison, pValue, pTestValue, _pThenBlock, _pEndBlock);
-        _functionEmitter.SetCurrentBlock(_pThenBlock);
+        _functionEmitter->SetCurrentBlock(_pConditionBlock);
+        _functionEmitter->Branch(comparison, pValue, pTestValue, _pThenBlock, _pEndBlock);
+        _functionEmitter->SetCurrentBlock(_pThenBlock);
     }
 
     void IRIfEmitter::IfThen(llvm::Value* pValue)
     {
-        _functionEmitter.SetCurrentBlock(_pConditionBlock);
-        _functionEmitter.Branch(pValue, _pThenBlock, _pEndBlock);
-        _functionEmitter.SetCurrentBlock(_pThenBlock);
+        _functionEmitter->SetCurrentBlock(_pConditionBlock);
+        _functionEmitter->Branch(pValue, _pThenBlock, _pEndBlock);
+        _functionEmitter->SetCurrentBlock(_pThenBlock);
     }
 
     void IRIfEmitter::PrepareBlocks()
     {
         _pConditionBlock = GetParentBlock();
-        _pThenBlock = _functionEmitter.BlockAfter(_pConditionBlock, IfThenBlockName);
-        _pEndBlock = _functionEmitter.BlockAfter(_pThenBlock, IfEndBlockName);
+        _pThenBlock = _functionEmitter->BlockAfter(_pConditionBlock, IfThenBlockName);
+        _pEndBlock = _functionEmitter->BlockAfter(_pThenBlock, IfEndBlockName);
     }
 
     void IRIfEmitter::PrepareBlocks(llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
@@ -203,35 +227,35 @@ namespace emitters
         _pConditionBlock = GetParentBlock();
         if (pThenBlock != nullptr)
         {
-            _pThenBlock = _functionEmitter.BlockAfter(_pConditionBlock, pThenBlock);
+            _pThenBlock = _functionEmitter->BlockAfter(_pConditionBlock, pThenBlock);
         }
         else
         {
-            _pThenBlock = _functionEmitter.BlockAfter(_pConditionBlock, IfThenBlockName);
+            _pThenBlock = _functionEmitter->BlockAfter(_pConditionBlock, IfThenBlockName);
         }
         if (pElseBlock != nullptr)
         {
-            _pEndBlock = _functionEmitter.BlockAfter(pThenBlock, pElseBlock);
+            _pEndBlock = _functionEmitter->BlockAfter(pThenBlock, pElseBlock);
         }
         else
         {
-            _pEndBlock = _functionEmitter.BlockAfter(_pThenBlock, IfEndBlockName);
+            _pEndBlock = _functionEmitter->BlockAfter(_pThenBlock, IfEndBlockName);
         }
     }
 
     void IRIfEmitter::PrepareBlocks(IRBlockRegion* pThenRegion, IRBlockRegion* pElseRegion)
     {
         // Insert the condition block before the start of the thenRegion
-        _pConditionBlock = _functionEmitter.BlockBefore(pThenRegion->Start(), IfCondBlockName);
+        _pConditionBlock = _functionEmitter->BlockBefore(pThenRegion->Start(), IfCondBlockName);
         // place the block that contains the "After" code of the "if-then" to after the Else region
-        _functionEmitter.BlockAfter(pElseRegion->End(), _pAfterBlock);
+        _functionEmitter->BlockAfter(pElseRegion->End(), _pAfterBlock);
         _pThenBlock = pThenRegion->Start();
         _pEndBlock = pElseRegion->Start();
     }
 
     llvm::BasicBlock* IRIfEmitter::GetParentBlock()
     {
-        return (_pEndBlock != nullptr) ? _pEndBlock : _functionEmitter.GetCurrentBlock();
+        return (_pEndBlock != nullptr) ? _pEndBlock : _functionEmitter->GetCurrentBlock();
     }
 }
 }

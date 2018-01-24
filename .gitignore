@@ -264,3 +264,6 @@ LaunchXslt/obj/**
 /_site/
 /.sass-cache/
 Gemfile.lock
+
+# ctags tag file
+tags

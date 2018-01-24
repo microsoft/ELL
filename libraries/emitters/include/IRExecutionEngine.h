@@ -21,7 +21,7 @@ namespace emitters
     /// <summary> Function signature for a basic function that takes no input and returns no output </summary>
     typedef void (*DynamicFunction)(void);
 
-    /// <summary> Wrapper class to setup and manage the LLVM Execution Engine. By default, we us the new "MCJIT" </summary>
+    /// <summary> Wrapper class to setup and manage the LLVM Execution Engine. By default, we use the new "MCJIT" </summary>
     class IRExecutionEngine
     {
     public:

@@ -88,5 +88,6 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels);
 void TestRecurrentNode();
 void TestGRUNode();
 void TestLSTMNode();
+void TestRegionDetectionNode();
 
 #include "../tcc/CompilableNodesTest.tcc"

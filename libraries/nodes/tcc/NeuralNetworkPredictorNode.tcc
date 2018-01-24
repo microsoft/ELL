@@ -61,7 +61,7 @@ namespace nodes
 
         node = TryAddLayerNode<predictors::neural::GRULayer<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>, GRULayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
-        
+
         node = TryAddLayerNode<predictors::neural::LSTMLayer<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>, LSTMLayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
 
@@ -69,6 +69,9 @@ namespace nodes
         if (node != nullptr) return node;
 
         node = TryAddLayerNode<predictors::neural::PoolingLayer<ValueType, predictors::neural::MeanPoolingFunction>, PoolingLayerNode<ValueType, predictors::neural::MeanPoolingFunction>>(transformer, layer, layerInputs, options, state);
+        if (node != nullptr) return node;
+
+        node = TryAddLayerNode<predictors::neural::RegionDetectionLayer<ValueType>, RegionDetectionLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
 
         node = TryAddLayerNode<predictors::neural::ScalingLayer<ValueType>, ScalingLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);

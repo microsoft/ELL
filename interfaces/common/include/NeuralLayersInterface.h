@@ -25,6 +25,7 @@
 #include "InputLayer.h"
 #include "LSTMLayer.h"
 #include "PoolingLayer.h"
+#include "RegionDetectionLayer.h"
 #include "ScalingLayer.h"
 
 // stl
@@ -238,7 +239,7 @@ namespace neural
     class GRULayer : public Layer<ElementType>
     {
     public:
-        GRULayer(const LayerParameters& layerParameters, 
+        GRULayer(const LayerParameters& layerParameters,
                  const ell::api::math::Tensor<ElementType>& updateWeightsTensor,
                  const ell::api::math::Tensor<ElementType>& resetWeightsTensor,
                  const ell::api::math::Tensor<ElementType>& hiddenWeightsTensor,
@@ -247,7 +248,7 @@ namespace neural
                  const ell::api::math::Tensor<ElementType>& hiddenBiasTensor,
                  ActivationType activation,
                  ActivationType recurrentActivation)
-            : Layer<ElementType>(layerParameters), 
+            : Layer<ElementType>(layerParameters),
             updateWeights(updateWeightsTensor),
             resetWeights(resetWeightsTensor),
             hiddenWeights(hiddenWeightsTensor),
@@ -307,6 +308,23 @@ namespace neural
 
         const PoolingType poolingType;
         const PoolingParameters poolingParameters;
+    };
+
+    // Api projection for RegionDetectionLayer
+    using RegionDetectionParameters = ell::predictors::neural::RegionDetectionParameters;
+
+    template <typename ElementType>
+    class RegionDetectionLayer : public Layer<ElementType>
+    {
+    public:
+        RegionDetectionLayer(const LayerParameters& layerParameters, const RegionDetectionParameters& detectionParameters)
+            : Layer<ElementType>(layerParameters), detectionParameters(detectionParameters)
+        {
+        }
+
+        LayerType GetLayerType() const override { return LayerType::region; }
+
+        const RegionDetectionParameters detectionParameters;
     };
 
     // Api projection for SoftmaxLayer

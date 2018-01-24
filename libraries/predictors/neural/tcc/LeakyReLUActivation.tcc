@@ -19,6 +19,12 @@ namespace neural
     }
 
     template <typename ElementType>
+    ElementType LeakyReLUActivation<ElementType>::operator()(const ElementType input) const
+    {
+        return Apply(input);
+    }
+
+    template <typename ElementType>
     ElementType LeakyReLUActivation<ElementType>::Apply(const ElementType input, const math::IntegerTriplet& /*index*/) const
     {
         return Apply(input);

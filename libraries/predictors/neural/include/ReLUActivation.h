@@ -22,14 +22,21 @@ namespace neural
     class ReLUActivation
     {
     public:
-        /// <summary> Sets the output as a function of the input. </summary>
+        /// <summary> Returns the output as a function of the input. </summary>
+        ///
+        /// <param name="input"> The input value. </param>
+        ///
+        /// <returns> The computed output. </param>
+        ElementType operator()(const ElementType input) const;
+
+        /// <summary> Returns the output as a function of the input. </summary>
         ///
         /// <param name="input"> The input value. </param>
         ///
         /// <returns> The computed output. </param>
         ElementType Apply(const ElementType input) const;
 
-        /// <summary> Sets the output as a function of the input. </summary>
+        /// <summary> Returns the output as a function of the input. </summary>
         ///
         /// <param name="input"> The input value. </param>
         /// <param name="index"> The input index. </param>

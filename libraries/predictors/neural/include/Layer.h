@@ -45,6 +45,7 @@ namespace neural
     ADD_LAYER_TYPE(lstm, "LSTM")\
     ADD_LAYER_TYPE(pooling, "Pooling")\
     ADD_LAYER_TYPE(recurrent, "Recurrent")\
+    ADD_LAYER_TYPE(region, "RegionDetection")\
     ADD_LAYER_TYPE(scaling, "Scaling")\
     ADD_LAYER_TYPE(softmax, "Softmax")
 
@@ -56,11 +57,11 @@ namespace neural
         LAYER_TYPES_LIST
     };
     #undef ADD_LAYER_TYPE
-    
+
     /// <summary> Vector of strings that contains the names of the neural network layer types. </summary>
     #define ADD_LAYER_TYPE(a, b) b,
-    static const std::string LayerNames[] = 
-    { 
+    static const std::string LayerNames[] =
+    {
         LAYER_TYPES_LIST
     };
     #undef ADD_LAYER_TYPE
@@ -132,19 +133,19 @@ namespace neural
     {
     public:
         using Shape = math::TensorShape;
-        
+
         using VectorType = math::ColumnVector<ElementType>;
         using VectorReferenceType = math::ColumnVectorReference<ElementType>;
         using ConstVectorReferenceType = math::ConstColumnVectorReference<ElementType>;
-        
+
         using MatrixType = math::RowMatrix<ElementType>;
         using MatrixReferenceType = math::ConstMatrixReference<ElementType, math::MatrixLayout::rowMajor>;
         using ConstMatrixReferenceType = math::ConstMatrixReference<ElementType, math::MatrixLayout::rowMajor>;
-        
+
         using TensorType = math::Tensor<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
         using TensorReferenceType = math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
         using ConstTensorReferenceType = math::ConstTensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
-        
+
         using DataVectorType = data::DenseDataVector<ElementType>;
 
         /// <summary> Parameters common to all layers, specifying info related to input and output of the layer. </summary>
@@ -162,8 +163,6 @@ namespace neural
             /// <summary> The padding requirements for the output. </summary>
             PaddingParameters outputPaddingParameters;
         };
-
-        ~Layer() override = default;
 
         /// <summary> Initializes this class with the required information regarding inputs and outputs. </summary>
         ///
@@ -255,8 +254,6 @@ namespace neural
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-    protected:
-
         /// <summary> Returns a read reference to the sub tensor of the input that does not contain padding. </summary>
         ///
         /// <returns> Read reference to the input tensor, minus padding. </returns>
@@ -298,8 +295,6 @@ namespace neural
         /// <summary> Constructor </summary>
         LayerSerializationContext(utilities::SerializationContext& previousContext)
             : SerializationContext(previousContext, {}), _outputReference(math::IntegerTriplet{ 0, 0, 0 }) {}
-
-        ~LayerSerializationContext() override {}
 
         /// <summary> Sets the output reference to be saved in the context.
         ///

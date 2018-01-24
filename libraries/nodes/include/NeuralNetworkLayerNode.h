@@ -85,11 +85,11 @@ namespace nodes
     };
 
     /// <summary> Base class for neural network layer nodes. </summary
-    template <typename DerivedType, typename LayerType, typename ValueType>
+    template <typename DerivedType, typename NodeLayerType, typename ValueType>
     class NeuralNetworkLayerNode : public NeuralNetworkLayerNodeBase<ValueType>
     {
     public:
-        using NodeLayerType = LayerType;
+        using LayerType = NodeLayerType;
 
         /// @name Input and Output Ports
         /// @{
@@ -124,10 +124,6 @@ namespace nodes
         /// <summary> Gets the LayerParameters from the layer wrapped by this node </summary>
         typename predictors::neural::Layer<ValueType>::LayerParameters GetLayerParameters() const override { return _layer.GetLayerParameters(); }
 
-        /// <summary> Indicates whether or not to include data padding on the input or output </summary>
-
-        
-        
     protected:
         size_t NumInputDimensions() const { return _inputLayout.NumDimensions(); }
         model::PortMemoryLayout CalculateMemoryLayout(size_t padding, typename predictors::neural::Layer<ValueType>::Shape dataBufferSize);
@@ -137,7 +133,7 @@ namespace nodes
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
-        
+
         using NeuralNetworkLayerNodeBase<ValueType>::_input;
         using NeuralNetworkLayerNodeBase<ValueType>::_output;
 
