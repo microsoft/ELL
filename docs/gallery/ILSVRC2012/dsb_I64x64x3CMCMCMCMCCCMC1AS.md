@@ -23,11 +23,11 @@ permalink: /gallery/ILSVRC2012/dsb_I64x64x3CMCMCMCMCCCMC1AS
     </tr>
     <tr>
         <td> Uncompressed Size </td>
-        <td colspan="3"> 29MB </td>
+        <td colspan="3"> 31MB </td>
     </tr>
     <tr>
         <td> Input </td>
-        <td colspan="3"> 64 x 64 x {B,G,R} </td>
+        <td colspan="3"> 64 &times; 64 &times; {B,G,R} </td>
     </tr>
     <tr>
         <td> Architecture </td>
@@ -35,77 +35,77 @@ permalink: /gallery/ILSVRC2012/dsb_I64x64x3CMCMCMCMCCCMC1AS
             <table class="arch-table">
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;64x64x32</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                    <td>&#8680;&nbsp;64×64×32</td>
+                    <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;32x32x32</td>
-                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                    <td>&#8680;&nbsp;32×32×32</td>
+                    <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;32x32x64</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                    <td>&#8680;&nbsp;32×32×64</td>
+                    <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;16x16x64</td>
-                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                    <td>&#8680;&nbsp;16×16×64</td>
+                    <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;16x16x128</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                    <td>&#8680;&nbsp;16×16×128</td>
+                    <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;8x8x128</td>
-                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                    <td>&#8680;&nbsp;8×8×128</td>
+                    <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;8x8x256</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                    <td>&#8680;&nbsp;8×8×256</td>
+                    <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;4x4x256</td>
-                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                    <td>&#8680;&nbsp;4×4×256</td>
+                    <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;4x4x256</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                    <td>&#8680;&nbsp;4×4×256</td>
+                    <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;4x4x256</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                    <td>&#8680;&nbsp;4×4×256</td>
+                    <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;4x4x256</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                    <td>&#8680;&nbsp;4×4×256</td>
+                    <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;2x2x256</td>
-                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                    <td>&#8680;&nbsp;2×2×256</td>
+                    <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;2x2x1000</td>
-                    <td>size=1x1,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                    <td>&#8680;&nbsp;2×2×1000</td>
+                    <td>size=1×1,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;1x1x1000</td>
-                    <td>size=2x2,&nbsp;stride=1,&nbsp;operation=average</td>
+                    <td>&#8680;&nbsp;1×1×1000</td>
+                    <td>size=2×2,&nbsp;stride=1,&nbsp;operation=average</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Softmax</td>
-                    <td>&#8680;&nbsp;1x1x1000</td>
+                    <td>&#8680;&nbsp;1×1×1000</td>
                     <td></td>
                 </tr>
             </table>
@@ -117,8 +117,7 @@ permalink: /gallery/ILSVRC2012/dsb_I64x64x3CMCMCMCMCCCMC1AS
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3">Trained by Juan Lema
- using CNTK 2.2 </td>
+        <td colspan="3"> Trained by Juan Lema using CNTK 2.2 </td>
     </tr>
 </table>
 

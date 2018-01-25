@@ -1,17 +1,32 @@
 [
   {
     "accuracy": {
+      "top1": "52.06",
+      "top5": "76.43"
+    },
+    "directory": "d:\\Work\\ELL-models\\models\\ILSVRC2012\\d_I128x128x3CMCMCMCMCMCMC1AS\\d_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
+    "filter_size": 3,
+    "image_size": "128x128",
+    "increase_factor": 0,
+    "model": "d",
+    "name": "d_I128x128x3CMCMCMCMCMCMC1AS",
+    "secs_per_frame": {
+      "pi3": "0.19"
+    }
+  },
+  {
+    "accuracy": {
       "top1": "60.11",
       "top5": "82.27"
     },
-    "directory": "dr_I256x256x3CMCMCMCMCMCMCMC1AS",
+    "directory": "d:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
     "filter_size": 3,
     "image_size": "256x256",
     "increase_factor": 112,
     "model": "d_reference",
     "name": "dr_I256x256x3CMCMCMCMCMCMCMC1AS",
     "secs_per_frame": {
-      "pi3": "0.58"
+      "pi3": "0.59"
     }
   },
   {
@@ -19,14 +34,14 @@
       "top1": "56.92",
       "top5": "80.54"
     },
-    "directory": "dsb_I128x128x3CMCMCMCMCMCCCMC1AS",
+    "directory": "d:\\Work\\ELL-models\\models\\ILSVRC2012\\dsb_I128x128x3CMCMCMCMCMCCCMC1AS\\dsb_I128x128x3CMCMCMCMCMCCCMC1AS.ell.zip",
     "filter_size": 3,
     "image_size": "128x128",
     "increase_factor": 0,
     "model": "dstackedbottom",
     "name": "dsb_I128x128x3CMCMCMCMCMCCCMC1AS",
     "secs_per_frame": {
-      "pi3": "0.24"
+      "pi3": "0.37"
     }
   },
   {
@@ -34,7 +49,7 @@
       "top1": "40.98",
       "top5": "66.43"
     },
-    "directory": "dsb_I64x64x3CMCMCMCMCCCMC1AS",
+    "directory": "d:\\Work\\ELL-models\\models\\ILSVRC2012\\dsb_I64x64x3CMCMCMCMCCCMC1AS\\dsb_I64x64x3CMCMCMCMCCCMC1AS.ell.zip",
     "filter_size": 3,
     "image_size": "64x64",
     "increase_factor": 0,
@@ -49,14 +64,14 @@
       "top1": "59.77",
       "top5": "82.12"
     },
-    "directory": "dsf_I128x128x3CCMCCMCCMCMCMCMC1AS",
+    "directory": "d:\\Work\\ELL-models\\models\\ILSVRC2012\\dsf_I128x128x3CCMCCMCCMCMCMCMC1AS\\dsf_I128x128x3CCMCCMCCMCMCMCMC1AS.ell.zip",
     "filter_size": 3,
     "image_size": "128x128",
     "increase_factor": 0,
     "model": "dstackedfull",
     "name": "dsf_I128x128x3CCMCCMCCMCMCMCMC1AS",
     "secs_per_frame": {
-      "pi3": "0.80"
+      "pi3": "0.78"
     }
   },
   {
@@ -64,44 +79,14 @@
       "top1": "44.67",
       "top5": "69.70"
     },
-    "directory": "dsf_I64x64x3CCMCCMCCMCMCMC1AS",
+    "directory": "d:\\Work\\ELL-models\\models\\ILSVRC2012\\dsf_I64x64x3CCMCCMCCMCMCMC1AS\\dsf_I64x64x3CCMCCMCCMCMCMC1AS.ell.zip",
     "filter_size": 3,
     "image_size": "64x64",
     "increase_factor": 0,
     "model": "dstackedfull",
     "name": "dsf_I64x64x3CCMCCMCCMCMCMC1AS",
     "secs_per_frame": {
-      "pi3": "0.18"
-    }
-  },
-  {
-    "accuracy": {
-      "top1": "52.06",
-      "top5": "76.43"
-    },
-    "directory": "d_I128x128x3CMCMCMCMCMCMC1AS",
-    "filter_size": 3,
-    "image_size": "128x128",
-    "increase_factor": 0,
-    "model": "d",
-    "name": "d_I128x128x3CMCMCMCMCMCMC1AS",
-    "secs_per_frame": {
-      "pi3": "0.17"
-    }
-  },
-  {
-    "accuracy": {
-      "top1": "55.12",
-      "top5": "78.33"
-    },
-    "directory": "d_I256x256x3CMCMCMCMCMCMCMC1AS",
-    "filter_size": 3,
-    "image_size": "256x256",
-    "increase_factor": 0,
-    "model": "d",
-    "name": "d_I256x256x3CMCMCMCMCMCMCMC1AS",
-    "secs_per_frame": {
-      "pi3": "0.54"
+      "pi3": "0.19"
     }
   },
   {
@@ -109,14 +94,14 @@
       "top1": "57.12",
       "top5": "80.49"
     },
-    "directory": "v_I64x64x3CCMCCMCCCMCCCMCCCMF2048S",
+    "directory": "d:\\Work\\ELL-models\\models\\ILSVRC2012\\v_I64x64x3CCMCCMCCCMCCCMCCCMF2048S\\v_I64x64x3CCMCCMCCCMCCCMCCCMF2048S.ell.zip",
     "filter_size": 3,
     "image_size": "64x64",
     "increase_factor": 0,
     "model": "v",
     "name": "v_I64x64x3CCMCCMCCCMCCCMCCCMF2048S",
     "secs_per_frame": {
-      "pi3": "0.80"
+      "pi3": "0.78"
     }
   }
 ]
