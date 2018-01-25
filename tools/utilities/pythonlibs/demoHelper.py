@@ -51,6 +51,7 @@ class DemoHelper:
         self.labels_file = None
         self.model_file = None
         self.iterations = None  # limit number of iterations through the loop.
+        self.current = None
         self.total_time = 0
         self.time_count = 0
         self.warm_up = True
@@ -71,11 +72,11 @@ class DemoHelper:
         arg_parser.add_argument("labels", help="path to the labels file for evaluating the model, or comma separated list if using more than one model")
 
         # options
-        arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
         arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
         arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
         arg_parser.add_argument("--bgr", help="specify True if input data should be in BGR format (default False)", default = self.bgr)
-        arg_parser.add_argument("--nogui", help="disable GUI to enable remote testing", action='store_true')
+        arg_parser.add_argument("--nogui", help="disable GUI to enable automated testing of a batch of images", action='store_true')
+        arg_parser.add_argument("--iterations", type=int, help="when used with --nogui this tests multiple iterations of each image to get better timing information")
 
         # mutually exclusive options
         group = arg_parser.add_mutually_exclusive_group()
@@ -109,11 +110,14 @@ class DemoHelper:
         self.save_images = self.value_from_arg(args.save, None)
         self.threshold = self.value_from_arg(args.threshold, None)
         self.iterations = self.value_from_arg(args.iterations, None)
+        self.current = self.iterations
         self.camera = self.value_from_arg(args.iterations, 0)
         self.image_filename = self.value_from_arg(args.image, None)
         self.image_folder = self.value_from_arg(args.folder, None)
         self.bgr = args.bgr
         self.nogui = args.nogui
+        if self.nogui and self.iterations == None:
+            self.iterations = 1
 
         # process image source options
         if (args.camera):
@@ -217,8 +221,8 @@ class DemoHelper:
         return labels
 
     def predict(self, data):
-        if self.iterations != None:
-            self.iterations = self.iterations - 1
+        if self.current != None:
+            self.current = self.current - 1
         start = time.time()
         if self.model == None:
             self.results = self.compiled_func(data)
@@ -312,6 +316,9 @@ class DemoHelper:
             self.frame = self.load_next_image()
     
     def load_next_image(self):
+        if self.image_folder is None:
+            return self.frame
+        # find images in the self.image_folder and cycle through them.
         if self.images == None:
             self.images = os.listdir(self.image_folder)
         frame = None
@@ -411,11 +418,19 @@ class DemoHelper:
         return 3
 
     def done(self):
-        if self.iterations is not None and self.iterations <= 0:
-            return True
+        if self.current is not None and self.current > 0:
+            return False
+            
         # on slow devices this helps let the images to show up on screen
         result = False
         try:
+            if self.nogui:
+                if self.images is not None and self.image_pos < len(self.images):
+                    self.frame = self.load_next_image()
+                    self.current = self.iterations
+                    return False
+                return True
+                
             for i in range(self.get_wait()):
                 key = cv2.waitKey(1) & 0xFF
                 if key == 27:

@@ -24,11 +24,16 @@ from os.path import basename
 
 # note: to run this in headless mode on a Linux machine run the following from your terminal window
 # export DISPLAY=:0
+_logger = logging.getLogger(__name__)
+
 
 def run_validation(args):
     """Loops through each image in the validation set (or a subset of it),
        evaluates it for predictions, and saves the results
     """
+    
+    _logger.info("starting run_validation:" + str(vars(args)))
+
     with open(args.validation_map, 'r') as valmap:
         top1 = 0
         top5 = 0
@@ -46,7 +51,7 @@ def run_validation(args):
             # assume: the CNTK models we are validating are trained to expect input as BGR
             result = validate_image([args.labels,
                 "--compiledModel", args.compiled_module, "--image", filename,
-                "--iterations", "5", "--threshold", "0.0", "--bgr", "true"], filename)
+                "--iterations", "5", "--threshold", "0.0", "--bgr", "true", "--nogui"], filename)
 
             result["truth"] = int(c)
             results["results"].append(result)
@@ -63,10 +68,9 @@ def run_validation(args):
         with open('validation.json', 'w', encoding='utf-8', newline='\r\n') as outfile:
             json.dump(results, outfile, ensure_ascii=False, indent=2, sort_keys=True)
 
+
 def validate_image(args, filename):
-    """Evaluates a single image to get predictions"""
-    
-    logger = logging.getLogger(__name__)
+    """Evaluates a single image to get predictions"""    
 
     helper = d.DemoHelper()
     helper.parse_arguments(args, helpString="Evaluates a series of images to get predictions and performance metrics")
@@ -76,7 +80,8 @@ def validate_image(args, filename):
 
     result = {}
     result["input"] = basename(filename)
-    logger.info(result["input"])
+    
+    _logger.info(result["input"])
 
     while (not helper.done()):
         # Grab next frame
@@ -96,7 +101,7 @@ def validate_image(args, filename):
         text = "".join(
             [str(element[0]) + "(" + str(int(100 * element[1])) + "%)  " for element in top5])
 
-        logger.info("\tPrediction: " + text)
+        _logger.info("\tPrediction: " + text)
 
         # Ensure that numbers are JSON serializable
         result["predictions"] = [(element[0], np.float(element[1])) for element in top5]
@@ -112,13 +117,24 @@ def monitor_resource_usage():
        A separate process is used instead of a thread within this process
        because CPU usage is expected to peg during model evaluation
     """
+    _logger.info("starting procmon.py")
     process = psutil.Process()
     subprocess.Popen(["nohup", "python", "procmon.py", str(process.pid), "--logfile", "procmon.json",
         "--interval", "0.25"])
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    logging.basicConfig(level=logging.INFO, 
+                        filename='validation.log',
+                        format="[%(asctime)s] %(message)s")
+    # set up logging to console
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    # set a format which is simpler for console use
+    formatter = logging.Formatter("[%(asctime)s] %(message)s")
+    console.setFormatter(formatter)
+    _logger.addHandler(console)
+
     parser = argparse.ArgumentParser()
 
     # required arguments

@@ -21,6 +21,7 @@ sys.path += ["../"] # pythonlibs
 import picluster
 from remoterunner import RemoteRunner
 import logger
+import logging 
 
 class RunValidation:
     def __init__(self):
@@ -149,7 +150,7 @@ class RunValidation:
                               target_dir=self.target_dir,
                               command="validate.sh",
                               verbose=True,
-                              copyback_files=['validation.json', 'validation.out', 'procmon.json'],
+                              copyback_files=['validation.json', 'validation.log', 'procmon.json'],
                               copyback_dir=self.output_dir,
                               start_clean=False, # reuse what drivetest.py already setup
                               cleanup=False)

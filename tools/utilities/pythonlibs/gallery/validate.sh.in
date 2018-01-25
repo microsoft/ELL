@@ -9,7 +9,8 @@ nohup python dependency_installer.py --environment py34 --pip_packages 'psutil>=
 cd @TARGET_DIR@
 
 export DISPLAY=:0
-python validate.py --maxfiles @MAXFILES@ @TRUTH@ @IMAGES@ @LABELS@ @COMPILED_MODEL@ > validation.out
+echo launching validate.py > validation.log
+python validate.py --maxfiles @MAXFILES@ @TRUTH@ @IMAGES@ @LABELS@ @COMPILED_MODEL@
 
 # sleep to wait for procmon.py (launched by validate.py) to exit
 sleep 2

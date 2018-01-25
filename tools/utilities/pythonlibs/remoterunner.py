@@ -18,6 +18,7 @@ import paramiko
 sys.path += ["../pythonlibs"]
 import picluster
 import logger
+import logging
 
 
 #
@@ -31,7 +32,8 @@ class RemoteRunner:
         command=None, logfile=None, verbose=True, start_clean=True, cleanup=True,
         timeout=None, all=None, source_files=None):
 
-        if cluster:
+        self.cluster = cluster
+        if isinstance(cluster, str):
             self.cluster = picluster.PiBoardTable(cluster)
         self.ipaddress = ipaddress
         self.username = username
@@ -47,9 +49,6 @@ class RemoteRunner:
         self.cleanup = cleanup
         self.logfile = logfile
         self.timeout = timeout
-        self.cluster = None
-        if not cluster and not ipaddress:
-            raise Exception("Error: required ipaddress or cluster or both")
 
         self.all = all
         self.machine = None
@@ -62,9 +61,12 @@ class RemoteRunner:
         # make sense of the combined output when remote commands are running in
         # parallel.
         self.logger = logger.get(self.logfile)
+        
+        if not cluster and not ipaddress:
+            raise Exception("Error: required ipaddress or cluster or both")
 
         # Sanity-check parameters
-        if os.path.pathsep in self.target_dir:
+        if self.target_dir and os.path.pathsep in self.target_dir:
             raise Exception("Error: multilevel target directories not supported")
 
     def lock_machine(self):
@@ -74,11 +76,17 @@ class RemoteRunner:
             self.print("Using machine at " + self.machine.ip_address)
             self.ipaddress = self.machine.ip_address
         elif self.cluster:
-            self.machine = self.cluster.lock(self.ipaddress, self.command)
+            self.machine = self.cluster.get(self.ipaddress)
+            if not self.machine:
+                self.print("Machine {} not found on cluster".format(self.ipaddress))
+            else:
+                self.print("Locking machine at " + self.machine.ip_address)
+                self.machine = self.cluster.lock(self.ipaddress, self.command)
         return self.ipaddress
 
     def free_machine(self):
         if self.machine != None:
+            self.print("Unlocking machine at " + self.machine.ip_address)
             f = self.cluster.unlock(self.machine.ip_address)
             if f.current_user_name:
                 self.print("Failed to free the machine at " + self.machine.ip_address)
@@ -132,8 +140,9 @@ class RemoteRunner:
         return result
 
     def clean_target(self):
-        self.print("cleaning target folder: " + os.path.basename(self.target_dir))
-        self.exec_remote_command("rm -rf {}".format(os.path.basename(self.target_dir)))
+        if self.target_dir:
+            self.print("cleaning target folder: " + os.path.basename(self.target_dir))
+            self.exec_remote_command("rm -rf {}".format(os.path.basename(self.target_dir)))
 
     def linux_join(self, path, name):
         # on windows os.path.join uses backslashes which doesn't work on the pi!
@@ -206,17 +215,21 @@ class RemoteRunner:
                 self.clean_target()
             self.publish_bits()
             if self.command:
-                self.exec_remote_command("cd {} && chmod u+x ./{}".format(
-                    self.target_dir, self.command.split(" ")[0]))
-                output = self.exec_remote_command("cd {} && ./{}".format(
-                    self.target_dir, self.command))
+                if self.target_dir:
+                    self.exec_remote_command("cd {} && chmod u+x ./{}".format(
+                        self.target_dir, self.command.split(" ")[0]))
+                    
+                    output = self.exec_remote_command("cd {} && ./{}".format(
+                        self.target_dir, self.command))
+                else:
+                    output = self.exec_remote_command(self.command)
             self.copy_files()
             if self.cleanup:
                 self.clean_target()
             self.close_ssh()
         except:
             errorType, value, traceback = sys.exc_info()
-            msg = "### Exception: %s: %s" % (str(errorType), str(value))
+            msg = "### Exception: %s: %s" % (str(errorType), str(value) + "\n" + str(traceback))
             self.print(msg)
             if self.buffer:
                 output = self.buffer.getvalue().split('\n')
@@ -232,4 +245,26 @@ class RemoteRunner:
                 self.run_command()
             except:
                 errorType, value, traceback = sys.exc_info()
-                print("### Unexpected Exception: " + str(errorType) + ": " + str(value))
+                self.print("### Unexpected Exception: " + str(errorType) + ": " + str(value) + "\n" + str(traceback))
+
+
+if __name__ == "__main__":
+    
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+    import argparse
+    arg_parser = argparse.ArgumentParser("remoterunnder executes remote commands on a given machine")
+
+    arg_parser.add_argument("--ipaddress", help="Address of machine to run commands on", required=True)
+    arg_parser.add_argument("--cluster", help="URL of pycluster server", default=None)
+    arg_parser.add_argument("--username", help="Username for logon to remote machine", default=None)
+    arg_parser.add_argument("--password", help="Password for logon to remote machine", default=None)
+    arg_parser.add_argument("--command", help="The command to run on the remote machine", default=None)
+    arg_parser.add_argument("--timeout", type=bool, help="Timeout for the command in seconds (default 300 seconds)", default=300)
+    
+    args = arg_parser.parse_args()
+        
+    runner = RemoteRunner(ipaddress = args.ipaddress, cluster=args.cluster, username=args.username, password=args.password,
+        command=args.command, verbose=True, timeout=args.timeout)
+    runner.run_command()
+    

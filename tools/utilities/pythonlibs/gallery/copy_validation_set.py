@@ -16,6 +16,7 @@ from itertools import islice
 _current_script = os.path.basename(__file__)
 sys.path += [".."] # pythonlibs
 import logger
+import logging 
 import picluster
 from remoterunner import RemoteRunner
 

@@ -279,7 +279,7 @@ class DriveTest:
             self.logger.info("### Test passed")
             self.logger.info("Prediction=%s, time=%f" % (prediction, prediction_time))
         elif self.expected:
-            msg = "### Test Failed, expecting %s, but found %s in time=%f" \
+            msg = "### Test Failed, expecting %s, but found '%s' in time=%f" \
                 % (self.expected, prediction, prediction_time)
             self.logger.error(msg)
             raise Exception(msg)
@@ -297,7 +297,8 @@ class DriveTest:
                 self.get_bash_files()
 
             start_time = time.time()
-            runner = RemoteRunner(cluster=self.cluster,
+            # do not pass cluster to remote runner because we've already locked the machine.
+            runner = RemoteRunner(cluster=None,
                                   ipaddress=self.ipaddress,
                                   username=self.username,
                                   password=self.password,
@@ -315,7 +316,7 @@ class DriveTest:
 
         except:
             errorType, value, traceback = sys.exc_info()
-            self.logger.error("### Exception: " + str(errorType) + ": " + str(value))
+            self.logger.error("### Exception: " + str(errorType) + ": " + str(value) + "\n" + str(traceback))
             raise Exception("### Test Failed")
 
 
