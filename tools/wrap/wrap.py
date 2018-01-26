@@ -92,9 +92,9 @@ class ModuleBuilder:
         self.model_file = args.model_file
         _, tail = os.path.split(self.model_file)
         self.model_file_base = os.path.splitext(tail)[0]
-        self.model_name = args.module_name 
+        self.model_name = args.module_name
         if not self.model_name:
-            self.model_name = self.model_file_base
+            self.model_name = self.model_file_base.replace('-', '_')
         self.language = args.language
         self.target = args.target
         self.output_dir = args.outdir
