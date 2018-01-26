@@ -29,6 +29,4 @@ if(${PYTHON_ENABLED})
         configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
     endforeach()
 
-    add_subdirectory(gallery)
-
 endif()  # PYTHON_ENABLED
