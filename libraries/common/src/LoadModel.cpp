@@ -158,14 +158,14 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::MelFilterBankNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MelFilterBankNode<double>>();
-        
+
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<float, math::MatrixLayout::rowMajor>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<float, math::MatrixLayout::columnMajor>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixMatrixMultiplyNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::MatrixMatrixMultiplyNode<double>>();        
+        context.GetTypeFactory().AddType<model::Node, nodes::MatrixMatrixMultiplyNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<int, bool>>();
@@ -237,7 +237,7 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
-        
+
         context.GetTypeFactory().AddType<model::Node, nodes::ProtoNNPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<float>>();
@@ -265,6 +265,8 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<double, ell::predictors::neural::MeanPoolingFunction>>();
         context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<float, ell::predictors::neural::MaxPoolingFunction>>();
         context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<double, ell::predictors::neural::MaxPoolingFunction>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::RegionDetectionLayerNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::RegionDetectionLayerNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ScalingLayerNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ScalingLayerNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SoftmaxLayerNode<float>>();

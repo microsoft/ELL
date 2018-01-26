@@ -319,6 +319,12 @@ namespace api
                     }
                 }
                 break;
+                case (underlying::LayerType::region):
+                {
+                    auto& apiLayer = LayerAs<api::RegionDetectionLayer<ElementType>>(layer);
+                    underlyingLayers.push_back(std::make_unique<underlying::RegionDetectionLayer<ElementType>>(parameters, apiLayer.detectionParameters));
+                }
+                break;
                 case (underlying::LayerType::scaling):
                 {
                     auto& apiLayer = LayerAs<api::ScalingLayer<ElementType>>(layer);

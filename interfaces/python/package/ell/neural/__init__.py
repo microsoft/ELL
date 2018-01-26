@@ -57,4 +57,5 @@ PaddingParameters,\
 PaddingScheme,\
 PoolingParameters,\
 PoolingType,\
+RegionDetectionParameters,\
 ZeroPadding

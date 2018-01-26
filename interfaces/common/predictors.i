@@ -50,6 +50,14 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
         poolingSize: size of the pooling field in row and column dimensions
         stride: size of stride in row and column dimensions
 %}
+%feature("docstring") RegionDetectionParameters::RegionDetectionParameters %{
+    RegionDetectionParameters(width, height, numBoxesPerCell, numClasses, numCoordinates)
+        width: width of the input
+        height: height of the input
+        numBoxesPerCell: number of possible bounding boxes per cell
+        numClasses: number of classes that can be detected
+        numCoordinates: number of coordinates per region. Currently, only supported value is 4
+%}
 
 // Include the C++ code to be wrapped
 %include "NeuralLayersInterface.h"
@@ -59,13 +67,13 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 // Include C++ cheaders that will be ignored, except for specific classes we will bring in
 // for wrapping by SWIG. This is to share POD types, enums and so on between Api and core code
 %rename($ignore, %$isclass) ""; // Ignore all classes by default, we will expose specific ones we need
-%rename("%s") LayerType; // Expose LayerType
-%rename("%s") PaddingScheme; // Expose PaddingScheme
-%rename("%s") PaddingParameters; // Expose PaddingParameters
-%rename("%s") BinaryConvolutionMethod; // Expose BinaryConvolutionMethod
 %rename("%s") BinaryConvolutionalParameters; // Expose BinaryConvolutionalParameters
-%rename("%s") ConvolutionMethod; // Expose ConvolutionMethod
+%rename("%s") BinaryConvolutionMethod; // Expose BinaryConvolutionMethod
 %rename("%s") ConvolutionalParameters; // Expose ConvolutionalParameters
+%rename("%s") ConvolutionMethod; // Expose ConvolutionMethod
+%rename("%s") LayerType; // Expose LayerType
+%rename("%s") PaddingParameters; // Expose PaddingParameters
+%rename("%s") PaddingScheme; // Expose PaddingScheme
 %rename("%s") PoolingParameters; // Expose PoolingParameters
 %rename("%s") RegionDetectionParameters; // Expose RegionDetectionParameters
 %ignore ell::predictors::neural::Layer::LayerParameters;
@@ -73,12 +81,15 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 %include <BinaryConvolutionalLayer.h>
 %include <ConvolutionalLayer.h>
 %include <PoolingLayer.h>
+%include <RegionDetectionLayer.h>
 
 // Template instantiations
 
 // These need to be defined before the other layer types
 %template(FloatLayer) ell::api::predictors::neural::Layer<float>;
+%template(FloatLayerVector) std::vector<ell::api::predictors::neural::Layer<float>*>;
 %template(DoubleLayer) ell::api::predictors::neural::Layer<double>;
+%template(DoubleLayerVector) std::vector<ell::api::predictors::neural::Layer<double>*>;
 
 %template(FloatActivationLayer) ell::api::predictors::neural::ActivationLayer<float>;
 %template(FloatBatchNormalizationLayer) ell::api::predictors::neural::BatchNormalizationLayer<float>;
@@ -87,7 +98,6 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 %template(FloatConvolutionalLayer) ell::api::predictors::neural::ConvolutionalLayer<float>;
 %template(FloatFullyConnectedLayer) ell::api::predictors::neural::FullyConnectedLayer<float>;
 %template(FloatGRULayer) ell::api::predictors::neural::GRULayer<float>;
-%template(FloatLayerVector) std::vector<ell::api::predictors::neural::Layer<float>*>;
 %template(FloatLSTMLayer) ell::api::predictors::neural::LSTMLayer<float>;
 %template(FloatNeuralNetworkPredictor) ell::api::predictors::NeuralNetworkPredictor<float>;
 %template(FloatPoolingLayer) ell::api::predictors::neural::PoolingLayer<float>;
@@ -103,7 +113,6 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 %template(DoubleConvolutionalLayer) ell::api::predictors::neural::ConvolutionalLayer<double>;
 %template(DoubleFullyConnectedLayer) ell::api::predictors::neural::FullyConnectedLayer<double>;
 %template(DoubleGRULayer) ell::api::predictors::neural::GRULayer<double>;
-%template(DoubleLayerVector) std::vector<ell::api::predictors::neural::Layer<double>*>;
 %template(DoubleLSTMLayer) ell::api::predictors::neural::LSTMLayer<double>;
 %template(DoubleNeuralNetworkPredictor) ell::api::predictors::NeuralNetworkPredictor<double>;
 %template(DoublePoolingLayer) ell::api::predictors::neural::PoolingLayer<double>;
