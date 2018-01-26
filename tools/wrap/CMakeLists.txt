@@ -22,7 +22,7 @@ set (builder_src
 add_custom_target(${module_name} DEPENDS ${builder_src} SOURCES ${builder_src})
 set_property(TARGET ${module_name} PROPERTY FOLDER "tools")
 
-# copy source files
+# copy files
 foreach(PY_FILE ${builder_src})
     configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
 endforeach()
