@@ -11,6 +11,8 @@ import json
 import os
 import logger
 import subprocess
+import sys
+from threading import Thread
 
 class EllBuildToolsRunException(Exception):
     def __init__(self, cmd, output=""):
@@ -30,6 +32,7 @@ class EllBuildTools:
         self.blas = None
         self.logger = logger.get()
         self.find_tools()
+        self.output = None
 
     def find_tools(self):
         if not os.path.isdir(self.build_root):
@@ -61,6 +64,22 @@ class EllBuildTools:
         if ("blas" in self.tools):
             self.blas = self.tools['blas']  # this one can be empty.
 
+    def logstream(self, stream):
+        try:
+            while True:
+                out = stream.readline()
+                if out:                    
+                    self.output += out
+                    msg = out.rstrip('\n')                    
+                    self.logger.info(msg)
+                else:
+                    break
+        except:
+            errorType, value, traceback = sys.exc_info()
+            msg = "### Exception: %s: %s" % (str(errorType), str(value))
+            if not "closed file" in msg:
+                self.logger.info(msg)
+
     def run(self, command, print_output=True, shell=False):
         cmdstr = command if isinstance(command, str) else " ".join(command)
         if self.verbose:
@@ -69,18 +88,23 @@ class EllBuildTools:
             with subprocess.Popen(
                 command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0, universal_newlines = True, shell=shell
             ) as proc:
-                output = ''
-                for line in proc.stdout:
-                    output += line
-                    if print_output or self.verbose:
-                        self.logger.info(line.strip("\n"))
-                for line in proc.stderr:
-                    output += line
-                    if print_output or self.verbose:
-                        self.logger.info(line.strip("\n"))
+                self.output = ''
+                    
+                stdout_thread = Thread(target=self.logstream, args=(proc.stdout,))
+                stderr_thread = Thread(target=self.logstream, args=(proc.stderr,))
+
+                stdout_thread.start()
+                stderr_thread.start()
+
+                while stdout_thread.isAlive() and stderr_thread.isAlive():
+                    pass
+
+                proc.wait()
+                
                 if proc.returncode:
-                    raise EllBuildToolsRunException(cmdstr, output)
-                return output
+                    self.logger.error("command {} failed with error code {}".format(command[0], proc.returncode))
+                    raise EllBuildToolsRunException(cmdstr, self.output)
+                return self.output
         except FileNotFoundError:
             raise EllBuildToolsRunException(cmdstr)
 
