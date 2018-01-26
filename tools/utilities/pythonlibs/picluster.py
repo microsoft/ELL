@@ -20,7 +20,7 @@ import uuid
 
 import logger
 
-class PiBoardEntity(): 
+class PiBoardEntity():
     def __init__(self, values = None):
         if isinstance(values, dict):
             self.load(values)
@@ -30,11 +30,11 @@ class PiBoardEntity():
             self.os_version = ""
             self.current_task_name = ""
             self.current_user_name = ""
-            self.command = ""       
+            self.command = ""
             self.last_heartbeat = ""
             self.lock_key = ""
 
-    def load(self, values) :        
+    def load(self, values) :
         self.ip_address = values['IpAddress']
         self.os_name = values['OsName']
         self.os_version = values['OsVersion']
@@ -49,8 +49,8 @@ class PiBoardEntity():
         self.load(values)
 
     def serialize(self):
-        return json.dumps({'IpAddress': self.ip_address, 
-                            'OsName': self.os_name, 'OsVersion': self.os_version, 
+        return json.dumps({'IpAddress': self.ip_address,
+                            'OsName': self.os_name, 'OsVersion': self.os_version,
                             'CurrentTaskName': self.current_task_name, 'CurrentUserName': self.current_user_name,
                             'Command':self.command, "LockKey": self.lock_key })
 
@@ -70,7 +70,7 @@ class PiBoardTable:
             raise Exception("update failed: " + str(r.status_code))
         e = json.loads(r.text)
         if isinstance(e, dict):
-            return PiBoardEntity(e)                   
+            return PiBoardEntity(e)
         return None
 
     def get(self, id):
@@ -79,9 +79,9 @@ class PiBoardTable:
         if len(e) > 0:
             e = e[0]
             if isinstance(e, dict):
-                return PiBoardEntity(e)                   
+                return PiBoardEntity(e)
         return None
-    
+
     def get_all(self):
         r = requests.get(self.endpoint)
         result = []
@@ -111,7 +111,7 @@ class PiBoardTable:
         elif r.lock_key != a.lock_key:
             raise Exception("Lock failed on machine {}, lock key mismatch {}".format(ip))
         return r
-    
+
     def unlock(self, ip):
         # now try and lock the device for our usage.
         a = PiBoardEntity()
@@ -136,7 +136,7 @@ class PiBoardTable:
         if name == "":
             name = os.getenv('USER')
         if name == "pi":
-            name += "_" + self.get_local_ip()        
+            name += "_" + self.get_local_ip()
         return name
 
     def heartbeat_is_valid(self, heartbeat):
@@ -163,5 +163,5 @@ class PiBoardTable:
                 except:
                     pass
 
-            self.logger("All machines are busy, sleeping 10 seconds and trying again...")
+            self.logger.info("All machines are busy, sleeping 10 seconds and trying again...")
             time.sleep(10)
