@@ -90,6 +90,8 @@ namespace nodes
 
     private:
         void EmitGetTicksUntilNextIntervalFunction(model::IRMapCompiler& compiler, emitters::IRModuleEmitter& moduleEmitter, llvm::GlobalVariable* pLastIntervalTime);
+        void EmitGetLagThresholdFunction(model::IRMapCompiler& compiler, emitters::IRModuleEmitter& moduleEmitter);
+        void EmitGetStepIntervalFunction(model::IRMapCompiler& compiler, emitters::IRModuleEmitter& moduleEmitter);
 
         model::InputPort<TimeTickType> _input;
         model::OutputPort<TimeTickType> _output;

@@ -77,7 +77,7 @@ namespace ell
             }
 
             // Tag the sink function as a callback that is emitted in headers
-            function.GetModule().IncludeInHeader(_sinkFunctionName);
+            function.IncludeInHeader();
         }
 
         template <typename ValueType>

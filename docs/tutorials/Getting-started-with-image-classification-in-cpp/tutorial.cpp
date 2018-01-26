@@ -13,7 +13,7 @@
 #include <opencv2/opencv.hpp>
 
 // Include the model interface file for the compiled ELL model
-#include "model.i.h"
+#include "model.h"
 
 // Include helper functions
 #include "tutorialHelpers.h"

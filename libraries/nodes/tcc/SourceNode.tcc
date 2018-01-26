@@ -57,23 +57,23 @@ namespace nodes
     {
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         compiler.EnsurePortEmitted(output);
+        auto& module = function.GetModule();
 
         // Globals
-        emitters::Variable* pBufferedSampleTimeVar = function.GetModule().Variables().AddVariable<emitters::InitializedScalarVariable<TimeTickType>>(emitters::VariableScope::global, _bufferedSampleTime);
-        emitters::Variable* pBufferedSampleVar = function.GetModule().Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, output.Size());
-        llvm::Value* pBufferedSampleTime = function.GetModule().EnsureEmitted(*pBufferedSampleTimeVar);
-        llvm::Value* pBufferedSample = function.GetModule().EnsureEmitted(*pBufferedSampleVar);
+        emitters::Variable* pBufferedSampleTimeVar = module.Variables().AddVariable<emitters::InitializedScalarVariable<TimeTickType>>(emitters::VariableScope::global, _bufferedSampleTime);
+        emitters::Variable* pBufferedSampleVar = module.Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, output.Size());
+        llvm::Value* pBufferedSampleTime = module.EnsureEmitted(*pBufferedSampleTimeVar);
+        llvm::Value* pBufferedSample = module.EnsureEmitted(*pBufferedSampleVar);
         llvm::Value* bufferedSampleTime = function.Load(pBufferedSampleTime);
         UNUSED(bufferedSampleTime);
 
         // Callback function
-        const emitters::VariableTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
+        const emitters::NamedVariableTypeList parameters = { { "input", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
-        function.GetModule().DeclareFunction(prefixedName, emitters::GetVariableType<bool>(), parameters);
-        function.GetModule().IncludeInHeader(prefixedName);
-        function.GetModule().IncludeInCallbackInterface(prefixedName, "SourceNode");
+        module.DeclareFunction(prefixedName, emitters::GetVariableType<bool>(), parameters);
+        module.IncludeInCallbackInterface(prefixedName, "SourceNode");
 
-        llvm::Function* pSamplingFunction = function.GetModule().GetFunction(prefixedName);
+        llvm::Function* pSamplingFunction = module.GetFunction(prefixedName);
 
         // Locals
         auto sampleTime = function.ValueAt(pInput, function.Literal(0));

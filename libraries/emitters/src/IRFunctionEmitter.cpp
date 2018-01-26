@@ -14,6 +14,7 @@
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 #include "IRThreadPool.h"
+#include "LLVMUtilities.h"
 
 // utilities
 #include "Logger.h"
@@ -49,6 +50,13 @@ namespace emitters
         RegisterFunctionArgs(arguments);
     }
 
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, llvm::Function* pFunction, const NamedLLVMTypeList& arguments, const std::string& name)
+        : IRFunctionEmitter(pModuleEmitter, pEmitter, pFunction, name)
+    {
+        // Note: already called other constructor
+        RegisterFunctionArgs(arguments);
+    }
+
     void IRFunctionEmitter::CompleteFunction(bool optimize)
     {
         Verify();
@@ -62,17 +70,6 @@ namespace emitters
     {
         Verify();
         Optimize(optimizer);
-    }
-
-    void IRFunctionEmitter::RegisterFunctionArgs(const NamedVariableTypeList& args)
-    {
-        auto argumentsIterator = Arguments().begin();
-        for (size_t i = 0; i < args.size(); ++i)
-        {
-            auto arg = &(*argumentsIterator);
-            _locals.Add(args[i].first, arg);
-            ++argumentsIterator;
-        }
     }
 
     void IRFunctionEmitter::SetUpFunction()
@@ -1356,23 +1353,6 @@ namespace emitters
         InsertMetadata(c_swigFunctionTagName);
     }
 
-    void IRFunctionEmitter::IncludeInCallbackInterface()
-    {
-        _pFunction->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
-        InsertMetadata(c_callbackFunctionTagName);
-    }
-
-    void IRFunctionEmitter::IncludeInStepInterface(size_t outputSize)
-    {
-        _pFunction->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
-        InsertMetadata(c_stepFunctionTagName, std::to_string(outputSize));
-    }
-
-    void IRFunctionEmitter::IncludeInStepTimeInterface(const std::string& functionName)
-    {
-        _pFunction->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
-        InsertMetadata(c_stepTimeFunctionTagName, functionName);
-    }
 
     //
     // Internal functions

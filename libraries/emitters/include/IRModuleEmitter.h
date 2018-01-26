@@ -150,6 +150,13 @@ namespace emitters
         /// <param name="argsTypes"> The argument types for the function. </param>
         IRFunctionEmitter& BeginFunction(const std::string& functionName, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes);
 
+        /// <summary> Begins an IR function and directs subsequent commands to it. </summary>
+        ///
+        /// <param name="functionName"> The name of the function. </param>
+        /// <param name="returnType"> The return type of the function. </param>
+        /// <param name="args"> The arguments to the function. </param>
+        IRFunctionEmitter& BeginFunction(const std::string& functionName, llvm::Type* returnType, const NamedLLVMTypeList& args);
+
         /// <summary> Emit a "main" function, the entry point to an LLVM program. </summary>
         ///
         /// <returns> An IRFunctionEmitter. </returns>
@@ -591,11 +598,6 @@ namespace emitters
         // Metadata
         //
 
-        /// <summary> Tags a function to be declared in a C/C++ header. </summary>
-        ///
-        /// <param name="functionName"> The function name. </param>
-        void IncludeInHeader(const std::string& functionName);
-
         /// <summary> Tags a type to be declared in a C/C++ header. </summary>
         ///
         /// <param name="typeName"> The name of the type. </param>
@@ -702,6 +704,7 @@ namespace emitters
         IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const NamedVariableTypeList& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const std::initializer_list<VariableType>& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes, bool isPublic = false);
+        IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const NamedLLVMTypeList& arguments, bool isPublic = false);
 
         /// <summary> Associates metadata with a given function. </summary>
         ///

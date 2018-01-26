@@ -1412,22 +1412,11 @@ namespace emitters
         /// <summary> Tags a profiling function to be included in the SWIG interface. </summary>
         void IncludeInSwigInterface();
 
-        /// <summary> Tags a callback function to be included in the SWIG interface. </summary>
-        void IncludeInCallbackInterface();
-
-        /// <summary> Tags the step function to be included in the SWIG interface. </summary>
-        ///
-        /// <param name="outputSize"> The output size. </param>
-        void IncludeInStepInterface(size_t outputSize);
-
-        /// <summary> Tags a step time function, such as GetInterval(), to be included in the SWIG interface. </summary>
-        ///
-        /// <param name="functionName"> The function name. </param>
-        void IncludeInStepTimeInterface(const std::string& functionName);
-
     private:
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const std::string& name);
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedVariableTypeList& arguments, const std::string& name);
+        IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedLLVMTypeList& arguments, const std::string& name);
+
         friend class IRModuleEmitter;
 
         class EntryBlockScope
@@ -1457,7 +1446,9 @@ namespace emitters
 
         llvm::BasicBlock* GetEntryBlock() { return _entryBlock; }
         void SetUpFunction();
-        void RegisterFunctionArgs(const NamedVariableTypeList& args);
+
+        template <typename ArgsListType>
+        void RegisterFunctionArgs(const ArgsListType& args);
         void CompleteFunction(bool optimize = true);
         void CompleteFunction(IRFunctionOptimizer& optimizer);
 

@@ -60,31 +60,31 @@ namespace nodes
     {
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
+        auto& module = function.GetModule();
 
         // EvaluateInput defaults to 'pass through' in base implementation, which means
         // we always call the sink function
         if (IsScalar(input))
         {
             // Callback signature: void SinkFunction(ValueType t)
-            const emitters::VariableTypeList parameters = { emitters::GetVariableType<ValueType>() };
-            function.GetModule().DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
+            const emitters::NamedVariableTypeList parameters = { { "output", emitters::GetVariableType<ValueType>() } };
+            module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
 
-            llvm::Function* pSinkFunction = function.GetModule().GetFunction(prefixedName);
+            llvm::Function* pSinkFunction = module.GetFunction(prefixedName);
             function.Call(pSinkFunction, { compiler.LoadPortElementVariable(input.GetInputElement(0)) });
         }
         else
         {
             // Callback signature: void SinkFunction(ValueType* array)
-            const emitters::VariableTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
-            function.GetModule().DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
+            const emitters::NamedVariableTypeList parameters = { { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
+            module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
 
-            llvm::Function* pSinkFunction = function.GetModule().GetFunction(prefixedName);
+            llvm::Function* pSinkFunction = module.GetFunction(prefixedName);
             function.Call(pSinkFunction, { function.PointerOffset(pInput, function.Literal(0)) });
         }
 
         // Tag the sink function as a callback that is emitted in headers
-        function.GetModule().IncludeInHeader(prefixedName);
-        function.GetModule().IncludeInCallbackInterface(prefixedName, "SinkNode");
+        module.IncludeInCallbackInterface(prefixedName, "SinkNode");
 
         // Set output values as well, useful when user code is in a non-event-driven mode
         if (!IsScalar(input) && !compiler.GetCompilerParameters().unrollLoops)

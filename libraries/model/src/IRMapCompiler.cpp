@@ -14,6 +14,7 @@
 
 // emitters
 #include "EmitterException.h"
+#include "LLVMUtilities.h"
 #include "Variable.h"
 
 // utils
@@ -203,9 +204,7 @@ namespace model
         auto shapeType = _moduleEmitter.GetStruct(TensorShapeName);
         auto arguments = fn.Arguments().begin();
         auto indexArgument = &(*arguments++);
-        indexArgument->setName("index");
         auto shapeArgument = &(*arguments++);
-        shapeArgument->setName("shape");
         auto& emitter = _moduleEmitter.GetIREmitter();
         auto& irBuilder = emitter.GetIRBuilder();
         auto rowsPtr = irBuilder.CreateInBoundsGEP(shapeType, shapeArgument, { fn.Literal(0), fn.Literal(0) });
@@ -295,14 +294,18 @@ namespace model
     void IRMapCompiler::EmitGetInputShapeFunction(const Map& map)
     {
         // We have to create this interface because LLVM cannot reliably return structures on the stack.
-        // void darknet_GetInputShape(struct TensorShape* shape, int index)
+        // void darknet_GetInputShape(int index, struct TensorShape* shape)
         auto shapeType = _moduleEmitter.GetStruct(TensorShapeName);
         auto& context = _moduleEmitter.GetLLVMContext();
         auto voidType = llvm::Type::getVoidTy(context);
         auto int32Type = llvm::Type::getInt32Ty(context);
-        const std::vector<llvm::Type*> parameters = { int32Type, shapeType->getPointerTo() };
-        auto fn = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputShape", voidType, parameters);
+
+        const emitters::NamedLLVMTypeList parameters = { { "index", int32Type }, { "shape", shapeType->getPointerTo() } };
+        const std::string functionName = GetNamespacePrefix() + "_GetInputShape";
+
+        auto fn = _moduleEmitter.BeginFunction(functionName, voidType, parameters);
         fn.IncludeInHeader();
+
         auto nodes = map.GetInputNodes();
         std::vector<math::TensorShape> shapes;
         for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)
@@ -317,14 +320,18 @@ namespace model
     void IRMapCompiler::EmitGetOutputShapeFunction(const Map& map)
     {
         // We have to create this interface because LLVM cannot reliably return structures on the stack.
-        // void darknet_GetInputShape(struct TensorShape* shape, int index)
+        // void darknet_GetOutputShape(int index, struct TensorShape* shape)
         auto shapeType = _moduleEmitter.GetStruct(TensorShapeName);
         auto& context = _moduleEmitter.GetLLVMContext();
         auto voidType = llvm::Type::getVoidTy(context);
         auto int32Type = llvm::Type::getInt32Ty(context);
-        const std::vector<llvm::Type*> parameters = { int32Type, shapeType->getPointerTo() };
-        auto fn = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputShape", voidType, parameters);
+
+        const emitters::NamedLLVMTypeList parameters = { { "index", int32Type },  { "shape", shapeType->getPointerTo() } };
+        const std::string functionName = GetNamespacePrefix() + "_GetOutputShape";
+
+        auto fn = _moduleEmitter.BeginFunction(functionName, voidType, parameters);
         fn.IncludeInHeader();
+
         auto nodes = map.GetOutputNodes();
         std::vector<math::TensorShape> shapes;
         for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)

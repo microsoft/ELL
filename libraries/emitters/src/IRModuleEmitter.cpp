@@ -117,6 +117,15 @@ namespace emitters
         return _functionStack.top().first;
     }
 
+    IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, llvm::Type* returnType, const NamedLLVMTypeList& args)
+    {
+        Log() << "Begin emitting IR for function " << functionName << EOL;
+        auto currentPos = _emitter.GetCurrentInsertPoint();
+        IRFunctionEmitter newFunction = Function(functionName, returnType, args, false);
+        _functionStack.emplace(newFunction, currentPos);
+        return _functionStack.top().first;
+    }
+
     IRFunctionEmitter IRModuleEmitter::BeginMainFunction()
     {
         return BeginFunction("main", VariableType::Void);
@@ -479,6 +488,16 @@ namespace emitters
         return IRFunctionEmitter(this, &_emitter, pFunction, name);
     }
 
+    IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, llvm::Type* returnType, const NamedLLVMTypeList& arguments, bool isPublic)
+    {
+        llvm::Function* pFunction = _emitter.Function(GetLLVMModule(), name, returnType, Linkage(isPublic), arguments);
+        if (pFunction == nullptr)
+        {
+            throw EmitterException(EmitterError::functionNotFound);
+        }
+        return IRFunctionEmitter(this, &_emitter, pFunction, name);
+    }
+
     bool IRModuleEmitter::HasFunction(const std::string& name)
     {
         return GetLLVMModule()->getFunction(name) != nullptr;
@@ -732,6 +751,7 @@ namespace emitters
     void IRModuleEmitter::WriteHeader(std::ostream& os)
     {
         WriteModuleHeader(os, *this);
+        WriteModuleCppWrapper(os, *this);
     }
 
     //
@@ -842,14 +862,6 @@ namespace emitters
     //
     // Metadata
     //
-
-    void IRModuleEmitter::IncludeInHeader(const std::string& functionName)
-    {
-        auto function = GetFunction(functionName);
-        function->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
-        InsertFunctionMetadata(function, c_declareFunctionInHeaderTagName);
-    }
-
     void IRModuleEmitter::IncludeTypeInHeader(const std::string& typeName)
     {
         InsertMetadata(c_declareTypeInHeaderTagName, { typeName });

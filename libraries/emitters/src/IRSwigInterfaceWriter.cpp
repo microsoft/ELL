@@ -12,7 +12,6 @@
 #include "IRMetadata.h"
 
 // utilities
-#include "Debug.h"
 #include "StringUtil.h"
 
 // stl
@@ -27,12 +26,6 @@ namespace emitters
     namespace
     {
         // Utilities
-        void ReplaceDelimiter(std::string& text, const std::string& delimiter, const std::string& replacement)
-        {
-            std::string actualDelimiter = "@@" + delimiter + "@@";
-            text = std::regex_replace(text, std::regex(actualDelimiter), replacement);
-        }
-
         std::string AsVectorType(const std::string& type)
         {
             return type == "float" ? "FloatVector" : "DoubleVector";
@@ -93,9 +86,11 @@ namespace emitters
 
                 // Write header for SWIG to generate a wrapper
                 // (Note: newlines are part of the syntax for #include)
+                // clang-format off
                 std::string predictFunctionCode(
-#include "SwigPredictFunction.in"
-                    );
+                    #include "SwigPredictFunction.in"
+                );
+                // clang-format on
 
                 ReplaceDelimiter(predictFunctionCode, "FUNCTION", _functionName);
                 ReplaceDelimiter(predictFunctionCode, "INPUT_TYPE", inputType);
@@ -109,9 +104,11 @@ namespace emitters
             {
                 DeclareIfDefGuard guard(os, "SWIGPYTHON", DeclareIfDefGuard::Type::Positive);
 
+                // clang-format off
                 std::string predictPythonCode(
-#include "SwigRawPredictPython.in"
-                    );
+                    #include "SwigRawPredictPython.in"
+                );
+                // clang-format on
 
                 ReplaceDelimiter(predictPythonCode, "PREDICT_FUNCTION", _functionName);
                 ReplaceDelimiter(predictPythonCode, "OUTPUT_VECTOR_TYPE", AsVectorType(_outputType));
@@ -160,82 +157,15 @@ namespace emitters
             llvm::Function* _function;
         };
 
-        struct CallbackSignature
-        {
-            CallbackSignature(llvm::Function& f)
-            {
-                functionName = f.getName();
-
-                // Callbacks have one input parameter and a return (which can be void)
-                {
-                    std::ostringstream os;
-                    auto& argument = *(f.args().begin());
-                    auto type = argument.getType();
-                    if (type->isPointerTy())
-                    {
-                        inputIsScalar = false;
-                        WriteLLVMType(os, argument.getType()->getPointerElementType());
-                    }
-                    else
-                    {
-                        inputIsScalar = true;
-                        WriteLLVMType(os, argument.getType());
-                    }
-                    inputType = os.str();
-                }
-
-                {
-                    std::ostringstream os;
-                    WriteLLVMType(os, f.getReturnType());
-                    returnType = os.str();
-                }
-
-                className = inputType + "CallbackBase";
-                className[0] = toupper(className[0]); // pascal case
-            }
-
-            std::string functionName;
-            std::string className;
-            std::string inputType;
-            std::string returnType;
-            bool inputIsScalar;
-        };
-
         // Writes SWIG interfaces for predictors with step support
         class SteppablePredictorInterfaceWriter
         {
         public:
             SteppablePredictorInterfaceWriter(IRModuleEmitter& moduleEmitter, const std::string& predictFunctionName, const std::vector<FunctionTagValues>& callbacks)
-                : _predictFunctionName(predictFunctionName)
+                : _predictFunctionName(predictFunctionName), _callbacks(callbacks)
             {
                 _moduleName = moduleEmitter.GetLLVMModule()->getName();
                 _className = _moduleName + "_Predictor";
-
-                for (const auto& c : callbacks)
-                {
-                    if (!c.values.empty())
-                    {
-                        auto nodeType = c.values[0];
-                        if (nodeType == "SourceNode")
-                        {
-                            _inputCallbacks.push_back(CallbackSignature(*c.function));
-                        }
-                        else if (nodeType == "SinkNode")
-                        {
-                            _outputCallbacks.push_back(CallbackSignature(*c.function));
-                        }
-                        else if (nodeType == "ClockNode")
-                        {
-                            _lagCallbacks.push_back(CallbackSignature(*c.function));
-                        }
-                    }
-                }
-
-                // Eventually we'd support multiple sources and sinks.
-                // For now, assert that we're only going to look at the first ones of each.
-                DEBUG_THROW(_inputCallbacks.size() != 1, EmitterException(EmitterError::badFunctionDefinition, "Only one input callback function will be generated"));
-                DEBUG_THROW(_outputCallbacks.size() != 1, EmitterException(EmitterError::badFunctionDefinition, "Only one output callback function will be generated"));
-                DEBUG_THROW(_lagCallbacks.size() != 1, EmitterException(EmitterError::badFunctionDefinition, "Only one lag callback function will be generated"));
             }
 
             virtual ~SteppablePredictorInterfaceWriter() = default;
@@ -251,18 +181,21 @@ namespace emitters
                 // Load the template, which declares a C++ predictor class
                 // for forwarding actuator callbacks to the predictor.
                 // (Note: newlines are part of the syntax for #include)
+
+                // clang-format off
                 std::string predictorCode(
-#include "SwigPredictorClass.in"
-                    );
+                    #include "SwigPredictorClass.in"
+                );
+                // clang-format on
 
                 ReplaceDelimiter(predictorCode, "PREDICTOR_CLASS", _className);
 
-                ReplaceDelimiter(predictorCode, "LAG_CALLBACK", _lagCallbacks[0].functionName);
-                ReplaceDelimiter(predictorCode, "SINK_CALLBACK", _outputCallbacks[0].functionName);
-                ReplaceDelimiter(predictorCode, "SOURCE_CALLBACK", _inputCallbacks[0].functionName);
+                ReplaceDelimiter(predictorCode, "LAG_CALLBACK", _callbacks.lagNotifications[0].functionName);
+                ReplaceDelimiter(predictorCode, "SINK_CALLBACK", _callbacks.sinks[0].functionName);
+                ReplaceDelimiter(predictorCode, "SOURCE_CALLBACK", _callbacks.sources[0].functionName);
 
-                ReplaceDelimiter(predictorCode, "SINK_TYPE", _outputCallbacks[0].inputType);
-                ReplaceDelimiter(predictorCode, "SOURCE_TYPE", _inputCallbacks[0].inputType);
+                ReplaceDelimiter(predictorCode, "SINK_TYPE", _callbacks.sinks[0].inputType);
+                ReplaceDelimiter(predictorCode, "SOURCE_TYPE", _callbacks.sources[0].inputType);
                 ReplaceDelimiter(predictorCode, "TIMETICK_TYPE", "double");
 
                 os << predictorCode << "\n";
@@ -273,11 +206,11 @@ namespace emitters
             {
                 os << "WRAP_CALLABLES_AS_CALLBACKS(" << _className << ", ";
                 WriteCommaSeparatedList(os,
-                                        { _inputCallbacks[0].className,
-                                          _inputCallbacks[0].inputType,
-                                          _outputCallbacks[0].className,
-                                          _outputCallbacks[0].inputType,
-                                          _lagCallbacks[0].className });
+                                        { _callbacks.sources[0].className,
+                                          _callbacks.sources[0].inputType,
+                                          _callbacks.sinks[0].className,
+                                          _callbacks.sinks[0].inputType,
+                                          _callbacks.lagNotifications[0].className });
                 os << ")\n\n";
             }
 
@@ -286,22 +219,25 @@ namespace emitters
                 // Load the template, which declares the Python base class derived
                 // by actuator code to implement callbacks.
                 // (Note: newlines are part of the syntax for #include)
+
+                // clang-format off
                 std::string pythonCode(
-#include "SwigPredictorPython.in"
-                    );
+                    #include "SwigPredictorPython.in"
+                );
+                // clang-format on
 
                 ReplaceDelimiter(pythonCode, "MODULE", _moduleName);
                 ReplaceDelimiter(pythonCode, "PREDICTOR_CLASS", _className);
                 ReplaceDelimiter(pythonCode, "PREDICT_FUNCTION", _predictFunctionName);
                 ReplaceDelimiter(pythonCode, "PREDICT_FUNCTION_PY", AsPythonMethod(_predictFunctionName));
 
-                ReplaceDelimiter(pythonCode, "LAG_CALLBACK", AsPythonMethod(_lagCallbacks[0].functionName));
-                ReplaceDelimiter(pythonCode, "SINK_CALLBACK", AsPythonMethod(_outputCallbacks[0].functionName));
-                ReplaceDelimiter(pythonCode, "SOURCE_CALLBACK", AsPythonMethod(_inputCallbacks[0].functionName));
+                ReplaceDelimiter(pythonCode, "LAG_CALLBACK", AsPythonMethod(_callbacks.lagNotifications[0].functionName));
+                ReplaceDelimiter(pythonCode, "SINK_CALLBACK", AsPythonMethod(_callbacks.sinks[0].functionName));
+                ReplaceDelimiter(pythonCode, "SOURCE_CALLBACK", AsPythonMethod(_callbacks.sources[0].functionName));
 
-                ReplaceDelimiter(pythonCode, "SINK_VECTOR_TYPE", AsVectorType(_outputCallbacks[0].inputType));
-                ReplaceDelimiter(pythonCode, "SOURCE_VECTOR_TYPE", AsVectorType(_inputCallbacks[0].inputType));
-                ReplaceDelimiter(pythonCode, "SOURCE_NUMPY_TYPE", AsNumpyType(_inputCallbacks[0].inputType));
+                ReplaceDelimiter(pythonCode, "SINK_VECTOR_TYPE", AsVectorType(_callbacks.sinks[0].inputType));
+                ReplaceDelimiter(pythonCode, "SOURCE_VECTOR_TYPE", AsVectorType(_callbacks.sources[0].inputType));
+                ReplaceDelimiter(pythonCode, "SOURCE_NUMPY_TYPE", AsNumpyType(_callbacks.sources[0].inputType));
 
                 os << "%pythoncode %{\n"
                    << pythonCode
@@ -325,14 +261,10 @@ namespace emitters
                 return utilities::ToLowercase(result);
             }
 
-            // Callbacks
-            std::vector<CallbackSignature> _outputCallbacks;
-            std::vector<CallbackSignature> _inputCallbacks;
-            std::vector<CallbackSignature> _lagCallbacks;
-
             std::string _predictFunctionName;
             std::string _moduleName;
             std::string _className;
+            ModuleCallbackDefinitions _callbacks;
         };
 
         void WriteCommonSwigCode(std::ostream& os, IRModuleEmitter& moduleEmitter)
@@ -367,9 +299,11 @@ namespace emitters
                 }
             %} */
 
+            // clang-format off
             std::string shapeWrappers(
-#include "SwigShapeWrappers.in"
-                );
+                #include "SwigShapeWrappers.in"
+            );
+            // clang-format on
 
             ReplaceDelimiter(shapeWrappers, "MODULE", moduleName);
 

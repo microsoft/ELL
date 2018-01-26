@@ -82,6 +82,7 @@ namespace nodes
     void ClockNode::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         auto now = compiler.EnsurePortEmitted(input);
+        auto& module = function.GetModule();
 
         // Constants
         auto interval = function.template Literal<TimeTickType>(_interval);
@@ -90,15 +91,13 @@ namespace nodes
         auto thresholdTime = function.template Literal<TimeTickType>(_lagThreshold);
 
         // Callback
-        const emitters::VariableTypeList parameters = { emitters::GetVariableType<TimeTickType>() };
+        const emitters::NamedVariableTypeList parameters = { { "currentTime", emitters::GetVariableType<TimeTickType>() } };
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + _lagNotificationFunctionName);
-
-        function.GetModule().DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
-        function.GetModule().IncludeInHeader(prefixedName);
-        function.GetModule().IncludeInCallbackInterface(prefixedName, "ClockNode");
+        module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
+        module.IncludeInCallbackInterface(prefixedName, "ClockNode");
 
         // State: _lastIntervalTime
-        auto pLastIntervalTime = function.GetModule().Global(compiler.GetNamespacePrefix() + "_lastIntervalTime", UninitializedIntervalTime);
+        auto pLastIntervalTime = module.Global(compiler.GetNamespacePrefix() + "_lastIntervalTime", UninitializedIntervalTime);
         auto lastIntervalTime = function.Load(pLastIntervalTime);
 
         // No lag when:
@@ -128,7 +127,7 @@ namespace nodes
             auto delta = function.Operator(minusTime, now, function.Load(newLastInterval));
             auto if2 = function.If(greaterThanOrEqualTime, delta, thresholdTime);
             {
-                auto pLagFunction = function.GetModule().GetFunction(prefixedName);
+                auto pLagFunction = module.GetFunction(prefixedName);
                 function.Call(pLagFunction, { delta });
             }
             if2.End();
@@ -143,7 +142,9 @@ namespace nodes
         function.SetValueAt(pOutput, function.Literal(0), function.Load(newLastInterval));
         function.SetValueAt(pOutput, function.Literal(1), now);
 
-        EmitGetTicksUntilNextIntervalFunction(compiler, function.GetModule(), pLastIntervalTime);
+        EmitGetTicksUntilNextIntervalFunction(compiler, module, pLastIntervalTime);
+        EmitGetLagThresholdFunction(compiler, module);
+        EmitGetStepIntervalFunction(compiler, module);
     }
 
     void ClockNode::Copy(model::ModelTransformer& transformer) const
@@ -193,11 +194,11 @@ namespace nodes
     {
         std::string functionName = compiler.GetNamespacePrefix() + "_GetTicksUntilNextInterval";
         const auto timeTickType = emitters::GetVariableType<TimeTickType>();
-        const emitters::VariableTypeList parameters = { timeTickType };
+        const emitters::NamedVariableTypeList parameters = { { "currentTime", timeTickType } };
 
         emitters::IRFunctionEmitter function = moduleEmitter.BeginFunction(functionName, timeTickType, parameters);
-        function.GetModule().DeclareFunction(functionName, timeTickType, parameters);
-        function.GetModule().IncludeInHeader(functionName);
+        moduleEmitter.DeclareFunction(functionName, timeTickType, parameters);
+        function.IncludeInHeader();
 
         auto arguments = function.Arguments().begin();
         auto now = &(*arguments++);
@@ -225,6 +226,32 @@ namespace nodes
         ifEmitter1.End();
 
         function.Return(function.Load(result));
+        moduleEmitter.EndFunction();
+    }
+
+    void ClockNode::EmitGetLagThresholdFunction(model::IRMapCompiler& compiler, emitters::IRModuleEmitter& moduleEmitter)
+    {
+        std::string functionName = compiler.GetNamespacePrefix() + "_GetLagThreshold";
+        const auto timeTickType = emitters::GetVariableType<TimeTickType>();
+
+        emitters::IRFunctionEmitter function = moduleEmitter.BeginFunction(functionName, timeTickType, emitters::NamedVariableTypeList{});
+        moduleEmitter.DeclareFunction(functionName, timeTickType, emitters::NamedVariableTypeList{});
+        function.IncludeInHeader();
+
+        function.Return(function.template Literal<TimeTickType>(_lagThreshold));
+        moduleEmitter.EndFunction();
+    }
+
+    void ClockNode::EmitGetStepIntervalFunction(model::IRMapCompiler& compiler, emitters::IRModuleEmitter& moduleEmitter)
+    {
+        std::string functionName = compiler.GetNamespacePrefix() + "_GetStepInterval";
+        const auto timeTickType = emitters::GetVariableType<TimeTickType>();
+
+        emitters::IRFunctionEmitter function = moduleEmitter.BeginFunction(functionName, timeTickType, emitters::NamedVariableTypeList{});
+        moduleEmitter.DeclareFunction(functionName, timeTickType, emitters::NamedVariableTypeList{});
+        function.IncludeInHeader();
+
+        function.Return(function.template Literal<TimeTickType>(_interval));
         moduleEmitter.EndFunction();
     }
 }

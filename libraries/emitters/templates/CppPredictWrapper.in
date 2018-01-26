@@ -1,0 +1,55 @@
+u8R"(#include <string.h>
+#include <vector>
+
+class @@MODULE@@_PredictWrapper
+{
+public:
+    @@MODULE@@_PredictWrapper()
+    {
+        _result.resize(@@MODULE@@_GetOutputSize());
+    }
+
+    int8_t @@SOURCE_CALLBACK@@(@@SOURCE_TYPE@@* buffer)
+    {
+        ::memcpy(buffer, _input, @@MODULE@@_GetInputSize() * sizeof(@@SOURCE_TYPE@@));
+        return true;
+    }
+
+    void @@SINK_CALLBACK@@(@@SINK_TYPE@@* buffer)
+    {
+        ::memcpy(_output, buffer, @@MODULE@@_GetOutputSize() * sizeof(@@SINK_TYPE@@));
+    }
+
+    void Predict(const std::vector<@@SOURCE_TYPE@@>& input, std::vector<@@SINK_TYPE@@>& output)
+    {
+        _input = const_cast<@@SOURCE_TYPE@@*>(&input[0]);
+        _output = &output[0];
+        @@FUNCTION@@(0.0, &_result[0]); // note: result is unused, can it be removed from the C function?
+    }
+
+private:
+    @@SOURCE_TYPE@@* _input;
+    @@SINK_TYPE@@* _output;
+    std::vector<@@SINK_TYPE@@> _result;
+};
+
+static @@MODULE@@_PredictWrapper @@MODULE@@_predict_wrapper_;
+
+extern "C"
+{
+int8_t @@MODULE@@_InputCallback(@@SOURCE_TYPE@@* input)
+{
+    return @@MODULE@@_predict_wrapper_.@@SOURCE_CALLBACK@@(input);
+}
+
+void @@MODULE@@_OutputCallback(@@SINK_TYPE@@* output)
+{
+    @@MODULE@@_predict_wrapper_.@@SINK_CALLBACK@@(output);
+}
+} // extern "C"
+
+void @@FUNCTION@@(const std::vector<@@SOURCE_TYPE@@>& input, std::vector<@@SINK_TYPE@@>& output)
+{
+    @@MODULE@@_predict_wrapper_.Predict(input, output);
+}
+)"
