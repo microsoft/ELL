@@ -52,6 +52,7 @@ namespace model
         ///
         /// <param name="map"> The map to compile. </param>
         /// <param name="functionName"> The name of the function to create. </param>
+        /// <param name="parameterNames"> The parameter names of the function to create. </param>
         void CompileMap(Map& map, const std::string& functionName);
 
         /// <summary> Gets the model-specific compiler parameters being used by the map compiler. </summary>

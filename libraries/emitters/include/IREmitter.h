@@ -522,6 +522,17 @@ namespace emitters
         /// <returns> Pointer to the declared function. </returns>
         llvm::Function* Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const std::vector<llvm::Type*>& argTypes);
 
+        /// <summary> Emits the function declaration and arguments, when beginning a new function. </summary>
+        ///
+        /// <param name="pModule"> The module in which the function is declared. </param>
+        /// <param name="name"> The function name. </param>
+        /// <param name="returnType"> Function return type. </param>
+        /// <param name="linkage"> The linkage. </param>
+        /// <param name="arguments"> Function arguments. </param>
+        ///
+        /// <returns> Pointer to the declared function. </returns>
+        llvm::Function* Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const NamedLLVMTypeList& arguments);
+
         /// <summary> Emit the beginning of a new code block in the given function. </summary>
         ///
         /// <param name="pFunction"> Pointer to the function to which the block is added. </param>
@@ -905,8 +916,13 @@ namespace emitters
         llvm::Type* GetVariableType(VariableType type);
         int SizeOf(VariableType type);
         llvm::Constant* Integer(VariableType type, const size_t value);
+
         std::vector<llvm::Type*> BindArgumentTypes(const NamedVariableTypeList& arguments);
-        void BindArgumentNames(llvm::Function* pFunction, const NamedVariableTypeList& arguments);
+        std::vector<llvm::Type*> BindArgumentTypes(const NamedLLVMTypeList& arguments);
+
+        template <typename ListType>
+        void BindArgumentNames(llvm::Function* pFunction, const ListType& arguments);
+
         llvm::Function* CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pFunctionType);
         llvm::Value* Zero();
 

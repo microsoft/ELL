@@ -1,12 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     SwigWriterTest.h (emitters_test)
+//  File:     InterfaceWriterTest.h (emitters_test)
 //  Authors:  Lisa Ong
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+void TestCppHeader();
 void TestSwigCallbackInterfaces();
 void TestSwigCallbackHeader();
 void TestSwigNoCallbackInterfaces();

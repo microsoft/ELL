@@ -100,7 +100,7 @@ source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 source_group("templates" FILES ${templates})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include} ${tcc} ${templates})
 target_include_directories(${library_name} PUBLIC include templates)
 target_include_directories(${library_name} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_link_libraries(${library_name} utilities ${LLVM_LIBS})
@@ -122,18 +122,18 @@ endif()
 set (test_src
   test/src/main.cpp
   test/src/AsyncEmitterTest.cpp
+  test/src/InterfaceWriterTest.cpp
   test/src/IREmitterTest.cpp
   test/src/IRFunctionTest.cpp
   test/src/PosixEmitterTest.cpp
-  test/src/SwigWriterTest.cpp
 )
 
 set (test_include
   test/include/AsyncEmitterTest.h
+  test/include/InterfaceWriterTest.h
   test/include/IREmitterTest.h
   test/include/IRFunctionTest.h
   test/include/PosixEmitterTest.h
-  test/include/SwigWriterTest.h
 )
 
 source_group("src" FILES ${test_src})

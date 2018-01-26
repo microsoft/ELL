@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     SwigWriterTest.cpp (emitters_test)
+//  File:     InterfaceWriterTest.cpp (emitters_test)
 //  Authors:  Lisa Ong
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SwigWriterTest.h"
+#include "InterfaceWriterTest.h"
 
 // model
 #include "Map.h"
@@ -16,6 +16,7 @@
 #include "OutputNode.h"
 
 // emitters
+#include "IRHeaderWriter.h"
 #include "IRMapCompiler.h"
 #include "IRModuleEmitter.h"
 #include "IRSwigInterfaceWriter.h"
@@ -115,6 +116,41 @@ template <>
 const char* ToTypeString<CallbackBase<float>>() { return "FloatCallbackBase"; }
 
 template <typename ElementType>
+void TestCppHeader()
+{
+    auto compiledMap = GetCompiledMapWithCallbacks<ElementType>("TestModule", "TestModule_Predict");
+    auto& module = compiledMap.GetModule();
+
+    std::stringstream ss;
+    WriteModuleHeader(ss, module);
+    WriteModuleCppWrapper(ss, module);
+    auto result = ss.str();
+
+    std::string typeString = ToTypeString<ElementType>();
+    std::string timeTypeString = ToTypeString<nodes::TimeTickType>();
+
+    testing::ProcessTest("Testing C predict function", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_Predict(") + timeTypeString + " input0, " + typeString + "* output0);")));
+    testing::ProcessTest("Testing C++ wrapper 1", testing::IsTrue(std::string::npos != result.find("class TestModule_PredictWrapper")));
+    testing::ProcessTest("Testing C++ wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("int8_t TestModule_MyDataCallback(") + typeString + "* buffer")));
+    testing::ProcessTest("Testing C++ wrapper 3", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_MyResultsCallback(") + typeString + "* buffer")));
+    testing::ProcessTest("Testing C++ wrapper 4", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_Predict(const std::vector<") + typeString + ">& input, std::vector<" + typeString + ">& output)")));
+    testing::ProcessTest("Testing C++ wrapper 5", testing::IsTrue(std::string::npos != result.find("TestModule_Predict(0.0, &_result[0]);")));
+
+    testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
+
+    if (testing::DidTestFail())
+    {
+        std::cout << result << std::endl;
+    }
+}
+
+void TestCppHeader()
+{
+    TestCppHeader<double>();
+    TestCppHeader<float>();
+}
+
+template <typename ElementType>
 void TestSwigCallbackInterfaces()
 {
     auto compiledMap = GetCompiledMapWithCallbacks<ElementType>("TestModuleWithCallbacks", "step");
@@ -150,6 +186,12 @@ void TestSwigCallbackInterfaces()
     {
         std::cout << result << std::endl;
     }
+}
+
+void TestSwigCallbackInterfaces()
+{
+    TestSwigCallbackInterfaces<double>();
+    TestSwigCallbackInterfaces<float>();
 }
 
 template <typename ElementType>
@@ -192,12 +234,6 @@ void TestSwigCallbackHeader()
     TestSwigCallbackHeader<float>();
 }
 
-void TestSwigCallbackInterfaces()
-{
-    TestSwigCallbackInterfaces<double>();
-    TestSwigCallbackInterfaces<float>();
-}
-
 template <typename ElementType>
 void TestSwigNoCallbackInterfaces()
 {
@@ -223,6 +259,12 @@ void TestSwigNoCallbackInterfaces()
     }
 }
 
+void TestSwigNoCallbackInterfaces()
+{
+    TestSwigNoCallbackInterfaces<double>();
+    TestSwigNoCallbackInterfaces<float>();
+}
+
 template <typename ElementType>
 void TestSwigNoCallbackHeader()
 {
@@ -236,14 +278,14 @@ void TestSwigNoCallbackHeader()
 
     // Sanity tests
     testing::ProcessTest("Testing predict function 1", testing::IsTrue(std::string::npos != result.find(
-        std::string("void TestModule_predict(" + typeString + "*, " + typeString + "*);"))));
+        std::string("void TestModule_predict(" + typeString + "* input0, " + typeString + "* output0);"))));
     testing::ProcessTest("Testing predict function 2", testing::IsTrue(std::string::npos != result.find(
         std::string("void TestModule_predict(const std::vector<" + typeString + ">& input, std::vector<" + typeString + ">& output)"))));
     testing::ProcessTest("Testing predict function 3", testing::IsTrue(std::string::npos != result.find(
         std::string("TestModule_predict(const_cast<" + typeString + "*>(&input[0]), &output[0]);"))));
 
-    testing::ProcessTest("Testing shape function 1", testing::IsTrue(std::string::npos != result.find("void TestModule_GetInputShape(int32_t, TensorShape*)")));
-    testing::ProcessTest("Testing shape function 2", testing::IsTrue(std::string::npos != result.find("void TestModule_GetOutputShape(int32_t, TensorShape*)")));
+    testing::ProcessTest("Testing shape function 1", testing::IsTrue(std::string::npos != result.find("void TestModule_GetInputShape(int32_t index, TensorShape* shape)")));
+    testing::ProcessTest("Testing shape function 2", testing::IsTrue(std::string::npos != result.find("void TestModule_GetOutputShape(int32_t index, TensorShape* shape)")));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
 
@@ -251,12 +293,6 @@ void TestSwigNoCallbackHeader()
     {
         std::cout << result << std::endl;
     }
-}
-
-void TestSwigNoCallbackInterfaces()
-{
-    TestSwigNoCallbackInterfaces<double>();
-    TestSwigNoCallbackInterfaces<float>();
 }
 
 void TestSwigNoCallbackHeader()

@@ -747,8 +747,7 @@ namespace emitters
         assert(pModule != nullptr);
 
         auto types = BindArgumentTypes(arguments);
-        llvm::FunctionType* pFunctionType = llvm::FunctionType::get(returnType, types, false);
-        llvm::Function* pFunction = CreateFunction(pModule, name, linkage, pFunctionType);
+        llvm::Function* pFunction = Function(pModule, name, returnType, linkage, types);
         BindArgumentNames(pFunction, arguments);
         return pFunction;
     }
@@ -759,6 +758,16 @@ namespace emitters
 
         auto functionType = llvm::FunctionType::get(returnType, argTypes, false);
         return CreateFunction(pModule, name, linkage, functionType);
+    }
+
+    llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const NamedLLVMTypeList& arguments)
+    {
+        assert(pModule != nullptr);
+
+        auto types = BindArgumentTypes(arguments);
+        llvm::Function* pFunction = Function(pModule, name, returnType, linkage, types);
+        BindArgumentNames(pFunction, arguments);
+        return pFunction;
     }
 
     //
@@ -1160,21 +1169,16 @@ namespace emitters
 
     std::vector<llvm::Type*> IREmitter::BindArgumentTypes(const NamedVariableTypeList& arguments)
     {
-        std::vector<llvm::Type*> types;
-        for (auto argument : arguments)
-        {
-            types.push_back(Type(argument.second));
-        }
+        std::vector<llvm::Type*> types(arguments.size());
+        std::transform(arguments.begin(), arguments.end(), types.begin(), [this](NamedVariableType argument) { return Type(argument.second); });
         return types;
     }
 
-    void IREmitter::BindArgumentNames(llvm::Function* pFunction, const NamedVariableTypeList& arguments)
+    std::vector<llvm::Type*> IREmitter::BindArgumentTypes(const NamedLLVMTypeList& arguments)
     {
-        size_t i = 0;
-        for (auto& argument : pFunction->args())
-        {
-            argument.setName(arguments[i++].first);
-        }
+        std::vector<llvm::Type*> types(arguments.size());
+        std::transform(arguments.begin(), arguments.end(), types.begin(), [](auto argument) { return argument.second; });
+        return types;
     }
 
     llvm::Function* IREmitter::CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pFunctionType)

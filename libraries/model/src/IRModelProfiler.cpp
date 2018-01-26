@@ -330,11 +330,10 @@ namespace model
     void ModelProfiler::EmitGetNodeInfoFunction()
     {
         auto& emitter = _module->GetIREmitter();
-        auto& context = _module->GetLLVMContext();
         auto& irBuilder = emitter.GetIRBuilder();
-        auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeInfo", _nodeInfoType->getPointerTo(), { int32Type });
+        const emitters::NamedVariableTypeList parameters = { { "nodeIndex", emitters::VariableType::Int32 } };
+        auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeInfo", _nodeInfoType->getPointerTo(), parameters);
         function.IncludeInHeader();
 
         auto args = function.Arguments();
@@ -348,11 +347,10 @@ namespace model
     void ModelProfiler::EmitGetNodeTypeInfoFunction()
     {
         auto& emitter = _module->GetIREmitter();
-        auto& context = _module->GetLLVMContext();
         auto& irBuilder = emitter.GetIRBuilder();
-        auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeTypeInfo", _nodeInfoType->getPointerTo(), { int32Type });
+        const emitters::NamedVariableTypeList parameters = { { "nodeIndex", emitters::VariableType::Int32 } };
+        auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeTypeInfo", _nodeInfoType->getPointerTo(), parameters);
         function.IncludeInHeader();
 
         auto args = function.Arguments();
@@ -366,11 +364,10 @@ namespace model
     void ModelProfiler::EmitGetNodePerformanceCountersFunction()
     {
         auto& emitter = _module->GetIREmitter();
-        auto& context = _module->GetLLVMContext();
         auto& irBuilder = emitter.GetIRBuilder();
-        auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodePerformanceCounters", _performanceCountersType->getPointerTo(), { int32Type });
+        const emitters::NamedVariableTypeList parameters = { { "nodeIndex", emitters::VariableType::Int32 } };
+        auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodePerformanceCounters", _performanceCountersType->getPointerTo(), parameters);
         function.IncludeInHeader();
 
         auto args = function.Arguments();
@@ -384,11 +381,10 @@ namespace model
     void ModelProfiler::EmitGetNodeTypePerformanceCountersFunction()
     {
         auto& emitter = _module->GetIREmitter();
-        auto& context = _module->GetLLVMContext();
         auto& irBuilder = emitter.GetIRBuilder();
-        auto int32Type = llvm::Type::getInt32Ty(context);
+        const emitters::NamedVariableTypeList parameters = { { "nodeIndex", emitters::VariableType::Int32 } };
 
-        auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeTypePerformanceCounters", _performanceCountersType->getPointerTo(), { int32Type });
+        auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeTypePerformanceCounters", _performanceCountersType->getPointerTo(), parameters);
         function.IncludeInHeader();
 
         auto args = function.Arguments();

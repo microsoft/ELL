@@ -1036,6 +1036,8 @@ TESTING_FORCE_DEFINE_SYMBOL(Test_ClockNode_LagNotificationCallback, void, double
 void TestCompilableClockNode()
 {
     using GetTicksUntilNextInterval = nodes::TimeTickType(nodes::TimeTickType);
+    using GetLagThreshold = nodes::TimeTickType();
+    using GetStepInterval = nodes::TimeTickType();
 
     constexpr nodes::TimeTickType lagThreshold = 125;
     constexpr nodes::TimeTickType interval = 50;
@@ -1055,6 +1057,13 @@ void TestCompilableClockNode()
     auto compiledMap = compiler.Compile(map);
 
     auto& jitter = compiledMap.GetJitter();
+
+    auto getStepIntervalFunction = reinterpret_cast<GetStepInterval*>(jitter.ResolveFunctionAddress("Test_GetStepInterval"));
+    testing::ProcessTest("Testing compiled GetStepInterval", testing::IsEqual(getStepIntervalFunction(), interval));
+    
+    auto getLagThresholdFunction = reinterpret_cast<GetLagThreshold*>(jitter.ResolveFunctionAddress("Test_GetLagThreshold"));
+    testing::ProcessTest("Testing compiled GetLagThreshold", testing::IsEqual(getLagThresholdFunction(), lagThreshold));
+
     auto getTicksFunction = reinterpret_cast<GetTicksUntilNextInterval*>(jitter.ResolveFunctionAddress("Test_GetTicksUntilNextInterval"));
 
     // compare output
