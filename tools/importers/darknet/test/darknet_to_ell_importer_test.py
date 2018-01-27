@@ -1,13 +1,12 @@
 ####################################################################################################
-##
+#
 # Project:  Embedded Learning Library (ELL)
 # File:     darknet_to_ell_impporter_test.py (importers)
 # Authors:  Byron Changuion
 #
 # Requires: Python 3.x
-##
+#
 ####################################################################################################
-from __future__ import print_function
 
 import sys
 import os

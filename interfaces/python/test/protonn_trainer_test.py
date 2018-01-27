@@ -1,4 +1,3 @@
-from __future__ import print_function
 import sys
 import os
 import numpy as np
@@ -22,8 +21,8 @@ def get_accuracy(predictor, dataset, input_size):
 def test():
     testing = Testing()
     # -dd auto -sw 1 -sb 1 -sz 1 -pd 10 -l 2 -mp 5 -v --evaluationFrequency 1 -plf L2
-    
-    args = ell.trainers.ProtoNNTrainerParameters()        
+
+    args = ell.trainers.ProtoNNTrainerParameters()
     args.projectedDimension = 10
     args.numPrototypesPerLabel = 5
     args.numLabels = 2
@@ -35,32 +34,32 @@ def test():
     args.numInnerIterations = 1
     args.numFeatures = 0
     args.verbose = True
-    
+
     trainer = ell.trainers.ProtoNNTrainer(args)
-    
+
     dataset = ell.data.AutoSupervisedDataset()
     testFile = os.path.join(find_ell.get_ell_root(), "examples/data/protonnTestData.txt")
     print("Loading: " + testFile)
     dataset.Load(testFile)
-    
+
     total = dataset.NumExamples()
     features = dataset.NumFeatures()
     testing.ProcessTest("Proton dataset loaded", testing.IsEqual(int(total), 200))
-    
+
     trainer.SetDataset(dataset)
 
     numIterations = 20
-    
+
     print("Training...")
     for i in range(numIterations):
         trainer.Update()
 
     predictor = trainer.GetPredictor()
-    
+
     accuracy = get_accuracy(predictor, dataset, features)
     print("Accuracy %f" % (accuracy))
     testing.ProcessTest("Proton accuracy test", testing.IsEqual(int(accuracy), 1))
-    
+
     map = predictor.GetMap()
     map.Save("protonnTestData.ell")
     testing.ProcessTest("Saving  protonnTestData.ell", testing.IsEqual(os.path.isfile("protonnTestData.ell"), True))

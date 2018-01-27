@@ -20,7 +20,6 @@ std::vector<T> LoadImage(std::string& fileName, int width, int height, double in
 {
     std::stringstream stream;
     stream << R"xx(
-from __future__ import print_function
 import sys
 import numpy as np
 import cv2
@@ -64,7 +63,7 @@ def main() :
         scale = float(sys.argv[4])
     if len(sys.argv) >= 6:
         bgr2rgb = int(sys.argv[5])
-        
+
     image = cv2.imread(file)
     if image is None:
         print("Error reading image {}".format(file))

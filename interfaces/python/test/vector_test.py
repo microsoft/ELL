@@ -1,4 +1,3 @@
-from __future__ import print_function
 import numpy as np
 import find_ell
 import ell
@@ -14,13 +13,13 @@ def test_double():
     # vector from list
     l = [1.1,2.2,3.3,4.4,]
     e = ell.math.DoubleVector(l)
-    
+
     np.testing.assert_equal(list(e), l)
 
     # vector from numpy array
     a = np.array(range(10), dtype=float)
     e = ell.math.DoubleVector(a)
-    
+
     np.testing.assert_equal(np.asarray(e), a)
 
     # conver to numpy using array
@@ -48,7 +47,7 @@ def test_double():
     a *= range(10)
     e = ell.math.DoubleVector(a)
     np.testing.assert_equal(np.asarray(e), a.ravel())
-    
+
     testing.ProcessTest("DoubleVector test", True)
 
 def assert_compare_floats(a, b):
@@ -66,13 +65,13 @@ def test_float():
     # vector from list of floats
     l = [1.1,2.2,3.3,4.4]
     e = ell.math.FloatVector(l)
-    
+
     assert_compare_floats(e, l)
 
     # vector from numpy array
     a = np.array(range(10), dtype=np.float32)
     e = ell.math.FloatVector(a)
-    
+
     np.testing.assert_equal(np.asarray(e), a)
 
     # convert to numpy using array
@@ -88,7 +87,7 @@ def test_float():
     a = a.astype(np.float)
     e = ell.math.FloatVector(a)
     np.testing.assert_equal(np.asarray(e), a)
-    
+
     # enumerating array
     for i in range(a.shape[0]):
         x = a[i]
@@ -100,7 +99,7 @@ def test_float():
     a *= range(10)
     e = ell.math.FloatVector(a)
     np.testing.assert_equal(np.asarray(e), a.ravel())
-    
+
     testing.ProcessTest("FloatVector test", True)
 
 

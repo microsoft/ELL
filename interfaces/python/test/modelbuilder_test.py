@@ -1,4 +1,3 @@
-from __future__ import print_function
 import ell
 from testing import Testing
 

@@ -1,4 +1,3 @@
-from __future__ import print_function
 import ell
 from math import exp, log
 from testing import Testing
@@ -16,7 +15,7 @@ def compareTest(testing, name, compare, data):
     for (x, y, z) in data: f(x, y, z)
 
 def hingeLossTest(testing):
-    def f(y, t): return float(max(0, 1 - t*y))      # reference hingeloss 
+    def f(y, t): return float(max(0, 1 - t*y))      # reference hingeloss
     def df(y, t):                                   # derivative
         if t*y <= 1.0: return -float(t)
         else: return 0.0

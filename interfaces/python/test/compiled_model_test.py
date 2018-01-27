@@ -1,4 +1,3 @@
-from __future__ import print_function
 import functools
 import ell
 import os
@@ -10,11 +9,11 @@ def test():
     compiledMap = map.Compile("host", "protonn", "predict", False,
         dtype=np.float)
     compiledMap.WriteBitcode("protonnTestData.bc");
-    
+
     if os.path.isfile("protonnTestData.bc"):
         return 0
 
-    print("### compiled_model_test failed to generate bitcode: protonnTestData.bc") 
+    print("### compiled_model_test failed to generate bitcode: protonnTestData.bc")
     return 1
 
 
