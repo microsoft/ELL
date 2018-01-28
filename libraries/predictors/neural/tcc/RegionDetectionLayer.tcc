@@ -124,6 +124,8 @@ namespace neural
     template <typename ElementType>
     void RegionDetectionLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
+        Layer<ElementType>::WriteToArchive(archiver);
+
         archiver["width"] << _regionDetectionParams.width;
         archiver["height"] << _regionDetectionParams.height;
         archiver["numBoxesPerCell"] << _regionDetectionParams.numBoxesPerCell;
@@ -134,6 +136,8 @@ namespace neural
     template <typename ElementType>
     void RegionDetectionLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& unarchiver)
     {
+        Layer<ElementType>::ReadFromArchive(unarchiver);
+
         unarchiver["width"] >> _regionDetectionParams.width;
         unarchiver["height"] >> _regionDetectionParams.height;
         unarchiver["numBoxesPerCell"] >> _regionDetectionParams.numBoxesPerCell;

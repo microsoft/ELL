@@ -2,7 +2,7 @@
 ##
 ##  Project:  Embedded Learning Library (ELL)
 ##  File:     darknet_to_ell.py (importers)
-##  Authors:  Byron Changuion
+##  Authors:  Byron Changuion, Kern Handa
 ##
 ##  Requires: Python 3.x
 ##
@@ -11,7 +11,8 @@
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
-import configparser
+from configparser import ConfigParser
+from collections import OrderedDict
 import logging
 import re
 import struct
@@ -37,14 +38,25 @@ def parse_cfg(filename):
        and anything else needed to construct up the relevant ELL layers"""
     with open(filename) as f:
         content = f.read()
-    matches = re.findall('(\[.*?\])((.*?)(?=\[))', content, re.DOTALL)
+
+    class DarknetConfigDict(OrderedDict):
+        def __init__(self, **kwargs):
+            OrderedDict.__init__(self, **kwargs)
+            self.__keysuffixes = {}
+
+        def __setitem__(self, key, value):
+            if isinstance(value, dict):
+                suffix = self.__keysuffixes.setdefault(key, 0)
+                self.__keysuffixes[key] += 1
+                key += "_" + str(suffix)
+            OrderedDict.__setitem__(self, key, value)
+
+    config = ConfigParser(dict_type=DarknetConfigDict, strict=False)
+    config.read_string(content)
     network = []
-    for layer in matches:
-        layer_desc = {'type': layer[0].replace('[', '').replace(']', '')}
-        for param in filter(None, layer[1].split('\n')):
-            if "=" in param:
-                arg, val = param.split('=')
-                layer_desc[arg] = val
+    for section in config._sections:
+        layer_desc = {'type' : section[:section.rfind('_')] }
+        layer_desc.update(config._sections[section])
         network.append(layer_desc)
 
     def print_layer(layer):
@@ -54,7 +66,8 @@ def parse_cfg(filename):
             "connected": "FullyConnected",
             "maxpool": "MaxPooling",
             "avgpool": "AveragePooling",
-            "softmax": "Softmax"
+            "softmax": "Softmax",
+            "region": "RegionDetection"
         }
         pretty_type = PRETTY_TYPE_MAP.get(layer.get("type"))
         if not pretty_type:
@@ -136,6 +149,9 @@ def parse_cfg(filename):
             layer['c'] = network[i-1]['out_c']
             layer['h'] = network[i-1]['out_h']
             layer['w'] = network[i-1]['out_w']
+            layer['out_c'] = network[i-1]['out_c']
+            layer['out_h'] = network[i-1]['out_h']
+            layer['out_w'] = network[i-1]['out_w']
         else:
             layer['c'] = network[i-1]['out_c']
             layer['h'] = network[i-1]['out_h']
@@ -366,6 +382,17 @@ def get_softmax_layer(layer):
     return ell.neural.FloatSoftmaxLayer(layerParameters)
 
 
+def get_region_detection_layer(layer):
+    """Returns ELL region detection layer from Darknet region detection layer"""
+
+    layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros,
+            layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros)
+
+    detectionParams = ell.neural.RegionDetectionParameters(int(layer['w']), int(layer['h']), int(layer['num']), int(layer['classes']),
+        int(layer['coords']))
+
+    return ell.neural.FloatRegionDetectionLayer(layerParameters, detectionParams)
+
 def process_fully_connected_layer(layer, weightsData):
     """Returns ELL layers corresponding to a Darknet connected layer"""
 
@@ -427,7 +454,8 @@ def process_network(network, weightsData, convolutionOrder):
     ellLayers = []
 
     for layer in network:
-        if layer['type'] == 'net':
+        if layer['type'] in ['net', 'cost', 'dropout']:
+            # Known layers that can be safely ignored or don't require processing
             pass
         elif layer['type'] == 'convolutional':
             ellLayers += process_convolutional_layer(layer, weightsData, convolutionOrder)
@@ -439,8 +467,10 @@ def process_network(network, weightsData, convolutionOrder):
             ellLayers.append(get_pooling_layer(layer, ell.neural.PoolingType.mean))
         elif layer['type'] == 'softmax':
             ellLayers.append(get_softmax_layer(layer))
+        elif layer['type'] == 'region':
+            ellLayers.append(get_region_detection_layer(layer))
         else:
-            _logger.warning("Skipping, ", layer['type'], "layer")
+            _logger.warning("Skipping unrecognized layer %s. The model may still work without it", layer['type'])
 
     if ellLayers:
         # Darknet expects the input to be between 0 and 1, so prepend

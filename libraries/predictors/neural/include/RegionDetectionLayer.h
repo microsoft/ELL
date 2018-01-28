@@ -50,6 +50,9 @@ namespace neural
         /// The number of elements should equal 2 x numBoxesPerCell. </param>
         RegionDetectionLayer(const LayerParameters& layerParameters, RegionDetectionParameters regionDetectionParamss);
 
+        /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
+        RegionDetectionLayer() : _regionDetectionParams({}) {}
+
         /// <summary> Feeds the input forward through the layer </summary>
         void Compute() override;
 

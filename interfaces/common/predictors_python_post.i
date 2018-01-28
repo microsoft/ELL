@@ -9,7 +9,7 @@ namespace neural
 {
 
     %extend LayerParameters
-    {  
+    {
         LayerParameters(const LayerShape& inputShape,
                         const PaddingParameters& inputPaddingParameters,
                         const LayerShape& outputShape,
@@ -33,15 +33,15 @@ namespace neural
 {
 
     %extend PaddingParameters
-    {  
-        PaddingParameters(PaddingScheme paddingScheme, size_t paddingSize) 
+    {
+        PaddingParameters(PaddingScheme paddingScheme, size_t paddingSize)
         {
             return new ell::predictors::neural::PaddingParameters{paddingScheme, paddingSize};
         }
     };
 
     %extend BinaryConvolutionalParameters
-    {  
+    {
         BinaryConvolutionalParameters(size_t receptiveField, size_t stride, BinaryConvolutionMethod binaryConvolutionMethod, BinaryWeightsScale weightScale)
         {
             return new ell::predictors::neural::BinaryConvolutionalParameters{receptiveField, stride, binaryConvolutionMethod, weightScale};
@@ -49,7 +49,7 @@ namespace neural
     };
 
     %extend ConvolutionalParameters
-    {  
+    {
         ConvolutionalParameters(size_t receptiveField, size_t stride, ConvolutionMethod convolutionMethod, size_t numFiltersAtATime)
         {
             return new ell::predictors::neural::ConvolutionalParameters{receptiveField, stride, convolutionMethod, numFiltersAtATime};
@@ -57,13 +57,20 @@ namespace neural
     };
 
     %extend PoolingParameters
-    {  
+    {
         PoolingParameters(size_t poolingSize, size_t stride)
         {
             return new ell::predictors::neural::PoolingParameters{poolingSize, stride};
         }
     };
-    
+
+    %extend RegionDetectionParameters
+    {
+        RegionDetectionParameters(int width, int height, int numBoxesPerCell, int numClasses, int numCoordinates)
+        {
+            return new ell::predictors::neural::RegionDetectionParameters{width, height, numBoxesPerCell, numClasses, numCoordinates};
+        }
+    };
 }
 }
 }
@@ -187,7 +194,7 @@ del LayerType_recurrent
 class EpsilonSummand:
     sqrtVariance = EpsilonSummand_sqrtVariance
     variance = EpsilonSummand_variance
-    
+
 del EpsilonSummand_sqrtVariance
 del EpsilonSummand_variance
 
