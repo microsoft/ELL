@@ -1,11 +1,10 @@
-from __future__ import print_function
 import ell
 import os
 
 def TestLoadSaveModel(fileName):
     print("Loading file %s" % fileName)
     m = ell.model.Model(fileName)
-    
+
     # save file in build folder to ensure we don't cause git changes
     fname = os.path.basename(fileName)
     path = os.path.abspath(fname)
@@ -25,5 +24,5 @@ def test():
         return  0
     except:
         return 1
-        
+
 

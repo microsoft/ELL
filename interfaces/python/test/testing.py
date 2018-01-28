@@ -1,6 +1,3 @@
-from __future__ import print_function
-
-
 class Testing(object):
     @staticmethod
     def IsEqualWithinTolerance(a, b, tol):

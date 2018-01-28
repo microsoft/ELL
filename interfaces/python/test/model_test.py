@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import functools
 
@@ -22,7 +21,7 @@ def GetNodeDictionary(nodes):
 of indices is 1 .. V. This means that 0 cannot be the index of a
 valid Node object.
 
-If the input is [node_1, node_2, ..., node_V] then the output is 
+If the input is [node_1, node_2, ..., node_V] then the output is
 a mapping 'index' such that index[node_n] = n where n = 1 ... V.
 This means that node indices are one-based.
 
@@ -101,7 +100,7 @@ def GetAdjacencyList(nodes, index):
 
 def DFS(u, baggage):
     '''
-    Depth first search starting at vertex u where 1 <= u <= V 
+    Depth first search starting at vertex u where 1 <= u <= V
     baggage contains state
     '''
     (adj, vertexStates, parents, processEdge,
@@ -149,7 +148,7 @@ def GetGraphStats(adj):
 
         e.g.   1 -- 2 -- 3 has adj = [None,[2],[1,3],[2]]
 
-    Returns an array of (V,E) pairs where V and E are the count of 
+    Returns an array of (V,E) pairs where V and E are the count of
     vertices and edges of each disjoint subgraph
     '''
     parents = [None for x in adj]

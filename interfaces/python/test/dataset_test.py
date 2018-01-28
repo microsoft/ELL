@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import numpy as np
 from testing import Testing
@@ -30,9 +29,9 @@ def test():
     print("Number of Features:", features)
     testing.ProcessTest("Dataset NumFeatures test", testing.IsEqual(int(features), 21))
 
-    for i in range(num):        
+    for i in range(num):
         exampleTest(dataset.GetExample(i))
-    
+
     testing.ProcessTest("Dataset eumeration test", True)
 
     return 0

@@ -1,4 +1,3 @@
-from __future__ import print_function
 import ell
 
 def test():
@@ -15,7 +14,7 @@ def test():
     ex = dataset.GetExample(0)
     print(type(ex))
 
-    iterator = dataset.GetIterator(0, dataset.NumExamples()) 
+    iterator = dataset.GetIterator(0, dataset.NumExamples())
     print(type(iterator))
 
     try:

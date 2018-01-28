@@ -7,7 +7,7 @@
 # Requires: Python 3.x, cntk-2.0-cp35
 #
 ###############################################################################
-from __future__ import print_function
+
 import os
 script_path = os.path.dirname(os.path.abspath(__file__))
 # Try to import CNTK and ell. If either don't exist it means they have not
@@ -623,7 +623,7 @@ class CntkToEllFullModelTestBase(CntkToEllTestBase):
     CATEGORIES_URL = 'https://raw.githubusercontent.com/Microsoft/ELL-models/master/models/ILSVRC2012/categories.txt'
     MODEL_URLS = [
         'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.cntk.zip'
-         
+
         # the binarized model is randomly failing on Windows, so it is temporarily disabled (see user story 899)
         #'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMB1AS/d_I160x160x3CMCMBMBMBMBMB1AS.cntk.zip',
         # Uncomment the next URL to test a VGG model in the gallery.
@@ -747,7 +747,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             _logger.info('Comparing unarchived map output (reference)')
             sys.stdout.flush()
 
-            ellMapFromArchiveResults = self.compute_ell_map(ellMapFromArchive, 
+            ellMapFromArchiveResults = self.compute_ell_map(ellMapFromArchive,
                 ellOrderedInput, cntkResults, modelName)
 
             _logger.info('Comparing map output (compiled)')
