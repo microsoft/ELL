@@ -87,6 +87,11 @@ namespace emitters
         return IRLocalScalar(*this, value);
     }
 
+    IRLocalArray IRFunctionEmitter::LocalArray(llvm::Value* value)
+    {
+        return IRLocalArray(*this, value);
+    }
+
     llvm::Value* IRFunctionEmitter::GetEmittedVariable(const VariableScope scope, const std::string& name)
     {
         switch (scope)

@@ -24,6 +24,7 @@ set (src
     src/IRLocalValue.cpp
     src/IRLoader.cpp
     src/IRLocalValue.cpp
+    src/IRLocalValueOperations.cpp
     src/IRLoopEmitter.cpp
     src/IRMetadata.cpp
     src/IRModuleEmitter.cpp
@@ -40,7 +41,7 @@ set (src
     src/Variable.cpp
 )
 
-set (include 
+set (include
     include/CompilableIRFunction.h
     include/EmitterException.h
     include/EmitterTypes.h
@@ -55,6 +56,7 @@ set (include
     include/IRIfEmitter.h
     include/IRLoader.h
     include/IRLocalValue.h
+    include/IRLocalValueOperations.h
     include/IRLoopEmitter.h
     include/IRModuleEmitter.h
     include/IRMetadata.h
@@ -79,6 +81,7 @@ set (tcc
     tcc/CompilableIRFunction.tcc
     tcc/EmitterTypes.tcc
     tcc/IRFunctionEmitter.tcc
+    tcc/IRLocalValueOperations.tcc
     tcc/IRModuleEmitter.tcc
     tcc/IRRuntime.tcc
     tcc/ScalarVariable.tcc

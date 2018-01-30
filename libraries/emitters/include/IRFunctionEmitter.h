@@ -70,6 +70,11 @@ namespace emitters
         template <typename ValueType, utilities::IsFundamental<ValueType> = true>
         IRLocalScalar LocalScalar(ValueType value);
 
+        /// <summary> Gets an `IRLocalArray` wrapper for an LLVM value object that represents an indexable array. </summary>
+        ///
+        /// <param name="value"> The value to wrap. </param>
+        IRLocalArray LocalArray(llvm::Value* value);
+
         /// <summary> Gets an emitted variable by scope and name. </summary>
         ///
         /// <param name="scope"> The variable scope. </param>

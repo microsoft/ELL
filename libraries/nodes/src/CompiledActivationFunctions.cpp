@@ -120,24 +120,8 @@ namespace nodes
     llvm::Value* SigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
     {
         auto x = function.LocalScalar(xValue);
-        auto zero = function.LocalScalar<ValueType>(0.0);
-        auto one = function.LocalScalar<ValueType>(1.0);
 
-        llvm::Value* result = function.Variable(emitters::GetVariableType<ValueType>(), "result");
-        auto ifEmitter = function.If();
-        ifEmitter.If(x > zero);
-        {
-            auto sigmoid = one / (Exp(-x) + one);
-            function.Store(result, sigmoid);
-        }
-        ifEmitter.Else();
-        {
-            auto expInput = Exp(x);
-            auto sigmoid = expInput / (expInput + one);
-            function.Store(result, sigmoid);
-        }
-        ifEmitter.End();
-        return function.Load(result);
+        return Sigmoid(x);
     }
 
     //
