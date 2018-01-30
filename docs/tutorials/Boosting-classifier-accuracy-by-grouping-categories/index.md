@@ -5,9 +5,11 @@ permalink: /tutorials/Boosting-classifier-accuracy-by-grouping-categories/
 ---
 # Boosting classifier accuracy by grouping categories
 
-*by Chris Lovett, Byron Changuion, and Ofer Dekel*
+*by Chris Lovett, Byron Changuion, Ofer Dekel, and Lisa Ong*
 
 In this tutorial, we will take an image classification model that was trained to recognize 1000 different image categories and use it to solve a simpler classification problem: distinguishing between *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will see how a model with low classification accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, and prints `Woof!` if it sees a dog and `Meow!` if it sees a cat, as well as showing the class `Dog` or `Cat` as the window header text.
+
+Lastly, the [Advanced features](#advanced-features) section describes how to use callbacks with the model.
 
 ---
 
@@ -96,13 +98,11 @@ def main():
     camera = cv2.VideoCapture(0)
 ```
 
-Read the category names from `categories.txt`, the list of dog breed categories from `dogs.txt`, and the list of cat breed categories from `cats.txt`.
+Read the list of dog breed categories from `dogs.txt`, and the list of cat breed categories from `cats.txt`.
 
 ```python
-    with open("categories.txt", "r") as categories_file,\
-            open("dogs.txt", "r") as dogs_file,\
-            open("cats.txt", "r") as cats_file:
-        categories = categories_file.read().splitlines()
+    with open("dogs.txt", "r") as dogs_file,\
+         open("cats.txt", "r") as cats_file:
         dogs = dogs_file.read().splitlines()
         cats = cats_file.read().splitlines()
 ```
@@ -184,7 +184,7 @@ python pets.py
 Point your camera at different objects and see how the model classifies them. Look at `dogs.txt` and `cats.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen, have your computer display images of different animals, and see when it barks or meows. If you copied the full `pets.py` script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py), you will also see the average time it takes for the model to process a single frame.
 
 ## Next steps
-
+### Playing sounds
 A fun next step would be to introduce the playing of sounds indicate whether a dog or cat was detected. For
 example, a dog's bark can be downloaded [here](http://freesound.org/people/davidmenke/sounds/231762/) and a
 cat's meow can be downloaded [here](https://freesound.org/people/tuberatanka/sounds/110011/).
@@ -196,5 +196,90 @@ Here is a video showing the result of this tutorial being modified to play a bar
 
 [![screenshot](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/thumbnail.png)](https://youtu.be/SOmV8tzg_DU)
 
+## Advanced features
+
+### Using callbacks
+The `predict` function on the ELL model provides a direct way to send input to the model and get predictions as parameters to the function.
+
+Instead of using the `predict` function, it is sometimes useful to implement input and output callbacks that the ELL model calls when necessary.
+
+The `pets_callback.py` script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets_callback.py) demonstrates how to provide callbacks for the input image and the output predictions.
+
+First, define a class called `CatsDogsPredictor` that extends the `model.Model` class.
+
+```python
+class CatsDogsPredictor(model.Model):
+    """Class that implements input and output callbacks for the ELL model
+    by deriving from the Model base class.
+    """
+```
+
+`CatsDogsPredictor.__init__` performs initialization for implementing the callbacks later.
+
+```python
+    def __init__(self, camera, cats, dogs):
+        """Initializes this object with the camera source and model-related
+        information"""
+        model.Model.__init__(self)
+
+        self.camera = camera
+        self.dogs = dogs
+        self.cats = cats
+
+        self.input_shape = model.get_default_input_shape()
+        self.image = None
+```
+
+`CatsDogsPredictor.input_callback` gets an image from the camera, processes it, and returns it to the ELL model. The ELL model will call this when it is ready to get input. 
+
+```python
+    def input_callback(self):
+        """The input callback that returns an image to the model"""
+        self.image = get_image_from_camera(self.camera)
+
+        return helpers.prepare_image_for_model(
+            self.image, self.input_shape.columns, self.input_shape.rows)
+```
+
+`CatsDogsPredictor.output_callback` receives predictions from the ELL model and determines what group the top prediction belongs to. This prints Woof! if it sees a dog and Meow! if it sees a cat, as well as showing the class Dog or Cat as the window header text. Alternatively, we can play a sound here by following the instructions in [Playing sounds](#playing-sounds)).
+
+
+```python
+    def output_callback(self, predictions):
+        """The output callback that the model calls when predictions are ready"""
+
+        header_text = ""
+        group, probability = self.get_group(predictions)
+
+        if group:
+            if group == "Dog":
+                print("Woof!")
+            elif group == "Cat":
+                print("Meow!")            
+            header_text = "({:.0%}) {}".format(probability, group)
+
+        helpers.draw_header(self.image, header_text)
+        cv2.imshow("Grouping (with callbacks)", self.image)
+```
+
+Finally, to tie everything together, the main entry point creates a `CatsDogsPredictor` object and calls its `predict` method in a loop. Each call to `predict` runs one iteration of the ELL model, and invokes the callbacks.
+
+```python
+def main():
+    """Entry point for the script when called directly"""
+    camera = cv2.VideoCapture(0)
+
+    with open("dogs.txt", "r") as dogs_file,\
+         open("cats.txt", "r") as cats_file:
+        dogs = dogs_file.read().splitlines()
+        cats = cats_file.read().splitlines()
+
+    predictor = CatsDogsPredictor(camera, cats, dogs)
+
+    while (cv2.waitKey(1) & 0xFF) == 0xFF:
+        predictor.predict()
+```
+
 ## Troubleshooting
 If you run into trouble, you can find some troubleshooting instructions at the bottom of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+

@@ -88,6 +88,8 @@ set (tcc
 )
 
 set (templates
+    templates/CppPredictWrapper.in
+    templates/SwigModule.in
     templates/SwigPredictFunction.in
     templates/SwigPredictorClass.in
     templates/SwigPredictorPython.in

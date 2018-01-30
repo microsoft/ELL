@@ -1,3 +1,8 @@
+u8R"(%module(directors="1") @@MODULE@@
+%feature("autodoc", "3");
+
+%include "callback.i"
+
 // Propagate python callback exceptions
 %feature("director:except") {
     if ($error != NULL) {
@@ -10,3 +15,8 @@
         Py_Exit(1);
     }
 }
+
+%{
+#include "@@HEADER@@"
+%}
+)"
