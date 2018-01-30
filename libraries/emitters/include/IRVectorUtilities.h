@@ -14,8 +14,8 @@
 #include "TypeTraits.h"
 
 // llvm
-#include "llvm/IR/Type.h"
-#include "llvm/IR/Value.h"
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
 
 namespace ell
 {
@@ -26,7 +26,7 @@ namespace emitters
     /// <typeparam name="ValueType"> The type of the value </typeparam>
     /// <param name="function"> The function being emitted </param>
     /// <param name="type"> The LLVM type of the result vector value </param>
-    /// <param name="elementValue"> The value to place in the vector elements </param> 
+    /// <param name="elementValue"> The value to place in the vector elements </param>
     ///
     /// <returns> An LLVM vector with repeated entries of the indicated value </returns>
     template <typename ValueType, utilities::IsIntegral<ValueType> = true>
@@ -37,7 +37,7 @@ namespace emitters
     /// <typeparam name="ValueType"> The type of the value </typeparam>
     /// <param name="function"> The function being emitted </param>
     /// <param name="type"> The LLVM type of the result vector value </param>
-    /// <param name="elementValue"> The value to place in the vector elements </param> 
+    /// <param name="elementValue"> The value to place in the vector elements </param>
     ///
     /// <returns> An LLVM vector with repeated entries of the indicated value </returns>
     template <typename ValueType, utilities::IsFloatingPoint<ValueType> = true>
@@ -45,7 +45,7 @@ namespace emitters
 
     /// <summary> Compute the sum of the entries in a vector </summary>
     ///
-    /// Emits explicit vector code to compute the sum. Hopefully, the vecorizing optimizer will 
+    /// Emits explicit vector code to compute the sum. Hopefully, the vecorizing optimizer will
     /// take care of this when vecorizing simple loops to sum up values, but for other operations
     /// we may want to do it ourselves.
     ///

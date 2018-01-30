@@ -10,8 +10,8 @@
 #include "EmitterTypes.h"
 
 // llvm
-#include "llvm/IR/Type.h"
-#include "llvm/IR/Value.h"
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
 
 namespace ell
 {
@@ -39,14 +39,14 @@ namespace emitters
     ///
     /// <returns> The corresponding LLVMTypeList. </returns>
     LLVMTypeList GetLLVMTypes(const VariableTypeList& types);
-    
+
     /// <summary> Transform a NamedVariableTypeList to a NamedLLVMTypeList. </summary>
     ///
     /// <param name="types"> The NamedVariableTypeList to transform. </param>
     ///
     /// <returns> The corresponding NamedLLVMTypeList. </returns>
     NamedLLVMTypeList GetLLVMTypes(const NamedVariableTypeList& types);
-    
+
     //
     // Get types from LLVM values
     //

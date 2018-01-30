@@ -9,7 +9,7 @@
 #pragma once
 
 // llvm
-#include "llvm/IR/BasicBlock.h"
+#include <llvm/IR/BasicBlock.h>
 
 // stl
 #include <memory>

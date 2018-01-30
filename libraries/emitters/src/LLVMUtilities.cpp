@@ -10,7 +10,7 @@
 #include "EmitterException.h"
 
 // llvm
-#include "llvm/IR/Type.h"
+#include <llvm/IR/Type.h>
 
 namespace ell
 {
@@ -57,7 +57,7 @@ namespace emitters
         {
             return GetFloatOperator(operation);
         }
-        
+
         throw EmitterException(EmitterError::valueTypeNotSupported);
     }
 
@@ -71,7 +71,7 @@ namespace emitters
         {
             return GetFloatComparison(comparison);
         }
-        
+
         throw EmitterException(EmitterError::valueTypeNotSupported);
     }
 

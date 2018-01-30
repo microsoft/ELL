@@ -18,30 +18,30 @@
 #include "IRModuleEmitter.h"
 
 // llvm
-#include "llvm/ADT/Triple.h"
-#include "llvm/Analysis/TargetLibraryInfo.h"
+#include <llvm/ADT/Triple.h>
+#include <llvm/Analysis/TargetLibraryInfo.h>
 
-#include "llvm/CodeGen/MachineModuleInfo.h"
-#include "llvm/CodeGen/TargetPassConfig.h"
+#include <llvm/CodeGen/MachineModuleInfo.h>
+#include <llvm/CodeGen/TargetPassConfig.h>
 
-#include "llvm/IR/Attributes.h"
-#include "llvm/IR/DataLayout.h"
-#include "llvm/IR/DiagnosticInfo.h"
-#include "llvm/IR/IRPrintingPasses.h"
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/LegacyPassManager.h"
+#include <llvm/IR/Attributes.h>
+#include <llvm/IR/DataLayout.h>
+#include <llvm/IR/DiagnosticInfo.h>
+#include <llvm/IR/IRPrintingPasses.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/LegacyPassManager.h>
 
-#include "llvm/IR/Module.h"
-#include "llvm/IR/Verifier.h"
+#include <llvm/IR/Module.h>
+#include <llvm/IR/Verifier.h>
 
-#include "llvm/Pass.h"
+#include <llvm/Pass.h>
 
-#include "llvm/Support/Host.h"
-#include "llvm/Support/TargetRegistry.h"
-#include "llvm/Support/TargetSelect.h"
-#include "llvm/Support/raw_os_ostream.h"
+#include <llvm/Support/Host.h>
+#include <llvm/Support/TargetRegistry.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Support/raw_os_ostream.h>
 
-#include "llvm/Target/TargetMachine.h"
+#include <llvm/Target/TargetMachine.h>
 
 // stl
 #include <functional>

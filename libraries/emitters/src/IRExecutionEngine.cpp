@@ -10,7 +10,7 @@
 #include "IRModuleEmitter.h"
 
 // llvm
-#include "llvm/Support/TargetSelect.h"
+#include <llvm/Support/TargetSelect.h>
 
 // stl
 #include <memory>
@@ -62,7 +62,7 @@ namespace emitters
         EnsureEngine();
         _pEngine->addModule(std::move(pModule));
     }
-    
+
     void IRExecutionEngine::PerformInitialization()
     {
         _pEngine->runStaticConstructorsDestructors(false);

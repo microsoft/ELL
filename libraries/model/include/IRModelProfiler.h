@@ -15,8 +15,8 @@
 #include "EmitterTypes.h"
 
 // llvm
-#include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/Value.h"
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Value.h>
 
 // stl
 #include <string>

@@ -21,7 +21,7 @@
 #include "Files.h"
 
 // llvm
-#include "llvm/Transforms/Utils/Cloning.h"
+#include <llvm/Transforms/Utils/Cloning.h>
 
 // stl
 #include <sstream>

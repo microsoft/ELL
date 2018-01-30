@@ -12,7 +12,7 @@
 #include "TypeTraits.h"
 
 // llvm
-#include "llvm/IR/Value.h"
+#include <llvm/IR/Value.h>
 
 namespace ell
 {
@@ -94,7 +94,7 @@ namespace emitters
     //
     // Convenience overloads for common operators
     //
-    
+
     // Basic arithmetic
     IRLocalScalar operator+(IRLocalScalar a, IRLocalScalar b);
     IRLocalScalar operator-(IRLocalScalar a, IRLocalScalar b);

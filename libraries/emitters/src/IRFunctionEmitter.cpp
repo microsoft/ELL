@@ -20,8 +20,8 @@
 #include "Logger.h"
 
 // llvm
-#include "llvm/IR/Verifier.h"
-#include "llvm/Support/raw_os_ostream.h"
+#include <llvm/IR/Verifier.h>
+#include <llvm/Support/raw_os_ostream.h>
 
 namespace ell
 {

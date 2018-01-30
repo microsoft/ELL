@@ -8,8 +8,8 @@
 #pragma once
 
 // llvm
-#include "llvm/IR/Function.h"
-#include "llvm/IR/Type.h"
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Type.h>
 
 // stl
 #include <ostream>
