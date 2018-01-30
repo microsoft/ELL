@@ -9,9 +9,9 @@
 #pragma once
 
 // llvm
-#include "llvm/IR/Function.h"
-#include "llvm/IR/Type.h"
-#include "llvm/IR/Value.h"
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
 
 // stl
 #include <vector>
@@ -75,7 +75,7 @@ namespace emitters
         llvm::Function* _taskFunction = nullptr;
         std::vector<llvm::Value*> _arguments;
         llvm::Type* _returnType = nullptr;
-        llvm::Value* _returnValue = nullptr;        
+        llvm::Value* _returnValue = nullptr;
 
         bool UsePthreads() const { return _usePthreads; }
         llvm::Function* GetPthreadWrapper(llvm::StructType* argsStructType);

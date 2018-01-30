@@ -267,21 +267,6 @@ namespace emitters
             ModuleCallbackDefinitions _callbacks;
         };
 
-        void WriteCommonSwigCode(std::ostream& os, IRModuleEmitter& moduleEmitter)
-        {
-            auto pModule = moduleEmitter.GetLLVMModule();
-            std::string moduleName = pModule->getName();
-
-            // Declare the module and enable the directors feature
-            os << "%module(directors=\"1\") " << moduleName << "\n";
-
-            // Generate docstrings from types and method signatures
-            os << "%feature(\"autodoc\", \"3\");\n\n";
-
-            // Common SWIG code
-            os << "%include \"callback.i\"\n";
-        }
-
         void WriteShapeWrappers(std::ostream& os, IRModuleEmitter& moduleEmitter)
         {
             auto pModule = moduleEmitter.GetLLVMModule();
@@ -312,15 +297,28 @@ namespace emitters
 
         void WriteModuleSwigCode(std::ostream& os, IRModuleEmitter& moduleEmitter, const std::string& headerName)
         {
-            // Module C++ #include
-            os << "%{\n"
-                  "#include \"" << headerName << "\"\n"
-                  "%}\n\n";
+            auto pModule = moduleEmitter.GetLLVMModule();
+            std::string moduleName = pModule->getName();
 
+            //
+            // Module
+            //
+            // clang-format off
+            std::string moduleCode(
+                #include "SwigModule.in"
+            );
+            // clang-format on
+
+            ReplaceDelimiter(moduleCode, "MODULE", moduleName);
+            ReplaceDelimiter(moduleCode, "HEADER", headerName);
+            os << moduleCode << "\n";
+
+            //
+            // Predictor interfaces and callback macros
+            //
             auto predicts = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
             std::string predictFunctionName = (predicts[0].function)->getName();
 
-            // Module callback macros
             auto callbacks = GetFunctionsWithTag(moduleEmitter, c_callbackFunctionTagName);
             if (!callbacks.empty())
             {
@@ -334,6 +332,10 @@ namespace emitters
             }
 
             os << "%include \"" << headerName << "\"\n";
+
+            //
+            // Shape wrappers
+            //
             WriteShapeWrappers(os, moduleEmitter);
         }
     }
@@ -393,8 +395,6 @@ namespace emitters
         std::string moduleName = pModule->getName();
 
         os << "//\n// ELL SWIG interface for module " << moduleName << "\n//\n\n";
-
-        WriteCommonSwigCode(os, moduleEmitter);
 
         WriteModuleSwigCode(os, moduleEmitter, headerName);
     }

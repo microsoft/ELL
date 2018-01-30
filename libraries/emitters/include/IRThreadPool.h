@@ -11,10 +11,10 @@
 #include "IREmitter.h"
 
 // llvm
-#include "llvm/IR/Function.h"
-#include "llvm/IR/GlobalVariable.h"
-#include "llvm/IR/Type.h"
-#include "llvm/IR/Value.h"
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
 
 // stl
 #include <string>
@@ -54,7 +54,7 @@ namespace emitters
         ///
         /// <param name="function"> The function currently being emitted into. </param>
         void Wait(IRFunctionEmitter& function);
-        
+
         /// <summary> Get the return value of a finished task </summary>
         ///
         /// <param name="function"> The function currently being emitted into. </param>
@@ -107,13 +107,13 @@ namespace emitters
         IRThreadPoolTaskArray(IRThreadPoolTaskQueue& taskQueue);
         void Initialize(IRFunctionEmitter& function);
         void SetTasks(IRFunctionEmitter& function, llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& taskArgs);
-        llvm::StructType* GetTaskArrayDataType(IRModuleEmitter& module);        
+        llvm::StructType* GetTaskArrayDataType(IRModuleEmitter& module);
         llvm::Value* GetTaskFunctionPointer(IRFunctionEmitter& function);
         llvm::Value* GetReturnValuesStoragePointer(IRFunctionEmitter& function);
         llvm::Value* GetTaskArgsStoragePointer(IRFunctionEmitter& function);
         llvm::Value* GetTaskArgsStructSize(IRFunctionEmitter& function);
         void SetTaskArgsStructSize(IRFunctionEmitter& function, llvm::Value* size);
-        
+
         enum class Fields
         {
             functionPtr = 0,
@@ -123,7 +123,7 @@ namespace emitters
             // nextArray
         };
         llvm::Value* _taskArrayData = nullptr;
-        
+
         IRThreadPoolTaskQueue& _taskQueue; // make this a pointer if we're not using threadpool
     };
 
@@ -182,7 +182,7 @@ namespace emitters
         llvm::Value* DecrementUnfinishedTasks(IRFunctionEmitter& function);
         llvm::Value* IsEmpty(IRFunctionEmitter& function);
         llvm::Value* IsFinished(IRFunctionEmitter& function);
-        
+
         bool IsInitialized();
         void NotifyWaitingClients(IRFunctionEmitter& function);
         void LockQueueMutex(IRFunctionEmitter& function);
@@ -233,7 +233,7 @@ namespace emitters
         void AddGlobalInitializer();
         void AddGlobalFinalizer();
         llvm::Function* GetWorkerThreadFunction();
-        
+
         IRModuleEmitter& _module;
         size_t _maxThreads = 0;
         llvm::GlobalVariable* _threads = nullptr; // global array of pthread_t

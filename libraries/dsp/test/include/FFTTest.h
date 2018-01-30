@@ -6,8 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma once
+
 // stl
 #include <cstring>
 
 template <typename ValueType>
 void TestFFT(size_t N);
+
+template <typename ValueType>
+void VerifyFFT();

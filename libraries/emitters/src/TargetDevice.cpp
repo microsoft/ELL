@@ -9,8 +9,8 @@
 #include "TargetDevice.h"
 
 // llvm
-#include "llvm/ADT/Triple.h"
-#include "llvm/Support/Host.h"
+#include <llvm/ADT/Triple.h>
+#include <llvm/Support/Host.h>
 
 namespace ell
 {

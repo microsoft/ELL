@@ -70,84 +70,53 @@ namespace nodes
     template <typename ValueType>
     void RegionDetectionNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        const auto add = emitters::TypedOperator::add;
-        const auto mul = emitters::TypedOperator::multiply;
+        auto input = function.LocalArray(compiler.EnsurePortEmitted(this->input));
+        auto width = function.LocalScalar(_params.width);
+        auto height = function.LocalScalar(_params.height);
+        auto numBoxes = function.LocalScalar(_params.numBoxesPerCell);
+        auto numClasses = function.LocalScalar(_params.numClasses);
+        auto numCoords = function.LocalScalar(_params.numCoordinates);
 
-        auto expFunc = function.GetModule().GetRuntime().GetExpFunction<ValueType>();
-        SigmoidActivationFunction<ValueType> sigmoidActivation;
-
-        llvm::Value* input = compiler.EnsurePortEmitted(this->input);
-        llvm::Value* width = function.Literal(_params.width);
-        llvm::Value* height = function.Literal(_params.height);
-        llvm::Value* numBoxes = function.Literal(_params.numBoxesPerCell);
-        llvm::Value* numClasses = function.Literal(_params.numClasses);
-        llvm::Value* numCoords = function.Literal(_params.numCoordinates);
-
-        llvm::Value* output = compiler.EnsurePortEmitted(this->output);
-
-        const auto zero = function.Literal(0);
-        const auto one = function.Literal(1);
+        auto output = function.LocalArray(compiler.EnsurePortEmitted(this->output));
 
         auto J = height;
         // the stride between each box in a cell (numCoordinates + 1 + numClasses)
-        auto boxStride = function.Operator(add, numCoords, function.Operator(add, one, numClasses));
+        auto boxStride = numCoords + 1 + numClasses;
         // the stride of each cell (numBoxesPerCell * boxStride)
-        auto K = function.Operator(mul, numBoxes, boxStride);
-        function.For(width, [input, output, zero, one, expFunc, sigmoidActivation, boxStride, numClasses, J, K, height, numBoxes, add, mul](auto& fn, auto i)
+        auto K = numBoxes * boxStride;
+        function.For(width, [input, output, boxStride, numClasses, J, K, height, numBoxes](auto& fn, auto i)
         {
-            fn.For(height, [input, output, zero, one, expFunc, sigmoidActivation, boxStride, numClasses, i, J, K, numBoxes, add, mul](auto& fn, auto j)
+            fn.For(height, [input, output, boxStride, numClasses, i, J, K, numBoxes](auto& fn, auto j)
             {
-                // (i*J + j)*K
-                auto sliceIndex = fn.Operator(mul,
-                                    fn.Operator(add,
-                                        fn.Operator(mul, i, J),
-                                    j),
-                                  K);
-                fn.For(numBoxes, [sliceIndex, input, output, zero, one, expFunc, sigmoidActivation, boxStride, numClasses, add, mul](auto& fn, auto k)
+                auto sliceIndex = ((i * J) + j) * K;
+                fn.For(numBoxes, [sliceIndex, input, output, boxStride, numClasses](auto& fn, auto k)
                 {
-                    const auto addFloat = emitters::TypedOperator::addFloat;
-                    const auto subFloat = emitters::TypedOperator::subtractFloat;
-                    const auto divFloat = emitters::TypedOperator::divideFloat;
+                    auto boxOffset = sliceIndex + (k * boxStride);
 
-                    // sliceIndex + k*boxStride
-                    auto boxOffset = fn.Operator(add, sliceIndex, fn.Operator(mul, k, boxStride));
+                    output[boxOffset + 0] = Sigmoid(input[boxOffset + 0]);
 
-                    // output[boxOffset + 0] = sigmoid(input[boxOffset + 0])
-                    auto elementOffset = fn.Operator(add, boxOffset, zero);
-                    fn.SetValueAt(output, elementOffset, sigmoidActivation.Compile(fn, fn.ValueAt(input, elementOffset)));
+                    output[boxOffset + 1] = Sigmoid(input[boxOffset + 1]);
 
-                    // output[boxOffset + 1] = sigmoid(input[boxOffset + 1])
-                    elementOffset = fn.Operator(add, elementOffset, one);
-                    fn.SetValueAt(output, elementOffset, sigmoidActivation.Compile(fn, fn.ValueAt(input, elementOffset)));
+                    output[boxOffset + 2] = Exp(input[boxOffset + 2]);
 
-                    // output[boxOffset + 2] = exp(input[boxOffset + 2])
-                    elementOffset = fn.Operator(add, elementOffset, one);
-                    fn.SetValueAt(output, elementOffset, fn.Call(expFunc, { fn.ValueAt(input, elementOffset) }));
+                    output[boxOffset + 3] = Exp(input[boxOffset + 3]);
 
-                    // output[boxOffset + 3] = exp(input[boxOffset + 3])
-                    elementOffset = fn.Operator(add, elementOffset, one);
-                    fn.SetValueAt(output, elementOffset, fn.Call(expFunc, { fn.ValueAt(input, elementOffset) }));
-
-                    // output[boxOffset + 4] = sigmoid(input[boxOffset + 4])
-                    elementOffset = fn.Operator(add, elementOffset, one);
-                    fn.SetValueAt(output, elementOffset, sigmoidActivation.Compile(fn, fn.ValueAt(input, elementOffset)));
+                    output[boxOffset + 4] = Sigmoid(input[boxOffset + 4]);
 
                     // output[boxOffset + 5 : boxOffset + 5 + numClasses] = softmax(input[boxOffset + 5 : boxOffset + 5 + numClasses])
-                    elementOffset = fn.Operator(add, elementOffset, one);
-
                     // set the initial max value to the first element
-                    auto classProbMax = fn.Variable(emitters::GetVariableType<ValueType>());
-                    fn.Store(classProbMax, fn.ValueAt(input, elementOffset));
+                    // NB: 5 is the result of numCoords + 1, where the 1 is due to the confidence scale value of the prediction.
+                    //     If numCoords ever needs support to be anything other than 4, this value will need to be calculated accordingly
+                    auto classProbMax = fn.LocalScalar(fn.Variable(emitters::GetVariableType<ValueType>()));
+                    fn.Store(classProbMax, input[boxOffset + 5]);
 
                     // find the max value in the rest of the probabilities
-                    fn.For(fn.Operator(add, elementOffset, one), fn.Operator(add, elementOffset, numClasses),
+                    fn.For(boxOffset + 5 + 1, boxOffset + 5 + numClasses,
                            [classProbMax, input](auto& fn, auto c)
                     {
-                        auto val = fn.ValueAt(input, c);
-                        auto test = fn.Comparison(emitters::TypedComparison::greaterThanFloat, fn.Load(classProbMax), val);
-                        fn.If(test, [classProbMax, val](auto& fn)
+                        emitters::IRLocalScalar val = input[c];
+                        fn.If(val > fn.Load(classProbMax), [classProbMax, val](auto& fn)
                         {
-                            // if val > classProbMax: classProbMax = val
                             fn.Store(classProbMax, val);
                         });
                     });
@@ -155,25 +124,19 @@ namespace nodes
                     // Calculate the sum of the all the euler values, which are calculated using the max above
                     auto sum = fn.Variable(emitters::GetVariableType<ValueType>());
                     fn.Store(sum, fn.Literal(ValueType{ 0 }));
-                    fn.For(elementOffset, fn.Operator(add, elementOffset, numClasses),
-                        [sum, classProbMax, input, output, expFunc, subFloat, addFloat](auto& fn, auto c)
+                    fn.For(boxOffset + 5, boxOffset + 5 + numClasses, [sum, classProbMax, input, output](auto& fn, auto c)
                     {
-                        // inputVal = input[c]
-                        auto inputVal = fn.ValueAt(input, c);
-                        // eulerVal = exp(inputVal - classProbMax)
-                        auto eulerVal = fn.Call(expFunc, { fn.Operator(subFloat, inputVal, fn.Load(classProbMax)) });
-                        // sum += eulerVal
-                        fn.Store(sum, fn.Operator(addFloat, fn.Load(sum), eulerVal));
-                        // output[c] = eulerVal
-                        fn.SetValueAt(output, c, eulerVal);
+                        emitters::IRLocalScalar inputVal = input[c];
+                        auto eulerVal = Exp(inputVal - fn.Load(classProbMax));
+                        fn.Store(sum, eulerVal + fn.Load(sum));
+                        output[c] = eulerVal;
                     });
 
                     // Divide each element by the sum
-                    fn.For(elementOffset, fn.Operator(add, elementOffset, numClasses),
-                        [sum, output, divFloat](auto& fn, auto c)
+                    fn.For(boxOffset + 5, boxOffset + 5 + numClasses,
+                        [sum, output](auto& fn, auto c)
                     {
-                        // ouput[c] /= sum
-                        fn.SetValueAt(output, c, fn.Operator(divFloat, fn.ValueAt(output, c), fn.Load(sum)));
+                        output[c] = (output[c] / fn.Load(sum));
                     });
                 });
             });

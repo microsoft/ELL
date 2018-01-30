@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DCTTest.h"
+#include "DSPTestData.h"
 #include "FFTTest.h"
 #include "FilterTest.h"
 #include "MelTest.h"
@@ -33,6 +34,8 @@ int main()
     // FFT
     TestFFT<float>(16);
     TestFFT<double>(16);
+    VerifyFFT<float>();
+    VerifyFFT<double>();
 
     // Filters
     TestIIRFilter<float>();
@@ -42,11 +45,14 @@ int main()
     // Window functions
     TestHammingWindow<float>();
     TestHammingWindow<double>();
+    TestHammingWindow2<float>();
+    TestHammingWindow2<double>();
     TestHannWindow<float>();
     TestHannWindow<double>();
 
     // Mel filterbank
     TestMelFilterBank();
+    // TestMelFilterBank2(); // Commented out because our implementation rounds filter centers to integer locations, and the reference (librosa) doesn't
 
     // DCT
     TestDCT();

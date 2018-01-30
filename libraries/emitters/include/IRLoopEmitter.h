@@ -11,8 +11,8 @@
 #include "EmitterTypes.h"
 
 // llvm
-#include "llvm/IR/BasicBlock.h"
-#include "llvm/IR/Value.h"
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Value.h>
 
 namespace ell
 {

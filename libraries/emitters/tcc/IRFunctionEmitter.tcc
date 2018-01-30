@@ -6,6 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Needed in the tcc because IRLocalValueHelpers.h needs IRFunctionEmitter to be defined
+#include "IRLocalValueOperations.h"
+
 namespace ell
 {
 namespace emitters

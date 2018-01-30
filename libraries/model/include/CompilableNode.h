@@ -21,7 +21,7 @@
 #include "TypeName.h"
 
 // llvm
-#include "llvm/IR/Value.h"
+#include <llvm/IR/Value.h>
 
 // stl
 #include <string>

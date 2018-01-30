@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     IRLocalValue.h (emitters)
-//  Authors:  Chuck Jacobs
+//  Authors:  Chuck Jacobs, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -12,7 +12,7 @@
 #include "TypeTraits.h"
 
 // llvm
-#include "llvm/IR/Value.h"
+#include <llvm/IR/Value.h>
 
 namespace ell
 {
@@ -36,19 +36,10 @@ namespace emitters
         /// <returns> An `IRLocalValue` wrapping the given value. </returns>
         IRLocalValue(IRFunctionEmitter& function, llvm::Value* value);
 
-        /// <summary> Constructor for a literal values of fundamental types </summary>
-        ///
-        /// <param name="function"> The current function being emitted. </param>
-        /// <param name="value"> The LLVM value to wrap. </param>
-        ///
-        /// <returns> An `IRLocalValue` wrapping the given value. </returns>
-        template <typename ValueType, utilities::IsFundamental<ValueType> = true>
-        IRLocalValue(IRFunctionEmitter& function, ValueType value);
-
         /// <summary> Implicit conversion to llvm::Value* </summary>
         ///
         /// <returns> An `llvm::Value` pointer to the wrapped value. </returns>
-        operator llvm::Value*() { return value; }
+        operator llvm::Value*() const { return value; }
 
         /// <summary> The function this value is in scope for. </summary>
         IRFunctionEmitter& function;
@@ -91,36 +82,53 @@ namespace emitters
         using IRLocalValue::IRLocalValue;
     };
 
-    //
-    // Convenience overloads for common operators
-    //
-    
-    // Basic arithmetic
-    IRLocalScalar operator+(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator-(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator-(IRLocalScalar a);
-    IRLocalScalar operator*(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator/(IRLocalScalar a, IRLocalScalar b);
+    /// Helper type for llvm values representing array values local to a function
+    /// </summary>
+    struct IRLocalArray
+    {
+    private:
+        /// <summary>
+        /// Helper type for llvm values representing values within arrays local to a function
+        /// </summary>
+        struct IRLocalArrayValue
+        {
+            IRLocalArrayValue(IRFunctionEmitter& function, llvm::Value* pPointer, llvm::Value* pOffset);
 
-    // Logical operations
-    IRLocalScalar operator&&(IRLocalScalar a, IRLocalScalar b); // logical and
-    IRLocalScalar operator||(IRLocalScalar a, IRLocalScalar b); // logical or
-    IRLocalScalar operator~(IRLocalScalar a); // logical not
+            IRLocalArrayValue& operator=(llvm::Value* value);
 
-    // Comparison operators
-    IRLocalScalar operator==(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator!=(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator<(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator<=(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator>(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator>=(IRLocalScalar a, IRLocalScalar b);
+            operator IRLocalScalar() const;
 
-    // Common math functions
-    IRLocalScalar Abs(IRLocalScalar a);
-    IRLocalScalar Sqrt(IRLocalScalar a);
-    IRLocalScalar Exp(IRLocalScalar a);
-    IRLocalScalar Log(IRLocalScalar a);
-    IRLocalScalar Sin(IRLocalScalar a);
-    IRLocalScalar Cos(IRLocalScalar a);
+            operator llvm::Value*() const { return static_cast<IRLocalScalar>(*this); }
+
+            IRFunctionEmitter& _function;
+            llvm::Value* _pPointer;
+            llvm::Value* _pOffset;
+        };
+
+    public:
+        /// <summary> Constructor from an llvm::Value* </summary>
+        ///
+        /// <param name="function"> The current function being emitted. </param>
+        /// <param name="value"> The LLVM value to wrap. </param>
+        IRLocalArray(IRFunctionEmitter& function, llvm::Value* pPointer);
+
+        /// <summary> Indexing operator to return a reference to the specified offset </summary>
+        ///
+        /// <param name="offset"> The offset where the value lies within the wrapped array. </param>
+        /// <return> An instance of IRLocalArray::IRLocalArrayValue to represent the value at the offset within the array </returns>
+        IRLocalArrayValue operator[](llvm::Value* offset) const;
+
+        /// <summary> Indexing operator to return a reference to the specified offset </summary>
+        ///
+        /// <param name="offset"> The offset where the value lies within the wrapped array. </param>
+        /// <return> An instance of IRLocalArray::IRLocalArrayValue to represent the value at the offset within the array </returns>
+        IRLocalArrayValue operator[](int offset) const;
+
+        /// <summary> The function this value is in scope for. </summary>
+        IRFunctionEmitter& function;
+
+        /// <summary> The llvm::Value* being wrapped. </summary>
+        llvm::Value* pPointer;
+    };
 }
 }

@@ -11,8 +11,8 @@
 #include "EmitterTypes.h"
 
 // llvm
-#include "llvm/IR/Function.h"
-#include "llvm/IR/Type.h"
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Type.h>
 
 namespace ell
 {

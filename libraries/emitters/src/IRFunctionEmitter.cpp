@@ -20,8 +20,8 @@
 #include "Logger.h"
 
 // llvm
-#include "llvm/IR/Verifier.h"
-#include "llvm/Support/raw_os_ostream.h"
+#include <llvm/IR/Verifier.h>
+#include <llvm/Support/raw_os_ostream.h>
 
 namespace ell
 {
@@ -85,6 +85,11 @@ namespace emitters
     IRLocalScalar IRFunctionEmitter::LocalScalar(llvm::Value* value)
     {
         return IRLocalScalar(*this, value);
+    }
+
+    IRLocalArray IRFunctionEmitter::LocalArray(llvm::Value* value)
+    {
+        return IRLocalArray(*this, value);
     }
 
     llvm::Value* IRFunctionEmitter::GetEmittedVariable(const VariableScope scope, const std::string& name)

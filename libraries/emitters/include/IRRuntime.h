@@ -15,9 +15,9 @@
 #include "Exception.h"
 
 // llvm
-#include "llvm/IR/Function.h"
-#include "llvm/IR/Type.h"
-#include "llvm/IR/Value.h"
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
 
 namespace ell
 {
@@ -74,7 +74,7 @@ namespace emitters
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
         llvm::Function* GetCosFunction();
-        
+
         /// <summary> Get the tanh function </summary>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
@@ -131,10 +131,10 @@ namespace emitters
         llvm::Function* GetGEMMFunction(bool useBlas);
 
         // Special OpenBLAS utility functions
-        
+
         /// <summary> Get the OpenBLAS function for getting the number of threads </summary>
         llvm::Function* GetOpenBLASGetNumThreadsFunction();
-        
+
         /// <summary> Get the OpenBLAS function for setting the number of threads </summary>
         llvm::Function* GetOpenBLASSetNumThreadsFunction();
 
@@ -146,7 +146,7 @@ namespace emitters
     private:
         friend IRModuleEmitter;
         IRRuntime(IRModuleEmitter& module);
-        
+
         llvm::Type* GetIntType(); // returns LLVM type for native `int`
 
         std::string GetNamespacePrefix() const;

@@ -8,7 +8,7 @@
 #pragma once
 
 // llvm
-#include "llvm/IR/Function.h"
+#include <llvm/IR/Function.h>
 
 // stl
 #include <string>
@@ -20,7 +20,7 @@ namespace ell
 namespace emitters
 {
     class IRModuleEmitter;
-    
+
     //
     // Metadata tags
     //

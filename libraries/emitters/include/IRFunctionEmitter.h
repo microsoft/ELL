@@ -20,16 +20,16 @@
 #include "Variable.h"
 
 // llvm
-#include "llvm/IR/Argument.h"
-#include "llvm/IR/BasicBlock.h"
-#include "llvm/IR/Constant.h"
-#include "llvm/IR/Function.h"
-#include "llvm/IR/GlobalVariable.h"
-#include "llvm/IR/Instruction.h"
-#include "llvm/IR/Instructions.h"
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/Type.h"
-#include "llvm/IR/Value.h"
+#include <llvm/IR/Argument.h>
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/Instruction.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
 
 // stl
 #include <functional>
@@ -69,6 +69,11 @@ namespace emitters
         /// <param name="value"> The literal value to wrap. </param>
         template <typename ValueType, utilities::IsFundamental<ValueType> = true>
         IRLocalScalar LocalScalar(ValueType value);
+
+        /// <summary> Gets an `IRLocalArray` wrapper for an LLVM value object that represents an indexable array. </summary>
+        ///
+        /// <param name="value"> The value to wrap. </param>
+        IRLocalArray LocalArray(llvm::Value* value);
 
         /// <summary> Gets an emitted variable by scope and name. </summary>
         ///

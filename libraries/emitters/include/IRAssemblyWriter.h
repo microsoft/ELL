@@ -10,9 +10,9 @@
 #include "TargetDevice.h"
 
 // llvm
-#include "llvm/Support/CodeGen.h" // for CodeGenOpt::Level enum
-#include "llvm/Target/TargetMachine.h" // for CodeGenFileType
-#include "llvm/Target/TargetOptions.h" // for FloatABI::ABIType and FPOpFusion::FpOpFusionMode
+#include <llvm/Support/CodeGen.h> // for CodeGenOpt::Level enum
+#include <llvm/Target/TargetMachine.h> // for CodeGenFileType
+#include <llvm/Target/TargetOptions.h> // for FloatABI::ABIType and FPOpFusion::FpOpFusionMode
 
 namespace ell
 {

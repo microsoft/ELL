@@ -10,8 +10,8 @@
 #include "EmitterException.h"
 
 // llvm
-#include "llvm/AsmParser/Parser.h"
-#include "llvm/Support/raw_os_ostream.h"
+#include <llvm/AsmParser/Parser.h>
+#include <llvm/Support/raw_os_ostream.h>
 
 // stl
 #include <sstream>
