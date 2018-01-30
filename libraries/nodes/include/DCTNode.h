@@ -54,7 +54,8 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The signal to process. </param>
-        DCTNode(const model::PortElements<ValueType>& input);
+        /// <param name="numFilters"> The number of DCT filters to use. Also, the output dimension. </param>
+        DCTNode(const model::PortElements<ValueType>& input, size_t numFilters);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

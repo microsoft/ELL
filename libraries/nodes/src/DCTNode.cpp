@@ -25,10 +25,10 @@ namespace nodes
     }
 
     template <typename ValueType>
-    DCTNode<ValueType>::DCTNode(const model::PortElements<ValueType>& input)
-        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size()), _dctCoeffs(0, 0)
+    DCTNode<ValueType>::DCTNode(const model::PortElements<ValueType>& input, size_t numFilters)
+        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, numFilters), _dctCoeffs(0, 0)
     {
-        _dctCoeffs = dsp::GetDCTMatrix<ValueType>(_input.Size());
+        _dctCoeffs = dsp::GetDCTMatrix<ValueType>(numFilters, _input.Size());
     }
 
     template <typename ValueType>
@@ -43,7 +43,7 @@ namespace nodes
     void DCTNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<DCTNode<ValueType>>(newPortElements);
+        auto newNode = transformer.AddNode<DCTNode<ValueType>>(newPortElements, _dctCoeffs.NumRows());
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -61,14 +61,18 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
+        archiver["numFilters"] << _dctCoeffs.NumRows();
     }
 
     template <typename ValueType>
     void DCTNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
+        size_t numFilters = 0;
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
-        _output.SetSize(_input.Size());
+        archiver["numFilters"] >> numFilters;
+        _dctCoeffs = dsp::GetDCTMatrix<ValueType>(numFilters, _input.Size());
+        _output.SetSize(numFilters);
     }
 
     // Explicit instantiations

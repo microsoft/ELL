@@ -77,8 +77,8 @@ namespace common
         builder.RegisterNodeCreator<nodes::DelayNode<float>, const model::PortElements<float>&, size_t>();
         builder.RegisterNodeCreator<nodes::DelayNode<double>, const model::PortElements<double>&, size_t>();
 
-        builder.RegisterNodeCreator<nodes::DCTNode<float>, const model::PortElements<float>&>();
-        builder.RegisterNodeCreator<nodes::DCTNode<double>, const model::PortElements<double>&>();
+        builder.RegisterNodeCreator<nodes::DCTNode<float>, const model::PortElements<float>&, size_t>();
+        builder.RegisterNodeCreator<nodes::DCTNode<double>, const model::PortElements<double>&, size_t>();
 
         builder.RegisterNodeCreator<nodes::DemultiplexerNode<bool, bool>, const model::PortElements<bool>&, const model::PortElements<bool>&, size_t>();
 

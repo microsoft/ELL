@@ -930,7 +930,7 @@ Node ModelBuilder::AddMelFilterBankNode(Model model, PortElements input, double 
     return Node(newNode);
 }
 
-Node ModelBuilder::AddDCTNode(Model model, PortElements input)
+Node ModelBuilder::AddDCTNode(Model model, PortElements input, int numFilters)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
@@ -938,10 +938,10 @@ Node ModelBuilder::AddDCTNode(Model model, PortElements input)
     switch (type)
     {
     case PortType::real:
-        newNode = model.GetModel().AddNode<ell::nodes::DCTNode<double>>(ell::model::PortElements<double>(elements));
+        newNode = model.GetModel().AddNode<ell::nodes::DCTNode<double>>(ell::model::PortElements<double>(elements), numFilters);
         break;
     case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::nodes::DCTNode<float>>(ell::model::PortElements<float>(elements));
+        newNode = model.GetModel().AddNode<ell::nodes::DCTNode<float>>(ell::model::PortElements<float>(elements), numFilters);
         break;
     default:
         throw std::invalid_argument("Error: could not create DCTNode of the requested type");

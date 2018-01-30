@@ -6,8 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma once
+
 template <typename ValueType>
 void TestHammingWindow();
+
+template <typename ValueType>
+void TestHammingWindow2();
 
 template <typename ValueType>
 void TestHannWindow();

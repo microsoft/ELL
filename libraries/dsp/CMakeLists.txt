@@ -43,7 +43,9 @@ set(test_name ${library_name}_test)
 
 set(test_src 
   test/src/main.cpp
+  test/src/CepstrumTestData.cpp
   test/src/DCTTest.cpp
+  test/src/DSPTestData.cpp
   test/src/FFTTest.cpp
   test/src/FilterTest.cpp
   test/src/MelTest.cpp
@@ -51,7 +53,9 @@ set(test_src
 )
   
 set(test_include
+  test/include/CepstrumTestData.h
   test/include/DCTTest.h
+  test/include/DSPTestData.h
   test/include/FFTTest.h
   test/include/FilterTest.h
   test/include/MelTest.h
@@ -61,9 +65,14 @@ set(test_include
 set(test_tcc
 )
 
+set(test_py
+  test/py/generate_test_data.py
+)
+
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 source_group("tcc" FILES ${test_tcc})
+source_group("py" FILES ${test_py})
 
 add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${include})
 target_include_directories(${test_name} PRIVATE test/include)

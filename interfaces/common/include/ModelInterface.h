@@ -366,7 +366,7 @@ public:
     Node AddBufferNode(Model model, PortElements input, int windowSize);
     Node AddClockNode(Model model, PortElements input, double interval, double lagThreshold, const std::string& lagNotificationName);
     Node AddConstantNode(Model model, std::vector<double> values, PortType type);
-    Node AddDCTNode(Model model, PortElements input);
+    Node AddDCTNode(Model model, PortElements input, int numFilters);
     Node AddDoubleNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<double> predictor);
     Node AddFFTNode(Model model, PortElements input);
     Node AddFloatNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<float> predictor);

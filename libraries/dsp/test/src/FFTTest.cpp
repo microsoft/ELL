@@ -6,10 +6,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "FFTTest.h"
+#include "DSPTestData.h"
+
+// dsp
 #include "FFT.h"
 
 // math
 #include "Vector.h"
+#include "VectorOperations.h"
 
 // testing
 #include "testing.h"
@@ -83,8 +88,32 @@ void TestFFT(size_t N)
     }
 }
 
+template <typename ValueType>
+void VerifyFFT(std::vector<ValueType> input, const std::vector<ValueType>& reference)
+{
+    // run our fft
+    FFT(input);
+
+    auto trunc_result = std::vector<ValueType>(input.begin(), input.begin() + reference.size());
+    testing::ProcessTest("Testing real-valued FFT vs numpy", testing::IsEqual(reference, trunc_result));
+}
+
+template <typename ValueType>
+void VerifyFFT()
+{
+    VerifyFFT(GetFFTTestData_32(), GetRealFFT_32());
+    VerifyFFT(GetFFTTestData_64(), GetRealFFT_64());
+    VerifyFFT(GetFFTTestData_128(), GetRealFFT_128());
+    VerifyFFT(GetFFTTestData_256(), GetRealFFT_256());
+    VerifyFFT(GetFFTTestData_512(), GetRealFFT_512());
+    VerifyFFT(GetFFTTestData_1024(), GetRealFFT_1024());
+}
+
 //
 // Explicit instantiation definitions
 //
 template void TestFFT<float>(size_t);
 template void TestFFT<double>(size_t);
+
+template void VerifyFFT<float>();
+template void VerifyFFT<double>();

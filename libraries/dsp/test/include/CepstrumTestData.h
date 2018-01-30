@@ -1,18 +1,15 @@
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     FilterTest.h (dsp)
+//  File:     CepstrumTestData.h (dsp)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-template <typename ValueType>
-void TestIIRFilter();
+// stl
+#include <vector>
 
-template <typename ValueType>
-void TestIIRFilterMultiSample();
-
-template <typename ValueType>
-void TestIIRFilterImpulse();
+std::vector<std::vector<double>> GetReferenceCepstrumCoefficients();
