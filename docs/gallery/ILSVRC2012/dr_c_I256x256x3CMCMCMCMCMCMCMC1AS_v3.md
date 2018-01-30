@@ -11,7 +11,7 @@ permalink: /gallery/ILSVRC2012/dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v3
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dr_c_I256x256x3CMCMCMCMCMCMCMC1AS/dr_c_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip">dr_c_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v3/dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v3.ell.zip">dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v3.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
