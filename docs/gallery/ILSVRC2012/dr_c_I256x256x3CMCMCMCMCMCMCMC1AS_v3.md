@@ -1,33 +1,33 @@
 ---
 layout: default
-title: 128x128x3 Convolutional Neural Network
-permalink: /gallery/ILSVRC2012/dsb_I128x128x3CMCMCMCMCMCCCMC1AS
+title: 256x256x3 Convolutional Neural Network
+permalink: /gallery/ILSVRC2012/dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v3
 ---
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (57.38% top 1 accuracy, 80.85% top 5 accuracy, 0.41s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 256x256x3 Convolutional Neural Network (49.65% top 1 accuracy, 74.12% top 5 accuracy, 0.24s/frame on Raspberry Pi 3)
 
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dsb_I128x128x3CMCMCMCMCMCCCMC1AS/dsb_I128x128x3CMCMCMCMCMCCCMC1AS.ell.zip">dsb_I128x128x3CMCMCMCMCMCCCMC1AS.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dr_c_I256x256x3CMCMCMCMCMCMCMC1AS/dr_c_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip">dr_c_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
-        <td colspan="3"> ILSVRC2012: 80.85% (Top 5), 57.38% (Top 1) </td>
+        <td colspan="3"> ILSVRC2012: 74.12% (Top 5), 49.65% (Top 1) </td>
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.41s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.24s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
-        <td colspan="3"> 121MB </td>
+        <td colspan="3"> 28MB </td>
     </tr>
     <tr>
         <td> Input </td>
-        <td colspan="3"> 128 &times; 128 &times; {B,G,R} </td>
+        <td colspan="3"> 256 &times; 256 &times; {B,G,R} </td>
     </tr>
     <tr>
         <td> Architecture </td>
@@ -35,63 +35,63 @@ permalink: /gallery/ILSVRC2012/dsb_I128x128x3CMCMCMCMCMCCCMC1AS
             <table class="arch-table">
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;128×128×32</td>
+                    <td>&#8680;&nbsp;256×256×8</td>
                     <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;66×66×32</td>
+                    <td>&#8680;&nbsp;130×130×8</td>
                     <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;64×64×64</td>
+                    <td>&#8680;&nbsp;128×128×16</td>
                     <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;34×34×64</td>
+                    <td>&#8680;&nbsp;66×66×16</td>
                     <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;32×32×128</td>
+                    <td>&#8680;&nbsp;64×64×32</td>
                     <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;18×18×128</td>
+                    <td>&#8680;&nbsp;34×34×32</td>
                     <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;16×16×256</td>
+                    <td>&#8680;&nbsp;32×32×64</td>
                     <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;10×10×256</td>
+                    <td>&#8680;&nbsp;18×18×64</td>
                     <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;8×8×512</td>
+                    <td>&#8680;&nbsp;16×16×128</td>
                     <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;6×6×512</td>
+                    <td>&#8680;&nbsp;10×10×128</td>
                     <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;4×4×512</td>
+                    <td>&#8680;&nbsp;8×8×256</td>
                     <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">
-                    <td>Convolution</td>
-                    <td>&#8680;&nbsp;4×4×512</td>
-                    <td>size=3×3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;6×6×256</td>
+                    <td>size=2×2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
@@ -127,7 +127,7 @@ permalink: /gallery/ILSVRC2012/dsb_I128x128x3CMCMCMCMCMCCCMC1AS
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Juan Lema using CNTK 2.2 </td>
+        <td colspan="3"> Trained by Juan Lema using CNTK 2.3.1 </td>
     </tr>
 </table>
 
