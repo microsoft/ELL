@@ -23,6 +23,7 @@
 
 // nodes
 #include "ClockNode.h"
+#include "ConstantNode.h"
 #include "SinkNode.h"
 #include "SourceNode.h"
 #include "SumNode.h"
@@ -55,8 +56,9 @@ model::IRCompiledMap GetCompiledMapWithCallbacks(
         "MyLagNotificationCallback");
     auto sourceNode = model.AddNode<nodes::SourceNode<ElementType>>(clockNode->output, inputSize,
         "MyDataCallback");
+    auto conditionNode = model.AddNode<nodes::ConstantNode<bool>>(true);
     auto sumNode = model.AddNode<nodes::SumNode<ElementType>>(sourceNode->output);
-    auto sinkNode = model.AddNode<nodes::SinkNode<ElementType>>(sumNode->output,
+    auto sinkNode = model.AddNode<nodes::SinkNode<ElementType>>(sumNode->output, conditionNode->output,
         "MyResultsCallback");
 
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);

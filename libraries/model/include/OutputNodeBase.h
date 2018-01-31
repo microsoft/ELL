@@ -52,6 +52,7 @@ namespace model
 
     protected:
         OutputNodeBase(InputPortBase& input, OutputPortBase& output, const ell::math::TensorShape& shape);
+        OutputNodeBase(const std::vector<InputPortBase*>& inputs, OutputPortBase& output, const ell::math::TensorShape& shape);
         bool ShouldCompileInline() const override { return true; }
         bool HasState() const override { return false; }
         void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
@@ -79,8 +80,8 @@ namespace model
         void SetCallbackName(const std::string& name) { _callbackName = name; };
 
     protected:
-        SinkNodeBase(InputPortBase& input, OutputPortBase& output, ell::math::TensorShape shape, const std::string& callbackName)
-            : OutputNodeBase(input, output, shape), _callbackName(callbackName)
+        SinkNodeBase(InputPortBase& input, InputPortBase& trigger, OutputPortBase& output, ell::math::TensorShape shape, const std::string& callbackName)
+            : OutputNodeBase({ &input, &trigger }, output, shape), _callbackName(callbackName)
         {
         }
 

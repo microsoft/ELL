@@ -23,6 +23,7 @@ namespace utilities
         v3_model_metadata = 3,
         v4_source_sink_shapes = 4,
         v5_refined_nodes = 5,
+        v6_sink_triggers = 6,
         nextVersion
     };
 

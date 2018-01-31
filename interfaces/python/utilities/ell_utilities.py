@@ -49,10 +49,15 @@ def ell_map_from_float_predictor(predictor, step_interval_msec=0, lag_threshold_
         nnNode = builder.AddFloatNeuralNetworkPredictorNode(
             model, ell.nodes.PortElements(sourceNode.GetOutputPort("output")),
             predictor)
+        # add a sink node that always triggers
+        conditionNode = builder.AddConstantNode(
+            model, ell.math.DoubleVector([1.0]), ell.nodes.PortType.boolean)
         sinkNode = builder.AddSinkNode(
             model, ell.nodes.PortElements(nnNode.GetOutputPort("output")),
+            ell.nodes.PortElements(conditionNode.GetOutputPort("output")),
             outputShape,
             "{}OutputCallback".format(function_prefix))
+
         outputNode = builder.AddOutputNode(
             model, outputShape, ell.nodes.PortElements(sinkNode.GetOutputPort("output")))
 

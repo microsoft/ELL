@@ -19,6 +19,11 @@ namespace model
     {
     }
 
+    OutputNodeBase::OutputNodeBase(const std::vector<InputPortBase*>& inputs, OutputPortBase& output, const math::TensorShape& shape)
+        : CompilableNode(inputs, { &output }), _inputBase(*inputs.at(0)), _outputBase(output), _shape(shape)
+    {
+    }
+
     ell::utilities::ArchiveVersion OutputNodeBase::GetArchiveVersion() const
     {
         return ell::utilities::ArchiveVersion{ 2 };

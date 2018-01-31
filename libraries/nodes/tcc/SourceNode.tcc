@@ -25,8 +25,8 @@ namespace nodes
     template <typename ValueType>
     SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, const math::TensorShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
         : model::SourceNodeBase(_input, _output, shape, sourceFunctionName),
-        _input(this, input, inputPortName),
-        _output(this, outputPortName, shape.Size()),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, shape.Size()),
         _source(source == nullptr ? [](auto&){ return false; } : source)
     {
         _bufferedSample.resize(shape.Size());
@@ -127,8 +127,8 @@ namespace nodes
     void SourceNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
+        archiver[defaultInputPortName] << _input;
+        archiver[defaultOutputPortName] << _output;
         archiver["sourceFunctionName"] << GetCallbackName();
         archiver["shape"] << static_cast<std::vector<size_t>>(GetShape());
     }
@@ -137,8 +137,8 @@ namespace nodes
     void SourceNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
+        archiver[defaultInputPortName] >> _input;
+        archiver[defaultOutputPortName] >> _output;
 
         std::string sourceFunctionName;
         archiver["sourceFunctionName"] >> sourceFunctionName;

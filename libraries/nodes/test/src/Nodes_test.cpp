@@ -15,6 +15,7 @@
 #include "BiasLayerNode.h"
 #include "BinaryOperationNode.h"
 #include "BufferNode.h"
+#include "ConstantNode.h"
 #include "ClockNode.h"
 #include "DTWDistanceNode.h"
 #include "DelayNode.h"
@@ -389,7 +390,7 @@ static void TestDemultiplexerNodeCompute()
     testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, { 0.0, 5.0 }));
 }
 
-void TestSourceNodeCompute()
+static void TestSourceNodeCompute()
 {
     // Callbacks
     struct SourceNodeTester
@@ -444,25 +445,41 @@ void TestSourceNodeCompute()
     }
 }
 
-static void TestSinkNodeCompute()
+void TestSinkNodeCompute(bool triggerValue)
 {
     const std::vector<std::vector<double>> data = { { 12 }, { 10 }, { 8 }, { 6 }, { 4 }, { 2 } };
-    std::vector<std::vector<double>> results;
 
+    std::vector<std::vector<double>> results;
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
+    auto conditionNode = model.AddNode<nodes::ConstantNode<bool>>(triggerValue);
     auto sinkNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output,
-                                                           "SinkFunction",
-                                                           [&results](const std::vector<double>& values) {
-                                                               results.push_back(values);
-                                                           });
+                                                        conditionNode->output,
+                                                        "SinkFunction",
+                                                        [&results](const std::vector<double>& values) {
+                                                            results.push_back(values);
+                                                        });
 
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
         model.ComputeOutput(sinkNode->output);
     }
-    testing::ProcessTest("Testing SinkNode output", testing::IsEqual(data, results));
+
+    if (triggerValue)
+    {
+        testing::ProcessTest("Testing SinkNode output (trigger = true)", testing::IsEqual(data, results));
+    }
+    else
+    {
+        testing::ProcessTest("Testing SinkNode output (trigger = true)", testing::IsTrue(results.empty()));
+    }
+}
+
+static void TestSinkNodeCompute()
+{
+    TestSinkNodeCompute(true);
+    TestSinkNodeCompute(false);
 }
 
 static void TestSquaredEuclideanDistanceNodeCompute()

@@ -673,20 +673,27 @@ Node ModelBuilder::AddClockNode(Model model, PortElements input, double interval
     return Node(newNode);
 }
 
-Node ModelBuilder::AddSinkNode(Model model, PortElements input, const ell::api::math::TensorShape& tensorShape, const std::string& sinkFunctionName)
+Node ModelBuilder::AddSinkNode(Model model, PortElements input, PortElements trigger, const ell::api::math::TensorShape& tensorShape, const std::string& sinkFunctionName)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
+    auto triggerElements = trigger.GetPortElements();
     ell::model::Node* newNode = nullptr;
     switch (type)
     {
     case PortType::real:
         newNode = model.GetModel().AddNode<ell::nodes::SinkNode<double>>(
-            ell::model::PortElements<double>(elements), tensorShape.ToMathTensorShape(), sinkFunctionName);
+            ell::model::PortElements<double>(elements),
+            ell::model::PortElements<bool>(triggerElements),
+            tensorShape.ToMathTensorShape(),
+            sinkFunctionName);
         break;
     case PortType::smallReal:
         newNode = model.GetModel().AddNode<ell::nodes::SinkNode<float>>(
-            ell::model::PortElements<float>(elements), tensorShape.ToMathTensorShape(), sinkFunctionName);
+            ell::model::PortElements<float>(elements),
+            ell::model::PortElements<bool>(triggerElements),
+            tensorShape.ToMathTensorShape(),
+            sinkFunctionName);
         break;
     default:
         throw std::invalid_argument("Error: could not create SinkNode of the requested type");
