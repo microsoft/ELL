@@ -1071,7 +1071,7 @@ void TestCompilableClockNode()
 
     auto getStepIntervalFunction = reinterpret_cast<GetStepInterval*>(jitter.ResolveFunctionAddress("Test_GetStepInterval"));
     testing::ProcessTest("Testing compiled GetStepInterval", testing::IsEqual(getStepIntervalFunction(), interval));
-    
+
     auto getLagThresholdFunction = reinterpret_cast<GetLagThreshold*>(jitter.ResolveFunctionAddress("Test_GetLagThreshold"));
     testing::ProcessTest("Testing compiled GetLagThreshold", testing::IsEqual(getLagThresholdFunction(), lagThreshold));
 
@@ -1943,6 +1943,11 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 
     // Test archiving / unarchiving produces same result
     VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestHardSigmoidActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    TestActivationLayerNode<ell::predictors::neural::HardSigmoidActivation>(inputPaddingSize, outputPaddingSize);
 }
 
 void TestReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)

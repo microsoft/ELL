@@ -37,11 +37,11 @@ namespace predictors
             typename Layer<ElementType>::VectorType& outputBias;
         };
 
-        /// <summary> 
+        /// <summary>
         /// A layer in a recurrent network that implements an LSTM layer. This layer retains "memory"
-        /// over time and uses this information to inform predictions. 
+        /// over time and uses this information to inform predictions.
         /// </summary>
-        template <typename ElementType, template <typename> class ActivationFunctionType = TanhActivation, template <typename> class RecurrentActivationFunctionType = SigmoidActivation>
+        template <typename ElementType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
         class LSTMLayer : public Layer<ElementType>
         {
         public:

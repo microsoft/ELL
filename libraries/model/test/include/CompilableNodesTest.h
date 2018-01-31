@@ -70,6 +70,7 @@ enum class ConvolutionType
 };
 
 void TestInputLayerNode(size_t outputPadding = 0);
+void TestHardSigmoidActivationLayerNode(size_t inputPaddingSize = 0, size_t outputPaddingSize = 0);
 void TestReLUActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestLeakyReLUActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestParametricReLUActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);

@@ -93,15 +93,15 @@ namespace nodes
                 {
                     auto boxOffset = sliceIndex + (k * boxStride);
 
-                    output[boxOffset + 0] = Sigmoid(input[boxOffset + 0]);
+                    output[boxOffset + 0] = emitters::Sigmoid<ValueType>(input[boxOffset + 0]);
 
-                    output[boxOffset + 1] = Sigmoid(input[boxOffset + 1]);
+                    output[boxOffset + 1] = emitters::Sigmoid<ValueType>(input[boxOffset + 1]);
 
                     output[boxOffset + 2] = Exp(input[boxOffset + 2]);
 
                     output[boxOffset + 3] = Exp(input[boxOffset + 3]);
 
-                    output[boxOffset + 4] = Sigmoid(input[boxOffset + 4]);
+                    output[boxOffset + 4] = emitters::Sigmoid<ValueType>(input[boxOffset + 4]);
 
                     // output[boxOffset + 5 : boxOffset + 5 + numClasses] = softmax(input[boxOffset + 5 : boxOffset + 5 + numClasses])
                     // set the initial max value to the first element

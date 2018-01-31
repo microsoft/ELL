@@ -114,6 +114,8 @@ namespace emitters
     IRLocalScalar Log(IRLocalScalar a);
     IRLocalScalar Sin(IRLocalScalar a);
     IRLocalScalar Cos(IRLocalScalar a);
+
+    template <typename ValueType>
     IRLocalScalar Sigmoid(IRLocalScalar a);
 }
 }

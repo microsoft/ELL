@@ -36,11 +36,11 @@ namespace predictors
             typename Layer<ElementType>::ConstVectorReferenceType hiddenBias;
         };
 
-        /// <summary> 
+        /// <summary>
         /// A layer in a recurrent network that implements an GRU layer, meaning this layer retains gated "memory"
         /// over time and uses this information to inform predictions.
         /// </summary>
-        template <typename ElementType, template <typename> class ActivationFunctionType = TanhActivation, template <typename> class RecurrentActivationFunctionType = SigmoidActivation>
+        template <typename ElementType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
         class GRULayer : public Layer<ElementType>
         {
         public:

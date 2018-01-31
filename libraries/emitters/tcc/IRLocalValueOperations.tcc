@@ -237,6 +237,18 @@ namespace emitters
     {
         return b < a;
     }
+
+    template <typename ValueType>
+    IRLocalScalar Sigmoid(IRLocalScalar a)
+    {
+        auto& fn = a.function;
+
+        auto expInput = Exp(a);
+        constexpr auto one = static_cast<ValueType>(1);
+        auto result = fn.Select(a > ValueType{0}, one / (Exp(-a) + one), expInput / (expInput + one));
+
+        return a.function.LocalScalar(result);
+    }
 }
 }
 

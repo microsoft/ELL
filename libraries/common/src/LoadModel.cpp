@@ -103,10 +103,12 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<double>>();
 
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<float, nodes::ReLUActivationFunction<float>>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<double, nodes::ReLUActivationFunction<double>>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<float, nodes::HardSigmoidActivationFunction<float>>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<double, nodes::HardSigmoidActivationFunction<double>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<float, nodes::LeakyReLUActivationFunction<float>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<double, nodes::LeakyReLUActivationFunction<double>>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<float, nodes::ReLUActivationFunction<float>>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<double, nodes::ReLUActivationFunction<double>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<float, nodes::SigmoidActivationFunction<float>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<double, nodes::SigmoidActivationFunction<double>>>();
 
@@ -238,17 +240,17 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
 
-        context.GetTypeFactory().AddType<model::Node, nodes::ProtoNNPredictorNode>();
-        context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<float>>();
-
         // NN layer nodes
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::ReLUActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::ReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::HardSigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::HardSigmoidActivation>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::LeakyReLUActivation>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::LeakyReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::ReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::ReLUActivation>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::SigmoidActivation>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::TanhActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::TanhActivation>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ParametricReLUActivationLayerNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ParametricReLUActivationLayerNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BatchNormalizationLayerNode<float>>();

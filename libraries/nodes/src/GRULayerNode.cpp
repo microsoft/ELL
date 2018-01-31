@@ -23,7 +23,7 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-    GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::GRULayerNode(const model::PortElements<ValueType>& input, const predictors::neural::GRULayer<ValueType>& layer)
+    GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::GRULayerNode(const model::PortElements<ValueType>& input, const LayerType& layer)
         : BaseType(input, layer)
     {
         const auto& layerParameters = layer.GetLayerParameters();
@@ -259,11 +259,31 @@ namespace nodes
         // output <- hiddenState (no-op, since output and hidden state are aliases)
     }
 
-    // most common: tanh, sigmoid
     // Explicit specialization
-    template class GRULayerNode<float, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>;
-    template class GRULayerNode<double, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>;
-    template class GRUNode<float, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>;
-    template class GRUNode<double, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>;
+#define INSTANTIATE_GRU(activation1, activation2) \
+    template class GRULayerNode<float, activation1, activation2>; \
+    template class GRULayerNode<double, activation1, activation2>; \
+    template class GRUNode<float, activation1, activation2>; \
+    template class GRUNode<double, activation1, activation2>
+
+    INSTANTIATE_GRU(predictors::neural::HardSigmoidActivation, predictors::neural::HardSigmoidActivation);
+    INSTANTIATE_GRU(predictors::neural::HardSigmoidActivation, predictors::neural::ReLUActivation);
+    INSTANTIATE_GRU(predictors::neural::HardSigmoidActivation, predictors::neural::SigmoidActivation);
+    INSTANTIATE_GRU(predictors::neural::HardSigmoidActivation, predictors::neural::TanhActivation);
+
+    INSTANTIATE_GRU(predictors::neural::ReLUActivation, predictors::neural::HardSigmoidActivation);
+    INSTANTIATE_GRU(predictors::neural::ReLUActivation, predictors::neural::ReLUActivation);
+    INSTANTIATE_GRU(predictors::neural::ReLUActivation, predictors::neural::SigmoidActivation);
+    INSTANTIATE_GRU(predictors::neural::ReLUActivation, predictors::neural::TanhActivation);
+
+    INSTANTIATE_GRU(predictors::neural::SigmoidActivation, predictors::neural::HardSigmoidActivation);
+    INSTANTIATE_GRU(predictors::neural::SigmoidActivation, predictors::neural::ReLUActivation);
+    INSTANTIATE_GRU(predictors::neural::SigmoidActivation, predictors::neural::SigmoidActivation);
+    INSTANTIATE_GRU(predictors::neural::SigmoidActivation, predictors::neural::TanhActivation);
+
+    INSTANTIATE_GRU(predictors::neural::TanhActivation, predictors::neural::HardSigmoidActivation);
+    INSTANTIATE_GRU(predictors::neural::TanhActivation, predictors::neural::ReLUActivation);
+    INSTANTIATE_GRU(predictors::neural::TanhActivation, predictors::neural::SigmoidActivation);
+    INSTANTIATE_GRU(predictors::neural::TanhActivation, predictors::neural::TanhActivation);
 } // nodes
 } // ell

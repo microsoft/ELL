@@ -297,15 +297,5 @@ namespace emitters
         return { a.function, a.function.Call(f, { a }) };
     }
 
-    IRLocalScalar Sigmoid(IRLocalScalar a)
-    {
-        auto& fn = a.function;
-
-        auto expInput = Exp(a);
-        auto result = fn.Select(a > 0, 1 / (Exp(-a) + 1), expInput / (expInput + 1));
-
-        return a.function.LocalScalar(result);
-    }
-
 }
 }
