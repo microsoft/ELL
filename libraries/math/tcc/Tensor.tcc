@@ -144,7 +144,8 @@ namespace math
 
         static ConstSliceType GetConstSlice(const ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
         {
-            if /*constexpr*/ (dimension1 > dimension2)
+            constexpr bool shouldSwap = dimension1 > dimension2;
+            if /*constexpr*/ (shouldSwap)
             {
                 std::swap(index1, index2);
             }
@@ -157,7 +158,8 @@ namespace math
 
         static SliceType GetSlice(ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
         {
-            if /*contexpr*/ (dimension1 > dimension2)
+            constexpr bool shouldSwap = dimension1 > dimension2;
+            if /*constexpr*/ (shouldSwap)
             {
                 std::swap(index1, index2);
             }
@@ -182,7 +184,8 @@ namespace math
 
         static ConstSliceType GetConstSlice(const ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
         {
-            if /*constexpr*/ (dimension0 > dimension2)
+            constexpr bool shouldSwap = dimension0 > dimension2;
+            if /*constexpr*/ (shouldSwap)
             {
                 std::swap(index1, index2);
             }
@@ -195,7 +198,8 @@ namespace math
 
         static SliceType GetSlice(ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
         {
-            if /*constexpr*/ (dimension0 > dimension2)
+            constexpr bool shouldSwap = dimension0 > dimension2;
+            if /*constexpr*/ (shouldSwap)
             {
                 std::swap(index1, index2);
             }
@@ -220,7 +224,8 @@ namespace math
 
         static ConstSliceType GetConstSlice(const ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
         {
-            if /*constexpr*/ (dimension0 > dimension1)
+            constexpr bool shouldSwap = dimension0 > dimension1;
+            if /*constexpr*/ (shouldSwap)
             {
                 std::swap(index1, index2);
             }
@@ -233,7 +238,8 @@ namespace math
 
         static SliceType GetSlice(ElementType* pData, TensorShape shape, size_t increment1, size_t increment2, size_t index1, size_t index2)
         {
-            if /*constexpr*/ (dimension0 > dimension1)
+            constexpr bool shouldSwap = dimension0 > dimension1;
+            if /*constexpr*/ (shouldSwap)
             {
                 std::swap(index1, index2);
             }

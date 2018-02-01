@@ -14,6 +14,9 @@
 // model
 #include "Model.h"
 
+// stl
+#include <string>
+
 namespace ell
 {
 namespace common

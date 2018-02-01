@@ -19,7 +19,7 @@ namespace emitters
         }
         else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return b.function.LocalScalar(static_cast<long>(a)) + b;
+            return b.function.LocalScalar(static_cast<int64_t>(a)) + b;
         }
 
         return b.function.LocalScalar(a) + b;
@@ -40,7 +40,7 @@ namespace emitters
         }
         else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return b.function.LocalScalar(static_cast<long>(a)) - b;
+            return b.function.LocalScalar(static_cast<int64_t>(a)) - b;
         }
 
         return b.function.LocalScalar(a) - b;
@@ -55,7 +55,7 @@ namespace emitters
         }
         else if (a.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return a - a.function.LocalScalar(static_cast<long>(b));
+            return a - a.function.LocalScalar(static_cast<int64_t>(b));
         }
 
         return a - a.function.LocalScalar(b);
@@ -70,7 +70,7 @@ namespace emitters
         }
         else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return b.function.LocalScalar(static_cast<long>(a)) * b;
+            return b.function.LocalScalar(static_cast<int64_t>(a)) * b;
         }
 
         return b.function.LocalScalar(a) * b;
@@ -91,7 +91,7 @@ namespace emitters
         }
         else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return b.function.LocalScalar(static_cast<long>(a)) / b;
+            return b.function.LocalScalar(static_cast<int64_t>(a)) / b;
         }
 
         return b.function.LocalScalar(a) / b;
@@ -106,7 +106,7 @@ namespace emitters
         }
         else if (a.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return a / a.function.LocalScalar(static_cast<long>(b));
+            return a / a.function.LocalScalar(static_cast<int64_t>(b));
         }
 
         return a / a.function.LocalScalar(b);
@@ -121,7 +121,7 @@ namespace emitters
         }
         else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return b.function.LocalScalar(static_cast<long>(a)) == b;
+            return b.function.LocalScalar(static_cast<int64_t>(a)) == b;
         }
 
         return b.function.LocalScalar(a) == b;
@@ -142,7 +142,7 @@ namespace emitters
         }
         else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return b.function.LocalScalar(static_cast<long>(a)) != b;
+            return b.function.LocalScalar(static_cast<int64_t>(a)) != b;
         }
 
         return b.function.LocalScalar(a) != b;
@@ -163,7 +163,7 @@ namespace emitters
         }
         else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return b.function.LocalScalar(static_cast<long>(a)) < b;
+            return b.function.LocalScalar(static_cast<int64_t>(a)) < b;
         }
 
         return b.function.LocalScalar(a) < b;
@@ -184,7 +184,7 @@ namespace emitters
         }
         else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return b.function.LocalScalar(static_cast<long>(a)) <= b;
+            return b.function.LocalScalar(static_cast<int64_t>(a)) <= b;
         }
 
         return b.function.LocalScalar(a) <= b;
@@ -205,7 +205,7 @@ namespace emitters
         }
         else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return b.function.LocalScalar(static_cast<long>(a)) > b;
+            return b.function.LocalScalar(static_cast<int64_t>(a)) > b;
         }
 
         return b.function.LocalScalar(a) > b;
@@ -226,7 +226,7 @@ namespace emitters
         }
         else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
         {
-            return b.function.LocalScalar(static_cast<long>(a)) >= b;
+            return b.function.LocalScalar(static_cast<int64_t>(a)) >= b;
         }
 
         return b.function.LocalScalar(a) >= b;

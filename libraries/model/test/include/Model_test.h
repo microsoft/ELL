@@ -10,7 +10,6 @@
 void TestNodeIterator();
 void TestStaticModel();
 void TestNodeIterator();
-void TestExampleModel();
 
 void TestModelSerialization();
 void TestModelMetadata();

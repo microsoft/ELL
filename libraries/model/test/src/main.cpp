@@ -33,7 +33,6 @@ int main()
         // Model tests
         TestStaticModel();
         TestNodeIterator();
-        TestExampleModel();
         TestModelSerialization();
         TestModelMetadata();
         TestInputRouting1();

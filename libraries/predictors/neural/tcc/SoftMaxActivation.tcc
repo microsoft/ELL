@@ -28,7 +28,7 @@ namespace neural
         ElementType sum = 0;
         for(size_t i = 0; i < input.Size(); ++i)
         {
-            double eulerVal = std::exp(input[i] - maxVal);
+            const auto eulerVal = static_cast<ElementType>(std::exp(input[i] - maxVal));
             input[i] = eulerVal;
             sum += eulerVal;
         }

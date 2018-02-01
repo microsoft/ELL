@@ -26,12 +26,12 @@ namespace dsp
         assert(_a.size() == _previousOutput.Size());
         for (size_t index = 0; index < _b.size(); index++)
         {
-            output += _b[index] * _previousInput[index];
+            output += _b[index] * _previousInput[static_cast<int>(index)];
         }
 
         for (size_t index = 0; index < _a.size(); index++)
         {
-            output -= _a[index] * _previousOutput[index];
+            output -= _a[index] * _previousOutput[static_cast<int>(index)];
         }
 
         _previousOutput.Append(output);

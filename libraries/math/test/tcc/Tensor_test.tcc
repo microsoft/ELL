@@ -281,7 +281,7 @@ void TestTensorGetSlice()
             {
                 for (unsigned k = 0; k < 11; ++k)
                 {
-                    T(i, j, k) = k + j * 11 + i * 77;
+                    T(i, j, k) = static_cast<typename TensorType::TensorElementType>(k + j * 11 + i * 77);
                 }
             }
         }

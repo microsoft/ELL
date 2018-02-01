@@ -66,6 +66,7 @@ namespace dsp
         template <typename Iterator, typename ComplexIterator>
         void FFTReal(Iterator begin, Iterator end, Iterator scratch, ComplexIterator outputBegin, ComplexIterator outputEnd, bool inverse)
         {
+            UNUSED(outputEnd);
             assert(!inverse);
             using ValueType = typename Iterator::value_type;
             const ValueType pi = math::Constants<ValueType>::pi;
