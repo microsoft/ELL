@@ -141,7 +141,7 @@ namespace utilities
 
         void ReadArray(const char* name, std::vector<std::string>& array);
 
-        bool TryMatchFieldName(const char* name);
+        bool TryMatchFieldName(const char* name, std::string& found);
         void MatchFieldName(const char* name);
 
         std::string _endOfPreviousLine;

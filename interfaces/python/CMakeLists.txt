@@ -11,7 +11,6 @@ else()
 endif() # PYTHON_ENABLED
 
 add_subdirectory(package)
-add_subdirectory(utilities)
 
 set(INTERFACE_MAIN "${CMAKE_CURRENT_LIST_DIR}/../common/ell_py.i")
 

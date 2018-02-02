@@ -2,14 +2,9 @@
 
 import re
 from collections import defaultdict
-from github import Github
-from ipywidgets import interact
-import ipywidgets as widgets
-from ..pretrained_model import PretrainedModel
 import os
 import time
 import datetime
-import codecs
 
 class ModelGallery:
     'Choose models from the Model Gallery on Github'
@@ -25,6 +20,7 @@ class ModelGallery:
                 download = False # use our cache then.
         
         if download:
+            from github import Github
             repo = Github().get_organization('Microsoft').get_repo('ELL-models')
             model_dirs = repo.get_contents('models/ILSVRC2012')
 
@@ -55,6 +51,10 @@ class ModelGallery:
             return json.loads(f.read())
 
     def choose_model(self):
+        from ipywidgets import interact
+        import ipywidgets as widgets
+        from .pretrained_model import PretrainedModel
+
         'Provide an interactive way to choose between models and call a callback when a choice is made'
         keys = list(self.grouped.keys())
         size_dropdown = widgets.Dropdown(options=keys, description='Size')

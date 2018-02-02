@@ -3,6 +3,8 @@
 #
 include(CommonInterfaces)
 
+add_subdirectory(test)
+
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(OBJECT_EXTENSION obj)
     set(ADDITIONAL_DISTUTILS_FLAGS "--plat-name=win-amd64 install")
@@ -39,7 +41,7 @@ if(NOT OPT_EXECUTABLE)
     return()
 endif()
 
-set(OUTPUT_DIR ${CMAKE_BINARY_DIR}/tools)
+set(OUTPUT_DIR ${CMAKE_BINARY_DIR})
 
 set(JSON "{ \"llc\": \"${LLC_EXECUTABLE}\", \"swig\": \"${SWIG_EXECUTABLE}\", \"compile\": \"${GLOBAL_BIN_DIR}/compile\", \"blas\": \"${BLAS_LIBS}\", \"opt\": \"${OPT_EXECUTABLE}\" }")
-file(WRITE "${OUTPUT_DIR}/tools.json" ${JSON})
+file(WRITE "${OUTPUT_DIR}/ell_build_tools.json" ${JSON})

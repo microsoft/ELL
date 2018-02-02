@@ -9,14 +9,15 @@
 ####################################################################################################
 import json
 import os
+import sys
+sys.path += [os.path.dirname(os.path.abspath(__file__)) ]
 import logger
 import subprocess
-import sys
-from threading import Thread
+from threading import Thread, Lock
 
 class EllBuildToolsRunException(Exception):
     def __init__(self, cmd, output=""):
-        Exception.__init__(self)
+        Exception.__init__(self, cmd)
         self.cmd = cmd
         self.output = output
 
@@ -24,21 +25,30 @@ class EllBuildTools:
     def __init__(self, ell_root, verbose = False):
         self.verbose = verbose
         self.ell_root = ell_root
-        self.build_root = os.path.join(self.ell_root, "build")
+        self.build_root = None
         self.compiler = None
         self.swigexe = None
         self.llcexe = None
         self.optexe = None
         self.blas = None
         self.logger = logger.get()
-        self.find_tools()
         self.output = None
+        self.lock = Lock()
+        self.find_tools()
+
+    def get_ell_build(self):
+        if not self.build_root:
+            import find_ell
+            self.build_root = find_ell.find_ell_build()
+        return self.build_root
 
     def find_tools(self):
-        if not os.path.isdir(self.build_root):
-            raise Exception("Could not find '%s', please make sure to build the ELL project first" % (self.build_root))
+        build_root = self.get_ell_build()
+        if not os.path.isdir(build_root):
+            raise Exception("Could not find '%s', please make sure to build the ELL project first" % (build_root))
 
-        jsonPath = os.path.join(self.build_root, "tools/tools.json")
+        ell_tools_json = "ell_build_tools.json"
+        jsonPath = os.path.join(build_root, ell_tools_json)
         if not os.path.isfile(jsonPath):
             raise Exception("Could not find build output: " + jsonPath)
 
@@ -47,19 +57,19 @@ class EllBuildTools:
 
         self.compiler = self.tools['compile']
         if self.compiler == "":
-            raise Exception("tools.json is missing compiler info")
+            raise Exception(ell_tools_json + " is missing compiler info")
 
         self.swigexe = self.tools['swig']
         if self.swigexe == "":
-            raise Exception("tools.json is missing swig info")
+            raise Exception(ell_tools_json + " is missing swig info")
 
         self.llcexe = self.tools['llc']
         if self.llcexe == "":
-            raise Exception("tools.json is missing llc info")
+            raise Exception(ell_tools_json + " is missing llc info")
 
         self.optexe = self.tools['opt']
         if self.optexe == "":
-            raise Exception("tools.json is missing opt info")
+            raise Exception(ell_tools_json + " is missing opt info")
 
         if ("blas" in self.tools):
             self.blas = self.tools['blas']  # this one can be empty.
@@ -68,10 +78,15 @@ class EllBuildTools:
         try:
             while True:
                 out = stream.readline()
-                if out:                    
-                    self.output += out
-                    msg = out.rstrip('\n')                    
-                    self.logger.info(msg)
+                if out:
+                    self.lock.acquire()
+                    try:
+                        self.output += out
+                        msg = out.rstrip('\n')   
+                        if self.verbose:                
+                            self.logger.info(msg)
+                    finally:
+                        self.lock.release()
                 else:
                     break
         except:
@@ -96,7 +111,7 @@ class EllBuildTools:
                 stdout_thread.start()
                 stderr_thread.start()
 
-                while stdout_thread.isAlive() and stderr_thread.isAlive():
+                while stdout_thread.isAlive() or stderr_thread.isAlive():
                     pass
 
                 proc.wait()

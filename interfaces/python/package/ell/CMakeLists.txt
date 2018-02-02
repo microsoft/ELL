@@ -2,7 +2,7 @@ if(${PYTHON_ENABLED})
 
     set(module_name "pythonpackage_ell")
 
-    set(src __init__.py rpi_magic.py platform.py pretrained_model.py)
+    set(src __init__.py rpi_magic.py platform.py)
 
     add_subdirectory(data)
     add_subdirectory(math)

@@ -20,7 +20,7 @@ import cv2
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import find_ell
 import darknet_to_ell
-import ell_utilities
+import ell
 import logger
 
 class DarknetImporter:
@@ -47,7 +47,7 @@ class DarknetImporter:
         filename_base = os.path.splitext(weights_filename)[0]
         model_file_name = filename_base + '.ell'
         model_file_path = os.path.join(output_directory, model_file_name)
-        ell_map = ell_utilities.ell_map_from_float_predictor(predictor,
+        ell_map = ell.neural.utilities.ell_map_from_float_predictor(predictor,
             self.step_interval, self.lag_threshold)
         self.logger.info("Saving model file: '" + model_file_name + "'")
         ell_map.Save(model_file_path)

@@ -14,7 +14,6 @@ import logging
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import find_ell
 import ell
-import ell_utilities
 import numpy as np
 from cntk import load_model
 

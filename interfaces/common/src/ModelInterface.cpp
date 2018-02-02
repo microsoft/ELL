@@ -613,7 +613,7 @@ Node ModelBuilder::AddNeuralNetworkPredictorNode(Model model, PortElements input
     return Node(newNode);
 }
 
-Node ModelBuilder::AddInputNode(Model model, const ell::api::math::TensorShape& tensorShape, PortType type)
+InputNode ModelBuilder::AddInputNode(Model model, const ell::api::math::TensorShape& tensorShape, PortType type)
 {
     using namespace std::string_literals;
     ell::model::Node* newNode = nullptr;
@@ -634,10 +634,10 @@ Node ModelBuilder::AddInputNode(Model model, const ell::api::math::TensorShape& 
     default:
         throw std::invalid_argument("Error: could not create InputNode of the requested type");
     }
-    return Node(newNode);
+    return InputNode(newNode);
 }
 
-Node ModelBuilder::AddOutputNode(Model model, const ell::api::math::TensorShape& tensorShape, PortElements input)
+OutputNode ModelBuilder::AddOutputNode(Model model, const ell::api::math::TensorShape& tensorShape, PortElements input)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
@@ -659,7 +659,7 @@ Node ModelBuilder::AddOutputNode(Model model, const ell::api::math::TensorShape&
     default:
         throw std::invalid_argument("Error: could not create OutputNode of the requested type");
     }
-    return Node(newNode);
+    return OutputNode(newNode);
 }
 
 Node ModelBuilder::AddClockNode(Model model, PortElements input, double interval, double lagThreshold, const std::string& lagNotificationName)

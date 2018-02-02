@@ -127,7 +127,7 @@ class RemoteRunner:
             stdout_thread.start()
             stderr_thread.start()
 
-            while stdout_thread.isAlive() and stderr_thread.isAlive():
+            while stdout_thread.isAlive() or stderr_thread.isAlive():
                 pass
 
         except:

@@ -136,7 +136,7 @@ void TestCppHeader()
     testing::ProcessTest("Testing C++ wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("int8_t TestModule_MyDataCallback(") + typeString + "* buffer")));
     testing::ProcessTest("Testing C++ wrapper 3", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_MyResultsCallback(") + typeString + "* buffer")));
     testing::ProcessTest("Testing C++ wrapper 4", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_Predict(const std::vector<") + typeString + ">& input, std::vector<" + typeString + ">& output)")));
-    testing::ProcessTest("Testing C++ wrapper 5", testing::IsTrue(std::string::npos != result.find("TestModule_Predict(0.0, &_result[0]);")));
+    testing::ProcessTest("Testing C++ wrapper 5", testing::IsTrue(std::string::npos != result.find("TestModule_Predict(0.0, nullptr);")));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
 

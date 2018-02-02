@@ -28,31 +28,25 @@ def find_ell_build():
     build_dir = ""
     head,tail = os.path.split(__this_file_directory)
     while (tail != ""):
-        test = os.path.join(head,"build")
-        if (os.path.isdir(test)):
-            build_dir = test
-            break
+        # find a file that is unique to the ELL build folder
+        test = os.path.join(head,"ell_build_tools.json")
+        if (os.path.isfile(test)):
+            return head
+        
+        # find a file that is unique to the ELL repo root.
+        test = os.path.join(head,"StyleGuide.md")
+        if (os.path.isfile(test)):
+            for d in os.listdir(head):
+                dd = os.path.join(head, d)
+                # support different named build folders, like 'build_gcc' or 'build_clang'
+                if d.startswith("build") and os.path.isdir(dd):
+                    return dd
+            raise Exception("ELL build folder not found in {}\nFound:{}".format(head,os.listdir(head)))
+
         head,tail = os.path.split(head)
     return build_dir
 
-def __is_ell_py_dir(path):
-    ell_py_path = os.path.join(path, "ell", "ell_py.py")
-    return os.path.isfile(ell_py_path)
-
-def __get_ell_py_dir():
-    # First check if we're in the source tree and have a build directory called 'build', then check if we're in a valid build tree
-    candidate_dirs = [
-        os.path.abspath(os.path.join(__this_file_directory, '..', '..', '..', 'build', 'interfaces', 'python', 'package')),
-        os.path.abspath(os.path.join(__this_file_directory, '..', '..', '..', 'interfaces', 'python', 'package'))
-    ]
-
-    for d in candidate_dirs:
-        if __is_ell_py_dir(d):
-            return d
-
-    return None
-
-ell_py_dir = __get_ell_py_dir()
+ell_py_dir = os.path.join(find_ell_build(), "interfaces", "python", "package")
 if ell_py_dir is None:
     raise ImportError("Could not find ell package, did you follow the ELL Python Binding build instructions?")
 
@@ -60,4 +54,3 @@ sys.path.append(ell_py_dir)
 
 import ell
 sys.path.append(os.path.join(ell_py_dir, "ell", "util"))
-import ell_utilities

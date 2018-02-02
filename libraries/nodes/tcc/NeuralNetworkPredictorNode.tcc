@@ -44,6 +44,9 @@ namespace nodes
         node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::SigmoidActivation>, ActivationLayerNode<ValueType, predictors::neural::SigmoidActivation>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
 
+        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::HardSigmoidActivation>, ActivationLayerNode<ValueType, predictors::neural::HardSigmoidActivation>>(transformer, layer, layerInputs, options, state);
+        if (node != nullptr) return node;
+
         node = TryAddLayerNode<predictors::neural::BatchNormalizationLayer<ValueType>, BatchNormalizationLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
 
@@ -178,8 +181,8 @@ namespace nodes
         node = TryAddLayerNode<predictors::neural::SoftmaxLayer<ValueType>, SoftmaxLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
 
-        assert(false && "Unknown layer type in refine");
-        return nullptr;
+        auto name = layer.GetRuntimeTypeName();
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unknown layer type in refine: " + name);
     }
 }
 }
