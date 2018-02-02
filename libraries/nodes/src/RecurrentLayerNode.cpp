@@ -170,7 +170,7 @@ namespace nodes
         function.MemoryCopy<ValueType>(input, hiddenPlusInput, inputSize);
         function.MemoryCopy<ValueType>(hiddenState, 0, hiddenPlusInput, inputSize, hiddenSize);
 
-        // Ht = activationFunction(Wh * [Xt, Ht−1] + Bh)
+        // Ht = activationFunction(Wh * [Xt, Ht-1] + Bh)
         const auto m = hiddenSize;
         const auto n = inputSize + hiddenSize;
         function.MemoryCopy<ValueType>(hiddenBias, output, hiddenSize); // Copy bias values into output so GEMM call accumulates them

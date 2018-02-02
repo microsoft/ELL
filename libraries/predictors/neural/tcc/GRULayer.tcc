@@ -61,7 +61,7 @@ namespace predictors
             VectorType htNew(outputSize);
             VectorType htOld(outputSize);
 
-            // inputPlusHiddenVector = [Xt-1, Ht−1] here
+            // inputPlusHiddenVector = [Xt-1, Ht-1] here
             auto inputPart = _inputPlusHiddenVector.GetSubVector(0, inputSize);
             auto htPart = _inputPlusHiddenVector.GetSubVector(inputSize, outputSize);
 
@@ -77,9 +77,9 @@ namespace predictors
                     }
                 }
             }
-            // Now, inputPlusHiddenVector = [Xt, Ht−1]
+            // Now, inputPlusHiddenVector = [Xt, Ht-1]
 
-            // Zt = recurrentFunction(Wz * [Xt, Ht−1] + Bz)   (where recurrentFunction is usually sigmoid)
+            // Zt = recurrentFunction(Wz * [Xt, Ht-1] + Bz)   (where recurrentFunction is usually sigmoid)
             math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _updateWeights, _inputPlusHiddenVector, static_cast<ElementType>(0), zt);
             math::AddUpdate(_updateBias, zt);
             _recurrentActivationFunction.Apply(zt);
@@ -97,7 +97,7 @@ namespace predictors
             math::AddUpdate(_hiddenBias, htNew);
             _activationFunction.Apply(htNew);
 
-            // Reshape the output and set Ht = (1−Zt) Ht~ + Zt * Ht-1,
+            // Reshape the output and set Ht = (1-Zt) Ht~ + Zt * Ht-1,
             columnIndex = 0;
             for (size_t i = 0; i < output.NumRows(); ++i)
             {

@@ -136,17 +136,32 @@
   },
   {
     "accuracy": {
-      "top1": "57.12",
-      "top5": "80.49"
+      "top1": "60.72",
+      "top5": "83.02"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\v_I64x64x3CCMCCMCCCMCCCMCCCMF2048S\\v_I64x64x3CCMCCMCCCMCCCMCCCMF2048S.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\v_I64x64x3CCMCCMCCMCCMCCMF4096S\\v_I64x64x3CCMCCMCCMCCMCCMF4096S.ell.zip",
     "filter_size": 3,
     "image_size": "64x64",
-    "increase_factor": 0,
+    "increase_factor": 112,
     "model": "v",
-    "name": "v_I64x64x3CCMCCMCCCMCCCMCCCMF2048S",
+    "name": "v_I64x64x3CCMCCMCCMCCMCCMF4096S",
     "secs_per_frame": {
-      "pi3": "0.78"
+      "pi3": "0.65"
+    }
+  },
+  {
+    "accuracy": {
+      "top1": "56.82",
+      "top5": "80.31"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\v_I64x64x3CCMCCMCMCMCMF3072S\\v_I64x64x3CCMCCMCMCMCMF3072S.ell.zip",
+    "filter_size": 3,
+    "image_size": "64x64",
+    "increase_factor": 112,
+    "model": "v",
+    "name": "v_I64x64x3CCMCCMCMCMCMF3072S",
+    "secs_per_frame": {
+      "pi3": "0.46"
     }
   }
 ]
