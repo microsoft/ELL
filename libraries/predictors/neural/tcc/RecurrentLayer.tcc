@@ -53,7 +53,7 @@ namespace predictors
                 }
             }
             
-            // Ht = activationFunction(Wh * [Xt, Ht−1] + Bh)
+            // Ht = activationFunction(Wh * [Xt, Ht-1] + Bh)
             
             // Matrix Multiply
             VectorType htNew(outputSize);
