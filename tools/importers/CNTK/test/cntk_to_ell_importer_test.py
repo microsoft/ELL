@@ -38,7 +38,6 @@ try:
     sys.path.append(os.path.join(script_path, '..'))
     import find_ell
     import ell
-    import ell_utilities
     import cntk_to_ell
     import demoHelper as dh
     import ziptools
@@ -193,7 +192,7 @@ class CntkToEllTestBase(unittest.TestCase):
 class CntkLayersTestCase(CntkToEllTestBase):
     def verify_compiled(self, predictor, input, expectedOutput, module_name,
                         method_name, precision=5):
-        map = ell_utilities.ell_map_from_float_predictor(predictor)
+        map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
 
         # Note: for testing purposes, callback functions assume the "model" namespace
         compiled = map.Compile("host", "model", method_name, False, dtype=np.float32)
@@ -610,11 +609,11 @@ class CntkXorModelTestCase(CntkToEllTestBase):
             result[0], 0, msg='incorrect prediction for [1, 1]')
 
         # create a map and save to file
-        ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
+        ell_map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
         ell_map.Save("xor_test.map")
 
         # create a map and save to file
-        ell_map = ell_utilities.ell_map_from_float_predictor(predictor,
+        ell_map = ell.neural.utilities.ell_map_from_float_predictor(predictor,
             step_interval_msec=500, lag_threshold_msec=750, function_prefix="XorTest")
         ell_map.Save("xor_test_steppable.map")
 
@@ -688,7 +687,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             # Import the model into an ELL map live, without unarchiving
             predictor = cntk_to_ell.predictor_from_cntk_model(
                 modelName + '.cntk')
-            ellMap = ell_utilities.ell_map_from_float_predictor(predictor)
+            ellMap = ell.neural.utilities.ell_map_from_float_predictor(predictor)
 
             # Load the map from archive
             ellMapFromArchive = ell.model.Map(modelName + '.ell')
@@ -898,7 +897,7 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
         and compare it against the CNTK output, `expectedOutput`.
         """
         # Note: for testing purposes, callback functions assume the "model" namespace
-        ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
+        ell_map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
         compiled = ell_map.Compile("host", "model", "test{}".format(
             self.method_index), False, dtype=np.float32)
         self.method_index += 1

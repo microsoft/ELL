@@ -195,7 +195,9 @@ void TestMapClockNode()
             inputValues.push_back(input);
             return true;
         });
+    auto condition = model.AddNode<nodes::ConstantNode<bool>>(true);
     auto sink = model.AddNode<nodes::SinkNode<double>>(source->output,
+        condition->output,
         "SinkCallback",
         [&outputValues] (const auto& values)
         {

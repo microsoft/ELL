@@ -5,11 +5,8 @@
 import os
 import sys
 _this_dir = os.path.dirname(os.path.abspath(__file__))
-_bin_dir = os.path.join(_this_dir, "build")
-_bin_dir = os.path.join(_this_dir, "build", "Release")
-
-print("Adding {} to path".format(_bin_dir))
-sys.path += [_bin_dir]
+sys.path += [ os.path.join(_this_dir, "build") ]
+sys.path += [ os.path.join(_this_dir, "build", "Release") ]
 
 print("Importing @ELL_model_name@")
 from . import @ELL_model_name@

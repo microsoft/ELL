@@ -110,6 +110,10 @@ void TestIRCompiler()
     // TestInputLayerNode(0);
     TestInputLayerNode(1);
 
+    TestHardSigmoidActivationLayerNode();
+    TestHardSigmoidActivationLayerNode(0, 1);
+    TestHardSigmoidActivationLayerNode(0, 2);
+
     TestReLUActivationLayerNode();
     TestReLUActivationLayerNode(0, 1);
     TestReLUActivationLayerNode(0, 2);

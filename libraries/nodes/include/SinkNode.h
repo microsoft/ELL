@@ -41,7 +41,10 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
+        static constexpr const char* triggerPortName = "inputTrigger";
+
         const model::InputPort<ValueType>& input = _input;
+        const model::InputPort<bool>& trigger = _trigger;
         const model::OutputPort<ValueType>& output = _output; // maybe we don't need this because results are reported via callback
         /// @}
 
@@ -50,25 +53,28 @@ namespace nodes
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> Port elements for input values. </param>
+        /// <param name="trigger"> Port elements for the trigger. </param>
         /// <param name="sinkFunctionName"> The sink function name to be emitted. </param>
         /// <param name="sink"> The optional sink function that will receive output values. </param>
-        SinkNode(const model::PortElements<ValueType>& input, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
+        SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
 
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> Port elements for input values. </param>
+        /// <param name="trigger"> Port elements for the trigger. </param>
         /// <param name="shape"> The output shape. </param>
         /// <param name="sinkFunctionName"> The sink function name to be emitted. </param>
         /// <param name="sink"> The optional sink function that will receive output values. </param>
-        SinkNode(const model::PortElements<ValueType>& input, const math::TensorShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
+        SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, const math::TensorShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
 
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> Port elements for input values. </param>
+        /// <param name="trigger"> Port elements for the trigger. </param>
         /// <param name="outputVectorSize"> The output vector size. </param>
         /// <param name="sinkFunctionName"> The sink function name to be emitted. </param>
         /// <param name="sink"> The optional sink function that will receive output values. </param>
-        SinkNode(const model::PortElements<ValueType>& input, size_t outputVectorSize, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
+        SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, size_t outputVectorSize, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -94,10 +100,6 @@ namespace nodes
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
-        // Evaluates whether the input meets the filter criteria,
-        // and should be forwarded to the sink function.
-        virtual bool EvaluateInput() const;
-
         utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
@@ -110,6 +112,7 @@ namespace nodes
 
     private:
         model::InputPort<ValueType> _input;
+        model::InputPort<bool> _trigger;
         model::OutputPort<ValueType> _output;
 
         SinkFunction<ValueType> _sink;

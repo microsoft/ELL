@@ -286,11 +286,27 @@ namespace emitters
             ReplaceDelimiter(predictWrapperCode, "FUNCTION", predictFunctions[0].function->getName());
 
             ModuleCallbackDefinitions moduleCallbacks(callbacks);
-            ReplaceDelimiter(predictWrapperCode, "SOURCE_TYPE", moduleCallbacks.sources[0].inputType);
-            ReplaceDelimiter(predictWrapperCode, "SOURCE_CALLBACK", moduleCallbacks.sources[0].functionName);
-            ReplaceDelimiter(predictWrapperCode, "SINK_TYPE", moduleCallbacks.sinks[0].inputType);
-            ReplaceDelimiter(predictWrapperCode, "SINK_CALLBACK", moduleCallbacks.sinks[0].functionName);
+            if (moduleCallbacks.sources.size() > 0) 
+            {
+                ReplaceDelimiter(predictWrapperCode, "SOURCE_TYPE", moduleCallbacks.sources[0].inputType);
+                ReplaceDelimiter(predictWrapperCode, "SOURCE_CALLBACK", moduleCallbacks.sources[0].functionName);
+            }
+            else
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
+                    "SourceNode callback is missing");
+            }
 
+            if (moduleCallbacks.sinks.size() > 0)
+            {
+                ReplaceDelimiter(predictWrapperCode, "SINK_TYPE", moduleCallbacks.sinks[0].inputType);
+                ReplaceDelimiter(predictWrapperCode, "SINK_CALLBACK", moduleCallbacks.sinks[0].functionName);
+            }
+            else
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
+                    "SinkNode callback is missing");
+            }
             os << predictWrapperCode << "\n";
         }
     }

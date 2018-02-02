@@ -34,7 +34,7 @@ namespace nodes
     {
     public:
         using LayerType = predictors::neural::GRULayer<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>;
-        using BaseType = NeuralNetworkLayerNode<GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>, predictors::neural::GRULayer<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>, ValueType>;
+        using BaseType = NeuralNetworkLayerNode<GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>, LayerType, ValueType>;
 
         /// @name Input and Output Ports
         /// @{
@@ -48,7 +48,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        GRULayerNode(const model::PortElements<ValueType>& input, const predictors::neural::GRULayer<ValueType>& layer);
+        GRULayerNode(const model::PortElements<ValueType>& input, const LayerType& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

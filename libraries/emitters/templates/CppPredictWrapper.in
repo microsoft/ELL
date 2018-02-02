@@ -6,7 +6,6 @@ class @@MODULE@@_PredictWrapper
 public:
     @@MODULE@@_PredictWrapper()
     {
-        _result.resize(@@MODULE@@_GetOutputSize());
     }
 
     int8_t @@SOURCE_CALLBACK@@(@@SOURCE_TYPE@@* buffer)
@@ -22,15 +21,14 @@ public:
 
     void Predict(const std::vector<@@SOURCE_TYPE@@>& input, std::vector<@@SINK_TYPE@@>& output)
     {
-        _input = const_cast<@@SOURCE_TYPE@@*>(&input[0]);
-        _output = &output[0];
-        @@FUNCTION@@(0.0, &_result[0]); // note: result is unused, can it be removed from the C function?
+        _input = const_cast<@@SOURCE_TYPE@@*>(input.data());
+        _output = output.data();
+        @@FUNCTION@@(0.0, nullptr);
     }
 
 private:
     @@SOURCE_TYPE@@* _input;
     @@SINK_TYPE@@* _output;
-    std::vector<@@SINK_TYPE@@> _result;
 };
 
 static @@MODULE@@_PredictWrapper @@MODULE@@_predict_wrapper_;

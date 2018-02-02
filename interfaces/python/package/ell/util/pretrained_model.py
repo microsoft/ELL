@@ -5,13 +5,10 @@ An ELL model from the Gallery
 import os
 import os.path
 import sys
-import cv2
 import numpy as np
-from .util.condabuildtools import CondaBuildTools
-
+from .condabuildtools import CondaBuildTools
 
 _buildtools = CondaBuildTools()
-
 
 def _is_file_newer(file1, file2):
     return os.path.getmtime(file1) >= os.path.getmtime(file2)
@@ -30,6 +27,7 @@ class PretrainedModel:
         self.local_path = None
         self.labels_path = None
         self.model = None
+        self.deploy_dir = os.path.join(os.path.dirname(__file__), '..', 'deploy')
 
     def rename(self, new_name):
         self.name = new_name
@@ -71,14 +69,14 @@ class PretrainedModel:
                 copyfile(local_file, renamed_file)
             local_file = renamed_file
 
-        return local_file
+        return os.path.abspath(local_file)
 
     def compile(self, target):
         """Compile the model for a given target platform"""
         if self.local_path is None:
             raise Exception('must call download before compile')
         print('compiling...', flush=True)
-        from . import model
+        from .. import model
         inpath = os.path.join(self.local_path, self.name)
         outdir = os.path.join(self.local_path, target)
         if not os.path.exists(outdir):
@@ -89,7 +87,7 @@ class PretrainedModel:
         if not os.path.exists(cmakefile) or _is_file_newer(inpath + '.ell', cmakefile) \
            or not os.path.exists(outpath + '.bc'):
             
-            compiled = ellmap.Compile(target, self.name, 'predict', True,
+            compiled = ellmap.Compile(target, self.name, 'model_predict', True,
                 dtype=np.float32)
             compiled.WriteBitcode(outpath + '.bc')
             compiled.WriteSwigInterface(outpath + '.i')
@@ -120,7 +118,7 @@ class PretrainedModel:
             print('building...', flush=True);
             os.chdir(os.path.dirname(cmake_file))
             import shutil
-            pkg_dir = os.path.join(os.path.dirname(__file__), 'deploy')
+            pkg_dir = self.deploy_dir
             shutil.copyfile(os.path.join(pkg_dir, 'OpenBLASSetup.cmake'), 'OpenBLASSetup.cmake')
             if not os.path.exists('include'):
                 shutil.copytree(os.path.join(pkg_dir, 'include'), 'include')
@@ -136,11 +134,14 @@ class PretrainedModel:
             os.chdir(orig_dir)
 
     def create_cmake_file(self, target):
-        cmake_template = os.path.join(
-            os.path.dirname(__file__), 'deploy', 'CMakeLists.python.txt.in')
+        cmake_template = os.path.join(self.deploy_dir, 'CMakeLists.python.txt.in')
         with open(cmake_template) as f:
             template = f.read()
+        
+        template = template.replace("@ELL_outdir@", self.name)
         template = template.replace("@ELL_model@", self.name)
+        template = template.replace("@ELL_model_name@", self.name)
+
         template = template.replace("@Arch@", target)
         template = template.replace("@OBJECT_EXTENSION@", 'obj')
         template = template.replace("@ELL_ROOT@", 'NotUsedOnLinux')
@@ -179,6 +180,7 @@ class PretrainedModel:
         - OpenCV gives the image in BGR order, so we may need to re-order the channels to RGB.
         - Convert the OpenCV result to a std::vector<float> for use with ELL model
         """
+        import cv2
         input_shape = self.model.get_default_input_shape()
         required_width = input_shape.columns
         required_height = input_shape.rows

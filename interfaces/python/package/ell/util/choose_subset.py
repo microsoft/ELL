@@ -1,7 +1,7 @@
-from IPython.core.display import HTML, display
-import ipywidgets as widgets
+from .. import platform
 
 def choose_subset(labels, path, labels_per_column=100):
+    import ipywidgets as widgets
     saved_labels=[]
     import os.path
     if os.path.isfile(path):
@@ -27,5 +27,7 @@ def choose_subset(labels, path, labels_per_column=100):
     display(widgets.HBox([widgets.VBox(boxes[i:i+labels_per_column]) for i in range(0, len(labels), labels_per_column)]))
     return label_set
 
-# improve the layout of checkboxes on the notebook page
-display(HTML("<style>.widget-inline-hbox .widget-label {width:0} .widget-checkbox input[type='checkbox'] {margin: 0} .widget-box {overflow: visible}</style>"))
+if platform.has_magic:
+    # improve the layout of checkboxes on the notebook page
+    from IPython.core.display import HTML, display
+    display(HTML("<style>.widget-inline-hbox .widget-label {width:0} .widget-checkbox input[type='checkbox'] {margin: 0} .widget-box {overflow: visible}</style>"))

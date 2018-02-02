@@ -154,8 +154,7 @@ class DemoHelper:
         sys.path.append(os.getcwd())
         print("### Loading ELL modules...")
         __import__("find_ell")
-        ell = __import__("ell")            
-        ell_utilities = __import__("ell_utilities")
+        ell = __import__("ell")
         print("loading model: " + self.model_file)
         self.model = ell.model.Map(self.model_file)
         self.input_shape = self.model.GetInputShape()
@@ -277,23 +276,13 @@ class DemoHelper:
             return self.labels[i]
         return ""
 
-    def get_predictor_map(self, predictor, intervalMs):
+    def get_predictor_map(self, predictor, intervalMs=0):
         """Creates an ELL map from an ELL predictor"""
-        import ell_utilities
-
-        name = self.model_name
-        return ell_utilities.ell_map_from_float_predictor(predictor)
-
-    def create_function(self, predictor, intervalMs=0):
-        """Creates an ELL map from an ELL predictor"""
-        from ..util.ell_utilities import ell_map_from_float_predictor
-
-        name = self.model_name
-        return ell_map_from_float_predictor(predictor)
+        return ell.neural.utilities.ell_map_from_float_predictor(predictor)
 
     def compile(self, predictor, platform, path):
         path += '/model'
-        prediction_function = self.create_function(predictor)
+        prediction_function = self.get_predictor_map(predictor)
         prediction_function.Compile(platform, 'model', 'step', path, dtype=np.float32)
         from ..util.commands import run_llc, run_swig
         run_swig(path + '.i')

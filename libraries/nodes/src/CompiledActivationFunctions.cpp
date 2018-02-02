@@ -63,6 +63,40 @@ namespace nodes
     }
 
     //
+    // Hard sigmoid activation function
+    //
+    template <typename ValueType>
+    ValueType HardSigmoidActivationFunction<ValueType>::Compute(ValueType x) const
+    {
+        // y = clip (scale*x + bias) to [0,1]
+        //   = scale * (clip x to [a, b]) + bias, where scale*a+bias = 0, scale*b+bias = 1; so, a = -bias/scale, b = (1-bias)/scale
+        constexpr auto scale = static_cast<ValueType>(0.2);
+        constexpr auto bias = static_cast<ValueType>(0.5);
+        constexpr auto lowBound = -bias / scale;
+        constexpr auto highBound = (1 - bias) / scale;
+        return x < lowBound ? 0 : x > highBound ? 1 : (scale * x) + bias;
+    }
+
+    template <typename ValueType>
+    llvm::Value* HardSigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
+    {
+        // y = clip (scale*x + bias) to [0,1]
+        //   = scale * (clip x to [a, b]) + bias, where scale*a+bias = 0, scale*b+bias = 1; so, a = -bias/scale, b = (1-bias)/scale
+        auto x = function.LocalScalar(xValue);
+        const auto zero = function.Literal(ValueType{0});
+        const auto one = function.Literal(static_cast<ValueType>(1));
+        constexpr auto scale = static_cast<ValueType>(0.2);
+        constexpr auto bias = static_cast<ValueType>(0.5);
+        constexpr auto lowBound = -bias / scale;
+        constexpr auto highBound = (1 - bias) / scale;
+
+        auto result = function.Select(x <= lowBound, zero,
+                        function.Select(x >= highBound, one, (scale * x) + bias));
+
+        return result;
+    }
+
+    //
     // ReLU activation function
     //
     template <typename ValueType>
@@ -121,7 +155,7 @@ namespace nodes
     {
         auto x = function.LocalScalar(xValue);
 
-        return Sigmoid(x);
+        return emitters::Sigmoid<ValueType>(x);
     }
 
     //
@@ -178,21 +212,27 @@ namespace nodes
     }
 
     // Explicit instantiation
-    template class ReLUActivationFunction<float>;
-    template class ReLUActivationFunction<double>;
+    template class HardSigmoidActivationFunction<float>;
+    template class HardSigmoidActivationFunction<double>;
     template class LeakyReLUActivationFunction<float>;
     template class LeakyReLUActivationFunction<double>;
+    template class ParametricReLUActivationFunction<float>;
+    template class ParametricReLUActivationFunction<double>;
+    template class ReLUActivationFunction<float>;
+    template class ReLUActivationFunction<double>;
     template class SigmoidActivationFunction<float>;
     template class SigmoidActivationFunction<double>;
     template class TanhActivationFunction<float>;
     template class TanhActivationFunction<double>;
-    template class ParametricReLUActivationFunction<float>;
-    template class ParametricReLUActivationFunction<double>;
 
-    template ReLUActivationFunction<float> GetNodeActivationFunction(const predictors::neural::ReLUActivation<float>& f);
-    template ReLUActivationFunction<double> GetNodeActivationFunction(const predictors::neural::ReLUActivation<double>& f);
+    template HardSigmoidActivationFunction<float> GetNodeActivationFunction(const predictors::neural::HardSigmoidActivation<float>& f);
+    template HardSigmoidActivationFunction<double> GetNodeActivationFunction(const predictors::neural::HardSigmoidActivation<double>& f);
     template LeakyReLUActivationFunction<float> GetNodeActivationFunction(const predictors::neural::LeakyReLUActivation<float>& f);
     template LeakyReLUActivationFunction<double> GetNodeActivationFunction(const predictors::neural::LeakyReLUActivation<double>& f);
+    template ParametricReLUActivationFunction<float> GetNodeActivationFunction(const predictors::neural::ParametricReLUActivation<float>& f);
+    template ParametricReLUActivationFunction<double> GetNodeActivationFunction(const predictors::neural::ParametricReLUActivation<double>& f);
+    template ReLUActivationFunction<float> GetNodeActivationFunction(const predictors::neural::ReLUActivation<float>& f);
+    template ReLUActivationFunction<double> GetNodeActivationFunction(const predictors::neural::ReLUActivation<double>& f);
     template SigmoidActivationFunction<float> GetNodeActivationFunction(const predictors::neural::SigmoidActivation<float>& f);
     template SigmoidActivationFunction<double> GetNodeActivationFunction(const predictors::neural::SigmoidActivation<double>& f);
     template TanhActivationFunction<float> GetNodeActivationFunction(const predictors::neural::TanhActivation<float>& f);

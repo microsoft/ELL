@@ -372,11 +372,11 @@ public:
     Node AddFloatNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<float> predictor);
     Node AddHammingWindowNode(Model model, PortElements input);
     Node AddIIRFilterNode(Model model, PortElements input, std::vector<double> bCoeffs, std::vector<double> aCoeffs);
-    Node AddInputNode(Model model, const ell::api::math::TensorShape& shape, PortType type);
+    InputNode AddInputNode(Model model, const ell::api::math::TensorShape& shape, PortType type);
     Node AddLinearFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse);
     Node AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse);
-    Node AddOutputNode(Model model, const ell::api::math::TensorShape& shape, PortElements input);
-    Node AddSinkNode(Model model, PortElements input, const ell::api::math::TensorShape& shape, const std::string& sinkFunctionName);
+    OutputNode AddOutputNode(Model model, const ell::api::math::TensorShape& shape, PortElements input);
+    Node AddSinkNode(Model model, PortElements input, PortElements trigger, const ell::api::math::TensorShape& shape, const std::string& sinkFunctionName);
     Node AddSourceNode(Model model, PortElements input, PortType outputType, const ell::api::math::TensorShape& shape, const std::string& sourceFunctionName);
     Node AddUnaryOperationNode(Model model, PortElements input, UnaryOperationType operation);
 

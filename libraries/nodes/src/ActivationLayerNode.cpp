@@ -91,12 +91,16 @@ namespace nodes
     }
 
     // Explicit specialization
-    template class ActivationLayerNode<float, ell::predictors::neural::ReLUActivation>;
-    template class ActivationLayerNode<double, ell::predictors::neural::ReLUActivation>;
+    template class ActivationLayerNode<float, ell::predictors::neural::HardSigmoidActivation>;
+    template class ActivationLayerNode<double, ell::predictors::neural::HardSigmoidActivation>;
     template class ActivationLayerNode<float, ell::predictors::neural::LeakyReLUActivation>;
     template class ActivationLayerNode<double, ell::predictors::neural::LeakyReLUActivation>;
+    template class ActivationLayerNode<float, ell::predictors::neural::ReLUActivation>;
+    template class ActivationLayerNode<double, ell::predictors::neural::ReLUActivation>;
     template class ActivationLayerNode<float, ell::predictors::neural::SigmoidActivation>;
     template class ActivationLayerNode<double, ell::predictors::neural::SigmoidActivation>;
+    template class ActivationLayerNode<float, ell::predictors::neural::TanhActivation>;
+    template class ActivationLayerNode<double, ell::predictors::neural::TanhActivation>;
     template class ParametricReLUActivationLayerNode<float>;
     template class ParametricReLUActivationLayerNode<double>;
 

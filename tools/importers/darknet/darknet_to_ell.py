@@ -20,7 +20,6 @@ import getopt
 import numpy as np
 import find_ell
 import ell
-import ell_utilities
 
 _logger = logging.getLogger(__name__)
 

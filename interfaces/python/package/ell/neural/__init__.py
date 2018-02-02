@@ -5,6 +5,7 @@
 """
 ELL neural network classes
 """
+from . import utilities
 
 from ..ell_py import \
 ActivationType,\

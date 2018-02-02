@@ -19,6 +19,11 @@ namespace model
     {
     }
 
+    OutputNodeBase::OutputNodeBase(const std::vector<InputPortBase*>& inputs, OutputPortBase& output, const math::TensorShape& shape)
+        : CompilableNode(inputs, { &output }), _inputBase(*inputs.at(0)), _outputBase(output), _shape(shape)
+    {
+    }
+
     ell::utilities::ArchiveVersion OutputNodeBase::GetArchiveVersion() const
     {
         return ell::utilities::ArchiveVersion{ 2 };
@@ -38,32 +43,38 @@ namespace model
         else
         {
             llvm::Value* pOutput = compiler.EnsurePortEmitted(_outputBase);
-            if (_inputBase.Size() == 1)
+            auto ifBlock = function.If();
+            // check if the pOutput variable is null.
+            ifBlock.If(ell::emitters::TypedComparison::notEquals, pOutput, function.NullPointer(pOutput->getType()->getPointerElementType()->getPointerTo()));
             {
-                llvm::Value* pVal = compiler.LoadPortElementVariable(_inputBase.GetInputElement(0));
-                function.Store(pOutput, pVal);
-            }
-            else
-            {
-                auto inputElements = _inputBase.GetInputElements();
-                int rangeStart = 0;
-                for (auto range : inputElements.GetRanges())
+                if (_inputBase.Size() == 1)
                 {
-                    llvm::Value* pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
-                    auto forLoop = function.ForLoop();
-                    auto rangeSize = range.Size();
-                    forLoop.Begin(rangeSize);
+                    llvm::Value* pVal = compiler.LoadPortElementVariable(_inputBase.GetInputElement(0));
+                    function.Store(pOutput, pVal);
+                }
+                else
+                {
+                    auto inputElements = _inputBase.GetInputElements();
+                    int rangeStart = 0;
+                    for (auto range : inputElements.GetRanges())
                     {
-                        auto i = forLoop.LoadIterationVariable();
-                        auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
-                        auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
-                        llvm::Value* pValue = function.ValueAt(pInput, inputIndex);
-                        function.SetValueAt(pOutput, outputIndex, pValue);
+                        llvm::Value* pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
+                        auto forLoop = function.ForLoop();
+                        auto rangeSize = range.Size();
+                        forLoop.Begin(rangeSize);
+                        {
+                            auto i = forLoop.LoadIterationVariable();
+                            auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
+                            auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
+                            llvm::Value* pValue = function.ValueAt(pInput, inputIndex);
+                            function.SetValueAt(pOutput, outputIndex, pValue);
+                        }
+                        forLoop.End();
+                        rangeStart += rangeSize;
                     }
-                    forLoop.End();
-                    rangeStart += rangeSize;
                 }
             }
+            ifBlock.End();
         }
     }
 

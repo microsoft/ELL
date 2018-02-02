@@ -353,7 +353,7 @@ namespace utilities
         }
     }
 
-    bool JsonUnarchiver::TryMatchFieldName(const char* key)
+    bool JsonUnarchiver::TryMatchFieldName(const char* key, std::string& found)
     {
         bool ok = _tokenizer.TryMatchToken("\"");
         if (!ok)
@@ -364,6 +364,7 @@ namespace utilities
         auto s = _tokenizer.PeekNextToken();
         if (s != key)
         {
+            found = s;
             return false;
         }
         _tokenizer.ReadNextToken();
@@ -374,9 +375,10 @@ namespace utilities
 
     void JsonUnarchiver::MatchFieldName(const char* key)
     {
-        if (!TryMatchFieldName(key))
+        std::string found = "non literal";
+        if (!TryMatchFieldName(key, found))
         {
-            throw InputException(InputExceptionErrors::badStringFormat, std::string{ "Failed to match field " } + key);
+            throw InputException(InputExceptionErrors::badStringFormat, std::string{ "Failed to match field " } + key + ", instead found token '" + found + "'");
         }
     }
 

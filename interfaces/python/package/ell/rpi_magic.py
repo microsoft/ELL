@@ -6,10 +6,11 @@ import tempfile
 import os
 import sys
 import paramiko
+
+from . import platform
 from IPython import get_ipython
-from IPython.core.magic import Magics, magics_class, cell_magic
-from IPython.core.display import display
 from ipywidgets import Button, HBox, Label, Output, Layout
+from IPython.core.magic import Magics, magics_class, cell_magic
 
 @magics_class
 class RaspberryPi(Magics):
@@ -60,8 +61,7 @@ class RaspberryPi(Magics):
 
     def copy_model_to_rpi(self, model, rpi_path):
         pkgdir = os.path.dirname(__file__)
-        from .platform import PI3
-        files = model.files(PI3) + [
+        files = model.files(platform.PI3) + [
             pkgdir + '/deploy/OpenBLASSetup.cmake',
             pkgdir + '/deploy/include/CallbackInterface.h',
             pkgdir + '/deploy/tcc/CallbackInterface.tcc',
@@ -126,6 +126,9 @@ class RaspberryPi(Magics):
 
     @cell_magic
     def rpi(self, line, cell):
+                
+        from IPython.core.display import display
+
         'provide a user interface for remotely executing code on the RPi'
         opts, _ = self.parse_options(line, '', 'user=', 'ip=', 'model=',
                                      'rpipath=', 'password=')
@@ -183,6 +186,9 @@ def init_magics():
     try:
         ipy = get_ipython()
         if ipy:
-            ipy.register_magics(RaspberryPi)
+            op = getattr(ipy, "register_magics", None)
+            if callable(op):
+                ipy.register_magics(RaspberryPi)
+                platform.has_magic = True
     except:
         pass  # We're in regular Python, not Jupyter, so we can't use magics

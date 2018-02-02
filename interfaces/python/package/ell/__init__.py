@@ -15,13 +15,6 @@ def package_dir():
     import os
     return os.path.join(os.path.dirname(__file__))
     
-try:
-    from .rpi_magic import init_magics
-    init_magics()
-except ImportError:
-    del package_dir
-    pass # we're in regular Python, not Jupyter
-
 # The SWIG generated wrappers are divided into pseudo-namespace sub packages.
 from . import data
 from . import math
@@ -29,6 +22,17 @@ from . import model
 from . import nodes
 from . import neural
 from . import trainers
+
+from . import platform
+
+try:
+    from .rpi_magic import init_magics
+    init_magics()
+except ImportError:
+    pass # we're in regular Python, not Jupyter
+
+# must come after we initialize rpi_magic.
+from . import util
 
 del os
 del sys

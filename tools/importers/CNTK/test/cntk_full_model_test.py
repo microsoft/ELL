@@ -16,7 +16,6 @@ sys.path.append(os.path.join(script_path, ".."))
 import cntk_to_ell
 from custom_functions import CustomSign, BinaryConvolution
 import ell
-import ell_utilities
 import lib.cntk_converters as cntk_converters
 import lib.cntk_layers as cntk_layers
 import lib.cntk_utilities as cntk_utilities
@@ -262,7 +261,7 @@ class FullModelTest:
         self.verify_compiled(predictor, ellTestInput, ellArray, op_name)
 
     def verify_compiled(self, predictor, input, expectedOutput, module_name, precision=1e-4):
-        map = ell_utilities.ell_map_from_float_predictor(predictor)
+        map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
 
         # Note: for testing purposes, callback functions assume the "model" namespace
         compiled = map.Compile("host", "model", "test" + str(self.method_index), False, dtype=np.float32)

@@ -74,12 +74,14 @@ set(test_src
     test/src/LoadDataset_test.cpp
     test/src/LoadMap_test.cpp
     test/src/LoadModel_test.cpp
+    test/src/LoadTestModels.cpp
 )
 
 set(test_include
     test/include/LoadDataset_test.h
     test/include/LoadMap_test.h
     test/include/LoadModel_test.h
+    test/include/LoadTestModels.h
 )
 
 source_group("src" FILES ${test_src})

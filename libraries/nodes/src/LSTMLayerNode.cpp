@@ -20,8 +20,8 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-    LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::LSTMLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::LSTMLayer<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>& layer)
-        : NeuralNetworkLayerNode<LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>, predictors::neural::LSTMLayer<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>, ValueType>(input, layer)
+    LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::LSTMLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer)
+        : BaseType(input, layer)
     {
         const auto& layerParameters = layer.GetLayerParameters();
         if (HasPadding(layerParameters.inputPaddingParameters))
@@ -297,9 +297,30 @@ namespace nodes
     }
 
     // Explicit specialization
-    template class LSTMLayerNode<float, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>;
-    template class LSTMLayerNode<double, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>;
-    template class LSTMNode<float, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>;
-    template class LSTMNode<double, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>;
+#define INSTANTIATE_LSTM(activation1, activation2) \
+    template class LSTMLayerNode<float, activation1, activation2>; \
+    template class LSTMLayerNode<double, activation1, activation2>; \
+    template class LSTMNode<float, activation1, activation2>; \
+    template class LSTMNode<double, activation1, activation2>
+
+    INSTANTIATE_LSTM(predictors::neural::HardSigmoidActivation, predictors::neural::HardSigmoidActivation);
+    INSTANTIATE_LSTM(predictors::neural::HardSigmoidActivation, predictors::neural::ReLUActivation);
+    INSTANTIATE_LSTM(predictors::neural::HardSigmoidActivation, predictors::neural::SigmoidActivation);
+    INSTANTIATE_LSTM(predictors::neural::HardSigmoidActivation, predictors::neural::TanhActivation);
+
+    INSTANTIATE_LSTM(predictors::neural::ReLUActivation, predictors::neural::HardSigmoidActivation);
+    INSTANTIATE_LSTM(predictors::neural::ReLUActivation, predictors::neural::ReLUActivation);
+    INSTANTIATE_LSTM(predictors::neural::ReLUActivation, predictors::neural::SigmoidActivation);
+    INSTANTIATE_LSTM(predictors::neural::ReLUActivation, predictors::neural::TanhActivation);
+
+    INSTANTIATE_LSTM(predictors::neural::SigmoidActivation, predictors::neural::HardSigmoidActivation);
+    INSTANTIATE_LSTM(predictors::neural::SigmoidActivation, predictors::neural::ReLUActivation);
+    INSTANTIATE_LSTM(predictors::neural::SigmoidActivation, predictors::neural::SigmoidActivation);
+    INSTANTIATE_LSTM(predictors::neural::SigmoidActivation, predictors::neural::TanhActivation);
+
+    INSTANTIATE_LSTM(predictors::neural::TanhActivation, predictors::neural::HardSigmoidActivation);
+    INSTANTIATE_LSTM(predictors::neural::TanhActivation, predictors::neural::ReLUActivation);
+    INSTANTIATE_LSTM(predictors::neural::TanhActivation, predictors::neural::SigmoidActivation);
+    INSTANTIATE_LSTM(predictors::neural::TanhActivation, predictors::neural::TanhActivation);
 } // nodes
 } // ell

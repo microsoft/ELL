@@ -10,6 +10,9 @@
 #include "MathConstants.h"
 #include "Vector.h"
 
+// utilities
+#include "Unused.h"
+
 // stl
 #include <cassert>
 #include <complex>

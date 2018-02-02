@@ -19,7 +19,7 @@ import numpy as np
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import find_ell
 import cntk_to_ell
-import ell_utilities
+import ell
 import json
 import logger as log
 import ziptools
@@ -65,7 +65,7 @@ def main(argv):
 
     model_file_name = os.path.splitext(filename)[0] + '.ell'
 
-    ell_map = ell_utilities.ell_map_from_float_predictor(predictor,
+    ell_map = ell.neural.utilities.ell_map_from_float_predictor(predictor,
         step_interval, lag_threshold)
 
     logger.info("Saving model file: '" + model_file_name + "'")

@@ -880,13 +880,14 @@ void Test_CompiledSinkNode_OutputCallback_Vector(double* output)
 }
 TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Vector, void, double*);
 
-void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionName)
+void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionName, bool triggerValue)
 {
     g_sinkOutputSize = inputSize;
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputSize);
-    auto testNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output, sinkFunctionName);
+    auto condition = model.AddNode<nodes::ConstantNode<bool>>(triggerValue);
+    auto testNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output, condition->output, sinkFunctionName);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
     model::MapCompilerParameters settings;
@@ -905,14 +906,24 @@ void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionNam
     outputValues.clear();
     VerifyCompiledOutput(map, compiledMap, signal, "SinkNode");
 
-    // Verify that sink callbacks are actually called
-    testing::ProcessTest("Testing callback values", testing::IsEqual(outputValues, signal[0]));
+    if (triggerValue)
+    {
+        // Verify that sink callbacks are actually called
+        testing::ProcessTest("Testing callback values", testing::IsEqual(outputValues, signal[0]));
+    }
+    else
+    {
+        // Verify that sink callbacks are never called
+        testing::ProcessTest("Testing callback values", testing::IsTrue(outputValues.empty()));
+    }
 }
 
 void TestCompilableSinkNode()
 {
-    TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar");
-    TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector");
+    TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar", true);
+    TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar", false);
+    TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector", true);
+    TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector", false);
 }
 
 void TestFloatNode()
@@ -1060,7 +1071,7 @@ void TestCompilableClockNode()
 
     auto getStepIntervalFunction = reinterpret_cast<GetStepInterval*>(jitter.ResolveFunctionAddress("Test_GetStepInterval"));
     testing::ProcessTest("Testing compiled GetStepInterval", testing::IsEqual(getStepIntervalFunction(), interval));
-    
+
     auto getLagThresholdFunction = reinterpret_cast<GetLagThreshold*>(jitter.ResolveFunctionAddress("Test_GetLagThreshold"));
     testing::ProcessTest("Testing compiled GetLagThreshold", testing::IsEqual(getLagThresholdFunction(), lagThreshold));
 
@@ -1932,6 +1943,11 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 
     // Test archiving / unarchiving produces same result
     VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestHardSigmoidActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    TestActivationLayerNode<ell::predictors::neural::HardSigmoidActivation>(inputPaddingSize, outputPaddingSize);
 }
 
 void TestReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)

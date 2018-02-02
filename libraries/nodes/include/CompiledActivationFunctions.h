@@ -35,8 +35,6 @@ namespace nodes
     class ReLUActivationFunction : public BroadcastUnaryFunction<ValueType>
     {
     public:
-        ~ReLUActivationFunction() override = default;
-
         /// <summary> Computes the ReLU activation (on the host machine) </summary>
         ///
         /// <param name="x"> The value </param>
@@ -62,7 +60,7 @@ namespace nodes
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ReLUActivationFunction"); }
-        
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -111,7 +109,7 @@ namespace nodes
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("LeakyReLUActivationFunction"); }
-        
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -151,7 +149,7 @@ namespace nodes
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SigmoidActivationFunction"); }
-        
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -188,7 +186,7 @@ namespace nodes
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("HardSigmoidActivationFunction"); }
-        
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -199,9 +197,6 @@ namespace nodes
     class TanhActivationFunction : public BroadcastUnaryFunction<ValueType>
     {
     public:
-        TanhActivationFunction() = default;
-        TanhActivationFunction(const TanhActivationFunction&) = default;
-
         /// <summary> Computes the tanh activation function (on the host machine) </summary>
         ///
         /// <param name="x"> The value </param>
@@ -216,12 +211,18 @@ namespace nodes
         ///
         /// <returns> The value of the function tanh(x) </returns>
         llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
+        using BroadcastUnaryFunction<ValueType>::Compile;
+
+        /// <summary> Indicates if the function can operate on vector types </summary>
+        ///
+        /// <returns> true if the function can operate on vector types </returns>
+        bool CanUseVectorTypes() const { return false; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("TanhActivationFunction"); }
-        
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -232,9 +233,6 @@ namespace nodes
     class ParametricReLUActivationFunction
     {
     public:
-        ParametricReLUActivationFunction() = default;
-        ParametricReLUActivationFunction(const ParametricReLUActivationFunction&) = default;
-
         /// <summary> Computes the Parametric ReLU activation function (on the host machine) </summary>
         ///
         /// <param name="x"> The value </param>
@@ -255,13 +253,13 @@ namespace nodes
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ParametricReLUActivationFunction"); }
-        
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const { return GetTypeName(); }
     };
-    
+
     //
     // Helper functions
     //

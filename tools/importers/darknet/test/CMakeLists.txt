@@ -16,7 +16,7 @@ if(${PYTHON_ENABLED})
     set (test_data unittest.cfg unittest.weights)
 
     add_custom_target(${test_name} DEPENDS ${test_src} SOURCES ${test_src})
-    add_dependencies(${test_name} _ELL_python ell_python_utilities)
+    add_dependencies(${test_name} _ELL_python)
 
     set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 

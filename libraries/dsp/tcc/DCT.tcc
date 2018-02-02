@@ -38,7 +38,7 @@ namespace dsp
                     }
                     x *= scale;
                 }
-                result(k, n) = x;
+                result(k, n) = static_cast<ValueType>(x);
             }
         }
 

@@ -19,6 +19,7 @@
 #include "testing.h"
 
 // stl
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -48,7 +49,8 @@ template <typename ValueType, typename ValueType2>
 void VerifyHammingWindow(const std::vector<ValueType>& computed, const std::vector<ValueType2>& reference, std::string symmetry)
 {
     using namespace std::string_literals;
-    std::vector<ValueType> cast_reference(reference.begin(), reference.end());
+    std::vector<ValueType> cast_reference(reference.size());
+    std::transform(reference.begin(), reference.end(), cast_reference.begin(), [](ValueType2 x){ return static_cast<ValueType>(x); });
     testing::ProcessTest("Testing "s + symmetry + " Hamming window against generated example", testing::IsEqual(computed, cast_reference, static_cast<ValueType>(epsilon)));
 }
 

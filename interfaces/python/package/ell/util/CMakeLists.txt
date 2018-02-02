@@ -15,10 +15,16 @@ if(${PYTHON_ENABLED})
         download_helper.py
         COPYONLY
     )
-
+    
     configure_file(
-        ${PROJECT_SOURCE_DIR}/interfaces/python/utilities/ell_utilities.py
-        ell_utilities.py
+        ${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/logger.py
+        logger.py
+        COPYONLY
+    )
+    
+    configure_file(
+        ${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/find_ell.py
+        find_ell.py
         COPYONLY
     )
 
