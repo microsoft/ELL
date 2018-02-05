@@ -134,5 +134,10 @@ namespace utilities
     /// <returns> The path. </returns>
     std::string GetWorkingDirectory();
 
+    /// <summary> Find a program using the current user PATH environment. </summary>
+    ///
+    /// <param name="name"> The name of the executable to find. </param>
+    /// <returns> The full path to the executable if found or empty string. </returns>
+    std::string FindExecutable(const std::string& name);
 }
 }

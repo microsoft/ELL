@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompareArguments.h"
-#include "LoadImage.h"
+#include "InvokePython.h"
 #include "ModelComparison.h"
 
 // common
@@ -35,7 +35,7 @@
 using namespace ell;
 
 template <typename InputType, utilities::IsIntegral<InputType> = true>
-std::vector<InputType> GetInputVector(const math::TensorShape& inputShape, float scale)
+std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
 {
     auto inputSize = inputShape.Size();
     std::vector<InputType> result(inputSize);
@@ -43,13 +43,13 @@ std::vector<InputType> GetInputVector(const math::TensorShape& inputShape, float
     std::uniform_int_distribution<InputType> dist(0, 255);
     for (auto index = 0; index < inputSize; ++index)
     {
-        result[index] = dist(engine) * scale;
+        result[index] = dist(engine);
     }
     return result;
 }
 
 template <typename InputType, utilities::IsFloatingPoint<InputType> = true>
-std::vector<InputType> GetInputVector(const math::TensorShape& inputShape, float scale)
+std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
 {
     auto inputSize = inputShape.Size();
     std::vector<InputType> result(inputSize);
@@ -57,28 +57,29 @@ std::vector<InputType> GetInputVector(const math::TensorShape& inputShape, float
     std::uniform_real_distribution<InputType> dist(0, std::nextafter(255, std::numeric_limits<InputType>::max()));
     for (size_t index = 0; index < inputSize; ++index)
     {
-        result[index] = dist(engine) * scale;
+        result[index] = dist(engine);
     }
     return result;
 }
 
 template <typename InputType>
-std::vector<InputType> GetInputImage(std::string filename, const math::TensorShape& inputShape, float inputScale, bool bgr2rgb)
+std::vector<InputType> GetInputConverted(std::string filename, const std::vector<std::string>& args)
 {
-    return LoadImage<InputType>(filename, inputShape.NumColumns(), inputShape.NumRows(), inputScale, bgr2rgb ? PixelOrder::RGB : PixelOrder::BGR);
+    auto result = ExecutePythonScript(filename, args);
+    return std::vector<InputType>(result.begin(), result.end());
 }
 
 template <typename InputType>
-std::vector<InputType> GetInputData(model::Map& map, const CompareArguments& compareArguments)
+std::vector<InputType> GetInputData(model::Map& map, const CompareArguments& compareArguments, const std::vector<std::string>& args)
 {
     auto inputShape = map.GetInputShape();
-    if (compareArguments.inputTestFile.empty())
+    if (compareArguments.inputConverter.empty())
     {
-        return GetInputVector<InputType>(inputShape, compareArguments.inputScale);
+        return GetInputVector<InputType>(inputShape);
     }
     else
     {
-        return GetInputImage<InputType>(compareArguments.inputTestFile, inputShape, compareArguments.inputScale, !compareArguments.bgr);
+        return GetInputConverted<InputType>(compareArguments.inputConverter, args);
     }
 }
 
@@ -122,7 +123,8 @@ int main(int argc, char* argv[])
             ell::utilities::EnsureDirectoryExists(compareArguments.outputDirectory);
         }
 
-        auto input = GetInputData<TestDataType>(map, compareArguments);
+        auto pluginArgs = commandLineParser.GetPassthroughArgs();
+        auto input = GetInputData<TestDataType>(map, compareArguments, pluginArgs);
         ModelComparison comparison(compareArguments.outputDirectory);
 
         model::MapCompilerParameters settings = compileArguments.GetMapCompilerParameters("");
@@ -133,7 +135,7 @@ int main(int argc, char* argv[])
         {
             std::string reportFileName = utilities::JoinPaths(compareArguments.outputDirectory, "report.md");
             std::ofstream reportStream(reportFileName);
-            comparison.WriteReport(reportStream, compareArguments.inputMapFile, compareArguments.inputTestFile, compareArguments.writePrediction);
+            comparison.WriteReport(reportStream, compareArguments.inputMapFile, pluginArgs, compareArguments.writePrediction);
         }
 
         // Write an annotated graph showing where differences occurred in the model
@@ -163,9 +165,14 @@ int main(int argc, char* argv[])
         }
         return 1;
     }
-    catch (utilities::LogicException exception)
+    catch (utilities::Exception exception)
     {
         std::cerr << "runtime error: " << exception.GetMessage() << std::endl;
+        return 1;
+    }
+    catch (std::exception ex)
+    {
+        std::cerr << "runtime error: " << ex.what() << std::endl;
         return 1;
     }
 

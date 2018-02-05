@@ -8,8 +8,8 @@
 
 #include "ProfileArguments.h"
 
-// tools/imageConverter
-#include "LoadImage.h"
+// tools/PythonPlugin
+#include "InvokePython.h"
 
 // common
 #include "LoadModel.h"
@@ -43,36 +43,56 @@
 
 using namespace ell;
 
+template <typename InputType, utilities::IsIntegral<InputType> = true>
+std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
+{
+    auto inputSize = inputShape.Size();
+    std::vector<InputType> result(inputSize);
+    auto engine = utilities::GetRandomEngine("123");
+    std::uniform_int_distribution<InputType> dist(0, 255);
+    for (size_t index = 0; index < inputSize; ++index)
+    {
+        result[index] = dist(engine);
+    }
+    return result;
+}
+
+template <typename InputType, utilities::IsFloatingPoint<InputType> = true>
+std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
+{
+    auto inputSize = inputShape.Size();
+    std::vector<InputType> result(inputSize);
+    auto engine = utilities::GetRandomEngine("123");
+    std::uniform_real_distribution<InputType> dist(0, std::nextafter(255, std::numeric_limits<InputType>::max()));
+    for (size_t index = 0; index < inputSize; ++index)
+    {
+        result[index] = dist(engine);
+    }
+    return result;
+}
+
 //
 // Test-data-related
 //
-template <typename T>
-std::vector<T> GetInputData(std::string filename, const math::TensorShape& inputShape, float scale, bool bgr2rgb)
+template <typename InputType>
+std::vector<InputType> GetInputConverted(std::string filename, const std::vector<std::string>& converterArgs)
 {
-    if (filename != "")
-    {
-        return LoadImage<T>(filename, inputShape.NumColumns(), inputShape.NumRows(), scale, bgr2rgb ? PixelOrder::RGB : PixelOrder::BGR);
-    }
-    else
-    {
-        auto inputSize = inputShape.Size();
-        std::vector<T> result(inputSize);
-        auto engine = utilities::GetRandomEngine("123");
-        std::uniform_real_distribution<double> dist;
-        for (size_t index = 0; index < inputSize; ++index)
-        {
-            result[index] = static_cast<T>(dist(engine));
-        }
-        return result;
-    }
+    auto result = ExecutePythonScript(filename, converterArgs);
+    return std::vector<InputType>(result.begin(), result.end());
 }
 
 template <typename InputType>
-std::vector<InputType> GetModelInput(model::Map& map, const ProfileArguments& profileArguments)
+std::vector<InputType> GetModelInput(model::Map& map, const ProfileArguments& profileArguments, const std::vector<std::string>& converterArgs)
 {
-    auto inputShape = map.GetInputShape();
-    std::vector<InputType> input = GetInputData<InputType>(profileArguments.inputTestFile, inputShape, 1.0f, true);
-    return input;
+    math::TensorShape inputShape = map.GetInputShape();
+    if (profileArguments.inputConverter.empty())
+    {
+        return GetInputVector<InputType>(inputShape);
+    }
+    else
+    {
+        return GetInputConverted<InputType>(profileArguments.inputConverter, converterArgs);
+    }
 }
 
 //
@@ -328,14 +348,14 @@ void TimeModel(model::Map& map, const std::vector<InputType>& input, const Profi
 }
 
 template <typename InputType, typename OutputType>
-void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
+void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments, const std::vector<std::string>& converterArgs)
 {
     const bool printTimingChart = profileArguments.timingOutputFilename != "";
     auto profileOutputStream = GetOutputStream(profileArguments.outputFilename);
     auto timingOutputStream = GetOutputStream(profileArguments.timingOutputFilename);
     const auto comment = profileArguments.outputComment;
 
-    std::vector<InputType> input = GetModelInput<InputType>(map, profileArguments);
+    std::vector<InputType> input = GetModelInput<InputType>(map, profileArguments, converterArgs);
 
     // In "summary only" mode, we don't compile the model with profiling enabled
     // (because we just want the overall run time), so we have a separate codepath
@@ -413,21 +433,21 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
 }
 
 template <typename InputType>
-void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
+void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments, const std::vector<std::string>& converterArgs)
 {
     switch (map.GetOutputType())
     {
         case model::Port::PortType::smallReal:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments, mapCompilerArguments);
+            ProfileModel<InputType, model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments, mapCompilerArguments, converterArgs);
             break;
         case model::Port::PortType::real:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::real>>(map, profileArguments, mapCompilerArguments);
+            ProfileModel<InputType, model::ValueType<model::Port::PortType::real>>(map, profileArguments, mapCompilerArguments, converterArgs);
             break;
         case model::Port::PortType::integer:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::integer>>(map, profileArguments, mapCompilerArguments);
+            ProfileModel<InputType, model::ValueType<model::Port::PortType::integer>>(map, profileArguments, mapCompilerArguments, converterArgs);
             break;
         case model::Port::PortType::bigInt:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments, mapCompilerArguments);
+            ProfileModel<InputType, model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments, mapCompilerArguments, converterArgs);
             break;
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported output type");
@@ -437,21 +457,21 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
 //
 // Load the map and process it
 //
-void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
+void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments, const std::vector<std::string>& converterArgs)
 {
     switch (map.GetInputType())
     {
         case model::Port::PortType::smallReal:
-            ProfileModel<model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments, mapCompilerArguments);
+            ProfileModel<model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments, mapCompilerArguments, converterArgs);
             break;
         case model::Port::PortType::real:
-            ProfileModel<model::ValueType<model::Port::PortType::real>>(map, profileArguments, mapCompilerArguments);
+            ProfileModel<model::ValueType<model::Port::PortType::real>>(map, profileArguments, mapCompilerArguments, converterArgs);
             break;
         case model::Port::PortType::integer:
-            ProfileModel<model::ValueType<model::Port::PortType::integer>>(map, profileArguments, mapCompilerArguments);
+            ProfileModel<model::ValueType<model::Port::PortType::integer>>(map, profileArguments, mapCompilerArguments, converterArgs);
             break;
         case model::Port::PortType::bigInt:
-            ProfileModel<model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments, mapCompilerArguments);
+            ProfileModel<model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments, mapCompilerArguments, converterArgs);
             break;
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported input type");
@@ -485,7 +505,7 @@ int main(int argc, char* argv[])
 
         // load map file
         auto map = common::LoadMap(mapLoadArguments);
-        ProfileModel(map, profileArguments, compileArguments);
+        ProfileModel(map, profileArguments, compileArguments, commandLineParser.GetPassthroughArgs());
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
