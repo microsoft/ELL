@@ -25,12 +25,11 @@ namespace ell
 /// <summary> Arguments for profile tool. </summary>
 struct ProfileArguments
 {
-    std::string inputTestFile;
-
-    std::string outputFilename = "";
-    std::string timingOutputFilename = "";
+    std::string inputConverter;
+    std::string outputFilename;
+    std::string timingOutputFilename;
     ProfileOutputFormat outputFormat = ProfileOutputFormat::text;
-    std::string outputComment = "";
+    std::string outputComment;
 
     int numIterations = 1;
     int numBurnInIterations = 0;

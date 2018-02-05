@@ -1,84 +1,187 @@
-# Style Guidelines for Tutorials
+# Embedded Learning Library (ELL) tutorial writer's guide to consistency
 
-We aspire to write high quality tutorials, which create a strongly positive first impression on our users. Ideally, every new user-facing feature the ELL library will be highlighted in a tutorial. Each tutorial should be novel and sufficiently disjoint from the others.
 
-The primary style guideline for writing tutorials is *consistency*, both within each tutorial and across tutorials. The tutorials should have the same consistency as chapters of a book - similar narrative, consistent terminology, consistent look and feel. The following guidelines and best practices are primarily intended to encourage and promote this consistency. Try to follow them unless there's a good reason not to. 
+## Why a style guide for tutorials?
 
-#### Be informal and friendly
+We built Embedded Learning Library (ELL) for makers, technology enthusiasts, students, entrepreneurs, and developers who aspire to build intelligent devices and AI-powered gadgets. We want to provide them with high quality tutorials that create a positive first impression of ELL. Our goal is to highlight each new user-facing feature of ELL with novel, distinctive tutorials.  We need to write in a way that ensures success for all skill levels. And, even though each tutorial will be unique in focus, we want the tutorials to have the same voice and tone, consistent terminology, and identical format.
 
-The voice should be informal and friendly, but don't try to be hip or clever. Avoid slang.  
+This style guide offers advice and best practices that will promote the consistency that will help our readers be successful in using ELL. Try to follow them unless there's a good reason not to.
 
-#### Shorter is better
+## How to use this guide
 
-Convey all useful information, but prefer to do so in a brief and concise way.    
+This guide specifies style and format for contributors to use when developing tutorials for Microsoft Research. Be warm and relaxed, crisp and clear, and ready to lend a hand to your readers. The following sections offer guidance on structure, style, and formatting. Additional resources for word choice and other topics can be found in the [```Microsoft Writing Guide```](https://docs.microsoft.com/en-us/style-guide/welcome/).
 
-* Good: "Raspbian throttles the processor speed when under heavy load to protect itself from overheating."
-* Not as good: "Raspbian has an extensive internal logic that allows is to adapt the processor speed according to the amount of computational load at any given moment - when the processor is under heavy load it clocks itself down to prevent overheating, which can lead to severe and permanent damage." 
+## Tutorial structure
 
-#### Don't say its easy
+Each tutorial should include the following sections, as required (delete sections that are not applicable for a given topic):
 
-Avoid words like "obviously", "it's easy to see that", "clearly". Think about the reader who doesn't understand something - labeling that thing as "obvious" will make the reader feel worse.   
+1. **Tutorial title** : one line that summarizes the goal of the tutorial (e.g., Setting up Raspberry Pi for tutorials)
+2. **Introductory text (no heading)**: an overview of goal and the expected results
+3. **Before you begin (heading)**: pre-requisites and a list of materials to be used
+4. **Steps (headings)**: Sections for each major step should include:
+    - Heading that reflects the action to be accomplished (e.g., Activate your environment and create a tutorial directory). Do not number these sections, but do present them in the order you want the reader to execute.
+	- Introductory text that orients the reader.
+	- Code blocks and instructions, as needed.
+	- Transition to the next step or section, as appropriate.
+5. **Results (heading)**: summary of what the tutorial accomplished
+6. **Next steps (heading)**: if applicable, suggests additional tutorials
+7. **Troubleshooting (heading)**: if applicable, covers the top issues that a reader might experience while trying to complete the tutorial.
 
-#### When describing a behavior or property, prefer present-simple tense, third-person active voice, indicative mood 
+## Writing style basics
 
-* Good: "The `predict` function returns an array."
-* Not as good: "The `predict` function will return an array." - future tense
-* Not as good: "An array is returned by the `predict` function" - passive voice
-* Bad: "The `predict` function is returning an array." - present progressive tense
+When writing tutorials, keep some basic guidelines in mind.
 
-#### For step-by-step instructions, use imperative mood, second-person active voice 
+**Keep it simple.** Write short, simple sentences. Replace complex sentences with lists and tables.
 
-* Good: "Copy these file to your Raspberry Pi."
-* Good: "Once the process terminates, restart your computer."
-* Not as good: "Next, we will copy the file to the Raspberry Pi." - indicative mood instead of imperative, should be "Next, copy the file..."
-* Not as good: "You should copy the files to your Raspberry Pi." - suggestive mood instead of imperative, should be, "Copy the file ..."
-* Not as good: "Let's copy the file to the Raspberry Pi." - suggestive mood instead of imperative, should be, "Copy the file ..."
-* Not as good: "You would do this to copy files to your Raspberry Pi." - should be, "Do this to copy ..."
-* Note as good: "At this point, we want to copy the file to your Raspberry Pi." - should be, "At this point, copy the file..."
+• Instead of: Raspbian has an extensive internal logic that allows it to adapt the processor speed according to the amount of computational load at any given moment - when the processor is under heavy load it clocks itself down to prevent overheating, which can lead to severe and permanent damage.
 
-#### Write introductory text in simple-future tense, referring to both the reader and the writer in first-person plural
+• Use: To protect the processor from damage caused by overheating, Raspbian throttles the processor speed during heavy loads.
 
-Tutorials usually start with some introductory text. Sections of tutorials can also start with some introductions. First person plural is the preferred narrative in teaching texts (school books, academic papers, etc) because it gives a sense of "we're in this together". For example, think of how you would introduce a topic in a classroom: "Good morning class, today we will learn about ...". "We" includes both the teacher and the students. 
+**Be clear and concise — not hip or clever.** Avoid idioms, colloquial expressions, and culture-specific references.
 
-* Good: "In this tutorial, we will build a squirrel detector."
-* Not as good: "In this tutorial, you will build a squirrel detector." - reader is referred to in the second person
-* Not as good: "In this tutorial, we will teach you how to build a squirrel detector." - reader is referred to in the second person
-* Not as good: "In this tutorial, we will be building a squirrel detector." - future continuous
-* Not as good: "By the end of this tutorial, we will have built a squirrel detector." - future perfect 
+• Instead of: Down the road, ELL will grow.
 
-#### Avoid technical synonyms
+• Use: In the future, ELL will grow.
 
-Use consistent terminology within a tutorial and across tutorials.
+**Don't say it's easy.** You're writing for a variety of readers, with varying degrees of ability. Don't assume you know what's challenging or easy for someone. Avoid adverbs such as _obviously, clearly,_ and _apparently_. Also avoid "filler" adverbs, such as _very, really,_ and _actually_.
 
-For example:
+**Use technical terms carefully**. Your audience is varied and includes high school robotics enthusiasts and experienced hobbyists, so define terms in context if there's a chance your audience won't understand them. Use plain language whenever you can.
 
-* classifier, classification function, predictor, hypothesis, model
-* folder, directory, subdirectory, sub-directory
-* USB power supply, USB power adapter, USB wall-wart
-* webcam, USB cam, cam, camera
-* app, application, demo
-* tensor dimensions, tensor sizes, tensor shape
+## Grammar and usage
 
- These are lists of terms that are usually interchangeable. We choose one term (often arbitrarily) and stick to it across our tutorials (unless there's a good reason not to). Look at other tutorials to see which term is already in use. 
- 
-#### Write linear instructions
+These basic guidelines will get you started creating clear and useful content.
 
-When possible, write linear step-by-step instructions. Avoid foreshadowing the future. Avoid forks and multiple choice, instead consider making multiple separate tutorials. 
+**Use present-tense verbs.** Present-tense verbs indicate the action is happening now, like _is_ and _open_. Avoid _will, was,_ and verbs ending in _–ed,_ which indicate that text isn't in the present tense. .
 
-#### Ensure directory names match permalink
-If a permalink contains the name of the directory where it is located, they should match exactly, including the casing.
+- **Instead of:** The predict function will return an array.
+- **Use:** The predict function returns an array.
 
-For example, `permalink: ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/`
-* Good: Should be in a directory `tutorials/Boosting-classifier-accuracy-by-grouping-categories/`
-* Bad: In a directory like `tutorials/Boosting-Classifier-Accuracy-by-Grouping-Categories`
+**Be direct.** Write simple statements of fact (called the indicative mood) or use direct commands (called imperative mood) for procedures and instructions.
 
-## Other Best Practices
+- **Instead of:** Next, we will copy the file to the Raspberry Pi. OR You should copy the files to your Raspberry Pi.
+- **Use:** Copy these files to your Raspberry Pi.
+- **Instead of:** At the point where the process terminates, you should restart your computer.
+- **Use:** After the process terminates, restart your computer.
 
-1. Skip end punctuation on titles and lists
-2. Include a comma after each item in a list. "Shake, rattle, and roll"
-3. Capitalize the first word of a sentence and any proper nouns (Python, CMake, Raspbian, Pi). Avoid title case, even in titles
-4. Use bullets for lists, not as a way to emphasize text
-5. Don't use too many colons 
+**Use active voice** (where the subject performs the action). In passive voice, the receiver of the action is the subject. 
 
-References:
-http://www.technicalauthoring.com/wiki/index.php/Using_the_correct_language
+- Active example: The predict function returns an array.
+- Passive example: An array is returned by the predict function.
+
+**Speak to the reader.** Use second person most of the time. Second person often uses the pronoun _you_, as though you're speaking to the reader.
+
+- Instead of: Next, we'll create a directory for this tutorial anywhere on your computer.
+- Use: Next, you'll learn how to create a directory for this tutorial on your computer.
+
+## Capitalization
+
+
+- Always capitalize proper nouns, such as Raspberry Pi.
+- Lowercase everything except the first word in a sentence, UI label, phrase, heading, or title (including the titles of blogs, articles, and press releases).
+- Don't capitalize the spelled-out form of an acronym unless it's a proper noun.
+- Use title-style capitalization for product and service names, book and song titles, article titles in citations, names of blogs, and titles of people (Vice President, for example). This typically means capitalizing the first and last word of a title, and using lower case for articles, prepositions, and conjuctions.
+- In programming languages, follow the traditional capitalization of keywords and other special terms. Review the [ELL code style guide](https://github.com/Microsoft/ELL/blob/master/StyleGuide.md) for further guidance. 
+- Don't use all uppercase for emphasis.
+- Don't use all lowercase as a design choice.
+
+## Punctuation
+
+- End all sentences with a period, even if they're only two words.
+- Include a colon at the end of a phrase that directly introduces a list.
+
+Example:
+
+Make sure you have the following materials before you begin this tutorial:
+
+• Laptop or desktop computer
+
+• Raspberry Pi 3
+
+• Raspberry Pi camera or USB webcam.
+
+- Include commas after items in a series, including before the second-to-last item, even when a conjuction (such as *and*) is used. 
+Example: networks, storage, and virtual machines
+
+- Don't use a slash (/) to indicate a choice or as a substitute for or.
+
+## Headings
+
+Readers scan text to find what they need. To help them, write to support scanning, and organize content into discrete, scannable chunks.
+
+- Use sentence-style capitalization and no end punctuation.
+
+Example heading: Getting started with image classification on Raspberry Pi
+
+- Use parallel construction (same verb form or grammatical construction) for headings at the same level.
+
+This parallel example uses active verb phrases (all the same tense and mood):
+
+
+  - Activate your environment
+  - Download pre-trained model
+  - Compile and run the model
+
+This example does not use parallel construction:
+
+
+  - Activating your environment (gerund phrase)
+  - Download pre-trained model (active verb phrase)
+  - How to compile and run the model (adverb paired with a to-infinitive clause)
+
+## Formatting text and code in instructions
+
+Follow the [ELL Style Guide](https://github.com/Microsoft/ELL/blob/master/StyleGuide.md) for code snippets and samples. When you reference elements or parameters in a paragraph, format the item accordingly; for example: `over\_voltage`
+
+When you want a reader to type code, use the following construction and format.
+
+To install OpenBLAS, type:
+
+`sudo apt-get install -y libopenblas-dev`
+
+Code blocks are part of the markdown spec, but syntax highlighting isn't. However, many renderers (including GitHub) support syntax highlighting.
+
+- Use `back-ticks` around inline `code`.
+- For blocks of code, start and end the code block  with three back-ticks.
+
+Examples for JavaScript and Python:
+
+```javascript
+
+var s = "JavaScript syntax highlighting";
+
+alert(s);
+
+```
+
+```python
+
+s = "Python syntax highlighting"
+
+print s
+
+```
+
+## Word choice preferences
+
+Choose simple, precise words that you use in conversations.
+
+- Use common contractions, such as that's and don't. They're friendly and conversational. [Learn more](https://worldready.cloudapp.net/Styleguide/Read?id=2700&amp;topicid=26899).
+- Avoid words with more than one meaning. [Learn more](https://worldready.cloudapp.net/Styleguide/Read?id=2700&amp;topicid=25512).
+
+Refer to this list to understand which common terms to use and when. (List to be updated regularly.)
+
+| Term | When to use |
+| --- | --- |
+| app, application, demo, program | Use **application** to refer to the "actuation code" that a user writes that runs on the target device. Do not use app, demo, or program to refer to this code. |
+| camera | Use **camera** when the format of the camera doesn't matter. Use webcam or USB cam, as appropriate, when the procedure requires it. |
+| classifier, classification function | Use to refer the output of a machine learning algorithm. Do not use predictor, hypothesis, or model interchangeably when referring to this output.  |
+| folder, directory, subdirectory | Use **directory** to refer to the structure of the file system or to match the API. |
+| root directory | Use root directory to refer to the directory or folder from which all other directories or folders branch. |
+| tensor dimensions, tensor sizes, tensor shape  | Use the term **tensor shape** to reference the size or dimensions of a tensor|
+| USB power cord | Use instead of USB power supply, USB power adapter, or USB wall-wart. |
+| USB webcam | Use when the camera must be a USB webcam. |
+| webcam | Use when referring to a video camera that feeds or streams its image in real time to or through a computer to a computer network, regardless of connector type. |
+|model| Use this term only when referring to an actual ELL model. |
+| (More terms to come)  |  TBD |
+|   |   |
+|   |   |

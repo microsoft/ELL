@@ -112,7 +112,7 @@ namespace model
         auto node = dynamic_cast<InputNode<ValueType>*>(GetInput(index));
         if (node == nullptr)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "missing input node of matching type");
         }
 
         SetNodeInput(node, inputValues);

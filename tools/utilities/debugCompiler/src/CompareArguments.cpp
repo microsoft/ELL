@@ -14,9 +14,7 @@ void ParsedCompareArguments::AddArgs(utilities::CommandLineParser& parser)
 {
     parser.AddDocumentationString("Input options");
     parser.AddOption(inputMapFile, "inputMapFile", "imap", "Path to the input *.map file", "");
-    parser.AddOption(inputTestFile, "inputTestFile", "itf", "Path to the input test file containing image to process", "");
-    parser.AddOption(inputScale, "inputScale", "is", "How to scale input image numbers (default 1/255)", 1.0f / 255.0f);
-    parser.AddOption(bgr, "bgr", "", "Whether to convert test image to BGR format (default RGB)", true);
+    parser.AddOption(inputConverter, "inputConverter", "ic", "Path to python script for converting the input to valid input for the map", "");
 
     parser.AddDocumentationString("Output options");
     parser.AddOption(outputDirectory, "outputDirectory", "od", "Location of output files (default cwd)", "");

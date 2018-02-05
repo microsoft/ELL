@@ -63,9 +63,9 @@ public:
     ///
     /// <param name="outputStream"> The stream to write output to. </param>
     /// <param name="modelName"> The name of the model. </param>
-    /// <param name="testDataName"> The name of input data file used during evaluation. </param>
+    /// <param name="testArgs"> The arguments used during evaluation. </param>
     /// <param name="writePrediction"> Indicates whether to write the predicted output (== argmax of the output vector) of the model. </param>
-    void WriteReport(std::ostream& outputStream, std::string modelName, std::string testDataName, bool writePrediction);
+    void WriteReport(std::ostream& outputStream, std::string modelName, const std::vector<std::string>& testArgs, bool writePrediction);
 
     /// <summary> Writes a DGML file of the model, annotated with differences between reference and compiled outputs. </summary>
     ///

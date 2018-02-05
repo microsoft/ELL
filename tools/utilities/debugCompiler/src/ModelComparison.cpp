@@ -33,6 +33,27 @@ void DebugOutput(char* label, float* output, void* userData)
         self->AddLayer(label, output);
     }
 }
+const float* _input = nullptr;
+size_t _input_size = 0;
+
+void SetInput(const float* buffer, size_t size)
+{
+    _input = buffer;
+    _input_size = size;
+}
+
+bool ELL_InputCallback(float* buffer) 
+{
+    if (_input != nullptr) 
+    {
+        ::memcpy(buffer, _input, _input_size * sizeof(float));
+        return true;
+    }
+    return false;
+}
+void ELL_OutputCallback(float* output) 
+{
+}
 }
 
 using namespace ell::utilities;
@@ -256,6 +277,8 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     SetUpReferenceMap(reference);
     _addingReference = false;
 
+    SetInput(input.data(), input.size());
+
     // Ok, now compile the model with debug set to true so we can get the DebugOutput
     // function calls to compare compiled model with reference implementation.
 
@@ -296,6 +319,19 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     else
     {
         std::cout << "Got null DebugOutput function" << std::endl;
+    }
+
+    // Define the ELL_InputCallback in case the model contains source nodes.
+    func = module->getFunction("ELL_InputCallback");
+    if (func != nullptr)
+    {
+        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uint64_t>(&ELL_InputCallback));
+    }
+    // Define the ELL_OutputCallback in case the model contains sink nodes.
+    func = module->getFunction("ELL_OutputCallback");
+    if (func != nullptr)
+    {
+        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uint64_t>(&ELL_OutputCallback));
     }
 
     std::cout << "jitting..." << std::endl;
@@ -352,14 +388,18 @@ size_t ModelComparison::GetOutputSize(const std::string& nodeId)
     return _outputSizes[nodeId];
 }
 
-void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelName, std::string testDataName, bool writePrediction)
+void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelName, const std::vector<std::string>& testArgs, bool writePrediction)
 {
     std::cout << "writing report..." << std::endl;
 
     outputStream << "# Comparison Results" << std::endl;
     outputStream << "**model**: " << modelName << std::endl;
     outputStream << std::endl;
-    outputStream << "**image**: " << testDataName << std::endl;
+    outputStream << "**args**:";
+    for (auto arg : testArgs) 
+    {
+        outputStream << " " << arg;
+    }
     outputStream << std::endl;
 
     WriteModelInfo(outputStream, _outputReference, _outputCompiled, writePrediction);

@@ -169,9 +169,13 @@ namespace utilities
             for (size_t index = 1; index < argc; index++)
             {
                 std::string arg = _originalArgs[index];
-                if (arg == "--") // "--" is the special "ignore this" option --- used to put between flag arguments and the positional arguments
+                if (arg == "--") // "--" is the special separator for passthrough args
                 {
-                    // nothing
+                    while (++index < argc) 
+                    {
+                        arg = _originalArgs[index];
+                        _passthroughArgs.push_back(arg);
+                    }
                 }
                 else if (arg[0] == '-') // it's an option
                 {
@@ -194,25 +198,27 @@ namespace utilities
                     {
                         throw CommandLineParserErrorException("Unknown option", { std::string("Error: unknown option ") + arg });
                     }
-
-                    unset_args.erase(option);
-                    if (index < argc - 1)
+                    else
                     {
-                        std::string val = _originalArgs[index + 1];
-                        if (val[0] == '-')
+                        unset_args.erase(option);
+                        if (index < argc - 1)
                         {
-                            // next token in an option, so use the default unset-value string
+                            std::string val = _originalArgs[index + 1];
+                            if (val[0] == '-')
+                            {
+                                // next token in an option, so use the default unset-value string
+                                needsReparse = SetOption(option) || needsReparse;
+                            }
+                            else
+                            {
+                                needsReparse = SetOption(option, val) || needsReparse;
+                                index++;
+                            }
+                        }
+                        else // this is the last thing on the line --- assume it's a shortcut for --option true
+                        {
                             needsReparse = SetOption(option) || needsReparse;
                         }
-                        else
-                        {
-                            needsReparse = SetOption(option, val) || needsReparse;
-                            index++;
-                        }
-                    }
-                    else // this is the last thing on the line --- assume it's a shortcut for --option true
-                    {
-                        needsReparse = SetOption(option) || needsReparse;
                     }
                 }
                 else

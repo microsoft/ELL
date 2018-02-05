@@ -171,6 +171,11 @@ namespace utilities
         /// <returns> true if the given short name has been registered </returns>
         bool HasShortName(std::string shortName);
 
+        /// <summary> Returns any args after the "--" separator </summary>
+        ///
+        /// <returns> The passthrough args </returns>
+        std::vector<std::string> GetPassthroughArgs() { return _passthroughArgs;  }
+
     private:
         CommandLineParser(const CommandLineParser&) = delete;
 
@@ -241,7 +246,7 @@ namespace utilities
         std::map<std::string, OptionInfo, case_insensitive_comparer> _options;
         std::vector<DocumentationEntry> _docEntries;
         std::vector<PostParseCallback> _postParseCallbacks;
-
+        std::vector<std::string> _passthroughArgs;
         void AddOption(const OptionInfo& info);
         virtual bool SetOption(std::string option_name); // returns true if we need to reparse
         virtual bool SetOption(std::string option_name, std::string option_val); // returns true if we need to reparse

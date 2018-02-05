@@ -24,9 +24,7 @@ struct CompareArguments
 {
     // input options
     std::string inputMapFile;
-    std::string inputTestFile;
-    float inputScale = 1 / 255;
-    bool bgr = false;
+    std::string inputConverter;
 
     // output options
     std::string outputDirectory = "";

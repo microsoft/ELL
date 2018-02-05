@@ -11,7 +11,9 @@
 #include "StringUtil.h"
 
 // stl
+#include <algorithm>
 #include <codecvt>
+#include <cstdlib>
 #include <ios>
 #include <locale>
 #include <memory>
@@ -287,7 +289,7 @@ namespace utilities
 #endif
             if (rc != 0)
             {
-                throw std::runtime_error(ell::utilities::FormatString("mkdir failed with error code %d", errno));
+                ell::utilities::Exception(ell::utilities::FormatString("mkdir failed with error code %d", errno));
             }
         }
     }
@@ -320,9 +322,33 @@ namespace utilities
 #endif
         if (rc != 0)
         {
-            throw std::runtime_error(ell::utilities::FormatString("error getting current working directory: %d", rc));
+            ell::utilities::Exception(ell::utilities::FormatString("error getting current working directory: %d", rc));
         }
         return utf8wd;
     }
+
+
+    std::string FindExecutable(const std::string& name)
+    {
+#ifdef WIN32
+#pragma warning(disable : 4996)
+        std::string path = getenv("PATH");
+        char separator = ';';
+#else
+        std::string path = getenv("PATH");
+        char separator = ':';
+#endif
+        std::vector<std::string> paths = Split(path, separator);
+        for (auto ptr = paths.begin(), end = paths.end(); ptr != end; ptr++)
+        {
+            std::string fullPath = JoinPaths(*ptr, name);
+            if (FileExists(fullPath))
+            {
+                return *ptr;
+            }
+        }
+        throw ell::utilities::Exception("Could not find '" + name + "' in your PATH environment");
+    }
+
 }
 }

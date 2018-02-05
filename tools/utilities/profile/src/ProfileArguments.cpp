@@ -13,10 +13,10 @@ namespace ell
 void ParsedProfileArguments::AddArgs(utilities::CommandLineParser& parser)
 {
     parser.AddOption(
-        inputTestFile,
-        "testFile",
-        "tf",
-        "Path to the test data (an image file)",
+        inputConverter,
+        "inputConverter",
+        "ic",
+        "Path to the python script that is used to convert input file to the correct format for the ELL map",
         "");
 
     parser.AddOption(

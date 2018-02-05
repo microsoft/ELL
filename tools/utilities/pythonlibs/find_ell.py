@@ -14,7 +14,7 @@ __this_file_directory = os.path.dirname(os.path.abspath(__file__))
 
 # find the root of the ELL git repo
 def get_ell_root():
-    expected_dir = "external" 
+    expected_dir = "external"
     root_dir = __this_file_directory
     while not os.path.isdir(os.path.join(root_dir, expected_dir)):
         parent = os.path.dirname(root_dir)
@@ -32,7 +32,7 @@ def find_ell_build():
         test = os.path.join(head,"ell_build_tools.json")
         if (os.path.isfile(test)):
             return head
-        
+
         # find a file that is unique to the ELL repo root.
         test = os.path.join(head,"StyleGuide.md")
         if (os.path.isfile(test)):
@@ -51,6 +51,3 @@ if ell_py_dir is None:
     raise ImportError("Could not find ell package, did you follow the ELL Python Binding build instructions?")
 
 sys.path.append(ell_py_dir)
-
-import ell
-sys.path.append(os.path.join(ell_py_dir, "ell", "util"))
