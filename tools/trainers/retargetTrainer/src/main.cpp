@@ -43,6 +43,7 @@
 #include "LinearPredictorNode.h"
 #include "MatrixVectorProductNode.h"
 #include "NeuralNetworkPredictorNode.h"
+#include "SinkNode.h"
 
 // predictors
 #include "Normalizer.h"
@@ -57,6 +58,14 @@ using namespace ell;
 using PredictorType = predictors::LinearPredictor<double>;
 
 template <typename ElementType>
+nodes::SinkNode<ElementType>* AppendSinkNodeToMap(model::Map& map, const model::OutputPort<ElementType>& sinkOutput)
+{
+    model::Model& model = map.GetModel();
+    auto condition = model.AddNode<nodes::ConstantNode<bool>>(true);
+    return model.AddNode<nodes::SinkNode<ElementType>>(sinkOutput, condition->output, "OutputCallback");
+}
+
+template <typename ElementType>
 model::Map AppendTrainedLinearPredictorToMap(const PredictorType& trainedPredictor, model::Map& map, size_t dimension)
 {
     predictors::LinearPredictor<ElementType> predictor(trainedPredictor);
@@ -65,7 +74,8 @@ model::Map AppendTrainedLinearPredictorToMap(const PredictorType& trainedPredict
     model::Model& model = map.GetModel();
     auto mapOutput = map.GetOutputElements<ElementType>(0);
     auto predictorNode = model.AddNode<nodes::LinearPredictorNode<ElementType>>(mapOutput, predictor);
-    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(predictorNode->output);
+    auto sinkNode = AppendSinkNodeToMap<ElementType>(map, predictorNode->output);
+    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
 
     auto& output = outputNode->output;
     auto outputMap = model::Map(map.GetModel(), { { "input", map.GetInput() } }, { { "output", output } });
@@ -307,8 +317,8 @@ model::Map GetMultiClassMapFromBinaryPredictors(std::vector<PredictorType>& bina
         addNode->output,
         model::PortMemoryLayout({ static_cast<int>(addNode->output.Size()), 1, 1 }),
         model::PortMemoryLayout({ static_cast<int>(addNode->output.Size()), 1, 1 }));
-
-    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sigmoidNode->output);
+    auto sinkNode = AppendSinkNodeToMap<ElementType>(map, sigmoidNode->output);
+    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
 
     auto& output = outputNode->output;
     auto outputMap = model::Map(model, { { "input", map.GetInput() } }, { { "output", output } });
@@ -434,7 +444,8 @@ int main(int argc, char* argv[])
             // Obtain a new training dataset for the set of Linear Predictors by running the
             // multiclassDataset through the modified model
             if (retargetArguments.verbose) std::cout << std::endl << "Transforming dataset with compiled model...";
-            _timer.Start();            
+            _timer.Start();
+
             auto dataset = common::TransformDatasetWithCompiledMap(multiclassDataset, map, retargetArguments.useBlas);
             if (retargetArguments.verbose) std::cout << "(" << _timer.Elapsed() << " ms)" << std::endl;
 
@@ -469,7 +480,8 @@ int main(int argc, char* argv[])
             // Obtain a new training dataset for the Linear Predictor by running the
             // binaryDataset through the modified model
             if (retargetArguments.verbose) std::cout << std::endl << "Transforming dataset with compiled model...";
-            _timer.Start();            
+            _timer.Start();
+
             auto dataset = common::TransformDatasetWithCompiledMap(binaryDataset, map);
             if (retargetArguments.verbose) std::cout << "(" << _timer.Elapsed() << " ms)" << std::endl;
 
