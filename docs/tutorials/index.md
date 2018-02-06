@@ -17,7 +17,7 @@ permalink: /tutorials/
 * [Boosting classifier accuracy by grouping categories](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/)
 * [Importing models](/ELL/tutorials/Importing-models/)
 * [Comparing image classification models side by side on the Raspberry Pi](/ELL/tutorials/Comparing-image-classification-models-side-by-side-on-the-Raspberry-Pi/)
+* [Repurposing a pretrained image classifier](/ELL/tutorials/Repurposing-a-pretrained-image-classifier/)
 
 ## Image Classification Tutorials in C++
-
 * [Getting started with image classification on the Raspberry Pi in C++](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/)

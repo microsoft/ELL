@@ -174,7 +174,7 @@ PredictorType RetargetModelUsingLinearPredictor(ParsedRetargetArguments& retarge
     auto evaluator = common::MakeEvaluator<PredictorType>(dataset.GetAnyDataset(), evaluatorParameters, retargetArguments.lossFunctionArguments);
 
     // Train the predictor
-    if (retargetArguments.verbose) std::cout << "Training ..." << std::endl;
+    std::cout << "Training ..." << std::endl;
     trainer.SetDataset(dataset.GetAnyDataset());
     size_t epoch = 0;
     double dualityGap = std::numeric_limits<double>::max();
@@ -395,18 +395,18 @@ int main(int argc, char* argv[])
             if (map.GetOutputType() == model::Port::PortType::smallReal)
             {
                 redirected = RedirectNeuralNetworkOutputByLayer<float>(map, retargetArguments.removeLastLayers);
-                if (redirected && retargetArguments.verbose) std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
+                std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
             }
             else
             {
                 redirected = RedirectNeuralNetworkOutputByLayer<double>(map, retargetArguments.removeLastLayers);
-                if (redirected && retargetArguments.verbose) std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
+                std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
             }
         }
         else if (retargetArguments.targetPortElements.length() > 0)
         {
             redirected = RedirectModelOutputByPortElements(map, retargetArguments.targetPortElements, retargetArguments.refineIterations);
-            if (redirected && retargetArguments.verbose) std::cout << "Redirected output for port elements " << retargetArguments.targetPortElements << " from model" << std::endl;
+            std::cout << "Redirected output for port elements " << retargetArguments.targetPortElements << " from model" << std::endl;
         }
         else
         {
@@ -450,7 +450,7 @@ int main(int argc, char* argv[])
             std::vector<PredictorType> predictors(datasets.size());
             for (size_t i = 0; i < datasets.size(); ++i)
             {
-                if (retargetArguments.verbose) std::cout << std::endl << "=== Training binary classifier for class " << i << " vs Rest ===" << std::endl;
+                std::cout << std::endl << "=== Training binary classifier for class " << i << " vs Rest ===" << std::endl;
 
                 predictors[i] = RetargetModelUsingLinearPredictor(retargetArguments, datasets[i]);
             }

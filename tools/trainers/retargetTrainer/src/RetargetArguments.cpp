@@ -68,7 +68,7 @@ namespace ell
             "regularization",
             "r",
             "The L2 regularization parameter",
-            1.0);
+            0.005);
 
         parser.AddOption(desiredPrecision,
             "desiredPrecision",
