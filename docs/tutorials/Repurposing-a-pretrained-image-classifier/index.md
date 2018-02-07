@@ -39,7 +39,7 @@ Optional materials include the following:
 
 
 
-## Step 1: Activate your environment and create a tutorial directory
+## Activate your environment and create a tutorial directory
 
 If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your Anaconda environment.
 
