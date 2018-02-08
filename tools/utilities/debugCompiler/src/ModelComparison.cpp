@@ -365,6 +365,16 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     // Compute compiled output
     _runningCompiled = true;
     _outputCompiled = GetMapOutput(compiledMap, input);
+
+    // The reference model is run a second time to gather the per-node outputs. We
+    // need to do the same thing for the compiled one, so that stateful models will
+    // match appropriately.
+    // We keep the overall output from the first run only, because that's what we do
+    // with the reference.
+    // This means that the "overall" stats don't actually report a summary of the per-node stats.
+    // We should fix this eventually to collect per-node and overall outputs during the same run 
+    // of the reference model.
+    auto temp = GetMapOutput(compiledMap, input); 
 }
 
 void ModelComparison::SaveOutput(std::string name, const std::vector<float>& reference, const std::vector<float>& compiled)

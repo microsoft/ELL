@@ -246,8 +246,16 @@ namespace emitters
         auto expInput = Exp(a);
         constexpr auto one = static_cast<ValueType>(1);
         auto result = fn.Select(a > ValueType{0}, one / (Exp(-a) + one), expInput / (expInput + one));
+        return fn.LocalScalar(result);
+    }
 
-        return a.function.LocalScalar(result);
+    template <typename ValueType>
+    IRLocalScalar Tanh(IRLocalScalar a)
+    {
+        // tanh(x) === (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+        //         = 2*sigmoid(2*x) - 1
+        auto two = static_cast<ValueType>(2.0);
+        return (two * Sigmoid<ValueType>(two * a)) - static_cast<ValueType>(1);
     }
 }
 }

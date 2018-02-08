@@ -21,11 +21,10 @@ namespace emitters
     class IRFunctionEmitter;
 
     /// <summary>
-    /// Helper type for llvm values representing values local to a function
+    /// Abstract base class for helper types for llvm values representing values local to a function
     /// </summary>
     struct IRLocalValue
     {
-        IRLocalValue() = default;
         IRLocalValue(const IRLocalValue&) = default;
 
         /// <summary> Constructor from an llvm::Value* </summary>
@@ -46,6 +45,9 @@ namespace emitters
 
         /// <summary> The llvm::Value* being wrapped. </summary>
         llvm::Value* value;
+
+    private:
+        IRLocalValue() = default;
     };
 
     /// <summary>
@@ -84,7 +86,7 @@ namespace emitters
 
     /// Helper type for llvm values representing array values local to a function
     /// </summary>
-    struct IRLocalArray
+    struct IRLocalArray : public IRLocalValue
     {
     private:
         /// <summary>
@@ -98,19 +100,13 @@ namespace emitters
 
             operator IRLocalScalar() const;
 
-            operator llvm::Value*() const { return static_cast<IRLocalScalar>(*this); }
-
             IRFunctionEmitter& _function;
             llvm::Value* _pPointer;
             llvm::Value* _pOffset;
         };
 
     public:
-        /// <summary> Constructor from an llvm::Value* </summary>
-        ///
-        /// <param name="function"> The current function being emitted. </param>
-        /// <param name="value"> The LLVM value to wrap. </param>
-        IRLocalArray(IRFunctionEmitter& function, llvm::Value* pPointer);
+        using IRLocalValue::IRLocalValue;
 
         /// <summary> Indexing operator to return a reference to the specified offset </summary>
         ///
@@ -123,12 +119,6 @@ namespace emitters
         /// <param name="offset"> The offset where the value lies within the wrapped array. </param>
         /// <return> An instance of IRLocalArray::IRLocalArrayValue to represent the value at the offset within the array </returns>
         IRLocalArrayValue operator[](int offset) const;
-
-        /// <summary> The function this value is in scope for. </summary>
-        IRFunctionEmitter& function;
-
-        /// <summary> The llvm::Value* being wrapped. </summary>
-        llvm::Value* pPointer;
     };
 }
 }

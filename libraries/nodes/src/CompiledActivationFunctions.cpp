@@ -154,7 +154,6 @@ namespace nodes
     llvm::Value* SigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
     {
         auto x = function.LocalScalar(xValue);
-
         return emitters::Sigmoid<ValueType>(x);
     }
 
@@ -171,13 +170,7 @@ namespace nodes
     llvm::Value* TanhActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
     {
         auto x = function.LocalScalar(xValue);
-        auto one = function.LocalScalar<ValueType>(1.0);
-        auto two = function.LocalScalar<ValueType>(2.0);
-        // tanh = (exp(x) - exp(-x)) / (exp(x) + exp(-x))
-        //      = 2*sigmoid(2*x) - 1
-        auto sigmoidFunction = SigmoidActivationFunction<ValueType>();
-        auto sig2x = function.LocalScalar(sigmoidFunction.Compile(function, two * x));
-        return (two * sig2x) - one;
+        return emitters::Tanh<ValueType>(x);
     }
 
     //
