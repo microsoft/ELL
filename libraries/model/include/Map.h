@@ -25,6 +25,7 @@
 #include "PropertyBag.h"
 #include "StlIndexValueIterator.h"
 #include "TypeTraits.h"
+#include "TypeName.h"
 
 // stl
 #include <algorithm>
