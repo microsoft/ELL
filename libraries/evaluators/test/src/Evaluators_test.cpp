@@ -11,15 +11,16 @@
 // data
 #include "Dataset.h"
 
-// common
-#include "MakeEvaluator.h"
-#include "TrainerArguments.h"
-
 // predictors
 #include "LinearPredictor.h"
 
 // evaluators
+#include "AUCAggregator.h"
 #include "Evaluator.h"
+#include "LossAggregator.h"
+
+// functions
+#include "SquaredLoss.h"
 
 // testing
 #include "testing.h"
@@ -39,10 +40,8 @@ void TestEvaluators()
 
     // get evaluator
     evaluators::EvaluatorParameters evaluatorParams{ 1, true };
-    common::LossFunctionArguments lossFunctionArguments;
-    lossFunctionArguments.lossFunction = common::LossFunctionArguments::LossFunction::squared;
     predictors::LinearPredictor<double> predictor({ 1.0, 1.0 }, 1.0);
-    auto evaluator = common::MakeEvaluator<predictors::LinearPredictor<double>>(dataset.GetAnyDataset(), evaluatorParams, lossFunctionArguments);
+    auto evaluator = evaluators::MakeEvaluator<predictors::LinearPredictor<double>>(dataset.GetAnyDataset(), evaluatorParams, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::SquaredLoss()));
 
     evaluator->Evaluate(predictor);
     evaluator->Evaluate(predictor);

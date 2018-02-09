@@ -20,7 +20,7 @@
 // testing
 #include "testing.h"
 
-// utlities
+// utilities
 #include "Unused.h"
 
 // stl

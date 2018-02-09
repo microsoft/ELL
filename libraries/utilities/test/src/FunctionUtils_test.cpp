@@ -9,11 +9,11 @@
 
 #include "FunctionUtils_test.h"
 
-// testing
-#include "testing.h"
-
 // utilities
 #include "FunctionUtils.h"
+
+// testing
+#include "testing.h"
 
 // stl
 #include <type_traits>

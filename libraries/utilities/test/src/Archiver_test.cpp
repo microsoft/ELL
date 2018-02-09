@@ -15,15 +15,6 @@
 #include "UniqueId.h"
 #include "XmlArchiver.h"
 
-// model
-#include "InputNode.h"
-#include "Model.h"
-#include "OutputNode.h"
-
-// nodes
-#include "BinaryOperationNode.h"
-#include "ConstantNode.h"
-
 // testing
 #include "testing.h"
 
@@ -160,12 +151,6 @@ void TestArchiver()
 
     utilities::UniqueId id;
 
-    model::Model g;
-    auto in = g.AddNode<model::InputNode<double>>(3);
-    auto constNode = g.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
-    auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, emitters::BinaryOperationType::add);
-    auto out = g.AddNode<model::OutputNode<double>>(in->output);
-
     std::stringstream strstream;
     ArchiverType archiver(strstream);
     archiver.Archive(boolVal);
@@ -179,16 +164,6 @@ void TestArchiver()
     archiver.Archive(testStruct);
 
     archiver.Archive(id);
-
-    archiver.Archive(*in);
-
-    archiver.Archive(*out);
-
-    archiver.Archive(*constNode);
-
-    archiver.Archive(*binaryOpNode);
-
-    archiver.Archive(g);
 
     // simple stuff
     archiver.Archive(5);
@@ -295,51 +270,6 @@ void TestUnarchiver()
     }
 
     {
-        model::Model g;
-        utilities::SerializationContext context;
-        model::ModelSerializationContext modelContext(context, &g);
-        modelContext.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
-        modelContext.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
-        modelContext.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
-        modelContext.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
-        modelContext.GetTypeFactory().AddType<nodes::ConstantNode<double>, nodes::ConstantNode<double>>();
-
-        std::stringstream strstream;
-        auto constVector = std::vector<double>{ 1.0, 2.0, 3.0 };
-
-        {
-            ArchiverType archiver(strstream);
-            auto in = g.AddNode<model::InputNode<double>>(3);
-            auto constNode = g.AddNode<nodes::ConstantNode<double>>(constVector);
-            auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, emitters::BinaryOperationType::add);
-            g.AddNode<model::OutputNode<double>>(in->output);
-
-            archiver.Archive("node1", *constNode);
-            archiver.Archive("node2", *in);
-            archiver.Archive("node3", constNode);
-            archiver.Archive("node4", constNode);
-            archiver.Archive("node5", binaryOpNode);
-        }
-
-        UnarchiverType unarchiver(strstream, context);
-        unarchiver.PushContext(modelContext);
-        nodes::ConstantNode<double> newConstNode;
-        model::InputNode<double> newIn;
-        nodes::BinaryOperationNode<double> newBinaryOpNode;
-        std::unique_ptr<nodes::ConstantNode<double>> newConstNodePtr = nullptr;
-        std::unique_ptr<model::Node> newNodePtr = nullptr;
-        std::unique_ptr<nodes::BinaryOperationNode<double>> newBinaryOpNodePtr = nullptr;
-        unarchiver.Unarchive("node1", newConstNode);
-        unarchiver.Unarchive("node2", newIn);
-        unarchiver.Unarchive("node3", newConstNodePtr);
-        unarchiver.Unarchive("node4", newNodePtr);
-        unarchiver.Unarchive("node5", newBinaryOpNode);
-        unarchiver.PopContext();
-        testing::ProcessTest("Deserialize nodes check", testing::IsEqual(constVector, newConstNode.GetValues()));
-        testing::ProcessTest("Deserialize nodes check", testing::IsEqual(constVector, newConstNodePtr->GetValues()));
-    }
-
-    {
         // arrays of stuff
         std::stringstream strstream;
         auto doubleVector = std::vector<double>{ 1.0, 2.0, 3.0 };
@@ -366,43 +296,6 @@ void TestUnarchiver()
         testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[1].a, newStructVector[1].a));
         testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[1].b, newStructVector[1].b));
         testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[1].c, newStructVector[1].c));
-    }
-
-    {
-        model::Model g;
-        utilities::SerializationContext context;
-        model::ModelSerializationContext modelContext(context, &g);
-        modelContext.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
-        modelContext.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
-        modelContext.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
-        modelContext.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
-        modelContext.GetTypeFactory().AddType<nodes::ConstantNode<double>, nodes::ConstantNode<double>>();
-        auto in = g.AddNode<model::InputNode<double>>(3);
-        auto doubleVector = std::vector<double>{ 1.0, 2.0, 3.0 };
-        auto constNode = g.AddNode<nodes::ConstantNode<double>>(doubleVector);
-        g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, emitters::BinaryOperationType::add);
-        g.AddNode<model::OutputNode<double>>(in->output);
-
-        std::stringstream strstream;
-        {
-            ArchiverType archiver(strstream);
-
-            archiver.Archive(g);
-            // std::cout << "Graph output:" << std::endl;
-            // std::cout << strstream.str() << std::endl;
-        }
-
-        UnarchiverType unarchiver(strstream, context);
-        unarchiver.PushContext(modelContext);
-        model::Model newGraph;
-        unarchiver.Unarchive(newGraph);
-
-        std::stringstream strstream2;
-        ArchiverType archiver2(strstream2);
-
-        archiver2.Archive(newGraph);
-        // std::cout << "New graph output:" << std::endl;
-        // std::cout << strstream2.str() << std::endl;
     }
 
     {

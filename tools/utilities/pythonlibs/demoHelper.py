@@ -149,12 +149,17 @@ class DemoHelper:
         print("Found input_shape [%d,%d,%d]" % (self.input_shape.rows, self.input_shape.columns, self.input_shape.channels))
         return True
 
+    def load_ell(self):
+        print("### Loading ELL modules...")
+        import find_ell
+        import ell
+        return ell
+
+
     def import_ell_map(self):
+        ell = self.load_ell()
         sys.path.append(script_path)
         sys.path.append(os.getcwd())
-        print("### Loading ELL modules...")
-        __import__("find_ell")
-        ell = __import__("ell")
         print("loading model: " + self.model_file)
         self.model = ell.model.Map(self.model_file)
         self.input_shape = self.model.GetInputShape()
@@ -277,6 +282,7 @@ class DemoHelper:
         return ""
 
     def get_predictor_map(self, predictor, intervalMs=0):
+        ell = self.load_ell()
         """Creates an ELL map from an ELL predictor"""
         return ell.neural.utilities.ell_map_from_float_predictor(predictor)
 

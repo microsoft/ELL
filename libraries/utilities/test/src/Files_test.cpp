@@ -74,7 +74,7 @@ namespace ell
         testing::ProcessTest("Unicode paths", ell::utilities::DirectoryExists(testdir));
 
         std::string testContent = "this is a test";
-        int testContentLength = testContent.size();
+        int testContentLength = static_cast<int>(testContent.size());
 
         // chinese for 'banana.txt'
         std::wstring banana(L"\u9999\u8549.txt");

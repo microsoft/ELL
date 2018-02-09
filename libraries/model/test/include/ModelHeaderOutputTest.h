@@ -1,14 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     InterfaceWriterTest.h (emitters_test)
+//  File:     ModelHeaderOutputTest.h (nodes_test)
 //  Authors:  Lisa Ong
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-void TestCppHeader();
-void TestSwigCallbackInterfaces();
-void TestSwigCallbackHeader();
-void TestSwigNoCallbackInterfaces();
-void TestSwigNoCallbackHeader();
+// The main test:
+void TestModelHeaderOutput();

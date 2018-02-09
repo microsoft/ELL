@@ -1,17 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     InterfaceWriterTest.cpp (emitters_test)
+//  File:     ModelHeaderOutputTest.cpp (nodes_test)
 //  Authors:  Lisa Ong
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InterfaceWriterTest.h"
+#include "ModelHeaderOutputTest.h"
 
 // model
-#include "Map.h"
-#include "InputNode.h"
 #include "IRCompiledMap.h"
+#include "InputNode.h"
+#include "Map.h"
 #include "Model.h"
 #include "OutputNode.h"
 
@@ -33,8 +33,8 @@
 
 // stl
 #include <ostream>
-#include <string>
 #include <sstream>
+#include <string>
 
 using namespace ell;
 using namespace ell::emitters;
@@ -52,14 +52,11 @@ model::IRCompiledMap GetCompiledMapWithCallbacks(
     model::Model model;
 
     auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1 /*currentTime*/);
-    auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold,
-        "MyLagNotificationCallback");
-    auto sourceNode = model.AddNode<nodes::SourceNode<ElementType>>(clockNode->output, inputSize,
-        "MyDataCallback");
+    auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold, "MyLagNotificationCallback");
+    auto sourceNode = model.AddNode<nodes::SourceNode<ElementType>>(clockNode->output, inputSize, "MyDataCallback");
     auto conditionNode = model.AddNode<nodes::ConstantNode<bool>>(true);
     auto sumNode = model.AddNode<nodes::SumNode<ElementType>>(sourceNode->output);
-    auto sinkNode = model.AddNode<nodes::SinkNode<ElementType>>(sumNode->output, conditionNode->output,
-        "MyResultsCallback");
+    auto sinkNode = model.AddNode<nodes::SinkNode<ElementType>>(sumNode->output, conditionNode->output, "MyResultsCallback");
 
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
     auto map = model::Map(model, { { "time", inputNode } }, { { "output", outputNode->output } });
@@ -99,23 +96,43 @@ model::IRCompiledMap GetCompiledMapNoCallbacks(
 
 // Empty class used for type information only
 template <typename ElementType>
-struct CallbackBase { };
+struct CallbackBase
+{
+};
 
 // Not using typeid because returns compiler-specific names, but we need well-known names here
 template <typename ElementType>
 const char* ToTypeString();
 template <>
-const char* ToTypeString<double>() { return "double"; }
+const char* ToTypeString<double>()
+{
+    return "double";
+}
 template <>
-const char* ToTypeString<float>() { return "float"; }
+const char* ToTypeString<float>()
+{
+    return "float";
+}
 template <>
-const char* ToTypeString<std::vector<double>>() { return "DoubleVector"; }
+const char* ToTypeString<std::vector<double>>()
+{
+    return "DoubleVector";
+}
 template <>
-const char* ToTypeString<std::vector<float>>() { return "FloatVector"; }
+const char* ToTypeString<std::vector<float>>()
+{
+    return "FloatVector";
+}
 template <>
-const char* ToTypeString<CallbackBase<double>>() { return "DoubleCallbackBase"; }
+const char* ToTypeString<CallbackBase<double>>()
+{
+    return "DoubleCallbackBase";
+}
 template <>
-const char* ToTypeString<CallbackBase<float>>() { return "FloatCallbackBase"; }
+const char* ToTypeString<CallbackBase<float>>()
+{
+    return "FloatCallbackBase";
+}
 
 template <typename ElementType>
 void TestCppHeader()
@@ -179,8 +196,7 @@ void TestSwigCallbackInterfaces()
     testing::ProcessTest("Testing shape wrappers 3", testing::IsTrue(std::string::npos != result.find("ell::api::math::TensorShape get_default_output_shape() {")));
     testing::ProcessTest("Testing shape wrappers 4", testing::IsTrue(std::string::npos != result.find("TestModuleWithCallbacks_GetOutputShape(0, &s);")));
 
-    testing::ProcessTest("Testing wrapper macro", testing::IsTrue(std::string::npos != result.find(std::string("TestModuleWithCallbacks_Predictor, " + 
-        callbackTypeString + ", " + typeString + ", " + callbackTypeString + ", " + typeString + ", " + ToTypeString<CallbackBase<nodes::TimeTickType>>()))));
+    testing::ProcessTest("Testing wrapper macro", testing::IsTrue(std::string::npos != result.find(std::string("TestModuleWithCallbacks_Predictor, " + callbackTypeString + ", " + typeString + ", " + callbackTypeString + ", " + typeString + ", " + ToTypeString<CallbackBase<nodes::TimeTickType>>()))));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
 
@@ -249,8 +265,7 @@ void TestSwigNoCallbackInterfaces()
 
     // Sanity tests
     testing::ProcessTest("Testing generated python code 1", testing::IsTrue(std::string::npos != result.find("def predict(inputData: 'numpy.ndarray') -> \"numpy.ndarray\":")));
-    testing::ProcessTest("Testing generated python code 2", testing::IsTrue(std::string::npos != result.find(
-        std::string("results = " + vectorTypeString + "(get_default_output_shape().Size())"))));
+    testing::ProcessTest("Testing generated python code 2", testing::IsTrue(std::string::npos != result.find(std::string("results = " + vectorTypeString + "(get_default_output_shape().Size())"))));
     testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("TestModule_predict(inputData, results)")));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
@@ -279,12 +294,9 @@ void TestSwigNoCallbackHeader()
     std::string typeString = ToTypeString<ElementType>();
 
     // Sanity tests
-    testing::ProcessTest("Testing predict function 1", testing::IsTrue(std::string::npos != result.find(
-        std::string("void TestModule_predict(" + typeString + "* input0, " + typeString + "* output0);"))));
-    testing::ProcessTest("Testing predict function 2", testing::IsTrue(std::string::npos != result.find(
-        std::string("void TestModule_predict(const std::vector<" + typeString + ">& input, std::vector<" + typeString + ">& output)"))));
-    testing::ProcessTest("Testing predict function 3", testing::IsTrue(std::string::npos != result.find(
-        std::string("TestModule_predict(const_cast<" + typeString + "*>(&input[0]), &output[0]);"))));
+    testing::ProcessTest("Testing predict function 1", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_predict(" + typeString + "* input0, " + typeString + "* output0);"))));
+    testing::ProcessTest("Testing predict function 2", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_predict(const std::vector<" + typeString + ">& input, std::vector<" + typeString + ">& output)"))));
+    testing::ProcessTest("Testing predict function 3", testing::IsTrue(std::string::npos != result.find(std::string("TestModule_predict(const_cast<" + typeString + "*>(&input[0]), &output[0]);"))));
 
     testing::ProcessTest("Testing shape function 1", testing::IsTrue(std::string::npos != result.find("void TestModule_GetInputShape(int32_t index, TensorShape* shape)")));
     testing::ProcessTest("Testing shape function 2", testing::IsTrue(std::string::npos != result.find("void TestModule_GetOutputShape(int32_t index, TensorShape* shape)")));
@@ -301,4 +313,17 @@ void TestSwigNoCallbackHeader()
 {
     TestSwigNoCallbackHeader<double>();
     TestSwigNoCallbackHeader<float>();
+}
+
+//
+// Invoke all the tests
+//
+
+void TestModelHeaderOutput()
+{
+    TestCppHeader();
+    TestSwigCallbackInterfaces();
+    TestSwigCallbackHeader();
+    TestSwigNoCallbackInterfaces();
+    TestSwigNoCallbackHeader();
 }

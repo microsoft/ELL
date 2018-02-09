@@ -108,7 +108,7 @@ namespace nodes
                     // NB: 5 is the result of numCoords + 1, where the 1 is due to the confidence scale value of the prediction.
                     //     If numCoords ever needs support to be anything other than 4, this value will need to be calculated accordingly
                     auto classProbMax = fn.LocalScalar(fn.Variable(emitters::GetVariableType<ValueType>()));
-                    fn.Store(classProbMax, input[boxOffset + 5]);
+                    fn.Store(classProbMax, static_cast<emitters::IRLocalScalar>(input[boxOffset + 5]));
 
                     // find the max value in the rest of the probabilities
                     fn.For(boxOffset + 5 + 1, boxOffset + 5 + numClasses,

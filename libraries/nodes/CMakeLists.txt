@@ -156,7 +156,7 @@ endif()
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 #
-# test project
+# test project 
 #
 
 set(test_name ${library_name}_test)

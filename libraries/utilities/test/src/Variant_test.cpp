@@ -9,10 +9,6 @@
 
 #include "Variant_test.h"
 
-// model
-#include "Node.h"
-#include "PortElements.h"
-
 // utilities
 #include "TypeName.h"
 #include "Variant.h"
@@ -169,29 +165,6 @@ void TestParseVectorVaraint()
     PrintVector(v.GetValue<std::vector<int>>());
 
     testing::ProcessTest("Variant ParseInto vector", v.GetValue<std::vector<int>>() == std::vector<int>{ 1, 2, 3 });
-}
-
-void TestParsePortElementsProxyVariant()
-{
-    auto v = utilities::MakeVariant<model::PortElementsProxy>();
-    auto success = v.TryParseInto("10.output");
-    testing::ProcessTest("Variant ParseInto PortElementsProxy", success);
-    if (!success) return;
-
-    auto elements = v.GetValue<model::PortElementsProxy>();
-    testing::ProcessTest("Variant ParseInto PortElementsProxy: size", elements.GetRanges().size() == 1);
-    if(elements.GetRanges().size() != 1) return;
-
-    auto range = elements.GetRanges()[0];
-    testing::ProcessTest("Variant ParseInto PortElementsProxy: id", range.GetNodeId() == model::Node::NodeId("10"));
-    testing::ProcessTest("Variant ParseInto PortElementsProxy: portName", range.GetPortName() == "output");
-}
-
-void TestParseObjVariant()
-{
-    // auto v = utilities::MakeVariant<std::vector<int>>();
-    // v.ParseInto("[1,2,3]");
-    // testing::ProcessTest("Variant ParseInto", v.GetValue<std::vector<int>>() == {1,2,3});
 }
 
 void TestVariantToString()

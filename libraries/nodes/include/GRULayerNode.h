@@ -170,8 +170,6 @@ namespace nodes
         model::PortMemoryLayout _inputMemoryLayout;
         model::PortMemoryLayout _outputMemoryLayout;
 
-        void ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength);
-
         template <typename ActivationType>
         void ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength);
     };

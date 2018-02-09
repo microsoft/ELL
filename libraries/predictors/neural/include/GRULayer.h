@@ -141,7 +141,7 @@ namespace predictors
             VectorType _resetBias;
             VectorType _hiddenBias;
 
-            VectorType _inputPlusHiddenVector;
+            VectorType _inputPlusHidden;
 
             ActivationFunctionType<ElementType> _activationFunction;
             RecurrentActivationFunctionType<ElementType> _recurrentActivationFunction;

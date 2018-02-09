@@ -43,10 +43,12 @@ described in the installation instructions for your platform.
 
 ## Importing a model from the Microsoft Cognitive Toolkit (CNTK)
 
-A Neural Network model in the CNTK file format can be converted into an ELL model using the *cntk_import.py* Python script, found in the `ELL/tools/importers/cntk` directory. As an example, we will import one of the models available on the [CNTK website](https://www.microsoft.com/en-us/cognitive-toolkit/). First, download the model to your computer.
+A Neural Network model in the CNTK file format can be converted into an ELL model using the *cntk_import.py* Python script, found in the `ELL/tools/importers/cntk` directory. As an example, we will import one of the models available on the [ELL Gallery](https://github.com/Microsoft/ELL-models). First, download the model to your computer.
 
 ```shell
-curl --location -o model.cntk https://www.cntk.ai/Models/Caffe_Converted/VGG16_ImageNet_Caffe.model
+curl --location -o model.cntk.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.cntk.zip
+unzip model.cntk.zip
+mv d_I160x160x3CMCMCMCMCMCMC1AS.cntk model.cntk
 ```
 
 Next, run the importer script, making sure to provide the CNTK model as a command line parameter.
@@ -63,49 +65,38 @@ Selected CPU as the process wide default device.
 
 Finished loading.
 Pre-processing...
+Will not process ReduceElements- skipping this layer as irrelevant.
+Will not process ClassificationError- skipping this layer as irrelevant.
+Will not process ReduceElements- skipping this layer as irrelevant.
+Will not process CrossEntropyWithSoftmax- skipping this layer as irrelevant.
+Will not process Reshape- skipping this layer as irrelevant.
+Will not process Combine- skipping this layer as irrelevant.
+Minus : 160x160x3 -> 160x160x3 | input padding 0 output padding 0
+BatchNormalization : 160x160x3 -> 162x162x3 | input padding 0 output padding 1
+Convolution (ReLU) : 162x162x3 -> 160x160x16 | input padding 1 output padding 0
+MaxPooling : 160x160x16 -> 80x80x16 | input padding 0 output padding 0
+BatchNormalization : 80x80x16 -> 82x82x16 | input padding 0 output padding 1
+Convolution (ReLU) : 82x82x16 -> 80x80x64 | input padding 1 output padding 0
+MaxPooling : 80x80x64 -> 40x40x64 | input padding 0 output padding 0
+BatchNormalization : 40x40x64 -> 42x42x64 | input padding 0 output padding 1
+Convolution (ReLU) : 42x42x64 -> 40x40x64 | input padding 1 output padding 0
+MaxPooling : 40x40x64 -> 20x20x64 | input padding 0 output padding 0
+BatchNormalization : 20x20x64 -> 22x22x64 | input padding 0 output padding 1
+Convolution (ReLU) : 22x22x64 -> 20x20x128 | input padding 1 output padding 0
+MaxPooling : 20x20x128 -> 10x10x128 | input padding 0 output padding 0
+BatchNormalization : 10x10x128 -> 12x12x128 | input padding 0 output padding 1
+Convolution (ReLU) : 12x12x128 -> 10x10x256 | input padding 1 output padding 0
+MaxPooling : 10x10x256 -> 5x5x256 | input padding 0 output padding 0
+BatchNormalization : 5x5x256 -> 7x7x256 | input padding 0 output padding 1
+Convolution (ReLU) : 7x7x256 -> 5x5x512 | input padding 1 output padding 0
+MaxPooling : 5x5x512 -> 3x3x512 | input padding 0 output padding 0
+BatchNormalization : 3x3x512 -> 5x5x512 | input padding 0 output padding 1
+Convolution (ReLU) : 5x5x512 -> 3x3x1024 | input padding 1 output padding 0
+BatchNormalization : 3x3x1024 -> 3x3x1024 | input padding 0 output padding 0
+Convolution (ReLU) : 3x3x1024 -> 3x3x1000 | input padding 0 output padding 0
+AveragePooling : 3x3x1000 -> 1x1x1000 | input padding 0 output padding 0
+Softmax : 1x1x1000 -> 1x1x1 | input padding 0 output padding 0
 
-Will not process Dropout - skipping this layer as irrelevant.
-
-Will not process Dropout - skipping this layer as irrelevant.
-
-Will not process Combine - skipping this layer as irrelevant.
-Convolution : 226x226x3 -> 224x224x64 | input padding 1 output padding 0
-ReLU : 224x224x64 -> 226x226x64 | input padding 0 output padding 1
-Convolution : 226x226x64 -> 224x224x64 | input padding 1 output padding 0
-ReLU : 224x224x64 -> 224x224x64 | input padding 0 output padding 0
-MaxPooling : 224x224x64 -> 114x114x64 | input padding 0 output padding 1
-Convolution : 114x114x64 -> 112x112x128 | input padding 1 output padding 0
-ReLU : 112x112x128 -> 114x114x128 | input padding 0 output padding 1
-Convolution : 114x114x128 -> 112x112x128 | input padding 1 output padding 0
-ReLU : 112x112x128 -> 112x112x128 | input padding 0 output padding 0
-MaxPooling : 112x112x128 -> 58x58x128 | input padding 0 output padding 1
-Convolution : 58x58x128 -> 56x56x256 | input padding 1 output padding 0
-ReLU : 56x56x256 -> 58x58x256 | input padding 0 output padding 1
-Convolution : 58x58x256 -> 56x56x256 | input padding 1 output padding 0
-ReLU : 56x56x256 -> 58x58x256 | input padding 0 output padding 1
-Convolution : 58x58x256 -> 56x56x256 | input padding 1 output padding 0
-ReLU : 56x56x256 -> 56x56x256 | input padding 0 output padding 0
-MaxPooling : 56x56x256 -> 30x30x256 | input padding 0 output padding 1
-Convolution : 30x30x256 -> 28x28x512 | input padding 1 output padding 0
-ReLU : 28x28x512 -> 30x30x512 | input padding 0 output padding 1
-Convolution : 30x30x512 -> 28x28x512 | input padding 1 output padding 0
-ReLU : 28x28x512 -> 30x30x512 | input padding 0 output padding 1
-Convolution : 30x30x512 -> 28x28x512 | input padding 1 output padding 0
-ReLU : 28x28x512 -> 28x28x512 | input padding 0 output padding 0
-MaxPooling : 28x28x512 -> 16x16x512 | input padding 0 output padding 1
-Convolution : 16x16x512 -> 14x14x512 | input padding 1 output padding 0
-ReLU : 14x14x512 -> 16x16x512 | input padding 0 output padding 1
-Convolution : 16x16x512 -> 14x14x512 | input padding 1 output padding 0
-ReLU : 14x14x512 -> 16x16x512 | input padding 0 output padding 1
-Convolution : 16x16x512 -> 14x14x512 | input padding 1 output padding 0
-ReLU : 14x14x512 -> 14x14x512 | input padding 0 output padding 0
-MaxPooling : 14x14x512 -> 7x7x512 | input padding 0 output padding 0
-Linear : 7x7x512 -> 1x1x4096 | input padding 0 output padding 0
-ReLU : 1x1x4096 -> 1x1x4096 | input padding 0 output padding 0
-Linear : 1x1x4096 -> 1x1x4096 | input padding 0 output padding 0
-ReLU : 1x1x4096 -> 1x1x4096 | input padding 0 output padding 0
-Linear : 1x1x4096 -> 1x1x1000 | input padding 0 output padding 0
-Softmax : 1x1x1000 -> 1x1x1000 | input padding 0 output padding 0
 Finished pre-processing.
 Saving model file: 'model.ell'
 ```
@@ -115,7 +106,7 @@ When the script finishes running, a new file named `model.ell` will appear in yo
 In addition to the model, also download the categories file, which contains the names of the categories predicted by the model, and which we require below.
 
 ```shell
-curl --location -o categories.txt https://raw.githubusercontent.com/Microsoft/ELL-models/master/models/ILSVRC2012/ILSVRC2012_labels.txt
+curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt
 ```
 
 ## Importing a model from Darknet

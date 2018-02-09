@@ -127,7 +127,6 @@ endif()
 set (test_src
   test/src/main.cpp
   test/src/AsyncEmitterTest.cpp
-  test/src/InterfaceWriterTest.cpp
   test/src/IREmitterTest.cpp
   test/src/IRFunctionTest.cpp
   test/src/PosixEmitterTest.cpp
@@ -135,7 +134,6 @@ set (test_src
 
 set (test_include
   test/include/AsyncEmitterTest.h
-  test/include/InterfaceWriterTest.h
   test/include/IREmitterTest.h
   test/include/IRFunctionTest.h
   test/include/PosixEmitterTest.h
@@ -146,7 +144,7 @@ source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} nodes model testing utilities predictors emitters)
+target_link_libraries(${test_name} testing utilities emitters)
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")

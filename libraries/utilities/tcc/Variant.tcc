@@ -192,6 +192,8 @@ namespace utilities
         template <typename ValueType>
         bool TryParseValueHelper(const std::string& s, ValueType& value, ...)
         {
+            UNUSED(s);
+            UNUSED(value);
             return false;
         }
 

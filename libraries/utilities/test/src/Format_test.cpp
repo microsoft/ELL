@@ -9,11 +9,11 @@
 
 #include "Format_test.h"
 
-// testing
-#include "testing.h"
-
 // utilities
 #include "Format.h"
+
+// testing
+#include "testing.h"
 
 namespace ell
 {

@@ -42,10 +42,10 @@ ELL can optionally be used from Python 3.6.
 An easy way to install Python and all the required modules is with [Miniconda](https://conda.io/miniconda.html).
 Download and install Miniconda from here <https://conda.io/miniconda.html>.
 
-After installing Miniconda, create a Python 3.6 environment and include the `numpy` module by typing
+After installing Miniconda, create a Python 3.6 environment by typing
 
 ```shell
-conda create -n py36 numpy python=3.6
+conda create -n py36 python=3.6
 ```
 
 Next, activate the environment you just created by

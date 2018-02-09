@@ -117,6 +117,9 @@ namespace emitters
 
     template <typename ValueType>
     IRLocalScalar Sigmoid(IRLocalScalar a);
+
+    template <typename ValueType>
+    IRLocalScalar Tanh(IRLocalScalar a);
 }
 }
 

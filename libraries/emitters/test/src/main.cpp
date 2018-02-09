@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "AsyncEmitterTest.h"
-#include "InterfaceWriterTest.h"
 #include "IREmitterTest.h"
 #include "IRFunctionTest.h"
 #include "PosixEmitterTest.h"
@@ -65,21 +64,11 @@ void TestPosixEmitter()
     TestPthreadCreate();
 }
 
-void TestInterfaceWriter()
-{
-    TestCppHeader();
-    TestSwigCallbackInterfaces();
-    TestSwigCallbackHeader();
-    TestSwigNoCallbackInterfaces();
-    TestSwigNoCallbackHeader();
-}
-
 int main()
 {
     TestIR();
     TestPosixEmitter();
     TestAsyncEmitter();
-    TestInterfaceWriter();
 
     if (testing::DidTestFail())
     {
