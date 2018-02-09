@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "Unused.h"
+
 // stl
 #include <tuple>
 #include <functional>
@@ -56,6 +58,7 @@ namespace utilities
     template <typename FunctionType>
     inline void ApplyToEach(FunctionType&& function)
     {
+        UNUSED(function);
     }
 
     /// <summary> Applies a single-argument function to each of a number of arguments. </summary>

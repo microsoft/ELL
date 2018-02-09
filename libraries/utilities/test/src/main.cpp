@@ -23,6 +23,7 @@
 
 // utilities
 #include "Exception.h"
+#include "Unused.h"
 
 // stl
 #include <iostream>
@@ -37,6 +38,7 @@ using namespace ell;
 ///
 int main(int argc, char* argv[])
 {
+    UNUSED(argc);
     try
     {
         std::string basePath = ell::utilities::GetDirectoryPath(argv[0]);
@@ -61,8 +63,6 @@ int main(int argc, char* argv[])
         TestVariantToString();
         TestVariantParseSimple();
         TestParseVectorVaraint();
-        TestParsePortElementsProxyVariant();
-        TestParseObjVariant();
         TestVariantArchive();
 
         // Verison number tests

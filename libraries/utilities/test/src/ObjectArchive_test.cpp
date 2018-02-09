@@ -124,9 +124,9 @@ void PrintDescription(const utilities::ObjectArchive& description, std::string n
 
     for (const auto& iter : description.GetProperties())
     {
-        auto name = iter.first;
-        auto prop = *iter.second;
-        PrintDescription(prop, name, indentCount + 1);
+        auto propertyName = iter.first;
+        auto propertyValue = *iter.second;
+        PrintDescription(propertyValue, propertyName, indentCount + 1);
     }
 }
 

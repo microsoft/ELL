@@ -8,6 +8,7 @@
 
 #include "CompilableNodesTest.h"
 #include "CompilerTest.h"
+#include "ModelHeaderOutputTest.h"
 #include "ModelTestUtilities.h"
 #include "PerformanceCountersTest.h"
 
@@ -198,6 +199,9 @@ void TestIRCompiler()
     TestRegionDetectionNode();
 
     TestMatrixVectorProductNodeCompile();
+
+    // Header file generation
+    TestModelHeaderOutput();
 }
 
 int main(int argc, char* argv[])

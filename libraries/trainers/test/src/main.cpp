@@ -6,16 +6,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// common
-#include "MakeTrainer.h"
-
 // data
 #include "Dataset.h"
 
-// trainers
+// functions
+#include "L2Regularizer.h"
 #include "LogLoss.h"
+#include "SquaredLoss.h"
+
+
+// trainers
 #include "MeanCalculator.h"
 #include "SDCATrainer.h"
+#include "SGDTrainer.h"
 #include "SquaredLoss.h"
 
 // utilities
@@ -34,7 +37,7 @@ void TestSDCATrainer()
     dataset.AddExample({ { 8.0, 0.0, 9.0 }, { 1.0, 1.0 } });
     dataset.AddExample({ { 0.0, 10.0 }, { 1.0, -1.0 } });
 
-    auto trainer = common::MakeSDCATrainer({ common::LossFunctionArguments::LossFunction::log }, { 1.0e-4, 1.0e-8, 20, false, "XYZ" });
+    auto trainer = trainers::MakeSDCATrainer(functions::LogLoss(), functions::L2Regularizer(), { 1.0e-4, 1.0e-8, 20, false, "XYZ" });
     trainer->SetDataset(dataset.GetAnyDataset());
 
     double error = 0;
@@ -85,7 +88,7 @@ void TestSGDTrainer()
     dataset.AddExample({ { 5.4, 1.3 }, { 1.0, 4 } });
     dataset.AddExample({ { 5.1, 1.4 }, { 1.0, 3 } });
 
-    auto trainer = common::MakeSGDTrainer({ common::LossFunctionArguments::LossFunction::squared }, { 4, "XYZ" });
+    auto trainer = trainers::MakeSGDTrainer(functions::SquaredLoss(), { 4, "XYZ" });
     trainer->SetDataset(dataset.GetAnyDataset());
 
     double error = 0;

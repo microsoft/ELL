@@ -14,6 +14,7 @@
 
 // utilities
 #include "Exception.h"
+#include "Unused.h"
 
 // stl
 #include <iostream>
@@ -22,12 +23,13 @@ using namespace ell;
 
 /// Runs all tests
 ///
-int main()
+int main(int argc, char** argv)
 {
+    UNUSED(argc);
+    UNUSED(argv);
     try
     {
         NodesTests();
-
         NeuralNetworkLayerNodesTests();
     }
     catch (const utilities::Exception& exception)

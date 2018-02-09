@@ -158,7 +158,7 @@ source_group("include" FILES ${test_include})
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
 
-target_link_libraries(${test_name} utilities testing data model nodes)
+target_link_libraries(${test_name} utilities testing)
 target_link_libraries(${test_name} Threads::Threads)
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
