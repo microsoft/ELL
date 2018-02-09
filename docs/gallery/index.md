@@ -18,8 +18,8 @@ var spec = {
   "data": {"values": {{site.data.all_models | jsonify}} },
   "mark": {"type":"point", "filled":true},
   "encoding": {
-    "x": {"field": "secs_per_frame", "type": "quantitative", "axis": {"title": "Seconds per frame"} },
-    "y": {"field": "top1", "type": "quantitative", "axis": {"title": "Top 1 accuracy"}, "scale": {"zero": false} },
+    "x": {"field": "secs_per_frame.pi3", "type": "quantitative", "axis": {"title": "Seconds per frame"} },
+    "y": {"field": "accuracy.top1", "type": "quantitative", "axis": {"title": "Top 1 accuracy"}, "scale": {"zero": false} },
     "color": {"field": "image_size", "type": "nominal", "legend": {"title": "Image Size"} },
     "shape": {"field": "image_size", "type": "nominal"},
     "tooltip": {"field": "directory", "type": "ordinal"},
@@ -67,8 +67,8 @@ var spec = {
   },
   "mark": {"type":"point", "filled":true},
   "encoding": {
-    "x": {"field": "secs_per_frame", "type": "quantitative", "axis": {"title": "Seconds per frame"} },
-    "y": {"field": "top1", "type": "quantitative", "axis": {"title": "Top 1 accuracy"}, "scale": {"zero": false} },
+    "x": {"field": "secs_per_frame.pi3", "type": "quantitative", "axis": {"title": "Seconds per frame"} },
+    "y": {"field": "accuracy.top1", "type": "quantitative", "axis": {"title": "Top 1 accuracy"}, "scale": {"zero": false} },
     "color": {
       "condition": {
         "selection": "filter",
