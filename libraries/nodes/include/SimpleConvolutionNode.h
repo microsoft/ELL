@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     DiagonalConvolutionNode.h (nodes)
+//  File:     SimpleConvolutionNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,11 +25,11 @@ namespace ell
 namespace nodes
 {
     /// <summary>
-    /// If diagonal convolution is specified, a ConvolutionalLayerNode will refine
-    /// itself into a DiagonalConvolutionNode.
+    /// If simple convolution is specified, a ConvolutionalLayerNode will refine
+    /// itself into a SimpleConvolutionNode.
     /// </summary>
     template <typename ValueType>
-    class DiagonalConvolutionNode : public model::CompilableNode
+    class SimpleConvolutionNode : public model::CompilableNode
     {
     public:
         using TensorType = typename predictors::neural::Layer<ValueType>::TensorType;
@@ -42,8 +42,7 @@ namespace nodes
         /// @}
 
         /// <summary> Default constructor. </summary>
-        DiagonalConvolutionNode();
-
+        SimpleConvolutionNode();
 
         /// <summary> Constructor. </summary>
         ///
@@ -52,7 +51,7 @@ namespace nodes
         /// <param name="filterWeights"> The weights for the convolutional filters. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         /// <param name="convolutionalParameters"> The convolutional parameters. </param>
-        DiagonalConvolutionNode(const model::PortElements<ValueType>& input,
+        SimpleConvolutionNode(const model::PortElements<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 const ConstTensorReferenceType& filterWeights,
@@ -74,7 +73,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("DiagonalConvolutionNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SimpleConvolutionNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -121,14 +120,14 @@ namespace nodes
     };
 
     //
-    // DiagonalConvolutionComputeNode
+    // SimpleConvolutionComputeNode
     //
 
     /// <summary>
     /// A node that does the actual convolution operation
     /// </summary>
     template <typename ValueType>
-    class DiagonalConvolutionComputeNode : public model::CompilableNode
+    class SimpleConvolutionComputeNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -140,7 +139,7 @@ namespace nodes
         /// @}
 
         /// <summary> Default constructor. </summary>
-        DiagonalConvolutionComputeNode();
+        SimpleConvolutionComputeNode();
 
         /// <summary> Constructor. </summary>
         ///
@@ -149,7 +148,7 @@ namespace nodes
         /// <param name="filterWeights"> The weights for the convolutional filters. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         /// <param name="convolutionalParameters"> The convolutional parameters. </param>
-        DiagonalConvolutionComputeNode(const model::PortElements<ValueType>& input,
+        SimpleConvolutionComputeNode(const model::PortElements<ValueType>& input,
                                 const model::PortElements<ValueType>& filterWeights,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
@@ -171,7 +170,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("DiagonalConvolutionComputeNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SimpleConvolutionComputeNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

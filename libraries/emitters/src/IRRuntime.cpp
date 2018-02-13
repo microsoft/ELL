@@ -221,7 +221,7 @@ namespace emitters
         llvm::Argument& leftValue = *arguments++;
         llvm::Argument& rightValue = *arguments++;
         llvm::Argument& result = *arguments++;
-        function.DotProductFloat(&count, &leftValue, &rightValue, &result);
+        function.DotProduct(&count, &leftValue, &rightValue, &result);
         function.Return();
         _module.EndFunction();
 

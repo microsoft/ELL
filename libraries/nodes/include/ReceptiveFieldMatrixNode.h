@@ -28,7 +28,7 @@ namespace ell
 namespace nodes
 {
     /// <summary>
-    /// A node that reshapes an image into a format suitable for computing convolutions via matrix multiplcation.
+    /// A node that reshapes an image into a format suitable for computing convolutions via matrix multiplication.
     /// Also known as Im2Col.
     /// </summary>
     template <typename ValueType>
@@ -56,12 +56,12 @@ namespace nodes
         /// <param name="outputHeight"> The output image height. </param>
         ReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input,
                                  const model::PortMemoryLayout& inputMemoryLayout,
-                                 size_t filterWidth,
-                                 size_t stride,
-                                 size_t convolutionPadding,
+                                 int filterWidth,
+                                 int stride,
+                                 int convolutionPadding,
                                  std::array<int, 3> dataOrder, // 0, 1, 2 == rows, columns, channels -- row-major
-                                 size_t outputWidth,
-                                 size_t outputHeight);
+                                 int outputWidth,
+                                 int outputHeight);
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
@@ -97,12 +97,12 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         model::PortMemoryLayout _inputMemoryLayout;
-        size_t _filterWidth;
-        size_t _stride;
-        size_t _convolutionPadding;
+        int _filterWidth;
+        int _stride;
+        int _convolutionPadding;
         std::array<int, 3> _dataOrder;
-        size_t _outputWidth;
-        size_t _outputHeight;
+        int _outputWidth;
+        int _outputHeight;
     };
 }
 }

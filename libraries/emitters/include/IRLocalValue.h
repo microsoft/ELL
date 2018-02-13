@@ -26,6 +26,9 @@ namespace emitters
     struct IRLocalValue
     {
         IRLocalValue(const IRLocalValue&) = default;
+        IRLocalValue(IRLocalValue&&) = default;
+        IRLocalValue& operator=(const IRLocalValue& other);
+        IRLocalValue& operator=(llvm::Value* value);
 
         /// <summary> Constructor from an llvm::Value* </summary>
         ///
@@ -74,6 +77,7 @@ namespace emitters
     struct IRLocalScalar : public IRLocalValue
     {
         using IRLocalValue::IRLocalValue;
+        using IRLocalValue::operator=;
     };
 
     /// <summary>

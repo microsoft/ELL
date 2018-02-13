@@ -361,11 +361,6 @@ namespace emitters
         return AddGlobal(name, _emitter.Type(type), _emitter.Literal(value), true);
     }
 
-    llvm::GlobalVariable* IRModuleEmitter::ConstantArray(const std::string& name, const std::vector<double>& value)
-    {
-        return AddGlobal(name, _emitter.ArrayType(VariableType::Double, value.size()), _emitter.Literal(value), true);
-    }
-
     llvm::GlobalVariable* IRModuleEmitter::Global(VariableType type, const std::string& name)
     {
         return AddGlobal(name, _emitter.Type(type), _emitter.Zero(type), false);

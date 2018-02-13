@@ -78,7 +78,7 @@ namespace nodes
         llvm::Value* pResult = compiler.EnsurePortEmitted(output);
         if (compiler.GetCompilerParameters().inlineOperators)
         {
-            function.DotProductFloat(count, pLVector, pRVector, pResult);
+            function.DotProduct(count, pLVector, pRVector, pResult);
         }
         else
         {

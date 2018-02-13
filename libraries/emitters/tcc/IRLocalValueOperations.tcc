@@ -10,18 +10,29 @@ namespace ell
 {
 namespace emitters
 {
+    namespace impl
+    {
+        template <typename ValueType, utilities::IsFundamental<ValueType> = true>
+        void VerifyArgTypesCompatible(const IRLocalValue& a, ValueType b)
+        {
+            if ((a.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{}) ||
+                (a.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{}))
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "IRLocalValue arguments have incompatible types");
+            }
+        }
+
+        template <typename ValueType, utilities::IsFundamental<ValueType> = true>
+        void VerifyArgTypesCompatible(ValueType a, const IRLocalValue& b)
+        {
+            VerifyArgTypesCompatible(b, a);
+        }
+    }
+
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator+(ValueType a, IRLocalScalar b)
     {
-        if (b.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<double>(a)) + b;
-        }
-        else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<int64_t>(a)) + b;
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return b.function.LocalScalar(a) + b;
     }
 
@@ -34,45 +45,21 @@ namespace emitters
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator-(ValueType a, IRLocalScalar b)
     {
-        if (b.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<double>(a)) - b;
-        }
-        else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<int64_t>(a)) - b;
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return b.function.LocalScalar(a) - b;
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator-(IRLocalScalar a, ValueType b)
     {
-        if (a.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return a - a.function.LocalScalar(static_cast<double>(b));
-        }
-        else if (a.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return a - a.function.LocalScalar(static_cast<int64_t>(b));
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return a - a.function.LocalScalar(b);
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator*(ValueType a, IRLocalScalar b)
     {
-        if (b.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<double>(a)) * b;
-        }
-        else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<int64_t>(a)) * b;
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return b.function.LocalScalar(a) * b;
     }
 
@@ -85,45 +72,41 @@ namespace emitters
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator/(ValueType a, IRLocalScalar b)
     {
-        if (b.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<double>(a)) / b;
-        }
-        else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<int64_t>(a)) / b;
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return b.function.LocalScalar(a) / b;
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator/(IRLocalScalar a, ValueType b)
     {
-        if (a.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return a / a.function.LocalScalar(static_cast<double>(b));
-        }
-        else if (a.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return a / a.function.LocalScalar(static_cast<int64_t>(b));
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return a / a.function.LocalScalar(b);
     }
 
+    template <typename ValueType, utilities::IsIntegral<ValueType> /* = true*/>
+    IRLocalScalar operator%(ValueType a, IRLocalScalar b)
+    {
+        if (b.value->getType()->isIntegerTy())
+        {
+            return b.function.LocalScalar(a) % b;
+        }
+        throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments must be integral");
+    }
+
+    template <typename ValueType, utilities::IsIntegral<ValueType> /* = true*/>
+    IRLocalScalar operator%(IRLocalScalar a, ValueType b)
+    {
+        if (a.value->getType()->isIntegerTy())
+        {
+            return a % a.function.LocalScalar(b);
+        }
+        throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments must be integral");
+    }
+    
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator==(ValueType a, IRLocalScalar b)
     {
-        if (b.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<double>(a)) == b;
-        }
-        else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<int64_t>(a)) == b;
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return b.function.LocalScalar(a) == b;
     }
 
@@ -136,15 +119,7 @@ namespace emitters
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator!=(ValueType a, IRLocalScalar b)
     {
-        if (b.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<double>(a)) != b;
-        }
-        else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<int64_t>(a)) != b;
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return b.function.LocalScalar(a) != b;
     }
 
@@ -157,85 +132,57 @@ namespace emitters
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator<(ValueType a, IRLocalScalar b)
     {
-        if (b.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<double>(a)) < b;
-        }
-        else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<int64_t>(a)) < b;
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return b.function.LocalScalar(a) < b;
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator<(IRLocalScalar a, ValueType b)
     {
-        return b >= a;
+        impl::VerifyArgTypesCompatible(a, b);
+        return a < a.function.LocalScalar(b);
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator<=(ValueType a, IRLocalScalar b)
     {
-        if (b.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<double>(a)) <= b;
-        }
-        else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<int64_t>(a)) <= b;
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return b.function.LocalScalar(a) <= b;
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator<=(IRLocalScalar a, ValueType b)
     {
-        return b > a;
+        impl::VerifyArgTypesCompatible(a, b);
+        return a <= a.function.LocalScalar(b);
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator>(ValueType a, IRLocalScalar b)
     {
-        if (b.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<double>(a)) > b;
-        }
-        else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<int64_t>(a)) > b;
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return b.function.LocalScalar(a) > b;
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator>(IRLocalScalar a, ValueType b)
     {
-        return b <= a;
+        impl::VerifyArgTypesCompatible(a, b);
+        return a > a.function.LocalScalar(b);
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator>=(ValueType a, IRLocalScalar b)
     {
-        if (b.value->getType()->isFloatingPointTy() && !std::is_floating_point<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<double>(a)) >= b;
-        }
-        else if (b.value->getType()->isIntegerTy() && !std::is_integral<ValueType>{})
-        {
-            return b.function.LocalScalar(static_cast<int64_t>(a)) >= b;
-        }
-
+        impl::VerifyArgTypesCompatible(a, b);
         return b.function.LocalScalar(a) >= b;
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
     IRLocalScalar operator>=(IRLocalScalar a, ValueType b)
     {
-        return b < a;
+        impl::VerifyArgTypesCompatible(a, b);
+        return a >= a.function.LocalScalar(b);
     }
 
     template <typename ValueType>

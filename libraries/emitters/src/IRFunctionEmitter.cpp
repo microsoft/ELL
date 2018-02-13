@@ -87,6 +87,11 @@ namespace emitters
         return IRLocalScalar(*this, value);
     }
 
+    IRLocalScalar IRFunctionEmitter::LocalScalar()
+    {
+        return IRLocalScalar(*this, static_cast<llvm::Value*>(nullptr));
+    }
+    
     IRLocalArray IRFunctionEmitter::LocalArray(llvm::Value* value)
     {
         return IRLocalArray(*this, value);
@@ -982,11 +987,13 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::Printf(std::initializer_list<llvm::Value*> arguments)
     {
+        EnsurePrintf();
         return Call(PrintfFnName, arguments);
     }
 
     llvm::Value* IRFunctionEmitter::Printf(const std::string& format, std::initializer_list<llvm::Value*> arguments)
     {
+        EnsurePrintf();
         IRValueList callArgs;
         callArgs.push_back(_pEmitter->Literal(format));
         callArgs.insert(callArgs.end(), arguments);
@@ -995,6 +1002,7 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::Printf(const std::string& format, std::vector<llvm::Value*> arguments)
     {
+        EnsurePrintf();
         IRValueList callArgs;
         callArgs.push_back(_pEmitter->Literal(format));
         callArgs.insert(callArgs.end(), arguments.begin(), arguments.end());
@@ -1014,6 +1022,11 @@ namespace emitters
         forLoop.End();
     }
 
+    void IRFunctionEmitter::EnsurePrintf()
+    {
+        _pModuleEmitter->DeclarePrintf();
+    }
+
     void IRFunctionEmitter::InsertMetadata(const std::string& tag, const std::string& content)
     {
         InsertMetadata(tag, std::vector<std::string>({ content }));
@@ -1031,50 +1044,66 @@ namespace emitters
         _pFunction->setMetadata(tag, metadataNode);
     }
 
-    llvm::Value* IRFunctionEmitter::DotProductFloat(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue)
-    {
-        llvm::Value* pTotal = Variable(VariableType::Double);
-        DotProductFloat(size, pLeftValue, pRightValue, pTotal);
-        return pTotal;
-    }
-
-    void IRFunctionEmitter::DotProductFloat(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
-    {
-        StoreZero(pDestination);
-        VectorOperator(TypedOperator::multiplyFloat, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
-            OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
-        });
-    }
-
-    void IRFunctionEmitter::DotProductFloat(llvm::Value* pSize, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
-    {
-        StoreZero(pDestination);
-        VectorOperator(TypedOperator::multiplyFloat, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
-            OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
-        });
-    }
-
-    llvm::Value* IRFunctionEmitter::DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue)
-    {
-        llvm::Value* pTotal = Variable(VariableType::Double);
-        DotProductFloat(size, pLeftValue, pRightValue, pTotal);
-        return pTotal;
-    }
-
     void IRFunctionEmitter::DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
     {
+        if(!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy() || !pDestination->getType()->isPointerTy())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers");
+        }
+
+        auto elementType = pLeftValue->getType()->getPointerElementType();
+
         StoreZero(pDestination);
-        VectorOperator(TypedOperator::multiply, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
-            OperationAndUpdate(pDestination, TypedOperator::add, pValue);
-        });
+        if(elementType->isFloatingPointTy())
+        {
+            VectorOperator(TypedOperator::multiplyFloat, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
+                OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
+            });
+        }
+        else
+        {
+            VectorOperator(TypedOperator::multiply, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
+                OperationAndUpdate(pDestination, TypedOperator::add, pValue);
+            });
+        }
     }
 
     void IRFunctionEmitter::DotProduct(llvm::Value* pSize, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
     {
+        if(!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy() || !pDestination->getType()->isPointerTy())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers");
+        }
+
+        auto elementType = pLeftValue->getType()->getPointerElementType();
+
         StoreZero(pDestination);
-        VectorOperator(TypedOperator::multiply, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
-            OperationAndUpdate(pDestination, TypedOperator::add, pValue);
-        });
+        if(elementType->isFloatingPointTy())
+        {
+            VectorOperator(TypedOperator::multiplyFloat, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
+                OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
+            });
+        }
+        else
+        {
+            VectorOperator(TypedOperator::multiply, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
+                OperationAndUpdate(pDestination, TypedOperator::add, pValue);
+            });
+        }
+    }
+
+    llvm::Value* IRFunctionEmitter::DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue)
+    {
+        if(!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers");
+        }
+
+        auto elementType = pLeftValue->getType()->getPointerElementType();
+
+        llvm::Value* pTotal = Variable(elementType, "result");
+        DotProduct(size, pLeftValue, pRightValue, pTotal);
+        return Load(pTotal);
     }
 
     //

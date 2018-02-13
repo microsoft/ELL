@@ -22,9 +22,11 @@ namespace neural
     enum class ConvolutionMethod : int
     {
         /// <summary> Normal method of doing convolution via reshaping input into columns and performing a gemm operation. </summary>
-        columnwise = 0,
+        unrolled = 0,
         /// <summary> A different method of doing convolution which avoids reshaping the input, and uses gemm on smaller matrices with diagonal sums to create output. </summary>
-        diagonal = 1
+        diagonal = 1,
+        /// <summary> A simple, straightforward nested-loop implementation. </summary>
+        simple,
     };
 
     /// <summary> Specifies the hyper parameters of the convolutional layer. </summary>
@@ -89,7 +91,7 @@ namespace neural
         /// <summary> Get the weights for the convolution filters. </summary>
         ///
         /// <returns> The weights, packed into a Matrix. </returns>
-        const MatrixType& GetWeightsMatrix() const { return _weightsMatrix; }
+        const MatrixType& GetWeightsMatrix() const { return _weightsMatrix; } // Doesn't work
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

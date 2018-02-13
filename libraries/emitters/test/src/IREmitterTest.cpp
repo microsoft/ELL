@@ -149,8 +149,8 @@ void TestLLVM()
     testLoop.Begin(data.size());
     testLoop.End();
 
-    auto vectorResult = fnMain.DotProductFloat(data.size(), fnMain.Pointer(pData), fnMain.Pointer(pData));
-    fnMain.Printf({ fnMain.Literal("DOT %f\n"), fnMain.Load(vectorResult) });
+    auto vectorResult = fnMain.DotProduct(data.size(), fnMain.Pointer(pData), fnMain.Pointer(pData));
+    fnMain.Printf({ fnMain.Literal("DOT %f\n"), vectorResult });
 
     IRForLoopEmitter forLoop(fnMain);
     auto pBodyBlock = forLoop.Begin(data.size());

@@ -31,26 +31,6 @@ namespace nodes
 {
     namespace
     {
-        // Useful aliases for operators
-        const auto plus = emitters::TypedOperator::add;
-        const auto minus = emitters::TypedOperator::subtract;
-        const auto times = emitters::TypedOperator::multiply;
-        const auto divide = emitters::TypedOperator::divideSigned;
-        const auto modulo = emitters::TypedOperator::moduloSigned;
-
-        const auto minusFloat = emitters::TypedOperator::subtractFloat;
-        const auto timesFloat = emitters::TypedOperator::multiplyFloat;
-
-        const auto logicalOr = emitters::TypedOperator::logicalOr;
-        const auto logicalAnd = emitters::TypedOperator::logicalAnd;
-        const auto logicalXor = emitters::TypedOperator::logicalXor;
-        const auto shiftLeft = emitters::TypedOperator::shiftLeft;
-
-        // comparisons
-        const auto lessThan = emitters::TypedComparison::lessThan;
-        const auto greaterThanOrEqual = emitters::TypedComparison::greaterThanOrEquals;
-        const auto greaterThanFloat = emitters::TypedComparison::greaterThanFloat;
-
         // convolution parameters
         const auto scaleOutputByFilterMeans = ell::predictors::neural::BinaryWeightsScale::mean;
 
@@ -80,91 +60,33 @@ namespace nodes
         }
 
         llvm::Value* GetValueFromVolume(emitters::IRFunctionEmitter& function,
-                                        llvm::Value* inputVolume,
+                                        emitters::IRLocalArray inputVolume,
                                         const model::PortMemoryLayout& inputLayout,
                                         const predictors::neural::BinaryConvolutionalParameters& convParams,
-                                        llvm::Value* valueRow, llvm::Value* valueColumn, llvm::Value* valueChannel)
+                                        emitters::IRLocalScalar valueRow, emitters::IRLocalScalar valueColumn, emitters::IRLocalScalar valueChannel)
         {
-            const auto columnStride = inputLayout.GetStride(1);
-            const auto channelStride = inputLayout.GetStride(2);
+            const int columnStride = inputLayout.GetStride(1);
+            const int channelStride = inputLayout.GetStride(2);
 
             // row, column, channel order
-            auto index1 = function.Operator(times, valueRow, function.Literal<int>(columnStride * channelStride));
-            auto index2 = function.Operator(times, valueColumn, function.Literal<int>(channelStride));
-            auto index = function.Operator(plus, index1, function.Operator(plus, index2, valueChannel));
-
-            return function.ValueAt(inputVolume, index);
+            auto index = valueRow * (columnStride * channelStride) + valueColumn * channelStride + valueChannel;
+            return static_cast<emitters::IRLocalScalar>(inputVolume[index]);
         }
 
         // TODO: adapt this to work with more generally strided data
         template <typename ValueType>
         llvm::Function* EmitGetValueFromPaddedVolumeFunction(emitters::IRModuleEmitter& moduleEmitter)
         {
-            assert(false && "Not implemented");
-            const auto functionName = "GetValuefromPaddedVolume";
-            llvm::Function* getValueFunction = moduleEmitter.GetFunction(functionName);
-            if (getValueFunction != nullptr)
-            {
-                return getValueFunction;
-            }
-
-            auto& emitter = moduleEmitter.GetIREmitter();
-            auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
-            auto valuePtrType = valueType->getPointerTo();
-            auto int32Type = emitter.Type(emitters::VariableType::Int32);
-
-            emitters::IRFunctionEmitter function = moduleEmitter.BeginFunction(functionName, valueType, { valuePtrType, int32Type, int32Type, int32Type, int32Type, int32Type, int32Type });
-            llvm::Value* returnValue = function.Variable(emitters::GetVariableType<ValueType>(), "returnValue");
-
-            auto arguments = function.Arguments().begin();
-            auto inputVolume = &(*arguments++);
-            auto row = &(*arguments++);
-            auto col = &(*arguments++);
-            auto depth = &(*arguments++);
-            auto width = &(*arguments++);
-            auto height = &(*arguments++);
-            auto padding = &(*arguments++);
-
-            auto valueRow = function.Operator(minus, row, padding);
-            auto valueCol = function.Operator(minus, col, padding);
-
-            auto tooSmallRow = function.Comparison(lessThan, valueRow, function.Literal(0));
-            auto tooSmallCol = function.Comparison(lessThan, valueCol, function.Literal(0));
-            auto tooBigRow = function.Comparison(greaterThanOrEqual, valueRow, height);
-            auto tooBigCol = function.Comparison(greaterThanOrEqual, valueCol, width);
-
-            auto rowBad = function.Operator(logicalOr, tooSmallRow, tooBigRow);
-            auto colBad = function.Operator(logicalOr, tooSmallCol, tooBigCol);
-            auto outOfBounds = function.Operator(logicalOr, rowBad, colBad);
-
-            auto oobIfEmitter = function.If();
-            oobIfEmitter.If(outOfBounds);
-            {
-                function.StoreZero(returnValue);
-            }
-            oobIfEmitter.Else();
-            {
-                auto index1 = function.Operator(times, depth, function.Operator(times, width, height));
-                auto index2 = function.Operator(times, valueRow, width);
-                auto index = function.Operator(plus, index1, function.Operator(plus, index2, valueCol));
-                auto val = function.ValueAt(inputVolume, index);
-
-                function.Store(returnValue, val);
-            }
-            oobIfEmitter.End();
-
-            function.Return(function.Load(returnValue));
-            moduleEmitter.EndFunction();
-            return function.GetFunction();
+            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
 
         template <typename ValueType>
         llvm::Value* GetValueFromPaddedVolume(emitters::IRFunctionEmitter& function,
-                                              llvm::Value* inputVolume,
+                                              emitters::IRLocalArray inputVolume,
                                               const model::PortMemoryLayout& inputLayout,
                                               const predictors::neural::BinaryConvolutionalParameters& convParams,
                                               size_t convPadding,
-                                              llvm::Value* inputRow, llvm::Value* inputCol, llvm::Value* inputChannel)
+                                              emitters::IRLocalScalar inputRow, emitters::IRLocalScalar inputCol, emitters::IRLocalScalar inputChannel)
         {
             const auto inputHeight = inputLayout.GetActiveSize(0);
             const auto inputWidth = inputLayout.GetActiveSize(1);
@@ -175,13 +97,13 @@ namespace nodes
             if (extraPadding > 0) // known at compile-time
             {
                 auto getValueFunction = EmitGetValueFromPaddedVolumeFunction<ValueType>(function.GetModule());
-                return function.Call(getValueFunction, { inputVolume, inputRow, inputCol, inputChannel, function.Literal<int>(inputWidth), function.Literal<int>(inputHeight), function.Literal<int>(inputDepth), function.Literal<int>(extraPadding) });
+                return function.Call(getValueFunction, { inputVolume.value, inputRow, inputCol, inputChannel, function.Literal<int>(inputWidth), function.Literal<int>(inputHeight), function.Literal<int>(inputDepth), function.Literal<int>(extraPadding) });
             }
 
             if (extraPadding != 0)
             {
-                inputRow = function.Operator(plus, inputRow, function.Literal<int>(extraPadding));
-                inputCol = function.Operator(plus, inputCol, function.Literal<int>(extraPadding));
+                inputRow = inputRow + extraPadding;
+                inputCol = inputCol + extraPadding;
             }
             return GetValueFromVolume(function, inputVolume, inputLayout, convParams, inputRow, inputCol, inputChannel);
         }
@@ -195,52 +117,46 @@ namespace nodes
                      const predictors::neural::BinaryConvolutionalParameters& convParams,
                      llvm::Value* realValueRow) // realValueRow == output
         {
-            const auto numChannels = inputLayout.GetActiveSize(2);
-            const auto outputImageWidth = outputLayout.GetActiveSize(1);
-            const auto filterSize = convParams.receptiveField;
-            const auto stride = convParams.stride;
-            const auto convPadding = inputLayout.GetOffset(0); // TODO: decouple input data padding from convolution padding
+            const int numChannels = inputLayout.GetActiveSize(2);
+            const int outputImageWidth = outputLayout.GetActiveSize(1);
+            const int filterSize = static_cast<int>(convParams.receptiveField);
+            const int stride = static_cast<int>(convParams.stride);
+            const int convPadding = inputLayout.GetOffset(0); // TODO: decouple input data padding from convolution padding
 
             // compute offset based on outputRowIndex
-            auto outputImageRow = function.Operator(divide, outputRowIndex, function.Literal<int>(outputImageWidth));
-            auto outputImageCol = function.Operator(modulo, outputRowIndex, function.Literal<int>(outputImageWidth));
-            auto inputRowStart = function.Operator(times, outputImageRow, function.Literal<int>(stride));
-            auto inputColStart = function.Operator(times, outputImageCol, function.Literal<int>(stride));
+            auto outputImageRow = function.LocalScalar(outputRowIndex) / outputImageWidth;
+            auto outputImageCol = function.LocalScalar(outputRowIndex) % outputImageWidth;
+            auto inputRowStart = outputImageRow * stride;
+            auto inputColStart = outputImageCol * stride;
+
+            auto input = function.LocalArray(inputVolume);
+            auto output = function.LocalArray(realValueRow);
 
             // For row, column, channel order:
-            auto rowLoop = function.ForLoop();
-            rowLoop.Begin(filterSize);
-            {
-                auto rowIndex = rowLoop.LoadIterationVariable();
+            function.For(filterSize, [input, inputLayout, numChannels, outputImageWidth, filterSize, stride, convParams, convPadding, outputImageRow, outputImageCol, inputRowStart, inputColStart, output](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+                auto rowIndex = function.LocalScalar(i);
 
-                auto colLoop = function.ForLoop();
-                colLoop.Begin(filterSize);
-                {
-                    auto colIndex = colLoop.LoadIterationVariable();
+                function.For(filterSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* j) {
+                    auto columnIndex = function.LocalScalar(j);
 
-                    auto channelLoop = function.ForLoop();
-                    channelLoop.Begin(numChannels);
-                    {
-                        auto channelIndex = channelLoop.LoadIterationVariable();
-                        auto inputRow = function.Operator(plus, inputRowStart, rowIndex);
-                        auto inputColumn = function.Operator(plus, inputColStart, colIndex);
+                    function.For(numChannels, [=](emitters::IRFunctionEmitter& function, llvm::Value* k) {
+                        auto channelIndex = function.LocalScalar(k);
+                        auto inputRow = inputRowStart + rowIndex;
+                        auto inputColumn = inputColStart + columnIndex;
                         auto inputChannel = channelIndex;
 
-                        auto value = GetValueFromPaddedVolume<ValueType>(function, inputVolume, inputLayout, convParams, convPadding, inputRow, inputColumn, inputChannel);
+                        auto value = GetValueFromPaddedVolume<ValueType>(function, input, inputLayout, convParams, convPadding, inputRow, inputColumn, inputChannel);
 
                         // The input is a filterSize x filterSize x numChannels image in in row x column x channel order
                         //   so offset = (filterSize*numChannels)*row + numChannels*column + channel
-                        auto rowOffset = function.Operator(times, rowIndex, function.Literal<int>(filterSize * numChannels));
-                        auto colOffset = function.Operator(times, colIndex, function.Literal<int>(numChannels));
-                        auto channelBeginOffset = function.Operator(plus, rowOffset, colOffset);
-                        auto outputOffset = function.Operator(plus, channelBeginOffset, channelIndex);
-                        function.SetValueAt(realValueRow, outputOffset, value);
-                    }
-                    channelLoop.End();
-                }
-                colLoop.End();
-            }
-            rowLoop.End();
+                        auto rowOffset = rowIndex * (filterSize * numChannels);
+                        auto colOffset = columnIndex * numChannels;
+                        auto channelBeginOffset = rowOffset + colOffset;
+                        auto outputOffset = channelBeginOffset + channelIndex;
+                        output[outputOffset] = value;
+                    });
+                });
+            });
         }
 
         template <typename ValueType, typename PackedBitsType>
@@ -250,24 +166,24 @@ namespace nodes
             int storedElementNumBits = 8 * storedElementSize;
             int numBlocks = (numValues - 1) / storedElementNumBits + 1;
             int numCompleteBlocks = numValues / storedElementNumBits;
-            auto blockLoop = function.ForLoop();
-            blockLoop.Begin(numCompleteBlocks);
-            {
-                auto blockIndex = blockLoop.LoadIterationVariable();
+
+            auto input = function.LocalArray(realRow);
+            auto output = function.LocalArray(packedOutput);
+            function.For(numCompleteBlocks, [storedElementNumBits, input, output](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+                auto blockIndex = function.LocalScalar(i);
 
                 // TODO: block-vectorize this:
-                llvm::Value* blockValue = function.Literal<PackedBitsType>(0);
+                auto blockValue = function.LocalScalar<PackedBitsType>(0);
                 for (int bitIndex = 0; bitIndex < storedElementNumBits; ++bitIndex)
                 {
-                    auto realValue = function.ValueAt(realRow, function.Operator(plus, function.Operator(times, blockIndex, function.Literal(storedElementNumBits)), function.Literal(bitIndex)));
-                    auto cmp = function.Comparison(greaterThanFloat, realValue, function.Literal<ValueType>(0));
-                    auto bitValue = function.Select(cmp, function.Literal<PackedBitsType>(1), function.Literal<PackedBitsType>(0));
+                    auto realValue = input[(blockIndex * storedElementNumBits) + bitIndex];
+                    auto cmp = realValue > static_cast<ValueType>(0);
+                    auto bitValue = function.LocalScalar(function.Select(cmp, function.Literal<PackedBitsType>(1), function.Literal<PackedBitsType>(0)));
                     // blockValue = blockValue | ((realValue>0?1:0) << bitIndex);
-                    blockValue = function.Operator(logicalOr, blockValue, function.Operator(shiftLeft, bitValue, function.Literal<PackedBitsType>(bitIndex)));
+                    blockValue = blockValue | (bitValue << function.LocalScalar<PackedBitsType>(bitIndex));
                 }
-                function.SetValueAt(packedOutput, blockIndex, blockValue);
-            }
-            blockLoop.End();
+                output[blockIndex] = blockValue;
+            });
 
             // now do the last, partial, block
             if (numBlocks > numCompleteBlocks)
@@ -275,14 +191,14 @@ namespace nodes
                 assert(numBlocks == numCompleteBlocks + 1);
                 int leftoverBits = numValues % storedElementNumBits;
 
-                llvm::Value* blockValue = function.Literal<PackedBitsType>(0);
+                auto blockValue = function.LocalScalar<PackedBitsType>(0);
                 for (int bitIndex = 0; bitIndex < leftoverBits; ++bitIndex)
                 {
-                    auto realValue = function.ValueAt(realRow, function.Literal(numCompleteBlocks * storedElementNumBits + bitIndex));
-                    auto cmp = function.Comparison(greaterThanFloat, realValue, function.Literal<ValueType>(0));
-                    auto bitValue = function.Select(cmp, function.Literal<PackedBitsType>(1), function.Literal<PackedBitsType>(0));
+                    auto realValue = input[numCompleteBlocks * storedElementNumBits + bitIndex];
+                    auto cmp = realValue > static_cast<ValueType>(0);
+                    auto bitValue = function.LocalScalar(function.Select(cmp, function.Literal<PackedBitsType>(1), function.Literal<PackedBitsType>(0)));
                     // blockValue = blockValue | ((realValue>0?1:0) << bitIndex);
-                    blockValue = function.Operator(logicalOr, blockValue, function.Operator(shiftLeft, bitValue, function.Literal<PackedBitsType>(bitIndex)));
+                    blockValue = blockValue | (bitValue << function.LocalScalar<PackedBitsType>(bitIndex));
                 }
 
                 // blockValue = function.Operator(shiftLeft, blockValue, function.Literal<PackedBitsType>(storedElementNumBits - leftoverBits));
@@ -468,14 +384,14 @@ namespace nodes
     template <typename ValueType, typename PackedBitsType>
     emitters::IRFunctionEmitter BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::GetTaskFunction(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        // Get port variables
-        llvm::Value* pInputTemp = compiler.EnsurePortEmitted(input);
-        llvm::Value* pOutputTemp = compiler.EnsurePortEmitted(output);
-
         // Get LLVM types
         auto& module = function.GetModule();
         auto& context = module.GetLLVMContext();
         auto voidType = llvm::Type::getVoidTy(context);
+
+        // Get port variables
+        llvm::Value* inputTemp = compiler.EnsurePortEmitted(input);
+        llvm::Value* outputTemp = compiler.EnsurePortEmitted(output);
 
         // Constants
         auto elementSize = sizeof(PackedBitsType);
@@ -487,7 +403,7 @@ namespace nodes
         int packedRowSize = (fieldVolumeSize - 1) / numBits + 1;
         assert(packedRowSize != 0);
 
-        auto argTypes = emitters::GetLLVMTypes({ pInputTemp, pOutputTemp, function.Literal<int32_t>(0), function.Literal<int32_t>(0) });
+        auto argTypes = emitters::GetLLVMTypes({ inputTemp, outputTemp, function.Literal<int32_t>(0), function.Literal<int32_t>(0) });
         emitters::IRFunctionEmitter taskFunction = function.GetModule().BeginFunction(utilities::to_string(GetId()) + "_task", voidType, argTypes);
         {
             auto arguments = taskFunction.Arguments().begin();
@@ -498,10 +414,8 @@ namespace nodes
 
             // TODO: interleave load/compress more tightly to eliminate need for a scratch variable to hold a whole row
             llvm::AllocaInst* realValueRow = taskFunction.Variable(emitters::GetVariableType<ValueType>(), fieldVolumeSize);
-            auto outputRowLoop = taskFunction.ForLoop();
-            outputRowLoop.Begin(begin, end, taskFunction.Literal<int>(1));
-            {
-                auto outputRowIndex = outputRowLoop.LoadIterationVariable();
+            taskFunction.For(begin, end, [this, pInput, pOutput, packedRowSize, fieldVolumeSize, realValueRow](emitters::IRFunctionEmitter& taskFunction, llvm::Value* i) {
+                auto outputRowIndex = taskFunction.LocalScalar(i);
                 LoadRow<ValueType>(taskFunction,
                                    pInput,
                                    this->GetInputMemoryLayout(),
@@ -510,10 +424,9 @@ namespace nodes
                                    _convolutionalParameters,
                                    realValueRow);
 
-                auto outputRow = taskFunction.PointerOffset(pOutput, taskFunction.Operator(times, outputRowIndex, taskFunction.Literal<int>(packedRowSize)));
+                auto outputRow = taskFunction.PointerOffset(pOutput, outputRowIndex * packedRowSize);
                 CompressRow<ValueType, PackedBitsType>(taskFunction, realValueRow, outputRow, fieldVolumeSize);
-            }
-            outputRowLoop.End();
+            });
             taskFunction.Return();
         }
         function.GetModule().EndFunction();
@@ -564,10 +477,8 @@ namespace nodes
         {
             // TODO: interleave load/compress more tightly to eliminate need for a scratch variable to hold the whole row
             llvm::AllocaInst* realValueRow = function.Variable(emitters::GetVariableType<ValueType>(), fieldVolumeSize);
-            auto outputRowLoop = function.ForLoop();
-            outputRowLoop.Begin(numOutputRows);
-            {
-                auto outputRowIndex = outputRowLoop.LoadIterationVariable();
+            function.For(numOutputRows, [this, pInput, pOutput, realValueRow, packedRowSize, fieldVolumeSize](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+                auto outputRowIndex = function.LocalScalar(i);
                 LoadRow<ValueType>(function,
                                    pInput,
                                    this->GetInputMemoryLayout(),
@@ -576,10 +487,9 @@ namespace nodes
                                    _convolutionalParameters,
                                    realValueRow);
 
-                auto outputRow = function.PointerOffset(pOutput, function.Operator(times, outputRowIndex, function.Literal<int>(packedRowSize)));
+                auto outputRow = function.PointerOffset(pOutput, outputRowIndex * static_cast<int>(packedRowSize));
                 CompressRow<ValueType, PackedBitsType>(function, realValueRow, outputRow, fieldVolumeSize);
-            }
-            outputRowLoop.End();
+            });
         }
     }
 
@@ -638,34 +548,36 @@ namespace nodes
 
     template <typename ValueType, typename PackedBitsType>
     void BinaryXnorNode<ValueType, PackedBitsType>::EmitInnerLoop(emitters::IRFunctionEmitter& function,
-                                                                  llvm::Value* reshapedInput,
-                                                                  llvm::Value* paddingMask,
-                                                                  llvm::Value* weights,
+                                                                  llvm::Value* reshapedInputPtr,
+                                                                  llvm::Value* paddingMaskPtr,
+                                                                  llvm::Value* weightsPtr,
                                                                   llvm::Value* xorSumVariable,
                                                                   llvm::Function* popCountFunction,
                                                                   int startBlock,
                                                                   int numBlocks,
                                                                   bool hasZeroPadding)
     {
-        auto blockLoop = function.ForLoop();
-        blockLoop.Begin(startBlock, startBlock + numBlocks, 1);
-        {
-            auto blockIndex = blockLoop.LoadIterationVariable();
-            auto inputVal = function.ValueAt(reshapedInput, blockIndex);
-            auto filterVal = function.ValueAt(weights, blockIndex);
-            auto xorVal = function.Operator(logicalXor, filterVal, inputVal);
+        auto reshapedInput = function.LocalArray(reshapedInputPtr);
+        auto paddingMask = function.LocalArray(paddingMaskPtr);
+        auto weights = function.LocalArray(weightsPtr);
+        function.For(startBlock, startBlock + numBlocks, [reshapedInput, paddingMask, weights, xorSumVariable, popCountFunction, hasZeroPadding](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            auto blockIndex = function.LocalScalar(i);
+
+            auto inputVal = reshapedInput[blockIndex];
+            auto filterVal = weights[blockIndex];
+            auto xorVal = inputVal ^ filterVal;
 
             if (hasZeroPadding)
             {
                 // Mask out the bits associated with zero padding from the XOR value
-                auto paddingMaskVal = function.ValueAt(paddingMask, blockIndex);
-                xorVal = function.Operator(logicalAnd, paddingMaskVal, xorVal);
+                auto paddingMaskVal = paddingMask[blockIndex];
+                xorVal = paddingMaskVal & xorVal;
             }
 
             auto xorCount = function.Call(popCountFunction, { xorVal });
+            const auto plus = emitters::TypedOperator::add;
             function.OperationAndUpdate(xorSumVariable, plus, xorCount);
-        }
-        blockLoop.End();
+        });
     }
 
     template <typename ValueType, typename PackedBitsType>
@@ -743,11 +655,8 @@ namespace nodes
         }
         else // single-threaded
         {
-            auto filterLoop = function.ForLoop();
-            filterLoop.Begin(numFilters);
-            {
-                auto filterIndex = filterLoop.LoadIterationVariable();
-
+            function.For(numFilters, [=, &compiler](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+                auto filterIndex = function.LocalScalar(i);
                 ComputeFilterOutput(compiler,
                                     function,
                                     pInput,
@@ -764,8 +673,7 @@ namespace nodes
                                     useVectorInstructions,
                                     vectorSize,
                                     numVectorBlocks);
-            }
-            filterLoop.End();
+            });
         }
     }
 
@@ -880,7 +788,7 @@ namespace nodes
                                                                         llvm::Value* pInputPaddingMask,
                                                                         llvm::Value* pInputPaddingMaskSums,
                                                                         llvm::Value* pOutput,
-                                                                        llvm::Value* filterIndex,
+                                                                        llvm::Value* filterIndexPtr,
                                                                         bool hasZeroPadding,
                                                                         int outputColumns,
                                                                         int packedRowSize,
@@ -893,17 +801,19 @@ namespace nodes
         const auto& inputLayout = this->GetInputMemoryLayout();
         const auto& inputSize = inputLayout.GetActiveSize();
 
-        const auto storedElementSize = sizeof(PackedBitsType);
-        const auto storedElementNumBits = 8 * storedElementSize;
-        const auto numBits = storedElementNumBits; // function.GetModule().GetCompilerParameters().numBits; // for Xnor, use 32 bits in 32-bit environment
-        const auto elementSize = numBits / 8;
+        const int storedElementSize = sizeof(PackedBitsType);
+        const int storedElementNumBits = 8 * storedElementSize;
+        const int numBits = storedElementNumBits; // function.GetModule().GetCompilerParameters().numBits; // for Xnor, use 32 bits in 32-bit environment
+        const int elementSize = numBits / 8;
         DEBUG_USED(elementSize);
         assert(elementSize <= storedElementSize);
-        const auto filterWidth = _convolutionalParameters.receptiveField;
-        const auto numInputChannels = inputSize[2]; // inputSize is the dimensions of the input to the original layer node
-        const auto fieldVolumeSize = filterWidth * filterWidth * numInputChannels; // = size*size*numInputChannels
+        const int filterWidth = static_cast<int>(_convolutionalParameters.receptiveField);
+        const int numInputChannels = inputSize[2]; // inputSize is the dimensions of the input to the original layer node
+        const int fieldVolumeSize = filterWidth * filterWidth * numInputChannels; // = size*size*numInputChannels
 
         const auto partialBlockSize = fieldVolumeSize % numBits;
+
+        auto filterIndex = function.LocalScalar(filterIndexPtr);
 
         // Get LLVM types
         auto& emitter = function.GetEmitter();
@@ -916,7 +826,7 @@ namespace nodes
         llvm::Function* vecPopcountFunction = function.GetModule().GetIntrinsic(llvm::Intrinsic::ctpop, { vectorType });
 
         // The start of the binarized weights matrix for this filter
-        auto weightsBegin = function.Operator(times, filterIndex, function.Literal<int>(packedRowStride));
+        auto weightsBegin = filterIndex * packedRowStride;
         auto weightsBeginPtr = function.PointerOffset(pFilterWeights, weightsBegin);
         auto weightsVector = function.CastPointer(weightsBeginPtr, vectorPointerType);
 
@@ -934,19 +844,17 @@ namespace nodes
 
         // Compute and accumulate xnor counts
 
-        auto columnLoop = function.ForLoop();
-        columnLoop.Begin(outputColumns);
-        {
-            auto outputColumnIndex = columnLoop.LoadIterationVariable(); // outputColumnIndex == input row index
+        function.For(outputColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            auto outputColumnIndex = function.LocalScalar(i);
 
             // The start of the binarized receptive field matrix for this output image pixel
-            auto inputBegin = function.Operator(times, outputColumnIndex, function.Literal<int>(packedRowSize));
-            auto paddingBegin = function.Operator(times, outputColumnIndex, function.Literal<int>(packedRowStride));
+            auto inputBegin = outputColumnIndex * packedRowSize;
+            auto paddingBegin = outputColumnIndex * packedRowStride;
 
             auto inputBeginPtr = function.PointerOffset(pInput, inputBegin);
             auto paddingMaskBeginPtr = function.PointerOffset(pInputPaddingMask, paddingBegin);
 
-            llvm::Value* vectorXorSum = nullptr;
+            auto vectorXorSum = function.LocalScalar();
             if (numVectorBlocks > 0)
             {
                 assert(vectorSumVar != nullptr);
@@ -961,7 +869,7 @@ namespace nodes
 
                 // Accumulate horizontal sum into output
                 vectorXorSum = emitters::HorizontalVectorSum<PackedBitsType>(function, function.Load(vectorSumVar));
-                assert(vectorXorSum->getType() == packedBitsType);
+                assert(vectorXorSum.value->getType() == packedBitsType);
             }
 
             // Now compute the non-vectorized values
@@ -975,38 +883,38 @@ namespace nodes
             }
 
             llvm::Value* xorSum = (sumVar == nullptr) ? nullptr : function.Load(sumVar);
-            if (vectorXorSum != nullptr)
+            if (vectorXorSum.value != nullptr)
             {
-                xorSum = (xorSum == nullptr) ? vectorXorSum : function.Operator(plus, xorSum, vectorXorSum);
+                xorSum = (xorSum == nullptr) ? vectorXorSum : xorSum + vectorXorSum;
             }
             assert(xorSum != nullptr);
 
             // Output scaling
             auto sumInt = function.CastValue<PackedBitsType, int>(xorSum);
-            auto scaledSum = function.Operator(plus, function.Operator(times, function.Literal<int>(-2), sumInt), function.Literal<int>(numBits * packedRowSize));
+            auto scaledSum = (function.LocalScalar<int>(-2) * sumInt) + (numBits * packedRowSize);
 
             auto scaledSumWithPadding = scaledSum;
             if (hasZeroPadding)
             {
                 // Add back the zero padding, if any (since the scaled sum is made negative, use the minus operation)
                 llvm::Value* paddingSum = function.ValueAt(pInputPaddingMaskSums, outputColumnIndex);
-                scaledSumWithPadding = function.Operator(minus, scaledSum, paddingSum);
+                scaledSumWithPadding = scaledSum - paddingSum;
             }
             auto sumFloat = function.CastValue<int, ValueType>(scaledSumWithPadding);
 
-            llvm::Value* adjustedSum = sumFloat;
+            auto adjustedSum = function.LocalScalar(sumFloat);
             if (partialBlockSize != 0)
             {
                 const auto filterAdjust = numBits - partialBlockSize;
-                adjustedSum = function.Operator(minusFloat, sumFloat, function.Literal<ValueType>(filterAdjust));
+                adjustedSum = sumFloat - function.LocalScalar<ValueType>(filterAdjust);
             }
 
-            auto outIndex = function.Operator(plus, function.Operator(times, filterIndex, function.Literal((int)outputColumns)), outputColumnIndex);
+            auto outIndex = (filterIndex * outputColumns) + outputColumnIndex;
             if (_convolutionalParameters.weightsScale == scaleOutputByFilterMeans)
             {
                 // Scale output by the filters mean
                 assert(filterMean != nullptr);
-                auto scaledOutput = function.Operator(timesFloat, adjustedSum, filterMean);
+                auto scaledOutput = adjustedSum * filterMean;
                 function.SetValueAt(pOutput, outIndex, scaledOutput);
             }
             else
@@ -1014,8 +922,7 @@ namespace nodes
                 // No output scaling
                 function.SetValueAt(pOutput, outIndex, adjustedSum);
             }
-        }
-        columnLoop.End();
+        });
     }
 
     template <typename ValueType, typename PackedBitsType>

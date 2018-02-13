@@ -379,7 +379,7 @@ void TestDotProduct(model::MapCompilerParameters& settings)
     ModelMaker mb;
     auto c1 = mb.Constant<double>(data);
     auto input1 = mb.Inputs<double>(4);
-    auto dotProduct = mb.DotProduct<double>(c1->output, input1->output);
+    auto dotProduct = mb.DotProduct(c1->output, input1->output);
     auto outputNode = mb.Outputs<double>(dotProduct->output);
 
     model::IRMapCompiler compiler(settings);
@@ -569,7 +569,7 @@ void TestDotProductOutput()
     ModelMaker mb;
     auto c1 = mb.Constant<double>(data);
     auto input1 = mb.Inputs<double>(4);
-    auto dotProduct = mb.DotProduct<double>(c1->output, input1->output);
+    auto dotProduct = mb.DotProduct(c1->output, input1->output);
     auto outputNode = mb.Outputs<double>(dotProduct->output);
 
     model::IRMapCompiler compiler(settings);

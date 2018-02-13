@@ -413,7 +413,7 @@ static void TestConvolutionalLayerNode()
     //
     // Verify ConvolutionalLayer with regular method
     //
-    convolutionalParams.method = ConvolutionMethod::columnwise;
+    convolutionalParams.method = ConvolutionMethod::unrolled;
     ConvolutionalLayer<ElementType> layer2(parameters, convolutionalParams, weights);
     layer2.Compute();
     auto output2 = layer2.GetOutput();

@@ -39,10 +39,12 @@ namespace ell
     {
         switch(method) {
             /// <summary> Normal method of doing convolution via reshaping input into columns and performing a gemm operation. </summary>
-        case ell::predictors::neural::ConvolutionMethod::columnwise:
-            return "columnwise";
+        case ell::predictors::neural::ConvolutionMethod::unrolled:
+            return "unrolled";
         case ell::predictors::neural::ConvolutionMethod::diagonal:
             return "diagonal";
+        case ell::predictors::neural::ConvolutionMethod::simple:
+            return "simple";
         };
         return "";
     }

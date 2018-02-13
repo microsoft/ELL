@@ -13,9 +13,42 @@ namespace ell
 {
 namespace emitters
 {
+    //
+    // Utility code
+    //
+    namespace
+    {
+        void VerifyFromSameFunction(const IRLocalValue& a, const IRLocalValue& b)
+        {
+            if (a.function.GetFunction() != b.function.GetFunction())
+            {
+                throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments are local to different functions");
+            }
+        }
+    }
+
+    //
+    // IRLocalValue
+    //
     IRLocalValue::IRLocalValue(emitters::IRFunctionEmitter& function, llvm::Value* value)
         : function(function), value(value) {}
 
+    IRLocalValue& IRLocalValue::operator=(const IRLocalValue& other)
+    {
+        VerifyFromSameFunction(*this, other);
+        this->value = other.value;
+        return *this;
+    }
+
+    IRLocalValue& IRLocalValue::operator=(llvm::Value* value)
+    {
+        this->value = value;
+        return *this;
+    }
+
+    //
+    // IRLocalArrayValue
+    //
     IRLocalArray::IRLocalArrayValue IRLocalArray::operator[](int offset) const
     {
         return IRLocalArrayValue(function, value, function.Literal(offset));

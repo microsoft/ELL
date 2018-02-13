@@ -205,14 +205,6 @@ namespace emitters
         template <typename ValueType>
         llvm::GlobalVariable* Constant(const std::string& name, ValueType value);
 
-        /// <summary> Emit a named, module scoped constant vector. </summary>
-        ///
-        /// <param name="name"> The name of the vector. </param>
-        /// <param name="value"> The value of the bector. </param>
-        ///
-        /// <returns> Pointer to the llvm::GlobalVariable that represents the constant. </returns>
-        llvm::GlobalVariable* ConstantArray(const std::string& name, const std::vector<double>& value);
-
         /// <summary> Emit a named, module scoped array constant of a template type. </summary>
         ///
         /// <typeparam name="ValueType"> Type of each array entry. </typeparam>

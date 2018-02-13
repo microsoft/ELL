@@ -19,176 +19,102 @@
 #include <string>
 #include <vector>
 
-#include <iostream>
-
 namespace ell
 {
 namespace nodes
 {
     namespace
     {
-        // Useful aliases for operators
-        const auto plus = emitters::TypedOperator::add;
-        const auto minus = emitters::TypedOperator::subtract;
-        const auto times = emitters::TypedOperator::multiply;
-        const auto divide = emitters::TypedOperator::divideSigned;
-        const auto modulo = emitters::TypedOperator::moduloSigned;
-
-        const auto plusFloat = emitters::TypedOperator::addFloat;
-        const auto minusFloat = emitters::TypedOperator::subtractFloat;
-        const auto timesFloat = emitters::TypedOperator::multiplyFloat;
-        const auto divideFloat = emitters::TypedOperator::divideFloat;
-
-        const auto logicalOr = emitters::TypedOperator::logicalOr;
-        const auto logicalAnd = emitters::TypedOperator::logicalAnd;
-        const auto shiftLeft = emitters::TypedOperator::shiftLeft;
-
-        // comparisons
-        const auto lessThan = emitters::TypedComparison::lessThan;
-        const auto greaterThanOrEqual = emitters::TypedComparison::greaterThanOrEquals;
-        const auto greaterThanFloat = emitters::TypedComparison::greaterThanFloat;
-
         //
         // Functions
         //
-        llvm::Value* GetValueFromVolume(emitters::IRFunctionEmitter& function,
+
+        // Note: this function is inline to supress a compiler warning about it being unneeded
+        inline llvm::Value* GetValueFromVolume(emitters::IRFunctionEmitter& function,
                                         llvm::Value* inputVolume,
                                         const model::PortMemoryLayout& inputLayout,
                                         std::array<int, 3> dataOrder,
-                                        llvm::Value* valueRow, llvm::Value* valueColumn, llvm::Value* valueChannel)
+                                        emitters::IRLocalScalar valueRow, emitters::IRLocalScalar valueColumn, emitters::IRLocalScalar valueChannel)
         {
             const auto rowStride = inputLayout.GetStride(0);
             const auto columnStride = inputLayout.GetStride(1);
             const auto channelStride = inputLayout.GetStride(2);
 
-            llvm::Value* index = nullptr;
-            // TODO: actually use the entries in dataOrder to compute the indices
-            if(dataOrder == std::array<int, 3>({0, 1, 2})) // row, column, channel order
+            auto index = function.LocalScalar();
+            if (dataOrder == std::array<int, 3>({ 0, 1, 2 })) 
             {
-                // index = (valueRow * inputWidth * inputDepth) + (valueColumn * inputDepth) + valueChannel;
-                auto index1 = function.Operator(times, valueRow, function.Literal<int>(columnStride * channelStride));
-                auto index2 = function.Operator(times, valueColumn, function.Literal<int>(channelStride));
-                index = function.Operator(plus, index1, function.Operator(plus, index2, valueChannel));
+                // row, column, channel order
+                index = valueRow * (columnStride * channelStride) + (valueColumn * channelStride) + valueChannel;
             }
             else
             {
                 // channel, row, column order
-                // index = (valueChannel * inputHeight * inputWidth) + (valueRow * inputWidth) + valueColumn;
-                auto index2 = function.Operator(times, valueChannel, function.Literal<int>(rowStride * columnStride));
-                auto index1 = function.Operator(times, valueRow, function.Literal<int>(columnStride));
-                index = function.Operator(plus, index1, function.Operator(plus, index2, valueColumn));
+                index = valueChannel * (rowStride * columnStride) + (valueRow * columnStride) + valueColumn;
             }
 
             return function.ValueAt(inputVolume, index);
-        }
-
-        // TODO: adapt this to work with more generally strided data
-        template <typename ValueType>
-        llvm::Function* EmitGetValueFromPaddedVolumeFunction(emitters::IRModuleEmitter& moduleEmitter, std::array<int, 3> dataOrder)
-        {
-            std::string functionName = std::string("GetValueFromPaddedVolume") + std::to_string(dataOrder[0]) + std::to_string(dataOrder[1]) + std::to_string(dataOrder[2]);
-            llvm::Function* getValueFunction = moduleEmitter.GetFunction(functionName);
-            if (getValueFunction != nullptr)
-            {
-                return getValueFunction;
-            }
-
-            auto& emitter = moduleEmitter.GetIREmitter();
-            auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
-            auto valuePtrType = valueType->getPointerTo();
-            auto int32Type = emitter.Type(emitters::VariableType::Int32);
-
-            // args: {volume, row, col, channel, width, height, depth, padding}
-            emitters::IRFunctionEmitter function = moduleEmitter.BeginFunction(functionName, valueType, { valuePtrType, int32Type, int32Type, int32Type, int32Type, int32Type, int32Type, int32Type });
-
-            llvm::Value* scratch = function.Variable(emitters::GetVariableType<ValueType>(), "scratch");
-
-            auto arguments = function.Arguments().begin();
-            auto inputVolume = &(*arguments++);
-            auto row = &(*arguments++);
-            auto col = &(*arguments++);
-            auto channel = &(*arguments++);
-            auto width = &(*arguments++);
-            auto height = &(*arguments++);
-            auto depth = &(*arguments++);
-            auto padding = &(*arguments++);
-
-            auto valueRow = function.Operator(minus, row, padding);
-            auto valueColumn = function.Operator(minus, col, padding);
-
-            auto tooSmallRow = function.Comparison(lessThan, valueRow, function.Literal(0));
-            auto tooSmallCol = function.Comparison(lessThan, valueColumn, function.Literal(0));
-            auto tooBigRow = function.Comparison(greaterThanOrEqual, valueRow, height);
-            auto tooBigCol = function.Comparison(greaterThanOrEqual, valueColumn, width);
-
-            auto rowBad = function.Operator(emitters::TypedOperator::logicalOr, tooSmallRow, tooBigRow);
-            auto colBad = function.Operator(emitters::TypedOperator::logicalOr, tooSmallCol, tooBigCol);
-            auto outOfBounds = function.Operator(emitters::TypedOperator::logicalOr, rowBad, colBad);
-
-            auto oobIfEmitter = function.If();
-            oobIfEmitter.If(outOfBounds);
-            {
-                // Note: we can't return from within an if/else block, so we store the value in a local variable
-                function.StoreZero(scratch);
-            }
-            oobIfEmitter.Else();
-            {
-                // channel, row, col order
-                auto index1 = function.Operator(times, valueRow, function.Operator(times, width, depth));
-                auto index2 = function.Operator(times, valueColumn, depth);
-                auto index = function.Operator(plus, index1, function.Operator(plus, index2, channel));
-                auto val = function.ValueAt(inputVolume, index);
-
-                // Note: we can't return from within an if/else block, so we store the value in a local variable
-                function.Store(scratch, val);
-            }
-            oobIfEmitter.End();
-
-            function.Return(function.Load(scratch));
-            moduleEmitter.EndFunction();
-            return function.GetFunction();
         }
 
         template <typename ValueType>
         llvm::Value* GetValueFromPaddedVolume(emitters::IRFunctionEmitter& function,
                                               llvm::Value* inputVolume,
                                               const model::PortMemoryLayout& inputLayout,
-                                              size_t convPadding,
+                                              int convPadding,
                                               std::array<int, 3> dataOrder,
-                                              llvm::Value* inputRow, llvm::Value* inputCol, llvm::Value* inputChannel)
+                                              emitters::IRLocalScalar inputRow, emitters::IRLocalScalar inputColumn, emitters::IRLocalScalar inputChannel)
         {
-            const auto inputHeight = inputLayout.GetActiveSize(0);
-            const auto inputWidth = inputLayout.GetActiveSize(1);
-            const auto inputDepth = inputLayout.GetActiveSize(2);
-            const auto inputPadding = inputLayout.GetOffset(0); // a proxy for the padding
+            const int inputHeight = inputLayout.GetActiveSize(0);
+            const int inputWidth = inputLayout.GetActiveSize(1);
+            const int inputDepth = inputLayout.GetActiveSize(2);
+            const int inputPadding = inputLayout.GetOffset(0); // a proxy for the padding
 
             const int extraPadding = convPadding - inputPadding; // amount by which the convolution's desired padding exceeds input's
+            // auto extraPadding = function.LocalScalar(extraPaddingVal);
             if (extraPadding > 0) // known at compile-time
             {
-                auto getValueFunction = EmitGetValueFromPaddedVolumeFunction<ValueType>(function.GetModule(), dataOrder);
+                auto valueRow = inputRow - extraPadding;
+                auto valueColumn = inputColumn - extraPadding;
 
-                // Offset row and col to account for padding
-                return function.Call(getValueFunction, { inputVolume, inputRow, inputCol, inputChannel, function.Literal<int>(inputWidth), function.Literal<int>(inputHeight), function.Literal<int>(inputDepth), function.Literal<int>(extraPadding) });
+                auto rowBad = (valueRow < 0) || (valueRow >= inputHeight);
+                auto colBad = (valueColumn < 0) || (valueColumn >= inputWidth);
+                auto outOfBounds = rowBad || colBad;
+
+                llvm::Value* returnValue = function.Variable(emitters::GetVariableType<ValueType>(), "returnVal");
+                function.If(outOfBounds, [=](emitters::IRFunctionEmitter& function) {
+                            function.StoreZero(returnValue);
+                        })
+                    .Else([=](emitters::IRFunctionEmitter& function) {
+                        // channel, row, col order
+                        auto index1 = valueRow * (inputWidth * inputDepth);
+                        auto index2 = valueColumn * inputDepth;
+                        auto index = index1 + index2 + inputChannel;
+                        auto val = function.ValueAt(inputVolume, index);
+
+                        // Note: we can't return from within an if/else block, so we store the value in a local variable
+                        function.Store(returnValue, val);
+                    });
+
+                return function.Load(returnValue);
             }
 
             if (extraPadding != 0) // negative
             {
-                inputRow = function.Operator(plus, inputRow, function.Literal<int>(extraPadding));
-                inputCol = function.Operator(plus, inputCol, function.Literal<int>(extraPadding));
+                inputRow = inputRow + extraPadding;
+                inputColumn = inputColumn + extraPadding;
             }
-            return GetValueFromVolume(function, inputVolume, inputLayout, dataOrder, inputRow, inputCol, inputChannel);
+            return GetValueFromVolume(function, inputVolume, inputLayout, dataOrder, inputRow, inputColumn, inputChannel);
         }
 
         template <typename ValueType>
         void EmitReceptiveFieldToColumns(emitters::IRFunctionEmitter& function,
                                          llvm::Value* inputVolume,
                                          const model::PortMemoryLayout& inputLayout,
-                                         size_t filterWidth,
-                                         size_t stride,
-                                         size_t convPadding, // amount of padding to assume around the image -- determines output size
+                                         int filterWidth,
+                                         int stride,
+                                         int convPadding, // amount of padding to assume around the image -- determines output size
                                          std::array<int, 3> dataOrder,
-                                         size_t outputWidth,
-                                         size_t outputHeight,
+                                         int outputWidth,
+                                         int outputHeight,
                                          llvm::Value* outputMatrix)
         {
             // Model parameters
@@ -196,7 +122,6 @@ namespace nodes
             const auto inputWidth = inputLayout.GetActiveSize(1);
             const auto inputDepth = inputLayout.GetActiveSize(2);
             const auto fieldVolumeSize = filterWidth * filterWidth * inputDepth;
-            const auto numOutputColumns = outputWidth * outputHeight;
 
             // Input (I): d x h x w (planar)
             // Output (S): (d * k * k) x (outputHeight * outputWidth) ==  fieldVolumeSize x outputImageSize
@@ -230,13 +155,13 @@ namespace nodes
             //      F G H I  J K L M  N O P .  . . . .
             //      f g h i  j k l m  n o p .  . . . .
             //
-            // Note that the middle 2 rows of S are the entire image, linearized:
+            // Note that the middle d=2 rows of S are the entire image, linearized:
             // A B C D E F G H I J K L M N O P a b c d e f g h i j k l m n o p
 
             // const int extraPadding = (int)convPadding - (int)inputPadding; // extraPadding is the amount of extra padding we need to do, on top of what's in the input data
-            const size_t extraPadding = convPadding;
-            const bool useNewReshape = dataOrder == std::array<int, 3>({2, 0, 1}); // channel, row, column order
-            if (useNewReshape && stride == 1)
+            const int extraPadding = convPadding;
+            const bool useContiguousReshape = (dataOrder == std::array<int, 3>({ 2, 0, 1 })) && (stride == 1); // channel, row, column order, unit stride
+            if (useContiguousReshape)
             {
                 // assert(inputPadding == 0 && "Input data must not be padded");
                 // Points to the beginning of the input volume
@@ -245,12 +170,15 @@ namespace nodes
                 // Points to the beginning of the outputMatrix
                 llvm::Value* outputPtr = function.PointerOffset(outputMatrix, 0);
 
-                for (size_t fy = 0; fy < filterWidth; ++fy)
+                // Unroll outer loops
+                for (int fy = 0; fy < filterWidth; ++fy)
                 {
-                    for (size_t fx = 0; fx < filterWidth; ++fx)
+                    for (int fx = 0; fx < filterWidth; ++fx)
                     {
-                        int outputRow = (fy * filterWidth + fx) * inputDepth; // The row of the output matrix to start writing to. Multiplied by inputDepth, because
+	                const auto numOutputColumns = outputWidth * outputHeight;
+                        // `outputRow` is the row of the output matrix to start writing to. Multiplied by `inputDepth`, because
                         // we're going to memcpy `inputDepth` rows at once
+                        int outputRow = (fy * filterWidth + fx) * inputDepth;
 
                         int outputOffset1 = inputWidth * (extraPadding - fy); // where to start writing this row in the output
                         int outputOffset2 = (extraPadding - fx); // where to start writing this row in the output
@@ -269,35 +197,33 @@ namespace nodes
                         int count = (inputWidth * inputHeight * inputDepth) - inputOffset - outputOffset;
                         outputOffset += outputRow * numOutputColumns;
 
-                        // For this output row, copy what we need from the input image...
+                        // For this output row, copy what we need from the input image
                         function.MemoryCopy<ValueType>(inputPtr, inputOffset, outputPtr, outputOffset, count);
                         const int outputRowOffset = outputRow * numOutputColumns;
 
                         // Zero out the padding areas
-                        auto depthLoop = function.ForLoop();
-                        depthLoop.Begin(inputDepth);
-                        {
-                            llvm::Value* channel = depthLoop.LoadIterationVariable();
-                            llvm::Value* outputDepthOffset = function.Operator(times, channel, function.Literal<int>(numOutputColumns));
+			// BUG: explicit capture-by-ref entries are here to work around a GCC bug
+                        function.For(inputDepth, [=, &fx, &fy, &extraPadding, &inputWidth, &inputHeight, &outputWidth, &outputHeight, &numOutputColumns](emitters::IRFunctionEmitter& function, llvm::Value* channelValue) {
+
+                            auto channel = function.LocalScalar(channelValue);
+                            auto outputDepthOffset = channel * numOutputColumns;
 
                             // Points to the beginning of the current channel in the outputMatrix
-                            llvm::Value* outputChannelPtr = function.PointerOffset(outputMatrix, outputDepthOffset);
+                            auto outputChannelPtr = function.PointerOffset(outputMatrix, outputDepthOffset);
 
                             uint8_t paddingValue = 0;
                             if (fy < extraPadding)
                             {
-                                // zero out full image rows at beginning
+                                // zero out full image rows at beginning of image
                                 int count = (extraPadding - fy) * outputWidth;
                                 int begin = 0;
-                                // assert((outputRowOffset + begin + count < filterWidth * filterWidth * inputDepth * numOutputColumns) && "1");
                                 function.MemorySet<ValueType>(outputChannelPtr, outputRowOffset + begin, function.Literal<uint8_t>(paddingValue), count);
                             }
                             else if (fy > extraPadding)
                             {
-                                // zero out full image rows at end
+                                // zero out full image rows at end of image
                                 int count = (fy - extraPadding) * outputWidth;
                                 int begin = numOutputColumns - count;
-                                // assert(outputRowOffset + begin + count < filterWidth * filterWidth * inputDepth * numOutputColumns && "2");
                                 assert(begin >= 0);
                                 function.MemorySet<ValueType>(outputChannelPtr, outputRowOffset + begin, function.Literal<uint8_t>(paddingValue), count);
                             }
@@ -305,109 +231,80 @@ namespace nodes
                             if (fx < extraPadding)
                             {
                                 // zero out elements at beginning of each row
-                                count = extraPadding - fx;
-                                auto loop = function.ForLoop();
-                                loop.Begin(inputHeight);
-                                {
-                                    // int begin = index * inputWidth;
-                                    // assert(outputRowOffset + begin + count < filterWidth * filterWidth * inputDepth * numOutputColumns && "3");
-                                    // assert(begin >= 0);
-                                    // auto offset = (outputRowOffset + begin) * inputDepth;
-                                    auto index = loop.LoadIterationVariable();
-                                    auto begin = function.Operator(times, index, function.Literal<int>(inputWidth));
-                                    auto offset = function.Operator(plus, begin, function.Literal<int>(outputRowOffset));
+                                int count = extraPadding - fx;
+			        // BUG: explicit capture-by-ref entries are here to work around a GCC bug
+                                function.For(inputHeight, [=, &inputWidth, &outputRowOffset](emitters::IRFunctionEmitter& function, llvm::Value* indexValue) {
+                                    auto index = function.LocalScalar(indexValue);
+                                    auto begin = index * inputWidth;
+                                    auto offset = begin + outputRowOffset;
                                     function.MemorySet<ValueType>(outputChannelPtr, offset, function.Literal<uint8_t>(paddingValue), count);
-                                }
-                                loop.End();
+                                });
                             }
                             else if (fx > extraPadding)
                             {
                                 // zero out elements at end of each row
-                                count = fx - extraPadding;
-                                auto loop = function.ForLoop();
-                                loop.Begin(inputHeight);
-                                {
-                                    // int begin = (index + 1) * inputWidth - count;
-                                    // assert(outputRowOffset + begin + count < filterWidth * filterWidth * inputDepth * numOutputColumns && "4");
-                                    // assert(begin >= 0);
-                                    // auto offset = (outputRowOffset + begin) * inputDepth;
-                                    auto index = loop.LoadIterationVariable();
-                                    auto begin = function.Operator(minus, function.Operator(times, function.Operator(plus, index, function.Literal<int>(1)), function.Literal<int>(inputWidth)), function.Literal<int>(count));
-                                    auto offset = function.Operator(plus, begin, function.Literal<int>(outputRowOffset));
+                                int count = fx - extraPadding;
+			        // BUG: explicit capture-by-ref entries are here to work around a GCC bug
+                                function.For(inputHeight, [=, &inputWidth, &outputRowOffset](emitters::IRFunctionEmitter& function, llvm::Value* indexValue) {
+                                    auto index = function.LocalScalar(indexValue);
+                                    auto begin = ((index + 1) * inputWidth) - count;
+                                    auto offset = begin + outputRowOffset;
                                     function.MemorySet<ValueType>(outputChannelPtr, offset, function.Literal<uint8_t>(paddingValue), count);
-                                }
-                                loop.End();
+                                });
                             }
-                        }
-                        depthLoop.End();
+                        });
                     }
                 }
             }
             else // Normal, single value-at-a-time method
             {
-                llvm::Value* filterWidthVal = function.Literal<int>(filterWidth);
-                llvm::Value* inputDepthVal = function.Literal<int>(inputDepth);
-
                 // The outer loop iterates over all d * k * k entries in the receptive field
-                auto outerLoop = function.ForLoop();
-                outerLoop.Begin(fieldVolumeSize);
-                {
-                    auto f = outerLoop.LoadIterationVariable();
-
-                    llvm::Value* fieldChannel = nullptr;
-                    llvm::Value* fieldColumn = nullptr;
-                    llvm::Value* fieldRow = nullptr;
+                function.For(fieldVolumeSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* fValue) {
+                    auto f = function.LocalScalar(fValue);
+                    auto fieldChannel = function.LocalScalar();
+                    auto fieldColumn = function.LocalScalar();
+                    auto fieldRow = function.LocalScalar();
 
                     // TODO: use the entries of dataOrder to compute the indices
-                    if (dataOrder == std::array<int, 3>({0, 1, 2})) // row, column, channel order
+                    if (dataOrder == std::array<int, 3>({ 0, 1, 2 })) // row, column, channel order
                     {
-                        fieldChannel = function.Operator(modulo, f, inputDepthVal);
-                        auto fDivDepth = function.Operator(divide, f, inputDepthVal);
-                        fieldColumn = function.Operator(modulo, fDivDepth, filterWidthVal);
-                        fieldRow = function.Operator(divide, fDivDepth, filterWidthVal);
+                        fieldChannel = f % inputDepth;
+                        auto fDivDepth = f / inputDepth;
+                        fieldColumn = fDivDepth % filterWidth;
+                        fieldRow = fDivDepth / filterWidth;
                     }
                     else // channel, row, column order
                     {
-
-                        fieldColumn = function.Operator(modulo, f, filterWidthVal);
-                        auto fDivColumns = function.Operator(divide, f, filterWidthVal);
-                        fieldRow = function.Operator(modulo, fDivColumns, filterWidthVal);
-                        fieldChannel = function.Operator(divide, fDivColumns, inputDepthVal);
+                        fieldColumn = f % filterWidth;
+                        auto fDivColumns = f / filterWidth;
+                        fieldRow = fDivColumns % filterWidth;
+                        fieldChannel = fDivColumns / filterWidth;
                     }
 
                     // Now for each receptive field entry, iterate over all h * w locations in the output image
-                    auto rowLoop = function.ForLoop();
-                    rowLoop.Begin(outputHeight);
-                    {
-                        auto outputImageRow = rowLoop.LoadIterationVariable();
-                        auto inputRow = function.Operator(times, outputImageRow, function.Literal<int>(stride));
-
-                        auto columnLoop = function.ForLoop();
-                        columnLoop.Begin(outputWidth);
-                        {
-                            auto outputImageColumn = columnLoop.LoadIterationVariable();
-                            auto inputColumn = function.Operator(times, outputImageColumn, function.Literal<int>(stride));
+                    function.For(outputHeight, [=, &fieldRow, &fieldColumn] (emitters::IRFunctionEmitter& function, llvm::Value* outputImageRowValue) {
+                        auto outputImageRow = function.LocalScalar(outputImageRowValue);
+                        auto inputRow = outputImageRow * stride;
+                        function.For(outputWidth, [=, &fieldRow, &fieldColumn, &inputRow](emitters::IRFunctionEmitter& function, llvm::Value* outputImageColumnValue) {
+                            auto outputImageColumn = function.LocalScalar(outputImageColumnValue);
+                            auto inputColumn = outputImageColumn * stride;
 
                             // outRowOffset is the offset to the f'th row in the output S matrix
-                            auto outRowOffset = function.Operator(times, f, function.Literal<int>(outputHeight * outputWidth));
+                            auto outRowOffset = f * (outputHeight * outputWidth);
 
                             // outColRowOffset is the offset to the column of the S matrix where `outputImageRow` begins
-                            auto outColRowOffset = function.Operator(times, outputImageRow, function.Literal<int>(outputWidth));
+                            auto outColRowOffset = outputImageRow * outputWidth;
                             // outputIndex is the index of the entry in S to write to
-                            auto outputIndex = function.Operator(plus, outRowOffset, function.Operator(plus, outColRowOffset, outputImageColumn));
+                            auto outputIndex = outRowOffset + (outColRowOffset + outputImageColumn);
 
                             // input row and column in the input image
-                            auto entryRow = function.Operator(plus, inputRow, fieldRow);
-                            auto entryColumn = function.Operator(plus, inputColumn, fieldColumn);
-
+                            auto entryRow = inputRow + fieldRow;
+                            auto entryColumn = inputColumn + fieldColumn;
                             auto volumeValue = GetValueFromPaddedVolume<ValueType>(function, inputVolume, inputLayout, extraPadding, dataOrder, entryRow, entryColumn, fieldChannel);
                             function.SetValueAt(outputMatrix, outputIndex, volumeValue);
-                        }
-                        columnLoop.End();
-                    }
-                    rowLoop.End();
-                }
-                outerLoop.End();
+                        });
+                    });
+                });
             }
         }
     }
@@ -417,12 +314,12 @@ namespace nodes
     //
     template <typename ValueType>
     ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filterWidth(0), _stride(0), _convolutionPadding(0), _dataOrder({0, 1, 2}), _outputWidth(0), _outputHeight(0)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filterWidth(0), _stride(0), _convolutionPadding(0), _dataOrder({ 0, 1, 2 }), _outputWidth(0), _outputHeight(0)
     {
     }
 
     template <typename ValueType>
-    ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, size_t filterWidth, size_t stride, size_t convolutionPadding, std::array<int, 3> dataOrder, size_t outputWidth, size_t outputHeight)
+    ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, int filterWidth, int stride, int convolutionPadding, std::array<int, 3> dataOrder, int outputWidth, int outputHeight)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, filterWidth * filterWidth * inputMemoryLayout.GetActiveSize(2) * outputWidth * outputHeight), _inputMemoryLayout(inputMemoryLayout), _filterWidth(filterWidth), _stride(stride), _convolutionPadding(convolutionPadding), _dataOrder(dataOrder), _outputWidth(outputWidth), _outputHeight(outputHeight)
     {
     }
@@ -447,14 +344,14 @@ namespace nodes
         llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
 
-        auto&& inputLayout = this->GetInputMemoryLayout();
+        const auto& inputLayout = this->GetInputMemoryLayout();
         assert(inputLayout.NumDimensions() == 3);
 
         // Re-shape input
         EmitReceptiveFieldToColumns<ValueType>(function, pInput, inputLayout, _filterWidth, _stride, _convolutionPadding, _dataOrder, _outputWidth, _outputHeight, pOutput);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void ReceptiveFieldMatrixNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
@@ -463,7 +360,8 @@ namespace nodes
         archiver["inputLayout"] << _inputMemoryLayout;
 
         archiver["filterWidth"] << _filterWidth;
-        archiver["stride"] << _stride;;
+        archiver["stride"] << _stride;
+        ;
         archiver["convolutionPadding"] << _convolutionPadding;
 
         std::vector<int> dataOrder(_dataOrder.begin(), _dataOrder.end());
@@ -473,7 +371,7 @@ namespace nodes
         archiver["outputHeight"] << _outputHeight;
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void ReceptiveFieldMatrixNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
@@ -482,7 +380,8 @@ namespace nodes
         archiver["inputLayout"] >> _inputMemoryLayout;
 
         archiver["filterWidth"] >> _filterWidth;
-        archiver["stride"] >> _stride;;
+        archiver["stride"] >> _stride;
+        ;
         archiver["convolutionPadding"] >> _convolutionPadding;
 
         std::vector<int> dataOrder;

@@ -19,13 +19,13 @@
 
 // model
 #include "CompiledMap.h"
-#include "Map.h"
 #include "EmitterException.h"
 #include "EmitterTypes.h"
 #include "IRCompiledMap.h"
 #include "IREmitter.h"
 #include "IRMapCompiler.h"
 #include "InputNode.h"
+#include "Map.h"
 #include "Model.h"
 #include "OutputNode.h"
 #include "PortMemoryLayout.h"
@@ -91,8 +91,8 @@
 #include "testing.h"
 
 // utilities
-#include "RandomEngines.h"
 #include "Logger.h"
+#include "RandomEngines.h"
 
 // stl
 #include <algorithm>
@@ -481,17 +481,17 @@ void TestL2NormSquaredNodeCompiled()
 void TestMatrixVectorProductNodeCompile()
 {
     math::RowMatrix<double> m{
-        {1.2, 1.1, 0.8},
-        {0.6, 0.9, 1.3},
-        {0.3, 1.0, 0.4},
-        {-.4, 0.2, -.7}
+        { 1.2, 1.1, 0.8 },
+        { 0.6, 0.9, 1.3 },
+        { 0.3, 1.0, 0.4 },
+        { -.4, 0.2, -.7 }
     };
     m.Transform([](double d) { return -2.0 * d; });
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto testNode = model.AddNode<nodes::MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
-    auto outputNode = model.AddNode<model::OutputNode<double>>(testNode->output, model::OutputShape{1, 4, 1});
+    auto outputNode = model.AddNode<model::OutputNode<double>>(testNode->output, model::OutputShape{ 1, 4, 1 });
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = false;
@@ -585,7 +585,7 @@ void TestCompilableTypeCastNode(size_t dimension)
     // compare output
     const int numEntries = 10;
     std::vector<std::vector<int>> signal;
-    std::generate_n(std::back_inserter(signal), numEntries, [dimension]{ return GetRandomVector<int>(dimension, 0, 100); });
+    std::generate_n(std::back_inserter(signal), numEntries, [dimension] { return GetRandomVector<int>(dimension, 0, 100); });
     VerifyCompiledOutput(map, compiledMap, signal, "TypeCastNode");
 }
 
@@ -810,8 +810,7 @@ void TestCompilableAccumulatorNodeFunction()
 //
 
 // C callback (called by emitted code)
-extern "C"
-{
+extern "C" {
 size_t g_callbackCount = 0;
 const size_t g_inputSize = 5;
 bool Test_CompiledSourceNode_InputCallback(double* input)
@@ -835,8 +834,7 @@ void TestCompilableSourceNode()
         inputNode->output,
         g_inputSize,
         "CompiledSourceNode_InputCallback",
-        [] (auto& input)
-        {
+        [](auto& input) {
             input.assign(g_inputSize, 42.0);
             return true;
         });
@@ -851,7 +849,7 @@ void TestCompilableSourceNode()
     auto compiledMap = compiler.Compile(map);
 
     // compare output
-    std::vector<std::vector<double>> signal = { { 5, 10 }, { 100, 200 }, { 456, 789} };
+    std::vector<std::vector<double>> signal = { { 5, 10 }, { 100, 200 }, { 456, 789 } };
     VerifyCompiledOutput(map, compiledMap, signal, "SourceNode");
 
     // Verify that source callbacks are actually called
@@ -859,8 +857,7 @@ void TestCompilableSourceNode()
 }
 
 // C callback (called by emitted code)
-extern "C"
-{
+extern "C" {
 size_t g_sinkOutputSize = 0;
 std::vector<double> outputValues;
 void Test_CompiledSinkNode_OutputCallback_Scalar(double output)
@@ -983,7 +980,7 @@ void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas)
     FillVector(vectorVals);
 
     model::Model model;
-    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(m*n);
+    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(m * n);
     auto inputVectorNode = model.AddNode<nodes::ConstantNode<ValueType>>(vectorVals);
 
     auto matVecMultNode = model.AddNode<nodes::MatrixVectorMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, n, inputVectorNode->output);
@@ -1033,8 +1030,7 @@ void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
 
 // C callback (called by emitted code)
 static int lagNotificationCallbackCount = 0;
-extern "C"
-{
+extern "C" {
 void Test_ClockNode_LagNotificationCallback(double lag)
 {
     testing::EnableLoggingHelper();
@@ -1079,25 +1075,25 @@ void TestCompilableClockNode()
 
     // compare output
     std::vector<std::vector<nodes::TimeTickType>> signal =
-    {
-        { start },
-        { start + interval*1 + lagThreshold/2 }, // within threshold
-        { start + interval*2 }, // on time
-        { start + interval*3 + lagThreshold }, // late (expect notification)
-        { start + interval*4 + lagThreshold*20 }, // really late (expect notification)
-        { start + interval*5 } // on time
-    };
+        {
+          { start },
+          { start + interval * 1 + lagThreshold / 2 }, // within threshold
+          { start + interval * 2 }, // on time
+          { start + interval * 3 + lagThreshold }, // late (expect notification)
+          { start + interval * 4 + lagThreshold * 20 }, // really late (expect notification)
+          { start + interval * 5 } // on time
+        };
 
     std::vector<nodes::TimeTickType> getTicksResults;
     std::vector<nodes::TimeTickType> expectedGetTicksResults =
-    {
-        interval,
-        interval - lagThreshold/2,
-        interval,
-        interval - lagThreshold,
-        interval - lagThreshold*20,
-        interval
-    };
+        {
+          interval,
+          interval - lagThreshold / 2,
+          interval,
+          interval - lagThreshold,
+          interval - lagThreshold * 20,
+          interval
+        };
 
     lagNotificationCallbackCount = 0;
     for (const auto& input : signal)
@@ -1122,7 +1118,7 @@ void TestCompilableFFTNode()
     std::vector<ValueType> input2(N, 0); // impulse
     input2[0] = 1.0;
     std::vector<ValueType> input3(N, 0);
-    for(int index = 0; index < N; ++index)
+    for (int index = 0; index < N; ++index)
     {
         input3[index] = std::sin(2 * math::Constants<ValueType>::pi * index / N);
     }
@@ -1422,7 +1418,7 @@ void TestNeuralNetworkPredictorNode3()
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
     LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, padding }, { imageSize, imageSize, numFilters }, NoPadding() };
-    auto convolutionMethod = ConvolutionMethod::columnwise;
+    auto convolutionMethod = ConvolutionMethod::unrolled;
     ConvolutionalParameters convolutionalParams{ k, stride, convolutionMethod, numFilters };
     TensorType convWeights(numFilters * k, k, numChannels);
     FillTensor(convWeights);
@@ -1488,8 +1484,8 @@ void TestNeuralNetworkPredictorNode4()
     InputParameters inputParams = { { imageSize, imageSize, numChannels }, NoPadding(), { imageSize + 2 * padding, imageSize + 2 * padding, numChannels }, { PaddingScheme::zeros, padding }, 1.0 };
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
-    LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, padding }, { imageSize-2*(k/2), imageSize-2*(k/2), numFilters }, NoPadding() };
-    auto convolutionMethod = ConvolutionMethod::columnwise;
+    LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, padding }, { imageSize - 2 * (k / 2), imageSize - 2 * (k / 2), numFilters }, NoPadding() };
+    auto convolutionMethod = ConvolutionMethod::unrolled;
     ConvolutionalParameters convolutionalParams{ k, stride, convolutionMethod, numFilters }; //
     TensorType convWeights(numFilters * k, k, numChannels);
     // FillTensor(convWeights);
@@ -1549,31 +1545,31 @@ void TestNeuralNetworkPredictorNode5()
     size_t f2 = 6;
 
     // Input Layer
-    InputParameters inputParams = { { w, w, d }, NoPadding(), { w+2, w+2, d }, ZeroPadding(1), 1 };
+    InputParameters inputParams = { { w, w, d }, NoPadding(), { w + 2, w + 2, d }, ZeroPadding(1), 1 };
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
     // ConvolutionalLayer
     LayerParameters layerParameters{ inputLayer->GetOutput(), ZeroPadding(1), { w, w, f1 }, NoPadding() };
-    auto convolutionMethod = ConvolutionMethod::columnwise;
+    auto convolutionMethod = ConvolutionMethod::unrolled;
     ConvolutionalParameters convolutionalParams{ k, 1, convolutionMethod, 1 };
     TensorType convWeights1(f1 * k, k, d);
     FillTensor(convWeights1, -10.0f, 0.0625f);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights1)));
 
     // Max PoolingLayer
-    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { w/2 + 2, w/2 + 2, f1 }, ZeroPadding(1) };
+    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { w / 2 + 2, w / 2 + 2, f1 }, ZeroPadding(1) };
     PoolingParameters poolingParameters{ 2, 2 }; // window size, stride
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new PoolingLayer<ElementType, MaxPoolingFunction>(layerParameters, poolingParameters)));
 
     // ConvolutionalLayer
-    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { w/2, w/2, f2 }, NoPadding() };
+    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { w / 2, w / 2, f2 }, NoPadding() };
     ConvolutionalParameters convolutionalParams2{ k, 1, convolutionMethod, 1 };
     TensorType convWeights2(f2 * k, k, f1);
     FillTensor(convWeights2, -2.0f, 0.0625f);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams2, convWeights2)));
 
     // Mean PoolingLayer
-    layerParameters = { layers.back()->GetOutput(), NoPadding(), { (w/2)/2, (w/2)/2, f2 }, NoPadding() };
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { (w / 2) / 2, (w / 2) / 2, f2 }, NoPadding() };
     PoolingParameters poolingParameters2{ 2, 2 };
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new PoolingLayer<ElementType, MeanPoolingFunction>(layerParameters, poolingParameters2)));
 
@@ -1594,7 +1590,7 @@ void TestNeuralNetworkPredictorNode5()
     // PrintIR(compiledMap);
 
     // Create an input vector
-    std::vector<ElementType> input(w*w*d);
+    std::vector<ElementType> input(w * w * d);
     FillVector(input);
 
     map.SetInputValue(0, input);
@@ -1632,7 +1628,7 @@ void TestNeuralNetworkPredictorNode6()
 
     // ConvolutionalLayer
     LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, 1 }, { 3, 3, 8 }, NoPadding() };
-    auto convolutionMethod = ConvolutionMethod::columnwise;
+    auto convolutionMethod = ConvolutionMethod::unrolled;
     ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 1 };
     TensorType convWeights1(8 * 3, 3, 3);
     FillTensor(convWeights1, -10.0);
@@ -1709,7 +1705,7 @@ void TestNeuralNetworkPredictorNode7()
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename NeuralNetworkPredictor<ElementType>::Layers layers;
 
-    auto convolutionMethod = ConvolutionMethod::columnwise;
+    auto convolutionMethod = ConvolutionMethod::unrolled;
     const Shape inputSize = { 224, 224, 3 };
     const Shape paddedInputSize = { 226, 226, 3 };
 
@@ -2104,7 +2100,7 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
     TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, imageRows, imageColumns, numChannels);
     input.Fill(0);
     int inputSize = input.Size();
-    FillTensor(input, -2*static_cast<ElementType>(inputSize)/3);
+    FillTensor(input, -2 * static_cast<ElementType>(inputSize) / 3);
 
     Shape outputShape = { imageRows + 2 * outputPaddingSize, imageColumns + 2 * outputPaddingSize, numFilters };
 
@@ -2112,7 +2108,7 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
     BinaryConvolutionalParameters convolutionalParams{ k, stride, BinaryConvolutionMethod::bitwise, scaleByFilterMeans ? BinaryWeightsScale::mean : BinaryWeightsScale::none };
     TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
     int weightsSize = weights.Size();
-    FillTensor(weights, -static_cast<ElementType>(weightsSize)/2);
+    FillTensor(weights, -static_cast<ElementType>(weightsSize) / 2);
 
     BinaryConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
     layer.Compute();
@@ -2134,8 +2130,8 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
-    auto signal = std::vector<std::vector<ElementType>> {inputWithPadding.ToArray()};
-    VerifyCompiledOutput<ElementType>(map, compiledMap, {signal}, computeNode->GetRuntimeTypeName());
+    auto signal = std::vector<std::vector<ElementType>>{ inputWithPadding.ToArray() };
+    VerifyCompiledOutput<ElementType>(map, compiledMap, { signal }, computeNode->GetRuntimeTypeName());
 
     // Test archiving / unarchiving produces same result
     VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
@@ -2160,16 +2156,34 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
 
     LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
-    auto convolutionMethod = (convolutionType == ConvolutionType::Diagonal) ? ConvolutionMethod::diagonal : ConvolutionMethod::columnwise;
+    auto convolutionMethod = ConvolutionMethod::unrolled;
+    switch (convolutionType)
+    {
+    case ConvolutionType::simple:
+        convolutionMethod = ConvolutionMethod::simple;
+        break;
+    case ConvolutionType::unrolled:
+        convolutionMethod = ConvolutionMethod::unrolled;
+        break;
+    case ConvolutionType::diagonal:
+        convolutionMethod = ConvolutionMethod::diagonal;
+        break;
+    }
     ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 2 }; // 2 == batch size
-    TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
+
+    // Filter weights in `weightsVector` are in numFilters x numChannels x filterSize x filterSize order
     // clang-format off
-    std::vector<ElementType> weightsVector{   // RowMajor then depth order
-        1, 3, 2, 3, 1, 1, 2, 3, 1,
-        2, 4, 1, 3, 1, 2, 1, 4, 2,
-        1, 2, 1, 2, 3, 2, 1, 2, 1,
-        0, 3, 2, 3, 1, 2, 1, 0, 2 };
+    std::vector<ElementType> weightsVector {
+        1, 3, 2,   3, 1, 1,   2, 3, 1,   // Filter 1, channel 1
+        2, 4, 1,   3, 1, 2,   1, 4, 2,   // Filter 1, channel 2
+
+        1, 2, 1,   2, 3, 2,   1, 2, 1,   // Filter 2, channel 1
+        0, 3, 2,   3, 1, 2,   1, 0, 2 }; // Filter 2, channel 2
     // clang-format on
+
+    // Filter weights in `weights` tensor are in numFilters x filterSize x filterSize x numChannels order
+    TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
+
     size_t vectorIndex = 0;
     for (size_t f = 0; f < outputShape.NumChannels(); ++f)
     {
@@ -2248,7 +2262,7 @@ void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPa
     Shape outputShape = { numRows + 2 * outputPaddingSize, numCols + 2 * outputPaddingSize, numFilters };
 
     LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
-    auto convolutionMethod = (convolutionType == ConvolutionType::Diagonal) ? ConvolutionMethod::diagonal : ConvolutionMethod::columnwise;
+    auto convolutionMethod = (convolutionType == ConvolutionType::diagonal) ? ConvolutionMethod::diagonal : ConvolutionMethod::unrolled;
     ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 2 }; // 2 == batch size
     TensorType weights(convolutionalParams.receptiveField * numFilters, convolutionalParams.receptiveField, input.NumChannels());
     weights.Fill(1.0);
@@ -2471,7 +2485,7 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     // Build a net
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename NeuralNetworkPredictor<ElementType>::Layers layers;
-    Layer<ElementType>::Shape dataShape = {rows, columns, channels };
+    Layer<ElementType>::Shape dataShape = { rows, columns, channels };
     auto dataSize = rows * columns * channels;
     UNUSED(dataSize);
 
@@ -2500,7 +2514,7 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias2)));
 
     NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
-    std::vector<ElementType> input(rows*columns*channels);
+    std::vector<ElementType> input(rows * columns * channels);
     FillRandomVector(input);
 
     // Create model
@@ -2796,7 +2810,7 @@ void TestRegionDetectionNode()
         #include "TestRegionDetectionNode_input.inc"
     };
     // clang-format on
-    testing::ProcessTest("Verifying input dimensions", testing::IsEqual(input.GetShape(), math::TensorShape{13, 13, 125}));
+    testing::ProcessTest("Verifying input dimensions", testing::IsEqual(input.GetShape(), math::TensorShape{ 13, 13, 125 }));
 
     // Expected output created by running the following operation for every 1D slice in aforementioned
     // input in the channel dimension in numpy:
@@ -2814,7 +2828,7 @@ void TestRegionDetectionNode()
         #include "TestRegionDetectionNode_expectedOutput.inc"
     };
     // clang-format on
-    testing::ProcessTest("Verifying expected output dimensions", testing::IsEqual(expectedOutput.GetShape(), math::TensorShape{13, 13, 125}));
+    testing::ProcessTest("Verifying expected output dimensions", testing::IsEqual(expectedOutput.GetShape(), math::TensorShape{ 13, 13, 125 }));
 
     Shape outputShape = { 13, 13, 125 };
     LayerParameters layerParams{ input, NoPadding(), outputShape, NoPadding() };
@@ -2826,25 +2840,25 @@ void TestRegionDetectionNode()
     auto output = detectionLayer.GetOutput();
     testing::ProcessTest("Layer output == expectedOutput", testing::IsEqual(output.ToArray(), expectedOutput.ToArray(), 1e-5));
 
-     // Create model
-     model::Model model;
-     auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
-     auto computeNode = model.AddNode<nodes::RegionDetectionLayerNode<ElementType>>(inputNode->output, detectionLayer);
-     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+    auto computeNode = model.AddNode<nodes::RegionDetectionLayerNode<ElementType>>(inputNode->output, detectionLayer);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
-     // Make a copy to ensure remaining tests aren't affected
-     auto mapCopy = map;
-     mapCopy.SetInputValue(0, input.ToArray());
-     auto mapOutput = mapCopy.ComputeOutput<ElementType>(0);
-     testing::ProcessTest("Map output == expectedOutput", testing::IsEqual(mapOutput, expectedOutput.ToArray(), 1e-5));
+    // Make a copy to ensure remaining tests aren't affected
+    auto mapCopy = map;
+    mapCopy.SetInputValue(0, input.ToArray());
+    auto mapOutput = mapCopy.ComputeOutput<ElementType>(0);
+    testing::ProcessTest("Map output == expectedOutput", testing::IsEqual(mapOutput, expectedOutput.ToArray(), 1e-5));
 
-     // Compile model
-     model::MapCompilerParameters settings;
-     settings.compilerSettings.useBlas = true;
-     model::IRMapCompiler compiler(settings);
-     auto compiledMap = compiler.Compile(map);
+    // Compile model
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
 
-     // compare computed vs. compiled output
-     std::vector<std::vector<ElementType>> signal = { input.ToArray() };
-     VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName(), 1e-5);
+    // compare computed vs. compiled output
+    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName(), 1e-5);
 }
