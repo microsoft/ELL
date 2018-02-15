@@ -62,7 +62,7 @@ To install all of the above, type
 ```shell
 brew install cmake
 brew install swig
-brew install homebrew/science/openblas
+brew install openblas
 brew install doxygen
 ```
 
@@ -124,6 +124,14 @@ make _ELL_python
 The generated executables will appear in `ELL/build/bin`.
 
 ## Troubleshooting
+
+**LLVM not found, please check that LLVM is installed.**
+
+Try telling CMake where to find LLVM as follows:
+
+```shell
+cmake -DLLVM_DIR=/usr/local/Cellar/llvm@3.9/3.9.1_1/lib/cmake/llvm ..
+```
 
 **ELL/libraries/model/include/IRModelProfiler.h:15:10: fatal error: 'EmitterTypes.h' file not found #include "EmitterTypes.h"**
 
