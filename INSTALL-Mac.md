@@ -133,22 +133,6 @@ Try telling CMake where to find LLVM as follows:
 cmake -DLLVM_DIR=/usr/local/Cellar/llvm@3.9/3.9.1_1/lib/cmake/llvm ..
 ```
 
-**ELL/libraries/model/include/IRModelProfiler.h:15:10: fatal error: 'EmitterTypes.h' file not found #include "EmitterTypes.h"**
-
-This error has been reported and a possible work around is to create a symbolic link from llvm@3.9 to the llvm folder as follows:
-
-```shell
-cd /usr/local/Cellar/llvm
-ln -s ../llvm@3.9/3.9.1_1
-```
-
-Then make sure you're using that version using this command:
-
-```shell
-brew switch llvm 3.9.1_1
-```
-
-
 ## Advanced Installation
 
 The instructions above are enough to start using ELL. For more advanced topics, like testing and generating documentation, please see our [advanced installation instructions](INSTALL-Advanced.md).
