@@ -426,12 +426,21 @@ public:
     CompiledMap CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const;
     CompiledMap CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const;
 
+    // Return true if the model contains a SourceNode.  In this case you need 
+    // to register the callbacks via SetSourceCallback and SetSinkCallback.
+    bool HasSourceNodes();
+
     template <typename ElementType>
     void SetSourceCallback(ell::api::CallbackBase<ElementType>& callback, size_t index);
     template <typename ElementType>
     void SetSinkCallback(ell::api::CallbackBase<ElementType>& callback, size_t index);
     template <typename ElementType>
     void Step(ell::api::TimeTickType timestamp = 0.0);
+
+    // Older non callback based API, only makes sense when model has single input/output nodes and no source/sink nodes.
+    std::vector<double> ComputeDouble(const AutoDataVector& inputData);
+    std::vector<double> ComputeDouble(const std::vector<double>& inputData);
+    std::vector<float> ComputeFloat(const std::vector<float>& inputData);
 
 #ifndef SWIG
     std::shared_ptr<ell::model::Map> GetInnerMap() { return _map; }
@@ -445,6 +454,7 @@ private:
 #endif
 
     std::shared_ptr<ell::model::Map> _map;
+    int _hasSourceNodes = 0;
 };
 
 //

@@ -22,6 +22,7 @@
 
 // math
 #include "FilterBank.h"
+#include "DenseDataVector.h"
 
 // model
 #include "InputNode.h"
@@ -38,6 +39,7 @@
 #include "FilterBankNode.h"
 #include "HammingWindowNode.h"
 #include "IIRFilterNode.h"
+#include "InputNodeBase.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "Tensor.h"
 #include "UnaryOperationNode.h"
@@ -1002,11 +1004,44 @@ void Map::Load(const std::string& filename)
     ell::common::MapLoadArguments args;
     args.inputMapFilename = filename;
     _map = std::make_shared<ell::model::Map>(ell::common::LoadMap(args));
+    _hasSourceNodes = 0;
 }
 
 void Map::Save(const std::string& filename) const
 {
     ell::common::SaveMap(*_map, filename);
+}
+
+bool Map::HasSourceNodes()
+{
+    // the valid values for _hasSourceNodes are:
+    // 0 - means it is unitialized
+    // 1 - means the model does not have any source nodes.
+    // 2 - means the model has source nodes.
+    if (_hasSourceNodes == 0) 
+    {
+        // lazily search for SourceNode and cache the answer so next call is much faster.
+        auto sourceNodes = _map->GetModel().GetNodesByType<ell::model::SourceNodeBase>();
+        _hasSourceNodes = sourceNodes.empty() ? 1 : 2;
+    }
+    return _hasSourceNodes == 2;
+}
+
+std::vector<double> Map::ComputeDouble(const AutoDataVector& inputData)
+{
+    const ell::data::AutoDataVector& data = *(inputData._impl->_vector);
+    ell::data::DenseDataVector<double> output = _map->Compute<ell::data::DenseDataVector<double>>(data);
+    return output.ToArray();
+}
+
+std::vector<double> Map::ComputeDouble(const std::vector<double>& inputData)
+{
+    return _map->Compute<double>(inputData);
+}
+
+std::vector<float> Map::ComputeFloat(const std::vector<float>& inputData)
+{
+    return _map->Compute<float>(inputData);
 }
 
 CompiledMap Map::CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const

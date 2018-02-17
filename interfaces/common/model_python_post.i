@@ -77,7 +77,8 @@ del BinaryOperationType_logicalXor
 del BinaryOperationType_shiftLeft
 del BinaryOperationType_logicalShiftRight
 del BinaryOperationType_arithmeticShiftRight
-
+    
+import numpy as np
 
 # Compute wrappers for always available (aka. synchronous) inputs
 # CompiledMap.Compute, parameterized on numpy.dtype
@@ -133,9 +134,12 @@ def Map_Compute(self, inputData: 'Vector<ElementType>', dtype: 'numpy.dtype') ->
     dtype: numpy.dtype
 
     """
+    
+    vec = np.asarray(inputData).astype(dtype)
+
     def input_callback(input):
         nonlocal dtype, inputData
-        input.copy_from(np.asarray(inputData).astype(dtype))
+        input.copy_from(vec)
         return True
 
     results = None
@@ -148,13 +152,23 @@ def Map_Compute(self, inputData: 'Vector<ElementType>', dtype: 'numpy.dtype') ->
             results = FloatVector(output)
 
     if dtype is np.float:
-        self.SetSourceCallbackDouble(input_callback, 0)
-        self.SetSinkCallbackDouble(results_callback, 0)
-        self.StepDouble()
+        if self.HasSourceNodes():
+            self.SetSourceCallbackDouble(input_callback, 0)
+            self.SetSinkCallbackDouble(results_callback, 0)
+            self.StepDouble()
+        else:
+            # model has no Source/Sink nodes, so use the compute method
+            results = self.ComputeDouble(DoubleVector(vec))
+
     elif dtype is np.float32:
-        self.SetSourceCallbackFloat(input_callback, 0)
-        self.SetSinkCallbackFloat(results_callback, 0)
-        self.StepFloat()
+        if self.HasSourceNodes():
+            self.SetSourceCallbackFloat(input_callback, 0)
+            self.SetSinkCallbackFloat(results_callback, 0)
+            self.StepFloat()
+        else:
+            # model has no Source/Sink nodes, so use the compute method            
+            results = self.ComputeFloat(math.FloatVector(vec))
+
     else:
         raise TypeError("Invalid type, expected numpy.float or numpy.float32")
 
@@ -176,7 +190,6 @@ def Map_Compile(self, targetDevice: 'std::string const &', moduleName: 'std::str
     dtype: numpy.dtype
 
     """
-
     if dtype is np.float:
         return self.CompileDouble(targetDevice, moduleName, functionName, useBlas)
     elif dtype is np.float32:
@@ -187,5 +200,9 @@ def Map_Compile(self, targetDevice: 'std::string const &', moduleName: 'std::str
     return None
 
 Map.Compile = Map_Compile
+
+del CompiledMap_Compute
+del Map_Compile
+del Map_Compute
 
 %}
