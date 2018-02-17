@@ -14,9 +14,6 @@
 #include "Exception.h"
 #include "Unused.h"
 
-// stl
-#include <iostream>
-
 namespace ell
 {
 namespace emitters

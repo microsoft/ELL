@@ -13,20 +13,20 @@
 
 // model
 #include "DebugSinkNode.h"
-#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
 #include "InputPort.h"
 #include "LoadModel.h"
+#include "Map.h"
 #include "Model.h"
 #include "ModelLoadArguments.h"
 #include "NeuralNetworkLayerNode.h"
 #include "OutputNode.h"
 
 // stl
-#include <iostream>
 #include <map>
-#include <memory>
+#include <ostream>
+#include <string>
 #include <vector>
 
 namespace ell

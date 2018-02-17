@@ -14,8 +14,6 @@
 #include <string>
 #include <vector>
 
-#include <iostream>
-
 namespace ell
 {
 namespace dsp

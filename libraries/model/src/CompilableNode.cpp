@@ -22,7 +22,6 @@
 #include <iterator>
 #include <numeric>
 #include <string>
-#include <time.h>
 
 namespace ell
 {

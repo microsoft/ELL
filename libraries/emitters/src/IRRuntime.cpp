@@ -14,10 +14,6 @@
 // utilities
 #include "Unused.h"
 
-// stl
-#include <iostream>
-#include <time.h>
-
 namespace ell
 {
 namespace emitters

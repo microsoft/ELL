@@ -32,7 +32,7 @@
 #include "testing.h"
 
 // stl
-#include <ostream>
+#include <iostream>
 #include <sstream>
 #include <string>
 

@@ -8,16 +8,16 @@
 #pragma once
 
 // model
-#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRDiagnosticHandler.h"
+#include "Map.h"
 #include "Port.h"
 
 // testing
 #include "testing.h"
 
 // stl
-#include <ostream>
+#include <iostream>
 #include <string>
 #include <vector>
 

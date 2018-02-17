@@ -17,6 +17,9 @@
 // testing
 #include "testing.h"
 
+// stl
+#include <iostream>
+
 using namespace ell;
 
 int main()

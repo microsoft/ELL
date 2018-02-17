@@ -20,7 +20,7 @@
 
 // stl
 #include <string>
-#include <iostream>
+#include <istream>
 
 namespace ell
 {
