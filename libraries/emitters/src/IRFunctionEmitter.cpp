@@ -1046,55 +1046,71 @@ namespace emitters
 
     void IRFunctionEmitter::DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
     {
-        if(!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy() || !pDestination->getType()->isPointerTy())
+        if (!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy() || !pDestination->getType()->isPointerTy())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers");
         }
 
         auto elementType = pLeftValue->getType()->getPointerElementType();
+        if (elementType != pRightValue->getType()->getPointerElementType() || elementType != pDestination->getType()->getPointerElementType())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers to the same type");
+        }
 
         StoreZero(pDestination);
-        if(elementType->isFloatingPointTy())
+        if (elementType->isFPOrFPVectorTy())
         {
             VectorOperator(TypedOperator::multiplyFloat, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
                 OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
             });
         }
-        else
+        else if (elementType->isIntOrIntVectorTy())
         {
             VectorOperator(TypedOperator::multiply, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
                 OperationAndUpdate(pDestination, TypedOperator::add, pValue);
             });
         }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers to integral or floating-point element types");
+        }
     }
 
     void IRFunctionEmitter::DotProduct(llvm::Value* pSize, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
     {
-        if(!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy() || !pDestination->getType()->isPointerTy())
+        if (!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy() || !pDestination->getType()->isPointerTy())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers");
         }
 
         auto elementType = pLeftValue->getType()->getPointerElementType();
+        if (elementType != pRightValue->getType()->getPointerElementType() || elementType != pDestination->getType()->getPointerElementType())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers to the same type");
+        }
 
         StoreZero(pDestination);
-        if(elementType->isFloatingPointTy())
+        if (elementType->isFPOrFPVectorTy())
         {
             VectorOperator(TypedOperator::multiplyFloat, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
                 OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
             });
         }
-        else
+        else if (elementType->isIntOrIntVectorTy())
         {
             VectorOperator(TypedOperator::multiply, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
                 OperationAndUpdate(pDestination, TypedOperator::add, pValue);
             });
         }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers to integral or floating-point element types");
+        }
     }
 
     llvm::Value* IRFunctionEmitter::DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue)
     {
-        if(!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy())
+        if (!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers");
         }

@@ -130,7 +130,7 @@ void TestLLVMShiftRegister()
     module.WriteToFile("shift.asm");
 }
 
-void TestLLVM()
+void TestEmitLLVM()
 {
     auto module = MakeHostModuleEmitter("Looper");
     module.DeclarePrintf();
@@ -148,9 +148,6 @@ void TestLLVM()
     IRForLoopEmitter testLoop(fnMain);
     testLoop.Begin(data.size());
     testLoop.End();
-
-    auto vectorResult = fnMain.DotProduct(data.size(), fnMain.Pointer(pData), fnMain.Pointer(pData));
-    fnMain.Printf({ fnMain.Literal("DOT %f\n"), vectorResult });
 
     IRForLoopEmitter forLoop(fnMain);
     auto pBodyBlock = forLoop.Begin(data.size());
