@@ -39,7 +39,6 @@ try:
     import find_ell
     import ell
     import cntk_to_ell
-    import demoHelper as dh
     import ziptools
     import lib.cntk_converters as cntk_converters
     import lib.cntk_layers as cntk_layers
