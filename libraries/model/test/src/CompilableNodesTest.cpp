@@ -2525,7 +2525,7 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
-    settings.fuseLinearFunctionNodes = true;
+    settings.optimizerSettings.fuseLinearFunctionNodes = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 

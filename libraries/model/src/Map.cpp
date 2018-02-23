@@ -8,6 +8,7 @@
 
 #include "Map.h"
 #include "Exception.h"
+#include "ModelOptimizer.h"
 #include "ModelTransformer.h"
 #include "OutputNode.h"
 
@@ -261,6 +262,35 @@ namespace model
         }
     }
 
+    void Map::FixTransformedIO(ModelOptimizer& optimizer)
+    {
+        for (auto& inputNode : _inputNodes)
+        {
+            auto refinedInput = optimizer.GetCorrespondingInputNode(inputNode);
+            inputNode = refinedInput;
+        }
+
+        for (auto& inputNode : _inputNodeMap)
+        {
+            auto input = inputNode.second;
+            auto refinedInput = optimizer.GetCorrespondingInputNode(input);
+            inputNode.second = refinedInput;
+        }
+
+        for (auto& outputElements : _outputElements)
+        {
+            auto refinedOutput = optimizer.GetCorrespondingOutputs(outputElements);
+            outputElements = refinedOutput;
+        }
+
+        for (auto& outputElements : _outputElementsMap)
+        {
+            auto output = outputElements.second;
+            auto refinedOutput = optimizer.GetCorrespondingOutputs(output);
+            outputElements.second = refinedOutput;
+        }
+    }
+
     void Map::Prune()
     {
         TransformContext context;
@@ -375,9 +405,17 @@ namespace model
     void Map::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
     {
         ModelTransformer transformer;
-        auto refinedModel = transformer.TransformModel(_model, transformFunction, context);
+        auto refinedModel = transformer.TransformModel(_model, context, transformFunction);
         FixTransformedIO(transformer);
         _model = std::move(refinedModel);
+    }
+
+    void Map::Optimize(ModelOptimizer& optimizer)
+    {
+        auto optimizedModel = optimizer.OptimizeModel(_model);
+        FixTransformedIO(optimizer);
+        _model = std::move(optimizedModel);
+        Prune();
     }
 
     void Map::RenameCallbacks(const std::string& sourceCallbackName, const std::string& sinkCallbackName)

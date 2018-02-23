@@ -9,6 +9,7 @@
 #include "IRFunctionTest.h"
 
 // emitters
+#include "CompilerOptions.h"
 #include "CompilableIRFunction.h"
 #include "EmitterException.h"
 #include "EmitterTypes.h"
@@ -59,8 +60,8 @@ using BinaryScalarDoubleFunction = double (*)(double, double);
 //
 void TestIRAddFunction()
 {
-    CompilerParameters compilerParameters;
-    IRModuleEmitter module("CompilableIRAddFunction", compilerParameters);
+    CompilerOptions options;
+    IRModuleEmitter module("CompilableIRAddFunction", options);
     module.DeclarePrintf();
 
     IRAddFunction<double> func;
@@ -98,8 +99,8 @@ void TestIRAddFunction()
 
 void TestIRFunction()
 {
-    CompilerParameters compilerParameters;
-    IRModuleEmitter module("CompilableIRFunction", compilerParameters);
+    CompilerOptions options;
+    IRModuleEmitter module("CompilableIRFunction", options);
     module.DeclarePrintf();
 
     CompilablePlusFiveFunction func;

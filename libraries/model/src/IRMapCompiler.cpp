@@ -10,6 +10,8 @@
 #include "CompilableNode.h"
 #include "CompilableNodeUtilities.h"
 #include "IRModelProfiler.h"
+#include "ModelOptimizer.h"
+#include "OptimizationPassRegistry.h"
 #include "OutputNode.h"
 
 // emitters
@@ -36,7 +38,7 @@ namespace model
     {
         Log() << "Initializing IR map compiler" << EOL;
 
-        _moduleEmitter.SetCompilerParameters(GetMapCompilerParameters().compilerSettings);
+        _moduleEmitter.SetCompilerOptions(GetMapCompilerParameters().compilerSettings);
         _moduleEmitter.SetTargetTriple(GetCompilerParameters().targetDevice.triple);
 
         _moduleEmitter.SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
@@ -48,6 +50,9 @@ namespace model
             _moduleEmitter.DeclarePrintf();
             Log() << "Including diagnostic information in IR" << EOL;
         }
+
+        Log() << "Initializing optimizer" << EOL;
+        OptimizationPassRegistry::AddPassesToOptimizer(_optimizer, settings.optimizerSettings);
 
         _nodeRegions.emplace_back();
     }
@@ -123,6 +128,9 @@ namespace model
         Log() << "Refining the model..." << EOL;
         model::TransformContext context{ this, [this](const model::Node& node) { return node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
         map.Refine(context);
+
+        Log() << "Optimizing the model..." << EOL;
+        map.Optimize(_optimizer);
 
         // Renaming callbacks based on map compiler parameters
         // Note: a more elegant solution is emit variables which get assigned to

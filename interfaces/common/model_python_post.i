@@ -177,23 +177,30 @@ def Map_Compute(self, inputData: 'Vector<ElementType>', dtype: 'numpy.dtype') ->
 Map.Compute = Map_Compute
 
 # Map.Compile, parameterized on numpy.dtype
-def Map_Compile(self, targetDevice: 'std::string const &', moduleName: 'std::string const &', functionName: 'std::string const &', useBlas: 'bool', dtype: 'numpy.dtype') -> "ELL_API::CompiledMap< ElementType >":
+def Map_Compile(self, targetDevice: 'std::string const &', moduleName: 'std::string const &', functionName: 'std::string const &', dtype: 'numpy.dtype', compilerOptions: 'MapCompilerOptions const &' = None, optimizerSettings: 'ModelOptimizerOptions const &' = None) -> "ELL_API::CompiledMap< ElementType >":
     """
-    Compile(Map self, std::string const & targetDevice, std::string const & moduleName, std::string const & functionName, bool useBlas, np.dtype dtype) -> CompiledMap<ElementType>
+    Compile(Map self, std::string const & targetDevice, std::string const & moduleName, std::string const & functionName, np.dtype dtype, MapCompilerOptions const & compilerSettings, ModelOptimizerOptions const & optimizerSettings) -> CompiledMap<ElementType>
 
     Parameters
     ----------
     targetDevice: std::string const &
     moduleName: std::string const &
     functionName: std::string const &
-    useBlas: bool
     dtype: numpy.dtype
-
+    compilerOptions: MapCompilerOptions const &
+    optimizerSettings: ModelOptimizerOptions const &
     """
+
+    if compilerOptions is None:
+        compilerOptions = MapCompilerOptions()
+
+    if optimizerSettings is None:
+        optimizerSettings = ModelOptimizerOptions()
+
     if dtype is np.float:
-        return self.CompileDouble(targetDevice, moduleName, functionName, useBlas)
+        return self.CompileDouble(targetDevice, moduleName, functionName, compilerOptions, optimizerSettings)
     elif dtype is np.float32:
-        return self.CompileFloat(targetDevice, moduleName, functionName, useBlas)
+        return self.CompileFloat(targetDevice, moduleName, functionName, compilerOptions, optimizerSettings)
     else:
         raise TypeError("Invalid type, expected numpy.float or numpy.float32")
 

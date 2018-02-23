@@ -40,6 +40,8 @@ bool IsVerbose();
 template <typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T>& v);
 
+void PrintMap(const model::Map& map);
+
 void PrintModel(const model::Model& model);
 void PrintModel(const model::Model& model, const model::Node* output);
 

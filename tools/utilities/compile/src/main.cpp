@@ -27,6 +27,9 @@
 #include "IRMapCompiler.h"
 #include "OutputNode.h"
 
+// passes
+#include "StandardPasses.h"
+
 // stl
 #include <iostream>
 #include <sstream>
@@ -194,6 +197,9 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetHelpString() << std::endl;
             return 0;
         }
+
+        // Initialize the pass registry
+        passes::AddStandardPassesToRegistry();
 
         // load map and produce the desired output
         TimingOutputCollector timer(timingOutput, "Time to load map", compileArguments.verbose);

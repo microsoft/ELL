@@ -194,7 +194,9 @@ class CntkLayersTestCase(CntkToEllTestBase):
         map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
 
         # Note: for testing purposes, callback functions assume the "model" namespace
-        compiled = map.Compile("host", "model", method_name, False, dtype=np.float32)
+        compile_options = ell.model.MapCompilerOptions()
+        compile_options.useBlas = False
+        compiled = map.Compile("host", "model", method_name, compilerOptions=compile_options, dtype=np.float32)
         compiledResults = compiled.Compute(input, dtype=np.float32)
 
         # Compare compiled results
@@ -696,12 +698,14 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
 
             # Compile the live map
             # Note: for testing purposes, callback functions assume the "model" namespace
-            ellCompiledMap = ellMap.Compile('host', 'model', 'predict', False, dtype=np.float32)
+            compiler_options = ell.model.MapCompilerOptions()
+            compiler_options.useBlas = False
+            ellCompiledMap = ellMap.Compile('host', 'model', 'predict', compilerOptions=compiler_options, dtype=np.float32)
 
             # Compile the unarchived map
             # Note: for testing purposes, callback functions assume the "model" namespace
             ellCompiledMapFromArchive = ellMapFromArchive.Compile(
-                'host', 'model', 'predict', False, dtype=np.float32)
+                'host', 'model', 'predict', compilerOptions=compiler_options, dtype=np.float32)
 
             cntkInput = np.random.uniform(
                 high=255, size=(
@@ -897,8 +901,10 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
         """
         # Note: for testing purposes, callback functions assume the "model" namespace
         ell_map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
+        compiler_options = ell.model.MapCompilerOptions()
+        compiler_options.useBlas = False
         compiled = ell_map.Compile("host", "model", "test{}".format(
-            self.method_index), False, dtype=np.float32)
+            self.method_index), compilerOptions=compiler_options, dtype=np.float32)
         self.method_index += 1
 
         compiledResults = np.array(compiled.Compute(inputData, dtype=np.float32))

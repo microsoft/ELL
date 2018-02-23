@@ -11,6 +11,7 @@
 #include "IRCompiledMap.h"
 #include "InputPort.h"
 #include "MapCompiler.h"
+#include "ModelOptimizer.h"
 #include "Node.h"
 #include "NodeMap.h"
 #include "OutputPort.h"
@@ -52,9 +53,10 @@ namespace model
 
         /// <summary> Gets the compiler parameters being used by the IR emitter. </summary>
         ///
-        /// <returns> The CompilerParameters struct used by the IR emitter to control code generation. </returns>
-        const emitters::CompilerParameters& GetCompilerParameters() const { return GetModule().GetCompilerParameters(); }
+        /// <returns> The CompilerOptions struct used by the IR emitter to control code generation. </returns>
+        const emitters::CompilerOptions& GetCompilerParameters() const { return GetModule().GetCompilerParameters(); }
 
+        ModelOptimizer& GetOptimizer() { return _optimizer; }
         //
         // Routines useful to Node implementers
         //
@@ -166,6 +168,7 @@ namespace model
         emitters::IRModuleEmitter _moduleEmitter;
         // Profiler object for model
         ModelProfiler _profiler;
+        ModelOptimizer _optimizer;
 
     private:
         NodeMap<emitters::IRBlockRegion*>& GetCurrentNodeBlocks();

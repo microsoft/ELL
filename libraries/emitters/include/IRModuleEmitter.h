@@ -55,7 +55,7 @@ namespace emitters
         ///
         /// <param name="emitter"> An IREmitter. </param>
         /// <param name="moduleName"> Name of the module. </param>
-        IRModuleEmitter(const std::string& moduleName, const CompilerParameters& parameters);
+        IRModuleEmitter(const std::string& moduleName, const CompilerOptions& parameters);
 
         IRModuleEmitter(IRModuleEmitter&& other) = default;
         ~IRModuleEmitter() override = default;
@@ -67,7 +67,7 @@ namespace emitters
         /// <summary> Set the base compiler settings </summary>
         ///
         /// <param name="parameters"> The settings for the compiler to use </param>
-        void SetCompilerParameters(const CompilerParameters& parameters) override;
+        void SetCompilerOptions(const CompilerOptions& parameters) override;
 
         /// <summary> Returns the module's name. </summary>
         ///

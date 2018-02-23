@@ -264,7 +264,9 @@ class FullModelTest:
         map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
 
         # Note: for testing purposes, callback functions assume the "model" namespace
-        compiled = map.Compile("host", "model", "test" + str(self.method_index), False, dtype=np.float32)
+        compiler_options = model.MapCompilerOptions()
+        compiler_options.useBlas = False
+        compiled = map.Compile("host", "model", "test" + str(self.method_index), compilerOptions=compiler_options, dtype=np.float32)
 
         self.method_index += 1
         compiledResults = compiled.Compute(input, dtype=np.float32)

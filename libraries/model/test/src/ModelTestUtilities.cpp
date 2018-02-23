@@ -48,6 +48,11 @@ bool IsVerbose()
     return g_isVerbose;
 }
 
+void PrintMap(const model::Map& map)
+{
+    map.GetModel().Print(std::cout);
+}
+
 void PrintModel(const model::Model& model)
 {
     model.Print(std::cout);

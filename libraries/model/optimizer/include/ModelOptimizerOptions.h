@@ -1,0 +1,22 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     ModelOptimizerOptions.h (model)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+
+namespace ell
+{
+namespace model
+{
+    struct ModelOptimizerOptions
+    {
+        // optimizations
+        bool fuseLinearFunctionNodes = true;
+    };
+}
+}

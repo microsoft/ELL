@@ -45,7 +45,7 @@ namespace emitters
     // Constructors
     //
 
-    IRModuleEmitter::IRModuleEmitter(const std::string& moduleName, const CompilerParameters& parameters)
+    IRModuleEmitter::IRModuleEmitter(const std::string& moduleName, const CompilerOptions& parameters)
         : _llvmContext(new llvm::LLVMContext()), _emitter(*_llvmContext), _runtime(*this), _threadPool(*this)
     {
         InitializeLLVM();
@@ -53,17 +53,17 @@ namespace emitters
 
         _pModule = _emitter.CreateModule(moduleName);
 
-        SetCompilerParameters(parameters);
+        SetCompilerOptions(parameters);
         if (GetCompilerParameters().includeDiagnosticInfo)
         {
             DeclarePrintf();
         }
     }
 
-    void IRModuleEmitter::SetCompilerParameters(const CompilerParameters& parameters)
+    void IRModuleEmitter::SetCompilerOptions(const CompilerOptions& parameters)
     {
         // Call base class implementation
-        ModuleEmitter::SetCompilerParameters(parameters);
+        ModuleEmitter::SetCompilerOptions(parameters);
 
         // Set IR-specific parameters
         SetTargetTriple(GetCompilerParameters().targetDevice.triple);
@@ -588,9 +588,9 @@ namespace emitters
     void IRModuleEmitter::WriteToFile(const std::string& filePath, ModuleOutputFormat format)
     {
         MachineCodeOutputOptions options;
-        auto compilerParameters = GetCompilerParameters();
-        options.targetDevice = compilerParameters.targetDevice;
-        if (compilerParameters.optimize)
+        auto CompilerOptions = GetCompilerParameters();
+        options.targetDevice = CompilerOptions.targetDevice;
+        if (CompilerOptions.optimize)
         {
             options.optimizationLevel = OptimizationLevel::Aggressive;
         }
@@ -655,9 +655,9 @@ namespace emitters
     void IRModuleEmitter::WriteToStream(std::ostream& stream, ModuleOutputFormat format)
     {
         MachineCodeOutputOptions options;
-        auto compilerParameters = GetCompilerParameters();
-        options.targetDevice = compilerParameters.targetDevice;
-        if (compilerParameters.optimize)
+        auto CompilerOptions = GetCompilerParameters();
+        options.targetDevice = CompilerOptions.targetDevice;
+        if (CompilerOptions.optimize)
         {
             options.optimizationLevel = OptimizationLevel::Aggressive;
         }
@@ -1013,7 +1013,7 @@ namespace emitters
 
     IRModuleEmitter MakeHostModuleEmitter(const std::string moduleName)
     {
-        CompilerParameters parameters;
+        CompilerOptions parameters;
         parameters.targetDevice.deviceName = "host";
         return {moduleName, parameters};
     }

@@ -9,10 +9,12 @@
 #pragma once
 
 #include "CompilableNodeUtilities.h"
+#include "MapCompilerOptions.h"
 #include "OutputPort.h"
 #include "PortElements.h"
 
 // emitters
+#include "CompilerOptions.h"
 #include "EmitterTypes.h"
 #include "ModuleEmitter.h"
 #include "Variable.h"
@@ -30,18 +32,6 @@ namespace model
     class Model;
     class Node;
     
-    struct MapCompilerParameters
-    {
-        std::string moduleName = "ELL";
-        std::string mapFunctionName = "predict";
-        bool inlineNodes = false;
-        bool fuseLinearFunctionNodes = false;
-        bool profile = false;
-        emitters::CompilerParameters compilerSettings;
-        std::string sourceFunctionName;
-        std::string sinkFunctionName;
-    };
-
     /// <summary> Abstract base class for ELL model compilers. </summary>
     class MapCompiler
     {

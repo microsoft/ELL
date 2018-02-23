@@ -186,61 +186,45 @@ namespace model
         /// <summary> Transforms the model by applying a transformation function to each node </summary>
         ///
         /// <param name="model"> The model to transform. </param>
-        /// <param name="transformFunction"> The function to apply on each node </param>
         /// <param name="context"> The TransformContext to use during the transformation </param>
+        /// <param name="transformFunction"> The function to apply on each node </param>
         ///
-        /// <returns> The refined Model. </returns>
-        Model TransformModel(const Model& model, const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
+        /// <returns> The transformed Model. </returns>
+        Model TransformModel(const Model& model, const TransformContext& context, const std::function<void(const Node&, ModelTransformer&)>& transformFunction);
 
-        /// <summary> Indicates if the last call to RefineModel produced a model that is compilable. </summary>
-        ///
-        /// <returns> true if the model returned by RefineModel is compilable. </returns>
-        /// <remarks> Only available after calling CopyModel or RefineModel. </remarks>
-        bool IsModelCompilable() const { return _isModelCompilable; }
+        /// <summary> Resets the internal state of the transformer </summary>
+        void Reset();
 
         /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
-        PortElements<ValueType> GetCorrespondingOutputs(const OutputPort<ValueType>& port);
+        PortElements<ValueType> GetCorrespondingOutputs(const OutputPort<ValueType>& port) const;
 
         /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        PortElementsBase GetCorrespondingOutputs(const OutputPortBase& port);
+        PortElementsBase GetCorrespondingOutputs(const OutputPortBase& port) const;
 
         /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
-        PortElements<ValueType> GetCorrespondingOutputs(const PortElements<ValueType>& elements);
+        PortElements<ValueType> GetCorrespondingOutputs(const PortElements<ValueType>& elements) const;
 
         /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        PortElementsBase GetCorrespondingOutputs(const PortElementsBase& elements);
+        PortElementsBase GetCorrespondingOutputs(const PortElementsBase& elements) const;
 
         /// <summary> Returns the input node from the new model corresponding to the given input node on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
-        InputNode<ValueType>* GetCorrespondingInputNode(const InputNode<ValueType>* node);
+        InputNode<ValueType>* GetCorrespondingInputNode(const InputNode<ValueType>* node) const;
 
         /// <summary> Returns the input node from the new model corresponding to the given input node on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        InputNodeBase* GetCorrespondingInputNode(const InputNodeBase* node);
+        InputNodeBase* GetCorrespondingInputNode(const InputNodeBase* node) const;
 
         ///
         /// Functions used by node implementors
         ///
-
-        /// <summary> Transforms a set of output port references from the input model space to the output model space. Called by node implementors. </summary>
-        ///
-        /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
-        /// <returns> A `PortElements` object representing the transformed elements in the space of the new model. </returns>
-        template <typename ValueType>
-        PortElements<ValueType> TransformPortElements(const PortElements<ValueType>& elements);
-
-        /// <summary> Transforms a set of output port references from the input model space to the output model space. Called by node implementors. </summary>
-        ///
-        /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
-        /// <returns> A `PortElementsBase` object representing the transformed elements in the space of the new model. </returns>
-        PortElementsBase TransformPortElements(const PortElementsBase& elements);
 
         /// <summary> Creates a new node in the transformed model. Called by node implementors. </summary>
         ///
@@ -274,11 +258,33 @@ namespace model
         /// <returns> The context in use by the transformer. </returns>
         TransformContext& GetContext() { return _context; }
 
+        /// <summary> Get the context used by the transformer. Called by node implementors </summary>
+        ///
+        /// <returns> The context in use by the transformer. </returns>
+        const TransformContext& GetContext() const { return _context; }
+
+        //
+        // Deprecated functions
+        //
+
+        /// <summary> Transforms a set of output port references from the input model space to the output model space. DEPRECATED: use GetCorrespondingOutputs instead. </summary>
+        ///
+        /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
+        /// <returns> A `PortElements` object representing the transformed elements in the space of the new model. </returns>
+        template <typename ValueType>
+        PortElements<ValueType> TransformPortElements(const PortElements<ValueType>& elements) const;
+
+        /// <summary> Transforms a set of output port references from the input model space to the output model space. DEPRECATED: use GetCorrespondingOutputs instead. </summary>
+        ///
+        /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
+        /// <returns> A `PortElementsBase` object representing the transformed elements in the space of the new model. </returns>
+        PortElementsBase TransformPortElements(const PortElementsBase& elements) const;
+
     private:
         friend class Node;
 
         template <typename NodeType>
-        NodeType* GetCorrespondingInputNodeAs(const NodeType* node);
+        NodeType* GetCorrespondingInputNodeAs(const NodeType* node) const;
 
         // Collect nodes that are't compilable
         std::vector<const Node*> FindUncompilableNodes(const Model& model, const TransformContext& context) const;

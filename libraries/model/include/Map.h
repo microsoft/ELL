@@ -38,6 +38,7 @@ namespace ell
 {
 namespace model
 {
+    class ModelOptimizer;
     class ModelTransformer;
     class OutputNodeBase;
 
@@ -143,6 +144,11 @@ namespace model
         /// <param name="context"> The TransformContext to use during refinement. </param>
         /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
         void Refine(const TransformContext& context, int maxIterations = 10);
+
+        /// <summary> Optimizes the model wrapped by this map. </summary>
+        ///
+        /// <param name="optimizer"> The optimizer to use for optimizing the model. </param>
+        void Optimize(ModelOptimizer& optimizer);
 
         /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
         ///
@@ -386,6 +392,7 @@ namespace model
         std::vector<const Node*> GetAllOutputNodes() const;
         std::vector<const Node*> GetDebugSinkNodes() const;
         void FixTransformedIO(ModelTransformer& transformer);
+        void FixTransformedIO(ModelOptimizer& optimizer);
     };
 
     /// <summary> A serialization context used during Map deserialization. Wraps an existing `ModelSerializationContext` </summary>

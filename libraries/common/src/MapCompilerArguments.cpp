@@ -175,9 +175,9 @@ namespace common
 
         settings.moduleName = namespacePrefix;
         settings.mapFunctionName = functionName;
+        settings.optimizerSettings.fuseLinearFunctionNodes = fuseLinearOperations;
         settings.compilerSettings.optimize = optimize;
         settings.compilerSettings.useBlas = useBlas;
-        settings.fuseLinearFunctionNodes = fuseLinearOperations;
         settings.compilerSettings.allowVectorInstructions = enableVectorization;
         settings.compilerSettings.parallelize = parallelize;
         settings.compilerSettings.vectorWidth = vectorWidth;

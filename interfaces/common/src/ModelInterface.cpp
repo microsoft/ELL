@@ -1044,7 +1044,7 @@ std::vector<float> Map::ComputeFloat(const std::vector<float>& inputData)
     return _map->Compute<float>(inputData);
 }
 
-CompiledMap Map::CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const
+CompiledMap Map::CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const
 {
     auto resolverFunction = [moduleName](llvm::Module* module, ell::emitters::IRExecutionEngine& jitter) {
         auto func = module->getFunction(moduleName + "_CompiledMap_SourceCallback_Double");
@@ -1060,10 +1060,10 @@ CompiledMap Map::CompileDouble(const std::string& targetDevice, const std::strin
         }
     };
 
-    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Double", "CompiledMap_SinkCallback_Double", useBlas, resolverFunction);
+    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Double", "CompiledMap_SinkCallback_Double", compilerSettings, optimizerSettings, resolverFunction);
 }
 
-CompiledMap Map::CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const
+CompiledMap Map::CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const
 {
     auto resolverFunction = [moduleName](llvm::Module* module, ell::emitters::IRExecutionEngine& jitter) {
         auto func = module->getFunction(moduleName + "_CompiledMap_SourceCallback_Float");
@@ -1079,7 +1079,7 @@ CompiledMap Map::CompileFloat(const std::string& targetDevice, const std::string
         }
     };
 
-    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Float", "CompiledMap_SinkCallback_Float", useBlas, resolverFunction);
+    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Float", "CompiledMap_SinkCallback_Float", compilerSettings, optimizerSettings, resolverFunction);
 }
 
 CompiledMap Map::Compile(const std::string& targetDevice,
@@ -1087,7 +1087,8 @@ CompiledMap Map::Compile(const std::string& targetDevice,
                          const std::string& functionName,
                          const std::string& sourceFunctionName,
                          const std::string& sinkFunctionName,
-                         bool useBlas,
+                         const MapCompilerOptions& compilerSettings, 
+                         const ModelOptimizerOptions& optimizerSettings,
                          std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolveCallbacks) const
 {
     ell::model::MapCompilerParameters settings;
@@ -1096,7 +1097,8 @@ CompiledMap Map::Compile(const std::string& targetDevice,
     settings.sourceFunctionName = sourceFunctionName;
     settings.sinkFunctionName = sinkFunctionName;
     settings.compilerSettings.targetDevice.deviceName = targetDevice;
-    settings.compilerSettings.useBlas = useBlas;
+    settings.compilerSettings.useBlas = compilerSettings.useBlas;
+    settings.optimizerSettings.fuseLinearFunctionNodes = optimizerSettings.fuseLinearFunctionNodes;
 
     ell::model::IRMapCompiler compiler(settings);
 

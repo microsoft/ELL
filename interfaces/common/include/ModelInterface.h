@@ -53,6 +53,8 @@ class InputPort;
 class Node;
 class NodeIterator;
 class OutputPort;
+struct MapCompilerOptions;
+struct ModelOptimizerOptions;
 
 //
 // PortType
@@ -423,8 +425,8 @@ public:
     Model GetModel() const;
 
     // Note: not templatized because these implement type-specific resolverFunctions
-    CompiledMap CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const;
-    CompiledMap CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, bool useBlas) const;
+    CompiledMap CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const;
+    CompiledMap CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const;
 
     // Return true if the model contains a SourceNode.  In this case you need 
     // to register the callbacks via SetSourceCallback and SetSinkCallback.
@@ -450,7 +452,8 @@ private:
 #ifndef SWIG
     CompiledMap Compile(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName,
                         const std::string& sourceFunctionName, const std::string& sinkFunctionName,
-                        bool useBlas, std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolverFunction) const;
+                        const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings,
+                        std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolverFunction) const;
 #endif
 
     std::shared_ptr<ell::model::Map> _map;
@@ -497,6 +500,23 @@ private:
     std::shared_ptr<ell::model::IRCompiledMap> _map;
     ell::api::math::TensorShape _inputShape;
     ell::api::math::TensorShape _outputShape;
+};
+
+//
+// Compiler options
+//
+struct MapCompilerOptions
+{
+    bool useBlas = true;
+    bool profile = false;
+};
+
+//
+// Optimizer settings
+//
+struct ModelOptimizerOptions
+{
+    bool fuseLinearFunctionNodes = true;
 };
 
 } // end namespace

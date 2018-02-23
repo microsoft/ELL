@@ -66,13 +66,13 @@ namespace emitters
     }
 
     // Sets the parameters (and rationalizes them)
-    void ModuleEmitter::SetCompilerParameters(const CompilerParameters& parameters)
+    void ModuleEmitter::SetCompilerOptions(const CompilerOptions& options)
     {
-        _parameters = parameters;
-        CompleteCompilerParameters(_parameters);
+        _options = options;
+        CompleteCompilerOptions(_options);
     }
 
-    void ModuleEmitter::CompleteCompilerParameters(CompilerParameters& parameters)
+    void ModuleEmitter::CompleteCompilerOptions(CompilerOptions& parameters)
     {
         if (parameters.targetDevice.numBits == 0)
         {

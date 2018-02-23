@@ -28,18 +28,19 @@ set(src
 
 set(include
     include/CompilableNodeUtilities.h
-    include/CompiledMap.h
-    include/Map.h
     include/CompilableNode.h
+    include/CompiledMap.h
     include/InputNodeBase.h
     include/InputNode.h
     include/InputPort.h
     include/IRCompiledMap.h
     include/IRMapCompiler.h
+    include/IRModelProfiler.h
+    include/Map.h
     include/MapCompiler.h
+    include/MapCompilerOptions.h
     include/Model.h
     include/ModelBuilder.h
-    include/IRModelProfiler.h
     include/ModelTransformer.h
     include/Node.h
     include/NodeMap.h
@@ -52,11 +53,11 @@ set(include
 )
 
 set(tcc 
-    tcc/Map.tcc
     tcc/InputNode.tcc
     tcc/InputPort.tcc
     tcc/IRCompiledMap.tcc
     tcc/IRMapCompiler.tcc
+    tcc/Map.tcc
     tcc/MapCompiler.tcc
     tcc/Model.tcc
     tcc/ModelBuilder.tcc
@@ -70,15 +71,39 @@ set(tcc
 
 set(doc 
     doc/CompileAsFunction.md
-    doc/README.md)
+    doc/README.md
+)
+
+set(optimizer_src
+    optimizer/src/ModelOptimizer.cpp
+    optimizer/src/OptimizationPass.cpp
+    optimizer/src/OptimizationPassRegistry.cpp
+)
+
+set(optimizer_include
+    optimizer/include/ModelOptimizer.h
+    optimizer/include/ModelOptimizerOptions.h
+    optimizer/include/OptimizationPass.h
+    optimizer/include/OptimizationPassRegistry.h
+)
+
+set(optimizer_tcc
+)
+
+set(optimizer_doc
+)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
+source_group("optimizer\\include" FILES ${optimizer_include})
+source_group("optimizer\\src" FILES ${optimizer_src})
+source_group("optimizer\\tcc" FILES ${optimizer_tcc})
+source_group("optimizer\\doc" FILES ${optimizer_doc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${doc})
-target_include_directories(${library_name} PUBLIC include)
+add_library(${library_name} ${src} ${include} ${tcc} ${doc} ${optimizer_src} ${optimizer_include} ${optimizer_tcc} ${optimizer_doc})
+target_include_directories(${library_name} PUBLIC include optimizer/include)
 target_link_libraries(${library_name} utilities data emitters)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
@@ -169,4 +194,3 @@ set_property(TARGET ${compiler_test_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${compiler_test_name} COMMAND ${compiler_test_name})
 set_test_library_path(${compiler_test_name})
-
