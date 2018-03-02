@@ -940,7 +940,7 @@ namespace emitters
 
     IRTaskArray IRFunctionEmitter::StartTasks(llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments)
     {
-        auto& compilerSettings = GetModule().GetCompilerParameters();
+        auto& compilerSettings = GetModule().GetCompilerOptions();
         if (compilerSettings.parallelize && compilerSettings.useThreadPool && !compilerSettings.targetDevice.IsWindows())
         {
             auto& threadPool = GetModule().GetThreadPool();
@@ -1337,7 +1337,7 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::GetCpu()
     {
-        if (GetModule().GetCompilerParameters().targetDevice.IsLinux())
+        if (GetModule().GetCompilerOptions().targetDevice.IsLinux())
         {
             // Signature: int sched_getcpu(void);
             auto& context = GetLLVMContext();
@@ -1420,7 +1420,7 @@ namespace emitters
 
     bool IRFunctionEmitter::CanUseBlas() const
     {
-        return GetModule().GetCompilerParameters().useBlas;
+        return GetModule().GetCompilerOptions().useBlas;
     }
 
     //

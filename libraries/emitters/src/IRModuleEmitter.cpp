@@ -54,7 +54,7 @@ namespace emitters
         _pModule = _emitter.CreateModule(moduleName);
 
         SetCompilerOptions(parameters);
-        if (GetCompilerParameters().includeDiagnosticInfo)
+        if (GetCompilerOptions().includeDiagnosticInfo)
         {
             DeclarePrintf();
         }
@@ -66,8 +66,8 @@ namespace emitters
         ModuleEmitter::SetCompilerOptions(parameters);
 
         // Set IR-specific parameters
-        SetTargetTriple(GetCompilerParameters().targetDevice.triple);
-        SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
+        SetTargetTriple(GetCompilerOptions().targetDevice.triple);
+        SetTargetDataLayout(GetCompilerOptions().targetDevice.dataLayout);
     }
 
     //
@@ -171,7 +171,7 @@ namespace emitters
                 Log() << "Function " << currentFunction.GetFunctionName() << " already has a terminator" << EOL;
             }
             currentFunction.ConcatRegions();
-            currentFunction.CompleteFunction(GetCompilerParameters().optimize);
+            currentFunction.CompleteFunction(GetCompilerOptions().optimize);
         }
         _emitter.SetCurrentInsertPoint(previousPos);
 
@@ -588,7 +588,7 @@ namespace emitters
     void IRModuleEmitter::WriteToFile(const std::string& filePath, ModuleOutputFormat format)
     {
         MachineCodeOutputOptions options;
-        auto CompilerOptions = GetCompilerParameters();
+        auto CompilerOptions = GetCompilerOptions();
         options.targetDevice = CompilerOptions.targetDevice;
         if (CompilerOptions.optimize)
         {
@@ -655,7 +655,7 @@ namespace emitters
     void IRModuleEmitter::WriteToStream(std::ostream& stream, ModuleOutputFormat format)
     {
         MachineCodeOutputOptions options;
-        auto CompilerOptions = GetCompilerParameters();
+        auto CompilerOptions = GetCompilerOptions();
         options.targetDevice = CompilerOptions.targetDevice;
         if (CompilerOptions.optimize)
         {
@@ -689,7 +689,7 @@ namespace emitters
 
     void IRModuleEmitter::WriteToLLVMStream(llvm::raw_ostream& os, ModuleOutputFormat format, MachineCodeOutputOptions options)
     {
-        const auto& params = GetCompilerParameters();
+        const auto& params = GetCompilerOptions();
 
         if (options.targetDevice.triple.empty())
         {

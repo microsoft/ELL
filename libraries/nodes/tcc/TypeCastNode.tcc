@@ -64,7 +64,7 @@ namespace nodes
             return;
         }
 
-        if (IsPureVector(input) && !compiler.GetCompilerParameters().unrollLoops)
+        if (IsPureVector(input) && !compiler.GetCompilerOptions().unrollLoops)
         {
             CompileLoop(compiler, function);
         }

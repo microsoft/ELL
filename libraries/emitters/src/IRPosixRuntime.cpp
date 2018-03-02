@@ -59,7 +59,7 @@ namespace emitters
         auto int32Type = llvm::Type::getInt32Ty(context);
         auto int64Type = llvm::Type::getInt64Ty(context);
 
-        if (_module.GetCompilerParameters().targetDevice.numBits == 32)
+        if (_module.GetCompilerOptions().targetDevice.numBits == 32)
         {
             // These are really time_t and long
             _timespecType = llvm::StructType::create(context, { int32Type, int32Type }, "timespec");
@@ -82,7 +82,7 @@ namespace emitters
 
     llvm::Type* IRPosixRuntime::GetPthreadType()
     {
-        auto& targetDevice = _module.GetCompilerParameters().targetDevice;
+        auto& targetDevice = _module.GetCompilerOptions().targetDevice;
         if(targetDevice.IsLinux())
         {
             return GetPointerSizedIntType();
@@ -104,7 +104,7 @@ namespace emitters
         auto int32Type = llvm::Type::getInt32Ty(context);
         auto int64Type = llvm::Type::getInt64Ty(context);
 
-        auto& targetDevice = _module.GetCompilerParameters().targetDevice;
+        auto& targetDevice = _module.GetCompilerOptions().targetDevice;
         if(targetDevice.IsLinux())
         {
             auto triple = targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : targetDevice.triple;
@@ -153,7 +153,7 @@ namespace emitters
         auto int32Type = llvm::Type::getInt32Ty(context);
         auto int64Type = llvm::Type::getInt64Ty(context);
 
-        auto& targetDevice = _module.GetCompilerParameters().targetDevice;
+        auto& targetDevice = _module.GetCompilerOptions().targetDevice;
         if(targetDevice.IsLinux())
         {
             auto triple = targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : targetDevice.triple;
@@ -195,7 +195,7 @@ namespace emitters
         auto& context = _module.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto& targetDevice = _module.GetCompilerParameters().targetDevice;
+        auto& targetDevice = _module.GetCompilerOptions().targetDevice;
         if(targetDevice.IsLinux())
         {
             auto triple = targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : targetDevice.triple;
@@ -424,7 +424,7 @@ namespace emitters
 
     llvm::Function* IRPosixRuntime::GetPthreadSpinInitFunction()
     {
-        assert(_module.GetCompilerParameters().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
+        assert(_module.GetCompilerOptions().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
         // Signature: int  pthread_spin_init(pthread_spinlock_t *lock, int pshared);
         auto intType = GetIntType();
@@ -435,7 +435,7 @@ namespace emitters
 
     llvm::Function* IRPosixRuntime::GetPthreadSpinLockFunction()
     {
-        assert(_module.GetCompilerParameters().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
+        assert(_module.GetCompilerOptions().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
         // Signature: int  pthread_spin_lock(pthread_spinlock_t *lock);
         auto intType = GetIntType();
@@ -446,7 +446,7 @@ namespace emitters
 
     llvm::Function* IRPosixRuntime::GetPthreadSpinTryLockFunction()
     {
-        assert(_module.GetCompilerParameters().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
+        assert(_module.GetCompilerOptions().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
         // Signature: int  pthread_spin_trylock(pthread_spinlock_t *lock);
         auto intType = GetIntType();
@@ -458,7 +458,7 @@ namespace emitters
 
     llvm::Function* IRPosixRuntime::GetPthreadSpinUnlockFunction()
     {
-        assert(_module.GetCompilerParameters().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
+        assert(_module.GetCompilerOptions().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
         // Signature: int  pthread_spin_unlock(pthread_spinlock_t *lock);
         auto intType = GetIntType();
@@ -469,7 +469,7 @@ namespace emitters
 
     llvm::Function* IRPosixRuntime::GetPthreadSpinDestroyFunction()
     {
-        assert(_module.GetCompilerParameters().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
+        assert(_module.GetCompilerOptions().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
         // Signature: int  pthread_spin_destroy(pthread_spinlock_t *lock);
         auto intType = GetIntType();

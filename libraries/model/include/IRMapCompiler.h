@@ -43,7 +43,7 @@ namespace model
         IRMapCompiler();
 
         /// <summary> Create a compiler to produce an LLVM module with the default name and the given parameters </summary>
-        IRMapCompiler(const MapCompilerParameters& settings);
+        IRMapCompiler(const MapCompilerOptions& settings);
 
         /// <summary> Compile a map into a CompiledMap </summary>
         ///
@@ -54,7 +54,7 @@ namespace model
         /// <summary> Gets the compiler parameters being used by the IR emitter. </summary>
         ///
         /// <returns> The CompilerOptions struct used by the IR emitter to control code generation. </returns>
-        const emitters::CompilerOptions& GetCompilerParameters() const { return GetModule().GetCompilerParameters(); }
+        const emitters::CompilerOptions& GetCompilerOptions() const { return GetModule().GetCompilerOptions(); }
 
         ModelOptimizer& GetOptimizer() { return _optimizer; }
         //

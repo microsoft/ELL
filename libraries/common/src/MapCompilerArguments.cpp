@@ -145,9 +145,9 @@ namespace common
             "");
     }
 
-    model::MapCompilerParameters MapCompilerArguments::GetMapCompilerParameters(const std::string& modelName) const
+    model::MapCompilerOptions MapCompilerArguments::GetMapCompilerOptions(const std::string& modelName) const
     {
-        model::MapCompilerParameters settings;
+        model::MapCompilerOptions settings;
         bool namespaceSpecified = true;
         auto namespacePrefix = compiledModuleName;
         if (namespacePrefix == "")

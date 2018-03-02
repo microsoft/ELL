@@ -984,7 +984,7 @@ static void TestIIRFilterNode1()
     auto outputNode = model.AddNode<nodes::IIRFilterNode<ValueType>>(inputNode->output, std::vector<ValueType>{ static_cast<ValueType>(1.0) }, std::vector<ValueType>{ static_cast<ValueType>(-0.95) });
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
@@ -1017,7 +1017,7 @@ static void TestIIRFilterNode2()
     auto outputNode = model.AddNode<nodes::IIRFilterNode<ValueType>>(inputNode->output, std::vector<ValueType>{ static_cast<ValueType>(1.0) }, std::vector<ValueType>{ static_cast<ValueType>(-0.95) });
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
@@ -1054,7 +1054,7 @@ static void TestIIRFilterNode3()
     auto outputNode = model.AddNode<nodes::IIRFilterNode<ValueType>>(inputNode->output, bCoeffs, aCoeffs);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
@@ -1086,7 +1086,7 @@ static void TestIIRFilterNode4()
     auto outputNode = model.AddNode<nodes::IIRFilterNode<ValueType>>(inputNode->output, bCoeffs, aCoeffs);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
@@ -1125,7 +1125,7 @@ static void TestMelFilterBankNode()
     auto outputNode = model.AddNode<nodes::MelFilterBankNode<ValueType>>(inputNode->output, filters);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
@@ -1164,7 +1164,7 @@ static void TestBufferNode()
     auto outputNode = model.AddNode<nodes::BufferNode<ValueType>>(inputNode->output, windowSize);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = false;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);

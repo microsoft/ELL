@@ -61,7 +61,7 @@ model::IRCompiledMap GetCompiledMapWithCallbacks(
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
     auto map = model::Map(model, { { "time", inputNode } }, { { "output", outputNode->output } });
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.moduleName = moduleName;
     settings.mapFunctionName = mapFunctionName;
     settings.compilerSettings.optimize = true;
@@ -85,7 +85,7 @@ model::IRCompiledMap GetCompiledMapNoCallbacks(
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sumNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.moduleName = moduleName;
     settings.mapFunctionName = mapFunctionName;
     settings.compilerSettings.optimize = true;

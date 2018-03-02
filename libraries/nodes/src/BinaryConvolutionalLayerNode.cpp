@@ -277,7 +277,7 @@ namespace nodes
     bool BinaryConvolutionalLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         auto compiler = dynamic_cast<const model::IRMapCompiler*>(transformer.GetContext().GetCompiler());
-        auto numPackedBits = compiler != nullptr ? compiler->GetCompilerParameters().targetDevice.numBits : 64;
+        auto numPackedBits = compiler != nullptr ? compiler->GetCompilerOptions().targetDevice.numBits : 64;
         if (numPackedBits == 0)
         {
             numPackedBits = 64;
@@ -442,7 +442,7 @@ namespace nodes
         llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
 
-        const auto& compilerSettings = compiler.GetCompilerParameters();
+        const auto& compilerSettings = compiler.GetCompilerOptions();
 
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
         auto elementSize = sizeof(PackedBitsType);
@@ -584,7 +584,7 @@ namespace nodes
     void BinaryXnorNode<ValueType, PackedBitsType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         // Get compiler settings
-        const auto& compilerSettings = compiler.GetCompilerParameters();
+        const auto& compilerSettings = compiler.GetCompilerOptions();
         const int vectorSize = compilerSettings.vectorWidth;
 
         // Get port variables
@@ -606,7 +606,7 @@ namespace nodes
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
         const auto storedElementSize = sizeof(PackedBitsType);
         const auto storedElementNumBits = 8 * storedElementSize;
-        const auto numBits = storedElementNumBits; // function.GetModule().GetCompilerParameters().numBits; // for Xnor, use 32 bits in 32-bit environment
+        const auto numBits = storedElementNumBits; // function.GetModule().GetCompilerOptions().numBits; // for Xnor, use 32 bits in 32-bit environment
         const auto elementSize = numBits / 8;
         assert(elementSize <= storedElementSize);
         const auto filterWidth = _convolutionalParameters.receptiveField;
@@ -688,7 +688,7 @@ namespace nodes
         llvm::Value* pInputPaddingMaskSums = compiler.EnsurePortEmitted(inputPaddingMaskSums);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
-        const auto& compilerSettings = compiler.GetCompilerParameters();
+        const auto& compilerSettings = compiler.GetCompilerOptions();
 
         // Get LLVM types
         auto& module = function.GetModule();
@@ -707,7 +707,7 @@ namespace nodes
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
         const auto storedElementSize = sizeof(PackedBitsType);
         const auto storedElementNumBits = 8 * storedElementSize;
-        const auto numBits = storedElementNumBits; // function.GetModule().GetCompilerParameters().numBits; // for Xnor, use 32 bits in 32-bit environment
+        const auto numBits = storedElementNumBits; // function.GetModule().GetCompilerOptions().numBits; // for Xnor, use 32 bits in 32-bit environment
         const auto elementSize = numBits / 8;
         assert(elementSize <= storedElementSize);
         const auto filterWidth = _convolutionalParameters.receptiveField;
@@ -803,7 +803,7 @@ namespace nodes
 
         const int storedElementSize = sizeof(PackedBitsType);
         const int storedElementNumBits = 8 * storedElementSize;
-        const int numBits = storedElementNumBits; // function.GetModule().GetCompilerParameters().numBits; // for Xnor, use 32 bits in 32-bit environment
+        const int numBits = storedElementNumBits; // function.GetModule().GetCompilerOptions().numBits; // for Xnor, use 32 bits in 32-bit environment
         const int elementSize = numBits / 8;
         DEBUG_USED(elementSize);
         assert(elementSize <= storedElementSize);

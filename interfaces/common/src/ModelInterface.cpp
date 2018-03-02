@@ -1091,7 +1091,7 @@ CompiledMap Map::Compile(const std::string& targetDevice,
                          const ModelOptimizerOptions& optimizerSettings,
                          std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolveCallbacks) const
 {
-    ell::model::MapCompilerParameters settings;
+    ell::model::MapCompilerOptions settings;
     settings.moduleName = moduleName;
     settings.mapFunctionName = functionName;
     settings.sourceFunctionName = sourceFunctionName;

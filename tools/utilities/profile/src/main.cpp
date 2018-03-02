@@ -319,7 +319,7 @@ void TimeModel(model::Map& map, const std::vector<InputType>& input, const Profi
     passes::AddStandardPassesToRegistry();
 
     // Compile map
-    model::MapCompilerParameters settings = mapCompilerArguments.GetMapCompilerParameters("");
+    model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions("");
     settings.profile = false;
     settings.optimizerSettings.fuseLinearFunctionNodes = true;
     model::IRMapCompiler compiler(settings);
@@ -377,7 +377,7 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
     passes::AddStandardPassesToRegistry();
 
     // Compile map
-    model::MapCompilerParameters settings = mapCompilerArguments.GetMapCompilerParameters("");
+    model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions("");
     settings.profile = true;
     settings.optimizerSettings.fuseLinearFunctionNodes = true;
     model::IRMapCompiler compiler(settings);

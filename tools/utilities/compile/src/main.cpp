@@ -105,7 +105,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
         baseFilename = utilities::JoinPaths(outputDirectory, utilities::GetFileName(baseFilename));
     }
 
-    model::MapCompilerParameters settings = mapCompilerArguments.GetMapCompilerParameters(baseFilename);
+    model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions(baseFilename);
     if (compileArguments.outputRefinedMap)
     {
         model::TransformContext context;

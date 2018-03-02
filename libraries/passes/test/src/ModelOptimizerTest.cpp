@@ -108,7 +108,7 @@ void TestModelCompilePlusOptimize()
     passes::AddStandardPassesToRegistry();
 
     // Compile it
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.optimizerSettings.fuseLinearFunctionNodes = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);

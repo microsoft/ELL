@@ -275,7 +275,7 @@ void ModelComparison::SetUpReferenceMap(model::Map& map)
     _referenceMap.Transform(transformFunc, addSinkNodeContext);
 }
 
-void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerParameters& settings)
+void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerOptions& settings)
 {
     SetUpReferenceMap(reference);
     _addingReference = false;

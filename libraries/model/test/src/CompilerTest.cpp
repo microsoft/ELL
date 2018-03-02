@@ -127,7 +127,7 @@ void TestSimpleMap(bool optimize)
     auto accumNode2 = model.AddNode<nodes::AccumulatorNode<double>>(accumNode->output);
     // auto outputNode = model.AddNode<model::OutputNode<double>>(accumNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", accumNode2->output } });
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = optimize;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
@@ -152,7 +152,7 @@ void TestSqEuclideanDistanceMap()
     auto sqEuclidDistNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
     auto map = model::Map{ model, { { "input", inputNode } }, { { "output", sqEuclidDistNode->output } } };
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
@@ -209,7 +209,7 @@ void TestProtoNNPredictorMap()
     auto outputNode = model.AddNode<model::OutputNode<double>>(protonnPredictorNode->output);
     auto map = model::Map{ model, { { "input", inputNode } }, { { "output", outputNode->output } } };
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = false;
     settings.compilerSettings.includeDiagnosticInfo = true;
     settings.compilerSettings.inlineOperators = false;
@@ -251,7 +251,7 @@ void TestMultiOutputMap()
     auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ inputNode->output, accumNode->output });
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
@@ -322,7 +322,7 @@ void TestBinaryVector(bool expanded, bool runJit)
     auto bop = mb.Add(c1->output, input1->output);
     auto multiplyNode = mb.Multiply(bop->output, c2->output);
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
     settings.mapFunctionName = modelFunctionName;
     model::IRMapCompiler compiler(settings);
@@ -364,7 +364,7 @@ void TestBinaryScalar()
 
     auto addNode = mb.Add(c1->output, input1->output);
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     model::Map map{ mb.Model, { { "input", input1 } }, { { "output", addNode->output } } };
@@ -372,7 +372,7 @@ void TestBinaryScalar()
     PrintIR(compiledMap);
 }
 
-void TestDotProduct(model::MapCompilerParameters& settings)
+void TestDotProduct(model::MapCompilerOptions& settings)
 {
     std::vector<double> data = { 5, 10, 15, 20 };
 
@@ -390,7 +390,7 @@ void TestDotProduct(model::MapCompilerParameters& settings)
 
 void TestDotProduct()
 {
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
 
     settings.compilerSettings.unrollLoops = false;
     settings.compilerSettings.inlineOperators = true;
@@ -413,7 +413,7 @@ void TestSimpleSum(bool expanded, bool optimized)
     auto input1 = mb.Inputs<double>(4);
     auto sumNode = mb.Sum<double>(input1->output);
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
     settings.compilerSettings.optimize = optimized;
     model::IRMapCompiler compiler(settings);
@@ -434,7 +434,7 @@ void TestSum(bool expanded, bool optimized)
     auto product = mb.Multiply<double>(c1->output, input1->output);
     auto sumNode = mb.Sum<double>(product->output);
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
     settings.compilerSettings.optimize = optimized;
     model::IRMapCompiler compiler(settings);
@@ -457,7 +457,7 @@ void TestAccumulator(bool expanded)
     auto accumulate = mb.Accumulate<double>(product->output);
     auto outputNode = mb.Outputs<double>(accumulate->output);
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
     model::IRMapCompiler compiler(settings);
     model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
@@ -533,7 +533,7 @@ void TestSlidingAverage()
     auto avg = mb.Divide<double>(sum->output, dim->output);
     auto outputNode = mb.Outputs<double>(avg->output);
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.mapFunctionName = "TestSlidingAverage";
     model::IRMapCompiler compiler(settings);
 
@@ -561,7 +561,7 @@ void TestSlidingAverage()
 
 void TestDotProductOutput()
 {
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.inlineOperators = false;
     settings.mapFunctionName = "TestDotProduct";
     std::vector<double> data = { 5, 10, 15, 20 };
@@ -595,7 +595,7 @@ void TestForest()
 
     std::vector<double> data = { 0.2, 0.5, 0.0 };
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
     settings.compilerSettings.includeDiagnosticInfo = false;
     settings.mapFunctionName = "TestForest";
@@ -715,7 +715,7 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
     auto map = model::Map(model, { { "time", inputNode } }, { { "output", outputNode->output } });
 
     // Compile the map
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.moduleName = "TestMulti";
     settings.compilerSettings.optimize = optimized;
     settings.compilerSettings.unrollLoops = expanded;

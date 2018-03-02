@@ -40,7 +40,7 @@ namespace emitters
         /// <summary> Return the base compiler settings </summary>
         ///
         /// <returns> The settings for the compiler </returns>
-        const CompilerOptions& GetCompilerParameters() const { return _options; }
+        const CompilerOptions& GetCompilerOptions() const { return _options; }
 
         /// <summary> Set the base compiler settings </summary>
         ///

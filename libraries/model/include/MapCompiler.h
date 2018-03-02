@@ -47,8 +47,8 @@ namespace model
 
         /// <summary> Gets the model-specific compiler parameters being used by the map compiler. </summary>
         ///
-        /// <returns> The MapCompilerParameters struct used by the map compiler to control code generation. </returns>
-        const MapCompilerParameters& GetMapCompilerParameters() const { return _parameters; }
+        /// <returns> The MapCompilerOptions struct used by the map compiler to control code generation. </returns>
+        const MapCompilerOptions& GetMapCompilerOptions() const { return _parameters; }
 
         //
         // Routines for Node implementers
@@ -85,7 +85,7 @@ namespace model
         void SetVariableForElement(const PortElementBase& element, emitters::Variable* pVar);
 
     protected:
-        MapCompiler(const MapCompilerParameters& settings);
+        MapCompiler(const MapCompilerOptions& settings);
 
         /// <summary>
         /// Create a variable to store computed output for the given output port. The variable
@@ -128,7 +128,7 @@ namespace model
         emitters::Variable* AllocateNodeFunctionArgument(emitters::ModuleEmitter& emitter, const OutputPortBase* pPort, ArgType argType);
         emitters::Variable* AllocateNodeFunctionArgument(emitters::ModuleEmitter& emitter, const PortElementBase& element, ArgType argType);
 
-        MapCompilerParameters _parameters;
+        MapCompilerOptions _parameters;
         // map from ports to runtime variables, for all ports in the model
         // stored as a stack, with the top of the stack being the innermost scope
         std::vector<std::unordered_map<const Port*, emitters::Variable*>> _portToVarMaps; // Do we need separate elementToVarMaps?

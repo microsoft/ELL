@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
         auto input = GetInputData<TestDataType>(map, compareArguments, pluginArgs);
         ModelComparison comparison(compareArguments.outputDirectory);
 
-        model::MapCompilerParameters settings = compileArguments.GetMapCompilerParameters("");
+        model::MapCompilerOptions settings = compileArguments.GetMapCompilerOptions("");
         comparison.Compare(input, map, settings);
 
         // Write summary report

@@ -24,7 +24,7 @@ namespace model
     class Model;
     class Node;
     
-    struct MapCompilerParameters
+    struct MapCompilerOptions
     {
         // map-specific compiler settings
         std::string moduleName = "ELL";

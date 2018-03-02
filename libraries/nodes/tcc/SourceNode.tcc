@@ -85,7 +85,7 @@ namespace nodes
         // Note: currentTime can be retrieved via currentTime = function.ValueAt(pInput, function.Literal(1));
 
         // Set sample values to the output
-        if (!IsScalar(output) && !compiler.GetCompilerParameters().unrollLoops)
+        if (!IsScalar(output) && !compiler.GetCompilerOptions().unrollLoops)
         {
             SetOutputValuesLoop(compiler, function, pBufferedSample);
         }

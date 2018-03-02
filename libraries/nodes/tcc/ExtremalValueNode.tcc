@@ -72,7 +72,7 @@ namespace nodes
     {
         VerifyIsScalar(val);
         VerifyIsScalar(argVal);
-        if (IsPureVector(input) && !compiler.GetCompilerParameters().unrollLoops)
+        if (IsPureVector(input) && !compiler.GetCompilerOptions().unrollLoops)
         {
             CompileLoop(compiler, function);
         }

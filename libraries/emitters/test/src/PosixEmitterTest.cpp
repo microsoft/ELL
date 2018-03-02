@@ -41,8 +41,8 @@ namespace
 {
 bool CanUsePosixLibrary(IRModuleEmitter& module)
 {
-    return module.GetCompilerParameters().targetDevice.IsLinux() ||
-           module.GetCompilerParameters().targetDevice.IsMacOS();
+    return module.GetCompilerOptions().targetDevice.IsLinux() ||
+           module.GetCompilerOptions().targetDevice.IsMacOS();
 }
 }
 

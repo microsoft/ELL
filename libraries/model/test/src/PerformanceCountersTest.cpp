@@ -70,7 +70,7 @@ void TestPerformanceCounters()
     auto matrixMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<double>>(inputNode->output, m, n, k, k, matrix2Node->output, n, n);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", matrixMultNode->output } });
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.profile = true;
 
     // Create first map
