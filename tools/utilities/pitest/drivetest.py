@@ -200,8 +200,8 @@ class DriveTest:
         """Copies demo files needed to run the test"""
         self.copy_files( 
             [ os.path.join(self.ell_root, "tools/utilities/pitest/coffeemug.jpg"),
-            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demo.py"),
-            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py"),
+            os.path.join(self.ell_root, "tools/utilities/pythonlibs/vision/demo.py"),
+            os.path.join(self.ell_root, "tools/utilities/pythonlibs/vision/demoHelper.py"),
             self.labels_file], self.output_dir)
         self.configure_runtest(self.output_dir)
 

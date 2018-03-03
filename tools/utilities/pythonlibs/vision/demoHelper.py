@@ -21,12 +21,11 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 
 
 # Helper class that interfaces with ELL models to get predictions and provides handy conversion from opencv to ELL buffers and 
-# rendering utilties
+# rendering utilities
 class DemoHelper:
     def __init__(self, threshold=0.15):
         """ Helper class to store information about the model we want to use.
-        argv       - arguments passed in from the command line 
-        threshold   - specifies a prediction threshold. We will ignore prediction values less than this
+        threshold   - specifies a prediction threshold
         """
 
         self.threshold = threshold
@@ -258,7 +257,7 @@ class DemoHelper:
         if average_time is not None:
             print("Average prediction time: " + str(average_time))
 
-        # if the model is compiled with profiling enabled, report the addtional info
+        # if the model is compiled with profiling enabled, report the additional info
         if hasattr(self.compiled_module, self.model_name + "_PrintModelProfilingInfo"):
             getattr(self.compiled_module, self.model_name + "_PrintModelProfilingInfo")()
 
@@ -438,93 +437,3 @@ class DemoHelper:
             pass
 
         return result
-
-class TiledImage:
-    def __init__(self, numImages=2, outputHeightAndWidth=(600, 800)):
-        """ Helper class to create a tiled image out of many smaller images.
-        The class calculates how many horizontal and vertical blocks are needed to fit the requested number of images 
-        and fills in unused blocks as blank. For example, to fit 4 images, the number of tiles is 2x2, to fit 5 images,
-        the number of tiles is 3x2, with the last tile being blank.
-        numImages - the maximum number of images that need to be composed into the tiled image. Note that the
-                    actual number of tiles is equal to or larger than this number.
-        outputHeightAndWidth - a list of two values giving the rows and columns of the output image. The output tiled image 
-                            is a composition of sub images.
-        """
-        self.composed_image_shape = self.get_composed_image_shape(numImages)
-        self.number_of_tiles = self.composed_image_shape[0] * self.composed_image_shape[1]
-        self.output_height_and_width = outputHeightAndWidth
-        self.images = None
-        self.window_name = 'ELL side by side'
-        cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL) # Ensure the window is resizable
-        # The aspect ratio of the composed image is now self.composed_image_shape[0] : self.composed_image_shape[1]
-        # Adjust the height of the window to account for this, else images will look distorted
-        cv2.resizeWindow(self.window_name, outputHeightAndWidth[1], int(outputHeightAndWidth[0] * (self.composed_image_shape[0] / self.composed_image_shape[1])))
-
-    def get_composed_image_shape(self, numImages):
-        """Returns a tuple indicating the (rows,cols) of the required number of tiles to hold numImages."""
-        # Split the image horizontally
-        numHorizontal = math.ceil(math.sqrt(numImages))
-        # Split the image vertically
-        numVertical = math.ceil(numImages / numHorizontal)
-
-        return (numVertical, numHorizontal)
-
-    def resize_to_same_height(self, images):
-        minHeight = min([i.shape[0] for i in images])
-        for i in range(len(images)):
-            shape = images[i].shape
-            h = shape[0]
-            if h > minHeight:
-                scale = minHeight / h
-                newSize = (int(shape[1] * scale), int(shape[0] * scale))
-                images[i] = cv2.resize(images[i], newSize)
-        return images
-
-    def compose(self):
-        """Composes an image made by tiling all the sub-images set with `set_image_at`. """
-        yElements = []
-        for verticalIndex in range(self.composed_image_shape[0]):
-            xElements = []
-            for horizontalIndex in range(self.composed_image_shape[1]):
-                currentIndex = verticalIndex * self.composed_image_shape[1] + horizontalIndex
-                xElements.append(self.images[currentIndex])
-            # np.hstack only works if the images are the same height 
-            xElements = self.resize_to_same_height(xElements)
-            horizontalImage = np.hstack(tuple(xElements))
-            yElements.append(horizontalImage)
-        composedImage = np.vstack(tuple(yElements))
-
-        # Draw separation lines
-        yStep = int(composedImage.shape[0] / self.composed_image_shape[0])
-        xStep = int(composedImage.shape[1] / self.composed_image_shape[1])
-        y = yStep
-        x = xStep
-        for horizontalIndex in range(1, self.composed_image_shape[1]):
-            cv2.line(composedImage, (x, 0), (x, composedImage.shape[0]), (0, 0, 0), 3)
-            x = x + xStep
-        for verticalIndex in range(1, self.composed_image_shape[0]):
-            cv2.line(composedImage, (0, y), (composedImage.shape[1], y), (0, 0, 0), 3)
-            y = y + yStep
-        
-        return composedImage
-
-    def set_image_at(self, imageIndex, frame):
-        """Sets the image at the specified index. Once all images have been set, the tiled image result can be retrieved with `compose`."""
-        # Ensure self.images is initialized.
-        if self.images is None:
-            self.images = [None] * self.number_of_tiles
-            for i in range(self.number_of_tiles):
-                self.images[i] = np.zeros((frame.shape), np.uint8)
-
-        # Update the image at the specified index
-        if (imageIndex < self.number_of_tiles):
-            self.images[imageIndex] = frame
-            return True
-        return False
-
-    def show(self):
-        """Shows the final result of the tiled image. Returns True if the user indicates they are done viewing by pressing `Esc`. """
-        # Compose the tiled image
-        imageToShow = self.compose()
-        # Show the tiled image
-        cv2.imshow(self.window_name, imageToShow)

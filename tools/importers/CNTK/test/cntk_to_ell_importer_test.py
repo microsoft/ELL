@@ -35,6 +35,7 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 try:
 
     sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
+    sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs/vision'))
     sys.path.append(os.path.join(script_path, '..'))
     import find_ell
     import ell

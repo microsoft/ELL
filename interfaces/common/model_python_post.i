@@ -167,7 +167,7 @@ def Map_Compute(self, inputData: 'Vector<ElementType>', dtype: 'numpy.dtype') ->
             self.StepFloat()
         else:
             # model has no Source/Sink nodes, so use the compute method            
-            results = self.ComputeFloat(math.FloatVector(vec))
+            results = self.ComputeFloat(FloatVector(vec))
 
     else:
         raise TypeError("Invalid type, expected numpy.float or numpy.float32")
