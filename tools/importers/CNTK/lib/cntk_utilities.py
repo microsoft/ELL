@@ -4,18 +4,20 @@
 # File:     cntk_utilities.py (importers)
 # Authors:  Byron Changuion, Lisa Ong
 #
-# Requires: Python 3.x, cntk-2.0-cp35
+# Requires: Python 3.x, cntk-2.4
 #
 ####################################################################################################
 
 """Internal utilities for the CNTK importer"""
 
-import ell
+import logging
+
 from cntk import parameter, constant, load_model
 from cntk.layers.typing import *
 from cntk.ops import *
 import cntk.logging.graph as graph
-import logging
+
+import ell
 
 _logger = logging.getLogger(__name__)
 
@@ -150,6 +152,9 @@ def get_model_layers(root):
 
     while stack:
         node = stack.pop(0)
+        if node.uid in visited:
+            continue
+
         from cntk import cntk_py
         try:
             # Function node
@@ -173,7 +178,7 @@ def get_model_layers(root):
     return layers
 
 
-def plot_model(root, output_file="model.png"):
+def plot_model(root, output_file="model.svg"):
     """Plots the CNTK model starting from the root node to an output image
 
     Pre-requisites:
@@ -185,3 +190,129 @@ def plot_model(root, output_file="model.png"):
 
     text = graph.plot(root, output_file)
     _logger.info(text)
+
+###############################################################################
+# Code above this belongs to the legacy importer and will be removed
+# once importing Nodes comes online.
+###############################################################################
+
+class Utilities:
+    """
+    Utility class for processing CNTK models.
+    """
+    @staticmethod    
+    def get_model_nodes(root):
+        """Returns a list of the high-level nodes (i.e. function blocks) that make up the CNTK model """
+        stack = [root.root_function]  # node
+        nodes = []         # final result, list of all relevant layers
+        visited = set()
+
+        while stack:
+            node = stack.pop(0)
+            if node.uid in visited:
+                continue
+            
+            from cntk import cntk_py
+            try:
+                node = node.root_function
+                # Function node
+                stack = list(node.root_function.inputs) + stack
+            except AttributeError:
+                # OutputVariable node. We need process the owner node if this is an output.
+                try:
+                    if node.is_output:
+                        stack.insert(0, node.owner)
+                        continue
+                except AttributeError:
+                    pass
+
+            # Add function nodes but skip Variable nodes. Only function nodes are
+            # needed since they represent operations.
+            if (not isinstance(node, Variable)) and (not node.uid in visited):
+                nodes.append(node)
+                visited.add(node.uid)
+                # Also add input variables
+                for i in node.inputs:
+                    if i.is_input:
+                        i.op_name = "Input"
+                        nodes.append(i)                
+
+        nodes.reverse()        
+        return nodes
+
+    @staticmethod    
+    def get_uid(obj):
+        """
+        Returns uid of a cntk node if one exists
+        """
+        if hasattr(obj, "uid"):
+            return obj.uid
+        else:
+            return ""
+
+    @staticmethod    
+    def get_padding_for_layer_with_sliding_window(cntk_attributes, 
+        window_size = 3, scheme = ell.neural.PaddingScheme.zeros):
+        """
+        Returns padding for a cntk node that uses sliding windows like
+        Convolution and Pooling
+        """
+        if ('autoPadding' in cntk_attributes):
+            if (cntk_attributes['autoPadding'][1] == True):
+                padding = int((window_size - 1) / 2)
+            else:
+                padding = cntk_attributes['upperPad'][0]
+        else:
+            padding = cntk_attributes['upperPad'][0]
+        return {"size": padding, "scheme": scheme}    
+    
+    @staticmethod
+    def op_name_equals(node, name):
+        """
+        Returns a bool indicating whether the node's 'op_name' == 'name', if
+        'op_name' exists.
+        """
+        result = False
+        if hasattr(node, 'op_name'):
+            result = (node.op_name == name)
+
+        return result
+
+    @staticmethod    
+    def get_ell_activation_type(nodes):
+        """
+        Returns an ell.neural.ActivationType from the list of nodes
+        """
+        if any(node.op_name == 'ReLU' for node in nodes):
+            return ell.neural.ActivationType.relu
+        elif any(node.op_name == 'Sigmoid' for node in nodes):
+            return ell.neural.ActivationType.sigmoid
+        elif any(node.op_name == 'LeakyReLU' for node in nodes):
+            return ell.neural.ActivationType.leaky
+
+        return None
+
+    @staticmethod    
+    def plot_model(root, output_file="model.svg"):
+        """Plots the CNTK model starting from the root node to an output image
+
+        Pre-requisites:
+            Install graphviz executables from graphviz.org
+            Update your PATH environment to include the path to graphviz
+            pip install graphviz
+            pip install pydot_ng
+        """
+        text = graph.plot(root, output_file)
+        _logger.info(text)
+
+    @staticmethod    
+    def dump(obj):
+        """
+        For debugging purposes
+        """
+        for attr in dir(obj):
+            try:
+                print("%s = %s" % (attr, getattr(obj, attr)))
+            except:
+                print("error, skipping attribute " + attr)
+        return

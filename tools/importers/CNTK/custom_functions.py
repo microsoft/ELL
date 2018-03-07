@@ -4,7 +4,7 @@
 # File:     custom_functions.py (importers)
 # Authors:  Josh Fromm
 #
-# Requires: Python 3.x, cntk-2.0-cp35
+# Requires: Python 3.x, cntk-2.4
 #
 ####################################################################################################
 

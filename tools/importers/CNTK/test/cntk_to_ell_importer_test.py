@@ -4,7 +4,7 @@
 # File:     cntk_to_ell_impporter_test.py (importers)
 # Authors:  Byron Changuion, Kern Handa, Chris Lovett
 #
-# Requires: Python 3.x, cntk-2.0-cp35
+# Requires: Python 3.x, cntk-2.4
 #
 ###############################################################################
 
@@ -14,7 +14,6 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 # being built, so don't run the tests.
 SkipTests = False
 SkipFullModelTests = False
-
 import getopt
 import configparser
 import inspect
@@ -37,6 +36,15 @@ try:
     sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
     sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs/vision'))
     sys.path.append(os.path.join(script_path, '..'))
+    from cntk.initializer import glorot_uniform, he_normal
+    from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout,\
+        BatchNormalization, Dense
+    from cntk import constant, param_relu, load_model
+    import cntk.layers.blocks
+    from cntk.ops import *
+    from itertools import product
+    from download_helper import *
+
     import find_ell
     import ell
     import cntk_to_ell
@@ -45,15 +53,7 @@ try:
     import lib.cntk_layers as cntk_layers
     import lib.cntk_utilities as cntk_utilities
     import cntk_import
-    from cntk.initializer import glorot_uniform, he_normal
-    from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout,\
-        BatchNormalization, Dense
-    from cntk import constant, param_relu, load_model
-    import cntk.layers.blocks
-    from cntk.ops import *
     from custom_functions import BinaryConvolution, CustomSign
-    from itertools import product
-    from download_helper import *
 except ImportError:
     errorType, value, traceback = sys.exc_info()
     if "Could not find ell package" in str(value):

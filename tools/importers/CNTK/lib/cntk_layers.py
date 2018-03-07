@@ -4,13 +4,13 @@
 # File:     cntk_layers.py (importers)
 # Authors:  Byron Changuion, Lisa Ong
 #
-# Requires: Python 3.x, cntk-2.0-cp35
+# Requires: Python 3.x, cntk-2.4
 #
 ####################################################################################################
 
 """Imports CNTK layers to ELL equivalents"""
 import logging
-import ell
+
 from cntk.initializer import glorot_uniform, he_normal
 from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
 import cntk.layers.blocks
@@ -20,6 +20,7 @@ from cntk import load_model
 from cntk.logging.graph import *
 from custom_functions import CustomSign, BinaryConvolution
 
+import ell
 import lib.cntk_converters as converters
 import lib.cntk_utilities as utilities
 from custom_functions import BinaryConvolution, CustomSign

@@ -5,26 +5,26 @@
 ##  File:     cntk_import.py (importers)
 ##  Authors:  Chris Lovett
 ##
-##  Requires: Python 3.x
+##  Requires: Python 3.5+
 ##
 ####################################################################################################
 
 import argparse
 import os
 import sys
+import json
 import logging
+
 import numpy as np
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import find_ell
 import cntk_to_ell
 import ell
-import json
-import logger as log
 import ziptools
 
 def main(argv):
-    logger = log.get()
+    logger = logging.getLogger(__name__)
     arg_parser = argparse.ArgumentParser(
         "Converts CNTK model to ELL model\n"
         "Example:\n"
@@ -35,6 +35,8 @@ def main(argv):
         help="path to a CNTK model file, or a zip archive of a CNTK model file")
     arg_parser.add_argument("--zip_ell_model",
         help="zips the output ELL model if set", action="store_true")
+    arg_parser.add_argument("--use_importer_engine",
+        help="specifies whether to use the new importer engine or the legacy importer", action="store_true")
 
     model_options = arg_parser.add_argument_group('model_options')
     model_options.add_argument("--step_interval",
@@ -60,7 +62,11 @@ def main(argv):
         # not a zip archive
         filename = args['cntk_model_file']
 
-    predictor = cntk_to_ell.predictor_from_cntk_model(filename)
+    if args['use_importer_engine']:
+        logger.info("-- Using new importer engine --")
+        predictor = cntk_to_ell.predictor_from_cntk_model_using_new_engine(filename)
+    else:
+        predictor = cntk_to_ell.predictor_from_cntk_model(filename)
 
     model_file_name = os.path.splitext(filename)[0] + '.ell'
 
