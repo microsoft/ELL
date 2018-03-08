@@ -1,33 +1,79 @@
 [
   {
     "accuracy": {
-      "top1": "52.06",
-      "top5": "76.43"
+      "top1": "55.00",
+      "top5": "78.75"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\d_I128x128x3CMCMCMCMCMCMC1AS\\d_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
+    "elapsedTime": "32:03:20",
     "filter_size": 3,
     "image_size": "128x128",
-    "increase_factor": 0,
-    "model": "d",
-    "name": "d_I128x128x3CMCMCMCMCMCMC1AS",
+    "increase_factor": 112,
+    "lastProgress": 101,
+    "model": "d_19A",
+    "name": "dr_19A_I128x128x3CMCMCMCMCMCMC1AS",
+    "friendly_name": "GardenCress",
     "secs_per_frame": {
-      "pi3": "0.19"
-    }
+      "pi3": "0.17"
+    },
+    "status": "Pass"
   },
   {
     "accuracy": {
-      "top1": "62.87",
-      "top5": "84.63"
+      "top1": "61.29",
+      "top5": "83.57"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19_I128x128x3CMCMCMCMCMCMC1AS\\dr_19_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS_v2\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS_v2.ell.zip",
+    "elapsedTime": "48:05:09",
     "filter_size": 3,
     "image_size": "128x128",
-    "increase_factor": 0,
-    "model": "d_19",
-    "name": "dr_19_I128x128x3CMCMCMCMCMCMC1AS",
+    "increase_factor": 112,
+    "lastProgress": 45,
+    "model": "d_19A",
+    "name": "dr_19A_I128x128x3CMCMCMCMCMCMC1AS_v2",
+    "friendly_name": "MountainPepper",
     "secs_per_frame": {
-      "pi3": "0.75"
-    }
+      "pi3": "0.69"
+    },
+    "status": "Running"
+  },
+  {
+    "accuracy": {
+      "top1": "55.93",
+      "top5": "79.47"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19B2_I128x128x3CMCMCMCMCMCMC1AS\\dr_19B2_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
+    "elapsedTime": "29:13:34",
+    "filter_size": 3,
+    "image_size": "128x128",
+    "increase_factor": 112,
+    "lastProgress": 101,
+    "model": "d_19B2",
+    "name": "dr_19B2_I128x128x3CMCMCMCMCMCMC1AS",
+    "friendly_name": "Ampullaris",
+    "secs_per_frame": {
+      "pi3": "0.30"
+    },
+    "status": "Pass"
+  },
+  {
+    "accuracy": {
+      "top1": "63.76",
+      "top5": "85.08"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19C_I128x128x3CMCMCMCMCMCMC1AS\\dr_19C_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
+    "elapsedTime": "48:25:48",
+    "filter_size": 3,
+    "image_size": "128x128",
+    "increase_factor": 112,
+    "lastProgress": 76,
+    "model": "d_19C",
+    "name": "dr_19C_I128x128x3CMCMCMCMCMCMC1AS",
+    "friendly_name": "Woodruff",
+    "secs_per_frame": {
+      "pi3": "0.76"
+    },
+    "status": "Running"
   },
   {
     "accuracy": {
@@ -35,89 +81,113 @@
       "top5": "76.80"
     },
     "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19_I64x64x3CMCMCMCMCMC1AS\\dr_19_I64x64x3CMCMCMCMCMC1AS.ell.zip",
+    "elapsedTime": "26:13:03",
     "filter_size": 3,
     "image_size": "64x64",
     "increase_factor": 0,
+    "lastProgress": 86,
     "model": "d_19",
     "name": "dr_19_I64x64x3CMCMCMCMCMC1AS",
+    "friendly_name": "Lettuce",
     "secs_per_frame": {
       "pi3": "0.16"
-    }
+    },
+    "status": "Running"
   },
   {
     "accuracy": {
-      "top1": "60.11",
-      "top5": "82.27"
+      "top1": "64.84",
+      "top5": "85.89"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_313B_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_313B_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
+    "elapsedTime": "44:33:32",
     "filter_size": 3,
     "image_size": "256x256",
     "increase_factor": 112,
-    "model": "d_reference",
-    "name": "dr_I256x256x3CMCMCMCMCMCMCMC1AS",
+    "lastProgress": 101,
+    "model": "d_313B",
+    "name": "dr_313B_I256x256x3CMCMCMCMCMCMCMC1AS",
+    "friendly_name": "CustardApple",
     "secs_per_frame": {
-      "pi3": "0.59"
-    }
+      "pi3": "0.83"
+    },
+    "status": "Pass"
   },
   {
     "accuracy": {
-      "top1": "62.65",
-      "top5": "84.27"
+      "top1": "65.18",
+      "top5": "86.31"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_c_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_c_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_313C_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_313C_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
+    "elapsedTime": "61:01:25",
     "filter_size": 3,
     "image_size": "256x256",
     "increase_factor": 112,
-    "model": "d_reference_configurable",
-    "name": "dr_c_I256x256x3CMCMCMCMCMCMCMC1AS",
+    "lastProgress": 101,
+    "model": "d_313C",
+    "name": "dr_313C_I256x256x3CMCMCMCMCMCMCMC1AS",
+    "friendly_name": "WaterSpinach",
     "secs_per_frame": {
-      "pi3": "0.86"
-    }
+      "pi3": "0.95"
+    },
+    "status": "Pass"
   },
   {
     "accuracy": {
-      "top1": "56.24",
-      "top5": "79.32"
+      "top1": "63.68",
+      "top5": "85.31"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v2\\dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v2.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_313_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_313_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
+    "elapsedTime": "43:29:29",
     "filter_size": 3,
     "image_size": "256x256",
     "increase_factor": 112,
-    "model": "d_reference_configurable",
-    "name": "dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v2",
+    "lastProgress": 101,
+    "model": "d_313",
+    "name": "dr_313_I256x256x3CMCMCMCMCMCMCMC1AS",
+    "friendly_name": "Zwetschge",
     "secs_per_frame": {
-      "pi3": "0.41"
-    }
+      "pi3": "0.68"
+    },
+    "status": "Pass"
   },
   {
     "accuracy": {
-      "top1": "49.65",
-      "top5": "74.12"
+      "top1": "61.56",
+      "top5": "83.93"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v3\\dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v3.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
+    "elapsedTime": "43:40:03",
     "filter_size": 3,
     "image_size": "256x256",
     "increase_factor": 112,
-    "model": "d_reference_configurable",
-    "name": "dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v3",
+    "lastProgress": 62,
+    "model": "d_reference_configurable_313_2X",
+    "name": "dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS",
+    "friendly_name": "Ziziphus",
     "secs_per_frame": {
-      "pi3": "0.24"
-    }
+      "pi3": "0.54"
+    },
+    "status": "Running"
   },
   {
     "accuracy": {
-      "top1": "63.83",
-      "top5": "85.21"
+      "top1": "57.43",
+      "top5": "80.91"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v5\\dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v5.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS_v2\\dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS_v2.ell.zip",
+    "elapsedTime": "30:12:28",
     "filter_size": 3,
     "image_size": "256x256",
     "increase_factor": 112,
-    "model": "d_reference_configurable",
-    "name": "dr_c_I256x256x3CMCMCMCMCMCMCMC1AS_v5",
+    "lastProgress": 101,
+    "model": "d_reference_configurable_313_2X",
+    "name": "dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS_v2",
+    "friendly_name": "Mangosteen",
     "secs_per_frame": {
-      "pi3": "1.13"
-    }
+      "pi3": "0.29"
+    },
+    "status": "Pass"
   },
   {
     "accuracy": {
@@ -125,29 +195,37 @@
       "top5": "80.85"
     },
     "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dsb_I128x128x3CMCMCMCMCMCCCMC1AS\\dsb_I128x128x3CMCMCMCMCMCCCMC1AS.ell.zip",
+    "elapsedTime": "50:45:59",
     "filter_size": 3,
     "image_size": "128x128",
     "increase_factor": 0,
+    "lastProgress": 101,
     "model": "dstackedbottom",
     "name": "dsb_I128x128x3CMCMCMCMCMCCCMC1AS",
+    "friendly_name": "Butternut",
     "secs_per_frame": {
       "pi3": "0.41"
-    }
+    },
+    "status": "Pass"
   },
   {
     "accuracy": {
-      "top1": "40.98",
-      "top5": "66.43"
+      "top1": "41.07",
+      "top5": "66.34"
     },
     "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dsb_I64x64x3CMCMCMCMCCCMC1AS\\dsb_I64x64x3CMCMCMCMCCCMC1AS.ell.zip",
+    "elapsedTime": "35:15:30",
     "filter_size": 3,
     "image_size": "64x64",
     "increase_factor": 0,
+    "lastProgress": 101,
     "model": "dstackedbottom",
     "name": "dsb_I64x64x3CMCMCMCMCCCMC1AS",
+    "friendly_name": "Loosestrife",
     "secs_per_frame": {
-      "pi3": "0.09"
-    }
+      "pi3": "0.10"
+    },
+    "status": "Pass"
   },
   {
     "accuracy": {
@@ -155,14 +233,18 @@
       "top5": "83.88"
     },
     "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\v_I64x64x3CCMCCMCCCCMCCCCMCCCCMF2048S\\v_I64x64x3CCMCCMCCCCMCCCCMCCCCMF2048S.ell.zip",
+    "elapsedTime": "44:26:40",
     "filter_size": 3,
     "image_size": "64x64",
     "increase_factor": 112,
+    "lastProgress": 101,
     "model": "v",
     "name": "v_I64x64x3CCMCCMCCCCMCCCCMCCCCMF2048S",
+    "friendly_name": "Aubergine",
     "secs_per_frame": {
       "pi3": "1.01"
-    }
+    },
+    "status": "Pass"
   },
   {
     "accuracy": {
@@ -170,14 +252,18 @@
       "top5": "83.02"
     },
     "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\v_I64x64x3CCMCCMCCMCCMCCMF4096S\\v_I64x64x3CCMCCMCCMCCMCCMF4096S.ell.zip",
+    "elapsedTime": "32:36:19",
     "filter_size": 3,
     "image_size": "64x64",
     "increase_factor": 112,
+    "lastProgress": 101,
     "model": "v",
     "name": "v_I64x64x3CCMCCMCCMCCMCCMF4096S",
+    "friendly_name": "Fuji",
     "secs_per_frame": {
       "pi3": "0.65"
-    }
+    },
+    "status": "Pass"
   },
   {
     "accuracy": {
@@ -185,13 +271,17 @@
       "top5": "80.31"
     },
     "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\v_I64x64x3CCMCCMCMCMCMF3072S\\v_I64x64x3CCMCCMCMCMCMF3072S.ell.zip",
+    "elapsedTime": "33:40:13",
     "filter_size": 3,
     "image_size": "64x64",
     "increase_factor": 112,
+    "lastProgress": 101,
     "model": "v",
     "name": "v_I64x64x3CCMCCMCMCMCMF3072S",
+    "friendly_name": "Mint",
     "secs_per_frame": {
       "pi3": "0.46"
-    }
+    },
+    "status": "Pass"
   }
 ]
