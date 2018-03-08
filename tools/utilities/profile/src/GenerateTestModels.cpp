@@ -298,7 +298,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     VectorType bnMean;
     VectorType bnVar;
     BinaryConvolutionalParameters convParams{ 3, 1, BinaryConvolutionMethod::bitwise, scaleByFilterMeans ? BinaryWeightsScale::mean : BinaryWeightsScale::none };
-    ConvolutionalParameters realConvParams{ 3, 1, ConvolutionMethod::columnwise, 1 };
+    ConvolutionalParameters realConvParams{ 3, 1, ConvolutionMethod::unrolled, 1 };
 
     // Input layer:  160x160x3
     InputParameters inputParams = { {160, 160, 3}, NoPadding(), {160, 160, 3}, NoPadding(), 1 };
@@ -308,7 +308,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     bias = GetRandomVector<VectorType>(3);
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, inputLayer, NoPadding(), {162, 162, 3}, ZeroPadding(1), bias);
 
-    // BinaryConvolutionalLayer<float>(shape=[162,162,3]->[160,160,16], inputPadding=zeros,1, stride=1, method=columnwise, receptiveField=3, numFilters=16)
+    // BinaryConvolutionalLayer<float>(shape=[162,162,3]->[160,160,16], inputPadding=zeros,1, stride=1, method=unrolled, receptiveField=3, numFilters=16)
     auto convWeights = GetRandomTensor<TensorType>(3 * 16, 3, 3); // k * f, k, ch
     AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {160, 160, 16}, NoPadding(), convParams, convWeights);
 
@@ -335,7 +335,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     // PoolingLayer<float,MaxPoolingFunction>(shape=[160,160,16]->[82,82,16], outputPadding=zeros,1, function=maxpooling, stride=2, size=2)
     AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, NoPadding(), {82, 82, 16}, ZeroPadding(1), PoolingParameters{2, 2});
 
-    // BinaryConvolutionalLayer<float>(shape=[82,82,16]->[80,80,64], inputPadding=zeros,1, stride=1, method=columnwise, receptiveField=3, numFilters=64)
+    // BinaryConvolutionalLayer<float>(shape=[82,82,16]->[80,80,64], inputPadding=zeros,1, stride=1, method=unrolled, receptiveField=3, numFilters=64)
     convWeights = GetRandomTensor<TensorType>(3 * 64, 3, 16); // k * f, k, ch
     AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {80, 80, 64}, NoPadding(), convParams, convWeights);
 
@@ -497,7 +497,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     bias = GetRandomVector<VectorType>(1024);
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1024}, NoPadding(), bias);
 
-    // ConvolutionalLayer<float>(shape=[2,2,1024]->[2,2,1000], stride=1, method=columnwise, receptiveField=1, numFilters=1000)
+    // ConvolutionalLayer<float>(shape=[2,2,1024]->[2,2,1000], stride=1, method=unrolled, receptiveField=1, numFilters=1000)
     convWeights = GetRandomTensor<TensorType>(3 * 1000, 3, 1024); // k * f, k, ch
     if(lastLayerReal)
     {

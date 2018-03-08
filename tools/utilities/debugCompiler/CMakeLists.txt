@@ -31,7 +31,7 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${tool_name} ${src} ${include} ${tcc})
 target_include_directories(${tool_name} PRIVATE include pythonPlugins utilities)
-target_link_libraries(${tool_name} utilities math model nodes common pythonPlugins)
+target_link_libraries(${tool_name} common math model nodes passes utilities pythonPlugins)
 copy_shared_libraries(${tool_name})
 
 set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")

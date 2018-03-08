@@ -145,9 +145,9 @@ namespace common
             "");
     }
 
-    model::MapCompilerParameters MapCompilerArguments::GetMapCompilerParameters(const std::string& modelName) const
+    model::MapCompilerOptions MapCompilerArguments::GetMapCompilerOptions(const std::string& modelName) const
     {
-        model::MapCompilerParameters settings;
+        model::MapCompilerOptions settings;
         bool namespaceSpecified = true;
         auto namespacePrefix = compiledModuleName;
         if (namespacePrefix == "")
@@ -175,9 +175,9 @@ namespace common
 
         settings.moduleName = namespacePrefix;
         settings.mapFunctionName = functionName;
+        settings.optimizerSettings.fuseLinearFunctionNodes = fuseLinearOperations;
         settings.compilerSettings.optimize = optimize;
         settings.compilerSettings.useBlas = useBlas;
-        settings.fuseLinearFunctionNodes = fuseLinearOperations;
         settings.compilerSettings.allowVectorInstructions = enableVectorization;
         settings.compilerSettings.parallelize = parallelize;
         settings.compilerSettings.vectorWidth = vectorWidth;

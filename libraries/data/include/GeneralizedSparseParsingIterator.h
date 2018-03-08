@@ -10,12 +10,6 @@
 #include "IndexValue.h"
 #include "TextLine.h"
 
-// stl
-#include <iostream>
-#include <memory>
-#include <string>
-#include <cctype>
-
 namespace ell
 {
 namespace data

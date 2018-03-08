@@ -86,8 +86,7 @@ class PretrainedModel:
         cmakefile = os.path.join(outdir, 'CMakeLists.txt')
         if not os.path.exists(cmakefile) or _is_file_newer(inpath + '.ell', cmakefile) \
            or not os.path.exists(outpath + '.bc'):
-            
-            compiled = ellmap.Compile(target, self.name, 'model_predict', True,
+            compiled = ellmap.Compile(target, self.name, 'model_predict',
                 dtype=np.float32)
             compiled.WriteBitcode(outpath + '.bc')
             compiled.WriteSwigInterface(outpath + '.i')

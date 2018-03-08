@@ -4,7 +4,7 @@
 # File:     cntk_to_ell_impporter_test.py (importers)
 # Authors:  Byron Changuion, Kern Handa, Chris Lovett
 #
-# Requires: Python 3.x, cntk-2.0-cp35
+# Requires: Python 3.x, cntk-2.4
 #
 ###############################################################################
 
@@ -14,7 +14,6 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 # being built, so don't run the tests.
 SkipTests = False
 SkipFullModelTests = False
-
 import getopt
 import configparser
 import inspect
@@ -35,25 +34,26 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 try:
 
     sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
+    sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs/vision'))
     sys.path.append(os.path.join(script_path, '..'))
-    import find_ell
-    import ell
-    import cntk_to_ell
-    import demoHelper as dh
-    import ziptools
-    import lib.cntk_converters as cntk_converters
-    import lib.cntk_layers as cntk_layers
-    import lib.cntk_utilities as cntk_utilities
-    import cntk_import
     from cntk.initializer import glorot_uniform, he_normal
     from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout,\
         BatchNormalization, Dense
     from cntk import constant, param_relu, load_model
     import cntk.layers.blocks
     from cntk.ops import *
-    from custom_functions import BinaryConvolution, CustomSign
     from itertools import product
     from download_helper import *
+
+    import find_ell
+    import ell
+    import cntk_to_ell
+    import ziptools
+    import lib.cntk_converters as cntk_converters
+    import lib.cntk_layers as cntk_layers
+    import lib.cntk_utilities as cntk_utilities
+    import cntk_import
+    from custom_functions import BinaryConvolution, CustomSign
 except ImportError:
     errorType, value, traceback = sys.exc_info()
     if "Could not find ell package" in str(value):
@@ -195,7 +195,9 @@ class CntkLayersTestCase(CntkToEllTestBase):
         map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
 
         # Note: for testing purposes, callback functions assume the "model" namespace
-        compiled = map.Compile("host", "model", method_name, False, dtype=np.float32)
+        compile_options = ell.model.MapCompilerOptions()
+        compile_options.useBlas = False
+        compiled = map.Compile("host", "model", method_name, compilerOptions=compile_options, dtype=np.float32)
         compiledResults = compiled.Compute(input, dtype=np.float32)
 
         # Compare compiled results
@@ -697,12 +699,14 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
 
             # Compile the live map
             # Note: for testing purposes, callback functions assume the "model" namespace
-            ellCompiledMap = ellMap.Compile('host', 'model', 'predict', False, dtype=np.float32)
+            compiler_options = ell.model.MapCompilerOptions()
+            compiler_options.useBlas = False
+            ellCompiledMap = ellMap.Compile('host', 'model', 'predict', compilerOptions=compiler_options, dtype=np.float32)
 
             # Compile the unarchived map
             # Note: for testing purposes, callback functions assume the "model" namespace
             ellCompiledMapFromArchive = ellMapFromArchive.Compile(
-                'host', 'model', 'predict', False, dtype=np.float32)
+                'host', 'model', 'predict', compilerOptions=compiler_options, dtype=np.float32)
 
             cntkInput = np.random.uniform(
                 high=255, size=(
@@ -898,8 +902,10 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
         """
         # Note: for testing purposes, callback functions assume the "model" namespace
         ell_map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
+        compiler_options = ell.model.MapCompilerOptions()
+        compiler_options.useBlas = False
         compiled = ell_map.Compile("host", "model", "test{}".format(
-            self.method_index), False, dtype=np.float32)
+            self.method_index), compilerOptions=compiler_options, dtype=np.float32)
         self.method_index += 1
 
         compiledResults = np.array(compiled.Compute(inputData, dtype=np.float32))

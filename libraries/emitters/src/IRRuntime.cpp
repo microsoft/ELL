@@ -14,10 +14,6 @@
 // utilities
 #include "Unused.h"
 
-// stl
-#include <iostream>
-#include <time.h>
-
 namespace ell
 {
 namespace emitters
@@ -190,7 +186,7 @@ namespace emitters
     llvm::Type* IRRuntime::GetIntType()
     {
         auto& context = _module.GetLLVMContext();
-        const auto numBits = _module.GetCompilerParameters().targetDevice.numBits;
+        const auto numBits = _module.GetCompilerOptions().targetDevice.numBits;
         if (numBits != 0)
         {
             return llvm::Type::getIntNTy(context, numBits);
@@ -221,7 +217,7 @@ namespace emitters
         llvm::Argument& leftValue = *arguments++;
         llvm::Argument& rightValue = *arguments++;
         llvm::Argument& result = *arguments++;
-        function.DotProductFloat(&count, &leftValue, &rightValue, &result);
+        function.DotProduct(&count, &leftValue, &rightValue, &result);
         function.Return();
         _module.EndFunction();
 
@@ -261,7 +257,7 @@ namespace emitters
         auto tmFieldType = timespecType->getElementType(0); // The type of the first field of the timespec struct -- it's the correct bitsize for 'int'
         auto intType = tmFieldType;
 
-        if (_module.GetCompilerParameters().targetDevice.IsWindows())
+        if (_module.GetCompilerOptions().targetDevice.IsWindows())
         {
             // We normally assume there is a system function "clock_gettime" that provides high resolution times for profiling the emitted model.
             // But this function doesn't exist on Windows.  So on Windows we implement this function to call the Win32 QueryPerformanceCounter API.

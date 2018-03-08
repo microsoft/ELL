@@ -6,8 +6,11 @@
 ELL model classes
 """
 
-from ..ell_py import CompiledMap,\
-Map,\
-Model,\
-ModelBuilder,\
-TransformContext
+from ..ell_py import \
+    CompiledMap,\
+    Map,\
+    MapCompilerOptions,\
+    Model,\
+    ModelBuilder,\
+    ModelOptimizerOptions,\
+    TransformContext

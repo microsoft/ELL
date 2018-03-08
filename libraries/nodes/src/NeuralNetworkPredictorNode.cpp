@@ -80,16 +80,15 @@ namespace nodes
         // Adjust the padding and data ordering depending on what options were set
         //
         // Constraints:
-        //   diag conv: interleaved order, data padding
-        //   normal conv: planar order, no padding
+        //   diagonal conv: interleaved order, data padding
+        //   unrolled conv: planar order, no padding
         //
         // options:
         //
-        // - diag vs. normal conv
+        // - convolution method
         // - always use regular 'normal' convolution
         // - always use transposed 'normal' convolution
         // - threshold to switch between regular and transposed 'normal' conv (ratio of # memcopies?)
-        //
         //
         // - always revert to interleaved order
         // - always revert to planar order

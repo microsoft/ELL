@@ -327,7 +327,7 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
     # Create the appropriate convolutional layer
     if 'xnor' not in layer:
         # Create the ELL convolutional layer
-        convolutionalParameters = ell.neural.ConvolutionalParameters(int(layer["size"]), int(layer["stride"]), ell.neural.ConvolutionMethod.columnwise, int(layer['filters']))
+        convolutionalParameters = ell.neural.ConvolutionalParameters(int(layer["size"]), int(layer["stride"]), ell.neural.ConvolutionMethod.unrolled, int(layer['filters']))
         layers.append(ell.neural.FloatConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
     else:
         # Create the ELL binary convolutional layer

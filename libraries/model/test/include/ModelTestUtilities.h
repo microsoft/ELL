@@ -8,16 +8,16 @@
 #pragma once
 
 // model
-#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRDiagnosticHandler.h"
+#include "Map.h"
 #include "Port.h"
 
 // testing
 #include "testing.h"
 
 // stl
-#include <ostream>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -39,6 +39,8 @@ bool IsVerbose();
 
 template <typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T>& v);
+
+void PrintMap(const model::Map& map);
 
 void PrintModel(const model::Model& model);
 void PrintModel(const model::Model& model, const model::Node* output);

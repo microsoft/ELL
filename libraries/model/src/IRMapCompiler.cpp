@@ -10,6 +10,8 @@
 #include "CompilableNode.h"
 #include "CompilableNodeUtilities.h"
 #include "IRModelProfiler.h"
+#include "ModelOptimizer.h"
+#include "OptimizationPassRegistry.h"
 #include "OutputNode.h"
 
 // emitters
@@ -27,27 +29,30 @@ namespace model
     using namespace logging;
 
     IRMapCompiler::IRMapCompiler()
-        : IRMapCompiler(MapCompilerParameters{})
+        : IRMapCompiler(MapCompilerOptions{})
     {
     }
 
-    IRMapCompiler::IRMapCompiler(const MapCompilerParameters& settings)
+    IRMapCompiler::IRMapCompiler(const MapCompilerOptions& settings)
         : MapCompiler(settings), _moduleEmitter(settings.moduleName, settings.compilerSettings), _profiler()
     {
         Log() << "Initializing IR map compiler" << EOL;
 
-        _moduleEmitter.SetCompilerParameters(GetMapCompilerParameters().compilerSettings);
-        _moduleEmitter.SetTargetTriple(GetCompilerParameters().targetDevice.triple);
+        _moduleEmitter.SetCompilerOptions(GetMapCompilerOptions().compilerSettings);
+        _moduleEmitter.SetTargetTriple(GetCompilerOptions().targetDevice.triple);
 
-        _moduleEmitter.SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
-        Log() << "Target device triple: " << GetCompilerParameters().targetDevice.triple << EOL
-              << "Target device layout: " << GetCompilerParameters().targetDevice.dataLayout << EOL;
+        _moduleEmitter.SetTargetDataLayout(GetCompilerOptions().targetDevice.dataLayout);
+        Log() << "Target device triple: " << GetCompilerOptions().targetDevice.triple << EOL
+              << "Target device layout: " << GetCompilerOptions().targetDevice.dataLayout << EOL;
 
         if (settings.compilerSettings.includeDiagnosticInfo)
         {
             _moduleEmitter.DeclarePrintf();
             Log() << "Including diagnostic information in IR" << EOL;
         }
+
+        Log() << "Initializing optimizer" << EOL;
+        OptimizationPassRegistry::AddPassesToOptimizer(_optimizer, settings.optimizerSettings);
 
         _nodeRegions.emplace_back();
     }
@@ -112,7 +117,7 @@ namespace model
 
     std::string IRMapCompiler::GetPredictFunctionName() const
     {
-        return GetMapCompilerParameters().mapFunctionName;
+        return GetMapCompilerOptions().mapFunctionName;
     }
 
     IRCompiledMap IRMapCompiler::Compile(Map map)
@@ -124,19 +129,22 @@ namespace model
         model::TransformContext context{ this, [this](const model::Node& node) { return node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
         map.Refine(context);
 
+        Log() << "Optimizing the model..." << EOL;
+        map.Optimize(_optimizer);
+
         // Renaming callbacks based on map compiler parameters
         // Note: a more elegant solution is emit variables which get assigned to
         // function pointers at runtime (prior to computing the map).
         Log() << "Renaming callbacks..." << EOL;
-        map.RenameCallbacks(GetMapCompilerParameters().sourceFunctionName, GetMapCompilerParameters().sinkFunctionName);
+        map.RenameCallbacks(GetMapCompilerOptions().sourceFunctionName, GetMapCompilerOptions().sinkFunctionName);
 
         // Now the model ready for compiling
-        if (GetMapCompilerParameters().profile)
+        if (GetMapCompilerOptions().profile)
         {
             Log() << "Enabling profiling in emitted IR" << EOL;
             GetModule().AddPreprocessorDefinition(GetNamespacePrefix() + "_PROFILING", "1");
         }
-        _profiler = { GetModule(), map.GetModel(), GetMapCompilerParameters().profile };
+        _profiler = { GetModule(), map.GetModel(), GetMapCompilerOptions().profile };
         _profiler.EmitInitialization();
 
         // Now we have the refined map, compile it
@@ -150,7 +158,7 @@ namespace model
         _profiler.EmitModelProfilerFunctions();
 
         auto module = std::make_unique<emitters::IRModuleEmitter>(std::move(_moduleEmitter));
-        return IRCompiledMap(std::move(map), GetMapCompilerParameters().mapFunctionName, std::move(module));
+        return IRCompiledMap(std::move(map), GetMapCompilerOptions().mapFunctionName, std::move(module));
     }
 
     void IRMapCompiler::EmitModelAPIFunctions(const Map& map)
@@ -502,7 +510,7 @@ namespace model
 
         GetCurrentNodeBlocks().Set(node, currentRegion);
 
-        if (GetMapCompilerParameters().compilerSettings.includeDiagnosticInfo)
+        if (GetMapCompilerOptions().compilerSettings.includeDiagnosticInfo)
         {
             currentFunction.Print(DiagnosticString(node) + '\n');
         }

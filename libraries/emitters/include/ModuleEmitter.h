@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "CompilerOptions.h"
 #include "EmitterTypes.h"
 #include "TargetDevice.h"
 #include "Variable.h"
@@ -30,33 +31,6 @@ namespace emitters
         swigInterface
     };
 
-    /// <summary> List of possible BLAS implementations (for enabling implementation-specific features). </summary>
-    enum class BlasType
-    {
-        unknown = 0,
-        openBLAS,
-        atlas
-    };
-    
-    /// <summary> Standard compiler switches. </summary>
-    struct CompilerParameters
-    {
-        bool unrollLoops = false;
-        bool inlineOperators = true;
-        bool allowVectorInstructions = false;
-        int vectorWidth = 4;
-        bool useBlas = false;
-        BlasType blasType = BlasType::unknown;
-        bool optimize = true;
-        bool includeDiagnosticInfo = false;
-        bool parallelize = false;
-        bool useThreadPool = true;
-        int maxThreads = 4;
-        bool debug = false;
-
-        TargetDevice targetDevice;
-    };
-
     /// <summary> Abstract base class for ELL compilers </summary>
     class ModuleEmitter
     {
@@ -66,17 +40,17 @@ namespace emitters
         /// <summary> Return the base compiler settings </summary>
         ///
         /// <returns> The settings for the compiler </returns>
-        const CompilerParameters& GetCompilerParameters() const { return _parameters; }
+        const CompilerOptions& GetCompilerOptions() const { return _options; }
 
         /// <summary> Set the base compiler settings </summary>
         ///
         /// <param name="parameters"> The settings for the compiler to use </param>
-        virtual void SetCompilerParameters(const CompilerParameters& parameters);
+        virtual void SetCompilerOptions(const CompilerOptions& options);
 
         /// <summary> Fills in missing values in the compiler settings </summary>
         ///
         /// <param name="parameters"> The compiler settings to fill in </param>
-        static void CompleteCompilerParameters(CompilerParameters& parameters);
+        static void CompleteCompilerOptions(CompilerOptions& parameters);
 
         // Note, this differs from IRModuleEmitter::BeginFunction only by return type
         /// <summary> Set a function declaration. Note that BeginMapPredictFunction can't be called from within a function - it completes the currently-being-emitted function </summary>
@@ -189,7 +163,7 @@ namespace emitters
         void FreeVariable(Variable& var);
 
     private:
-        CompilerParameters _parameters;
+        CompilerOptions _options;
 
         EmittedVariableAllocator _inputVars; // Runtime input variable table
         EmittedVariableAllocator _outputVars; // Runtime output variable table

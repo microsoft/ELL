@@ -64,7 +64,7 @@ def plot_model(modelFile, outputFile):
  
 def main(argv): 
     modelFile = '' 
-    outputFile = 'out.png' 
+    outputFile = 'out.svg' 
     try: 
         opts, args = getopt.getopt(argv,"hm:o:",["modelFile=","outputFile="]) 
     except getopt.GetoptError: 
@@ -92,7 +92,7 @@ if __name__ == "__main__":
 For example, to plot the VGG16 model from ELL's getting started tutorial: 
  
 ```
-python plot_model.py -m VGG16_ImageNet_Caffe.model -o vgg16.png
+python plot_model.py -m VGG16_ImageNet_Caffe.model -o vgg16.svg
 ```
 
 This produces a PNG file that shows a graph of the functions/blocks in a model.

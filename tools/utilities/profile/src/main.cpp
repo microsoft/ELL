@@ -24,6 +24,9 @@
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
 
+// passes
+#include "StandardPasses.h"
+
 // utilities
 #include "CommandLineParser.h"
 #include "Exception.h"
@@ -312,9 +315,13 @@ void TimeModel(model::Map& map, const std::vector<InputType>& input, const Profi
     // Get output stream
     auto outputStream = GetOutputStream(profileArguments.outputFilename);
 
+    // Initialize pass registry
+    passes::AddStandardPassesToRegistry();
+
     // Compile map
-    model::MapCompilerParameters settings = mapCompilerArguments.GetMapCompilerParameters("");
+    model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions("");
     settings.profile = false;
+    settings.optimizerSettings.fuseLinearFunctionNodes = true;
     model::IRMapCompiler compiler(settings);
 
     std::cout << "Compiling model" << std::endl;
@@ -366,9 +373,13 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
         return;
     }
 
+    // Initialize pass registry
+    passes::AddStandardPassesToRegistry();
+
     // Compile map
-    model::MapCompilerParameters settings = mapCompilerArguments.GetMapCompilerParameters("");
+    model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions("");
     settings.profile = true;
+    settings.optimizerSettings.fuseLinearFunctionNodes = true;
     model::IRMapCompiler compiler(settings);
 
     std::cout << "Compiling model" << std::endl;

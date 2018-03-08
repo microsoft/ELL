@@ -372,23 +372,29 @@ void ConvolutionalLayerTest()
     using Shape = typename Layer<ElementType>::Shape;
 
     // Verify ConvolutionalLayer with diagonal method
-    TensorType input(3, 4, 2); // Input includes padding
+    TensorType input(3, 4, 2); // Input includes padding --- 1 x 2 x 2 with 1 pixel of padding 
     input.Fill(0);
     input(1, 1, 0) = 2;
     input(1, 2, 0) = 1;
     input(1, 1, 1) = 3;
     input(1, 2, 1) = 2;
-    Shape outputShape = { 1, 2, 2 }; // Output has no padding
+    Shape outputShape = { 1, 2, 2 }; // Output has no padding: 1 x 2 x 2
     LayerParameters parameters{ input, ZeroPadding(1), outputShape, NoPadding() };
     ConvolutionalParameters convolutionalParams{ 3, 1, ConvolutionMethod::diagonal, 2 };
-    TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
+    
+    // Filter weights in `weightsVector` are in numFilters x numChannels x filterSize x filterSize order
     // clang-format off
-    std::vector<ElementType> weightsVector{   // RowMajor then depth order
-        1, 3, 2, 3, 1, 1, 2, 3, 1,
-        2, 4, 1, 3, 1, 2, 1, 4, 2,
-        1, 2, 1, 2, 3, 2, 1, 2, 1,
-        0, 3, 2, 3, 1, 2, 1, 0, 2 };
+    std::vector<ElementType> weightsVector {
+        1, 3, 2,   3, 1, 1,   2, 3, 1,   // Filter 1, channel 1
+        2, 4, 1,   3, 1, 2,   1, 4, 2,   // Filter 1, channel 2
+
+        1, 2, 1,   2, 3, 2,   1, 2, 1,   // Filter 2, channel 1
+        0, 3, 2,   3, 1, 2,   1, 0, 2 }; // Filter 2, channel 2
     // clang-format on
+
+    // Filter weights in `weights` tensor are in numFilters x filterSize x filterSize x numChannels order
+    TensorType weights(outputShape.NumChannels() * convolutionalParams.receptiveField, convolutionalParams.receptiveField, input.NumChannels());
+
     size_t vectorIndex = 0;
     for (size_t f = 0; f < outputShape.NumChannels(); f++)
     {
@@ -404,19 +410,27 @@ void ConvolutionalLayerTest()
         }
     }
 
-    ConvolutionalLayer<ElementType> convolutionalLayer(parameters, convolutionalParams, weights);
-    convolutionalLayer.Compute();
-    auto output = convolutionalLayer.GetOutput();
+    // Verify ConvolutionalLayer with simple method
+    convolutionalParams.method = ConvolutionMethod::simple;
+    ConvolutionalLayer<ElementType> convolutionalLayerSimple(parameters, convolutionalParams, weights);
+    convolutionalLayerSimple.Compute();
+    auto outputSimple = convolutionalLayerSimple.GetOutput();
+    testing::ProcessTest("Testing ConvolutionalLayer (simple), values", Equals(outputSimple(0, 0, 0), 10) && Equals(outputSimple(0, 0, 1), 15) && Equals(outputSimple(0, 1, 0), 18) && Equals(outputSimple(0, 1, 1), 18));
 
-    testing::ProcessTest("Testing ConvolutionalLayer (diagonal), values", Equals(output(0, 0, 0), 10) && Equals(output(0, 0, 1), 15) && Equals(output(0, 1, 0), 18) && Equals(output(0, 1, 1), 18));
+    // Verify ConvolutionalLayer with unrolled method
+    convolutionalParams.method = ConvolutionMethod::unrolled;
+    ConvolutionalLayer<ElementType> convolutionalLayerUnrolled(parameters, convolutionalParams, weights);
+    convolutionalLayerUnrolled.Compute();
+    auto outputUnrolled = convolutionalLayerUnrolled.GetOutput();
+    testing::ProcessTest("Testing ConvolutionalLayer (unrolled), values", Equals(outputUnrolled(0, 0, 0), 10) && Equals(outputUnrolled(0, 0, 1), 15) && Equals(outputUnrolled(0, 1, 0), 18) && Equals(outputUnrolled(0, 1, 1), 18));
 
-    // Verify ConvolutionalLayer with regular method
-    convolutionalParams.method = ConvolutionMethod::columnwise;
-    ConvolutionalLayer<ElementType> convolutionalLayer2(parameters, convolutionalParams, weights);
-    convolutionalLayer2.Compute();
-    auto output2 = convolutionalLayer2.GetOutput();
+    // Verify ConvolutionalLayer with diagonal method
+    convolutionalParams.method = ConvolutionMethod::diagonal;
+    ConvolutionalLayer<ElementType> convolutionalLayerDiagonal(parameters, convolutionalParams, weights);
+    convolutionalLayerDiagonal.Compute();
+    auto outputDiagonal = convolutionalLayerDiagonal.GetOutput();
+    testing::ProcessTest("Testing ConvolutionalLayer (diagonal), values", Equals(outputDiagonal(0, 0, 0), 10) && Equals(outputDiagonal(0, 0, 1), 15) && Equals(outputDiagonal(0, 1, 0), 18) && Equals(outputDiagonal(0, 1, 1), 18));
 
-    testing::ProcessTest("Testing ConvolutionalLayer (columnwise), values", Equals(output2(0, 0, 0), 10) && Equals(output2(0, 0, 1), 15) && Equals(output2(0, 1, 0), 18) && Equals(output2(0, 1, 1), 18));
 }
 
 template <typename ElementType>
@@ -954,7 +968,7 @@ void ConvolutionalArchiveTest()
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
     LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, 1 }, { 3, 3, 8 }, NoPadding() };
-    auto convolutionMethod = ConvolutionMethod::columnwise;
+    auto convolutionMethod = ConvolutionMethod::unrolled;
     ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 1 };
     TensorType convWeights1(8 * 3, 3, 3);
     FillTensor(convWeights1);

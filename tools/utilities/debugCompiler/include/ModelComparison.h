@@ -13,20 +13,20 @@
 
 // model
 #include "DebugSinkNode.h"
-#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
 #include "InputPort.h"
 #include "LoadModel.h"
+#include "Map.h"
 #include "Model.h"
 #include "ModelLoadArguments.h"
 #include "NeuralNetworkLayerNode.h"
 #include "OutputNode.h"
 
 // stl
-#include <iostream>
 #include <map>
-#include <memory>
+#include <ostream>
+#include <string>
 #include <vector>
 
 namespace ell
@@ -44,7 +44,7 @@ public:
     /// <param name="input"> The data to evaluate the map with when comparing outputs. </param>
     /// <param name="reference"> The map to compare the reference vs. compiled versions of. </param>
     /// <param name="settings"> The compiler settings to use when compiling the map. </param>
-    void Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerParameters& settings);
+    void Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerOptions& settings);
 
     /// <summary> Saves reference and compiled outputs to a file. </summary>
     ///

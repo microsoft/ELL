@@ -95,8 +95,8 @@ namespace nodes
         {
             auto valueType = emitters::GetVariableType<ValueType>();
             _accumValueVar = function.Variable(valueType, "poolingAccumValue");
-            _paddingValue = function.Literal<ValueType>(paddingValue);
-            _initialValue = function.Literal<ValueType>(std::numeric_limits<ValueType>::lowest());
+            _paddingValue = function.LocalScalar<ValueType>(paddingValue);
+            _initialValue = function.LocalScalar<ValueType>(std::numeric_limits<ValueType>::lowest());
             Reset(function, staticCount);
         }
 
@@ -142,7 +142,7 @@ namespace nodes
             : _count(staticCount)
         {
             auto valueType = emitters::GetVariableType<ValueType>();
-            _paddingValue = function.Literal(paddingValue);
+            _paddingValue = function.LocalScalar(paddingValue);
             _accumValueVar = function.Variable(valueType, "poolingAccumValue");
             // if we don't know how many times we'll be called, create a variable (_countVar) to keep track
             _countVar = staticCount < 0 ? function.Variable(emitters::VariableType::Int32, "poolingAccumCount") : nullptr;
@@ -166,7 +166,7 @@ namespace nodes
             if (_countVar != nullptr)
             {
                 const auto plus = emitters::TypedOperator::add;
-                function.OperationAndUpdate(_countVar, plus, function.Literal(1));
+                function.OperationAndUpdate(_countVar, plus, function.Literal<int>(1));
             }
         }
 
@@ -180,7 +180,7 @@ namespace nodes
         {
             if (_countVar == nullptr)
             {
-                return function.Operator(emitters::TypedOperator::divideFloat, function.Load(_accumValueVar), function.Literal<ValueType>(_count));
+                return function.Operator(emitters::TypedOperator::divideFloat, function.Load(_accumValueVar), function.LocalScalar<ValueType>(_count));
             }
             else
             {
@@ -268,11 +268,11 @@ namespace nodes
             {
                 // poolingInputRow and poolingInputColumn are the coordinates of the input image value to
                 // accumulate for this entry in the pooling window
-                auto poolingInputRow = function.Operator(plus, inputRow, function.Literal<int>(poolingRow));
-                auto poolingInputColumn = function.Operator(plus, inputColumn, function.Literal<int>(poolingColumn));
+                auto poolingInputRow = function.Operator(plus, inputRow, function.LocalScalar<int>(poolingRow));
+                auto poolingInputColumn = function.Operator(plus, inputColumn, function.LocalScalar<int>(poolingColumn));
 
                 // auto totalOffset = (offsetX * inputIncrement[0]) + (offsetY * inputIncrement[1]);
-                auto inputIndex = function.Operator(plus, function.Operator(plus, function.Operator(times, poolingInputRow, function.Literal<int>(inputIncrement[0])), function.Operator(times, poolingInputColumn, function.Literal<int>(inputIncrement[1]))), inputChannel);
+                auto inputIndex = function.Operator(plus, function.Operator(plus, function.Operator(times, poolingInputRow, function.LocalScalar<int>(inputIncrement[0])), function.Operator(times, poolingInputColumn, function.LocalScalar<int>(inputIncrement[1]))), inputChannel);
                 auto value = function.ValueAt(inputBuffer, inputIndex);
                 poolingFunction.Accumulate(function, value);
             }
@@ -289,16 +289,16 @@ namespace nodes
     When scanning a window of size w over a signal (assume size >=w), there are
     2w-1 possible 'regions', or amounts of overlap between the window and the
     signal:
-      * An infinite region w or more entries to the left of the signal, where there is 0 overlap
-      * w-1 regions of size 1, where there is (w-1) overlap
-      * 1 region of size (signal width - w + 1) where the window and signal completely overlap
-      * w-1 more regions of size 1, where there is (w-1) overlap, on the other size of the window
+      * An infinite region w or more entries to the left of the signal, where there is no overlap
+      * w-1 regions of size 1, where there is an overlap amount between 1 and (w-1)
+      * 1 region of size (signal width - w + 1) where the window and signal completely overlap (an overlap of size w)
+      * w-1 more regions of size 1, where there is between (w-1) and 1 elements of overlap, on the other side of the window
       * Another infinite region to the right of the signal, where there is no overlap
 
     In practice, we can ignore many of these regions. If the 'pad' setting is 'false', we only need
     to deal with the middle region of full overlap.
 
-    When 'pad' is 'true', we can ignore the infinite non-overlap regionsregions and ~half of the size-1
+    When 'pad' is 'true', we can ignore the infinite non-overlap regions and ~half of the size-1
     regions. The infinite regions are obvious. We can also ignore the size-1 regions where the center of
     the window is outside the input signal. This gives us w regions:
 
@@ -308,7 +308,6 @@ namespace nodes
 
 
     ## To compute:
-
     ```
     For each region r:
       Intersect the region's extent with the signal's extent, to get a range of included input locations.
@@ -411,9 +410,6 @@ namespace nodes
     void PoolingLayerNode<ValueType, PoolingFunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         // convenience operator names
-        const auto plus = emitters::TypedOperator::add;
-        const auto times = emitters::TypedOperator::multiply;
-
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
@@ -490,41 +486,35 @@ namespace nodes
 
                 if (maxOutputRow > minOutputRow && maxOutputCol > minOutputCol)
                 {
-                    auto outputRowLoop = function.ForLoop();
-                    outputRowLoop.Begin(minOutputRow, maxOutputRow, 1);
-                    {
-                        auto outputRow = outputRowLoop.LoadIterationVariable();
-                        auto inputRow = function.Operator(times, outputRow, function.Literal<int>(stride));
+                    // BUG: explicit by-ref captures of `usesPadding` and `negWindowExtent` are here to work around a GCC bug
+                    function.For(minOutputRow, maxOutputRow, 1, [=, &usesPadding, &negWindowExtent, &poolingFunction](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex1) {
+                        auto outputRow = function.LocalScalar(loopIndex1);
+                        auto inputRow = outputRow * function.LocalScalar<int>(stride);
                         if (!usesPadding)
                         {
-                            inputRow = function.Operator(plus, inputRow, function.Literal<int>(-negWindowExtent));
+                            inputRow = inputRow + function.LocalScalar<int>(-negWindowExtent);
                         }
 
-                        auto outputColumnLoop = function.ForLoop();
-                        outputColumnLoop.Begin(minOutputCol, maxOutputCol, 1);
-                        {
-                            auto outputColumn = outputColumnLoop.LoadIterationVariable();
-                            auto inputColumn = function.Operator(times, outputColumn, function.Literal<int>(stride));
+                        function.For(minOutputCol, maxOutputCol, 1, [=, &poolingFunction, &inputRow](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
+                            auto outputColumn = function.LocalScalar(loopIndex2);
+                            auto inputColumn = outputColumn * function.LocalScalar<int>(stride);
                             if (!usesPadding)
                             {
-                                inputColumn = function.Operator(plus, inputColumn, function.Literal<int>(-negWindowExtent));
+                                inputColumn = inputColumn + function.LocalScalar<int>(-negWindowExtent);
                             }
 
-                            auto channelLoop = function.ForLoop();
-                            channelLoop.Begin(outputDepth);
-                            {
-                                auto channel = channelLoop.LoadIterationVariable();
+                            function.For(outputDepth, [=, &poolingFunction, &inputRow, &inputColumn](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
+                                auto channel = function.LocalScalar(loopIndex3);
                                 // Get the pooled value
                                 auto pooledValue = GetPoolingWindowValue(function, rowRegionBounds.windowBounds.begin, rowRegionBounds.windowBounds.end, columnRegionBounds.windowBounds.begin, columnRegionBounds.windowBounds.end, inputRow, inputColumn, channel, inputBuffer, inputIncrement, poolingFunction);
                                 // and store it in the output
-                                auto outputIndex = function.Operator(plus, function.Operator(plus, function.Operator(times, outputRow, function.Literal<int>(outputIncrement[0])), function.Operator(times, outputColumn, function.Literal<int>(outputIncrement[1]))), channel);
+                                auto outputIndex = (outputRow * function.LocalScalar<int>(outputIncrement[0])) +
+                                                   (outputColumn * function.LocalScalar<int>(outputIncrement[1])) +
+                                                   channel;
                                 function.SetValueAt(outputBuffer, outputIndex, pooledValue);
-                            }
-                            channelLoop.End();
-                        }
-                        outputColumnLoop.End();
-                    }
-                    outputRowLoop.End();
+                            });
+                        });
+                    });
                 }
             }
         }

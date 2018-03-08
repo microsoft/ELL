@@ -51,6 +51,6 @@ struct ParsedCompileArguments : public CompileArguments, public utilities::Parse
     /// <param name="parser"> [in,out] The parser. </param>
     void AddArgs(utilities::CommandLineParser& parser) override;
 
-    model::MapCompilerParameters GetMapCompilerParameters(const std::string& baseFilename);
+    model::MapCompilerOptions GetMapCompilerOptions(const std::string& baseFilename);
 };
 }

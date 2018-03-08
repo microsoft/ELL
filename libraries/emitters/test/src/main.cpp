@@ -24,7 +24,7 @@ void TestIR()
     // From IREmitterTest.h
     TestIREmitter();
 
-    TestLLVM();
+    TestEmitLLVM();
     TestLLVMShiftRegister();
     TestIfElseComplex();
     TestIfElseBlockRegions(false);

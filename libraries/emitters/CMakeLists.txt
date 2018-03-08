@@ -43,6 +43,7 @@ set (src
 
 set (include
     include/CompilableIRFunction.h
+    include/CompilerOptions.h
     include/EmitterException.h
     include/EmitterTypes.h
     include/IRAssemblyWriter.h

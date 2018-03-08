@@ -47,6 +47,8 @@ namespace model
         /// <param name="name"> The name of this port </param>
         InputPortBase(const class Node* owningNode, const PortElementsBase& inputs, const std::string& name);
 
+        ~InputPortBase() override = default;
+
         /// <summary> Returns the list of nodes this input port gets values from </summary>
         ///
         /// <returns> The list nodes this input port gets values from </returns>

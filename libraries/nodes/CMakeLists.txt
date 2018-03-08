@@ -30,8 +30,10 @@ set(src
     src/RecurrentLayerNode.cpp
     src/RegionDetectionLayerNode.cpp
     src/ScalingLayerNode.cpp
+    src/SimpleConvolutionNode.cpp
     src/SingleElementThresholdNode.cpp
     src/SoftmaxLayerNode.cpp
+    src/UnrolledConvolutionNode.cpp
 )
 
 set(include
@@ -82,6 +84,7 @@ set(include
     include/RegionDetectionLayerNode.h
     include/ReorderDataNode.h
     include/ScalingLayerNode.h
+    include/SimpleConvolutionNode.h
     include/SingleElementThresholdNode.h
     include/SinkNode.h
     include/SoftmaxLayerNode.h
@@ -90,6 +93,7 @@ set(include
     include/SumNode.h
     include/TypeCastNode.h
     include/UnaryOperationNode.h
+    include/UnrolledConvolutionNode.h
     include/ValueSelectorNode.h
 )
 
@@ -140,6 +144,7 @@ target_include_directories(${library_name}
 )
 
 target_link_libraries(${library_name}
+    math    
     model
     predictors
     dsp

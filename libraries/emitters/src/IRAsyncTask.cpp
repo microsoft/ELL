@@ -14,9 +14,6 @@
 #include "Exception.h"
 #include "Unused.h"
 
-// stl
-#include <iostream>
-
 namespace ell
 {
 namespace emitters
@@ -24,7 +21,7 @@ namespace emitters
     IRAsyncTask::IRAsyncTask(IRFunctionEmitter& owningFunction, llvm::Function* taskFunction, const std::vector<llvm::Value*>& arguments)
         : _taskFunction(taskFunction), _arguments(arguments)
     {
-        const auto& compilerParameters = owningFunction.GetModule().GetCompilerParameters();
+        const auto& compilerParameters = owningFunction.GetModule().GetCompilerOptions();
         _usePthreads = compilerParameters.parallelize && !compilerParameters.targetDevice.IsWindows();
         if (UsePthreads())
         {

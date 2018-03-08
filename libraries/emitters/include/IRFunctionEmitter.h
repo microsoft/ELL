@@ -70,6 +70,9 @@ namespace emitters
         template <typename ValueType, utilities::IsFundamental<ValueType> = true>
         IRLocalScalar LocalScalar(ValueType value);
 
+        /// <summary> Gets an uninitialized `IRLocalScalar` wrapper. </summary>
+        IRLocalScalar LocalScalar();
+        
         /// <summary> Gets an `IRLocalArray` wrapper for an LLVM value object that represents an indexable array. </summary>
         ///
         /// <param name="value"> The value to wrap. </param>
@@ -1166,32 +1169,7 @@ namespace emitters
         /// <param name="size"> The array size. </param>
         void PrintForEach(const std::string& formatString, llvm::Value* pVector, int size);
 
-        /// <summary> Emit IR to compute a DOT product of floats. </summary>
-        ///
-        /// <param name="size"> Array size. </param>
-        /// <param name="pLeftValue"> Pointer to the address of the first entry in the first array. </param>
-        /// <param name="pRightValue"> Pointer to the address of the first entry in the second array. </param>
-        ///
-        /// <returns> Pointer to the result. </returns>
-        llvm::Value* DotProductFloat(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue);
-
-        /// <summary> Emit IR to compute a DOT product of floats. </summary>
-        ///
-        /// <param name="size"> Array size. </param>
-        /// <param name="pLeftValue"> Pointer to the address of the first entry in the first array. </param>
-        /// <param name="pRightValue"> Pointer to the address of the first entry in the second array. </param>
-        /// <param name="pDestination"> Pointer to the address where to write the result. </param>
-        void DotProductFloat(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination);
-
-        /// <summary> Emit IR to compute a DOT product of floats. </summary>
-        ///
-        /// <param name="pSize"> [in,out] Pointer to the runtime size variable. </param>
-        /// <param name="pLeftValue"> Pointer to the address of the first entry in the first array. </param>
-        /// <param name="pRightValue"> Pointer to the address of the first entry in the second array. </param>
-        /// <param name="pDestination"> Pointer to the address where to write the result. </param>
-        void DotProductFloat(llvm::Value* pSize, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination);
-
-        /// <summary> Emit IR to compute a DOT product. </summary>
+        /// <summary> Emit IR to compute a dot product. </summary>
         ///
         /// <param name="size"> Array size. </param>
         /// <param name="pLeftValue"> Pointer to the address of the first entry in the first array. </param>
@@ -1200,7 +1178,7 @@ namespace emitters
         /// <returns> Pointer to the result. </returns>
         llvm::Value* DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue);
 
-        /// <summary> Emit IR to compute a DOT product. </summary>
+        /// <summary> Emit IR to compute a dot product, storing the result in an existing variable. </summary>
         ///
         /// <param name="size"> Array size. </param>
         /// <param name="pLeftValue"> Pointer to the address of the first entry in the first array. </param>
@@ -1208,7 +1186,7 @@ namespace emitters
         /// <param name="pDestination"> Pointer to the address where to write the result. </param>
         void DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination);
 
-        /// <summary> Emit IR to compute a DOT product. </summary>
+        /// <summary> Emit IR to compute a dot product, storing the result in an existing variable. </summary>
         ///
         /// <param name="pSize"> [in,out] Pointer to the runtime size variable. </param>
         /// <param name="pLeftValue"> Pointer to the address of the first entry in the first array. </param>
@@ -1458,6 +1436,7 @@ namespace emitters
         void CompleteFunction(IRFunctionOptimizer& optimizer);
 
         bool CanUseBlas() const;
+        void EnsurePrintf();
 
         llvm::Function* ResolveFunction(const std::string& name);
         llvm::Module* GetLLVMModule() { return _pFunction->getParent(); }

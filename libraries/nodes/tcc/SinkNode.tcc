@@ -90,7 +90,7 @@ namespace nodes
         module.IncludeInCallbackInterface(prefixedName, "SinkNode");
 
         // Set output values as well, useful when user code is in a non-event-driven mode
-        if (!IsScalar(input) && !compiler.GetCompilerParameters().unrollLoops)
+        if (!IsScalar(input) && !compiler.GetCompilerOptions().unrollLoops)
         {
             SetOutputValuesLoop(compiler, function);
         }

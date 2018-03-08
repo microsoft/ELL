@@ -21,3 +21,4 @@ permalink: /tutorials/
 
 ## Image Classification Tutorials in C++
 * [Getting started with image classification on the Raspberry Pi in C++](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/)
+

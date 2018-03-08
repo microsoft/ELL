@@ -171,12 +171,14 @@ del BinaryWeightsScale_mean
 
 # Python friendly class for ConvolutionMethod
 class ConvolutionMethod:
-    columnwise = ConvolutionMethod_columnwise
+    unrolled = ConvolutionMethod_unrolled
     diagonal = ConvolutionMethod_diagonal
+    simple = ConvolutionMethod_simple
 
 # Remove flat defines so callers only see the class above
-del ConvolutionMethod_columnwise
+del ConvolutionMethod_unrolled
 del ConvolutionMethod_diagonal
+del ConvolutionMethod_simple
 
 # Python friendly class for LayerType
 class LayerType:

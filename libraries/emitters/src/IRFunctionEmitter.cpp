@@ -87,6 +87,11 @@ namespace emitters
         return IRLocalScalar(*this, value);
     }
 
+    IRLocalScalar IRFunctionEmitter::LocalScalar()
+    {
+        return IRLocalScalar(*this, static_cast<llvm::Value*>(nullptr));
+    }
+    
     IRLocalArray IRFunctionEmitter::LocalArray(llvm::Value* value)
     {
         return IRLocalArray(*this, value);
@@ -935,7 +940,7 @@ namespace emitters
 
     IRTaskArray IRFunctionEmitter::StartTasks(llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments)
     {
-        auto& compilerSettings = GetModule().GetCompilerParameters();
+        auto& compilerSettings = GetModule().GetCompilerOptions();
         if (compilerSettings.parallelize && compilerSettings.useThreadPool && !compilerSettings.targetDevice.IsWindows())
         {
             auto& threadPool = GetModule().GetThreadPool();
@@ -982,11 +987,13 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::Printf(std::initializer_list<llvm::Value*> arguments)
     {
+        EnsurePrintf();
         return Call(PrintfFnName, arguments);
     }
 
     llvm::Value* IRFunctionEmitter::Printf(const std::string& format, std::initializer_list<llvm::Value*> arguments)
     {
+        EnsurePrintf();
         IRValueList callArgs;
         callArgs.push_back(_pEmitter->Literal(format));
         callArgs.insert(callArgs.end(), arguments);
@@ -995,6 +1002,7 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::Printf(const std::string& format, std::vector<llvm::Value*> arguments)
     {
+        EnsurePrintf();
         IRValueList callArgs;
         callArgs.push_back(_pEmitter->Literal(format));
         callArgs.insert(callArgs.end(), arguments.begin(), arguments.end());
@@ -1014,6 +1022,11 @@ namespace emitters
         forLoop.End();
     }
 
+    void IRFunctionEmitter::EnsurePrintf()
+    {
+        _pModuleEmitter->DeclarePrintf();
+    }
+
     void IRFunctionEmitter::InsertMetadata(const std::string& tag, const std::string& content)
     {
         InsertMetadata(tag, std::vector<std::string>({ content }));
@@ -1031,50 +1044,82 @@ namespace emitters
         _pFunction->setMetadata(tag, metadataNode);
     }
 
-    llvm::Value* IRFunctionEmitter::DotProductFloat(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue)
-    {
-        llvm::Value* pTotal = Variable(VariableType::Double);
-        DotProductFloat(size, pLeftValue, pRightValue, pTotal);
-        return pTotal;
-    }
-
-    void IRFunctionEmitter::DotProductFloat(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
-    {
-        StoreZero(pDestination);
-        VectorOperator(TypedOperator::multiplyFloat, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
-            OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
-        });
-    }
-
-    void IRFunctionEmitter::DotProductFloat(llvm::Value* pSize, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
-    {
-        StoreZero(pDestination);
-        VectorOperator(TypedOperator::multiplyFloat, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
-            OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
-        });
-    }
-
-    llvm::Value* IRFunctionEmitter::DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue)
-    {
-        llvm::Value* pTotal = Variable(VariableType::Double);
-        DotProductFloat(size, pLeftValue, pRightValue, pTotal);
-        return pTotal;
-    }
-
     void IRFunctionEmitter::DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
     {
+        if (!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy() || !pDestination->getType()->isPointerTy())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers");
+        }
+
+        auto elementType = pLeftValue->getType()->getPointerElementType();
+        if (elementType != pRightValue->getType()->getPointerElementType() || elementType != pDestination->getType()->getPointerElementType())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers to the same type");
+        }
+
         StoreZero(pDestination);
-        VectorOperator(TypedOperator::multiply, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
-            OperationAndUpdate(pDestination, TypedOperator::add, pValue);
-        });
+        if (elementType->isFPOrFPVectorTy())
+        {
+            VectorOperator(TypedOperator::multiplyFloat, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
+                OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
+            });
+        }
+        else if (elementType->isIntOrIntVectorTy())
+        {
+            VectorOperator(TypedOperator::multiply, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
+                OperationAndUpdate(pDestination, TypedOperator::add, pValue);
+            });
+        }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers to integral or floating-point element types");
+        }
     }
 
     void IRFunctionEmitter::DotProduct(llvm::Value* pSize, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
     {
+        if (!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy() || !pDestination->getType()->isPointerTy())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers");
+        }
+
+        auto elementType = pLeftValue->getType()->getPointerElementType();
+        if (elementType != pRightValue->getType()->getPointerElementType() || elementType != pDestination->getType()->getPointerElementType())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers to the same type");
+        }
+
         StoreZero(pDestination);
-        VectorOperator(TypedOperator::multiply, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
-            OperationAndUpdate(pDestination, TypedOperator::add, pValue);
-        });
+        if (elementType->isFPOrFPVectorTy())
+        {
+            VectorOperator(TypedOperator::multiplyFloat, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
+                OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
+            });
+        }
+        else if (elementType->isIntOrIntVectorTy())
+        {
+            VectorOperator(TypedOperator::multiply, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
+                OperationAndUpdate(pDestination, TypedOperator::add, pValue);
+            });
+        }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers to integral or floating-point element types");
+        }
+    }
+
+    llvm::Value* IRFunctionEmitter::DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue)
+    {
+        if (!pLeftValue->getType()->isPointerTy() || !pRightValue->getType()->isPointerTy())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Arguments to DotProduct must be pointers");
+        }
+
+        auto elementType = pLeftValue->getType()->getPointerElementType();
+
+        llvm::Value* pTotal = Variable(elementType, "result");
+        DotProduct(size, pLeftValue, pRightValue, pTotal);
+        return Load(pTotal);
     }
 
     //
@@ -1292,7 +1337,7 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::GetCpu()
     {
-        if (GetModule().GetCompilerParameters().targetDevice.IsLinux())
+        if (GetModule().GetCompilerOptions().targetDevice.IsLinux())
         {
             // Signature: int sched_getcpu(void);
             auto& context = GetLLVMContext();
@@ -1375,7 +1420,7 @@ namespace emitters
 
     bool IRFunctionEmitter::CanUseBlas() const
     {
-        return GetModule().GetCompilerParameters().useBlas;
+        return GetModule().GetCompilerOptions().useBlas;
     }
 
     //

@@ -106,7 +106,7 @@ namespace common
     template <typename ExampleType, typename MapType>
     auto TransformDatasetWithCompiledMap(data::Dataset<ExampleType>& input, const MapType& map, bool useBlas)
     {
-        ell::model::MapCompilerParameters settings;
+        ell::model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = useBlas;
 
         model::IRMapCompiler compiler(settings);

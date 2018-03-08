@@ -238,6 +238,12 @@ namespace nodes
         /// <summary> Returns the number of secondary input ports. </summary>
         virtual int NumSecondaryInputs() const = 0;
 
+        const model::PortMemoryLayout& GetInputLayout() const { return _inputLayout; }
+        const model::PortMemoryLayout& GetOutputLayout() const { return _outputLayout; }
+
+        size_t GetBroadcastDimension() const { return _broadcastDimension; }
+        size_t NumPrimaryInputDimensions() const { return _inputLayout.NumDimensions(); }
+
     protected:
         BroadcastFunctionNode(const std::vector<model::InputPortBase*>& inputs, const std::vector<model::OutputPortBase*>& outputs);
 
@@ -247,11 +253,6 @@ namespace nodes
                               const model::PortMemoryLayout& outputLayout,
                               FunctionType function,
                               ValueType padding = 0);
-
-        const model::PortMemoryLayout& GetInputLayout() const { return _inputLayout; }
-        const model::PortMemoryLayout& GetOutputLayout() const { return _outputLayout; }
-        size_t GetBroadcastDimension() const { return _broadcastDimension; }
-        size_t NumPrimaryInputDimensions() const { return _inputLayout.NumDimensions(); }
 
         bool HasState() const override { return true; } // stored state: function, broadcast dimension, and padding value
 
@@ -330,11 +331,12 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetInputLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetOutputLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetBroadcastDimension;
         using BroadcastFunctionNode<ValueType, FunctionType>::NumPrimaryInputDimensions;
+
+    protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
 
         void Copy(model::ModelTransformer& transformer) const override;
@@ -409,11 +411,12 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetInputLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetOutputLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetBroadcastDimension;
         using BroadcastFunctionNode<ValueType, FunctionType>::NumPrimaryInputDimensions;
+
+    protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
         using BroadcastFunctionNode<ValueType, FunctionType>::NumElements;
 
@@ -490,11 +493,12 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetInputLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetOutputLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetBroadcastDimension;
         using BroadcastFunctionNode<ValueType, FunctionType>::NumPrimaryInputDimensions;
+
+    protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
 
         void Copy(model::ModelTransformer& transformer) const override;
@@ -549,26 +553,11 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Indicates if this node is able to compile itself to code. </summary>
-        bool IsCompilable(const model::MapCompiler* compiler) const override;
-
     protected:
         void Copy(model::ModelTransformer& transformer) const override;
-        bool Refine(model::ModelTransformer& transformer) const override;
         bool HasState() const override { return false; }
         bool HasScale() const { return secondaryInput1.Size() != 0; }
         bool HasBias() const { return secondaryInput2.Size() != 0; }
-
-        // Helpers to fold sequential linear operations together
-        bool HasSimpleConstantSecondaryInputs() const;
-        bool CanCombineWithPrimaryInput() const;
-        struct LinearCoeffNodes
-        {
-            const ConstantNode<ValueType>* scaleNode;
-            const ConstantNode<ValueType>* biasNode;
-        };
-        LinearCoeffNodes GetConstantSecondaryInputNodes() const;
-        void GetCombinedLinearCoeffs(const BroadcastLinearFunctionNode<ValueType>& prevNode, std::vector<ValueType>& scale, std::vector<ValueType>& bias) const;
     };
 }
 }

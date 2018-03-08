@@ -23,7 +23,7 @@ namespace model
 {
     using namespace logging;
 
-    MapCompiler::MapCompiler(const MapCompilerParameters& settings)
+    MapCompiler::MapCompiler(const MapCompilerOptions& settings)
         : _parameters(settings)
     {
         PushScope();

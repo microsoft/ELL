@@ -39,8 +39,7 @@ namespace model
 
         Port() = default;
         Port(const Port& other) = delete;
-        Port(Port&& other) = default;
-        ~Port() override = default;
+        Port(Port&& other) = delete;
 
         /// <summary> Returns the node the output port connected to this port belongs to </summary>
         ///
@@ -92,6 +91,7 @@ namespace model
     protected:
         Port(const class Node* node, std::string name, PortType type)
             : _node(node), _name(name), _type(type) {}
+        ~Port() override = default;
 
         utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
@@ -99,6 +99,7 @@ namespace model
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
     
     private:
+
         // _node keeps info on where the input is coming from
         const class Node* _node = nullptr;
         std::string _name;

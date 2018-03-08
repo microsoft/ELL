@@ -21,7 +21,7 @@
 #include "OutputStreamImpostor.h"
 
 // stl
-#include <iostream>
+#include <iostream> // For std::cout in VERBOSE_MODE
 #include <memory>
 #include <queue>
 

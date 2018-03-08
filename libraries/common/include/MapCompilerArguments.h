@@ -54,12 +54,12 @@ namespace common
         std::string targetFeatures = "";
         std::string targetDataLayout = "";
 
-        /// <summary> Gets a `MapCompilerParameters` with the settings specified in the commandline arguments. </summary>
+        /// <summary> Gets a `MapCompilerOptions` with the settings specified in the commandline arguments. </summary>
         ///
         /// <param name="modelname"> The name of the model. </param>
         ///
-        /// <returns> A `model::MapCompilerParameters`. </returns>
-        model::MapCompilerParameters GetMapCompilerParameters(const std::string& modelName) const;        
+        /// <returns> A `model::MapCompilerOptions`. </returns>
+        model::MapCompilerOptions GetMapCompilerOptions(const std::string& modelName) const;        
     };
 
     /// <summary> A version of DataLoadArguments that adds its members to the command line parser. </summary>

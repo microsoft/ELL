@@ -22,7 +22,6 @@
 #include <iterator>
 #include <numeric>
 #include <string>
-#include <time.h>
 
 namespace ell
 {
@@ -41,7 +40,7 @@ namespace model
         emitters::IRModuleEmitter& moduleEmitter = irCompiler->GetModule();
         auto& enclosingFunction = moduleEmitter.GetCurrentFunction();
 
-        if (ShouldCompileInline() || compiler.GetMapCompilerParameters().inlineNodes)
+        if (ShouldCompileInline() || compiler.GetMapCompilerOptions().inlineNodes)
         {
             Log() << "Inlining node " << DiagnosticString(*this) << " into function " << enclosingFunction.GetFunctionName() << EOL;
 

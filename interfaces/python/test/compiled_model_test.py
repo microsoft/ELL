@@ -6,8 +6,7 @@ import numpy as np
 def test():
     # Load the map created by proton trainer test and compile it
     map = ell.model.Map("protonnTestData.ell")
-    compiledMap = map.Compile("host", "protonn", "predict", False,
-        dtype=np.float)
+    compiledMap = map.Compile("host", "protonn", "predict", dtype=np.float)
     compiledMap.WriteBitcode("protonnTestData.bc");
 
     if os.path.isfile("protonnTestData.bc"):

@@ -45,7 +45,7 @@ namespace emitters
     // Constructors
     //
 
-    IRModuleEmitter::IRModuleEmitter(const std::string& moduleName, const CompilerParameters& parameters)
+    IRModuleEmitter::IRModuleEmitter(const std::string& moduleName, const CompilerOptions& parameters)
         : _llvmContext(new llvm::LLVMContext()), _emitter(*_llvmContext), _runtime(*this), _threadPool(*this)
     {
         InitializeLLVM();
@@ -53,21 +53,21 @@ namespace emitters
 
         _pModule = _emitter.CreateModule(moduleName);
 
-        SetCompilerParameters(parameters);
-        if (GetCompilerParameters().includeDiagnosticInfo)
+        SetCompilerOptions(parameters);
+        if (GetCompilerOptions().includeDiagnosticInfo)
         {
             DeclarePrintf();
         }
     }
 
-    void IRModuleEmitter::SetCompilerParameters(const CompilerParameters& parameters)
+    void IRModuleEmitter::SetCompilerOptions(const CompilerOptions& parameters)
     {
         // Call base class implementation
-        ModuleEmitter::SetCompilerParameters(parameters);
+        ModuleEmitter::SetCompilerOptions(parameters);
 
         // Set IR-specific parameters
-        SetTargetTriple(GetCompilerParameters().targetDevice.triple);
-        SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
+        SetTargetTriple(GetCompilerOptions().targetDevice.triple);
+        SetTargetDataLayout(GetCompilerOptions().targetDevice.dataLayout);
     }
 
     //
@@ -171,7 +171,7 @@ namespace emitters
                 Log() << "Function " << currentFunction.GetFunctionName() << " already has a terminator" << EOL;
             }
             currentFunction.ConcatRegions();
-            currentFunction.CompleteFunction(GetCompilerParameters().optimize);
+            currentFunction.CompleteFunction(GetCompilerOptions().optimize);
         }
         _emitter.SetCurrentInsertPoint(previousPos);
 
@@ -359,11 +359,6 @@ namespace emitters
     llvm::GlobalVariable* IRModuleEmitter::Constant(VariableType type, const std::string& name, double value)
     {
         return AddGlobal(name, _emitter.Type(type), _emitter.Literal(value), true);
-    }
-
-    llvm::GlobalVariable* IRModuleEmitter::ConstantArray(const std::string& name, const std::vector<double>& value)
-    {
-        return AddGlobal(name, _emitter.ArrayType(VariableType::Double, value.size()), _emitter.Literal(value), true);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::Global(VariableType type, const std::string& name)
@@ -593,9 +588,9 @@ namespace emitters
     void IRModuleEmitter::WriteToFile(const std::string& filePath, ModuleOutputFormat format)
     {
         MachineCodeOutputOptions options;
-        auto compilerParameters = GetCompilerParameters();
-        options.targetDevice = compilerParameters.targetDevice;
-        if (compilerParameters.optimize)
+        auto CompilerOptions = GetCompilerOptions();
+        options.targetDevice = CompilerOptions.targetDevice;
+        if (CompilerOptions.optimize)
         {
             options.optimizationLevel = OptimizationLevel::Aggressive;
         }
@@ -660,9 +655,9 @@ namespace emitters
     void IRModuleEmitter::WriteToStream(std::ostream& stream, ModuleOutputFormat format)
     {
         MachineCodeOutputOptions options;
-        auto compilerParameters = GetCompilerParameters();
-        options.targetDevice = compilerParameters.targetDevice;
-        if (compilerParameters.optimize)
+        auto CompilerOptions = GetCompilerOptions();
+        options.targetDevice = CompilerOptions.targetDevice;
+        if (CompilerOptions.optimize)
         {
             options.optimizationLevel = OptimizationLevel::Aggressive;
         }
@@ -694,7 +689,7 @@ namespace emitters
 
     void IRModuleEmitter::WriteToLLVMStream(llvm::raw_ostream& os, ModuleOutputFormat format, MachineCodeOutputOptions options)
     {
-        const auto& params = GetCompilerParameters();
+        const auto& params = GetCompilerOptions();
 
         if (options.targetDevice.triple.empty())
         {
@@ -1018,7 +1013,7 @@ namespace emitters
 
     IRModuleEmitter MakeHostModuleEmitter(const std::string moduleName)
     {
-        CompilerParameters parameters;
+        CompilerOptions parameters;
         parameters.targetDevice.deviceName = "host";
         return {moduleName, parameters};
     }

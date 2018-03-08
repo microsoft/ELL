@@ -9,6 +9,7 @@
 #include "AsyncEmitterTest.h"
 
 // emitters
+#include "CompilerOptions.h"
 #include "EmitterException.h"
 #include "EmitterTypes.h"
 #include "IRAsyncTask.h"
@@ -45,11 +46,11 @@ using UnaryScalarFloatFunction = float (*)(float);
 void TestIRAsyncTask(bool parallel)
 {
     std::cout << "\nTesting IRAsyncTask Function in " << (parallel ? "parallel" : "serial") << " mode" << std::endl;
-    CompilerParameters compilerParameters;
-    compilerParameters.optimize = false;
-    compilerParameters.parallelize = parallel;
-    compilerParameters.targetDevice.deviceName = "host";
-    IRModuleEmitter module("IRAsyncTaskTest", compilerParameters);
+    CompilerOptions options;
+    options.optimize = false;
+    options.parallelize = parallel;
+    options.targetDevice.deviceName = "host";
+    IRModuleEmitter module("IRAsyncTaskTest", options);
     module.DeclarePrintf();
 
     // Common stuff for both functions
@@ -119,12 +120,12 @@ void TestIRAsyncTask(bool parallel)
 void TestParallelTasks(bool parallel, bool useThreadPool)
 {
     std::cout << "Testing parallel tasks in " << (parallel ? (useThreadPool ? "threadpool" : "async") : "deferred") << " mode" << std::endl;
-    CompilerParameters compilerParameters;
-    compilerParameters.optimize = false;
-    compilerParameters.targetDevice.deviceName = "host";
-    compilerParameters.parallelize = parallel;
-    compilerParameters.useThreadPool = useThreadPool;
-    IRModuleEmitter module("ThreadPoolTest", compilerParameters);
+    CompilerOptions options;
+    options.optimize = false;
+    options.targetDevice.deviceName = "host";
+    options.parallelize = parallel;
+    options.useThreadPool = useThreadPool;
+    IRModuleEmitter module("ThreadPoolTest", options);
     module.DeclarePrintf();
 
     // Types
@@ -148,7 +149,7 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
         auto arr = &(*arguments++);
         auto begin = &(*arguments++);
         auto end = &(*arguments++);
-        if(compilerParameters.targetDevice.IsWindows())
+        if(options.targetDevice.IsWindows())
         {
             taskFunction.Printf("Task\tbegin: %d\tend: %d\n", {begin, end});
         }

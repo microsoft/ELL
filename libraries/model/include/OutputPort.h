@@ -38,7 +38,9 @@ namespace model
         /// <param name="name"> The name of this port. </param>
         /// <param name="type"> The datatype for this port. </param>
         /// <param name="size"> The size of the port's output. </param>
-        OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);
+        OutputPortBase(const Node* node, std::string name, PortType type, size_t size);
+
+        ~OutputPortBase() override = default;
 
         /// <summary> Notify this port that it is being referenced </summary>
         void ReferencePort() const { _isReferenced = true; }

@@ -8,17 +8,17 @@ if(${PYTHON_ENABLED})
 
     set(lib_src 
         buildtools.py 
-        demo.py
-        demoHelper.py
         dependency_installer.py
         download_helper.py
         find_ell.py 
         logger.py
-        modelHelpers.py
         picluster.py
         procmon.py 
         remoterunner.py
         ziptools.py)
+
+    add_subdirectory(vision)
+    add_subdirectory(audio)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${lib_src})
 

@@ -176,13 +176,15 @@ void TestIRCompiler()
     TestBinaryConvolutionalLayerNode(32, 32, 3, 4, 1, 0, PaddingScheme::minusOnes, false);
     TestBinaryConvolutionalLayerNode(32, 32, 3, 4, 1, 0, PaddingScheme::minusOnes, true);
 
-    // TestConvolutionalLayerNode(ConvolutionType::GEMM);
-    TestConvolutionalLayerNode(ConvolutionType::GEMM, 1, 0);
-    TestConvolutionalLayerNode2(ConvolutionType::GEMM, 1, 0);
-    // TestConvolutionalLayerNode(ConvolutionType::GEMM, 2, 0);
-    // TestConvolutionalLayerNode(ConvolutionType::GEMM, 1, 1); // Convolutional layer output padding not supported
+    // TestConvolutionalLayerNode(ConvolutionType::unrolled);
+    TestConvolutionalLayerNode(ConvolutionType::unrolled, 1, 0);
+    TestConvolutionalLayerNode2(ConvolutionType::unrolled, 1, 0);
+    // TestConvolutionalLayerNode(ConvolutionType::unrolled, 2, 0);
+    // TestConvolutionalLayerNode(ConvolutionType::unrolled, 1, 1); // Convolutional layer output padding not supported
 
-    TestConvolutionalLayerNode(ConvolutionType::Diagonal); // Input padding must be set correctly (to floor(filterWidth/2))
+    TestConvolutionalLayerNode(ConvolutionType::diagonal); // Input padding must be set correctly (to floor(filterWidth/2))
+    
+    TestConvolutionalLayerNode(ConvolutionType::simple); // Input padding must be set correctly (to floor(filterWidth/2))
 
     TestFullyConnectedLayerNode();
     // TestFullyConnectedLayerNode(0, 1); // Fully-connected layer nodes can't have padding (yet)

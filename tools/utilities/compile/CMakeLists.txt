@@ -28,7 +28,7 @@ set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR})
 
 add_executable(${tool_name} ${src} ${include} ${tcc})
 target_include_directories(${tool_name} PRIVATE include)
-target_link_libraries(${tool_name} utilities model common)
+target_link_libraries(${tool_name} common model passes utilities)
 copy_shared_libraries(${tool_name})
 
 set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")

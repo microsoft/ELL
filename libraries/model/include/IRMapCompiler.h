@@ -11,6 +11,7 @@
 #include "IRCompiledMap.h"
 #include "InputPort.h"
 #include "MapCompiler.h"
+#include "ModelOptimizer.h"
 #include "Node.h"
 #include "NodeMap.h"
 #include "OutputPort.h"
@@ -42,7 +43,7 @@ namespace model
         IRMapCompiler();
 
         /// <summary> Create a compiler to produce an LLVM module with the default name and the given parameters </summary>
-        IRMapCompiler(const MapCompilerParameters& settings);
+        IRMapCompiler(const MapCompilerOptions& settings);
 
         /// <summary> Compile a map into a CompiledMap </summary>
         ///
@@ -52,9 +53,10 @@ namespace model
 
         /// <summary> Gets the compiler parameters being used by the IR emitter. </summary>
         ///
-        /// <returns> The CompilerParameters struct used by the IR emitter to control code generation. </returns>
-        const emitters::CompilerParameters& GetCompilerParameters() const { return GetModule().GetCompilerParameters(); }
+        /// <returns> The CompilerOptions struct used by the IR emitter to control code generation. </returns>
+        const emitters::CompilerOptions& GetCompilerOptions() const { return GetModule().GetCompilerOptions(); }
 
+        ModelOptimizer& GetOptimizer() { return _optimizer; }
         //
         // Routines useful to Node implementers
         //
@@ -166,6 +168,7 @@ namespace model
         emitters::IRModuleEmitter _moduleEmitter;
         // Profiler object for model
         ModelProfiler _profiler;
+        ModelOptimizer _optimizer;
 
     private:
         NodeMap<emitters::IRBlockRegion*>& GetCurrentNodeBlocks();

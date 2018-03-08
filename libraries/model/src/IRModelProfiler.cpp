@@ -22,9 +22,6 @@
 #include <numeric>
 #include <string>
 
-// standard C library
-#include <time.h>
-
 namespace ell
 {
 namespace model

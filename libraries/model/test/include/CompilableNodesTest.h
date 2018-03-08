@@ -65,8 +65,9 @@ void TestNeuralNetworkPredictorNode6();
 
 enum class ConvolutionType
 {
-    GEMM,
-    Diagonal
+    simple,
+    unrolled,
+    diagonal
 };
 
 void TestInputLayerNode(size_t outputPadding = 0);

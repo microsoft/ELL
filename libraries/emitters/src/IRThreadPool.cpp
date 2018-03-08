@@ -36,7 +36,7 @@ namespace emitters
 
     void IRThreadPool::Initialize()
     {
-        _maxThreads = _module.GetCompilerParameters().maxThreads;
+        _maxThreads = _module.GetCompilerOptions().maxThreads;
         auto pthreadType = _module.GetRuntime().GetPosixEmitter().GetPthreadType();
 
         // Create global array to hold pthread objects

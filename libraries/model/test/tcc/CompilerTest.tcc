@@ -38,7 +38,7 @@ void TestLinearPredictor()
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
 
-    model::MapCompilerParameters settings;
+    model::MapCompilerOptions settings;
     settings.mapFunctionName = "TestLinear";
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);

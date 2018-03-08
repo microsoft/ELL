@@ -20,20 +20,23 @@ namespace model
     //
     // TransformContext implementation
     //
-    TransformContext::TransformContext() : _compiler(nullptr)
+    TransformContext::TransformContext()
+        : _compiler(nullptr)
     {
     }
 
-    TransformContext::TransformContext(const NodeActionFunction& nodeActionFunction) : _compiler(nullptr)
+    TransformContext::TransformContext(const NodeActionFunction& nodeActionFunction)
+        : _compiler(nullptr)
     {
         _nodeActionFunctions.emplace_back(nodeActionFunction);
     }
-    
-    TransformContext::TransformContext(const MapCompiler* compiler, const NodeActionFunction& nodeActionFunction) : _compiler(compiler)
+
+    TransformContext::TransformContext(const MapCompiler* compiler, const NodeActionFunction& nodeActionFunction)
+        : _compiler(compiler)
     {
         _nodeActionFunctions.emplace_back(nodeActionFunction);
     }
-    
+
     bool TransformContext::IsNodeCompilable(const Node& node) const
     {
         return node.IsCompilable(_compiler);
@@ -73,6 +76,7 @@ namespace model
 
     PortElementsBase PortOutputsMap::GetCorrespondingPortElements(const PortElementsBase& queryElements) const
     {
+        using namespace std::string_literals;
         PortElementsBase result;
         auto&& queryRanges = queryElements.GetRanges();
         for (auto&& queryRange : queryRanges)
@@ -86,7 +90,7 @@ namespace model
             // get elements for port
             if (_map.find(queryRangePort) == _map.end())
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element in new model.");
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element "s + to_string(queryRangePort->GetNode()->GetId()) + "." + queryRangePort->GetName() + " in new model.");
             }
 
             PortElementsBase portElements = _map.at(queryRangePort);
@@ -110,7 +114,7 @@ namespace model
                     assert(queryRangeSize >= intersectionSize);
                     queryRangeSize -= intersectionSize;
                     result.Append(PortRange(*targetRangePort, targetRange.GetStartIndex(), intersectionSize));
-                    
+
                     // If we've matched all the elements of the query range, we can break out of this loop
                     if (queryRangeSize == 0)
                         break;
@@ -196,7 +200,7 @@ namespace model
             _model = Model();
 
             auto previousElementMap = std::move(_elementsMap);
-            _elementsMap = PortOutputsMap();
+            _elementsMap.Clear();
 
             _isModelCompilable = true;
 
@@ -220,7 +224,7 @@ namespace model
 
             if (!previousElementMap.IsEmpty())
             {
-                // Now we have 2 maps, the previous one mapping A->B, and a new one mapping B->C (in _elementsMap). 
+                // Now we have 2 maps, the previous one mapping A->B, and a new one mapping B->C (in _elementsMap).
                 // Concatenate them to get a map A->C, and keep it.
                 auto newElementsMap = PortOutputsMap::ConcatenateMaps(previousElementMap, _elementsMap);
                 _elementsMap = newElementsMap;
@@ -238,32 +242,47 @@ namespace model
         return std::move(_model);
     }
 
-    Model ModelTransformer::TransformModel(const Model& model, const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
+    Model ModelTransformer::TransformModel(const Model& oldModel, const TransformContext& context, const std::function<void(const Node&, ModelTransformer&)>& transformFunction)
     {
         _context = context;
         _model = Model();
+        auto previousElementMap = std::move(_elementsMap);
         _elementsMap.Clear();
-        model.Visit([this, transformFunction](const Node& node) { transformFunction(node, *this); });
+
+        oldModel.Visit([this, transformFunction](const Node& node) { transformFunction(node, *this); });
+
+        if (!previousElementMap.IsEmpty())
+        {
+            // Now we have 2 maps, the previous one mapping A->B, and a new one mapping B->C (in _elementsMap).
+            // Concatenate them to get a map A->C, and keep it.
+            auto newElementsMap = PortOutputsMap::ConcatenateMaps(previousElementMap, _elementsMap);
+            _elementsMap = newElementsMap;
+        }
         _context = TransformContext(); // reset context
         return std::move(_model);
     }
 
-    PortElementsBase ModelTransformer::TransformPortElements(const PortElementsBase& elements)
+    void ModelTransformer::Reset()
+    {
+        _elementsMap.Clear();        
+    }
+
+    PortElementsBase ModelTransformer::TransformPortElements(const PortElementsBase& elements) const
     {
         return _elementsMap.GetCorrespondingPortElements(elements);
     }
 
-    PortElementsBase ModelTransformer::GetCorrespondingOutputs(const OutputPortBase& port)
+    PortElementsBase ModelTransformer::GetCorrespondingOutputs(const OutputPortBase& port) const
     {
         return _elementsMap.GetCorrespondingPortElements(PortElementsBase(port));
     }
 
-    PortElementsBase ModelTransformer::GetCorrespondingOutputs(const PortElementsBase& elements)
+    PortElementsBase ModelTransformer::GetCorrespondingOutputs(const PortElementsBase& elements) const
     {
         return _elementsMap.GetCorrespondingPortElements(elements);
     }
 
-    InputNodeBase* ModelTransformer::GetCorrespondingInputNode(const InputNodeBase* inputNode)
+    InputNodeBase* ModelTransformer::GetCorrespondingInputNode(const InputNodeBase* inputNode) const
     {
         return GetCorrespondingInputNodeAs(inputNode);
     }
@@ -284,7 +303,5 @@ namespace model
         }
         return uncompilableNodes;
     }
-
-
 }
 }

@@ -27,6 +27,9 @@
 #include "IRMapCompiler.h"
 #include "OutputNode.h"
 
+// passes
+#include "StandardPasses.h"
+
 // stl
 #include <iostream>
 #include <sstream>
@@ -102,7 +105,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
         baseFilename = utilities::JoinPaths(outputDirectory, utilities::GetFileName(baseFilename));
     }
 
-    model::MapCompilerParameters settings = mapCompilerArguments.GetMapCompilerParameters(baseFilename);
+    model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions(baseFilename);
     if (compileArguments.outputRefinedMap)
     {
         model::TransformContext context;
@@ -194,6 +197,9 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetHelpString() << std::endl;
             return 0;
         }
+
+        // Initialize the pass registry
+        passes::AddStandardPassesToRegistry();
 
         // load map and produce the desired output
         TimingOutputCollector timer(timingOutput, "Time to load map", compileArguments.verbose);

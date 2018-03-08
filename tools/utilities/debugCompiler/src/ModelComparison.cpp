@@ -16,6 +16,9 @@
 #include "DebugSinkNode.h"
 #include "NeuralNetworkPredictorNode.h"
 
+// passes
+#include "StandardPasses.h"
+
 // utilities
 #include "Files.h"
 #include "Graph.h"
@@ -272,7 +275,7 @@ void ModelComparison::SetUpReferenceMap(model::Map& map)
     _referenceMap.Transform(transformFunc, addSinkNodeContext);
 }
 
-void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerParameters& settings)
+void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerOptions& settings)
 {
     SetUpReferenceMap(reference);
     _addingReference = false;
@@ -301,6 +304,9 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     };
 
     reference.Transform(transformFunc, context);
+
+    // Initialize pass registry
+    passes::AddStandardPassesToRegistry();
 
     model::IRMapCompiler compiler(settings);
 

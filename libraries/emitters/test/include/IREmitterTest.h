@@ -16,7 +16,7 @@ std::string OutputPath(const char* pRelPath);
 void TestIREmitter();
 
 // Tests for higher-level classes (mostly IRModuleEmitter)
-void TestLLVM();
+void TestEmitLLVM();
 void TestLLVMShiftRegister();
 void TestIfElseComplex();
 void TestIfElseBlockRegions(bool runJit = false);
