@@ -25,7 +25,7 @@ namespace math
     }
 
     template <typename ElementType>
-    ElementType UnorientedConstVectorBase<ElementType>::operator[](size_t index) const
+    const ElementType& UnorientedConstVectorBase<ElementType>::operator[](size_t index) const
     {
         DEBUG_THROW(index >= _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size."));
 

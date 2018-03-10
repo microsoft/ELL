@@ -7,9 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ConvolutionalLayerNode.h"
-#include "UnrolledConvolutionNode.h"
 #include "DiagonalConvolutionNode.h"
 #include "SimpleConvolutionNode.h"
+#include "UnrolledConvolutionNode.h"
+#include "WinogradConvolutionNode.h"
 
 using namespace ell::math;
 using namespace ell::math::Blas;
@@ -30,46 +31,42 @@ namespace nodes
         const auto inputLayout = this->GetInputMemoryLayout();
         const auto outputLayout = this->GetOutputMemoryLayout();
         const auto convParams = this->GetLayer().GetConvolutionalParameters();
-        const auto inputPadding = this->GetRequestedInputPadding();
-        const auto outputPadding = this->GetRequestedOutputPadding();
 
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
 
         // Terminology:
         // fw: filter width
         // d: # input channels
-        // f: # filters (== output channels)        
-        
+        // f: # filters (== output channels)
+        const auto& weights = this->GetLayer().GetWeights();
         switch (convParams.method)
         {
-            case predictors::neural::ConvolutionMethod::simple:
-            {
-                // (row, column), channel order:
-                const auto& weights = this->GetLayer().GetWeights();
-                auto convNode = transformer.AddNode<SimpleConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams, inputPadding, outputPadding);
-                transformer.MapNodeOutput(this->output, convNode->output);
-            }
-            break;
-            case predictors::neural::ConvolutionMethod::unrolled:
-            {
-                // (row, column), channel order:
-                const auto& weights = this->GetLayer().GetWeights();
-                auto convNode = transformer.AddNode<UnrolledConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams, inputPadding, outputPadding);
-                transformer.MapNodeOutput(this->output, convNode->output);
-            }            
-            break;
-            case predictors::neural::ConvolutionMethod::diagonal:
-            {                
-                assert((convParams.stride == 1) && (convParams.receptiveField % 2 == 1));
-
-                // (row, column), channel order:
-                const auto& weights = this->GetLayer().GetWeights();
-                auto convNode = transformer.AddNode<DiagonalConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams, inputPadding, outputPadding);
-                transformer.MapNodeOutput(this->output, convNode->output);
-            }                
-            break;
-            default:
-                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        case predictors::neural::ConvolutionMethod::simple:
+        {
+            auto convNode = transformer.AddNode<SimpleConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams.stride);
+            transformer.MapNodeOutput(this->output, convNode->output);
+        }
+        break;
+        case predictors::neural::ConvolutionMethod::unrolled:
+        {
+            auto convNode = transformer.AddNode<UnrolledConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams.stride);
+            transformer.MapNodeOutput(this->output, convNode->output);
+        }
+        break;
+        case predictors::neural::ConvolutionMethod::diagonal:
+        {
+            const auto& weights = this->GetLayer().GetWeights();
+            auto convNode = transformer.AddNode<DiagonalConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams.stride);
+            transformer.MapNodeOutput(this->output, convNode->output);
+        }
+        break;
+        case predictors::neural::ConvolutionMethod::winograd:
+        {
+            auto convNode = transformer.AddNode<WinogradConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams.stride);
+            transformer.MapNodeOutput(this->output, convNode->output);
+        }
+        default:
+            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
         return true;
     }

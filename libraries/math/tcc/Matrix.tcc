@@ -74,7 +74,8 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     ElementType ConstMatrixReference<ElementType, layout>::operator()(size_t rowIndex, size_t columnIndex) const
     {
-        DEBUG_THROW(rowIndex >= this->NumRows() || columnIndex >= this->NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "(rowIndex, columnIndex) exceeds matrix dimensions."));
+        using namespace std::string_literals;
+        DEBUG_THROW(rowIndex >= this->NumRows() || columnIndex >= this->NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "("s + std::to_string(rowIndex) + ", " + std::to_string(columnIndex) + ") exceeds matrix dimensions (" + std::to_string(this->NumRows()) + " x " + std::to_string(this->NumColumns()) + "."));
 
         return GetConstDataPointer()[rowIndex * this->GetRowIncrement() + columnIndex * this->GetColumnIncrement()];
     }
@@ -223,7 +224,8 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     ElementType& MatrixReference<ElementType, layout>::operator()(size_t rowIndex, size_t columnIndex)
     {
-        DEBUG_THROW(rowIndex >= this->NumRows() || columnIndex >= this->NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "(rowIndex, columnIndex) exceeds matrix dimensions."));
+        using namespace std::string_literals;
+        DEBUG_THROW(rowIndex >= this->NumRows() || columnIndex >= this->NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "("s + std::to_string(rowIndex) + ", " + std::to_string(columnIndex) + ") exceeds matrix dimensions (" + std::to_string(this->NumRows()) + " x " + std::to_string(this->NumColumns()) + "."));
 
         return GetDataPointer()[rowIndex * this->GetRowIncrement() + columnIndex * this->GetColumnIncrement()];
     }

@@ -88,7 +88,7 @@ namespace nodes
         // Performing FFT (either by calling a function or emitting inline code)
         void DoFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch);
         void DoRealFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch, llvm::Value* complexInput);
- 
+
         // Inputs
         model::InputPort<ValueType> _input;
 

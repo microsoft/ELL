@@ -9,14 +9,22 @@ if(MSVC)
 endif()
 
 set(src
+  src/Convolution.cpp
   src/FilterBank.cpp
+  src/SimpleConvolution.cpp
+  src/UnrolledConvolution.cpp
+  src/WinogradConvolution.cpp
 )
 
 set(include
+  include/Convolution.h
   include/FFT.h
   include/FilterBank.h
   include/IIRFilter.h
+  include/SimpleConvolution.h
+  include/UnrolledConvolution.h
   include/WindowFunctions.h
+  include/WinogradConvolution.h
 )
 
 set(tcc
@@ -25,9 +33,15 @@ set(tcc
   tcc/WindowFunctions.tcc
 )
 
+set(py
+  py/symbolic.py
+  py/winograd.py
+)
+
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
+source_group("py" FILES ${py})
 
 add_library(${library_name} ${src} ${include} ${tcc})
 target_include_directories(${library_name} PUBLIC include)
@@ -44,20 +58,26 @@ set(test_name ${library_name}_test)
 set(test_src 
   test/src/main.cpp
   test/src/CepstrumTestData.cpp
+  test/src/ConvolutionTest.cpp
+  test/src/ConvolutionTestData.cpp
   test/src/DCTTest.cpp
   test/src/DSPTestData.cpp
   test/src/FFTTest.cpp
   test/src/FilterTest.cpp
+  test/src/HammingWindowCoefficients.cpp
   test/src/MelTest.cpp
   test/src/WindowTest.cpp
 )
   
 set(test_include
   test/include/CepstrumTestData.h
+  test/include/ConvolutionTest.h
+  test/include/ConvolutionTestData.h
   test/include/DCTTest.h
   test/include/DSPTestData.h
   test/include/FFTTest.h
   test/include/FilterTest.h
+  test/include/HammingWindowCoefficients.h
   test/include/MelTest.h
   test/include/WindowTest.h
 )

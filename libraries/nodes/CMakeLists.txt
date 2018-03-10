@@ -34,6 +34,7 @@ set(src
     src/SingleElementThresholdNode.cpp
     src/SoftmaxLayerNode.cpp
     src/UnrolledConvolutionNode.cpp
+    src/WinogradConvolutionNode.cpp
 )
 
 set(include
@@ -95,6 +96,7 @@ set(include
     include/UnaryOperationNode.h
     include/UnrolledConvolutionNode.h
     include/ValueSelectorNode.h
+    include/WinogradConvolutionNode.h
 )
 
 set (tcc
@@ -168,13 +170,17 @@ set(test_name ${library_name}_test)
 
 set(test_src
     test/src/main.cpp
-    test/src/NeuralNetworkLayerNodesTest.cpp
-    test/src/Nodes_test.cpp
+    test/src/DSPNodesTests.cpp
+    test/src/NeuralNetworkLayerNodesTests.cpp
+    test/src/NodesTests.cpp
+    test/src/NodesTestData.cpp
 )
 
 set(test_include
-    test/include/NeuralNetworkLayerNodesTest.h
-    test/include/Nodes_test.h
+    test/include/DSPNodesTests.h
+    test/include/NeuralNetworkLayerNodesTests.h
+    test/include/NodesTests.h
+    test/include/NodesTestData.h
 )
 
 source_group("src" FILES ${test_src})
@@ -193,6 +199,7 @@ target_include_directories(${test_name}
 
 target_link_libraries(${test_name}
     common
+    dsp
     math
     model
     nodes

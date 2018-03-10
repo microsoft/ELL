@@ -31,7 +31,7 @@ namespace dsp
     ///
     /// <returns> The coefficient matrix to multiply by the signal vector. </returns>
     template <typename ValueType>
-    math::RowMatrix<ValueType> GetDCTMatrix(size_t numFilters, size_t windowSize, bool normalize=false);
+    math::RowMatrix<ValueType> GetDCTMatrix(size_t numFilters, size_t windowSize, bool normalize = false);
 
     /// <summary> Compute the discrete cosine transform (DCT-II) of a vector of values, with an existing coefficient matrix. </summary>
     ///

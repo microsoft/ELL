@@ -34,7 +34,7 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> 
+    /// <summary>
     /// Base class for nodes that perform elementwise multiply between a set of filters and the input frequency response
     /// </summary>
     template <typename ValueType>
@@ -67,8 +67,8 @@ namespace nodes
         const dsp::TriangleFilterBank& _filters;
     };
 
-    /// <summary> 
-    /// A node that applies a linearly-spaced filter bank to an FFT output 
+    /// <summary>
+    /// A node that applies a linearly-spaced filter bank to an FFT output
     /// </summary>
     template <typename ValueType>
     class LinearFilterBankNode : public FilterBankNode<ValueType>
@@ -112,8 +112,8 @@ namespace nodes
         dsp::LinearFilterBank _linearFilters;
     };
 
-    /// <summary> 
-    /// A node that applies a mel filter bank to an FFT output 
+    /// <summary>
+    /// A node that applies a mel filter bank to an FFT output
     /// </summary>
     template <typename ValueType>
     class MelFilterBankNode : public FilterBankNode<ValueType>

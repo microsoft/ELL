@@ -74,5 +74,38 @@ namespace emitters
 
         return *this;
     }
+
+    //
+    // IRLocalMatrix
+    //
+    IRLocalMatrix::IRLocalMatrix(emitters::IRFunctionEmitter& function, llvm::Value* data, int rows, int columns)
+        : function(function), data(data), rows(rows), columns(columns) {}
+
+    IRLocalMatrix::IRLocalMatrixValue IRLocalMatrix::operator()(int row, int column) const
+    {
+        return IRLocalMatrixValue(function, data, function.Literal(row*columns + column));
+    }
+
+    IRLocalMatrix::IRLocalMatrixValue IRLocalMatrix::operator()(llvm::Value* row, llvm::Value* column) const
+    {
+        auto r = function.LocalScalar(row);
+        auto c = function.LocalScalar(column);
+        return IRLocalMatrixValue(function, data, (r*columns + c));
+    }
+
+    IRLocalMatrix::IRLocalMatrixValue::IRLocalMatrixValue(emitters::IRFunctionEmitter& function, llvm::Value* data, llvm::Value* offset)
+        : _function(function), _data(data), _offset(offset) {}
+
+    IRLocalMatrix::IRLocalMatrixValue::operator IRLocalScalar() const
+    {
+        return _function.LocalScalar(_function.ValueAt(_data, _offset));
+    }
+
+    IRLocalMatrix::IRLocalMatrixValue& IRLocalMatrix::IRLocalMatrixValue::operator=(llvm::Value* value)
+    {
+        _function.SetValueAt(_data, _offset, value);
+
+        return *this;
+    }
 }
 }

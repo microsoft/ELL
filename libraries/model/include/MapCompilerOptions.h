@@ -33,6 +33,7 @@ namespace model
         bool profile = false;
         std::string sourceFunctionName;
         std::string sinkFunctionName;
+        bool verifyJittedModule = false;
         
         // optimizations
         ModelOptimizerOptions optimizerSettings;

@@ -44,32 +44,25 @@ namespace nodes
         /// <summary> Default constructor. </summary>
         DiagonalConvolutionNode();
 
-
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> The ports to get input data from. </param>
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
-        /// <param name="filterWeights"> The weights for the convolutional filters. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        /// <param name="convolutionalParameters"> The convolutional parameters. </param>
+        /// <param name="filterWeights"> The weights for the convolutional filters. Stored
+        ///  as a 3D tensor of dimensions (nf*fw) x fw x d, where nf == # filters, fw == filter width, and d == input depth. </param>
+        /// <param name="stride"> The output stride. </param>
         DiagonalConvolutionNode(const model::PortElements<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 const ConstTensorReferenceType& filterWeights,
-                                const predictors::neural::ConvolutionalParameters& convolutionalParameters,
-                                const predictors::neural::PaddingParameters& inputPaddingParameters,
-                                const predictors::neural::PaddingParameters& outputPaddingParameters);
+                                int stride);
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
-
-        /// <summary> Get the parameters used to control convolution. </summary>
-        ///
-        /// <returns> A ConvolutionalParameters struct. </returns>
-        const predictors::neural::ConvolutionalParameters& GetConvolutionalParameters() const { return _convolutionalParameters; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -92,15 +85,8 @@ namespace nodes
     protected:
         void Compute() const override;
         bool Refine(model::ModelTransformer& transformer) const override;
-        void WriteToArchive(utilities::Archiver& archiver) const override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
-
-        void ReadFromArchive(utilities::Unarchiver& archiver) override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
         bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
 
     private:
@@ -114,10 +100,8 @@ namespace nodes
         model::PortMemoryLayout _outputMemoryLayout;
 
         TensorType _filterWeights;
-      
-        predictors::neural::ConvolutionalParameters _convolutionalParameters;
-        predictors::neural::PaddingParameters _inputPaddingParameters;
-        predictors::neural::PaddingParameters _outputPaddingParameters;
+
+        int _stride = 1;
     };
 
     //
@@ -145,28 +129,23 @@ namespace nodes
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> The ports to get input data from. </param>
-        /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="filterWeights"> The weights for the convolutional filters. </param>
+        /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        /// <param name="convolutionalParameters"> The convolutional parameters. </param>
+        /// <param name="filterSize"> The filter width. </param>
+        /// <param name="stride"> The output stride. </param>
         DiagonalConvolutionComputeNode(const model::PortElements<ValueType>& input,
-                                const model::PortElements<ValueType>& filterWeights,
-                                const model::PortMemoryLayout& inputMemoryLayout,
-                                const model::PortMemoryLayout& outputMemoryLayout,
-                                const predictors::neural::ConvolutionalParameters& convolutionalParameters,
-                                const predictors::neural::PaddingParameters& inputPaddingParameters,
-                                const predictors::neural::PaddingParameters& outputPaddingParameters);
+                                       const model::PortElements<ValueType>& filterWeights,
+                                       const model::PortMemoryLayout& inputMemoryLayout,
+                                       const model::PortMemoryLayout& outputMemoryLayout,
+                                       int filterSize,
+                                       int stride);
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
-
-        /// <summary> Get the parameters used to control convolution. </summary>
-        ///
-        /// <returns> A ConvolutionalParameters struct. </returns>
-        const predictors::neural::ConvolutionalParameters& GetConvolutionalParameters() const { return _convolutionalParameters; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -208,9 +187,9 @@ namespace nodes
         model::PortMemoryLayout _inputMemoryLayout;
         model::PortMemoryLayout _outputMemoryLayout;
 
-        predictors::neural::ConvolutionalParameters _convolutionalParameters;
-        predictors::neural::PaddingParameters _inputPaddingParameters;
-        predictors::neural::PaddingParameters _outputPaddingParameters;
+        int _filterSize = 0;
+        int _stride = 1;
+        int _batchSize = 0;
     };
 }
 }

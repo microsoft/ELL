@@ -9,6 +9,7 @@
 #pragma once
 
 // predictors
+#include <ConvolutionalLayer.h>
 #include <Layer.h>
 
 // stl
@@ -63,12 +64,7 @@ void TestNeuralNetworkPredictorNode4();
 void TestNeuralNetworkPredictorNode5();
 void TestNeuralNetworkPredictorNode6();
 
-enum class ConvolutionType
-{
-    simple,
-    unrolled,
-    diagonal
-};
+using ConvolutionType = ell::predictors::neural::ConvolutionMethod;
 
 void TestInputLayerNode(size_t outputPadding = 0);
 void TestHardSigmoidActivationLayerNode(size_t inputPaddingSize = 0, size_t outputPaddingSize = 0);

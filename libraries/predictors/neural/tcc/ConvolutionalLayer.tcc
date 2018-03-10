@@ -6,6 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// #include "DiagonalConvolution.h"
+#include "SimpleConvolution.h"
+#include "UnrolledConvolution.h"
+#include "WinogradConvolution.h"
+
 namespace ell
 {
 namespace predictors
@@ -50,55 +55,15 @@ namespace predictors
             {
             case ConvolutionMethod::simple:
             {
-                const int filterRows = static_cast<int>(_convolutionalParameters.receptiveField);
-                const int filterColumns = filterRows;
-                const int outputRows = static_cast<int>(output.NumRows());
-                const int outputColumns = static_cast<int>(output.NumColumns());
                 const int numFilters = static_cast<int>(output.NumChannels());
-                for (int filterIndex = 0; filterIndex < numFilters; ++filterIndex)
-                {
-                    const auto filterOffset = filterIndex * filterRows;
-                    for (int i = 0; i < outputRows; ++i)
-                    {
-                        for (int j = 0; j < outputColumns; ++j)
-                        {
-                            ElementType accum = 0;
-                            for (int filterRowIndex = 0; filterRowIndex < filterRows; ++filterRowIndex)
-                            {
-                                for (int filterColumnIndex = 0; filterColumnIndex < filterColumns; ++filterColumnIndex)
-                                {
-                                    auto signalVector = input.template GetSlice<math::Dimension::channel>(i + filterRowIndex, j + filterColumnIndex);
-                                    auto filterVector = _weights.template GetSlice<math::Dimension::channel>(filterOffset + filterRowIndex, filterColumnIndex);
-                                    accum += math::Dot(signalVector, filterVector);
-                                }
-                            }
-                            output(i, j, filterIndex) = accum;
-                        }
-                    }
-                }
+                dsp::Convolve2DSimple(input, _weights, numFilters, output);
             }
             break;
             case ConvolutionMethod::unrolled:
             {
-                // Re-shape input.
-                ReceptiveFieldToColumns(input, _shapedInput);
-
-                // Multiply reshaped input and weights.
-                math::MultiplyScaleAddUpdate(static_cast<ElementType>(1.0), _weightsMatrix, _shapedInput, static_cast<ElementType>(0.0), _outputMatrix);
-
-                // Re-shape the output into the output tensor
-                for (size_t i = 0; i < output.NumRows(); i++)
-                {
-                    for (size_t j = 0; j < output.NumColumns(); j++)
-                    {
-                        for (size_t k = 0; k < output.NumChannels(); k++)
-                        {
-                            size_t row = k;
-                            size_t column = (i * output.NumColumns()) + j;
-                            output(i, j, k) = _outputMatrix(row, column);
-                        }
-                    }
-                }
+                const int numFilters = static_cast<int>(output.NumChannels());
+                auto result = dsp::Convolve2DUnrolled(input, _weights, numFilters);
+                output.CopyFrom(result);
             }
             break;
             case ConvolutionMethod::diagonal:
@@ -147,36 +112,9 @@ namespace predictors
                 }
             }
             break;
-            }
-        }
 
-        template <typename ElementType>
-        void ConvolutionalLayer<ElementType>::ReceptiveFieldToColumns(ConstTensorReferenceType input, MatrixType& shapedInput)
-        {
-            size_t fieldVolumeSize = _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels();
-            size_t convolutionalHeight = NumOutputRowsMinusPadding();
-            size_t convolutionalWidth = NumOutputColumnsMinusPadding();
-
-            for (size_t f = 0; f < fieldVolumeSize; f++)
-            {
-                size_t fieldDepth = f % _layerParameters.input.NumChannels();
-                size_t fieldColumn = (f / _layerParameters.input.NumChannels()) % _convolutionalParameters.receptiveField;
-                size_t fieldRow = (f / _layerParameters.input.NumChannels()) / _convolutionalParameters.receptiveField;
-
-                size_t rowOffset = 0;
-                for (size_t h = 0; h < convolutionalHeight; h++)
-                {
-                    size_t colOffset = 0;
-                    for (size_t w = 0; w < convolutionalWidth; w++)
-                    {
-                        size_t input_row = rowOffset + fieldRow;
-                        size_t input_col = colOffset + fieldColumn;
-
-                        shapedInput(f, h * convolutionalWidth + w) = input(input_row, input_col, fieldDepth);
-                        colOffset += _convolutionalParameters.stride;
-                    }
-                    rowOffset += _convolutionalParameters.stride;
-                }
+            default:
+                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Append element not supported for AutoDataVector");
             }
         }
 

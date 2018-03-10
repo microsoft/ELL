@@ -13,6 +13,8 @@
 // dsp
 #include "FilterBank.h"
 
+#include "CepstrumTestData.h"
+
 // testing
 #include "testing.h"
 

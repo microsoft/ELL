@@ -12,8 +12,6 @@
 #include "ReceptiveFieldMatrixNode.h"
 #include "ReorderDataNode.h"
 
-
-
 namespace ell
 {
 namespace nodes
@@ -33,39 +31,36 @@ namespace nodes
     }
 
     template <typename ValueType>
-    UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode(const model::PortElements<ValueType>& input, 
-                                                                    const model::PortMemoryLayout& inputMemoryLayout,
-                                                                    const model::PortMemoryLayout& outputMemoryLayout,
-                                                                    const ConstTensorReferenceType& filterWeights,
-                                                                    const predictors::neural::ConvolutionalParameters& convolutionalParameters,
-                                                                    const predictors::neural::PaddingParameters& inputPaddingParameters,
-                                                                    const predictors::neural::PaddingParameters& outputPaddingParameters)
-    : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterWeights(0,0), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _outputPaddingParameters(outputPaddingParameters)
+    UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode(const model::PortElements<ValueType>& input,
+                                                                const model::PortMemoryLayout& inputMemoryLayout,
+                                                                const model::PortMemoryLayout& outputMemoryLayout,
+                                                                const ConstTensorReferenceType& filterWeights,
+                                                                int stride)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterWeights(0, 0), _filterSize(filterWeights.NumColumns()), _stride(stride)
     {
         _filterWeights = GetWeightsMatrix(filterWeights);
     }
-    
+
     template <typename ValueType>
-    UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode(const model::PortElements<ValueType>& input, 
-                                                                    const model::PortMemoryLayout& inputMemoryLayout,
-                                                                    const model::PortMemoryLayout& outputMemoryLayout,
-                                                                    ConstMatrixReferenceType filterWeights,
-                                                                    const predictors::neural::ConvolutionalParameters& convolutionalParameters,
-                                                                    const predictors::neural::PaddingParameters& inputPaddingParameters,
-                                                                    const predictors::neural::PaddingParameters& outputPaddingParameters)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterWeights(filterWeights), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _outputPaddingParameters(outputPaddingParameters)
+    UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode(const model::PortElements<ValueType>& input,
+                                                                const model::PortMemoryLayout& inputMemoryLayout,
+                                                                const model::PortMemoryLayout& outputMemoryLayout,
+                                                                ConstMatrixReferenceType filterWeights,
+                                                                int filterSize,
+                                                                int stride)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterWeights(filterWeights), _filterSize(filterSize), _stride(stride)
     {
     }
-    
+
     template <typename ValueType>
     typename UnrolledConvolutionNode<ValueType>::MatrixType UnrolledConvolutionNode<ValueType>::GetWeightsMatrix(const ConstTensorReferenceType& weightsTensor) const
     {
-        const size_t filterWidth = _convolutionalParameters.receptiveField;
+        const size_t filterWidth = weightsTensor.NumColumns();
         const size_t inputDepth = GetInputMemoryLayout().GetActiveSize(2);
         const size_t numFilters = GetOutputMemoryLayout().GetActiveSize(2);
 
         // Reshape the weights
-        MatrixType weightsMatrix {numFilters, filterWidth * filterWidth * inputDepth};
+        MatrixType weightsMatrix{ numFilters, filterWidth * filterWidth * inputDepth };
         auto flattened = weightsTensor.ReferenceAsMatrix();
         for (size_t startRow = 0; startRow < flattened.NumRows() / filterWidth; startRow++)
         {
@@ -87,7 +82,7 @@ namespace nodes
     void UnrolledConvolutionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<UnrolledConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, _outputMemoryLayout, _filterWeights, _convolutionalParameters, _inputPaddingParameters, _outputPaddingParameters);
+        auto newNode = transformer.AddNode<UnrolledConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, _outputMemoryLayout, _filterWeights, _filterSize, _stride);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -110,18 +105,14 @@ namespace nodes
         const auto inputHeight = inputLayout.GetActiveSize(0);
         const auto inputWidth = inputLayout.GetActiveSize(1);
         const auto inputDepth = inputLayout.GetActiveSize(2);
-        const auto inputDataPadding = inputLayout.GetOffset(0);
-
-        const auto filterWidth = _convolutionalParameters.receptiveField;
+        const auto inputPadding = inputLayout.GetOffset(0);
 
         const auto outputImageHeight = outputLayout.GetActiveSize(0);
         const auto outputImageWidth = outputLayout.GetActiveSize(1);
-        const auto outputDataPadding = outputLayout.GetOffset(0);
+        const auto outputPadding = outputLayout.GetOffset(0);
         const auto numFilters = outputLayout.GetActiveSize(2);
         const auto outputRows = outputImageWidth * outputImageHeight;
-        const auto stride = _convolutionalParameters.stride;
-
-        const auto padding = _inputPaddingParameters.paddingSize;
+        const auto filterSize = _filterSize;
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
 
         // Needs (channel, row, column) order and no data padding
@@ -136,9 +127,9 @@ namespace nodes
 
         // Input data is in the canonical RCD order
         // `dataOrder` is the order the we're going to generate the receptive field matrix from
-        bool useNewMethod = (stride == 1 && padding == filterWidth/2);
+        bool useNewMethod = (_stride == 1 && inputPadding == filterSize / 2);
         std::array<int, 3> dataOrder = useNewMethod ? drcOrder : rcdOrder;
-        assert(outputDataPadding == 0 && "Convolutional node output padding not supported yet");
+        assert(outputPadding == 0 && "Unrolled convolution node output padding not supported yet");
 
         // weights: numFilters x fieldVolumeSize == m x k
         // ShapedInput: fieldVolumeSize x outputRows == k x n
@@ -146,12 +137,12 @@ namespace nodes
 
         if (dataOrder == rcdOrder) // don't reorder input -- use old method
         {
-            auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(newInput, inputLayout, _convolutionalParameters.receptiveField, _convolutionalParameters.stride, _inputPaddingParameters.paddingSize, dataOrder, outputImageWidth, outputImageHeight);
+            auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(newInput, inputLayout, filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
             auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc);
 
             // Output of matrix multiply is in (f x h x w) order, need to transpose to (h x w x f)
             model::PortMemoryLayout outputShape({ numFilters, outputImageHeight, outputImageWidth });
-            model::PortMemoryLayout transposedOutputShape({ outputImageHeight, outputImageWidth, numFilters }, { outputDataPadding, outputDataPadding, 0 });
+            model::PortMemoryLayout transposedOutputShape({ outputImageHeight, outputImageWidth, numFilters }, { outputPadding, outputPadding, 0 });
             auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape, std::vector<int>{ 1, 2, 0 });
             transformer.MapNodeOutput(this->output, reorderOutputNode->output);
         }
@@ -160,20 +151,44 @@ namespace nodes
             assert(dataOrder == drcOrder);
 
             // Remove padding and transpose to DRC order
-            model::PortMemoryLayout inputShape({ inputHeight, inputWidth, inputDepth }, { inputDataPadding, inputDataPadding, 0 });
-            model::PortMemoryLayout transposedInputShape({ inputDepth, inputHeight, inputWidth});
+            model::PortMemoryLayout inputShape({ inputHeight, inputWidth, inputDepth }, { inputPadding, inputPadding, 0 });
+            model::PortMemoryLayout transposedInputShape({ inputDepth, inputHeight, inputWidth });
             auto reorderInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, inputShape, transposedInputShape, std::vector<int>{ 2, 0, 1 });
 
-            auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(reorderInputNode->output, inputLayout, _convolutionalParameters.receptiveField, _convolutionalParameters.stride, _inputPaddingParameters.paddingSize, dataOrder, outputImageWidth, outputImageHeight);
+            auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(reorderInputNode->output, inputLayout, _filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
             auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc);
 
             // Output of matrix multiply is in (f x h x w) order, need to transpose to (h x w x f)
             model::PortMemoryLayout outputShape({ numFilters, outputImageHeight, outputImageWidth });
-            model::PortMemoryLayout transposedOutputShape({ outputImageHeight, outputImageWidth, numFilters }, { outputDataPadding, outputDataPadding, 0 });
-            auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape, std::vector<int>{1, 2, 0});
+            model::PortMemoryLayout transposedOutputShape({ outputImageHeight, outputImageWidth, numFilters }, { outputPadding, outputPadding, 0 });
+            auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape, std::vector<int>{ 1, 2, 0 });
             transformer.MapNodeOutput(this->output, reorderOutputNode->output);
         }
         return true;
+    }
+
+    template <typename ValueType>
+    void UnrolledConvolutionNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        model::CompilableNode::WriteToArchive(archiver);
+        archiver[defaultInputPortName] << _input;
+        archiver["inputLayout"] << _inputMemoryLayout;
+        archiver["outputLayout"] << _outputMemoryLayout;
+        archiver["filterSize"] << _filterSize;
+        archiver["stride"] << _stride;
+        math::MatrixArchiver::Write(_filterWeights, "weights", archiver);
+    }
+
+    template <typename ValueType>
+    void UnrolledConvolutionNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        model::CompilableNode::ReadFromArchive(archiver);
+        archiver[defaultInputPortName] >> _input;
+        archiver["inputLayout"] >> _inputMemoryLayout;
+        archiver["outputLayout"] >> _outputMemoryLayout;
+        archiver["filterSize"] >> _filterSize;
+        archiver["stride"] >> _stride;
+        math::MatrixArchiver::Read(_filterWeights, "weights", archiver);
     }
 
     // Explicit specializations

@@ -179,7 +179,7 @@ namespace model
     private:
         friend class IRMapCompiler;
 
-        IRCompiledMap(Map map, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module);
+        IRCompiledMap(Map map, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module, bool verifyJittedModule);
 
         void EnsureExecutionEngine() const;
         void EnsureValidMap(); // fixes up model if necessary and checks inputs/outputs are compilable
@@ -196,6 +196,7 @@ namespace model
         std::unique_ptr<emitters::IRModuleEmitter> _module;
 
         mutable std::unique_ptr<emitters::IRExecutionEngine> _executionEngine;
+        bool _verifyJittedModule = false;
 
         // Only one of the entries in each of these tuples is active, depending on the input and output types of the map
         mutable bool _computeFunctionDefined;

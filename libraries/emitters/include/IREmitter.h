@@ -85,6 +85,17 @@ namespace emitters
         llvm::ArrayType* ArrayType(VariableType type, size_t size);
 
         /// <summary>
+        /// Get the LLVM Type Information for a 2D array of VariableType, with the given number of rows and columns.
+        /// </summary>
+        ///
+        /// <param name="type"> The entry type. </param>
+        /// <param name="rows"> The number of rows in the array. </param>
+        /// <param name="columns"> The number of columns in the array. </param>
+        ///
+        /// <returns> Pointer to an llvm::ArrayType object that represents the specified array. </returns>
+        llvm::ArrayType* ArrayType(VariableType type, size_t rows, size_t columns);
+
+        /// <summary>
         /// Get the LLVM Type Information for an ARRAY of VariableType, with a given size.
         /// </summary>
         ///
@@ -93,6 +104,17 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::ArrayType object that represents the specified array. </returns>
         llvm::ArrayType* ArrayType(llvm::Type* type, size_t size);
+
+        /// <summary>
+        /// Get the LLVM Type Information for a 2D array of VariableType, with the given number of rows and columns.
+        /// </summary>
+        ///
+        /// <param name="type"> The entry type. </param>
+        /// <param name="rows"> The number of rows in the array. </param>
+        /// <param name="columns"> The number of columns in the array. </param>
+        ///
+        /// <returns> Pointer to an llvm::ArrayType object that represents the specified array. </returns>
+        llvm::ArrayType* ArrayType(llvm::Type* type, size_t rows, size_t columns);
 
         /// <summary>
         /// Get the LLVM Type Information for a vector of a given size.
@@ -799,6 +821,15 @@ namespace emitters
         /// <returns> Pointer to a llvm::AllocaInst that represents the allocated array. </returns>
         llvm::AllocaInst* StackAllocate(VariableType type, size_t size);
 
+        /// <summary> Emits a stack alloc instruction for a 2D array of primitive types. </summary>
+        ///
+        /// <param name="type"> The array entry type. </param>
+        /// <param name="rows"> The number of rows in the array. </param>
+        /// <param name="columns"> The number of columns in the array. </param>
+        ///
+        /// <returns> Pointer to a llvm::AllocaInst that represents the allocated array. </returns>
+        llvm::AllocaInst* StackAllocate(VariableType type, size_t rows, size_t columns);
+
         /// <summary> Emits a stack alloc instruction for an array of primitive types. </summary>
         ///
         /// <param name="type"> The array entry type. </param>
@@ -806,6 +837,15 @@ namespace emitters
         ///
         /// <returns> Pointer to a llvm::AllocaInst that represents the allocated array. </returns>
         llvm::AllocaInst* StackAllocate(llvm::Type* type, size_t size);
+
+        /// <summary> Emits a stack alloc instruction for a 2D array of primitive types. </summary>
+        ///
+        /// <param name="type"> The array entry type. </param>
+        /// <param name="rows"> The number of rows in the array. </param>
+        /// <param name="columns"> The number of columns in the array. </param>
+        ///
+        /// <returns> Pointer to a llvm::AllocaInst that represents the allocated array. </returns>
+        llvm::AllocaInst* StackAllocate(llvm::Type* type, size_t rows, size_t columns);
 
         /// <summary> Emit a conditional branch. </summary>
         ///

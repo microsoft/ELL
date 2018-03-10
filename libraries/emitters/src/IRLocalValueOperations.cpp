@@ -45,7 +45,7 @@ namespace emitters
             VerifyFromSameFunction(a, b);
             if (!(BothIntegral(a, b) || BothFloatingPoint(a, b)))
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "IRLocalValue arguments have incompatible types");
+                throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments have incompatible types");
             }
         }
 

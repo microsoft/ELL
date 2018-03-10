@@ -68,6 +68,5 @@ namespace dsp
         archiver["b"] >> _b;
         archiver["a"] >> _a;
     }
-
 }
 }

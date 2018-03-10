@@ -41,7 +41,7 @@ namespace nodes
         /// @}
 
         ConvolutionalLayerNode() = default;
-        
+
         /// <summary> Constructor from a layer. </summary>
         ///
         /// <param name="input"> </param>

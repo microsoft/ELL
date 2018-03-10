@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     Nodes_test.cpp (nodes_test)
+//  File:     DTWPrototype.h (nodes_test)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,7 +10,7 @@
 
 #include <vector>
 
-std::vector<std::vector<double>> GetNextSlidePrototype()
+inline std::vector<std::vector<double>> GetNextSlidePrototype()
 {
     return {
         { -1.6676821356852263,

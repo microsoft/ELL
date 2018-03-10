@@ -34,17 +34,16 @@ namespace dsp
 
         const auto pi = math::Constants<double>::pi;
         const auto numCoeffs = coefficients.size();
-        auto denom = static_cast<ValueType>(symmetry == WindowSymmetry::symmetric ? size-1 : size);
+        auto denom = static_cast<ValueType>(symmetry == WindowSymmetry::symmetric ? size - 1 : size);
         std::vector<ValueType> result(size);
         for (size_t index = 0; index < size; index++)
         {
             double windowVal = coefficients[0];
             double sign = -1.0;
-            for(size_t coeffIndex = 1; coeffIndex < numCoeffs; ++coeffIndex)
+            for (size_t coeffIndex = 1; coeffIndex < numCoeffs; ++coeffIndex)
             {
                 windowVal += sign * coefficients[coeffIndex] * std::cos((2 * pi * coeffIndex * index) / denom);
                 sign *= -1;
-
             }
             result[index] = static_cast<ValueType>(windowVal);
         }

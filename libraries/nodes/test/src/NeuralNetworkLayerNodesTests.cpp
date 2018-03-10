@@ -6,7 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "NeuralNetworkLayerNodesTest.h"
+#include "NeuralNetworkLayerNodesTests.h"
 
 // nodes
 #include "ActivationLayerNode.h"
@@ -705,7 +705,7 @@ static void TestSoftmaxLayerNode()
     testing::ProcessTest("Testing SoftmaxLayerNode compute", testing::IsEqual(modelOutput, output.ToArray()));
 }
 
-void NeuralNetworkLayerNodesTests()
+void TestNeuralNetworkLayerNodes()
 {
     // Neural nets
     TestNeuralNetworkPredictorNode();

@@ -6,8 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "NeuralNetworkLayerNodesTest.h"
-#include "Nodes_test.h"
+#include "DSPNodesTests.h"
+#include "NeuralNetworkLayerNodesTests.h"
+#include "NodesTests.h"
 
 // testing
 #include "testing.h"
@@ -29,8 +30,9 @@ int main(int argc, char** argv)
     UNUSED(argv);
     try
     {
-        NodesTests();
-        NeuralNetworkLayerNodesTests();
+        TestNodes();
+        TestNeuralNetworkLayerNodes();
+        TestDSPNodes();
     }
     catch (const utilities::Exception& exception)
     {

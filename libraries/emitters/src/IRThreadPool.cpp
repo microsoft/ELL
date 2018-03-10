@@ -92,11 +92,9 @@ namespace emitters
     IRThreadPoolTaskArray& IRThreadPool::AddTasks(IRFunctionEmitter& function, llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments)
     {
         // Call Initialize() the first time we're called --- this adds global init code to the module
-        static bool initialized = false;
-        if (!initialized)
+        if (!IsInitialized())
         {
             Initialize();
-            initialized = true;
         }
 
         return _taskQueue.StartTasks(function, taskFunction, arguments);

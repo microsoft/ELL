@@ -43,10 +43,8 @@ namespace nodes
                                                                 const model::PortMemoryLayout& inputMemoryLayout,
                                                                 const model::PortMemoryLayout& outputMemoryLayout,
                                                                 const ConstTensorReferenceType& filterWeights,
-                                                                const predictors::neural::ConvolutionalParameters& convolutionalParameters,
-                                                                const predictors::neural::PaddingParameters& inputPaddingParameters,
-                                                                const predictors::neural::PaddingParameters& outputPaddingParameters)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterWeights(filterWeights), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _outputPaddingParameters(outputPaddingParameters)
+                                                                int stride)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterWeights(filterWeights), _stride(stride)
     {
     }
 
@@ -54,7 +52,7 @@ namespace nodes
     void DiagonalConvolutionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<DiagonalConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, _outputMemoryLayout, _filterWeights, _convolutionalParameters, _inputPaddingParameters, _outputPaddingParameters);
+        auto newNode = transformer.AddNode<DiagonalConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, _outputMemoryLayout, _filterWeights, _stride);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -67,8 +65,9 @@ namespace nodes
         const auto& weightsMatrix = _filterWeights.ReferenceAsMatrix();
         auto weightsTranspose = weightsMatrix.Transpose();
         auto weightsValues = weightsTranspose.ToArray();
+        int filterSize = _filterWeights.NumColumns();
         auto weightsNode = transformer.AddNode<ConstantNode<ValueType>>(weightsValues);
-        auto convNode = transformer.AddNode<DiagonalConvolutionComputeNode<ValueType>>(newInput, weightsNode->output, _inputMemoryLayout, _outputMemoryLayout, _convolutionalParameters, _inputPaddingParameters, _outputPaddingParameters);
+        auto convNode = transformer.AddNode<DiagonalConvolutionComputeNode<ValueType>>(newInput, weightsNode->output, _inputMemoryLayout, _outputMemoryLayout, filterSize, _stride);
         transformer.MapNodeOutput(this->output, convNode->output);
         return true;
     }
@@ -80,37 +79,33 @@ namespace nodes
         const auto inputLayout = this->GetInputMemoryLayout();
         const auto inputDepth = inputLayout.GetActiveSize(2);
         const auto inputPadding = inputLayout.GetOffset(0);
-        const auto filterWidth = static_cast<int>(this->GetConvolutionalParameters().receptiveField);
+        const int filterSize = _filterWeights.NumColumns();
 
         const auto outputLayout = this->GetOutputMemoryLayout();
         const auto outputWidth = outputLayout.GetActiveSize(1);
         const auto outputHeight = outputLayout.GetActiveSize(0);
-        const auto numFilters = outputLayout.GetActiveSize(2);
-
-        const auto padding = inputPadding;
-
-        // const int batchSize = _convolutionalParameters.numFiltersAtATime;
+        const int numFilters = outputLayout.GetActiveSize(2);
         const int batchSize = numFilters;
 
-        const int paddedWidth = outputWidth + (2 * padding);
-        const int paddedHeight = outputHeight + (2 * padding);
+        const auto paddedWidth = outputWidth + (2 * inputPadding);
+        const auto paddedHeight = outputHeight + (2 * inputPadding);
         assert(static_cast<int>(_input.Size()) == paddedWidth * paddedHeight * inputDepth);
 
         const int numFlattenedMatrixColumns = inputDepth * paddedWidth;
 
-        const int kd = filterWidth * inputDepth;
-        // const int numConvolutions = ((paddedWidth - filterWidth) * inputDepth + 1) / inputDepth; // Note: this should be paddedWidth - filterWidth + 1?
-        const int numConvolutions = paddedWidth - filterWidth + 1; // Note: numConvolutions == output width if padding is on
+        const int kd = filterSize * inputDepth;
+        // const size_t numConvolutions = ((paddedWidth - filterSize) * inputDepth + 1) / inputDepth; // Note: this should be paddedWidth - filterSize + 1?
+        const int numConvolutions = paddedWidth - filterSize + 1; // Note: numConvolutions == output width if padding is on
 
         auto inputData = _input.GetValue();
         auto filterWeightsData = _filterWeights.ToArray();
-        assert(static_cast<int>(filterWeightsData.size()) == filterWidth * filterWidth * inputDepth * numFilters);
-        const int outputSize = (paddedHeight * paddedWidth) * numFilters;
+        assert(static_cast<int>(filterWeightsData.size()) == filterSize * filterSize * inputDepth * numFilters);
+        const size_t outputSize = (paddedHeight * paddedWidth) * numFilters;
         std::vector<ValueType> output(outputSize);
-        std::vector<ValueType> scratch(paddedHeight * filterWidth * batchSize);
+        std::vector<ValueType> scratch(paddedHeight * filterSize * batchSize);
 
         math::RowMatrixReference<ValueType> inputMatrix(inputData.data(), paddedHeight, numFlattenedMatrixColumns);
-        math::RowMatrixReference<ValueType> weightsMatrix(filterWeightsData.data(), filterWidth * inputDepth, filterWidth * numFilters);
+        math::RowMatrixReference<ValueType> weightsMatrix(filterWeightsData.data(), filterSize * inputDepth, filterSize * numFilters);
         math::RowMatrixReference<ValueType> outputMatrix(output.data(), paddedHeight, paddedWidth * numFilters);
 
         for (int j = 0; j < numConvolutions; j++) // each pass through this loop computes 1 column of the output image, for all filters
@@ -121,28 +116,50 @@ namespace nodes
             {
                 int numFiltersToUse = std::min(batchSize, numFilters - filterStart);
 
-                auto Wl = weightsMatrix.GetSubMatrix(0, filterStart * filterWidth, weightsMatrix.NumRows(), numFiltersToUse * filterWidth);
+                auto Wl = weightsMatrix.GetSubMatrix(0, filterStart * filterSize, weightsMatrix.NumRows(), numFiltersToUse * filterSize);
                 math::RowMatrixReference<ValueType> A(scratch.data(), Vj.NumRows(), Wl.NumColumns());
 
                 math::MultiplyScaleAddUpdate(static_cast<ValueType>(1.0), Vj, Wl, static_cast<ValueType>(0.0), A);
 
                 for (int l = 0; l < numFiltersToUse; l++)
                 {
-                    for (int startRow = 0; startRow < (paddedHeight - 2 * padding); startRow++) // assumes padding = floor(filterWidth/2)
+                    for (int startRow = 0; startRow < (paddedHeight - 2 * inputPadding); startRow++) // assumes padding = floor(filterSize/2)
                     {
                         double sum = 0.0;
-                        for (int diagonal = 0; diagonal < filterWidth; diagonal++)
+                        for (int diagonal = 0; diagonal < filterSize; diagonal++)
                         {
-                            sum += A(startRow + diagonal, l * filterWidth + diagonal);
+                            sum += A(startRow + diagonal, l * filterSize + diagonal);
                         }
 
-                        outputMatrix(startRow + padding, j + padding + paddedWidth * (filterStart + l)) = sum;
+                        outputMatrix(startRow + inputPadding, j + inputPadding + paddedWidth * (filterStart + l)) = sum;
                     }
                 }
             }
         }
 
         _output.SetOutput(output);
+    }
+
+    template <typename ValueType>
+    void DiagonalConvolutionNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        model::CompilableNode::WriteToArchive(archiver);
+        archiver[defaultInputPortName] << _input;
+        archiver["inputLayout"] << _inputMemoryLayout;
+        archiver["outputLayout"] << _outputMemoryLayout;
+        archiver["stride"] << _stride;
+        math::TensorArchiver::Write(_filterWeights, "weights", archiver);
+    }
+
+    template <typename ValueType>
+    void DiagonalConvolutionNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        model::CompilableNode::ReadFromArchive(archiver);
+        archiver[defaultInputPortName] >> _input;
+        archiver["inputLayout"] >> _inputMemoryLayout;
+        archiver["outputLayout"] >> _outputMemoryLayout;
+        archiver["stride"] >> _stride;
+        math::TensorArchiver::Read(_filterWeights, "weights", archiver);
     }
 
     //
@@ -160,11 +177,12 @@ namespace nodes
                                                                               const model::PortElements<ValueType>& filterWeights,
                                                                               const model::PortMemoryLayout& inputMemoryLayout,
                                                                               const model::PortMemoryLayout& outputMemoryLayout,
-                                                                              const predictors::neural::ConvolutionalParameters& convolutionalParameters,
-                                                                              const predictors::neural::PaddingParameters& inputPaddingParameters,
-                                                                              const predictors::neural::PaddingParameters& outputPaddingParameters)
-        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _outputPaddingParameters(outputPaddingParameters)
+                                                                              int filterSize,
+                                                                              int stride)
+        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterSize(filterSize), _stride(stride)
     {
+        const int numFilters = outputMemoryLayout.GetActiveSize(2);
+        _batchSize = numFilters;
     }
 
     template <typename ValueType>
@@ -172,7 +190,7 @@ namespace nodes
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newFilterWeights = transformer.TransformPortElements(_filterWeights.GetPortElements());
-        auto newNode = transformer.AddNode<DiagonalConvolutionComputeNode<ValueType>>(newInput, newFilterWeights, _inputMemoryLayout, _outputMemoryLayout, _convolutionalParameters, _inputPaddingParameters, _outputPaddingParameters);
+        auto newNode = transformer.AddNode<DiagonalConvolutionComputeNode<ValueType>>(newInput, newFilterWeights, _inputMemoryLayout, _outputMemoryLayout, _filterSize, _stride);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -199,13 +217,12 @@ namespace nodes
         // Model parameters
         const auto inputLayout = this->GetInputMemoryLayout();
         const auto outputLayout = this->GetOutputMemoryLayout();
-        const auto convParams = this->GetConvolutionalParameters();
         const auto inputHeight = inputLayout.GetActiveSize(0);
         const auto inputWidth = inputLayout.GetActiveSize(1);
         const auto inputDepth = inputLayout.GetActiveSize(2);
-        const int filterWidth = static_cast<int>(convParams.receptiveField);
-        const int padding = inputLayout.GetOffset(0);
-        assert((padding == filterWidth / 2) && "Padding must be filterWidth/2");
+        const auto filterSize = _filterSize;
+        const auto inputPadding = inputLayout.GetOffset(0);
+        assert((inputPadding == filterSize / 2) && "Input padding must be filterSize/2");
 
         // input data parameters
         const int paddedWidth = inputLayout.GetStride(1);
@@ -215,14 +232,14 @@ namespace nodes
         const int numFilters = outputLayout.GetActiveSize(2);
 
         // computation parameters
-        const int batchSize = numFilters;
-        const int stackSize = inputWidth;
+        const int batchSize = _batchSize;
+        const size_t stackSize = inputWidth;
 
         // TODO: check this carefully to make sure it's valid for stackSize != all and stackSize != 1
-        const int stackedInputHeight = (inputHeight + padding) * stackSize + padding;
-        const int columnsPerStack = (inputWidth - 1) / stackSize + 1;
-        const int stackedInputWidth = (columnsPerStack + 2 * padding);
-        const int stackedInputSize = stackedInputWidth * stackedInputHeight * inputDepth;
+        const size_t stackedInputHeight = (inputHeight + inputPadding) * stackSize + inputPadding;
+        const size_t columnsPerStack = (inputWidth - 1) / stackSize + 1;
+        const size_t stackedInputWidth = (columnsPerStack + 2 * inputPadding);
+        const size_t stackedInputSize = stackedInputWidth * stackedInputHeight * inputDepth;
 
         const auto stackedInputStride = stackedInputWidth * inputDepth;
         const auto inputStride = paddedWidth * inputDepth;
@@ -235,23 +252,23 @@ namespace nodes
 
             // Fill in input memory
             // First, the top p rows of zeros (padding):
-            for (int rowIndex = 0; rowIndex < padding; ++rowIndex)
+            for (int rowIndex = 0; rowIndex < inputPadding; ++rowIndex)
             {
                 function.MemoryCopy<ValueType>(pInput, rowIndex * inputStride, pStackedInput, rowIndex * stackedInputStride, stackedInputStride);
             }
 
             // Now skip past the first p rows of padding and copy the rest
-            auto inputPtr = function.PointerOffset(pInput, padding * inputStride);
-            auto stackedInputPtr = function.PointerOffset(pStackedInput, padding * stackedInputStride);
+            auto inputPtr = function.PointerOffset(pInput, inputPadding * inputStride);
+            auto stackedInputPtr = function.PointerOffset(pStackedInput, inputPadding * stackedInputStride);
             function.For(stackSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex1) {
                 auto stackIndex = function.LocalScalar(loopIndex1);
-                auto inputColOffset = stackIndex * (columnsPerStack * inputDepth);
-                auto stackBeginOffset = stackIndex * ((inputHeight + padding) * stackedInputStride);
-                const auto numRows = inputHeight + padding;
+                auto inputColOffset = stackIndex * function.LocalScalar<int>(columnsPerStack * inputDepth);
+                auto stackBeginOffset = stackIndex * function.LocalScalar<int>((inputHeight + inputPadding) * stackedInputStride);
+                const auto numRows = inputHeight + inputPadding;
                 function.For(numRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
                     auto rowIndex = function.LocalScalar(loopIndex2);
-                    auto inputOffset = inputColOffset + (rowIndex * inputStride);
-                    auto outputOffset = stackBeginOffset + (rowIndex * stackedInputStride);
+                    auto inputOffset = inputColOffset + (rowIndex * function.LocalScalar<int>(inputStride));
+                    auto outputOffset = stackBeginOffset + (rowIndex * function.LocalScalar<int>(stackedInputStride));
                     function.MemoryCopy<ValueType>(inputPtr, inputOffset, stackedInputPtr, outputOffset, function.LocalScalar<int>(stackedInputStride));
                 });
             });
@@ -262,19 +279,19 @@ namespace nodes
         }
 
         // Allocate scratch memory for 'A' matrix
-        // TODO: this is really paddedHeight * filterWidth * batchSize * stackSize - padding * filterWidth * batchSize
-        //              == (inputHeight + padding) * filterWidth * batchSize * (stackSize + padding);
-        const int scratchMemSize = paddedHeight * filterWidth * batchSize * stackSize;
+        // TODO: this is really paddedHeight * filterSize * batchSize * stackSize - inputPadding * filterSize * batchSize
+        //              == (inputHeight + inputPadding) * filterSize * batchSize * (stackSize + inputPadding);
+        const size_t scratchMemSize = paddedHeight * filterSize * batchSize * stackSize;
         llvm::GlobalVariable* scratch = function.GetModule().GlobalArray(emitters::GetVariableType<ValueType>(), "scratch", scratchMemSize);
         auto scratchPtr = function.PointerOffset(scratch, 0); // Convert LLVM array to pointer
 
         const int outputStride = paddedWidth * numFilters;
-        const int numConvolutions = (inputWidth - 1) / stackSize + 1;
-        function.For(numConvolutions, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex1) {
+        const size_t numConvolutions = (inputWidth - 1) / stackSize + 1;
+        function.For(numConvolutions, [inputDepth, pStackedInput, pWeights, scratchPtr, inputPadding, inputHeight, pOutput, outputLayout, numFilters, batchSize, filterSize, stackedInputHeight, stackSize, stackedInputWidth, numConvolutions, outputStride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex1) {
             auto j = function.LocalScalar(loopIndex1); // j = start column for convolution
 
             // Get the submatrix for Vj
-            auto inputOffset = j * inputDepth;
+            auto inputOffset = j * function.LocalScalar<int>(inputDepth);
             llvm::Value* Vj = function.PointerOffset(pStackedInput, inputOffset);
 
             // now for each batch of filter weights
@@ -283,54 +300,51 @@ namespace nodes
                 int numFiltersToUse = std::min(batchSize, numFilters - filterStart);
 
                 // Get the submatrix for Wl
-                auto weightsOffset = filterStart * filterWidth;
+                auto weightsOffset = filterStart * filterSize;
                 llvm::Value* Wl = function.PointerOffset(pWeights, weightsOffset);
 
                 // int m = paddedHeight;
                 const int m = stackedInputHeight;
-                const int n = filterWidth * numFiltersToUse; // this batch
-                const int k = inputDepth * filterWidth;
+                const int n = filterSize * numFiltersToUse; // this batch
+                const int k = inputDepth * filterSize;
                 const int lda = stackedInputWidth * inputDepth;
-                const int ldb = filterWidth * numFilters;
-                const int ldc = filterWidth * batchSize;
-                const auto rowStride = ldc;
+                const int ldb = filterSize * numFilters;
+                const int ldc = filterSize * batchSize;
 
                 // Note: Wl is transposed
                 function.CallGEMM<ValueType>(false, true, m, n, k, Vj, lda, Wl, ldb, scratchPtr, ldc);
 
                 // S loop here as well
-                // BUG: The explicit list of by-reference captures here is to work around a GCC bug
-                function.For(stackSize, [=, &numFilters, &numConvolutions, &filterWidth](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
+                function.For(stackSize, [inputPadding, j, numFiltersToUse, numConvolutions, filterStart, inputHeight, filterSize, scratchPtr, pOutput, outputLayout, batchSize, numFilters, outputStride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
                     auto stackIndex = function.LocalScalar(loopIndex2);
-                    auto stackRowOffset = stackIndex * (inputHeight + padding);
-                    auto outputColumn = (stackIndex * numConvolutions) + j;
+                    auto stackRowOffset = stackIndex * function.LocalScalar<int>(inputHeight + inputPadding);
+                    auto outputColumn = (stackIndex * function.LocalScalar<int>(numConvolutions)) + j;
 
-                    function.For(numFiltersToUse, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
+                    function.For(numFiltersToUse, [filterStart, inputHeight, stackRowOffset, filterSize, scratchPtr, outputColumn, pOutput, outputLayout, batchSize, numFilters, outputStride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
                         auto l = function.LocalScalar(loopIndex3); // batchFilterIndex
-                        auto filterIndex = filterStart + l;
-                        function.For(inputHeight, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex4) {
+                        auto filterIndex = function.LocalScalar<int>(filterStart) + l;
+			function.For(inputHeight, [stackRowOffset, filterSize, l, scratchPtr, outputColumn, filterIndex, pOutput, batchSize, outputStride, outputLayout, numFilters](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex4) {
                             auto startRow = function.LocalScalar(loopIndex4);
                             auto stackStartRow = stackRowOffset + startRow;
                             auto sum = function.LocalScalar();
-                            for (int diagonal = 0; diagonal < filterWidth; diagonal++)
+                            for (int diagonal = 0; diagonal < filterSize; diagonal++)
                             {
-                                auto currRow = stackStartRow + diagonal;
-                                auto currRowOffset = currRow * rowStride;
-
-                                // col offset = l*k + diagonal
+                                auto currRow = stackStartRow + function.LocalScalar<int>(diagonal);
+                                auto currRowOffset = currRow * function.LocalScalar<int>(batchSize * filterSize);
                                 // auto currColOffset = function.LocalScalar<int>(batchSize * diagonal) + l;
-                                auto currColOffset = (l * filterWidth) + diagonal;
+                                // col offset = l*k + diagonal
+                                auto currColOffset = (l * function.LocalScalar<int>(filterSize)) + function.LocalScalar<int>(diagonal);
 
                                 auto inputIndex = currRowOffset + currColOffset;
                                 auto diagonalValue = function.LocalScalar(function.ValueAt(scratchPtr, inputIndex));
-
+                                // diagonalValue = A[startRow + diagonal, l*k + diagonal]
                                 if (sum.value == nullptr)
                                     sum = diagonalValue;
                                 else
                                     sum = sum + diagonalValue;
                             }
-                            auto outRowOffset = startRow * outputStride;
-                            auto outColOffset = outputColumn * numFilters;
+                            auto outRowOffset = startRow * function.LocalScalar<int>(outputStride);
+                            auto outColOffset = outputColumn * function.LocalScalar<int>(numFilters);
                             auto outputIndex = outRowOffset + outColOffset + filterIndex;
                             function.SetValueAt(pOutput, outputIndex, sum);
                         });

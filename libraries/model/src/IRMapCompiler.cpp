@@ -64,10 +64,10 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Compiled maps must have a single input");
         }
 
-        if (map.NumOutputPorts() != 1)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Compiled maps must have a single output");
-        }
+       if (map.NumOutputPorts() != 1)
+       {
+           throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Compiled maps must have a single output");
+       }
 
         Log() << "Ensuring map is valid..." << EOL;
         // if output isn't a simple port, add an output node to model
@@ -158,7 +158,7 @@ namespace model
         _profiler.EmitModelProfilerFunctions();
 
         auto module = std::make_unique<emitters::IRModuleEmitter>(std::move(_moduleEmitter));
-        return IRCompiledMap(std::move(map), GetMapCompilerOptions().mapFunctionName, std::move(module));
+        return IRCompiledMap(std::move(map), GetMapCompilerOptions().mapFunctionName, std::move(module), GetMapCompilerOptions().verifyJittedModule);
     }
 
     void IRMapCompiler::EmitModelAPIFunctions(const Map& map)

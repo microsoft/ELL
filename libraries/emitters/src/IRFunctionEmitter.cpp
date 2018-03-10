@@ -97,6 +97,11 @@ namespace emitters
         return IRLocalArray(*this, value);
     }
 
+    IRLocalMatrix IRFunctionEmitter::LocalMatrix(llvm::Value* value, int rows, int columns)
+    {
+        return IRLocalMatrix(*this, value, rows, columns);
+    }
+
     llvm::Value* IRFunctionEmitter::GetEmittedVariable(const VariableScope scope, const std::string& name)
     {
         switch (scope)
@@ -604,10 +609,22 @@ namespace emitters
         return _pEmitter->StackAllocate(type, size);
     }
 
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int rows, int columns)
+    {
+        EntryBlockScope scope(*this);
+        return _pEmitter->StackAllocate(type, rows, columns);
+    }
+
     llvm::AllocaInst* IRFunctionEmitter::Variable(llvm::Type* type, int size)
     {
         EntryBlockScope scope(*this);
         return _pEmitter->StackAllocate(type, size);
+    }
+
+    llvm::AllocaInst* IRFunctionEmitter::Variable(llvm::Type* type, int rows, int columns)
+    {
+        EntryBlockScope scope(*this);
+        return _pEmitter->StackAllocate(type, rows, columns);
     }
 
     llvm::Value* IRFunctionEmitter::Load(llvm::Value* pPointer)
@@ -1011,6 +1028,7 @@ namespace emitters
 
     void IRFunctionEmitter::PrintForEach(const std::string& formatString, llvm::Value* pVector, int size)
     {
+        EnsurePrintf();
         llvm::Value* pFormat = Literal(formatString);
         IRForLoopEmitter forLoop = ForLoop();
         forLoop.Begin(size);

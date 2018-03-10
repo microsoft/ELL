@@ -21,6 +21,7 @@
 #include "BufferNode.h"
 #include "ClockNode.h"
 #include "DCTNode.h"
+#include "DiagonalConvolutionNode.h"
 #include "ClockNode.h"
 #include "CompiledActivationFunctions.h"
 #include "DelayNode.h"
@@ -42,9 +43,12 @@
 #include "ProtoNNPredictorNode.h"
 #include "ReceptiveFieldMatrixNode.h"
 #include "ReorderDataNode.h"
+#include "SimpleConvolutionNode.h"
 #include "SinkNode.h"
 #include "SourceNode.h"
 #include "UnaryOperationNode.h"
+#include "UnrolledConvolutionNode.h"
+#include "WinogradConvolutionNode.h"
 
 // predictors
 #include "ForestPredictor.h"
@@ -137,6 +141,9 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::DemultiplexerNode<bool, bool>>();
 
+        context.GetTypeFactory().AddType<model::Node, nodes::DiagonalConvolutionNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DiagonalConvolutionNode<double>>();
+
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<double>>();
 
@@ -192,6 +199,9 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<double>>();
 
+        context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionNode<double>>();
+
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestPredictorNode>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
@@ -239,6 +249,12 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::UnrolledConvolutionNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::UnrolledConvolutionNode<double>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::WinogradConvolutionNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::WinogradConvolutionNode<double>>();
 
         // NN layer nodes
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::HardSigmoidActivation>>();

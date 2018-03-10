@@ -8,15 +8,14 @@
 
 #pragma once
 
-#include "NeuralNetworkLayerNode.h"
+// math
+#include "Tensor.h"
 
 // model
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
 #include "PortElements.h"
-
-// predictors
-#include "ConvolutionalLayer.h"
+#include "PortMemoryLayout.h"
 
 // stl
 #include <string>
@@ -26,14 +25,16 @@ namespace ell
 namespace nodes
 {
     /// <summary> A node that implements convolution using matrix multiply on a reshaped input image. </summary>
+    /// If Unrolled convolution is specified, a ConvolutionalLayerNode will refine
+    /// itself into a UnrolledConvolutionNode.
     template <typename ValueType>
     class UnrolledConvolutionNode : public model::CompilableNode
     {
     public:
-        using MatrixType = typename predictors::neural::Layer<ValueType>::MatrixType;
-        using ConstMatrixReferenceType = typename predictors::neural::Layer<ValueType>::ConstMatrixReferenceType;
-        using TensorType = typename predictors::neural::Layer<ValueType>::TensorType;
-        using ConstTensorReferenceType = typename predictors::neural::Layer<ValueType>::ConstTensorReferenceType;
+        using MatrixType = math::RowMatrix<ValueType>;
+        using ConstMatrixReferenceType = math::ConstRowMatrixReference<ValueType>;
+        using TensorType = math::ChannelColumnRowTensor<ValueType>;
+        using ConstTensorReferenceType = math::ConstChannelColumnRowTensorReference<ValueType>;
 
         /// @name Input and Output Ports
         /// @{
@@ -50,14 +51,11 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="filterWeights"> The weights for the convolutional filters. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        /// <param name="convolutionalParameters"> The convolutional parameters. </param>
         UnrolledConvolutionNode(const model::PortElements<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 const ConstTensorReferenceType& filterWeights,
-                                const predictors::neural::ConvolutionalParameters& convolutionalParameters,
-                                const predictors::neural::PaddingParameters& inputPaddingParameters,
-                                const predictors::neural::PaddingParameters& outputPaddingParameters);
+                                int stride);
 
         /// <summary> Constructor. </summary>
         ///
@@ -65,25 +63,18 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="filterWeights"> The weights for the convolutional filters, expressed as a matrix. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        /// <param name="convolutionalParameters"> The convolutional parameters. </param>
         UnrolledConvolutionNode(const model::PortElements<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 ConstMatrixReferenceType filterWeights,
-                                const predictors::neural::ConvolutionalParameters& convolutionalParameters,
-                                const predictors::neural::PaddingParameters& inputPaddingParameters,
-                                const predictors::neural::PaddingParameters& outputPaddingParameters);
+                                int filterSize,
+                                int stride);
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
-
-        /// <summary> Get the parameters used to control convolution. </summary>
-        ///
-        /// <returns> A ConvolutionalParameters struct. </returns>
-        const predictors::neural::ConvolutionalParameters& GetConvolutionalParameters() const { return _convolutionalParameters; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -106,15 +97,8 @@ namespace nodes
     protected:
         bool Refine(model::ModelTransformer& transformer) const override;
         void Compute() const override;
-        void WriteToArchive(utilities::Archiver& archiver) const override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
-
-        void ReadFromArchive(utilities::Unarchiver& archiver) override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
         bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
 
     private:
@@ -131,12 +115,8 @@ namespace nodes
 
         MatrixType _filterWeights;
 
-        predictors::neural::ConvolutionalParameters _convolutionalParameters;
-        predictors::neural::PaddingParameters _inputPaddingParameters;
-        predictors::neural::PaddingParameters _outputPaddingParameters;
-
-        size_t _numWeightsRows = 0;
-        size_t _numWeightsColumns = 0;
+        int _filterSize = 0;
+        int _stride = 1;
     };
 }
 }

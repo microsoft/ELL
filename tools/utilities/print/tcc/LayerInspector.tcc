@@ -45,6 +45,8 @@ namespace ell
             return "diagonal";
         case ell::predictors::neural::ConvolutionMethod::simple:
             return "simple";
+        case ell::predictors::neural::ConvolutionMethod::winograd:
+            return "winograd";
         };
         return "";
     }

@@ -88,7 +88,8 @@ namespace emitters
         using IRLocalValue::IRLocalValue;
     };
 
-    /// Helper type for llvm values representing array values local to a function
+    /// <summary>
+    /// Helper type for llvm values representing 1D array values local to a function
     /// </summary>
     struct IRLocalArray : public IRLocalValue
     {
@@ -123,6 +124,59 @@ namespace emitters
         /// <param name="offset"> The offset where the value lies within the wrapped array. </param>
         /// <return> An instance of IRLocalArray::IRLocalArrayValue to represent the value at the offset within the array </returns>
         IRLocalArrayValue operator[](int offset) const;
+    };
+
+    /// <summary>
+    /// Helper type for llvm values representing 2D array values local to a function
+    /// </summary>
+    struct IRLocalMatrix
+    {
+    private:
+        /// <summary>
+        /// Helper type for llvm values representing values within arrays local to a function
+        /// </summary>
+        struct IRLocalMatrixValue
+        {
+            IRLocalMatrixValue(IRFunctionEmitter& function, llvm::Value* data, llvm::Value* offset);
+
+            IRLocalMatrixValue& operator=(llvm::Value* value);
+
+            operator IRLocalScalar() const;
+
+            IRFunctionEmitter& _function;
+            llvm::Value* _data;
+            llvm::Value* _offset;
+        };
+
+    public:
+        /// <summary> Constructor from an llvm::Value* </summary>
+        ///
+        /// <param name="function"> The current function being emitted. </param>
+        /// <param name="data"> The LLVM value to wrap. </param>
+        IRLocalMatrix(IRFunctionEmitter& function, llvm::Value* data, int rows, int columns);
+
+        /// <summary> Indexing operator to return a reference to the specified element </summary>
+        ///
+        /// <param name="row"> The row of the element. </param>
+        /// <param name="column"> The column of the element. </param>
+        /// <return> An instance of IRLocalMatrix::IRLocalMatrixValue to represent the value at the offset within the array </returns>
+        IRLocalMatrixValue operator()(llvm::Value* row, llvm::Value* column) const;
+
+        /// <summary> Indexing operator to return a reference to the specified element </summary>
+        ///
+        /// <param name="row"> The row of the element. </param>
+        /// <param name="column"> The column of the element. </param>
+        /// <return> An instance of IRLocalMatrix::IRLocalMatrixValue to represent the value at the offset within the array </returns>
+        IRLocalMatrixValue operator()(int row, int column) const;
+
+        /// <summary> The function this value is in scope for. </summary>
+        IRFunctionEmitter& function;
+
+        /// <summary> The llvm::Value* being wrapped. </summary>
+        llvm::Value* data = nullptr;
+
+        int rows = 0;
+        int columns = 0;
     };
 }
 }

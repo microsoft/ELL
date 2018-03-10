@@ -99,6 +99,7 @@
 #include <iostream>
 #include <ostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 using namespace ell;
@@ -2139,6 +2140,25 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
 
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
 {
+    // Abbreviations:
+    //
+    // r == # input rows
+    // c == # input columns
+    // ch == # input channels
+    // fw == filter width
+    // nf == # filters
+    // pi == input padding amount
+    // po == output padding amount
+
+    // Data dimensions:
+    //
+    // Input: r x c x ch, with padding -> r+2pi x c+2pi x ch
+    //     == 1 x 2 x 2, with padding == 1 -> 3 x 4 x 2
+    // Weights: nf x fw x fw x ch
+    //       == 2 x 3 x 3 x 2, (2 3x3 filters, with 2 input channels each)
+    // Output: r x c x nf, with padding -> 1+2po x 2+2po x 2
+    //      == 1 x 2 x 2, with padding == 0 -> 1 x 2 x 2
+
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -2147,12 +2167,14 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
 
     assert(inputPaddingSize == 1);
     TensorType inputWithPadding(1 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
-    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor({inputPaddingSize, inputPaddingSize, 0}, {1, 2, 2});
     inputWithPadding.Fill(0);
     input(0, 0, 0) = 2;
     input(0, 1, 0) = 1;
     input(0, 0, 1) = 3;
     input(0, 1, 1) = 2;
+    // Input channel 0: [2, 3], input channel 1: [1, 2]
+
     Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
 
     LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
@@ -2168,6 +2190,11 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     case ConvolutionType::diagonal:
         convolutionMethod = ConvolutionMethod::diagonal;
         break;
+    case ConvolutionType::winograd:
+        convolutionMethod = ConvolutionMethod::winograd;
+        break;
+    default:
+        throw std::runtime_error("Unsupported convolution type");
     }
     ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 2 }; // 2 == batch size
 
@@ -2181,6 +2208,17 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
         0, 3, 2,   3, 1, 2,   1, 0, 2 }; // Filter 2, channel 2
     // clang-format on
 
+
+    // Viewed as planar filters (ch x fw x fw):
+    //
+    //       1 3 2   2 4 1
+    // f0 =  3 1 1   3 1 2
+    //       2 3 1   1 4 2
+    //
+    //       1 2 1   0 3 2
+    // f1 =  2 3 2   3 1 2
+    //       1 2 1   1 0 2
+    
     // Filter weights in `weights` tensor are in numFilters x filterSize x filterSize x numChannels order
     TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
 

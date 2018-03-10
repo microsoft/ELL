@@ -78,6 +78,13 @@ namespace emitters
         /// <param name="value"> The value to wrap. </param>
         IRLocalArray LocalArray(llvm::Value* value);
 
+        /// <summary> Gets an `IRLocalMatrix` wrapper for an LLVM value object that represents a fixed-size array. </summary>
+        ///
+        /// <param name="value"> The value to wrap. </param>
+        /// <param name="rows"> The number of rows. </param>
+        /// <param name="columns"> The number of columns. </param>
+        IRLocalMatrix LocalMatrix(llvm::Value* value, int rows, int columns);
+
         /// <summary> Gets an emitted variable by scope and name. </summary>
         ///
         /// <param name="scope"> The variable scope. </param>
@@ -639,6 +646,15 @@ namespace emitters
         /// <returns> Pointer to the array. </returns>
         llvm::AllocaInst* Variable(VariableType type, int size);
 
+        /// <summary> Emit a 2D stack array of the given dimensions. </summary>
+        ///
+        /// <param name="type"> The array entry type. </param>
+        /// <param name="rows"> The number of rows in the array. </param>
+        /// <param name="columns"> The number of columns in the array. </param>
+        ///
+        /// <returns> Pointer to the array. </returns>
+        llvm::AllocaInst* Variable(VariableType type, int rows, int columns);
+
         /// <summary> Emit a stack array of the given size. </summary>
         ///
         /// <param name="type"> The array entry type. </param>
@@ -646,6 +662,15 @@ namespace emitters
         ///
         /// <returns> Pointer to the array. </returns>
         llvm::AllocaInst* Variable(llvm::Type* type, int size);
+
+        /// <summary> Emit a 2D stack array of the given dimensions. </summary>
+        ///
+        /// <param name="type"> The array entry type. </param>
+        /// <param name="rows"> The number of rows in the array. </param>
+        /// <param name="columns"> The number of columns in the array. </param>
+        ///
+        /// <returns> Pointer to the array. </returns>
+        llvm::AllocaInst* Variable(llvm::Type* type, int rows, int columns);
 
         /// <summary> Return an emitted stack variable and assign it a name. </summary>
         ///

@@ -9,6 +9,9 @@
 #pragma once
 #include "Layer.h"
 
+// dsp
+#include "Convolution.h"
+
 // math
 #include "Matrix.h"
 
@@ -27,6 +30,8 @@ namespace neural
         diagonal = 1,
         /// <summary> A simple, straightforward nested-loop implementation. </summary>
         simple,
+        /// <summary> An implementation that performs convolution with fewer arithmetic operations. </summary>
+        winograd
     };
 
     /// <summary> Specifies the hyper parameters of the convolutional layer. </summary>

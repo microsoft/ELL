@@ -900,11 +900,39 @@ namespace math
     using ChannelColumnRowTensor = Tensor<ElementType, Dimension::channel, Dimension::column, Dimension::row>;
 
     /// <summary>
+    /// Specialization to channel/column/row memory layout. For example, if the tensor represents an
+    /// RGB image, the entries will be stored as R_00, G_00, B_00, R_01, G_01, B_01, ...
+    /// </summary>
+    template <typename ElementType>
+    using ChannelColumnRowTensorReference = TensorReference<ElementType, Dimension::channel, Dimension::column, Dimension::row>;
+
+    /// <summary>
+    /// Specialization to channel/column/row memory layout. For example, if the tensor represents an
+    /// RGB image, the entries will be stored as R_00, G_00, B_00, R_01, G_01, B_01, ...
+    /// </summary>
+    template <typename ElementType>
+    using ConstChannelColumnRowTensorReference = ConstTensorReference<ElementType, Dimension::channel, Dimension::column, Dimension::row>;
+
+    /// <summary>
     /// Specialization to column/row/channel memory layout. This means that channels are stored
     /// one after the other and each channel is stored as a row-major matrix.
     /// </summary>
     template <typename ElementType>
     using ColumnRowChannelTensor = Tensor<ElementType, Dimension::column, Dimension::row, Dimension::channel>;
+
+    /// <summary>
+    /// Specialization to column/row/channel memory layout. This means that channels are stored
+    /// one after the other and each channel is stored as a row-major matrix.
+    /// </summary>
+    template <typename ElementType>
+    using ColumnRowChannelTensorReference = TensorReference<ElementType, Dimension::column, Dimension::row, Dimension::channel>;
+
+    /// <summary>
+    /// Specialization to column/row/channel memory layout. This means that channels are stored
+    /// one after the other and each channel is stored as a row-major matrix.
+    /// </summary>
+    template <typename ElementType>
+    using ConstColumnRowChannelTensorReference = ConstTensorReference<ElementType, Dimension::column, Dimension::row, Dimension::channel>;
 }
 }
 #include "../tcc/Tensor.tcc"

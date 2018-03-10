@@ -46,7 +46,7 @@ void SaveModels(const std::string& ext, const std::string& outputPath)
 
     common::SaveModel(GenerateMultiOutModel(3), outputPath + "/multi_out." + ext);
 
-    common::SaveModel(GenerateBroadcastTimesTwoModel<float>(256), outputPath + "broadcast_times_two." + ext);
+    common::SaveModel(GenerateBroadcastTimesTwoModel<float>(256), outputPath + "/broadcast_times_two." + ext);
 }
 
 int main(int argc, char* argv[])

@@ -67,7 +67,7 @@ namespace math
         /// <param name="index"> Zero-based index of the element. </param>
         ///
         /// <returns> A copy of the specified element. </returns>
-        inline ElementType operator[](size_t index) const;
+        inline const ElementType& operator[](size_t index) const;
 
         /// <summary> Gets the vector size. </summary>
         ///
