@@ -11,13 +11,14 @@ setlocal
 set ELL_SRC=%1
 set CONDA_PATH=%2
 set OUTPUT_PATH=%3
-set RPI_CLUSTER=%4
+set VS_VERSION=%4
+set RPI_CLUSTER=%5
 pushd %ELL_SRC%
 
 call %CONDA_PATH%\Scripts\activate.bat ell
 
 echo ===================================== BUILD ==================================
-call .\rebuild.cmd 14
+call .\rebuild.cmd %VS_VERSION%
 if ERRORLEVEL 1 exit 1
 
 echo ===================================== TEST ==================================
