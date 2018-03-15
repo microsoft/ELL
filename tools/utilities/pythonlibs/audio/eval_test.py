@@ -24,10 +24,8 @@ import wav_reader
 def str2bool(v):
     return v.lower() in [ "true", "1", "yes"]
     
-threshold = 0.01
-window_size = 80
-smoothing = 0.2 # 0.2 second smoothing window on classifier output
-ignore_labels = [0]
+THRESHOLD = 0.01
+SMOOTHING = 0.2 # 0.2 second smoothing window on classifier output
 
 class FeatureReader:
     def __init__(self, features, classifier_input_size):
@@ -69,23 +67,23 @@ class ModelTester:
     def process_prediction(self, prediction, expected):
         if prediction == expected:
             self.passed += 1
-            self.rate = self.passed * 100 / (self.passed + self.failed)
+            self.rate = self.passed / (self.passed + self.failed)
             if self.verbose:
-                print("PASSED {:.2f}%: {}".format(self.rate, self.expected)) 
+                print("PASSED {:.2f}%: {}".format(self.rate * 100, self.expected)) 
             else:
                 print("PASSED {}".format(expected)) 
         else:
             self.failed += 1
             self.rate = self.passed / (self.passed + self.failed)
             if self.verbose:
-                print("FAILED {:.2f}%: expected {}, got {}".format(self.rate, expected, prediction))
+                print("FAILED {:.2f}%: expected {}, got {}".format(self.rate * 100, expected, prediction))
             else:
                 print("FAILED: expected {}, got {}".format(expected, prediction))
 
-    def RunTest(self, feature_model, classifier_model, list_file, dataset, categories, sample_rate):
+    def RunTest(self, featurizer_model, classifier_model, list_file, dataset, categories, sample_rate, ignore_label):
 
-        transform = featurizer.AudioTransform(feature_model, window_size)
-        predictor = classifier.AudioClassifier(classifier_model, categories, ignore_labels, threshold, smoothing)
+        predictor = classifier.AudioClassifier(classifier_model, categories, [ignore_label], THRESHOLD, SMOOTHING)
+        transform = featurizer.AudioTransform(featurizer_model, predictor.input_size)
 
         print("Evaluation with transform input size {}, output size {}".format(transform.input_size, transform.output_size))
         print("Evaluation with classifier input size {}, output size {}".format(predictor.input_size, predictor.output_size))
@@ -142,14 +140,15 @@ class ModelTester:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("test the given featurizer+classifier against test input set")
-    parser.add_argument("--feature_model", "-f", help="specify path to featurizer model (*.ell or compiled_folder/model_name)", required=True)
-    parser.add_argument("--classifier_model", "-c", help="specify path to classifier model (*.ell or compiled_folder/model_name)", required=True)
+    parser = argparse.ArgumentParser("test the given featurizer and classifier against test input set")
+    parser.add_argument("--featurizer", "-f", help="specify path to featurizer model (*.ell or compiled_folder/model_name)", required=True)
+    parser.add_argument("--classifier", "-c", help="specify path to classifier model (*.ell or compiled_folder/model_name)", required=True)
     parser.add_argument("--list_file", "-l", help="specify path to testing_list.txt")
     parser.add_argument("--dataset", "-d", help="specify path to cached dataset file (*.npz)")
     parser.add_argument("--categories", "-cat", help="specify path to categories file", required=True)
     parser.add_argument("--verbose", "-v", help="provide more output", default="False")
-    parser.add_argument("--sample_rate", "-r", help="specify audio rate (default 16000)", default=16000, type=int)    
+    parser.add_argument("--sample_rate", "-r", help="specify audio rate (default 16000)", default=16000, type=int)  
+    parser.add_argument("--ignore_label", "-i", help="specify label to ignore", default=None, type=int)    
 
     args = parser.parse_args()
     verbose = str2bool(args.verbose)
@@ -168,4 +167,4 @@ if __name__ == "__main__":
         sys.exit(1)
 
     test = ModelTester(verbose)
-    test.RunTest(args.feature_model, args.classifier_model, args.list_file, args.dataset, args.categories, sample_rate)
+    test.RunTest(args.featurizer, args.classifier, args.list_file, args.dataset, args.categories, sample_rate, args.ignore_label)

@@ -36,6 +36,10 @@ class AudioTransform:
             
         self.logfile = None
         self.output_window_size = output_window_size
+        ts = self.model.input_shape
+        self.input_shape = (ts.rows, ts.columns, ts.channels)        
+        ts = self.model.output_shape
+        self.output_shape = (ts.rows, ts.columns, ts.channels)
         self.input_size = int(self.model.input_shape.Size())
         self.output_size = int(self.model.output_shape.Size())
         self.frame_count = 0

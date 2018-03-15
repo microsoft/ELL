@@ -22,26 +22,23 @@ import speaker
 import wav_reader
 
 
-window_size = 40 # classifier is looking at this many features at once
-threshold = 0.6 # only report predictions with greater than 60% confidence
-sample_rate = 16000 # classifier was trained on 16kHz samples
-channels = 1 # classifier was trained on mono audio
-smoothing = 0.2 # 0.2 second smoothing window on classifier output
+THRESHOLD = 0.6 # default is only report predictions with greater than 60% confidence
+SAMPLE_RATE = 16000 # default is classifier was trained on 16kHz samples
+CHANNELS = 1 # default classifier was trained on mono audio
+SMOOTHING = 0.2 # default 0.2 second smoothing window on classifier output
 
-parser = argparse.ArgumentParser("test the classifier+featurizer against mic or wav file input")
+parser = argparse.ArgumentParser("test the classifier and featurizer against mic or wav file input")
 parser.add_argument("--wav_file", help="optional path to wav file to test", default=None)
-parser.add_argument("--feature_model", "-f", help="specify path to featurizer model (*.ell or compiled_folder/model_name)", required=True)
-parser.add_argument("--classifier_model", "-c", help="specify path to classifier model (*.ell or compiled_folder/model_name)", required=True)
+parser.add_argument("--featurizer", "-f", help="specify path to featurizer model (*.ell or compiled_folder/model_name)", required=True)
+parser.add_argument("--classifier", "-c", help="specify path to classifier model (*.ell or compiled_folder/model_name)", required=True)
 parser.add_argument("--categories", "-cat", help="specify path to categories file", required=True)
-parser.add_argument("--sample_rate", "-s", help="Audio sample rate expected by classifier", default=16000, type=int)
-parser.add_argument("--threshold", "-t", help="Classifier threshold (default 0.6)", default=0.6, type=float)
+parser.add_argument("--sample_rate", "-s", help="Audio sample rate expected by classifier", default=SAMPLE_RATE, type=int)
+parser.add_argument("--threshold", "-t", help="Classifier threshold (default 0.6)", default=THRESHOLD, type=float)
 
 args = parser.parse_args()
 
-transform = featurizer.AudioTransform(args.feature_model, window_size)
-predictor = classifier.AudioClassifier(args.classifier_model, args.categories, None, threshold, smoothing)
-sample_rate = args.sample_rate
-threshold = args.threshold
+predictor = classifier.AudioClassifier(args.classifier, args.categories, [0], args.threshold, SMOOTHING)
+transform = featurizer.AudioTransform(args.featurizer, predictor.input_size)
 
 if transform.using_map != predictor.using_map:
     raise Exception("cannot mix .ell and compiled models")
@@ -49,11 +46,11 @@ if transform.using_map != predictor.using_map:
 # setup inputs and outputs
 if args.wav_file:
     speaker = speaker.Speaker() # output wav file to speakers at the same time
-    reader = wav_reader.WavReader(sample_rate, channels)
+    reader = wav_reader.WavReader(args.sample_rate, CHANNELS)
     reader.open(args.wav_file, transform.input_size, speaker)
 else:
     reader = microphone.Microphone(True)
-    reader.open(transform.input_size, sample_rate, channels)
+    reader.open(transform.input_size, args.sample_rate, CHANNELS)
     print("Please type 'x' and enter to terminate this app...")
 
 transform.open(reader)
@@ -65,7 +62,7 @@ try:
             break
         else:
             prediction, probability, label = predictor.predict(feature_data)
-            if probability is not None and probability >= threshold:                
+            if probability is not None:                
                 percent = int(100 * probability)
                 print("<<< DETECTED ({}) {}% {} >>>".format(prediction, percent, label))
 

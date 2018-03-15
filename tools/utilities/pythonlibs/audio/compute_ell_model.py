@@ -36,6 +36,7 @@ class ComputeModel:
         self.output_shape = self.map.GetOutputShape()
 
     def transform(self, x):
+        """ call the ell model with input array 'x' and return the output as numpy array """
         # Turn the input into something the model can read
         in_vec = np.array(x).astype(np.float32).ravel()
 

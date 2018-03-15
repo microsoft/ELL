@@ -49,6 +49,10 @@ class AudioClassifier:
             self.model = ell.CompiledModel(model_path)
 
         self.logfile = None
+        ts = self.model.input_shape
+        self.input_shape = (ts.rows, ts.columns, ts.channels)
+        ts = self.model.output_shape
+        self.output_shape = (ts.rows, ts.columns, ts.channels)
         self.input_size = int(self.model.input_shape.Size())
         self.output_size = int(self.model.output_shape.Size())
         self.items = []
@@ -119,6 +123,7 @@ class AudioClassifier:
 
 
     def avg_time(self):
+        """ get the average prediction time """
         if self.count == 0:
             self.count = 1
         return self.total_time /  self.count

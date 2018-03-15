@@ -22,3 +22,6 @@ permalink: /tutorials/
 ## Image Classification Tutorials in C++
 * [Getting started with image classification on the Raspberry Pi in C++](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/)
 
+## Audio Classification Tutorials in Python
+
+* [Getting started with audio keyword classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-audio-keyword-classification-on-the-Raspberry-Pi/)

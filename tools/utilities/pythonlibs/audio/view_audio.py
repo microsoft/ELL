@@ -43,11 +43,11 @@ class AudioDemo(Frame):
     """ A demo application class that provides simple GUI for testing featurizer+classifier on 
     microphone or wav file input. """
 
-    def __init__(self, feature_model=None, classifier_model=None, 
+    def __init__(self, featurizer_model=None, classifier_model=None, 
                 sample_rate=None, channels=None, input_device=None, categories=None, 
                 image_width=80, ignore_label=None, threshold=None, wav_file=None, clear=5):
         """ Initialize AudioDemo object
-        feature_model - the path to the compiled ELL featurizer
+        featurizer_model - the path to the compiled ELL featurizer
         classifier_model - the path to the compiled ELL classifier
         sample_rate - sample rate to featurizer is expecting
         channels - number of channels featurizer is expecting
@@ -62,19 +62,19 @@ class AudioDemo(Frame):
         super().__init__()
 
         self.CLASSIFIER_MODEL_KEY = "classifier_model"
-        self.FEATURE_MODEL_KEY = "feature_model"
+        self.FEATURIZER_MODEL_KEY = "featurizer_model"
         self.WAV_FILE_KEY = "wav_file"
         self.CATEGORY_FILE_KEY = "categories"
 
         self.get_settings_file_name()
         self.load_settings()
         self.reading_input = False
-        self.feature_model = None
-        if feature_model:
-            self.feature_model = feature_model
-            self.settings[self.FEATURE_MODEL_KEY] = feature_model
-        elif self.FEATURE_MODEL_KEY in self.settings:
-            self.feature_model = self.settings[self.FEATURE_MODEL_KEY]        
+        self.featurizer_model = None
+        if featurizer_model:
+            self.featurizer_model = featurizer_model
+            self.settings[self.FEATURIZER_MODEL_KEY] = featurizer_model
+        elif self.FEATURIZER_MODEL_KEY in self.settings:
+            self.featurizer_model = self.settings[self.FEATURIZER_MODEL_KEY]        
 
         self.classifier_model = None
         if classifier_model:
@@ -140,8 +140,8 @@ class AudioDemo(Frame):
         
         self.init_ui()
         
-        if self.feature_model:
-            self.load_feature_model(os.path.abspath(self.feature_model))
+        if self.featurizer_model:
+            self.load_featurizer_model(os.path.abspath(self.featurizer_model))
         else:
             self.show_output("Please specify and load a feature model")
 
@@ -173,25 +173,26 @@ class AudioDemo(Frame):
         with open(self.settings_file_name, "w") as f:
             f.write(json.dumps(self.settings))            
 
-    def load_feature_model(self, feature_model):
+    def load_featurizer_model(self, featurizer_model):
         """ load the given compiled ELL featurizer for use in processing subsequent audio input """
-        if feature_model:
-            self.featurizer = featurizer.AudioTransform(feature_model, 40)
+        if featurizer_model:
+            self.featurizer = featurizer.AudioTransform(featurizer_model, 40)
             self.setup_spectrogram_image()
             
             self.show_output("Feature input size: {}, output size: {}".format(
                 self.featurizer.input_size, 
                 self.featurizer.output_size))
-            if self.features_entry.get() != feature_model:
+            if self.features_entry.get() != featurizer_model:
                 self.features_entry.delete(0, END)
-                self.features_entry.insert(0, feature_model)
+                self.features_entry.insert(0, featurizer_model)
             
         self.init_data()
 
     def load_classifier(self, classifier_path):
         """ load the given compiled ELL classifier for use in processing subsequent audio input """
         if classifier_path:
-            self.classifier = classifier.AudioClassifier(classifier_path, self.categories, self.ignore_list, self.threshold)
+            self.classifier = classifier.AudioClassifier(classifier_path, self.categories, 
+                                                         self.ignore_list, self.threshold)
             self.show_output("Classifier input size: {}, output size: {}".format(
                 self.classifier.input_size,
                 self.classifier.output_size))
@@ -203,19 +204,21 @@ class AudioDemo(Frame):
     def init_data(self):
         """ initialize the spectrogram_image_data and classifier_feature_data based on the newly loaded model info """
         if self.featurizer:
-            self.spectrogram_image_data = np.zeros((self.featurizer.output_size, self.max_spectrogram_width), dtype=float)  
+            dim = (self.featurizer.output_size, self.max_spectrogram_width)
+            self.spectrogram_image_data = np.zeros(dim, dtype=float)  
             if self.spectrogram_image is not None:
                 self.spectrogram_image.set_data(self.spectrogram_image_data)
 
             if self.classifier:
                 self.num_classifier_features = self.classifier.input_size // self.featurizer.output_size
-                print("Classifier requires {} buffered features of size {}".format(self.num_classifier_features, self.featurizer.output_size))
-                self.classifier_feature_data = np.zeros((self.num_classifier_features, self.featurizer.output_size), dtype=float)
+                dim = (self.num_classifier_features, self.featurizer.output_size)
+                self.classifier_feature_data = np.zeros(dim, dtype=float)
 
     def accumulate_feature(self, feature_data):
         """ accumulate the feature data and pass feature data to classifier """
         if self.classifier and self.show_classifier_output:
-            self.classifier_feature_data = np.vstack((self.classifier_feature_data, feature_data))[-self.num_classifier_features:,:]
+            self.classifier_feature_data = np.vstack((self.classifier_feature_data, 
+                feature_data))[-self.num_classifier_features:,:]
             self.evaluate_classifier()
             
     def accumulate_spectrogram_image(self, feature_data):
@@ -434,27 +437,42 @@ class AudioDemo(Frame):
         self.play_button["text"] = "Play"
         self.stop()
 
-    def on_plus_key(self, event):
-        """ When user presses the plus button we advance to the next wav file in the current folder.
-        This way you can easily step through all the training wav files """
+    def get_wav_list(self):
         if self.wav_filename and os.path.isfile(self.wav_filename):
             dir_name = os.path.dirname(self.wav_filename)
             if not self.wav_file_list:
                 self.wav_file_list = [x for x in os.listdir(dir_name) if os.path.splitext(x)[1] == ".wav"]
                 self.wav_file_list.sort()
-            try:
-                i = self.wav_file_list.index(os.path.basename(self.wav_filename))
-                if i + 1 < len(self.wav_file_list):
-                    next_wav_file = self.wav_file_list[i+1]
-                    self.wav_filename = os.path.join(dir_name, next_wav_file)
-                    # show the file in the UI                                
-                    self.wav_filename_entry.delete(0, END)
-                    if self.wav_filename:
-                        self.wav_filename_entry.insert(0, self.wav_filename)
-                    # and automatically play the file.
-                    self.on_play()
-            except:
-                pass            
+        return self.wav_file_list
+
+    def select_wav_file(self, filename):
+        self.wav_filename = filename
+        # show the file in the UI                                
+        self.wav_filename_entry.delete(0, END)
+        if self.wav_filename:
+            self.wav_filename_entry.insert(0, self.wav_filename)
+        # and automatically play the file.
+        self.on_play()
+
+    def on_minus_key(self, event):
+        """ When user presses the plus button we reverse to the previous wav file in the current folder.
+        This way you can easily step through all the training wav files """
+        if self.get_wav_list():
+            i = self.wav_file_list.index(os.path.basename(self.wav_filename))
+            if i - 1 >= 0:
+                next_wav_file = self.wav_file_list[i - 1]
+                dir_name = os.path.dirname(self.wav_filename)
+                self.select_wav_file(os.path.join(dir_name, next_wav_file))
+
+    def on_plus_key(self, event):
+        """ When user presses the plus button we advance to the next wav file in the current folder.
+        This way you can easily step through all the training wav files """
+        if self.get_wav_list():
+            i = self.wav_file_list.index(os.path.basename(self.wav_filename))
+            if i + 1 < len(self.wav_file_list):
+                next_wav_file = self.wav_file_list[i + 1]
+                dir_name = os.path.dirname(self.wav_filename)
+                self.select_wav_file(os.path.join(dir_name, next_wav_file))
 
     def init_ui(self):
         """ setup the GUI for the app """
@@ -463,6 +481,7 @@ class AudioDemo(Frame):
 
         # Input section
         input_frame = LabelFrame(self, text="Input")
+        input_frame.bind("-", self.on_minus_key)
         input_frame.bind("+", self.on_plus_key)
         input_frame.pack(fill=X)
         self.play_button = Button(input_frame, text="Play", command=self.on_play_button_click)
@@ -481,13 +500,13 @@ class AudioDemo(Frame):
 
         features_control_frame = Frame(features_frame)
         features_control_frame.pack(fill=X)
-        load_features_button = Button(features_control_frame, text="Load", command=self.on_load_feature_model)
+        load_features_button = Button(features_control_frame, text="Load", command=self.on_load_featurizer_model)
         load_features_button.pack(side=RIGHT)
         self.features_entry = Entry(features_control_frame, width=8)
         self.features_entry.pack(fill=X)
         self.features_entry.delete(0, END)
-        if self.feature_model:
-            self.features_entry.insert(0, self.feature_model)
+        if self.featurizer_model:
+            self.features_entry.insert(0, self.featurizer_model)
 
         viz_frame = Frame(features_frame)
         viz_frame.pack(fill=X)
@@ -518,20 +537,23 @@ class AudioDemo(Frame):
         self.output_text.pack(fill=BOTH, padx=4, expand=True) 
 
     def setup_spectrogram_image(self):
-        """ this need to be called if you load a new feature model, because the featurizer output size might have changed. """
+        """ this need to be called if you load a new feature model, because the featurizer output size might have 
+        changed. """
         if self.featurizer:
-            self.spectrogram_image_data = np.zeros((self.featurizer.output_size, self.max_spectrogram_width), dtype=float)  
+            dim = (self.featurizer.output_size, self.max_spectrogram_width)
+            self.spectrogram_image_data = np.zeros(dim, dtype=float)  
             self.subplot.clear()
-            self.spectrogram_image = self.subplot.imshow(self.spectrogram_image_data, vmin=self.min_value, vmax=self.max_value, origin="lower", animated=True, cmap=pyplot.get_cmap(self.colormap_name))
+            self.spectrogram_image = self.subplot.imshow(self.spectrogram_image_data, vmin=self.min_value, 
+                vmax=self.max_value, origin="lower", animated=True, cmap=pyplot.get_cmap(self.colormap_name))
 
-    def on_load_feature_model(self):
+    def on_load_featurizer_model(self):
         """ called when user clicks the Load button for the feature model """
         filename = self.features_entry.get()
         filename = filename.strip('"')
-        self.settings[self.FEATURE_MODEL_KEY] = filename
+        self.settings[self.FEATURIZER_MODEL_KEY] = filename
         self.save_settings()
         self.stop()
-        self.load_feature_model(filename)
+        self.load_featurizer_model(filename)
 
     def on_load_classifier(self):
         """ called when user clicks the Load button for the feature model """
@@ -541,12 +563,15 @@ class AudioDemo(Frame):
         self.stop()
         self.load_classifier(self.classifier_model)
 
-def main(feature_model=None, classifier=None, sample_rate=None, channels=None, input_device=None, categories=None, image_width=80, ignore_label=None, threshold=None, wav_file=None, clear=5):
+def main(featurizer_model=None, classifier=None, sample_rate=None, channels=None, input_device=None, categories=None, 
+    image_width=80, ignore_label=None, threshold=None, wav_file=None, clear=5):
     """ Main function to create root UI and AudioDemo object, then run the main UI loop """
     root = tk.Tk()
     root.geometry("800x800")
-    app = AudioDemo(feature_model, classifier, sample_rate, channels, input_device, categories, image_width, ignore_label, threshold, wav_file, clear)
+    app = AudioDemo(featurizer_model, classifier, sample_rate, channels, input_device, categories, image_width, 
+                    ignore_label, threshold, wav_file, clear)
     root.bind("+", app.on_plus_key)
+    root.bind("-", app.on_minus_key)
     while True:
         try:
             root.mainloop()
@@ -558,20 +583,30 @@ if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser(description="Test a feature model and optional classifier in a handy GUI app")
 
     # options
-    arg_parser.add_argument("--feature_model", "-m", help="Compiled ELL model to use for generating features", default=None)
-    arg_parser.add_argument("--classifier_model", "-c", help="Compiled ELL model to use for classification", default=None)
-    arg_parser.add_argument("--sample_rate", "-s", help="Audio sample rate expected by classifier", default=16000, type=int)
-    arg_parser.add_argument("--channels", "-ch", help="Audio channels expected by classifier", default=1, type=int)
-    arg_parser.add_argument("--input_device", "-d", help="Input device", default=None, type=int)
-    arg_parser.add_argument("--categories", help="Provide categories file that provide labels for each predicted class", default=None)
-    arg_parser.add_argument("--wav_file", help="Provide an input wav file to test", default=None)
-    arg_parser.add_argument("--image_width", type=int, help="Provide the display width of spectrogram image", default=80)
-    arg_parser.add_argument("--ignore_label", type=int, help="Ignore the given label when predicted", default=None)
-    arg_parser.add_argument("--threshold", type=float, help="Ignore predictions below given confidence threshold (between 0 and 1)", default=0)
-    arg_parser.add_argument("--clear", type=float, help="Seconds before clearing output (default 5)", default=5)
+    arg_parser.add_argument("--featurizer", "-m", help="Compiled ELL model to use for generating features", 
+            default=None)
+    arg_parser.add_argument("--classifier", "-c", help="Compiled ELL model to use for classification", 
+            default=None)
+    arg_parser.add_argument("--sample_rate", "-s", help="Audio sample rate expected by classifier", 
+            default=16000, type=int)
+    arg_parser.add_argument("--channels", "-ch", help="Audio channels expected by classifier", 
+            default=1, type=int)
+    arg_parser.add_argument("--input_device", "-d", help="Input device", 
+            default=None, type=int)
+    arg_parser.add_argument("--categories", help="Provide categories file that provide labels for each predicted class",
+            default=None)
+    arg_parser.add_argument("--wav_file", help="Provide an input wav file to test", 
+            default=None)
+    arg_parser.add_argument("--image_width", help="Provide the display width of spectrogram image", 
+            type=int, default=80)
+    arg_parser.add_argument("--ignore_label", help="Ignore the given label when predicted", 
+            type=int, default=None)
+    arg_parser.add_argument("--threshold", help="Ignore predictions below given confidence threshold (0 to 1)",
+            type=float, default=0)
+    arg_parser.add_argument("--clear", help="Seconds before clearing output (default 5)", 
+            type=float, default=5)
     args = arg_parser.parse_args()
 
-    main(args.feature_model, args.classifier_model, 
+    main(args.featurizer, args.classifier, 
         args.sample_rate, args.channels, args.input_device, args.categories, 
         args.image_width, args.ignore_label, args.threshold, args.wav_file, args.clear)
-
