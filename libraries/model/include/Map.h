@@ -39,6 +39,7 @@ namespace ell
 namespace model
 {
     class ModelOptimizer;
+    class ModelOptimizerContext;
     class ModelTransformer;
     class OutputNodeBase;
 
@@ -148,7 +149,7 @@ namespace model
         /// <summary> Optimizes the model wrapped by this map. </summary>
         ///
         /// <param name="optimizer"> The optimizer to use for optimizing the model. </param>
-        void Optimize(ModelOptimizer& optimizer);
+        void Optimize(const ModelOptimizer& optimizer);
 
         /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
         ///
@@ -392,7 +393,7 @@ namespace model
         std::vector<const Node*> GetAllOutputNodes() const;
         std::vector<const Node*> GetDebugSinkNodes() const;
         void FixTransformedIO(ModelTransformer& transformer);
-        void FixTransformedIO(ModelOptimizer& optimizer);
+        void FixTransformedIO(ModelOptimizerContext& context);
     };
 
     /// <summary> A serialization context used during Map deserialization. Wraps an existing `ModelSerializationContext` </summary>

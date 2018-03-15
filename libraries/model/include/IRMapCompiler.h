@@ -56,7 +56,9 @@ namespace model
         /// <returns> The CompilerOptions struct used by the IR emitter to control code generation. </returns>
         const emitters::CompilerOptions& GetCompilerOptions() const { return GetModule().GetCompilerOptions(); }
 
+        /// <summary> Get the optimizer used by this compiler. </summary>
         ModelOptimizer& GetOptimizer() { return _optimizer; }
+
         //
         // Routines useful to Node implementers
         //

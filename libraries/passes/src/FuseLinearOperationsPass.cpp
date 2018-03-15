@@ -273,9 +273,9 @@ namespace passes
     //
     // FuseLinearOperationsPass methods
     //
-    void FuseLinearOperationsPass::OptimizeNode(const model::Node& node, model::ModelTransformer& transformer)
+    void FuseLinearOperationsPass::OptimizeNode(const model::Node& node, const model::MapCompilerOptions& settings, model::ModelOptimizerContext& context) const
     {
-        CombineLinearFunctionNodes(node, transformer);
+        CombineLinearFunctionNodes(node, context.GetTransformer());
     }
 
     void FuseLinearOperationsPass::AddToRegistry()

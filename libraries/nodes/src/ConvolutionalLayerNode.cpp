@@ -55,7 +55,6 @@ namespace nodes
         break;
         case predictors::neural::ConvolutionMethod::diagonal:
         {
-            const auto& weights = this->GetLayer().GetWeights();
             auto convNode = transformer.AddNode<DiagonalConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams.stride);
             transformer.MapNodeOutput(this->output, convNode->output);
         }
@@ -65,6 +64,7 @@ namespace nodes
             auto convNode = transformer.AddNode<WinogradConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams.stride);
             transformer.MapNodeOutput(this->output, convNode->output);
         }
+        break;
         default:
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }

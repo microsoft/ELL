@@ -12,6 +12,7 @@
 #include "InputNode.h"
 #include "IRMapCompiler.h"
 #include "Map.h"
+#include "MapCompilerOptions.h"
 #include "ModelOptimizer.h"
 #include "PortMemoryLayout.h"
 
@@ -72,7 +73,8 @@ void TestModelOptimizer()
     auto oldSize = map.GetModel().Size();
 
     // Optimize it
-    model::ModelOptimizer optimizer;
+    model::MapCompilerOptions settings;
+    model::ModelOptimizer optimizer(settings);
     optimizer.AddPass(std::make_unique<passes::FuseLinearOperationsPass>());
     map.Optimize(optimizer);
     auto newSize = map.GetModel().Size();

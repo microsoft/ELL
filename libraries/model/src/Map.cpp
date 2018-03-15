@@ -15,9 +15,7 @@
 // stl
 #include <algorithm>
 #include <unordered_set>
-
 #include <iomanip>
-#include <iostream>
 
 namespace ell
 {
@@ -262,31 +260,31 @@ namespace model
         }
     }
 
-    void Map::FixTransformedIO(ModelOptimizer& optimizer)
+    void Map::FixTransformedIO(ModelOptimizerContext& context)
     {
         for (auto& inputNode : _inputNodes)
         {
-            auto refinedInput = optimizer.GetCorrespondingInputNode(inputNode);
+            auto refinedInput = context.GetCorrespondingInputNode(inputNode);
             inputNode = refinedInput;
         }
 
         for (auto& inputNode : _inputNodeMap)
         {
             auto input = inputNode.second;
-            auto refinedInput = optimizer.GetCorrespondingInputNode(input);
+            auto refinedInput = context.GetCorrespondingInputNode(input);
             inputNode.second = refinedInput;
         }
 
         for (auto& outputElements : _outputElements)
         {
-            auto refinedOutput = optimizer.GetCorrespondingOutputs(outputElements);
+            auto refinedOutput = context.GetCorrespondingOutputs(outputElements);
             outputElements = refinedOutput;
         }
 
         for (auto& outputElements : _outputElementsMap)
         {
             auto output = outputElements.second;
-            auto refinedOutput = optimizer.GetCorrespondingOutputs(output);
+            auto refinedOutput = context.GetCorrespondingOutputs(output);
             outputElements.second = refinedOutput;
         }
     }
@@ -396,26 +394,27 @@ namespace model
 
         ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(_model, context, maxIterations);
-        FixTransformedIO(transformer);
 
+        FixTransformedIO(transformer);
         _model = std::move(refinedModel);
         Prune();
     }
 
+    void Map::Optimize(const ModelOptimizer& optimizer)
+    {
+        ModelOptimizerContext context;
+        auto optimizedModel = optimizer.OptimizeModel(_model, context);
+        FixTransformedIO(context);
+        _model = std::move(optimizedModel);
+        Prune();
+    }
+    
     void Map::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
     {
         ModelTransformer transformer;
         auto refinedModel = transformer.TransformModel(_model, context, transformFunction);
         FixTransformedIO(transformer);
         _model = std::move(refinedModel);
-    }
-
-    void Map::Optimize(ModelOptimizer& optimizer)
-    {
-        auto optimizedModel = optimizer.OptimizeModel(_model);
-        FixTransformedIO(optimizer);
-        _model = std::move(optimizedModel);
-        Prune();
     }
 
     void Map::RenameCallbacks(const std::string& sourceCallbackName, const std::string& sinkCallbackName)

@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FuseLinearOperationsPass.h"
+#include "SetConvolutionMethodPass.h"
 
 // utilities
 #include "Exception.h"
@@ -17,6 +18,7 @@ namespace passes
 {
     void AddStandardPassesToRegistry()
     {
+        SetConvolutionMethodPass::AddToRegistry();
         FuseLinearOperationsPass::AddToRegistry();
     }
 

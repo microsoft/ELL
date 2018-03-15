@@ -155,7 +155,7 @@ namespace model
         /// <summary> Print a human-readable representation of the Node. </summary>
         ///
         /// <param name="os"> The stream to write data to. </param>
-        void Print(std::ostream& os) const;
+        virtual void Print(std::ostream& os) const;
 
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;

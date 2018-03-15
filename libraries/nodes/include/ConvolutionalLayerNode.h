@@ -45,7 +45,7 @@ namespace nodes
         /// <summary> Constructor from a layer. </summary>
         ///
         /// <param name="input"> </param>
-        /// <param name="layer"> The bias layer to wrap. </param>
+        /// <param name="layer"> The convolutional layer to wrap. </param>
         ConvolutionalLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ConvolutionalLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>

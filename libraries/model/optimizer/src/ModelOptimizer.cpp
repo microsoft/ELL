@@ -29,36 +29,77 @@ namespace model
         _passes.emplace_back(std::move(pass));
     }
 
-    std::vector<std::unique_ptr<OptimizationPass>>::iterator OptimizationPassList::begin()
+    OptimizationPassList::InternalListType::iterator OptimizationPassList::begin()
     {
         return _passes.begin();
     }
 
-    std::vector<std::unique_ptr<OptimizationPass>>::iterator OptimizationPassList::end()
+    OptimizationPassList::InternalListType::iterator OptimizationPassList::end()
     {
         return _passes.end();
+    }
+
+    OptimizationPassList::InternalListType::const_iterator OptimizationPassList::begin() const
+    {
+        return _passes.cbegin();
+    }
+
+    OptimizationPassList::InternalListType::const_iterator OptimizationPassList::end() const
+    {
+        return _passes.cend();
+    }
+
+    //
+    // ModelOptimizerContext
+    //
+
+    ModelTransformer& ModelOptimizerContext::GetTransformer()
+    {
+        return _transformer;
+    }
+
+    PortElementsBase ModelOptimizerContext::GetCorrespondingOutputs(const OutputPortBase& port)
+    {
+        return _transformer.GetCorrespondingOutputs(port);
+    }
+
+    PortElementsBase ModelOptimizerContext::GetCorrespondingOutputs(const PortElementsBase& elements)
+    {
+        return _transformer.GetCorrespondingOutputs(elements);
+    }
+
+    InputNodeBase* ModelOptimizerContext::GetCorrespondingInputNode(const InputNodeBase* node)
+    {
+        return _transformer.GetCorrespondingInputNode(node);
     }
 
     //
     // ModelOptimizer
     //
-    Model ModelOptimizer::OptimizeModel(const Model& model)
+    ModelOptimizer::ModelOptimizer(const MapCompilerOptions& settings)
+        : _settings(settings)
     {
-        for(auto& pass: _passes)
+    }
+
+    Model ModelOptimizer::OptimizeModel(const Model& model, ModelOptimizerContext& context) const
+    {
+        context.GetTransformer().Reset();
+        TransformContext transformContext;
+        Model result = context.GetTransformer().CopyModel(model, transformContext);
+
+        for (auto& pass : _passes)
         {
-            pass->Initialize(*this, model);
+            pass->Initialize(result, _settings, context);
         }
 
-        TransformContext context;
-        Model result = _transformer.CopyModel(model, context);
-        for(auto& pass: _passes)
+        for (auto& pass : _passes)
         {
-            result = pass->Run(*this, result);
+            result = pass->Run(result, _settings, context);
         }
 
-        for(auto& pass: _passes)
+        for (auto& pass : _passes)
         {
-            pass->Finalize(*this, result);
+            pass->Finalize(result, _settings, context);
         }
         return result;
     }
@@ -66,26 +107,6 @@ namespace model
     void ModelOptimizer::AddPass(std::unique_ptr<OptimizationPass> pass)
     {
         _passes.AddPass(std::move(pass));
-    }
-
-    PortElementsBase ModelOptimizer::GetCorrespondingOutputs(const OutputPortBase& port)
-    {
-        return _transformer.GetCorrespondingOutputs(port);
-    }
-
-    PortElementsBase ModelOptimizer::GetCorrespondingOutputs(const PortElementsBase& elements)
-    {
-        return _transformer.GetCorrespondingOutputs(elements);
-    }
-
-    InputNodeBase* ModelOptimizer::GetCorrespondingInputNode(const InputNodeBase* node)
-    {
-        return _transformer.GetCorrespondingInputNode(node);
-    }
-
-    ModelTransformer& ModelOptimizer::GetTransformer()
-    {
-        return _transformer;
     }
 }
 }

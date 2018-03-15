@@ -264,7 +264,9 @@ namespace model
 
     void ModelTransformer::Reset()
     {
-        _elementsMap.Clear();        
+        _context = TransformContext(); // reset context
+        _elementsMap.Clear();
+        _isModelCompilable = false;
     }
 
     PortElementsBase ModelTransformer::TransformPortElements(const PortElementsBase& elements) const

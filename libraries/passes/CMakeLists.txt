@@ -6,11 +6,13 @@ set(library_name passes)
 
 set(src 
     src/FuseLinearOperationsPass.cpp
+    src/SetConvolutionMethodPass.cpp
     src/StandardPasses.cpp
 )
 
 set(include
     include/FuseLinearOperationsPass.h
+    include/SetConvolutionMethodPass.h
     include/StandardPasses.h
 )
 

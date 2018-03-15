@@ -26,6 +26,14 @@ namespace ell
 {
 namespace model
 {
+    namespace
+    {
+        bool IsConvolutionalLayerNode(const Node& node)
+        {
+            return (node.GetRuntimeTypeName().find("ConvolutionalLayerNode") == 0);
+        }
+    }
+
     using namespace logging;
 
     IRMapCompiler::IRMapCompiler()
@@ -34,7 +42,7 @@ namespace model
     }
 
     IRMapCompiler::IRMapCompiler(const MapCompilerOptions& settings)
-        : MapCompiler(settings), _moduleEmitter(settings.moduleName, settings.compilerSettings), _profiler()
+        : MapCompiler(settings), _moduleEmitter(settings.moduleName, settings.compilerSettings), _profiler(), _optimizer(settings)
     {
         Log() << "Initializing IR map compiler" << EOL;
 
@@ -125,11 +133,22 @@ namespace model
         Log() << "Compile called for map" << EOL;
         EnsureValidMap(map);
 
+        //
+        // Temporary special-purpose code to allow the "SetConvolutionMethod" optimization pass to work.
+        // When refinement is an integrated part of optimization, then this special-case code will disappear.
+        //
         Log() << "Refining the model..." << EOL;
-        model::TransformContext context{ this, [this](const model::Node& node) { return node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
-        map.Refine(context);
+        model::TransformContext noRefineConvNodesContext{ this, [this](const model::Node& node) { return IsConvolutionalLayerNode(node) || node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
+        map.Refine(noRefineConvNodesContext);
 
         Log() << "Optimizing the model..." << EOL;
+        map.Optimize(_optimizer);
+
+        Log() << "Refining the model again..." << EOL;
+        model::TransformContext refineContext{ this, [this](const model::Node& node) { return node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
+        map.Refine(refineContext);
+
+        Log() << "Optimizing the model again..." << EOL;
         map.Optimize(_optimizer);
 
         // Renaming callbacks based on map compiler parameters

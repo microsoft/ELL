@@ -13,10 +13,21 @@ namespace ell
 {
 namespace model
 {
+    enum class PreferredConvolutionMethod : int
+    {
+        none = -1,
+        unrolled = 0,
+        diagonal,
+        simple,
+        winograd,
+    };
+
     struct ModelOptimizerOptions
     {
-        // optimizations
+        // individual optimization settings
         bool fuseLinearFunctionNodes = true;
+
+        PreferredConvolutionMethod preferredConvolutionMethod = PreferredConvolutionMethod::none;
     };
 }
 }

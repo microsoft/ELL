@@ -195,6 +195,9 @@ namespace model
         /// <summary> Resets the internal state of the transformer </summary>
         void Reset();
 
+        // for debugging
+        bool IsEmpty() const { return _elementsMap.IsEmpty(); }
+
         /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
@@ -292,7 +295,7 @@ namespace model
         Model _model;
         TransformContext _context;
         PortOutputsMap _elementsMap;
-        bool _isModelCompilable;
+        bool _isModelCompilable = false;
     };
 }
 }

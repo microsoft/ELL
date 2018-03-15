@@ -12,8 +12,10 @@ namespace ell
 {
 namespace model
 {
+    struct MapCompilerOptions;
     class Model;
     class ModelOptimizer;
+    class ModelOptimizerContext;
     class ModelTransformer;
     class Node;
 
@@ -24,22 +26,25 @@ namespace model
         /// <summary> Perform any pre-optimization initialization required by the pass. </summary>
         /// This method is always called before the optimization pass is started.
         ///
-        /// <param name="optimizer"> The optimizer this pass belongs to. </param>
         /// <param name="model"> The model about to be optimized. </param>
-        virtual void Initialize(ModelOptimizer& optimizer, const Model& model) = 0;
+        /// <param name="settings"> The compiler settings for the model being optimized. </param>
+        /// <param name="context"> The optimization context object for this run of the optimizer. </param>
+        virtual void Initialize(const Model& model, const MapCompilerOptions& settings, ModelOptimizerContext& context) const;
 
         /// <summary> Run this pass. </summary>
         ///
-        /// <param name="optimizer"> The optimizer this pass belongs to. </param>
         /// <param name="model"> The model being optimized. </param>
-        virtual Model Run(ModelOptimizer& optimizer, const Model& model) = 0;
+        /// <param name="settings"> The compiler settings for the model being optimized. </param>
+        /// <param name="context"> The optimization context object for this run of the optimizer. </param>
+        virtual Model Run(const Model& model, const MapCompilerOptions& settings, ModelOptimizerContext& context) const = 0;
 
         /// <summary> Perform any post-optimization teardown required by the pass. </summary>
         /// This method is always called after the optimization pass is finished.
         ///
-        /// <param name="optimizer"> The optimizer this pass belongs to. </param>
         /// <param name="model"> The (new) model that was the result of the optimization. </param>
-        virtual void Finalize(ModelOptimizer& optimizer, const Model& model) = 0;
+        /// <param name="settings"> The compiler settings for the model being optimized. </param>
+        /// <param name="context"> The optimization context object for this run of the optimizer. </param>
+        virtual void Finalize(const Model& model, const MapCompilerOptions& settings, ModelOptimizerContext& context) const;
     };
 
     /// <summary> An optimization pass that operates on the local neighborhood of a node. </summary>
@@ -53,12 +58,16 @@ namespace model
         /// <summary> Optimization method for this pass. Performs the optimization. </summary>
         ///
         /// <param name="node"> The current node being visited. </param>
-        /// <param name="transformer"> The transformer object operating on the model. </param>
-        virtual void OptimizeNode(const model::Node& node, model::ModelTransformer& transformer) = 0;
+        /// <param name="settings"> The compiler settings for the model being optimized. </param>
+        /// <param name="context"> The optimization context object for this run of the optimizer. </param>
+        virtual void OptimizeNode(const model::Node& node, const MapCompilerOptions& settings, ModelOptimizerContext& context) const = 0;
 
-        void Initialize(ModelOptimizer& optimizer, const Model& model) override;
-        Model Run(ModelOptimizer& optimizer, const Model& model) override;
-        void Finalize(ModelOptimizer& optimizer, const Model& model) override;
+        /// <summary> Run this pass. </summary>
+        ///
+        /// <param name="model"> The model being optimized. </param>
+        /// <param name="settings"> The compiler settings for the model being optimized. </param>
+        /// <param name="context"> The optimization context object for this run of the optimizer. </param>
+        Model Run(const Model& model, const MapCompilerOptions& settings, ModelOptimizerContext& context) const final;
     };
 }
 }

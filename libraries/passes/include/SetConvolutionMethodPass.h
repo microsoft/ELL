@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     FuseLinearOperationsPass.h (passes)
+//  File:     SetConvolutionMethodPass.h (passes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ namespace ell
 namespace passes
 {
     /// <summary> An optimization pass that fuses sequential `BroadcastLinearFunctionNode`s into one. </summary>
-    class FuseLinearOperationsPass : public model::NodeLocalOptimizationPass
+    class SetConvolutionMethodPass : public model::NodeLocalOptimizationPass
     {
     public:
         /// <summary> Combine a linear function node with its predecessor if possible. </summary>

@@ -58,6 +58,18 @@ namespace common
             true);
 
         parser.AddOption(
+            convolutionMethod,
+            "convolutionMethod",
+            "",
+            "Set the preferred convolution method",
+            { { "unrolled", PreferredConvolutionMethod::unrolled }, 
+              { "simple", PreferredConvolutionMethod::simple }, 
+              { "diagonal", PreferredConvolutionMethod::diagonal }, 
+              { "winograd", PreferredConvolutionMethod::winograd }, 
+              { "none", PreferredConvolutionMethod::none } },
+            "none");
+
+        parser.AddOption(
             enableVectorization,
             "vectorize",
             "vec",
@@ -175,12 +187,13 @@ namespace common
 
         settings.moduleName = namespacePrefix;
         settings.mapFunctionName = functionName;
-        settings.optimizerSettings.fuseLinearFunctionNodes = fuseLinearOperations;
         settings.compilerSettings.optimize = optimize;
         settings.compilerSettings.useBlas = useBlas;
         settings.compilerSettings.allowVectorInstructions = enableVectorization;
         settings.compilerSettings.parallelize = parallelize;
         settings.compilerSettings.vectorWidth = vectorWidth;
+        settings.optimizerSettings.fuseLinearFunctionNodes = fuseLinearOperations;
+        settings.optimizerSettings.preferredConvolutionMethod = convolutionMethod;
         settings.profile = profile;
 
         if (target != "")
