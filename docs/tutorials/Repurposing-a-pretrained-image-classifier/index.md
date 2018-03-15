@@ -8,7 +8,7 @@ permalink: /tutorials/Repurposing-a-pretrained-image-classifier/
 
 *by Byron Changuion*
 
-This tutorial provides instructions on how to repurpose a pretrained image classifier to understand transfer learning. Repurposing or retargeting a pretrained neural network is one example of transfer learning. In example used here, the original neural network was trained on the 1000 class ILSVRC2012 ImageNet dataset. By taking output from one of the layers near the output of the network, you can leverage (or transfer) the pretrained model's ability to recognize general features and use it as a featurizer to another predictor. This predictor only needs to learn how to map those features onto the new classes that you want it to recognize. Putting it all together results in a new model that has been repurposed from the original 1000 classes to recognize a different set of classes. 
+This tutorial provides instructions on how to repurpose a pretrained image classifier to understand transfer learning. Repurposing or retargeting a pretrained neural network is one example of transfer learning. In example used here, the original neural network was trained on the 1000 class ILSVRC2012 ImageNet dataset. By taking output from one of the layers near the output of the network, you can leverage (or transfer) the pretrained model's ability to recognize general features and use it as a featurizer to another predictor. This predictor only needs to learn how to map those features onto the new classes that you want it to recognize. Putting it all together results in a new model that has been repurposed from the original 1,000 classes to recognize a different set of classes. 
 
 In this tutorial, you will complete the following:
 * Download a pretrained image classification model from the [ELL gallery](/ELL/gallery/) to a laptop or desktop computer
@@ -16,32 +16,30 @@ In this tutorial, you will complete the following:
 * Compile the new model and wrap it in a Python module. 
 * Write a simple Python script that runs a validation dataset through the model and prints the results.
 
-In addition to being very quick to train, the model in this tutorial is also much more accurate than the original, since it has been specialized with significantly fewer output classes.
+In addition to being very quick to train, the model in this tutorial is also much more accurate than the original, because it has been specialized with significantly fewer output classes.
 
 ---
 
 ![screenshot](/ELL/tutorials/Repurposing-a-pretrained-image-classifier/Screenshot.jpg)
 
-#### Before you begin
-
+## Before you begin
+Complete the following steps before starting the tutorial.
 * Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
 * Optional: If you want to run this on a Raspberry Pi, follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 
 **Note** In this tutorial, where `<ELL-root>` is specified, use the path to the location where you have cloned ELL. (For more information, refer to the installation instructions for your platform.)
 
-#### Required materials
+## What you will need
 
 * Laptop or desktop computer
 
-Optional materials include the following:
+Optional items include the following:
 * Raspberry Pi 3
 * Active cooling attachment (refer to our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
 
-
-
 ## Activate your environment and create a tutorial directory
 
-If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your Anaconda environment.
+After following the setup instructions, you  have an environment named **py36**. Open a terminal window and activate your Anaconda environment.
 
 ```shell
 [Linux/macOS] source activate py36
@@ -60,7 +58,7 @@ curl --location -o pretrained.ell.zip https://github.com/Microsoft/ELL-models/ra
 
 Now, unzip the compressed file. 
 
-**Note** On Windows, the `unzip` utility is distributed as part of Git. For example, in `\Program Files\Git\usr\bin`.
+**Note** On Windows, the `unzip` utility is distributed as part of Git. For example, in `\Program Files\Git\usr\bin`. On Linux computers, you can install unzip using the **apt-get install unzip** command.
 
 ```shell
 unzip pretrained.ell.zip
@@ -76,7 +74,7 @@ Rename the `dsf_I64x64x3CCMCCMCCMCMCMC1AS.ell` model file to `pretrained.ell`:
 A `pretrained.ell` file now appears in the directory.
 
 ## Create your training and validation datasets
-Before you retarget an exsiting neural network, you must create a training dataset and a validation dataset for the image classes you want to recognize. In this tutorial, you'll classify images of 10 common fruits, including `apple, banana, blackberry, blueberry, cherry, grapes, lemon, lime, orange and raspberry`.
+Before you retarget an existing neural network, you must create a training dataset and a validation dataset for the image classes you want to recognize. In this tutorial, you'll classify images of 10 common fruits, including `apple, banana, blackberry, blueberry, cherry, grapes, lemon, lime, orange and raspberry`.
 
 Put images of each class in a separate folder under the class name, using a different set of images for training and validation. For example:
 ```
@@ -237,7 +235,7 @@ You now have a `model.ell` file containing the retargeted model.
 
 ## Compile the model for execution on the host
 
-Compiling an ELL model requires two steps. First,  run a tool named `wrap`, which both compiles `model.ell` into machine code and generates a CMake project to build a Python wrapper for it. Second,  call CMake to build the Python library.
+Compiling an ELL model requires two steps. First,  run a tool named `wrap`, which both compiles `model.ell` into machine code and generates a CMake project to build a Python wrapper for it. Second, call CMake to build the Python library.
 
 Run `wrap` as follows.
 
@@ -245,7 +243,7 @@ Run `wrap` as follows.
 python <ELL-root>/tools/wrap/wrap.py model.ell -lang python -target host
 ```
 
-**Note** The `wrap` in this case includes the command line option `-target host`, which tells it to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi. 
+**Note** The `wrap` in this case includes the command line option *-target host*, which tells it to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi. 
 
 The following output appears.
 
@@ -257,7 +255,7 @@ running llc...
 success, now you can build the 'host' folder
 ```
 
-The `wrap` tool creates a `cmake` project in a new directory named `host`. Create a `build` directory inside the `host` directory and change to that directory
+The *wrap* tool creates a CMake project in a new directory named **host**. Create a **build** directory inside the **host** directory and change to that directory
 
 ```shell
 cd host
@@ -265,14 +263,14 @@ mkdir build
 cd build
 ```
 
-To finish creating the Python wrapper, build the `cmake` project.
+To finish creating the Python wrapper, build the CMake project.
 
 ```shell
 [Linux/macOS] cmake .. -DCMAKE_BUILD_TYPE=Release && make && cd ../..
 [Windows] cmake -G "Visual Studio 14 2015 Win64" .. && cmake --build . --config release && cd ..\..
 ```
 
-You have just created a Python module named `model`. This module provides functions that report the shapes of the model's input and output as well as the `predict` function, which invokes the retargeted model you created earlier.
+You have just created a Python module named **model**. This module provides functions that report the shapes of the model's input and output as well as the **predict** function, which invokes the retargeted model you created earlier.
 
 Before writing the script that will use the compiled model, you also need to copy over some Python helper code.
 
@@ -281,14 +279,14 @@ Before writing the script that will use the compiled model, you also need to cop
 [Windows] copy <ELL-root>\docs\tutorials\shared\tutorial_helpers.py .
 ```
 
-At this point, you a `host` directory that contains a `cmake` project that builds the Python wrapper and some helpful Python utilities. In the next steps, you will use the following files created in the current directory:
+At this point, your **host** directory that contains a CMake project that builds the Python wrapper and some helpful Python utilities. In the next steps, you will use the following files created in the current directory:
 * `categories.txt`
 * `fruit_validate.gsdf`
 * `tutorial_helpers.py`
 
 ## Write code to validate the model
 
-Next, you'll write a Python script that loads the Python wrapper that was created previously, runs a validation dataset through the model, and outputs the results. If you just want the full script, copy it from [here](/ELL/tutorials/Repurposing-a-pretrained-image-classifier/retarget_validation.py). Otherwise, create an empty text file named `retarget_validation.py` and copy in the code snippets below.
+Next, you'll write a Python script that loads the Python wrapper that was created previously, runs a validation dataset through the model, and outputs the results. If you just want the full script, copy it from [here](/ELL/tutorials/Repurposing-a-pretrained-image-classifier/retarget_validation.py). Otherwise, create an empty text file named **retarget_validation.py** and copy in the code snippets below.
 
 First, import a few dependencies, including the helper that you copied over earlier.
 
@@ -302,7 +300,7 @@ import numpy as np
 import tutorial_helpers as helpers
 ```
 
-Import the helper code that you copied over. Note that this must precede importing of the model because it helps find the requisite compiled model files.
+Import the helper code that you copied. Note that you must do this before you import the model because it helps find the requisite compiled model files.
 
 ```python
 import tutorial_helpers as helpers
@@ -314,7 +312,7 @@ Import the Python wrapper for the compiled ELL model.
 import model
 ```
 
-In order to process the validation set, you will use the main ELL Python module. Rather than copying it, use the `find_ell` helper module to find it. To use it, first add it to your Python system path. Replace <ELL-root> appriproately.
+In order to process the validation set, you will use the main ELL Python module. Rather than copying it, use the `find_ell` helper module to find it. To use it, first add it to your Python system path. Replace <ELL-root> appropriately.
 
 ```python
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '<ELL-root>/tools/utilities/pythonlibs'))
@@ -390,15 +388,14 @@ Read each example into a numpy array.
         data = np.asarray(auto_data_vector.ToArray()).astype(np.float_, copy=False)
 ```
 
-Ask the model to predict the class based on the input data, and pick the top result.
+Ask the model to predict the class based on the input data and pick the top result.
 
 ```python
         predictions = model.predict(data)
         predicted = np.argmax(predictions)
 ```
 
-Get the expected result, and add the values to the confusion matrix. If the predicted value matches the expected value, 
-increase the number of correct predictions:
+Get the expected result and add the values to the confusion matrix. If the predicted value matches the expected value, increase the number of correct predictions:
 
 ```python
         expected = int(example.GetLabel())
@@ -407,7 +404,7 @@ increase the number of correct predictions:
             num_correct += 1
 ```
 
-Once all examples have been processed, save the confusion matrix:
+After all examples have been processed, save the confusion matrix:
 ```python
     save_confusion_matrix(categories, confusion_matrix_filename, confusion_matrix, num_correct, num)
 ```
@@ -446,11 +443,11 @@ Mean prediction time:   160ms/frame
 Accuracy:               86/100 = 86.0%
 ```
 ## Results
-The original pretrained model had a Top-1 accuracy of 44.67% against the 1000 class ILSVRC2012 dataset. Using the `retargetTrainer` to create a new model with the pretrained model as a featurizer, this new model has a Top-1 accuracy of 86% against this (much smaller) 10 class dataset.
+The original pretrained model had a Top-1 accuracy of 44.67% against the 1000 class ILSVRC2012 dataset. Using the `retargetTrainer` to create a new model with the pretrained model as a featurizer, this new model has a Top-1 accuracy of 86% against this (much smaller) 10-class dataset.
 
 Looking at the confusion matrix, you can also see where the model doesn't do well. For example, at the last row `raspberry`, you can see that the model predicted `raspberry` a total of 13 times (add up the numbers in the row), but there were only 10 instances of `raspberry` in the validation dataset (add up the numbers in the `raspberry` column). More specifically, notice that:
-* In 2 instances, the model predicted `raspberry` but the actual image was a `cherry` (row `raspberry`, column `cherry`)
-* In 1 instance, the model predicted `raspberry` but the actual image was a `lemon`.
+* In 2 instances, the model predicted raspberry, but the actual image was a cherry (row raspberry, column cherry)
+* In 1 instance, the model predicted raspberry but the actual image was a lemon.
 
 This tutorial used a training set of 400 examples and a validation set of 100. Be sure to choose the training and validation datasets that are suited to your scenario, because that has a dramatic effect on the accuracy of your model.
 
@@ -462,10 +459,10 @@ Follow the steps in [Getting started with image classification on the Raspberry 
 
 The [ELL gallery](/ELL/gallery/) offers different models for image classification. Some are slow and accurate, while others are faster and less accurate. Different models can even lead to different power draw on the Raspberry Pi. Repeat the steps above with different models.
 
-The `wrap` tool used here is a convenient way to compile the model and prepare for building its Python wrapper. To understand how `wrap` works, read the [wrap documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
+The **wrap** tool used here is a convenient way to compile the model and prepare for building its Python wrapper. To understand how `wrap` works, read the [wrap documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
 
 ## Troubleshooting
 
 * For more information about the `datasetsFromImages` tool read the [datasetsFromImages Readme].(https://github.com/Microsoft/ELL/blob/master/tools/utilities/datasetFromImages/README.md).
 * For more information about using the `retargetTrainer` tool read [retargetTrainer Readme].(https://github.com/Microsoft/ELL/blob/master/tools/trainers/retargetTrainer/README.md)
-* If you run into trouble, you can find some troubleshooting instructions at the bottom of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+* Find more tips in the Troubleshooting section of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
