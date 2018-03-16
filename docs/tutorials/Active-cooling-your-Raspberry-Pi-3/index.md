@@ -17,7 +17,7 @@ Raspberry Pi 3 devices tend to overheat when they run prolonged heavy loads. Whe
 
 Figure 1 contrasts the difference in heat levels of a Raspberry Pi 3 device while idling and after a few minutes of running a compute-intensive AI model. Notice that the main processor heats up much more than any of the other components on the board. Some cooling kits for the Raspberry Pi include heat sinks for the other components, but these infrared images suggest that the focus should be on cooling the processor. In this tutorial, you'll  build a simple and effective active cooling solution for a Raspberry Pi 3 device.
 
-## Required materials
+## What you will need
 
 * [Adafruit Aluminum Heat Sink for Raspberry Pi 3 - 15 x 15 x 15mm](https://www.adafruit.com/product/3082) (comes with a thermally conductive sticker) or equivalent.
 * [Adafruit Miniature 5V Cooling Fan for Raspberry Pi](https://www.adafruit.com/product/3368) (comes with mouting screws and nuts) or equivalent 5V 0.2A DC brushless fan, 30mm x 30mm, with mounting holes spaced 24mm apart.
@@ -35,7 +35,7 @@ Figure 1 contrasts the difference in heat levels of a Raspberry Pi 3 device whil
 
 ## Assemble the active cooling system
 
-As shown in Figure 3, attach the fan to the fan mount using the screws and nuts provided with the fan. Make sure that the fan is oriented to bloww air towards the mount. After installation, this will ensure that the fan blows air on the heat sink, instead of sucking air from the heat sink.
+As shown in Figure 3, attach the fan to the fan mount using the screws and nuts provided with the fan. Make sure that the fan is oriented to blow air towards the mount. After installation, this will ensure that the fan blows air on the heat sink, instead of sucking air from the heat sink.
 
 ![Attach-Fan-to-Mount](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Attach-Fan-to-Mount.jpg)
 
@@ -51,11 +51,11 @@ Finally, plug the fan into the 5V and ground pins on the Pi. Figure 4 shows the 
 
 ![Pi with Fan](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Pi-with-Fan.jpg)
 
-*Figure 4. Assembled active cooling systmer for Raspberry Pi 3 device.*
+*Figure 4. Assembled active cooling system for Raspberry Pi 3 device.*
 
 ## Optional: mount the active cooling system on the Raspberry Pi 7-inch Touchscreen Display
 
-Many active cooling solutions for the Raspberry Pi available onlilne come in the form of an active cooling enclosure or case. While some of these work well, sometimes you don't want to enclosing the Pi device in a case. This active cooling solution is compatible with the 7-inch touchscreen display. 
+Many active cooling solutions for the Raspberry Pi available online come in the form of an active cooling enclosure or case. While some of these work well, sometimes you don't want to enclose the Pi device in a case. This active cooling solution is compatible with the 7-inch touchscreen display. 
 
 If you choose the touchscreen display, use the M2.5 x 12 screws to attach directly into the M2.5 standoffs that come with the display.
 
@@ -65,11 +65,11 @@ If you choose the touchscreen display, use the M2.5 x 12 screws to attach direct
 
 ## Results
 
-Although some people contend that you can cool the Pi using only a heat sink (no fan), this approach is often insufficient. ELL team members ran the following stress tests, running all four cores at 100% and measuring the processor temperature as it heats up.  The experiment was conducted in an air conditioned office (room temperature was about 26 degrees Celsius) and repeated using four different configurations:
+Although it may be possible to cool the Pi using only a heat sink (no fan), this approach is often insufficient. ELL team members ran the following stress tests, running all four cores at 100% and measuring the processor temperature as it heats up. The experiment was conducted in an air conditioned office (room temperature was about 26 degrees Celsius) and repeated using four different configurations:
 
 * `none` - no cooling at all, just a Raspberry Pi device as-is
 * `heat sink` - heat sink on the processor, fan turned off
-* `fan` - fan mounted on the Rapsberry Pi using the ELL fan mount, blowing air on the bare processor (no heat sink)
+* `fan` - fan mounted on the Raspberry Pi using the ELL fan mount, blowing air on the bare processor (no heat sink)
 * `both` - the full cooling solution, as described above, with both fan and heat sink
 
 The following table shows the results.
@@ -94,7 +94,7 @@ vegaEmbed("#plot", spec, {actions:false})
 
 The x-axis represents time in seconds and the y-axis represents the processor temperature in Celsius. The measurement starts with the idle processor temperature, and the stress test begins after 20 seconds. You can pan and zoom in and out to examine the results.
 
-The `none` configuration quickly overheats. Within a few minutes, the processor temperature hits 85 degrees, the temperature at which the processor starts protecting itself by throttling down its frequency. The passive cooling configuration, `heat sink`, isn't much better. At first, the heat sink absorbs some of the heat, causing the processor temperature to rise more slowly. However, the heat sink struggles to dissipate that heat and the processor temperature gradually climbs into the 70's. The passive heat sink prevented the processor from reaching the critical temperature of 85 degrees, but came too close for comfort. Processor temperature depends on many factors, such as ambient temperature, processor load, and processor frequency. Moreover, different Raspberry Pi units behave differently. 
+The `none` configuration quickly overheats. Within a few minutes, the processor temperature hits 85 degrees, the temperature at which the processor starts protecting itself by throttling down its frequency. The passive cooling configuration, `heat sink`, isn't much better. At first, the heat sink absorbs some of the heat, causing the processor temperature to rise more slowly. However, the heat sink struggles to dissipate that heat and the processor temperature gradually climbs into the 70s. The passive heat sink prevented the processor from reaching the critical temperature of 85 degrees, but came too close for comfort. Processor temperature depends on many factors, such as ambient temperature, processor load, and processor frequency. Moreover, each Raspberry Pi unit behaves differently. 
 
 The fan by itself works fairly well, with the processor temperature quickly stabilizing around 63 degrees Celsius. But the clear winner is the `both` configuration, where the combination of fan and heat sink works to maintain the processor temperature below 50 degrees Celsius.
 
