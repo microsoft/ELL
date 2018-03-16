@@ -75,8 +75,8 @@ There should now be `model1.ell` and `model2.ell` files as well as a `categories
 Use the `wrap.py` tool to compile the models and create Python wrappers. We'll use the `--outdir` option to put the models into different directories. Please replace `<ELL-root>` with the path to the location where you have cloned ELL, as described in the installation instructions for your platform.
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py model1.ell -lang python -target pi3 -outdir model1
-python <ELL-root>/tools/wrap/wrap.py model2.ell -lang python -target pi3 -outdir model2
+python <ELL-root>/tools/wrap/wrap.py model1.ell --language python --target pi3 --outdir model1
+python <ELL-root>/tools/wrap/wrap.py model2.ell --language python --target pi3 --outdir model2
 ```
 
 You should see output similar to the following:
@@ -87,15 +87,9 @@ generating python interfaces for model1 in model1
 running opt...
 running llc...
 success, now copy the 'model1' folder to your target machine and build it there
-...
-compiling model...
-generating python interfaces for model2 in model2
-running opt...
-running llc...
-success, now copy the 'model2' folder to your target machine and build it there
 ```
 
-Also copy a few helper functions to the directory.
+and similar output for model2.  Also copy a few helper functions to the directory.
 
 ```shell
 [Linux/macOS] cp <ELL-root>/docs/tutorials/shared/tutorial_helpers.py .
