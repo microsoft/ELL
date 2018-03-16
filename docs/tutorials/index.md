@@ -18,6 +18,7 @@ permalink: /tutorials/
 * [Importing models](/ELL/tutorials/Importing-models/)
 * [Comparing image classification models side by side on the Raspberry Pi](/ELL/tutorials/Comparing-image-classification-models-side-by-side-on-the-Raspberry-Pi/)
 * [Repurposing a pretrained image classifier](/ELL/tutorials/Repurposing-a-pretrained-image-classifier/)
+* [Getting started with object detection using region of interest networks](/ELL/tutorials/Getting-started-with-object-detection-using-region-of-interest-networks/)
 
 ## Image Classification Tutorials in C++
 * [Getting started with image classification on the Raspberry Pi in C++](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/)
