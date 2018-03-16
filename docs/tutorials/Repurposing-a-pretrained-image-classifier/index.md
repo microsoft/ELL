@@ -240,10 +240,10 @@ Compiling an ELL model requires two steps. First,  run a tool named `wrap`, whic
 Run `wrap` as follows.
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py model.ell -lang python -target host
+python <ELL-root>/tools/wrap/wrap.py model.ell --language python --target host
 ```
 
-**Note** The `wrap` in this case includes the command line option *-target host*, which tells it to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi. 
+**Note** The `wrap` in this case includes the command line option *--target host*, which tells it to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi. 
 
 The following output appears.
 

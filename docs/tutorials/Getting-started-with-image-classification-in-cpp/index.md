@@ -73,10 +73,10 @@ Deploying an ELL model to the Raspberry Pi using C++ requires two steps. First, 
 These steps are performed by the **wrap** tool. Run **wrap** as follows, replacing `<ELL-root>` with the path to the location where you have cloned ELL, as described in the installation instructions for your platform.
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py model.ell -lang cpp -target pi3 -outdir model
+python <ELL-root>/tools/wrap/wrap.py model.ell --language cpp --target pi3 --outdir model
 ```
 
-The **wrap** command line option **-target pi3** tells it to generate machine code for execution on the Raspberry Pi device. The **-outdir model** option  tells the **wrap** tool to put the output files in a directory named **model**. After that, you'll see the following output.
+The **wrap** command line option **--target pi3** tells it to generate machine code for execution on the Raspberry Pi device. The **--outdir model** option  tells the **wrap** tool to put the output files in a directory named **model**. After that, you'll see the following output.
 
 ```
     compiling model...

@@ -7,61 +7,63 @@ permalink: /tutorials/Boosting-classifier-accuracy-by-grouping-categories/
 
 *by Chris Lovett, Byron Changuion, Ofer Dekel, and Lisa Ong*
 
-In this tutorial, we will take an image classification model that was trained to recognize 1000 different image categories and use it to solve a simpler classification problem: distinguishing between *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will see how a model with low classification accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, and prints `Woof!` if it sees a dog and `Meow!` if it sees a cat, as well as showing the class `Dog` or `Cat` as the window header text.
+The pretrained models in the [Embedded Learning Library (ELL) gallery](/ELL/gallery/) are trained to identify 1,000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). This tutorial uses that image classification model to help solve a simpler classification problem: distinguishing among *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). This classification model has an error rate of 64% on the 1,000-class problem, but it has a low error rate of just 5.7% on the 3-class problem. 
 
-Lastly, the [Advanced features](#advanced-features) section describes how to use callbacks with the model.
+The tutorial includes instructions for a Python script that reads images from the camera and prints `Woof!` for dog recognition and `Meow!` for cat recognition while showing the class *Dog* or *Cat* as the window header text. In addition, the **Next steps** section describes how to include sound clips and also how to use callbacks with the model.
 
 ---
 
 ![screenshot](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/Screenshot.jpg)
 
-#### Materials
+## Before you begin
+Complete the following steps before starting the tutorial.
+* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
+* Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+* Optional: Complete the tutorial [Getting started with image classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/) to learn how to produce a Python wrapper for an ELL model.
+
+## What you will need
 
 * Laptop or desktop computer
 * Raspberry Pi 3
 * Raspberry Pi camera or USB webcam
-* *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
+* Optional: active cooling attachment (refer to the [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
 
-#### Prerequisites
 
-* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
-* Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
-* Complete the basic tutorial, [Getting started with image classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), to learn how to produce a Python wrapper for an ELL model.
+## Deploy a pretrained model on the Raspberry Pi device
 
-## Overview
+You'll start by repeating the steps of [Getting Started with Image Classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with [this faster and less accurate model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMC1AS/d_I160x160x3CMCMBMBMBMBMC1AS.ell.zip). Use this general process:
 
-The pre-trained models in the [ELL gallery](/ELL/gallery/) are trained to identify 1000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). Often times, we are only interested in a subset of these categories and we don't require the fine-grained categorization that the model was trained to provide. For example, we may want to distinguish between images of dogs versus images of cats, whereas the model is actually trained to distinguish between several different varieties of cats and over 100 different dog breeds.
+1. Download [the model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMC1AS/d_I160x160x3CMCMBMBMBMBMC1AS.ell.zip) to your computer.
+2. Use the `wrap` tool to compile it for the Raspberry Pi device.
+3. Copy the resulting CMake project to the Pi device.
+4. Build the project on the Pi device. 
 
-The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate for the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5.7% on the 3-class problem. We will write a script that grabs a frame from a camera, outputs a `Woof!`when it recognizes a dog, and `Meow!` when it recognizes a cat.
+Now, a Python module named `model` is on your Pi device.
 
-## Step 1: Deploy a pre-trained model on the Raspberry Pi
-
-Start by repeating the steps of the basic tutorial, [Getting Started with Image Classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with [this faster and less accurate model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMC1AS/d_I160x160x3CMCMBMBMBMBMC1AS.ell.zip). Namely, download the model to your computer, use the `wrap` tool to compile it for the Raspberry Pi, copy the resulting CMake project to the Pi, and build it there. After completing these steps, you should have a Python module on your Pi named `model`.
-
-Copy the following files to your Pi.
+Copy the following files to your Pi device.
 - [dogs.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/dogs.txt)
 - [cats.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/cats.txt)
 - [tutorial_helpers.py](/ELL/tutorials/shared/tutorial_helpers.py)
 - [categories.txt](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)
 
-## Step 2: Write a script
+## Write a script
 
-We will write a Python script that invokes the model on a Raspberry Pi, groups the categories as described above, and takes action if a dog or cat is recognized. If you just want the code, copy the complete script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py). Otherwise, create an empty text file named `pets.py` and copy in the code snippets below.
+Next, you'll write a Python script that invokes the model on your Raspberry Pi device, groups the categories as described above, and takes action when a dog or cat is recognized. If you just want the code, copy the complete script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py). Otherwise, create an empty text file named `pets.py` and copy in the code snippets below.
 
-First, import the required modules.
+Import the required modules.
 
 ```python
 import cv2
 import tutorial_helpers as helpers
 ```
 
-Also, import the Python module for the compiled ELL model.
+Import the Python module for the compiled ELL model.
 
 ```python
 import model
 ```
 
-As in previous tutorials, define a helper function that reads images from the camera.
+Define a helper function that reads images from the camera.
 
 ```python
 def get_image_from_camera(camera):
@@ -73,7 +75,7 @@ def get_image_from_camera(camera):
     return None
 ```
 
-Next, define helper functions that check whether a category is contained in a category list. The predicted category is the numeric index of the prediction (where the index is based on which line that category is within categories.txt), so the helper function verifies that the prediction index is contained in the set.
+Next, define helper functions that check whether a category is contained in a category list. The predicted category is the numeric index of the prediction, so the helper function verifies that the prediction index is contained in the set. (The index is based on which line that category is within the categories.txt file.)
 
 ```python
 def prediction_index_in_set(prediction_index, set):
@@ -82,7 +84,7 @@ def prediction_index_in_set(prediction_index, set):
             return True
     return False
 ```
-When a prediction belonging to the dog group or the cat group is detected, we want to print the appropriate string. Define helper functions that print a woof or a meow.
+Define helper functions that print *woof* or  *meow* appropriately.  
 
 ```python
 def take_action(group):
@@ -113,10 +115,8 @@ Get the model input shape, which we will use to prepare the input data.
     input_shape = model.get_default_input_shape()
 ```
 
-Declare a loop where we get an image from the camera and prepare it to be used as input to the model.
-The preparation of the image involves cropping and resizing the image while maintaining the aspect ratio,
-reordering the image channels (if needed), and returning the image data as a flat `numpy` array of
-floats so that it can be provided as input to the model.
+Declare a loop so that the camera can get an image and prepare it to be used as input to the model. The preparation of the image involves cropping and resizing the image while maintaining the aspect ratio,
+reordering the image channels (if needed), and returning the image data as a flat **NumPy** array of floats so that it can be provided as input to the model.
 
 ```python
     while (cv2.waitKey(1) & 0xFF) == 0xFF:
@@ -126,13 +126,13 @@ floats so that it can be provided as input to the model.
             image, input_shape.columns, input_shape.rows)
 ```
 
-Send the processed image to the model to get a `numpy` array of predictions.
+Send the processed image to the model to get a **NumPy** array of predictions.
 
 ```python
         predictions = model.predict(input_data)
 ```
 
-Use the helper function to get the top prediction. The `threshold` parameter selects predictions with a 5% or higher confidence.
+Use the helper function to get the top prediction. The *threshold* parameter selects predictions with a 5% or higher confidence.
 
 ```python
         top_n = helpers.get_top_n(predictions, 1, threshold=0.05)
@@ -151,7 +151,7 @@ Check whether the prediction is part of a group.
                 group = "Cat"
 ```
 
-If the prediction is in one of the define category groups, take the appropriate action.
+If the prediction is in one of the defined category groups, take the appropriate action.
 
 ```python
         header_text = ""
@@ -172,40 +172,34 @@ if __name__ == "__main__":
     main()
 ```
 
-## Step 3: Classify live video on the Raspberry Pi
+## Classify live video on the Raspberry Pi device
 
-If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an anaconda environment named `py34`. Activate the environment and run the script.
+By following the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you now have an anaconda environment named `py34`. Activate the environment and run the script.
 
 ```shell
 source activate py34
 python pets.py
 ```
 
-Point your camera at different objects and see how the model classifies them. Look at `dogs.txt` and `cats.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen, have your computer display images of different animals, and see when it barks or meows. If you copied the full `pets.py` script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py), you will also see the average time it takes for the model to process a single frame.
+Point the camera at different objects and see how the model classifies them. Look at `dogs.txt` and `cats.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen, have your computer display images of different animals, and see when it barks or meows. If you copied the full `pets.py` script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py), you will also see the average time it takes for the model to process a single frame.
 
 ## Next steps
 ### Playing sounds
-A fun next step would be to introduce the playing of sounds indicate whether a dog or cat was detected. For
-example, a dog's bark can be downloaded [here](http://freesound.org/people/davidmenke/sounds/231762/) and a
-cat's meow can be downloaded [here](https://freesound.org/people/tuberatanka/sounds/110011/).
+A fun next step would be to introduce the playing of sounds to indicate the detection of either a dog or cat. To do this, download a dog's bark [here](http://freesound.org/people/davidmenke/sounds/231762/) and a
+cat's meow [here](https://freesound.org/people/tuberatanka/sounds/110011/). These can be used with the **play_sound** function that's available in the `tutorial_helpers` module, to play sounds on your computer or on your Raspberry Pi. Find more details on playing sounds at [Notes on Playing Audio](/ELL/tutorials/Notes-on-playing-audio).
 
-These can be used with the `play_sound` function that's available in the `tutorial_helpers` module, to play
-sounds on your computer or on the Raspberry Pi. More details on playing sounds can be found in [Notes on Playing Audio](/ELL/tutorials/Notes-on-playing-audio).
-
-Here is a video showing the result of this tutorial being modified to play a bark or meow sound when run on images in a folder:
+Here's an example of the classifier running with the audio barks and meows. 
 
 [![screenshot](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/thumbnail.png)](https://youtu.be/SOmV8tzg_DU)
 
-## Advanced features
-
 ### Using callbacks
-The `predict` function on the ELL model provides a direct way to send input to the model and get predictions as parameters to the function.
+The **predict** function on the ELL model provides a direct way to send input to the model and get predictions as parameters to the function.
 
-Instead of using the `predict` function, it is sometimes useful to implement input and output callbacks that the ELL model calls when necessary.
+Instead of using the **predict** function, you can implement input and output callbacks that the ELL model calls when necessary.
 
 The `pets_callback.py` script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets_callback.py) demonstrates how to provide callbacks for the input image and the output predictions.
 
-First, define a class called `CatsDogsPredictor` that extends the `model.Model` class.
+First, define a class called **CatsDogsPredictor** that extends the **model.Model** class.
 
 ```python
 class CatsDogsPredictor(model.Model):
@@ -214,7 +208,7 @@ class CatsDogsPredictor(model.Model):
     """
 ```
 
-`CatsDogsPredictor.__init__` performs initialization for implementing the callbacks later.
+**CatsDogsPredictor.__init__** performs initialization for implementing the callbacks later.
 
 ```python
     def __init__(self, camera, cats, dogs):
@@ -230,7 +224,7 @@ class CatsDogsPredictor(model.Model):
         self.image = None
 ```
 
-`CatsDogsPredictor.input_callback` gets an image from the camera, processes it, and returns it to the ELL model. The ELL model will call this when it is ready to get input. 
+**CatsDogsPredictor.input_callback** gets an image from the camera, processes it, and returns it to the ELL model. The ELL model will call this when it is ready to get input. 
 
 ```python
     def input_callback(self):
@@ -241,7 +235,7 @@ class CatsDogsPredictor(model.Model):
             self.image, self.input_shape.columns, self.input_shape.rows)
 ```
 
-`CatsDogsPredictor.output_callback` receives predictions from the ELL model and determines what group the top prediction belongs to. This prints Woof! if it sees a dog and Meow! if it sees a cat, as well as showing the class Dog or Cat as the window header text. Alternatively, we can play a sound here by following the instructions in [Playing sounds](#playing-sounds)).
+**CatsDogsPredictor.output_callback** receives predictions from the ELL model and determines which group the top prediction belongs to. This prints *Woof!* and *Meow!* appropriately while showing the class *Dog* or *Cat* as the window header text. Alternatively, you can choose to play a sound by following the instructions in [Playing sounds](#playing-sounds)).
 
 
 ```python
@@ -262,7 +256,7 @@ class CatsDogsPredictor(model.Model):
         cv2.imshow("Grouping (with callbacks)", self.image)
 ```
 
-Finally, to tie everything together, the main entry point creates a `CatsDogsPredictor` object and calls its `predict` method in a loop. Each call to `predict` runs one iteration of the ELL model, and invokes the callbacks.
+As a final step, the main entry point creates a `CatsDogsPredictor` object and calls its **predict** method in a loop. Each call to **predict** runs one iteration of the ELL model and invokes the callbacks.
 
 ```python
 def main():
@@ -281,5 +275,5 @@ def main():
 ```
 
 ## Troubleshooting
-If you run into trouble, you can find some troubleshooting instructions at the bottom of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+Find tips in the Troubleshooting section of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 
