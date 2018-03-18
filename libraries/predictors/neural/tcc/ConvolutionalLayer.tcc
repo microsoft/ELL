@@ -51,18 +51,27 @@ namespace predictors
             auto output = GetOutputMinusPadding();
             auto& input = _layerParameters.input;
 
+            auto stride = static_cast<int>(_convolutionalParameters.stride);
             switch (_convolutionalParameters.method)
             {
             case ConvolutionMethod::simple:
             {
                 const int numFilters = static_cast<int>(output.NumChannels());
-                dsp::Convolve2DSimple(input, _weights, numFilters, output);
+                dsp::Convolve2DSimple(input, _weights, numFilters, stride, output);
             }
             break;
             case ConvolutionMethod::unrolled:
             {
                 const int numFilters = static_cast<int>(output.NumChannels());
-                auto result = dsp::Convolve2DUnrolled(input, _weights, numFilters);
+                auto result = dsp::Convolve2DUnrolled(input, _weights, numFilters, stride);
+                output.CopyFrom(result);
+            }
+            break;
+            case ConvolutionMethod::winograd:
+            {
+                assert(stride == 1);
+                const int numFilters = static_cast<int>(output.NumChannels());
+                auto result = dsp::Convolve2DWinograd(input, _weights, numFilters);
                 output.CopyFrom(result);
             }
             break;

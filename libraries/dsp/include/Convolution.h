@@ -9,7 +9,6 @@
 #pragma once
 
 // math
-#include "Matrix.h"
 #include "Tensor.h"
 #include "Vector.h"
 
@@ -44,7 +43,7 @@ namespace dsp
         /// <summary> An algorithm that reduces the number of arithmetic operations. </summary>
         winograd
     };
-    
+
     /// <summary> Convolve a 1D input with a 1D filter. </summary>
     ///
     /// <param name="input"> The input. </param>
@@ -54,16 +53,6 @@ namespace dsp
     /// <returns> A vector with the result of the convolution `input` (*) `filter`
     template <typename ValueType>
     math::RowVector<ValueType> Convolve1D(const math::RowVector<ValueType>& input, const math::RowVector<ValueType>& filter, ConvolutionMethodOption method = ConvolutionMethodOption::automatic);
-
-    /// <summary> Convolve a single-channel 2D image with a 2D filter. </summary>
-    ///
-    /// <param name="input"> The input image: an (r x c) matrix. </param>
-    /// <param name="filter"> The filter to convolve the input with: an (fr x fc) matrix. </param>
-    /// <param name="method"> The convolution algorithm to use. </param>
-    ///
-    /// <returns> A matrix with the result of the convolution `input` (*) `filter`
-    template <typename ValueType>
-    math::RowMatrix<ValueType> Convolve2D(const math::ConstRowMatrixReference<ValueType>& input, const math::ConstRowMatrixReference<ValueType>& filter, ConvolutionMethodOption method = ConvolutionMethodOption::automatic);
 
     /// <summary> Spatially (in 2D) convolve a 3D image with a stack of 3D filters. </summary>
     ///
@@ -76,16 +65,28 @@ namespace dsp
     template <typename ValueType>
     math::ChannelColumnRowTensor<ValueType> Convolve2D(const math::ChannelColumnRowTensor<ValueType>& input, const math::ChannelColumnRowTensor<ValueType>& filters, int numFilters, ConvolutionMethodOption method = ConvolutionMethodOption::automatic);
 
+    /// <summary> Spatially (in 2D) convolve a 3D image with a stack of 3D filters. </summary>
+    ///
+    /// <param name="input"> The input image: a (r x c x d) tensor. </param>
+    /// <param name="filters"> The filters to convolve with. A (nf x fr x fc x d) tensor, reshaped as a ((nf*fr) x fc x d) 3D tensor. </param>
+    /// <param name="numFilters"> The number of filters in the `filters` argument. </param>
+    /// <param name="stride"> The number of elements to move/jump when sliding over the input. Typically this is 1 to 3. </param>
+    /// <param name="method"> The convolution algorithm to use. </param>
+    ///
+    /// <returns> A tensor with the result of the convolution `input` (*) `filter`
+    template <typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2D(const math::ChannelColumnRowTensor<ValueType>& input, const math::ChannelColumnRowTensor<ValueType>& filters, int numFilters, int stride, ConvolutionMethodOption method = ConvolutionMethodOption::automatic);
+
     //
     // Explicit instantiation declarations:
     //
     extern template math::RowVector<float> Convolve1D(const math::RowVector<float>& input, const math::RowVector<float>& filter, ConvolutionMethodOption method);
     extern template math::RowVector<double> Convolve1D(const math::RowVector<double>& input, const math::RowVector<double>& filter, ConvolutionMethodOption method);
 
-    extern template math::RowMatrix<float> Convolve2D(const math::ConstRowMatrixReference<float>& input, const math::ConstRowMatrixReference<float>& filter, ConvolutionMethodOption method);
-    extern template math::RowMatrix<double> Convolve2D(const math::ConstRowMatrixReference<double>& input, const math::ConstRowMatrixReference<double>& filter, ConvolutionMethodOption method);
-
     extern template math::ChannelColumnRowTensor<float> Convolve2D(const math::ChannelColumnRowTensor<float>& input, const math::ChannelColumnRowTensor<float>& filters, int numFilters, ConvolutionMethodOption method);
     extern template math::ChannelColumnRowTensor<double> Convolve2D(const math::ChannelColumnRowTensor<double>& input, const math::ChannelColumnRowTensor<double>& filters, int numFilters, ConvolutionMethodOption method);
+
+    extern template math::ChannelColumnRowTensor<float> Convolve2D(const math::ChannelColumnRowTensor<float>& input, const math::ChannelColumnRowTensor<float>& filters, int numFilters, int stride, ConvolutionMethodOption method);
+    extern template math::ChannelColumnRowTensor<double> Convolve2D(const math::ChannelColumnRowTensor<double>& input, const math::ChannelColumnRowTensor<double>& filters, int numFilters, int stride, ConvolutionMethodOption method);
 }
 }

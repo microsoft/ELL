@@ -62,6 +62,7 @@ set(test_src
   test/src/ConvolutionTestData.cpp
   test/src/DCTTest.cpp
   test/src/DSPTestData.cpp
+  test/src/DSPTestUtilities.cpp
   test/src/FFTTest.cpp
   test/src/FilterTest.cpp
   test/src/HammingWindowCoefficients.cpp
@@ -75,6 +76,7 @@ set(test_include
   test/include/ConvolutionTestData.h
   test/include/DCTTest.h
   test/include/DSPTestData.h
+  test/include/DSPTestUtilities.h
   test/include/FFTTest.h
   test/include/FilterTest.h
   test/include/HammingWindowCoefficients.h
@@ -96,10 +98,50 @@ source_group("py" FILES ${test_py})
 
 add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} dsp testing)
+target_link_libraries(${test_name} dsp testing utilities)
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${test_name} COMMAND ${test_name})
 set_test_library_path(${test_name})
+
+#
+# dsp timing
+#
+
+set(timing_name ${library_name}_timing)
+
+set(timing_src 
+  test/src/timing_main.cpp
+  test/src/ConvolutionTiming.cpp
+  test/src/DSPTestUtilities.cpp
+)
+  
+set(timing_include
+  test/include/ConvolutionTiming.h
+  test/include/DSPTestUtilities.h
+)
+
+set(timing_tcc
+)
+
+set(timing_py
+)
+
+source_group("src" FILES ${timing_src})
+source_group("include" FILES ${timing_include})
+source_group("tcc" FILES ${timing_tcc})
+source_group("py" FILES ${timing_py})
+
+add_executable(${timing_name} ${timing_src} ${timing_include} ${timing_tcc} ${include})
+target_include_directories(${timing_name} PRIVATE test/include)
+target_link_libraries(${timing_name} dsp testing utilities)
+copy_shared_libraries(${timing_name})
+
+set_property(TARGET ${timing_name} PROPERTY FOLDER "tests")
+
+if (PROFILING)
+add_test(NAME ${timing_name} COMMAND ${timing_name})
+set_test_library_path(${timing_name})
+endif()

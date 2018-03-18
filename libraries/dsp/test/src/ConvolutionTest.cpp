@@ -6,15 +6,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "ConvolutionTest.h"
 #include "ConvolutionTestData.h"
+#include "DSPTestUtilities.h"
 
 // dsp
 #include "Convolution.h"
 
 // math
 #include "MathConstants.h"
-#include "Matrix.h"
-#include "MatrixOperations.h"
 #include "Tensor.h"
 #include "TensorOperations.h"
 #include "Vector.h"
@@ -27,6 +27,7 @@
 #include "MillisecondTimer.h"
 
 // stl
+#include <cassert>
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -37,217 +38,27 @@ using namespace ell;
 //
 // Helper functions
 //
+namespace
+{
 template <typename ValueType>
-std::ostream& operator<<(std::ostream& os, const std::vector<ValueType>& vec)
+math::ChannelColumnRowTensor<ValueType>& operator-=(math::ChannelColumnRowTensor<ValueType>& a, const math::ChannelColumnRowTensor<ValueType>& b)
 {
-    for (auto x : vec)
-        os << x << "  ";
-    return os;
-}
+    assert(a.NumRows() == b.NumRows());
+    assert(a.NumColumns() == b.NumColumns());
+    assert(a.NumChannels() == b.NumChannels());
 
-template <typename ValueType>
-std::string GetSizeString(math::ConstRowMatrixReference<ValueType> input)
-{
-    return std::to_string(input.NumRows()) + " x " + std::to_string(input.NumColumns());
-}
-
-template <typename ValueType>
-std::string GetSizeString(math::ConstChannelColumnRowTensorReference<ValueType> input)
-{
-    return std::to_string(input.NumRows()) + " x " + std::to_string(input.NumColumns()) + " x " + std::to_string(input.NumChannels());
-}
-
-template <typename ValueType>
-std::string GetFilterSizeString(math::ConstRowMatrixReference<ValueType> filter)
-{
-    auto filterSize = filter.NumColumns();
-    auto numFilters = filter.NumRows() / filterSize;
-    return std::to_string(numFilters) + " " + std::to_string(filterSize) + " x " + std::to_string(filter.NumColumns());
-}
-
-template <typename ValueType>
-std::string GetFilterSizeString(math::ConstChannelColumnRowTensorReference<ValueType> filters)
-{
-    auto filterSize = filters.NumColumns();
-    auto numFilters = filters.NumRows() / filterSize;
-    return std::to_string(numFilters) + " " + std::to_string(filterSize) + " x " + std::to_string(filterSize) + " x " + std::to_string(filters.NumChannels());
-}
-
-std::string GetConvAlgName(dsp::ConvolutionMethodOption alg)
-{
-    switch (alg)
+    for (size_t i = 0; i < a.NumRows(); ++i)
     {
-    case dsp::ConvolutionMethodOption::automatic:
-        return "automatic";
-    case dsp::ConvolutionMethodOption::simple:
-        return "simple";
-    case dsp::ConvolutionMethodOption::unrolled:
-        return "unrolled";
-    case dsp::ConvolutionMethodOption::diagonal:
-        return "diagonal";
-    case dsp::ConvolutionMethodOption::winograd:
-        return "winograd";
-    }
-    return "";
-}
-
-// Helper function to avoid annoying double-to-float errors
-template <typename ValueType, typename ValueType2>
-ell::math::RowVector<ValueType> MakeVector(std::initializer_list<ValueType2> list)
-{
-    auto numElements = list.size();
-    std::vector<ValueType> data;
-    data.reserve(numElements);
-    std::transform(list.begin(), list.end(), std::back_inserter(data), [](ValueType2 x) { return static_cast<ValueType>(x); });
-    return ell::math::RowVector<ValueType>(data);
-}
-
-//
-// Fill a vector with some "interesting" input signal data. The particular values aren't that important, 
-// but using something other than uniform noise is probably a good idea.
-//
-// The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
-// so that printing them out for debugging purposes is easier on the eyes.
-//
-template <typename ValueType>
-void FillInputVector(math::RowVector<ValueType>& input)
-{
-    const auto pi = math::Constants<ValueType>::pi;
-    const auto size = static_cast<int>(input.Size());
-    for (int index = 0; index < size; ++index)
-    {
-        double value = std::sin(2 * 2 * pi * index / size) + std::sin(2 * 3 * pi * index / size) + std::sin(2 * 9 * pi * index / size);
-        value = std::trunc(value * 16) / 16.0;
-        input[index] = static_cast<ValueType>(value);
-    }
-}
-
-//
-// Fill a vector with some "interesting" filter weights. The particular values aren't that important, 
-// but using something other than uniform noise is probably a good idea.
-//
-// The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
-// so that printing them out for debugging purposes is easier on the eyes.
-//
-template <typename ValueType>
-void FillFilterVector(math::RowVector<ValueType>& filter)
-{
-    const auto pi = math::Constants<ValueType>::pi;
-    const auto size = static_cast<int>(filter.Size());
-    for (int index = 0; index < size; ++index)
-    {
-        double value = 2 * std::sin(3.7 * pi * index / size) * std::cos(2 * 5 * pi * index / size) + std::cos(2 * 15 * pi * index / size);
-        value = std::trunc(value * 16) / 16.0;
-        filter[index] = static_cast<ValueType>(value);
-    }
-}
-
-//
-// Fill a matrix with some "interesting" input signal data. The particular values aren't that important, 
-// but using something other than uniform noise is probably a good idea.
-//
-// The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
-// so that printing them out for debugging purposes is easier on the eyes.
-//
-template <typename ValueType>
-void FillInputMatrix(math::RowMatrix<ValueType>& input)
-{
-    const auto pi = math::Constants<ValueType>::pi;
-    const auto numRows = input.NumRows();
-    const auto numColumns = input.NumColumns();
-    for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
-    {
-        for (size_t columnIndex = 0; columnIndex < numColumns; ++columnIndex)
+        for (size_t j = 0; j < a.NumColumns(); ++j)
         {
-            double value = std::sin(2 * 7 * pi * rowIndex / numRows) * std::cos(2 * 3 * pi * columnIndex / numColumns);
-            value = std::trunc(value * 4) / 4.0;
-            input(rowIndex, columnIndex) = static_cast<ValueType>(value);
-        }
-    }
-}
-
-//
-// Fill a matrix with some "interesting" filter weights. The particular values aren't that important, 
-// but using something other than uniform noise is probably a good idea.
-//
-// The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
-// so that printing them out for debugging purposes is easier on the eyes.
-//
-template <typename ValueType>
-void FillFilterMatrix(math::RowMatrix<ValueType>& filter)
-{
-    const auto pi = math::Constants<ValueType>::pi;
-    const auto numRows = filter.NumRows();
-    const auto numColumns = filter.NumColumns();
-    for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
-    {
-        for (size_t columnIndex = 0; columnIndex < numColumns; ++columnIndex)
-        {
-            double value = 2 * std::sin(2 * pi * rowIndex / numRows) * std::cos(2 * 2 * pi * columnIndex / numColumns);
-            value = std::trunc(value * 4) / 4.0;
-            value = (rowIndex == (numRows + 1) / 2) && (columnIndex == (numColumns + 1) / 2) ? 1.0 : 0.0;
-            filter(rowIndex, columnIndex) = static_cast<ValueType>(value);
-        }
-    }
-}
-
-//
-// Fill a tensor with some "interesting" input signal data. The particular values aren't that important, 
-// but using something other than uniform noise is probably a good idea.
-//
-// The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
-// so that printing them out for debugging purposes is easier on the eyes.
-//
-template <typename ValueType>
-void FillInputTensor(math::ChannelColumnRowTensor<ValueType>& input)
-{
-    const auto pi = math::Constants<ValueType>::pi;
-    const auto numRows = input.NumRows();
-    const auto numColumns = input.NumColumns();
-    const auto numChannels = input.NumChannels();
-    for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
-    {
-        for (size_t columnIndex = 0; columnIndex < numColumns; ++columnIndex)
-        {
-            for (size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
+            for (size_t k = 0; k < a.NumChannels(); ++k)
             {
-                double value = std::sin(2 * 7 * pi * rowIndex / numRows) * std::cos(2 * 3 * pi * columnIndex / numColumns) + 0.2 * std::sin(2 * 0.1 * pi * channelIndex / numChannels);
-                value = std::trunc(value * 4) / 4.0;
-                input(rowIndex, columnIndex, channelIndex) = static_cast<ValueType>(value);
+                a(i, j, k) -= b(i, j, k);
             }
         }
     }
+    return a;
 }
-
-//
-// Fill a tensor with some "interesting" filter weights. The particular values aren't that important, 
-// but using something other than uniform noise is probably a good idea.
-//
-// The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
-// so that printing them out for debugging purposes is easier on the eyes.
-//
-template <typename ValueType>
-void FillFiltersTensor(math::ChannelColumnRowTensor<ValueType>& filters, size_t numFilters)
-{
-    const auto pi = math::Constants<ValueType>::pi;
-    const auto numRows = filters.NumRows() / numFilters;
-    const auto numColumns = filters.NumColumns();
-    const auto numChannels = filters.NumChannels();
-    for (size_t filterIndex = 0; filterIndex < numFilters; ++filterIndex)
-    {
-        for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
-        {
-            for (size_t columnIndex = 0; columnIndex < numColumns; ++columnIndex)
-            {
-                for (size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
-                {
-                    double value = 2 * std::sin(2 * pi * rowIndex / numRows) * std::cos(2 * 2 * pi * columnIndex / numColumns) + 0.3 * std::sin(2 * pi * channelIndex / numChannels) * std::cos(2 * 1.5 * pi * filterIndex / numFilters);
-                    value = std::trunc(value * 4) / 4.0;
-                    filters((filterIndex * numRows) + rowIndex, columnIndex, channelIndex) = static_cast<ValueType>(value);
-                }
-            }
-        }
-    }
 }
 
 //
@@ -289,12 +100,12 @@ void TestConv2D(dsp::ConvolutionMethodOption algorithm)
 {
     ValueType epsilon = static_cast<ValueType>(1e-5);
 
-    math::RowMatrix<ValueType> signal = GetReferenceMatrixSignal<ValueType>();
-    math::RowMatrix<ValueType> filter = GetReferenceMatrixFilter<ValueType>();
-    math::RowMatrix<ValueType> reference = GetReferenceMatrixConvolution<ValueType>();
+    auto signal = GetReferenceSignal<ValueType>();
+    auto filter = GetReferenceFilter<ValueType>();
+    auto reference = GetReferenceConvolutionResult<ValueType>();
 
     // Perform the convolution
-    auto result = Convolve2D(signal, filter, algorithm);
+    auto result = Convolve2D(signal, filter, 1, algorithm);
 
     testing::ProcessTest("Testing convolution result size matches", (result.NumRows() == reference.NumRows()) && (result.NumColumns() == reference.NumColumns()));
     if (result.NumRows() != reference.NumRows())
@@ -305,8 +116,8 @@ void TestConv2D(dsp::ConvolutionMethodOption algorithm)
     bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
     if (!ok)
     {
-        std::cout << "Incorrect result for 2D matrix " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << std::endl;
-        math::RowMatrix<ValueType> diff(result);
+        std::cout << "Incorrect result for 2D convolution " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << std::endl;
+        math::ChannelColumnRowTensor<ValueType> diff(result);
         diff -= reference;
 
 #if 0
@@ -322,7 +133,7 @@ void TestConv2D(dsp::ConvolutionMethodOption algorithm)
 }
 
 template <typename ValueType>
-void TestConv1DVsSimple(size_t length, size_t filterSize, dsp::ConvolutionMethodOption algorithm)
+void TestConv1DVsSimple(int length, int filterSize, dsp::ConvolutionMethodOption algorithm)
 {
     using Vector = math::RowVector<ValueType>;
     const ValueType epsilon = static_cast<ValueType>(1e-5);
@@ -365,56 +176,7 @@ void TestConv1DVsSimple(size_t length, size_t filterSize, dsp::ConvolutionMethod
 }
 
 template <typename ValueType>
-void TestConv2DMatrixVsSimple(size_t numRows, size_t numColumns, size_t filterSize, dsp::ConvolutionMethodOption algorithm)
-{
-    using Matrix = math::RowMatrix<ValueType>;
-
-    const ValueType epsilon = static_cast<ValueType>(1e-5);
-
-    const auto filterRows = filterSize;
-    const auto filterColumns = filterSize;
-    Matrix signal(numRows, numColumns);
-    Matrix filter(filterRows, filterColumns);
-
-    FillInputMatrix(signal);
-    FillFilterMatrix(filter);
-
-    // Perform the convolution
-    auto reference = Convolve2D(signal, filter, dsp::ConvolutionMethodOption::simple);
-    auto result = Convolve2D(signal, filter, algorithm);
-
-    // Compare results
-    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
-    if (!ok)
-    {
-        std::cout << "Incorrect result for 2D matrix "
-                  << " " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << std::endl;
-        std::cout << "Reference:\n"
-                  << reference << std::endl;
-        std::cout << std::endl;
-        std::cout << "Computed:\n"
-                  << result << std::endl;
-        auto referenceArray = reference.ToArray();
-        auto resultArray = result.ToArray();
-        auto size = referenceArray.size();
-        std::vector<ValueType> diffArray(size);
-        for (size_t index = 0; index < size; ++index)
-        {
-            diffArray[index] = referenceArray[index] - resultArray[index];
-        }
-
-#if 0
-        // Useful for pinpointing errors during debugging:
-        std::cout << "Difference:  " << diffArray << std::endl;
-#endif
-        auto minmax = std::minmax_element(diffArray.begin(), diffArray.end());
-        std::cout << "Min difference:  " << *minmax.first << std::endl;
-        std::cout << "Max difference:  " << *minmax.second << std::endl;
-    }
-}
-
-template <typename ValueType>
-void TestConv2DTensorVsSimple(size_t numRows, size_t numColumns, size_t numChannels, size_t filterSize, size_t numFilters, dsp::ConvolutionMethodOption algorithm)
+void TestConv2DVsSimple(int numRows, int numColumns, int numChannels, int filterSize, int numFilters, int stride, dsp::ConvolutionMethodOption algorithm)
 {
     using Tensor = math::ChannelColumnRowTensor<ValueType>;
 
@@ -429,8 +191,8 @@ void TestConv2DTensorVsSimple(size_t numRows, size_t numColumns, size_t numChann
     FillFiltersTensor(filters, numFilters);
 
     // Perform the convolution
-    auto reference = Convolve2D(signal, filters, static_cast<int>(numFilters), dsp::ConvolutionMethodOption::simple);
-    auto result = Convolve2D(signal, filters, static_cast<int>(numFilters), algorithm);
+    auto reference = Convolve2D(signal, filters, numFilters, stride, dsp::ConvolutionMethodOption::simple);
+    auto result = Convolve2D(signal, filters, numFilters, stride, algorithm);
 
     // Compare results
     bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
@@ -438,9 +200,13 @@ void TestConv2DTensorVsSimple(size_t numRows, size_t numColumns, size_t numChann
     {
         std::cout << "Incorrect result for 2D tensor "
                   << " " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << " x " << signal.NumChannels() << std::endl;
-        // std::cout << "Reference:\n" << reference << std::endl;
-        // std::cout << std::endl;
-        // std::cout << "Computed:\n" << result << std::endl;
+
+#if 0
+        std::cout << "Reference:\n" << reference << std::endl;
+        std::cout << std::endl;
+        std::cout << "Computed:\n" << result << std::endl;
+        std::cout << std::endl;
+#endif
         auto referenceArray = reference.ToArray();
         auto resultArray = result.ToArray();
         auto size = referenceArray.size();
@@ -452,70 +218,10 @@ void TestConv2DTensorVsSimple(size_t numRows, size_t numColumns, size_t numChann
 
 #if 0
         // Useful for pinpointing errors during debugging:
-        std::cout << "Difference:  " << diffArray() << std::endl;
+        std::cout << "Difference:  " << diffArray << std::endl;
 #endif
         std::cout << "Max difference:  " << *std::max_element(diffArray.begin(), diffArray.end()) << std::endl;
     }
-}
-
-//
-// Timing
-//
-template <typename ValueType>
-void TimeConv1D(size_t signalSize, size_t numIterations, dsp::ConvolutionMethodOption algorithm)
-{
-    math::RowVector<ValueType> signal(signalSize);
-    math::RowVector<ValueType> filter = { 0.25, 0.5, 0.25 };
-
-    // Perform the convolution
-    utilities::MillisecondTimer timer;
-    for (size_t iter = 0; iter < numIterations; ++iter)
-    {
-        auto result = Convolve1D(signal, filter, algorithm);
-    }
-    auto duration = timer.Elapsed();
-
-    std::cout << "Time to perform 1D "
-              << " " << GetConvAlgName(algorithm) << " convolution: " << duration << " ms" << std::endl;
-}
-
-template <typename ValueType>
-void TimeConv2D(size_t numRows, size_t numColumns, size_t numIterations, dsp::ConvolutionMethodOption algorithm)
-{
-    math::RowMatrix<ValueType> signal(numRows, numColumns);
-    math::RowMatrix<ValueType> filter{ { 0.25, 0.5, 0.25 },
-                                       { 0.5, 0.75, 0.5 },
-                                       { 0.25, 0.5, 0.25 } };
-
-    // Perform the convolution
-    utilities::MillisecondTimer timer;
-    for (size_t iter = 0; iter < numIterations; ++iter)
-    {
-        auto result = Convolve2D(signal, filter, algorithm);
-    }
-    auto duration = timer.Elapsed();
-
-    std::cout << "Time to perform 2D "
-              << " " << GetConvAlgName(algorithm) << " convolution on " << GetSizeString(signal) << " input with " << GetFilterSizeString(filter) << " filters: " << duration << " ms" << std::endl;
-}
-
-template <typename ValueType>
-void TimeConv2DTensor(size_t numRows, size_t numColumns, size_t numChannels, size_t filterSize, size_t numFilters, size_t numIterations, dsp::ConvolutionMethodOption algorithm)
-{
-    const auto filterRows = filterSize;
-    const auto filterColumns = filterSize;
-    math::ChannelColumnRowTensor<ValueType> signal(numRows, numColumns, numChannels);
-    math::ChannelColumnRowTensor<ValueType> filters{ numFilters * filterRows, filterColumns, numChannels };
-
-    // Perform the convolution
-    utilities::MillisecondTimer timer;
-    for (size_t iter = 0; iter < numIterations; ++iter)
-    {
-        auto result = Convolve2D(signal, filters, static_cast<int>(numFilters), algorithm);
-    }
-    auto duration = timer.Elapsed();
-
-    std::cout << "Time to perform 2D " << GetConvAlgName(algorithm) << " tensor convolution on " << GetSizeString(signal) << " input with " << GetFilterSizeString(filters) << " filters: " << duration << " ms" << std::endl;
 }
 
 //
@@ -523,25 +229,13 @@ void TimeConv2DTensor(size_t numRows, size_t numColumns, size_t numChannels, siz
 //
 
 // 1D
-template void TestConv1DVsSimple<float>(size_t size, size_t filterSize, dsp::ConvolutionMethodOption algorithm);
-template void TestConv1DVsSimple<double>(size_t size, size_t filterSize, dsp::ConvolutionMethodOption algorithm);
 template void TestConv1D<float>(dsp::ConvolutionMethodOption);
 template void TestConv1D<double>(dsp::ConvolutionMethodOption);
+template void TestConv1DVsSimple<float>(int size, int filterSize, dsp::ConvolutionMethodOption algorithm);
+template void TestConv1DVsSimple<double>(int size, int filterSize, dsp::ConvolutionMethodOption algorithm);
 
-// 2D (matrix)
-template void TestConv2DMatrixVsSimple<float>(size_t numRows, size_t numColumns, size_t filterSize, dsp::ConvolutionMethodOption algorithm);
-template void TestConv2DMatrixVsSimple<double>(size_t numRows, size_t numColumns, size_t filterSize, dsp::ConvolutionMethodOption algorithm);
+// 2D
 template void TestConv2D<float>(dsp::ConvolutionMethodOption);
 template void TestConv2D<double>(dsp::ConvolutionMethodOption);
-
-// 2D (Tensor)
-template void TestConv2DTensorVsSimple<float>(size_t numRows, size_t numColumns, size_t numChannels, size_t filterSize, size_t numFilters, dsp::ConvolutionMethodOption algorithm);
-template void TestConv2DTensorVsSimple<double>(size_t numRows, size_t numColumns, size_t numChannels, size_t filterSize, size_t numFilters, dsp::ConvolutionMethodOption algorithm);
-
-template void TimeConv1D<float>(size_t signalSize, size_t numIterations, dsp::ConvolutionMethodOption);
-template void TimeConv1D<double>(size_t signalSize, size_t numIterations, dsp::ConvolutionMethodOption);
-template void TimeConv2D<float>(size_t numRows, size_t numColumns, size_t numIterations, dsp::ConvolutionMethodOption);
-template void TimeConv2D<double>(size_t numRows, size_t numColumns, size_t numIterations, dsp::ConvolutionMethodOption);
-
-template void TimeConv2DTensor<float>(size_t numRows, size_t numColumns, size_t numChannels, size_t filterSize, size_t numFilters, size_t numIterations, dsp::ConvolutionMethodOption algorithm);
-template void TimeConv2DTensor<double>(size_t numRows, size_t numColumns, size_t numChannels, size_t filterSize, size_t numFilters, size_t numIterations, dsp::ConvolutionMethodOption algorithm);
+template void TestConv2DVsSimple<float>(int numRows, int numColumns, int numChannels, int filterSize, int numFilters, int stride, dsp::ConvolutionMethodOption algorithm);
+template void TestConv2DVsSimple<double>(int numRows, int numColumns, int numChannels, int filterSize, int numFilters, int stride, dsp::ConvolutionMethodOption algorithm);

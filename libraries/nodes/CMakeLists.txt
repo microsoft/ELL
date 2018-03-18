@@ -171,6 +171,7 @@ set(test_name ${library_name}_test)
 set(test_src
     test/src/main.cpp
     test/src/DSPNodesTests.cpp
+    test/src/DSPNodesTiming.cpp
     test/src/NeuralNetworkLayerNodesTests.cpp
     test/src/NodesTests.cpp
     test/src/NodesTestData.cpp
@@ -178,6 +179,7 @@ set(test_src
 
 set(test_include
     test/include/DSPNodesTests.h
+    test/include/DSPNodesTiming.h
     test/include/NeuralNetworkLayerNodesTests.h
     test/include/NodesTests.h
     test/include/NodesTestData.h

@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DSPNodesTests.h"
+#include "DSPNodesTiming.h"
 #include "NeuralNetworkLayerNodesTests.h"
 #include "NodesTests.h"
 
@@ -33,6 +34,8 @@ int main(int argc, char** argv)
         TestNodes();
         TestNeuralNetworkLayerNodes();
         TestDSPNodes();
+        
+        TimeDSPNodes();
     }
     catch (const utilities::Exception& exception)
     {

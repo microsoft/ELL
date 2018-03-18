@@ -90,17 +90,15 @@ namespace dsp
     }
 
     template <typename ValueType>
-    math::RowMatrix<ValueType> Convolve2DUnrolled(const math::ConstRowMatrixReference<ValueType>& input, const math::ConstRowMatrixReference<ValueType>& filter)
+    math::ChannelColumnRowTensor<ValueType> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters)
     {
-        UNUSED(input, filter);
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        return Convolve2DUnrolled(input, filters, numFilters, 1);
     }
 
     template <typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters)
+    math::ChannelColumnRowTensor<ValueType> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride)
     {
         const auto filterSize = static_cast<int>(filters.NumColumns());
-        const auto stride = 1;
         const auto numChannels = static_cast<int>(input.NumChannels());
         const auto numOutputRows = (static_cast<int>(input.NumRows()) - filterSize + 1) / stride;
         const auto numOutputColumns = (static_cast<int>(input.NumColumns()) - filterSize + 1) / stride;
@@ -135,10 +133,10 @@ namespace dsp
     template math::RowVector<float> Convolve1DUnrolled(const math::RowVector<float>& input, const math::RowVector<float>& filter);
     template math::RowVector<double> Convolve1DUnrolled(const math::RowVector<double>& input, const math::RowVector<double>& filter);
 
-    template math::RowMatrix<float> Convolve2DUnrolled(const math::ConstRowMatrixReference<float>& input, const math::ConstRowMatrixReference<float>& filter);
-    template math::RowMatrix<double> Convolve2DUnrolled(const math::ConstRowMatrixReference<double>& input, const math::ConstRowMatrixReference<double>& filter);
-
     template math::ChannelColumnRowTensor<float> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters);
     template math::ChannelColumnRowTensor<double> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters);
+
+    template math::ChannelColumnRowTensor<float> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride);
+    template math::ChannelColumnRowTensor<double> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride);
 }
 }

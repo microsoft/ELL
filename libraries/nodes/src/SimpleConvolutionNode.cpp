@@ -74,7 +74,7 @@ namespace nodes
                         for (int windowRow = 0; windowRow < filterSize; ++windowRow)
                         {
                             // Note: if the memory storage from consecutive columns is contiguous, we can process them together and avoid a loop
-                            const bool canCombineColumns = inputLayout.GetActiveSize(1) == inputLayout.GetStride(1);
+                            const bool canCombineColumns = (inputLayout.GetActiveSize(1) == inputLayout.GetStride(1)) && (stride == 1);
                             if (canCombineColumns)
                             {
                                 auto inputOffset = ((outputRow + function.LocalScalar<int>(windowRow)) * function.LocalScalar<int>(inputMemoryIncrements[0])) +
@@ -98,8 +98,10 @@ namespace nodes
                                 for (int windowColumn = 0; windowColumn < filterSize; ++windowColumn)
                                 {
                                     // I[r+wc, c+wc]
-                                    auto inputOffset = ((outputRow + function.LocalScalar<int>(windowRow)) * function.LocalScalar<int>(inputMemoryIncrements[0])) +
-                                                       ((outputColumn + function.LocalScalar<int>(windowColumn)) * function.LocalScalar<int>(inputMemoryIncrements[1]));
+                                    auto inputRow = outputRow * stride;
+                                    auto inputColumn = outputColumn * stride;
+                                    auto inputOffset = ((inputRow + function.LocalScalar<int>(windowRow)) * function.LocalScalar<int>(inputMemoryIncrements[0])) +
+                                                       ((inputColumn + function.LocalScalar<int>(windowColumn)) * function.LocalScalar<int>(inputMemoryIncrements[1]));
                                     auto imageRow = function.PointerOffset(input, inputOffset);
                                     auto filterOffset = function.LocalScalar<int>(inputDepth * (filterSize * windowRow + windowColumn)) +
                                                         (filterIndex * function.LocalScalar<int>(filterSize * filterSize * inputDepth));

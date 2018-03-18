@@ -523,7 +523,7 @@ namespace nodes
         _filterSize = filterWeights.NumColumns();
         assert(filterWeights.NumRows() == _filterSize * numFilters);
         _tileSize = 2;
-        _filterWeights = dsp::GetTransformedFilters(filterWeights, numFilters, _tileSize, dsp::WinogradAlgorithmVersion::v2);
+        _filterWeights = dsp::GetTransformedFilters(filterWeights, numFilters, _tileSize, dsp::WinogradFilterOrder::tilesFirst);
     }
 
     template <typename ValueType>

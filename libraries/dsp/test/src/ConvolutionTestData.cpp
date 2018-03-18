@@ -9,7 +9,7 @@
 #include "ConvolutionTestData.h"
 
 // math
-#include "Matrix.h"
+#include "Tensor.h"
 #include "Vector.h"
 
 // utilities
@@ -20,21 +20,22 @@
 #include <vector>
 namespace
 {
-    // Helper function to avoid annoying double-to-float errors
-    template <typename ValueType, typename ValueType2>
-    ell::math::RowMatrix<ValueType> MakeMatrix(std::initializer_list<std::initializer_list<ValueType2>> list)
+// Helper function to avoid annoying double-to-float errors
+template <typename ValueType, typename ValueType2>
+ell::math::ChannelColumnRowTensor<ValueType> MakeTensor(std::initializer_list<std::initializer_list<ValueType2>> list)
+{
+    auto numRows = list.size();
+    auto numColumns = list.begin()->size();
+    auto numChannels = 1;
+    std::vector<ValueType> data;
+    data.reserve(numRows * numColumns * numChannels);
+    for (const auto& row : list)
     {
-        auto numRows = list.size();
-        auto numColumns = list.begin()->size();
-        std::vector<ValueType> data;
-        data.reserve(numRows * numColumns);
-        for(const auto& row: list)
-        {
-            DEBUG_THROW(row.size() != numColumns, ell::utilities::InputException(ell::utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
-            std::transform(row.begin(), row.end(), std::back_inserter(data), [](ValueType2 x) { return static_cast<ValueType>(x); });
-        }
-        return ell::math::RowMatrix<ValueType>(numRows, numColumns, data);
+        DEBUG_THROW(row.size() != numColumns, ell::utilities::InputException(ell::utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
+        std::transform(row.begin(), row.end(), std::back_inserter(data), [](ValueType2 x) { return static_cast<ValueType>(x); });
     }
+    return ell::math::ChannelColumnRowTensor<ValueType>(numRows, numColumns, numChannels, data);
+}
 }
 
 //
@@ -53,10 +54,10 @@ namespace
 
 // This is `signal` from the above script
 template <typename ValueType>
-ell::math::RowMatrix<ValueType> GetReferenceMatrixSignal()
+ell::math::ChannelColumnRowTensor<ValueType> GetReferenceSignal()
 {
     // clang-format off
-    return MakeMatrix<ValueType>({ { 0.54900258127, 0.782928093357, 0.954594952519, 0.817351111922, 0.792785972612, 0.25462638477, 0.210152585739, 0.692073223247, 0.167481157006, 0.971090467053, 0.179318733006, 0.599021152946, 0.834673554887, 0.386348427793 },
+    return MakeTensor<ValueType>({ { 0.54900258127, 0.782928093357, 0.954594952519, 0.817351111922, 0.792785972612, 0.25462638477, 0.210152585739, 0.692073223247, 0.167481157006, 0.971090467053, 0.179318733006, 0.599021152946, 0.834673554887, 0.386348427793 },
                 { 0.524057667387, 0.194810273283, 0.281117429801, 0.85840343111, 0.341948878426, 0.746582556421, 0.652652661702, 0.128009583894, 0.0518214129825, 0.725093613108, 0.959391654627, 0.855865690685, 0.477288810167, 0.377122018536 },
                 { 0.108184051901, 0.33939357211, 0.226753457819, 0.850992043036, 0.681719017611, 0.0533975345706, 0.42068870679, 0.464879372521, 0.218378069544, 0.687925640618, 0.926972195288, 0.588161280455, 0.411787003919, 0.859107295273 },
                 { 0.108170633046, 0.184432925953, 0.439135204701, 0.136856091125, 0.950697274789, 0.333354459857, 0.111668226374, 0.531076395508, 0.633729543749, 0.75789003677, 0.127282417915, 0.519996210482, 0.193265765535, 0.413893963557 },
@@ -75,10 +76,10 @@ ell::math::RowMatrix<ValueType> GetReferenceMatrixSignal()
 
 // This is `filter` from the above script
 template <typename ValueType>
-ell::math::RowMatrix<ValueType> GetReferenceMatrixFilter()
+ell::math::ChannelColumnRowTensor<ValueType> GetReferenceFilter()
 {
     // clang-format off
-    return MakeMatrix<ValueType>(
+    return MakeTensor<ValueType>(
            { { 0.25, 0.5, 0.25 },
              { 0.5, 0.75, 0.5 },
              { 0.25, 0.5, 0.25 } });
@@ -87,10 +88,10 @@ ell::math::RowMatrix<ValueType> GetReferenceMatrixFilter()
 
 // This is `reference` from the above script
 template <typename ValueType>
-ell::math::RowMatrix<ValueType> GetReferenceMatrixConvolution()
+ell::math::ChannelColumnRowTensor<ValueType> GetReferenceConvolutionResult()
 {
     // clang-format off
-    return MakeMatrix<ValueType>({ { 1.56948984717, 2.02578533482, 2.45347065507, 2.29029891627, 1.73758621774, 1.60845034148, 1.28089565292, 1.36233944737, 2.25197233618, 2.77471849228, 2.54201858889, 2.20585028076 },
+    return MakeTensor<ValueType>({ { 1.56948984717, 2.02578533482, 2.45347065507, 2.29029891627, 1.73758621774, 1.60845034148, 1.28089565292, 1.36233944737, 2.25197233618, 2.77471849228, 2.54201858889, 2.20585028076 },
             { 0.949755767294, 1.46900989856, 2.09333472804, 2.12860626325, 1.64546228159, 1.3915711766, 1.36020386846, 1.61847894441, 2.27316744514, 2.59132103103, 2.23773867259, 1.90947129947 },
             { 0.855478233718, 1.24122265514, 2.13771474176, 2.14803771587, 1.48833874951, 1.4073492814, 1.80371890578, 1.90018221866, 1.8490428031, 1.98715329288, 1.88561772876, 1.8751827147 },
             { 1.01623143988, 1.4775594342, 2.13073803693, 2.12910143289, 1.70276705596, 1.71193815672, 1.77521725928, 1.7183151252, 1.57487343191, 1.68707659883, 2.07323882077, 2.15709981643 },
@@ -105,11 +106,11 @@ ell::math::RowMatrix<ValueType> GetReferenceMatrixConvolution()
     // clang-format on
 }
 
-template ell::math::RowMatrix<float> GetReferenceMatrixFilter();
-template ell::math::RowMatrix<double> GetReferenceMatrixFilter();
+template ell::math::ChannelColumnRowTensor<float> GetReferenceFilter();
+template ell::math::ChannelColumnRowTensor<double> GetReferenceFilter();
 
-template ell::math::RowMatrix<float> GetReferenceMatrixSignal();
-template ell::math::RowMatrix<double> GetReferenceMatrixSignal();
+template ell::math::ChannelColumnRowTensor<float> GetReferenceSignal();
+template ell::math::ChannelColumnRowTensor<double> GetReferenceSignal();
 
-template ell::math::RowMatrix<float> GetReferenceMatrixConvolution();
-template ell::math::RowMatrix<double> GetReferenceMatrixConvolution();
+template ell::math::ChannelColumnRowTensor<float> GetReferenceConvolutionResult();
+template ell::math::ChannelColumnRowTensor<double> GetReferenceConvolutionResult();

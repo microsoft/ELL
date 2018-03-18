@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include "Matrix.h"
+#include "Tensor.h"
 
 template <typename ValueType>
-ell::math::RowMatrix<ValueType> GetReferenceMatrixFilter();
+ell::math::ChannelColumnRowTensor<ValueType> GetReferenceFilter();
 
 template <typename ValueType>
-ell::math::RowMatrix<ValueType> GetReferenceMatrixSignal();
+ell::math::ChannelColumnRowTensor<ValueType> GetReferenceSignal();
 
 template <typename ValueType>
-ell::math::RowMatrix<ValueType> GetReferenceMatrixConvolution();
+ell::math::ChannelColumnRowTensor<ValueType> GetReferenceConvolutionResult();
