@@ -13,6 +13,7 @@ set CONDA_PATH=%2
 set OUTPUT_PATH=%3
 set VS_VERSION=%4
 set RPI_CLUSTER=%5
+set PASSWORD=%6
 pushd %ELL_SRC%
 
 call %CONDA_PATH%\Scripts\activate.bat ell
@@ -23,7 +24,7 @@ if ERRORLEVEL 1 exit 1
 
 echo ===================================== TEST ==================================
 cd build
-cmake .. -DRPI_CLUSTER=%RPI_CLUSTER%
+cmake .. -DRPI_CLUSTER=%RPI_CLUSTER% -DRPI_PASSWORD=%PASSWORD%
 if ERRORLEVEL 1 exit /B 1
 
 ctest . --build-config release -VV

@@ -19,6 +19,7 @@ import logging
 SkipTests = False
 SkipFullModelTests = False
 cluster = None
+password = None
 
 class PiTestBase(unittest.TestCase):
     def setUp(self):
@@ -29,7 +30,7 @@ class PiTestBase(unittest.TestCase):
     def test_raspberryPi(self):
         global cluster
         with drivetest.DriveTest(cluster=cluster, target="pi3",
-            target_dir="/home/pi/pi3", username="pi", password="raspberry",
+            target_dir="/home/pi/pi3", username="pi", password=password,
             expected="coffee mug", timeout=300) as driver:
             driver.run_test()
 
@@ -43,8 +44,13 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '--cluster', help='HTTP address of cluster manager')
+    parser.add_argument(
+        '--password', help='The raspberry pi password')
 
     args, argv = parser.parse_known_args()
     cluster = args.cluster
+    password = args.password
+    if not password:
+        password = "raspberry"
     
     unittest.main(argv=[sys.argv[0]] + argv)
