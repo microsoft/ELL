@@ -43,7 +43,7 @@ class DriveTest:
     def __init__(self, ipaddress=None, cluster=None, outdir=None, profile=False, 
             model=None, labels=None, target="pi3", target_dir="/home/pi/pi3", 
             username="pi", password="raspberry", iterations=1, expected=None, 
-            blas=True, test=False, verbose=True, timeout=None):
+            blas=True, compile=True, test=True, verbose=True, timeout=None):
         self.ipaddress = ipaddress
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)   
@@ -58,6 +58,7 @@ class DriveTest:
         self.blas = blas
         self.expected = expected
         self.profile = profile
+        self.compile = compile
         self.test = test
         self.verbose = verbose
         self.logger = logger.get()
@@ -77,17 +78,22 @@ class DriveTest:
         if not self.output_dir:
             self.output_dir = "test"
         self.test_dir = os.path.abspath(self.output_dir)
-        
-        if os.path.isdir(self.test_dir):
-            rmtree(self.test_dir)
-        os.makedirs(self.test_dir)
 
-        self.extract_model_info(self.ell_model, self.labels_file)
+        if os.path.isdir(self.test_dir):
+            if self.compile:
+                rmtree(self.test_dir)
+        else:
+            if not self.compile:
+                raise Exception("Test only usage requires outdir '{}' to exist already".format(self.output_dir))
+            os.makedirs(self.test_dir)
+
+        if self.compile:
+            self.extract_model_info(self.ell_model, self.labels_file)
+            
         self.output_dir = os.path.join(self.test_dir, self.target)
 
-        self.resolve_address(self.ipaddress, self.cluster)
-        if not os.path.isdir(self.output_dir):
-            os.makedirs(self.output_dir)
+        if self.test:
+            self.resolve_address(self.ipaddress, self.cluster)
 
     def __enter__(self):
         """Called when this object is instantiated with 'with'"""
@@ -291,28 +297,30 @@ class DriveTest:
     def run_test(self):
         """Runs the test"""
         try:
-            if not self.test:
+            if self.compile:
                 self.get_model()
                 self.make_project()
                 self.get_bash_files()
 
-            start_time = time.time()
-            # do not pass cluster to remote runner because we've already locked the machine.
-            runner = RemoteRunner(cluster=None,
-                                  ipaddress=self.ipaddress,
-                                  username=self.username,
-                                  password=self.password,
-                                  source_dir=self.output_dir,
-                                  target_dir=self.target_dir,
-                                  command="runtest.sh",
-                                  verbose=self.verbose,
-                                  start_clean=not self.test,
-                                  timeout=self.timeout,
-                                  cleanup=False)
-            output = runner.run_command()
-            self.verify_remote_test(output)
-            end_time = time.time()
-            self.logger.info("Remote test time: %f seconds" % (end_time - start_time))
+            if self.test:
+                start_time = time.time()
+                print("source={}".format(self.output_dir))
+                # do not pass cluster to remote runner because we've already locked the machine.
+                runner = RemoteRunner(cluster=None,
+                                    ipaddress=self.ipaddress,
+                                    username=self.username,
+                                    password=self.password,
+                                    source_dir=self.output_dir,
+                                    target_dir=self.target_dir,
+                                    command="runtest.sh",
+                                    verbose=self.verbose,
+                                    start_clean=not self.test,
+                                    timeout=self.timeout,
+                                    cleanup=False)
+                output = runner.run_command()
+                self.verify_remote_test(output)
+                end_time = time.time()
+                self.logger.info("Remote test time: %f seconds" % (end_time - start_time))
 
         except:
             errorType, value, traceback = sys.exc_info()
@@ -338,6 +346,10 @@ if __name__ == "__main__":
     arg_parser.add_argument("--outdir", default=".", help="where to store local working files as a staging area (default '.')")
     arg_parser.add_argument("--profile", help="enable profiling functions in the ELL module", action="store_true")
 
+    model_group = arg_parser.add_argument_group("phase", "options for two separate phases")
+    arg_parser.add_argument("--compile", default="true", help="enable compile step preparing model for --test phase (default 'True')")
+    arg_parser.add_argument("--test", default="true", help="enable test phase, assume the outdir has already been built (default 'True')")
+
     model_group = arg_parser.add_argument_group("model", "options for loading a non-default model. All 3 must be specified for a non-default model to be used.")
     model_group.add_argument("--model", help="path to an ELL model file, the filename (without extension) will be used as the model name")
     model_group.add_argument("--labels", help="path to the labels file for evaluating the model")
@@ -350,7 +362,6 @@ if __name__ == "__main__":
     arg_parser.add_argument("--iterations", "-i", type=int, help="the number of iterations for each predict (default 1)", default=1)
     arg_parser.add_argument("--expected", "-e", help="the string to search for to verify test passed (default '')", default=None)
     arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
-    arg_parser.add_argument("--test", help="test only, assume the outdir has already been built (default 'False')", action="store_true")
     arg_parser.add_argument("--verbose", help="enable or disable verbose print output (default 'True')", default="True")
     arg_parser.add_argument("--timeout", help="set remote test run timeout in seconds (default '300')", default="300")
 
@@ -365,5 +376,5 @@ if __name__ == "__main__":
     with DriveTest(args.ipaddress,  args.cluster, args.outdir, args.profile, 
         args.model, args.labels, args.target, args.target_dir, args.username, 
         args.password, args.iterations, args.expected, str2bool(args.blas), 
-        args.test, str2bool(args.verbose), args.timeout) as tester:
+        str2bool(args.compile), str2bool(args.test), str2bool(args.verbose), args.timeout) as tester:
         tester.run_test()

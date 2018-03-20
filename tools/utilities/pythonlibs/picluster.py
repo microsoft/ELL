@@ -13,6 +13,7 @@ from dateutil.parser import parse
 import json
 import os
 import random
+import re
 import requests
 import socket
 import time
@@ -20,7 +21,7 @@ import uuid
 
 import logger
 
-class PiBoardEntity():
+class PiBoardEntity(): 
     def __init__(self, values = None):
         if isinstance(values, dict):
             self.load(values)
@@ -30,11 +31,11 @@ class PiBoardEntity():
             self.os_version = ""
             self.current_task_name = ""
             self.current_user_name = ""
-            self.command = ""
+            self.command = ""       
             self.last_heartbeat = ""
             self.lock_key = ""
 
-    def load(self, values) :
+    def load(self, values) :        
         self.ip_address = values['IpAddress']
         self.os_name = values['OsName']
         self.os_version = values['OsVersion']
@@ -49,8 +50,8 @@ class PiBoardEntity():
         self.load(values)
 
     def serialize(self):
-        return json.dumps({'IpAddress': self.ip_address,
-                            'OsName': self.os_name, 'OsVersion': self.os_version,
+        return json.dumps({'IpAddress': self.ip_address, 
+                            'OsName': self.os_name, 'OsVersion': self.os_version, 
                             'CurrentTaskName': self.current_task_name, 'CurrentUserName': self.current_user_name,
                             'Command':self.command, "LockKey": self.lock_key })
 
@@ -70,7 +71,7 @@ class PiBoardTable:
             raise Exception("update failed: " + str(r.status_code))
         e = json.loads(r.text)
         if isinstance(e, dict):
-            return PiBoardEntity(e)
+            return PiBoardEntity(e)                   
         return None
 
     def get(self, id):
@@ -79,9 +80,9 @@ class PiBoardTable:
         if len(e) > 0:
             e = e[0]
             if isinstance(e, dict):
-                return PiBoardEntity(e)
+                return PiBoardEntity(e)                   
         return None
-
+    
     def get_all(self):
         r = requests.get(self.endpoint)
         result = []
@@ -111,7 +112,7 @@ class PiBoardTable:
         elif r.lock_key != a.lock_key:
             raise Exception("Lock failed on machine {}, lock key mismatch {}".format(ip))
         return r
-
+    
     def unlock(self, ip):
         # now try and lock the device for our usage.
         a = PiBoardEntity()
@@ -136,7 +137,7 @@ class PiBoardTable:
         if name == "":
             name = os.getenv('USER')
         if name == "pi":
-            name += "_" + self.get_local_ip()
+            name += "_" + self.get_local_ip()        
         return name
 
     def heartbeat_is_valid(self, heartbeat):
@@ -146,20 +147,31 @@ class PiBoardTable:
         diff = abs(now.timestamp() - h.timestamp())
         return diff < 5 * 60
 
-    def wait_for_free_machine(self, jobName):
-        # then this is a pi cluster server, so find a free machine
+    def is_alive(self, machine):
+        heartbeat = parse(machine.last_heartbeat)
+        if not self.heartbeat_is_valid(heartbeat):
+             print("note: machine at %s is not sending heartbeats" % (e.ip_address))
+             if machine.command != "dead?":
+                 machine.command = "dead?"
+                 self.update(machine)
+        else:
+            if machine.command == "dead?":
+                 machine.command = ""
+                 self.update(machine)
+            return True
+
+    def wait_for_free_machine(self, jobName, reAddress=None):
+        """ find a free machine on the cluster, optionally matching the given regex pattern on ipaddress"""
         while True:
             machines = self.get_all()
             random.shuffle(machines)
             for e in machines:
                 try:
-                    heartbeat = parse(e.last_heartbeat)
-                    if not self.heartbeat_is_valid(heartbeat):
-                        self.logger.info("note: machine at %s is not sending heartbeats" % (e.ip_address))
-                    elif e.command != 'Lock':
-                        result = self.lock(e.ip_address, jobName)
-                        # no exception, so we got it
-                        return result
+                    if not reAddress or re.match(reAddress, e.ip_address):
+                        if self.is_alive(e) and e.command != 'Lock':
+                            result = self.lock(e.ip_address, jobName)
+                            # no exception, so we got it
+                            return result
                 except:
                     pass
 
