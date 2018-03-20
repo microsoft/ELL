@@ -1,9 +1,17 @@
-#! /bin/
+#!/bin/bash
+
 # get path of current script: https://stackoverflow.com/a/39340259/207661
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# usage: build.sh build_dir nproc dailyclean cmakeargs
+# This script checks to make sure you have required tools instealled then builds ELL.
+# Options:
+#     build_dir  - the output folder (default 'build')
+#     nproc      - number of procs to use (default let make decide)
+#     dailyclean - true/false if you want the folder cleaned each day
+#     cmakeargs  - args to pass cmake (default '-DCMAKE_BUILD_TYPE=Release ..')
+
 set -e
-set -x
 
 # make sure we have the required tools
 if printf '%s\n%s\n' "$(cmake --version | head -n1 | cut -d" " -f3 | awk '{print $NF}')" 3.7.9 | sort -CV; then
@@ -18,8 +26,8 @@ if printf '%s\n%s\n' "$(gcc --version | head -n1 | cut -d" " -f4 | awk '{print $
     exit 1
 fi
 
-if printf '%s\n%s\n' "$(llc --version | grep -e 'LLVM version' | cut -d" " -f5 | awk '{print $NF}')" 3.9.0 | sort -CV; then
-    echo "Your LLVM version is less than the required 3.9.1"
+if [[ ! -f "/usr/bin/llvm-config-3.9" ]]; then
+    echo "LLVM version 3.9 needs to be installed"
     echo "See INSTALL-Ubuntu.md for information on how to install llvm"
     exit 1
 fi
@@ -41,17 +49,53 @@ if [[ ! -f "/usr/lib/libopenblas.a" ]]; then
     sudo apt-get install -y libopenblas-dev
 fi
 
-pushd "$SCRIPT_DIR"  >/dev/null
+pushd "$SCRIPT_DIR" > /dev/null
 # variable for build output
-build_dir=build
-echo "putting build in $build_dir folder, to clean, just delete the directory..."
+build_dir=$1
+if [[ -z "$build_dir" ]]; then
+    build_dir=build
+fi
+
+nproc=$2
+dailyclean=$3
+incremental="true"
+shift
+shift
+shift
+
+if [[ -d $build_dir ]]; then
+    if [ "${dailyclean}" = "true" ]; then
+        d="$(date +%d/%m/%Y)"
+        e=""
+        if [[ -f .lastbuild ]]; then
+            e="$(cat .lastbuild)"
+        fi
+        if [ ! "${d}" = "${e}" ]; then
+            echo forcing clean build by deleting ${build_dir}
+            rm -rf $build_dir
+            incremental="false"
+        fi
+        echo ${d} > .lastbuild
+    fi
+    if [ "${incremental}" = "true" ]; then
+        echo performing incremental build in ${build_dir}
+    fi
+fi
 
 if [[ ! -d $build_dir ]]; then
+    echo "putting build in $build_dir folder, to clean, just delete the directory..."
     mkdir -p $build_dir
 fi
 
-pushd $build_dir  >/dev/null
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j
-make -j _ELL_python
-popd >/dev/null
+set -x
+
+cmakeargs="$@"
+if [[ -z "${cmakeargs}" ]]; then
+    cmakeargs="-DCMAKE_BUILD_TYPE=Release .."
+fi
+
+pushd $build_dir > /dev/null
+cmake ${cmakeargs}
+make -j $nproc 
+make -j $nproc _ELL_python
+popd > /dev/null
