@@ -38,6 +38,9 @@ set(module_prefix)
 if(WIN32)
     # path to the OpenBLAS Nuget
     set(PACKAGE_ROOT "@ELL_ROOT@")
+else()
+    # SWIG has this GCC 7 warning.
+    add_compile_options("-Wno-psabi")    
 endif()
 include(OpenBLASSetup.cmake)
 

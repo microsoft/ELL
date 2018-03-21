@@ -39,11 +39,16 @@ from download_helper import download_file, download_and_extract_model
 from remoterunner import RemoteRunner
 import logger
 
+# possible values for the compile option.
+COMPILE_NONE=0
+COMPILE_INCREMENTAL=1
+COMPILE_FULL=2
+
 class DriveTest:
     def __init__(self, ipaddress=None, cluster=None, outdir=None, profile=False, 
             model=None, labels=None, target="pi3", target_dir="/home/pi/pi3", 
             username="pi", password="raspberry", iterations=1, expected=None, 
-            blas=True, compile=True, test=True, verbose=True, timeout=None):
+            blas=True, compile=COMPILE_INCREMENTAL, test=True, verbose=True, timeout=None):
         self.ipaddress = ipaddress
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)   
@@ -80,10 +85,10 @@ class DriveTest:
         self.test_dir = os.path.abspath(self.output_dir)
 
         if os.path.isdir(self.test_dir):
-            if self.compile:
+            if self.compile == COMPILE_FULL:
                 rmtree(self.test_dir)
         else:
-            if not self.compile:
+            if self.compile == COMPILE_NONE:
                 raise Exception("Test only usage requires outdir '{}' to exist already".format(self.output_dir))
             os.makedirs(self.test_dir)
 
@@ -146,10 +151,18 @@ class DriveTest:
             name,ext = os.path.splitext(ell_model)
             if ext.lower() == ".zip":
                 with zipfile.ZipFile(ell_model) as myzip:
-                    filename = myzip.extract(myzip.filelist[0], self.test_dir)
+                    extract = True
+                    for name in myzip.namelist():
+                        if os.path.splitext(name)[1] == ".ell":
+                            filename = os.path.join(self.test_dir, name)
+                            if os.path.isfile(filename) and os.path.getmtime(self.ell_model) < os.path.getmtime(filename):
+                                # already extracted and up to date.
+                                extract = False
+                    if extract:
+                        filename = myzip.extract(myzip.filelist[0], self.test_dir)
+                        self.logger.info("extracted: {}".format(filename))
 
                 if filename != "":
-                    self.logger.info("extracted: " + filename)
                     self.ell_model = filename
                 else:
                     # not a zip archive
@@ -171,12 +184,14 @@ class DriveTest:
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
         for path in filelist:
+            head, file_name = os.path.split(path)
+            dest = os.path.join(target_dir, file_name)
+            if os.path.isfile(dest) and os.path.getmtime(path) < os.path.getmtime(dest):
+                continue # this file already up to date
             if self.verbose:
                 self.logger.info("Copying file: " + path + " to " + target_dir)
             if not os.path.isfile(path):
                 raise Exception("expected file not found: " + path)
-            head, file_name = os.path.split(path)
-            dest = os.path.join(target_dir, file_name)
             copyfile(path, dest)
 
     def configure_runtest(self, dest):
@@ -211,10 +226,13 @@ class DriveTest:
             self.labels_file], self.output_dir)
         self.configure_runtest(self.output_dir)
 
+    def remove_bitcode(self):
         # avoid copying over bitcode files (as they are big)
         bitcode_files = self.find_files_with_extension(self.output_dir, "bc")
         for bitcode in bitcode_files:
-            os.remove(os.path.join(self.output_dir, bitcode))
+            bitcode_path = os.path.join(self.output_dir, bitcode)
+            if os.path.isfile(bitcode_path):
+                os.remove(bitcode_path)
 
     def get_default_model(self):
         """Downloads the default model"""
@@ -244,9 +262,18 @@ class DriveTest:
         self.get_default_labels()
         self.logger.info("using ELL model: " + self.model_name)
 
-    def make_project(self):
+    def wrap_project(self):
         """Creates a project for the model and target"""
-        if os.path.isdir(self.output_dir):
+        if os.path.isdir(self.output_dir):            
+            if self.compile == COMPILE_INCREMENTAL:
+                try:
+                    base_name = os.path.basename(self.ell_model)
+                    obj_file = os.path.join(self.output_dir, os.path.splitext(base_name)[0] + ".obj")
+                    if os.path.isfile(obj_file) and os.path.getmtime(self.ell_model) < os.path.getmtime(obj_file):
+                        self.logger.info("wrapped model already up to date")
+                        return # already up to date.
+                except:
+                    pass # model needs to be re-compiled then.
             rmtree(self.output_dir)
         sys.path.append(os.path.join(current_path, "../../wrap"))
         mpp = __import__("wrap")
@@ -298,9 +325,10 @@ class DriveTest:
         """Runs the test"""
         try:
             if self.compile:
-                self.get_model()
-                self.make_project()
+                self.get_model() 
+                self.wrap_project()
                 self.get_bash_files()
+                self.remove_bitcode()
 
             if self.test:
                 start_time = time.time()
