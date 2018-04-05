@@ -30,7 +30,7 @@ Complete the following steps before starting the tutorial.
 
 ## Activate your environment and create a tutorial directory
 
-After following the setup instructions, you'll have an environment named **py36**. Open a terminal window and activate your Anaconda environment.
+After following the setup instructions, you'll have an Anaconda environment named **py36**. Open a terminal window and activate your Anaconda environment.
 
 ```shell
 [Linux/macOS] source activate py36
@@ -41,7 +41,7 @@ Create a directory for this tutorial anywhere on your computer and `cd` into it.
 
 ## Download a pretrained model
 
-Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip) into the directory. The model file contains a pretrained Deep Neural Network for image classification and is one of the models available from the [ELL gallery](/ELL/gallery). (The file's long name indicates the Neural Network's architecture.) Save the file locally as **model.ell.zip**.
+Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip) into your directory. The model file contains a pretrained Deep Neural Network for image classification and is one of the models available from the [ELL gallery](/ELL/gallery). (The file's long name indicates the Neural Network's architecture.) Save the file locally as **model.ell.zip**.
 
 ```shell
 curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip
@@ -62,21 +62,21 @@ Rename the **d_I224x224x3CMCMCMCMCMCMC1AS.ell** model file to **model.ell**.
 [Windows] ren d_I224x224x3CMCMCMCMCMCMC1AS.ell model.ell
 ```
 
-Next, download the **categories.txt** file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) and save it in the directory.
+Next, download the **categories.txt** file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) and save it in your directory.
 
 ```shell
 curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt
 ```
 
-This file contains the names of the 1,000 categories that the model is trained to recognize. For example, if the model recognizes an object of category 504, you can read line 504 of the categories.txt file to find out that the name of the recognized category is "coffee mug."
+This file contains the names of the 1,000 categories that the model is trained to recognize. For example, if the model recognizes an object of category 504, read line 504 of the categories.txt file to find out that the name of the recognized category is "coffee mug."
 
-There should now be a **model.ell** file and a **categories.txt** file in the directory.
+There should now be a **model.ell** file and a **categories.txt** file in your directory.
 
 ## Compile and run the model on your laptop or desktop computer
 
-Before deploying the model to the Raspberry Pi device, practice deploying it to the laptop or desktop computer. Deploying an ELL model requires two steps. First, you'll run the **wrap** tool, which both compiles the `model.ell` into machine code and generates a CMake project to build a Python wrapper for it. Second, you'll call **CMake** to build the Python library.
+Before deploying the model to the Raspberry Pi device, practice deploying it to the laptop or desktop computer. Deploying an ELL model requires two steps. First, you'll run the **wrap** tool, which compiles `model.ell` into machine code and generates a CMake project that builds a Python wrapper for it. Then, you'll call **CMake** to build that Python wrapper.
 
-Run **wrap** as follows. Replace `<ELL-root>` with the path to the location where you have cloned ELL, as described in the installation instructions for your platform.
+Run **wrap** as follows, replacing `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
 
 ```shell
 python <ELL-root>/tools/wrap/wrap.py model.ell --language python --target host
@@ -100,7 +100,7 @@ mkdir build
 cd build
 ```
 
-To finish creating the Python wrapper, build the CMake project.
+Finally, use CMake to finish building the Python wrapper.
 
 ```shell
 [Linux/macOS] cmake .. -DCMAKE_BUILD_TYPE=Release && make && cd ../..
@@ -111,16 +111,14 @@ This creates a Python module named **model**. This module provides functions tha
 
 ## Invoke the model on your computer
 
-The next step is to create a Python script that loads the model, sends images to it, and interprets the model's output. (You can view the full script [here](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/call_model.py).) Create an empty text file named **call_model.py** and copy in the code snippets below.
-
-Before writing the script that will use the compiled model, copy over some Python helper code.
+The next step is to create a Python script that loads the model, sends images to it, and interprets the model's output. (You can view the full script [here](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/call_model.py).) Before creating this script, copy over some Python helper code.
 
 ```shell
 [Linux/macOS] cp <ELL-root>/docs/tutorials/shared/tutorial_helpers.py .
 [Windows] copy <ELL-root>\docs\tutorials\shared\tutorial_helpers.py .
 ```
 
-Import a few dependencies and add directories to the path, to allow Python to find the module that you created, above.
+Create an empty text file named **call_model.py** and copy in the code snippets below. First, import a few dependencies.
 
 ```python
 import cv2
@@ -129,7 +127,7 @@ import numpy as np
 
 Import the helper code that you copied over. 
 
-**Note** You must do this before importing  the model because it helps find the requisite compiled model files.
+**Note** Do this before importing the model because it helps find the requisite compiled model files.
 
 ```python
 import tutorial_helpers as helpers
@@ -181,15 +179,15 @@ Invoke the model by calling its **predict** method.
 predictions = model.predict(input_data)
 ```
 
-The `predict` method returns a `predictions` array with non-negative scores that sum to 1. Each element of this array corresponds to one of the 1,000 image classes recognized by the model. Print the index of the highest confidence category.
+The `predict` method returns a `predictions` array with non-negative scores that sum to 1. Each element of this array corresponds to one of the 1000 image categories recognized by the model and represents the model's confidence that the image contains an object from that category. For example, recall that category 504 is **coffee mug** - the value of `predictions[504]` is the model's confidence that the image contains a coffee mug. 
+
+Print the index of the highest confidence category.
 
 ```python
 prediction_index = int(np.argmax(predictions))
 print("Category index: {}".format(prediction_index))
 print("Confidence: {}".format(predictions[prediction_index]))
 ```
-
-This code also looks up the category name in the **categories** array. For example, assume that the highest confidence category is category 504. The string in `categories[504]` is the name of category 504, which is **coffee mug**. Thus, the value at `predictions[504]` is the model's confidence that the image contains a coffee mug.
 
 ## Compile the model for execution on the Raspberry Pi device
 
@@ -204,7 +202,7 @@ As before, run the **wrap** tool on your laptop or desktop computer, but this ti
 python <ELL-root>/tools/wrap/wrap.py model.ell --language python --target pi3
 ```
 
-The **wrap** tool creates a new directory named **pi3**, which contains a CMake project that can be used to build the desired Python module. This time, you need to build this project on the Raspberry Pi.
+The **wrap** tool creates a new directory named **pi3**, which contains a CMake project that can be used to build the desired Python module. Don't build this project yet - this time, you need to build this project on the Raspberry Pi.
 
 **Note**: To speed up the transfer of files to the Raspberry Pi,  delete the model.ell file first before copying the folder.
 
@@ -217,9 +215,9 @@ Now, there's a **pi3** directory that contains a CMake project that builds the P
 
 ## Write code to invoke the model on the Raspberry Pi device
 
-Next, you'll write a Python script that invokes the model and runs the demo on the Raspberry Pi device. The script loads the Python wrapper that you created, read images from the camera, pass these images to the model, and display the classification results. If you just want the full script, copy it from [here](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/tutorial.py). Otherwise, create an empty text file named **tutorial.py** and copy in the code snippets below.
+Next, you'll write a Python script that invokes the model on the Raspberry Pi device. The script loads the Python wrapper that you created, reads images from the camera, passes these images to the model, and displays the classification results. If you just want the full script, copy it from [here](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/tutorial.py). Otherwise, create an empty text file named **tutorial.py** and copy in the code snippets below.
 
-First, import a few dependencies, including system utilities, OpenCV, and NumPy.
+First, import a few dependencies.
 
 ```python
 import sys
@@ -230,7 +228,7 @@ import cv2
 
 Import the helper code that you copied over. 
 
-**Note** You must do this before importing the model because it helps find the requisite compiled model files.
+**Note** The helper code helps find the compiled model files, so make sure to import it before importing the model. 
 
 ```python
 import tutorial_helpers as helpers
@@ -322,7 +320,7 @@ if __name__ == "__main__":
 
 ## Build the Python module on the Raspberry Pi
 
-For this step, you'll be working with your the Raspberry Pi device. If your Pi device is accessible over the network, you can copy the directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
+For this step, you'll be working with your the Raspberry Pi device. If your Pi device is accessible over the network, copy the directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
 Log in to your Raspberry Pi, find the directory you just copied from your computer, and build the python module that wraps the ELL model.
 
@@ -339,7 +337,7 @@ You just created a Python module named **model**, which includes functions that 
 
 ## Classify live video on the Raspberry Pi device
 
-After following the [Raspberry Pi setup instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you'll have an environment named **py36.** Open a terminal window, and activate your Anaconda environment, and run the script that you wrote above.
+After following the [Raspberry Pi setup instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you'll have an Anaconda environment named **py36.** Open a terminal window, and activate your Anaconda environment, and run the script that you wrote above.
 
 ```shell
 source activate py34
@@ -357,6 +355,6 @@ To learn more about how the **wrap** tool works, read the [wrap documentation](h
 
 ## Troubleshooting
 
-**Image processing is slow.** You might notice that the average time it takes the model to process each image is slower than indicated in  the [ELL gallery](/ELL/gallery/). This is because the Python wrapper adds some overhead compared to calling ELL from C++. To run the model at its top speed, follow the [C++ version of this tutorial](/ELL/tutorials/Getting-started-with-image-classification-in-cpp).
+**Image processing is slow.** You might notice that the average time it takes the model to process each image is slower than indicated in  the [ELL gallery](/ELL/gallery/). This is because the Python wrapper adds some overhead that slows the model down. To run the model at its top speed, follow the [C++ version of this tutorial](/ELL/tutorials/Getting-started-with-image-classification-in-cpp).
 
 **Look for more troubleshooting tips** at the end of the [Raspberry Pi setup instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).

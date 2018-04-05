@@ -46,7 +46,7 @@ Finally, you'll write a simple Python script that captures audio from the Raspbe
 
 ## Activate your environment and create a tutorial directory
 
-After following the setup instructions, you'll have an environment named **py36** on your laptop or desktop computer. 
+After following the setup instructions, you'll have an Anaconda environment named **py36** on your laptop or desktop computer. 
 On your computer, open a terminal window and activate your Anaconda environment.
 
 
@@ -99,7 +99,7 @@ Before deploying the model to the Raspberry Pi device, practice deploying it to 
 Deploying an ELL model requires two steps. First, you'll run the **wrap** tool, which both compiles the `featurizer_16k.ell` and `classifier_16k.ell` models into machine code and generates a CMake project to build a Python wrapper for it. 
 Second, you'll call **CMake** to build the Python library.
 
-Run **wrap** as follows. Replace `<ELL-root>` with the path to the location where you have cloned and built ELL, as described in the installation instructions for your platform.
+Run **wrap** as follows, replacing `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
 
 ```shell
 python <ELL-root>/tools/wrap/wrap.py featurizer_16k.ell --target host --outdir featurizer_16k --module_name mfcc

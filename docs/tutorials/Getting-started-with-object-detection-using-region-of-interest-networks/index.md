@@ -57,11 +57,7 @@ curl --location -o model.weights https://pjreddie.com/media/files/tiny-yolo-voc.
 curl --location -o categories.txt https://raw.githubusercontent.com/pjreddie/darknet/master/data/voc.names
 ```
 
-Next, import the Darknet model into ELL by running `darknet_import.py`. From
-the root of the ELL repository, run the following command.
-
-**Note** Replace `<ELL-root>` with the path to the location where you have
-cloned ELL, as described in the installation instructions for your platform.
+Next, import the Darknet model into ELL by running `darknet_import.py`, replacing `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
 
 ```shell
 python <ELL-root>/tools/importers/darknet/darknet_import.py model.cfg model.weights
@@ -187,7 +183,7 @@ def main():
     camera = cv2.VideoCapture(0)
 ```
 
-Read the list of categories from `categories.txt`.
+The argument **0** in the function call above selects the default camera. If you have more than one camera connected to your Pi device, choose which camera to use by changing this argument. Read the list of categories from `categories.txt`.
 
 ```python
     with open("categories.txt", "r") as categories_file:
@@ -287,10 +283,7 @@ if __name__ == "__main__":
 
 ## Detect and classify objects in live video on the Raspberry Pi device
 
-If you set up your device using the
-[Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi),
-you have an anaconda environment named `py34`. Activate the environment and run
-the script.
+If you set up your device using the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an Anaconda environment named `py34`. Activate this environment and run the script.
 
 ```shell
 source activate py34

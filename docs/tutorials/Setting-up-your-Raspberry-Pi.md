@@ -8,23 +8,25 @@ permalink: /tutorials/Setting-up-your-Raspberry-Pi
 
 *by Chris Lovett and Ofer Dekel*
 
-Most Embedded Learning Library (ELL) tutorials follow a common workflow, including authoring and designing an ELL model on a laptop or desktop computer and then deploying the ELL model and invoking it on the Raspberry Pi device. This means that you'll need to set up your computer and your Pi appropriately before starting any of the ELL tutorials. 
+Most Embedded Learning Library (ELL) tutorials follow a common workflow. You typically start by designing an ELL model on a laptop or desktop computer. Then, you transition to your Raspberry Pi device to compile and run your application. This means that you'll need to set up your computer and your Pi appropriately before starting any of the ELL tutorials. 
 
-This tutorial provides step-by-step instructions for setting up your Pi device. Find setup information for your computer here:
+Find setup instructions for your computer here:
 
 * [Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md)
 * [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md)
 * [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)
 
+This tutorial provides step-by-step instructions for setting up your Raspberry Pi device. 
+
 ## Adapters, cables, and software for your Raspberry Pi device
 
 * **Power adapter and power cable.** AI workloads use a lot of power, so be sure to use a high quality power supply. If you use a USB power adapter and micro-USB cable, choose an adapter rated for at least 12 watts (2.4 Amps) per USB port. Suggested models include 12-watt USB power adapters from Apple, Anker, and Amazon Basics. 
 
-   Avoid long and thin micro-USB cables because using them will often create a noticeable voltage drop and they may fail to provide sufficient power to the Raspberry Pi device. The adapters recommended, above, cost a bit more but will be more reliable.
+Avoid long and thin micro-USB cables because using them will often create a noticeable voltage drop and they may fail to provide sufficient power to the Raspberry Pi device. 
 
-* **Operating system**. These tutorials a work best with the Raspbian Jessie ([NOOBS](https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2017-07-05/) or [image](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/)) operating system for Raspberry Pi devices. Do not use the Raspbian Stretch operating system for these tutorials.
+* **Operating system**. These tutorials work best with the Raspbian Jessie ([NOOBS](https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2017-07-05/) or [image](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/)) operating system for Raspberry Pi devices. Do not use the Raspbian Stretch operating system for these tutorials.
 
-* **Networking**. You'll use a network  to download required software to the Pi and to transfer compiled ELL models from your computer to the Pi. Connect your Pi to your network, either over Wifi or with an Ethernet cable. 
+* **Network**. You'll use a network  to download required software to the Pi and to transfer compiled ELL models from your computer to the Pi. Connect your Pi to your network, either over Wifi or with an Ethernet cable. 
 
 * **Pi Camera** By default, OpenCV can read images from a USB webcam, but not from the Raspberry Pi camera. To enable the Pi camera, first make sure that the camera interface is enabled by running the Pi configuration tool.
 
@@ -38,8 +40,7 @@ sudo raspi-config
 sudo modprobe bcm2835-v4l2
 ```
 
-* **Secure Shell (SSH)** The tutorials require copying files to run on the Pi device. A typical way to copy files to the Pi is to use SSH tools, such as the Unix **scp** tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
-To enable SSH on your Pi, run the Pi configuration tool.
+* **Secure Shell (SSH)** The tutorials require you to copy files to the Raspberry Pi device. A typical way to copy files to the Pi is to use an SSH tool, such as the Unix **scp** tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool. To enable SSH on your Pi, run the Pi configuration tool.
 ```shell
 sudo raspi-config
 ```
@@ -80,12 +81,12 @@ source activate py34
 Remember to run `source activate py34` each time you start a new terminal window.
 
 * **[OpenCV](http://opencv.org/)** 
- is a computer vision library that makes it possible to read images from a camera, resize them, and prepare them for processing by ELL. To install OpenCV, type the following.
+ is a computer vision library that makes it easy to read images from a camera, resize them, and prepare them for processing by ELL. To install OpenCV, type the following.
 ```shell
 conda install -c microsoft-ell opencv -y
 ```
 
-* **C++ OpenCV SDK** To run the C++ tutorials, you also need the C++ OpenCV SDK, which you can install on your Raspberry Pi using the following command.
+* **C++ OpenCV SDK** If you intend to run the C++ tutorials, you also need the C++ OpenCV SDK, which you can install on your Raspberry Pi using the following command.
 ```shell
 sudo apt-get install -y libopencv-dev
 ```
@@ -96,10 +97,10 @@ Raspberry Pi devices weren't designed to run AI workloads. Many AI workloads, li
 
 ### Disable Energy Star and Screensaver
 
-Edit the file `~/.config/lxsession/LXDE-pi/autostart`, for example, by typing the following. (If you are using SSH terminal window use 'nano' instead of 'leafpad'.)
+Edit the file `~/.config/lxsession/LXDE-pi/autostart`, for example, by typing the following.
 
 ```shell
-leafpad ~/.config/lxsession/LXDE-pi/autostart
+nano ~/.config/lxsession/LXDE-pi/autostart
 ```
 
 Add the following lines to this file.
@@ -117,7 +118,7 @@ The first line disables Energy Star and the next two lines disable the screensav
 The Raspberry Pi supports dynamic clocking, which means that it can change the processor frequency according to processor load. You can check the range of processor frequencies that your Raspberry Pi is configured for by typing `lscpu`. To disable dynamic clocking, edit `/boot/config.txt`, for example, by typing the following. 
 
 ```shell
-sudo leafpad /boot/config.txt
+sudo nano /boot/config.txt
 ```
 
 Add the setting.
@@ -134,12 +135,12 @@ Computation produces heat. Even at the default processor frequency of 700 megahe
 
 If you do fit your Pi with an active cooling attachment, you can also increase the processor frequency (overclocking) without overheating. 
 
-**Warning** Overclocking your Raspberry Pi can void your warranty. You might experience issues when overclocking your Raspberry Pi device, such as freezing up or losing USB peripheral connections.
+**Warning** Overclocking your Raspberry Pi will void your warranty. Overclocking might cause your Raspberry Pi to freeze or lose USB peripheral connections. Proceed at your own risk. 
 
 To change your processor frequency, edit `/boot/config.txt`, for example, by typing the following.
 
 ```shell
-sudo leafpad /boot/config.txt
+sudo nano /boot/config.txt
 ```
 
 The default processor speed is 700 MHz. To underclock your processor, add the setting
@@ -171,15 +172,15 @@ temp_limit=75
 
 **ImportError: libavcodec.so.56: cannot open shared object file: No such file or directory**
 
-If you do not have the built-in **libavcodec.so.56**, you are probably running a newer version of Raspbian. These tutorials currently require Raspbian Jessie.
+If you do not have the built-in **libavcodec.so.56**, you are probably running a newer version of Raspbian. The ELL tutorials currently require Raspbian Jessie.
 
 
 **ImportError: No module named 'numpy'**
 
 You probably forgot to activate your Miniconda environment using `source activate py34`. See `Miniconda` instructions above.
 
-**(ELL model:18037): Gtk-WARNING **: cannot open display**
+**Gtk-WARNING : cannot open display**
 
 You are probably trying to use OpenCV from an SSH terminal window. You must tell OpenCV which display to use with the command `export DISPLAY=:0`. 
 
-Many of our tutorials also expect keyboard input to terminate the demo. From SSH you can stop the program from the command line by typing `CTRL+C`.
+Note that many of the tutorial scripts terminate when they receive keyboard input - to terminate a script over SSH, type `CTRL+C`.

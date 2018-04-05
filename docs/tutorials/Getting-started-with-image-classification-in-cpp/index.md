@@ -15,10 +15,11 @@ This tutorial guides you through the process of getting started with image class
 
 ## Before you begin
 
-For best results, complete the following steps before starting the tutorial.
+Complete the following steps before starting the tutorial.
 * Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). 
 
-**Note** Python is required to run the **wrap.py** tool, which makes compilation easy. If you prefer not to use it, you can perform the compilation steps manually, as described in the [wrap tool documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
+**Note** The **wrap.py** tool, which simplifies the process of compiling ELL models, is written in **Python**. If you prefer not to use it, you can perform the compilation steps manually, as described in the [wrap tool documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
+
 * Follow the instructions for [setting up your Raspberry Pi device](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 * Optional: read  the instructions in [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/).
 
@@ -35,7 +36,7 @@ Create a directory for this tutorial anywhere on your computer and `cd` into it.
 
 ## Download a pretrained model
 
-Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip) into the directory. The model file contains a pretrained Deep Neural Network for image classification and is one of the models available from the [ELL gallery](/ELL/gallery). (The file's long name indicates the Neural Network's architecture.) Save the file locally as **model.ell.zip**.
+Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip) into your directory. The model file contains a pretrained Deep Neural Network for image classification and is one of the models available from the [ELL gallery](/ELL/gallery). (The file's long name indicates the Neural Network's architecture.) Save the file locally as **model.ell.zip**.
 
 ```shell
 curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip
@@ -56,7 +57,7 @@ Then, rename it.
 [Windows] ren d_I224x224x3CMCMCMCMCMCMC1AS.ell model.ell
 ```
 
-Next, download the **categories.txt** file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) and save it in the directory.
+Next, download the **categories.txt** file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) and save it in your directory.
 
 ```shell
 curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt
@@ -64,19 +65,17 @@ curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/ma
 
 This file contains the names of the 1,000 categories that the model is trained to recognize. For example, if the model recognizes an object of category 504, you can read line 504 of the **categories.txt** file to find out that the name of the recognized category is "coffee mug."
 
-The **model.ell** file and a **categories.txt** file are now in the directory.
+The **model.ell** file and a **categories.txt** file are now in your directory.
 
 ## Compile the model
 
-Deploying an ELL model to the Raspberry Pi using C++ requires two steps. First, the ELL compiler compiles `model.ell` into machine code. Next, you prepare to wrap the compiled model in a CMake project. The result of this step is a special CMake project that contains all of the configurations and settings needed to compile and link the ELL model into a demo executable.
-
-These steps are performed by the **wrap** tool. Run **wrap** as follows, replacing `<ELL-root>` with the path to the location where you have cloned ELL, as described in the installation instructions for your platform.
+Deploying an ELL model to the Raspberry Pi using C++ requires two steps. First, the ELL compiler compiles `model.ell` into machine code. Next, you create a special CMake project that contains all of the configurations and settings needed to compile and link the ELL model into an application. Both of these steps are performed by the **wrap** tool. Run **wrap** as follows, replacing `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
 
 ```shell
 python <ELL-root>/tools/wrap/wrap.py model.ell --language cpp --target pi3 --outdir model
 ```
 
-The **wrap** command line option **--target pi3** tells it to generate machine code for execution on the Raspberry Pi device. The **--outdir model** option  tells the **wrap** tool to put the output files in a directory named **model**. After that, you'll see the following output.
+The command line option **--target pi3** tells **wrap** to generate machine code for execution on the Raspberry Pi device. The **--outdir model** option tells **wrap** to put the output files in a directory named **model**. After running **wrap**, you'll see the following output.
 
 ```
     compiling model...
@@ -104,9 +103,9 @@ Now, you have a directory that contains the **categories.txt** file, helper C++ 
 
 ## Call the model from a C++ application
 
-You'll write a C++ application that invokes the model and then you'll run the demo on a Raspberry Pi device. The application will read images from the camera, pass them to the model directory, and display the results. Either copy the complete code from [here](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/tutorial.cpp) or create an empty text file  (**tutorial.cpp**) in the directory and copy in the code snippets below.
+You'll write a C++ application that invokes the model on a Raspberry Pi device. The application will read images from the camera, pass them to the model directory, and display the results. Either copy the complete code from [here](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/tutorial.cpp) or create an empty text file  (**tutorial.cpp**) in the directory and copy in the code snippets below.
 
-First, add the required include statements. ELL code depends on some **STL** libraries and on the **OpenCV** library.
+First, add the required include statements. ELL code depends on some standard libraries and on **OpenCV**.
 
 ```cpp
 #include <stdio.h>
@@ -271,7 +270,7 @@ target_link_libraries(tutorial ${OpenCV_LIBS} model)
 
 For the step, you'll be working with your the Raspberry Pi device. If your Pi device is accessible over the network, you can copy the directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
-Next, log on to your Raspberry Pi device, find the directory you just copied over, and build the CMake project.
+Log in to your Raspberry Pi, find the directory you just copied from your computer, and build the CMake project.
 
 ```shell
 mkdir build
@@ -289,7 +288,7 @@ Make sure that a camera is connected to your Pi device and run the application.
 ./build/tutorial
 ```
 
-You'll see a window similar to the screenshot that is at the beginning of this tutorial. Point your camera at different objects and see how the model classifies them. Look at categories.txt file to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen or phone and have your computer display images of different objects. For example, experiment with different dog breeds and other types of animals.
+You'll see a window similar to the screenshot that appears at the beginning of this tutorial. Point your camera at different objects and see how the model classifies them. Look at categories.txt file to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and other types of animals.
 
 If you copied the full **tutorial.cpp** file from [here](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/tutorial.cpp), you will also see the average time (in milliseconds) it takes the model to process a frame.
 

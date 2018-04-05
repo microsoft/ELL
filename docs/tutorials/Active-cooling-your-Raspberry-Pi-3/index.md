@@ -8,7 +8,6 @@ permalink: /tutorials/Active-cooling-your-Raspberry-Pi-3/
 
 *by Ofer Dekel and Spencer Persaud*
 
-
 Raspberry Pi 3 devices tend to overheat when they run prolonged heavy loads. When the processor's internal temperature approaches 85 degrees Celsius, it protects itself by downclocking or shutting down completely. This can adversely affect performance of AI models.
 
 ![Idle RPi3 heatmap](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Pi-3-IR.jpg)
@@ -43,8 +42,6 @@ As shown in Figure 3, attach the fan to the fan mount using the screws and nuts 
 
 Next, attach the fan mount to the Pi circuit board using the two M2.5 x 12 machine screws and nuts. 
 
-**Note** If your were not able to print standoffs, add  nylon spacers or standoffs to lift the plastic mount off of the Pi circuit board.
-
 Now, you can stick the heat sink on the processor. **You must align the heat sink fins with the air flow from the fan**.
 
 Finally, plug the fan into the 5V and ground pins on the Pi. Figure 4 shows the completed assembly.
@@ -55,9 +52,7 @@ Finally, plug the fan into the 5V and ground pins on the Pi. Figure 4 shows the 
 
 ## Optional: mount the active cooling system on the Raspberry Pi 7-inch Touchscreen Display
 
-Many active cooling solutions for the Raspberry Pi available online come in the form of an active cooling enclosure or case. While some of these work well, sometimes you don't want to enclose the Pi device in a case. This active cooling solution is compatible with the 7-inch touchscreen display. 
-
-If you choose the touchscreen display, use the M2.5 x 12 screws to attach directly into the M2.5 standoffs that come with the display.
+Other active cooling solutions for the Raspberry Pi come in the form of an active cooling enclosure or case. While some of these work well, it isn't always convenient to enclose the Pi in a case. For example, an enclosed Pi cannot be mounted on the back of the Raspberry Pi 7-inch touchscreen display. This active cooling solution can be used with the touchscreen display, by screwing the M2.5 x 12 screws directly into the M2.5 standoffs that come with the display.
 
 ![Pi with Fan on Display](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Pi-with-Fan-on-Display.jpg)
 
@@ -65,14 +60,12 @@ If you choose the touchscreen display, use the M2.5 x 12 screws to attach direct
 
 ## Results
 
-Although it may be possible to cool the Pi using only a heat sink (no fan), this approach is often insufficient. ELL team members ran the following stress tests, running all four cores at 100% and measuring the processor temperature as it heats up. The experiment was conducted in an air conditioned office (room temperature was about 26 degrees Celsius) and repeated using four different configurations:
+Although it may be possible to cool the Pi using only a heat sink (no fan), this approach is often insufficient. The plot below shows how the processor core temperature increases over time, when all four cores are at 100% load. The experiment was conducted in an air conditioned office (room temperature was about 26 degrees Celsius) and repeated in four different configurations:
 
 * `none` - no cooling at all, just a Raspberry Pi device as-is
 * `heat sink` - heat sink on the processor, fan turned off
 * `fan` - fan mounted on the Raspberry Pi using the ELL fan mount, blowing air on the bare processor (no heat sink)
 * `both` - the full cooling solution, as described above, with both fan and heat sink
-
-The following table shows the results.
 
 <div id='plot'></div>
 <script>
@@ -92,7 +85,7 @@ var spec = {
 vegaEmbed("#plot", spec, {actions:false})
 </script>
 
-The x-axis represents time in seconds and the y-axis represents the processor temperature in Celsius. The measurement starts with the idle processor temperature, and the stress test begins after 20 seconds. You can pan and zoom in and out to examine the results.
+The x-axis represents time in seconds and the y-axis represents the processor temperature in degrees Celsius. The measurement starts with the idle processor temperature, and the stress test begins after 20 seconds. You can pan and zoom in and out to examine the results.
 
 The `none` configuration quickly overheats. Within a few minutes, the processor temperature hits 85 degrees, the temperature at which the processor starts protecting itself by throttling down its frequency. The passive cooling configuration, `heat sink`, isn't much better. At first, the heat sink absorbs some of the heat, causing the processor temperature to rise more slowly. However, the heat sink struggles to dissipate that heat and the processor temperature gradually climbs into the 70s. The passive heat sink prevented the processor from reaching the critical temperature of 85 degrees, but came too close for comfort. Processor temperature depends on many factors, such as ambient temperature, processor load, and processor frequency. Moreover, each Raspberry Pi unit behaves differently. 
 

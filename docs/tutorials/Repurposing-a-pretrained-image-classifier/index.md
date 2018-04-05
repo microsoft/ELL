@@ -27,8 +27,6 @@ Complete the following steps before starting the tutorial.
 * Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
 * Optional: If you want to run this on a Raspberry Pi, follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 
-**Note** In this tutorial, where `<ELL-root>` is specified, use the path to the location where you have cloned ELL. (For more information, refer to the installation instructions for your platform.)
-
 ## What you will need
 
 * Laptop or desktop computer
@@ -39,7 +37,7 @@ Optional items include the following:
 
 ## Activate your environment and create a tutorial directory
 
-After following the setup instructions, you  have an environment named **py36**. Open a terminal window and activate your Anaconda environment.
+After following the setup instructions, you  have an Anaconda environment named **py36**. Open a terminal window and activate your Anaconda environment.
 
 ```shell
 [Linux/macOS] source activate py36
@@ -111,7 +109,7 @@ data
 ```
 **Note** Make sure that you have the appropriate rights or licensing to use the images in your datasets. If you use a search engine like Bing or Google, filter on the license type that makes sense for your situation.
 
-After you have the images in the appropriate folder structure, you are ready to use the [datasetsFromImages](https://github.com/Microsoft/ELL/blob/master/tools/utilities/datasetFromImages/README.md) Python tool to create our training and validation datasets with the `--folder` option:
+After you have the images in the appropriate folder structure, you are ready to use the [datasetsFromImages](https://github.com/Microsoft/ELL/blob/master/tools/utilities/datasetFromImages/README.md) Python tool to create our training and validation datasets with the `--folder` option. Make sure to replace `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
 
 ```shell
 python <ELL-root>/tools/utilities/datasetFromImages/datasetFromImages.py --imageSize 64x64 --outputDataset fruit_train.gsdf --folder data/fruit/train
@@ -300,7 +298,9 @@ import numpy as np
 import tutorial_helpers as helpers
 ```
 
-Import the helper code that you copied. Note that you must do this before you import the model because it helps find the requisite compiled model files.
+Import the helper code that you copied over. 
+
+**Note** The helper code helps find the compiled model files, so make sure to import it before importing the model. 
 
 ```python
 import tutorial_helpers as helpers
@@ -312,7 +312,7 @@ Import the Python wrapper for the compiled ELL model.
 import model
 ```
 
-In order to process the validation set, you will use the main ELL Python module. Rather than copying it, use the `find_ell` helper module to find it. To use it, first add it to your Python system path. Replace <ELL-root> appropriately.
+The main ELL Python module includes functionality that makes it easier to process the dataset. Rather than copying this module, use the `find_ell` helper module to find it. Add the correct path to your Python system path, making sure to replace `<ELL-root>` appropriately.
 
 ```python
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '<ELL-root>/tools/utilities/pythonlibs'))

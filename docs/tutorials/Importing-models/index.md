@@ -12,8 +12,7 @@ The [Embedded Learning Library (ELL) gallery](/ELL/gallery/) includes different 
 
 ---
 ## Before you begin
-For best results, complete the following steps before starting the tutorial.
-
+Complete the following steps before starting the tutorial.
 * Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
 * To import a model from the CNTK file format, you must install the [CNTK python packages](https://docs.microsoft.com/en-us/cognitive-toolkit/setup-cntk-on-your-machine).
 

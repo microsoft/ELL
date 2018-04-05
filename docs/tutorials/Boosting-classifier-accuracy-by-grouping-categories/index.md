@@ -99,8 +99,7 @@ Define the main entry point and start the camera.
 def main():
     camera = cv2.VideoCapture(0)
 ```
-
-Read the list of dog breed categories from `dogs.txt`, and the list of cat breed categories from `cats.txt`.
+The argument **0** in the function call above selects the default camera. If you have more than one camera connected to your Pi device, choose which camera to use by changing this argument. Read the list of dog breed categories from `dogs.txt`, and the list of cat breed categories from `cats.txt`.
 
 ```python
     with open("dogs.txt", "r") as dogs_file,\
@@ -174,7 +173,7 @@ if __name__ == "__main__":
 
 ## Classify live video on the Raspberry Pi device
 
-By following the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you now have an anaconda environment named `py34`. Activate the environment and run the script.
+By following the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should now have an Anaconda environment named `py34`. Activate this environment and run the script.
 
 ```shell
 source activate py34
