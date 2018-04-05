@@ -35,6 +35,7 @@ try:
 
     sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
     sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs/vision'))
+    sys.path.append(os.path.join(script_path, '../..'))
     sys.path.append(os.path.join(script_path, '..'))
     from cntk.initializer import glorot_uniform, he_normal
     from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout,\

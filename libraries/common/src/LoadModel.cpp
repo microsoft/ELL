@@ -15,11 +15,13 @@
 #include "OutputNode.h"
 
 // nodes
+#include "AccumulatorNode.h"
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
 #include "BroadcastFunctionNode.h"
 #include "BufferNode.h"
 #include "ClockNode.h"
+#include "ConcatenationNode.h"
 #include "DCTNode.h"
 #include "DiagonalConvolutionNode.h"
 #include "ClockNode.h"
@@ -123,6 +125,12 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ClockNode>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<int64_t>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<int>>();

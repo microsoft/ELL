@@ -36,7 +36,7 @@ def ell_map_from_float_predictor(predictor, step_interval_msec=0, lag_threshold_
 
         if function_prefix:
             if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", function_prefix):
-                raise Exception("function_prefix is not a valid python Name: " + prefix)
+                raise Exception("function_prefix is not a valid python Name: " + function_prefix)
             function_prefix = function_prefix + '_'
 
         inputNode = builder.AddInputNode(
@@ -73,7 +73,6 @@ def ell_map_from_float_predictor(predictor, step_interval_msec=0, lag_threshold_
 
     return ell_map
 
-
 def ell_map_from_double_predictor(predictor, step_interval_msec=0, lag_threshold_msec=0,
     function_prefix=""):
     """Wraps an ell.DoubleNeuralNetworkPredictor into an ell.model.Map
@@ -97,7 +96,7 @@ def ell_map_from_double_predictor(predictor, step_interval_msec=0, lag_threshold
 
         if function_prefix:
             if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", function_prefix):
-                raise Exception("function_prefix is not a valid python Name: " + prefix)
+                raise Exception("function_prefix is not a valid python Name: " + function_prefix)
             function_prefix = function_prefix + '_'
 
         inputNode = builder.AddInputNode(
@@ -118,6 +117,61 @@ def ell_map_from_double_predictor(predictor, step_interval_msec=0, lag_threshold
             model, ell.math.DoubleVector([1.0]), ell.nodes.PortType.boolean)
         sinkNode = builder.AddSinkNode(
             model, ell.nodes.PortElements(nnNode.GetOutputPort("output")),
+            ell.nodes.PortElements(conditionNode.GetOutputPort("output")),
+            outputShape,
+            "{}OutputCallback".format(function_prefix))
+
+        outputNode = builder.AddOutputNode(
+            model, outputShape, ell.nodes.PortElements(sinkNode.GetOutputPort("output")))
+
+        ell_map = ell.model.Map(model, inputNode, 
+            ell.nodes.PortElements(outputNode.GetOutputPort("output")))
+
+    except:
+        print("Error occurrred attempting to wrap ELL predictor in ELL model")
+        traceback.print_exc()
+
+    return ell_map
+
+def ell_map_from_float_model(model, model_input_node, input_shape, model_output_node, output_shape, step_interval_msec=0, lag_threshold_msec=0,
+    function_prefix=""):
+    """Wraps an ell.FloatNeuralNetworkPredictor into an ell.model.Map
+
+    Optional parameters:
+       step_interval_msec - step interval for the model (set 0 for no interval)
+       lag_threshold_msec - how long to fall behind before sending a lag 
+                            callback (applies when step_interval_msec > 0)
+       function_prefix - the prefix for function names
+    """
+    
+    ell_map = None
+
+    try:
+        builder = ell.model.ModelBuilder()
+        inputShape = input_shape
+        outputShape = output_shape
+        inputNode = None
+        outputNode = None
+
+        if function_prefix:
+            if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", function_prefix):
+                raise Exception("function_prefix is not a valid python Name: " + prefix)
+            function_prefix = function_prefix + '_'
+
+        inputNode = model_input_node
+        clockNode = builder.AddClockNode(
+            model, ell.nodes.PortElements(inputNode.GetOutputPort("output")),
+            float(step_interval_msec), float(lag_threshold_msec),
+            "{}LagNotification".format(function_prefix))
+        sourceNode = builder.AddSourceNode(
+            model, ell.nodes.PortElements(clockNode.GetOutputPort("output")),
+            ell.nodes.PortType.smallReal, inputShape,
+            "{}InputCallback".format(function_prefix))
+        # add a sink node that always triggers
+        conditionNode = builder.AddConstantNode(
+            model, ell.math.DoubleVector([1.0]), ell.nodes.PortType.boolean)
+        sinkNode = builder.AddSinkNode(
+            model, ell.nodes.PortElements(model_output_node.GetOutputPort("output")),
             ell.nodes.PortElements(conditionNode.GetOutputPort("output")),
             outputShape,
             "{}OutputCallback".format(function_prefix))

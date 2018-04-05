@@ -34,6 +34,7 @@
 #include "BinaryOperationNode.h"
 #include "BufferNode.h"
 #include "ClockNode.h"
+#include "ConcatenationNode.h"
 #include "DCTNode.h"
 #include "FFTNode.h"
 #include "FilterBankNode.h"
@@ -41,6 +42,7 @@
 #include "IIRFilterNode.h"
 #include "InputNodeBase.h"
 #include "NeuralNetworkPredictorNode.h"
+#include "ReorderDataNode.h"
 #include "Tensor.h"
 #include "UnaryOperationNode.h"
 
@@ -300,6 +302,22 @@ std::string Node::GetRuntimeTypeName()
     return _node->GetRuntimeTypeName();
 }
 
+std::string Node::GetMetadataValue(const std::string& key)
+{
+    std::string value;
+    if (_node->GetMetadata().HasEntry(key))
+    {
+        value = _node->GetMetadata().GetEntry<std::string>(key);
+    }
+    return value;
+}
+
+void Node::SetMetadataValue(const std::string& key, const std::string& value)
+{
+    auto node = const_cast<ell::model::Node*>(_node);
+    node->GetMetadata()[key] = value;
+}
+
 //
 // InputNode
 //
@@ -515,6 +533,26 @@ void OutputPort::ReferencePort()
 }
 
 //
+// PortMemoryLayout
+//
+PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<int>& p, const std::vector<int>& o)
+    : size(s), padding(p), offset(o)
+{
+    if (padding.size() == 0 && offset.size() == 0)
+    {
+        _layout = ell::model::PortMemoryLayout(size);
+    }
+    else if (offset.size() == 0)
+    {
+        _layout = ell::model::PortMemoryLayout(size, padding);
+    }
+    else
+    {
+        _layout = ell::model::PortMemoryLayout(size, padding, offset);
+    }
+}
+
+//
 // Model
 //
 
@@ -675,6 +713,76 @@ Node ModelBuilder::AddClockNode(Model model, PortElements input, double interval
     return Node(newNode);
 }
 
+template <typename ElementType>
+ell::model::PortElements<ElementType> GetPortElementsFromList(const std::vector<PortElements*>& inputs)
+{
+    auto elements_list = std::vector<ell::model::PortElements<ElementType>>{};
+    for (const auto input: inputs)
+    {
+        const auto& elements = input->GetPortElements();
+        elements_list.push_back(ell::model::PortElements<ElementType>(elements));
+    }
+    return ell::model::PortElements<ElementType>(elements_list);
+}
+
+Node ModelBuilder::AddConcatenationNode(Model model, const ell::api::math::TensorShape& outputShape, const std::vector<PortElements*>& inputs)
+{
+    if (inputs.size() < 1)
+    {
+        throw std::invalid_argument("Error: expected at least one input port element for AddConcatenationNode");
+    }
+    auto type = inputs[0]->GetType();
+    ell::model::Node* newNode = nullptr;
+
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<bool>>(GetPortElementsFromList<bool>(inputs), outputShape.ToMathTensorShape());
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<int>>(GetPortElementsFromList<int>(inputs), outputShape.ToMathTensorShape());
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<double>>(GetPortElementsFromList<double>(inputs), outputShape.ToMathTensorShape());
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<float>>(GetPortElementsFromList<float>(inputs), outputShape.ToMathTensorShape());
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create ConcatenationNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddReorderDataNode(Model model, PortElements input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order, double outputPaddingValue)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::ReorderDataNode<double>>(
+            ell::model::PortElements<double>(elements),
+            inputMemoryLayout.Get(),
+            outputMemoryLayout.Get(),
+            order,
+            outputPaddingValue);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::ReorderDataNode<float>>(
+            ell::model::PortElements<float>(elements),
+            inputMemoryLayout.Get(),
+            outputMemoryLayout.Get(),
+            order,
+            static_cast<float>(outputPaddingValue));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create ReorderDataNode of the requested type");
+    }
+    return Node(newNode);
+}
+
 Node ModelBuilder::AddSinkNode(Model model, PortElements input, PortElements trigger, const ell::api::math::TensorShape& tensorShape, const std::string& sinkFunctionName)
 {
     auto type = input.GetType();
@@ -806,6 +914,38 @@ Node ModelBuilder::AddBinaryOperationNode(Model model, PortElements input1, Port
         break;
     case PortType::smallReal:
         newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<float>>(ell::model::PortElements<float>(elements1), ell::model::PortElements<float>(elements2), operation);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create BinaryOperationNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddBinaryOperationNodeWithMemoryLayout(Model model, PortElements input1, PortMemoryLayout input1Layout, PortElements input2, PortMemoryLayout input2Layout, PortMemoryLayout outputLayout, BinaryOperationType op)
+{
+    auto operation = static_cast<ell::emitters::BinaryOperationType>(op);
+
+    auto type = input1.GetType();
+    if (type != input2.GetType())
+    {
+        throw std::invalid_argument("Error: BinaryOperationNode requires both arguments to be of the same type");
+    }
+    auto elements1 = input1.GetPortElements();
+    auto elements2 = input2.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<bool>>(ell::model::PortElements<bool>(elements1), input1Layout.Get(), ell::model::PortElements<bool>(elements2), input2Layout.Get(), outputLayout.Get(), operation);
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<int>>(ell::model::PortElements<int>(elements1), input1Layout.Get(), ell::model::PortElements<int>(elements2), input2Layout.Get(), outputLayout.Get(), operation);
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<double>>(ell::model::PortElements<double>(elements1), input1Layout.Get(), ell::model::PortElements<double>(elements2), input2Layout.Get(), outputLayout.Get(), operation);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<float>>(ell::model::PortElements<float>(elements1), input1Layout.Get(), ell::model::PortElements<float>(elements2), input2Layout.Get(), outputLayout.Get(), operation);
         break;
     default:
         throw std::invalid_argument("Error: could not create BinaryOperationNode of the requested type");
@@ -955,6 +1095,232 @@ Node ModelBuilder::AddDCTNode(Model model, PortElements input, int numFilters)
     default:
         throw std::invalid_argument("Error: could not create DCTNode of the requested type");
     }
+    return Node(newNode);
+}
+
+template <typename ElementType>
+typename ell::predictors::neural::Layer<ElementType>::LayerParameters GetLayerParametersForLayerNode(const ell::api::predictors::neural::Layer<ElementType>& layer)
+{
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<ElementType>::LayerParameters;
+    using TensorType = typename ell::predictors::neural::Layer<ElementType>::TensorType;
+    return UnderlyingLayerParameters
+    {
+        TensorType(static_cast<size_t>(layer.parameters.inputShape.rows), static_cast<size_t>(layer.parameters.inputShape.columns), static_cast<size_t>(layer.parameters.inputShape.channels)),
+        layer.parameters.inputPaddingParameters,
+        { static_cast<size_t>(layer.parameters.outputShape.rows), static_cast<size_t>(layer.parameters.outputShape.columns), static_cast<size_t>(layer.parameters.outputShape.channels) },
+        layer.parameters.outputPaddingParameters,
+    };
+}
+
+Node ModelBuilder::AddFloatActivationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ActivationLayer<float>& layer)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+    using TensorType = typename ell::predictors::neural::Layer<float>::TensorType;
+    using namespace ell::predictors;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+
+    switch (layer.activation)
+    {
+    case ell::api::predictors::neural::ActivationType::relu:
+    {
+        auto activationLayer = neural::ActivationLayer<float, neural::ReLUActivation>(parameters);
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::ReLUActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        break;
+    }
+    case ell::api::predictors::neural::ActivationType::hardSigmoid:
+    {
+        auto activationLayer = neural::ActivationLayer<float, neural::HardSigmoidActivation>(parameters);
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::HardSigmoidActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        break;
+    }
+    case ell::api::predictors::neural::ActivationType::leaky:
+    {
+        auto activationLayer = neural::ActivationLayer<float, neural::LeakyReLUActivation>(parameters);
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::LeakyReLUActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        break;
+    }
+    case ell::api::predictors::neural::ActivationType::sigmoid:
+    {
+        auto activationLayer = neural::ActivationLayer<float, neural::SigmoidActivation>(parameters);
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::SigmoidActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        break;
+    }
+    case ell::api::predictors::neural::ActivationType::tanh:
+    {
+        auto activationLayer = neural::ActivationLayer<float, neural::TanhActivation>(parameters);
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::TanhActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        break;
+    }
+    case ell::api::predictors::neural::ActivationType::prelu:
+    {
+        using apiPReLUActivationLayer = typename ell::api::predictors::neural::PReLUActivationLayer<float>;
+        auto* activationlayer = const_cast<ell::api::predictors::neural::ActivationLayer<float>*>(&layer);
+        auto& preluApiLayer = activationlayer->template As<apiPReLUActivationLayer>();
+        TensorType alpha(preluApiLayer.alpha.shape.rows, preluApiLayer.alpha.shape.columns, preluApiLayer.alpha.shape.channels, preluApiLayer.alpha.data);
+        neural::ParametricReLUActivation<float> prelu(alpha);
+        auto activationLayer = neural::ActivationLayer<float, neural::ParametricReLUActivation>(parameters, prelu);
+        newNode = model.GetModel().AddNode<ell::nodes::ParametricReLUActivationLayerNode<float>>(ell::model::PortElements<float>(elements), activationLayer);
+        break;
+    }
+    default:
+        throw ell::utilities::InputException(ell::utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.activation)));
+    }
+
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFloatBatchNormalizationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BatchNormalizationLayer<float>& layer)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+    using namespace ell::predictors;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+    auto epsilonSummand = (layer.epsilonSummand == ell::api::predictors::neural::EpsilonSummand::variance) ? 
+        ell::predictors::neural::EpsilonSummand::Variance : ell::predictors::neural::EpsilonSummand::SqrtVariance;
+    
+    ell::predictors::neural::BatchNormalizationLayer<float> batchNormalizationLayer(parameters, layer.mean, layer.variance, layer.epsilon, epsilonSummand);
+
+    newNode = model.GetModel().AddNode<ell::nodes::BatchNormalizationLayerNode<float>>(ell::model::PortElements<float>(elements), batchNormalizationLayer);
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFloatBiasLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BiasLayer<float>& layer)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+    ell::predictors::neural::BiasLayer<float> biasLayer(parameters, layer.bias);
+
+    newNode = model.GetModel().AddNode<ell::nodes::BiasLayerNode<float>>(ell::model::PortElements<float>(elements), biasLayer);
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFloatBinaryConvolutionalLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BinaryConvolutionalLayer<float>& layer)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+    using TensorType = typename ell::predictors::neural::Layer<float>::TensorType;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+
+    TensorType weights(layer.weights.shape.rows, layer.weights.shape.columns, layer.weights.shape.channels, layer.weights.data);
+    ell::predictors::neural::BinaryConvolutionalLayer<float> convolutionalLayer(parameters, layer.convolutionalParameters, weights);
+
+    newNode = model.GetModel().AddNode<ell::nodes::BinaryConvolutionalLayerNode<float>>(ell::model::PortElements<float>(elements), convolutionalLayer);
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFloatConvolutionalLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ConvolutionalLayer<float>& layer)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+    using TensorType = typename ell::predictors::neural::Layer<float>::TensorType;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+
+    TensorType weights(layer.weights.shape.rows, layer.weights.shape.columns, layer.weights.shape.channels, layer.weights.data);
+    ell::predictors::neural::ConvolutionalLayer<float> convolutionalLayer(parameters, layer.convolutionalParameters, weights);
+
+    newNode = model.GetModel().AddNode<ell::nodes::ConvolutionalLayerNode<float>>(ell::model::PortElements<float>(elements), convolutionalLayer);
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFloatFullyConnectedLayerNode(Model model, PortElements input, const ell::api::predictors::neural::FullyConnectedLayer<float>& layer)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+    using TensorType = typename ell::predictors::neural::Layer<float>::TensorType;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+    TensorType weights(layer.weights.shape.rows, layer.weights.shape.columns, layer.weights.shape.channels, layer.weights.data);
+    ell::predictors::neural::FullyConnectedLayer<float> fullyConnectedLayer(parameters, weights);
+
+    newNode = model.GetModel().AddNode<ell::nodes::FullyConnectedLayerNode<float>>(ell::model::PortElements<float>(elements), fullyConnectedLayer);
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFloatPoolingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::PoolingLayer<float>& layer)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+    using namespace ell::predictors;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+    if (layer.poolingType == ell::api::predictors::neural::PoolingType::max)
+    {   
+        neural::PoolingLayer<float, neural::MaxPoolingFunction> poolingLayer(parameters, layer.poolingParameters);
+        newNode = model.GetModel().AddNode<ell::nodes::PoolingLayerNode<float, neural::MaxPoolingFunction>>(ell::model::PortElements<float>(elements), poolingLayer);
+    }
+    else
+    {
+        neural::PoolingLayer<float, neural::MeanPoolingFunction> poolingLayer(parameters, layer.poolingParameters);
+        newNode = model.GetModel().AddNode<ell::nodes::PoolingLayerNode<float, neural::MeanPoolingFunction>>(ell::model::PortElements<float>(elements), poolingLayer);
+    }  
+
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFloatScalingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ScalingLayer<float>& layer)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+    ell::predictors::neural::ScalingLayer<float> scalingLayer(parameters, layer.scales);
+
+    newNode = model.GetModel().AddNode<ell::nodes::ScalingLayerNode<float>>(ell::model::PortElements<float>(elements), scalingLayer);
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFloatSoftmaxLayerNode(Model model, PortElements input, const ell::api::predictors::neural::SoftmaxLayer<float>& layer)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+    ell::predictors::neural::SoftmaxLayer<float> softmaxLayer(parameters);
+
+    newNode = model.GetModel().AddNode<ell::nodes::SoftmaxLayerNode<float>>(ell::model::PortElements<float>(elements), softmaxLayer);
     return Node(newNode);
 }
 

@@ -31,6 +31,7 @@ void TestCompilableUnaryOperation_square_Node();
 void TestL2NormSquaredNodeCompiled();
 void TestMatrixVectorProductNodeCompile();
 void TestCompilableBinaryOperationNode();
+void TestCompilableBinaryOperationNode2();
 void TestCompilableScalarBinaryPredicateNode();
 void TestCompilableBinaryPredicateNode();
 void TestCompilableMultiplexerNode();

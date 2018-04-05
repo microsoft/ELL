@@ -26,6 +26,7 @@
 #include "OutputPort.h"
 #include "Port.h"
 #include "PortElements.h"
+#include "PortMemoryLayout.h"
 
 // apis
 #include "CallbackInterface.h"
@@ -167,6 +168,8 @@ public:
     OutputPortIterator GetOutputPorts();
     InputPortIterator GetInputPorts();
     std::string GetRuntimeTypeName();
+    std::string GetMetadataValue(const std::string& key);
+    void SetMetadataValue(const std::string& key, const std::string& value);
 #ifndef SWIG
     Node(const ell::model::Node* other);
     const ell::model::Node* GetNode() const { return _node; }
@@ -245,7 +248,7 @@ public:
 
 #ifndef SWIG
     PortElements(const ell::model::PortElementsBase& other);
-    const ell::model::PortElementsBase& GetPortElements() { return _elements; }
+    const ell::model::PortElementsBase& GetPortElements() const { return _elements; }
 #endif
 private:
     ell::model::PortElementsBase _elements;
@@ -295,6 +298,25 @@ public:
 #endif
 private:
     const ell::model::OutputPortBase* _port = nullptr;
+};
+
+//
+// Port Memory Layout
+//
+struct PortMemoryLayout
+{
+    std::vector<int> size;
+    std::vector<int> padding;
+    std::vector<int> offset;
+
+    PortMemoryLayout(const std::vector<int>& size,
+                     const std::vector<int>& padding = {},
+                     const std::vector<int>& offset = {});
+#ifndef SWIG
+    const ell::model::PortMemoryLayout& Get() const { return _layout; }
+#endif
+private:
+    ell::model::PortMemoryLayout _layout;
 };
 
 //
@@ -365,8 +387,10 @@ public:
 
     // Specific methods per node type
     Node AddBinaryOperationNode(Model model, PortElements input1, PortElements input2, BinaryOperationType operation);
+    Node AddBinaryOperationNodeWithMemoryLayout(Model model, PortElements input1, PortMemoryLayout input1Layout, PortElements input2, PortMemoryLayout input2Layout, PortMemoryLayout outputLayout, BinaryOperationType operation);
     Node AddBufferNode(Model model, PortElements input, int windowSize);
     Node AddClockNode(Model model, PortElements input, double interval, double lagThreshold, const std::string& lagNotificationName);
+    Node AddConcatenationNode(Model model, const ell::api::math::TensorShape& outputShape, const std::vector<PortElements*>& inputs);
     Node AddConstantNode(Model model, std::vector<double> values, PortType type);
     Node AddDCTNode(Model model, PortElements input, int numFilters);
     Node AddDoubleNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<double> predictor);
@@ -378,9 +402,20 @@ public:
     Node AddLinearFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse);
     Node AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse);
     OutputNode AddOutputNode(Model model, const ell::api::math::TensorShape& shape, PortElements input);
+    Node AddReorderDataNode(Model model, PortElements input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order, double outputPaddingValue = 0.0);
     Node AddSinkNode(Model model, PortElements input, PortElements trigger, const ell::api::math::TensorShape& shape, const std::string& sinkFunctionName);
     Node AddSourceNode(Model model, PortElements input, PortType outputType, const ell::api::math::TensorShape& shape, const std::string& sourceFunctionName);
     Node AddUnaryOperationNode(Model model, PortElements input, UnaryOperationType operation);
+
+    Node AddFloatActivationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ActivationLayer<float>& layer);
+    Node AddFloatBatchNormalizationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BatchNormalizationLayer<float>& layer);
+    Node AddFloatBiasLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BiasLayer<float>& layer);
+    Node AddFloatBinaryConvolutionalLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BinaryConvolutionalLayer<float>& layer);
+    Node AddFloatConvolutionalLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ConvolutionalLayer<float>& layer);
+    Node AddFloatFullyConnectedLayerNode(Model model, PortElements input, const ell::api::predictors::neural::FullyConnectedLayer<float>& layer);
+    Node AddFloatPoolingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::PoolingLayer<float>& layer);
+    Node AddFloatScalingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ScalingLayer<float>& layer);
+    Node AddFloatSoftmaxLayerNode(Model model, PortElements input, const ell::api::predictors::neural::SoftmaxLayer<float>& layer);
 
 private:
 #ifndef SWIG

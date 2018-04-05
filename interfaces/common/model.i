@@ -21,6 +21,7 @@ WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(DoubleCallbackBase, DoubleCallbackBase,
 WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(FloatCallbackBase, FloatCallbackBase, float)
 
 %include "ModelInterface.h"
+%include "macros.i"
 
 // Template instantiations
 %template(RegisterCallbacksDouble) ELL_API::CompiledMap::RegisterCallbacks<double>;
@@ -36,6 +37,8 @@ WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(FloatCallbackBase, FloatCallbackBase, f
 %template(SetSourceCallbackFloat) ELL_API::Map::SetSourceCallback<float>;
 %template(StepDouble) ELL_API::Map::Step<double>;
 %template(StepFloat) ELL_API::Map::Step<float>;
+
+%template(PortElementsList) std::vector<ELL_API::PortElements*>;
 
 #ifdef SWIGPYTHON
     %include "model_python_post.i"

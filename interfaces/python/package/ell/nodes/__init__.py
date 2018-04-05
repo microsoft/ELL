@@ -18,5 +18,6 @@ OutputPortIterator,\
 Port,\
 PortElement,\
 PortElements,\
+PortElementsList,\
 PortType,\
 UnaryOperationType

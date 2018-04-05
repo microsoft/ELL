@@ -77,6 +77,7 @@ namespace nodes
         auto&& inputOffset = _inputLayout.GetOffset();
         auto&& inputSize = _inputLayout.GetActiveSize();
         auto&& outputOffset = _outputLayout.GetOffset();
+        auto&& outputStride = _outputLayout.GetStride();
 
         for (int loopIndex = 0; loopIndex < inputSize[dimension]; ++loopIndex)
         {
@@ -89,6 +90,7 @@ namespace nodes
             if (dimension != 0)
             {
                 thisInputDimensionOffset += prevInputDimensionOffset * inputStride[dimension];
+                thisOutputDimensionOffset += prevOutputDimensionOffset * outputStride[dimension];
             }
 
             if (dimension < numDimensions - 1)

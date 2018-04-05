@@ -4,3 +4,4 @@
 
 add_subdirectory(CNTK)
 add_subdirectory(darknet)
+add_subdirectory(common)

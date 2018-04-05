@@ -38,6 +38,7 @@
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
 #include "ClockNode.h"
+#include "ConcatenationNode.h"
 #include "ConstantNode.h"
 #include "DTWDistanceNode.h"
 #include "DelayNode.h"
@@ -272,6 +273,24 @@ void TestCompilableAccumulatorNode()
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNode");
+}
+
+void TestCompilableConcatenationNode()
+{
+    model::Model model;
+
+    auto inputNode = model.AddNode<model::InputNode<double>>(5);
+    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 6, 7, 8 });
+    auto concatenationInputs = model::PortElements<double>({ inputNode->output, constantNode->output });
+    auto outputNode = model.AddNode<nodes::ConcatenationNode<double>>(concatenationInputs, math::TensorShape(1, 1, 8));
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1, 2, 3, 4, 5 } };
+    VerifyCompiledOutput(map, compiledMap, signal, "ConcatenationNode");
 }
 
 void TestCompilableConstantNode()
@@ -517,6 +536,34 @@ void TestCompilableBinaryOperationNode()
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+    VerifyCompiledOutput(map, compiledMap, signal, "BinaryOperationNode");
+}
+
+void TestCompilableBinaryOperationNode2()
+{
+    model::Model model;
+    int numRows = 2;
+    int numColumns = 2;
+    int numChannels = 2;
+    int padding = 1;
+
+    model::PortMemoryLayout input1Shape({ numRows, numColumns, numChannels }, { padding, padding, 0 });
+    model::PortMemoryLayout input2Shape({ numRows, numColumns, numChannels });
+    model::PortMemoryLayout outputShape({ numRows, numColumns, numChannels });
+
+    auto inputNode = model.AddNode<model::InputNode<double>>(input1Shape.GetMemorySize());
+    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0 });
+    auto testNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, input1Shape, constantNode->output, input2Shape, outputShape, emitters::BinaryOperationType::add, 0.0);
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    // compare output
+    std::vector<std::vector<double>> signal = {{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                 0.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 0.0,
+                                                 0.0, 0.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0,
+                                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
     VerifyCompiledOutput(map, compiledMap, signal, "BinaryOperationNode");
 }
 

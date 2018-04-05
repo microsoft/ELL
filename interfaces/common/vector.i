@@ -28,6 +28,7 @@
 %template(FloatVector) std::vector<float>;
 %template(FloatVectorVector) std::vector<std::vector<float>>;
 %template(StringVector) std::vector<std::string>;
+%template(IntVector) std::vector<int>;
 
 // Include language specific SWIG definitions that must be declared after the
 // C++ code has been wrapped by SWIG

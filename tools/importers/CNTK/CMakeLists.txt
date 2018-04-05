@@ -11,8 +11,6 @@ if(${PYTHON_ENABLED})
         lib/cntk_converters.py
         lib/cntk_layers.py
         lib/cntk_utilities.py
-        lib/shared_converters.py
-        lib/shared_importer.py
         custom_functions.py)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})

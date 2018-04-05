@@ -72,6 +72,7 @@ void TestIRCompiler()
     TestCompilableSumNode();
     TestCompilableUnaryOperationNode();
     TestCompilableBinaryOperationNode();
+    TestCompilableBinaryOperationNode2();
     TestCompilableScalarBinaryPredicateNode();
     TestCompilableBinaryPredicateNode();
     TestCompilableMultiplexerNode();

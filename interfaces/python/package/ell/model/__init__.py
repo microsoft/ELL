@@ -13,4 +13,5 @@ from ..ell_py import \
     Model,\
     ModelBuilder,\
     ModelOptimizerOptions,\
+    PortMemoryLayout,\
     TransformContext

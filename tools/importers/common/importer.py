@@ -1,7 +1,7 @@
 ####################################################################################################
 #
 # Project:  Embedded Learning Library (ELL)
-# File:     shared_importer.py (importers)
+# File:     importer.py (importers)
 # Authors:  Byron Changuion
 #
 # Requires: Python 3.5+
@@ -13,7 +13,7 @@ from enum import Enum, auto
 import typing
 
 import ell
-from lib.shared_converters import *
+from .converters import *
 
 _logger = logging.getLogger(__name__)
 
@@ -41,6 +41,7 @@ operation_map = {
     "Activation": ConvertActivation,
     "AveragePooling": ConvertAveragePooling,
     "BatchNormalization": [ConvertBatchNormalization, ConvertScaling, ConvertBias],
+    "Bias": ConvertBias,
     "BinaryConvolution": [ConvertBinaryConvolution, ConvertBias, ConvertActivation],
     "Convolution": [ConvertConvolution, ConvertBias, ConvertActivation],
     "FullyConnected": [ConvertFullyConnected, ConvertBias, ConvertActivation],
@@ -80,15 +81,22 @@ class ImporterEngine:
     The common class for doing an import to ELL. The ImporterEngine converts
     an ImporterModel to ELL nodes or (currently, layers).
     """
-    def __init__(self, operation_map: typing.Mapping[str, typing.Sequence[typing.Any]] = operation_map):
+    def __init__(self, operation_map: typing.Mapping[str, typing.Sequence[typing.Any]] = operation_map,
+        step_interval_msec=0, lag_threshold_msec=0):
         """
         Initializes the engine with an appropriate operation to converter mapping.
         See `operation_map` comments for more information.
         """
         self.ell_nodes = {}
         self.ell_model = None
+        self.ell_model_builder = None
         self.operation_map = operation_map
         self.lookup_table = None
+        self.step_interval_msec = step_interval_msec
+        self.lag_threshold_msec = lag_threshold_msec
+        self.ordered_importer_nodes = []
+        self.final_ell_map = None
+        self.final_mapping = {}
 
     def get_supported_operation_types(self):
         """
@@ -105,7 +113,6 @@ class ImporterEngine:
         specified when this class was initialized.
         """
         self.lookup_table = LookupTable(model.tensors)
-        builder = ell.model.ModelBuilder()
 
         # Make a first pass through the model to set output padding. Since ELL
         # does pre-padding, a particular node must know what the input of the
@@ -117,7 +124,7 @@ class ImporterEngine:
         for ordered_node in ordered_nodes:
             _logger.info(ordered_node)
         
-        _logger.info("Converting intermediate importer nodes to ELL....")
+        _logger.info("Converting intermediate importer nodes to ELL layers....")
         # For now, convert to ELL layers. Later, we will convert to ELL nodes.
         layers = []
         for node_to_import in ordered_nodes:
@@ -126,6 +133,90 @@ class ImporterEngine:
         _logger.info("Done.")
             
         return layers
+
+    def get_node_group_mapping(self, model: ell.model.Model) -> typing.Mapping[str, typing.Sequence[ell.nodes.Node]]:
+        """
+        Returns the mapping of ImporterNode id to the group of ELL nodes that
+        got converted from it.
+        """
+        group_id_mapping = {}
+        nodes = model.GetNodes()
+
+        # Collect the group id to ell node mapping
+        while nodes.IsValid():
+            node = nodes.Get()
+            group_id = node.GetMetadataValue("GroupId")
+            # Ensure that GroupId is set to something. If it isn't, this indicates
+            # an ELL node that was inserted independently of the import, e.g.
+            # a SinkNode
+            if group_id:            
+                if group_id in group_id_mapping:
+                    group_id_mapping[group_id].append(node)
+                else:
+                    group_id_mapping[group_id] = [node]
+            nodes.Next()
+
+        return group_id_mapping 
+
+    def convert_nodes(self, model: ImporterModel):
+        """
+        Converts the model using the operation conversion map that was 
+        specified when this class was initialized.
+        """
+        self.ell_model = ell.model.Model()
+        self.ell_model_builder = ell.model.ModelBuilder()
+        self.lookup_table = LookupTable(model.tensors)
+        function_prefix = ""
+
+        # Make a first pass through the model to set output padding. Since ELL
+        # does pre-padding, a particular node must know what the input of the
+        # next node wants in terms of padding.
+        self.set_output_padding_for_nodes(model.nodes)
+
+        ordered_nodes = self.get_nodes_in_import_order(model.nodes)
+        self.ordered_importer_nodes = ordered_nodes
+        _logger.info("Processing the following importer nodes in order:")
+        for ordered_node in ordered_nodes:
+            _logger.info(ordered_node)
+        
+        _logger.info("Converting intermediate importer nodes to ELL nodes....")
+        for node_to_import in ordered_nodes:
+            converted = self.convert_importer_node_to_ell_nodes(node_to_import)
+        _logger.info("Done.")
+
+        # Quick workaround to create the map's output node. The last node in
+        # the ordered nodes list will be used.
+        last_importer_node = ordered_nodes[-1]
+        shape_entry = last_importer_node.output_shapes[0]
+        ell_output_shape = memory_shapes.get_ell_shape(shape_entry[0], shape_entry[1], 0)
+
+        last_ell_node = self.lookup_table.get_ell_node_from_importer_node_id(last_importer_node.id)
+
+        # Add the sink node
+        condition_node = self.ell_model_builder.AddConstantNode(
+            self.ell_model, ell.math.DoubleVector([1.0]), ell.nodes.PortType.boolean)
+        sink_node = self.ell_model_builder.AddSinkNode(
+            self.ell_model, ell.nodes.PortElements(last_ell_node.GetOutputPort("output")),
+            ell.nodes.PortElements(condition_node.GetOutputPort("output")),
+            ell_output_shape,
+            "{}OutputCallback".format(function_prefix))
+
+        output_node = self.ell_model_builder.AddOutputNode(
+            self.ell_model, ell_output_shape, ell.nodes.PortElements(sink_node.GetOutputPort("output")))
+        self.lookup_table.add_ell_output(output_node)
+
+        # Create the map
+        self.final_ell_map = ell.model.Map(self.ell_model, self.lookup_table.get_ell_inputs()[0], 
+            ell.nodes.PortElements(self.lookup_table.get_ell_outputs()[0].GetOutputPort("output")))
+
+        # Print out the nodes and where they came from
+        self.final_mapping = self.get_node_group_mapping(self.final_ell_map.GetModel())
+        _logger.info("\nFinal mapping of imported nodes:")
+        for group_id in self.final_mapping.keys():
+            _logger.info("Imported {} -> ell nodes {}".format(group_id, 
+            [ell_node.GetId() for ell_node in self.final_mapping[group_id]]))
+
+        return self.final_ell_map
     
     def convert_importer_node_to_ell_layers(self, node_to_import: ImporterNode):
         """
@@ -149,12 +240,44 @@ class ImporterEngine:
         for i in range(len(converters)):
             conversion_parameters = {"lookup_table": self.lookup_table,
                                      "first_in_block": i == 0,
-                                     "last_in_block": i == (len(converters) - 1)}
+                                     "last_in_block": i == (len(converters) - 1),
+                                     }
             layer = converters[i].convert(conversion_parameters)
             if layer:
                 layers.append(layer)
         
         return layers
+
+    def convert_importer_node_to_ell_nodes(self, node_to_import: ImporterNode):
+        """
+        Convert this importer node to an ELL node and add it to the ELL model.
+        """
+        converter_types = self.operation_map[node_to_import.operation_type]
+        if not isinstance(converter_types, list):
+            converter_types = [converter_types]
+
+        # Remove converters that don't apply. This can happen when blocks
+        # contain optional nodes
+        converters = []
+        for converter_type in converter_types:
+            converter = converter_type(node_to_import)
+            if converter.can_convert():
+                converters.append(converter)
+        _logger.debug("Importing node {}".format(node_to_import.id))
+                
+        # Convert a block.
+        for i in range(len(converters)):
+            conversion_parameters = {"lookup_table": self.lookup_table,
+                                     "first_in_block": i == 0,
+                                     "last_in_block": i == (len(converters) - 1),
+                                     "builder": self.ell_model_builder,
+                                     "model": self.ell_model,
+                                     "step_interval_msec": self.step_interval_msec,
+                                     "lag_threshold_msec": self.lag_threshold_msec,
+                                     }
+            converters[i].convert_node(conversion_parameters)
+        
+        return
 
     def get_nodes_in_import_order(self, nodes: typing.Mapping[str, typing.Any]):
         """
@@ -216,7 +339,7 @@ class ImporterEngine:
             next_nodes = self.find_nodes_with_input(node.outputs[0], nodes)
             if next_nodes:
                 if next_nodes[0]:
-                    if (next_nodes[0].operation_type == "Splice") or (next_nodes[0].operation_type == "Reorder"):
+                    if next_nodes[0].operation_type in ("Splice", "Reorder", "Passthrough"):
                         padding = self.get_padding_for_node(next_nodes[0], nodes)
                     else:
                         padding = next_nodes[0].padding
@@ -233,7 +356,12 @@ class ImporterEngine:
             padding = self.get_padding_for_node(nodes[key], nodes)
             if padding:
                 nodes[key].output_padding = padding
-
-
-
-
+    
+    def get_importer_node_to_ell_mapping(self) -> (typing.Sequence[ImporterNode], typing.Mapping[str, typing.Sequence[ell.nodes.Node]]):
+        """
+        Returns a tuple containing:
+            (ordered input nodes, mapping of input node id to ell nodes)
+        after converting the model with convert_nodes().
+        This is used to help test of the model.
+        """
+        return (self.ordered_importer_nodes, self.final_mapping)

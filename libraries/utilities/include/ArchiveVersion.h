@@ -24,6 +24,7 @@ namespace utilities
         v4_source_sink_shapes = 4,
         v5_refined_nodes = 5,
         v6_sink_triggers = 6,
+        v7_binary_operation_active_regions = 7,
         nextVersion
     };
 

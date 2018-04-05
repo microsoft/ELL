@@ -382,7 +382,7 @@ namespace model
             }
             sumRangeSizesSoFar += range.Size();
         }
-        throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds PortElements range");
+        throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index value " + std::to_string(index) + " exceeds PortElements range");
     }
 
     void PortElementsBase::ComputeSize()

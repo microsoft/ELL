@@ -47,7 +47,7 @@ namespace model
 
         /// <summary> Gets the output shape. </summary>
         ///
-        /// <returns> The output shpe. </returns>
+        /// <returns> The output shape. </returns>
         OutputShape GetShape() const { return _shape; }
 
     protected:

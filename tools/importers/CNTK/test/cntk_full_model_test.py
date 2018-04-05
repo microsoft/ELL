@@ -18,6 +18,7 @@ import math
 import argparse
 
 script_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(script_path, '../..'))
 sys.path.append(os.path.join(script_path, ".."))
 import cntk_to_ell
 from custom_functions import CustomSign, BinaryConvolution

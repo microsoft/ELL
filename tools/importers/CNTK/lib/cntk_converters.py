@@ -10,6 +10,7 @@
 
 """Converts CNTK data structures to ELL equivalents"""
 import logging
+import sys
 
 import numpy as np
 from cntk.initializer import glorot_uniform, he_normal
@@ -21,8 +22,8 @@ from cntk.logging.graph import *
 
 import ell
 from custom_functions import CustomSign, BinaryConvolution
-import lib.shared_importer as shared_importer
 from lib.cntk_utilities import *
+from common.importer import *
 
 _logger = logging.getLogger(__name__)
 
@@ -47,7 +48,6 @@ def get_float_vector_from_cntk_trainable_parameter(tensorParameter):
     for columnValue in tensorValue:
         orderedWeights[i] = columnValue
         i += 1
-
     return ell.math.FloatVector(orderedWeights)
 
 
@@ -98,7 +98,6 @@ def get_float_vector_from_cntk_array(inputArray):
     else:
         _logger.error("Error: Input array has incorrect dimensions")
         return None
-
     return np.ravel(orderedWeights)
 
 
@@ -129,9 +128,7 @@ def get_float_tensor_from_cntk_dense_weight_parameter(tensorParameter):
     else:
         orderedWeights = tensorValue.ravel().astype(
             np.float).reshape(1, 1, tensorValue.size)
-
     return ell.math.FloatTensor(orderedWeights)
-
 
 def get_float_tensor_from_cntk_convolutional_weight_parameter(tensorParameter):
     """Returns an ell.math.FloatTensor from a trainable parameter
@@ -200,10 +197,12 @@ class CntkStandardConverter():
 
         self.activation = None
         # Get activation function for block nodes
-        if importer_op_name == "Convolution":
-            if hasattr(self.cntk_node, "block_root") and self.cntk_node.is_block:
+        try:
+            if not self.cntk_node.is_input and self.cntk_node.is_block and hasattr(self.cntk_node, "block_root"):
                 internal_nodes = Utilities.get_model_nodes(self.cntk_node.block_root)
                 self.activation = Utilities.get_ell_activation_type(internal_nodes)
+        except:
+            self.activation = None
 
         # Fill in members based on methods that base classes may override
         self.inputs = self.get_input_ids()
@@ -232,15 +231,27 @@ class CntkStandardConverter():
         of the elements.
         e.g. on a Convolution block, the mapping would be
         {"weights": 0, "bias": 1}, or,
-        {"weights": (0, "filter_channel_row_column", "bias": (1, "channel_row_column")}
+        {"weights": (0, "filter_channel_row_column", "bias": (1, "channel_row_column")} or,
+        {"weights": (0, "W", "filter_channel_row_column", "bias": (1, "b", "channel_row_column")}
         """
         weights = {}
         for label in weight_index_mapping.keys():
             tensor = None
             weight_mapping = weight_index_mapping[label]
             if isinstance(weight_mapping, tuple):
-                order = weight_mapping[1]
-                uid, tensor = self.get_tensor_at_input_index(weight_mapping[0])
+                input_index = weight_mapping[0]
+                if len(weight_mapping) == 3:
+                    # This tuple contains (index, name, order)
+                    order = weight_mapping[2]
+                    name = weight_mapping[1]
+                    # Get the parameter index by doing a search on the name
+                    input_index =  Utilities.find_parameter_index_by_name(
+                        self.cntk_node.inputs, name, input_index)
+                else:
+                    # This tuple contains (index, order)
+                    order = weight_mapping[1]
+
+                uid, tensor = self.get_tensor_at_input_index(input_index)
             else:
                 uid, tensor = self.get_tensor_at_input_index(weight_mapping)
                 order = ""
@@ -325,7 +336,7 @@ class CntkStandardConverter():
         attributes should override.
         """
         attributes = {}
-        if self.activation:
+        if self.activation is not None:
             attributes["activation"] = self.activation
             
         return attributes
@@ -380,26 +391,65 @@ class CntkStandardConverter():
         """
         Return an instance of the ELL ImporterNode for the CNTK node.
         """
-        return shared_importer.ImporterNode(self.cntk_node.uid, 
+        return ImporterNode(self.cntk_node.uid, 
             self.importer_op_name, self.inputs, self.outputs, 
             self.weights, self.attributes, self.padding,
             self.input_shapes, self.output_shapes)
+
 
 class CntkConvolutionConverter(CntkStandardConverter):
     """
     Custom converter for Convolutions.
     """
     def __init__(self, cntk_node):
-        convolutional_nodes = depth_first_search(cntk_node.block_root, 
-            lambda x: Utilities.op_name_equals(x, 'Convolution'))
-        self.convolutional_node = convolutional_nodes[0]
-        super().__init__(cntk_node, {"weights": (0, "filter_channel_row_column"), "bias": (1, "channel")}, "Convolution")
+        if cntk_node.is_block:
+            convolutional_nodes = depth_first_search(cntk_node.block_root, 
+                lambda x: Utilities.op_name_equals(x, 'Convolution'))
+            self.convolutional_node = convolutional_nodes[0]
+            self.is_binary_convolution = False            
+            super().__init__(cntk_node, {"weights": (0, "filter_channel_row_column"), "bias": (1, "channel")}, "Convolution")
+        else:
+            # Treat this as binary convolution
+            self.convolutional_node = cntk_node
+            self.is_binary_convolution = True            
+            # Weights is 4-dimensional (filters, channels, rows, columns), but could be in either
+            # input position 0 or 1
+            if len(cntk_node.inputs[0].shape) == 4:
+                super().__init__(cntk_node, {"weights": (0, "filter_channel_row_column")}, "BinaryConvolution")
+            else:
+                super().__init__(cntk_node, {"weights": (1, "filter_channel_row_column")}, "BinaryConvolution")
+
+    def get_input_ids(self):
+        if not self.is_binary_convolution:
+            return super().get_input_ids()
+        else:
+            ids = []
+            for i in self.cntk_node.inputs:
+                if not i.is_input and len(i.shape) < 4:
+                    ids.append(Utilities.get_uid(i))
+            return ids
+
+    def get_weights(self, weight_index_mapping):
+        if not self.is_binary_convolution:
+            return super().get_weights(weight_index_mapping)
+        else:
+            # Get the weight values
+            weights = {}
+            weight_index = weight_index_mapping["weights"][0]
+            weight_order = weight_index_mapping["weights"][1]
+            weights_parameter = Utilities.find_parameter_by_name(
+                self.cntk_node.inputs[weight_index].owner.parameters, 'filter')
+            tensor = weights_parameter.value
+            weights["weights"] = (weights_parameter.uid, tensor, weight_order)
+
+            return weights
 
     def get_attributes(self):
         attributes = {}
-        attributes["size"] = self.convolutional_node.W.shape[2]
+        # The receptive field size is equal to the weights tensor's row or col value
+        attributes["size"] = self.weights["weights"][1].shape[2]
         attributes["stride"] = self.convolutional_node.attributes['strides'][2]
-        if self.activation:
+        if self.activation is not None:
             attributes["activation"] = self.activation
             
         return attributes
@@ -409,6 +459,7 @@ class CntkConvolutionConverter(CntkStandardConverter):
         return Utilities.get_padding_for_layer_with_sliding_window(
             self.convolutional_node.attributes, receptive_field, 
             ell.neural.PaddingScheme.zeros)
+
 
 class CntkDenseConverter(CntkStandardConverter):
     """
@@ -431,6 +482,7 @@ class CntkDenseConverter(CntkStandardConverter):
             
         return attributes
 
+
 class CntkElementTimesConverter(CntkStandardConverter):
     """
     Custom converter for ElementTimes.
@@ -441,7 +493,43 @@ class CntkElementTimesConverter(CntkStandardConverter):
         indexes = [index for index,value in enumerate(cntk_node.inputs) if not value.is_output]
         if len(indexes) < 1:
             raise Exception("ElementTimes node {} cannot be converted, the CNTK importer does not currently support arbitrary inputs".format(cntk_node.uid))
-        super().__init__(cntk_node, {"scale": (indexes[0], "channel")}, "ElementTimes")
+        parameter_indexes = [index for index,value in enumerate(cntk_node.inputs) if value.is_parameter]
+        if len(parameter_indexes) > 1:
+            # Skip this for now
+            super().__init__(cntk_node, {}, "Skip")
+        else:    
+            super().__init__(cntk_node, {"scale": (indexes[0], "channel")}, "ElementTimes")
+
+
+class CntkPlusConverter(CntkStandardConverter):
+    """
+    Custom converter for ElementTimes.
+    """
+    def __init__(self, cntk_node):
+        # Until we support arbitrary connections between nodes, look for the
+        # input that is not an output to denote the scale.
+        indexes_of_constants = [index for index,value in enumerate(cntk_node.inputs) if value.is_constant]
+        indexes_of_parameters = [index for index,value in enumerate(cntk_node.inputs) if value.is_parameter]
+        use_plus = len(indexes_of_constants) == 0 and len(indexes_of_parameters) == 0
+        if use_plus:
+            super().__init__(cntk_node, {}, "Plus")
+        elif len(indexes_of_constants) == 1:
+            # If the shape constant is a scalar, or (channel, 1, 1) apply as a bias
+            shape = cntk_node.inputs[indexes_of_constants[0]].as_constant().shape
+            if len(shape) == 0 or (len(shape) == 3 and shape[1] == shape[2] == 1):
+                super().__init__(cntk_node, {"bias": (indexes_of_constants[0], "channel_row_column")}, "Bias")
+            else:
+                raise Exception("Plus using arbitrary Constants is not yet supported in node {}".format(cntk_node.uid))
+        elif len(indexes_of_parameters) == 1:
+            # If the shape of the parameter is (channels, 1, 1), then treat as a Bias
+            shape = cntk_node.inputs[indexes_of_parameters[0]].as_parameter().shape
+            if len(shape) == 0 or (len(shape) == 3 and shape[1] == shape[2] == 1):
+                super().__init__(cntk_node, {"bias": (indexes_of_parameters[0], "channel_row_column")}, "Bias")
+            else:
+                raise Exception("Plus using arbitrary Parameters is not yet supported in node {}".format(cntk_node.uid))
+        else:
+            raise Exception("Plus using Constants is not yet supported in node {}".format(cntk_node.uid))
+
 
 class CntkPoolingConverter(CntkStandardConverter):
     """
@@ -473,6 +561,7 @@ class CntkPoolingConverter(CntkStandardConverter):
         return Utilities.get_padding_for_layer_with_sliding_window(
             node_attributes, pooling_size, scheme)
 
+
 class CntkSpliceConverter(CntkStandardConverter):
     """
     Custom converter for Splice. Until ELL importer moves to ELL nodes,
@@ -482,7 +571,31 @@ class CntkSpliceConverter(CntkStandardConverter):
         super().__init__(cntk_node, {}, cntk_node.op_name)
 
     def get_attributes(self):
+        if self.cntk_node.attributes["axis"] == ("ordered", "static", 2):
+            # This means splice will order against columns first, then rows, then channels.
+            # It results in stacking along the channel dimension.
+            return {"dimension_to_stack": "channel"}
         return {}
+
+
+class CntkUserFunctionConverter(CntkStandardConverter):
+    """
+    Custom converter for UserFunction. This importer only supports 
+    the Sign function for Binary Convolutional networks.
+    """
+    def __init__(self, cntk_node):
+        if cntk_node.name == "Sign":
+            if len(cntk_node.inputs[0].shape) == 4:
+                # This is for a convolutional filter, so skip. The reason is that
+                # BinaryConvolution will get these values as one of the input parameters
+                super().__init__(cntk_node, {}, "Skip")
+            else:
+                # This is used to binarize the input. Use a Passthrough, since the
+                # ELL BinaryConvolution which follows will do this operation internally.
+                super().__init__(cntk_node, {}, "Passthrough")
+        else:
+            raise Exception("UserFunction node {} cannot be converted, unsupported user function {}".format(cntk_node.uid, cntk_node.name))
+
 
 class CntkReshapeConverter(CntkStandardConverter):
     """
@@ -494,6 +607,7 @@ class CntkReshapeConverter(CntkStandardConverter):
 
     def get_attributes(self):
         return {}
+
 
 class CntkInputConverter(CntkStandardConverter):
     """
@@ -519,6 +633,7 @@ class CntkInputConverter(CntkStandardConverter):
             shapes.append((shape, "channel"))
                 
         return shapes
+
 
 class CntkCrossEntropyWithSoftmaxConverter(CntkStandardConverter):
     """
@@ -547,11 +662,12 @@ class CntkCrossEntropyWithSoftmaxConverter(CntkStandardConverter):
                 
         return shapes        
 
+
 class CntkConverterFactory():
     @staticmethod
     def get_converter(cntk_node, cntk_converter_map):
         """
-        Gets the appropriate converter for the 
+        Gets the appropriate converter for the node
         """
         try:
             if cntk_node.op_name in cntk_converter_map:

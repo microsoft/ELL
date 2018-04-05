@@ -50,6 +50,7 @@ set(include
     include/BufferNode.h
     include/ClockNode.h
     include/CompiledActivationFunctions.h
+    include/ConcatenationNode.h
     include/ConstantNode.h
     include/ConvolutionalLayerNode.h
     include/DCTNode.h
@@ -106,6 +107,7 @@ set (tcc
     tcc/BinaryPredicateNode.tcc
     tcc/BroadcastFunctionNode.tcc
     tcc/BufferNode.tcc
+    tcc/ConcatenationNode.tcc
     tcc/ConstantNode.tcc
     tcc/DTWDistanceNode.tcc
     tcc/DebugSinkNode.tcc
