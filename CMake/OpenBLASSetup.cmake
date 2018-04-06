@@ -58,13 +58,28 @@ if(NOT WIN32)
         /opt/OpenBLAS/include
         /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/
         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers/
+        /usr/local/Cellar/openblas/0.2.20_1/include
         /usr/include
         /usr/local/include
         /usr/include/openblas
     )
 
     set(BLAS_LIB_SEARCH_PATHS
-        /opt/OpenBLAS/lib /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
+        /opt/OpenBLAS/lib
+        /usr/local/Cellar/openblas/0.2.20_1/lib
+        /usr/lib64/atlas-sse3
+        /usr/lib64/atlas
+        /usr/lib64
+        /usr/local/lib64/atlas
+        /usr/local/lib64
+        /usr/lib/atlas-sse3
+        /usr/lib/atlas-sse2
+        /usr/lib/atlas-sse
+        /usr/lib/atlas-3dnow
+        /usr/lib/atlas
+        /usr/lib
+        /usr/local/lib/atlas
+        /usr/local/lib
     )
 endif()
 
