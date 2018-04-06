@@ -62,7 +62,7 @@ To install all of the above, type
 ```shell
 brew install cmake
 brew install swig
-brew install homebrew/science/openblas
+brew install openblas
 brew install doxygen
 ```
 
@@ -125,21 +125,13 @@ The generated executables will appear in `ELL/build/bin`.
 
 ## Troubleshooting
 
-**ELL/libraries/model/include/IRModelProfiler.h:15:10: fatal error: 'EmitterTypes.h' file not found #include "EmitterTypes.h"**
+**LLVM not found, please check that LLVM is installed.**
 
-This error has been reported and a possible work around is to create a symbolic link from llvm@3.9 to the llvm folder as follows:
-
-```shell
-cd /usr/local/Cellar/llvm
-ln -s ../llvm@3.9/3.9.1_1
-```
-
-Then make sure you're using that version using this command:
+Try telling CMake where to find LLVM as follows:
 
 ```shell
-brew switch llvm 3.9.1_1
+cmake -DLLVM_DIR=/usr/local/Cellar/llvm@3.9/3.9.1_1/lib/cmake/llvm ..
 ```
-
 
 ## Advanced Installation
 
