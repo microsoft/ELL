@@ -369,9 +369,9 @@ namespace dsp
         if (tileSize == 2 && filterSize == 3)
         {
             // clang-format off
-            return MakeMatrix<ValueType>({ {     1.0,      0.0,     0.0 }, 
-                                           { 1.0 / 2,  1.0 / 2, 1.0 / 2 }, 
-                                           { 1.0 / 2, -1.0 / 2, 1.0 / 2 }, 
+            return MakeMatrix<ValueType>({ {     1.0,      0.0,     0.0 },
+                                           { 1.0 / 2,  1.0 / 2, 1.0 / 2 },
+                                           { 1.0 / 2, -1.0 / 2, 1.0 / 2 },
                                            {     0.0,      0.0,     1.0 } });
             // clang-format on
         }
@@ -680,6 +680,8 @@ namespace dsp
     class Fixed2DArray
     {
     public:
+        constexpr Fixed2DArray() : _data({0}) {}
+
         void CopyFrom(const math::ConstChannelColumnRowTensorReference<ValueType>& data)
         {
             const auto dataPtr = data.GetConstDataPointer();
@@ -734,7 +736,7 @@ namespace dsp
         }
 
     private:
-        std::array<ValueType, rows * columns> _data = {0};
+        std::array<ValueType, rows * columns> _data;
     };
 
     //
