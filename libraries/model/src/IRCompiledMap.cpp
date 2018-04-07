@@ -398,5 +398,29 @@ namespace model
         auto fn = reinterpret_cast<PerformanceCounters* (*)(int)>(jitter.GetFunctionAddress(_moduleName+"_GetNodeTypePerformanceCounters"));
         return fn(nodeIndex);
     }
+
+    //
+    // Low-level region profiling support
+    //
+    int IRCompiledMap::GetNumProfileRegions()
+    {
+        auto& jitter = GetJitter();
+        auto fn = reinterpret_cast<int (*)()>(jitter.GetFunctionAddress(_moduleName+"_GetNumProfileRegions"));
+        return fn();
+    }
+
+    emitters::ProfileRegionInfo* IRCompiledMap::GetRegionProfilingInfo(int regionIndex)
+    {
+        auto& jitter = GetJitter();
+        auto fn = reinterpret_cast<ProfileRegionInfo* (*)(int)>(jitter.GetFunctionAddress(_moduleName+"_GetRegionProfilingInfo"));
+        return fn(regionIndex);
+    }
+
+    void IRCompiledMap::ResetRegionProfilingInfo()
+    {
+        auto& jitter = GetJitter();
+        auto fn = reinterpret_cast<void (*)()>(jitter.GetFunctionAddress(_moduleName+"_ResetRegionProfilingInfo"));
+        fn();
+    }
 }
 }

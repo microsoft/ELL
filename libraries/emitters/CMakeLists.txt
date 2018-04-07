@@ -30,6 +30,7 @@ set (src
     src/IRModuleEmitter.cpp
     src/IROptimizer.cpp
     src/IRPosixRuntime.cpp
+    src/IRProfiler.cpp
     src/IRRuntime.cpp
     src/IRSwigInterfaceWriter.cpp
     src/IRTask.cpp
@@ -63,6 +64,7 @@ set (include
     include/IRMetadata.h
     include/IROptimizer.h
     include/IRPosixRuntime.h
+    include/IRProfiler.h
     include/IRRuntime.h
     include/IRSwigInterfaceWriter.h
     include/IRTask.h
@@ -130,14 +132,18 @@ set (test_src
   test/src/AsyncEmitterTest.cpp
   test/src/IREmitterTest.cpp
   test/src/IRFunctionTest.cpp
+  test/src/IRProfilerTest.cpp
   test/src/PosixEmitterTest.cpp
+  test/src/StdlibEmitterTest.cpp
 )
 
 set (test_include
   test/include/AsyncEmitterTest.h
   test/include/IREmitterTest.h
   test/include/IRFunctionTest.h
+  test/include/IRProfilerTest.h
   test/include/PosixEmitterTest.h
+  test/include/StdlibEmitterTest.h
 )
 
 source_group("src" FILES ${test_src})

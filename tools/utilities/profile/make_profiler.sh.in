@@ -58,9 +58,13 @@ fi
 # Platform-specific options
 generic_llc_opts="-relocation-model=pic"
 pi3_llc_opts="-relocation-model=pic -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53"
+pi0_llc_opts="-relocation-model=pic -mtriple=arm-linux-gnueabihf -mcpu=arm1176jzf-s"
 llc_opts=$generic_llc_opts
 if [ ${target} == 'pi3' ] ; then
     llc_opts=$pi3_llc_opts
+fi
+if [ ${target} == 'pi0' ] ; then
+    llc_opts=$pi0_llc_opts
 fi
 
 echo "Compiling model profilers to ${profiler_directory}"
@@ -79,6 +83,8 @@ rm -f *.ll
 
 cp ../tools/utilities/profile/CompiledProfile_main.cpp .
 cp ../tools/utilities/profile/CompiledExerciseModel_main.cpp .
+cp ../tools/utilities/profile/ProfileReport.h .
+cp ../tools/utilities/profile/ProfileReport.cpp .
 cp ../tools/utilities/profile/OpenBLASSetup.cmake .
 cp ../tools/utilities/profile/build_and_run.sh .
 

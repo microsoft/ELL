@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "ProfileReport.h"
+
 // utilities
 #include "CommandLineParser.h"
 
@@ -16,12 +18,6 @@
 
 namespace ell
 {
-    enum class ProfileOutputFormat
-    {
-        text,
-        json
-    };
-
 /// <summary> Arguments for profile tool. </summary>
 struct ProfileArguments
 {
@@ -35,6 +31,9 @@ struct ProfileArguments
     int numBurnInIterations = 0;
     bool filterTrivialNodes = true;
     bool summaryOnly = false;
+
+    // TODO: something about regions
+
 };
 
 /// <summary> Arguments for parsed print. </summary>

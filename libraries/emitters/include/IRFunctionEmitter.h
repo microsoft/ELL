@@ -178,7 +178,7 @@ namespace emitters
         /// <summary> Emit pointer cast to a given pointer type. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
-        /// <param name="valueType"> The type to cast to. </param>
+        /// <param name="valueType"> The type to cast to. Must be a pointer type. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         llvm::Value* CastPointer(llvm::Value* pValue, llvm::Type* valueType);
@@ -186,7 +186,7 @@ namespace emitters
         /// <summary> Emit pointer cast to a given pointer type. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
-        /// <param name="valueType"> The type to cast to. </param>
+        /// <param name="valueType"> The type to cast to. Must be a pointer type. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         llvm::Value* CastPointer(llvm::Value* pValue, VariableType valueType);
@@ -202,7 +202,7 @@ namespace emitters
         /// <summary> Emit a cast from a pointer to an integer type. </summary>
         ///
         /// <param name="pValue"> Input value. </param>
-        /// <param name="destinationType"> Output type. </param>
+        /// <param name="destinationType"> Output pointer type. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         llvm::Value* CastPointerToInt(llvm::Value* pValue, llvm::Type* destinationType);
@@ -1027,6 +1027,22 @@ namespace emitters
 
         /// <summary> Emits a malloc call. </summary>
         ///
+        /// <param name="type"> The type being allocated. </param>
+        /// <param name="size"> The size being allocated. </param>
+        ///
+        /// <returns> Pointer to the llvm::Value that points to the allocated memory. </returns>
+        llvm::Value* Malloc(llvm::Type* type, int64_t size);
+
+        /// <summary> Emits a malloc call. </summary>
+        ///
+        /// <param name="type"> The type being allocated. </param>
+        /// <param name="size"> The size being allocated. </param>
+        ///
+        /// <returns> Pointer to the llvm::Value that points to the allocated memory. </returns>
+        llvm::Value* Malloc(llvm::Type* type, llvm::Value* size);
+
+        /// <summary> Emits a malloc call. </summary>
+        ///
         /// <typeparam name="ValueType"> The type being allocated. </typeparam>
         /// <param name="size"> The size being allocated. </param>
         ///
@@ -1424,7 +1440,7 @@ namespace emitters
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const std::string& name);
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedVariableTypeList& arguments, const std::string& name);
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedLLVMTypeList& arguments, const std::string& name);
-
+        
         friend class IRModuleEmitter;
 
         class EntryBlockScope

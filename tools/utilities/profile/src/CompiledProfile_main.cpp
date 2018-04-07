@@ -8,21 +8,15 @@
 
 // compiled model
 #include "compiled_model.h"
+#include "ProfileReport.h"
 
 // stl
 #include <algorithm>
 #include <cstring>
-#include <iomanip>
 #include <iostream>
 #include <random>
 #include <string>
 #include <vector>
-
-enum class ProfileOutputFormat
-{
-    text,
-    json
-};
 
 struct ProfileArguments
 {
@@ -53,50 +47,12 @@ std::vector<T> GetInputData(std::string filename, const TensorShape& inputShape,
 //
 // Output-related
 //
-void WriteUserComment(const std::string& comment, ProfileOutputFormat format, std::ostream& out)
-{
-    if (format == ProfileOutputFormat::text)
-    {
-        out << "Comment: " << comment << "\n";
-    }
-    else // json
-    {
-        out << "\"comment\": \"" << comment << "\"\n";
-    }
-}
 
 void WriteModelStatistics(ProfileOutputFormat format, std::ostream& out)
 {
     // get overall stats
     auto modelStats = ELL_GetModelPerformanceCounters();
-
-    if (format == ProfileOutputFormat::text)
-    {
-        std::ios::fmtflags savedFlags(out.flags());
-        out << std::fixed;
-        out.precision(5);
-
-        int count = modelStats->count;
-        double totalTime = modelStats->totalTime;
-        double timePerRun = totalTime / count;
-
-        out << "\nModel statistics" << std::endl;
-        out << "Total time: " << totalTime << " ms \tcount: " << count << "\t time per run: " << timePerRun << " ms" << std::endl;
-
-        out.flags(savedFlags);
-    }
-    else // json
-    {
-        int count = modelStats->count;
-        double totalTime = modelStats->totalTime;
-        double timePerRun = totalTime / count;
-
-        out << "\"model_statistics\": {\n";
-        out << "  \"total_time\": " << totalTime << ",\n";
-        out << "  \"average_time\": " << timePerRun << ",\n";
-        out << "  \"count\": " << count << "\n";
-        out << "}";
-    }
+    WriteModelStatistics(modelStats, format, out);
 }
 
 void WriteNodeStatistics(ProfileOutputFormat format, std::ostream& out)
@@ -111,7 +67,6 @@ void WriteNodeStatistics(ProfileOutputFormat format, std::ostream& out)
         nodeInfo.emplace_back(*info, *stats);
     }
 
-    size_t maxTypeLength = 0;
     std::vector<std::pair<ELL_NodeInfo, ELL_PerformanceCounters>> nodeTypeInfo;
     auto numNodeTypes = ELL_GetNumNodeTypes();
     for (int index = 0; index < numNodeTypes; ++index)
@@ -119,75 +74,26 @@ void WriteNodeStatistics(ProfileOutputFormat format, std::ostream& out)
         auto info = ELL_GetNodeTypeInfo(index);
         auto stats = ELL_GetNodeTypePerformanceCounters(index);
         nodeTypeInfo.emplace_back(*info, *stats);
-        maxTypeLength = std::max(maxTypeLength, std::strlen((const char*)(info->nodeType)));
     }
     std::sort(nodeTypeInfo.begin(), nodeTypeInfo.end(), [](auto a, auto b) { return a.second.totalTime < b.second.totalTime; });
 
-    // Write node statistics
-    if (format == ProfileOutputFormat::text)
+    WriteNodeStatistics(nodeInfo, nodeTypeInfo, format, out);
+}
+
+void WriteRegionStatistics(ProfileOutputFormat format, std::ostream& out)
+{
+    // Gather region statistics
+    std::vector<ELL_ProfileRegionInfo> regions;
+    auto numRegions = ELL_GetNumProfileRegions();
+    size_t maxNameLength = 0;
+    for (int index = 0; index < numRegions; ++index)
     {
-        std::ios::fmtflags savedFlags(out.flags());
-        out << std::fixed;
-        out.precision(5);
-
-        out << "Node statistics" << std::endl;
-        for (const auto& info : nodeInfo)
-        {
-            out << "Node[" << info.first.nodeName << "]:\t" << std::setw(maxTypeLength) << std::left << info.first.nodeType << "\ttime: " << info.second.totalTime << " ms\tcount: " << info.second.count << "\n";
-        }
-
-        out << "\n\n";
-        out << "Node type statistics" << std::endl;
-        for (const auto& info : nodeTypeInfo)
-        {
-            out << std::setw(maxTypeLength) << std::left << info.first.nodeType << "\ttime: " << info.second.totalTime << " ms \tcount: " << info.second.count << "\n";
-        }
-
-        out.flags(savedFlags);
+        auto info = ELL_GetRegionProfilingInfo(index);
+        maxNameLength = std::max(maxNameLength, std::strlen((const char*)(info->name)));
+        regions.emplace_back(*info);
     }
-    else // json
-    {
-        out << "\"node_statistics\": [\n";
-        for (const auto& info : nodeInfo)
-        {
-            out << "  {\n";
-            out << "    \"name\": "
-                << "\"" << info.first.nodeName << "\",\n";
-            out << "    \"type\": "
-                << "\"" << info.first.nodeType << "\",\n";
-            out << "    \"total_time\": " << info.second.totalTime << ",\n";
-            out << "    \"average_time\": " << info.second.totalTime / info.second.count << ",\n";
-            out << "    \"count\": " << info.second.count << "\n";
-            out << "  }";
-            bool isLast = (&info == &nodeInfo.back());
-            if (!isLast)
-            {
-                out << ",";
-            }
-            out << "\n";
-        }
-        out << "],\n";
 
-        out << "\"node_type_statistics\": [\n";
-        out << "  [";
-        for (const auto& info : nodeTypeInfo)
-        {
-            out << "  {\n";
-            out << "    \"type\": "
-                << "\"" << info.first.nodeType << "\",\n";
-            out << "    \"total_time\": " << info.second.totalTime << ",\n";
-            out << "    \"average_time\": " << info.second.totalTime / info.second.count << ",\n";
-            out << "    \"count\": " << info.second.count << "\n";
-            out << "  }";
-            bool isLast = (&info == &nodeTypeInfo.back());
-            if (!isLast)
-            {
-                out << ",";
-            }
-            out << "\n";
-        }
-        out << "]";
-    }
+    WriteRegionStatistics(regions, format, out);
 }
 
 //
@@ -198,6 +104,7 @@ void ResetProfilingInfo()
     ELL_ResetModelProfilingInfo();
     ELL_ResetNodeProfilingInfo();
     ELL_ResetNodeTypeProfilingInfo();
+    ELL_ResetRegionProfilingInfo();
 }
 
 template<typename InputType, typename OutputType>
@@ -241,6 +148,7 @@ void ProfileModel(const ProfileArguments& profileArguments)
             WriteUserComment(comment, format, profileOutputStream);
         }
         WriteNodeStatistics(format, profileOutputStream);
+        WriteRegionStatistics(format, profileOutputStream);
         WriteModelStatistics(format, profileOutputStream);
     }
     else
@@ -252,6 +160,8 @@ void ProfileModel(const ProfileArguments& profileArguments)
             profileOutputStream << ",\n";
         }
         WriteNodeStatistics(format, profileOutputStream);
+        profileOutputStream << ",\n";
+        WriteRegionStatistics(format, profileOutputStream);
         profileOutputStream << ",\n";
         WriteModelStatistics(format, profileOutputStream);
         profileOutputStream << "}\n";

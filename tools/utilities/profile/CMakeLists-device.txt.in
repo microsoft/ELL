@@ -18,6 +18,11 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set (src 
   CompiledProfile_main.cpp
+  ProfileReport.cpp
+  )
+
+set (include
+  ProfileReport.h
   )
 
 source_group("src" FILES ${src})
@@ -27,10 +32,12 @@ source_group("tcc" FILES ${tcc})
 # Version using ELL's native object file output
 add_executable(profile ${src} ${include} ${tcc})
 target_link_libraries(profile ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLAS_LIBS})
+target_compile_definitions(profile PUBLIC COMPILED_ELL_PROFILER)
 
 # Version with LLVM's opt tool optimizing ELL's IR output and then compiling with llc
 add_executable(profile_opt ${src} ${include} ${tcc})
 target_link_libraries(profile_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS})
+target_compile_definitions(profile_opt PUBLIC COMPILED_ELL_PROFILER)
 
 
 #
@@ -39,6 +46,9 @@ target_link_libraries(profile_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt
 
 set (src 
   CompiledExerciseModel_main.cpp
+  )
+
+set (include
   )
 
 source_group("src" FILES ${src})

@@ -195,6 +195,7 @@ namespace common
         settings.optimizerSettings.fuseLinearFunctionNodes = fuseLinearOperations;
         settings.optimizerSettings.preferredConvolutionMethod = convolutionMethod;
         settings.profile = profile;
+        settings.compilerSettings.profile = profile;
 
         if (target != "")
         {

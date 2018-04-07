@@ -12,6 +12,7 @@
 #include "IRDiagnosticHandler.h"
 #include "IREmitter.h"
 #include "IRFunctionEmitter.h"
+#include "IRProfiler.h"
 #include "IRRuntime.h"
 #include "IRThreadPool.h"
 #include "LLVMUtilities.h"
@@ -79,13 +80,24 @@ namespace emitters
         //
 
         /// <summary> The current function being emitted. </summary>
+        ///
+        /// <returns> Reference to an `IRFunctionEmitter` for the current function. </returns>
         IRFunctionEmitter& GetCurrentFunction();
 
         /// <summary> Returns the current block being emitted into. </summary>
+        ///
+        /// <returns> Pointer to an `IRBlockRegion` for the current region. </returns>
         IRBlockRegion* GetCurrentRegion() { return GetCurrentFunction().GetCurrentRegion(); }
 
         /// <summary> Returns the runtime object that manages functions. </summary>
+        ///
+        /// <returns> Reference to the `IRRuntime`. </returns>
         IRRuntime& GetRuntime() { return _runtime; }
+
+        /// <summary> Gets a reference to the profiler. </summary>
+        ///
+        /// <returns> Reference to the `IRProfiler` object for this module. </returns>
+        IRProfiler& GetProfiler() { return _profiler; }
 
         /// <summary> Gets a reference to the underlying IREmitter. </summary>
         ///
@@ -163,12 +175,12 @@ namespace emitters
         IRFunctionEmitter BeginMainFunction();
 
         /// <summary> Ends the current function. </summary>
-        void EndFunction();
+        void EndFunction(bool allowOptimization = true);
 
         /// <summary> Ends the current function with a return value. </summary>
         ///
         /// <param name="return"> The value the function returns. </param>
-        void EndFunction(llvm::Value* pReturn);
+        void EndFunction(llvm::Value* pReturn, bool allowOptimization = true);
 
         //
         // Variable management
@@ -749,6 +761,7 @@ namespace emitters
         IRVariableTable _globals; // Symbol table - name to global variables
         IRRuntime _runtime; // Manages emission of runtime functions
         IRThreadPool _threadPool; // A pool of worker threads -- gets initialized the first time it's used (?)
+        IRProfiler _profiler;
         std::unique_ptr<llvm::Module> _pModule; // The LLVM Module being emitted
 
         // Info to modify how code is written out

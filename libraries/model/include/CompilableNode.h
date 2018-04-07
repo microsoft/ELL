@@ -10,7 +10,6 @@
 
 #include "IRModelProfiler.h"
 #include "Node.h"
-#include "IRModelProfiler.h"
 
 // emitters
 #include "EmitterTypes.h"

@@ -9,7 +9,9 @@
 #include "AsyncEmitterTest.h"
 #include "IREmitterTest.h"
 #include "IRFunctionTest.h"
+#include "IRProfilerTest.h"
 #include "PosixEmitterTest.h"
+#include "StdlibEmitterTest.h"
 
 // testing
 #include "testing.h"
@@ -64,11 +66,23 @@ void TestPosixEmitter()
     TestPthreadCreate();
 }
 
+void TestProfiler()
+{
+    TestProfileRegion();
+}
+
+void TestStdlibEmitter()
+{
+    TestIRMallocFunction();
+}
+
 int main()
 {
     TestIR();
-    TestPosixEmitter();
     TestAsyncEmitter();
+    TestPosixEmitter();
+    TestProfiler();
+    TestStdlibEmitter();
 
     if (testing::DidTestFail())
     {

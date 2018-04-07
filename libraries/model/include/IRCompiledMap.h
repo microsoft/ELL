@@ -107,7 +107,7 @@ namespace model
         emitters::IRExecutionEngine& GetJitter();
 
         //
-        // Profiling support
+        // Node profiling support
         //
 
         /// <summary> Get a pointer to the performance counters struct for the whole model. </summary>
@@ -156,6 +156,25 @@ namespace model
 
         /// <summary> Reset the performance counters for all the node types to zero. </summary>
         void ResetNodeTypeProfilingInfo();
+
+        //
+        // Low-level region profiling support
+        //
+
+        /// <summary> Get the number of regions that have profiling information. </summary>
+        int GetNumProfileRegions();
+
+        /// <summary> Get a pointer to the info struct for a region. </summary>
+        ///
+        /// <param name="regionIndex"> the index of the region. </param>
+        emitters::ProfileRegionInfo* GetRegionProfilingInfo(int regionIndex);
+
+        /// <summary> Reset the performance summary for the model to zero. </summary>
+        void ResetRegionProfilingInfo();
+
+        //
+        // Just-in-time compilation functions
+        //
 
         /// <summary> Force jitting to finish so you can time execution without jit cost. </summary>
         void FinishJitting() const;

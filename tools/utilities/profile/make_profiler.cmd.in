@@ -43,9 +43,12 @@ cd %profiler_directory%
 
 copy ..\tools\utilities\profile\CompiledProfile_main.cpp .
 copy ..\tools\utilities\profile\CompiledExerciseModel_main.cpp .
-copy ..\tools\utilities\profile\build_and_run.sh .
-copy ..\tools\utilities\profile\CMakeLists-device-parallel.txt.in .\CMakeLists.txt
+copy ..\tools\utilities\profile\ProfileReport.h .
+copy ..\tools\utilities\profile\ProfileReport.cpp .
 copy ..\tools\utilities\profile\OpenBLASSetup.cmake .\OpenBLASSetup.cmake
+copy ..\tools\utilities\profile\build_and_run.sh .
+
+copy ..\tools\utilities\profile\CMakeLists-device-parallel.txt.in .\CMakeLists.txt
 popd
 
 :usage

@@ -19,6 +19,7 @@
 #include <llvm/IR/Value.h>
 
 // stl
+#include <map>
 #include <string>
 
 // External API for profiling functions

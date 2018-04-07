@@ -46,7 +46,7 @@ namespace emitters
     //
 
     IRModuleEmitter::IRModuleEmitter(const std::string& moduleName, const CompilerOptions& parameters)
-        : _llvmContext(new llvm::LLVMContext()), _emitter(*_llvmContext), _runtime(*this), _threadPool(*this)
+        : _llvmContext(new llvm::LLVMContext()), _emitter(*_llvmContext), _runtime(*this), _threadPool(*this), _profiler(*this, parameters.profile)
     {
         InitializeLLVM();
         InitializeGlobalPassRegistry();
@@ -58,6 +58,8 @@ namespace emitters
         {
             DeclarePrintf();
         }
+
+        _profiler.Init();
     }
 
     void IRModuleEmitter::SetCompilerOptions(const CompilerOptions& parameters)
@@ -131,12 +133,12 @@ namespace emitters
         return BeginFunction("main", VariableType::Void);
     }
 
-    void IRModuleEmitter::EndFunction()
+    void IRModuleEmitter::EndFunction(bool allowOptimization)
     {
-        EndFunction(nullptr);
+        EndFunction(nullptr, allowOptimization);
     }
 
-    void IRModuleEmitter::EndFunction(llvm::Value* pReturn)
+    void IRModuleEmitter::EndFunction(llvm::Value* pReturn, bool allowOptimization)
     {
         if (_functionStack.empty())
         {
@@ -171,7 +173,7 @@ namespace emitters
                 Log() << "Function " << currentFunction.GetFunctionName() << " already has a terminator" << EOL;
             }
             currentFunction.ConcatRegions();
-            currentFunction.CompleteFunction(GetCompilerOptions().optimize);
+            currentFunction.CompleteFunction(allowOptimization && GetCompilerOptions().optimize);
         }
         _emitter.SetCurrentInsertPoint(previousPos);
 

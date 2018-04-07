@@ -43,6 +43,11 @@ namespace emitters
         /// <returns> An `llvm::Value` pointer to the wrapped value. </returns>
         operator llvm::Value*() const { return value; }
 
+        /// <summary> Checks if this value has been assigned to. </summary>
+        ///
+        /// <returns> Returns `true` if there is a value assigned to this. </returns>
+        bool IsValid() const { return value != nullptr; }
+
         /// <summary> The function this value is in scope for. </summary>
         IRFunctionEmitter& function;
 

@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ProfileArguments.h"
+#include "ProfileReport.h"
 
 // tools/PythonPlugin
 #include "InvokePython.h"
@@ -23,6 +24,7 @@
 #include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
+#include "IRModelProfiler.h"
 
 // passes
 #include "StandardPasses.h"
@@ -114,50 +116,11 @@ utilities::OutputStreamImpostor GetOutputStream(const std::string& filename)
     return { filename };
 }
 
-void WriteUserComment(const std::string& comment, ProfileOutputFormat format,std::ostream& out)
-{
-    if (format == ProfileOutputFormat::text)
-    {
-        out << "Comment: " << comment << "\n";
-    }
-    else // json
-    {
-        out << "\"comment\": \"" << comment << "\"\n";
-    }
-}
-
 void WriteModelStatistics(model::IRCompiledMap& map, ProfileOutputFormat format, std::ostream& out)
 {
     // get overall stats
     auto modelStats = map.GetModelPerformanceCounters();
-
-    if (format == ProfileOutputFormat::text)
-    {
-        std::ios::fmtflags savedFlags(out.flags());
-        out << std::fixed;
-        out.precision(5);
-
-        int count = modelStats->count;
-        double totalTime = modelStats->totalTime;
-        double timePerRun = totalTime / count;
-
-        out << "\nModel statistics" << std::endl;
-        out << "Total time: " << totalTime << " ms \tcount: " << count << "\t time per run: " << timePerRun << " ms" << std::endl;
-
-        out.flags(savedFlags);
-    }
-    else // json
-    {
-        int count = modelStats->count;
-        double totalTime = modelStats->totalTime;
-        double timePerRun = totalTime / count;
-
-        out << "\"model_statistics\": {\n";
-        out << "  \"total_time\": " << totalTime << ",\n";
-        out << "  \"average_time\": " << timePerRun << ",\n";
-        out << "  \"count\": " << count << "\n";
-        out << "}";
-    }
+    WriteModelStatistics(modelStats, format, out);
 }
 
 void WriteNodeStatistics(model::IRCompiledMap& map, ProfileOutputFormat format, std::ostream& out)
@@ -172,7 +135,6 @@ void WriteNodeStatistics(model::IRCompiledMap& map, ProfileOutputFormat format, 
         nodeInfo.emplace_back(*info, *stats);
     }
 
-    size_t maxTypeLength = 0;
     std::vector<std::pair<model::NodeInfo, model::PerformanceCounters>> nodeTypeInfo;
     auto numNodeTypes = map.GetNumProfiledNodeTypes();
     for (int index = 0; index < numNodeTypes; ++index)
@@ -180,75 +142,22 @@ void WriteNodeStatistics(model::IRCompiledMap& map, ProfileOutputFormat format, 
         auto info = map.GetNodeTypeInfo(index);
         auto stats = map.GetNodeTypePerformanceCounters(index);
         nodeTypeInfo.emplace_back(*info, *stats);
-        maxTypeLength = std::max(maxTypeLength, std::strlen(info->nodeType));
     }
     std::sort(nodeTypeInfo.begin(), nodeTypeInfo.end(), [](auto a, auto b) { return a.second.totalTime < b.second.totalTime; });
+    WriteNodeStatistics(nodeInfo, nodeTypeInfo, format, out);
+}
 
-    // Write node statistics
-    if (format == ProfileOutputFormat::text)
+void WriteRegionStatistics(model::IRCompiledMap& map, ProfileOutputFormat format, std::ostream& out)
+{
+    // Gather region statistics
+    std::vector<emitters::ProfileRegionInfo> regions;
+    auto numRegions = map.GetNumProfileRegions();
+    for (int index = 0; index < numRegions; ++index)
     {
-        std::ios::fmtflags savedFlags(out.flags());
-        out << std::fixed;
-        out.precision(5);
-
-        out << "Node statistics" << std::endl;
-        for (const auto& info : nodeInfo)
-        {
-            out << "Node[" << info.first.nodeName << "]:\t" << std::setw(maxTypeLength) << std::left << info.first.nodeType << "\ttime: " << info.second.totalTime << " ms\tcount: " << info.second.count << "\n";
-        }
-
-        out << "\n\n";
-        out << "Node type statistics" << std::endl;
-        for (const auto& info : nodeTypeInfo)
-        {
-            out << std::setw(maxTypeLength) << std::left << info.first.nodeType << "\ttime: " << info.second.totalTime << " ms \tcount: " << info.second.count << "\n";
-        }
-
-        out.flags(savedFlags);
+        auto info = map.GetRegionProfilingInfo(index);
+        regions.emplace_back(*info);
     }
-    else // json
-    {
-        out << "\"node_statistics\": [\n";
-        for (const auto& info : nodeInfo)
-        {
-            out << "  {\n";
-            out << "    \"name\": "
-                << "\"" << info.first.nodeName << "\",\n";
-            out << "    \"type\": "
-                << "\"" << info.first.nodeType << "\",\n";
-            out << "    \"total_time\": " << info.second.totalTime << ",\n";
-            out << "    \"average_time\": " << info.second.totalTime / info.second.count << ",\n";
-            out << "    \"count\": " << info.second.count << "\n";
-            out << "  }";
-            bool isLast = (&info == &nodeInfo.back());
-            if (!isLast)
-            {
-                out << ",";
-            }
-            out << "\n";
-        }
-        out << "],\n";
-
-        out << "\"node_type_statistics\": [\n";
-        out << "  [";
-        for (const auto& info : nodeTypeInfo)
-        {
-            out << "  {\n";
-            out << "    \"type\": "
-                << "\"" << info.first.nodeType << "\",\n";
-            out << "    \"total_time\": " << info.second.totalTime << ",\n";
-            out << "    \"average_time\": " << info.second.totalTime / info.second.count << ",\n";
-            out << "    \"count\": " << info.second.count << "\n";
-            out << "  }";
-            bool isLast = (&info == &nodeTypeInfo.back());
-            if (!isLast)
-            {
-                out << ",";
-            }
-            out << "\n";
-        }
-        out << "]";
-    }
+    WriteRegionStatistics(regions, format, out);
 }
 
 void WriteTimingDetail(std::ostream& timingOutputStream, ProfileOutputFormat format, const std::vector<std::vector<double>>& nodeTimings)
@@ -297,16 +206,21 @@ void ResetProfilingInfo(model::IRCompiledMap& map)
     map.ResetModelProfilingInfo();
     map.ResetNodeProfilingInfo();
     map.ResetNodeTypeProfilingInfo();
+    map.ResetRegionProfilingInfo();
 }
 
 template <typename InputType, typename OutputType>
-void WarmUpModel(model::IRCompiledMap& map, const std::vector<InputType>& input, int numBurnInIterations)
+void WarmUpModel(model::IRCompiledMap& map, const std::vector<InputType>& input, int numBurnInIterations, bool isProfiling)
 {
     for (int iter = 0; iter < numBurnInIterations; ++iter)
     {
         auto output = map.Compute<OutputType>(input);
     }
-    ResetProfilingInfo(map);
+    
+    if(isProfiling)
+    {
+        ResetProfilingInfo(map);
+    }
 }
 
 template <typename InputType, typename OutputType>
@@ -321,6 +235,7 @@ void TimeModel(model::Map& map, const std::vector<InputType>& input, const Profi
     // Compile map
     model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions("");
     settings.profile = false;
+    settings.compilerSettings.profile = false;
     settings.optimizerSettings.fuseLinearFunctionNodes = true;
     model::IRMapCompiler compiler(settings);
 
@@ -328,7 +243,7 @@ void TimeModel(model::Map& map, const std::vector<InputType>& input, const Profi
     auto compiledMap = compiler.Compile(map);
 
     // Warm up the system by evaluating the model some number of times
-    WarmUpModel<InputType, OutputType>(compiledMap, input, profileArguments.numBurnInIterations);
+    WarmUpModel<InputType, OutputType>(compiledMap, input, profileArguments.numBurnInIterations, false);
 
     // Now evaluate the model and time it
     utilities::MillisecondTimer timer;
@@ -379,6 +294,7 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
     // Compile map
     model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions("");
     settings.profile = true;
+    settings.compilerSettings.profile = true;
     settings.optimizerSettings.fuseLinearFunctionNodes = true;
     model::IRMapCompiler compiler(settings);
 
@@ -393,7 +309,7 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
     }
 
     // Warm up the system by evaluating the model some number of times
-    WarmUpModel<InputType, OutputType>(compiledMap, input, profileArguments.numBurnInIterations);
+    WarmUpModel<InputType, OutputType>(compiledMap, input, profileArguments.numBurnInIterations, true);
 
     // Now evaluate the model and record the profiling info
     for (int iter = 0; iter < profileArguments.numIterations; ++iter)
@@ -426,6 +342,7 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
             WriteUserComment(comment, format, profileOutputStream);
         }
         WriteNodeStatistics(compiledMap, format, profileOutputStream);
+        WriteRegionStatistics(compiledMap, format, profileOutputStream);
         WriteModelStatistics(compiledMap, format, profileOutputStream);
     }
     else
@@ -437,6 +354,8 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
             profileOutputStream << ",\n";
         }
         WriteNodeStatistics(compiledMap, format, profileOutputStream);
+        profileOutputStream << ",\n";
+        WriteRegionStatistics(compiledMap, format, profileOutputStream);
         profileOutputStream << ",\n";
         WriteModelStatistics(compiledMap, format, profileOutputStream);
         profileOutputStream << "}\n";

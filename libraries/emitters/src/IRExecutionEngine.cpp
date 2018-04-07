@@ -50,7 +50,7 @@ namespace emitters
 
     IRExecutionEngine::~IRExecutionEngine()
     {
-        if(_pEngine)
+        if (_pEngine)
         {
             PerformFinalization();
         }

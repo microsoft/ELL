@@ -7,11 +7,13 @@ set (tool_name profile)
 
 set (src 
   src/ProfileArguments.cpp
+  src/ProfileReport.cpp
   src/main.cpp
   )
-
-set (include 
+  
+  set (include 
   include/ProfileArguments.h
+  include/ProfileReport.h
 )
 
 source_group("src" FILES ${src})
@@ -82,6 +84,8 @@ configure_file(CMakeLists-device.txt.in CMakeLists-device.txt.in @ONLY)
 configure_file(CMakeLists-device-parallel.txt.in CMakeLists-device-parallel.txt.in @ONLY)
 configure_file(src/CompiledProfile_main.cpp CompiledProfile_main.cpp COPYONLY)
 configure_file(src/CompiledExerciseModel_main.cpp CompiledExerciseModel_main.cpp COPYONLY)
+configure_file(src/ProfileReport.cpp ProfileReport.cpp COPYONLY)
+configure_file(include/ProfileReport.h ProfileReport.h COPYONLY)
 configure_file(make_profiler.sh.in make_profiler.sh @ONLY)
 configure_file(make_profiler.cmd.in make_profiler.cmd @ONLY)
 configure_file(build_and_run.sh.in build_and_run.sh @ONLY)

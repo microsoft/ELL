@@ -31,6 +31,7 @@ namespace emitters
         int vectorWidth = 4;
         bool useBlas = true;
         BlasType blasType = BlasType::unknown;
+        bool profile = false;
         bool optimize = true;
         bool includeDiagnosticInfo = false;
         bool parallelize = false;

@@ -91,7 +91,7 @@ namespace emitters
     {
         return IRLocalScalar(*this, static_cast<llvm::Value*>(nullptr));
     }
-    
+
     IRLocalArray IRFunctionEmitter::LocalArray(llvm::Value* value)
     {
         return IRLocalArray(*this, value);
@@ -148,6 +148,7 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::CastPointer(llvm::Value* pValue, llvm::Type* valueType)
     {
+        assert(valueType->isPointerTy());
         return _pEmitter->CastPointer(pValue, valueType);
     }
 
@@ -158,21 +159,26 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::CastIntToPointer(llvm::Value* pValue, llvm::Type* valueType)
     {
+        assert(valueType->isPointerTy());
         return _pEmitter->CastIntToPointer(pValue, valueType);
     }
 
     llvm::Value* IRFunctionEmitter::CastPointerToInt(llvm::Value* pValue, llvm::Type* destinationType)
     {
+        assert(pValue->getType()->isPointerTy());
+        assert(destinationType->isIntOrIntVectorTy());
         return _pEmitter->CastPointerToInt(pValue, destinationType);
     }
 
     llvm::Value* IRFunctionEmitter::CastIntToFloat(llvm::Value* pValue, VariableType destinationType, bool isSigned)
     {
+        assert(pValue->getType()->isIntOrIntVectorTy());
         return _pEmitter->CastIntToFloat(pValue, destinationType, isSigned);
     }
 
     llvm::Value* IRFunctionEmitter::CastFloatToInt(llvm::Value* pValue, VariableType destinationType)
     {
+        assert(pValue->getType()->isFPOrFPVectorTy());
         return _pEmitter->CastFloatToInt(pValue, destinationType);
     }
 
@@ -988,12 +994,26 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::Malloc(VariableType type, int64_t size)
     {
+        _pModuleEmitter->DeclareMalloc();
         IRValueList arguments = { Literal(size) };
+        return CastPointer(Call(MallocFnName, arguments), type);
+    }
+
+    llvm::Value* IRFunctionEmitter::Malloc(llvm::Type* type, int64_t size)
+    {
+        return Malloc(type, Literal(size));
+    }
+
+    llvm::Value* IRFunctionEmitter::Malloc(llvm::Type* type, llvm::Value* size)
+    {
+        _pModuleEmitter->DeclareMalloc();
+        IRValueList arguments = { size };
         return CastPointer(Call(MallocFnName, arguments), type);
     }
 
     void IRFunctionEmitter::Free(llvm::Value* pValue)
     {
+        _pModuleEmitter->DeclareFree();
         Call(FreeFnName, CastPointer(pValue, VariableType::BytePointer));
     }
 
@@ -1143,13 +1163,13 @@ namespace emitters
     //
     // BLAS functions
     //
-    template <typename ValueType>
+    template<typename ValueType>
     void IRFunctionEmitter::CallGEMV(int m, int n, llvm::Value* A, int lda, llvm::Value* x, int incx, llvm::Value* y, int incy)
     {
         CallGEMV<ValueType>(m, n, static_cast<ValueType>(1.0), A, lda, x, incx, static_cast<ValueType>(0.0), y, incy);
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     void IRFunctionEmitter::CallGEMV(int m, int n, ValueType alpha, llvm::Value* A, int lda, llvm::Value* x, int incx, ValueType beta, llvm::Value* y, int incy)
     {
         auto useBlas = CanUseBlas();
@@ -1176,13 +1196,13 @@ namespace emitters
         Call(gemv, args);
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     void IRFunctionEmitter::CallGEMM(int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
     {
         CallGEMM<ValueType>(false, false, m, n, k, A, lda, B, ldb, C, ldc);
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     void IRFunctionEmitter::CallGEMM(bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
     {
         auto useBlas = CanUseBlas();
@@ -1420,7 +1440,6 @@ namespace emitters
         _pFunction->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
         InsertMetadata(c_swigFunctionTagName);
     }
-
 
     //
     // Internal functions

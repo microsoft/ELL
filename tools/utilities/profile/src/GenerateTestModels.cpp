@@ -15,6 +15,8 @@
 #include "BroadcastFunctionNode.h"
 #include "ForestPredictorNode.h"
 #include "NeuralNetworkPredictorNode.h"
+#include "SimpleConvolutionNode.h"
+#include "UnrolledConvolutionNode.h"
 
 // predictors
 #include "ForestPredictor.h"
@@ -532,6 +534,49 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    return map;
+}
+
+
+model::Map GenerateSimpleConvolutionModel(int imageRows, int imageColumns, int numChannels, int numFilters)
+{
+    using ElementType = float;
+
+    model::Model model;
+    const int filterSize = 3;
+    const int pad = filterSize / 2;
+    size_t stride = 1;
+
+    using InputShape = math::TensorShape;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(InputShape(imageRows+2*pad, imageColumns+2*pad, numChannels));
+    model::PortMemoryLayout inputLayout({imageRows, imageColumns, numChannels}, {pad, pad, 0});
+    model::PortMemoryLayout outputLayout({imageRows, imageColumns, numFilters});
+
+    math::ChannelColumnRowTensor<ElementType> weights(numFilters * filterSize, filterSize, numChannels);
+
+    auto computeNode = model.AddNode<nodes::SimpleConvolutionNode<ElementType>>(inputNode->output, inputLayout, outputLayout, weights, stride);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    return map;
+}
+
+model::Map GenerateUnrolledConvolutionModel(int imageRows, int imageColumns, int numChannels, int numFilters)
+{
+    using ElementType = float;
+
+    model::Model model;
+    const int filterSize = 3;
+    const int pad = filterSize / 2;
+    size_t stride = 1;
+
+    using InputShape = math::TensorShape;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(InputShape(imageRows+2*pad, imageColumns+2*pad, numChannels));
+    model::PortMemoryLayout inputLayout({imageRows, imageColumns, numChannels}, {pad, pad, 0});
+    model::PortMemoryLayout outputLayout({imageRows, imageColumns, numFilters});
+
+    math::ChannelColumnRowTensor<ElementType> weights(numFilters * filterSize, filterSize, numChannels);
+
+    auto computeNode = model.AddNode<nodes::UnrolledConvolutionNode<ElementType>>(inputNode->output, inputLayout, outputLayout, weights, stride);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     return map;
 }
 }
