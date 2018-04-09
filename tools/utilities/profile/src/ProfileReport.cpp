@@ -9,6 +9,7 @@
 #include "ProfileReport.h"
 
 // stl
+#include <cstring>
 #include <iomanip>
 #include <ostream>
 #include <sstream>
