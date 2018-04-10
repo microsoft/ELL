@@ -106,6 +106,8 @@ namespace emitters
         {
             IRLocalArrayValue(IRFunctionEmitter& function, llvm::Value* pPointer, llvm::Value* pOffset);
 
+            IRLocalArrayValue& operator=(const IRLocalArrayValue& value);
+
             IRLocalArrayValue& operator=(llvm::Value* value);
 
             operator IRLocalScalar() const;

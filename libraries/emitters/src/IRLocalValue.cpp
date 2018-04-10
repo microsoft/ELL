@@ -63,6 +63,14 @@ namespace emitters
         emitters::IRFunctionEmitter& function, llvm::Value* value, llvm::Value* pOffset)
         : _function(function), _pPointer(value), _pOffset(pOffset) {}
 
+    IRLocalArray::IRLocalArrayValue& IRLocalArray::IRLocalArrayValue::operator=(const IRLocalArrayValue& value)
+    {
+        // cast the rhs to IRLocalScalar, which decomposes into llvm::Value* thanks to the overload below
+        *this = static_cast<IRLocalScalar>(value);
+
+        return *this;
+    }
+
     IRLocalArray::IRLocalArrayValue::operator IRLocalScalar() const
     {
         return _function.LocalScalar(_function.ValueAt(_pPointer, _pOffset));
