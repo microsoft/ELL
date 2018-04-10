@@ -51,7 +51,7 @@ foreach(llvm_version 3.9)
     endif()
 endforeach()
 
-if(LLVM_FOUND)
+if(LLVM_FOUND AND LLVM_PACKAGE_VERSION EQUAL 3.9)
     message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
     message("Found LLVM package version ${LLVM_VERSION_MAJOR}.${LLVM_VERSION_MINOR}")
     find_program(llvm-config NAMES llvm-config-${LLVM_VERSION_MAJOR}.${LLVM_VERSION_MINOR} llvm-config PATHS "${LLVM_TOOLS_BINARY_DIR}")
