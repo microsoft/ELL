@@ -17,7 +17,7 @@ so those instructions are not included here.
 ## Basic Pi Setup
 
 ### Operating System
-Our tutorials assume that the operating system running on your Pi is *Raspbian Jessie* ([NOOBS](https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2017-07-05/) or [image](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/)), not the more recent *Raspbian Stretch*.
+Your Raspberry Pi Zero W should be running the [Raspbian OS](https://www.raspberrypi.org/downloads/raspbian/).
 
 ### Network
 Connect your Pi to the network, either over Wifi or with an Ethernet cable. We will use the network both to download required software to the Pi and to transfer compiled ELL models from your computer to the Pi. Raspberry Pi Zero W has a Wifi module on board which makes it easy to connect over Wifi. If you are using a Raspberry Pi Zero with no integrated Wifi module, you may have to connect your board via a Ethernet cable or install a third part wifi dongle.
@@ -54,7 +54,7 @@ sudo apt-get install -y cmake
 ### Python 3.4 installation
 Our tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). Since the last Conda support for ARMV6 is not actively maintained, here we install Python 3.4 directly into our system path. We will also install pip3 which is a Python package management tool.
 
-To install Python 3.4 on your Raspbian Jessie, type the following:
+To install Python 3.4 on your Raspbian OS, type the following:
 
 ```shell
 sudo apt-get install python3 python3-dev

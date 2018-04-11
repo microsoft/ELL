@@ -24,7 +24,7 @@ This tutorial provides step-by-step instructions for setting up your Raspberry P
 
 Avoid long and thin micro-USB cables because using them will often create a noticeable voltage drop and they may fail to provide sufficient power to the Raspberry Pi device. 
 
-* **Operating system**. These tutorials work best with the Raspbian Jessie ([NOOBS](https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2017-07-05/) or [image](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/)) operating system for Raspberry Pi devices. Do not use the Raspbian Stretch operating system for these tutorials.
+* **Operating system**. These tutorials prefer that the operating system running on your Pi is [Raspbian Stretch](https://www.raspberrypi.org/downloads/raspbian/) so if your Pi is running Jessie you will need to upgrade.  If you really need to use Jessie for some reason see Troubleshooting below.
 
 * **Network**. You'll use a network  to download required software to the Pi and to transfer compiled ELL models from your computer to the Pi. Connect your Pi to your network, either over Wifi or with an Ethernet cable. 
 
@@ -170,9 +170,25 @@ temp_limit=75
 
 ## Troubleshooting
 
+**Raspbian Jessie**
+
+If you really need to use Raspbian Jessie then you will need to install a different version of OpenCV.
+To do that run the following:
+```
+conda install -c microsoft-ell/label/jessie opencv
+```
+
+**ImportError: libavcodec.so.57: cannot open shared object file: No such file or directory**
+
+You might be running Rasbian Jessie but you installed OpenCV for Stretch. You can check this by running `lsb_release -a`. If it says 'Codename: jessie' then you need to upgrade
+to [Raspbian Stretch](https://www.raspberrypi.org/downloads/raspbian/) or install Jessie version of OpenCV, see above.
+
 **ImportError: libavcodec.so.56: cannot open shared object file: No such file or directory**
 
-If you do not have the built-in **libavcodec.so.56**, you are probably running a newer version of Raspbian. The ELL tutorials currently require Raspbian Jessie.
+You might be running Rasbian Stretch but you installed OpenCV for Jessie. You can check this by running `lsb_release -a`. If it says 'Codename: stretch' then you need to install the OpenCV version for Stretch which you can do with this command:
+```
+conda install -c microsoft-ell/label/stretch opencv
+```
 
 
 **ImportError: No module named 'numpy'**
