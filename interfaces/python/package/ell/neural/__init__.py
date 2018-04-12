@@ -23,6 +23,7 @@ DoubleFullyConnectedLayer,\
 DoubleGRULayer,\
 DoubleLayer,\
 DoubleLayerVector,\
+DoubleLeakyReLUActivationLayer,\
 DoubleLSTMLayer,\
 DoubleNeuralNetworkPredictor,\
 DoublePoolingLayer,\
@@ -40,6 +41,7 @@ FloatFullyConnectedLayer,\
 FloatGRULayer,\
 FloatLayer,\
 FloatLayerVector,\
+FloatLeakyReLUActivationLayer,\
 FloatLSTMLayer,\
 FloatNeuralNetworkPredictor,\
 FloatPoolingLayer,\

@@ -437,8 +437,10 @@ class ConvertActivation(ConvertBase):
         """
         layer_parameters = self.get_layer_parameters(conversion_parameters)
         activation = self.importer_node.attributes["activation"]
-
-        return ell.neural.FloatActivationLayer(layer_parameters, activation)
+        if (activation == ell.neural.ActivationType.leaky):
+            return ell.neural.FloatLeakyReLUActivationLayer(layer_parameters, 0.01)
+        else:
+            return ell.neural.FloatActivationLayer(layer_parameters, activation)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -854,12 +856,6 @@ class ConvertLeakyReLU(ConvertActivation):
         self.required_attributes = []
         self.importer_node.attributes["activation"] = ell.neural.ActivationType.leaky
         
-    def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
-        """
-        Derived classes override to return the appropriate ELL node
-        """
-        return None
-
 class ConvertMaxPooling(ConvertBase):
     """
     Converter for Max Pooling

@@ -1141,8 +1141,21 @@ Node ModelBuilder::AddFloatActivationLayerNode(Model model, PortElements input, 
     }
     case ell::api::predictors::neural::ActivationType::leaky:
     {
-        auto activationLayer = neural::ActivationLayer<float, neural::LeakyReLUActivation>(parameters);
-        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::LeakyReLUActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        using apiLeakyReLUActivationLayer = typename ell::api::predictors::neural::LeakyReLUActivationLayer<float>;
+        auto* activationlayer = const_cast<ell::api::predictors::neural::ActivationLayer<float>*>(&layer);
+        auto* apiLeakyLayer = dynamic_cast<apiLeakyReLUActivationLayer*>(activationlayer);
+        if (apiLeakyLayer)
+        {
+            float alpha = apiLeakyLayer->_alpha;
+            neural::LeakyReLUActivation<float> leaky(alpha);
+            auto activationLayer = neural::ActivationLayer<float, neural::LeakyReLUActivation>(parameters, leaky);
+            newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::LeakyReLUActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        }
+        else
+        {
+            auto defaultLeakyLayer = neural::ActivationLayer<float, neural::LeakyReLUActivation>(parameters);
+            newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::LeakyReLUActivation>>(ell::model::PortElements<float>(elements), defaultLeakyLayer);
+        }
         break;
     }
     case ell::api::predictors::neural::ActivationType::sigmoid:

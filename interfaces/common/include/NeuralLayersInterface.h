@@ -142,6 +142,19 @@ namespace neural
         API_READONLY(ell::api::math::Tensor<ElementType> alpha);
     };
 
+    // Api projection for LeakyReLUActivationLayer
+    template <typename ElementType>
+    class LeakyReLUActivationLayer : public ActivationLayer<ElementType>
+    {
+    public:
+        LeakyReLUActivationLayer(const LayerParameters& layerParameters, ElementType alpha)
+            : ActivationLayer<ElementType>(layerParameters, ActivationType::leaky), _alpha(alpha)
+        {
+        }
+
+        API_READONLY(ElementType _alpha);
+    };
+
     // Api projection for BatchNormalizationLayer
     enum class EpsilonSummand : int
     {

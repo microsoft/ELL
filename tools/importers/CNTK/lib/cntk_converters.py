@@ -406,8 +406,12 @@ class CntkConvolutionConverter(CntkStandardConverter):
             convolutional_nodes = depth_first_search(cntk_node.block_root, 
                 lambda x: Utilities.op_name_equals(x, 'Convolution'))
             self.convolutional_node = convolutional_nodes[0]
-            self.is_binary_convolution = False            
-            super().__init__(cntk_node, {"weights": (0, "filter_channel_row_column"), "bias": (1, "channel")}, "Convolution")
+            self.is_binary_convolution = False
+            has_bias = Utilities.find_parameter_by_name(cntk_node.parameters, "b") is not None
+            if has_bias:
+                super().__init__(cntk_node, {"weights": (0, "W", "filter_channel_row_column"), "bias": (1, "b", "channel")}, "Convolution")
+            else:
+                super().__init__(cntk_node, {"weights": (0, "W", "filter_channel_row_column")}, "Convolution")
         else:
             # Treat this as binary convolution
             self.convolutional_node = cntk_node
@@ -494,7 +498,8 @@ class CntkElementTimesConverter(CntkStandardConverter):
         if len(indexes) < 1:
             raise Exception("ElementTimes node {} cannot be converted, the CNTK importer does not currently support arbitrary inputs".format(cntk_node.uid))
         parameter_indexes = [index for index,value in enumerate(cntk_node.inputs) if value.is_parameter]
-        if len(parameter_indexes) > 1:
+        constant_indexes = [index for index,value in enumerate(cntk_node.inputs) if value.is_constant]
+        if len(parameter_indexes) > 1 or len(constant_indexes) > 1:
             # Skip this for now
             super().__init__(cntk_node, {}, "Skip")
         else:    

@@ -252,25 +252,21 @@ class Utilities:
         for p in parameters:
             if (p.name.endswith(name)):
                 return p
-        # If no named parameter was found, just return the one at the
-        # specified index
-        if index < len(parameters):
-            return parameters[index]
         # Parameter is missing, so return None.
         return None
 
     @staticmethod    
     def find_parameter_index_by_name(parameters, name, index=0):
-        for index in range(len(parameters)):
-            if (parameters[index].name == name):
-                return index
+        for i in range(len(parameters)):
+            if (parameters[i].name == name):
+                return i
         # Fallback case: Sometimes parameters are renamed.
         # Convention is to end with the original name e.g.
         # if weights are normally "W", a renamed weights parameters
         # is something like "conv2_2.W".
-        for index in range(len(parameters)):
-            if (parameters[index].name.endswith(name)):
-                return index
+        for i in range(len(parameters)):
+            if (parameters[i].name.endswith(name)):
+                return i
         # If no named parameter was found, just return the one at the
         # specified index
         if index < len(parameters):
