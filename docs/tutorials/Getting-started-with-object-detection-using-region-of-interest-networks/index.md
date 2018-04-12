@@ -52,8 +52,8 @@ to instructions you might have followed in the Darknet model section of the
 downloading the model description, weights, and labels.
 
 ```shell
-curl --location -o model.cfg https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/tiny-yolo-voc.cfg
-curl --location -o model.weights https://pjreddie.com/media/files/tiny-yolo-voc.weights
+curl --location -o model.cfg https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2-tiny-voc.cfg
+curl --location -o model.weights https://pjreddie.com/media/files/yolov2-tiny-voc.weights
 curl --location -o categories.txt https://raw.githubusercontent.com/pjreddie/darknet/master/data/voc.names
 ```
 
