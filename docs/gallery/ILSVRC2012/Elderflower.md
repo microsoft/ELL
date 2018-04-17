@@ -1,29 +1,29 @@
 ---
 layout: default
 title: 64x64x3 Convolutional Neural Network
-permalink: /gallery/ILSVRC2012/dr_19_I64x64x3CMCMCMCMCMC1AS
+permalink: /gallery/ILSVRC2012/Elderflower
 ---
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (52.96% top 1 accuracy, 76.80% top 5 accuracy, 0.23s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (49.32% top 1 accuracy, 73.99% top 5 accuracy, 0.12s/frame on Raspberry Pi 3)
 
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dr_19_I64x64x3CMCMCMCMCMC1AS/dr_19_I64x64x3CMCMCMCMCMC1AS.ell.zip">dr_19_I64x64x3CMCMCMCMCMC1AS.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Elderflower/Elderflower.ell.zip">Elderflower.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
-        <td colspan="3"> ILSVRC2012: 76.80% (Top 5), 52.96% (Top 1) </td>
+        <td colspan="3"> ILSVRC2012: 73.99% (Top 5), 49.32% (Top 1) </td>
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.23s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.12s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
-        <td colspan="3"> 65MB </td>
+        <td colspan="3"> 57MB </td>
     </tr>
     <tr>
         <td> Input </td>
@@ -32,7 +32,7 @@ permalink: /gallery/ILSVRC2012/dr_19_I64x64x3CMCMCMCMCMC1AS
     <tr>
         <td> Architecture </td>
         <td>
-            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dr_19_I64x64x3CMCMCMCMCMC1AS/dr_19_I64x64x3CMCMCMCMCMC1AS.cntk.svg?sanitize=true" target="_blank">dr_19_I64x64x3CMCMCMCMCMC1AS architecture (SVG)</a>
+            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Elderflower/Elderflower.cntk.svg?sanitize=true" target="_blank">Elderflower architecture (SVG)</a>
         </td>
     </tr>
     <tr>

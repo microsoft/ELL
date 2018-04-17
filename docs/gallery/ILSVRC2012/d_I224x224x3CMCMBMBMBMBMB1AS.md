@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/d_I224x224x3CMCMBMBMBMBMB1AS
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 224x224x3 Convolutional Neural Network (37.22% top 1 accuracy, 62.63% top 5 accuracy, 0.56s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 224x224x3 Convolutional Neural Network (37.22% top 1 accuracy, 62.63% top 5 accuracy, 0.73s/frame on Raspberry Pi 3)
 
 <table class="table table-striped table-bordered">
     <tr>
@@ -19,101 +19,20 @@ permalink: /gallery/ILSVRC2012/d_I224x224x3CMCMBMBMBMBMB1AS
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.56s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.40s/frame<br>DragonBoard 410c @ 1.2GHz: 0.24s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.73s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.40s/frame<br>DragonBoard 410c @ 1.2GHz: 0.24s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
-        <td colspan="3"> 20MB </td>
+        <td colspan="3"> 21MB </td>
     </tr>
     <tr>
         <td> Input </td>
-        <td colspan="3"> 224 x 224 x {B,G,R} </td>
+        <td colspan="3"> 224 &times; 224 &times; {B,G,R} </td>
     </tr>
     <tr>
         <td> Architecture </td>
         <td>
-            <table class="arch-table">
-                <tr class="arch-table">
-                    <td>Convolution</td>
-                    <td>&#8680;&nbsp;224x224x16</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Pooling</td>
-                    <td>&#8680;&nbsp;114x114x16</td>
-                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Convolution</td>
-                    <td>&#8680;&nbsp;112x112x64</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Pooling</td>
-                    <td>&#8680;&nbsp;58x58x64</td>
-                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Convolution</td>
-                    <td>&#8680;&nbsp;56x56x64</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Pooling</td>
-                    <td>&#8680;&nbsp;28x28x64</td>
-                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Convolution</td>
-                    <td>&#8680;&nbsp;28x28x128</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Pooling</td>
-                    <td>&#8680;&nbsp;14x14x128</td>
-                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Convolution</td>
-                    <td>&#8680;&nbsp;14x14x256</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Pooling</td>
-                    <td>&#8680;&nbsp;7x7x256</td>
-                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Convolution</td>
-                    <td>&#8680;&nbsp;7x7x512</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Pooling</td>
-                    <td>&#8680;&nbsp;4x4x512</td>
-                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Convolution</td>
-                    <td>&#8680;&nbsp;4x4x1024</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Convolution</td>
-                    <td>&#8680;&nbsp;4x4x1000</td>
-                    <td>size=1x1,&nbsp;stride=1,&nbsp;type=float32</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Pooling</td>
-                    <td>&#8680;&nbsp;1x1x1000</td>
-                    <td>size=4x4,&nbsp;stride=1,&nbsp;operation=average</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Softmax</td>
-                    <td>&#8680;&nbsp;1x1x1000</td>
-                    <td></td>
-                </tr>
-            </table>
+            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMBMBMBMBMB1AS/d_I224x224x3CMCMBMBMBMBMB1AS.cntk.svg?sanitize=true" target="_blank">d_I224x224x3CMCMBMBMBMBMB1AS architecture (SVG)</a>
         </td>
     </tr>
     <tr>
@@ -122,8 +41,7 @@ permalink: /gallery/ILSVRC2012/d_I224x224x3CMCMBMBMBMBMB1AS
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3">Trained by Juan Lema
- using CNTK 2.2 </td>
+        <td colspan="3"> Trained by v-jlema@microsoft.com using CNTK 2.2 </td>
     </tr>
 </table>
 

@@ -1,287 +1,246 @@
 [
   {
     "accuracy": {
-      "top1": "55.00",
-      "top5": "78.75"
+      "top1": "68.19",
+      "top5": "88.24"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
-    "elapsedTime": "32:03:20",
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_1117\\resnet34_f_I128x128x3_ADS.ell.zip",
     "filter_size": 3,
+    "filters_per_layer": [],
     "image_size": "128x128",
     "increase_factor": 112,
-    "lastProgress": 101,
-    "model": "d_19A",
-    "name": "dr_19A_I128x128x3CMCMCMCMCMCMC1AS",
-    "friendly_name": "GardenCress",
+    "model": "resnet34",
+    "name": "resnet34_f_I128x128x3_ADS",
     "secs_per_frame": {
-      "pi3": "0.17"
+      "pi3": "0.86"
     },
-    "status": "Pass"
+    "friendly_name": "Chenet"
   },
   {
     "accuracy": {
-      "top1": "61.29",
-      "top5": "83.57"
+      "top1": "63.23",
+      "top5": "84.72"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS_v2\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS_v2.ell.zip",
-    "elapsedTime": "48:05:09",
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_1126\\resnet101_f_I64x64x3_1AS.ell.zip",
     "filter_size": 3,
-    "image_size": "128x128",
-    "increase_factor": 112,
-    "lastProgress": 45,
-    "model": "d_19A",
-    "name": "dr_19A_I128x128x3CMCMCMCMCMCMC1AS_v2",
-    "friendly_name": "MountainPepper",
-    "secs_per_frame": {
-      "pi3": "0.69"
-    },
-    "status": "Running"
-  },
-  {
-    "accuracy": {
-      "top1": "55.93",
-      "top5": "79.47"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19B2_I128x128x3CMCMCMCMCMCMC1AS\\dr_19B2_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
-    "elapsedTime": "29:13:34",
-    "filter_size": 3,
-    "image_size": "128x128",
-    "increase_factor": 112,
-    "lastProgress": 101,
-    "model": "d_19B2",
-    "name": "dr_19B2_I128x128x3CMCMCMCMCMCMC1AS",
-    "friendly_name": "Ampullaris",
-    "secs_per_frame": {
-      "pi3": "0.30"
-    },
-    "status": "Pass"
-  },
-  {
-    "accuracy": {
-      "top1": "63.76",
-      "top5": "85.08"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19C_I128x128x3CMCMCMCMCMCMC1AS\\dr_19C_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
-    "elapsedTime": "48:25:48",
-    "filter_size": 3,
-    "image_size": "128x128",
-    "increase_factor": 112,
-    "lastProgress": 76,
-    "model": "d_19C",
-    "name": "dr_19C_I128x128x3CMCMCMCMCMCMC1AS",
-    "friendly_name": "Woodruff",
-    "secs_per_frame": {
-      "pi3": "0.76"
-    },
-    "status": "Running"
-  },
-  {
-    "accuracy": {
-      "top1": "52.96",
-      "top5": "76.80"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_19_I64x64x3CMCMCMCMCMC1AS\\dr_19_I64x64x3CMCMCMCMCMC1AS.ell.zip",
-    "elapsedTime": "26:13:03",
-    "filter_size": 3,
+    "filters_per_layer": [],
     "image_size": "64x64",
-    "increase_factor": 0,
-    "lastProgress": 86,
-    "model": "d_19",
-    "name": "dr_19_I64x64x3CMCMCMCMCMC1AS",
-    "friendly_name": "Lettuce",
-    "secs_per_frame": {
-      "pi3": "0.16"
-    },
-    "status": "Running"
-  },
-  {
-    "accuracy": {
-      "top1": "64.84",
-      "top5": "85.89"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_313B_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_313B_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
-    "elapsedTime": "44:33:32",
-    "filter_size": 3,
-    "image_size": "256x256",
     "increase_factor": 112,
-    "lastProgress": 101,
-    "model": "d_313B",
-    "name": "dr_313B_I256x256x3CMCMCMCMCMCMCMC1AS",
-    "friendly_name": "CustardApple",
-    "secs_per_frame": {
-      "pi3": "0.83"
-    },
-    "status": "Pass"
-  },
-  {
-    "accuracy": {
-      "top1": "65.18",
-      "top5": "86.31"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_313C_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_313C_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
-    "elapsedTime": "61:01:25",
-    "filter_size": 3,
-    "image_size": "256x256",
-    "increase_factor": 112,
-    "lastProgress": 101,
-    "model": "d_313C",
-    "name": "dr_313C_I256x256x3CMCMCMCMCMCMCMC1AS",
-    "friendly_name": "WaterSpinach",
-    "secs_per_frame": {
-      "pi3": "0.95"
-    },
-    "status": "Pass"
-  },
-  {
-    "accuracy": {
-      "top1": "63.68",
-      "top5": "85.31"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_313_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_313_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
-    "elapsedTime": "43:29:29",
-    "filter_size": 3,
-    "image_size": "256x256",
-    "increase_factor": 112,
-    "lastProgress": 101,
-    "model": "d_313",
-    "name": "dr_313_I256x256x3CMCMCMCMCMCMCMC1AS",
-    "friendly_name": "Zwetschge",
-    "secs_per_frame": {
-      "pi3": "0.68"
-    },
-    "status": "Pass"
-  },
-  {
-    "accuracy": {
-      "top1": "61.56",
-      "top5": "83.93"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS\\dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS.ell.zip",
-    "elapsedTime": "43:40:03",
-    "filter_size": 3,
-    "image_size": "256x256",
-    "increase_factor": 112,
-    "lastProgress": 62,
-    "model": "d_reference_configurable_313_2X",
-    "name": "dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS",
-    "friendly_name": "Ziziphus",
+    "model": "resnet101",
+    "name": "resnet101_f_I64x64x3_1AS",
     "secs_per_frame": {
       "pi3": "0.54"
     },
-    "status": "Running"
+    "friendly_name": "Wattleseed"
   },
   {
     "accuracy": {
-      "top1": "57.43",
-      "top5": "80.91"
+      "top1": "64.59",
+      "top5": "85.50"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS_v2\\dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS_v2.ell.zip",
-    "elapsedTime": "30:12:28",
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_1132\\resnet152_f_I64x64x3_1AS.ell.zip",
     "filter_size": 3,
-    "image_size": "256x256",
+    "filters_per_layer": [],
+    "image_size": "64x64",
     "increase_factor": 112,
-    "lastProgress": 101,
-    "model": "d_reference_configurable_313_2X",
-    "name": "dr_cD_313_2X_I256x256x3CMCMCMCMCMCMCMC1AS_v2",
-    "friendly_name": "Mangosteen",
+    "model": "resnet152",
+    "name": "resnet152_f_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.29"
+      "pi3": "0.80"
     },
-    "status": "Pass"
+    "friendly_name": "Mashua"
   },
   {
     "accuracy": {
-      "top1": "57.38",
-      "top5": "80.85"
+      "top1": "59.59",
+      "top5": "82.15"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dsb_I128x128x3CMCMCMCMCMCCCMC1AS\\dsb_I128x128x3CMCMCMCMCMCCCMC1AS.ell.zip",
-    "elapsedTime": "50:45:59",
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_3075\\resnetconf_I128x128x3_ADS.ell.zip",
     "filter_size": 3,
+    "filters_per_layer": [
+      1,
+      1,
+      0,
+      0
+    ],
     "image_size": "128x128",
-    "increase_factor": 0,
-    "lastProgress": 101,
-    "model": "dstackedbottom",
-    "name": "dsb_I128x128x3CMCMCMCMCMCCCMC1AS",
-    "friendly_name": "Butternut",
+    "increase_factor": 112,
+    "model": "resnetconf",
+    "name": "resnetconf_I128x128x3_ADS",
     "secs_per_frame": {
-      "pi3": "0.41"
+      "pi3": "0.32"
     },
-    "status": "Pass"
+    "friendly_name": "Pawpaw"
   },
   {
     "accuracy": {
-      "top1": "41.07",
-      "top5": "66.34"
+      "top1": "64.61",
+      "top5": "85.63"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\dsb_I64x64x3CMCMCMCMCCCMC1AS\\dsb_I64x64x3CMCMCMCMCCCMC1AS.ell.zip",
-    "elapsedTime": "35:15:30",
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_3092\\resnetconf_I128x128x3_1AS.ell.zip",
     "filter_size": 3,
-    "image_size": "64x64",
-    "increase_factor": 0,
-    "lastProgress": 101,
-    "model": "dstackedbottom",
-    "name": "dsb_I64x64x3CMCMCMCMCCCMC1AS",
-    "friendly_name": "Loosestrife",
+    "filters_per_layer": [
+      1,
+      1,
+      2,
+      1
+    ],
+    "image_size": "128x128",
+    "increase_factor": 112,
+    "model": "resnetconf",
+    "name": "resnetconf_I128x128x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.10"
+      "pi3": "0.45"
     },
-    "status": "Pass"
+    "friendly_name": "Carrot"
   },
   {
     "accuracy": {
-      "top1": "62.08",
-      "top5": "83.88"
+      "top1": "66.04",
+      "top5": "86.59"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\v_I64x64x3CCMCCMCCCCMCCCCMCCCCMF2048S\\v_I64x64x3CCMCCMCCCCMCCCCMCCCCMF2048S.ell.zip",
-    "elapsedTime": "44:26:40",
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_3169\\resnetconf_I128x128x3_ADS.ell.zip",
     "filter_size": 3,
+    "filters_per_layer": [
+      1,
+      2,
+      2,
+      2
+    ],
+    "image_size": "128x128",
+    "increase_factor": 112,
+    "model": "resnetconf",
+    "name": "resnetconf_I128x128x3_ADS",
+    "secs_per_frame": {
+      "pi3": "0.56"
+    },
+    "friendly_name": "SevenSisters"
+  },
+  {
+    "accuracy": {
+      "top1": "49.32",
+      "top5": "73.99"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_3282\\resnetconf_I64x64x3_ADS.ell.zip",
+    "filter_size": 3,
+    "filters_per_layer": [
+      1,
+      2,
+      2,
+      2
+    ],
     "image_size": "64x64",
     "increase_factor": 112,
-    "lastProgress": 101,
-    "model": "v",
-    "name": "v_I64x64x3CCMCCMCCCCMCCCCMCCCCMF2048S",
-    "friendly_name": "Aubergine",
+    "model": "resnetconf",
+    "name": "resnetconf_I64x64x3_ADS",
     "secs_per_frame": {
-      "pi3": "1.01"
+      "pi3": "0.11"
     },
-    "status": "Pass"
+    "friendly_name": "Elderflower"
   },
   {
     "accuracy": {
-      "top1": "60.72",
-      "top5": "83.02"
+      "top1": "44.01",
+      "top5": "68.64"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\v_I64x64x3CCMCCMCCMCCMCCMF4096S\\v_I64x64x3CCMCCMCCMCCMCCMF4096S.ell.zip",
-    "elapsedTime": "32:36:19",
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1521072110030_2396\\resnetconf_I64x64x3_ADS.ell.zip",
     "filter_size": 3,
+    "filters_per_layer": [
+      1,
+      1,
+      0,
+      0
+    ],
     "image_size": "64x64",
     "increase_factor": 112,
-    "lastProgress": 101,
-    "model": "v",
-    "name": "v_I64x64x3CCMCCMCCMCCMCCMF4096S",
-    "friendly_name": "Fuji",
+    "model": "resnetconf",
+    "name": "resnetconf_I64x64x3_ADS",
     "secs_per_frame": {
-      "pi3": "0.65"
+      "pi3": "0.08"
     },
-    "status": "Pass"
+    "friendly_name": "BrazilianGuava"
   },
   {
     "accuracy": {
-      "top1": "56.82",
-      "top5": "80.31"
+      "top1": "54.39",
+      "top5": "78.02"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\v_I64x64x3CCMCCMCMCMCMF3072S\\v_I64x64x3CCMCCMCMCMCMF3072S.ell.zip",
-    "elapsedTime": "33:40:13",
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1522187747072_0789\\resnetconf_bottleneck_I64x64x3_1AS.ell.zip",
     "filter_size": 3,
+    "filters_per_layer": [
+      1,
+      1,
+      1,
+      0
+    ],
     "image_size": "64x64",
     "increase_factor": 112,
-    "lastProgress": 101,
-    "model": "v",
-    "name": "v_I64x64x3CCMCCMCMCMCMF3072S",
-    "friendly_name": "Mint",
+    "model": "resnetconf_bottleneck",
+    "name": "resnetconf_bottleneck_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.46"
+      "pi3": "0.18"
     },
-    "status": "Pass"
+    "friendly_name": "Candlenut"
+  },
+  {
+    "accuracy": {
+      "top1": "58.74",
+      "top5": "81.59"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1522191724086_0185\\resnetconf_bottleneck_I64x64x3_1AS.ell.zip",
+    "filter_size": 3,
+    "filters_per_layer": [
+      1,
+      1,
+      5,
+      1
+    ],
+    "image_size": "64x64",
+    "increase_factor": 112,
+    "model": "resnetconf_bottleneck",
+    "name": "resnetconf_bottleneck_I64x64x3_1AS",
+    "secs_per_frame": {
+      "pi3": "0.24"
+    },
+    "friendly_name": "Chalta"
+  },
+  {
+    "accuracy": {
+      "top1": "62.05",
+      "top5": "83.80"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1522193514033_0457\\resnetconf_bottleneck_I64x64x3_1AS.ell.zip",
+    "filter_size": 3,
+    "filters_per_layer": [
+      3,
+      4,
+      8,
+      0
+    ],
+    "image_size": "64x64",
+    "increase_factor": 112,
+    "model": "resnetconf_bottleneck",
+    "name": "resnetconf_bottleneck_I64x64x3_1AS",
+    "secs_per_frame": {
+      "pi3": "0.38"
+    },
+    "friendly_name": "PandanFlower"
+  },
+  {
+    "accuracy": {
+      "top1": "55.00",
+      "top5": "78.75"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
+    "filter_size": 3,
+    "filters_per_layer": [],
+    "image_size": "128x128",
+    "increase_factor": 112,
+    "model": "d_19A",
+    "name": "dr_19A_I128x128x3CMCMCMCMCMCMC1AS",
+    "secs_per_frame": {
+      "pi3": "0.22"
+    },
+    "friendly_name": "GardenCress"
   }
 ]

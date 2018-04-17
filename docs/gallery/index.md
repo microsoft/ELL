@@ -82,7 +82,7 @@ var spec = {
       "value": "rgba(100,100,100,0.2)"
     },
     "shape": {"field": "image_size", "type": "nominal"},
-    "tooltip": {"field": "directory", "type": "ordinal"},
+    "tooltip": {"field": "friendly_name", "type": "ordinal"},
     "size": {"value": 100}
   }
 }
@@ -107,7 +107,7 @@ vegaEmbed("#plot", spec, {actions:false})
     <td style="text-align: right">{{model.accuracy.top1}}</td>
     <td style="text-align: right">{{model.accuracy.top5}}</td>
     <td style="text-align: right">{{model.secs_per_frame.pi3}}</td>
-    <td><a href="/ELL/gallery/ILSVRC2012/{{model.name}}.html">{{model.friendly_name}}</a></td>
+    <td><a href="/ELL/gallery/ILSVRC2012/{{model.friendly_name}}.html">{{model.friendly_name}}</a></td>
   </tr>
 {% endfor %}
 </table>
