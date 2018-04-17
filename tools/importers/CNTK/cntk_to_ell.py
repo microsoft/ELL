@@ -15,7 +15,7 @@ import math
 import time
 
 import numpy as np
-from cntk import load_model
+from cntk import load_model, ModelFormat
 from cntk.ops import softmax
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))

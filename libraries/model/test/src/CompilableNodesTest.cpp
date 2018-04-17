@@ -2382,6 +2382,74 @@ void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPa
     VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
+// Test separable convolutions
+void TestConvolutionalLayerNode3(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using ElementType = double;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
+    using Shape = typename Layer<ElementType>::Shape;
+
+    const size_t numRows = 2;
+    const size_t numCols = 2;
+    const size_t numChannels = 2;
+    const size_t numFilters = 2;
+
+    auto rng = utilities::GetRandomEngine("123");
+    auto rand = [&rng]() { return (double)rng() / (double)(rng.max() - rng.min()); };
+
+    assert(inputPaddingSize == 1);
+    TensorType inputWithPadding(numRows + 2 * inputPaddingSize, numCols + 2 * inputPaddingSize, numChannels);
+    inputWithPadding.Fill(0);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, numRows, numCols, numChannels);
+    for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
+    {
+        for (size_t colIndex = 0; colIndex < numCols; ++colIndex)
+        {
+            for (size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
+            {
+                input(rowIndex, colIndex, channelIndex) = rand() - 0.5;
+            }
+        }
+    }
+    Shape outputShape = { numRows + 2 * outputPaddingSize, numCols + 2 * outputPaddingSize, numFilters };
+
+    LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    auto convolutionMethod = ConvolutionMethod::unrolled;
+    ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 2 }; // 2 == batch size
+    TensorType weights(convolutionalParams.receptiveField * numFilters, convolutionalParams.receptiveField, 1);
+    weights.Fill(1.0);
+    for (size_t rowIndex = 0; rowIndex < convolutionalParams.receptiveField * numFilters; ++rowIndex)
+    {
+        for (size_t colIndex = 0; colIndex < convolutionalParams.receptiveField; ++colIndex)
+        {
+            for (size_t channelIndex = 0; channelIndex < 1; ++channelIndex)
+            {
+                weights(rowIndex, colIndex, channelIndex) = rand() - 0.5;
+            }
+        }
+    }
+
+    //
+    // Verify ConvolutionalLayerNode
+    //
+    ConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<double>>(inputNode->output, layer);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
 void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
     using ElementType = double;

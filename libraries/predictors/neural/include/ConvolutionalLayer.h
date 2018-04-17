@@ -128,6 +128,8 @@ namespace neural
         MatrixType _shapedInput;
         MatrixType _weightsMatrix;
         MatrixType _outputMatrix;
+
+        bool _isDepthwiseSeparable = false;
     };
 
 }

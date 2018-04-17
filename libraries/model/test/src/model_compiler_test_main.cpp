@@ -180,6 +180,7 @@ void TestIRCompiler()
     // TestConvolutionalLayerNode(ConvolutionType::unrolled);
     TestConvolutionalLayerNode(ConvolutionType::unrolled, 1, 0);
     TestConvolutionalLayerNode2(ConvolutionType::unrolled, 1, 0);
+    TestConvolutionalLayerNode3(ConvolutionType::unrolled, 1, 0);
     // TestConvolutionalLayerNode(ConvolutionType::unrolled, 2, 0);
     // TestConvolutionalLayerNode(ConvolutionType::unrolled, 1, 1); // Convolutional layer output padding not supported
 

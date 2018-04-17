@@ -92,11 +92,12 @@ namespace nodes
         void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
-        bool IsCompilable(const model::MapCompiler* compiler) const override { return false; }
+        bool IsCompilable(const model::MapCompiler* compiler) const override { return _isDepthwiseSeparable; }
 
     protected:
         bool Refine(model::ModelTransformer& transformer) const override;
         void Compute() const override;
+        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
         bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
@@ -117,6 +118,7 @@ namespace nodes
 
         int _filterSize = 0;
         int _stride = 1;
+        bool _isDepthwiseSeparable = false;
     };
 }
 }
