@@ -861,7 +861,7 @@ void TestCompilableAccumulatorNodeFunction()
 extern "C" {
 size_t g_callbackCount = 0;
 const size_t g_inputSize = 5;
-bool Test_CompiledSourceNode_InputCallback(double* input)
+bool Test_CompiledSourceNode_InputCallback(void* context, double* input)
 {
     Log() << "Source Input Callback " << input << EOL;
     for (size_t i = 0; i < g_inputSize; ++i)
@@ -871,7 +871,7 @@ bool Test_CompiledSourceNode_InputCallback(double* input)
     g_callbackCount++;
     return true;
 }
-TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSourceNode_InputCallback, bool, double*);
+TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSourceNode_InputCallback, bool, void*, double*);
 }
 
 void TestCompilableSourceNode()
@@ -908,22 +908,22 @@ void TestCompilableSourceNode()
 extern "C" {
 size_t g_sinkOutputSize = 0;
 std::vector<double> outputValues;
-void Test_CompiledSinkNode_OutputCallback_Scalar(double output)
+void Test_CompiledSinkNode_OutputCallback_Scalar(void* context, double output)
 {
     Log() << "Sink Output Callback (Scalar) " << output << EOL;
     assert(g_sinkOutputSize == 1);
     outputValues.push_back(output);
 }
-TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Scalar, void, double);
+TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Scalar, void, void*, double);
 
-void Test_CompiledSinkNode_OutputCallback_Vector(double* output)
+void Test_CompiledSinkNode_OutputCallback_Vector(void* context, double* output)
 {
     Log() << "Sink Output Callback (Vector) " << *output << EOL;
     assert(g_sinkOutputSize > 1);
     outputValues.assign(output, output + g_sinkOutputSize); // assign reallocates as needed
 }
 }
-TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Vector, void, double*);
+TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Vector, void, void*, double*);
 
 void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionName, bool triggerValue)
 {
@@ -1079,14 +1079,14 @@ void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
 // C callback (called by emitted code)
 static int lagNotificationCallbackCount = 0;
 extern "C" {
-void Test_ClockNode_LagNotificationCallback(double lag)
+void Test_ClockNode_LagNotificationCallback(void* context, double lag)
 {
     testing::EnableLoggingHelper();
     Log() << "ClockNode Lag Notification Callback " << lag << EOL;
     lagNotificationCallbackCount++;
 }
 }
-TESTING_FORCE_DEFINE_SYMBOL(Test_ClockNode_LagNotificationCallback, void, double);
+TESTING_FORCE_DEFINE_SYMBOL(Test_ClockNode_LagNotificationCallback, void, void*, double);
 
 void TestCompilableClockNode()
 {

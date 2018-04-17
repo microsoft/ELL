@@ -1,9 +1,9 @@
-u8R"(void @@FUNCTION@@(@@INPUT_TYPE@@ input, std::vector<@@OUTPUT_TYPE@@>& output);
+u8R"(void @@FUNCTION@@(void* context, @@INPUT_TYPE@@ input, std::vector<@@OUTPUT_TYPE@@>& output);
 
 #if !defined(SWIG)
-void @@FUNCTION@@(@@INPUT_TYPE@@ input, std::vector<@@OUTPUT_TYPE@@>& output)
+void @@FUNCTION@@(void* context, @@INPUT_TYPE@@ input, std::vector<@@OUTPUT_TYPE@@>& output)
 {
-    @@FUNCTION@@(@@INPUT_ARGUMENT@@, &output[0]);
+    @@FUNCTION@@(context, @@INPUT_ARGUMENT@@, &output[0]);
 }
 #endif // !defined(SWIG)
 )"

@@ -522,19 +522,21 @@ public:
     CompiledMap(ell::model::IRCompiledMap map, ell::api::math::TensorShape inputShape, ell::api::math::TensorShape outputShape);
 
     template <typename ElementType>
-    static bool InvokeSourceCallback(ElementType* input);
+    bool InvokeSourceCallback(ElementType* input);
 
     template <typename ElementType>
-    static void InvokeSinkCallback(ElementType* output);
+    void InvokeSinkCallback(ElementType* output);
 #endif
 
 private:
     template <typename ElementType>
-    static ell::api::CallbackForwarder<ElementType, ElementType>& CallbackForwarder();
+    ell::api::CallbackForwarder<ElementType, ElementType>& GetCallbackForwarder();
 
     std::shared_ptr<ell::model::IRCompiledMap> _map;
     ell::api::math::TensorShape _inputShape;
     ell::api::math::TensorShape _outputShape;
+    ell::api::CallbackForwarder<double, double> forwarderDouble;
+    ell::api::CallbackForwarder<float, float> forwarderFloat;
 };
 
 //

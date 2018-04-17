@@ -193,9 +193,17 @@ namespace emitters
                 }
                 first = false;
 
-                WriteLLVMType(os, arg.getType());
-
                 std::string argName = arg.getName();
+                // HACK: work around LLVM problem with void*
+                if (argName == "context")
+                {
+                    os << "void*";
+                }
+                else 
+                {
+                    WriteLLVMType(os, arg.getType());
+                }
+
                 if (!argName.empty())
                 {
                     os << " " << argName;
@@ -388,7 +396,9 @@ namespace emitters
         // Callbacks have one input parameter and a return (which can be void)
         {
             std::ostringstream os;
-            auto& argument = *(function.args().begin());
+            auto ptr = function.args().begin();
+            ptr++; // first argument is now a void* context, second argument has the type info we need.
+            auto& argument = *ptr;
             auto type = argument.getType();
             if (type->isPointerTy())
             {

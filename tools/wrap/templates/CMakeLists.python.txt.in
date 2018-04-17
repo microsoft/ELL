@@ -53,6 +53,7 @@ if(${PYTHONLIBS_FOUND})
 
     set(target_name ${module_prefix}@ELL_model_name@)
 
+    add_definitions(-DSWIG_PYTHON_INTERPRETER_NO_DEBUG)
     set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     add_library(${target_name} SHARED

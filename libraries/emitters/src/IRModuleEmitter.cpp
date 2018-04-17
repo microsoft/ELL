@@ -78,7 +78,12 @@ namespace emitters
 
     void IRModuleEmitter::BeginMapPredictFunction(const std::string& functionName, NamedVariableTypeList& args)
     {
-        BeginFunction(functionName, VariableType::Void, args);
+        IRFunctionEmitter& function = BeginFunction(functionName, VariableType::Void, args);
+
+        // store context variable so the callbacks can find it later.
+        auto context = function.GetFunctionArgument("context");        
+        auto globalContext = GlobalPointer(GetModuleName() + "_context", emitters::VariableType::Byte);
+        function.Store(globalContext, context);
     }
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType)
@@ -372,6 +377,12 @@ namespace emitters
     {
         auto initializer = ZeroInitializer(pType);
         return AddGlobal(name, pType, initializer, false);
+    }
+
+    llvm::GlobalVariable* IRModuleEmitter::GlobalPointer(const std::string& name, VariableType type)
+    {
+        llvm::PointerType* pointerType = _emitter.Type(type)->getPointerTo();
+        return AddGlobal(name, pointerType, _emitter.NullPointer(pointerType), false);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::GlobalArray(VariableType type, const std::string& name, const size_t size)

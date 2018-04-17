@@ -71,6 +71,7 @@ void CompiledMap::Step(ell::api::TimeTickType timestamp)
 {
     // Note: casting TimeTickType to match input and output port types
     std::vector<ell::api::TimeTickType> input = { timestamp };
+    _map->SetContext(this);
     _map->Compute<ElementType>(input);
 }
 
@@ -80,25 +81,25 @@ void CompiledMap::RegisterCallbacks(
     ell::api::CallbackBase<ElementType>& outputCallback)
 {
     ell::api::CallbackBase<ell::api::TimeTickType> unusedLagCallback;
-    CallbackForwarder<ElementType>().Register(inputCallback, _inputShape.Size(), outputCallback, _outputShape.Size(), unusedLagCallback);
+    GetCallbackForwarder<ElementType>().Register(inputCallback, _inputShape.Size(), outputCallback, _outputShape.Size(), unusedLagCallback);
 }
 
 template <typename ElementType>
 void CompiledMap::UnregisterCallbacks()
 {
-    CallbackForwarder<ElementType>().Clear();
+    GetCallbackForwarder<ElementType>().Clear();
 }
 
 template <typename ElementType>
 bool CompiledMap::InvokeSourceCallback(ElementType* input)
 {
-    return CallbackForwarder<ElementType>().InvokeInput(input);
+    return GetCallbackForwarder<ElementType>().InvokeInput(input);
 }
 
 template <typename ElementType>
 void CompiledMap::InvokeSinkCallback(ElementType* output)
 {
-    CallbackForwarder<ElementType>().InvokeOutput(output);
+    GetCallbackForwarder<ElementType>().InvokeOutput(output);
 }
 
 } // end namespace

@@ -1,11 +1,19 @@
 u8R"(class Model:
     """Base class that user code derives from to provide callbacks"""
     def __init__(self):
-        self.predictor = @@PREDICTOR_CLASS@@.GetInstance(self._@@SOURCE_CALLBACK@@,
+        
+        self.predictor = @@PREDICTOR_CLASS@@()
+
+        # keep these wrapper objects alive so the @@PREDICTOR_CLASS@@ C++ code can keep a pointer to them.
+        self.input_wrapper = InputCallableWrapper(self._@@SOURCE_CALLBACK@@)
+        self.output_wrapper = OutputCallableWrapper(self.@@SINK_CALLBACK@@)
+        self.lag_wrapper = LagCallableWrapper(self.@@LAG_CALLBACK@@)
+
+        self.predictor.Register(self.input_wrapper,
           get_default_input_shape().Size(),
-          self.@@SINK_CALLBACK@@,
+          self.output_wrapper,
           get_default_output_shape().Size(),
-          self.@@LAG_CALLBACK@@)
+          self.lag_wrapper)
 
         self.input = @@SOURCE_VECTOR_TYPE@@(get_default_input_shape().Size())
         self.result = @@SINK_VECTOR_TYPE@@(get_default_output_shape().Size())
@@ -41,7 +49,7 @@ u8R"(class Model:
 
     def @@PREDICT_FUNCTION_PY@@(self, current_time=0):
         """Runs @@PREDICT_FUNCTION_PY@@ with the current time in milliseconds"""
-        @@PREDICT_FUNCTION@@(current_time, self.result)
+        @@PREDICT_FUNCTION@@(self.predictor, current_time, self.result)
 
 
 def predict(inputData: 'numpy.ndarray') -> "numpy.ndarray":

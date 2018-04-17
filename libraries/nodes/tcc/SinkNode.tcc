@@ -65,23 +65,29 @@ namespace nodes
 
         auto if1 = function.If(emitters::TypedComparison::equals, pTrigger, function.Literal(true));
         {
+            // look up our global context object
+            auto context = module.GlobalPointer(compiler.GetNamespacePrefix() + "_context", emitters::VariableType::Byte);
+            auto globalContext = function.Load(context);
+
             if (IsScalar(input))
             {
-                // Callback signature: void SinkFunction(ValueType t)
-                const emitters::NamedVariableTypeList parameters = { { "output", emitters::GetVariableType<ValueType>() } };
+                // Callback signature: void SinkFunction(void* context, ValueType t)
+                const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer }, 
+                                                                     { "output", emitters::GetVariableType<ValueType>() } };
                 module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
-
+                
                 llvm::Function* pSinkFunction = module.GetFunction(prefixedName);
-                function.Call(pSinkFunction, { compiler.LoadPortElementVariable(input.GetInputElement(0)) });
+                function.Call(pSinkFunction, { globalContext, compiler.LoadPortElementVariable(input.GetInputElement(0)) });
             }
             else
             {
-                // Callback signature: void SinkFunction(ValueType* array)
-                const emitters::NamedVariableTypeList parameters = { { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
+                // Callback signature: void SinkFunction(void* context, ValueType* array)
+                const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer }, 
+                                                                     { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
                 module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
 
                 llvm::Function* pSinkFunction = module.GetFunction(prefixedName);
-                function.Call(pSinkFunction, { function.PointerOffset(pInput, function.Literal(0)) });
+                function.Call(pSinkFunction, { globalContext, function.PointerOffset(pInput, function.Literal(0)) });
             }
         }
         if1.End();

@@ -68,18 +68,23 @@ namespace nodes
         UNUSED(bufferedSampleTime);
 
         // Callback function
-        const emitters::NamedVariableTypeList parameters = { { "input", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
+        const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer },
+                                                             { "input", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
         module.DeclareFunction(prefixedName, emitters::GetVariableType<bool>(), parameters);
         module.IncludeInCallbackInterface(prefixedName, "SourceNode");
 
         llvm::Function* pSamplingFunction = module.GetFunction(prefixedName);
 
+        // look up our global context object
+        auto context = module.GlobalPointer(compiler.GetNamespacePrefix() + "_context", emitters::VariableType::Byte);
+        auto globalContext = function.Load(context);
+        
         // Locals
         auto sampleTime = function.ValueAt(pInput, function.Literal(0));
 
         // Invoke the callback and optionally interpolate.
-        function.Call(pSamplingFunction, { function.PointerOffset(pBufferedSample, 0) });
+        function.Call(pSamplingFunction, { globalContext, function.PointerOffset(pBufferedSample, 0) });
 
         // TODO: Interpolate if there is a sample, and currentTime > sampleTime
         // Note: currentTime can be retrieved via currentTime = function.ValueAt(pInput, function.Literal(1));

@@ -50,6 +50,8 @@ static std::vector<std::string> ReadLinesFromFile(const std::string& filename)
 
 int main(int argc, char** argv)
 {
+    model_PredictWrapper wrapper;
+
     // Open the video camera. To use a different camera, change the camera index.
     cv::VideoCapture camera(0);
 
@@ -57,11 +59,10 @@ int main(int argc, char** argv)
     auto categories = ReadLinesFromFile("categories.txt");
 
     // Get the model's input shape. We will use this information later to resize images appropriately.
-    TensorShape inputShape;
-    model_GetInputShape(0, &inputShape);
+    TensorShape inputShape = wrapper.GetInputShape();
 
     // Create a vector to hold the model's output predictions
-    std::vector<float> predictions(model_GetOutputSize());
+    std::vector<float> predictions(wrapper.GetOutputSize());
 
     // Declare a variable to hold the prediction times
     std::vector<double>  predictionTimes;
@@ -80,7 +81,7 @@ int main(int argc, char** argv)
 
         // Send the image to the compiled model and fill the predictions vector with scores, measure how long it takes
         auto start = std::chrono::steady_clock::now();
-        model_Predict(input, predictions);
+        wrapper.Predict(input, predictions);
         auto end = std::chrono::steady_clock::now();
 
         // Get the value of the top 5 predictions

@@ -56,24 +56,31 @@ extern "C" {
 
 // Note: this currently assumes that there is just 1 source and 1 sink in the map
 // Future: extend this to route to multiple sources + sinks based on extra context parameter.
-bool model_CompiledMap_SourceCallback_Double(double* input)
+bool model_CompiledMap_SourceCallback_Double(void* context, double* input)
 {
-    return ELL_API::CompiledMap::InvokeSourceCallback(input);
+    // Note: this context is passed through by IRCompiledMap::SetNodeInput where it calls GetContext()
+    // for the first parameter to the compiled _computeInputFunction and SetContext() happens in 
+    // CompiledMap::Step so we know the context is the CompiledMap interface object.
+    auto map = reinterpret_cast<ELL_API::CompiledMap*>(context);
+    return map->InvokeSourceCallback(input);
 }
 
-bool model_CompiledMap_SourceCallback_Float(float* input)
+bool model_CompiledMap_SourceCallback_Float(void* context, float* input)
 {
-    return ELL_API::CompiledMap::InvokeSourceCallback(input);
+    auto map = reinterpret_cast<ELL_API::CompiledMap*>(context);
+    return map->InvokeSourceCallback(input);
 }
 
-void model_CompiledMap_SinkCallback_Double(double* output)
+void model_CompiledMap_SinkCallback_Double(void* context, double* output)
 {
-    ELL_API::CompiledMap::InvokeSinkCallback(output);
+    auto map = reinterpret_cast<ELL_API::CompiledMap*>(context);
+    return map->InvokeSinkCallback(output);
 }
 
-void model_CompiledMap_SinkCallback_Float(float* output)
+void model_CompiledMap_SinkCallback_Float(void* context, float* output)
 {
-    ELL_API::CompiledMap::InvokeSinkCallback(output);
+    auto map = reinterpret_cast<ELL_API::CompiledMap*>(context);
+    return map->InvokeSinkCallback(output);
 }
 
 #ifdef __cplusplus
@@ -1487,7 +1494,6 @@ CompiledMap Map::Compile(const std::string& targetDevice,
     {
         resolveCallbacks(module, compiledMap.GetJitter());
     }
-
     return CompiledMap(std::move(compiledMap), GetInputShape(), GetOutputShape());
 }
 
@@ -1542,17 +1548,15 @@ void CompiledMap::WriteSwigInterface(const std::string& filePath)
 
 // Specializations with type-specific static forwarder instances
 template <>
-ell::api::CallbackForwarder<double, double>& CompiledMap::CallbackForwarder()
+ell::api::CallbackForwarder<double, double>& CompiledMap::GetCallbackForwarder()
 {
-    static ell::api::CallbackForwarder<double, double> forwarderDouble;
     return forwarderDouble;
 }
 
 // Specializations with type-specific static forwarder instances
 template <>
-ell::api::CallbackForwarder<float, float>& CompiledMap::CallbackForwarder()
+ell::api::CallbackForwarder<float, float>& CompiledMap::GetCallbackForwarder()
 {
-    static ell::api::CallbackForwarder<float, float> forwarderFloat;
     return forwarderFloat;
 }
 }

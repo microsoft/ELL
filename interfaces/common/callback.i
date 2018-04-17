@@ -54,51 +54,29 @@
 
 // Macro for emitted code
 %define WRAP_CALLABLES_AS_CALLBACKS(ForwarderClass, InputCallbackClass, InputType, OutputCallbackClass, OutputType, LagCallbackClass)
-    %pythonprepend ForwarderClass::GetInstance(ell::api::CallbackBase<InputType>&, size_t, ell::api::CallbackBase<OutputType>&, size_t, ell::api::CallbackBase<double>&) %{
-        class InputCallableWrapper(InputCallbackClass):
-            def __init__(self, f):
-                super(InputCallableWrapper, self).__init__()
-                self.f_ = f
-            def Run(self, data):
-                return self.f_(data)
+    %pythoncode %{
+    class InputCallableWrapper(InputCallbackClass):
+        def __init__(self, f):
+            super(InputCallableWrapper, self).__init__()
+            self.f_ = f
+        def Run(self, data):
+            return self.f_(data)
 
-        class OutputCallableWrapper(OutputCallbackClass):
-            def __init__(self, f):
-                super(OutputCallableWrapper, self).__init__()
-                self.f_ = f
-            def Run(self, data):
-                self.f_(data)
-                return True
+    class OutputCallableWrapper(OutputCallbackClass):
+        def __init__(self, f):
+            super(OutputCallableWrapper, self).__init__()
+            self.f_ = f
+        def Run(self, data):
+            self.f_(data)
+            return True
 
-        class LagCallableWrapper(LagCallbackClass):
-            def __init__(self, f):
-                super(LagCallableWrapper, self).__init__()
-                self.f_ = f
-            def Run(self, data):
-                self.f_(data)
-                return True
-
-        if not isinstance(inputCallback, InputCallbackClass) and callable(inputCallback):
-            wrapper = InputCallableWrapper(inputCallback)
-            wrapper.__disown__() # caller to deref wrapper in its dtor
-            inputCallback = wrapper
-        else:
-            inputCallback.__disown__() # caller to deref callback in its dtor
-
-        if not isinstance(outputCallback, OutputCallbackClass) and callable(outputCallback):
-            wrapper = OutputCallableWrapper(outputCallback)
-            wrapper.__disown__() # caller to deref wrapper in its dtor
-            outputCallback = wrapper
-        else:
-            outputCallback.__disown__() # caller to deref callback in its dtor
-
-        if not isinstance(lagCallback, LagCallbackClass) and callable(lagCallback):
-            wrapper =  LagCallableWrapper(lagCallback)
-            wrapper.__disown__() # caller to deref wrapper in its dtor
-            lagCallback = wrapper
-        else:
-            lagCallback.__disown__() # caller to deref callback in its dtor
-
+    class LagCallableWrapper(LagCallbackClass):
+        def __init__(self, f):
+            super(LagCallableWrapper, self).__init__()
+            self.f_ = f
+        def Run(self, data):
+            self.f_(data)
+            return True
     %}
 %enddef
 
@@ -113,11 +91,8 @@
                 return self.f_(data)
 
         if not isinstance(callback, CallbackClass) and callable(callback):
-            wrapper = InputCallableWrapper(callback)
-            wrapper.__disown__() # caller to deref wrapper in its dtor
-            callback = wrapper
-        else:
-            callback.__disown__() # caller to deref callback in its dtor
+            callback = InputCallableWrapper(callback)
+        self.input_wrapper = callback # keep it alive
     %}
 %enddef
 
@@ -132,11 +107,8 @@
                 return True
 
         if not isinstance(callback, CallbackClass) and callable(callback):
-            wrapper = OutputCallableWrapper(callback)
-            wrapper.__disown__() # caller to deref wrapper in its dtor
-            callback = wrapper
-        else:
-            callback.__disown__() # caller to deref callback in its dtor
+            callback = OutputCallableWrapper(callback)
+        self.output_wrapper = callback # keep it alive 
     %}
 %enddef
 
@@ -159,18 +131,12 @@
                 return True
 
         if not isinstance(inputCallback, InputCallbackClass) and callable(inputCallback):
-            wrapper = InputCallableWrapper(inputCallback)
-            wrapper.__disown__() # caller to deref wrapper in its dtor
-            inputCallback = wrapper
-        else:
-            inputCallback.__disown__() # caller to deref callback in its dtor
+            inputCallback = InputCallableWrapper(inputCallback)
+        self.input_wrapper = inputCallback # keep it alive
 
         if not isinstance(outputCallback, OutputCallbackClass) and callable(outputCallback):
-            wrapper = OutputCallableWrapper(outputCallback)
-            wrapper.__disown__() # caller to deref wrapper in its dtor
-            outputCallback = wrapper
-        else:
-            outputCallback.__disown__() # caller to deref callback in its dtor
+            outputCallback = OutputCallableWrapper(outputCallback)
+        self.output_wrapper = outputCallback # keep it alive
     %}
 %enddef
 

@@ -59,7 +59,7 @@ namespace emitters
             }
         };
 
-        // Writes SWIG interfaces for predict
+        // Writes SWIG C++ interfaces for predict that take std::vectors for output.
         class PredictInterfaceWriter
         {
         public:
@@ -123,8 +123,10 @@ namespace emitters
             {
                 _functionName = _function->getName();
 
-                // Two arguments (input may be a scalar or pointer)
-                auto it = _function->args().begin();
+                // Three arguments context, input, output (input may be a scalar or pointer)
+                auto it = _function->args().begin();                
+                ++it; // skip context argument
+
                 {
                     std::ostringstream os;
                     auto& argument = *it;

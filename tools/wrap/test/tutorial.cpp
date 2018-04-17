@@ -32,17 +32,17 @@ std::string str(T begin, T end)
 
 int main(int argc, char** argv)
 {
-    // Get the model's input shape. We will use this information later to resize images appropriately.
-    TensorShape inputShape;
-    model_GetInputShape(0, &inputShape);
-    std::vector<double> input(model_GetInputSize());
+    model_PredictWrapper wrapper;
+
+    // Create a vector to hold the input to the model
+    std::vector<double> input(wrapper.GetInputSize());
 
     // Create a vector to hold the model's output predictions
-    std::vector<double> predictions(model_GetOutputSize());
+    std::vector<double> predictions(wrapper.GetOutputSize());
 
-    // Send the image to the compiled model and fill the predictions vector with scores, measure how long it takes
+    // Send the image to the compiled model and fill the predictions vector with scores and measure how long it takes
     auto start = std::chrono::steady_clock::now();
-    model_Predict(input, predictions);
+    wrapper.Predict(input, predictions);
     auto end = std::chrono::steady_clock::now();
 
     std::cout << "Prediction=" << str(predictions.begin(), predictions.end()) << std::endl;

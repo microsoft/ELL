@@ -111,7 +111,7 @@ namespace model
             temp[index] = static_cast<bool>(inputValues[index]);
         }
 
-        std::get<ComputeFunction<bool>>(_computeInputFunction)((bool*)temp.data());
+        std::get<ComputeFunction<bool>>(_computeInputFunction)(GetContext(), (bool*)temp.data());
     }
 
     void IRCompiledMap::SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) const
@@ -123,7 +123,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        std::get<ComputeFunction<int>>(_computeInputFunction)(inputValues.data());
+        std::get<ComputeFunction<int>>(_computeInputFunction)(GetContext(), inputValues.data());
     }
 
     void IRCompiledMap::SetNodeInput(model::InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const
@@ -135,7 +135,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        std::get<ComputeFunction<int64_t>>(_computeInputFunction)(inputValues.data());
+        std::get<ComputeFunction<int64_t>>(_computeInputFunction)(GetContext(), inputValues.data());
     }
 
     void IRCompiledMap::SetNodeInput(model::InputNode<float>* node, const std::vector<float>& inputValues) const
@@ -147,7 +147,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        std::get<ComputeFunction<float>>(_computeInputFunction)(inputValues.data());
+        std::get<ComputeFunction<float>>(_computeInputFunction)(GetContext(), inputValues.data());
     }
 
     void IRCompiledMap::SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues) const
@@ -158,7 +158,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        std::get<ComputeFunction<double>>(_computeInputFunction)(inputValues.data());
+        std::get<ComputeFunction<double>>(_computeInputFunction)(GetContext(), inputValues.data());
     }
 
     std::vector<bool> IRCompiledMap::ComputeBoolOutput(const model::PortElementsBase& outputs) const

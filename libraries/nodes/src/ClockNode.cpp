@@ -91,7 +91,8 @@ namespace nodes
         auto thresholdTime = function.template Literal<TimeTickType>(_lagThreshold);
 
         // Callback
-        const emitters::NamedVariableTypeList parameters = { { "currentTime", emitters::GetVariableType<TimeTickType>() } };
+        const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer }, 
+                                                             { "currentTime", emitters::GetVariableType<TimeTickType>() } };
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + _lagNotificationFunctionName);
         module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
         module.IncludeInCallbackInterface(prefixedName, "ClockNode");
@@ -127,8 +128,11 @@ namespace nodes
             auto delta = function.Operator(minusTime, now, function.Load(newLastInterval));
             auto if2 = function.If(greaterThanOrEqualTime, delta, thresholdTime);
             {
+                // look up our global context object
+                auto context = module.GlobalPointer(compiler.GetNamespacePrefix() + "_context", emitters::VariableType::Byte);
+                auto globalContext = function.Load(context);
                 auto pLagFunction = module.GetFunction(prefixedName);
-                function.Call(pLagFunction, { delta });
+                function.Call(pLagFunction, { globalContext, delta });
             }
             if2.End();
         }

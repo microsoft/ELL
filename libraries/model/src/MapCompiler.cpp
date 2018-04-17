@@ -109,6 +109,9 @@ namespace model
     {
         emitters::NamedVariableTypeList functionArguments;
 
+        // context parameter
+        functionArguments.push_back({ "context", emitters::VariableType::BytePointer });
+
         // Allocate variables for inputs
         for (auto inputNode : map.GetInputs())
         {

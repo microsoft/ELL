@@ -179,6 +179,12 @@ namespace model
         /// <summary> Force jitting to finish so you can time execution without jit cost. </summary>
         void FinishJitting() const;
 
+        /// <summary> Set a context object to use in the predict call </summary>
+        void SetContext(void* context) { _context = context; }
+
+        /// <summary> Get the context object to use in the predict call </summary>
+        void* GetContext() const { return _context; }
+
     protected:
         void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
         void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
@@ -202,20 +208,19 @@ namespace model
 
         void EnsureExecutionEngine() const;
         void EnsureValidMap(); // fixes up model if necessary and checks inputs/outputs are compilable
-        template <typename InputType, typename OutputType>
-        void SetComputeFunction();
         void SetComputeFunction() const;
         template <typename InputType>
         void SetComputeFunctionForInputType() const;
 
         template <typename InputType>
-        using ComputeFunction = std::function<void(const InputType*)>;
+        using ComputeFunction = std::function<void(void*, const InputType*)>;
 
         std::string _moduleName = "ELL";
         std::unique_ptr<emitters::IRModuleEmitter> _module;
 
         mutable std::unique_ptr<emitters::IRExecutionEngine> _executionEngine;
         bool _verifyJittedModule = false;
+        void* _context = nullptr;
 
         // Only one of the entries in each of these tuples is active, depending on the input and output types of the map
         mutable bool _computeFunctionDefined;

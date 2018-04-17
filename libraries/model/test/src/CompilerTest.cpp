@@ -305,7 +305,7 @@ void TestCompiledMapMove()
     VerifyCompiledOutput(map, compiledMap2, signal, " moved compiled map");
 }
 
-typedef void (*MapPredictFunction)(double*, double*);
+typedef void (*MapPredictFunction)(void* context, double*, double*);
 
 void TestBinaryVector(bool expanded, bool runJit)
 {
@@ -338,12 +338,14 @@ void TestBinaryVector(bool expanded, bool runJit)
     {
         auto& jitter = compiledMap.GetJitter();
         auto predict = reinterpret_cast<MapPredictFunction>(jitter.ResolveFunctionAddress(modelFunctionName));
-        predict(&testInput[0], testOutput.data());
+        predict(nullptr, &testInput[0], testOutput.data());
     }
     else
     {
         auto mainFunction = compiledMap.GetModule().BeginMainDebugFunction();
         emitters::IRFunctionCallArguments args(mainFunction);
+        auto& emitter = compiledMap.GetModule().GetIREmitter();
+        args.Append(emitter.NullPointer(emitter.GetIRBuilder().getInt8Ty()->getPointerTo()));
         args.Append(compiledMap.GetModule().ConstantArray("c_data", testInput));
         auto* pResult = args.AppendOutput(emitters::VariableType::Double, testInput.size());
         mainFunction.Call(modelFunctionName, args);
@@ -544,13 +546,15 @@ void TestSlidingAverage()
     module.DeclarePrintf();
     auto mainFunction = module.BeginMainFunction();
     std::vector<double> data = { 5, 10, 15, 20 };
+    auto& emitter = compiledMap.GetModule().GetIREmitter();
+    llvm::Value* pContext = emitter.NullPointer(emitter.GetIRBuilder().getInt8Ty()->getPointerTo());
     llvm::Value* pData = module.ConstantArray("c_data", data);
     llvm::Value* pResult = mainFunction.Variable(emitters::VariableType::Double, 1);
-    mainFunction.Call("TestSlidingAverage", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
+    mainFunction.Call("TestSlidingAverage", { pContext, mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
     mainFunction.PrintForEach("%f\n", pResult, 1);
-    mainFunction.Call("TestSlidingAverage", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
+    mainFunction.Call("TestSlidingAverage", { pContext, mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
     mainFunction.PrintForEach("%f\n", pResult, 1);
-    mainFunction.Call("TestSlidingAverage", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
+    mainFunction.Call("TestSlidingAverage", { pContext, mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
     mainFunction.PrintForEach("%f\n", pResult, 1);
     mainFunction.Return();
     module.EndFunction();
@@ -578,6 +582,8 @@ void TestDotProductOutput()
 
     auto mainFunction = compiledMap.GetModule().BeginMainDebugFunction();
     emitters::IRFunctionCallArguments args(mainFunction);
+    auto& emitter = compiledMap.GetModule().GetIREmitter();
+    args.Append(emitter.NullPointer(emitter.GetIRBuilder().getInt8Ty()->getPointerTo()));
     args.Append(compiledMap.GetModule().ConstantArray("c_data", data));
     auto pResult = args.AppendOutput(emitters::VariableType::Double, 1);
     mainFunction.Call("TestDotProduct", args);
@@ -648,14 +654,14 @@ void TestForest()
 extern "C"
 {
 // Callbacks used by compiled map
-bool TestMulti_DataCallback1(double* input)
+bool TestMulti_DataCallback1(void* context, double* input)
 {
     Log() << "Data callback 1" << EOL;
     const std::vector<double> input1{ 1, 3, 5, 7, 9, 11, 13 };
     std::copy(input1.begin(), input1.end(), input);
     return true;
 }
-bool TestMulti_DataCallback2(double* input)
+bool TestMulti_DataCallback2(void* context, double* input)
 {
     Log() << "Data callback 2" << EOL;
     const std::vector<double> input2{ 42 };
@@ -663,28 +669,28 @@ bool TestMulti_DataCallback2(double* input)
     return true;
 }
 
-void TestMulti_ResultsCallback_Scalar(double result)
+void TestMulti_ResultsCallback_Scalar(void* context, double result)
 {
     Log() << "Results callback (scalar): " << result << EOL;
 }
 
-void TestMulti_ResultsCallback_Vector(double* result)
+void TestMulti_ResultsCallback_Vector(void* context, double* result)
 {
     Log() << "Results callback (vector): " << result[0] << EOL;
 }
 
-void TestMulti_LagNotificationCallback(double lag)
+void TestMulti_LagNotificationCallback(void* context, double lag)
 {
     Log() << "Lag callback:" << lag << EOL;
 }
 }
 
 // Ensure that LLVM jit can find these symbols
-TESTING_FORCE_DEFINE_SYMBOL(TestMulti_DataCallback1, bool, double*);
-TESTING_FORCE_DEFINE_SYMBOL(TestMulti_DataCallback2, bool, double*);
-TESTING_FORCE_DEFINE_SYMBOL(TestMulti_ResultsCallback_Scalar, void, double);
-TESTING_FORCE_DEFINE_SYMBOL(TestMulti_ResultsCallback_Vector, void, double*);
-TESTING_FORCE_DEFINE_SYMBOL(TestMulti_LagNotificationCallback, void, double);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_DataCallback1, bool, void*, double*);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_DataCallback2, bool, void*, double*);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_ResultsCallback_Scalar, void, void*, double);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_ResultsCallback_Vector, void, void*, double*);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_LagNotificationCallback, void, void*, double);
 
 void TestMultiSourceSinkMap(bool expanded, bool optimized)
 {
@@ -697,9 +703,9 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
     auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold,
         "LagNotificationCallback");
     auto sourceNode1 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 7,
-        "DataCallback1", [] (auto& v) { return TestMulti_DataCallback1(&v[0]); });
+        "DataCallback1", [] (auto& v) { return TestMulti_DataCallback1(nullptr, &v[0]); });
     auto sourceNode2 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 1,
-        "DataCallback2", [] (auto& v) { return TestMulti_DataCallback2(&v[0]); });
+        "DataCallback2", [] (auto& v) { return TestMulti_DataCallback2(nullptr, &v[0]); });
     auto sumNode = model.AddNode<nodes::SumNode<double>>(sourceNode1->output);
     auto minusNode = model.AddNode<nodes::BinaryOperationNode<double>>(sumNode->output,
         sourceNode2->output, emitters::BinaryOperationType::subtract);

@@ -148,12 +148,11 @@ void TestCppHeader()
     std::string typeString = ToTypeString<ElementType>();
     std::string timeTypeString = ToTypeString<nodes::TimeTickType>();
 
-    testing::ProcessTest("Testing C predict function", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_Predict(") + timeTypeString + " input0, " + typeString + "* output0);")));
+    testing::ProcessTest("Testing C predict function", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_Predict(void* context, ") + timeTypeString + " input0, " + typeString + "* output0);")));
     testing::ProcessTest("Testing C++ wrapper 1", testing::IsTrue(std::string::npos != result.find("class TestModule_PredictWrapper")));
     testing::ProcessTest("Testing C++ wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("int8_t TestModule_MyDataCallback(") + typeString + "* buffer")));
     testing::ProcessTest("Testing C++ wrapper 3", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_MyResultsCallback(") + typeString + "* buffer")));
-    testing::ProcessTest("Testing C++ wrapper 4", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_Predict(const std::vector<") + typeString + ">& input, std::vector<" + typeString + ">& output)")));
-    testing::ProcessTest("Testing C++ wrapper 5", testing::IsTrue(std::string::npos != result.find("TestModule_Predict(0.0, nullptr);")));
+    testing::ProcessTest("Testing C++ wrapper 4", testing::IsTrue(std::string::npos != result.find("TestModule_Predict(this, 0.0, nullptr);")));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
 
@@ -184,7 +183,6 @@ void TestSwigCallbackInterfaces()
 
     // Sanity tests
     testing::ProcessTest("Testing generated python code 1", testing::IsTrue(std::string::npos != result.find("%pythoncode %{\nclass Model:")));
-    testing::ProcessTest("Testing generated python code 2", testing::IsTrue(std::string::npos != result.find("self.predictor = TestModuleWithCallbacks_Predictor.GetInstance(self._my_data_callback,")));
     testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("def _my_data_callback(self, data: '" + vectorTypeString + "') -> \"bool\":")));
     testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("def my_data_callback(self) -> \"numpy.ndarray\":")));
     testing::ProcessTest("Testing generated python code 4", testing::IsTrue(std::string::npos != result.find(std::string("def my_results_callback(self, output: '" + vectorTypeString + "'):"))));
@@ -227,16 +225,16 @@ void TestSwigCallbackHeader()
 
     // Sanity tests
     testing::ProcessTest("Testing generated C++ class 1", testing::IsTrue(std::string::npos != result.find(std::string("class TestModuleWithCallbacks_Predictor : public ell::api::CallbackForwarder<" + typeString + ", " + typeString + ">"))));
-    testing::ProcessTest("Testing generated C++ class 2", testing::IsTrue(std::string::npos != result.find(std::string("ell::api::CallbackBase<" + typeString + ">& inputCallback"))));
-    testing::ProcessTest("Testing generated C++ class 3", testing::IsTrue(std::string::npos != result.find(std::string("ell::api::CallbackBase<" + typeString + ">& outputCallback"))));
-    testing::ProcessTest("Testing generated C++ class 4", testing::IsTrue(std::string::npos != result.find(std::string("ell::api::CallbackBase<" + timeTypeString + ">& lagCallback"))));
+    testing::ProcessTest("Testing generated C++ class 2", testing::IsTrue(std::string::npos != result.find(std::string("return static_cast<int8_t>(predictor->InvokeInput(input));"))));
+    testing::ProcessTest("Testing generated C++ class 3", testing::IsTrue(std::string::npos != result.find(std::string("predictor->InvokeOutput(output);"))));
+    testing::ProcessTest("Testing generated C++ class 4", testing::IsTrue(std::string::npos != result.find(std::string("predictor->InvokeLagNotification(lag);"))));
 
-    testing::ProcessTest("Testing generated callback definitions 1", testing::IsTrue(std::string::npos != result.find(std::string("int8_t TestModuleWithCallbacks_MyDataCallback(" + typeString + "* input"))));
-    testing::ProcessTest("Testing generated callback definitions 2", testing::IsTrue(std::string::npos != result.find(std::string("void TestModuleWithCallbacks_MyResultsCallback(" + typeString + "* output"))));
-    testing::ProcessTest("Testing generated callback definitions 3", testing::IsTrue(std::string::npos != result.find(std::string("void TestModuleWithCallbacks_MyLagNotificationCallback(" + timeTypeString + " lag"))));
+    testing::ProcessTest("Testing generated callback definitions 1", testing::IsTrue(std::string::npos != result.find(std::string("int8_t TestModuleWithCallbacks_MyDataCallback(void* context, " + typeString + "* input"))));
+    testing::ProcessTest("Testing generated callback definitions 2", testing::IsTrue(std::string::npos != result.find(std::string("void TestModuleWithCallbacks_MyResultsCallback(void* context, " + typeString + "* output"))));
+    testing::ProcessTest("Testing generated callback definitions 3", testing::IsTrue(std::string::npos != result.find(std::string("void TestModuleWithCallbacks_MyLagNotificationCallback(void* context, " + timeTypeString + " lag"))));
 
-    testing::ProcessTest("Testing step function wrapper 1", testing::IsTrue(std::string::npos != result.find(std::string("void step(" + timeTypeString + " input, std::vector<" + typeString + ">& output)"))));
-    testing::ProcessTest("Testing step function wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("step(input, &output[0]);"))));
+    testing::ProcessTest("Testing step function wrapper 1", testing::IsTrue(std::string::npos != result.find(std::string("void step(void* context, " + timeTypeString + " input, std::vector<" + typeString + ">& output)"))));
+    testing::ProcessTest("Testing step function wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("step(context, input, &output[0]);"))));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
 
@@ -266,7 +264,7 @@ void TestSwigNoCallbackInterfaces()
     // Sanity tests
     testing::ProcessTest("Testing generated python code 1", testing::IsTrue(std::string::npos != result.find("def predict(inputData: 'numpy.ndarray') -> \"numpy.ndarray\":")));
     testing::ProcessTest("Testing generated python code 2", testing::IsTrue(std::string::npos != result.find(std::string("results = " + vectorTypeString + "(get_default_output_shape().Size())"))));
-    testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("TestModule_predict(inputData, results)")));
+    testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("TestModule_predict(None, inputData, results)")));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
 
@@ -294,9 +292,9 @@ void TestSwigNoCallbackHeader()
     std::string typeString = ToTypeString<ElementType>();
 
     // Sanity tests
-    testing::ProcessTest("Testing predict function 1", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_predict(" + typeString + "* input0, " + typeString + "* output0);"))));
-    testing::ProcessTest("Testing predict function 2", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_predict(const std::vector<" + typeString + ">& input, std::vector<" + typeString + ">& output)"))));
-    testing::ProcessTest("Testing predict function 3", testing::IsTrue(std::string::npos != result.find(std::string("TestModule_predict(const_cast<" + typeString + "*>(&input[0]), &output[0]);"))));
+    testing::ProcessTest("Testing predict function 1", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_predict(void* context, " + typeString + "* input0, " + typeString + "* output0);"))));
+    testing::ProcessTest("Testing predict function 2", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_predict(void* context, const std::vector<" + typeString + ">& input, std::vector<" + typeString + ">& output)"))));
+    testing::ProcessTest("Testing predict function 3", testing::IsTrue(std::string::npos != result.find(std::string("TestModule_predict(context, const_cast<" + typeString + "*>(&input[0]), &output[0]);"))));
 
     testing::ProcessTest("Testing shape function 1", testing::IsTrue(std::string::npos != result.find("void TestModule_GetInputShape(int32_t index, TensorShape* shape)")));
     testing::ProcessTest("Testing shape function 2", testing::IsTrue(std::string::npos != result.find("void TestModule_GetOutputShape(int32_t index, TensorShape* shape)")));

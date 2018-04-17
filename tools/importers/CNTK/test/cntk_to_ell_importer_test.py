@@ -23,6 +23,7 @@ import os
 import re
 import requests
 import struct
+import time
 import traceback
 import unittest
 import sys
@@ -638,11 +639,30 @@ class CntkToEllFullModelTestBase(CntkToEllTestBase):
         if SkipFullModelTests:
             self.skipTest('Full model tests are being skipped')
 
-        self.label_file = download_file(self.CATEGORIES_URL)
+        filename = os.path.basename(self.CATEGORIES_URL)
+        if not self.needs_updating(filename):
+            self.label_file = filename
+        else:
+            self.label_file = download_file(self.CATEGORIES_URL)
+
         with open(self.label_file) as categories_file:
             self.categories = categories_file.read().splitlines()
-        self.model_names = [download_and_extract_model(m) for m in
-                            self.MODEL_URLS]
+
+        self.model_names = []
+        for m in self.MODEL_URLS:
+            zip_name = os.path.basename(m)
+            filename = os.path.splitext(zip_name)[0]
+            if self.needs_updating(filename):
+                self.model_names += [ download_and_extract_model(m) ]
+            else:
+                self.model_names += [ os.path.splitext(filename)[0] ]
+
+    def needs_updating(self, filename):
+        if os.path.isfile(filename):
+            diff = time.time() - os.stat(filename).st_mtime
+            return diff > 60*60*24 # more than 1 day old, then download a new version.
+        else:
+            return True
 
 
 class CntkModelsTestCase(CntkToEllFullModelTestBase):
