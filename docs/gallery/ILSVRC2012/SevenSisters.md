@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 128x128x3 Convolutional Neural Network
-permalink: /gallery/ILSVRC2012/resnetconf_I128x128x3_ADS
+permalink: /gallery/ILSVRC2012/SevenSisters
 ---
 
 [Back to Gallery](/ELL/gallery)
@@ -11,7 +11,7 @@ permalink: /gallery/ILSVRC2012/resnetconf_I128x128x3_ADS
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/resnetconf_I128x128x3_ADS/resnetconf_I128x128x3_ADS.ell.zip">resnetconf_I128x128x3_ADS.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/SevenSisters/SevenSisters.ell.zip">SevenSisters.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
@@ -32,7 +32,7 @@ permalink: /gallery/ILSVRC2012/resnetconf_I128x128x3_ADS
     <tr>
         <td> Architecture </td>
         <td>
-            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/resnetconf_I128x128x3_ADS/resnetconf_I128x128x3_ADS.cntk.svg?sanitize=true" target="_blank">resnetconf_I128x128x3_ADS architecture (SVG)</a>
+            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/SevenSisters/SevenSisters.cntk.svg?sanitize=true" target="_blank">resnetconf_I128x128x3_ADS architecture (SVG)</a>
         </td>
     </tr>
     <tr>

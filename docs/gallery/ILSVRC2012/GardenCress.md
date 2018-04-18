@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 128x128x3 Convolutional Neural Network
-permalink: /gallery/ILSVRC2012/dr_19A_I128x128x3CMCMCMCMCMCMC1AS
+permalink: /gallery/ILSVRC2012/GardenCress
 ---
 
 [Back to Gallery](/ELL/gallery)
@@ -11,7 +11,7 @@ permalink: /gallery/ILSVRC2012/dr_19A_I128x128x3CMCMCMCMCMCMC1AS
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dr_19A_I128x128x3CMCMCMCMCMCMC1AS/dr_19A_I128x128x3CMCMCMCMCMCMC1AS.ell.zip">dr_19A_I128x128x3CMCMCMCMCMCMC1AS.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/GardenCress/GardenCress.ell.zip">GardenCress.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
@@ -32,7 +32,7 @@ permalink: /gallery/ILSVRC2012/dr_19A_I128x128x3CMCMCMCMCMCMC1AS
     <tr>
         <td> Architecture </td>
         <td>
-            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dr_19A_I128x128x3CMCMCMCMCMCMC1AS/dr_19A_I128x128x3CMCMCMCMCMCMC1AS.cntk.svg?sanitize=true" target="_blank">dr_19A_I128x128x3CMCMCMCMCMCMC1AS architecture (SVG)</a>
+            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/GardenCress/GardenCress.cntk.svg?sanitize=true" target="_blank">GardenCress architecture (SVG)</a>
         </td>
     </tr>
     <tr>

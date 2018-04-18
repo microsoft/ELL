@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 64x64x3 Convolutional Neural Network
-permalink: /gallery/ILSVRC2012/resnet101_f_I64x64x3_1AS
+permalink: /gallery/ILSVRC2012/Wattleseed
 ---
 
 [Back to Gallery](/ELL/gallery)
@@ -11,7 +11,7 @@ permalink: /gallery/ILSVRC2012/resnet101_f_I64x64x3_1AS
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/resnet101_f_I64x64x3_1AS/resnet101_f_I64x64x3_1AS.ell.zip">resnet101_f_I64x64x3_1AS.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Wattleseed/Wattleseed.ell.zip">Wattleseed.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
@@ -32,7 +32,7 @@ permalink: /gallery/ILSVRC2012/resnet101_f_I64x64x3_1AS
     <tr>
         <td> Architecture </td>
         <td>
-            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/resnet101_f_I64x64x3_1AS/resnet101_f_I64x64x3_1AS.cntk.svg?sanitize=true" target="_blank">resnet101_f_I64x64x3_1AS architecture (SVG)</a>
+            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Wattleseed/Wattleseed.cntk.svg?sanitize=true" target="_blank">Wattleseed architecture (SVG)</a>
         </td>
     </tr>
     <tr>
