@@ -46,6 +46,7 @@ template <typename ElementType>
 void TestCompilableDotProductNode2(int dimension);
 void TestFloatNode();
 void TestMultipleOutputNodes();
+void TestShapeFunctionGeneration();
 void TestCompilableClockNode();
 void TestCompilableFFTNode();
 

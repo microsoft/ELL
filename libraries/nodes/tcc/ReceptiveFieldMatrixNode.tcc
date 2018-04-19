@@ -203,7 +203,7 @@ namespace nodes
 
                         // Zero out the padding areas
                         // BUG: explicit capture-by-ref entries are here to work around a GCC bug
-                        function.For(inputDepth, [=, &fx, &fy, &extraPadding, &inputWidth, &inputHeight, &outputWidth, &outputHeight, &numOutputColumns](emitters::IRFunctionEmitter& function, llvm::Value* channelValue) {
+                        function.For(inputDepth, [=, &fx, &fy, &extraPadding, &inputWidth, &inputHeight, &outputWidth, &numOutputColumns](emitters::IRFunctionEmitter& function, llvm::Value* channelValue) {
 
                             auto channel = function.LocalScalar(channelValue);
                             auto outputDepthOffset = channel * numOutputColumns;

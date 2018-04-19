@@ -271,7 +271,7 @@ namespace emitters
         auto function = _module->BeginFunction(GetGetNumRegionsFunctionName(), VariableType::Int32);
         function.IncludeInHeader();
         function.Return(function.Literal(_regionCount));
-        _module->EndFunction(false); // Important: must not pre-optimize this function
+        _module->EndFunction();
         _getNumRegionsFunction = function.GetFunction();
     }
 
@@ -307,7 +307,7 @@ namespace emitters
         // cast _profileRegionsArray to ptr-to-region
         auto castPtr = function.CastPointer(_profileRegionsArray, returnType);
         function.Return(castPtr);
-        _module->EndFunction(false); // Important: must not pre-optimize this function
+        _module->EndFunction();
         _getRegionBufferFunction = function.GetFunction();
     }
 
@@ -359,7 +359,7 @@ namespace emitters
             ResetRegionCounts(function, regionIndex);
         });
 
-        _module->EndFunction(false);
+        _module->EndFunction();
     }
 
     llvm::Value* IRProfiler::GetRegionBuffer(IRFunctionEmitter& function)

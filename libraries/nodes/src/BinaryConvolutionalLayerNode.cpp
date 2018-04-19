@@ -133,7 +133,7 @@ namespace nodes
             auto output = function.LocalArray(realValueRow);
 
             // For row, column, channel order:
-            function.For(filterSize, [input, inputLayout, numChannels, outputImageWidth, filterSize, stride, convParams, convPadding, outputImageRow, outputImageCol, inputRowStart, inputColStart, output](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            function.For(filterSize, [input, inputLayout, numChannels, filterSize, convParams, convPadding, outputImageRow, outputImageCol, inputRowStart, inputColStart, output](emitters::IRFunctionEmitter& function, llvm::Value* i) {
                 auto rowIndex = function.LocalScalar(i);
 
                 function.For(filterSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* j) {

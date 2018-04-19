@@ -65,11 +65,6 @@ namespace emitters
         // Properties of the module
         //
 
-        /// <summary> Set the base compiler settings </summary>
-        ///
-        /// <param name="parameters"> The settings for the compiler to use </param>
-        void SetCompilerOptions(const CompilerOptions& parameters) override;
-
         /// <summary> Returns the module's name. </summary>
         ///
         /// <returns> The module's name. </returns>
@@ -175,12 +170,12 @@ namespace emitters
         IRFunctionEmitter BeginMainFunction();
 
         /// <summary> Ends the current function. </summary>
-        void EndFunction(bool allowOptimization = true);
+        void EndFunction();
 
         /// <summary> Ends the current function with a return value. </summary>
         ///
         /// <param name="return"> The value the function returns. </param>
-        void EndFunction(llvm::Value* pReturn, bool allowOptimization = true);
+        void EndFunction(llvm::Value* pReturn);
 
         //
         // Variable management
@@ -529,21 +524,21 @@ namespace emitters
         // Optimization
         //
 
-        /// <summary> Run standard module optimization passes. </summary>
-        void Optimize();
-
         /// <summary> Optimize this module using the given optimizer. </summary>
         ///
         /// <param name="optimizer"> The optimizer. </param>
-        void Optimize(IRModuleOptimizer& optimizer);
+        void Optimize(IROptimizer& optimizer);
 
         /// <summary>
-        /// Set the target machine and arch for this module. This aids the system in optimizations and
+        /// Get the target machine and arch for this module. The target machine aids the system in optimizations and
         /// Jitting etc.
         /// </summary>
         ///
-        /// <param name="pMachine"> Pointer to a llvm::TargetMachine object that describes the target machine. </param>
-        void SetTargetMachine(llvm::TargetMachine* pMachine);
+        /// <returns> 
+        /// An llvm::TargetMachine object that describes the target machine. It may return `nullptr` if a specific 
+        /// target machine can't be found. It isn't an error if no target machine is found. 
+        ///</param>
+        llvm::TargetMachine* GetTargetMachine();
 
         //
         // Helpers, standard C Runtime functions, and debug support
@@ -594,18 +589,8 @@ namespace emitters
         /// <returns> Pointer to the underlying llvm::Module. </returns>
         llvm::Module* GetLLVMModule() const { return _pModule.get(); }
 
-        /// <summary> Sets the LLVM triple for the current module. </summary>
-        ///
-        /// <param name="triple"> The triple representing the desired machine configuration. </param>
-        void SetTargetTriple(const std::string& triple);
-
         /// <summary> Gets the LLVM data layout object for the current module. </summary>
         const llvm::DataLayout& GetTargetDataLayout() const;
-
-        /// <summary> Sets the LLVM data layout string for the current module. </summary>
-        ///
-        /// <param name="dataLayout"> The data layout string representing the desired machine configuration. </param>
-        void SetTargetDataLayout(const std::string& dataLayout);
 
         /// <summary> Can this module emitter still be used to add functions to the module? </summary>
         ///
@@ -663,6 +648,10 @@ namespace emitters
         /// <param name="priority"> The priority for this finalization function. Finalization functions are called in increasing order of priority. The default value is LLVM's default priority. </param>
         /// <param name="forData"> Optional global constant that this function is for. If the data is optimized away, then the finalization function will be also. </param>
         void AddFinalizationFunction(IRFunctionEmitter& function, int priority = 65536, llvm::Constant* forData = nullptr);
+
+    protected:
+        void SetCompilerOptions(const CompilerOptions& parameters) override;
+
 
     private:
         friend class IRFunctionEmitter;
@@ -729,12 +718,8 @@ namespace emitters
         IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const NamedLLVMTypeList& arguments, bool isPublic = false);
 
-        /// <summary> Associates metadata with a given function. </summary>
-        ///
-        /// <param name="function"> A pointer to the `llvm::Function` instance representing the function. </param>
-        /// <param name="tag"> The metadata tag. </param>
-        /// <param name="content"> Optional metadata value. </param>
-        /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
+        // Associate metadata with a given function.
+        // Note: to insert well-known metadata, prefer the "IncludeInXXX" metadata methods.
         void InsertFunctionMetadata(llvm::Function* function, const std::string& tag, const std::vector<std::string>& value = { "" });
 
         // Get a reference to the thread pool
@@ -751,6 +736,8 @@ namespace emitters
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const VariableTypeList* pArguments, bool isPublic);
         llvm::Function::LinkageTypes Linkage(bool isPublic);
         llvm::ConstantAggregateZero* ZeroInitializer(llvm::Type* pType);
+        static void CompleteCompilerOptions(CompilerOptions& parameters);
+        void SetTargetTriple(const std::string& triple);
 
         //
         // LLVM global state management

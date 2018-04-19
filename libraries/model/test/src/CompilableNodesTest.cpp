@@ -996,6 +996,25 @@ void TestMultipleOutputNodes()
     ell::math::TensorShape shape{ 224, 224, 3 };
     auto inputNode = model.AddNode<model::InputNode<double>>(shape);
     auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output, shape);
+    auto outputNode2 = model.AddNode<model::OutputNode<double>>(inputNode->output);
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output }, { "output2", outputNode2->output } });
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    PrintIR(compiledMap);
+}
+
+void TestShapeFunctionGeneration()
+{
+    auto npos = std::string::npos;
+
+    model::Model model;
+    ell::math::TensorShape shape{ 224, 224, 3 };
+    auto inputNode = model.AddNode<model::InputNode<double>>(shape);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output, shape);
 
     // this is blocked by IRMapCompiler.cpp line 42 which throws, so uncomment this when we decide to fix that.
     //    auto outputNode2 = model.AddNode<model::OutputNode<double>>(inputNode->output);
@@ -1012,13 +1031,20 @@ void TestMultipleOutputNodes()
     compiledMap.WriteCode(buffer, emitters::ModuleOutputFormat::ir);
 
     std::string result = buffer.str();
-
+    std::cout << result << std::endl;
     // some minimal strings for testing, full verbose string comparison might be too fragile to future code gen changes.
     auto inputFuncPos = result.find("define void @ELL_GetInputShape(i32 %index, %TensorShape* %shape");
-    auto outputFuncpos = result.find("define void @ELL_GetOutputShape(i32 %index, %TensorShape* %shape");
+    auto inputFuncPos2 = result.find("define void @ELL_GetInputShape(i32 %index, %TensorShape* nocapture %shape");
+    auto outputFuncPos = result.find("define void @ELL_GetOutputShape(i32 %index, %TensorShape* %shape");
+    auto outputFuncPos2 = result.find("define void @ELL_GetOutputShape(i32 %index, %TensorShape* nocapture %shape");
     auto storePos = result.find("store i32 224, i32* %rows, align 4");
+
+    auto hasInputFunc = inputFuncPos != npos || inputFuncPos2 != npos;
+    auto hasOutputFunc = outputFuncPos != npos || outputFuncPos2 != npos;
+    auto hasStoreInstruction = storePos != npos;
+
     testing::ProcessTest("Testing GetOutputShape generation",
-                         storePos != std::string::npos && inputFuncPos != std::string::npos && outputFuncpos != std::string::npos);
+                         hasInputFunc && hasOutputFunc && hasStoreInstruction);
 }
 
 void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas)

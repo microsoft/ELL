@@ -204,10 +204,9 @@ namespace model
     private:
         friend class IRMapCompiler;
 
-        IRCompiledMap(Map map, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module, bool verifyJittedModule);
+        IRCompiledMap(Map map, const std::string& functionName, const MapCompilerOptions& options, std::unique_ptr<emitters::IRModuleEmitter> module, bool verifyJittedModule);
 
         void EnsureExecutionEngine() const;
-        void EnsureValidMap(); // fixes up model if necessary and checks inputs/outputs are compilable
         void SetComputeFunction() const;
         template <typename InputType>
         void SetComputeFunctionForInputType() const;

@@ -57,19 +57,9 @@ namespace emitters
         RegisterFunctionArgs(arguments);
     }
 
-    void IRFunctionEmitter::CompleteFunction(bool optimize)
+    void IRFunctionEmitter::CompleteFunction()
     {
         Verify();
-        if (optimize)
-        {
-            Optimize();
-        }
-    }
-
-    void IRFunctionEmitter::CompleteFunction(IRFunctionOptimizer& optimizer)
-    {
-        Verify();
-        Optimize(optimizer);
     }
 
     void IRFunctionEmitter::SetUpFunction()
@@ -980,16 +970,9 @@ namespace emitters
         }
     }
 
-    void IRFunctionEmitter::Optimize()
+    void IRFunctionEmitter::Optimize(IROptimizer& optimizer)
     {
-        IRFunctionOptimizer optimizer(GetLLVMModule());
-        optimizer.AddStandardPasses();
-        Optimize(optimizer);
-    }
-
-    void IRFunctionEmitter::Optimize(IRFunctionOptimizer& optimizer)
-    {
-        optimizer.Run(GetFunction());
+        optimizer.OptimizeFunction(GetFunction());
     }
 
     llvm::Value* IRFunctionEmitter::Malloc(VariableType type, int64_t size)

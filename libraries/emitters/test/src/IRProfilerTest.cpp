@@ -82,7 +82,7 @@ void TestProfileRegion()
         region2.Exit();
         function.Return(result3);
     }
-    module.EndFunction(false); // false == don't optimize
+    module.EndFunction();
 
 // When debugging, it can be helpful to dump the IR
 #if 0

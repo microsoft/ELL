@@ -1191,13 +1191,10 @@ namespace emitters
         // Optimizations
         //
 
-        /// <summary> Performs standard optimization passes. </summary>
-        void Optimize();
-
         /// <summary> Applies an optimizer. </summary>
         ///
         /// <param name="optimizer"> The optimizer to apply. </param>
-        void Optimize(IRFunctionOptimizer& optimizer);
+        void Optimize(IROptimizer& optimizer);
 
         //
         // Inline common code generators
@@ -1473,8 +1470,7 @@ namespace emitters
 
         template <typename ArgsListType>
         void RegisterFunctionArgs(const ArgsListType& args);
-        void CompleteFunction(bool optimize = true);
-        void CompleteFunction(IRFunctionOptimizer& optimizer);
+        void CompleteFunction();
 
         bool CanUseBlas() const;
         void EnsurePrintf();

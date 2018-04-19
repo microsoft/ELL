@@ -13,6 +13,7 @@
 
 // model
 #include "Map.h"
+#include "MapCompilerOptions.h"
 
 // stl
 #include <ostream>
@@ -85,8 +86,10 @@ namespace model
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        CompiledMap(Map map, std::string functionName);
+        CompiledMap(Map map, std::string functionName, const MapCompilerOptions& options);
+      
         std::string _functionName;
+        MapCompilerOptions _compilerOptions;
     };
 }
 }

@@ -25,7 +25,8 @@ using namespace ell::predictors::neural;
 void TestIRCompiler()
 {
     TestFloatNode();
-    TestMultipleOutputNodes();
+    // TestMultipleOutputNodes(); // Multiple output nodes aren't currently supported
+    TestShapeFunctionGeneration();
     TestCompilableDotProductNode2<float>(3);
     TestCompilableDotProductNode2<double>(3);
     TestCompilableDotProductNode2<float>(4);
@@ -185,7 +186,7 @@ void TestIRCompiler()
     // TestConvolutionalLayerNode(ConvolutionType::unrolled, 1, 1); // Convolutional layer output padding not supported
 
     TestConvolutionalLayerNode(ConvolutionType::diagonal); // Input padding must be set correctly (to floor(filterWidth/2))
-    
+
     TestConvolutionalLayerNode(ConvolutionType::simple); // Input padding must be set correctly (to floor(filterWidth/2))
 
     TestFullyConnectedLayerNode();
