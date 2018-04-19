@@ -270,8 +270,8 @@ class Utilities:
         # If no named parameter was found, just return the one at the
         # specified index
         if index < len(parameters):
-            return parameters[index]
-        # Parameter is missing, so return None.
+            return index
+        # Parameter is missing, so return 0.
         return 0
 
     @staticmethod    

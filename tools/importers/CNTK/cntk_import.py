@@ -47,6 +47,8 @@ def main(argv):
         help="verifies the imported vision ELL model produces the same output as the original CNTK model", action="store_true")
     arg_parser.add_argument("--verify_audio_model",
         help="verifies the imported audio ELL model produces the same output as the original CNTK model", action="store_true")
+    arg_parser.add_argument("--verbose",
+        help="print verbose output during the import. Helps to diagnose ", action="store_true")
 
     model_options = arg_parser.add_argument_group('model_options')
     model_options.add_argument("--step_interval",
@@ -58,6 +60,11 @@ def main(argv):
         default=5)
 
     args = vars(arg_parser.parse_args(argv))
+
+    if args["verbose"]:
+        logging.basicConfig(level=logging.DEBUG, format="%(message)s")
+    else:
+        logging.basicConfig(level=logging.INFO, format="%(message)s")
 
     model_options = args.get('model_options', {})
     step_interval = model_options.get('step_interval', 0)
@@ -96,5 +103,4 @@ def main(argv):
         os.remove(model_file_name)
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
     main(sys.argv[1:]) # drop the first argument (program name)
