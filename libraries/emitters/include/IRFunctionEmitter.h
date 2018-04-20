@@ -85,6 +85,12 @@ namespace emitters
         /// <param name="columns"> The number of columns. </param>
         IRLocalMatrix LocalMatrix(llvm::Value* value, int rows, int columns);
 
+        /// <summary> Gets an `IRLocalMultidimArray` wrapper for an LLVM value object that represents a fixed-size array. </summary>
+        ///
+        /// <param name="value"> The value to wrap. </param>
+        /// <param name="dimensions"> The sizes of the array's dimensions. </param>
+        IRLocalMultidimArray LocalMultidimArray(llvm::Value* value, std::initializer_list<int> dimensions);
+
         /// <summary> Gets an emitted variable by scope and name. </summary>
         ///
         /// <param name="scope"> The variable scope. </param>

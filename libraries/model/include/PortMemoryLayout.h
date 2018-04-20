@@ -75,23 +75,71 @@ namespace model
         /// <returns> The number of dimensions </summary>
         size_t NumDimensions() const { return _size.size(); }
 
-        /// <summary></summary>
+        /// <summary>
+        /// Returns the size of the "active" memory area (not counting any padding).
+        /// </summary>
+        ///
+        /// <returns> A `Shape` object containing the size of the memory area. </returns>
         const Shape& GetActiveSize() const { return _size; }
 
-        /// <summary></summary>
+        /// <summary>
+        /// Returns the allocated size of the memory (including padding).
+        /// </summary>
+        ///
+        /// <returns> A `Shape` object containing the allocated size in each dimension </returns>
         const Shape& GetStride() const { return _stride; }
 
-        /// <summary></summary>
+        /// <summary>
+        /// Returns the offsets to the "active" area of memory.
+        /// </summary>
+        ///
+        /// <returns> A `Shape` object containing the offset to the active part of memory for that dimension. </returns>
         const Shape& GetOffset() const { return _offset; }
 
-        /// <summary></summary>
+        /// <summary>
+        /// Returns the cumulative increments for each dimension. This is the distance in memory
+        /// between two entries that are adjacent in that dimension.
+        /// </summary>
+        ///
+        /// <returns> A `Shape` object containing the cumulative increment in each dimension </returns>
+        const Shape& GetCumulativeIncrement() const { return _increment; }
+
+        /// <summary>
+        /// Returns the size of the "active" memory area for the given dimension (not counting any padding).
+        /// </summary>
+        ///
+        /// <param name="index"> The dimension. </param>
+        ///
+        /// <returns> The size of the memory area for the given dimension. </returns>
         int GetActiveSize(size_t index) const { return _size[index]; }
 
-        /// <summary></summary>
+        /// <summary>
+        /// Returns the allocated size of the memory for the given dimension (including padding).
+        /// </summary>
+        ///
+        /// <param name="index"> The dimension. </param>
+        ///
+        /// <returns> The allocated size in each dimension </returns>
         int GetStride(size_t index) const { return _stride[index]; }
 
-        /// <summary></summary>
+        /// <summary>
+        /// Returns the offset to the "active" area of memory for the given dimension.
+        /// </summary>
+        ///
+        /// <param name="index"> The dimension. </param>
+        ///
+        /// <returns> The offset to the active part of memory for the given dimension. </returns>
         int GetOffset(size_t index) const { return _offset[index]; }
+        
+        /// <summary>
+        /// Returns the cumulative increment for the requested dimension. This is the distance in memory
+        /// between two entries that are adjacent in that dimension.
+        /// </summary>
+        ///
+        /// <param name="index"> The dimension. </param>
+        ///
+        /// <returns> The cumulative increment for the given dimension. </returns>
+        size_t GetCumulativeIncrement(size_t index) const { return _increment[index]; }
 
         /// <summary> Returns the number of active elements in this memory layout </summary>
         ///
@@ -127,14 +175,6 @@ namespace model
         /// <returns> A value representing `true` if the location is out of bounds </returns>
         llvm::Value* EmitIsOutOfBounds(emitters::IRFunctionEmitter& function, const std::vector<llvm::Value*>& location) const;
 
-        /// <summary>
-        /// Gets the cumulative increments for each dimension. This is the distance in memory
-        /// between two entries that are adjacent in that dimension.
-        /// </summary>
-        ///
-        /// <returns> A `Shape` object containing the cumulative increment in each dimension </returns>
-        Shape GetCumulativeIncrement() const;
-
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -151,9 +191,12 @@ namespace model
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        Shape ComputeCumulativeIncrement() const;
+
         Shape _size; // the "active" area of the memory
         Shape _stride; // the allocated size along each dimension
         Shape _offset; // the offset to the active area for each dimension
+        Shape _increment; // the distance in memory between adjacent elements for each dimension
     };
 
     /// <summary> Checks if two shapes are equal. </summary>

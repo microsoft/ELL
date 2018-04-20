@@ -218,3 +218,47 @@ set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${test_name} COMMAND ${test_name})
 set_test_library_path(${test_name})
+
+#
+# timing project 
+#
+
+set(timing_name ${library_name}_timing)
+
+set(timing_src
+    test/src/timing_main.cpp
+    test/src/DSPNodesTiming.cpp
+)
+
+set(timing_include
+    test/include/DSPNodesTiming.h
+)
+
+source_group("src" FILES ${timing_src})
+source_group("include" FILES ${timing_include})
+
+add_executable(${timing_name}
+    ${timing_src}
+    ${timing_include}
+    ${include}
+)
+
+target_include_directories(${timing_name}
+    PRIVATE
+        test/include
+)
+
+target_link_libraries(${timing_name}
+    dsp
+    math
+    model
+    nodes
+    predictors
+    testing
+    utilities
+)
+
+copy_shared_libraries(${timing_name})
+
+set_property(TARGET ${timing_name} PROPERTY FOLDER "tests")
+

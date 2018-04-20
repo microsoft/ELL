@@ -6,9 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DSPNodesTests.h"
-#include "NeuralNetworkLayerNodesTests.h"
-#include "NodesTests.h"
+#include "DSPNodesTiming.h"
 
 // testing
 #include "testing.h"
@@ -29,10 +27,8 @@ int main(int argc, char** argv)
     UNUSED(argc);
     UNUSED(argv);
     try
-    { 
-        TestNodes();
-        TestNeuralNetworkLayerNodes();
-        TestDSPNodes();
+    {
+        TimeDSPNodes();
     }
     catch (const utilities::Exception& exception)
     {

@@ -9,6 +9,9 @@
 #include "IRLocalValue.h"
 #include "IRFunctionEmitter.h"
 
+// stl
+#include <cassert>
+
 namespace ell
 {
 namespace emitters
@@ -110,6 +113,63 @@ namespace emitters
     }
 
     IRLocalMatrix::IRLocalMatrixValue& IRLocalMatrix::IRLocalMatrixValue::operator=(llvm::Value* value)
+    {
+        _function.SetValueAt(_data, _offset, value);
+
+        return *this;
+    }
+
+    //
+    // IRLocalMultidimArray
+    //
+    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, llvm::Value* data, std::initializer_list<int> dimensions) 
+        : function(function), data(data), dimensions(dimensions.begin(), dimensions.end())
+        {
+            strides.reserve(dimensions.size());
+            std::copy(dimensions.begin()+1, dimensions.end(), std::back_inserter(strides)); 
+            strides.push_back(1);
+            int currentStride = 1;
+            for(auto it = std::rbegin(strides); it != std::rend(strides); ++it)
+            {
+                *it *= currentStride;
+                currentStride = *it;
+            }
+        }
+
+    IRLocalMultidimArray::IRLocalArrayElement IRLocalMultidimArray::operator()(std::initializer_list<int> indices) const
+    {
+        assert(indices.size() == strides.size());
+        int offset = 0;
+        auto stridesIt = strides.begin();
+        for(auto& i: indices)
+        {
+            offset += i * *stridesIt;
+            ++stridesIt;
+        }
+        return IRLocalArrayElement(function, data, function.Literal(offset));
+    }
+
+    IRLocalMultidimArray::IRLocalArrayElement IRLocalMultidimArray::operator()(std::initializer_list<llvm::Value*> indices) const
+    {
+        auto offset = function.LocalScalar(0);
+        auto stridesIt = strides.begin();
+        for(auto& i: indices)
+        {
+            offset = offset + function.LocalScalar(i) * *stridesIt;
+            ++stridesIt;
+        }
+        return IRLocalArrayElement(function, data, offset);
+    }
+
+    IRLocalMultidimArray::IRLocalArrayElement::IRLocalArrayElement(emitters::IRFunctionEmitter& function, llvm::Value* data, llvm::Value* offset)
+        : _function(function), _data(data), _offset(offset) {}
+
+    IRLocalMultidimArray::IRLocalArrayElement::operator IRLocalScalar() const
+    {
+        return _function.LocalScalar(_function.ValueAt(_data, _offset));
+    }
+
+    IRLocalMultidimArray::IRLocalArrayElement& IRLocalMultidimArray::IRLocalArrayElement::operator=(llvm::Value* value)
     {
         _function.SetValueAt(_data, _offset, value);
 

@@ -166,6 +166,10 @@ namespace nodes
         /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
         void Copy(model::ModelTransformer& transformer) const override;
 
+        // Cloning constructor
+        WinogradConvolutionComputeNode(const WinogradConvolutionComputeNode<ValueType>& other,
+                                                                              const model::PortElements<ValueType>& input,
+                                                                              const model::PortElements<ValueType>& filterWeights);
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
@@ -196,6 +200,9 @@ namespace nodes
         // Winograd-specific parameters
         int _tileSize = 0;
         int _filterSize = 0;
+
+        // Tunable parameters
+        int _blockSize = 1;
     };
 }
 }

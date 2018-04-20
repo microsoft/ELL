@@ -15,8 +15,10 @@
 #include "BroadcastFunctionNode.h"
 #include "ForestPredictorNode.h"
 #include "NeuralNetworkPredictorNode.h"
+#include "DiagonalConvolutionNode.h"
 #include "SimpleConvolutionNode.h"
 #include "UnrolledConvolutionNode.h"
+#include "WinogradConvolutionNode.h"
 
 // predictors
 #include "ForestPredictor.h"
@@ -47,6 +49,16 @@ using namespace predictors::neural;
 size_t GetShapeSize(const math::IntegerTriplet& shape)
 {
     return shape[0] * shape[1] * shape[2];
+}
+
+model::PortMemoryLayout CalculateMemoryLayout(int numRows, int numColumns, int numChannels, int padding)
+{
+    // Calculate dimension parameters
+    model::Shape size{ numRows, numColumns, numChannels };
+    model::Shape offset{ padding, padding, 0 };
+    model::Shape stride{ numRows + 2 * padding, numColumns + 2 * padding, numChannels };
+
+    return { size, stride, offset };
 }
 
 template <typename ValueType>
@@ -537,46 +549,53 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     return map;
 }
 
-
-model::Map GenerateSimpleConvolutionModel(int imageRows, int imageColumns, int numChannels, int numFilters)
+model::Map GenerateConvolutionModel(int inputRows, int inputColumns, int numChannels, int numFilters, int filterSize, int stride, dsp::ConvolutionMethodOption convolutionMethod)
 {
-    using ElementType = float;
+    using ValueType = float;
+    using Tensor = math::ChannelColumnRowTensor<ValueType>;
+
+    const int outputRows = inputRows / stride;
+    const int outputColumns = inputColumns / stride;
+    const int inputPadding = (filterSize - 1) / 2;
+    const int outputPadding = 0;
+
+    auto filterWeightsSize = numFilters * filterSize * filterSize * numChannels;
+    auto filter = GetRandomVector<std::vector<ValueType>>(filterWeightsSize);
+
+    auto inputMemoryLayout = CalculateMemoryLayout(inputRows, inputColumns, numChannels, inputPadding);
+    auto outputMemoryLayout = CalculateMemoryLayout(outputRows, outputColumns, numFilters, outputPadding);
+    auto filterWeights = Tensor(filter.data(), numFilters * filterSize, filterSize, numChannels);
+
+    auto inputSize = inputMemoryLayout.GetMemorySize();
+
+    // Create compiler for models
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.optimize = true;
+    settings.compilerSettings.useBlas = true;
 
     model::Model model;
-    const int filterSize = 3;
-    const int pad = filterSize / 2;
-    size_t stride = 1;
-
-    using InputShape = math::TensorShape;
-    auto inputNode = model.AddNode<model::InputNode<ElementType>>(InputShape(imageRows+2*pad, imageColumns+2*pad, numChannels));
-    model::PortMemoryLayout inputLayout({imageRows, imageColumns, numChannels}, {pad, pad, 0});
-    model::PortMemoryLayout outputLayout({imageRows, imageColumns, numFilters});
-
-    math::ChannelColumnRowTensor<ElementType> weights(numFilters * filterSize, filterSize, numChannels);
-
-    auto computeNode = model.AddNode<nodes::SimpleConvolutionNode<ElementType>>(inputNode->output, inputLayout, outputLayout, weights, stride);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto inputNode = model.AddNode<model::InputNode<ValueType>>(inputSize);
+    model::Node* outputNode = nullptr;
+    switch (convolutionMethod)
+    {
+    case dsp::ConvolutionMethodOption::automatic:
+        std::cout << "Testing 'automatic' method --- using 'simple' instead" << std::endl;
+    // fallthrough
+    case dsp::ConvolutionMethodOption::simple:
+        outputNode = model.AddNode<nodes::SimpleConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        break;
+    case dsp::ConvolutionMethodOption::diagonal:
+        outputNode = model.AddNode<nodes::DiagonalConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        break;
+    case dsp::ConvolutionMethodOption::unrolled:
+        outputNode = model.AddNode<nodes::UnrolledConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        break;
+    case dsp::ConvolutionMethodOption::winograd:
+        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        break;
+    }
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", model::PortElementsBase(*(outputNode->GetOutputPort(0))) } });
     return map;
 }
 
-model::Map GenerateUnrolledConvolutionModel(int imageRows, int imageColumns, int numChannels, int numFilters)
-{
-    using ElementType = float;
-
-    model::Model model;
-    const int filterSize = 3;
-    const int pad = filterSize / 2;
-    size_t stride = 1;
-
-    using InputShape = math::TensorShape;
-    auto inputNode = model.AddNode<model::InputNode<ElementType>>(InputShape(imageRows+2*pad, imageColumns+2*pad, numChannels));
-    model::PortMemoryLayout inputLayout({imageRows, imageColumns, numChannels}, {pad, pad, 0});
-    model::PortMemoryLayout outputLayout({imageRows, imageColumns, numFilters});
-
-    math::ChannelColumnRowTensor<ElementType> weights(numFilters * filterSize, filterSize, numChannels);
-
-    auto computeNode = model.AddNode<nodes::UnrolledConvolutionNode<ElementType>>(inputNode->output, inputLayout, outputLayout, weights, stride);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
-    return map;
-}
 }

@@ -227,8 +227,6 @@ static void TestDTWDistanceNodeCompute()
         auto inputValue = prototype[sampleIndex];
         inputNode->SetInput(inputValue);
         std::vector<double> outputVec = model.ComputeOutput(dtwNode->output);
-        std::cout << "[" << sampleIndex << "]: \t" << outputVec[0] << std::endl;
-        if (sampleIndex + increment >= prototypeLength) std::cout << std::endl;
     }
 }
 
@@ -297,7 +295,6 @@ static void TestIIRFilterNode2()
 
         testing::ProcessTest("Testing IIRFilterNode compute 2", testing::IsEqual(computedResult, expectedOutput[index], epsilon));
         testing::ProcessTest("Testing IIRFilterNode compile 2", testing::IsEqual(compiledResult, expectedOutput[index], epsilon));
-        // std::cout << "Computed: " << computedResult << "\nCompiled: " << compiledResult << std::endl;
     }
 }
 
@@ -599,26 +596,34 @@ static void TestConvolutionNodeCompileVsReference(int inputRows, int inputColumn
     auto compiledMap = compiler.Compile(map);
 
     // Get reference value from dsp library
-    auto reference = dsp::Convolve2D(paddedDataTensor, filterWeights, numFilters, stride);
+    auto reference = dsp::Convolve2D(paddedDataTensor, filterWeights, numFilters, stride).ToArray();
 
     compiledMap.SetInputValue(0, paddedDataArray);
     auto compiledResult = compiledMap.ComputeOutput<ValueType>(0);
 
-    auto ok = testing::IsEqual(reference.ToArray(), compiledResult, epsilon);
+    auto ok = testing::IsEqual(reference, compiledResult, epsilon);
     testing::ProcessTest("Testing compiled "s + GetConvAlgName(convolutionMethod) + " convolution node vs dsp reference", ok);
 
     // Helpful debugging output
     if (!ok)
     {
+        std::vector<ValueType> diff(reference.size());
+        for(size_t index = 0; index < reference.size(); ++index)
+        {
+            diff[index] = reference[index] - compiledResult[index];
+        }
+        auto minmax = std::minmax_element(diff.begin(), diff.end());
+
         std::cout << "Error processing compiled "s + GetConvAlgName(convolutionMethod) + " convolution node vs dsp reference for image size " << inputRows << " x " << inputColumns << " x " << numChannels;
         std::cout << " and " << numFilters << " " << filterSize << " x " << filterSize << " filters, with stride " << stride << "\n";
+        std::cout << "  Min diff: " << *minmax.first << " max diff: " << *minmax.second << "\n";
 #if 0
         if (compiledResult.size() < 500)
         {
             std::cout << "Compiled result:\n"
                     << compiledResult << "\n\n";
             std::cout << "Reference result:\n"
-                    << reference.ToArray() << "\n\n";
+                    << reference << "\n\n";
         }
 #endif
     }
@@ -670,6 +675,7 @@ void TestDSPNodes()
     TestConvolutionNodeCompileVsReference<float>(5, 5, 2, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 2, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(5, 15, 4, 7, 3, 1, dsp::ConvolutionMethodOption::simple);
+    TestConvolutionNodeCompileVsReference<float>(32, 32, 8, 8, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 2, dsp::ConvolutionMethodOption::simple);
 
@@ -689,6 +695,7 @@ void TestDSPNodes()
     TestConvolutionNodeCompileVsReference<float>(5, 5, 2, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 2, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(5, 15, 4, 7, 3, 1, dsp::ConvolutionMethodOption::unrolled);
+    TestConvolutionNodeCompileVsReference<float>(32, 32, 8, 8, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 2, dsp::ConvolutionMethodOption::unrolled);
 
@@ -708,6 +715,7 @@ void TestDSPNodes()
     TestConvolutionNodeCompileVsReference<float>(5, 5, 2, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
     TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 2, 3, 1, dsp::ConvolutionMethodOption::winograd);
     TestConvolutionNodeCompileVsReference<float>(5, 15, 4, 7, 3, 1, dsp::ConvolutionMethodOption::winograd);
+    TestConvolutionNodeCompileVsReference<float>(32, 32, 8, 8, 3, 1, dsp::ConvolutionMethodOption::winograd);
     TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 1, dsp::ConvolutionMethodOption::winograd);
     // TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 2, dsp::ConvolutionMethodOption::winograd); // Commented-out because Winograd doesn't support non-1 stride
 }

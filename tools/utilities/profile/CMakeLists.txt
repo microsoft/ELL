@@ -48,7 +48,7 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${model_tool_name} ${models_src} ${models_include})
 target_include_directories(${model_tool_name} PRIVATE include)
-target_link_libraries(${model_tool_name} utilities model nodes common)
+target_link_libraries(${model_tool_name} common dsp model nodes utilities)
 copy_shared_libraries(${model_tool_name})
 
 #
@@ -112,7 +112,7 @@ if(WIN32)
   file(COPY ${CMAKE_CURRENT_BINARY_DIR}/remote_test.cmd
     DESTINATION ${CMAKE_BINARY_DIR}
     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-    GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)  
+    GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 endif()
 
 add_custom_target(make_profiler DEPENDS compile CMakeLists-device.txt.in CMakeLists-device-parallel.txt.in src/CompiledProfile_main.cpp src/CompiledExerciseModel_main.cpp make_profiler.sh.in make_profiler.cmd.in)

@@ -202,6 +202,10 @@ void TestConv2DVsSimple(int numRows, int numColumns, int numChannels, int filter
                   << " " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << " x " << signal.NumChannels() << std::endl;
 
 #if 0
+        std::cout << "Input:\n" << signal << std::endl;
+        std::cout << std::endl;
+        std::cout << "Filters:\n" << filters << std::endl;
+        std::cout << std::endl;
         std::cout << "Reference:\n" << reference << std::endl;
         std::cout << std::endl;
         std::cout << "Computed:\n" << result << std::endl;

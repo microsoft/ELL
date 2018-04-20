@@ -29,6 +29,15 @@ namespace nodes
             return outputLayout.GetActiveSize(0) * outputLayout.GetActiveSize(1) * outputLayout.GetActiveSize(2);
         }
 
+        template <typename ValueType>
+        int GetConstantIntValue(llvm::Value* value)
+        {
+            static_assert(std::is_integral<ValueType>(), "Template parameter must be integral");
+            assert(llvm::isa<llvm::ConstantInt>(value));
+            auto constIntVal = llvm::cast<llvm::ConstantInt>(value);
+            return static_cast<ValueType>(constIntVal->getSExtValue());
+        }
+
         //
         // Winograd-specific routines
         //
@@ -67,6 +76,36 @@ namespace nodes
                 X(3, 3) = ((d(1, 1) - d(3, 1)) - (d(1, 3) - d(3, 3)));
             }
 
+            static void TransformInputBlock(emitters::IRFunctionEmitter& function, llvm::Value* window, int blockSize, llvm::Value* transformedWindow)
+            {
+                auto d = function.LocalMultidimArray(window, {windowSize, windowSize, blockSize});
+                auto X = function.LocalMultidimArray(transformedWindow, {windowSize, windowSize, blockSize});
+
+                // Compute B'dB
+                auto i0 = function.Literal<int>(0);
+                auto i1 = function.Literal<int>(1);
+                auto i2 = function.Literal<int>(2);
+                auto i3 = function.Literal<int>(3);
+                function.For(blockSize, [d, X, i0, i1, i2, i3](emitters::IRFunctionEmitter& function, llvm::Value* index) {
+                    X({i0, i0, index}) = ((d({i0, i0, index}) - d({i2, i0, index})) - (d({i0, i2, index}) - d({i2, i2, index})));
+                    X({i0, i1, index}) = ((d({i0, i1, index}) - d({i2, i1, index})) + (d({i0, i2, index}) - d({i2, i2, index})));
+                    X({i0, i2, index}) = ((d({i0, i2, index}) - d({i2, i2, index})) - (d({i0, i1, index}) - d({i2, i1, index})));
+                    X({i0, i3, index}) = ((d({i0, i1, index}) - d({i2, i1, index})) - (d({i0, i3, index}) - d({i2, i3, index})));
+                    X({i1, i0, index}) = ((d({i1, i0, index}) + d({i2, i0, index})) - (d({i1, i2, index}) + d({i2, i2, index})));
+                    X({i1, i1, index}) = ((d({i1, i1, index}) + d({i2, i1, index})) + (d({i1, i2, index}) + d({i2, i2, index})));
+                    X({i1, i2, index}) = ((d({i1, i2, index}) + d({i2, i2, index})) - (d({i1, i1, index}) + d({i2, i1, index})));
+                    X({i1, i3, index}) = ((d({i1, i1, index}) + d({i2, i1, index})) - (d({i1, i3, index}) + d({i2, i3, index})));
+                    X({i2, i0, index}) = ((d({i2, i0, index}) - d({i1, i0, index})) - (d({i2, i2, index}) - d({i1, i2, index})));
+                    X({i2, i1, index}) = ((d({i2, i1, index}) - d({i1, i1, index})) + (d({i2, i2, index}) - d({i1, i2, index})));
+                    X({i2, i2, index}) = ((d({i2, i2, index}) - d({i1, i2, index})) - (d({i2, i1, index}) - d({i1, i1, index})));
+                    X({i2, i3, index}) = ((d({i2, i1, index}) - d({i1, i1, index})) - (d({i2, i3, index}) - d({i1, i3, index})));
+                    X({i3, i0, index}) = ((d({i1, i0, index}) - d({i3, i0, index})) - (d({i1, i2, index}) - d({i3, i2, index})));
+                    X({i3, i1, index}) = ((d({i1, i1, index}) - d({i3, i1, index})) + (d({i1, i2, index}) - d({i3, i2, index})));
+                    X({i3, i2, index}) = ((d({i1, i2, index}) - d({i3, i2, index})) - (d({i1, i1, index}) - d({i3, i1, index})));
+                    X({i3, i3, index}) = ((d({i1, i1, index}) - d({i3, i1, index})) - (d({i1, i3, index}) - d({i3, i3, index})));
+                });
+            }
+            
             static void TransformOutputTile(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutputWindow, llvm::Value* outputTile)
             {
                 auto X = function.LocalMatrix(transformedOutputWindow, windowSize, windowSize);
@@ -78,233 +117,240 @@ namespace nodes
                 result(1, 0) = ((((X(1, 0) - X(2, 0)) - X(3, 0)) + ((X(1, 1) - X(2, 1)) - X(3, 1))) + ((X(1, 2) - X(2, 2)) - X(3, 2)));
                 result(1, 1) = ((((X(1, 1) - X(2, 1)) - X(3, 1)) - ((X(1, 2) - X(2, 2)) - X(3, 2))) - ((X(1, 3) - X(2, 3)) - X(3, 3)));
             }
+
+            static void TransformOutputBlock(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutputWindow, int blockSize, llvm::Value* outputTile)
+            {
+                auto X = function.LocalMultidimArray(transformedOutputWindow, {windowSize, windowSize, blockSize});
+                auto result = function.LocalMultidimArray(outputTile, {tileSize, tileSize, blockSize});
+
+                auto i0 = function.Literal<int>(0);
+                auto i1 = function.Literal<int>(1);
+                auto i2 = function.Literal<int>(2);
+                auto i3 = function.Literal<int>(3);
+                
+                // Compute result tile At * X * A
+                function.For(blockSize, [X, result, i0, i1, i2, i3](emitters::IRFunctionEmitter& function, llvm::Value* index) {
+                    result({i0, i0, index}) = ((((X({i0, i0, index}) + X({i1, i0, index})) + X({i2, i0, index})) + ((X({i0, i1, index}) + X({i1, i1, index})) + X({i2, i1, index}))) + ((X({i0, i2, index}) + X({i1, i2, index})) + X({i2, i2, index})));
+                    result({i0, i1, index}) = ((((X({i0, i1, index}) + X({i1, i1, index})) + X({i2, i1, index})) - ((X({i0, i2, index}) + X({i1, i2, index})) + X({i2, i2, index}))) - ((X({i0, i3, index}) + X({i1, i3, index})) + X({i2, i3, index})));
+                    result({i1, i0, index}) = ((((X({i1, i0, index}) - X({i2, i0, index})) - X({i3, i0, index})) + ((X({i1, i1, index}) - X({i2, i1, index})) - X({i3, i1, index}))) + ((X({i1, i2, index}) - X({i2, i2, index})) - X({i3, i2, index})));
+                    result({i1, i1, index}) = ((((X({i1, i1, index}) - X({i2, i1, index})) - X({i3, i1, index})) - ((X({i1, i2, index}) - X({i2, i2, index})) - X({i3, i2, index}))) - ((X({i1, i3, index}) - X({i2, i3, index})) - X({i3, i3, index})));
+                });
+            }
         };
 
         template <typename ValueType>
-        void TransformInputWindow(emitters::IRFunctionEmitter& function, llvm::Value* window, int tileSize, int filterSize, llvm::Value* transformedWindow)
-        {
-            // out = Bt * window * B
-            if (tileSize == 2 && filterSize == 3)
-            {
-                WinogradTransform<ValueType, 2, 3>::TransformInputWindow(function, window, transformedWindow);
-            }
-        }
-
-        template <typename ValueType>
-        void TransformOutputTile(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutputWindow, int tileSize, int filterSize, llvm::Value* outputTile)
+        void TransformOutputBlock(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutputWindow, int tileSize, int filterSize, int blockSize, llvm::Value* outputTile)
         {
             // out = At * window * A
             if (tileSize == 2 && filterSize == 3)
             {
-                WinogradTransform<ValueType, 2, 3>::TransformOutputTile(function, transformedOutputWindow, outputTile);
+                WinogradTransform<ValueType, 2, 3>::TransformOutputBlock(function, transformedOutputWindow, blockSize, outputTile);
             }
         }
 
-        // TODO: create a struct to hold the problem size values (inputColumnStride, numChannels, numTileRows, ...)
-
         //
-        // `GetInputWindow()` copies data from the input into a contiguous input window of size (filterSize+tileSize-1) x (filterSize+tileSize-1).
+        // `GetInputBlock()` copies data from the input into a contiguous input window of size (filterSize+tileSize-1) x (filterSize+tileSize-1).
         // If the tile row or column are passed in as compile-time constants, then partial windows will be correctly
         // copied, otherwise this code assumes the window is fully contained in the input.
         //
-        void GetInputWindow(emitters::IRFunctionEmitter& function,
-                            llvm::Value* input,
-                            emitters::IRLocalScalar tileRow,
-                            emitters::IRLocalScalar tileColumn,
-                            emitters::IRLocalScalar channel,
-                            int inputColumnStride,
-                            int numChannels,
-                            int outputRows,
-                            int outputColumns,
-                            int tileSize,
-                            int filterSize,
-                            llvm::Value* inputWindow)
+        template <typename ValueType>
+        void GetInputBlock(emitters::IRFunctionEmitter& function,
+                           llvm::Value* input,
+                           emitters::IRLocalScalar tileRow,
+                           emitters::IRLocalScalar tileColumn,
+                           emitters::IRLocalScalar channel,
+                           int inputRowStride,
+                           int numChannels,
+                           int numOutputRows,
+                           int numOutputColumns,
+                           int tileSize,
+                           int filterSize,
+                           int blockSize,
+                           llvm::Value* inputBlock)
         {
             // input: inputImageRows x inputImageColumns x numChannels tensor
-            // inputWindow: windowSize x windowSize block extracted from the given channel with the given upper-left coordinates
+            // inputBlock: windowSize x windowSize x blockSize block extracted from the given channel with the given upper-left coordinates
             const int windowSize = tileSize + filterSize - 1;
-            int windowRowSize = windowSize;
-            int windowColumnSize = windowSize;
+            int windowRows = windowSize;
+            int windowColumns = windowSize;
+            const auto inputRows = numOutputRows + filterSize - 1;
+            const auto inputColumns = numOutputColumns + filterSize - 1;
+            const auto inputColumnStride = numChannels;
 
             // check for constant tile row on last row
             if (llvm::isa<llvm::ConstantInt>(static_cast<llvm::Value*>(tileRow)))
             {
-                auto constRow = llvm::cast<llvm::ConstantInt>(static_cast<llvm::Value*>(tileRow));
-                auto constRowVal = static_cast<int>(constRow->getSExtValue());
-                auto inputRows = outputRows + filterSize - 1;
-                auto windowStart = constRowVal * tileSize;
-                windowRowSize = std::min(windowSize, inputRows - windowStart);
+                auto tileRowStart = GetConstantIntValue<int>(tileRow) * tileSize;
+                windowRows = std::min(windowSize, inputRows - tileRowStart);
             }
 
             // check for constant tile column on last column
             if (llvm::isa<llvm::ConstantInt>(static_cast<llvm::Value*>(tileColumn)))
             {
-                auto constColumn = llvm::cast<llvm::ConstantInt>(static_cast<llvm::Value*>(tileColumn));
-                auto constColumnVal = static_cast<int>(constColumn->getSExtValue());
-                auto inputColumns = outputColumns + filterSize - 1;
-                auto windowStart = constColumnVal * tileSize;
-                windowColumnSize = std::min(windowSize, inputColumns - windowStart);
+                auto tileColumnStart = GetConstantIntValue<int>(tileColumn) * tileSize;
+                windowColumns = std::min(windowSize, inputColumns - tileColumnStart);
             }
 
-            // Retrieve values from input into local matrix of size tr x tc
+            // Retrieve values from input into local matrix of size windowSize x windowSize x blockSize
             auto imageRow = tileRow * tileSize;
             auto imageColumn = tileColumn * tileSize;
-            auto offset = ((imageRow * inputColumnStride) + imageColumn) * numChannels + channel; // offset to upper-left of input tile
-            for (int rowIndex = 0; rowIndex < windowRowSize; ++rowIndex)
+            auto inputWindowOffset = (imageRow * inputRowStride) + (imageColumn * inputColumnStride) + channel; // offset to given channel of the upper-left of input tile 
+            for (int rowIndex = 0; rowIndex < windowRows; ++rowIndex)
             {
-                for (int columnIndex = 0; columnIndex < windowColumnSize; ++columnIndex)
+                for (int columnIndex = 0; columnIndex < windowColumns; ++columnIndex)
                 {
-                    auto inputLoc = offset + ((rowIndex * inputColumnStride) + columnIndex) * numChannels;
-                    auto outputLoc = rowIndex * windowSize + columnIndex;
-                    auto value = function.ValueAt(input, inputLoc);
-                    function.SetValueAt(inputWindow, outputLoc, value);
+                    auto inputLoc = (rowIndex * inputRowStride) + (columnIndex * inputColumnStride) + inputWindowOffset;
+                    auto windowLoc = (rowIndex * windowSize + columnIndex) * blockSize;
+                    function.MemoryCopy<ValueType>(input, inputLoc, inputBlock, function.Literal<int>(windowLoc), function.Literal<int>(blockSize));
                 }
             }
 
             // Zero out unused parts
-            for (int rowIndex = windowRowSize; rowIndex < windowSize; ++rowIndex)
+            // First, the righthand edge:
+            for (int rowIndex = 0; rowIndex < windowRows; ++rowIndex)
             {
-                for (int columnIndex = 0; columnIndex < windowSize; ++columnIndex)
-                {
-                    auto outputLoc = rowIndex * windowSize + columnIndex;
-                    function.StoreZero(function.PointerOffset(inputWindow, outputLoc));
-                }
+                auto outputLoc = (rowIndex * windowSize + windowColumns) * blockSize;
+                function.StoreZero(function.PointerOffset(inputBlock, outputLoc), (windowSize-windowColumns) * blockSize);
             }
-            for (int rowIndex = 0; rowIndex < windowRowSize; ++rowIndex)
-            {
-                for (int columnIndex = windowColumnSize; columnIndex < windowSize; ++columnIndex)
-                {
-                    auto outputLoc = rowIndex * windowSize + columnIndex;
-                    function.StoreZero(function.PointerOffset(inputWindow, outputLoc));
-                }
-            }
+            
+            // Then the bottom part:
+            auto outputLoc = windowRows * windowSize * blockSize;
+            function.StoreZero(function.PointerOffset(inputBlock, outputLoc), (windowSize-windowRows) * windowSize * blockSize);
         }
 
         template <typename ValueType>
-        void GetTransformedInputWindow(emitters::IRFunctionEmitter& function,
-                                       llvm::Value* input,
-                                       emitters::IRLocalScalar tileRow,
-                                       emitters::IRLocalScalar tileColumn,
-                                       emitters::IRLocalScalar channel,
-                                       int inputColumnStride,
-                                       int numChannels,
-                                       int outputRows,
-                                       int outputColumns,
-                                       int tileSize,
-                                       int filterSize,
-                                       llvm::Value* transformedInput)
+        void TransformInputBlock(emitters::IRFunctionEmitter& function, llvm::Value* window, int tileSize, int filterSize, int blockSize, llvm::Value* transformedWindow)
+        {
+            // out = Bt * window * B
+            if (tileSize == 2 && filterSize == 3)
+            {
+                WinogradTransform<ValueType, 2, 3>::TransformInputBlock(function, window, blockSize, transformedWindow);
+            }
+        }
+
+        // transformedInput is a windowSize x windowSize x tileRows x tileColumns x numChannels  tensor containing the entire transformed input signal.
+        // Think of it as (windowSize*windowSize) separate tileRows x tileColumns x numChannels tensors: one tileRows x tileColumns image for each position in the transformed window.
+        // So, there's a tensor representing the upper-left window pixel for each transformed input tile, another representing the (0,1) pixel
+        // of each tranformed input tile, and so on.
+        template <typename ValueType>
+        void SplatTransformedInputBlock(emitters::IRFunctionEmitter& function, 
+                                        llvm::Value* transformedInputBlock, 
+                                        emitters::IRLocalScalar tileRow,
+                                        emitters::IRLocalScalar tileColumn,
+                                        emitters::IRLocalScalar channel,
+                                        int numOutputRows,
+                                        int numOutputColumns,
+                                        int numChannels,
+                                        int tileSize, 
+                                        int filterSize, 
+                                        int blockSize, 
+                                        llvm::Value* transformedInput)
+        {
+            const int windowSize = tileSize + filterSize - 1;
+            const auto numTileRows = (numOutputRows + tileSize - 1) / tileSize;
+            const auto numTileColumns = (numOutputColumns + tileSize - 1) / tileSize;
+            auto offset = (tileRow * numTileColumns * numChannels) + (tileColumn * numChannels) + channel;
+            auto entryStride = numTileRows * numTileColumns * numChannels;
+
+            for(int windowLoc = 0; windowLoc < windowSize * windowSize; ++windowLoc)
+            {
+                auto outputLoc = windowLoc * entryStride + offset;
+                function.MemoryCopy<ValueType>(transformedInputBlock, function.Literal<int>(windowLoc * blockSize), transformedInput, outputLoc, function.Literal<int>(blockSize));
+            }
+        }
+        
+        template <typename ValueType>
+        void ProcessInputBlock(emitters::IRFunctionEmitter& function,
+                               llvm::Value* input,
+                               emitters::IRLocalScalar tileRow,
+                               emitters::IRLocalScalar tileColumn,
+                               emitters::IRLocalScalar channel,
+                               int inputRowStride,
+                               int numOutputRows,
+                               int numOutputColumns,
+                               int numChannels,
+                               int tileSize,
+                               int filterSize,
+                               int blockSize,
+                               llvm::Value* inputBlock,
+                               llvm::Value* transformedInputBlock,
+                               llvm::Value* transformedInput)
         {
             // input: inputImageRows x inputImageColumns x numChannels tensor
-            // transformedInput is a (wr*wc) x numChannels x (tr * tc) tensor containing the entire transformed input signal
-            const auto numPartialTileRows = (outputRows + tileSize - 1) / tileSize;
-            const auto numPartialTileColumns = (outputColumns + tileSize - 1) / tileSize;
-            const int windowSize = tileSize + filterSize - 1;
+            // transformedInput is a windowSize x windowSize x tileRows x tileColumns x numChannels tensor containing the entire transformed input signal
+            GetInputBlock<ValueType>(function, input, tileRow, tileColumn, channel, inputRowStride, numChannels, numOutputRows, numOutputColumns, tileSize, filterSize, blockSize, inputBlock);
 
-            llvm::AllocaInst* inputWindow = function.Variable(emitters::GetVariableType<ValueType>(), windowSize * windowSize);
-            GetInputWindow(function, input, tileRow, tileColumn, channel, inputColumnStride, numChannels, outputRows, outputColumns, tileSize, filterSize, inputWindow);
+            TransformInputBlock<ValueType>(function, inputBlock, tileSize, filterSize, blockSize, transformedInputBlock);
 
-            llvm::AllocaInst* transformedWindow = function.Variable(emitters::GetVariableType<ValueType>(), windowSize * windowSize);
-            TransformInputWindow<ValueType>(function, inputWindow, tileSize, filterSize, transformedWindow);
-
-            // transformedInput is a (wr*wc) x numChannels x (tr * tc) tensor containing the entire transformed input signal.
-            // Think of it as (wr*wc) separate numChannels x tr x tc tensors: one tr x tc image for each position in the transformed window.
-            // So, there's a tensor representing the upper-left window pixel for each transformed input tile, another representing the (0,1) pixel
-            // of each tranformed input tile, and so on.
-            // This operation is dispersing the computed values in a maximally discontiguous way. We can likely speed it up by processing
-            // contiguous entries in the output tensors. That is, processing multiple windows at a time. Processing multiple input windows at a time
-            // will also enable reusing the overlapped input window data across tiles.
-            auto offset = ((((channel * numPartialTileRows) + tileRow) * numPartialTileColumns) + tileColumn); // this is the offset within a (numChannels x tr x tc) tensor for the input window we're processing
-            auto stride = numChannels * numPartialTileRows * numPartialTileColumns;
-
-            for (int rowIndex = 0; rowIndex < windowSize; ++rowIndex)
-            {
-                for (int columnIndex = 0; columnIndex < windowSize; ++columnIndex)
-                {
-                    auto windowLoc = (rowIndex * windowSize) + columnIndex;
-                    auto outputLoc = windowLoc * stride + offset;
-                    auto value = function.ValueAt(transformedWindow, windowLoc);
-                    function.SetValueAt(transformedInput, outputLoc, value);
-                }
-            }
+            SplatTransformedInputBlock<ValueType>(function, transformedInputBlock, tileRow, tileColumn, channel, numOutputRows, numOutputColumns, numChannels, tileSize, filterSize, blockSize, transformedInput);
         }
 
         template <typename ValueType>
-        void GetTransformedOutputTile(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutput, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int outputRows, int outputColumns, int numFilters, int tileSize, int filterSize, llvm::Value* outputTile)
+        void GetTransformedOutputBlock(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutput, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int numOutputRows, int numOutputColumns, int numFilters, int tileSize, int filterSize, int blockSize, llvm::Value* transformedOutputWindow)
         {
-            const int windowSize = tileSize + filterSize - 1;
-            const auto numPartialTileRows = (outputRows + tileSize - 1) / tileSize;
-            const auto numPartialTileColumns = (outputColumns + tileSize - 1) / tileSize;
+            const auto windowSize = tileSize + filterSize - 1;
+            const auto numTileRows = ((numOutputRows - 1) / tileSize) + 1;
+            const auto numTileColumns = ((numOutputColumns - 1) / tileSize) + 1;
+            const auto windowEntryStride = numFilters * numTileRows * numTileColumns;
+            const auto tileIndex = tileRow * numTileColumns + tileColumn;
+            const auto offset = (tileIndex * numFilters) + filterIndex;
 
-            llvm::AllocaInst* transformedOutputWindow = function.Variable(emitters::GetVariableType<ValueType>(), windowSize * windowSize);
-
-            // Gather wr x wc slice from tile tr, tc and channel filterIndex of transformedOutput
-            // transformedOutput is (wr*wc) x nf x tr x tc, where tr == # tile rows and tc == # tile columns
-            // transformedOutputWindow is (wr*wc)
-
-            // Retrieve values from transformed output into local matrix of size wr x wc
-            auto stride = numFilters * numPartialTileRows * numPartialTileColumns;
-            auto offset = (filterIndex * numPartialTileRows * numPartialTileColumns) + (tileRow * numPartialTileColumns) + tileColumn;
-
-            // rowIndex and columnIndex are the row and column indices within the window
-            for (int rowIndex = 0; rowIndex < windowSize; ++rowIndex)
+            for (int windowLoc = 0; windowLoc < windowSize * windowSize; ++windowLoc)
             {
-                for (int columnIndex = 0; columnIndex < windowSize; ++columnIndex)
-                {
-                    auto windowLoc = (rowIndex * windowSize) + columnIndex;
-                    auto inputLoc = windowLoc * stride + offset;
-                    auto value = function.ValueAt(transformedOutput, inputLoc);
-                    function.SetValueAt(transformedOutputWindow, windowLoc, value);
-                }
+                auto inputLoc = windowLoc * windowEntryStride + offset;
+                function.MemoryCopy<ValueType>(transformedOutput, inputLoc, transformedOutputWindow, function.Literal<int>(windowLoc*blockSize), function.Literal<int>(blockSize));
             }
-
-            TransformOutputTile<ValueType>(function, transformedOutputWindow, tileSize, filterSize, outputTile);
         }
 
-        //
-        // `SplatTransformedOutputTile()` copies data for a transformed output tile into the correct place in the output
-        // If the tile row or column are passed in as compile-time constants, then partial tiles will be correctly
-        // copied, otherwise this code assumes the tile is fully contained in the output.
-        //
         template <typename ValueType>
-        void SplatTransformedOutputTile(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutput, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int outputRows, int outputColumns, int numFilters, int tileSize, int filterSize, llvm::Value* output)
+        void SplatOutputTile(emitters::IRFunctionEmitter& function, llvm::Value* outputTile, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int numOutputRows, int numOutputColumns, int numFilters, int tileSize, int blockSize, llvm::Value* output)
         {
             auto tileRowSize = tileSize;
             auto tileColumnSize = tileSize;
-
-            // outputTile is tile (tr, tc, f) of the output
-            // output is a r, c, nf image tensor containing the convolution result
-            llvm::AllocaInst* outputTile = function.Variable(emitters::GetVariableType<ValueType>(), tileSize * tileSize);
-            GetTransformedOutputTile<ValueType>(function, transformedOutput, tileRow, tileColumn, filterIndex, outputRows, outputColumns, numFilters, tileSize, filterSize, outputTile);
-
             if (llvm::isa<llvm::ConstantInt>(static_cast<llvm::Value*>(tileRow)))
             {
-                auto constRow = llvm::cast<llvm::ConstantInt>(static_cast<llvm::Value*>(tileRow));
-                auto constRowVal = static_cast<int>(constRow->getSExtValue());
-                auto tileStart = constRowVal * tileSize;
-                tileRowSize = std::min(tileSize, outputRows - tileStart);
+                auto tileStart = GetConstantIntValue<int>(tileRow) * tileSize;
+                tileRowSize = std::min(tileSize, numOutputRows - tileStart);
             }
 
             // check for constant tile column on last column
             if (llvm::isa<llvm::ConstantInt>(static_cast<llvm::Value*>(tileColumn)))
             {
-                auto constColumn = llvm::cast<llvm::ConstantInt>(static_cast<llvm::Value*>(tileColumn));
-                auto constColumnVal = static_cast<int>(constColumn->getSExtValue());
-                auto tileStart = constColumnVal * tileSize;
-                tileColumnSize = std::min(tileSize, outputColumns - tileStart);
+                auto tileStart = GetConstantIntValue<int>(tileColumn) * tileSize;
+                tileColumnSize = std::min(tileSize, numOutputColumns - tileStart);
             }
 
             // rowIndex and columnIndex are the row and column indices within the tile
-            auto offset = ((tileSize * tileRow * outputColumns) + (tileSize * tileColumn)) * numFilters + filterIndex; // offset into the upper-left of the given tile
+            const auto columnStride = numFilters;
+            const auto rowStride = columnStride * numOutputColumns;
+            auto outputStart = (tileSize * tileRow * rowStride) + (tileSize * tileColumn * columnStride) + filterIndex; // offset into the upper-left of the given tile
             for (int rowIndex = 0; rowIndex < tileRowSize; ++rowIndex)
             {
                 for (int columnIndex = 0; columnIndex < tileColumnSize; ++columnIndex)
                 {
-                    auto inputLoc = (rowIndex * tileSize) + columnIndex;
-                    auto outputLoc = ((rowIndex * outputColumns) + columnIndex) * numFilters + offset; // This is incorrect
-                    auto value = function.ValueAt(outputTile, inputLoc);
-                    function.SetValueAt(output, outputLoc, value);
+                    auto inputLoc = ((rowIndex * tileSize) + columnIndex) * blockSize;
+                    auto outputLoc = outputStart + (rowIndex * rowStride) + (columnIndex * columnStride);
+                    function.MemoryCopy<ValueType>(outputTile, function.Literal<int>(inputLoc), output, outputLoc, function.Literal<int>(blockSize));
                 }
             }
+        }
+
+        //
+        // `ProcessOutputBlock()` copies data for a transformed output tile into the correct place in the output
+        // If the tile row or column are passed in as compile-time constants, then partial tiles will be correctly
+        // copied, otherwise this code assumes the tile is fully contained in the output.
+        //
+        template <typename ValueType>
+        void ProcessOutputBlock(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutput, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int numOutputRows, int numOutputColumns, int numFilters, int tileSize, int filterSize, int blockSize, llvm::Value* transformedOutputBlock, llvm::Value* outputTile, llvm::Value* output)
+        {
+            // transformedOutput is a numTileRows, numTileColumns, numFilters image tensor containing the convolution result
+            GetTransformedOutputBlock<ValueType>(function, transformedOutput, tileRow, tileColumn, filterIndex, numOutputRows, numOutputColumns, numFilters, tileSize, filterSize, blockSize, transformedOutputBlock);
+
+            // transformedOutputWindow
+            TransformOutputBlock<ValueType>(function, transformedOutputBlock, tileSize, filterSize, blockSize, outputTile);
+
+            // outputTile is tile (tileRow, tileColumn, filterIndex) of the output
+            SplatOutputTile<ValueType>(function, outputTile, tileRow, tileColumn, filterIndex, numOutputRows, numOutputColumns, numFilters, tileSize, blockSize, output);
         }
 
         //
@@ -313,66 +359,73 @@ namespace nodes
         template <typename ValueType>
         void TransformInput(emitters::IRFunctionEmitter& function,
                             llvm::Value* input,
-                            int outputRows,
-                            int outputColumns,
+                            int numOutputRows,
+                            int numOutputColumns,
                             int numChannels,
-                            int inputColumnStride,
+                            int inputRowStride,
                             int tileSize,
                             int filterSize,
+                            int blockSize,
                             llvm::Value* transformedInput)
         {
-            const auto numTileRows = outputRows / tileSize;
-            const auto numTileColumns = outputColumns / tileSize;
-            const auto numPartialTileRows = (outputRows + tileSize - 1) / tileSize;
-            const auto numPartialTileColumns = (outputColumns + tileSize - 1) / tileSize;
+            const int windowSize = tileSize + filterSize - 1;
+            const auto numFullTileRows = numOutputRows / tileSize;
+            const auto numFullTileColumns = numOutputColumns / tileSize;
+            const auto numTileRows = (numOutputRows + tileSize - 1) / tileSize;
+            const auto numTileColumns = (numOutputColumns + tileSize - 1) / tileSize;
+
+            // scratch space for conversion
+            llvm::AllocaInst* inputBlock = function.Variable(emitters::GetVariableType<ValueType>(), windowSize * windowSize * blockSize);
+            llvm::AllocaInst* transformedBlock = function.Variable(emitters::GetVariableType<ValueType>(), windowSize * windowSize * blockSize);
 
             // Get transformed input for all "full" windows (ones that don't fall off the edge or bottom of the input image)
-            function.For(numTileRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* index1) {
+            function.For(numFullTileRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* index1) {
                 auto rowTileIndex = function.LocalScalar(index1);
-                function.For(numTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index2) {
+                function.For(numFullTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index2) {
                     auto columnTileIndex = function.LocalScalar(index2);
-                    function.For(numChannels, [=](emitters::IRFunctionEmitter& function, llvm::Value* index3) {
-                        auto channelIndex = function.LocalScalar(index3);
-                        GetTransformedInputWindow<ValueType>(function, input, rowTileIndex, columnTileIndex, channelIndex, inputColumnStride, numChannels, outputRows, outputColumns, tileSize, filterSize, transformedInput);
-                    });
+                    for(int channelIndex = 0; channelIndex < numChannels; channelIndex += blockSize)
+                    {
+                        int thisBlockSize = numChannels - channelIndex > blockSize ? blockSize : numChannels - channelIndex;
+                        ProcessInputBlock<ValueType>(function, input, rowTileIndex, columnTileIndex, function.LocalScalar(channelIndex), inputRowStride, numOutputRows, numOutputColumns, numChannels, tileSize, filterSize, thisBlockSize, inputBlock, transformedBlock, transformedInput);
+                    }
                 });
+
+                // Extra partial window at the right of the row
+                if (numTileColumns > numFullTileColumns)
+                {
+                    auto columnTileIndex = function.LocalScalar(numFullTileColumns);
+                    for(int channelIndex = 0; channelIndex < numChannels; channelIndex += blockSize)
+                    {
+                        int thisBlockSize = numChannels - channelIndex > blockSize ? blockSize : numChannels - channelIndex;
+                        ProcessInputBlock<ValueType>(function, input, rowTileIndex, columnTileIndex, function.LocalScalar(channelIndex), inputRowStride, numOutputRows, numOutputColumns, numChannels, tileSize, filterSize, thisBlockSize, inputBlock, transformedBlock, transformedInput);
+                    }
+                }
             });
-
-            // Extra rows on the bottom
-            if (numPartialTileRows > numTileRows)
+            
+            // Extra row on the bottom
+            if (numTileRows > numFullTileRows)
             {
-                auto rowTileIndex = function.LocalScalar(numTileRows);
+                auto rowTileIndex = function.LocalScalar(numFullTileRows);
                 function.For(numTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index2) {
                     auto columnTileIndex = function.LocalScalar(index2);
-                    function.For(numChannels, [=](emitters::IRFunctionEmitter& function, llvm::Value* index3) {
-                        auto channelIndex = function.LocalScalar(index3);
-                        GetTransformedInputWindow<ValueType>(function, input, rowTileIndex, columnTileIndex, channelIndex, inputColumnStride, numChannels, outputRows, outputColumns, tileSize, filterSize, transformedInput);
-                    });
+                    for(int channelIndex = 0; channelIndex < numChannels; channelIndex += blockSize)
+                    {
+                        int thisBlockSize = numChannels - channelIndex > blockSize ? blockSize : numChannels - channelIndex;
+                        ProcessInputBlock<ValueType>(function, input, rowTileIndex, columnTileIndex, function.LocalScalar(channelIndex), inputRowStride, numOutputRows, numOutputColumns, numChannels, tileSize, filterSize, thisBlockSize, inputBlock, transformedBlock, transformedInput);
+                    }
                 });
             }
 
-            // Extra columns on the right
-            if (numPartialTileColumns > numTileColumns)
+            // Extra entry in the bottom-right corner
+            if ((numTileRows > numFullTileRows) && (numTileColumns > numFullTileColumns))
             {
-                auto columnTileIndex = function.LocalScalar(numTileColumns);
-                function.For(numTileRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* index1) {
-                    auto rowTileIndex = function.LocalScalar(index1);
-                    function.For(numChannels, [=](emitters::IRFunctionEmitter& function, llvm::Value* index3) {
-                        auto channelIndex = function.LocalScalar(index3);
-                        GetTransformedInputWindow<ValueType>(function, input, rowTileIndex, columnTileIndex, channelIndex, inputColumnStride, numChannels, outputRows, outputColumns, tileSize, filterSize, transformedInput);
-                    });
-                });
-            }
-
-            // Extra entries in the bottom-right corner
-            if ((numPartialTileRows > numTileRows) && (numPartialTileColumns > numTileColumns))
-            {
-                auto rowTileIndex = function.LocalScalar(numTileRows);
-                auto columnTileIndex = function.LocalScalar(numTileColumns);
-                function.For(numChannels, [=](emitters::IRFunctionEmitter& function, llvm::Value* index3) {
-                    auto channelIndex = function.LocalScalar(index3);
-                    GetTransformedInputWindow<ValueType>(function, input, rowTileIndex, columnTileIndex, channelIndex, inputColumnStride, numChannels, outputRows, outputColumns, tileSize, filterSize, transformedInput);
-                });
+                auto rowTileIndex = function.LocalScalar(numFullTileRows);
+                auto columnTileIndex = function.LocalScalar(numFullTileColumns);
+                for(int channelIndex = 0; channelIndex < numChannels; channelIndex += blockSize)
+                {
+                    int thisBlockSize = numChannels - channelIndex > blockSize ? blockSize : numChannels - channelIndex;
+                    ProcessInputBlock<ValueType>(function, input, rowTileIndex, columnTileIndex, function.LocalScalar(channelIndex), inputRowStride, numOutputRows, numOutputColumns, numChannels, tileSize, filterSize, thisBlockSize, inputBlock, transformedBlock, transformedInput);
+                }
             }
         }
 
@@ -381,115 +434,112 @@ namespace nodes
         void ComputeTransformedOutput(emitters::IRFunctionEmitter& function,
                                       llvm::Value* transformedInput,
                                       llvm::Value* transformedFilters,
-                                      int outputRows,
-                                      int outputColumns,
+                                      int numOutputRows,
+                                      int numOutputColumns,
                                       int numChannels,
                                       int numFilters,
                                       int tileSize,
                                       int filterSize,
                                       llvm::Value* transformedOutput)
         {
-            const auto numPartialTileRows = (outputRows + tileSize - 1) / tileSize;
-            const auto numPartialTileColumns = (outputColumns + tileSize - 1) / tileSize;
-
-            int windowSize = filterSize + tileSize - 1;
-
-            // Now, transformedInput is a tensor of dimensions (wsxwsx?x?), which we can multiply by the stored filter matrix
-            // Now do the multiply to reduce many entries in parallel
+            // Do a matrix multiply to reduce many entries in parallel
             //
-            // transformedInput is a (wr*wc) x d x (tr * tc) tensor containing the entire transformed input signal
-            // transformedFilters is a (wr*wc) x nf x d tensor
-            // transformedOutput is (wr*wc) x nf x (tr * tc)
-            // transformedFilters(i,j) * transformedInput(i,j) -> transformedOutput  (nf x d) * (d x (tr*tc)) -> nf x (tr*tc)
+            // transformedSignal is a (windowRows*windowColumns) x (tr * tc) x (numChannels) tensor containing the entire transformed input signal
+            // transformedFilters is a (windowRows*windowColumns) x (numFilters) x (numChannels) tensor
+            // transformedOutput is a (windowRows*windowColumns) x (tr * tc) x (numFilters) tensor containing the entire transformed output signal
+
+            const auto windowSize = filterSize + tileSize - 1;
+            const auto numTileRows = ((numOutputRows - 1) / tileSize) + 1;
+            const auto numTileColumns = ((numOutputColumns - 1) / tileSize) + 1;
 
             // These strides are the distance between spatially-adjacent window entries in the various data structures
-            int numOutputTiles = numPartialTileRows * numPartialTileColumns;
-            int transformedInputStride = numChannels * numOutputTiles;
+            int numOutputTiles = numTileRows * numTileColumns;
+            int transformedInputStride = numOutputTiles * numChannels;
             int transformedFiltersStride = numFilters * numChannels;
-            int transformedOutputStride = numFilters * numOutputTiles;
+            int transformedOutputStride = numOutputTiles * numFilters;
 
             // Each window pixel position has a separate matrix of values to transform via a matrix multiply
-            // rowIndex, columnIndex are the row and column indicies within the window
-            for (int rowIndex = 0; rowIndex < windowSize; ++rowIndex)
+            for (int windowPosition = 0; windowPosition < windowSize * windowSize; ++windowPosition)
             {
-                for (int columnIndex = 0; columnIndex < windowSize; ++columnIndex)
-                {
-                    // Compute the offsets to the particular (wr, wc) matrix we want
-                    const auto windowIndex = (rowIndex * windowSize) + columnIndex;
-                    auto transformedInputMatrix = function.PointerOffset(transformedInput, windowIndex * transformedInputStride);
-                    auto transformedFiltersMatrix = function.PointerOffset(transformedFilters, windowIndex * transformedFiltersStride);
-                    auto transformedOutputMatrix = function.PointerOffset(transformedOutput, windowIndex * transformedOutputStride); // wrong location in memory
+                // Compute the offsets to the particular (wr, wc) matrix we want
+                auto transformedInputMatrix = function.PointerOffset(transformedInput, windowPosition * transformedInputStride);
+                auto transformedFiltersMatrix = function.PointerOffset(transformedFilters, windowPosition * transformedFiltersStride);
+                auto transformedOutputMatrix = function.PointerOffset(transformedOutput, windowPosition * transformedOutputStride);
 
-                    // filter: m x k, input: k x n, output: m x n
-                    // transformedOutput = transformedFilter * transformedInput
-                    int m = numFilters;
-                    int n = numOutputTiles;
-                    int k = numChannels;
+                // filter: m x k, input: k x n, output: m x n
+                // transformedOutput = transformedFilter * transformedInput
+                const int m = numOutputTiles;
+                const int n = numFilters;
+                const int k = numChannels;
+                const int lda = numChannels;
+                const int ldb = numChannels;
+                const int ldc = numFilters;
 
-                    // Now do a matrix multiply to reduce many entries in parallel
-                    function.CallGEMM<ValueType>(false, false, m, n, k, transformedFiltersMatrix, k, transformedInputMatrix, n, transformedOutputMatrix, n);
-                }
+                // Now do a matrix multiply to reduce many entries in parallel
+                function.CallGEMM<ValueType>(false, true, m, n, k, transformedInputMatrix, lda, transformedFiltersMatrix, ldb, transformedOutputMatrix, ldc);
             }
         }
 
         template <typename ValueType>
-        void TransformOutput(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutput, int outputRows, int outputColumns, int numFilters, int tileSize, int filterSize, llvm::Value* output)
+        void TransformOutput(emitters::IRFunctionEmitter& function, 
+                             llvm::Value* transformedOutput, 
+                             int numOutputRows, 
+                             int numOutputColumns, 
+                             int numFilters, 
+                             int tileSize, 
+                             int filterSize, 
+                             int blockSize,
+                             llvm::Value* output)
         {
-            const auto numTileRows = outputRows / tileSize;
-            const auto numTileColumns = outputColumns / tileSize;
-            const auto numPartialTileRows = (outputRows + tileSize - 1) / tileSize;
-            const auto numPartialTileColumns = (outputColumns + tileSize - 1) / tileSize;
+            const int windowSize = tileSize + filterSize - 1;
+            const auto numFullTileRows = numOutputRows / tileSize;
+            const auto numFullTileColumns = numOutputColumns / tileSize;
+            const auto numTileRows = (numOutputRows + tileSize - 1) / tileSize;
+            const auto numTileColumns = (numOutputColumns + tileSize - 1) / tileSize;
 
-            // First output all of the complete tiles
-            function.For(numFilters, [=](emitters::IRFunctionEmitter& function, llvm::Value* index1) {
-                auto filterIndex = function.LocalScalar(index1);
-                function.For(numTileRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* index2) {
+            llvm::AllocaInst* transformedOutputWindow = function.Variable(emitters::GetVariableType<ValueType>(), windowSize * windowSize * blockSize);
+            llvm::AllocaInst* outputTile = function.Variable(emitters::GetVariableType<ValueType>(), tileSize * tileSize * blockSize);
+
+            for(int filterIndex = 0; filterIndex < numFilters; filterIndex += blockSize)
+            {
+                auto irFilterIndex = function.LocalScalar<int>(filterIndex);
+                
+                int thisBlockSize = numFilters - filterIndex > blockSize ? blockSize : numFilters - filterIndex;
+                function.For(numFullTileRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* index2) {
                     auto rowTileIndex = function.LocalScalar(index2);
-                    function.For(numTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index3) {
+
+                    // First output all of the complete tiles for this row
+                    function.For(numFullTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index3) {
                         auto columnTileIndex = function.LocalScalar(index3);
 
-                        SplatTransformedOutputTile<ValueType>(function, transformedOutput, rowTileIndex, columnTileIndex, filterIndex, outputRows, outputColumns, numFilters, tileSize, filterSize, output);
+                        ProcessOutputBlock<ValueType>(function, transformedOutput, rowTileIndex, columnTileIndex, irFilterIndex, numOutputRows, numOutputColumns, numFilters, tileSize, filterSize, thisBlockSize, transformedOutputWindow, outputTile, output);
                     });
+                
+                    // Extra partial tile on the right
+                    if (numTileColumns > numFullTileColumns)
+                    {
+                        auto columnTileIndex = function.LocalScalar(numFullTileColumns);
+                        ProcessOutputBlock<ValueType>(function, transformedOutput, rowTileIndex, columnTileIndex, irFilterIndex, numOutputRows, numOutputColumns, numFilters, tileSize, filterSize, thisBlockSize, transformedOutputWindow, outputTile, output);
+                    }
                 });
-            });
 
-            // Now, if there are any partially-filled tiles on the right and left, output them:
-
-            // Extra rows on the bottom
-            if (numPartialTileRows > numTileRows)
-            {
-                auto rowTileIndex = function.LocalScalar(numTileRows);
-                function.For(numFilters, [=](emitters::IRFunctionEmitter& function, llvm::Value* index1) {
-                    auto filterIndex = function.LocalScalar(index1);
-                    function.For(numTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index3) {
+                // Extra row on the bottom
+                if (numTileRows > numFullTileRows)
+                {
+                    auto rowTileIndex = function.LocalScalar(numFullTileRows);
+                    function.For(numFullTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index3) {
                         auto columnTileIndex = function.LocalScalar(index3);
-                        SplatTransformedOutputTile<ValueType>(function, transformedOutput, rowTileIndex, columnTileIndex, filterIndex, outputRows, outputColumns, numFilters, tileSize, filterSize, output);
+                        ProcessOutputBlock<ValueType>(function, transformedOutput, rowTileIndex, columnTileIndex, irFilterIndex, numOutputRows, numOutputColumns, numFilters, tileSize, filterSize, thisBlockSize, transformedOutputWindow, outputTile, output);
                     });
-                });
-            }
+                }
 
-            // Extra columns on the right
-            if (numPartialTileColumns > numTileColumns)
-            {
-                auto columnTileIndex = function.LocalScalar(numTileColumns);
-                function.For(numFilters, [=](emitters::IRFunctionEmitter& function, llvm::Value* index1) {
-                    auto filterIndex = function.LocalScalar(index1);
-                    function.For(numTileRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* index2) {
-                        auto rowTileIndex = function.LocalScalar(index2);
-                        SplatTransformedOutputTile<ValueType>(function, transformedOutput, rowTileIndex, columnTileIndex, filterIndex, outputRows, outputColumns, numFilters, tileSize, filterSize, output);
-                    });
-                });
-            }
-
-            // Extra entries in the lower-right partial tile
-            if ((numPartialTileRows > numTileRows) && (numPartialTileColumns > numTileColumns))
-            {
-                auto rowTileIndex = function.LocalScalar(numTileRows);
-                auto columnTileIndex = function.LocalScalar(numTileColumns);
-                function.For(numFilters, [=](emitters::IRFunctionEmitter& function, llvm::Value* index1) {
-                    auto filterIndex = function.LocalScalar(index1);
-                    SplatTransformedOutputTile<ValueType>(function, transformedOutput, rowTileIndex, columnTileIndex, filterIndex, outputRows, outputColumns, numFilters, tileSize, filterSize, output);
-                });
+                // Extra entry in the lower-right partial tile
+                if ((numTileRows > numFullTileRows) && (numTileColumns > numFullTileColumns))
+                {
+                    auto rowTileIndex = function.LocalScalar(numFullTileRows);
+                    auto columnTileIndex = function.LocalScalar(numFullTileColumns);
+                    ProcessOutputBlock<ValueType>(function, transformedOutput, rowTileIndex, columnTileIndex, irFilterIndex, numOutputRows, numOutputColumns, numFilters, tileSize, filterSize, thisBlockSize, transformedOutputWindow, outputTile, output);
+                }
             }
         }
     } // end anonymous namespace
@@ -519,7 +569,6 @@ namespace nodes
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _stride(static_cast<int>(stride))
     {
         const int numFilters = outputMemoryLayout.GetActiveSize(2);
-        // filters is (nf*fr) x fc x d
         _filterSize = filterWeights.NumColumns();
         assert(filterWeights.NumRows() == _filterSize * numFilters);
         _tileSize = 2;
@@ -600,6 +649,15 @@ namespace nodes
                                                                               int filterSize)
         : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _stride(stride), _tileSize(tileSize), _filterSize(filterSize)
     {
+        _blockSize = 64;
+    }
+
+    template <typename ValueType>
+    WinogradConvolutionComputeNode<ValueType>::WinogradConvolutionComputeNode(const WinogradConvolutionComputeNode<ValueType>& other,
+                                                                              const model::PortElements<ValueType>& input,
+                                                                              const model::PortElements<ValueType>& filterWeights)
+        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, GetOutputSize(other._outputMemoryLayout)), _inputMemoryLayout(other._inputMemoryLayout), _outputMemoryLayout(other._outputMemoryLayout), _stride(other._stride), _tileSize(other._tileSize), _filterSize(other._filterSize), _blockSize(other._blockSize)
+    {
     }
 
     template <typename ValueType>
@@ -607,7 +665,7 @@ namespace nodes
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newFilterWeights = transformer.TransformPortElements(_filterWeights.GetPortElements());
-        auto newNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(newInput, newFilterWeights, _inputMemoryLayout, _outputMemoryLayout, _stride, _tileSize, _filterSize);
+        auto newNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(*this, newInput, newFilterWeights);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -617,70 +675,46 @@ namespace nodes
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
 
-    // Terminology:
-    // fw: filter width
-    // d: # input channels
-    // f: # filters (== output channels)
-
     template <typename ValueType>
     void WinogradConvolutionComputeNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        using namespace std::string_literals;
-
         auto& module = function.GetModule();
 
-        // input is a d x (w+2p) x (h+2p) array
-        // reshaped, it's a d*(w+2p)) x (h+2p) array == d*(w+k-1) x (h+k-1)
         llvm::Value* input = compiler.EnsurePortEmitted(this->input);
-
-        // weights is f x k x k x d array
-        // reshaped, it's (f*k) x (k*d) or f x k x (k*d)
-        // transformedFilters is a (wr*wc) x nf x d tensor
         llvm::Value* transformedFilters = compiler.EnsurePortEmitted(this->filterWeights);
-
-        // output is a (w+2p) x (h+2p) x f array
         llvm::Value* output = compiler.EnsurePortEmitted(this->output);
 
         // Input data parameters
         const auto inputLayout = this->GetInputMemoryLayout();
-        const auto inputRowStride = inputLayout.GetStride(1);
-        const auto inputColumnStride = inputLayout.GetStride(1);
+        const auto inputRowStride = inputLayout.GetCumulativeIncrement(0);
         const auto numChannels = inputLayout.GetActiveSize(2);
-        UNUSED(inputRowStride);
+        assert((inputLayout.GetOffset(0) == _filterSize / 2) && "Padding must be filterSize/2");
 
         // Output data parameters
         const auto outputLayout = this->GetOutputMemoryLayout();
-        const int outputRows = outputLayout.GetActiveSize(0);
-        const int outputColumns = outputLayout.GetActiveSize(1);
+        const int numOutputRows = outputLayout.GetActiveSize(0);
+        const int numOutputColumns = outputLayout.GetActiveSize(1);
         const int numFilters = outputLayout.GetActiveSize(2);
 
-        // Filter parameters
-        const int inputPadding = inputLayout.GetOffset(0);
-        DEBUG_USED(inputPadding);
-        assert((inputPadding == _filterSize / 2) && "Padding must be filterSize/2");
-
         // Winograd-specific stuff
-        const auto tileSize = _tileSize;
-        const auto filterSize = _filterSize;
-        const auto windowSize = _filterSize + tileSize - 1;
-        const auto numPartialTileRows = (outputRows + tileSize - 1) / tileSize;
-        const auto numPartialTileColumns = (outputColumns + tileSize - 1) / tileSize;
+        const auto windowSize = _filterSize + _tileSize - 1;
+        const auto numTileRows = (numOutputRows + _tileSize - 1) / _tileSize;
+        const auto numTileColumns = (numOutputColumns + _tileSize - 1) / _tileSize;
 
-        // Allocate scratch space --- rounding up the number of tiles
-        int transformedInputSize = windowSize * windowSize * numChannels * numPartialTileRows * numPartialTileColumns;
-        int transformedOutputSize = windowSize * windowSize * numFilters * numPartialTileRows * numPartialTileColumns;
-        auto transformedInput = module.GlobalArray<ValueType>("transformedInput"s + GetInternalStateIdentifier(), transformedInputSize);
-        auto transformedOutput = module.GlobalArray<ValueType>("transformedOutput"s + GetInternalStateIdentifier(), transformedOutputSize);
+        // Allocate scratch space to hold transformed input and output
+        int transformedInputSize = windowSize * windowSize * numTileRows * numTileColumns * numChannels;
+        int transformedOutputSize = windowSize * windowSize * numTileRows * numTileColumns * numFilters;
+        auto transformedInput = module.GlobalArray<ValueType>(GetInternalStateIdentifier() + "_transformedInput", transformedInputSize);
+        auto transformedOutput = module.GlobalArray<ValueType>(GetInternalStateIdentifier() + "_transformedOutput", transformedOutputSize);
 
-        // transformedInput is a (wr*wc) x d x (tr * tc) tensor containing the entire transformed input signal
-        // transformedFilters is a (wr*wc) x nf x d tensor
-        // transformedOutput is (wr*wc) x nf x (tr * tc)
-        // transformedFilters(i,j) * transformedInput(i,j) -> transformedOutput  (nf x d) * (d x (tr*tc)) -> nf x (tr*tc)
+        // transformedInput is (windowSize*windowSize) x (tileRows * tileColumns) x numChannels
+        // transformedFilters is (windowSize*windowSize) x numFilters x numChannels 
+        // transformedOutput is (windowSize*windowSize) x (tileRows * tileColumns) x numFilters
 
         // This is the core of the Winograd convolution algorithm: transform the input, perform an elementwise multiply between it an the transformed filter, and transform it back
-        TransformInput<ValueType>(function, input, outputRows, outputColumns, numChannels, inputColumnStride, tileSize, filterSize, transformedInput);
-        ComputeTransformedOutput<ValueType>(function, transformedInput, transformedFilters, outputRows, outputColumns, numChannels, numFilters, tileSize, filterSize, transformedOutput);
-        TransformOutput<ValueType>(function, transformedOutput, outputRows, outputColumns, numFilters, tileSize, filterSize, output);
+        TransformInput<ValueType>(function, input, numOutputRows, numOutputColumns, numChannels, inputRowStride, _tileSize, _filterSize, _blockSize, transformedInput);
+        ComputeTransformedOutput<ValueType>(function, transformedInput, transformedFilters, numOutputRows, numOutputColumns, numChannels, numFilters, _tileSize, _filterSize, transformedOutput);
+        TransformOutput<ValueType>(function, transformedOutput, numOutputRows, numOutputColumns, numFilters, _tileSize, _filterSize, _blockSize, output);
     }
 
     // Explicit specializations

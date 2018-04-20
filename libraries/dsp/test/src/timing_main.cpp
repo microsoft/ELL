@@ -69,7 +69,7 @@ int main()
     // void TimeConv2D(size_t numRows, size_t numColumns, size_t numChannels, size_t filterSize, size_t numFilters, size_t numIterations, ell::dsp::ConvolutionMethodOption algorithm);
     TimeConv2D<float>(200, 200, 1, 3, 1, 100, ell::dsp::ConvolutionMethodOption::simple);
     TimeConv2D<float>(200, 200, 1, 3, 1, 100, ell::dsp::ConvolutionMethodOption::unrolled);
-    TimeConv2D<float>(200, 200, 1, 3, 1, 100, ell::dsp::ConvolutionMethodOption::winograd);
+    TimeConv2D<float>(200, 200, 1, 3, 1, 1, ell::dsp::ConvolutionMethodOption::winograd);
     std::cout << "\n";
 
     TimeConv2D<float>(120, 80, 8, 3, 16, 1, ell::dsp::ConvolutionMethodOption::simple);

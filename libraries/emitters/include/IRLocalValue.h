@@ -14,6 +14,9 @@
 // llvm
 #include <llvm/IR/Value.h>
 
+// stl
+#include <initializer_list>
+
 namespace ell
 {
 namespace emitters
@@ -184,6 +187,60 @@ namespace emitters
 
         int rows = 0;
         int columns = 0;
+    };
+
+    /// <summary>
+    /// Helper type for llvm values representing N-D arrays local to a function
+    /// </summary>
+    struct IRLocalMultidimArray
+    {
+    private:
+        /// <summary>
+        /// Helper type for llvm values representing values within arrays local to a function
+        /// </summary>
+        struct IRLocalArrayElement
+        {
+            IRLocalArrayElement(IRFunctionEmitter& function, llvm::Value* data, llvm::Value* offset);
+
+            IRLocalArrayElement& operator=(llvm::Value* value);
+
+            operator IRLocalScalar() const;
+
+            IRFunctionEmitter& _function;
+            llvm::Value* _data;
+            llvm::Value* _offset;
+        };
+
+    public:
+        /// <summary> Constructor from a pointer to data and a list of dimensions. </summary>
+        ///
+        /// <param name="function"> The current function being emitted. </param>
+        /// <param name="data"> The pointer to the LLVM array to wrap. </param>
+        /// <param name="dimensions"> The sizes of the array's dimensions. </param>
+        IRLocalMultidimArray(IRFunctionEmitter& function, llvm::Value* data, std::initializer_list<int> dimensions);
+
+        /// <summary> Indexing operator to return a reference to the specified element </summary>
+        ///
+        /// <param name="indices"> The indices of the element. </param>
+        ///
+        /// <return> An instance of IRLocalMultidimArray::IRLocalArrayElement to represent the value at the offset within the array </returns>
+        IRLocalArrayElement operator()(std::initializer_list<llvm::Value*> indices) const;
+
+        /// <summary> Indexing operator to return a reference to the specified element </summary>
+        ///
+        /// <param name="indices"> The indices of the element. </param>
+        ///
+        /// <return> An instance of IRLocalMultidimArray::IRLocalArrayElement to represent the value at the offset within the array </returns>
+        IRLocalArrayElement operator()(std::initializer_list<int> indices) const;
+
+        /// <summary> The function this value is in scope for. </summary>
+        IRFunctionEmitter& function;
+
+        /// <summary> The llvm::Value* being wrapped. </summary>
+        llvm::Value* data = nullptr;
+
+        std::vector<int> dimensions;
+        std::vector<int> strides;
     };
 }
 }

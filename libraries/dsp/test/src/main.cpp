@@ -66,6 +66,7 @@ int main()
     TestConv2DVsSimple<float>(60, 40, 64, 3, 128, 2, ConvolutionMethodOption::unrolled);
     
     // Winograd
+    TestConv2DVsSimple<float>(4, 4, 1, 3, 1, 1, ConvolutionMethodOption::winograd);
     TestConv2DVsSimple<float>(4, 4, 8, 3, 16, 1, ConvolutionMethodOption::winograd);
     TestConv2DVsSimple<float>(6, 6, 8, 3, 16, 1, ConvolutionMethodOption::winograd);
     TestConv2DVsSimple<float>(120, 80, 8, 3, 16, 1, ConvolutionMethodOption::winograd);

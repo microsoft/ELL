@@ -7,11 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DSPNodesTests.h"
-#include "DTWPrototype.h"
-#include "NodesTestData.h"
-
-// common
-#include "LoadModel.h"
 
 // dsp
 #include "Convolution.h"
@@ -32,9 +27,6 @@
 #include "SimpleConvolutionNode.h"
 #include "UnrolledConvolutionNode.h"
 #include "WinogradConvolutionNode.h"
-
-// predictors
-#include "NeuralNetworkPredictor.h"
 
 // predictors/neural
 #include "ConvolutionalLayer.h"
@@ -219,15 +211,22 @@ static void TimeConvolutionNode(int inputRows, int inputColumns, int numChannels
     dataTensorReference.CopyFrom(rawDataTensor);
     auto paddedDataArray = paddedDataTensor.ToArray();
 
+    utilities::MillisecondTimer timer;
+
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
     settings.compilerSettings.useBlas = true;
     settings.compilerSettings.parallelize = false;
     settings.verifyJittedModule = true;
     model::IRMapCompiler compiler(settings);
-    auto compiledMap = compiler.Compile(map);
 
-    utilities::MillisecondTimer timer;
+    timer.Reset();
+    auto compiledMap = compiler.Compile(map);
+    auto compilationTime = timer.Elapsed();
+    std::cout << "Time to compile model: " << compilationTime << " ms\n";
+
+
+    timer.Reset();
     for (int index = 0; index < numIterations; ++index)
     {
         compiledMap.SetInputValue(0, paddedDataArray);
@@ -263,6 +262,26 @@ void TimeDSPNodes()
     TimeConvolutionNode<float>(32, 48, 64, 256, 10, dsp::ConvolutionMethodOption::simple);
     TimeConvolutionNode<float>(32, 48, 64, 256, 10, dsp::ConvolutionMethodOption::unrolled);
     TimeConvolutionNode<float>(32, 48, 64, 256, 10, dsp::ConvolutionMethodOption::winograd);
+    std::cout << std::endl;
+
+    TimeConvolutionNode<float>(64, 64, 16, 16, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>(64, 64, 16, 16, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>(64, 64, 16, 16, 10, dsp::ConvolutionMethodOption::winograd);
+    std::cout << std::endl;
+    
+    TimeConvolutionNode<float>(64, 64, 32, 32, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>(64, 64, 32, 32, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>(64, 64, 32, 32, 10, dsp::ConvolutionMethodOption::winograd);
+    std::cout << std::endl;
+    
+    TimeConvolutionNode<float>(64, 64, 64, 64, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>(64, 64, 64, 64, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>(64, 64, 64, 64, 10, dsp::ConvolutionMethodOption::winograd);
+    std::cout << std::endl;
+    
+    TimeConvolutionNode<float>(64, 64, 128, 128, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>(64, 64, 128, 128, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>(64, 64, 128, 128, 10, dsp::ConvolutionMethodOption::winograd);
     std::cout << std::endl;
 
 

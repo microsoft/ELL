@@ -138,7 +138,7 @@ void FillInputMatrix(math::RowMatrixReference<ValueType> input)
     {
         for (size_t columnIndex = 0; columnIndex < numColumns; ++columnIndex)
         {
-            double value = std::sin(2 * 7 * pi * rowIndex / numRows) * std::cos(2 * 3 * pi * columnIndex / numColumns);
+            double value = std::sin(5.3 * 2 * pi * rowIndex / numRows) + std::cos(1.6 * 2 * pi * columnIndex / numColumns);
             value = std::trunc(value * 4) / 4.0;
             input(rowIndex, columnIndex) = static_cast<ValueType>(value);
         }
@@ -162,9 +162,8 @@ void FillFilterMatrix(math::RowMatrixReference<ValueType> filter)
     {
         for (size_t columnIndex = 0; columnIndex < numColumns; ++columnIndex)
         {
-            double value = 2 * std::sin(2 * pi * rowIndex / numRows) * std::cos(2 * 2 * pi * columnIndex / numColumns);
+            double value = 2 * std::sin(2.1 * pi * rowIndex / numRows) * std::cos(3.7 * 2 * pi * columnIndex / numColumns);
             value = std::trunc(value * 4) / 4.0;
-            value = (rowIndex == (numRows + 1) / 2) && (columnIndex == (numColumns + 1) / 2) ? 1.0 : 0.0;
             filter(rowIndex, columnIndex) = static_cast<ValueType>(value);
         }
     }

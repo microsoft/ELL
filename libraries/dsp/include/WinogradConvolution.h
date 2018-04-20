@@ -108,7 +108,7 @@ namespace dsp
     /// <param name="numFilters"> The number of filters in the `filters` argument. </param>
     /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
     template <typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> GetTransformedFilters(math::ConstChannelColumnRowTensorReference<ValueType> filters, int numFilters, int tileSize, WinogradFilterOrder order = WinogradFilterOrder::tilesFirst);
+    math::ChannelColumnRowTensor<ValueType> GetTransformedFilters(const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int tileSize, WinogradFilterOrder order = WinogradFilterOrder::tilesFirst);
 
     /// <summary> Transforms a filter tensor into a form usable directly by Winograd convolution, using an existing output tensor. </summary>
     ///
@@ -117,7 +117,7 @@ namespace dsp
     /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
     /// <param name="transformedFilters"> (Output) The transformed filter. </param>
     template <typename ValueType>
-    void TransformFilters(math::ConstChannelColumnRowTensorReference<ValueType> filters, int numFilters, int tileSize, math::ChannelColumnRowTensorReference<ValueType> transformedFilters);
+    void TransformFilters(const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int tileSize, WinogradFilterOrder order, math::ChannelColumnRowTensorReference<ValueType>& transformedFilters);
 
     //
     // Winograd convolution implementation functions

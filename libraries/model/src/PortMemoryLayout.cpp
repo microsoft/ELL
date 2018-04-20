@@ -22,6 +22,7 @@ namespace model
     : _size(size), _stride(size)
     {
         _offset.resize(_size.size(), 0);
+        _increment = ComputeCumulativeIncrement();
     }
 
     PortMemoryLayout::PortMemoryLayout(const Shape& size, const Shape& padding)
@@ -32,11 +33,13 @@ namespace model
         {
             _stride[index] = _size[index] + (2 * padding[index]);
         }
+        _increment = ComputeCumulativeIncrement();
     }
 
     PortMemoryLayout::PortMemoryLayout(const Shape& size, const Shape& stride, const Shape& offset)
         : _size(size), _stride(stride), _offset(offset)
     {
+        _increment = ComputeCumulativeIncrement();
     }
 
     size_t PortMemoryLayout::NumEntries() const
@@ -49,7 +52,7 @@ namespace model
         return std::accumulate(_stride.begin(), _stride.end(), 1, std::multiplies<size_t>());
     }
 
-    Shape PortMemoryLayout::GetCumulativeIncrement() const
+    Shape PortMemoryLayout::ComputeCumulativeIncrement() const
     {
         const auto numDimensions = NumDimensions();
         Shape result(numDimensions);
@@ -154,6 +157,7 @@ namespace model
         archiver["size"] >> _size;
         archiver["stride"] >> _stride;
         archiver["offset"] >> _offset;
+        _increment = ComputeCumulativeIncrement();
     }
 
     size_t NumElements(const Shape& size)
