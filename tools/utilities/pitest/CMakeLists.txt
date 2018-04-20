@@ -23,7 +23,8 @@ if(${PYTHON_ENABLED})
     if(RPI_CLUSTER)
         add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${test_src} 
                                             --cluster ${RPI_CLUSTER} 
-                                            --password ${RPI_PASSWORD})
+                                            --password ${RPI_PASSWORD}
+                                            --key ${RPI_KEY})
     endif(RPI_CLUSTER)
 
 endif()  # PYTHON_ENABLED

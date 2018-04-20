@@ -48,7 +48,7 @@ class DriveTest:
     def __init__(self, ipaddress=None, cluster=None, outdir=None, profile=False, 
             model=None, labels=None, target="pi3", target_dir="/home/pi/pi3", 
             username="pi", password="raspberry", iterations=1, expected=None, 
-            blas=True, compile=COMPILE_INCREMENTAL, test=True, verbose=True, timeout=None):
+            blas=True, compile=COMPILE_INCREMENTAL, test=True, verbose=True, timeout=None, apikey=None):
         self.ipaddress = ipaddress
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)   
@@ -60,6 +60,7 @@ class DriveTest:
         self.password = password
         self.target = target
         self.cluster = cluster
+        self.apikey = apikey
         self.blas = blas
         self.expected = expected
         self.profile = profile
@@ -122,7 +123,7 @@ class DriveTest:
         """Resolves the ip address of the target device and locks it if it is
         part of a cluster"""
         if cluster:
-            self.cluster = picluster.PiBoardTable(cluster)
+            self.cluster = picluster.PiBoardTable(cluster, self.apikey)
             task = " ".join((current_script, self.model_name))
 
             if ipaddress:

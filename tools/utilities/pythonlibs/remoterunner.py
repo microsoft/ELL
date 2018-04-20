@@ -30,11 +30,11 @@ class RemoteRunner:
     def __init__(self, cluster=None, ipaddress=None, username=None, password=None,
         source_dir=None, target_dir=None, copyback_files=None, copyback_dir=None,
         command=None, logfile=None, verbose=True, start_clean=True, cleanup=True,
-        timeout=None, all=None, source_files=None):
+        timeout=None, all=None, source_files=None, apikey=None):
 
         self.cluster = cluster
         if isinstance(cluster, str):
-            self.cluster = picluster.PiBoardTable(cluster)
+            self.cluster = picluster.PiBoardTable(cluster, apikey)
         self.ipaddress = ipaddress
         self.username = username
         self.password = password
@@ -256,7 +256,8 @@ if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser("remoterunnder executes remote commands on a given machine")
 
     arg_parser.add_argument("--ipaddress", help="Address of machine to run commands on", required=True)
-    arg_parser.add_argument("--cluster", help="URL of pycluster server", default=None)
+    arg_parser.add_argument("--cluster", help="URL of picluster server", default=None)
+    arg_parser.add_argument("--apikey", help="API key for picluster server", default=None)
     arg_parser.add_argument("--username", help="Username for logon to remote machine", default=None)
     arg_parser.add_argument("--password", help="Password for logon to remote machine", default=None)
     arg_parser.add_argument("--command", help="The command to run on the remote machine", default=None)
@@ -265,6 +266,6 @@ if __name__ == "__main__":
     args = arg_parser.parse_args()
         
     runner = RemoteRunner(ipaddress = args.ipaddress, cluster=args.cluster, username=args.username, password=args.password,
-        command=args.command, verbose=True, timeout=args.timeout)
+        command=args.command, verbose=True, timeout=args.timeout, apikey=args.apikey)
     runner.run_command()
     
