@@ -59,6 +59,7 @@ set(include
     include/DemultiplexerNode.h
     include/DiagonalConvolutionNode.h
     include/DotProductNode.h
+    include/DTWDistanceNode.h
     include/ExtremalValueNode.h
     include/FFTNode.h
     include/FilterBankNode.h

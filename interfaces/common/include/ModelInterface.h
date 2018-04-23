@@ -32,6 +32,7 @@
 #include "CallbackInterface.h"
 #include "MathInterface.h"
 #include "NeuralNetworkPredictorInterface.h"
+#include "DTWDistanceNode.h"
 
 // stl
 #include <memory>
@@ -406,6 +407,7 @@ public:
     Node AddSinkNode(Model model, PortElements input, PortElements trigger, const ell::api::math::TensorShape& shape, const std::string& sinkFunctionName);
     Node AddSourceNode(Model model, PortElements input, PortType outputType, const ell::api::math::TensorShape& shape, const std::string& sourceFunctionName);
     Node AddUnaryOperationNode(Model model, PortElements input, UnaryOperationType operation);
+    Node AddDTWNode(Model model, std::vector<std::vector<double>> prototype, PortElements input);
 
     Node AddFloatActivationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ActivationLayer<float>& layer);
     Node AddFloatBatchNormalizationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BatchNormalizationLayer<float>& layer);

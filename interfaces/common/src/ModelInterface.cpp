@@ -46,6 +46,9 @@
 #include "Tensor.h"
 #include "UnaryOperationNode.h"
 
+// stl
+#include <algorithm>
+
 //
 // Callback functions
 //
@@ -95,7 +98,25 @@ namespace
     template <typename OutputType, typename InputType>
     std::vector<OutputType> CastVector(const std::vector<InputType>& vector)
     {
-        return { vector.begin(), vector.end() };
+        std::vector<OutputType> result;
+        result.reserve(vector.size());
+        std::transform(vector.begin(), vector.end(), std::back_inserter(result), [](InputType x) { return static_cast<OutputType>(x); });
+        return result;
+    }
+
+    template <typename OutputType, typename InputType>
+    std::vector<std::vector<OutputType>> CastVector(const std::vector<std::vector<InputType>>& vector)
+    {
+        std::vector<std::vector<OutputType>> result;
+        result.reserve(vector.size());
+        for(const auto& row: vector)
+        {
+            std::vector<OutputType> outRow;
+            outRow.reserve(row.size());
+            std::transform(row.begin(), row.end(), std::back_inserter(outRow), [](InputType x) { return static_cast<OutputType>(x); });
+            result.push_back(outRow);
+        }
+        return result;
     }
 }
 
@@ -1341,6 +1362,25 @@ Node ModelBuilder::AddFloatSoftmaxLayerNode(Model model, PortElements input, con
     ell::predictors::neural::SoftmaxLayer<float> softmaxLayer(parameters);
 
     newNode = model.GetModel().AddNode<ell::nodes::SoftmaxLayerNode<float>>(ell::model::PortElements<float>(elements), softmaxLayer);
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddDTWNode(Model model, std::vector<std::vector<double>> prototype, PortElements input)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::DTWDistanceNode<double>>(ell::model::PortElements<double>(elements), prototype);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::DTWDistanceNode<float>>(ell::model::PortElements<float>(elements), CastVector<float>(prototype));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create DCTNode of the requested type");
+    }
     return Node(newNode);
 }
 

@@ -67,11 +67,6 @@ namespace nodes
         /// <param name="transformer"> The `ModelTransformer` currently copying the model </param>
         void Copy(model::ModelTransformer& transformer) const override;
 
-        /// <summary> Refines this node in the model being constructed by the transformer </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` currently refining the model </param>
-        // virtual bool Refine(model::ModelTransformer& transformer) const override;
-
         /// <summary></summary>
         std::vector<std::vector<ValueType>> GetPrototype() const { return _prototype; }
 

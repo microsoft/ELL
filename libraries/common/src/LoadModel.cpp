@@ -28,6 +28,7 @@
 #include "CompiledActivationFunctions.h"
 #include "DelayNode.h"
 #include "DotProductNode.h"
+#include "DTWDistanceNode.h"
 #include "ExtremalValueNode.h"
 #include "FFTNode.h"
 #include "ForestPredictorNode.h"
@@ -154,6 +155,9 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<double>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::DTWDistanceNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DTWDistanceNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<double>>();

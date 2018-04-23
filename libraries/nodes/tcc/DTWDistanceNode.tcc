@@ -228,8 +228,20 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
         archiver[defaultOutputPortName] << _output;
-        // archiver["prototype"] << _prototype;
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        // Since we know the prototype  will always be rectangular, we
+        // archive it as a matrix here.
+        auto numRows = _prototype.size();
+        auto numColumns = _prototype[0].size();
+        std::vector<double> elements;
+        elements.reserve(numRows * numColumns);
+        for (const auto& row : _prototype) 
+        {
+            elements.insert(elements.end(), row.begin(), row.end());
+        }
+        archiver["prototype_rows"] << numRows;
+        archiver["prototype_columns"] << numColumns;
+        math::Matrix<double, math::MatrixLayout::columnMajor> temp(numRows, numColumns, elements);
+        math::MatrixArchiver::Write(temp, "prototype", archiver);
     }
 
     template <typename ValueType>
@@ -238,8 +250,19 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
         archiver[defaultOutputPortName] >> _output;
-        // archiver["prototype"] >> _prototype;
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        size_t numRows;
+        size_t numColumns;
+        archiver["prototype_rows"] >> numRows;
+        archiver["prototype_columns"] >> numColumns;
+        math::Matrix<ValueType, math::MatrixLayout::columnMajor> temp(numRows, numColumns);
+        math::MatrixArchiver::Read(temp, "prototype", archiver);
+        for (size_t i = 0; i < numRows; i++)
+        {
+            _prototype.emplace_back(temp.GetRow(i).ToArray());
+        }
+        _prototypeLength = _prototype.size();
+        _d.resize(_prototypeLength + 1);
+        _s.resize(_prototypeLength + 1);
     }
 }
 }
