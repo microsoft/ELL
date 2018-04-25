@@ -506,16 +506,16 @@ namespace dsp
         static constexpr int tileSize = 2;
         static constexpr int filterSize = 3;
 
-        static void Convolve(const math::RowVector<ValueType>& signal, const math::RowVector<ValueType>& filter, math::RowVector<ValueType>& result)
+        static void Convolve(const math::RowVector<ValueType>& input, const math::RowVector<ValueType>& filter, math::RowVector<ValueType>& output)
         {
             assert(filter.Size() == filterSize);
-            const int outputSize = static_cast<int>(result.Size());
+            const int outputSize = static_cast<int>(output.Size());
 
             // Y = A' * (Gg .* B'd)
             //   See matrix section above for definition of G, B', and A' matrices
             //
             // g = filter ([g0 g1 g2]')
-            // d = signal ([d0 d1 d2 d3]')
+            // d = input ([d0 d1 d2 d3]')
             //
             // Precompute Gg:
             //
@@ -530,7 +530,7 @@ namespace dsp
             auto Gg3 = filter[2];
 
             // prefetch 2 values so we don't have to get them again (check to see if this really matters)
-            auto d = signal.GetConstDataPointer();
+            auto d = input.GetConstDataPointer();
             ValueType d0 = d[0];
             ValueType d1 = d[1];
             int numFullTiles = outputSize / tileSize;
@@ -545,8 +545,8 @@ namespace dsp
                 const auto m2 = (d1 + d2) * Gg1;
                 const auto m3 = (d2 - d1) * Gg2;
                 const auto m4 = (d1 - d3) * Gg3;
-                result[index] = m1 + m2 + m3;
-                result[index + 1] = m2 - m3 - m4;
+                output[index] = m1 + m2 + m3;
+                output[index + 1] = m2 - m3 - m4;
 
                 // shift d0, d1
                 d0 = d2;
@@ -566,7 +566,7 @@ namespace dsp
                 auto m1 = (d0 - d2) * Gg0;
                 auto m2 = (d1 + d2) * Gg1;
                 auto m3 = (d2 - d1) * Gg2;
-                result[index] = m1 + m2 + m3;
+                output[index] = m1 + m2 + m3;
             }
         }
     };
@@ -663,7 +663,7 @@ namespace dsp
     }
 
     template <typename ValueType>
-    void ComputeTransformedOutput(const math::ConstChannelColumnRowTensorReference<ValueType>& transformedSignal,
+    void ComputeTransformedOutput(const math::ConstChannelColumnRowTensorReference<ValueType>& transformedInput,
                                   const math::ConstChannelColumnRowTensorReference<ValueType>& transformedFilters,
                                   int numOutputRows,
                                   int numOutputColumns,
@@ -675,7 +675,7 @@ namespace dsp
     {
         // Do a matrix multiply to reduce many entries in parallel
         //
-        // transformedSignal is a (windowRows*windowColumns) x (tr * tc) x (numChannels) tensor containing the entire transformed input signal
+        // transformedInput is a (windowRows*windowColumns) x (tr * tc) x (numChannels) tensor containing the entire transformed input signal
         // transformedFilters is a (windowRows*windowColumns) x (numFilters) x (numChannels) tensor
         // transformedOutput is a (windowRows*windowColumns) x (tr * tc) x (numFilters) tensor containing the entire transformed output signal
 
@@ -684,7 +684,7 @@ namespace dsp
         const auto numTileColumns = ((numOutputColumns - 1) / tileSize) + 1;
 
         // Pointers to the beginning of memory for the 3 tensors we're using
-        const auto signalBasePointer = transformedSignal.GetConstDataPointer();
+        const auto signalBasePointer = transformedInput.GetConstDataPointer();
         const auto filterBasePointer = transformedFilters.GetConstDataPointer();
         auto outputBasePointer = transformedOutput.GetDataPointer();
 
@@ -961,7 +961,7 @@ namespace dsp
         using TensorReference = math::ChannelColumnRowTensorReference<ValueType>;
         using ConstTensorReference = math::ConstChannelColumnRowTensorReference<ValueType>;
 
-        static void GetInputBlock(const ConstTensorReference& signal,
+        static void GetInputBlock(const ConstTensorReference& input,
                                   int tileRowIndex,
                                   int tileColumnIndex,
                                   int channelIndex,
@@ -969,13 +969,13 @@ namespace dsp
         {
             const auto rowIndex = tileRowIndex * tileSize;
             const auto columnIndex = tileColumnIndex * tileSize;
-            const auto numChannels = static_cast<int>(signal.NumChannels());
+            const auto numChannels = static_cast<int>(input.NumChannels());
             const int channelsToCopy = (numChannels - channelIndex) < blockSize ? (numChannels - channelIndex) : blockSize;
 
-            d.CopyFrom(signal, rowIndex, columnIndex, channelIndex, windowSize, windowSize, channelsToCopy, numChannels * signal.NumColumns(), numChannels);
+            d.CopyFrom(input, rowIndex, columnIndex, channelIndex, windowSize, windowSize, channelsToCopy, numChannels * input.NumColumns(), numChannels);
         }
 
-        static void GetPartialInputBlock(const ConstTensorReference& signal,
+        static void GetPartialInputBlock(const ConstTensorReference& input,
                                          int tileRowIndex,
                                          int tileColumnIndex,
                                          int channelIndex,
@@ -985,13 +985,13 @@ namespace dsp
         {
             auto rowIndex = tileRowIndex * tileSize;
             auto columnIndex = tileColumnIndex * tileSize;
-            const auto numChannels = static_cast<int>(signal.NumChannels());
-            const auto numColumns = static_cast<int>(signal.NumColumns());
+            const auto numChannels = static_cast<int>(input.NumChannels());
+            const auto numColumns = static_cast<int>(input.NumColumns());
             const int channelsToCopy = (numChannels - channelIndex) < blockSize ? (numChannels - channelIndex) : blockSize;
-            d.CopyFrom(signal, rowIndex, columnIndex, channelIndex, rows, columns, channelsToCopy, numChannels * numColumns, numChannels);
+            d.CopyFrom(input, rowIndex, columnIndex, channelIndex, rows, columns, channelsToCopy, numChannels * numColumns, numChannels);
         }
 
-        static void ProcessInputBlock(const ConstTensorReference& signal,
+        static void ProcessInputBlock(const ConstTensorReference& input,
                                       int tileRowIndex,
                                       int tileColumnIndex,
                                       int channelStartIndex,
@@ -1001,19 +1001,19 @@ namespace dsp
                                       int thisBlockSize,
                                       WindowBlock& d,
                                       WindowBlock& X,
-                                      Tensor& transformedSignal)
+                                      Tensor& transformedInput)
         {
             // Get the input window
-            GetInputBlock(signal, tileRowIndex, tileColumnIndex, channelStartIndex, d);
+            GetInputBlock(input, tileRowIndex, tileColumnIndex, channelStartIndex, d);
 
             // Transform it
             FixedWinogradTransform2D<ValueType, tileSize, filterSize>::TransformInputBlock(d, thisBlockSize, X);
 
-            // Now splat transformedInputWindow into transformedSignal
-            SplatTransformedInputBlock(X, tileRowIndex, tileColumnIndex, channelStartIndex, numTileRows, numTileColumns, numChannels, transformedSignal);
+            // Now splat transformedInputWindow into transformedInput
+            SplatTransformedInputBlock(X, tileRowIndex, tileColumnIndex, channelStartIndex, numTileRows, numTileColumns, numChannels, transformedInput);
         }
 
-        static void ProcessPartialInputBlock(const ConstTensorReference& signal,
+        static void ProcessPartialInputBlock(const ConstTensorReference& input,
                                              int tileRowIndex,
                                              int tileColumnIndex,
                                              int channelStartIndex,
@@ -1025,18 +1025,18 @@ namespace dsp
                                              int thisBlockSize,
                                              WindowBlock& d,
                                              WindowBlock& X,
-                                             Tensor& transformedSignal)
+                                             Tensor& transformedInput)
         {
-            GetPartialInputBlock(signal, tileRowIndex, tileColumnIndex, channelStartIndex, rows, columns, d);
+            GetPartialInputBlock(input, tileRowIndex, tileColumnIndex, channelStartIndex, rows, columns, d);
             FixedWinogradTransform2D<ValueType, tileSize, filterSize>::TransformInputBlock(d, thisBlockSize, X);
-            SplatTransformedInputBlock(X, tileRowIndex, tileColumnIndex, channelStartIndex, numTileRows, numTileColumns, numChannels, transformedSignal);
+            SplatTransformedInputBlock(X, tileRowIndex, tileColumnIndex, channelStartIndex, numTileRows, numTileColumns, numChannels, transformedInput);
         }
 
-        static void TransformInput(const ConstTensorReference& signal,
+        static void TransformInput(const ConstTensorReference& input,
                                    int numOutputRows,
                                    int numOutputColumns,
                                    int numChannels,
-                                   Tensor& transformedSignal)
+                                   Tensor& transformedInput)
         {
             const auto numFullTileRows = numOutputRows / tileSize;
             const auto numFullTileColumns = numOutputColumns / tileSize;
@@ -1056,7 +1056,7 @@ namespace dsp
                     for (int channelStartIndex = 0; channelStartIndex < numChannels; channelStartIndex += blockSize)
                     {
                         int thisBlockSize = numChannels - channelStartIndex > blockSize ? blockSize : numChannels - channelStartIndex;
-                        ProcessInputBlock(signal, tileRowIndex, tileColumnIndex, channelStartIndex, numTileRows, numTileColumns, numChannels, thisBlockSize, d, X, transformedSignal);
+                        ProcessInputBlock(input, tileRowIndex, tileColumnIndex, channelStartIndex, numTileRows, numTileColumns, numChannels, thisBlockSize, d, X, transformedInput);
                     }
                 }
             }
@@ -1074,13 +1074,13 @@ namespace dsp
             if (numTileRows > numFullTileRows)
             {
                 assert(numTileRows == numFullTileRows + 1);
-                const auto rows = static_cast<int>(signal.NumRows() - lastRowStart);
+                const auto rows = static_cast<int>(input.NumRows() - lastRowStart);
                 for (int tileColumnIndex = 0; tileColumnIndex < numFullTileColumns; ++tileColumnIndex)
                 {
                     for (int channelStartIndex = 0; channelStartIndex < numChannels; channelStartIndex += blockSize)
                     {
                         int thisBlockSize = numChannels - channelStartIndex > blockSize ? blockSize : numChannels - channelStartIndex;
-                        ProcessPartialInputBlock(signal, lastTileRow, tileColumnIndex, channelStartIndex, numTileRows, numTileColumns, numChannels, rows, windowSize, thisBlockSize, d, X, transformedSignal);
+                        ProcessPartialInputBlock(input, lastTileRow, tileColumnIndex, channelStartIndex, numTileRows, numTileColumns, numChannels, rows, windowSize, thisBlockSize, d, X, transformedInput);
                     }
                 }
             }
@@ -1089,13 +1089,13 @@ namespace dsp
             if (numTileColumns > numFullTileColumns)
             {
                 assert(numTileColumns == numFullTileColumns + 1);
-                const auto columns = static_cast<int>(signal.NumColumns() - lastColumnStart);
+                const auto columns = static_cast<int>(input.NumColumns() - lastColumnStart);
                 for (int tileRowIndex = 0; tileRowIndex < numFullTileRows; ++tileRowIndex)
                 {
                     for (int channelStartIndex = 0; channelStartIndex < numChannels; channelStartIndex += blockSize)
                     {
                         int thisBlockSize = numChannels - channelStartIndex > blockSize ? blockSize : numChannels - channelStartIndex;
-                        ProcessPartialInputBlock(signal, tileRowIndex, lastTileColumn, channelStartIndex, numTileRows, numTileColumns, numChannels, windowSize, columns, thisBlockSize, d, X, transformedSignal);
+                        ProcessPartialInputBlock(input, tileRowIndex, lastTileColumn, channelStartIndex, numTileRows, numTileColumns, numChannels, windowSize, columns, thisBlockSize, d, X, transformedInput);
                     }
                 }
             }
@@ -1104,29 +1104,29 @@ namespace dsp
             if (numTileRows > numFullTileRows && numTileColumns > numFullTileColumns)
             {
                 assert(numTileRows == numFullTileRows + 1);
-                const auto rows = static_cast<int>(signal.NumRows() - lastRowStart);
-                const auto columns = static_cast<int>(signal.NumColumns() - lastColumnStart);
+                const auto rows = static_cast<int>(input.NumRows() - lastRowStart);
+                const auto columns = static_cast<int>(input.NumColumns() - lastColumnStart);
 
                 for (int channelStartIndex = 0; channelStartIndex < numChannels; channelStartIndex += blockSize)
                 {
                     int thisBlockSize = numChannels - channelStartIndex > blockSize ? blockSize : numChannels - channelStartIndex;
-                    ProcessPartialInputBlock(signal, lastTileRow, lastTileColumn, channelStartIndex, numTileRows, numTileColumns, numChannels, rows, columns, thisBlockSize, d, X, transformedSignal);
+                    ProcessPartialInputBlock(input, lastTileRow, lastTileColumn, channelStartIndex, numTileRows, numTileColumns, numChannels, rows, columns, thisBlockSize, d, X, transformedInput);
                 }
             }
         }
 
-        static void SplatTransformedInputBlock(const WindowBlock& dataTile, int tileRowIndex, int tileColumnIndex, int channelIndex, int numTileRows, int numTileColumns, int numChannels, Tensor& transformedSignal)
+        static void SplatTransformedInputBlock(const WindowBlock& dataTile, int tileRowIndex, int tileColumnIndex, int channelIndex, int numTileRows, int numTileColumns, int numChannels, Tensor& transformedInput)
         {
             const auto windowEntryStride = numChannels * numTileRows * numTileColumns;
             const auto tileOffset = (tileRowIndex * numTileColumns * numChannels) + (tileColumnIndex * numChannels) + channelIndex; // offset within the tile
-            auto transformedSignalPtr = transformedSignal.GetDataPointer() + tileOffset;
+            auto transformedInputPtr = transformedInput.GetDataPointer() + tileOffset;
             auto dataTilePtr = dataTile.GetDataPointer();
             const int channelsToCopy = (numChannels - channelIndex) < blockSize ? (numChannels - channelIndex) : blockSize;
             for (int entryIndex = 0; entryIndex < windowSize * windowSize; ++entryIndex)
             {
-                std::copy(dataTilePtr, dataTilePtr + channelsToCopy, transformedSignalPtr);
+                std::copy(dataTilePtr, dataTilePtr + channelsToCopy, transformedInputPtr);
                 dataTilePtr += blockSize;
-                transformedSignalPtr += windowEntryStride;
+                transformedInputPtr += windowEntryStride;
             }
         }
 
@@ -1149,116 +1149,116 @@ namespace dsp
         }
 
         // outputTile is a tr x tc matrix
-        // result is a r x c x nf tensor
+        // output is a r x c x nf tensor
         static void SplatOutputTile(const TileArray& outputTile,
                                     int tileRowIndex,
                                     int tileColumnIndex,
                                     int filterIndex,
-                                    TensorReference& result)
+                                    TensorReference& output)
         {
             // iterate over entries in the tile
             for (int rowIndex = 0; rowIndex < tileSize; ++rowIndex)
             {
                 for (int columnIndex = 0; columnIndex < tileSize; ++columnIndex)
                 {
-                    result((tileRowIndex * tileSize) + rowIndex, (tileColumnIndex * tileSize) + columnIndex, filterIndex) = outputTile(rowIndex, columnIndex);
+                    output((tileRowIndex * tileSize) + rowIndex, (tileColumnIndex * tileSize) + columnIndex, filterIndex) = outputTile(rowIndex, columnIndex);
                 }
             }
         }
 
         // outputBlock is a tr x tc x nf block
-        // result is a r x c x nf tensor
+        // output is a r x c x nf tensor
         static inline void SplatOutputBlock(const TileBlock& outputBlock,
                                             int tileRowIndex,
                                             int tileColumnIndex,
                                             int filterIndex,
-                                            TensorReference& result)
+                                            TensorReference& output)
         {
-            const int numFilters = result.NumChannels();
+            const int numFilters = output.NumChannels();
             assert(filterIndex < numFilters);
             const int filtersToCopy = (numFilters - filterIndex) < blockSize ? (numFilters - filterIndex) : blockSize;
 
             const auto rowOffset = tileRowIndex * tileSize;
-            const auto rowStride = result.NumChannels() * result.NumColumns();
+            const auto rowStride = output.NumChannels() * output.NumColumns();
             const auto columnOffset = tileColumnIndex * tileSize;
-            const auto columnStride = result.NumChannels();
+            const auto columnStride = output.NumChannels();
             const auto outputOffset = rowOffset * rowStride + columnOffset * columnStride + filterIndex;
 
             auto outputBlockPtr = outputBlock.GetDataPointer();
-            auto resultPtr = result.GetDataPointer() + outputOffset;
+            auto outputPtr = output.GetDataPointer() + outputOffset;
 
             // iterate over entries in the tile
             for (int rowIndex = 0; rowIndex < tileSize; ++rowIndex)
             {
-                auto resultRow = resultPtr;
+                auto outputRow = outputPtr;
                 for (int columnIndex = 0; columnIndex < tileSize; ++columnIndex)
                 {
-                    std::copy(outputBlockPtr, outputBlockPtr + filtersToCopy, resultRow);
+                    std::copy(outputBlockPtr, outputBlockPtr + filtersToCopy, outputRow);
                     outputBlockPtr += blockSize;
-                    resultRow += columnStride;
+                    outputRow += columnStride;
                 }
-                resultPtr += rowStride;
+                outputPtr += rowStride;
             }
         }
 
         // outputTile is a tr x tc matrix
-        // result is a r x c x nf tensor
+        // output is a r x c x nf tensor
         static void SplatPartialOutputTile(const TileArray& outputTile,
                                            int tileRowIndex,
                                            int tileColumnIndex,
                                            int filterIndex,
                                            int rows,
                                            int columns,
-                                           TensorReference& result)
+                                           TensorReference& output)
         {
             // iterate over entries in the tile
             for (int rowIndex = 0; rowIndex < rows; ++rowIndex)
             {
                 for (int columnIndex = 0; columnIndex < columns; ++columnIndex)
                 {
-                    result((tileRowIndex * tileSize) + rowIndex, (tileColumnIndex * tileSize) + columnIndex, filterIndex) = outputTile(rowIndex, columnIndex);
+                    output((tileRowIndex * tileSize) + rowIndex, (tileColumnIndex * tileSize) + columnIndex, filterIndex) = outputTile(rowIndex, columnIndex);
                 }
             }
         }
 
         // outputBlock is a tr x tc x blockSize matrix
-        // result is a r x c x nf tensor
+        // output is a r x c x nf tensor
         static void SplatPartialOutputBlock(const TileBlock& outputBlock,
                                             int tileRowIndex,
                                             int tileColumnIndex,
                                             int filterIndex,
                                             int rows,
                                             int columns,
-                                            TensorReference& result)
+                                            TensorReference& output)
         {
 
-            const int numFilters = result.NumChannels();
+            const int numFilters = output.NumChannels();
             assert(filterIndex < numFilters);
             const int filtersToCopy = (numFilters - filterIndex) < blockSize ? (numFilters - filterIndex) : blockSize;
 
             const auto rowOffset = tileRowIndex * tileSize;
-            const auto rowStride = result.NumChannels() * result.NumColumns();
+            const auto rowStride = output.NumChannels() * output.NumColumns();
             const auto columnOffset = tileColumnIndex * tileSize;
-            const auto columnStride = result.NumChannels();
+            const auto columnStride = output.NumChannels();
             const auto outputOffset = rowOffset * rowStride + columnOffset * columnStride + filterIndex;
 
             auto outputBlockPtr = outputBlock.GetDataPointer();
-            auto resultPtr = result.GetDataPointer() + outputOffset;
+            auto outputPtr = output.GetDataPointer() + outputOffset;
 
             // iterate over entries in the tile
             for (int rowIndex = 0; rowIndex < rows; ++rowIndex)
             {
-                auto resultRow = resultPtr;
+                auto outputRow = outputPtr;
                 auto outputRowPtr = outputBlockPtr;
                 for (int columnIndex = 0; columnIndex < columns; ++columnIndex)
                 {
-                    std::copy(outputRowPtr, outputRowPtr + filtersToCopy, resultRow);
+                    std::copy(outputRowPtr, outputRowPtr + filtersToCopy, outputRow);
 
                     outputRowPtr += blockSize;
-                    resultRow += columnStride;
+                    outputRow += columnStride;
                 }
                 outputBlockPtr += blockSize * outputBlock.columns;
-                resultPtr += rowStride;
+                outputPtr += rowStride;
             }
         }
 
@@ -1346,22 +1346,21 @@ namespace dsp
         // Straightforward implementation of Winograd algorithm, using separate matrix multiplies to transform
         // each tile
         //
-        static void Convolve2DWinogradFiltersFirst(const Tensor& signal,
+        static void Convolve2DWinogradFiltersFirst(const Tensor& input,
                                                    const Tensor& transformedFilters,
                                                    int numFilters,
-                                                   TensorReference& result)
+                                                   TensorReference& output)
         {
             using Matrix = math::RowMatrix<ValueType>;
-            const auto windowSize = tileSize + filterSize - 1;
-            const int inputRows = static_cast<int>(signal.NumRows());
-            const int inputColumns = static_cast<int>(signal.NumColumns());
-            const int numChannels = static_cast<int>(signal.NumChannels());
-            const auto outputRows = result.NumRows();
-            const auto outputColumns = result.NumColumns();
-            assert(numFilters == result.NumChannels());
+            const int inputRows = static_cast<int>(input.NumRows());
+            const int inputColumns = static_cast<int>(input.NumColumns());
+            const int numChannels = static_cast<int>(input.NumChannels());
+            const int outputRows = static_cast<int>(output.NumRows());
+            const int outputColumns = static_cast<int>(output.NumColumns());
+            assert(numFilters == output.NumChannels());
 
             // Temporary values
-            Matrix signalSlice(inputRows, inputColumns);
+            Matrix inputSlice(inputRows, inputColumns);
             WindowArray X;
             WindowArray d;
             TileArray outputTile;
@@ -1372,7 +1371,7 @@ namespace dsp
             const int channelStride = windowSize * windowSize;
             for (int channelIndex = 0; channelIndex < numChannels; ++channelIndex)
             {
-                GetChannelSlice(signal, channelIndex, signalSlice);
+                GetChannelSlice(input, channelIndex, inputSlice);
 
                 for (int filterIndex = 0; filterIndex < numFilters; ++filterIndex)
                 {
@@ -1383,18 +1382,18 @@ namespace dsp
                         for (int tileColumnIndex = 0; tileColumnIndex < numTileColumns; ++tileColumnIndex)
                         {
                             auto columnIndex = tileColumnIndex * tileSize;
-                            d.CopyFrom(signalSlice.GetConstDataPointer(), rowIndex, columnIndex, 0, inputRows, inputColumns, inputColumns, 1);
+                            d.CopyFrom(inputSlice.GetConstDataPointer(), rowIndex, columnIndex, 0, inputRows, inputColumns, inputColumns, 1);
 
                             // Compute X = B'dB
                             FixedWinogradTransform2D<ValueType, tileSize, filterSize>::TransformInputWindow(d, X);
 
                             ElementwiseMultiply(filterPtr, X.GetDataPointer(), windowSize * windowSize, X.GetDataPointer());
 
-                            // Now compute result tile Y = At * X * A
+                            // Now compute output tile Y = At * X * A
                             FixedWinogradTransform2D<ValueType, 2, 3>::TransformOutputTile(X, outputTile);
 
                             // copy the tile into the output image
-                            SplatOutputTile(outputTile, tileRowIndex, tileColumnIndex, filterIndex, result);
+                            SplatOutputTile(outputTile, tileRowIndex, tileColumnIndex, filterIndex, output);
                         }
                     }
                 }
@@ -1406,30 +1405,28 @@ namespace dsp
         // pretransforms all of the input tiles, uses a series of GEMM calls to accumulate the channels
         // of the filtered output, and then transforms the output.
         //
-        static void Convolve2DWinogradTilesFirst(const ConstTensorReference& signal,
+        static void Convolve2DWinogradTilesFirst(const ConstTensorReference& input,
                                                  const Tensor& transformedFilters,
                                                  int numFilters,
-                                                 int tileSize,
-                                                 int filterSize,
-                                                 Tensor& transformedSignalScratch,
+                                                 Tensor& transformedInputScratch,
                                                  Tensor& transformedOutputScratch,
-                                                 TensorReference& result)
+                                                 TensorReference& output)
         {
             // transformedFilters is a (windowRows*windowColumns) x numFilters x numChannels array
             // output is a rows x columns x numFilters tensor
-            const auto numOutputRows = static_cast<int>(signal.NumRows()) - filterSize + 1;
-            const auto numOutputColumns = static_cast<int>(signal.NumColumns()) - filterSize + 1;
-            const auto numChannels = static_cast<int>(signal.NumChannels());
-            assert(numFilters == result.NumChannels());
+            const auto numOutputRows = static_cast<int>(input.NumRows()) - filterSize + 1;
+            const auto numOutputColumns = static_cast<int>(input.NumColumns()) - filterSize + 1;
+            const auto numChannels = static_cast<int>(input.NumChannels());
+            assert(numFilters == output.NumChannels());
 
-            // transformedSignal is a (windowRows*windowColumns) x (numTileRows * numTileColumns) x (numChannels) tensor containing the entire transformed input signal
-            TransformInput(signal, numOutputRows, numOutputColumns, numChannels, transformedSignalScratch);
+            // transformedInput is a (windowRows*windowColumns) x (numTileRows * numTileColumns) x (numChannels) tensor containing the entire transformed input signal
+            TransformInput(input, numOutputRows, numOutputColumns, numChannels, transformedInputScratch);
 
             // transformedOutput is (windowRows*windowColumns) x (numTileRows * numTileColumns) x (numFilters)
-            ComputeTransformedOutput(transformedSignalScratch, transformedFilters, numOutputRows, numOutputColumns, numChannels, numFilters, tileSize, filterSize, transformedOutputScratch);
+            ComputeTransformedOutput(transformedInputScratch, transformedFilters, numOutputRows, numOutputColumns, numChannels, numFilters, tileSize, filterSize, transformedOutputScratch);
 
             // Un-transform convolved output and write into output image
-            TransformOutput(transformedOutputScratch, result);
+            TransformOutput(transformedOutputScratch, output);
         }
     }; // End of FixedWinograd2D class
 
@@ -1468,7 +1465,7 @@ namespace dsp
     //
 
     template <typename ValueType>
-    void Convolve2DWinogradFiltersFirst(const math::ConstChannelColumnRowTensorReference<ValueType>& signal,
+    void Convolve2DWinogradFiltersFirst(const math::ConstChannelColumnRowTensorReference<ValueType>& input,
                                         const math::ConstChannelColumnRowTensorReference<ValueType>& transformedFilters,
                                         int numFilters,
                                         int tileSize,
@@ -1478,11 +1475,11 @@ namespace dsp
         constexpr int blockSize = 64;
         if (tileSize == 2 && filterSize == 3)
         {
-            FixedWinograd2D<ValueType, 2, 3, blockSize>::Convolve2DWinogradFiltersFirst(signal, transformedFilters, numFilters, output);
+            FixedWinograd2D<ValueType, 2, 3, blockSize>::Convolve2DWinogradFiltersFirst(input, transformedFilters, numFilters, output);
         }
         else if (tileSize == 4 && filterSize == 3)
         {
-            FixedWinograd2D<ValueType, 4, 3, blockSize>::Convolve2DWinogradFiltersFirst(signal, transformedFilters, numFilters, output);
+            FixedWinograd2D<ValueType, 4, 3, blockSize>::Convolve2DWinogradFiltersFirst(input, transformedFilters, numFilters, output);
         }
         else
         {
@@ -1496,23 +1493,23 @@ namespace dsp
     // of the filtered output, and then transforms the output.
     //
     template <typename ValueType>
-    void Convolve2DWinogradTilesFirst(const math::ConstChannelColumnRowTensorReference<ValueType>& signal,
+    void Convolve2DWinogradTilesFirst(const math::ConstChannelColumnRowTensorReference<ValueType>& input,
                                       const math::ConstChannelColumnRowTensorReference<ValueType>& transformedFilters,
                                       int numFilters,
                                       int tileSize,
                                       int filterSize,
-                                      math::ChannelColumnRowTensor<ValueType>& transformedSignalScratch,
+                                      math::ChannelColumnRowTensor<ValueType>& transformedInputScratch,
                                       math::ChannelColumnRowTensor<ValueType>& transformedOutputScratch,
                                       math::ChannelColumnRowTensor<ValueType>& output)
     {
         constexpr int blockSize = 64;
         if (tileSize == 2 && filterSize == 3)
         {
-            FixedWinograd2D<ValueType, 2, 3, blockSize>::Convolve2DWinogradTilesFirst(signal, transformedFilters, numFilters, tileSize, filterSize, transformedSignalScratch, transformedOutputScratch, output);
+            FixedWinograd2D<ValueType, 2, 3, blockSize>::Convolve2DWinogradTilesFirst(input, transformedFilters, numFilters, transformedInputScratch, transformedOutputScratch, output);
         }
         else if (tileSize == 4 && filterSize == 3)
         {
-            FixedWinograd2D<ValueType, 4, 3, blockSize>::Convolve2DWinogradTilesFirst(signal, transformedFilters, numFilters, tileSize, filterSize, transformedSignalScratch, transformedOutputScratch, output);
+            FixedWinograd2D<ValueType, 4, 3, blockSize>::Convolve2DWinogradTilesFirst(input, transformedFilters, numFilters, transformedInputScratch, transformedOutputScratch, output);
         }
         else
         {
@@ -1526,76 +1523,76 @@ namespace dsp
 
     // 1D
     template <typename ValueType>
-    math::RowVector<ValueType> Convolve1DWinograd(const math::RowVector<ValueType>& signal, const math::RowVector<ValueType>& filter)
+    math::RowVector<ValueType> Convolve1DWinograd(const math::RowVector<ValueType>& input, const math::RowVector<ValueType>& filter)
     {
         const int tileSize = 2;
-        return Convolve1DWinograd(signal, filter, tileSize);
+        return Convolve1DWinograd(input, filter, tileSize);
     }
 
     template <typename ValueType>
-    math::RowVector<ValueType> Convolve1DWinograd(const math::RowVector<ValueType>& signal, const math::RowVector<ValueType>& filter, int tileSize)
+    math::RowVector<ValueType> Convolve1DWinograd(const math::RowVector<ValueType>& input, const math::RowVector<ValueType>& filter, int tileSize)
     {
         using namespace std::string_literals;
         const int filterSize = static_cast<int>(filter.Size());
-        const int outputSize = static_cast<int>(signal.Size()) - filterSize + 1;
-        math::RowVector<ValueType> result(outputSize);
+        const int outputSize = static_cast<int>(input.Size()) - filterSize + 1;
+        math::RowVector<ValueType> output(outputSize);
         if (tileSize == 2 && filterSize == 3)
         {
-            FixedWinograd1D<ValueType, 2, 3>::Convolve(signal, filter, result);
+            FixedWinograd1D<ValueType, 2, 3>::Convolve(input, filter, output);
         }
         else
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "1D Winograd convolution not implemented for tile size "s + std::to_string(tileSize) + " and filter size " + std::to_string(filterSize));
         }
-        return result;
+        return output;
     }
 
     // 2D
     template <typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, WinogradFilterOrder order)
+    math::ChannelColumnRowTensor<ValueType> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, WinogradFilterOrder order)
     {
         const int tileSize = 2;
-        return Convolve2DWinograd(signal, filters, numFilters, tileSize, order);
+        return Convolve2DWinograd(input, filters, numFilters, tileSize, order);
     }
 
     // filters is a numFilters x filterSize x filterSize x numChannels tensor (represented in 3D as (numFilters * filterSize) x filterSize x numChannels)
     template <typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int tileSize, WinogradFilterOrder order)
+    math::ChannelColumnRowTensor<ValueType> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int tileSize, WinogradFilterOrder order)
     {
         const auto filterSize = static_cast<int>(filters.NumRows()) / numFilters;
         assert(filterSize == static_cast<int>(filters.NumColumns()) && "Filters must be square");
 
         auto transformedFilters = GetTransformedFilters(filters, numFilters, tileSize, order);
-        return Convolve2DWinogradPretransformed(signal, transformedFilters, numFilters, tileSize, filterSize, order);
+        return Convolve2DWinogradPretransformed(input, transformedFilters, numFilters, tileSize, filterSize, order);
     }
 
     template <typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradPretransformed(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order)
+    math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradPretransformed(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order)
     {
-        const auto numOutputRows = static_cast<int>(signal.NumRows()) - filterSize + 1;
-        const auto numOutputColumns = static_cast<int>(signal.NumColumns()) - filterSize + 1;
-        const auto numChannels = static_cast<int>(signal.NumChannels());
-        math::ChannelColumnRowTensor<ValueType> result(numOutputRows, numOutputColumns, numFilters);
+        const auto numOutputRows = static_cast<int>(input.NumRows()) - filterSize + 1;
+        const auto numOutputColumns = static_cast<int>(input.NumColumns()) - filterSize + 1;
+        const auto numChannels = static_cast<int>(input.NumChannels());
+        math::ChannelColumnRowTensor<ValueType> output(numOutputRows, numOutputColumns, numFilters);
 
         switch (order)
         {
         case WinogradFilterOrder::filtersFirst:
         {
-            Convolve2DWinogradFiltersFirst(signal, transformedFilters, numFilters, tileSize, filterSize, result);
+            Convolve2DWinogradFiltersFirst(input, transformedFilters, numFilters, tileSize, filterSize, output);
         }
         break;
         case WinogradFilterOrder::tilesFirst:
         {
-            auto transformedSignalScratch = AllocateScratchInput<ValueType>(numOutputRows, numOutputColumns, numChannels, tileSize, filterSize, order);
+            auto transformedInputScratch = AllocateScratchInput<ValueType>(numOutputRows, numOutputColumns, numChannels, tileSize, filterSize, order);
             auto transformedOutputScratch = AllocateScratchOutput<ValueType>(numOutputRows, numOutputColumns, numFilters, tileSize, filterSize, order);
-            Convolve2DWinogradTilesFirst(signal, transformedFilters, numFilters, tileSize, filterSize, transformedSignalScratch, transformedOutputScratch, result);
+            Convolve2DWinogradTilesFirst(input, transformedFilters, numFilters, tileSize, filterSize, transformedInputScratch, transformedOutputScratch, output);
         }
         break;
         default:
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
 
-        return result;
+        return output;
     }
 
     //
@@ -1603,18 +1600,18 @@ namespace dsp
     //
 
     // Basic 1D entry points
-    template math::RowVector<float> Convolve1DWinograd(const math::RowVector<float>& signal, const math::RowVector<float>& filter);
-    template math::RowVector<float> Convolve1DWinograd(const math::RowVector<float>& signal, const math::RowVector<float>& filter, int tileSize);
-    template math::RowVector<double> Convolve1DWinograd(const math::RowVector<double>& signal, const math::RowVector<double>& filter);
-    template math::RowVector<double> Convolve1DWinograd(const math::RowVector<double>& signal, const math::RowVector<double>& filter, int tileSize);
+    template math::RowVector<float> Convolve1DWinograd(const math::RowVector<float>& input, const math::RowVector<float>& filter);
+    template math::RowVector<float> Convolve1DWinograd(const math::RowVector<float>& input, const math::RowVector<float>& filter, int tileSize);
+    template math::RowVector<double> Convolve1DWinograd(const math::RowVector<double>& input, const math::RowVector<double>& filter);
+    template math::RowVector<double> Convolve1DWinograd(const math::RowVector<double>& input, const math::RowVector<double>& filter, int tileSize);
 
     // Basic tensor-valued 2D entry points
-    template math::ChannelColumnRowTensor<float> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<float>& signal, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, WinogradFilterOrder order);
-    template math::ChannelColumnRowTensor<float> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<float>& signal, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int tileSize, WinogradFilterOrder order);
-    template math::ChannelColumnRowTensor<float> Convolve2DWinogradPretransformed(const math::ConstChannelColumnRowTensorReference<float>& signal, const math::ConstChannelColumnRowTensorReference<float>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order);
-    template math::ChannelColumnRowTensor<double> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<double>& signal, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, WinogradFilterOrder order);
-    template math::ChannelColumnRowTensor<double> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<double>& signal, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int tileSize, WinogradFilterOrder order);
-    template math::ChannelColumnRowTensor<double> Convolve2DWinogradPretransformed(const math::ConstChannelColumnRowTensorReference<double>& signal, const math::ConstChannelColumnRowTensorReference<double>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order);
+    template math::ChannelColumnRowTensor<float> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, WinogradFilterOrder order);
+    template math::ChannelColumnRowTensor<float> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int tileSize, WinogradFilterOrder order);
+    template math::ChannelColumnRowTensor<float> Convolve2DWinogradPretransformed(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order);
+    template math::ChannelColumnRowTensor<double> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, WinogradFilterOrder order);
+    template math::ChannelColumnRowTensor<double> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int tileSize, WinogradFilterOrder order);
+    template math::ChannelColumnRowTensor<double> Convolve2DWinogradPretransformed(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order);
 
     // Winograd matrix functions
     template math::RowMatrix<float> GetLeftDataTransformMatrix(int tileSize, int filterSize);
