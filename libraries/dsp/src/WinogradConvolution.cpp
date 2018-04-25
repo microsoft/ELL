@@ -448,7 +448,7 @@ namespace dsp
                                            { -1.0 / 6,   1.0 / 6,  -1.0 / 6 },
                                            {  1.0 / 24,  1.0 / 12,  1.0 / 6 },
                                            {  1.0 / 24, -1.0 / 12,  1.0 / 6 },
-                                           {       0.0,       0.0,      0.0 } });
+                                           {       0.0,       0.0,      1.0 } });
             // clang-format on
         }
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);

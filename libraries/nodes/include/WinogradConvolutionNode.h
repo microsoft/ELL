@@ -53,7 +53,8 @@ namespace nodes
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 const ConstTensorReferenceType& filterWeights,
-                                size_t stride);
+                                int stride,
+                                int tileSize = 2);
 
         /// <summary> Cloning constructor </summary>
         ///
@@ -202,7 +203,8 @@ namespace nodes
         int _filterSize = 0;
 
         // Tunable parameters
-        int _blockSize = 1;
+        int _inputBlockSize = 1;
+        int _outputBlockSize = 1;
     };
 }
 }

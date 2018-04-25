@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     UNUSED(argc);
     UNUSED(argv);
     try
-    { 
+    {
         TestNodes();
         TestNeuralNetworkLayerNodes();
         TestDSPNodes();

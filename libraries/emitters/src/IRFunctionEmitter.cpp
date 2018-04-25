@@ -97,6 +97,11 @@ namespace emitters
         return IRLocalMultidimArray(*this, value, dimensions);
     }
 
+    IRLocalMultidimArray IRFunctionEmitter::LocalMultidimArray(llvm::Value* value, std::initializer_list<int> dimensions, std::initializer_list<int> memorySizes)
+    {
+        return IRLocalMultidimArray(*this, value, dimensions, memorySizes);
+    }
+
     llvm::Value* IRFunctionEmitter::GetEmittedVariable(const VariableScope scope, const std::string& name)
     {
         switch (scope)

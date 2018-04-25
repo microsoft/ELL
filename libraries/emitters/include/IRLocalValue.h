@@ -219,6 +219,14 @@ namespace emitters
         /// <param name="dimensions"> The sizes of the array's dimensions. </param>
         IRLocalMultidimArray(IRFunctionEmitter& function, llvm::Value* data, std::initializer_list<int> dimensions);
 
+        /// <summary> Constructor from a pointer to data and a list of logical and physical dimensions. </summary>
+        ///
+        /// <param name="function"> The current function being emitted. </param>
+        /// <param name="data"> The pointer to the LLVM array to wrap. </param>
+        /// <param name="dimensions"> The sizes of the array's logical dimensions. </param>
+        /// <param name="memorySize"> The sizes of the array's physical dimensions. </param>
+        IRLocalMultidimArray(IRFunctionEmitter& function, llvm::Value* data, std::initializer_list<int> dimensions, std::initializer_list<int> memorySize);
+
         /// <summary> Indexing operator to return a reference to the specified element </summary>
         ///
         /// <param name="indices"> The indices of the element. </param>

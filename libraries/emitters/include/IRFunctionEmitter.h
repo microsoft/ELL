@@ -91,6 +91,13 @@ namespace emitters
         /// <param name="dimensions"> The sizes of the array's dimensions. </param>
         IRLocalMultidimArray LocalMultidimArray(llvm::Value* value, std::initializer_list<int> dimensions);
 
+        /// <summary> Gets an `IRLocalMultidimArray` wrapper for an LLVM value object that represents a fixed-size array. </summary>
+        ///
+        /// <param name="value"> The value to wrap. </param>
+        /// <param name="dimensions"> The sizes of the array's logical dimensions. </param>
+        /// <param name="memorySize"> The sizes of the array's physical layout. </param>
+        IRLocalMultidimArray LocalMultidimArray(llvm::Value* value, std::initializer_list<int> dimensions, std::initializer_list<int> memorySize);
+
         /// <summary> Gets an emitted variable by scope and name. </summary>
         ///
         /// <param name="scope"> The variable scope. </param>

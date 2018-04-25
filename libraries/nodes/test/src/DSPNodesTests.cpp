@@ -89,6 +89,12 @@ void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, El
 }
 
 template <typename ElementType>
+void FillVector(std::vector<ElementType>& vector, ElementType value)
+{
+    std::fill(vector.begin(), vector.end(), value);
+}
+
+template <typename ElementType>
 void FillDataVector(std::vector<ElementType>& vector, int numRows, int numColumns, int numChannels)
 {
     int vectorIndex = 0;
@@ -459,6 +465,8 @@ static void TestConvolutionNodeCompile(dsp::ConvolutionMethodOption convolutionM
     const int outputPadding = 0;
     const int stride = 1;
 
+    const int winogradTileSize = 2;
+
     auto data = GetConvolutionTestData<ValueType>();
     auto filter = GetConvolutionTestFilter<ValueType>();
     auto reference = GetCorrelationTestResultSame<ValueType>();
@@ -488,7 +496,7 @@ static void TestConvolutionNodeCompile(dsp::ConvolutionMethodOption convolutionM
         outputNode = model.AddNode<nodes::UnrolledConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
         break;
     case dsp::ConvolutionMethodOption::winograd:
-        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride, winogradTileSize);
         break;
     }
 
@@ -529,11 +537,11 @@ static void TestConvolutionNodeCompile(dsp::ConvolutionMethodOption convolutionM
 }
 
 template <typename ValueType>
-static void TestConvolutionNodeCompileVsReference(int inputRows, int inputColumns, int numChannels, int numFilters, int filterSize, int stride, dsp::ConvolutionMethodOption convolutionMethod)
+static void TestConvolutionNodeCompileVsReference(int inputRows, int inputColumns, int numChannels, int numFilters, int filterSize, int stride, dsp::ConvolutionMethodOption convolutionMethod, int winogradTileSize=2)
 {
     using Tensor = math::ChannelColumnRowTensor<ValueType>;
 
-    const ValueType epsilon = static_cast<ValueType>(1e-5);
+    const ValueType epsilon = static_cast<ValueType>(1e-4);
     const int outputRows = inputRows / stride;
     const int outputColumns = inputColumns / stride;
     const int inputPadding = (filterSize - 1) / 2;
@@ -581,7 +589,7 @@ static void TestConvolutionNodeCompileVsReference(int inputRows, int inputColumn
         outputNode = model.AddNode<nodes::UnrolledConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
         break;
     case dsp::ConvolutionMethodOption::winograd:
-        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride, winogradTileSize);
         break;
     }
 
@@ -660,62 +668,82 @@ void TestDSPNodes()
     TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::winograd);
 
     // Test simple convolution
-    TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
-    TestConvolutionNodeCompileVsReference<float>(8, 8, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(2, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(2, 3, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(3, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(3, 3, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
+    TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 2, 3, 1, dsp::ConvolutionMethodOption::simple);
+    TestConvolutionNodeCompileVsReference<float>(4, 4, 2, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(4, 5, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(5, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
-    TestConvolutionNodeCompileVsReference<float>(2, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
-    TestConvolutionNodeCompileVsReference<float>(2, 2, 2, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(5, 5, 2, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 2, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(5, 15, 4, 7, 3, 1, dsp::ConvolutionMethodOption::simple);
+    TestConvolutionNodeCompileVsReference<float>(8, 8, 1, 1, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(32, 32, 8, 8, 3, 1, dsp::ConvolutionMethodOption::simple);
+    TestConvolutionNodeCompileVsReference<float>(64, 64, 8, 8, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 2, dsp::ConvolutionMethodOption::simple);
 
     // Test unrolled convolution
-    TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
-    TestConvolutionNodeCompileVsReference<float>(8, 8, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(2, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(2, 3, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(3, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(3, 3, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
+    TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 2, 3, 1, dsp::ConvolutionMethodOption::unrolled);
+    TestConvolutionNodeCompileVsReference<float>(4, 4, 2, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(4, 5, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(5, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
-    TestConvolutionNodeCompileVsReference<float>(2, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
-    TestConvolutionNodeCompileVsReference<float>(2, 2, 2, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(5, 5, 2, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 2, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(5, 15, 4, 7, 3, 1, dsp::ConvolutionMethodOption::unrolled);
+    TestConvolutionNodeCompileVsReference<float>(8, 8, 1, 1, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(32, 32, 8, 8, 3, 1, dsp::ConvolutionMethodOption::unrolled);
+    TestConvolutionNodeCompileVsReference<float>(64, 64, 8, 8, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 1, dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 2, dsp::ConvolutionMethodOption::unrolled);
 
-    // Test Winograd convolution
-    TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(8, 8, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(2, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(2, 3, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(3, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(3, 3, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(4, 5, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(5, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(2, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(2, 2, 2, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(5, 5, 2, 1, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 2, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(5, 15, 4, 7, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(32, 32, 8, 8, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 1, dsp::ConvolutionMethodOption::winograd);
-    // TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 2, dsp::ConvolutionMethodOption::winograd); // Commented-out because Winograd doesn't support non-1 stride
+    // Test Winograd convolution with tile size 2
+    TestConvolutionNodeCompileVsReference<float>(2, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(2, 3, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(3, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(3, 3, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 2, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(4, 4, 2, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(4, 5, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(5, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(5, 5, 2, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 2, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(5, 15, 4, 7, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(8, 8, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(32, 32, 8, 8, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(64, 64, 8, 8, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 1, dsp::ConvolutionMethodOption::winograd, 2);
+    // TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 2, dsp::ConvolutionMethodOption::winograd, 2); // Commented-out because Winograd doesn't support non-1 stride
+
+    // Test Winograd convolution with tile size 4
+    TestConvolutionNodeCompileVsReference<float>(2, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(2, 3, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(3, 2, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(3, 3, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(4, 4, 1, 2, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(4, 4, 2, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(4, 5, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(5, 4, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(5, 5, 2, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(5, 5, 1, 2, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(5, 15, 4, 7, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(8, 8, 1, 1, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(32, 32, 8, 8, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(64, 64, 8, 8, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 1, dsp::ConvolutionMethodOption::winograd, 4);
+    // TestConvolutionNodeCompileVsReference<float>(120, 80, 8, 16, 3, 2, dsp::ConvolutionMethodOption::winograd, 4); // Commented-out because Winograd doesn't support non-1 stride
 }

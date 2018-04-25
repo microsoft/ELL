@@ -123,10 +123,15 @@ namespace emitters
     // IRLocalMultidimArray
     //
     IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, llvm::Value* data, std::initializer_list<int> dimensions) 
+        : IRLocalMultidimArray(function, data, dimensions, dimensions)
+        {
+        }
+
+    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, llvm::Value* data, std::initializer_list<int> dimensions, std::initializer_list<int> memorySize) 
         : function(function), data(data), dimensions(dimensions.begin(), dimensions.end())
         {
-            strides.reserve(dimensions.size());
-            std::copy(dimensions.begin()+1, dimensions.end(), std::back_inserter(strides)); 
+            strides.reserve(memorySize.size());
+            std::copy(memorySize.begin()+1, memorySize.end(), std::back_inserter(strides)); 
             strides.push_back(1);
             int currentStride = 1;
             for(auto it = std::rbegin(strides); it != std::rend(strides); ++it)
