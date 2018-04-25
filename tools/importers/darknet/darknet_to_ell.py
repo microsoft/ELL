@@ -400,7 +400,7 @@ def process_fully_connected_layer(layer, weightsData):
 
     # Create Fully Connected
     activationType = get_activation_type(layer)
-    if activationType:
+    if activationType is not None:
         layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros)
     else:
         layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
@@ -416,16 +416,15 @@ def process_fully_connected_layer(layer, weightsData):
         weight_vals.append(struct.unpack('f', weightsData.read(4)))
     weight_vals = np.array(weight_vals, dtype=np.float)
 
-    orderedWeights = weight_vals.reshape(layer['c'], layer['h'], layer['w'], (layer['out_h'] * layer['out_w'] * layer['out_c']))
-    orderedWeights = np.moveaxis(orderedWeights, 0, 2)
-    orderedWeights = np.moveaxis(orderedWeights,-1, 0)
+    orderedWeights = weight_vals.reshape(layer['out_h'] * layer['out_w'] * layer['out_c'], layer['c'], layer['h'], layer['w'])
+    orderedWeights = np.moveaxis(orderedWeights, 1, -1)
     orderedWeights = orderedWeights.reshape((layer['out_h'] * layer['out_w'] * layer['out_c'] * layer['h'], layer['w'], layer['c']))
 
     weightsTensor = ell.math.FloatTensor(orderedWeights)
 
     layers.append(ell.neural.FloatFullyConnectedLayer(layerParameters, weightsTensor))
 
-    if activationType:
+    if activationType is not None:
         # Create BiasLayer
         layers.append(get_bias_layer(layer, False, bias_vals))
         # Create ActivationLayer
