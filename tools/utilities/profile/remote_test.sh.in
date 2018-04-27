@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 all_args=("$@")
 if [ "${all_args}" == "" ] ; then

@@ -10,6 +10,16 @@ set(CMAKE_CXX_STANDARD 14)
 
 include(./OpenBLASSetup.cmake)
 
+if(MSVC)
+  # Set Visual Studio-specific options
+  add_definitions(-DUNICODE)
+  add_compile_options(/MP)
+  add_compile_options(/bigobj)
+  add_compile_options(/W4)
+  add_compile_options(-D_SCL_SECURE_NO_WARNINGS)
+  add_compile_options(-D_CRT_SECURE_NO_DEPRECATE)
+endif()
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 #

@@ -9,6 +9,7 @@
 #include "ProfileReport.h"
 
 // stl
+#include <algorithm>
 #include <cstring>
 #include <iomanip>
 #include <ostream>
@@ -214,3 +215,10 @@ void WriteRegionStatistics(std::vector<ELL_ProfileRegionInfo>& regions, ProfileO
     }
 }
 
+
+void fun()
+{
+    // this hack allows us to resolve printf which is used by compiled_model.o
+    // Not sure why the windows linker is not resolving it anyway.
+    printf("hi");
+}

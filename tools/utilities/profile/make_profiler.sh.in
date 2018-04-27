@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # A script that creates a compiled profiler in a subdirectory:
 #   - create subdirectory (w/name of model)

@@ -1,0 +1,32 @@
+@ECHO OFF
+SETLOCAL ENABLEEXTENSIONS
+cd %~dp0
+
+REM A script that builds and runs the CMake project
+REM   - create build directory
+REM   - cd to build directory, run cmake and make
+REM   - run the specified command passed in as commandline parameters
+
+REM Create build directory and build project
+
+if EXIST build rd /s /q build
+mkdir build
+cd build
+cmake -G "@CMAKE_GENERATOR@" ..
+if ERRORLEVEL 1 exit /b 1
+cmake --build . --config Release -- /v:m
+if ERRORLEVEL 1 exit /b 1
+cd Release
+
+REM Run profile tool with arguments given on the command line
+echo "Running ELL profiler tool -- normal"
+profile 100 20
+
+REM echo "Running ELL profiler tool -- opt"
+profile_opt 100 20
+
+REM Run exercise_model tool with 10 iterations
+exercise_model.exe 100
+
+REM run exercise_model_opt
+exercise_model_opt 100

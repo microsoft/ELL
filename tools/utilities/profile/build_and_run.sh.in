@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # A script that builds and runs the CMake project
 #   - create build directory
@@ -6,10 +6,11 @@
 #   - run the specified command passed in as commandline parameters
 
 # Create build directory and build project
+if [[ -d $build_dir ]]; then
+    rm -rf build
+fi
 mkdir -p build
 cd build
-rm -rf *
-# cmake ..
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make -s
 
@@ -62,11 +63,11 @@ echo "Timing ELL exercise tool -- opt"
 # Note: add '-s' option to perf record and '-T' option to perf report to get per-thread info
 
 # Run perf tool to get overall stats
-echo "Getting overall perf stats -- normal"
-/bin/bash -c "perf stat -e cpu-cycles,instructions,cache-misses ./exercise_model 100"
+# echo "Getting overall perf stats -- normal"
+# /bin/bash -c "perf stat -e cpu-cycles,instructions,cache-misses ./exercise_model 100"
 
-echo "Getting overall perf stats -- opt"
-/bin/bash -c "perf stat -e cpu-cycles,instructions,cache-misses ./exercise_model_opt 100"
+# echo "Getting overall perf stats -- opt"
+# /bin/bash -c "perf stat -e cpu-cycles,instructions,cache-misses ./exercise_model_opt 100"
 
 # Run perf tool to record profile data
 # echo "Recording perf data"

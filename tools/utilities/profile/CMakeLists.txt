@@ -89,30 +89,61 @@ configure_file(include/ProfileReport.h ProfileReport.h COPYONLY)
 configure_file(make_profiler.sh.in make_profiler.sh @ONLY)
 configure_file(make_profiler.cmd.in make_profiler.cmd @ONLY)
 configure_file(build_and_run.sh.in build_and_run.sh @ONLY)
+configure_file(build_and_run.cmd.in build_and_run.cmd @ONLY)
 configure_file(remote_test.sh.in remote_test.sh @ONLY)
 configure_file(remote_test.cmd.in remote_test.cmd @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/CMake/OpenBLASSetup.cmake OpenBLASSetup.cmake COPYONLY)
 
-file(COPY ${CMAKE_CURRENT_BINARY_DIR}/make_profiler.sh
-  DESTINATION ${GLOBAL_BIN_DIR}
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-  GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-
-file(COPY ${CMAKE_CURRENT_BINARY_DIR}/remote_test.sh
-  DESTINATION ${CMAKE_BINARY_DIR}
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-  GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 if(WIN32)
-  file(COPY ${CMAKE_CURRENT_BINARY_DIR}/make_profiler.cmd
-    DESTINATION ${GLOBAL_BIN_DIR}
-    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-    GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+    file(COPY ${CMAKE_CURRENT_BINARY_DIR}/make_profiler.cmd
+        DESTINATION ${GLOBAL_BIN_DIR}
+        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+        GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
-  file(COPY ${CMAKE_CURRENT_BINARY_DIR}/remote_test.cmd
-    DESTINATION ${CMAKE_BINARY_DIR}
-    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-    GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+    file(COPY ${CMAKE_CURRENT_BINARY_DIR}/remote_test.cmd
+        DESTINATION ${CMAKE_BINARY_DIR}
+        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+        GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+        
+    add_custom_target(make_profiler DEPENDS compile CMakeLists-device.txt.in CMakeLists-device-parallel.txt.in src/CompiledProfile_main.cpp src/CompiledExerciseModel_main.cpp make_profiler.cmd.in)
+    
+    set(make_profiler_test_script "${GLOBAL_BIN_DIR}/make_profiler.cmd")
+else()
+
+    file(COPY ${CMAKE_CURRENT_BINARY_DIR}/make_profiler.sh
+      DESTINATION ${GLOBAL_BIN_DIR}
+      FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+    file(COPY ${CMAKE_CURRENT_BINARY_DIR}/remote_test.sh
+      DESTINATION ${CMAKE_BINARY_DIR}
+      FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+      
+    add_custom_target(make_profiler DEPENDS compile CMakeLists-device.txt.in CMakeLists-device-parallel.txt.in src/CompiledProfile_main.cpp src/CompiledExerciseModel_main.cpp make_profiler.sh.in)
+    
+    set(make_profiler_test_script "${GLOBAL_BIN_DIR}/make_profiler.sh")
 endif()
 
-add_custom_target(make_profiler DEPENDS compile CMakeLists-device.txt.in CMakeLists-device-parallel.txt.in src/CompiledProfile_main.cpp src/CompiledExerciseModel_main.cpp make_profiler.sh.in make_profiler.cmd.in)
+#
+# Tests
+#
+
+set(make_profiler_test_model "unrolled_64x64x4x8")
+set(make_profiler_test_model_file "${CMAKE_BINARY_DIR}/${make_profiler_test_model}.ell")
+set(make_profiler_test_directory "${CMAKE_BINARY_DIR}/${make_profiler_test_model}_test_profiler")
+
+add_test(NAME make_profiler_test
+  WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+  COMMAND ${CMAKE_COMMAND} 
+    -D BUILD_DIR=${CMAKE_BINARY_DIR}
+    -D BIN_DIR=${GLOBAL_BIN_DIR}
+    -D MAKE_MODELS_EXE=$<TARGET_FILE:makeProfileModels>
+    -D MAKE_PROFILE_SCRIPT=${make_profiler_test_script}
+    -D MODEL_FILE=${make_profiler_test_model_file}
+    -D PROFILE_DIRECTORY=${make_profiler_test_directory}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/make_profiler_test.cmake
+)
+set_property(TARGET ${test_name} PROPERTY FOLDER "tests")

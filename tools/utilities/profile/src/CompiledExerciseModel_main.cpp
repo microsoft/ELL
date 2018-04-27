@@ -57,7 +57,7 @@ void RunModel(const ProfileArguments& profileArguments)
     for (int iter = 0; iter < profileArguments.numIterations; ++iter)
     {
         // Exercise the model
-        ELL_Predict(input.data(), output.data());
+        ELL_Predict(nullptr, input.data(), output.data());
     }
 }
 
@@ -79,4 +79,11 @@ int main(int argc, char* argv[])
     RunModel<InputType, OutputType>(profileArguments);
 
     return 0;
+}
+
+void fun()
+{
+    // this hack allows us to resolve printf which is used by compiled_model.o
+    // Not sure why the windows linker is not resolving it anyway.
+    printf("hi");
 }

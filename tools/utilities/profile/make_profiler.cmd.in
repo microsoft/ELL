@@ -21,7 +21,7 @@ shift
 set profiler_directory="%model_name%_profiler"
 
 set next_opt=%1
-if "%next_opt:~0,1%"=="-" (
+if NOT "%next_opt:~0,1%"=="-" (
     set profiler_directory=%1
 )
 shift
@@ -47,10 +47,7 @@ copy ..\tools\utilities\profile\ProfileReport.h .
 copy ..\tools\utilities\profile\ProfileReport.cpp .
 copy ..\tools\utilities\profile\OpenBLASSetup.cmake .\OpenBLASSetup.cmake
 copy ..\tools\utilities\profile\build_and_run.sh .
+copy ..\tools\utilities\profile\build_and_run.cmd .
 
 copy ..\tools\utilities\profile\CMakeLists-device-parallel.txt.in .\CMakeLists.txt
 popd
-
-:usage
-
-echo Usage: make_profiler.cmd model_file [<output directory>] [<compile options>]
