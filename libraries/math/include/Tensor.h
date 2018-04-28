@@ -41,13 +41,6 @@ namespace math
     class TensorCoordinateBase
     {
     public:
-        /// <summary> Constructs a TensorCoordinateBase from row, column, channel values. </summary>
-        ///
-        /// <param name="rowValue"> The row value. </param>
-        /// <param name="columnValue"> The column value. </param>
-        /// <param name="channelValue"> The channel value. </param>
-        TensorCoordinateBase(size_t rowValue, size_t columnValue, size_t channelValue);
-
         /// <summary> Constructs a TensorCoordinateBase from an IntegerTriplet. </summary>
         ///
         /// <param name="values"> The triplet. </param>
@@ -97,6 +90,8 @@ namespace math
         }
 
     protected:
+        TensorCoordinateBase(size_t rowValue, size_t columnValue, size_t channelValue);
+
         size_t _rowValue;
         size_t _columnValue;
         size_t _channelValue;
@@ -106,7 +101,22 @@ namespace math
     class TensorShape : public TensorCoordinateBase
     {
     public:
-        using TensorCoordinateBase::TensorCoordinateBase;
+        /// <summary> Constructs a TensorShape from row, column, channel values. </summary>
+        ///
+        /// <param name="rowValue"> The row value. </param>
+        /// <param name="columnValue"> The column value. </param>
+        /// <param name="channelValue"> The channel value. </param>
+        TensorShape(size_t rowValue, size_t columnValue, size_t channelValue);
+
+        /// <summary> Constructs a TensorShape from an IntegerTriplet. </summary>
+        ///
+        /// <param name="values"> The triplet. </param>
+        TensorShape(IntegerTriplet values);
+
+        /// <summary> Constructs a TensorShape from a vector equivalent of IntegerTriplet. </summary>
+        ///
+        /// <param name="values"> The vector. </param>
+        TensorShape(const std::vector<size_t>& values);
 
         /// <summary> Gets the number rows in the tensor. </summary>
         ///
@@ -133,8 +143,23 @@ namespace math
     class TensorCoordinate : public TensorCoordinateBase
     {
     public:
-        using TensorCoordinateBase::TensorCoordinateBase;
+        /// <summary> Constructs a TensorCoordinate from row, column, channel values. </summary>
+        ///
+        /// <param name="rowValue"> The row value. </param>
+        /// <param name="columnValue"> The column value. </param>
+        /// <param name="channelValue"> The channel value. </param>
+        TensorCoordinate(size_t rowValue, size_t columnValue, size_t channelValue);
 
+        /// <summary> Constructs a TensorCoordinate from an IntegerTriplet. </summary>
+        ///
+        /// <param name="values"> The triplet. </param>
+        TensorCoordinate(IntegerTriplet values);
+
+        /// <summary> Constructs a TensorCoordinate from a vector equivalent of IntegerTriplet. </summary>
+        ///
+        /// <param name="values"> The vector. </param>
+        TensorCoordinate(const std::vector<size_t>& values);
+        
         /// <summary> Gets the row index. </summary>
         ///
         /// <returns> The row index. </returns>
@@ -429,8 +454,8 @@ namespace math
         /// @}
 
     protected:
-        size_t GetOffset(TensorCoordinate coordinate) const;
         ConstTensorReference(const ElementType* pData, TensorShape shape, size_t increment1, size_t increment2);
+        size_t GetOffset(TensorCoordinate coordinate) const;
 
         const ElementType* _pData;
         TensorShape _shape;
@@ -512,7 +537,10 @@ namespace math
         using ConstTensorRef = ConstTensorReference<ElementType, dimension0, dimension1, dimension2>;
         using TensorElementType = typename ConstTensorRef::TensorElementType;
 
-        using ConstTensorRef::ConstTensorReference;
+        /// <summary> Constructs an instance of TensorReference. </summary>
+        ///
+        /// <param name="shape"> The tensor shape (always given in logical coordinates: row, column, channel). </param>
+        TensorReference(TensorShape shape);
 
         /// <summary> Constructs tensor of given shape that uses a pointer to an external buffer as the element data.
         /// This allows the Tensor to use data provided by some other source, and this Tensor does not
@@ -774,8 +802,6 @@ namespace math
     public:
         using TensorRef = TensorReference<ElementType, dimension0, dimension1, dimension2>;
         using TensorElementType = typename TensorRef::TensorElementType;
-
-        using TensorRef::TensorReference;
 
         /// <summary> Constructs an empty tensor. </summary>
         Tensor();

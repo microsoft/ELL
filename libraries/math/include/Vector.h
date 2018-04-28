@@ -152,7 +152,12 @@ namespace math
     class ConstVectorReference : public UnorientedConstVectorBase<ElementType>
     {
     public:
-        using UnorientedConstVectorBase<ElementType>::UnorientedConstVectorBase;
+        /// <summary> Constructs an instance of ConstVectorReference. </summary>
+        ///
+        /// <param name="pData"> Pointer to the data. </param>
+        /// <param name="size"> The size of the vector. </param>
+        /// <param name="increment"> The vector increment. </param>
+        ConstVectorReference(const ElementType* pData, size_t size, size_t increment=1);
 
         /// <summary> Swaps the contents of this with the contents of another ConstVectorReference. </summary>
         ///
@@ -232,7 +237,13 @@ namespace math
     class VectorReference : public ConstVectorReference<ElementType, orientation>
     {
     public:
-        using ConstVectorReference<ElementType, orientation>::ConstVectorReference;
+        /// <summary> Constructs an instance of VectorReference. </summary>
+        ///
+        /// <param name="pData"> Pointer to the data. </param>
+        /// <param name="size"> The size of the vector. </param>
+        /// <param name="increment"> The vector increment. </param>
+        VectorReference(const ElementType* pData, size_t size, size_t increment=1);
+
         using ConstVectorReference<ElementType, orientation>::operator[];
         using ConstVectorReference<ElementType, orientation>::GetSubVector;
         using ConstVectorReference<ElementType, orientation>::Transpose;

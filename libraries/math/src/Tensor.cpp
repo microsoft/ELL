@@ -60,5 +60,39 @@ namespace math
     {
         return !((*this) == other);
     }
+
+    //
+    // TensorShape
+    //
+
+    TensorShape::TensorShape(size_t rowValue, size_t columnValue, size_t channelValue) :
+        TensorCoordinateBase(rowValue, columnValue, channelValue)
+    {}
+
+    TensorShape::TensorShape(IntegerTriplet values) :
+        TensorCoordinateBase(values)
+    {}
+
+    TensorShape::TensorShape(const std::vector<size_t>& values) :
+        TensorCoordinateBase(values)
+    {
+    }
+
+    //
+    // TensorCoordinate
+    //
+
+    TensorCoordinate::TensorCoordinate(size_t rowValue, size_t columnValue, size_t channelValue) :
+        TensorCoordinateBase(rowValue, columnValue, channelValue)
+    {}
+
+    TensorCoordinate::TensorCoordinate(IntegerTriplet values) :
+        TensorCoordinateBase(values)
+    {}
+
+    TensorCoordinate::TensorCoordinate(const std::vector<size_t>& values) :
+        TensorCoordinateBase(values)
+    {
+    }
 }
 }

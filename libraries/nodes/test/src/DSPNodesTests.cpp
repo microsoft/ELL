@@ -473,7 +473,7 @@ static void TestConvolutionNodeCompile(dsp::ConvolutionMethodOption convolutionM
 
     auto inputMemoryLayout = CalculateMemoryLayout(inputRows, inputColumns, numChannels, inputPadding);
     auto outputMemoryLayout = CalculateMemoryLayout(outputRows, outputColumns, numFilters, outputPadding);
-    auto filterWeights = Tensor(filter.data(), numFilters * filterSize, filterSize, numChannels);
+    auto filterWeights = Tensor(numFilters * filterSize, filterSize, numChannels, filter);
 
     // auto inputSize = data.size();
     auto inputSize = inputMemoryLayout.GetMemorySize();
@@ -502,7 +502,7 @@ static void TestConvolutionNodeCompile(dsp::ConvolutionMethodOption convolutionM
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", model::PortElementsBase(*(outputNode->GetOutputPort(0))) } });
 
-    auto rawDataTensor = Tensor(data.data(), inputRows, inputColumns, numChannels);
+    auto rawDataTensor = Tensor(inputRows, inputColumns, numChannels, data);
     auto paddedDataTensor = Tensor(inputRows + 2, inputColumns + 2, numChannels);
     paddedDataTensor.Fill(0);
     auto dataTensorReference = paddedDataTensor.GetSubTensor(inputPadding, inputPadding, 0, inputRows, inputColumns, numChannels);
@@ -557,7 +557,7 @@ static void TestConvolutionNodeCompileVsReference(int inputRows, int inputColumn
 
     auto inputMemoryLayout = CalculateMemoryLayout(inputRows, inputColumns, numChannels, inputPadding);
     auto outputMemoryLayout = CalculateMemoryLayout(outputRows, outputColumns, numFilters, outputPadding);
-    auto filterWeights = Tensor(filter.data(), numFilters * filterSize, filterSize, numChannels);
+    auto filterWeights = Tensor(numFilters * filterSize, filterSize, numChannels, filter);
 
     auto inputSize = inputMemoryLayout.GetMemorySize();
 
@@ -595,7 +595,7 @@ static void TestConvolutionNodeCompileVsReference(int inputRows, int inputColumn
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", model::PortElementsBase(*(outputNode->GetOutputPort(0))) } });
 
-    auto rawDataTensor = Tensor(data.data(), inputRows, inputColumns, numChannels);
+    auto rawDataTensor = Tensor(inputRows, inputColumns, numChannels, data);
     auto paddedDataTensor = Tensor(inputRows + 2 * inputPadding, inputColumns + 2 * inputPadding, numChannels);
     paddedDataTensor.Fill(0);
     auto dataTensorReference = paddedDataTensor.GetSubTensor(inputPadding, inputPadding, 0, inputRows, inputColumns, numChannels);

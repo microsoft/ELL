@@ -564,7 +564,7 @@ model::Map GenerateConvolutionModel(int inputRows, int inputColumns, int numChan
 
     auto inputMemoryLayout = CalculateMemoryLayout(inputRows, inputColumns, numChannels, inputPadding);
     auto outputMemoryLayout = CalculateMemoryLayout(outputRows, outputColumns, numFilters, outputPadding);
-    auto filterWeights = Tensor(filter.data(), numFilters * filterSize, filterSize, numChannels);
+    auto filterWeights = Tensor(numFilters * filterSize, filterSize, numChannels, filter);
 
     auto inputSize = inputMemoryLayout.GetMemorySize();
 

@@ -27,14 +27,6 @@ namespace math
     class CommonMatrixBase
     {
     public:
-        /// <summary> Constructs an instance of CommonMatrixBase. </summary>
-        ///
-        /// <param name="pData"> Pointer to the underlying memory that contains the tensor data. </param>
-        /// <param name="numRows"> Number of matrix rows. </param>
-        /// <param name="numColumns"> Number of matrix columns. </param>
-        /// <param name="increment"> The matrix increment. </param>
-        CommonMatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
-
         /// <summary> Gets the number of rows. </summary>
         ///
         /// <returns> The number of rows. </returns>
@@ -56,6 +48,8 @@ namespace math
         size_t GetIncrement() const { return _increment; }
 
     protected:
+        CommonMatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
+
         void Swap(CommonMatrixBase<ElementType>& other);
         const ElementType* _pData;
         size_t _numRows;
@@ -116,15 +110,6 @@ namespace math
     class MatrixBase<ElementType, MatrixLayout::columnMajor> : public CommonMatrixBase<ElementType>
     {
     public:
-        using CommonMatrixBase<ElementType>::CommonMatrixBase;
-
-        /// <summary> Constructs a column major instance of MatrixBase> </summary>
-        ///
-        /// <param name="pData"> (Optional) Pointer to the data. </param>
-        /// <param name="numRows"> Number of rows. </param>
-        /// <param name="numColumns"> Number of columns. </param>
-        MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns);
-
         /// \name Accessor Functions
         /// @{
 
@@ -151,6 +136,8 @@ namespace math
         /// @}
 
     protected:
+        MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns);
+        MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
         void Swap(MatrixBase<ElementType, MatrixLayout::columnMajor>& other);
         static constexpr VectorOrientation _intervalOrientation = VectorOrientation::column;
     };
@@ -162,15 +149,6 @@ namespace math
     class MatrixBase<ElementType, MatrixLayout::rowMajor> : public CommonMatrixBase<ElementType>
     {
     public:
-        using CommonMatrixBase<ElementType>::CommonMatrixBase;
-
-        /// <summary> Constructs a row major instance of MatrixBase> </summary>
-        ///
-        /// <param name="pData"> (Optional) Pointer to the data. </param>
-        /// <param name="numRows"> Number of rows. </param>
-        /// <param name="numColumns"> Number of columns. </param>
-        MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns);
-
         /// \name Accessor Functions
         /// @{
 
@@ -197,6 +175,8 @@ namespace math
         /// @}
 
     protected:
+        MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns);
+        MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
         void Swap(MatrixBase<ElementType, MatrixLayout::rowMajor>& other);
         static constexpr VectorOrientation _intervalOrientation = VectorOrientation::row;
     };
@@ -209,8 +189,21 @@ namespace math
     class ConstMatrixReference : public MatrixBase<ElementType, layout>
     {
     public:
-       using MatrixBase<ElementType, layout>::MatrixBase;
+        /// <summary> Constructs an instance of ConstMatrixReference. </summary>
+        ///
+        /// <param name="pData"> (Optional) Pointer to the data. </param>
+        /// <param name="numRows"> Number of rows. </param>
+        /// <param name="numColumns"> Number of columns. </param>
+        ConstMatrixReference(const ElementType* pData, size_t numRows, size_t numColumns);
 
+        /// <summary> Constructs an instance of ConstMatrixReference. </summary>
+        ///
+        /// <param name="pData"> Pointer to the underlying memory that contains the tensor data. </param>
+        /// <param name="numRows"> Number of matrix rows. </param>
+        /// <param name="numColumns"> Number of matrix columns. </param>
+        /// <param name="increment"> The matrix increment. </param> 
+        ConstMatrixReference(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
+        
         /// \name Accessor Functions
         /// @{
 

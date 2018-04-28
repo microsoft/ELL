@@ -96,6 +96,12 @@ namespace math
     //
 
     template <typename ElementType, VectorOrientation orientation>
+    ConstVectorReference<ElementType, orientation>::ConstVectorReference(const ElementType* pData, size_t size, size_t increment)
+        : UnorientedConstVectorBase<ElementType>(pData, size, increment)
+    {
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
     void ConstVectorReference<ElementType, orientation>::Swap(ConstVectorReference<ElementType, orientation>& other)
     {
         UnorientedConstVectorBase<ElementType>::Swap(other);
@@ -150,6 +156,12 @@ namespace math
     //
     // VectorReference
     //
+
+    template <typename ElementType, VectorOrientation orientation>
+    VectorReference<ElementType, orientation>::VectorReference(const ElementType* pData, size_t size, size_t increment)
+        : ConstVectorReference<ElementType, orientation>(pData, size, increment)
+    {
+    }
 
     template <typename ElementType, VectorOrientation orientation>
     ElementType& VectorReference<ElementType, orientation>::operator[](size_t index)

@@ -180,7 +180,7 @@ static void TimeConvolutionNode(int inputRows, int inputColumns, int numChannels
 
     auto inputMemoryLayout = CalculateMemoryLayout(inputRows, inputColumns, numChannels, inputPadding);
     auto outputMemoryLayout = CalculateMemoryLayout(outputRows, outputColumns, numFilters, outputPadding);
-    auto filterWeights = Tensor(filter.data(), numFilters * filterSize, filterSize, numChannels);
+    auto filterWeights = Tensor(numFilters * filterSize, filterSize, numChannels, filter);
 
     model::Node* outputNode = nullptr;
     switch (convolutionMethod)
@@ -204,7 +204,7 @@ static void TimeConvolutionNode(int inputRows, int inputColumns, int numChannels
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", model::PortElementsBase(*(outputNode->GetOutputPort(0))) } });
 
-    auto rawDataTensor = Tensor(data.data(), inputRows, inputColumns, numChannels);
+    auto rawDataTensor = Tensor(inputRows, inputColumns, numChannels, data);
     auto paddedDataTensor = Tensor(inputRows + 2, inputColumns + 2, numChannels);
     paddedDataTensor.Fill(0);
 

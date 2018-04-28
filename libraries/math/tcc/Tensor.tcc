@@ -484,6 +484,11 @@ namespace math
     //
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    TensorReference<ElementType, dimension0, dimension1, dimension2>::TensorReference(TensorShape shape)
+        : ConstTensorRef(shape)
+    {}
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     TensorReference<ElementType, dimension0, dimension1, dimension2>::TensorReference(ElementType* pData, size_t numRows, size_t numColumns, size_t numChannels)
         : ConstTensorRef(pData, TensorShape{ numRows, numColumns, numChannels })
     {}
