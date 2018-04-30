@@ -54,14 +54,20 @@ pushd "$SCRIPT_DIR" > /dev/null
 build_dir=$1
 if [[ -z "$build_dir" ]]; then
     build_dir=build
+else
+    shift
 fi
 
-nproc=$2
-dailyclean=$3
+nproc=$1
+if [[ ! -z "$nproc" ]]; then
+    shift
+fi
+dailyclean=$1
+if [[ ! -z "$dailyclean" ]]; then
+    shift
+fi
+
 incremental="true"
-shift
-shift
-shift
 
 if [[ -d $build_dir ]]; then
     if [ "${dailyclean}" = "true" ]; then
