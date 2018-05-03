@@ -160,6 +160,9 @@ namespace model
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;
 
+        /// <summary> Resets any state on the node, if any </summary>
+        virtual void Reset() { };
+
         /// <summary> Get this object's metadata object. </summary>
         ///
         /// <returns> A reference to the PropertyBag containing the metadata for this object. </returns>

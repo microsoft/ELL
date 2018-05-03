@@ -26,6 +26,13 @@ namespace utilities
     }
 
     template <typename T>
+    void RingBuffer<T>::Resize(size_t size)
+    {
+        _buffer.resize(size);
+        _currentPos = 0;
+    }
+
+    template <typename T>
     size_t RingBuffer<T>::GetBufferIndex(int entryIndex) const
     {
         int size = static_cast<int>(Size());

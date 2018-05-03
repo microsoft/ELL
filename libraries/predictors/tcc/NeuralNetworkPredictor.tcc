@@ -116,6 +116,15 @@ namespace predictors
     }
 
     template <typename ElementType>
+    void NeuralNetworkPredictor<ElementType>::Reset()
+    {
+        for (size_t i = 0; i < _layers.size(); i++)
+        {
+            _layers[i]->Reset();
+        }
+    }
+
+    template <typename ElementType>
     void NeuralNetworkPredictor<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["inputLayer"] << _inputLayer.get();

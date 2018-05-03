@@ -147,6 +147,12 @@ namespace nodes
     }
 
     template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+    void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Reset()
+    {
+        // noop until Compute() is implemented...
+    }
+
+    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
     void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength)
     {
         const auto plusFloat = emitters::TypedOperator::addFloat;
@@ -204,13 +210,22 @@ namespace nodes
         const size_t inputSize = this->input.Size();
         const size_t hiddenSize = this->inputBias.Size();
 
+        size_t outputSize = this->output.Size();
+        if (outputSize > hiddenSize)
+        {
+            outputSize = hiddenSize;
+        }
+
         ActivationFunctionType<ValueType> layerActivationFunction;
         auto activationFunction = GetNodeActivationFunction(layerActivationFunction);
         RecurrentActivationFunctionType<ValueType> recurrentLayerActivationFunction;
         auto recurrentActivationFunction = GetNodeActivationFunction(recurrentLayerActivationFunction);
 
         // Global state (in addition to output)
-        llvm::GlobalVariable* ctActual = function.GetModule().GlobalArray(emitters::GetVariableType<ValueType>(), "ctActual", hiddenSize);
+        emitters::IRModuleEmitter& module = function.GetModule();
+        emitters::VariableType varType = emitters::GetVariableType<ValueType>();
+        auto ctActual = module.Variables().AddVectorVariable(emitters::VariableScope::global, varType, hiddenSize);
+        auto ctActualValue = module.EnsureEmitted(*ctActual);
 
         // Get LLVM references for all node inputs
         llvm::Value* input = compiler.EnsurePortEmitted(this->input);
@@ -227,8 +242,10 @@ namespace nodes
         // Get LLVM reference for node output
         llvm::Value* output = compiler.EnsurePortEmitted(this->output);
 
-        // The node's output is the same as the hidden state --- just make an alias so the code looks nicer
-        auto& hiddenState = output;
+        // Allocate global buffer for hidden state 
+        auto hiddenStateVariable = module.Variables().AddVectorVariable(emitters::VariableScope::global, varType, hiddenSize);
+        auto hiddenStateValue = module.EnsureEmitted(*hiddenStateVariable);
+        auto hiddenState = function.LocalArray(hiddenStateValue);
 
         // Allocate local variables
         llvm::AllocaInst* inputPlusHidden = function.Variable(emitters::GetVariableType<ValueType>(), inputSize + hiddenSize);
@@ -261,7 +278,7 @@ namespace nodes
         ctActualLoop.Begin(hiddenSize);
         {
             auto index = ctActualLoop.LoadIterationVariable();
-            auto ctActualVal = function.ValueAt(ctActual, index);
+            auto ctActualVal = function.ValueAt(ctActualValue, index);
             auto ftVal = function.ValueAt(ft, index);
             auto itVal = function.ValueAt(it, index);
             auto ctNewVal = function.ValueAt(ctNew, index);
@@ -270,7 +287,7 @@ namespace nodes
             auto itctNew = function.Operator(timesFloat, itVal, ctNewVal);
 
             auto result = function.Operator(plusFloat, ftCt, itctNew);
-            function.SetValueAt(ctActual, index, result);
+            function.SetValueAt(ctActualValue, index, result);
         }
         ctActualLoop.End();
 
@@ -281,19 +298,28 @@ namespace nodes
 
         // compute the hidden layer and copy into state vector
         // ht = ot * activationFunction(Ct)  (where activationFunction is usually tanh)
-        ApplyActivation(function, activationFunction, ctActual, hiddenSize);
+        ApplyActivation(function, activationFunction, ctActualValue, hiddenSize);
 
         auto outputLoop = function.ForLoop();
         outputLoop.Begin(hiddenSize);
         {
             auto index = outputLoop.LoadIterationVariable();
             auto otVal = function.ValueAt(ot, index);
-            auto ctVal = function.ValueAt(ctActual, index);
+            auto ctVal = function.ValueAt(ctActualValue, index);
             auto result = function.Operator(timesFloat, ctVal, otVal);
             function.SetValueAt(hiddenState, index, result);
         }
         outputLoop.End();
-        // output <- hiddenState (no-op, since output and hidden state are aliases)
+        // output <- hiddenState
+        function.MemoryCopy<ValueType>(hiddenState, 0, output, 0, outputSize);
+
+        // Add the internal reset function
+        emitters::IRFunctionEmitter& resetFunction = module.BeginResetFunction("LSTMNode" + this->GetId().ToString());
+        auto resetctState = resetFunction.LocalArray(ctActualValue);
+        resetFunction.MemorySet<ValueType>(resetctState, 0, function.Literal<uint8_t>(0), hiddenSize);
+        auto resetHiddenState = resetFunction.LocalArray(ctActualValue);
+        resetFunction.MemorySet<ValueType>(resetHiddenState, 0, function.Literal<uint8_t>(0), hiddenSize);
+        module.EndResetFunction();
     }
 
     // Explicit specialization

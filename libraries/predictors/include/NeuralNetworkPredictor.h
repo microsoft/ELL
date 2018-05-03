@@ -150,6 +150,9 @@ namespace predictors
         /// <returns> The current archive format version. </summary>
         static utilities::ArchiveVersion GetCurrentArchiveVersion();
 
+        /// <summary> Reset the state of the predictor </summary>
+        void Reset();
+
     protected:
         utilities::ArchiveVersion GetArchiveVersion() const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;

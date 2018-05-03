@@ -115,7 +115,17 @@ namespace emitters
         void BeginMapPredictFunction(const std::string& functionName, NamedVariableTypeList& args) override;
 
         /// <summary> Ends the current model prediction function. </summary>
-        void EndMapPredictFunction() override { EndFunction(); }
+        void EndMapPredictFunction() override;
+
+        /// <summary> Begin a new function for resetting a given node. Each node that needs to implement 
+        /// reset calls this and implements their own reset logic.  The IRModuleEmitter wraps all that
+        /// in a master model_Reset function which is exposed in the API. </summary>
+        ///
+        /// <param name="nodeName"> The name of the node being reset (should be unique to the model). </param>
+        IRFunctionEmitter& BeginResetFunction(const std::string& nodeName);
+
+        /// <summary> End your reset function created with BeginResetFunction. </summary>
+        void EndResetFunction() { EndFunction(); }
 
         /// <summary> Begins an IR function with no arguments and directs subsequent commands to it. </summary>
         ///
@@ -763,6 +773,7 @@ namespace emitters
         // Info to modify how code is written out
         std::map<std::string, std::vector<std::string>> _functionComments;
         std::vector<std::pair<std::string, std::string>> _preprocessorDefinitions;
+        std::vector<std::string> _resetFunctions;
     };
 
     //

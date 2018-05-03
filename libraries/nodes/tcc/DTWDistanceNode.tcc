@@ -54,7 +54,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void DTWDistanceNode<ValueType>::Reset() const
+    void DTWDistanceNode<ValueType>::Reset()
     {
         std::fill(_d.begin() + 1, _d.end(), std::numeric_limits<ValueType>::max());
         _d[0] = 0.0;

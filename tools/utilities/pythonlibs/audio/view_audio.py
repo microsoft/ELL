@@ -374,6 +374,8 @@ class AudioDemo(Frame):
                 traceback = traceback.tb_next
 
         self.reading_input = False
+        if self.classifier:
+            self.classifier.reset() # good time to reset.
     
     def stop(self):
         """ called when user clicks the stop button, or we reach the end of a wav file input """
@@ -391,6 +393,8 @@ class AudioDemo(Frame):
         self.reading_input = False
         self.last_prediction = None
         self.probability = 0
+        if self.classifier:
+            self.classifier.reset() # good time to reset.
     
     def on_rec_button_click(self):
         """ called when user clicks the record button, same button is used to "stop" recording. """

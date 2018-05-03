@@ -217,7 +217,10 @@ namespace neural
 
         /// <summary> Computes the output of the layer via a forward feed of the configured input.
         ///           This is a no-op for this layer type. </summary>
-        virtual void Compute(){};
+        virtual void Compute() {};
+
+        /// <summary> Resets the state of the layer </summary>
+        virtual void Reset() {};
 
         /// <summary> Indicates the kind of layer. </summary>
         ///

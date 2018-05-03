@@ -20,12 +20,17 @@ class CompiledModel:
         self.path = model_path
         model_dir, model_name = os.path.split(model_path)
         full_path = os.path.abspath(model_dir)
+        saved = sys.path
         sys.path += [full_path]
         sys.path += [os.path.join(full_path, "build")]
         sys.path += [os.path.join(full_path, "build", "Release")]
         self.module = importlib.import_module(model_name)
         self.input_shape = self.module.get_default_input_shape()
         self.output_shape = self.module.get_default_output_shape()
+        sys.path = saved 
+
+    def __del__(self):
+        del self.module
 
     def transform(self, x):
         # Turn the input into something the model can read
@@ -37,6 +42,6 @@ class CompiledModel:
         # Send the input to the predict function and return the prediction result
         return self.module.predict(in_vec)
 
-    def reload(self):
-        """ reload the module, hence resetting all model state """
-        self.module = importlib.reload(self.module)
+    def reset(self):
+        """ reset all model state """
+        self.module.reset()

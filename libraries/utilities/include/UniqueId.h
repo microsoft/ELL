@@ -63,6 +63,9 @@ namespace utilities
         /// <summary> String conversion </summary>
         friend std::string to_string(const UniqueId& id);
 
+        /// <summary> String conversion </summary>
+        std::string ToString() const { return _id; }
+
     protected:
         void WriteToArchive(Archiver& archiver) const override;
         void ReadFromArchive(Unarchiver& archiver) override;

@@ -8,6 +8,7 @@
 
 #include "GRULayerNode.h"
 #include "BroadcastFunctionNode.h"
+#include "CompilableNodeUtilities.h" // for PortTypeToVariableType
 #include "CompiledActivationFunctions.h"
 #include "ConstantNode.h"
 #include "HardSigmoidActivation.h"
@@ -127,6 +128,12 @@ namespace nodes
     }
 
     template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+    void GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Reset()
+    {
+        // noop until Compute() is implemented...
+    }
+
+    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
     template <typename ActivationType>
     void GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength)
     {
@@ -176,10 +183,13 @@ namespace nodes
         // Get LLVM reference for node output
         auto output = function.LocalArray(compiler.EnsurePortEmitted(this->output));
 
-        // The node's output is the same as the hidden state --- just make an alias so the code looks nicer
-        // Same goes for prevHiddenState
-        auto& hiddenState = output;
-        auto& prevHiddenState = output;
+        // Allocate global buffer for hidden state 
+        emitters::IRModuleEmitter& module = function.GetModule();
+        emitters::VariableType varType = PortTypeToVariableType(this->output.GetType());
+        auto hiddenStateVariable = module.Variables().AddVectorVariable(emitters::VariableScope::global, varType, outputSize);
+        auto hiddenStateValue = module.EnsureEmitted(*hiddenStateVariable);
+        auto hiddenState = function.LocalArray(hiddenStateValue);
+        auto& prevHiddenState = hiddenState;
 
         // Allocate local variables
         auto inputPlusHidden = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), inputSize + outputSize));
@@ -224,6 +234,15 @@ namespace nodes
             auto newValue = ((static_cast<ValueType>(1.0) - z_i) * newHiddenState[index]) + (z_i * prevHiddenState[index]);
             output[index] = newValue;
         });
+
+        // save new hidden state
+        function.MemoryCopy<ValueType>(output, 0, hiddenState, 0, outputSize);
+
+        // Add the internal reset function
+        emitters::IRFunctionEmitter& resetFunction = module.BeginResetFunction("GRUNode" + this->GetId().ToString());
+        auto resetHiddenState = resetFunction.LocalArray(hiddenStateValue);
+        resetFunction.MemorySet<ValueType>(resetHiddenState, 0, function.Literal<uint8_t>(0), outputSize);
+        module.EndResetFunction();
     }
 
 // Explicit specialization

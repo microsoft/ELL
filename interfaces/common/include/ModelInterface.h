@@ -476,6 +476,8 @@ public:
     template <typename ElementType>
     void Step(ell::api::TimeTickType timestamp = 0.0);
 
+    void Reset();
+
     // Older non callback based API, only makes sense when model has single input/output nodes and no source/sink nodes.
     std::vector<double> ComputeDouble(const AutoDataVector& inputData);
     std::vector<double> ComputeDouble(const std::vector<double>& inputData);

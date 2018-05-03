@@ -114,7 +114,7 @@ namespace predictors
             const VectorType& GetOutputBias() const { return _outputBias; }
 
             /// <summary> Resets the layer's hidden values </summary>
-            void Reset();
+            void Reset() override;
 
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///

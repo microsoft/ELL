@@ -236,6 +236,7 @@ void TestSwigCallbackHeader()
     testing::ProcessTest("Testing step function wrapper 1", testing::IsTrue(std::string::npos != result.find(std::string("void step(void* context, " + timeTypeString + " input, std::vector<" + typeString + ">& output)"))));
     testing::ProcessTest("Testing step function wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("step(context, input, &output[0]);"))));
 
+    testing::ProcessTest("Testing reset function exists", testing::IsTrue(std::string::npos != result.find(std::string("void TestModuleWithCallbacks_Reset()"))));
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
 
     if (testing::DidTestFail())

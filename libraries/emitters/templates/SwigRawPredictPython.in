@@ -6,4 +6,7 @@ def predict(inputData: 'numpy.ndarray') -> "numpy.ndarray":
     @@PREDICT_FUNCTION@@(None, inputData, results)
     return np.asarray(results)
 
+def reset():
+    @@RESET_FUNCTION@@()
+
 )"

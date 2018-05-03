@@ -67,6 +67,8 @@ namespace dsp
     {
         archiver["b"] >> _b;
         archiver["a"] >> _a;
+        _previousInput.Resize(_b.size());
+        _previousOutput.Resize(_a.size());
     }
 }
 }

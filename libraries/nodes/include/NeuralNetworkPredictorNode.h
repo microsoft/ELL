@@ -115,6 +115,9 @@ public:
         bool isInterleavedOrder;
     };
 
+    /// <summary> Reset the state of the node </summary>
+    void Reset() override;
+
 protected:
     void Compute() const override;
     bool Refine(model::ModelTransformer& transformer) const override;

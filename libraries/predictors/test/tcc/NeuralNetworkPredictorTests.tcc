@@ -774,6 +774,7 @@ void GRULayerTest()
     VectorType updateBias = VectorType({ 0.0f, 0.0f, 3.95111f });
     VectorType resetBias = VectorType({ 0.0f, 0.0f, 0.0f });
     VectorType hiddenBias = VectorType({ -0.0686757f, 0.0f, 0.281977f });
+    TensorType expected(1, 1, 3, { (ElementType)0.86100114222961344, (ElementType)0.0081086727552619111, (ElementType)0.000000000000000 });
 
     MatrixType updateWeights(3, 7);
     MatrixType resetWeights(3, 7);
@@ -810,7 +811,17 @@ void GRULayerTest()
     gru.Compute();
     TensorType output = gru.GetOutput();
 
-    testing::ProcessTest("Testing GRULayer, values", Equals(output(0, 0, 0), 0.861001074314117) && Equals(output(0, 0, 1), 0.008108692243695) && Equals(output(0, 0, 2), 0.000000000000000));
+    ElementType epsilon = static_cast<ElementType>(1.0e-6);
+    testing::ProcessTest("Testing GRULayer, values", output.IsEqual(expected, epsilon));
+
+    gru.Compute();
+    TensorType output2 = gru.GetOutput();
+    
+    gru.Reset();
+    gru.Compute();
+    TensorType output3 = gru.GetOutput();
+
+    testing::ProcessTest("Testing GRULayer, reset", !output2.IsEqual(expected, epsilon) && output.IsEqual(output, epsilon));
 }
 
 // clang-format off

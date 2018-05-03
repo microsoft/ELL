@@ -95,6 +95,9 @@ namespace model
         template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
         OutputVectorType Compute(const InputVectorType& inputValues) const;
 
+        /// <summary> Reset the state of the model </summary>
+        void Reset();
+
         /// <summary> Returns the size of the map's input </summary>
         ///
         /// <returns> The dimensionality of the map's input port </returns>

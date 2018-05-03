@@ -54,6 +54,9 @@ namespace utilities
         ///
         /// <param name="value"> The value to fill the buffer with. </param>
         void Fill(const T& value);
+
+        /// <summary> Resize the ring buffer and reset the current position to zero. </summary>
+        void Resize(size_t size);
         
     private:
         size_t GetBufferIndex(int inputIndex) const;

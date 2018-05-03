@@ -80,4 +80,7 @@ def predict(inputData: 'numpy.ndarray') -> "numpy.ndarray":
     wrapper.@@PREDICT_FUNCTION_PY@@()
     return wrapper.get_results()
 
+def reset():
+    @@RESET_FUNCTION@@()
+
 )"

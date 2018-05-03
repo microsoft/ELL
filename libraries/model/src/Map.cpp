@@ -155,6 +155,11 @@ namespace model
         return ComputeDoubleOutput(elements);
     }
 
+    void Map::Reset()
+    {
+        _model.Reset();
+    }
+
     void Map::AddInput(const std::string& inputName, InputNodeBase* inputNode)
     {
         _inputNodes.push_back(inputNode);

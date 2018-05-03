@@ -1438,6 +1438,11 @@ void Map::Save(const std::string& filename) const
     ell::common::SaveMap(*_map, filename);
 }
 
+void Map::Reset()
+{
+    _map->Reset();
+}
+
 bool Map::HasSourceNodes()
 {
     // the valid values for _hasSourceNodes are:

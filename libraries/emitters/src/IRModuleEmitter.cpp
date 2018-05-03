@@ -249,6 +249,31 @@ namespace emitters
         function.Store(globalContext, context);
     }
 
+    void IRModuleEmitter::EndMapPredictFunction()
+    {
+        EndFunction(); 
+
+        // now generate the public reset function that combines all the node level reset functions.
+        IRFunctionEmitter& resetFunction = BeginFunction(GetModuleName() + "_Reset", VariableType::Void);
+        resetFunction.IncludeInHeader();
+        for (auto name : _resetFunctions) 
+        {
+            resetFunction.Call(name);
+        }
+        EndFunction();
+    }
+
+    /// <summary> Begin a new function for resetting a given node. Each node that needs to implement 
+    /// reset calls this and implements their own reset logic.  The IRModuleEmitter wraps all that
+    /// in a master model_Reset function which is exposed in the API. </summary>
+    IRFunctionEmitter& IRModuleEmitter::BeginResetFunction(const std::string& nodeName)
+    {
+        std::string functionName = "internalreset_" + nodeName;
+        IRFunctionEmitter& function = BeginFunction(functionName, VariableType::Void);
+        _resetFunctions.push_back(functionName);
+        return function;
+    }
+
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType)
     {
         return BeginFunction(functionName, _emitter.Type(returnType));

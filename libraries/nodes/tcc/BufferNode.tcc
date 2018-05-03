@@ -27,11 +27,16 @@ namespace nodes
     void BufferNode<ValueType>::Compute() const
     {
         auto inputSize = input.Size();
+        if (inputSize > _samples.size())
+        {
+            inputSize = _samples.size();
+        }
         auto offset = _samples.size() - inputSize;
-
-        // Copy samples forward to make room for new samples
-        std::copy_n(_samples.begin() + offset, inputSize, _samples.begin());
-
+        if (offset > 0)
+        {
+            // Copy samples forward to make room for new samples
+            std::copy_n(_samples.begin() + offset, inputSize, _samples.begin());
+        }
         // Copy input samples to tail
         for (size_t index = 0; index < inputSize; ++index)
         {
@@ -87,7 +92,6 @@ namespace nodes
         archiver["windowSize"] >> _windowSize;
 
         _samples.resize(_windowSize);
-        _samples.clear();
         _output.SetSize(_windowSize);
     }
 }

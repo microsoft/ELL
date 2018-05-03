@@ -20,12 +20,9 @@ import numpy as np
 import classifier
 import featurizer
 import wav_reader
-
-def str2bool(v):
-    return v.lower() in [ "true", "1", "yes"]
     
 THRESHOLD = 0.01
-SMOOTHING = 0.2 # 0.2 second smoothing window on classifier output
+SMOOTHING = 0 # no smoothing window on classifier output
 
 class FeatureReader:
     def __init__(self, features, classifier_input_size):
@@ -41,46 +38,53 @@ class FeatureReader:
 
 
 class ModelTester:
-    def __init__(self, verbose):
+    def __init__(self, verbose, reset):
         
         self.passed = 0
         self.failed = 0
         self.rate = 0
         self.verbose = verbose
+        self.reset = reset
 
-    def get_prediction(self, transform, predictor):        
+    def get_prediction(self, name, transform, predictor):        
         eof = False
         best_prediction = None
         best_probability = 0
+        label = None
         while not eof :
             feature_data = transform.read()
             if feature_data is None:
                 eof = True
             else:
                 prediction, probability, label = predictor.predict(feature_data)
+                if probability is not None and name == 'bed/0ea0e2f4_nohash_0.wav':    
+                    percent = int(100 * probability)
+                    print("<<< DETECTED ({}) {}% '{}' >>>".format(prediction, percent, label))
                 if probability is not None and probability > best_probability:
                     best_probability = probability
                     best_prediction = label
 
-        return best_prediction
+        if self.reset:
+            predictor.reset()
+        return (best_prediction, best_probability, label)
 
-    def process_prediction(self, prediction, expected):
+    def process_prediction(self, name, prediction, expected, confidence):
         if prediction == expected:
             self.passed += 1
             self.rate = self.passed / (self.passed + self.failed)
             if self.verbose:
-                print("PASSED {:.2f}%: {}".format(self.rate * 100, self.expected)) 
+                print("PASSED {:.2f}%: {} on test file {} with confidence {:.2f}%".format(self.rate * 100, expected, name, confidence*100)) 
             else:
                 print("PASSED {}".format(expected)) 
         else:
             self.failed += 1
             self.rate = self.passed / (self.passed + self.failed)
             if self.verbose:
-                print("FAILED {:.2f}%: expected {}, got {}".format(self.rate * 100, expected, prediction))
+                print("FAILED {:.2f}%: expected {}, got {} on test file {}".format(self.rate * 100, expected, prediction, name))
             else:
                 print("FAILED: expected {}, got {}".format(expected, prediction))
 
-    def RunTest(self, featurizer_model, classifier_model, list_file, dataset, categories, sample_rate, ignore_label):
+    def RunTest(self, featurizer_model, classifier_model, list_file, max_tests, dataset, categories, sample_rate, ignore_label):
 
         predictor = classifier.AudioClassifier(classifier_model, categories, [ignore_label], THRESHOLD, SMOOTHING)
         transform = featurizer.AudioTransform(featurizer_model, predictor.input_size)
@@ -97,18 +101,21 @@ class ModelTester:
 
             wav_dir = os.path.dirname(list_file)
 
+            if max_tests:
+                testlist = np.random.choice(testlist, max_tests, replace=False)
+
             start = time.time()
 
             for name in testlist:
-                # bed/28497c5b_nohash_0.wav
+                # e.g. bed/28497c5b_nohash_0.wav
                 expected = name.split('/')[0]
                 wav_file = os.path.join(wav_dir, "audio", name)
                 # open the wav file.
                 reader = wav_reader.WavReader(sample_rate)
                 reader.open(wav_file, transform.input_size, None)
                 transform.open(reader)
-                prediction = self.get_prediction(transform, predictor)
-                self.process_prediction(prediction, expected)
+                prediction, confidence, label = self.get_prediction(name, transform, predictor)
+                self.process_prediction(name, prediction, expected, confidence)
 
 
         elif dataset:
@@ -130,6 +137,8 @@ class ModelTester:
                 prediction = self.get_prediction(reader, predictor)
                 self.process_prediction(prediction, expected)
                 index += 1
+        else:
+            raise Exception("Missing list_file and dataset arguments")
 
         end = time.time()
         seconds = end - start
@@ -146,12 +155,13 @@ if __name__ == "__main__":
     parser.add_argument("--list_file", "-l", help="specify path to testing_list.txt")
     parser.add_argument("--dataset", "-d", help="specify path to cached dataset file (*.npz)")
     parser.add_argument("--categories", "-cat", help="specify path to categories file", required=True)
-    parser.add_argument("--verbose", "-v", help="provide more output", default="False")
-    parser.add_argument("--sample_rate", "-r", help="specify audio rate (default 16000)", default=16000, type=int)  
-    parser.add_argument("--ignore_label", "-i", help="specify label to ignore", default=None, type=int)    
+    parser.add_argument("--sample_rate", "-s", help="specify audio sample rate (default 16000)", default=16000, type=int)  
+    parser.add_argument("--ignore_label", "-i", help="specify label to ignore", default=None, type=int)
+    parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
+    parser.add_argument("--reset", "-r", help="do a GRU reset between each test file", action="store_true")
+    parser.add_argument("--max_tests", type=int, help="maimum number of words chosen at random from each word list", default=None)
 
     args = parser.parse_args()
-    verbose = str2bool(args.verbose)
     sample_rate = args.sample_rate
 
     if args.list_file:
@@ -166,5 +176,5 @@ if __name__ == "__main__":
         print("Expecting one of --list_file or --dataset")
         sys.exit(1)
 
-    test = ModelTester(verbose)
-    test.RunTest(args.featurizer, args.classifier, args.list_file, args.dataset, args.categories, sample_rate, args.ignore_label)
+    test = ModelTester(args.verbose, args.reset)
+    test.RunTest(args.featurizer, args.classifier, args.list_file, args.max_tests, args.dataset, args.categories, sample_rate, args.ignore_label)

@@ -1,4 +1,5 @@
 u8R"(void @@FUNCTION@@(void* context, @@INPUT_TYPE@@ input, std::vector<@@OUTPUT_TYPE@@>& output);
+void @@RESETFUNCTION@@();
 
 #if !defined(SWIG)
 void @@FUNCTION@@(void* context, @@INPUT_TYPE@@ input, std::vector<@@OUTPUT_TYPE@@>& output)

@@ -20,14 +20,14 @@ class AudioClassifier:
     tend to be rather noisy. It also supports a threshold value so any prediction less than this
     probability is ignored.
     """
-    def __init__(self, model_path, categories_file, ignore_list=[], threshold=0, smoothing_delay=0.2):
+    def __init__(self, model_path, categories_file, ignore_list=[], threshold=0, smoothing_delay=0):
         """
         Initialize the new AudioClassifier.
         model - the path to the ELL model module to load.
         categories_file - the path to a text file containing strings labels for each prediction
         ignore_list - a list of prediction indices to ignore
         threshold - threshold for predictions, (default 0).
-        smoothing_delay - controls the size of this window (defaults to 0.2 seconds).
+        smoothing_delay - controls the size of this window (defaults to 0).
         """
         self.smoothing_delay = smoothing_delay
         self.ignore_list = ignore_list
@@ -78,7 +78,8 @@ class AudioClassifier:
         if self.logfile:
             self.logfile.write("{}\n".format(",".join([str(x) for x in output])))
 
-        output = self._smooth(output)
+        if self.smoothing_delay:
+            output = self._smooth(output)
         
         prediction = self._get_prediction(output)
         if prediction and prediction not in self.ignore_list:
@@ -88,6 +89,9 @@ class AudioClassifier:
             return (prediction, output[prediction], label)
 
         return (None, None, None)
+
+    def reset(self):
+        self.model.reset()
 
     def _get_prediction(self, output):
         """ handles scalar and vector predictions """
@@ -116,7 +120,7 @@ class AudioClassifier:
         new_items = [x for x in self.items if x[0] + self.smoothing_delay >= now ]
         new_items += [ (now, predictions) ] # add our new item
         self.items = new_items
-        
+
         # compute summed probabilities over this new sliding window
         sum = np.sum([p[1] for p in new_items], axis=0)
         return sum / len(new_items)

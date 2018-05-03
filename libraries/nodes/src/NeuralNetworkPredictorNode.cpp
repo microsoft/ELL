@@ -149,6 +149,12 @@ namespace nodes
         _output.SetOutput(_predictor.Predict(inputDataVector));
     }
 
+    template <typename ValueType>
+    void NeuralNetworkPredictorNode<ValueType>::Reset()
+    {
+        _predictor.Reset();
+    }
+
     // explicit specialization for float, double
     template class NeuralNetworkPredictorNode<float>;
     template class NeuralNetworkPredictorNode<double>;

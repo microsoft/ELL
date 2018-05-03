@@ -128,6 +128,13 @@ namespace model
         VisitSubset(output, [&os](const Node& node) { node.Print(os); });
     }
 
+    /// <summary> Reset the state of the model </summary>
+    void Model::Reset()
+    {
+        auto reset = [](const Node& node) { const_cast<Node&>(node).Reset(); };
+        Visit(reset);
+    }
+
     //
     // NodeIterator implementation
     //

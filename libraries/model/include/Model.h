@@ -118,6 +118,9 @@ namespace model
         template <typename ValueType>
         std::vector<ValueType> ComputeOutput(const PortElementsBase& elements) const;
 
+        /// <summary> Reset the state of the model </summary>
+        void Reset();
+
         /// <summary>
         /// Visits all the nodes in the model in dependency order. No nodes will be visited until all
         /// its inputs have first been visited.

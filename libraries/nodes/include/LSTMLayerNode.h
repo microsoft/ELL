@@ -140,6 +140,9 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Resets any state on the node, if any </summary>
+        virtual void Reset() override;
+
     protected:
         void Copy(model::ModelTransformer& transformer) const override;
         void Compute() const override;

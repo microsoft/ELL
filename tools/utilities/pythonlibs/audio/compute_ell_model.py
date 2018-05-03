@@ -43,6 +43,6 @@ class ComputeModel:
         # Send the input to the predict function and return the prediction result
         return np.array(self.map.Compute(in_vec, dtype=np.float32))
 
-    def reload(self):
-        """ reload the map, hence resetting all model state """
-        self.map = ell.model.Map(model_path)
+    def reset(self):
+        """ reset all model state """
+        self.map.Reset()

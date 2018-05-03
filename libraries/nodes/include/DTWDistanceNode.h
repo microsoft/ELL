@@ -70,8 +70,10 @@ namespace nodes
         /// <summary></summary>
         std::vector<std::vector<ValueType>> GetPrototype() const { return _prototype; }
 
+        /// <summary> Reset the state of the node </summary>
+        void Reset() override;
+
     protected:
-        void Reset() const;
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         bool HasState() const override { return true; }
