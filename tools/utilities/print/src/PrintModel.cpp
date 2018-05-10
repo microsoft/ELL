@@ -23,10 +23,11 @@
 
 namespace ell
 {
-void PrintLayerParameters(std::ostream& out, std::shared_ptr<ell::predictors::neural::Layer<float>> layer)
+template <typename valueType>
+void PrintLayerParameters(std::ostream& out, const ell::predictors::neural::Layer<valueType>& layer)
 {
     bool first = true;
-    std::vector<NameValue> result = InspectLayerParameters<float>(layer);
+    std::vector<NameValue> result = InspectLayerParameters<valueType>(layer);
     for (auto ptr = result.begin(), end = result.end(); ptr != end; ptr++)
     {
         NameValue nv = *ptr;
@@ -36,6 +37,22 @@ void PrintLayerParameters(std::ostream& out, std::shared_ptr<ell::predictors::ne
         }
         out << nv.name << "=" << nv.value;
         first = false;
+    }
+}
+
+template <typename valueType>
+void PrintNeuralNetworkPredictorNode(std::ostream& out, const model::Node& node)
+{
+    const ell::nodes::NeuralNetworkPredictorNode<valueType>& predictorNode = dynamic_cast<const ell::nodes::NeuralNetworkPredictorNode<valueType>&>(node);
+    auto predictor = predictorNode.GetPredictor();
+    auto layers = predictor.GetLayers();
+    for (auto ptr = layers.begin(), end = layers.end(); ptr != end; ptr++)
+    {
+        std::shared_ptr<ell::predictors::neural::Layer<valueType>> layer = *ptr;
+        std::string layerName = layer->GetRuntimeTypeName();
+        out << "    " << layerName << "(";
+        PrintLayerParameters(out, *layer);
+        out << ")" << std::endl;
     }
 }
 
@@ -93,17 +110,27 @@ void PrintNode(const model::Node& node, std::ostream& out, bool includeNodeId)
     // model Visit doesn't look inside this node...
     if (nodeType == "NeuralNetworkPredictorNode<float>")
     {
-        const ell::nodes::NeuralNetworkPredictorNode<float>& predictorNode = dynamic_cast<const ell::nodes::NeuralNetworkPredictorNode<float>&>(node);
-        auto predictor = predictorNode.GetPredictor();
-        auto layers = predictor.GetLayers();
-        for (auto ptr = layers.begin(), end = layers.end(); ptr != end; ptr++)
-        {
-            std::shared_ptr<ell::predictors::neural::Layer<float>> layer = *ptr;
-            std::string layerName = layer->GetRuntimeTypeName();
-            out << "    " << layerName << "(";
-            PrintLayerParameters(out, layer);
-            out << ")" << std::endl;
-        }
+        PrintNeuralNetworkPredictorNode<float>(out, node);
+    }
+    if (nodeType == "NeuralNetworkPredictorNode<double>")
+    {
+        PrintNeuralNetworkPredictorNode<double>(out, node);
+    }
+    else if (const ell::nodes::NeuralNetworkLayerNodeBase<float>* layerNode = dynamic_cast<const ell::nodes::NeuralNetworkLayerNodeBase<float>*>(&node))
+    {
+        auto& layer = layerNode->GetBaseLayer();
+        std::string layerName = layer.GetRuntimeTypeName();
+        out << "    " << layerName << "(";
+        PrintLayerParameters(out, layer);
+        out << ")" << std::endl;
+    }
+    else if (const ell::nodes::NeuralNetworkLayerNodeBase<double>* layerNode = dynamic_cast<const ell::nodes::NeuralNetworkLayerNodeBase<double>*>(&node))
+    {
+        auto& layer = layerNode->GetBaseLayer();
+        std::string layerName = layer.GetRuntimeTypeName();
+        out << "    " << layerName << "(";
+        PrintLayerParameters(out, layer);
+        out << ")" << std::endl;
     }
 }
 

@@ -53,7 +53,7 @@ void PrintGraph(const model::Model& model, const std::string& outputFormat, std:
                 std::shared_ptr<ell::predictors::neural::Layer<float>> layer = *ptr;
                 std::string layerName = layer->GetRuntimeTypeName();
                 GraphNode& layerNode = graph.GetOrCreateNode(layerName + "(" + std::to_string(layerId) + ")", layerName);
-                std::vector<NameValue> result = InspectLayerParameters<float>(layer);
+                std::vector<NameValue> result = InspectLayerParameters<float>(*layer);
                 for (auto ptr = result.begin(), end = result.end(); ptr != end; ptr++)
                 {
                     NameValue nv = *ptr;

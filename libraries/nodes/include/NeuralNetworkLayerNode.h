@@ -59,6 +59,9 @@ namespace nodes
         /// <summary> Gets the LayerParameters from the layer wrapped by this node </summary>
         virtual typename predictors::neural::Layer<ValueType>::LayerParameters GetLayerParameters() const = 0;
 
+        /// <summary> Gets the neural network base class Layer from the actual layer wrapped by this node </summary>
+        virtual typename predictors::neural::Layer<ValueType>& GetBaseLayer() const = 0;
+
         /// <summary> Get the input padding requested by the layer </summary>
         predictors::neural::PaddingParameters GetRequestedInputPadding() const { return GetLayerParameters().inputPaddingParameters; }
 
@@ -123,6 +126,9 @@ namespace nodes
 
         /// <summary> Gets the LayerParameters from the layer wrapped by this node </summary>
         typename predictors::neural::Layer<ValueType>::LayerParameters GetLayerParameters() const override { return _layer.GetLayerParameters(); }
+
+        /// <summary> Gets the neural network base class Layer from the actual layer wrapped by this node </summary>
+        typename predictors::neural::Layer<ValueType>& GetBaseLayer() const override { return _layer; }
 
     protected:
         size_t NumInputDimensions() const { return _inputLayout.NumDimensions(); }

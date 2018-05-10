@@ -61,6 +61,8 @@ namespace nodes
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
         bool IsCompilable(const model::MapCompiler* compiler) const override { return true; }
+        
+        using BaseType::GetLayer;
 
     protected:
         template <typename PoolingFunctionT>
@@ -78,7 +80,6 @@ namespace nodes
 
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         using BaseType::HasState;
-        using BaseType::GetLayer;
     };
 }
 }
