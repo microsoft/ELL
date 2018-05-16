@@ -87,6 +87,7 @@ cntk_converter_map = {
     "ReduceElements": (CntkStandardConverter, {}, "Skip"),
     "ReLU": (CntkStandardConverter, {}, "ReLU"),
     "Reshape": CntkReshapeConverter,
+    "Softmax": CntkStandardConverter,
     "Splice": CntkSpliceConverter,
     "UserFunction": CntkUserFunctionConverter,
 }
