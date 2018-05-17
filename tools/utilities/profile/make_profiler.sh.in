@@ -68,7 +68,7 @@ if [ ${target} == 'pi0' ] ; then
     llc_opts=$pi0_llc_opts
 fi
 if [ ${target} == 'host' ] ; then
-    compile_opts="--relocatableObjectCode"
+    compile_opts="--positionIndependentCode"
 fi
 
 echo "Compiling model profilers to ${profiler_directory}"
