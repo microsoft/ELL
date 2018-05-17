@@ -51,10 +51,12 @@ RUN curl -o openmpi-1.10.3.tar.gz -L https://www.open-mpi.org/software/ompi/v1.1
     && cd openmpi-1.10.3 \
     && ./configure --prefix=/usr/local/mpi
 
-WORKDIR /openmpi-1.10.3
-RUN make -j all \
-    && make install
-WORKDIR /
+# Moved to the docker run stage.
+# (running it here can exhaust virtual memory on Travis-CI docker builds)
+# WORKDIR /openmpi-1.10.3
+# RUN make -j all \
+#    && make install
+# WORKDIR /
 
 # LD path to libpython3.6m.so
 RUN echo /opt/conda/lib >> /etc/ld.so.conf.d/conda.conf && \

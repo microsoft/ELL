@@ -2,9 +2,10 @@ sudo: required
 
 services:
   - docker
-  
+
 install:
   - docker build -t microsoft/ell:latest .
 
 script:
-  - docker run -it microsoft/ell:latest /bin/sh -c 'cd /ELL/build; ctest -VV'
+  # hack to install openmpi because docker runs out of memory
+  - docker run -it microsoft/ell:latest /bin/sh -c 'cd /openmpi-1.10.3; make -j all; make install; cd /ELL/build; ctest -VV'
