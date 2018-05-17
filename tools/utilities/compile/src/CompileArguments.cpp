@@ -50,6 +50,13 @@ void ParsedCompileArguments::AddArgs(utilities::CommandLineParser& parser)
         false);
 
     parser.AddOption(
+        relocatableObjectCode,
+        "relocatableObjectCode",
+        "reloc",
+        "Output relocatable object code (requires the --objectCode option)",
+        false);
+
+    parser.AddOption(
         outputSwigInterface,
         "swig",
         "",

@@ -38,6 +38,7 @@ struct CompileArguments
     std::string outputDirectory;
     std::string outputFilenameBase;
     bool verbose = false;
+    bool relocatableObjectCode = false;
 
     // model-generation options
     int maxRefinementIterations = 0;
