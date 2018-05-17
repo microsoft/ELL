@@ -45,6 +45,18 @@ RUN /bin/bash -c "source activate base" \
     && pip install --no-cache-dir --ignore-installed \
           cntk
 
+# OpenMPI
+RUN curl -o openmpi-1.10.3.tar.gz -L https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.3.tar.gz \
+    && tar zxvf openmpi-1.10.3.tar.gz \
+    && cd openmpi-1.10.3 \
+    && ./configure --prefix=/usr/local/mpi \
+    && make -j all \
+    && make install
+
+# LD path to libpython3.6m.so
+RUN echo /opt/conda/lib >> /etc/ld.so.conf.d/conda.conf && \
+    ldconfig
+
 # ELL
 RUN git clone https://github.com/Microsoft/ELL.git \
     && cd ELL \
