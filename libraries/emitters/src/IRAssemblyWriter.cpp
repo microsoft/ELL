@@ -137,7 +137,7 @@ namespace emitters
         targetOptions.MCOptions.AsmVerbose = ellOptions.verboseOutput;
         targetOptions.FloatABIType = ellOptions.floatABI;
 
-        llvm::Reloc::Model relocModel = llvm::Reloc::Static;
+        llvm::Reloc::Model relocModel = ellOptions.relocModel;
         llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
 
         std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(module.getTargetTriple(),

@@ -56,6 +56,7 @@ if [ ${next_opt:0:1} != '-' ] ; then
 fi
 
 # Platform-specific options
+compile_opts=""
 generic_llc_opts="-relocation-model=pic"
 pi3_llc_opts="-relocation-model=pic -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53"
 pi0_llc_opts="-relocation-model=pic -mtriple=arm-linux-gnueabihf -mcpu=arm1176jzf-s"
@@ -66,11 +67,14 @@ fi
 if [ ${target} == 'pi0' ] ; then
     llc_opts=$pi0_llc_opts
 fi
+if [ ${target} == 'host' ] ; then
+    compile_opts="--positionIndependentCode"
+fi
 
 echo "Compiling model profilers to ${profiler_directory}"
 mkdir -p $profiler_directory
-@COMPILE_EXECUTABLE@ $model_option $model_file --profile --ir --objectCode --header -od $profiler_directory -ob compiled_model $@
-@COMPILE_EXECUTABLE@ $model_option $model_file --ir --objectCode --header -od $profiler_directory -ob compiled_model_noprofile $@
+@COMPILE_EXECUTABLE@ $model_option $model_file --profile --ir --objectCode $compile_opts --header -od $profiler_directory -ob compiled_model $@
+@COMPILE_EXECUTABLE@ $model_option $model_file --ir --objectCode $compile_opts --header -od $profiler_directory -ob compiled_model_noprofile $@
 
 cd $profiler_directory
 @OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3 -S
