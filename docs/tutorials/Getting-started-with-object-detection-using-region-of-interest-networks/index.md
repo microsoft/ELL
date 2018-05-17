@@ -222,7 +222,7 @@ that it can be provided as input to the model.
             image, input_shape.columns, input_shape.rows, reorder_to_rgb=True,
             ravel=False)
 
-        input_data = resized_image.astype(np.float32).ravel()
+        input_data = image.astype(np.float32).ravel()
 ```
 
 Send the processed image to the model to get a `numpy` array of predictions.
