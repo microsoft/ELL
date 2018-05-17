@@ -115,6 +115,11 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
         common::SaveMap(map, baseFilename + "_refined.map");
     }
 
+    if (compileArguments.objectCode && compileArguments.positionIndependentCode)
+    {
+        settings.compilerSettings.positionIndependentCode = true;
+    }
+
     model::IRMapCompiler compiler(settings);
     TimingOutputCollector timer(timingOutput, "Time to compile map", compileArguments.verbose);
     auto compiledMap = compiler.Compile(map);
@@ -150,12 +155,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
         if (compileArguments.outputObjectCode)
         {
             TimingOutputCollector timer(timingOutput, "Time to save object code", compileArguments.verbose);
-            emitters::MachineCodeOutputOptions mcOptions;
-            if (compileArguments.relocatableObjectCode)
-            {
-                mcOptions.relocModel = emitters::OutputRelocationModel::PIC_;
-            }
-            compiledMap.WriteCode(baseFilename + ".o", emitters::ModuleOutputFormat::objectCode, mcOptions);
+            compiledMap.WriteCode(baseFilename + ".o", emitters::ModuleOutputFormat::objectCode;
         }
     }
     if (compileArguments.outputSwigInterface)
