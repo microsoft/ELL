@@ -203,6 +203,7 @@ namespace common
         settings.optimizerSettings.preferredConvolutionMethod = convolutionMethod;
         settings.profile = profile;
         settings.compilerSettings.profile = profile;
+        settings.compilerSettings.positionIndependentCode = positionIndependentCode;
 
         if (target != "")
         {

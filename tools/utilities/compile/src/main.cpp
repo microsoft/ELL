@@ -115,11 +115,6 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
         common::SaveMap(map, baseFilename + "_refined.map");
     }
 
-    if (compileArguments.objectCode && compileArguments.positionIndependentCode)
-    {
-        settings.compilerSettings.positionIndependentCode = true;
-    }
-
     model::IRMapCompiler compiler(settings);
     TimingOutputCollector timer(timingOutput, "Time to compile map", compileArguments.verbose);
     auto compiledMap = compiler.Compile(map);
