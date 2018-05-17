@@ -1,0 +1,10 @@
+sudo: required
+
+services:
+  - docker
+  
+install:
+  - docker build -t microsoft/ell:latest .
+
+script:
+  - docker run -it microsoft/ell:latest /bin/sh -c 'cd /ELL/build; ctest -VV'
