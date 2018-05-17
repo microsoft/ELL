@@ -220,8 +220,8 @@ while True:
     if feature_data is None:
         break
     else:
-        prediction, probablity, label = predictor.predict(feature_data)
-        if probablity is not None:          
+        prediction, probability, label = predictor.predict(feature_data)
+        if probability is not None:
             percent = int(100 * probability)
             print("<<< DETECTED ({}) {}% {} >>>".format(prediction, percent, label))
 ```
