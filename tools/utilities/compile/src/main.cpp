@@ -151,8 +151,11 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
         {
             TimingOutputCollector timer(timingOutput, "Time to save object code", compileArguments.verbose);
             emitters::MachineCodeOutputOptions mcOptions;
-            mcOptions.relocModel = compileArguments.relocatableObjectCode;
-            compiledMap.WriteCode(baseFilename + ".o", emitters::ModuleOutputFormat::objectCode, mcOptions;
+            if (compileArguments.relocatableObjectCode)
+            {
+                mcOptions.relocModel = emitters::OutputRelocationModel::PIC_;
+            }
+            compiledMap.WriteCode(baseFilename + ".o", emitters::ModuleOutputFormat::objectCode, mcOptions);
         }
     }
     if (compileArguments.outputSwigInterface)
