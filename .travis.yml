@@ -4,7 +4,9 @@ services:
   - docker
 
 install:
-  - docker build -t microsoft/ell:latest .
+  - export TRAVIS_REPO_OWNER=${TRAVIS_REPO_SLUG%/*}
+  - export TRAVIS_REPO_NAME=${TRAVIS_REPO_SLUG#*/}
+  - docker build -t microsoft/ell:latest --build-arg branch=$TRAVIS_PULL_REQUEST_BRANCH https://github.com/$TRAVIS_REPO_OWNER/ELL.git.
 
 script:
   # hack to install openmpi because docker runs out of memory

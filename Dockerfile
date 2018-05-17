@@ -1,6 +1,8 @@
 # Dockerfile for an Ubuntu environment for ELL
-
 FROM continuumio/miniconda3:latest
+
+ARG branch=master
+ARG repo=https://github.com/Microsoft/ELL.git
 
 RUN apt-get update \
     && apt-get install -y \
@@ -63,7 +65,7 @@ RUN echo /opt/conda/lib >> /etc/ld.so.conf.d/conda.conf && \
     ldconfig
 
 # ELL
-RUN git clone https://github.com/Microsoft/ELL.git \
+RUN git clone -b $branch $repo \
     && cd ELL \
     && mkdir -p build \
     && cd build \
