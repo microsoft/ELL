@@ -49,9 +49,12 @@ RUN /bin/bash -c "source activate base" \
 RUN curl -o openmpi-1.10.3.tar.gz -L https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.3.tar.gz \
     && tar zxvf openmpi-1.10.3.tar.gz \
     && cd openmpi-1.10.3 \
-    && ./configure --prefix=/usr/local/mpi \
-    && make -j all \
+    && ./configure --prefix=/usr/local/mpi
+
+WORKDIR /openmpi-1.10.3
+RUN make -j all \
     && make install
+WORKDIR /
 
 # LD path to libpython3.6m.so
 RUN echo /opt/conda/lib >> /etc/ld.so.conf.d/conda.conf && \
