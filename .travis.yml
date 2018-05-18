@@ -4,13 +4,8 @@ services:
   - docker
 
 install:
-  - export TRAVIS_REPO_OWNER=${TRAVIS_REPO_SLUG%/*}
-  - export TRAVIS_REPO_NAME=${TRAVIS_REPO_SLUG#*/}
-  - export REPO=https://github.com/$TRAVIS_REPO_OWNER/ELL.git
-  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
-  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"  
-  - docker build -t microsoft/ell:latest --build-arg branch=$BRANCH --build-arg repo=$REPO .
+  - export DOCKERHUB_ACCOUNT=lisaong
+  - docker pull $DOCKERHUB_ACCOUNT/ell-build:latest
 
 script:
-  # hack to install openmpi because docker runs out of memory
-  - docker run -it microsoft/ell:latest /bin/sh -c 'cd /openmpi-1.10.3; make -j all; make install; cd /ELL/build; ctest -VV'
+  - docker run -v $TRAVIS_BUILD_DIR:/ELL -it $DOCKERHUB_ACCOUNT/ell-build:latest /bin/sh -c 'cd /ELL; ./build.sh build 1; cd build; ctest -VV'
