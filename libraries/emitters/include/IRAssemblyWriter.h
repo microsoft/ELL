@@ -32,6 +32,9 @@ namespace emitters
     /// <summary> An enum containing the type of output to generate {CGFT_AssemblyFile, CGFT_ObjectFile, CGFT_Null} </summary>
     typedef llvm::TargetMachine::CodeGenFileType OutputFileType;
 
+    /// <summary> An enum containing the relocation model of the LLVM machine code output {Static, PIC_, DynamicNoPIC, ROPI, RWPI, ROPI_RWPI} </summary>
+    typedef llvm::Reloc::Model OutputRelocationModel;
+
     /// <summary> Options for LLVM machine code output (assembly or object code) </summary>
     struct MachineCodeOutputOptions
     {
@@ -43,6 +46,7 @@ namespace emitters
         OptimizationLevel optimizationLevel = OptimizationLevel::Default;
         FloatABIType floatABI = FloatABIType::Default;
         FloatFusionMode floatFusionMode = FloatFusionMode::Standard;
+        OutputRelocationModel relocModel = OutputRelocationModel::Static;
     };
 
     /// <summary> Indicates if the requested output type is binary or text </summary>

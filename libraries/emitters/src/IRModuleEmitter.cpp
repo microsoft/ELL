@@ -795,6 +795,10 @@ namespace emitters
         {
             options.optimizationLevel = OptimizationLevel::Aggressive;
         }
+        if (compilerOptions.positionIndependentCode)
+        {
+            options.relocModel = OutputRelocationModel::PIC_;
+        }
         // Other params to possibly set:
         //   bool verboseOutput = false;
         //   bool verifyModule = false;
