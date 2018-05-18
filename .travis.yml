@@ -8,4 +8,4 @@ install:
   - docker pull $DOCKERHUB_ACCOUNT/ell-build:latest
 
 script:
-  - docker run -it $DOCKERHUB_ACCOUNT/ell-build:latest -v $TRAVIS_BUILD_DIR:/ELL /bin/sh -c 'cd /ELL; ./build.sh; cd build; ctest -VV'
+  - docker run -v $TRAVIS_BUILD_DIR:/ELL -it $DOCKERHUB_ACCOUNT/ell-build:latest /bin/sh -c 'cd /ELL; ./build.sh; cd build; ctest -VV'
