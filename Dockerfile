@@ -1,13 +1,9 @@
-# Dockerfile for an Ubuntu environment for ELL
+# Dockerfile for an Ubuntu environment for ELL for Continuous Integration
 FROM continuumio/miniconda3:latest
-
-ARG branch=master
-ARG repo=https://github.com/Microsoft/ELL.git
 
 RUN apt-get update \
     && apt-get install -y \
       build-essential \
-      cmake \
       curl \
       gcc \
       git \
@@ -51,24 +47,16 @@ RUN /bin/bash -c "source activate base" \
 RUN curl -o openmpi-1.10.3.tar.gz -L https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.3.tar.gz \
     && tar zxvf openmpi-1.10.3.tar.gz \
     && cd openmpi-1.10.3 \
-    && ./configure --prefix=/usr/local/mpi
-
-# Moved to the docker run stage.
-# (running it here can exhaust virtual memory on Travis-CI docker builds)
-# WORKDIR /openmpi-1.10.3
-# RUN make -j all \
-#    && make install
-# WORKDIR /
+    && ./configure --prefix=/usr/local/mpi \
+    && make -j all \
+    && make install
 
 # LD path to libpython3.6m.so
 RUN echo /opt/conda/lib >> /etc/ld.so.conf.d/conda.conf && \
     ldconfig
 
-# ELL
-RUN git clone -b $branch $repo \
-    && cd ELL \
-    && mkdir -p build \
-    && cd build \
-    && cmake .. \
-    && make \
-    && make _ELL_python
+# cmake
+RUN curl -o cmake-3.11.2-Linux-x86_64.sh -L https://cmake.org/files/v3.11/cmake-3.11.2-Linux-x86_64.sh \
+    && chmod +x cmake-3.11.2-Linux-x86_64.sh \
+    && ./cmake-3.11.2-Linux-x86_64.sh --skip-license \
+    &&  ln -s /opt/cmake-3.11.2-Linux-x86_64/bin/* /usr/local/bin
