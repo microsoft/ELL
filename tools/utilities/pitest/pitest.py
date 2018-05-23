@@ -9,10 +9,11 @@
 ##
 ####################################################################################################
 import argparse
-import drivetest
 import sys
 import unittest
 import logging
+
+import drivetest
 
 # Try to import CNTK and ELL. If either don't exist it means they have not
 # being built, so don't run the tests.

@@ -28,7 +28,7 @@ cd build
 cmake .. -DRPI_CLUSTER=%RPI_CLUSTER% -DRPI_PASSWORD=%PASSWORD% -DRPI_KEY=%KEY%
 if ERRORLEVEL 1 exit /B 1
 
-ctest . --build-config release -VV
+ctest . --build-config release -R pitest_test -VV
 if ERRORLEVEL 1 exit /B 1
 goto :eof
 

@@ -13,11 +13,15 @@ from dateutil.parser import parse
 import json
 import os
 import random
+import re
 import requests
 import socket
 import time
 import uuid
 import platform
+
+import cpuinfo
+import logger
 
 class PiBoardEntity(): 
     def __init__(self, values = None):
@@ -34,6 +38,9 @@ class PiBoardEntity():
             self.last_heartbeat = ""
             self.lock_key = ""
             self.comment = ""
+            self.hostname = ""
+            self.temperature = ""
+            self.system_load = ""
             self.alive = False
 
     def load(self, values) :        
@@ -47,6 +54,9 @@ class PiBoardEntity():
         self.last_heartbeat = self.getValue(values ,'LastHeartbeat')
         self.lock_key = self.getValue(values ,'LockKey')
         self.comment = self.getValue(values ,'Comment')
+        self.hostname = self.getValue(values ,'HostName')
+        self.temperature = self.getValue(values ,'Temperature')
+        self.system_load = self.getValue(values ,'SystemLoad')
         self.alive = self.getValue(values ,'IsAlive')
 
     def getValue(self, d, name):
@@ -59,20 +69,23 @@ class PiBoardEntity():
         self.load(values)
 
     def serialize(self):
-        
         self.os_name = platform.platform()
         self.os_version = platform.version()
         
         return json.dumps({'IpAddress': self.ip_address, "Platform": self.platform,
                             'OsName': self.os_name, 'OsVersion': self.os_version, 
                             'CurrentTaskName': self.current_task_name, 'CurrentUserName': self.current_user_name,
-                            'Command':self.command, "LockKey": self.lock_key, "Comment": self.comment, "ApiKey": self.apikey })
+                            'Command': self.command, "LockKey": self.lock_key, "Comment": self.comment, 
+                            'HostName': self.hostname, 'Temperature': self.temperature, 'SystemLoad': self.system_load,
+                            "ApiKey": self.apikey })
 
 class PiBoardTable:
     def __init__(self, endpoint, apikey, username = None):
         self.endpoint = endpoint
         self.username = username
-        self.apikey = apikey
+        self.apikey = apikey     
+        self.ci = None
+        self.logger = logger.get()
         if self.username is None:
             self.username = self.get_user_name()
 
@@ -89,11 +102,20 @@ class PiBoardTable:
         return None
 
     def update(self, entity):
+        # heartbeats from monitor.py should include platform info.        
+        if not self.ci:
+            self.ci = cpuinfo.CpuInfo()
+        entity.platform = self.ci.platform
         self.send(entity, "update")
 
     def get(self, id):
         r = requests.get("{}?id={}".format(self.endpoint, id))
-        e = json.loads(r.text)
+        try:
+            e = json.loads(r.text)
+        except:
+            self.logger.info("### Error parsing response: {}".format(r.text))
+            sys.exit(1)
+
         if len(e) > 0:
             e = e[0]
             if isinstance(e, dict):
@@ -160,20 +182,23 @@ class PiBoardTable:
 
     def get_user_name(self):
         name = os.getenv('USERNAME')
-        if name == "":
+        if not name:
             name = os.getenv('USER')
         if name == "pi":
             name += "_" + self.get_local_ip()        
         return name
 
-    def wait_for_free_machine(self, jobName, reAddress=None):
-        """ find a free machine on the cluster, optionally matching the given regex pattern on ipaddress"""
+    def wait_for_free_machine(self, jobName, reAddress=None, rePlatform=None):
+        """ find a free machine on the cluster, optionally matching the given regex pattern on ip address or platform"""
         while True:
+            self.logger.info("Waiting for a free machine")
             machines = self.get_all()
             random.shuffle(machines)
             for e in machines:
                 try:
-                    if not reAddress or re.match(reAddress, e.ip_address):
+                    self.logger.info("Trying to lock machine " + str(e.ip_address))
+                    if ((not reAddress or re.match(reAddress, e.ip_address)) and 
+                       (not rePlatform or re.match(rePlatform, e.platform))):
                         if e.alive and e.command != 'Lock':
                             result = self.lock(e.ip_address, jobName)
                             # no exception, so we got it
@@ -181,5 +206,30 @@ class PiBoardTable:
                 except:
                     pass
 
-            print("All machines are busy, sleeping 10 seconds and trying again...")
+            self.logger.info("All machines are busy, sleeping 10 seconds and trying again...")
             time.sleep(10)
+
+    def get_matching_machines(self, patterns):
+        if not patterns:
+            patterns = [ ".*" ]
+        result = []
+        machines = self.get_all()
+        for r in patterns:
+            matched = False
+            for e in machines:
+                matches = False
+                ip = e.ip_address
+                if r == ip:
+                    matches = True
+                    matched = True
+                elif "?" in r or "*" in r:
+                    m = re.match(r, ip)
+                    if m and m.span(0)[1] == len(ip):   
+                        matches = True
+                        matched = True
+                if matches and not e in result:
+                    result += [e]
+                    matches = False
+            if not matched:
+                self.logger.info("nothing matching expression {}".format(r))          
+        return result
