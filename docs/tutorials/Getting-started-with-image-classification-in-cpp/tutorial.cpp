@@ -13,6 +13,9 @@
 #include <opencv2/opencv.hpp>
 
 // Include the model interface file for the compiled ELL model
+// Note: the "<modelname>_MAIN" preprocessor symbol must be defined in exactly one source file
+//       that includes the model interface file. This is typically the file that defines "main()"
+#define model_MAIN
 #include "model.h"
 
 // Include helper functions

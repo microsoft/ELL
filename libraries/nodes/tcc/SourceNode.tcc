@@ -33,6 +33,13 @@ namespace nodes
     }
 
     template <typename ValueType>
+    void SourceNode<ValueType>::SetInput(std::vector<ValueType> inputValues)
+    {
+        assert(_bufferedSample.size() == inputValues.size());
+        _bufferedSample = inputValues;
+    }
+
+    template <typename ValueType>
     void SourceNode<ValueType>::Compute() const
     {
         auto sampleTime = _input.GetValue(0);

@@ -117,6 +117,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
 
     model::IRMapCompiler compiler(settings);
     TimingOutputCollector timer(timingOutput, "Time to compile map", compileArguments.verbose);
+
     auto compiledMap = compiler.Compile(map);
     timer.Stop();
 

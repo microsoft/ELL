@@ -8,12 +8,14 @@ set (tool_name profile)
 set (src 
   src/ProfileArguments.cpp
   src/ProfileReport.cpp
+  src/ReplaceSourceAndSinkNodesPass.cpp
   src/main.cpp
   )
   
   set (include 
   include/ProfileArguments.h
   include/ProfileReport.h
+  include/ReplaceSourceAndSinkNodesPass.h
 )
 
 source_group("src" FILES ${src})

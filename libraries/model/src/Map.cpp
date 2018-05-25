@@ -167,6 +167,13 @@ namespace model
         _inputNodeMap.insert({ inputName, inputNode });
     }
 
+    void Map::RemoveInputs()
+    {
+        _inputNodes.clear();
+        _inputNames.clear();
+        _inputNodeMap.clear();
+    }
+    
     void Map::AddOutput(const std::string& outputName, PortElementsBase outputElements)
     {
         _outputElements.push_back(outputElements);

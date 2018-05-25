@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // compiled model
+#define ELL_MAIN
 #include "compiled_model_noprofile.h"
 
 // stl
@@ -53,11 +54,19 @@ void RunModel(const ProfileArguments& profileArguments)
     std::vector<InputType> input(inputSize);
     std::vector<OutputType> output(outputSize);
 
+    #ifdef ELL_WRAPPER_CLASS
+    ELL_PredictWrapper wrapper;
+    #endif
+
     // Evaluate the model in a loop
     for (int iter = 0; iter < profileArguments.numIterations; ++iter)
     {
         // Exercise the model
+#ifdef ELL_WRAPPER_CLASS
+        wrapper.Predict(input, output);
+#else
         ELL_Predict(nullptr, input.data(), output.data());
+#endif
     }
 }
 

@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // compiled model
+#define ELL_MAIN
 #include "compiled_model.h"
 #include "ProfileReport.h"
 
@@ -124,10 +125,18 @@ void ProfileModel(const ProfileArguments& profileArguments)
     std::vector<InputType> input(inputSize);
     std::vector<OutputType> output(outputSize);
 
+    #ifdef ELL_WRAPPER_CLASS
+    ELL_PredictWrapper wrapper;
+    #endif
+
     // Warm up the system by evaluating the model some number of times
     for (int iter = 0; iter < profileArguments.numWarmUpIterations; ++iter)
     {
+#ifdef ELL_WRAPPER_CLASS
+        wrapper.Predict(input, output);
+#else
         ELL_Predict(nullptr, input.data(), output.data());
+#endif
     }
     ResetProfilingInfo();
 
@@ -135,7 +144,11 @@ void ProfileModel(const ProfileArguments& profileArguments)
     for (int iter = 0; iter < profileArguments.numIterations; ++iter)
     {
         // Exercise the model
+#ifdef ELL_WRAPPER_CLASS
+        wrapper.Predict(input, output);
+#else
         ELL_Predict(nullptr, input.data(), output.data());
+#endif
     }
 
     auto format = profileArguments.outputFormat;

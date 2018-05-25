@@ -1,6 +1,8 @@
 u8R"(#include <string.h>
 #include <vector>
 
+#define @@MODULE@@_WRAPPER_CLASS
+
 class @@MODULE@@_PredictWrapper
 {
 public:
@@ -18,7 +20,7 @@ public:
         return @@MODULE@@_GetInputSize();
     }
     
-    TensorShape GetoutputShape() const
+    TensorShape GetOutputShape() const
     {
         TensorShape outputShape;
         @@MODULE@@_GetOutputShape(0, &outputShape);
@@ -35,7 +37,6 @@ public:
         ::memcpy(buffer, _input, @@MODULE@@_GetInputSize() * sizeof(@@SOURCE_TYPE@@));
         return 1;
     }
-
     void @@SINK_CALLBACK@@(@@SINK_TYPE@@* buffer)
     {
         ::memcpy(_output, buffer, @@MODULE@@_GetOutputSize() * sizeof(@@SINK_TYPE@@));
@@ -54,19 +55,21 @@ private:
 };
 
 
+#ifdef @@MODULE@@_MAIN
 extern "C"
 {
-int8_t @@MODULE@@_InputCallback(void* context, @@SOURCE_TYPE@@* input)
-{
-    auto predictor = reinterpret_cast<@@MODULE@@_PredictWrapper*>(context);
-    return predictor->@@SOURCE_CALLBACK@@(input);
-}
+    int8_t @@MODULE@@_InputCallback(void* context, @@SOURCE_TYPE@@* input)
+    {
+        auto predictor = reinterpret_cast<@@MODULE@@_PredictWrapper*>(context);
+        return predictor->@@SOURCE_CALLBACK@@(input);
+    }
 
-void @@MODULE@@_OutputCallback(void* context, @@SINK_TYPE@@* output)
-{
-    auto predictor = reinterpret_cast<@@MODULE@@_PredictWrapper*>(context);
-    predictor->@@SINK_CALLBACK@@(output);
-}
+    void @@MODULE@@_OutputCallback(void* context, @@SINK_TYPE@@* output)
+    {
+        auto predictor = reinterpret_cast<@@MODULE@@_PredictWrapper*>(context);
+        predictor->@@SINK_CALLBACK@@(output);
+    }
 } // extern "C"
+#endif
 
 )"

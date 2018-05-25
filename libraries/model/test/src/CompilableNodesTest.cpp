@@ -922,8 +922,8 @@ void Test_CompiledSinkNode_OutputCallback_Vector(void* context, double* output)
     assert(g_sinkOutputSize > 1);
     outputValues.assign(output, output + g_sinkOutputSize); // assign reallocates as needed
 }
-}
 TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Vector, void, void*, double*);
+}
 
 void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionName, bool triggerValue)
 {

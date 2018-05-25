@@ -220,8 +220,10 @@ namespace emitters
 
         // Header comment
         std::string moduleName = pModule->getName();
-        os << "//\n// ELL header for module " << moduleName << "\n//\n\n";
-
+        os << "//\n";
+        os << "// ELL header for module " << moduleName << "\n";
+        os << "//\n\n";
+        os << "#pragma once\n\n";
         os << "#include <stdint.h>\n\n";
 
         {
@@ -279,7 +281,7 @@ namespace emitters
         auto callbacks = GetFunctionsWithTag(moduleEmitter, c_callbackFunctionTagName);
         if (!callbacks.empty())
         {
-            // If callbacks are part of the module, write the predict wrapper
+            // If callbacks are part of the module, write the callback-based predict wrapper
 
             // (Note: newlines are part of the syntax for #include)
             // clang-format off
@@ -287,14 +289,14 @@ namespace emitters
                 #include "CppPredictWrapper.in"
             );
             // clang-format on
-
+            
             ReplaceDelimiter(predictWrapperCode, "MODULE", moduleEmitter.GetLLVMModule()->getName());
 
             auto predictFunctions = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
             ReplaceDelimiter(predictWrapperCode, "FUNCTION", predictFunctions[0].function->getName());
 
             ModuleCallbackDefinitions moduleCallbacks(callbacks);
-            if (moduleCallbacks.sources.size() > 0) 
+            if (moduleCallbacks.sources.size() > 0)
             {
                 ReplaceDelimiter(predictWrapperCode, "SOURCE_TYPE", moduleCallbacks.sources[0].inputType);
                 ReplaceDelimiter(predictWrapperCode, "SOURCE_CALLBACK", moduleCallbacks.sources[0].functionName);
@@ -302,9 +304,9 @@ namespace emitters
             else
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    "SourceNode callback is missing");
+                                                "SourceNode callback is missing");
             }
-
+            
             if (moduleCallbacks.sinks.size() > 0)
             {
                 ReplaceDelimiter(predictWrapperCode, "SINK_TYPE", moduleCallbacks.sinks[0].inputType);
@@ -313,7 +315,7 @@ namespace emitters
             else
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    "SinkNode callback is missing");
+                                                "SinkNode callback is missing");
             }
             os << predictWrapperCode << "\n";
         }

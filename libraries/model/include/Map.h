@@ -342,6 +342,9 @@ namespace model
         /// <param name="inputNode"> The input node. </param>
         void AddInput(const std::string& inputName, InputNodeBase* inputNode);
 
+        /// <summary> Removes the inputs from the map. </summary>
+        void RemoveInputs();
+
         /// <summary> Adds the given output node to the map. </summary>
         ///
         /// <param name="outputName"> Name of the output. </param>

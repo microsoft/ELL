@@ -94,6 +94,11 @@ namespace nodes
         /// <param name="function"> The source function to set. </param>
         void SetSourceFunction(SourceFunction<ValueType> function) { _source = function; }
 
+        /// <summary> Sets the value output by this node </summary>
+        ///
+        /// <param name="inputValues"> The values for this node to output </param>
+        void SetInput(std::vector<ValueType> inputValues);
+
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
