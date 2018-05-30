@@ -38,6 +38,7 @@ namespace emitters
         bool useThreadPool = true;
         int maxThreads = 4;
         bool debug = false;
+        bool positionIndependentCode = false;
 
         TargetDevice targetDevice;
     };
