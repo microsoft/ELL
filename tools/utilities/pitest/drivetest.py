@@ -68,6 +68,9 @@ class DriveTest:
         self.test = test
         self.verbose = verbose
         self.logger = logger.get()
+        self.rePlatform = "ARMv7.*"
+        if target == "pi0":
+            self.rePlatform = "ARMv6.*"
         if timeout:
             self.timeout = int(timeout)
         else:
@@ -132,7 +135,7 @@ class DriveTest:
                 self.logger.info("Locked requested machine at " + self.machine.ip_address)
             else:
                 # No specific machine requested, find a free machine
-                self.machine = self.cluster.wait_for_free_machine(task, rePlatform="ARMv7")
+                self.machine = self.cluster.wait_for_free_machine(task, rePlatform=self.rePlatform)
                 self.logger.info("Locked machine at " + self.machine.ip_address)
 
             # if any of the above fails, this line should throw

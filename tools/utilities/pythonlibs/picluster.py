@@ -79,6 +79,24 @@ class PiBoardEntity():
                             'HostName': self.hostname, 'Temperature': self.temperature, 'SystemLoad': self.system_load,
                             "ApiKey": self.apikey })
 
+    def matches(self, field_name, pattern):
+        if pattern is None or pattern == []:
+            return True
+        value = getattr(self, field_name)
+        if value is None:
+            value = ""
+        if isinstance(pattern, list):
+            for p in pattern:
+                m = re.match(p, value)
+                # make sure pattern matches the entire value.
+                if m and m.span(0)[1] == len(value):
+                    return True
+        else:
+            m = re.match(pattern, value)
+            if m and m.span(0)[1] == len(value):
+                return True
+        return False
+
 class PiBoardTable:
     def __init__(self, endpoint, apikey, username = None):
         self.endpoint = endpoint
@@ -192,44 +210,29 @@ class PiBoardTable:
         """ find a free machine on the cluster, optionally matching the given regex pattern on ip address or platform"""
         while True:
             self.logger.info("Waiting for a free machine")
-            machines = self.get_all()
+            machines = self.get_matching_machines(reAddress, rePlatform)
             random.shuffle(machines)
             for e in machines:
                 try:
                     self.logger.info("Trying to lock machine " + str(e.ip_address))
-                    if ((not reAddress or re.match(reAddress, e.ip_address)) and 
-                       (not rePlatform or re.match(rePlatform, e.platform))):
-                        if e.alive and e.command != 'Lock':
-                            result = self.lock(e.ip_address, jobName)
-                            # no exception, so we got it
-                            return result
+                    if e.alive and e.command != 'Lock':
+                        result = self.lock(e.ip_address, jobName)
+                        # no exception, so we got it
+                        return result
                 except:
                     pass
 
             self.logger.info("All machines are busy, sleeping 10 seconds and trying again...")
             time.sleep(10)
 
-    def get_matching_machines(self, patterns):
-        if not patterns:
-            patterns = [ ".*" ]
-        result = []
+    def get_matching_machines(self, reAddress=None, rePlatform=None):
         machines = self.get_all()
-        for r in patterns:
-            matched = False
-            for e in machines:
-                matches = False
-                ip = e.ip_address
-                if r == ip:
-                    matches = True
-                    matched = True
-                elif "?" in r or "*" in r:
-                    m = re.match(r, ip)
-                    if m and m.span(0)[1] == len(ip):   
-                        matches = True
-                        matched = True
-                if matches and not e in result:
-                    result += [e]
-                    matches = False
-            if not matched:
-                self.logger.info("nothing matching expression {}".format(r))          
+        result = []
+        for e in machines:
+            platform_ok = e.matches("platform", rePlatform)
+            address_ok = e.matches("ip_address", reAddress)
+            if address_ok and platform_ok:
+                result += [e]
+        if result == [] and len(machines) > 0:
+            self.logger.info("nothing matching ip_address '{}' and platform '{}'".format(reAddress, rePlatform))          
         return result

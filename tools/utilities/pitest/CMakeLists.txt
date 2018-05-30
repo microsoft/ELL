@@ -24,7 +24,8 @@ if(${PYTHON_ENABLED})
         add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${test_src} 
                                             --cluster ${RPI_CLUSTER} 
                                             --password ${RPI_PASSWORD}
-                                            --key ${RPI_KEY})
+                                            --key ${RPI_KEY}
+                                            --target ${RPI_TARGET})
     endif(RPI_CLUSTER)
 
 endif()  # PYTHON_ENABLED
