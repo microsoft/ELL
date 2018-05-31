@@ -1,5 +1,5 @@
 #
-# CMake file for Raspberry Pi test tools
+# CMake file for Raspberry Pi tests
 #
 
 if(${PYTHON_ENABLED})
@@ -24,8 +24,7 @@ if(${PYTHON_ENABLED})
         add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${test_src} 
                                             --cluster ${RPI_CLUSTER} 
                                             --password ${RPI_PASSWORD}
-                                            --key ${RPI_KEY}
-                                            --target ${RPI_TARGET})
+                                            --key ${RPI_KEY})
     endif(RPI_CLUSTER)
 
 endif()  # PYTHON_ENABLED
