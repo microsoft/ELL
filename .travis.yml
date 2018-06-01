@@ -1,0 +1,11 @@
+sudo: required
+
+services:
+  - docker
+
+install:
+  - export DOCKERHUB_ACCOUNT=lisaong
+  - docker pull $DOCKERHUB_ACCOUNT/ell-build:latest
+
+script:
+  - docker run -v $TRAVIS_BUILD_DIR:/ELL -it $DOCKERHUB_ACCOUNT/ell-build:latest /bin/sh -c 'cd /ELL; ./build.sh; cd build; ctest -VV'
