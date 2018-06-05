@@ -5,6 +5,7 @@
 #  Authors:  Chris Lovett
 #            Byron Changuion
 #            Kern Handa
+#            Chuck Jacobs
 #
 #  Requires: Python 3.x
 #
@@ -33,6 +34,12 @@ if platform.system() == "Windows":
     sys.path += [os.path.join(d, "build", "Release") for d in SEARCH_DIRS]
 else:
     sys.path += [os.path.join(d, "build") for d in SEARCH_DIRS]
+
+
+def set_camera_resolution(camera, width, height):
+    """ set the resolution of the OpenCV camera object """
+    camera.set(3, width)
+    camera.set(4, height)
 
 
 def prepare_image_for_model(
@@ -71,7 +78,7 @@ def prepare_image_for_model(
         # Return as a vector of floats
         result = resized.astype(np.float).ravel()
         return result
-    return resized
+    return resized, (col_start, row_start), (cropped.shape[1] / width, cropped.shape[0] / height)
 
 
 def get_top_n(predictions, n=5, threshold=0.20):
@@ -280,7 +287,7 @@ class Region:
 
         `location` - An array representing the bounding box encompassing the
         detected object. First two values are the x and y coordinates
-        representing the center of the bounding box, respectively. Second pair
+        representing the top, left of the bounding box, respectively. Second pair
         of values are the width and height of the bounding box, respectively.
         All values are normalized and thus need to be scaled accordingly by the
         dimensions of the image onto which the bounding box is to be applied.
@@ -295,6 +302,18 @@ class Region:
                 'probability = {0.probability},\n'
                 'location = {0.location})').format(self)
 
+    def intersect(self, region):
+        """ return the intersection between this region and the given region """
+        x1, y1, w1, h1 = self.location
+        x2, y2 = (x1 + w1, y1 + h1)
+        x3, y3, w2, h2 = region.location
+        x4, y4 = (x3 + w2, y3 + h2)
+        x1, y1 = np.maximum((x1, y1), (x3, y3))
+        x2, y2 = np.minimum((x2, y2), (x4, y4))
+        if x2 <= x1 or y2 <= y1:
+            return (0, 0, 0, 0)
+        return (x1, y1, x2 - x1, y2 - y1)
+            
 
 def get_regions(inference_output, categories, threshold, anchor_boxes):
     """Returns an array of Region instances that represent detected objects
@@ -357,7 +376,7 @@ def get_regions(inference_output, categories, threshold, anchor_boxes):
         # greater than the threshold
         if probability > threshold:
             regions.append(Region(categories[category_index], probability,
-                                  (x, y, w, h)))
+                                  (x - (w/2), y - (h/2), w, h)))
     return regions
 
 
@@ -386,15 +405,9 @@ def non_max_suppression(regions, overlap_threshold, categories):
 
         # Get all the boxes that represent the object in question
         boxes = np.array([region.location for region in filtered_regions])
-        w_half = (boxes[:, 2] / 2)
-        h_half = (boxes[:, 3] / 2)
-        x1 = boxes[:, 0] - w_half
-        y1 = boxes[:, 1] - h_half
-        x2 = boxes[:, 0] + w_half
-        y2 = boxes[:, 1] + h_half
 
         # Calculate the areas once
-        areas = (boxes[:, 2] + 1) * (boxes[:, 3] + 1)
+        areas = boxes[:, 2] * boxes[:, 3]
 
         # `argsort` returns the indices in ascending order
         # We want the regions with the highest probability to be considered
@@ -409,21 +422,19 @@ def non_max_suppression(regions, overlap_threshold, categories):
             for pos in range(last):
                 j = sorted_indices[pos]
 
-                xx1 = max(x1[i], x1[j])
-                yy1 = max(y1[i], y1[j])
-                xx2 = min(x2[i], x2[j])
-                yy2 = min(y2[i], y2[j])
+                intersection = filtered_regions[i].intersect(filtered_regions[j])
 
-                overlap_width = xx2 - xx1 + 1
-                overlap_height = yy2 - yy1 + 1
+                overlap_width = intersection[2]
+                overlap_height = intersection[3]
 
                 # If either `overlap_width` or `overlap_height` are `<= 0`
                 # then that means there's no overlap
                 if overlap_width > 0 and overlap_height > 0:
-                    overlap = overlap_width * overlap_height / areas[j]
+                    overlap1 = overlap_width * overlap_height / areas[j]
+                    overlap2 = overlap_width * overlap_height / areas[i]
 
                     # If there's enough overlap, we want to remove this box
-                    if overlap > overlap_threshold:
+                    if overlap1 > overlap_threshold and overlap2 > overlap_threshold:
                         suppress.append(pos)
 
             # Remove all the values that are at the list of indices of
@@ -436,26 +447,30 @@ def non_max_suppression(regions, overlap_threshold, categories):
     return final_regions
 
 
-def draw_regions_on_image(image, regions):
+def draw_regions_on_image(image, regions, offset, scale):
     """Draws a bounding box with a text label for each `Region` instance in
     `regions` on `image`."""
 
     for r in regions:
         # Unpack the location
         x, y, w, h = r.location
+        width = image.shape[1]
+        height = image.shape[0]
 
         # Clamp the values so that they remain within the bounds of the overall
         # image
-        x1 = max(0, int((x - (w / 2)) * image.shape[1]))
-        y1 = max(0, int((y - (h / 2)) * image.shape[0]))
-        x2 = min(image.shape[1], int((x + (w / 2)) * image.shape[1]))
-        y2 = min(image.shape[0], int((y + (h / 2)) * image.shape[0]))
+        x_scale = scale[0]
+        y_scale = scale[1]
+        x1 = max(0, int(offset[0] + (x * x_scale)))
+        y1 = max(0, int(offset[1] + (y * y_scale)))
+        x2 = min(width, int(offset[0] + (x + w) * x_scale))
+        y2 = min(height, int(offset[1] + (y + h) * y_scale))
 
         image = cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 3)
         image = cv2.putText(
             image, "{0} - {1:.0%}".format(r.category, r.probability),
             (x1, y1 - 13),
             cv2.FONT_HERSHEY_SIMPLEX,
-            1e-3 * image.shape[0],
+            1e-3 * height,
             (0, 255, 0),
             2)

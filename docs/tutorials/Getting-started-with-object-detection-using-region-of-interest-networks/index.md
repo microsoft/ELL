@@ -160,7 +160,7 @@ in which they are being used.
 
 ```python
 CONFIDENCE_THRESHOLD = 0.4
-OVERLAP_THRESHOLD = 0.4
+OVERLAP_THRESHOLD = 0.05
 ```
 
 As in previous tutorials, define a helper function that reads images from the
@@ -210,7 +210,7 @@ key.
 
 ```python
     while (cv2.waitKey(1) & 0xFF) != 27:
-        image = get_image_from_camera(camera)
+        original = get_image_from_camera(camera)
 ```
 
 The preparation of the image involves resizing the image, reordering the image
@@ -218,17 +218,15 @@ channels, and returning the image data as a flat `numpy` array of floats so
 that it can be provided as input to the model.
 
 ```python
-        image = helpers.prepare_image_for_model(
-            image, input_shape.columns, input_shape.rows, reorder_to_rgb=True,
+        image, offset, scale = helpers.prepare_image_for_model(
+            original, input_shape.columns, input_shape.rows, reorder_to_rgb=True,
             ravel=False)
-
-        input_data = resized_image.astype(np.float32).ravel()
 ```
 
 Send the processed image to the model to get a `numpy` array of predictions.
 
 ```python
-        predictions = model.predict(input_data)
+        predictions = model.predict(image)
 ```
 
 Next, reshape the predictions so that it is no longer a flat array. The
@@ -272,10 +270,10 @@ To use this algorithm, call `helpers.non_max_suppression`.
 Finally, display the detected regions onto the original image.
 
 ```python
-        helpers.draw_regions_on_image(image, regions)
+        scale = (scale[0] * image.shape[1], scale[1] * image.shape[0])
+        helpers.draw_regions_on_image(original, regions, offset, scale)
 
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        cv2.imshow("Object detection", image)
+        cv2.imshow("Object detection", original)
 
 if __name__ == "__main__":
     main()
