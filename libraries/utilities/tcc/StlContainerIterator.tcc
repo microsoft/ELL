@@ -10,14 +10,14 @@ namespace ell
 {
 namespace utilities
 {
-    template <typename IteratorType, typename ValueType>
-    StlContainerIteratorBase<IteratorType, ValueType>::StlContainerIteratorBase(IteratorType begin, IteratorType end)
+    template <typename IteratorType>
+    StlContainerIteratorBase<IteratorType>::StlContainerIteratorBase(IteratorType begin, IteratorType end)
         : _current(begin), _end(end)
     {
     }
 
-    template <typename IteratorType, typename ValueType>
-    void StlContainerIteratorBase<IteratorType, ValueType>::Next()
+    template <typename IteratorType>
+    void StlContainerIteratorBase<IteratorType>::Next()
     {
         if (IsValid())
         {

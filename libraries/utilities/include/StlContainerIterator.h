@@ -17,7 +17,7 @@ namespace ell
 namespace utilities
 {
     /// <summary> An adapter that transforms a begin/end pair of STL iterators into a read-only forward iterator with IsValid, Next, and Get functions</summary>
-    template <typename IteratorType, typename ValueType>
+    template <typename IteratorType>
     class StlContainerIteratorBase
     {
     public:
@@ -55,11 +55,12 @@ namespace utilities
     };
 
     /// <summary> An adapter that transforms a begin/end pair of STL iterators into a read-only forward iterator with IsValid, Next, and Get functions</summary>
-    template <typename IteratorType, typename ValueType = typename std::decay<decltype(*std::declval<IteratorType>())>::type>
-    class StlContainerIterator : public StlContainerIteratorBase<IteratorType, ValueType>
+    template <typename IteratorType, typename ValueType = typename std::iterator_traits<std::decay_t<IteratorType>>::value_type>
+    class StlContainerIterator : public StlContainerIteratorBase<IteratorType>
     {
+        using BaseType = StlContainerIteratorBase<IteratorType>;
     public:
-        using StlContainerIteratorBase<IteratorType, ValueType>::StlContainerIteratorBase;
+        using BaseType::BaseType;
 
         /// <summary> Returns the value of the current iterate. </summary>
         ///
@@ -67,7 +68,7 @@ namespace utilities
         ValueType Get() const { return *_current; }
 
     protected:
-        using StlContainerIteratorBase<IteratorType, ValueType>::_current;
+        using BaseType::_current;
     };
 
     /// <summary> Handy type alias for a StlContainerIterator over a std::vector </summary>
@@ -92,11 +93,12 @@ namespace utilities
     auto MakeStlContainerIterator(ContainerType& container)->StlContainerIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
 
     /// <summary> An adapter that transforms a begin/end pair of STL iterators into a read-only forward iterator with IsValid, Next, and Get functions</summary>
-    template <typename IteratorType, typename ValueType = typename std::decay<decltype(*std::declval<IteratorType>())>::type>
-    class StlContainerReferenceIterator : public StlContainerIteratorBase<IteratorType, ValueType>
+    template<typename IteratorType, typename ValueType = typename std::iterator_traits<std::decay_t<IteratorType>>::value_type>
+    class StlContainerReferenceIterator : public StlContainerIteratorBase<IteratorType>
     {
+        using BaseType = StlContainerIteratorBase<IteratorType>;
     public:
-        using StlContainerIteratorBase<IteratorType, ValueType>::StlContainerIteratorBase;
+        using BaseType::BaseType;
 
         /// <summary> Returns the value of the current iterate. </summary>
         ///
@@ -104,7 +106,7 @@ namespace utilities
         const ValueType& Get() const { return *_current; }
 
     protected:
-        using StlContainerIteratorBase<IteratorType, ValueType>::_current;
+        using BaseType::_current;
     };
 
     /// <summary> Handy type alias for a StlContainerReferenceIterator over a std::vector </summary>
