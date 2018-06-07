@@ -13,7 +13,6 @@
 #include "Variant.h"
 
 // stl
-#include <cassert>
 #include <functional>
 #include <string>
 #include <type_traits>

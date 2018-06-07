@@ -11,7 +11,6 @@
 #include "IArchivable.h"
 #include "Unused.h"
 
-#include <cassert>
 #include <cctype>
 #include <iostream>
 #include <sstream>
@@ -195,7 +194,10 @@ namespace utilities
         MatchFieldName("_type");
         _tokenizer.MatchToken("\"");
         auto encodedTypeName = _tokenizer.ReadNextToken();
-        assert(encodedTypeName != "");
+        if (encodedTypeName == "")
+        {
+            throw utilities::DataFormatException(DataFormatErrors::badFormat, "JSON format is invalid, expecting a non empty object _type name");
+        }
         _tokenizer.MatchToken("\"");
 
         int version = 0;

@@ -16,7 +16,6 @@
 #include "Exception.h"
 
 // stl
-#include <cassert>
 #include <vector>
 
 namespace ell
@@ -33,7 +32,10 @@ namespace nodes
     MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& w)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, w.NumRows()), _w(w)
     {
-        assert(input.Size() == w.NumColumns());
+        if (input.Size() != w.NumColumns())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "MatrixVectorProductNode: input size must match the number of columns in the 'w' matrix");
+        }
     }
 
     template <typename ValueType, math::MatrixLayout layout>

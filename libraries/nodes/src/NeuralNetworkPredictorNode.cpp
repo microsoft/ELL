@@ -17,7 +17,6 @@
 #include "Exception.h"
 
 // stl
-#include <cassert>
 #include <string>
 #include <vector>
 
@@ -44,7 +43,10 @@ namespace nodes
     NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode(const model::PortElements<ValueType>& input, const PredictorType& predictor)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetShapeSize(predictor.GetOutputShape())), _predictor(predictor)
     {
-        assert(input.Size() == GetShapeSize(_predictor.GetInputShape()));
+        if (input.Size() != GetShapeSize(_predictor.GetInputShape()))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input to predictor doesn't match the expected input size");
+        }
     }
 
     template <typename ValueType>
@@ -130,7 +132,10 @@ namespace nodes
         {
             auto numInputs = GetShapeSize(layer->GetInputShape());
             DEBUG_USED(numInputs);
-            assert(prevOutputSize == numInputs);
+            if (prevOutputSize != numInputs) 
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input to layer doesn't match the output size of the previous layer");
+            }
             auto layerNode = AddLayerNode(transformer, *layer, layerInputs, options, state);
 
             prevOutputSize = GetShapeSize(layer->GetOutputShape());

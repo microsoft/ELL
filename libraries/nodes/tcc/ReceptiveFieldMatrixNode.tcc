@@ -321,6 +321,10 @@ namespace nodes
     ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, int filterWidth, int stride, int convolutionPadding, std::array<int, 3> dataOrder, int outputWidth, int outputHeight)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, filterWidth * filterWidth * inputMemoryLayout.GetActiveSize(2) * outputWidth * outputHeight), _inputMemoryLayout(inputMemoryLayout), _filterWidth(filterWidth), _stride(stride), _convolutionPadding(convolutionPadding), _dataOrder(dataOrder), _outputWidth(outputWidth), _outputHeight(outputHeight)
     {
+        if (inputMemoryLayout.NumDimensions() != 3)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "ReceptiveFieldMatrixNode: inputMemoryLayout must have 3 dimensions");
+        }
     }
 
     template <typename ValueType>

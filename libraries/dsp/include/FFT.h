@@ -14,7 +14,6 @@
 #include "Unused.h"
 
 // stl
-#include <cassert>
 #include <complex>
 #include <vector>
 

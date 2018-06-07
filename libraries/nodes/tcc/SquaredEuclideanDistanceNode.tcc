@@ -21,7 +21,6 @@
 #include "Exception.h"
 
 // stl
-#include <cassert>
 #include <vector>
 
 namespace ell
@@ -38,7 +37,10 @@ namespace nodes
     SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& vectorsAsMatrix)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, vectorsAsMatrix.NumRows()), _vectorsAsMatrix(vectorsAsMatrix)
     {
-        assert(input.Size() == vectorsAsMatrix.NumColumns());
+        if (input.Size() != vectorsAsMatrix.NumColumns())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "SquaredEuclideanDistanceNode: input size must match the number of columns in the vectorsAsMatrix");
+        }
     }
 
     template <typename ValueType, math::MatrixLayout layout>

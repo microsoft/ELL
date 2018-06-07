@@ -92,7 +92,8 @@ namespace data
         }
 
         ElementType storedValue = static_cast<ElementType>(value);
-        assert(storedValue - value <= 1.0e-5 && value - storedValue <= 1.0e-5);
+        // Chris - why are we asserting this?  Are we trying to stop someone appending doubles to an integer vector?
+        // assert(storedValue - value <= 1.0e-5 && value - storedValue <= 1.0e-5);
 
         if (index < _data.size())
         {

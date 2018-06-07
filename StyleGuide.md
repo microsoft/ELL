@@ -156,3 +156,8 @@ three slashes (///) and the first line in a documentation block should contain a
     template <typename RandomAccessContainerType>
     void InplaceSort(RandomAccessContainerType& container);
 
+### Error Handling
+
+The c "assert" function usually results in immediate termination of the program, so this should only be used in cases where it should never happen unless there is a logic error in our code.  To this end assert documents the existing invariants, preconditions and post conditions in the code.  
+
+Bad input parameters from our public API or bad data read from a file should not result in this kind of assert termination because it is hard to debug, and it provides no useful information to the caller.   Instead, throw the appropriate type of exception as defined in ~/libraries/utilities/include/Exception.h.  This includes the notImplemented case, which you can raise using throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);

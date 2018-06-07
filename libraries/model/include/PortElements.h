@@ -21,7 +21,6 @@
 
 // stl
 #include <algorithm>
-#include <cassert>
 #include <deque>
 #include <vector>
 

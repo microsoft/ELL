@@ -25,7 +25,6 @@
 #include "DenseDataVector.h"
 
 // stl
-#include <cassert>
 #include <string>
 #include <vector>
 
@@ -41,7 +40,10 @@ namespace nodes
     ProtoNNPredictorNode::ProtoNNPredictorNode(const model::PortElements<double>& input, const predictors::ProtoNNPredictor& predictor)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, predictor.GetNumLabels()), _predictor(predictor)
     {
-        assert(input.Size() == predictor.GetDimension());
+        if (input.Size() != predictor.GetDimension())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "ProtoNNPredictorNode: input size must match the predictor dimension");
+        }
     }
 
     void ProtoNNPredictorNode::WriteToArchive(utilities::Archiver& archiver) const

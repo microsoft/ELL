@@ -19,6 +19,7 @@
 #include "Exception.h"
 
 // stl
+#include <cassert>
 #include <exception>
 #include <functional>
 #include <memory>

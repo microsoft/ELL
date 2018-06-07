@@ -20,6 +20,7 @@
 #include "Variable.h"
 
 // stl
+#include <cassert>
 #include <stack>
 #include <string>
 #include <unordered_map>

@@ -130,7 +130,10 @@ namespace utilities
         registry.SetVariantType(*this, type);
         archiver["value"] >> *_value;
 
-        assert(_value);
+        if (_value.get() == nullptr)
+        {
+            throw utilities::DataFormatException(DataFormatErrors::badFormat, "Archive format is invalid, expecting a non empty value");
+        }
     }
 
     void Variant::RegisterArchivableVariantTypes(VariantTypeRegistry& registry)

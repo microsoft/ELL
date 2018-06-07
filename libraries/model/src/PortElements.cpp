@@ -15,7 +15,6 @@
 #include "Tokenizer.h"
 
 // stl
-#include <cassert>
 #include <sstream>
 
 namespace ell

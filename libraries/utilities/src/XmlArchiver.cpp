@@ -13,7 +13,6 @@
 
 // stl
 #include <algorithm>
-#include <cassert>
 #include <cctype>
 #include <iostream>
 #include <sstream>
@@ -184,7 +183,10 @@ namespace utilities
 
         _tokenizer.MatchToken("<");
         auto readTypeName = XmlUtilities::DecodeTypeName(_tokenizer.ReadNextToken());
-        assert(readTypeName != "");
+        if (readTypeName == "") 
+        {
+            throw utilities::DataFormatException(DataFormatErrors::badFormat, "XML format is invalid, expecting a non empty object type name");
+        }
         if (hasName)
         {
             _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
@@ -202,8 +204,7 @@ namespace utilities
 
     bool XmlUnarchiver::HasNextPropertyName(const std::string&)
     {
-        assert(false && "Unimplemented");
-        return false;
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "XmlUnarchiver::HasNextPropertyName is not implemented");
     }
 
     //

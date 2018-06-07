@@ -17,6 +17,9 @@
 // utilities
 #include "Unused.h"
 
+// stl
+#include <cassert>
+
 namespace ell
 {
 namespace model

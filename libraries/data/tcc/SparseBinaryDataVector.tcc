@@ -9,9 +9,6 @@
 // utilities
 #include "Exception.h"
 
-// stl
-#include <cassert>
-
 namespace ell
 {
 namespace data
@@ -99,7 +96,10 @@ namespace data
             return;
         }
 
-        assert(value == 1);
+        if (value != 1) 
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input to BinaryDataVector needs to be 0 or 1");
+        }
 
         _indexList.Append(index);
     }

@@ -31,7 +31,10 @@ namespace dsp
         template <typename Iterator>
         void FFT(Iterator begin, Iterator end, Iterator scratch, bool inverse)
         {
-            assert(!inverse);
+            if (inverse)
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+            }
             using ValueType = typename Iterator::value_type::value_type;
             const ValueType pi = math::Constants<ValueType>::pi;
 
@@ -67,7 +70,9 @@ namespace dsp
         void FFTReal(Iterator begin, Iterator end, Iterator scratch, ComplexIterator outputBegin, ComplexIterator outputEnd, bool inverse)
         {
             UNUSED(outputEnd);
-            assert(!inverse);
+
+            // CHRIS: this is odd, why do we have this parameter if it must always be false?
+            // assert(!inverse);
             using ValueType = typename Iterator::value_type;
             const ValueType pi = math::Constants<ValueType>::pi;
 

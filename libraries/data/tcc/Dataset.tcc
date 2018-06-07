@@ -12,7 +12,6 @@
 
 // stl
 #include <algorithm>
-#include <cassert>
 #include <random>
 #include <stdexcept>
 

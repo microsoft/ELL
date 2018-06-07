@@ -12,7 +12,6 @@
 #include "VectorOperations.h"
 
 // stl
-#include <cassert>
 #include <cmath>
 
 namespace ell

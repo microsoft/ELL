@@ -30,7 +30,6 @@
 #include "TypeName.h"
 
 // stl
-#include <cassert>
 #include <functional>
 #include <numeric>
 #include <string>
