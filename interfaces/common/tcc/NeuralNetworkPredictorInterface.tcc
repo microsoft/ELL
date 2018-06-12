@@ -150,6 +150,92 @@ namespace api
         }
 
         //
+        // CreateLSTMLayer
+        //
+
+        template <typename ElementType>
+        template <template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateLSTMLayer(api::LSTMLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
+        {
+            size_t m = layer.inputWeights.shape.rows;
+            size_t n = layer.inputWeights.shape.columns;
+            underlying::LSTMParameters<ElementType> lstmParameters = { 
+                { layer.inputWeights.data.data(), m, n },
+                { layer.forgetMeWeights.data.data(), m, n },
+                { layer.candidateWeights.data.data(), m, n },
+                { layer.outputWeights.data.data(), m, n },
+                { layer.inputBias.data.data(), m },
+                { layer.forgetMeBias.data.data(), m },
+                { layer.candidateBias.data.data(), m },
+                { layer.outputBias.data.data(), m } };
+
+            return std::make_unique<underlying::LSTMLayer<ElementType, ActivationFunctionType, RecurrentActivationFunctionType>>(parameters, lstmParameters);
+        }
+
+        template <typename ElementType>
+        template <template <typename> class ActivationFunctionType>
+        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateLSTMLayer(api::LSTMLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
+        {
+            using TensorType = typename underlying::Layer<ElementType>::TensorType;
+
+            switch (layer.recurrentActivation)
+            {
+            case api::ActivationType::relu:
+                return CreateLSTMLayer<ActivationFunctionType, underlying::ReLUActivation>(layer, parameters);
+            case api::ActivationType::leaky:
+                return CreateLSTMLayer<ActivationFunctionType, underlying::LeakyReLUActivation>(layer, parameters);
+            case api::ActivationType::sigmoid:
+                return CreateLSTMLayer<ActivationFunctionType, underlying::SigmoidActivation>(layer, parameters);
+            case api::ActivationType::hardSigmoid:
+                return CreateLSTMLayer<ActivationFunctionType, underlying::HardSigmoidActivation>(layer, parameters);
+            case api::ActivationType::tanh:
+                return CreateLSTMLayer<ActivationFunctionType, underlying::TanhActivation>(layer, parameters);
+            case api::ActivationType::prelu:
+            {
+                auto& preluApiLayer = NeuralNetworkPredictor<ElementType>::LayerAs<api::PReLUActivationLayer<ElementType>>(&layer);
+                TensorType alpha(preluApiLayer.alpha.shape.rows, preluApiLayer.alpha.shape.columns, preluApiLayer.alpha.shape.channels, preluApiLayer.alpha.data);
+                underlying::ParametricReLUActivation<ElementType> prelu(alpha);
+                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
+            }
+            case api::ActivationType::softmax:
+                return std::make_unique<underlying::SoftmaxLayer<ElementType>>(parameters);
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown recurrent activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.recurrentActivation)));
+            }
+        }
+
+        template <typename ElementType>
+        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateLSTMLayer(api::LSTMLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
+        {
+            using TensorType = typename underlying::Layer<ElementType>::TensorType;
+
+            switch (layer.activation)
+            {
+            case api::ActivationType::relu:
+                return CreateLSTMLayer<underlying::ReLUActivation>(layer, parameters);
+            case api::ActivationType::leaky:
+                return CreateLSTMLayer<underlying::LeakyReLUActivation>(layer, parameters);
+            case api::ActivationType::sigmoid:
+                return CreateLSTMLayer<underlying::SigmoidActivation>(layer, parameters);
+            case api::ActivationType::hardSigmoid:
+                return CreateLSTMLayer<underlying::HardSigmoidActivation>(layer, parameters);
+            case api::ActivationType::tanh:
+                return CreateLSTMLayer<underlying::TanhActivation>(layer, parameters);
+            case api::ActivationType::prelu:
+            {
+                auto& preluApiLayer = NeuralNetworkPredictor<ElementType>::LayerAs<api::PReLUActivationLayer<ElementType>>(&layer);
+                TensorType alpha(preluApiLayer.alpha.shape.rows, preluApiLayer.alpha.shape.columns, preluApiLayer.alpha.shape.channels, preluApiLayer.alpha.data);
+                underlying::ParametricReLUActivation<ElementType> prelu(alpha);
+                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
+            }
+            case api::ActivationType::softmax:
+                return std::make_unique<underlying::SoftmaxLayer<ElementType>>(parameters);
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.activation)));
+            }
+        }
+
+        //
         // API classes for the neural predictor
         //
         template <typename ElementType>
@@ -298,6 +384,12 @@ namespace api
                     auto& apiLayer = LayerAs<api::FullyConnectedLayer<ElementType>>(layer);
                     TensorType weights(apiLayer.weights.shape.rows, apiLayer.weights.shape.columns, apiLayer.weights.shape.channels, apiLayer.weights.data);
                     underlyingLayers.push_back(std::make_unique<underlying::FullyConnectedLayer<ElementType>>(parameters, weights));
+                }
+                break;
+                case (underlying::LayerType::lstm):
+                {
+                    auto& apiLayer = LayerAs<api::LSTMLayer<ElementType>>(layer);
+                    underlyingLayers.push_back(CreateLSTMLayer(apiLayer, parameters));
                 }
                 break;
                 case (underlying::LayerType::gru):

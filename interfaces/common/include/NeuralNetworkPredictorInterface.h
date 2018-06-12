@@ -72,6 +72,15 @@ private:
     
         static std::unique_ptr<UnderlyingLayer> CreateGRULayer(neural::GRULayer<ElementType>& layer, const UnderlyingLayerParameters& parameters);
 
+
+        template <template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+        static std::unique_ptr<UnderlyingLayer> CreateLSTMLayer(neural::LSTMLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters);
+
+        template <template <typename> class ActivationFunctionType>
+        static std::unique_ptr<UnderlyingLayer> CreateLSTMLayer(neural::LSTMLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters);
+
+        static std::unique_ptr<UnderlyingLayer> CreateLSTMLayer(neural::LSTMLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters);
+
 #endif
 
         std::shared_ptr<UnderlyingPredictor> _predictor;
