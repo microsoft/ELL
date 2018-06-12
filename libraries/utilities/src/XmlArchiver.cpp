@@ -183,7 +183,7 @@ namespace utilities
 
         _tokenizer.MatchToken("<");
         auto readTypeName = XmlUtilities::DecodeTypeName(_tokenizer.ReadNextToken());
-        if (readTypeName == "") 
+        if (readTypeName.empty()) 
         {
             throw utilities::DataFormatException(DataFormatErrors::badFormat, "XML format is invalid, expecting a non empty object type name");
         }
