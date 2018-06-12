@@ -57,33 +57,38 @@ namespace dsp
     // Filters: nf x fr x fc x d tensor packed into a 3D tensor by collapsing the leading 2 dimensions
     //          (So, a (nf*fr) x fc x d tensor)
     template <typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> Convolve2DSimple(const math::ChannelColumnRowTensor<ValueType>& signal, const math::ChannelColumnRowTensor<ValueType>& filters, int numFilters)
+    math::ChannelColumnRowTensor<ValueType> Convolve2DSimple(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters)
     {
         return Convolve2DSimple(signal, filters, numFilters, 1);
     }
 
     template <typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> Convolve2DSimple(const math::ChannelColumnRowTensor<ValueType>& signal, const math::ChannelColumnRowTensor<ValueType>& filters, int numFilters, int stride)
+    math::ChannelColumnRowTensor<ValueType> Convolve2DSimple(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride)
     {
         const auto filterRows = filters.NumRows() / numFilters;
         const auto filterColumns = filters.NumColumns();
-        const auto outputRows = (signal.NumRows() - filterRows + 1) / stride;
-        const auto outputColumns = (signal.NumColumns() - filterColumns + 1) / stride;
+        const auto inputRows = signal.NumRows();
+        const auto inputColumns = signal.NumColumns();
+        const auto outputRows = (inputRows - filterRows + 1) / stride;
+        const auto outputColumns = (inputColumns - filterColumns + 1) / stride;
         math::ChannelColumnRowTensor<ValueType> result(outputRows, outputColumns, numFilters);
         Convolve2DSimple(signal, filters, numFilters, stride, result);
         return result;
     }
 
     template <typename ValueType>
-    void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<ValueType> signal, const math::ChannelColumnRowTensor<ValueType>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<ValueType> result)
+    void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<ValueType> signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<ValueType> result)
     {
+        const auto numChannels = static_cast<int>(signal.NumChannels());
         const auto filterRows = static_cast<int>(filters.NumRows()) / numFilters;
         const auto filterColumns = static_cast<int>(filters.NumColumns());
+        const auto numFilterChannels = static_cast<int>(filters.NumChannels());
         const auto outputRows = static_cast<int>(result.NumRows());
         const auto outputColumns = static_cast<int>(result.NumColumns());
 
         for (int filterIndex = 0; filterIndex < numFilters; ++filterIndex)
         {
+            const int channelStart = (filterIndex * numFilterChannels) % numChannels;
             const auto filterOffset = filterIndex * filterRows;
             for (int rowIndex = 0; rowIndex < outputRows; ++rowIndex)
             {
@@ -96,7 +101,7 @@ namespace dsp
                     {
                         for (int filterColumnIndex = 0; filterColumnIndex < filterColumns; ++filterColumnIndex)
                         {
-                            auto signalVector = signal.template GetSlice<math::Dimension::channel>(inputRowIndex + filterRowIndex, inputColumnIndex + filterColumnIndex);
+                            auto signalVector = signal.GetSubTensor(inputRowIndex + filterRowIndex, inputColumnIndex + filterColumnIndex, channelStart, 1, 1, numFilterChannels).template GetSlice<math::Dimension::channel>(0, 0);
                             auto filterVector = filters.template GetSlice<math::Dimension::channel>(filterOffset + filterRowIndex, filterColumnIndex);
                             accum += math::Dot(signalVector, filterVector);
                         }
@@ -107,29 +112,42 @@ namespace dsp
         }
     }
 
+    template <typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2DSimpleDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride)
+    {
+        if(numFilters != static_cast<int>(input.NumChannels()) || filters.NumChannels() != 1)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Depthwise separable convolution requires numFilters to be the same as the number of input channels and the filter depth to be 1.");
+        }
+        return Convolve2DSimple(input, filters, numFilters, stride);
+    }
+
     //
     // Explicit instantiations
     //
 
     //
-    // Versions that return result
+    // Versions that return the result
     //
     template math::RowVector<float> Convolve1DSimple(const math::RowVector<float>& signal, const math::RowVector<float>& filter);
     template math::RowVector<double> Convolve1DSimple(const math::RowVector<double>& signal, const math::RowVector<double>& filter);
 
-    template math::ChannelColumnRowTensor<float> Convolve2DSimple(const math::ChannelColumnRowTensor<float>& signal, const math::ChannelColumnRowTensor<float>& filters, int numFilters);
-    template math::ChannelColumnRowTensor<double> Convolve2DSimple(const math::ChannelColumnRowTensor<double>& signal, const math::ChannelColumnRowTensor<double>& filters, int numFilters);
+    template math::ChannelColumnRowTensor<float> Convolve2DSimple(const math::ConstChannelColumnRowTensorReference<float>& signal, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters);
+    template math::ChannelColumnRowTensor<double> Convolve2DSimple(const math::ConstChannelColumnRowTensorReference<double>& signal, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters);
 
-    template math::ChannelColumnRowTensor<float> Convolve2DSimple(const math::ChannelColumnRowTensor<float>& signal, const math::ChannelColumnRowTensor<float>& filters, int numFilters, int stride);
-    template math::ChannelColumnRowTensor<double> Convolve2DSimple(const math::ChannelColumnRowTensor<double>& signal, const math::ChannelColumnRowTensor<double>& filters, int numFilters, int stride);
+    template math::ChannelColumnRowTensor<float> Convolve2DSimple(const math::ConstChannelColumnRowTensorReference<float>& signal, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride);
+    template math::ChannelColumnRowTensor<double> Convolve2DSimple(const math::ConstChannelColumnRowTensorReference<double>& signal, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride);
+
+    template math::ChannelColumnRowTensor<float> Convolve2DSimpleDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<float>& signal, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride);
+    template math::ChannelColumnRowTensor<double> Convolve2DSimpleDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<double>& signal, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride);
 
     //
-    // Versions with preallocated result
+    // Versions with a preallocated result
     //
     template void Convolve1DSimple(math::ConstRowVectorReference<float> signal, const math::RowVector<float>& filter, math::RowVectorReference<float> result);
     template void Convolve1DSimple(math::ConstRowVectorReference<double> signal, const math::RowVector<double>& filter, math::RowVectorReference<double> result);
 
-    template void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<float> signal, const math::ChannelColumnRowTensor<float>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<float> result);
-    template void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<double> signal, const math::ChannelColumnRowTensor<double>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<double> result);
+    template void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<float> signal, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<float> result);
+    template void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<double> signal, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<double> result);
 }
 }

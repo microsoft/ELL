@@ -89,7 +89,7 @@ namespace dsp
     /// <summary> Spatially convolve a 3D image with a stack of 3D filters, using pre-transformed filter weights. </summary>
     ///
     /// <param name="input"> The input image: a (r x c x d) tensor. </param>
-    /// <param name="transformedFilters"> The transformed filters to convolve with. This is obtained by calling output of calling `GetTransformedFilters` or `TransformFilters()`
+    /// <param name="transformedFilters"> The transformed filters to convolve with. This is obtained by calling `GetTransformedFilters` or `TransformFilters()`
     /// <param name="numFilters"> The number of filters in the `filters` argument. </param>
     /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
     /// <param name="order"> The ordering to use for the transformed filters. </param>
@@ -97,6 +97,28 @@ namespace dsp
     /// <returns> A tensor with the result of the convolution `input` (*) `filter`
     template <typename ValueType>
     math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradPretransformed(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order = WinogradFilterOrder::tilesFirst);
+
+    /// <summary> Convolve a set of 2D images with a corresponding set of 2D filters. </summary>
+    ///
+    /// <param name="input"> The input image: a (r x c x d) tensor. </param>
+    /// <param name="filters"> The filters to convolve with. A (fr x fc x d) tensor. </param>
+    /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
+    /// <param name="order"> The ordering to use for the transformed filters. </param>
+    ///
+    /// <returns> A tensor with the result of the convolution `input` (*) `filter`
+    template <typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int tileSize, WinogradFilterOrder order = WinogradFilterOrder::filtersFirst);
+
+    /// <summary> Convolve a set of 2D images with a corresponding set of 2D filters, using pre-transformed filter weights. </summary>
+    ///
+    /// <param name="input"> The input image: a (r x c x d) tensor. </param>
+    /// <param name="transformedFilters"> The transformed filters to convolve with. This is obtained by calling `GetTransformedFilters` or `TransformFilters()`
+    /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
+    /// <param name="order"> The ordering to use for the transformed filters. </param>
+    ///
+    /// <returns> A tensor with the result of the convolution `input` (*) `filter`
+    template <typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradDepthwiseSeparablePretransformed(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order = WinogradFilterOrder::filtersFirst);
 
     //
     // Filter pre-transformation functions

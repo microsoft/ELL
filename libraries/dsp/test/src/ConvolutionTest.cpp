@@ -59,6 +59,8 @@ math::ChannelColumnRowTensor<ValueType>& operator-=(math::ChannelColumnRowTensor
     }
     return a;
 }
+
+const double epsilon = 1e-6;
 }
 
 //
@@ -68,11 +70,9 @@ math::ChannelColumnRowTensor<ValueType>& operator-=(math::ChannelColumnRowTensor
 template <typename ValueType>
 void TestConv1D(dsp::ConvolutionMethodOption algorithm)
 {
-    ValueType epsilon = static_cast<ValueType>(1e-6);
-
-    math::RowVector<ValueType> signal = MakeVector<ValueType>({ 0.42929697, 0.90317845, 0.84490289, 0.66174327, 0.10820399, 0.3511343, 0.58248869, 0.62674724, 0.11014194, 0.00132073, 0.58431646, 0.39873614, 0.40304155, 0.79139607, 0.97710827, 0.21268128 });
-    math::RowVector<ValueType> filter = MakeVector<ValueType>({ 0.25, 0.5, 0.25 });
-    math::RowVector<ValueType> reference = MakeVector<ValueType>({ 0.77013919, 0.81368187, 0.56914835, 0.30732139, 0.34824032, 0.53571473, 0.48653128, 0.21208796, 0.17427497, 0.39217245, 0.44620757, 0.49905383, 0.74073549, 0.73957347 });
+    math::RowVector<ValueType> signal = Get1DReferenceSignal<ValueType>();
+    math::RowVector<ValueType> filter = Get1DReferenceFilter<ValueType>();
+    math::RowVector<ValueType> reference = Get1DReferenceConvolutionResult<ValueType>();
 
     // Perform the convolution
     auto result = Convolve1D(signal, filter, algorithm);
@@ -98,8 +98,6 @@ void TestConv1D(dsp::ConvolutionMethodOption algorithm)
 template <typename ValueType>
 void TestConv2D(dsp::ConvolutionMethodOption algorithm)
 {
-    ValueType epsilon = static_cast<ValueType>(1e-5);
-
     auto signal = GetReferenceSignal<ValueType>();
     auto filter = GetReferenceFilter<ValueType>();
     auto reference = GetReferenceConvolutionResult<ValueType>();
@@ -122,7 +120,40 @@ void TestConv2D(dsp::ConvolutionMethodOption algorithm)
 
 #if 0
         // Useful for pinpointing errors during debugging:
+        std::cerr << "Reference:\n" << reference << std::endl;
+        std::cerr << "Computed:\n" << result << std::endl;
+        std::cerr << "Difference:  " << diff << std::endl;
+#endif
+        auto diffArray = diff.ToArray();
+        std::cerr << "Max difference:  " << *std::max_element(diffArray.begin(), diffArray.end()) << std::endl;
+    }
+}
 
+template <typename ValueType>
+void TestConv2DSeparable(dsp::ConvolutionMethodOption algorithm)
+{
+    auto signal = GetSeparableReferenceSignal<ValueType>();
+    auto filters = GetSeparableReferenceFilters<ValueType>();
+    auto reference = GetSeparableReferenceConvolutionResult<ValueType>();
+
+    // Perform the convolution
+    auto result = Convolve2DDepthwiseSeparable(signal, filters, static_cast<int>(signal.NumChannels()), algorithm);
+
+    testing::ProcessTest("Testing convolution result size matches", (result.NumRows() == reference.NumRows()) && (result.NumColumns() == reference.NumColumns()));
+    if (result.NumRows() != reference.NumRows())
+    {
+        std::cerr << "Error: result sizes not equal, reference: " << reference.Size() << ", result: " << result.Size() << std::endl;
+    }
+
+    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
+    if (!ok)
+    {
+        std::cout << "Incorrect result for separable 2D convolution " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << std::endl;
+        math::ChannelColumnRowTensor<ValueType> diff(result);
+        diff -= reference;
+
+#if 0
+        // Useful for pinpointing errors during debugging:
         std::cerr << "Reference:\n" << reference << std::endl;
         std::cerr << "Computed:\n" << result << std::endl;
         std::cerr << "Difference:  " << diff << std::endl;
@@ -136,7 +167,6 @@ template <typename ValueType>
 void TestConv1DVsSimple(int length, int filterSize, dsp::ConvolutionMethodOption algorithm)
 {
     using Vector = math::RowVector<ValueType>;
-    const ValueType epsilon = static_cast<ValueType>(1e-5);
 
     Vector signal(length);
     Vector filter(filterSize);
@@ -180,8 +210,6 @@ void TestConv2DVsSimple(int numRows, int numColumns, int numChannels, int filter
 {
     using Tensor = math::ChannelColumnRowTensor<ValueType>;
 
-    const ValueType epsilon = static_cast<ValueType>(1e-5);
-
     const auto filterRows = filterSize;
     const auto filterColumns = filterSize;
     Tensor signal(numRows, numColumns, numChannels);
@@ -202,6 +230,7 @@ void TestConv2DVsSimple(int numRows, int numColumns, int numChannels, int filter
                   << " " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << " x " << signal.NumChannels() << std::endl;
 
 #if 0
+        // Useful for pinpointing errors during debugging:
         std::cout << "Input:\n" << signal << std::endl;
         std::cout << std::endl;
         std::cout << "Filters:\n" << filters << std::endl;
@@ -228,6 +257,68 @@ void TestConv2DVsSimple(int numRows, int numColumns, int numChannels, int filter
     }
 }
 
+// Depthwise-separable
+template <typename ValueType>
+void TestConv2DSeparableVsSimple(int numRows, int numColumns, int numChannels, int filterSize, int stride, dsp::ConvolutionMethodOption algorithm)
+{
+    using Tensor = math::ChannelColumnRowTensor<ValueType>;
+
+    const int numFilters = numChannels;
+    const auto filterRows = filterSize;
+    const auto filterColumns = filterSize;
+    Tensor signal(numRows, numColumns, numChannels);
+    Tensor filters(numFilters * filterRows, filterColumns, 1);
+
+    FillInputTensor(signal);
+    FillFiltersTensor(filters, numFilters);
+
+    // Perform the convolution
+    auto fullResult = Convolve2DDepthwiseSeparable(signal, filters, numFilters, stride, algorithm);
+
+    // Separately convolve each image / filter pair and compare with that channel of result
+    for(int channelIndex = 0; channelIndex < numChannels; ++channelIndex)
+    {
+        auto signalSlice = signal.GetSubTensor(0, 0, channelIndex, numRows, numColumns, 1);
+        auto filterSlice = filters.GetSubTensor(channelIndex*filterRows, 0, 0, filterRows, filterColumns, 1);
+        auto reference = Convolve2D(signalSlice, filterSlice, 1, stride, dsp::ConvolutionMethodOption::simple);
+        auto result = fullResult.GetSubTensor(0, 0, channelIndex, fullResult.NumRows(), fullResult.NumColumns(), 1);
+        
+        // Compare results
+        bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
+        if (!ok)
+        {
+            std::cout << "Incorrect result for channel " << channelIndex << " of 2D separable tensor "
+                    << " " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << " x " << signal.NumChannels() << std::endl;
+
+    #if 0
+            // Useful for pinpointing errors during debugging:
+            std::cout << "Input:\n" << signal << std::endl;
+            std::cout << std::endl;
+            std::cout << "Filter:\n" << filters << std::endl;
+            std::cout << std::endl;
+            std::cout << "Reference:\n" << reference << std::endl;
+            std::cout << std::endl;
+            std::cout << "Computed:\n" << result << std::endl;
+            std::cout << std::endl;
+    #endif
+            auto referenceArray = reference.ToArray();
+            auto resultArray = result.ToArray();
+            auto size = referenceArray.size();
+            std::vector<ValueType> diffArray(size);
+            for (size_t index = 0; index < size; ++index)
+            {
+                diffArray[index] = referenceArray[index] - resultArray[index];
+            }
+
+    #if 0
+            // Useful for pinpointing errors during debugging:
+            std::cout << "Difference:  " << diffArray << std::endl;
+    #endif
+            std::cout << "Max difference:  " << *std::max_element(diffArray.begin(), diffArray.end()) << std::endl;
+        }
+    }
+}
+
 //
 // Explicit instantiations
 //
@@ -243,3 +334,9 @@ template void TestConv2D<float>(dsp::ConvolutionMethodOption);
 template void TestConv2D<double>(dsp::ConvolutionMethodOption);
 template void TestConv2DVsSimple<float>(int numRows, int numColumns, int numChannels, int filterSize, int numFilters, int stride, dsp::ConvolutionMethodOption algorithm);
 template void TestConv2DVsSimple<double>(int numRows, int numColumns, int numChannels, int filterSize, int numFilters, int stride, dsp::ConvolutionMethodOption algorithm);
+
+// Depthwise-separable (i.e., multiple 2D in parallel)
+template void TestConv2DSeparable<float>(dsp::ConvolutionMethodOption);
+template void TestConv2DSeparable<double>(dsp::ConvolutionMethodOption);
+template void TestConv2DSeparableVsSimple<float>(int numRows, int numColumns, int numChannels, int filterSize, int stride, dsp::ConvolutionMethodOption algorithm);
+template void TestConv2DSeparableVsSimple<double>(int numRows, int numColumns, int numChannels, int filterSize, int stride, dsp::ConvolutionMethodOption algorithm);

@@ -189,6 +189,10 @@ void TestIRCompiler()
 
     TestConvolutionalLayerNode(ConvolutionType::simple); // Input padding must be set correctly (to floor(filterWidth/2))
 
+    TestConvolutionalLayerNode(ConvolutionType::winograd, 1, 0);
+    TestConvolutionalLayerNode2(ConvolutionType::winograd, 1, 0);
+    TestConvolutionalLayerNode3(ConvolutionType::winograd, 1, 0);
+
     TestFullyConnectedLayerNode();
     // TestFullyConnectedLayerNode(0, 1); // Fully-connected layer nodes can't have padding (yet)
     // TestFullyConnectedLayerNode(0, 2); // Fully-connected layer nodes can't have padding (yet)

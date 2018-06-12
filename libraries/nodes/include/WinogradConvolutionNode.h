@@ -8,6 +8,9 @@
 
 #pragma once
 
+// dsp
+#include "WinogradConvolution.h"
+
 // math
 #include "Tensor.h"
 
@@ -33,6 +36,7 @@ namespace nodes
     public:
         using TensorType = math::Tensor<ValueType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
         using ConstTensorReferenceType = math::ConstTensorReference<ValueType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
+        using FilterOrder = dsp::WinogradFilterOrder;
 
         /// @name Input and Output Ports
         /// @{
@@ -49,12 +53,16 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="filterWeights"> The weights for the convolutional filters. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
+        /// <param name="stride"> The number of elements to move/jump when sliding over the input. Typically this is 1 to 3. </param>
+        /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
+        /// <param name="order"> The order to process data during convolution. </param>
         WinogradConvolutionNode(const model::PortElements<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 const ConstTensorReferenceType& filterWeights,
                                 int stride,
-                                int tileSize = 2);
+                                int tileSize,
+                                FilterOrder order);
 
         /// <summary> Cloning constructor </summary>
         ///
@@ -108,6 +116,7 @@ namespace nodes
         int _stride = 1;
         int _tileSize = 0;
         int _filterSize = 0;
+        FilterOrder _order = FilterOrder::tilesFirst;        
     };
 
     //
@@ -121,6 +130,8 @@ namespace nodes
     class WinogradConvolutionComputeNode : public model::CompilableNode
     {
     public:
+        using FilterOrder = dsp::WinogradFilterOrder;
+
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* filterWeightsPortName = "filterWeights";
@@ -138,13 +149,16 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="filterWeights"> The weights for the convolutional filters. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
+        /// <param name="order"> The order to process data during convolution. </param>
         WinogradConvolutionComputeNode(const model::PortElements<ValueType>& input,
                                        const model::PortElements<ValueType>& filterWeights,
                                        const model::PortMemoryLayout& inputMemoryLayout,
                                        const model::PortMemoryLayout& outputMemoryLayout,
                                        int stride,
                                        int tileSize,
-                                       int filterSize);
+                                       int filterSize,
+                                       FilterOrder order,
+                                       int numFilterChannels);
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
@@ -186,6 +200,9 @@ namespace nodes
         bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
 
     private:
+        void CompileFiltersFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* input, llvm::Value* transformedFilters, llvm::Value* output);
+        void CompileTilesFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* input, llvm::Value* transformedFilters, llvm::Value* output);
+
         // Input
         model::InputPort<ValueType> _input;
         model::InputPort<ValueType> _filterWeights;
@@ -196,11 +213,14 @@ namespace nodes
         model::PortMemoryLayout _inputMemoryLayout;
         model::PortMemoryLayout _outputMemoryLayout;
 
+        int n_numFilters = 0;
         int _stride = 1;
 
         // Winograd-specific parameters
         int _tileSize = 0;
         int _filterSize = 0;
+        FilterOrder _order = FilterOrder::tilesFirst;        
+        int _numFilterChannels = 0;
 
         // Tunable parameters
         int _inputBlockSize = 1;

@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     main.cpp (nodes_test)
+//  File:     DSPNodesTest_main.cpp (nodes_test)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "NodesTests.h"
+#include "DSPNodesTests.h"
 
 // testing
 #include "testing.h"
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     UNUSED(argv);
     try
     {
-        TestNodes();
+        TestDSPNodes();
     }
     catch (const utilities::Exception& exception)
     {

@@ -559,6 +559,9 @@ model::Map GenerateConvolutionModel(int inputRows, int inputColumns, int numChan
     const int inputPadding = (filterSize - 1) / 2;
     const int outputPadding = 0;
 
+    const int winogradTileSize = 2;
+    const auto winogradFilterOrder = nodes::WinogradConvolutionNode<ValueType>::FilterOrder::tilesFirst;
+
     auto filterWeightsSize = numFilters * filterSize * filterSize * numChannels;
     auto filter = GetRandomVector<std::vector<ValueType>>(filterWeightsSize);
 
@@ -591,7 +594,7 @@ model::Map GenerateConvolutionModel(int inputRows, int inputColumns, int numChan
         outputNode = model.AddNode<nodes::UnrolledConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
         break;
     case dsp::ConvolutionMethodOption::winograd:
-        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride, winogradTileSize, winogradFilterOrder);
         break;
     }
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", model::PortElementsBase(*(outputNode->GetOutputPort(0))) } });

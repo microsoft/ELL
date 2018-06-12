@@ -20,9 +20,9 @@ namespace dsp
     //
 
     template<typename ValueType>
-    math::RowVector<ValueType> Convolve1D(const math::RowVector<ValueType>& signal, const math::RowVector<ValueType>& filter, ConvolutionMethodOption alg)
+    math::RowVector<ValueType> Convolve1D(const math::RowVector<ValueType>& signal, const math::RowVector<ValueType>& filter, ConvolutionMethodOption method)
     {
-        switch (alg)
+        switch (method)
         {
         case ConvolutionMethodOption::automatic:
         // fallthrough
@@ -38,15 +38,15 @@ namespace dsp
     }
 
     template<typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> Convolve2D(const math::ChannelColumnRowTensor<ValueType>& signal, const math::ChannelColumnRowTensor<ValueType>& filters, int numFilters, ConvolutionMethodOption alg)
+    math::ChannelColumnRowTensor<ValueType> Convolve2D(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, ConvolutionMethodOption method)
     {
-        return Convolve2D(signal, filters, numFilters, 1, alg);
+        return Convolve2D(signal, filters, numFilters, 1, method);
     }
 
     template<typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> Convolve2D(const math::ChannelColumnRowTensor<ValueType>& signal, const math::ChannelColumnRowTensor<ValueType>& filters, int numFilters, int stride, ConvolutionMethodOption alg)
+    math::ChannelColumnRowTensor<ValueType> Convolve2D(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride, ConvolutionMethodOption method)
     {
-        switch (alg)
+        switch (method)
         {
         case ConvolutionMethodOption::automatic:
         // fallthrough
@@ -66,16 +66,51 @@ namespace dsp
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
 
+    template<typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, ConvolutionMethodOption method)
+    {
+        return Convolve2DDepthwiseSeparable(signal, filters, numFilters, 1, method);
+    }
+
+    template<typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride, ConvolutionMethodOption method)
+    {
+        switch (method)
+        {
+        case ConvolutionMethodOption::automatic:
+        // fallthrough
+        case ConvolutionMethodOption::simple:
+            return Convolve2DSimpleDepthwiseSeparable(signal, filters, numFilters, stride);
+        case ConvolutionMethodOption::unrolled:
+            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        case ConvolutionMethodOption::winograd:
+            if (stride == 1)
+            {
+                const int tileSize = 2;
+                return Convolve2DWinogradDepthwiseSeparable(signal, filters, numFilters, tileSize);
+            }
+        default:
+            break;
+        }
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+    }
+
     //
     // Explicit instantiation definitions:
     //
-    template math::RowVector<float> Convolve1D(const math::RowVector<float>& signal, const math::RowVector<float>& filter, ConvolutionMethodOption alg);
-    template math::RowVector<double> Convolve1D(const math::RowVector<double>& signal, const math::RowVector<double>& filter, ConvolutionMethodOption alg);
+    template math::RowVector<float> Convolve1D(const math::RowVector<float>& signal, const math::RowVector<float>& filter, ConvolutionMethodOption method);
+    template math::RowVector<double> Convolve1D(const math::RowVector<double>& signal, const math::RowVector<double>& filter, ConvolutionMethodOption method);
 
-    template math::ChannelColumnRowTensor<float> Convolve2D(const math::ChannelColumnRowTensor<float>& signal, const math::ChannelColumnRowTensor<float>& filters, int numFilters, ConvolutionMethodOption alg);
-    template math::ChannelColumnRowTensor<double> Convolve2D(const math::ChannelColumnRowTensor<double>& signal, const math::ChannelColumnRowTensor<double>& filters, int numFilters, ConvolutionMethodOption alg);
+    template math::ChannelColumnRowTensor<float> Convolve2D(const math::ConstChannelColumnRowTensorReference<float>& signal, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, ConvolutionMethodOption method);
+    template math::ChannelColumnRowTensor<double> Convolve2D(const math::ConstChannelColumnRowTensorReference<double>& signal, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, ConvolutionMethodOption method);
 
-    template math::ChannelColumnRowTensor<float> Convolve2D(const math::ChannelColumnRowTensor<float>& signal, const math::ChannelColumnRowTensor<float>& filters, int numFilters, int stride, ConvolutionMethodOption alg);
-    template math::ChannelColumnRowTensor<double> Convolve2D(const math::ChannelColumnRowTensor<double>& signal, const math::ChannelColumnRowTensor<double>& filters, int numFilters, int stride, ConvolutionMethodOption alg);
+    template math::ChannelColumnRowTensor<float> Convolve2D(const math::ConstChannelColumnRowTensorReference<float>& signal, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride, ConvolutionMethodOption method);
+    template math::ChannelColumnRowTensor<double> Convolve2D(const math::ConstChannelColumnRowTensorReference<double>& signal, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride, ConvolutionMethodOption method);
+
+    template math::ChannelColumnRowTensor<float> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, ConvolutionMethodOption method);
+    template math::ChannelColumnRowTensor<double> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, ConvolutionMethodOption method);
+
+    template math::ChannelColumnRowTensor<float> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride, ConvolutionMethodOption method);
+    template math::ChannelColumnRowTensor<double> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride, ConvolutionMethodOption method);
 }
 }

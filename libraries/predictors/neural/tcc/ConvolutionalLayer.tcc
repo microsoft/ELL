@@ -48,9 +48,9 @@ namespace predictors
             }
             if (_convolutionalParameters.method == ConvolutionMethod::winograd)
             {
-                // Verify that we meet the criteria for doing WinoGrad method. If not,
+                // Verify that we meet the criteria for doing Winograd method. If not,
                 // choose the normal method.
-                if (_convolutionalParameters.stride != 1)
+                if (_convolutionalParameters.stride != 1 || _convolutionalParameters.receptiveField != 3)
                 {
                     _convolutionalParameters.method = ConvolutionMethod::unrolled;
                 }
@@ -58,7 +58,7 @@ namespace predictors
             if (_isDepthwiseSeparable)
             {
                 // Verify we can use a workable method for depthwise separable convolutions.
-                if ((_convolutionalParameters.method != ConvolutionMethod::unrolled) || (_convolutionalParameters.method != ConvolutionMethod::simple))
+                if ((_convolutionalParameters.method != ConvolutionMethod::unrolled) && (_convolutionalParameters.method != ConvolutionMethod::simple) && (_convolutionalParameters.method != ConvolutionMethod::winograd))
                 {
                     _convolutionalParameters.method = ConvolutionMethod::unrolled;
                 }
@@ -177,6 +177,12 @@ namespace predictors
                     case ConvolutionMethod::unrolled:
                     {
                         auto result = dsp::Convolve2DUnrolled(inputChannelTensor, weights, numFilters, stride);
+                        outputChannelTensor.CopyFrom(result);
+                    }
+                    break;
+                    case ConvolutionMethod::winograd:
+                    {
+                        auto result = dsp::Convolve2DWinogradDepthwiseSeparable(inputChannelTensor, weights, numFilters, stride);
                         outputChannelTensor.CopyFrom(result);
                     }
                     break;

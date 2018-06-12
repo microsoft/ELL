@@ -61,7 +61,12 @@ namespace nodes
         break;
         case predictors::neural::ConvolutionMethod::winograd:
         {
-            auto convNode = transformer.AddNode<WinogradConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams.stride);
+            using FilterOrder = typename WinogradConvolutionNode<ValueType>::FilterOrder;
+            const int winogradTileSize = 2;
+            auto numFilterChannels = static_cast<int>(weights.NumChannels());
+            const int filtersFirstThreshold = 2;
+            const auto order = (numFilterChannels < filtersFirstThreshold) ? FilterOrder::filtersFirst : FilterOrder::tilesFirst;
+            auto convNode = transformer.AddNode<WinogradConvolutionNode<ValueType>>(newInput, inputLayout, outputLayout, weights, convParams.stride, winogradTileSize, order);
             transformer.MapNodeOutput(this->output, convNode->output);
         }
         break;

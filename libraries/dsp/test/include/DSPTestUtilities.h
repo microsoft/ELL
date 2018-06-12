@@ -36,9 +36,15 @@ std::string GetFilterSizeString(ell::math::ConstChannelColumnRowTensorReference<
 
 std::string GetConvAlgName(ell::dsp::ConvolutionMethodOption alg);
 
-// Helper function to avoid annoying double-to-float errors
+// Helper functions to avoid annoying double-to-float errors
 template <typename ValueType, typename ValueType2>
 ell::math::RowVector<ValueType> MakeVector(std::initializer_list<ValueType2> list);
+
+template <typename ValueType, typename ValueType2>
+ell::math::ChannelColumnRowTensor<ValueType> MakeTensor(std::initializer_list<std::initializer_list<ValueType2>> list);
+
+template <typename ValueType, typename ValueType2>
+ell::math::ChannelColumnRowTensor<ValueType> MakeTensor(std::initializer_list<std::initializer_list<std::initializer_list<ValueType2>>> list);
 
 //
 // Get some "interesting" input signal data.

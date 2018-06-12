@@ -81,6 +81,44 @@ math::RowVector<ValueType> MakeVector(std::initializer_list<ValueType2> list)
     return ell::math::RowVector<ValueType>(data);
 }
 
+// Helper function to avoid annoying double-to-float errors
+template <typename ValueType, typename ValueType2>
+ell::math::ChannelColumnRowTensor<ValueType> MakeTensor(std::initializer_list<std::initializer_list<ValueType2>> list)
+{
+    auto numRows = list.size();
+    auto numColumns = list.begin()->size();
+    auto numChannels = 1;
+    std::vector<ValueType> data;
+    data.reserve(numRows * numColumns * numChannels);
+    for (const auto& row : list)
+    {
+        DEBUG_THROW(row.size() != numColumns, ell::utilities::InputException(ell::utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
+        std::transform(row.begin(), row.end(), std::back_inserter(data), [](ValueType2 x) { return static_cast<ValueType>(x); });
+    }
+    return ell::math::ChannelColumnRowTensor<ValueType>(numRows, numColumns, numChannels, data);
+}
+
+// Helper function to avoid annoying double-to-float errors
+template <typename ValueType, typename ValueType2>
+ell::math::ChannelColumnRowTensor<ValueType> MakeTensor(std::initializer_list<std::initializer_list<std::initializer_list<ValueType2>>> list)
+{
+    auto numRows = list.size();
+    auto numColumns = list.begin()->size();
+    auto numChannels = list.begin()->begin()->size();
+    std::vector<ValueType> data;
+    data.reserve(numRows * numColumns * numChannels);
+    for (const auto& row : list)
+    {
+        DEBUG_THROW(row.size() != numColumns, ell::utilities::InputException(ell::utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
+        for (const auto& column: row)
+        {
+            DEBUG_THROW(column.size() != numChannels, ell::utilities::InputException(ell::utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
+            std::transform(column.begin(), column.end(), std::back_inserter(data), [](ValueType2 x) { return static_cast<ValueType>(x); });
+        }
+    }
+    return ell::math::ChannelColumnRowTensor<ValueType>(numRows, numColumns, numChannels, data);
+}
+
 //
 // Fill a vector with some "interesting" input signal data. The particular values aren't that important, 
 // but using something other than uniform noise is probably a good idea.
@@ -162,8 +200,8 @@ void FillFilterMatrix(math::RowMatrixReference<ValueType> filter)
     {
         for (size_t columnIndex = 0; columnIndex < numColumns; ++columnIndex)
         {
-            double value = 2 * std::sin(2.1 * pi * rowIndex / numRows) * std::cos(3.7 * 2 * pi * columnIndex / numColumns);
-            value = std::trunc(value * 4) / 4.0;
+            double value = 2 * std::sin((2.1 * pi * rowIndex + 0.25) / numRows) * std::cos(3.7 * 2 * pi * columnIndex / numColumns);
+            value = std::trunc(value * 8) / 8.0;
             filter(rowIndex, columnIndex) = static_cast<ValueType>(value);
         }
     }
@@ -219,6 +257,16 @@ template ell::math::RowVector<float> MakeVector(std::initializer_list<float> lis
 template ell::math::RowVector<float> MakeVector(std::initializer_list<double> list);
 template ell::math::RowVector<double> MakeVector(std::initializer_list<float> list);
 template ell::math::RowVector<double> MakeVector(std::initializer_list<double> list);
+
+template ell::math::ChannelColumnRowTensor<float> MakeTensor(std::initializer_list<std::initializer_list<float>> list);
+template ell::math::ChannelColumnRowTensor<float> MakeTensor(std::initializer_list<std::initializer_list<double>> list);
+template ell::math::ChannelColumnRowTensor<double> MakeTensor(std::initializer_list<std::initializer_list<float>> list);
+template ell::math::ChannelColumnRowTensor<double> MakeTensor(std::initializer_list<std::initializer_list<double>> list);
+
+template ell::math::ChannelColumnRowTensor<float> MakeTensor(std::initializer_list<std::initializer_list<std::initializer_list<float>>> list);
+template ell::math::ChannelColumnRowTensor<float> MakeTensor(std::initializer_list<std::initializer_list<std::initializer_list<double>>> list);
+template ell::math::ChannelColumnRowTensor<double> MakeTensor(std::initializer_list<std::initializer_list<std::initializer_list<float>>> list);
+template ell::math::ChannelColumnRowTensor<double> MakeTensor(std::initializer_list<std::initializer_list<std::initializer_list<double>>> list);
 
 //
 // Get some "interesting" input signal data.

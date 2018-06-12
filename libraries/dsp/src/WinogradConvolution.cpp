@@ -99,7 +99,7 @@ namespace dsp
         }
 
         //
-        // Utility functions for extracting data from or inserting data into tensors
+        // Tensor utility functions
         //
 
         // Extract a non-contiguous slice from a tensor by copying
@@ -117,6 +117,13 @@ namespace dsp
                     slice(rowIndex, columnIndex) = tensor(rowIndex, columnIndex, channelIndex);
                 }
             }
+        }
+
+        // Convert incoming f x r x c tensor into a (f*r) x c x 1 one
+        template <typename ValueType>
+        math::ConstChannelColumnRowTensorReference<ValueType> ReorderSeparableFiltersTensor(const math::ConstChannelColumnRowTensorReference<ValueType>& filters)
+        {
+            return { filters.GetConstDataPointer(), { filters.NumRows() * filters.NumColumns(), filters.NumChannels(), 1 } };
         }
 
         //
@@ -160,9 +167,9 @@ namespace dsp
 
             void CopyFrom(const ValueType* dataPtr, int startRow, int startColumn, int channelIndex, int numRows, int numColumns, int increment1, int increment2)
             {
-                for (int rowIndex = 0; rowIndex < numRows; ++rowIndex)
+                for (int rowIndex = 0; rowIndex < rows; ++rowIndex)
                 {
-                    for (int columnIndex = 0; columnIndex < numColumns; ++columnIndex)
+                    for (int columnIndex = 0; columnIndex < columns; ++columnIndex)
                     {
                         _data[rowIndex * columns + columnIndex] = dataPtr[(rowIndex + startRow) * increment2 + (columnIndex + startColumn) * increment1 + channelIndex];
                     }
@@ -184,7 +191,7 @@ namespace dsp
             const ValueType* GetDataPointer() const { return _data.data(); }
 
         private:
-            std::array<ValueType, rows * columns> _data = { 0 };
+            std::array<ValueType, rows* columns> _data = { 0 };
         };
 
         //
@@ -232,7 +239,7 @@ namespace dsp
             const ValueType* GetDataPointer() const { return _data.data(); }
 
         private:
-            std::array<ValueType, rows * columns * channels> _data = { 0 };
+            std::array<ValueType, rows* columns* channels> _data = { 0 };
         };
 
         template <typename ElementType, int rows, int columns>
@@ -587,9 +594,13 @@ namespace dsp
         const auto windowSize = tileSize + filterSize - 1;
         const auto numChannels = static_cast<int>(filters.NumChannels());
         assert(static_cast<int>(filters.NumColumns()) == filterSize);
-        assert(static_cast<int>(transformedFilters.NumRows()) == windowSize * windowSize);
-        assert(static_cast<int>(transformedFilters.NumColumns()) == numFilters);
-        assert(static_cast<int>(transformedFilters.NumChannels()) == numChannels);
+
+        if (order == WinogradFilterOrder::tilesFirst)
+        {
+            assert(static_cast<int>(transformedFilters.NumRows()) == windowSize * windowSize);
+            assert(static_cast<int>(transformedFilters.NumColumns()) == numFilters);
+            assert(static_cast<int>(transformedFilters.NumChannels()) == numChannels);
+        }
 
         // Get the strides for the various dimensions (which depend on the order parameter)
         // 'filtersFirst': (numFilters) x (numChannels) x (windowRows * windowColumns)
@@ -1221,6 +1232,26 @@ namespace dsp
             }
         }
 
+        // outputTile is a tr x tc matrix
+        // output is a r x c x nf tensor
+        static void AccumulatePartialOutputTile(const TileArray& outputTile,
+                                           int tileRowIndex,
+                                           int tileColumnIndex,
+                                           int filterIndex,
+                                           int rows,
+                                           int columns,
+                                           TensorReference& output)
+        {
+            // iterate over entries in the tile
+            for (int rowIndex = 0; rowIndex < rows; ++rowIndex)
+            {
+                for (int columnIndex = 0; columnIndex < columns; ++columnIndex)
+                {
+                    output((tileRowIndex * tileSize) + rowIndex, (tileColumnIndex * tileSize) + columnIndex, filterIndex) += outputTile(rowIndex, columnIndex);
+                }
+            }
+        }
+
         // outputBlock is a tr x tc x blockSize matrix
         // output is a r x c x nf tensor
         static void SplatPartialOutputBlock(const TileBlock& outputBlock,
@@ -1344,7 +1375,7 @@ namespace dsp
 
         //
         // Straightforward implementation of Winograd algorithm, using separate matrix multiplies to transform
-        // each tile
+        // each tile. Handles the depthwise-separable case as well.
         //
         static void Convolve2DWinogradFiltersFirst(const Tensor& input,
                                                    const Tensor& transformedFilters,
@@ -1352,37 +1383,41 @@ namespace dsp
                                                    TensorReference& output)
         {
             using Matrix = math::RowMatrix<ValueType>;
-            const int inputRows = static_cast<int>(input.NumRows());
-            const int inputColumns = static_cast<int>(input.NumColumns());
+            const int numInputRows = static_cast<int>(input.NumRows());
+            const int numInputColumns = static_cast<int>(input.NumColumns());
             const int numChannels = static_cast<int>(input.NumChannels());
-            const int outputRows = static_cast<int>(output.NumRows());
-            const int outputColumns = static_cast<int>(output.NumColumns());
+            const int numOutputRows = static_cast<int>(output.NumRows());
+            const int numOutputColumns = static_cast<int>(output.NumColumns());
             assert(numFilters == output.NumChannels());
 
+            const auto numTileRows = ((numOutputRows - 1) / tileSize) + 1;
+            const auto numTileColumns = ((numOutputColumns - 1) / tileSize) + 1;
+            const int numFilterChannels = transformedFilters.NumColumns();
+            const int filterStride = numFilterChannels * windowSize * windowSize;
+            const int filterChannelStride = windowSize * windowSize;
+
             // Temporary values
-            Matrix inputSlice(inputRows, inputColumns);
+            Matrix inputSlice(numInputRows, numInputColumns);
             WindowArray X;
             WindowArray d;
             TileArray outputTile;
 
-            const int numTileRows = outputRows / tileSize;
-            const int numTileColumns = outputColumns / tileSize;
-            const int filterStride = numChannels * windowSize * windowSize;
-            const int channelStride = windowSize * windowSize;
-            for (int channelIndex = 0; channelIndex < numChannels; ++channelIndex)
+            output.Fill(0);
+            for (int filterIndex = 0; filterIndex < numFilters; ++filterIndex)
             {
-                GetChannelSlice(input, channelIndex, inputSlice);
-
-                for (int filterIndex = 0; filterIndex < numFilters; ++filterIndex)
+                const int channelStart = (filterIndex * numFilterChannels) % numChannels;
+                for (int filterChannel = 0; filterChannel < numFilterChannels; ++filterChannel)
                 {
-                    auto filterPtr = transformedFilters.GetConstDataPointer() + filterIndex * filterStride + channelIndex * channelStride;
+                    const int channelIndex = channelStart + filterChannel;
+                    GetChannelSlice(input, channelIndex, inputSlice);
+                    const auto filterPtr = transformedFilters.GetConstDataPointer() + filterIndex * filterStride + filterChannel * filterChannelStride;
                     for (int tileRowIndex = 0; tileRowIndex < numTileRows; ++tileRowIndex)
                     {
-                        auto rowIndex = tileRowIndex * tileSize;
+                        const auto rowIndex = tileRowIndex * tileSize;
                         for (int tileColumnIndex = 0; tileColumnIndex < numTileColumns; ++tileColumnIndex)
                         {
-                            auto columnIndex = tileColumnIndex * tileSize;
-                            d.CopyFrom(inputSlice.GetConstDataPointer(), rowIndex, columnIndex, 0, inputRows, inputColumns, inputColumns, 1);
+                            const auto columnIndex = tileColumnIndex * tileSize;
+                            d.CopyFrom(inputSlice.GetConstDataPointer(), rowIndex, columnIndex, 0, numInputRows, numInputColumns, 1, numInputColumns);
 
                             // Compute X = B'dB
                             FixedWinogradTransform2D<ValueType, tileSize, filterSize>::TransformInputWindow(d, X);
@@ -1392,8 +1427,10 @@ namespace dsp
                             // Now compute output tile Y = At * X * A
                             FixedWinogradTransform2D<ValueType, 2, 3>::TransformOutputTile(X, outputTile);
 
-                            // copy the tile into the output image
-                            SplatOutputTile(outputTile, tileRowIndex, tileColumnIndex, filterIndex, output);
+                            // copy the tile into the output
+                            const int outputTileRows = std::min(static_cast<int>(tileSize), numOutputRows - rowIndex);
+                            const int outputTileColumns = std::min(static_cast<int>(tileSize), numOutputColumns - columnIndex);
+                            AccumulatePartialOutputTile(outputTile, tileRowIndex, tileColumnIndex, filterIndex, outputTileRows, outputTileColumns, output);
                         }
                     }
                 }
@@ -1595,6 +1632,45 @@ namespace dsp
         return output;
     }
 
+    // filters is a numFilters x filterSize x filterSize tensor
+    template <typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int tileSize, WinogradFilterOrder order)
+    {
+        const auto filterSize = static_cast<int>(filters.NumColumns());
+        // assert(filterSize == static_cast<int>(filters.NumChannels()) && "Filters must be square");
+        assert(filters.NumChannels() == 1 && "Filters must be single-channel");
+        assert(numFilters == static_cast<int>(input.NumChannels()) && "Must have same number of filters as input channels");
+
+        auto transformedFilters = GetTransformedFilters(filters, numFilters, tileSize, order);
+        return Convolve2DWinogradDepthwiseSeparablePretransformed(input, transformedFilters, numFilters, tileSize, filterSize, order);
+    }
+
+    template <typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradDepthwiseSeparablePretransformed(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order)
+    {
+        const auto numOutputRows = static_cast<int>(input.NumRows()) - filterSize + 1;
+        const auto numOutputColumns = static_cast<int>(input.NumColumns()) - filterSize + 1;
+        const auto numChannels = static_cast<int>(input.NumChannels());
+
+        math::ChannelColumnRowTensor<ValueType> output(numOutputRows, numOutputColumns, numChannels);
+
+        constexpr int blockSize = 1; // blockSize isn't really used in "filters first" mode
+        if (tileSize == 2 && filterSize == 3)
+        {
+            FixedWinograd2D<ValueType, 2, 3, blockSize>::Convolve2DWinogradFiltersFirst(input, transformedFilters, numFilters, output);
+        }
+        else if (tileSize == 4 && filterSize == 3)
+        {
+            FixedWinograd2D<ValueType, 4, 3, blockSize>::Convolve2DWinogradFiltersFirst(input, transformedFilters, numFilters, output);
+        }
+        else
+        {
+            assert(false && "Tile and filter size not implemented");
+        }
+
+        return output;
+    }
+
     //
     // Explicit instantiations
     //
@@ -1612,6 +1688,12 @@ namespace dsp
     template math::ChannelColumnRowTensor<double> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, WinogradFilterOrder order);
     template math::ChannelColumnRowTensor<double> Convolve2DWinograd(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int tileSize, WinogradFilterOrder order);
     template math::ChannelColumnRowTensor<double> Convolve2DWinogradPretransformed(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order);
+
+    // Depthwise-separable versions
+    template math::ChannelColumnRowTensor<float> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int tileSize, WinogradFilterOrder order);
+    template math::ChannelColumnRowTensor<float> Convolve2DWinogradDepthwiseSeparablePretransformed(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order);
+    template math::ChannelColumnRowTensor<double> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int tileSize, WinogradFilterOrder order);
+    template math::ChannelColumnRowTensor<double> Convolve2DWinogradDepthwiseSeparablePretransformed(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order);
 
     // Winograd matrix functions
     template math::RowMatrix<float> GetLeftDataTransformMatrix(int tileSize, int filterSize);

@@ -166,25 +166,109 @@ endif()
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 #
-# test project 
+# test projects
 #
 
+# general nodes tests
 set(test_name ${library_name}_test)
 
 set(test_src
     test/src/main.cpp
+    test/src/NodesTests.cpp
+    test/src/NodesTestData.cpp
+)
+
+set(test_include
+    test/include/NodesTests.h
+    test/include/NodesTestData.h
+)
+
+source_group("src" FILES ${test_src})
+source_group("include" FILES ${test_include})
+
+add_executable(${test_name}
+    ${test_src}
+    ${test_include}
+    ${include}
+)
+
+target_include_directories(${test_name}
+    PRIVATE
+        test/include
+)
+
+target_link_libraries(${test_name}
+    common
+    model
+    nodes
+    testing
+    utilities
+)
+
+copy_shared_libraries(${test_name})
+
+set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
+
+add_test(NAME ${test_name} COMMAND ${test_name})
+set_test_library_path(${test_name})
+
+# dsp nodes tests
+set(test_name dsp_${library_name}_test)
+
+set(test_src
+    test/src/DSPNodesTest_main.cpp
     test/src/DSPNodesTests.cpp
     test/src/DSPNodesTiming.cpp
-    test/src/NeuralNetworkLayerNodesTests.cpp
-    test/src/NodesTests.cpp
     test/src/NodesTestData.cpp
 )
 
 set(test_include
     test/include/DSPNodesTests.h
     test/include/DSPNodesTiming.h
+    test/include/NodesTestData.h
+)
+
+source_group("src" FILES ${test_src})
+source_group("include" FILES ${test_include})
+
+add_executable(${test_name}
+    ${test_src}
+    ${test_include}
+    ${include}
+)
+
+target_include_directories(${test_name}
+    PRIVATE
+        test/include
+)
+
+target_link_libraries(${test_name}
+    common
+    math
+    model
+    nodes
+    testing
+    utilities
+)
+
+copy_shared_libraries(${test_name})
+
+set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
+
+add_test(NAME ${test_name} COMMAND ${test_name})
+set_test_library_path(${test_name})
+
+# neural net nodes test
+set(test_name nn_${library_name}_test)
+
+set(test_src
+    test/src/NeuralNetworkLayerNodesTest_main.cpp
+    test/src/NeuralNetworkLayerNodesTests.cpp
+    test/src/NodesTestData.cpp
+)
+
+set(test_include
     test/include/NeuralNetworkLayerNodesTests.h
-    test/include/NodesTests.h
     test/include/NodesTestData.h
 )
 

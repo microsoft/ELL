@@ -39,13 +39,17 @@ int main()
     // 1D Convolution
     TestConv1D<float>(ConvolutionMethodOption::simple);
     TestConv1D<float>(ConvolutionMethodOption::winograd);
-    TestConv1D<float>(ConvolutionMethodOption::winograd);
     TestConv1DVsSimple<float>(32, 3, ConvolutionMethodOption::winograd);
     TestConv1DVsSimple<float>(33, 3, ConvolutionMethodOption::winograd);    
     
     // 2D Convolution
 
+    // Simple
+    TestConv2D<float>(ConvolutionMethodOption::simple);
+
     // Unrolled
+    TestConv2D<float>(ConvolutionMethodOption::unrolled);
+    
     // stride == 1
     TestConv2DVsSimple<float>(4, 4, 8, 3, 16, 1, ConvolutionMethodOption::unrolled);
     TestConv2DVsSimple<float>(6, 6, 8, 3, 16, 1, ConvolutionMethodOption::unrolled);
@@ -66,6 +70,7 @@ int main()
     TestConv2DVsSimple<float>(60, 40, 64, 3, 128, 2, ConvolutionMethodOption::unrolled);
     
     // Winograd
+    TestConv2D<float>(ConvolutionMethodOption::winograd);
     TestConv2DVsSimple<float>(4, 4, 1, 3, 1, 1, ConvolutionMethodOption::winograd);
     TestConv2DVsSimple<float>(4, 4, 8, 3, 16, 1, ConvolutionMethodOption::winograd);
     TestConv2DVsSimple<float>(6, 6, 8, 3, 16, 1, ConvolutionMethodOption::winograd);
@@ -76,6 +81,19 @@ int main()
     TestConv2DVsSimple<float>(60, 40, 64, 3, 128, 1, ConvolutionMethodOption::winograd);
     TestConv2DVsSimple<float>(129, 129, 128, 3, 128, 1, ConvolutionMethodOption::winograd);
     
+    // Depthwise-separable 2D convolution
+    // Winograd
+    TestConv2DSeparable<float>(ConvolutionMethodOption::winograd);
+    TestConv2DSeparableVsSimple<float>(4, 4, 1, 3, 1, ConvolutionMethodOption::winograd);
+    TestConv2DSeparableVsSimple<float>(4, 4, 8, 3, 1, ConvolutionMethodOption::winograd);
+    TestConv2DSeparableVsSimple<float>(6, 6, 8, 3, 1, ConvolutionMethodOption::winograd);
+    TestConv2DSeparableVsSimple<float>(120, 80, 8, 3, 1, ConvolutionMethodOption::winograd);
+    TestConv2DSeparableVsSimple<float>(121, 80, 8, 3, 1, ConvolutionMethodOption::winograd);
+    TestConv2DSeparableVsSimple<float>(122, 80, 8, 3, 1, ConvolutionMethodOption::winograd);
+    TestConv2DSeparableVsSimple<float>(121, 81, 8, 3, 1, ConvolutionMethodOption::winograd);
+    TestConv2DSeparableVsSimple<float>(60, 40, 64, 3, 1, ConvolutionMethodOption::winograd);
+    TestConv2DSeparableVsSimple<float>(129, 129, 128, 3, 1, ConvolutionMethodOption::winograd);
+
     // FFT
     TestFFT<float>(16);
     TestFFT<double>(16);

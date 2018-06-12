@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ConvolutionTestData.h"
+#include "DSPTestUtilities.h"
 
 // math
 #include "Tensor.h"
@@ -20,26 +21,44 @@
 #include <vector>
 namespace
 {
-// Helper function to avoid annoying double-to-float errors
-template <typename ValueType, typename ValueType2>
-ell::math::ChannelColumnRowTensor<ValueType> MakeTensor(std::initializer_list<std::initializer_list<ValueType2>> list)
-{
-    auto numRows = list.size();
-    auto numColumns = list.begin()->size();
-    auto numChannels = 1;
-    std::vector<ValueType> data;
-    data.reserve(numRows * numColumns * numChannels);
-    for (const auto& row : list)
-    {
-        DEBUG_THROW(row.size() != numColumns, ell::utilities::InputException(ell::utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
-        std::transform(row.begin(), row.end(), std::back_inserter(data), [](ValueType2 x) { return static_cast<ValueType>(x); });
-    }
-    return ell::math::ChannelColumnRowTensor<ValueType>(numRows, numColumns, numChannels, data);
-}
+
 }
 
 //
-// NOTE: The examples matrices below were randomly-generated using
+// NOTE: The examples below were randomly-generated using
+//       the following script:
+//
+// ```
+// import scipy
+// import scipy.signal
+// import numpy as np
+//
+// input = np.random.rand(16)
+// filter = [0.25, 0.5, 0.25]
+// reference = scipy.signal.correlate(input, filter, mode="valid", method="direct")
+// ```
+
+template <typename ValueType>
+ell::math::RowVector<ValueType> Get1DReferenceFilter()
+{
+    return MakeVector<ValueType>({ 0.25, 0.5, 0.25 });
+}
+
+template <typename ValueType>
+ell::math::RowVector<ValueType> Get1DReferenceSignal()
+{
+    return MakeVector<ValueType>({ 0.42929697, 0.90317845, 0.84490289, 0.66174327, 0.10820399, 0.3511343, 0.58248869, 0.62674724, 0.11014194, 0.00132073, 0.58431646, 0.39873614, 0.40304155, 0.79139607, 0.97710827, 0.21268128 });
+}
+
+template <typename ValueType>
+ell::math::RowVector<ValueType> Get1DReferenceConvolutionResult()
+{
+    return MakeVector<ValueType>({ 0.77013919, 0.81368187, 0.56914835, 0.30732139, 0.34824032, 0.53571473, 0.48653128, 0.21208796, 0.17427497, 0.39217245, 0.44620757, 0.49905383, 0.74073549, 0.73957347 });
+}
+
+
+//
+// NOTE: The examples below were randomly-generated using
 //       the following script:
 //
 // ```
@@ -106,6 +125,201 @@ ell::math::ChannelColumnRowTensor<ValueType> GetReferenceConvolutionResult()
     // clang-format on
 }
 
+//
+// NOTE: The (separable) examples below were randomly-generated using
+//       the following script:
+//
+// ```
+// import numpy as np
+// import scipy
+// import scipy.signal
+//
+// signal0 = np.random.rand(8, 8)
+// signal1 = np.random.rand(8, 8)
+// filter0 = np.array([[0.25, 0.5, 0.25], [0.5, 0.75, 0.5], [0.25, 0.5, 0.25]])
+// filter1 = np.array([[-4.0, -3.0, -2.0], [-1.0, 0, 1.0], [2.0, 3.0, 4.0]])
+// reference0 = scipy.signal.correlate2d(signal0, filter0, 'valid')
+// reference1 = scipy.signal.correlate2d(signal1, filter1, 'valid')
+// signal = np.dstack((signal0, signal1))
+// filters = np.vstack((filter0, filter1))[..., np.newaxis]
+// reference = np.dstack((reference0, reference1))
+// ```
+
+// This is `signal` from the above script
+template <typename ValueType>
+ell::math::ChannelColumnRowTensor<ValueType> GetSeparableReferenceSignal()
+{
+    // clang-format off
+    return MakeTensor<ValueType>(
+  {{{ 0.77704386,  0.17719713},
+        { 0.2127641 ,  0.26191137},
+        { 0.55649509,  0.03679116},
+        { 0.60540351,  0.8080396 },
+        { 0.23176575,  0.30967451},
+        { 0.42270152,  0.29999038},
+        { 0.57870271,  0.30152876},
+        { 0.18390143,  0.9763656 }},
+
+       {{ 0.2513238 ,  0.6472011 },
+        { 0.45239128,  0.20456586},
+        { 0.14063393,  0.7356127 },
+        { 0.56301986,  0.51060672},
+        { 0.61931064,  0.3529742 },
+        { 0.3007121 ,  0.73187422},
+        { 0.6515026 ,  0.23840884},
+        { 0.0660189 ,  0.15498372}},
+
+       {{ 0.34754481,  0.56981455},
+        { 0.39545264,  0.61763261},
+        { 0.81155498,  0.85366757},
+        { 0.93284053,  0.09572927},
+        { 0.59607739,  0.07535916},
+        { 0.80628505,  0.67507245},
+        { 0.37462412,  0.75733525},
+        { 0.26548847,  0.10677427}},
+
+       {{ 0.86017424,  0.84620209},
+        { 0.60825397,  0.70948095},
+        { 0.62464957,  0.20917322},
+        { 0.65586735,  0.58894087},
+        { 0.2558593 ,  0.12988929},
+        { 0.72331977,  0.30518262},
+        { 0.10762656,  0.50205134},
+        { 0.7833497 ,  0.67471143}},
+
+       {{ 0.88433706,  0.10657174},
+        { 0.31878617,  0.03046742},
+        { 0.99841977,  0.76936515},
+        { 0.27481677,  0.48168907},
+        { 0.3890554 ,  0.83798981},
+        { 0.57709129,  0.8440552 },
+        { 0.96311566,  0.68162945},
+        { 0.22571877,  0.55449145}},
+
+       {{ 0.89020216,  0.90723188},
+        { 0.52967635,  0.2198577 },
+        { 0.76388013,  0.76108195},
+        { 0.99716117,  0.44162324},
+        { 0.60465463,  0.95560629},
+        { 0.08213041,  0.3780067 },
+        { 0.981942  ,  0.87859442},
+        { 0.91193782,  0.58253307}},
+
+       {{ 0.91033461,  0.07916011},
+        { 0.78014145,  0.30759858},
+        { 0.85930059,  0.16007589},
+        { 0.19431951,  0.19259716},
+        { 0.46727963,  0.38571914},
+        { 0.77355964,  0.80754423},
+        { 0.37712725,  0.54913516},
+        { 0.03556924,  0.33632854}},
+
+       {{ 0.72599405,  0.43763108},
+        { 0.19753109,  0.79416237},
+        { 0.92076123,  0.71817211},
+        { 0.26679867,  0.78686167},
+        { 0.30170623,  0.37078718},
+        { 0.87734979,  0.77122499},
+        { 0.73528817,  0.9158854 },
+        { 0.72936416,  0.28024589}}}
+        );
+    // clang-format on
+}
+
+// This is `filters` from the above script
+template <typename ValueType>
+ell::math::ChannelColumnRowTensor<ValueType> GetSeparableReferenceFilters()
+{
+    // clang-format off
+    return MakeTensor<ValueType>(
+      {{{ 0.25},
+        { 0.5 },
+        { 0.25}},
+
+       {{ 0.5 },
+        { 0.75},
+        { 0.5 }},
+
+       {{ 0.25},
+        { 0.5 },
+        { 0.25}},
+
+       {{-4.  },
+        {-3.  },
+        {-2.  }},
+
+       {{-1.  },
+        { 0.  },
+        { 1.  }},
+
+       {{ 2.  },
+        { 3.  },
+        { 4.  }}}
+    );
+    // clang-format on
+}
+
+// This is `reference` from the above script
+template <typename ValueType>
+ell::math::ChannelColumnRowTensor<ValueType> GetSeparableReferenceConvolutionResult()
+{
+    // clang-format off
+    return MakeTensor<ValueType>(
+      {{{ 1.46254038,  4.92750386},
+        { 1.83382125,  1.71112773},
+        { 2.12033251, -1.27731134},
+        { 2.00207819, -1.42206935},
+        { 1.92072648,  2.34898465},
+        { 1.56824999, -0.58492177}},
+
+       {{ 1.87565738,  0.26766556},
+        { 2.22533768, -0.16597329},
+        { 2.42300355, -3.25380155},
+        { 2.31493557, -1.19747465},
+        { 2.01065525, -0.21882925},
+        { 1.66476955,  0.29437593}},
+
+       {{ 2.31618593, -3.09451367},
+        { 2.48600924, -1.04774518},
+        { 2.23476048,  2.40389643},
+        { 2.02181284,  4.61067063},
+        { 1.99663906,  3.46550053},
+        { 1.97157043,  1.13464925}},
+
+       {{ 2.53415973,  0.24956041},
+        { 2.43762086,  0.29735065},
+        { 2.28862533,  3.87478935},
+        { 1.76262222,  2.26866165},
+        { 1.9991497 ,  3.96404225},
+        { 2.29371048,  1.35605782}},
+
+       {{ 2.68686023, -0.48114994},
+        { 2.65720502, -1.3057643 },
+        { 2.34522024, -3.56316331},
+        { 1.87625108, -1.41992401},
+        { 2.07936607, -1.933784  },
+        { 2.3065968 , -1.71775754}},
+
+       {{ 2.6587368 ,  0.40068899},
+        { 2.47181842,  2.72936322},
+        { 2.08876022, -0.77468887},
+        { 1.84343973,  0.99660672},
+        { 2.13801102,  0.16857288},
+        { 2.19622051, -0.37300212}}}        
+        );
+    // clang-format on
+}
+
+
+template ell::math::RowVector<float> Get1DReferenceFilter();
+template ell::math::RowVector<double> Get1DReferenceFilter();
+
+template ell::math::RowVector<float> Get1DReferenceSignal();
+template ell::math::RowVector<double> Get1DReferenceSignal();
+
+template ell::math::RowVector<float> Get1DReferenceConvolutionResult();
+template ell::math::RowVector<double> Get1DReferenceConvolutionResult();
+
 template ell::math::ChannelColumnRowTensor<float> GetReferenceFilter();
 template ell::math::ChannelColumnRowTensor<double> GetReferenceFilter();
 
@@ -114,3 +328,12 @@ template ell::math::ChannelColumnRowTensor<double> GetReferenceSignal();
 
 template ell::math::ChannelColumnRowTensor<float> GetReferenceConvolutionResult();
 template ell::math::ChannelColumnRowTensor<double> GetReferenceConvolutionResult();
+
+template ell::math::ChannelColumnRowTensor<float> GetSeparableReferenceFilters();
+template ell::math::ChannelColumnRowTensor<double> GetSeparableReferenceFilters();
+
+template ell::math::ChannelColumnRowTensor<float> GetSeparableReferenceSignal();
+template ell::math::ChannelColumnRowTensor<double> GetSeparableReferenceSignal();
+
+template ell::math::ChannelColumnRowTensor<float> GetSeparableReferenceConvolutionResult();
+template ell::math::ChannelColumnRowTensor<double> GetSeparableReferenceConvolutionResult();

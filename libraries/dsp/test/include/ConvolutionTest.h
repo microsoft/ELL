@@ -37,3 +37,10 @@ void TestConv2D(ell::dsp::ConvolutionMethodOption algorithm);
 
 template <typename ValueType>
 void TestConv2DVsSimple(int numRows, int numColumns, int numChannels, int filterSize, int numFilters, int stride, ell::dsp::ConvolutionMethodOption algorithm);
+
+// Depthwise-separable 2D (multiple "flat" 2D in parallel)
+template <typename ValueType>
+void TestConv2DSeparable(ell::dsp::ConvolutionMethodOption algorithm);
+
+template <typename ValueType>
+void TestConv2DSeparableVsSimple(int numRows, int numColumns, int numChannels, int filterSize, int stride, ell::dsp::ConvolutionMethodOption algorithm);

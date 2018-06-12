@@ -35,7 +35,7 @@ namespace dsp
     ///
     /// <returns> A tensor with the result of the convolution `input` (*) `filter`
     template <typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> Convolve2DSimple(const math::ChannelColumnRowTensor<ValueType>& input, const math::ChannelColumnRowTensor<ValueType>& filters, int numFilters);
+    math::ChannelColumnRowTensor<ValueType> Convolve2DSimple(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters);
 
     /// <summary> Spatially convolve a 3D image with a stack of 3D filters. </summary>
     ///
@@ -46,7 +46,18 @@ namespace dsp
     ///
     /// <returns> A tensor with the result of the convolution `input` (*) `filter`
     template <typename ValueType>
-    math::ChannelColumnRowTensor<ValueType> Convolve2DSimple(const math::ChannelColumnRowTensor<ValueType>& input, const math::ChannelColumnRowTensor<ValueType>& filters, int numFilters, int stride);
+    math::ChannelColumnRowTensor<ValueType> Convolve2DSimple(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride);
+
+    /// <summary> Convolve a set of 2D images with a corresponding set of 2D filters. </summary>
+    ///
+    /// <param name="input"> The input image: a (r x c x d) tensor. </param>
+    /// <param name="filters"> The filters to convolve with. A (fr x fc x d) tensor. </param>
+    /// <param name="numFilters"> The number of filters in the `filters` argument. </param>
+    /// <param name="stride"> The number of elements to move/jump when sliding over the input. Typically this is 1 to 3. </param>
+    ///
+    /// <returns> A tensor with the result of the convolution `input` (*) `filter`
+    template <typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2DSimpleDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride);
 
     //
     // Versions that accept the result storage
@@ -67,6 +78,6 @@ namespace dsp
     /// <param name="stride"> The number of elements to move/jump when sliding over the input. Typically this is 1 to 3. </param>
     /// <param name="result"> The tensor to write the result into. </param>
     template <typename ValueType>
-    void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<ValueType> input, const math::ChannelColumnRowTensor<ValueType>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<ValueType> result);
+    void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<ValueType> input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<ValueType> result);
 }
 }

@@ -167,7 +167,9 @@ static void TimeConvolutionNode(int inputRows, int inputColumns, int numChannels
     const int inputPadding = 1;
     const int outputPadding = 0;
     const int stride = 1;
+    
     const int winogradTileSize = 2;
+    const auto winogradFilterOrder = nodes::WinogradConvolutionNode<ValueType>::FilterOrder::tilesFirst;
     
     auto inputSize = (inputRows + 2 * inputPadding) * (inputColumns + 2 * inputPadding) * numChannels;
     auto totalFilterSize = filterSize * filterSize * numFilters * numChannels;
@@ -198,7 +200,7 @@ static void TimeConvolutionNode(int inputRows, int inputColumns, int numChannels
         outputNode = model.AddNode<nodes::UnrolledConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
         break;
     case dsp::ConvolutionMethodOption::winograd:
-        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride, winogradTileSize);
+        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride, winogradTileSize, winogradFilterOrder);
         break;
     }
 

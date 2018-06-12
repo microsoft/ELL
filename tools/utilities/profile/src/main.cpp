@@ -299,6 +299,8 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
 
     std::vector<InputType> input = GetModelInput<InputType>(map, profileArguments, converterArgs);
 
+    // Initialize pass registry
+    passes::AddStandardPassesToRegistry();
     ReplaceSourceAndSinkNodes(map);
 
     // In "summary only" mode, we don't compile the model with profiling enabled
@@ -318,6 +320,7 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
     model::IRMapCompiler compiler(settings);
 
     std::cout << "Compiling model" << std::endl;
+    std::cout << "Preferred convolution method: " << static_cast<int>(settings.optimizerSettings.preferredConvolutionMethod) << std::endl;
     auto compiledMap = compiler.Compile(map);
 
     auto numNodes = compiledMap.GetNumProfiledNodes();
