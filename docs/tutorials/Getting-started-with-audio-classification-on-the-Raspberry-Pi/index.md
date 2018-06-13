@@ -22,7 +22,7 @@ Think of it as a way of transforming the audio into a picture that the classifie
 
 Complete the following steps before starting the tutorial.
 * Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
-* Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+* Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Raspberry-Pi-setup).
 
 ## What you will need
 
@@ -312,4 +312,4 @@ This tutorial used the **wrap** tool as a convenient way to compile the model an
 
 ## Troubleshooting
 
-Look for troubleshooting tips at the end of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+Look for troubleshooting tips at the end of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup).

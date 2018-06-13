@@ -17,7 +17,7 @@ This tutorial shows you how to run two different ELL models side-by-side on a Ra
 ## Before you begin
 Complete the following steps before starting the tutorial.
 * Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
-* Follow the instructions for [setting up your Raspberry Pi device](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+* Follow the instructions for [setting up your Raspberry Pi device](/ELL/tutorials/Raspberry-Pi-setup).
 * Complete the [Getting started with image classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/) tutorial to learn how to produce a Python wrapper for an ELL model.
 
 ## Required materials
@@ -276,7 +276,7 @@ cd ../..
 
 ## Classify live video on the Raspberry Pi
 
-If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an Anaconda environment named `py34`. Activate this environment and run your script.
+If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup), you should have an Anaconda environment named `py34`. Activate this environment and run your script.
 
 ```shell
 source activate py34
@@ -289,4 +289,4 @@ If you downloaded the full **side_by_side.py** script from [here](/ELL/tutorials
 
 ## Troubleshooting
 
-Look for tips in the Troubleshooting section of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+Look for tips in the Troubleshooting section of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup).

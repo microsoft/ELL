@@ -20,7 +20,7 @@ Complete the following steps before starting the tutorial.
 
 **Note** The **wrap.py** tool, which simplifies the process of compiling ELL models, is written in **Python**. If you prefer not to use it, you can perform the compilation steps manually, as described in the [wrap tool documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
 
-* Follow the instructions for [setting up your Raspberry Pi device](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+* Follow the instructions for [setting up your Raspberry Pi device](/ELL/tutorials/Raspberry-Pi-setup).
 * Optional: read  the instructions in [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/).
 
 ## What you will need
@@ -298,4 +298,4 @@ The [ELL gallery](/ELL/gallery/) offers different models for image classificatio
 
 ## Troubleshooting
 
-Look for troubleshooting tips at the end of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+Look for troubleshooting tips at the end of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup).

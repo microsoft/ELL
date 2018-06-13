@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Setting up your Raspberry Pi for tutorials
-permalink: /tutorials/Setting-up-your-Raspberry-Pi
+title: Raspberry Pi Setup
+permalink: /tutorials/Raspberry-Pi-setup/
 ---
 
-# Setting up your Raspberry Pi device for tutorials
+# Raspberry Pi Setup
 
 *by Chris Lovett and Ofer Dekel*
 
@@ -29,43 +29,62 @@ Avoid long and thin micro-USB cables because using them will often create a noti
 * **Network**. You'll use a network  to download required software to the Pi and to transfer compiled ELL models from your computer to the Pi. Connect your Pi to your network, either over Wifi or with an Ethernet cable. 
 
 * **Pi Camera** By default, OpenCV can read images from a USB webcam, but not from the Raspberry Pi camera. To enable the Pi camera, first make sure that the camera interface is enabled by running the Pi configuration tool.
-
-```shell
-sudo raspi-config
-```
-1. Select **5 Interfacing Option** and press **Enter**. 
-2. Select **P1 Camera** and press **Enter** . 
-3. Select **Yes** to enable the camera interface. 4. Load the camera module, as follows.
-```shell
-sudo modprobe bcm2835-v4l2
-```
+    ```shell
+    sudo raspi-config
+    ```
+    1. Select **5 Interfacing Option** and press **Enter**. 
+    2. Select **P1 Camera** and press **Enter** . 
+        3. Select **Yes** to enable the camera interface. 
+    4. Install the camera module, as follows.
+    ```shell
+    sudo modprobe bcm2835-v4l2
+    ```
+    5. If this works you should get this device should show up `/dev/video0`
+    6. The camera will be disabled automatically after reboot (it's a security feature), so if you want the camera to be on after reboot without having to repeat the above steps you need to add the following line to the end of your `/boot/config.txt` file:
+    ```shell
+    # enable the camera
+    start_x=1
+    ```
+    6. And the following line to the end of your `/etc/modules` file:
+    ```shell
+    # camera with v4l2 driver
+    bcm2835-v4l2
+    ```
 
 * **Secure Shell (SSH)** The tutorials require you to copy files to the Raspberry Pi device. A typical way to copy files to the Pi is to use an SSH tool, such as the Unix **scp** tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool. To enable SSH on your Pi, run the Pi configuration tool.
-```shell
-sudo raspi-config
-```
-1. Select **5 Interfacing Options** and press **Enter**. 
-2. Select **P2 SSH** and press **Enter**. 
-3. Select **Yes** to enable the SSH server.
+    ```shell
+    sudo raspi-config
+    ```
+    1. Select **5 Interfacing Options** and press **Enter**. 
+    2. Select **P2 SSH** and press **Enter**. 
+    3. Select **Yes** to enable the SSH server.
 
 ## Programming tools
-* **CMake** You'll use CMake on the Raspberry Pi to create Python modules that can be called from the tutorial code. To install CMake on your Pi, connect to the network, open a terminal window, and type the following.
+### CMake
+You'll use CMake on the Raspberry Pi to create Python modules that can be called from the tutorial code. To install CMake on your Pi, connect to the network, open a terminal window, and type the following.
 ```shell
 sudo apt-get update
 sudo apt-get install -y cmake
 ```
 
-* **OpenBLAS** This is a library for fast linear algebra operations, which can significantly increase the speed of your models. It is optional, but highly recommended. To install OpenBLAS, type the following.
+### OpenBLAS
+This is a library for fast linear algebra operations, which can significantly increase the speed of your models. It is optional, but highly recommended. To install OpenBLAS, type the following.
 ```shell
 sudo apt-get install -y libopenblas-dev
 ```
 
-* **curl** This is a command line tool used to transfer data via URL. When files are required to be downloaded from a URL, the instructions assume you have **curl** available to perform the download. To install `curl`, type the following.
+### curl
+This is a command line tool used to transfer data via URL. When files are required to be downloaded from a URL, the instructions assume you have **curl** available to perform the download. To install `curl`, type the following.
 ```shell
 sudo apt-get install -y curl
 ```
 
-* **Python 3.4 via Miniconda** All of the tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). An easy way to install Python and all the required modules is with [Miniconda](https://conda.io/miniconda.html).
+### Python 3.4 via Miniconda
+All of the tutorials require Python 3.4 or above on the Pi (and Python 3.6 on your computer). An easy way to install Python and all the required modules is with [Miniconda](https://conda.io/miniconda.html).
+
+**Note:** Miniconda is not available for `Raspberry Pi Zero`.  Turns out Rasbian Stretch already comes with Python 3.5, so
+we only really need Miniconda to get our build of OpenCV which we use in the tutorials.  On Raspberry Pi Zero you will need to jump to these instructions on how to [Build OpenCV for Python 3.5](https://github.com/Microsoft/ELL/wiki/Building-OpenCV-for-Python-3.5)
+
 To install Miniconda, type the following.
 ```shell
 curl -O --location http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
@@ -80,13 +99,17 @@ source activate py34
 ```
 Remember to run `source activate py34` each time you start a new terminal window.
 
-* **[OpenCV](http://opencv.org/)** 
- is a computer vision library that makes it easy to read images from a camera, resize them, and prepare them for processing by ELL. To install OpenCV, type the following.
+### [OpenCV](http://opencv.org/)
+OpenCV is a computer vision library that makes it easy to read images from a camera, resize them, and prepare them for processing by ELL. To install OpenCV, type the following.
+
 ```shell
-conda install -c microsoft-ell opencv -y
+conda config --add channels "microsoft-ell"
+conda install -y -c microsoft-ell/label/stretch opencv
 ```
 
-* **C++ OpenCV SDK** If you intend to run the C++ tutorials, you also need the C++ OpenCV SDK, which you can install on your Raspberry Pi using the following command.
+### C++ OpenCV SDK
+If you intend to run the C++ tutorials, you also need the C++ OpenCV SDK, which you can install on your Raspberry Pi using the following command.
+
 ```shell
 sudo apt-get install -y libopencv-dev
 ```
@@ -189,7 +212,6 @@ You might be running Rasbian Stretch but you installed OpenCV for Jessie. You ca
 ```
 conda install -c microsoft-ell/label/stretch opencv
 ```
-
 
 **ImportError: No module named 'numpy'**
 

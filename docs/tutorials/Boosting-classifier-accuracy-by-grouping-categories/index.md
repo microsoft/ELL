@@ -18,7 +18,7 @@ The tutorial includes instructions for a Python script that reads images from th
 ## Before you begin
 Complete the following steps before starting the tutorial.
 * Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
-* Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+* Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Raspberry-Pi-setup).
 * Optional: Complete the tutorial [Getting started with image classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/) to learn how to produce a Python wrapper for an ELL model.
 
 ## What you will need
@@ -173,7 +173,7 @@ if __name__ == "__main__":
 
 ## Classify live video on the Raspberry Pi device
 
-By following the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should now have an Anaconda environment named `py34`. Activate this environment and run the script.
+By following the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup), you should now have an Anaconda environment named `py34`. Activate this environment and run the script.
 
 ```shell
 source activate py34
@@ -274,5 +274,5 @@ def main():
 ```
 
 ## Troubleshooting
-Find tips in the Troubleshooting section of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+Find tips in the Troubleshooting section of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup).
 

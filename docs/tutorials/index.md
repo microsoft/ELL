@@ -8,7 +8,7 @@ permalink: /tutorials/
 
 ## Setting Up
 
-* [Setting up your Raspberry Pi for tutorials](/ELL/tutorials/Setting-up-your-Raspberry-Pi)
+* [Raspberry Pi Setup](/ELL/tutorials/Raspberry-Pi-setup)
 * [Active cooling your Raspberry Pi 3](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3)
 
 ## Image Classification Tutorials in Python

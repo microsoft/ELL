@@ -18,7 +18,7 @@ This tutorial guides you through the process of getting started with image class
 
 Complete the following steps before starting the tutorial.
 * Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
-* Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+* Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Raspberry-Pi-setup).
 
 ## What you will need
 
@@ -337,7 +337,7 @@ You just created a Python module named **model**, which includes functions that 
 
 ## Classify live video on the Raspberry Pi device
 
-After following the [Raspberry Pi setup instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you'll have an Anaconda environment named **py36.** Open a terminal window, and activate your Anaconda environment, and run the script that you wrote above.
+After following the [Raspberry Pi setup instructions](/ELL/tutorials/Raspberry-Pi-setup), you'll have an Anaconda environment named **py36.** Open a terminal window, and activate your Anaconda environment, and run the script that you wrote above.
 
 ```shell
 source activate py34
@@ -357,4 +357,4 @@ To learn more about how the **wrap** tool works, read the [wrap documentation](h
 
 **Image processing is slow.** You might notice that the average time it takes the model to process each image is slower than indicated in  the [ELL gallery](/ELL/gallery/). This is because the Python wrapper adds some overhead that slows the model down. To run the model at its top speed, follow the [C++ version of this tutorial](/ELL/tutorials/Getting-started-with-image-classification-in-cpp).
 
-**Look for more troubleshooting tips** at the end of the [Raspberry Pi setup instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+**Look for more troubleshooting tips** at the end of the [Raspberry Pi setup instructions](/ELL/tutorials/Raspberry-Pi-setup).

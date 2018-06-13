@@ -28,7 +28,7 @@ boxes and labels.
     [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md),
     [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
 * Follow the instructions for
-[setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+[setting up your Raspberry Pi](/ELL/tutorials/Raspberry-Pi-setup).
 * Complete the basic tutorial,
 [Getting started with image classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/),
 to learn how to produce a Python wrapper for an ELL model.
@@ -281,7 +281,7 @@ if __name__ == "__main__":
 
 ## Detect and classify objects in live video on the Raspberry Pi device
 
-If you set up your device using the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an Anaconda environment named `py34`. Activate this environment and run the script.
+If you set up your device using the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup), you should have an Anaconda environment named `py34`. Activate this environment and run the script.
 
 ```shell
 source activate py34
@@ -310,4 +310,4 @@ detected regions.
 ## Troubleshooting
 
 For help with Raspberry Pi device set up, see
-[Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+[Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup).
