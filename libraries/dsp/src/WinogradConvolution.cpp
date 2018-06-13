@@ -17,6 +17,7 @@
 // utilities
 #include "Debug.h"
 #include "Exception.h"
+#include "Unused.h"
 
 // stl
 #include <array>
@@ -167,6 +168,7 @@ namespace dsp
 
             void CopyFrom(const ValueType* dataPtr, int startRow, int startColumn, int channelIndex, int numRows, int numColumns, int increment1, int increment2)
             {
+                UNUSED(numColumns, numRows);
                 for (int rowIndex = 0; rowIndex < rows; ++rowIndex)
                 {
                     for (int columnIndex = 0; columnIndex < columns; ++columnIndex)
@@ -983,7 +985,7 @@ namespace dsp
             const auto numChannels = static_cast<int>(input.NumChannels());
             const int channelsToCopy = (numChannels - channelIndex) < blockSize ? (numChannels - channelIndex) : blockSize;
 
-            d.CopyFrom(input, rowIndex, columnIndex, channelIndex, windowSize, windowSize, channelsToCopy, numChannels * input.NumColumns(), numChannels);
+            d.CopyFrom(input, rowIndex, columnIndex, channelIndex, windowSize, windowSize, channelsToCopy, numChannels * static_cast<int>(input.NumColumns()), numChannels);
         }
 
         static void GetPartialInputBlock(const ConstTensorReference& input,
@@ -1185,7 +1187,7 @@ namespace dsp
                                             int filterIndex,
                                             TensorReference& output)
         {
-            const int numFilters = output.NumChannels();
+            const int numFilters = static_cast<int>(output.NumChannels());
             assert(filterIndex < numFilters);
             const int filtersToCopy = (numFilters - filterIndex) < blockSize ? (numFilters - filterIndex) : blockSize;
 
@@ -1263,7 +1265,7 @@ namespace dsp
                                             TensorReference& output)
         {
 
-            const int numFilters = output.NumChannels();
+            const int numFilters = static_cast<int>(output.NumChannels());
             assert(filterIndex < numFilters);
             const int filtersToCopy = (numFilters - filterIndex) < blockSize ? (numFilters - filterIndex) : blockSize;
 
@@ -1390,9 +1392,9 @@ namespace dsp
             const int numOutputColumns = static_cast<int>(output.NumColumns());
             assert(numFilters == output.NumChannels());
 
-            const auto numTileRows = ((numOutputRows - 1) / tileSize) + 1;
-            const auto numTileColumns = ((numOutputColumns - 1) / tileSize) + 1;
-            const int numFilterChannels = transformedFilters.NumColumns();
+            const int numTileRows = ((numOutputRows - 1) / tileSize) + 1;
+            const int numTileColumns = ((numOutputColumns - 1) / tileSize) + 1;
+            const int numFilterChannels = static_cast<int>(transformedFilters.NumColumns());
             const int filterStride = numFilterChannels * windowSize * windowSize;
             const int filterChannelStride = windowSize * windowSize;
 
@@ -1648,6 +1650,7 @@ namespace dsp
     template <typename ValueType>
     math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradDepthwiseSeparablePretransformed(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order)
     {
+        UNUSED(order);
         const auto numOutputRows = static_cast<int>(input.NumRows()) - filterSize + 1;
         const auto numOutputColumns = static_cast<int>(input.NumColumns()) - filterSize + 1;
         const auto numChannels = static_cast<int>(input.NumChannels());

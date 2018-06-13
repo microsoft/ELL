@@ -83,7 +83,7 @@ void TestConv1D(dsp::ConvolutionMethodOption algorithm)
         std::cerr << "Error: result sizes not equal, reference: " << reference.Size() << ", result: " << result.Size() << std::endl;
     }
 
-    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
+    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, static_cast<ValueType>(epsilon)));
     if (!ok)
     {
         std::cout << "Incorrect result for 1D " << GetConvAlgName(algorithm) << " convolution " << std::endl;
@@ -111,7 +111,7 @@ void TestConv2D(dsp::ConvolutionMethodOption algorithm)
         std::cerr << "Error: result sizes not equal, reference: " << reference.Size() << ", result: " << result.Size() << std::endl;
     }
 
-    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
+    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, static_cast<ValueType>(epsilon)));
     if (!ok)
     {
         std::cout << "Incorrect result for 2D convolution " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << std::endl;
@@ -145,7 +145,7 @@ void TestConv2DSeparable(dsp::ConvolutionMethodOption algorithm)
         std::cerr << "Error: result sizes not equal, reference: " << reference.Size() << ", result: " << result.Size() << std::endl;
     }
 
-    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
+    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, static_cast<ValueType>(epsilon)));
     if (!ok)
     {
         std::cout << "Incorrect result for separable 2D convolution " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << std::endl;
@@ -179,7 +179,7 @@ void TestConv1DVsSimple(int length, int filterSize, dsp::ConvolutionMethodOption
     auto result = Convolve1D(signal, filter, algorithm);
 
     // Compare results
-    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
+    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, static_cast<ValueType>(epsilon)));
     if (!ok)
     {
         std::cout << "Incorrect result for 1D " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.Size() << std::endl;
@@ -223,7 +223,7 @@ void TestConv2DVsSimple(int numRows, int numColumns, int numChannels, int filter
     auto result = Convolve2D(signal, filters, numFilters, stride, algorithm);
 
     // Compare results
-    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
+    bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, static_cast<ValueType>(epsilon)));
     if (!ok)
     {
         std::cout << "Incorrect result for 2D tensor "
@@ -284,7 +284,7 @@ void TestConv2DSeparableVsSimple(int numRows, int numColumns, int numChannels, i
         auto result = fullResult.GetSubTensor(0, 0, channelIndex, fullResult.NumRows(), fullResult.NumColumns(), 1);
         
         // Compare results
-        bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, epsilon));
+        bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, static_cast<ValueType>(epsilon)));
         if (!ok)
         {
             std::cout << "Incorrect result for channel " << channelIndex << " of 2D separable tensor "
