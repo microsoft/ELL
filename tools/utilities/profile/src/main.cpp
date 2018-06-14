@@ -77,6 +77,24 @@ std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
     return result;
 }
 
+void ReplaceSourceAndSinkNodes(model::Map& map)
+{
+    model::MapCompilerOptions settings;
+    model::ModelOptimizer optimizer(settings);
+    optimizer.AddPass(std::make_unique<ReplaceSourceAndSinkNodesPass>());
+    map.RemoveInputs();
+    map.Optimize(optimizer);
+    
+    // now put back inputs
+    auto inputNodes = map.GetModel().GetNodesByType<model::InputNodeBase>();
+    int index = 1;
+    for(auto node: inputNodes)
+    {
+        map.AddInput("input_" + std::to_string(index), node);
+        ++index;
+    }
+}
+
 //
 // Test-data-related
 //
@@ -230,9 +248,10 @@ void TimeModel(model::Map& map, const std::vector<InputType>& input, const Profi
     // Get output stream
     auto outputStream = GetOutputStream(profileArguments.outputFilename);
 
+    ReplaceSourceAndSinkNodes(map);
+
     // Initialize pass registry
     passes::AddStandardPassesToRegistry();
-    ReplaceSourceAndSinkNodesPass::AddToRegistry();
 
     // Compile map
     model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions("");
@@ -271,24 +290,6 @@ void TimeModel(model::Map& map, const std::vector<InputType>& input, const Profi
     }
 }
 
-void ReplaceSourceAndSinkNodes(model::Map& map)
-{
-    model::MapCompilerOptions settings;
-    model::ModelOptimizer optimizer(settings);
-    optimizer.AddPass(std::make_unique<ReplaceSourceAndSinkNodesPass>());
-    map.RemoveInputs();
-    map.Optimize(optimizer);
-    
-    // now put back inputs
-    auto inputNodes = map.GetModel().GetNodesByType<model::InputNodeBase>();
-    int index = 1;
-    for(auto node: inputNodes)
-    {
-        map.AddInput("input_" + std::to_string(index), node);
-        ++index;
-    }
-}
-
 template <typename InputType, typename OutputType>
 void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments, const std::vector<std::string>& converterArgs)
 {
@@ -297,11 +298,12 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
     auto timingOutputStream = GetOutputStream(profileArguments.timingOutputFilename);
     const auto comment = profileArguments.outputComment;
 
+    ReplaceSourceAndSinkNodes(map);
+    
     std::vector<InputType> input = GetModelInput<InputType>(map, profileArguments, converterArgs);
 
-    // Initialize pass registry
+    // Initialize the pass registry
     passes::AddStandardPassesToRegistry();
-    ReplaceSourceAndSinkNodes(map);
 
     // In "summary only" mode, we don't compile the model with profiling enabled
     // (because we just want the overall run time), so we have a separate codepath

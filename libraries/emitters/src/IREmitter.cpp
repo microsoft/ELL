@@ -931,7 +931,7 @@ namespace emitters
         return _irBuilder.CreateGEP(pArray, pOffset, name);
     }
 
-    llvm::Value* IREmitter::Pointer(llvm::GlobalVariable* pArray)
+    llvm::Value* IREmitter::DereferenceGlobalPointer(llvm::Value* pArray)
     {
         assert(pArray != nullptr);
         llvm::Value* derefArguments[1]{

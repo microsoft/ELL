@@ -98,8 +98,10 @@ namespace emitters
         ModuleEmitter::SetCompilerOptions(params);
 
         // Set IR-specific parameters
-        SetTargetTriple(GetCompilerOptions().targetDevice.triple);
-        // GetLLVMModule()->setDataLayout(pMachine->createDataLayout());
+        const auto& targetDevice = GetCompilerOptions().targetDevice;
+        SetTargetTriple(targetDevice.triple);
+        llvm::DataLayout dataLayout(GetCompilerOptions().targetDevice.dataLayout);
+        GetLLVMModule()->setDataLayout(dataLayout);
     }
 
     void IRModuleEmitter::CompleteCompilerOptions(CompilerOptions& parameters)

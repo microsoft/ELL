@@ -17,23 +17,6 @@ namespace ell
 namespace emitters
 {
     //
-    // Type conversion from emitter types to LLVM types
-    //
-    // LLVMTypeList GetLLVMTypes(const VariableTypeList& types);
-    // LLVMTypeList GetLLVMTypes(const VariableTypeList& types)
-    // {
-    //     LLVMTypeList llvmTypes;
-    //     for (auto t : types)
-    //     {
-    //         llvmTypes.push_back(Type(t));
-    //     }
-
-    //     return llvmTypes;
-    // }
-
-    // std::vector<NamedLLVMType> GetLLVMTypes(const NamedVariableTypeList& types);
-
-    //
     // Get types from LLVM values
     //
     LLVMTypeList GetLLVMTypes(const std::vector<llvm::Value*> values)
@@ -53,7 +36,7 @@ namespace emitters
         {
             return GetIntegerOperator(operation);
         }
-        else if(type->isFloatingPointTy())
+        else if (type->isFloatingPointTy())
         {
             return GetFloatOperator(operation);
         }
@@ -67,16 +50,12 @@ namespace emitters
         {
             return GetIntegerComparison(comparison);
         }
-        else if(type->isFloatingPointTy())
+        else if (type->isFloatingPointTy())
         {
             return GetFloatComparison(comparison);
         }
 
         throw EmitterException(EmitterError::valueTypeNotSupported);
     }
-
-    // TODO:
-    // template <typename... ArgTypes>
-    // std::vector<LLVMType> GetLLVMTypes(ArgTypes... args);
 }
 }

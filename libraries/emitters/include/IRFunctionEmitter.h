@@ -15,6 +15,7 @@
 #include "IRIfEmitter.h"
 #include "IRLocalValue.h"
 #include "IRLoopEmitter.h"
+#include "IRParallelLoopEmitter.h"
 #include "IROptimizer.h"
 #include "IRTask.h"
 #include "Variable.h"
@@ -827,13 +828,6 @@ namespace emitters
         /// <param name="fieldValues"> The values to set the fields to. </param>
         void FillStruct(llvm::Value* structPtr, const std::vector<llvm::Value*>& fieldValues);
 
-        /// <summary> Emits a pointer to a global. </summary>
-        ///
-        /// <param name="pGlobal"> Pointer to the first entry in an llvm global array. </param>
-        ///
-        /// <returns> Pointer to the first entry in the llvm global array. </returns>
-        llvm::Value* Pointer(llvm::GlobalVariable* pGlobal);
-
         /// <summary> Emit a pointer to an entry in an array. </summary>
         ///
         /// <param name="pArray"> Pointer to the array. </param>
@@ -951,6 +945,58 @@ namespace emitters
         /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
         /// <param name="body"> A function that emits the body of the "if true" block. </param>
         IRIfEmitter If(llvm::Value* pTestValuePointer, IfElseBodyFunction body);
+
+        using ParallelForLoopBodyFunction = IRParallelForLoopEmitter::BodyFunction;
+
+        /// <summary> Emits a parallel for loop counting from zero to a constant end value. </summary>
+        ///
+        /// <param name="count"> The number of iterations to make. </param>
+        /// <param name="capturedValues"> A list of values to be used inside the loop. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void ParallelFor(int count, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body);
+
+        /// <summary> Emits a parallel for loop counting from zero to a constant end value. </summary>
+        ///
+        /// <param name="count"> The number of iterations to make. </param>
+        /// <param name="options"> The options used to modify how the loop is emitted. </param>
+        /// <param name="capturedValues"> A list of values to be used inside the loop. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void ParallelFor(int count, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value with a given increment. </summary>
+        ///
+        /// <param name="beginValue"> The starting value of the loop iterator. </param>
+        /// <param name="endValue"> The ending value of the loop iterator. </param>
+        /// <param name="increment"> The increment for the iterator. </param>
+        /// <param name="options"> The options used to modify how the loop is emitted. </param>
+        /// <param name="capturedValues"> A list of values to be used inside the loop. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void ParallelFor(int beginValue, int endValue, int increment, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body);
+
+        /// <summary> Emits a parallel for loop counting from zero to a constant end value. </summary>
+        ///
+        /// <param name="count"> The number of iterations to make. </param>
+        /// <param name="capturedValues"> A list of values to be used inside the loop. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void ParallelFor(llvm::Value* count, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body);
+
+        /// <summary> Emits a parallel for loop counting from zero to a constant end value. </summary>
+        ///
+        /// <param name="count"> The number of iterations to make. </param>
+        /// <param name="numTasks"> The number of tasks (chunks) to split the loop into. </param>
+        /// <param name="capturedValues"> A list of values to be used inside the loop. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void ParallelFor(llvm::Value* count, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value with a given increment. </summary>
+        ///
+        /// <param name="beginValue"> The starting value of the loop iterator. </param>
+        /// <param name="endValue"> The ending value of the loop iterator. </param>
+        /// <param name="increment"> The increment for the iterator. </param>
+        /// <param name="options"> The options used to modify how the loop is emitted. </param>
+        /// <param name="capturedValues"> A list of values to be used inside the loop. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void ParallelFor(llvm::Value* beginValue, llvm::Value* endValue, llvm::Value* increment, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body);
 
         //
         // Deprecated loop emitter functions

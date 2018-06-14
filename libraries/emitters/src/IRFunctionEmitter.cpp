@@ -13,6 +13,7 @@
 #include "IREmitter.h"
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
+#include "IRParallelLoopEmitter.h"
 #include "IRThreadPool.h"
 #include "LLVMUtilities.h"
 
@@ -743,11 +744,6 @@ namespace emitters
         return _pEmitter->Store(PtrOffsetH(pPointer, offset), pValue);
     }
 
-    llvm::Value* IRFunctionEmitter::Pointer(llvm::GlobalVariable* pGlobal)
-    {
-        return _pEmitter->Pointer(pGlobal);
-    }
-
     llvm::Value* IRFunctionEmitter::PointerOffset(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset)
     {
         return _pEmitter->PointerOffset(pGlobal, pOffset);
@@ -790,7 +786,7 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::ValueAt(llvm::GlobalVariable* pGlobal)
     {
-        return Load(_pEmitter->Pointer(pGlobal));
+        return Load(_pEmitter->DereferenceGlobalPointer(pGlobal));
     }
 
     llvm::Value* IRFunctionEmitter::PointerOffset(llvm::Value* pPointer, llvm::Value* pOffset)
@@ -835,10 +831,17 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::SetValueAt(llvm::Value* pPointer, llvm::Value* pOffset, llvm::Value* pValue)
     {
-        llvm::GlobalVariable* pGlobal = llvm::dyn_cast<llvm::GlobalVariable>(pPointer);
-        if (pGlobal != nullptr)
+        auto pointerType = pPointer->getType();
+        assert(pointerType->isPointerTy());
+
+        // check if we're a pointer to an array:
+        auto pointedType = pointerType->getPointerElementType();
+        if (pointedType->isArrayTy())
         {
-            return SetValueAt(pGlobal, pOffset, pValue);
+            auto valueType = pointedType->getArrayElementType();
+            auto dereferencedPointer = _pEmitter->DereferenceGlobalPointer(pPointer);
+            auto castPointer = CastPointer(dereferencedPointer, valueType->getPointerTo());
+            return SetValueAtA(castPointer, pOffset, pValue);
         }
         return SetValueAtA(pPointer, pOffset, pValue);
     }
@@ -889,6 +892,42 @@ namespace emitters
         loop.Begin(beginValue, endValue, increment);
         body(*this, loop.LoadIterationVariable());
         loop.End();
+    }
+
+    void IRFunctionEmitter::ParallelFor(int count, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
+    {
+        auto loop = IRParallelForLoopEmitter(*this);
+        loop.EmitLoop(0, count, 1, {0}, capturedValues, body);
+    }
+
+    void IRFunctionEmitter::ParallelFor(int count, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
+    {
+        auto loop = IRParallelForLoopEmitter(*this);
+        loop.EmitLoop(0, count, 1, options, capturedValues, body);
+    }
+
+    void IRFunctionEmitter::ParallelFor(int beginValue, int endValue, int increment, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
+    {
+        auto loop = IRParallelForLoopEmitter(*this);
+        loop.EmitLoop(beginValue, endValue, increment, options, capturedValues, body);
+    }
+
+    void IRFunctionEmitter::ParallelFor(llvm::Value* count, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
+    {
+        auto loop = IRParallelForLoopEmitter(*this);
+        loop.EmitLoop(LocalScalar<int32_t>(0), LocalScalar(count), LocalScalar<int32_t>(1), {0}, capturedValues, body);
+    }
+
+    void IRFunctionEmitter::ParallelFor(llvm::Value* count, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
+    {
+        auto loop = IRParallelForLoopEmitter(*this);
+        loop.EmitLoop(LocalScalar<int32_t>(0), LocalScalar(count), LocalScalar<int32_t>(1), options, capturedValues, body);
+    }
+
+    void IRFunctionEmitter::ParallelFor(llvm::Value* beginValue, llvm::Value* endValue, llvm::Value* increment, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
+    {
+        auto loop = IRParallelForLoopEmitter(*this);
+        loop.EmitLoop(LocalScalar(beginValue), LocalScalar(endValue), LocalScalar(increment), options, capturedValues, body);
     }
 
     void IRFunctionEmitter::While(llvm::Value* pTestValuePointer, std::function<void(IRFunctionEmitter& function)> body)
@@ -1156,13 +1195,13 @@ namespace emitters
     //
     // BLAS functions
     //
-    template<typename ValueType>
+    template <typename ValueType>
     void IRFunctionEmitter::CallGEMV(int m, int n, llvm::Value* A, int lda, llvm::Value* x, int incx, llvm::Value* y, int incy)
     {
         CallGEMV<ValueType>(m, n, static_cast<ValueType>(1.0), A, lda, x, incx, static_cast<ValueType>(0.0), y, incy);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void IRFunctionEmitter::CallGEMV(int m, int n, ValueType alpha, llvm::Value* A, int lda, llvm::Value* x, int incx, ValueType beta, llvm::Value* y, int incy)
     {
         auto useBlas = CanUseBlas();
@@ -1189,13 +1228,13 @@ namespace emitters
         Call(gemv, args);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void IRFunctionEmitter::CallGEMM(int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
     {
         CallGEMM<ValueType>(false, false, m, n, k, A, lda, B, ldb, C, ldc);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void IRFunctionEmitter::CallGEMM(bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
     {
         auto useBlas = CanUseBlas();

@@ -10,3 +10,5 @@
 void TestIRAsyncTask(bool parallel);
 
 void TestParallelTasks(bool parallel, bool useThreadPool);
+
+void TestParallelFor(int start, int end, int increment, bool parallel);

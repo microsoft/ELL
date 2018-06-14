@@ -246,7 +246,7 @@ namespace emitters
         ///
         /// <param name="value"> The pointer value. </param>
         ///
-        /// <returns> Pointer to an llvm::Constant that represents an pointer. </returns>
+        /// <returns> Pointer to an llvm::Constant that represents a pointer. </returns>
         template <typename ValueType>
         llvm::Constant* Pointer(ValueType* ptr);
 
@@ -711,12 +711,12 @@ namespace emitters
         /// <returns> Pointer to a value that represents that entry in the array. </returns>
         llvm::Value* PointerOffset(llvm::Value* pArray, llvm::Value* pOffset, const std::string& name = "");
 
-        /// <summary> Emits a pointer to the global array. </summary>
+        /// <summary> Emits a dereference of a pointer to a global variable. </summary>
         ///
         /// <param name="pArray"> Pointer to the array. </param>
         ///
         /// <returns> Pointer to the first entry in the array. </returns>
-        llvm::Value* Pointer(llvm::GlobalVariable* pArray);
+        llvm::Value* DereferenceGlobalPointer(llvm::Value* pArray);
 
         /// <summary> Emit a pointer to an entry in an array. </summary>
         ///

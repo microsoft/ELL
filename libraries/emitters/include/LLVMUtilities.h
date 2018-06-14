@@ -30,24 +30,6 @@ namespace emitters
     using NamedLLVMTypeList = std::vector<NamedLLVMType>;
 
     //
-    // Type conversion from emitter types to LLVM types
-    //
-
-    /// <summary> Transform a VariableTypeList to a LLVMTypeList. </summary>
-    ///
-    /// <param name="types"> The VariableTypeList to transform. </param>
-    ///
-    /// <returns> The corresponding LLVMTypeList. </returns>
-    LLVMTypeList GetLLVMTypes(const VariableTypeList& types);
-
-    /// <summary> Transform a NamedVariableTypeList to a NamedLLVMTypeList. </summary>
-    ///
-    /// <param name="types"> The NamedVariableTypeList to transform. </param>
-    ///
-    /// <returns> The corresponding NamedLLVMTypeList. </returns>
-    NamedLLVMTypeList GetLLVMTypes(const NamedVariableTypeList& types);
-
-    //
     // Get types from LLVM values
     //
 
@@ -73,9 +55,5 @@ namespace emitters
     ///
     /// <returns> The TypedComparison for comparing values of the given type. </returns>
     emitters::TypedComparison GetComparison(LLVMType type, BinaryPredicateType operation);
-
-    // TODO:
-    // template <typename... ArgTypes>
-    // std::vector<LLVMType> GetLLVMTypes(ArgTypes... args);
 }
 }

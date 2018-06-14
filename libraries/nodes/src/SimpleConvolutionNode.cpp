@@ -40,29 +40,28 @@ namespace nodes
             // output is a (w+2p) x (h+2p) x f array
 
             // Model parameters
-            const auto inputDepth = inputLayout.GetActiveSize(2);
             const auto inputPadding = inputLayout.GetOffset(0);
             DEBUG_USED(inputPadding);
             assert((inputPadding == filterSize / 2) && "Input padding must be filterSize/2");
-
-            // output data parameters
-            const auto outputRows = outputLayout.GetActiveSize(0);
-            const auto outputColumns = outputLayout.GetActiveSize(1);
-            const auto numFilters = outputLayout.GetActiveSize(2);
 
             auto inputMemoryIncrements = inputLayout.GetCumulativeIncrement();
             auto outputMemoryIncrements = outputLayout.GetCumulativeIncrement();
 
             // For each filter
-            function.For(numFilters, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex1) {
-                auto filterIndex = function.LocalScalar(loopIndex1);
+            const auto numFilters = outputLayout.GetActiveSize(2);
+            function.ParallelFor(numFilters, {input, filterWeights, result}, [inputLayout, outputLayout, inputMemoryIncrements, outputMemoryIncrements, filterSize, stride](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar filterIndex, const std::vector<llvm::Value*>& capturedValues) {
+                auto input = capturedValues[0];
+                auto filterWeights = capturedValues[1];
+                auto result = capturedValues[2];
 
                 // For each output row
-                function.For(outputRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
+                const auto outputRows = outputLayout.GetActiveSize(0);
+                function.For(outputRows, [filterIndex, input, filterWeights, result, inputLayout, outputLayout, inputMemoryIncrements, outputMemoryIncrements, filterSize, stride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
                     auto outputRow = function.LocalScalar(loopIndex2);
 
                     // For each output column
-                    function.For(outputColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
+                    const auto outputColumns = outputLayout.GetActiveSize(1);
+                    function.For(outputColumns, [outputRow, filterIndex, input, filterWeights, result, inputLayout, inputMemoryIncrements, outputMemoryIncrements, filterSize, stride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
                         auto outputColumn = function.LocalScalar(loopIndex3);
 
                         auto outputOffset = (outputRow * function.LocalScalar(outputMemoryIncrements[0])) +
@@ -73,6 +72,7 @@ namespace nodes
                         // The filters are typically small, so we unroll the loops here
                         for (int windowRow = 0; windowRow < filterSize; ++windowRow)
                         {
+                            const auto inputDepth = inputLayout.GetActiveSize(2);
                             // Note: if the memory storage from consecutive columns is contiguous, we can process them together and avoid a loop
                             const bool canCombineColumns = (inputLayout.GetActiveSize(1) == inputLayout.GetStride(1)) && (stride == 1);
                             if (canCombineColumns)

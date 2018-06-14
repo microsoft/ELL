@@ -204,6 +204,34 @@ namespace emitters
         auto two = static_cast<ValueType>(2.0);
         return (two * Sigmoid<ValueType>(two * a)) - static_cast<ValueType>(1);
     }
+
+    template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
+    IRLocalScalar Min(ValueType a, IRLocalScalar b)
+    {
+        impl::VerifyArgTypesCompatible(a, b);
+        return Min(b.function.LocalScalar(a), b);
+    }
+
+    template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
+    IRLocalScalar Min(IRLocalScalar a, ValueType b)
+    {
+        impl::VerifyArgTypesCompatible(a, b);
+        return Min(a, a.function.LocalScalar(b));
+    }
+
+    template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
+    IRLocalScalar Max(ValueType a, IRLocalScalar b)
+    {
+        impl::VerifyArgTypesCompatible(a, b);
+        return Max(b.function.LocalScalar(a), b);
+    }
+
+    template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
+    IRLocalScalar Max(IRLocalScalar a, ValueType b)
+    {
+        impl::VerifyArgTypesCompatible(a, b);
+        return Max(a, a.function.LocalScalar(b));
+    }
 }
 }
 

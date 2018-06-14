@@ -16,21 +16,30 @@ namespace ell
 {
 namespace emitters
 {
+    namespace
+    {
+        llvm::Triple GetNormalizedTriple(std::string tripleString)
+        {
+            auto normalizedTriple = llvm::Triple::normalize(tripleString.empty() ? llvm::sys::getDefaultTargetTriple() : tripleString);
+            return llvm::Triple(normalizedTriple);
+        }
+    }
+
     bool TargetDevice::IsWindows() const
     {
-        llvm::Triple tripleObj(triple.empty() ? llvm::sys::getDefaultTargetTriple() : triple);
+        auto tripleObj = GetNormalizedTriple(triple);
         return tripleObj.getOS() == llvm::Triple::Win32;
     }
 
     bool TargetDevice::IsLinux() const
     {
-        llvm::Triple tripleObj(triple.empty() ? llvm::sys::getDefaultTargetTriple() : triple);
+        auto tripleObj = GetNormalizedTriple(triple);
         return tripleObj.getOS() == llvm::Triple::Linux;
     }
 
     bool TargetDevice::IsMacOS() const
     {
-        llvm::Triple tripleObj(triple.empty() ? llvm::sys::getDefaultTargetTriple() : triple);
+        auto tripleObj = GetNormalizedTriple(triple);
         return tripleObj.getOS() == llvm::Triple::MacOSX || tripleObj.getOS() == llvm::Triple::Darwin;
     }
 }

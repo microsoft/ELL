@@ -6,9 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "IRModuleEmitter.h"
-#include "EmitterException.h"
 #include "IRLocalValueOperations.h"
+#include "EmitterException.h"
+#include "IRModuleEmitter.h"
 
 // utilities
 #include "Exception.h"
@@ -51,7 +51,7 @@ namespace emitters
 
         // `areCompatible` is a function that returns true if the arg types are compatible. It has the signature: bool(const IRLocalValue& a, const IRLocalValue& b)
         using CompatibleTypesPredicate = std::function<bool(const IRLocalValue&, const IRLocalValue&)>;
-        void VerifyArgTypesCompatible(const IRLocalValue& a, const IRLocalValue& b, CompatibleTypesPredicate areCompatible) 
+        void VerifyArgTypesCompatible(const IRLocalValue& a, const IRLocalValue& b, CompatibleTypesPredicate areCompatible)
         {
             VerifyFromSameFunction(a, b);
             if (!(areCompatible(a, b)))
@@ -362,5 +362,18 @@ namespace emitters
         return { a.function, a.function.Call(f, { a }) };
     }
 
+    IRLocalScalar Min(IRLocalScalar a, IRLocalScalar b)
+    {
+        VerifyArgTypesCompatible(a, b);
+        llvm::Value* result = a.function.Select(a < b, a, b);
+        return { a.function, result };
+    }
+
+    IRLocalScalar Max(IRLocalScalar a, IRLocalScalar b)
+    {
+        VerifyArgTypesCompatible(a, b);
+        llvm::Value* result = a.function.Select(a >= b, a, b);
+        return { a.function, result };
+    }
 }
 }

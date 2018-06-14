@@ -29,6 +29,7 @@ set (src
     src/IRMetadata.cpp
     src/IRModuleEmitter.cpp
     src/IROptimizer.cpp
+    src/IRParallelLoopEmitter.cpp
     src/IRPosixRuntime.cpp
     src/IRProfiler.cpp
     src/IRRuntime.cpp
@@ -63,6 +64,7 @@ set (include
     include/IRModuleEmitter.h
     include/IRMetadata.h
     include/IROptimizer.h
+    include/IRParallelLoopEmitter.h
     include/IRPosixRuntime.h
     include/IRProfiler.h
     include/IRRuntime.h

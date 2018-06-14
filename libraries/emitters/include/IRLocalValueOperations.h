@@ -134,6 +134,18 @@ namespace emitters
 
     template <typename ValueType>
     IRLocalScalar Tanh(IRLocalScalar a);
+
+    IRLocalScalar Min(IRLocalScalar a, IRLocalScalar b);
+    template <typename ValueType, utilities::IsFundamental<ValueType> = true>
+    IRLocalScalar Min(ValueType a, IRLocalScalar b);
+    template <typename ValueType, utilities::IsFundamental<ValueType> = true>
+    IRLocalScalar Min(IRLocalScalar a, ValueType b);
+
+    IRLocalScalar Max(IRLocalScalar a, IRLocalScalar b);
+    template <typename ValueType, utilities::IsFundamental<ValueType> = true>
+    IRLocalScalar Max(ValueType a, IRLocalScalar b);
+    template <typename ValueType, utilities::IsFundamental<ValueType> = true>
+    IRLocalScalar Max(IRLocalScalar a, ValueType b);
 }
 }
 
