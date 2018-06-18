@@ -335,7 +335,7 @@ namespace nodes
 
                 // Compute a * b * a' for a sub-block of b
                 auto inputSubBlock = function.PointerOffset(b.data, channelIndex);
-                auto d = function.LocalMultidimArray(inputSubBlock, { k, k, 1 }, { k, k, blockSize });
+                auto d = function.LocalTensor(inputSubBlock, { k, k, blockSize }, emitters::RowMajorTensorLayout);
 
                 auto Xvals = MatrixMatrixTransposeMultiply(a, d, 1);
 

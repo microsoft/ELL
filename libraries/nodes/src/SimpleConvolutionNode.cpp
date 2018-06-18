@@ -29,6 +29,7 @@ namespace nodes
         //
         // Low-level code-generation
         //
+        template <typename ValueType>
         void EmitSimpleConvolutionCode(emitters::IRFunctionEmitter& function, llvm::Value* input, llvm::Value* filterWeights, const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, int filterSize, int stride, llvm::Value* result)
         {
             // input is a d x (w+2p) x (h+2p) array
@@ -45,53 +46,42 @@ namespace nodes
             assert((inputPadding == filterSize / 2) && "Input padding must be filterSize/2");
 
             auto inputMemoryIncrements = inputLayout.GetCumulativeIncrement();
-            auto outputMemoryIncrements = outputLayout.GetCumulativeIncrement();
 
             // For each filter
             const auto numFilters = outputLayout.GetActiveSize(2);
-            function.ParallelFor(numFilters, {input, filterWeights, result}, [inputLayout, outputLayout, inputMemoryIncrements, outputMemoryIncrements, filterSize, stride](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar filterIndex, const std::vector<llvm::Value*>& capturedValues) {
+            function.ParallelFor(numFilters, { input, filterWeights, result }, [inputLayout, outputLayout, inputMemoryIncrements, filterSize, stride](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar filterIndex, const std::vector<llvm::Value*>& capturedValues) {
                 auto input = capturedValues[0];
                 auto filterWeights = capturedValues[1];
                 auto result = capturedValues[2];
+                auto outputTensor = function.LocalTensor(result, outputLayout.GetStride(), emitters::RowMajorTensorLayout);
 
                 // For each output row
                 const auto outputRows = outputLayout.GetActiveSize(0);
-                function.For(outputRows, [filterIndex, input, filterWeights, result, inputLayout, outputLayout, inputMemoryIncrements, outputMemoryIncrements, filterSize, stride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
+                function.For(outputRows, [filterIndex, input, filterWeights, inputLayout, outputLayout, inputMemoryIncrements, outputTensor, filterSize, stride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
                     auto outputRow = function.LocalScalar(loopIndex2);
 
                     // For each output column
                     const auto outputColumns = outputLayout.GetActiveSize(1);
-                    function.For(outputColumns, [outputRow, filterIndex, input, filterWeights, result, inputLayout, inputMemoryIncrements, outputMemoryIncrements, filterSize, stride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
+                    function.For(outputColumns, [outputRow, filterIndex, input, filterWeights, inputLayout, inputMemoryIncrements, outputTensor, filterSize, stride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
                         auto outputColumn = function.LocalScalar(loopIndex3);
 
-                        auto outputOffset = (outputRow * function.LocalScalar(outputMemoryIncrements[0])) +
-                                            (outputColumn * function.LocalScalar(outputMemoryIncrements[1])) +
-                                            (filterIndex * function.LocalScalar(outputMemoryIncrements[2]));
-                        auto outputPtr = function.PointerOffset(result, outputOffset);
+                        const bool canCombineColumns = (inputLayout.GetActiveSize(1) == inputLayout.GetStride(1)) && (stride == 1);
+                        const auto inputDepth = inputLayout.GetActiveSize(2);
 
                         // The filters are typically small, so we unroll the loops here
+                        auto val = function.LocalScalar(ValueType{0});
                         for (int windowRow = 0; windowRow < filterSize; ++windowRow)
                         {
-                            const auto inputDepth = inputLayout.GetActiveSize(2);
                             // Note: if the memory storage from consecutive columns is contiguous, we can process them together and avoid a loop
-                            const bool canCombineColumns = (inputLayout.GetActiveSize(1) == inputLayout.GetStride(1)) && (stride == 1);
                             if (canCombineColumns)
                             {
-                                auto inputOffset = ((outputRow + function.LocalScalar<int>(windowRow)) * function.LocalScalar<int>(inputMemoryIncrements[0])) +
-                                                   (outputColumn * function.LocalScalar<int>(inputMemoryIncrements[1]));
+                                auto inputOffset = ((outputRow + windowRow) * inputMemoryIncrements[0]) +
+                                                   (outputColumn * inputMemoryIncrements[1]);
                                 auto imageRow = function.PointerOffset(input, inputOffset);
-                                auto filterOffset = function.LocalScalar<int>(inputDepth * (filterSize * windowRow)) +
-                                                    (filterIndex * function.LocalScalar<int>(filterSize * filterSize * inputDepth));
+                                auto filterOffset = inputDepth * (filterSize * windowRow) +
+                                                    filterIndex * (filterSize * filterSize * inputDepth);
                                 auto filterRow = function.PointerOffset(filterWeights, filterOffset);
-                                auto val = function.LocalScalar(function.DotProduct(filterSize * inputDepth, imageRow, filterRow));
-                                if (windowRow == 0)
-                                {
-                                    function.Store(outputPtr, val);
-                                }
-                                else
-                                {
-                                    function.Store(outputPtr, function.LocalScalar(function.Load(outputPtr)) + val);
-                                }
+                                val = val + function.DotProduct(filterSize * inputDepth, imageRow, filterRow);
                             }
                             else
                             {
@@ -100,23 +90,16 @@ namespace nodes
                                     // I[r+wc, c+wc]
                                     auto inputRow = outputRow * stride;
                                     auto inputColumn = outputColumn * stride;
-                                    auto inputOffset = ((inputRow + function.LocalScalar<int>(windowRow)) * function.LocalScalar<int>(inputMemoryIncrements[0])) +
-                                                       ((inputColumn + function.LocalScalar<int>(windowColumn)) * function.LocalScalar<int>(inputMemoryIncrements[1]));
+                                    auto inputOffset = ((inputRow + windowRow) * inputMemoryIncrements[0]) +
+                                                       ((inputColumn + windowColumn) * inputMemoryIncrements[1]);
                                     auto imageRow = function.PointerOffset(input, inputOffset);
-                                    auto filterOffset = function.LocalScalar<int>(inputDepth * (filterSize * windowRow + windowColumn)) +
-                                                        (filterIndex * function.LocalScalar<int>(filterSize * filterSize * inputDepth));
+                                    auto filterOffset = inputDepth * (filterSize * windowRow + windowColumn) +
+                                                        filterIndex * (filterSize * filterSize * inputDepth);
                                     auto filterRow = function.PointerOffset(filterWeights, filterOffset);
-                                    auto val = function.LocalScalar(function.DotProduct(inputDepth, imageRow, filterRow));
-                                    if (windowRow == 0 && windowColumn == 0)
-                                    {
-                                        function.Store(outputPtr, val);
-                                    }
-                                    else
-                                    {
-                                        function.Store(outputPtr, function.LocalScalar(function.Load(outputPtr)) + val);
-                                    }
+                                    val = val + function.DotProduct(inputDepth, imageRow, filterRow);
                                 }
                             }
+                            outputTensor({ outputRow, outputColumn, filterIndex }) = val;
                         }
                     }); // End outputColumns loop
                 }); // End outputRows loop
@@ -257,7 +240,7 @@ namespace nodes
         DEBUG_USED(inputPadding);
         assert((inputPadding == _filterSize / 2) && "Input padding must be filterSize/2");
 
-        EmitSimpleConvolutionCode(function, pInput, pWeights, inputLayout, outputLayout, _filterSize, _stride, pOutput);
+        EmitSimpleConvolutionCode<ValueType>(function, pInput, pWeights, inputLayout, outputLayout, _filterSize, _stride, pOutput);
     }
 
     // Explicit specializations

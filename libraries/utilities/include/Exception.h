@@ -97,11 +97,11 @@ namespace utilities
         abruptEnd,
     };
 
-    typedef ErrorCodeException<LogicExceptionErrors> LogicException;
-    typedef ErrorCodeException<SystemExceptionErrors> SystemException;
-    typedef ErrorCodeException<NumericExceptionErrors> NumericException;
-    typedef ErrorCodeException<InputExceptionErrors> InputException;
-    typedef ErrorCodeException<DataFormatErrors> DataFormatException;
+    using LogicException = ErrorCodeException<LogicExceptionErrors>;
+    using SystemException = ErrorCodeException<SystemExceptionErrors>;
+    using NumericException = ErrorCodeException<NumericExceptionErrors>;
+    using InputException = ErrorCodeException<InputExceptionErrors>;
+    using DataFormatException = ErrorCodeException<DataFormatErrors>;
 }
 }
 

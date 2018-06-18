@@ -59,55 +59,6 @@ namespace nodes
             return ((filterVolumeSize - 1) / (8 * sizeof(PackedBitsType)) + 1) * numOutputPixels;
         }
 
-        llvm::Value* GetValueFromVolume(emitters::IRFunctionEmitter& function,
-                                        emitters::IRLocalArray inputVolume,
-                                        const model::PortMemoryLayout& inputLayout,
-                                        const predictors::neural::BinaryConvolutionalParameters& convParams,
-                                        emitters::IRLocalScalar valueRow, emitters::IRLocalScalar valueColumn, emitters::IRLocalScalar valueChannel)
-        {
-            const int columnStride = inputLayout.GetStride(1);
-            const int channelStride = inputLayout.GetStride(2);
-
-            // row, column, channel order
-            auto index = valueRow * (columnStride * channelStride) + valueColumn * channelStride + valueChannel;
-            return static_cast<emitters::IRLocalScalar>(inputVolume[index]);
-        }
-
-        // TODO: adapt this to work with more generally strided data
-        template <typename ValueType>
-        llvm::Function* EmitGetValueFromPaddedVolumeFunction(emitters::IRModuleEmitter& moduleEmitter)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
-
-        template <typename ValueType>
-        llvm::Value* GetValueFromPaddedVolume(emitters::IRFunctionEmitter& function,
-                                              emitters::IRLocalArray inputVolume,
-                                              const model::PortMemoryLayout& inputLayout,
-                                              const predictors::neural::BinaryConvolutionalParameters& convParams,
-                                              size_t convPadding,
-                                              emitters::IRLocalScalar inputRow, emitters::IRLocalScalar inputCol, emitters::IRLocalScalar inputChannel)
-        {
-            const auto inputHeight = inputLayout.GetActiveSize(0);
-            const auto inputWidth = inputLayout.GetActiveSize(1);
-            const auto inputDepth = inputLayout.GetActiveSize(2);
-            const auto inputPadding = inputLayout.GetOffset(0);
-
-            const int extraPadding = convPadding - inputPadding; // amount by which the convolution's desired padding exceeds input's
-            if (extraPadding > 0) // known at compile-time
-            {
-                auto getValueFunction = EmitGetValueFromPaddedVolumeFunction<ValueType>(function.GetModule());
-                return function.Call(getValueFunction, { inputVolume.value, inputRow, inputCol, inputChannel, function.Literal<int>(inputWidth), function.Literal<int>(inputHeight), function.Literal<int>(inputDepth), function.Literal<int>(extraPadding) });
-            }
-
-            if (extraPadding != 0)
-            {
-                inputRow = inputRow + extraPadding;
-                inputCol = inputCol + extraPadding;
-            }
-            return GetValueFromVolume(function, inputVolume, inputLayout, convParams, inputRow, inputCol, inputChannel);
-        }
-
         template <typename ValueType>
         void LoadRow(emitters::IRFunctionEmitter& function,
                      llvm::Value* inputVolume,
@@ -129,8 +80,9 @@ namespace nodes
             auto inputRowStart = outputImageRow * stride;
             auto inputColStart = outputImageCol * stride;
 
-            auto input = function.LocalArray(inputVolume);
-            auto output = function.LocalArray(realValueRow);
+            // The input is a filterSize x filterSize x numChannels image in in row x column x channel order
+            auto input = function.LocalTensor(inputVolume, inputLayout.GetStride(), emitters::RowMajorTensorLayout);
+            auto output = function.LocalTensor(realValueRow, { filterSize, filterSize, numChannels }, emitters::RowMajorTensorLayout);
 
             // For row, column, channel order:
             function.For(filterSize, [input, inputLayout, numChannels, filterSize, convParams, convPadding, inputRowStart, inputColStart, output](emitters::IRFunctionEmitter& function, llvm::Value* i) {
@@ -145,15 +97,7 @@ namespace nodes
                         auto inputColumn = inputColStart + columnIndex;
                         auto inputChannel = channelIndex;
 
-                        auto value = GetValueFromPaddedVolume<ValueType>(function, input, inputLayout, convParams, convPadding, inputRow, inputColumn, inputChannel);
-
-                        // The input is a filterSize x filterSize x numChannels image in in row x column x channel order
-                        //   so offset = (filterSize*numChannels)*row + numChannels*column + channel
-                        auto rowOffset = rowIndex * (filterSize * numChannels);
-                        auto colOffset = columnIndex * numChannels;
-                        auto channelBeginOffset = rowOffset + colOffset;
-                        auto outputOffset = channelBeginOffset + channelIndex;
-                        output[outputOffset] = value;
+                        output({ rowIndex, columnIndex, channelIndex }) = input({ inputRow, inputColumn, inputChannel });
                     });
                 });
             });

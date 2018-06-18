@@ -33,7 +33,7 @@ namespace emitters
     using IRValueList = std::vector<llvm::Value*>;
 
     /// <summary> Symbol Table that maps symbol Names to emitted IR Value* </summary>
-    using IRVariableTable = SymbolTable<llvm::Value*>;
+    using IRValueTable = SymbolTable<llvm::Value*>;
 
     /// <summary> Symbol Table that maps type Names to emitted IR Type* </summary>
     using IRTypeTable = SymbolTable<llvm::Type*>;
@@ -968,7 +968,7 @@ namespace emitters
 
         llvm::LLVMContext& _llvmContext; // LLVM global context
         llvm::IRBuilder<> _irBuilder; // IRBuilder API
-        IRVariableTable _stringLiterals; // String literals are emitted as constants. We have to track them ourselves to prevent dupes.
+        IRValueTable _stringLiterals; // String literals are emitted as constants. We have to track them ourselves to prevent dupes.
         llvm::Value* _pZeroLiteral = nullptr;
         std::unordered_map<std::string, llvm::StructType*> _structs;
     };

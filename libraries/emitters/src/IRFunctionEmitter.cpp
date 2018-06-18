@@ -6,11 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "IRFunctionEmitter.h"
 #include "EmitterException.h"
 #include "IRAsyncTask.h"
 #include "IRBlockRegion.h"
 #include "IREmitter.h"
+#include "IRFunctionEmitter.h"
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 #include "IRParallelLoopEmitter.h"
@@ -88,19 +88,21 @@ namespace emitters
         return IRLocalArray(*this, value);
     }
 
-    IRLocalMatrix IRFunctionEmitter::LocalMatrix(llvm::Value* value, int rows, int columns)
+    IRLocalMatrix IRFunctionEmitter::LocalMatrix(llvm::Value* value, const std::vector<int>& shape, std::array<int, 2> layout)
     {
-        return IRLocalMatrix(*this, value, rows, columns);
+        assert(shape.size() == 2);
+        return IRLocalMatrix(*this, value, { shape[0], shape[1] }, layout);
+    }
+
+    IRLocalTensor IRFunctionEmitter::LocalTensor(llvm::Value* value, const std::vector<int>& shape, std::array<int, 3> layout)
+    {
+        assert(shape.size() == 3);
+        return IRLocalTensor(*this, value, { shape[0], shape[1], shape[2] }, layout);
     }
 
     IRLocalMultidimArray IRFunctionEmitter::LocalMultidimArray(llvm::Value* value, std::initializer_list<int> dimensions)
     {
         return IRLocalMultidimArray(*this, value, dimensions);
-    }
-
-    IRLocalMultidimArray IRFunctionEmitter::LocalMultidimArray(llvm::Value* value, std::initializer_list<int> dimensions, std::initializer_list<int> memorySizes)
-    {
-        return IRLocalMultidimArray(*this, value, dimensions, memorySizes);
     }
 
     llvm::Value* IRFunctionEmitter::GetEmittedVariable(const VariableScope scope, const std::string& name)
@@ -208,6 +210,11 @@ namespace emitters
         return _pEmitter->Call(ResolveFunction(name), arguments);
     }
 
+    llvm::Value* IRFunctionEmitter::Call(const std::string& name, std::vector<IRLocalScalar> arguments)
+    {
+        return Call(ResolveFunction(name), arguments);
+    }
+
     llvm::Value* IRFunctionEmitter::Call(const std::string& name, std::initializer_list<llvm::Value*> arguments)
     {
         return _pEmitter->Call(ResolveFunction(name), arguments);
@@ -229,6 +236,13 @@ namespace emitters
     {
         assert(pFunction != nullptr);
         return _pEmitter->Call(pFunction, arguments);
+    }
+
+    llvm::Value* IRFunctionEmitter::Call(llvm::Function* pFunction, std::vector<IRLocalScalar> arguments)
+    {
+        assert(pFunction != nullptr);
+        std::vector<llvm::Value*> llvmArgs(arguments.begin(), arguments.end());
+        return _pEmitter->Call(pFunction, llvmArgs);
     }
 
     void IRFunctionEmitter::Return()
@@ -852,45 +866,45 @@ namespace emitters
     }
 
     // Control flow constructs
-    void IRFunctionEmitter::For(size_t count, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    void IRFunctionEmitter::For(size_t count, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
     {
         auto loop = IRForLoopEmitter(*this);
         loop.Begin(count);
-        body(*this, loop.LoadIterationVariable());
+        body(*this, LocalScalar(loop.LoadIterationVariable()));
         loop.End();
     }
 
-    void IRFunctionEmitter::For(llvm::Value* count, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    void IRFunctionEmitter::For(llvm::Value* count, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
     {
         auto loop = IRForLoopEmitter(*this);
         loop.Begin(count);
-        body(*this, loop.LoadIterationVariable());
+        body(*this, LocalScalar(loop.LoadIterationVariable()));
         loop.End();
     }
 
-    void IRFunctionEmitter::For(size_t beginValue, size_t endValue, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    void IRFunctionEmitter::For(size_t beginValue, size_t endValue, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
     {
         For(beginValue, endValue, 1, body);
     }
 
-    void IRFunctionEmitter::For(llvm::Value* beginValue, llvm::Value* endValue, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    void IRFunctionEmitter::For(llvm::Value* beginValue, llvm::Value* endValue, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
     {
         For(beginValue, endValue, Literal<int>(1), body);
     }
 
-    void IRFunctionEmitter::For(size_t beginValue, size_t endValue, size_t increment, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    void IRFunctionEmitter::For(size_t beginValue, size_t endValue, size_t increment, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
     {
         auto loop = IRForLoopEmitter(*this);
         loop.Begin(beginValue, endValue, increment);
-        body(*this, loop.LoadIterationVariable());
+        body(*this, LocalScalar(loop.LoadIterationVariable()));
         loop.End();
     }
 
-    void IRFunctionEmitter::For(llvm::Value* beginValue, llvm::Value* endValue, llvm::Value* increment, std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)> body)
+    void IRFunctionEmitter::For(llvm::Value* beginValue, llvm::Value* endValue, llvm::Value* increment, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
     {
         auto loop = IRForLoopEmitter(*this);
         loop.Begin(beginValue, endValue, increment);
-        body(*this, loop.LoadIterationVariable());
+        body(*this, LocalScalar(loop.LoadIterationVariable()));
         loop.End();
     }
 
@@ -938,7 +952,7 @@ namespace emitters
         loop.End();
     }
 
-    IRIfEmitter IRFunctionEmitter::If(llvm::Value* pTestValuePointer, std::function<void(IRFunctionEmitter& function)> body)
+    IRIfEmitter IRFunctionEmitter::If(llvm::Value* pTestValuePointer, std::function<void(IRFunctionEmitter&)> body)
     {
         auto ifEmitter = IRIfEmitter(*this, true);
         ifEmitter.If(pTestValuePointer);

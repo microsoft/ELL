@@ -53,6 +53,7 @@ set(include
   include/IIterator.h
   include/IndentedTextWriter.h
   include/IntegerList.h
+  include/IntegerNArray.h
   include/IntegerStack.h
   include/JsonArchiver.h
   include/Logger.h

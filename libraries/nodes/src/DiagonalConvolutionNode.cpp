@@ -224,6 +224,8 @@ namespace nodes
         const auto inputPadding = inputLayout.GetOffset(0);
         assert((inputPadding == filterSize / 2) && "Input padding must be filterSize/2");
 
+        const auto outputTensor = function.LocalTensor(pOutput, outputLayout.GetStride(), emitters::RowMajorTensorLayout);
+
         // input data parameters
         const int paddedWidth = inputLayout.GetStride(1);
         const int paddedHeight = inputLayout.GetStride(0);
@@ -285,9 +287,8 @@ namespace nodes
         llvm::GlobalVariable* scratch = function.GetModule().GlobalArray(emitters::GetVariableType<ValueType>(), "scratch", scratchMemSize);
         auto scratchPtr = function.PointerOffset(scratch, 0); // Convert LLVM array to pointer
 
-        const int outputStride = paddedWidth * numFilters;
         const size_t numConvolutions = (inputWidth - 1) / stackSize + 1;
-        function.For(numConvolutions, [inputDepth, pStackedInput, pWeights, scratchPtr, inputPadding, inputHeight, pOutput, outputLayout, numFilters, batchSize, filterSize, stackedInputHeight, stackSize, stackedInputWidth, numConvolutions, outputStride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex1) {
+        function.For(numConvolutions, [inputDepth, pStackedInput, pWeights, scratchPtr, inputPadding, inputHeight, outputTensor, numFilters, batchSize, filterSize, stackedInputHeight, stackSize, stackedInputWidth, numConvolutions](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex1) {
             auto j = function.LocalScalar(loopIndex1); // j = start column for convolution
 
             // Get the submatrix for Vj
@@ -315,15 +316,16 @@ namespace nodes
                 function.CallGEMM<ValueType>(false, true, m, n, k, Vj, lda, Wl, ldb, scratchPtr, ldc);
 
                 // S loop here as well
-                function.For(stackSize, [inputPadding, j, numFiltersToUse, numConvolutions, filterStart, inputHeight, filterSize, scratchPtr, pOutput, outputLayout, batchSize, numFilters, outputStride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
+                function.For(stackSize, [inputPadding, j, numFiltersToUse, numConvolutions, filterStart, inputHeight, filterSize, scratchPtr, outputTensor, batchSize](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
                     auto stackIndex = function.LocalScalar(loopIndex2);
                     auto stackRowOffset = stackIndex * function.LocalScalar<int>(inputHeight + inputPadding);
                     auto outputColumn = (stackIndex * function.LocalScalar<int>(numConvolutions)) + j;
 
-                    function.For(numFiltersToUse, [filterStart, inputHeight, stackRowOffset, filterSize, scratchPtr, outputColumn, pOutput, outputLayout, batchSize, numFilters, outputStride](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
+                    function.For(numFiltersToUse, [filterStart, inputHeight, stackRowOffset, filterSize, scratchPtr, outputColumn, outputTensor, batchSize](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
                         auto l = function.LocalScalar(loopIndex3); // batchFilterIndex
                         auto filterIndex = function.LocalScalar<int>(filterStart) + l;
-			function.For(inputHeight, [stackRowOffset, filterSize, l, scratchPtr, outputColumn, filterIndex, pOutput, batchSize, outputStride, outputLayout, numFilters](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex4) {
+
+                        function.For(inputHeight, [stackRowOffset, filterSize, l, scratchPtr, outputColumn, filterIndex, batchSize, outputTensor](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex4) {
                             auto startRow = function.LocalScalar(loopIndex4);
                             auto stackStartRow = stackRowOffset + startRow;
                             auto sum = function.LocalScalar();
@@ -343,10 +345,8 @@ namespace nodes
                                 else
                                     sum = sum + diagonalValue;
                             }
-                            auto outRowOffset = startRow * function.LocalScalar<int>(outputStride);
-                            auto outColOffset = outputColumn * function.LocalScalar<int>(numFilters);
-                            auto outputIndex = outRowOffset + outColOffset + filterIndex;
-                            function.SetValueAt(pOutput, outputIndex, sum);
+
+                            outputTensor({startRow, outputColumn, filterIndex}) = sum;
                         });
                     });
                 });

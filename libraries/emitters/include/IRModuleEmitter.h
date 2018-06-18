@@ -763,8 +763,8 @@ namespace emitters
         IREmitter _emitter;
         std::stack<std::pair<IRFunctionEmitter, llvm::IRBuilder<>::InsertPoint>> _functionStack; // contains the location we were emitting code into when we paused to emit a new function
 
-        IRVariableTable _literals; // Symbol table - name to literals
-        IRVariableTable _globals; // Symbol table - name to global variables
+        IRValueTable _literals; // Symbol table - name to literals
+        IRValueTable _globals; // Symbol table - name to global variables
         IRRuntime _runtime; // Manages emission of runtime functions
         IRThreadPool _threadPool; // A pool of worker threads -- gets initialized the first time it's used (?)
         IRProfiler _profiler;

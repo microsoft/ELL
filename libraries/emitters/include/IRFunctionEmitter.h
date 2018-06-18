@@ -45,6 +45,9 @@ namespace emitters
 {
     class IRModuleEmitter;
 
+    /// <summary> A list of IRLocalScalar values </summary>
+    using IRScalarList = std::vector<IRLocalScalar>;
+
     /// <summary> Used to emit code into an existing LLVM IR Function </summary>
     class IRFunctionEmitter
     {
@@ -73,7 +76,7 @@ namespace emitters
 
         /// <summary> Gets an uninitialized `IRLocalScalar` wrapper. </summary>
         IRLocalScalar LocalScalar();
-        
+
         /// <summary> Gets an `IRLocalArray` wrapper for an LLVM value object that represents an indexable array. </summary>
         ///
         /// <param name="value"> The value to wrap. </param>
@@ -82,22 +85,22 @@ namespace emitters
         /// <summary> Gets an `IRLocalMatrix` wrapper for an LLVM value object that represents a fixed-size array. </summary>
         ///
         /// <param name="value"> The value to wrap. </param>
-        /// <param name="rows"> The number of rows. </param>
-        /// <param name="columns"> The number of columns. </param>
-        IRLocalMatrix LocalMatrix(llvm::Value* value, int rows, int columns);
+        /// <param name="shape"> A two-element vector describing the shape of the tensor. </param>
+        /// <param name="layout"> The order of the dimensions, outermost to innermost. </param>
+        IRLocalMatrix LocalMatrix(llvm::Value* value, const std::vector<int>& shape, std::array<int, 2> layout);
+
+        /// <summary> Gets an `IRLocalTensor` wrapper for an LLVM value object that represents a fixed-size array. </summary>
+        ///
+        /// <param name="value"> The value to wrap. </param>
+        /// <param name="shape"> A three-element vector describing the shape of the tensor. </param>
+        /// <param name="layout"> The order of the dimensions, outermost to innermost. </param>
+        IRLocalTensor LocalTensor(llvm::Value* value, const std::vector<int>& shape, std::array<int, 3> layout);
 
         /// <summary> Gets an `IRLocalMultidimArray` wrapper for an LLVM value object that represents a fixed-size array. </summary>
         ///
         /// <param name="value"> The value to wrap. </param>
         /// <param name="dimensions"> The sizes of the array's dimensions. </param>
         IRLocalMultidimArray LocalMultidimArray(llvm::Value* value, std::initializer_list<int> dimensions);
-
-        /// <summary> Gets an `IRLocalMultidimArray` wrapper for an LLVM value object that represents a fixed-size array. </summary>
-        ///
-        /// <param name="value"> The value to wrap. </param>
-        /// <param name="dimensions"> The sizes of the array's logical dimensions. </param>
-        /// <param name="memorySize"> The sizes of the array's physical layout. </param>
-        IRLocalMultidimArray LocalMultidimArray(llvm::Value* value, std::initializer_list<int> dimensions, std::initializer_list<int> memorySize);
 
         /// <summary> Gets an emitted variable by scope and name. </summary>
         ///
@@ -274,6 +277,14 @@ namespace emitters
         /// <param name="arguments"> The function arguments. </param>
         ///
         /// <returns> Pointer to the result of the function call. </returns>
+        llvm::Value* Call(const std::string& name, IRScalarList arguments);
+
+        /// <summary> Emit a call to a function with arguments. </summary>
+        ///
+        /// <param name="name"> The function name. </param>
+        /// <param name="arguments"> The function arguments. </param>
+        ///
+        /// <returns> Pointer to the result of the function call. </returns>
         llvm::Value* Call(const std::string& name, std::initializer_list<llvm::Value*> arguments);
 
         /// <summary> Emit a call to a function with arguments. </summary>
@@ -282,7 +293,7 @@ namespace emitters
         /// <param name="arguments"> The function arguments. </param>
         ///
         /// <returns> Pointer to the result of the function call. </returns>
-        llvm::Value* Call(IRFunctionEmitter& function, std::vector<llvm::Value*> arguments);
+        llvm::Value* Call(IRFunctionEmitter& function, IRValueList arguments);
 
         /// <summary> Emit a call to a function with arguments. </summary>
         ///
@@ -298,7 +309,15 @@ namespace emitters
         /// <param name="arguments"> The function arguments. </param>
         ///
         /// <returns> Pointer to the result of the function call. </returns>
-        llvm::Value* Call(llvm::Function* pFunction, std::vector<llvm::Value*> arguments);
+        llvm::Value* Call(llvm::Function* pFunction, IRValueList arguments);
+
+        /// <summary> Emit a call to a function with arguments. </summary>
+        ///
+        /// <param name="pFunction"> Pointer to the llvm::Function. </param>
+        /// <param name="arguments"> The function arguments. </param>
+        ///
+        /// <returns> Pointer to the result of the function call. </returns>
+        llvm::Value* Call(llvm::Function* pFunction, IRScalarList arguments);
 
         /// <summary> Emit a return from a function with no return value. </summary>
         void Return();
@@ -884,7 +903,7 @@ namespace emitters
         // Type aliases for lambda functions that define body regions
 
         /// <summary> Type alias for for-loop body lambda. </summary>
-        using ForLoopBodyFunction = std::function<void(IRFunctionEmitter& function, llvm::Value* iterationVariable)>;
+        using ForLoopBodyFunction = std::function<void(IRFunctionEmitter& function, IRLocalScalar iterationVariable)>;
 
         /// <summary> Type alias for while-loop body lambda. </summary>
         using WhileLoopBodyFunction = std::function<void(IRFunctionEmitter& function)>;
@@ -1496,7 +1515,7 @@ namespace emitters
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const std::string& name);
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedVariableTypeList& arguments, const std::string& name);
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedLLVMTypeList& arguments, const std::string& name);
-        
+
         friend class IRModuleEmitter;
 
         class EntryBlockScope
@@ -1538,7 +1557,7 @@ namespace emitters
         llvm::Module* GetLLVMModule() { return _pFunction->getParent(); }
         friend void swap(IRFunctionEmitter& first, IRFunctionEmitter& second);
 
-        IRVariableTable _locals; // Symbol table: name -> llvm::Value* (stack variables or function arguments)
+        IRValueTable _locals; // Symbol table: name -> llvm::Value* (stack variables or function arguments)
 
         IRModuleEmitter* _pModuleEmitter = nullptr;
         IREmitter* _pEmitter = nullptr;

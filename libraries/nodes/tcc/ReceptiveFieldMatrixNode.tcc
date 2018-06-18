@@ -243,7 +243,7 @@ namespace nodes
                             {
                                 // zero out elements at end of each row
                                 int count = fx - extraPadding;
-			                    // BUG: explicit capture-by-ref entries are here to work around a GCC bug
+                                // BUG: explicit capture-by-ref entries are here to work around a GCC bug
                                 function.For(inputHeight, [=, &inputWidth, &outputRowOffset](emitters::IRFunctionEmitter& function, llvm::Value* indexValue) {
                                     auto index = function.LocalScalar(indexValue);
                                     auto begin = ((index + 1) * inputWidth) - count;
