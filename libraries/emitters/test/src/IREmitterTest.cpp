@@ -660,7 +660,7 @@ void TestScopedIfElse()
     module.DeclarePrintf();
 
     auto fn = module.BeginMainFunction();
-    fn.For(10, [](IRFunctionEmitter& fn, llvm::Value* index) {
+    fn.For(10, [](IRFunctionEmitter& fn, auto index) {
         fn.Printf("index: ", { index });
         auto cmp = fn.Comparison(TypedComparison::lessThan, index, fn.Literal<int>(3));
         fn.If(cmp, [](IRFunctionEmitter& fn) {
@@ -681,7 +681,7 @@ void TestScopedIfElse2()
     module.DeclarePrintf();
 
     auto fn = module.BeginMainFunction();
-    fn.For(10, [](IRFunctionEmitter& fn, llvm::Value* index) {
+    fn.For(10, [](IRFunctionEmitter& fn, auto index) {
         fn.Printf("Index: ", { index });
         auto cmp1 = fn.Comparison(TypedComparison::lessThan, index, fn.Literal<int>(3));
         auto cmp2 = fn.Comparison(TypedComparison::greaterThan, index, fn.Literal<int>(6));

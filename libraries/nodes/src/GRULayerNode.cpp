@@ -137,7 +137,7 @@ namespace nodes
     template <typename ActivationType>
     void GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength)
     {
-        function.For(dataLength, [activationFunction, data](emitters::IRFunctionEmitter& function, llvm::Value* index) {
+        function.For(dataLength, [activationFunction, data](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar index) {
             auto dataArray = function.LocalArray(data);
             dataArray[index] = activationFunction.Compile(function, static_cast<emitters::IRLocalScalar>(dataArray[index]));
         });
@@ -216,7 +216,7 @@ namespace nodes
 
         // in-place modify inputPlusHidden by scaling hidden part by resetGateActivation
         auto hiddenPart = function.LocalArray(function.PointerOffset(inputPlusHidden, inputSize));
-        function.For(outputSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* index) {
+        function.For(outputSize, [=](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar index) {
             hiddenPart[index] = resetGateActivation[index] * hiddenPart[index];
         });
 
@@ -227,7 +227,7 @@ namespace nodes
         ApplyActivation(function, activationFunction, newHiddenState, outputSize);
 
         // Compute Ht = (1-Zt) .* Ht~ + Zt * Ht-1,
-        function.For(outputSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* index) {
+        function.For(outputSize, [=](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar index) {
             auto z_i = updateGateActivation[index];
 
             // Note: Keep the static cast here -- using 1.0 directly results in NaN

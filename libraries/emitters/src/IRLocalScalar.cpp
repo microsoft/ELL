@@ -1,17 +1,20 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     IRLocalValueOperations.cpp (emitter)
+//  File:     IRLocalScalar.cpp (emitter)
 //  Authors:  Chuck Jacobs, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "IRLocalValueOperations.h"
+#include "IRLocalScalar.h"
 #include "EmitterException.h"
 #include "IRModuleEmitter.h"
 
 // utilities
 #include "Exception.h"
+
+// LLVM
+#include <llvm/IR/Value.h>
 
 // stl
 #include <functional>
@@ -20,45 +23,111 @@ namespace ell
 {
 namespace emitters
 {
-    namespace
+    namespace detail
     {
-        void VerifyFromSameFunction(const IRLocalValue& a, const IRLocalValue& b)
+        // This function is needed to break the cyclical dependency between
+        // IRFunctionEmitter and IRLocalScalar
+        IREmitter& GetEmitter(IRFunctionEmitter& function)
         {
-            if (a.function.GetFunction() != b.function.GetFunction())
-            {
-                throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments are local to different functions");
-            }
+            return function.GetEmitter();
         }
+    }
+    using namespace detail;
 
-        bool BothIntegral(const IRLocalValue& a, const IRLocalValue& b)
-        {
-            return (a.value->getType()->getScalarType()->isIntegerTy() && b.value->getType()->getScalarType()->isIntegerTy());
-        }
+    IRLocalScalar& IRLocalScalar::operator+=(const IRLocalScalar& rhs)
+    {
+        VerifyArgTypesCompatible(*this, rhs);
 
-        bool BothFloatingPoint(const IRLocalValue& a, const IRLocalValue& b)
-        {
-            return (a.value->getType()->getScalarType()->isFloatingPointTy() && b.value->getType()->getScalarType()->isFloatingPointTy());
-        }
+        auto type = this->value->getType();
+        auto op = GetOperator(type, emitters::BinaryOperationType::add);
 
-        void VerifyArgTypesCompatible(const IRLocalValue& a, const IRLocalValue& b)
-        {
-            VerifyFromSameFunction(a, b);
-            if (!(BothIntegral(a, b) || BothFloatingPoint(a, b)))
-            {
-                throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments have incompatible types");
-            }
-        }
+        value = function.Operator(op, value, rhs);
 
-        // `areCompatible` is a function that returns true if the arg types are compatible. It has the signature: bool(const IRLocalValue& a, const IRLocalValue& b)
-        using CompatibleTypesPredicate = std::function<bool(const IRLocalValue&, const IRLocalValue&)>;
-        void VerifyArgTypesCompatible(const IRLocalValue& a, const IRLocalValue& b, CompatibleTypesPredicate areCompatible)
-        {
-            VerifyFromSameFunction(a, b);
-            if (!(areCompatible(a, b)))
-            {
-                throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments have incompatible types");
-            }
-        }
+        return *this;
+    }
+
+    IRLocalScalar& IRLocalScalar::operator-=(const IRLocalScalar& rhs)
+    {
+        VerifyArgTypesCompatible(*this, rhs);
+
+        auto type = this->value->getType();
+        auto op = GetOperator(type, emitters::BinaryOperationType::subtract);
+
+        value = function.Operator(op, value, rhs);
+
+        return *this;
+    }
+
+    IRLocalScalar& IRLocalScalar::operator*=(const IRLocalScalar& rhs)
+    {
+        VerifyArgTypesCompatible(*this, rhs);
+
+        auto type = this->value->getType();
+        auto op = GetOperator(type, emitters::BinaryOperationType::coordinatewiseMultiply);
+
+        value = function.Operator(op, value, rhs);
+
+        return *this;
+    }
+
+    IRLocalScalar& IRLocalScalar::operator/=(const IRLocalScalar& rhs)
+    {
+        VerifyArgTypesCompatible(*this, rhs);
+
+        auto type = this->value->getType();
+        auto op = GetOperator(type, emitters::BinaryOperationType::coordinatewiseDivide);
+
+        value = function.Operator(op, value, rhs);
+
+        return *this;
+    }
+
+    IRLocalScalar& IRLocalScalar::operator%=(const IRLocalScalar& rhs)
+    {
+        VerifyArgTypesCompatible(*this, rhs, BothIntegral);
+
+        const auto op = emitters::TypedOperator::moduloSigned;
+
+        value = function.Operator(op, value, rhs);
+
+        return *this;
+    }
+
+    IRLocalScalar& IRLocalScalar::operator|=(const IRLocalScalar& rhs)
+    {
+        VerifyArgTypesCompatible(*this, rhs);
+        const auto op = emitters::TypedOperator::logicalOr;
+
+        value = function.Operator(op, value, rhs);
+
+        return *this;
+    }
+
+    IRLocalScalar& IRLocalScalar::operator&=(const IRLocalScalar& rhs)
+    {
+        VerifyArgTypesCompatible(*this, rhs);
+        const auto op = emitters::TypedOperator::logicalAnd;
+        value = function.Operator(op, value, rhs);
+
+        return *this;
+    }
+
+    IRLocalScalar& IRLocalScalar::operator^=(const IRLocalScalar& rhs)
+    {
+        VerifyArgTypesCompatible(*this, rhs);
+        const auto op = emitters::TypedOperator::logicalXor;
+        value = function.Operator(op, value, rhs);
+
+        return *this;
+    }
+
+    IRLocalScalar& IRLocalScalar::operator<<=(const IRLocalScalar& rhs)
+    {
+        VerifyArgTypesCompatible(*this, rhs);
+        const auto op = emitters::TypedOperator::shiftLeft;
+        value = function.Operator(op, value, rhs);
+
+        return *this;
     }
 
     //
@@ -66,10 +135,8 @@ namespace emitters
     //
     IRLocalScalar operator+(IRLocalScalar a, IRLocalScalar b)
     {
-        VerifyArgTypesCompatible(a, b);
-        auto type = a.value->getType();
-        auto op = GetOperator(type, emitters::BinaryOperationType::add);
-        return { a.function, a.function.Operator(op, a, b) };
+        a += b;
+        return a;
     }
 
     IRLocalScalar operator+(llvm::Value* a, IRLocalScalar b)
@@ -84,10 +151,8 @@ namespace emitters
 
     IRLocalScalar operator-(IRLocalScalar a, IRLocalScalar b)
     {
-        VerifyArgTypesCompatible(a, b);
-        auto type = a.value->getType();
-        auto op = GetOperator(type, emitters::BinaryOperationType::subtract);
-        return { a.function, a.function.Operator(op, a, b) };
+        a -= b;
+        return a;
     }
 
     IRLocalScalar operator-(llvm::Value* a, IRLocalScalar b)
@@ -110,10 +175,8 @@ namespace emitters
 
     IRLocalScalar operator*(IRLocalScalar a, IRLocalScalar b)
     {
-        VerifyArgTypesCompatible(a, b);
-        auto type = a.value->getType();
-        auto op = GetOperator(type, emitters::BinaryOperationType::coordinatewiseMultiply);
-        return { a.function, a.function.Operator(op, a, b) };
+        a *= b;
+        return a;
     }
 
     IRLocalScalar operator*(llvm::Value* a, IRLocalScalar b)
@@ -128,10 +191,8 @@ namespace emitters
 
     IRLocalScalar operator/(IRLocalScalar a, IRLocalScalar b)
     {
-        VerifyArgTypesCompatible(a, b);
-        auto type = a.value->getType();
-        auto op = GetOperator(type, emitters::BinaryOperationType::coordinatewiseDivide);
-        return { a.function, a.function.Operator(op, a, b) };
+        a /= b;
+        return a;
     }
 
     IRLocalScalar operator/(llvm::Value* a, IRLocalScalar b)
@@ -146,9 +207,8 @@ namespace emitters
 
     IRLocalScalar operator%(IRLocalScalar a, IRLocalScalar b)
     {
-        VerifyArgTypesCompatible(a, b, BothIntegral);
-        const auto op = emitters::TypedOperator::moduloSigned;
-        return { a.function, a.function.Operator(op, a, b) };
+        a %= b;
+        return a;
     }
 
     IRLocalScalar operator%(llvm::Value* a, IRLocalScalar b)
@@ -186,30 +246,26 @@ namespace emitters
     //
     IRLocalScalar operator&(IRLocalScalar a, IRLocalScalar b)
     {
-        VerifyArgTypesCompatible(a, b);
-        const auto op = emitters::TypedOperator::logicalAnd;
-        return { a.function, a.function.Operator(op, a, b) };
+        a &= b;
+        return a;
     }
 
     IRLocalScalar operator|(IRLocalScalar a, IRLocalScalar b)
     {
-        VerifyArgTypesCompatible(a, b);
-        const auto op = emitters::TypedOperator::logicalOr;
-        return { a.function, a.function.Operator(op, a, b) };
+        a |= b;
+        return a;
     }
 
     IRLocalScalar operator^(IRLocalScalar a, IRLocalScalar b)
     {
-        VerifyArgTypesCompatible(a, b);
-        const auto op = emitters::TypedOperator::logicalXor;
-        return { a.function, a.function.Operator(op, a, b) };
+        a ^= b;
+        return a;
     }
 
     IRLocalScalar operator<<(IRLocalScalar a, IRLocalScalar b)
     {
-        VerifyArgTypesCompatible(a, b);
-        const auto op = emitters::TypedOperator::shiftLeft;
-        return { a.function, a.function.Operator(op, a, b) };
+        a <<= b;
+        return a;
     }
 
     //

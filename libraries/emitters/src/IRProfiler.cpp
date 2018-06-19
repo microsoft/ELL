@@ -124,7 +124,7 @@ namespace emitters
     {
         return _profileRegionType;
     }
-    
+
     IRLocalScalar IRProfiler::GetCurrentTime(IRFunctionEmitter& function)
     {
         auto time = function.GetModule().GetRuntime().GetCurrentTime(function);
@@ -142,7 +142,7 @@ namespace emitters
             throw EmitterException(EmitterError::duplicateSymbol, "Region name already used");
         }
         _regionNames.insert(name);
-        
+
         auto& function = region.GetFunction();
         auto regionPtr = GetRegionPointer(function, region.GetIndex());
 
@@ -152,7 +152,7 @@ namespace emitters
     }
 
     void IRProfiler::EnterRegion(IRProfileRegion& region)
-    {        
+    {
         if (!_profilingEnabled)
             return;
 
@@ -170,7 +170,7 @@ namespace emitters
     }
 
     void IRProfiler::ExitRegion(IRProfileRegion& region)
-    {        
+    {
         if (!_profilingEnabled)
             return;
 
@@ -188,7 +188,7 @@ namespace emitters
     }
 
     void IRProfiler::ResetRegionCounts(IRFunctionEmitter& function, const IRLocalScalar& regionIndex)
-    {        
+    {
         if (!_profilingEnabled)
             return;
 
@@ -354,9 +354,8 @@ namespace emitters
         function.IncludeInSwigInterface();
 
         auto numRegions = GetNumRegions(function);
-        function.For(numRegions, [this](IRFunctionEmitter& function, llvm::Value* i) {
-            auto regionIndex = function.LocalScalar(i);
-            ResetRegionCounts(function, regionIndex);
+        function.For(numRegions, [this](IRFunctionEmitter& function, auto regionIndex) {
+            this->ResetRegionCounts(function, regionIndex);
         });
 
         _module->EndFunction();

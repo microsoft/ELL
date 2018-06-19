@@ -1,20 +1,61 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     IRLocalValueOperations.h (emitters)
+//  File:     IRLocalScalar.h (emitters)
 //  Authors:  Chuck Jacobs, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include "IRFunctionEmitter.h"
+#include "IREmitter.h"
 #include "IRLocalValue.h"
+
+// utilities
+#include "TypeTraits.h"
 
 namespace ell
 {
 namespace emitters
 {
+    /// <summary>
+    /// Version of IRLocalValue for scalar values (values in registers)
+    /// </summary>
+    ///
+    /// This subclass represents scalar values that can have arithmetic operations,
+    /// comparisons, and simple math functions performed on them. The implementations
+    /// for those operations are all separate functions and operator overloads.
+    ///
+    /// Usage:
+    ///
+    /// ```
+    /// IRFunctionEmitter function = ...;
+    /// llvm::Value* outPtr = ...;
+    /// llvm::Value* value1 = ...;
+    /// auto a = function.LocalScalar(value1);  // create an `IRLocalScalar` from an `llvm::Value*`
+    /// auto b = function.LocalScalar(1.25f);   // create an `IRLocalScalar` from a constant
+    /// auto c = a + b;                         // directly perform math operations on `IRLocalScalar` values
+    /// auto d = Sin(c);                        // ...and call math functions on them
+    /// function.SetValue(outPtr, d);           // d implicitly converts to `llvm::Value*` for functions that use llvm values directly
+    /// ...
+    /// ```
+    struct IRLocalScalar : public IRLocalValue
+    {
+        using IRLocalValue::IRLocalValue;
+        using IRLocalValue::operator=;
+
+        // Compound operators
+        IRLocalScalar& operator+=(const IRLocalScalar& rhs);
+        IRLocalScalar& operator-=(const IRLocalScalar& rhs);
+        IRLocalScalar& operator*=(const IRLocalScalar& rhs);
+        IRLocalScalar& operator/=(const IRLocalScalar& rhs);
+        IRLocalScalar& operator%=(const IRLocalScalar& rhs);
+        IRLocalScalar& operator|=(const IRLocalScalar& rhs);
+        IRLocalScalar& operator&=(const IRLocalScalar& rhs);
+        IRLocalScalar& operator^=(const IRLocalScalar& rhs);
+        IRLocalScalar& operator<<=(const IRLocalScalar& rhs);
+    };
+
     //
     // Convenience overloads for common operators
     //
@@ -149,4 +190,4 @@ namespace emitters
 }
 }
 
-#include "../tcc/IRLocalValueOperations.tcc"
+#include "../tcc/IRLocalScalar.tcc"

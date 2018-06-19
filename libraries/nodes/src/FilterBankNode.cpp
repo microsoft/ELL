@@ -68,7 +68,7 @@ namespace nodes
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
-        function.For(numFilters, [pInput, pOutput, half, beginVar, centerVar, endVar](emitters::IRFunctionEmitter& function, llvm::Value* filterIndex) {
+        function.For(numFilters, [pInput, pOutput, half, beginVar, centerVar, endVar](emitters::IRFunctionEmitter& function, auto filterIndex) {
             auto sum = function.Variable(emitters::GetVariableType<ValueType>());
             auto begin = function.LocalScalar(function.ValueAt(beginVar, filterIndex));
             auto center = function.LocalScalar(function.ValueAt(centerVar, filterIndex));
@@ -76,9 +76,8 @@ namespace nodes
             function.StoreZero(sum);
 
             // for index in [begin, center)
-            function.For(begin, center, [pInput, half, sum, begin, center](emitters::IRFunctionEmitter& function, llvm::Value* indexValue) {
+            function.For(begin, center, [pInput, half, sum, begin, center](emitters::IRFunctionEmitter& function, auto index) {
                 // sum += signal[i] * ((i-begin+0.5) / (center-begin))
-                auto index = function.LocalScalar(indexValue);
                 auto inputVal = function.LocalScalar(function.ValueAt(pInput, index));
                 auto numer = index - begin;
                 auto denom = center - begin;
@@ -87,9 +86,8 @@ namespace nodes
             });
 
             // for index in [center, end)
-            function.For(center, end, [pInput, half, sum, center, end](emitters::IRFunctionEmitter& function, llvm::Value* indexValue) {
+            function.For(center, end, [pInput, half, sum, center, end](emitters::IRFunctionEmitter& function, auto index) {
                 // sum += signal[i] * ((end-i-0.5) / (end-center))
-                auto index = function.LocalScalar(indexValue);
                 auto inputVal = function.LocalScalar(function.ValueAt(pInput, index));
                 auto numer = end - index;
                 auto denom = end - center;

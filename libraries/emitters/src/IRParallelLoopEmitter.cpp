@@ -9,7 +9,6 @@
 #include "IRParallelLoopEmitter.h"
 #include "IRAsyncTask.h"
 #include "IRFunctionEmitter.h"
-#include "IRLocalValueOperations.h"
 #include "IRModuleEmitter.h"
 
 // stl

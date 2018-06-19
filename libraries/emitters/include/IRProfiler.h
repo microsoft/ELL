@@ -10,7 +10,7 @@
 
 // emitters
 #include "EmitterTypes.h"
-#include "IRLocalValue.h"
+#include "IRLocalScalar.h"
 
 // llvm
 #include <llvm/IR/DerivedTypes.h>

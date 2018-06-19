@@ -70,7 +70,7 @@ void TestProfileRegion()
         int vecSize = 10000;
         int numIter = 100;
         auto vec = function.Variable(VariableType::Double, vecSize);
-        function.For(numIter, [vec, vecSize](IRFunctionEmitter& function, llvm::Value* i){
+        function.For(numIter, [vec, vecSize](IRFunctionEmitter& function, auto){
             auto dotSum = function.DotProduct(vecSize, vec, vec);
             UNUSED(dotSum);
         });

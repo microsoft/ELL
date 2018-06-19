@@ -2,12 +2,9 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     IRFunctionEmitter.tcc (emitters)
-//  Authors:  Umesh Madan
+//  Authors:  Umesh Madan, Chuck Jacobs, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Needed in the tcc because IRLocalValueHelpers.h needs IRFunctionEmitter to be defined
-#include "IRLocalValueOperations.h"
 
 namespace ell
 {

@@ -134,6 +134,8 @@ namespace dsp
         class Fixed2DArray
         {
         public:
+            constexpr Fixed2DArray() : _data({ 0 }) {}
+
             void CopyFrom(const math::ConstChannelColumnRowTensorReference<ValueType>& data)
             {
                 const auto dataPtr = data.GetConstDataPointer();
@@ -193,7 +195,7 @@ namespace dsp
             const ValueType* GetDataPointer() const { return _data.data(); }
 
         private:
-            std::array<ValueType, rows* columns> _data = { 0 };
+            std::array<ValueType, rows* columns> _data;
         };
 
         //
@@ -206,6 +208,9 @@ namespace dsp
             static constexpr int rows = M;
             static constexpr int columns = N;
             static constexpr int channels = K;
+
+            constexpr Fixed3DArray() : _data({ 0 }) {}
+
             ValueType operator()(int row, int column, int channel) const
             {
                 return _data[(row * columns * channels) + (column * channels) + channel];
@@ -241,7 +246,7 @@ namespace dsp
             const ValueType* GetDataPointer() const { return _data.data(); }
 
         private:
-            std::array<ValueType, rows* columns* channels> _data = { 0 };
+            std::array<ValueType, rows* columns* channels> _data;
         };
 
         template <typename ElementType, int rows, int columns>

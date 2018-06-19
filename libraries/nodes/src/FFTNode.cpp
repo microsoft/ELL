@@ -294,17 +294,15 @@ namespace nodes
     inline void Deinterleave(emitters::IRFunctionEmitter& function, llvm::Value* array, llvm::Value* halfLength, llvm::Value* scratch)
     {
         auto halfN = function.LocalScalar(halfLength);
-        function.For(halfN, [&scratch, &array](emitters::IRFunctionEmitter& function, llvm::Value* indexVar)
+        function.For(halfN, [&scratch, &array](emitters::IRFunctionEmitter& function, auto index)
         {
-            auto index = function.LocalScalar(indexVar);
-            auto evenIndex = index * function.LocalScalar(2);
-            auto oddIndex = evenIndex + function.LocalScalar(1);
+            auto evenIndex = index * 2;
+            auto oddIndex = evenIndex + 1;
             function.SetValueAt(scratch, index, function.ValueAt(array, oddIndex));
             function.SetValueAt(array, index, function.ValueAt(array, evenIndex));
         });
 
-        function.For(halfN, [&scratch, &array, halfN](emitters::IRFunctionEmitter& function, llvm::Value* indexVar) {
-            auto index = function.LocalScalar(indexVar);
+        function.For(halfN, [&scratch, &array, halfN](emitters::IRFunctionEmitter& function, auto index) {
             function.SetValueAt(array, index + halfN, function.ValueAt(scratch, index));
         });
     }
@@ -446,8 +444,7 @@ namespace nodes
         bool twiddleFactorsVar = false;
 #endif
 
-        function.For(halfN, [&evens, &odds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
-            auto k = function.LocalScalar(kVar);
+        function.For(halfN, [&evens, &odds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, auto k) {
 
 #if (USE_STORED_TWIDDLE_FACTORS)
             auto w = function.LocalScalar(function.ValueAt(twiddleFactorsVar, k));
@@ -541,8 +538,7 @@ namespace nodes
         bool twiddleFactorsVar = false; // Just here to appease the compiler
 #endif
 
-        function.For(halfN, [&evens, &odds, &complexEvens, complexOdds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, llvm::Value* kVar) {
-            auto k = function.LocalScalar(kVar);
+        function.For(halfN, [&evens, &odds, &complexEvens, complexOdds, &twiddleFactorsVar](emitters::IRFunctionEmitter& function, auto k) {
 
 #if (USE_STORED_TWIDDLE_FACTORS)
             auto w = function.LocalScalar(function.ValueAt(twiddleFactorsVar, k));
@@ -676,7 +672,7 @@ namespace nodes
         llvm::Value* temp = function.Variable(complexType, "temp");
 
         // Convert real-valued data to complex
-        function.For(inputSize, [pInput, complexBuffer, temp](emitters::IRFunctionEmitter& function, llvm::Value* index) {
+        function.For(inputSize, [pInput, complexBuffer, temp](emitters::IRFunctionEmitter& function, auto index) {
             function.FillStruct(temp, { function.ValueAt(pInput, index), function.Literal<ValueType>(0) });
             function.SetValueAt(complexBuffer, index, function.Load(temp));
         });
@@ -685,7 +681,7 @@ namespace nodes
 
 #endif // USE_REAL_FFT
 
-        function.For(outputSize, [pOutput, complexBuffer](emitters::IRFunctionEmitter& function, llvm::Value* index) {
+        function.For(outputSize, [pOutput, complexBuffer](emitters::IRFunctionEmitter& function, auto index) {
             auto complexValue = function.LocalScalar(function.ValueAt(complexBuffer, index));
             auto absValue = detail::ComplexAbs(complexValue);
             function.SetValueAt(pOutput, index, absValue);

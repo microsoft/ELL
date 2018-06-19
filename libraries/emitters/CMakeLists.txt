@@ -21,10 +21,11 @@ set (src
     src/IRFunctionEmitter.cpp
     src/IRHeaderWriter.cpp
     src/IRIfEmitter.cpp
-    src/IRLocalValue.cpp
     src/IRLoader.cpp
+    src/IRLocalArray.cpp
+    src/IRLocalMultidimArray.cpp
+    src/IRLocalScalar.cpp
     src/IRLocalValue.cpp
-    src/IRLocalValueOperations.cpp
     src/IRLoopEmitter.cpp
     src/IRMetadata.cpp
     src/IRModuleEmitter.cpp
@@ -58,11 +59,13 @@ set (include
     include/IRHeaderWriter.h
     include/IRIfEmitter.h
     include/IRLoader.h
+    include/IRLocalArray.h
+    include/IRLocalMultidimArray.h
+    include/IRLocalScalar.h
     include/IRLocalValue.h
-    include/IRLocalValueOperations.h
     include/IRLoopEmitter.h
-    include/IRModuleEmitter.h
     include/IRMetadata.h
+    include/IRModuleEmitter.h
     include/IROptimizer.h
     include/IRParallelLoopEmitter.h
     include/IRPosixRuntime.h
@@ -86,7 +89,7 @@ set (tcc
     tcc/CompilableIRFunction.tcc
     tcc/EmitterTypes.tcc
     tcc/IRFunctionEmitter.tcc
-    tcc/IRLocalValueOperations.tcc
+    tcc/IRLocalScalar.tcc
     tcc/IRModuleEmitter.tcc
     tcc/IRRuntime.tcc
     tcc/ScalarVariable.tcc

@@ -12,6 +12,9 @@
 // utilities
 #include "Exception.h"
 
+// LLVM
+#include <llvm/IR/Value.h>
+
 // stl
 #include <cassert>
 
@@ -33,6 +36,41 @@ namespace emitters
         }
     }
 
+    namespace detail
+    {
+        bool BothIntegral(const IRLocalValue& a, const IRLocalValue& b)
+        {
+            return (a.value->getType()->getScalarType()->isIntegerTy() && b.value->getType()->getScalarType()->isIntegerTy());
+        }
+
+        bool BothFloatingPoint(const IRLocalValue& a, const IRLocalValue& b)
+        {
+            return (a.value->getType()->getScalarType()->isFloatingPointTy() && b.value->getType()->getScalarType()->isFloatingPointTy());
+        }
+
+        void VerifyArgTypesCompatible(const IRLocalValue& a, const IRLocalValue& b)
+        {
+            VerifyFromSameFunction(a, b);
+            if (!(BothIntegral(a, b) || BothFloatingPoint(a, b)))
+            {
+                throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments have incompatible types");
+            }
+        }
+
+        // `areCompatible` is a function that returns true if the arg types are compatible. It has the signature: bool(const IRLocalValue& a, const IRLocalValue& b)
+        using CompatibleTypesPredicate = std::function<bool(const IRLocalValue&, const IRLocalValue&)>;
+        void VerifyArgTypesCompatible(const IRLocalValue& a, const IRLocalValue& b, CompatibleTypesPredicate areCompatible)
+        {
+            VerifyFromSameFunction(a, b);
+            if (!(areCompatible(a, b)))
+            {
+                throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments have incompatible types");
+            }
+        }
+    }
+
+    using namespace detail;
+
     //
     // IRLocalValue
     //
@@ -49,113 +87,6 @@ namespace emitters
     IRLocalValue& IRLocalValue::operator=(llvm::Value* value)
     {
         this->value = value;
-        return *this;
-    }
-
-    //
-    // IRLocalArrayValue
-    //
-    IRLocalArray::IRLocalArrayValue IRLocalArray::operator[](int offset) const
-    {
-        return IRLocalArrayValue(function, value, function.Literal(offset));
-    }
-
-    IRLocalArray::IRLocalArrayValue IRLocalArray::operator[](llvm::Value* offset) const
-    {
-        return IRLocalArrayValue(function, value, offset);
-    }
-
-    IRLocalArray::IRLocalArrayValue::IRLocalArrayValue(
-        emitters::IRFunctionEmitter& function, llvm::Value* value, llvm::Value* pOffset)
-        : _function(function), _pPointer(value), _pOffset(pOffset) {}
-
-    IRLocalArray::IRLocalArrayValue& IRLocalArray::IRLocalArrayValue::operator=(const IRLocalArrayValue& value)
-    {
-        // cast the rhs to IRLocalScalar, which decomposes into llvm::Value* thanks to the overload below
-        *this = static_cast<IRLocalScalar>(value);
-
-        return *this;
-    }
-
-    IRLocalArray::IRLocalArrayValue::operator IRLocalScalar() const
-    {
-        return _function.LocalScalar(_function.ValueAt(_pPointer, _pOffset));
-    }
-
-    IRLocalArray::IRLocalArrayValue& IRLocalArray::IRLocalArrayValue::operator=(llvm::Value* value)
-    {
-        _function.SetValueAt(_pPointer, _pOffset, value);
-
-        return *this;
-    }
-
-    //
-    // IRLocalMultidimArray
-    //
-    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, llvm::Value* data, std::vector<int> extents)
-        : IRLocalMultidimArray(function, data, extents, extents)
-    {
-    }
-
-    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, llvm::Value* data, std::vector<int> extents, std::vector<int> memorySize)
-        : function(function), data(data), extents(extents)
-    {
-        strides.reserve(memorySize.size());
-        std::copy(memorySize.begin() + 1, memorySize.end(), std::back_inserter(strides));
-        strides.push_back(1);
-        int currentStride = 1;
-        for (auto it = std::rbegin(strides); it != std::rend(strides); ++it)
-        {
-            *it *= currentStride;
-            currentStride = *it;
-        }
-    }
-
-    IRLocalMultidimArray::IRLocalArrayElement IRLocalMultidimArray::operator()(std::vector<int> indices) const
-    {
-        assert(indices.size() == strides.size());
-        int offset = 0;
-        auto stridesIt = strides.begin();
-        for (auto& i : indices)
-        {
-            offset += i * *stridesIt;
-            ++stridesIt;
-        }
-        return IRLocalArrayElement(function, data, function.Literal(offset));
-    }
-
-    IRLocalMultidimArray::IRLocalArrayElement IRLocalMultidimArray::operator()(std::vector<IRLocalScalar> indices) const
-    {
-        auto offset = function.LocalScalar(0);
-        auto stridesIt = strides.begin();
-        for (auto& i : indices)
-        {
-            offset = offset + (i * *stridesIt);
-            ++stridesIt;
-        }
-        return IRLocalArrayElement(function, data, offset);
-    }
-
-    IRLocalMultidimArray::IRLocalArrayElement::IRLocalArrayElement(emitters::IRFunctionEmitter& function, llvm::Value* data, llvm::Value* offset)
-        : _function(function), _data(data), _offset(offset) {}
-
-    IRLocalMultidimArray::IRLocalArrayElement& IRLocalMultidimArray::IRLocalArrayElement::operator=(const IRLocalArrayElement& value)
-    {
-        // cast the rhs to IRLocalScalar, which decomposes into llvm::Value* thanks to the overload below
-        *this = static_cast<IRLocalScalar>(value);
-
-        return *this;
-    }
-
-    IRLocalMultidimArray::IRLocalArrayElement::operator IRLocalScalar() const
-    {
-        return _function.LocalScalar(_function.ValueAt(_data, _offset));
-    }
-
-    IRLocalMultidimArray::IRLocalArrayElement& IRLocalMultidimArray::IRLocalArrayElement::operator=(llvm::Value* value)
-    {
-        _function.SetValueAt(_data, _offset, value);
-
         return *this;
     }
 }

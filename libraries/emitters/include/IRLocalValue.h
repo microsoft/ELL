@@ -8,24 +8,31 @@
 
 #pragma once
 
-// utilities
-#include "Exception.h"
-#include "IntegerNArray.h"
-#include "TypeTraits.h"
-
-// llvm
-#include <llvm/IR/Value.h>
-
 // stl
-#include <algorithm>
-#include <array>
-#include <initializer_list>
+#include <functional>
+
+namespace llvm
+{
+    class Value;
+}
 
 namespace ell
 {
 namespace emitters
 {
     class IRFunctionEmitter;
+    struct IRLocalValue;
+
+    namespace detail
+    {
+        bool BothIntegral(const IRLocalValue& a, const IRLocalValue& b);
+
+        bool BothFloatingPoint(const IRLocalValue& a, const IRLocalValue& b);
+
+        void VerifyArgTypesCompatible(const IRLocalValue& a, const IRLocalValue& b);
+
+        void VerifyArgTypesCompatible(const IRLocalValue& a, const IRLocalValue& b, std::function<bool(const IRLocalValue&, const IRLocalValue&)> areCompatible);
+    }
 
     /// <summary>
     /// Abstract base class for helper types for llvm values representing values local to a function
@@ -66,213 +73,11 @@ namespace emitters
     };
 
     /// <summary>
-    /// Version of IRLocalValue for scalar values (values in registers)
-    /// </summary>
-    ///
-    /// This subclass represents scalar values that can have arithmetic operations,
-    /// comparisons, and simple math functions performed on them. The implementations
-    /// for those operations are all separate functions and operator overloads.
-    ///
-    /// Usage:
-    ///
-    /// ```
-    /// IRFunctionEmitter function = ...;
-    /// llvm::Value* outPtr = ...;
-    /// llvm::Value* value1 = ...;
-    /// auto a = function.LocalScalar(value1);  // create an `IRLocalScalar` from an `llvm::Value*`
-    /// auto b = function.LocalScalar(1.25f);   // create an `IRLocalScalar` from a constant
-    /// auto c = a + b;                         // directly perform math operations on `IRLocalScalar` values
-    /// auto d = Sin(c);                        // ...and call math functions on them
-    /// function.SetValue(outPtr, d);           // d implicitly converts to `llvm::Value*` for functions that use llvm values directly
-    /// ...
-    /// ```
-    struct IRLocalScalar : public IRLocalValue
-    {
-        using IRLocalValue::IRLocalValue;
-        using IRLocalValue::operator=;
-    };
-
-    /// <summary>
     /// Version of IRLocalValue for pointer values
     /// </summary>
     struct IRLocalPointer : public IRLocalValue
     {
         using IRLocalValue::IRLocalValue;
     };
-
-    /// <summary>
-    /// Helper type for llvm values representing 1D array values local to a function
-    /// </summary>
-    struct IRLocalArray : public IRLocalValue
-    {
-    private:
-        /// <summary>
-        /// Helper type for llvm values representing values within arrays local to a function
-        /// </summary>
-        struct IRLocalArrayValue
-        {
-            IRLocalArrayValue(IRFunctionEmitter& function, llvm::Value* pPointer, llvm::Value* pOffset);
-
-            IRLocalArrayValue& operator=(const IRLocalArrayValue& value);
-
-            IRLocalArrayValue& operator=(llvm::Value* value);
-
-            operator IRLocalScalar() const;
-
-            IRFunctionEmitter& _function;
-            llvm::Value* _pPointer;
-            llvm::Value* _pOffset;
-        };
-
-    public:
-        using IRLocalValue::IRLocalValue;
-
-        /// <summary> Indexing operator to return a reference to the specified offset </summary>
-        ///
-        /// <param name="offset"> The offset where the value lies within the wrapped array. </param>
-        /// <return> An instance of IRLocalArray::IRLocalArrayValue to represent the value at the offset within the array </returns>
-        IRLocalArrayValue operator[](llvm::Value* offset) const;
-
-        /// <summary> Indexing operator to return a reference to the specified offset </summary>
-        ///
-        /// <param name="offset"> The offset where the value lies within the wrapped array. </param>
-        /// <return> An instance of IRLocalArray::IRLocalArrayValue to represent the value at the offset within the array </returns>
-        IRLocalArrayValue operator[](int offset) const;
-    };
-
-    /// <summary>
-    /// Helper type for llvm values representing N-D arrays local to a function
-    /// </summary>
-    struct IRLocalMultidimArray
-    {
-    protected:
-        /// <summary>
-        /// Helper type for llvm values representing values within arrays local to a function
-        /// </summary>
-        struct IRLocalArrayElement
-        {
-            IRLocalArrayElement(IRFunctionEmitter& function, llvm::Value* data, llvm::Value* offset);
-
-            IRLocalArrayElement& operator=(const IRLocalArrayElement& other);
-
-            IRLocalArrayElement& operator=(llvm::Value* value);
-
-            operator IRLocalScalar() const;
-
-            IRFunctionEmitter& _function;
-            llvm::Value* _data;
-            llvm::Value* _offset;
-        };
-
-    public:
-        /// <summary> Constructor from a pointer to data and a list of dimensions. </summary>
-        ///
-        /// <param name="function"> The current function being emitted. </param>
-        /// <param name="data"> The pointer to the LLVM array to wrap. </param>
-        /// <param name="extents"> The sizes of the array's dimensions. </param>
-        IRLocalMultidimArray(IRFunctionEmitter& function, llvm::Value* data, std::vector<int> extents);
-
-        /// <summary> Constructor from a pointer to data and a list of logical and physical dimensions. </summary>
-        ///
-        /// <param name="function"> The current function being emitted. </param>
-        /// <param name="data"> The pointer to the LLVM array to wrap. </param>
-        /// <param name="extents"> The sizes of the array's logical dimensions. </param>
-        /// <param name="memorySize"> The sizes of the array's physical dimensions. </param>
-        IRLocalMultidimArray(IRFunctionEmitter& function, llvm::Value* data, std::vector<int> extents, std::vector<int> memorySize);
-
-        /// <summary> Indexing operator to return a reference to the specified element </summary>
-        ///
-        /// <param name="indices"> The indices of the element. </param>
-        ///
-        /// <return> An instance of IRLocalMultidimArray::IRLocalArrayElement to represent the value at the offset within the array </returns>
-        IRLocalArrayElement operator()(std::vector<IRLocalScalar> indices) const;
-
-        /// <summary> Indexing operator to return a reference to the specified element </summary>
-        ///
-        /// <param name="indices"> The indices of the element. </param>
-        ///
-        /// <return> An instance of IRLocalMultidimArray::IRLocalArrayElement to represent the value at the offset within the array </returns>
-        IRLocalArrayElement operator()(std::vector<int> indices) const;
-
-        /// <summary> The function this value is in scope for. </summary>
-        IRFunctionEmitter& function;
-
-        /// <summary> The llvm::Value* being wrapped. </summary>
-        llvm::Value* data = nullptr;
-
-        std::vector<int> extents;
-        std::vector<int> strides;
-    };
-
-    /// <summary>
-    /// Helper type for llvm values representing N-D arrays local to a function, where order of dimensions can be represented logically
-    /// </summary>
-    template <size_t N>
-    struct IRLocalNDimArray : IRLocalMultidimArray
-    {
-        IRLocalNDimArray(IRFunctionEmitter& function, llvm::Value* data, std::array<int, N> extents, std::array<int, N> layout)
-            : IRLocalMultidimArray(function, data, ToLayoutOrder(extents, layout)), layout(layout)
-        {
-            constexpr auto expectedLayout = utilities::MakeNArray<N>();
-
-            if (!std::is_permutation(layout.begin(), layout.end(), expectedLayout.begin(), expectedLayout.end()))
-            {
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
-            }
-        }
-
-        /// <summary> Indexing operator to return a reference to the specified element </summary>
-        ///
-        /// <param name="index"> The index of the element. </param>
-        ///
-        /// <return> An instance of IRLocalMultidimArray::IRLocalArrayElement to represent the value at the offset within the array </returns>
-        IRLocalArrayElement operator()(std::array<IRLocalScalar, N> index) const
-        {
-            return IRLocalMultidimArray::operator()(ToLayoutOrder(index, layout));
-        }
-
-        /// <summary> Indexing operator to return a reference to the specified element </summary>
-        ///
-        /// <param name="index"> The index of the element. </param>
-        ///
-        /// <return> An instance of IRLocalMultidimArray::IRLocalArrayElement to represent the value at the offset within the array </returns>
-        IRLocalArrayElement operator()(std::array<int, N> index) const
-        {
-            return IRLocalMultidimArray::operator()(ToLayoutOrder(index, layout));
-        }
-
-        std::array<int, N> layout;
-
-    private:
-        template <typename T>
-        static constexpr auto ToLayoutOrder(const std::array<T, N>& array, const std::array<int, N>& layout)
-        {
-            return ToLayoutOrder(array, layout, std::make_index_sequence<N>{});
-        }
-
-        template <typename T, size_t... I>
-        static constexpr auto ToLayoutOrder(const std::array<T, N>& array, const std::array<int, N>& layout, std::index_sequence<I...>)
-        {
-            return std::vector<T>{ array[layout[I]]... };
-        }
-    };
-
-    /// <summary> Helper type for llvm values representing a matrix local to a function </summary>
-    using IRLocalMatrix = IRLocalNDimArray<2>;
-
-    /// <summary> Helper type for llvm values representing a tensor local to a function </summary>
-    using IRLocalTensor = IRLocalNDimArray<3>;
-
-    /// <summary> Represents row-major layout for use with IRLocalMatrix </summary>
-    constexpr std::array<int, 2> RowMajorMatrixLayout{ 0, 1 };
-
-    /// <summary> Represents column-major layout for use with IRLocalMatrix </summary>
-    constexpr std::array<int, 2> ColumnMajorMatrixLayout{ 1, 0 };
-
-    /// <summary> Represents row-major layout for use with IRLocalTensor </summary>
-    constexpr std::array<int, 3> RowMajorTensorLayout{ 0, 1, 2 };
-
-    /// <summary> Represents channel-major layout for use with IRLocalTensor </summary>
-    constexpr std::array<int, 3> ChannelMajorTensorLayout{ 2, 1, 0 };
 }
 }

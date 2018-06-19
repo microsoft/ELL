@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "IRLocalValue.h"
+#include "IRLocalScalar.h"
 
 // llvm
 #include <llvm/IR/Value.h>
