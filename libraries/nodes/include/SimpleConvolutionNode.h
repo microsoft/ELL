@@ -102,6 +102,7 @@ namespace nodes
         TensorType _filterWeights;
 
         int _stride = 1;
+        bool _isDepthwiseSeparable = false;
     };
 
     //
@@ -134,12 +135,14 @@ namespace nodes
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         /// <param name="filterSize"> The filter width. </param>
         /// <param name="stride"> The output stride. </param>
+        /// <param name="isDepthwiseSeparable"> Boolean value indicating whether the convolution is depthwise separable. </param>
         SimpleConvolutionComputeNode(const model::PortElements<ValueType>& input,
                                      const model::PortElements<ValueType>& filterWeights,
                                      const model::PortMemoryLayout& inputMemoryLayout,
                                      const model::PortMemoryLayout& outputMemoryLayout,
                                      int filterSize,
-                                     int stride);
+                                     int stride,
+                                     bool isDepthwiseSeparable);
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
@@ -189,6 +192,8 @@ namespace nodes
 
         int _filterSize = 0;
         int _stride = 1;
+
+        bool _isDepthwiseSeparable = false;
     };
 }
 }

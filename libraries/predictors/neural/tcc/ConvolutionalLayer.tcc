@@ -171,7 +171,8 @@ namespace predictors
                     {
                     case ConvolutionMethod::simple:
                     {
-                        dsp::Convolve2DSimple(inputChannelTensor, weights, numFilters, stride, outputChannelTensor);
+                        auto result = dsp::Convolve2DSimpleDepthwiseSeparable(inputChannelTensor, weights, numFilters, stride);
+                        outputChannelTensor.CopyFrom(result);
                     }
                     break;
                     case ConvolutionMethod::unrolled:

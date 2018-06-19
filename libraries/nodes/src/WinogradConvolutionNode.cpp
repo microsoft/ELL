@@ -330,7 +330,9 @@ namespace nodes
 
             // The size of the input blocks is generally larger than the blocks we want to operate on when
             // doing the transformation itself. So, we'll break the block up into sub-blocks
-            function.For(blockSize, [=](emitters::IRFunctionEmitter& function, auto channelIndex) {
+            function.For(blockSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+                auto channelIndex = function.LocalScalar(i);
+
                 // Compute a * b * a' for a sub-block of b
                 auto inputSubBlock = function.PointerOffset(b.data, channelIndex);
                 auto d = function.LocalTensor(inputSubBlock, { k, k, blockSize }, emitters::RowMajorTensorLayout);
@@ -1113,16 +1115,20 @@ namespace nodes
         llvm::AllocaInst* transformedOutputBlock = function.Variable(emitters::GetVariableType<ValueType>(), windowSize * windowSize * blockSize);
         llvm::AllocaInst* outputTile = function.Variable(emitters::GetVariableType<ValueType>(), _tileSize * _tileSize * blockSize);
 
-        function.For(numFilters, [transformedFilters, numFullTileRows, numFullTileColumns, numTileRows, numTileColumns, numChannels, numFilters, numFilterChannels, numOutputRows, numOutputColumns, inputRowStride, filterStride, filterChannelStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, auto filterIndex) {
+        function.For(numFilters, [transformedFilters, numFullTileRows, numFullTileColumns, numTileRows, numTileColumns, numChannels, numFilters, numFilterChannels, numOutputRows, numOutputColumns, inputRowStride, filterStride, filterChannelStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            auto filterIndex = function.LocalScalar(i);
             auto channelStart = (filterIndex * numFilterChannels) % numChannels;
 
-            function.For(numFilterChannels, [filterIndex, channelStart, transformedFilters, numFullTileRows, numFullTileColumns, numTileRows, numTileColumns, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, filterStride, filterChannelStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, auto filterChannel) {
+            function.For(numFilterChannels, [filterIndex, channelStart, transformedFilters, numFullTileRows, numFullTileColumns, numTileRows, numTileColumns, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, filterStride, filterChannelStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, llvm::Value* j) {
+                auto filterChannel = function.LocalScalar(j);
                 auto channelIndex = channelStart + filterChannel;
                 auto filterChannelPtr = function.PointerOffset(transformedFilters, filterIndex * filterStride + filterChannel * filterChannelStride);
 
                 // Convolve all "full" windows (ones that don't fall off the edge or bottom of the input image)
-                function.For(numFullTileRows, [channelIndex, filterIndex, numFullTileColumns, numTileColumns, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, auto tileRowIndex) {
-                    function.For(numFullTileColumns, [tileRowIndex, channelIndex, filterIndex, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, auto tileColumnIndex) {
+                function.For(numFullTileRows, [channelIndex, filterIndex, numFullTileColumns, numTileColumns, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, llvm::Value* k) {
+                    auto tileRowIndex = function.LocalScalar(k);
+                    function.For(numFullTileColumns, [tileRowIndex, channelIndex, filterIndex, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, llvm::Value* l) {
+                        auto tileColumnIndex = function.LocalScalar(l);
                         ConvolveAccumulateBlock<ValueType>(function, input, filterChannelPtr, tileRowIndex, tileColumnIndex, channelIndex, filterIndex, inputRowStride, numOutputRows, numOutputColumns, numChannels, numFilters, _tileSize, _filterSize, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, output);
                     });
 
@@ -1138,7 +1144,8 @@ namespace nodes
                 if (numTileRows > numFullTileRows)
                 {
                     auto tileRowIndex = function.LocalScalar(numFullTileRows);
-                    function.For(numFullTileColumns, [tileRowIndex, channelIndex, filterIndex, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, auto tileColumnIndex) {
+                    function.For(numFullTileColumns, [tileRowIndex, channelIndex, filterIndex, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, llvm::Value* l) {
+                        auto tileColumnIndex = function.LocalScalar(l);
                         ConvolveAccumulateBlock<ValueType>(function, input, filterChannelPtr, tileRowIndex, tileColumnIndex, channelIndex, filterIndex, inputRowStride, numOutputRows, numOutputColumns, numChannels, numFilters, _tileSize, _filterSize, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, output);
                     });
                 }
