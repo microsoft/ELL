@@ -72,24 +72,19 @@ namespace nodes
         auto pLMergeableSrc = compiler.GetMergeableNodeRegion(lVal);
         auto pRMergeableSrc = compiler.GetMergeableNodeRegion(rVal);
 
-        emitters::IRIfEmitter ife = function.If();
-        ife.If(emitters::TypedComparison::equals, pSelectorVal, function.Literal<SelectorType>(0));
-        {
+        function.If(emitters::TypedComparison::equals, pSelectorVal, function.Literal<SelectorType>(0), [pLMergeableSrc, pResult, &compiler, this](emitters::IRFunctionEmitter& function) {
             if (pLMergeableSrc != nullptr)
             {
                 function.MergeRegion(pLMergeableSrc);
             }
             function.Store(pResult, compiler.LoadPortElementVariable(elements.GetInputElement(0)));
-        }
-        ife.Else();
-        {
+        }).Else([pRMergeableSrc, pResult, &compiler, this](emitters::IRFunctionEmitter& function) {
             if (pRMergeableSrc != nullptr)
             {
                 function.MergeRegion(pRMergeableSrc);
             }
             function.Store(pResult, compiler.LoadPortElementVariable(elements.GetInputElement(1)));
-        }
-        ife.End();
+        });
 
         auto pSelectorNode = selector.GetParentNodes()[0];
         if (HasSingleDescendant(*pSelectorNode))
@@ -109,12 +104,10 @@ namespace nodes
         llvm::Value* result = compiler.EnsurePortEmitted(output);
         for (size_t index = 0; index < numElements; ++index)
         {
-            emitters::IRIfEmitter if1 = function.If(emitters::TypedComparison::equals, function.Literal((int)index), pSelectorVal);
-            {
+            function.If(emitters::TypedComparison::equals, function.Literal((int)index), pSelectorVal, [index, result, &compiler, this](emitters::IRFunctionEmitter& function) {
                 llvm::Value* val = compiler.LoadPortElementVariable(elements.GetInputElement(index));
                 function.Store(result, val);
-            }
-            if1.End();
+            });
         }
     }
 

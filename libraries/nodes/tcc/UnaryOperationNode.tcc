@@ -244,15 +244,11 @@ namespace nodes
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
-        auto forLoop = function.ForLoop();
-        forLoop.Begin(count);
-        {
-            auto i = forLoop.LoadIterationVariable();
+        function.For(count, [pInput, pResult, this](emitters::IRFunctionEmitter& function, llvm::Value* i) {
             llvm::Value* inputValue = function.ValueAt(pInput, i);
             llvm::Value* pOpResult = function.Call(GetOperator(function), { inputValue });
             function.SetValueAt(pResult, i, pOpResult);
-        }
-        forLoop.End();
+        });
     }
 
     template <typename ValueType>

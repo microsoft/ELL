@@ -390,11 +390,7 @@ namespace nodes
         auto&& outputStride = _outputLayout.GetStride();
         auto&& outputOffset = _outputLayout.GetOffset();
 
-        auto loop = function.ForLoop();
-        loop.Begin(inputSize[dimension]);
-        {
-            auto loopIndex = loop.LoadIterationVariable();
-
+        function.For(inputSize[dimension], [input1, input2, output, inputOffset1, inputOffset2, inputStride1, inputStride2, outputStride, outputOffset, prevInput1DimensionOffset, prevInput2DimensionOffset, prevOutputDimensionOffset, dimension, numDimensions, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex) {
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
             llvm::Value* thisInput1DimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(inputOffset1[dimension]));
             llvm::Value* thisInput2DimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(inputOffset2[dimension]));
@@ -439,8 +435,7 @@ namespace nodes
                 auto outputValue = function.Operator(emitters::GetOperator<ValueType>(GetOperation()), value1, value2);
                 function.SetValueAt(output, thisOutputDimensionOffset, outputValue);
             }
-        }
-        loop.End();
+        });
     }
 
     template <typename ValueType>

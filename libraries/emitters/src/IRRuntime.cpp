@@ -26,51 +26,39 @@ namespace emitters
         template <typename ValueType>
         llvm::Function* EmitGEMVFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
         {
-            const auto plus = emitters::TypedOperator::add;
-            const auto times = emitters::TypedOperator::multiply;
-            const auto plusFloat = emitters::TypedOperator::addFloat;
-            const auto timesFloat = emitters::TypedOperator::multiplyFloat;
-
             auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);
             auto arguments = function.Arguments().begin();
             auto order = &(*arguments++);
             auto transpose = &(*arguments++);
-            auto m = &(*arguments++);
-            auto n = &(*arguments++);
-            auto alpha = &(*arguments++);
-            auto A = &(*arguments++);
-            auto lda = &(*arguments++);
-            auto x = &(*arguments++);
-            auto incx = &(*arguments++);
-            auto beta = &(*arguments++);
-            auto y = &(*arguments++);
-            auto incy = &(*arguments++);
+            auto m = function.LocalScalar(&(*arguments++));
+            auto n = function.LocalScalar(&(*arguments++));
+            auto alpha = function.LocalScalar(&(*arguments++));
+            auto A = function.LocalArray(&(*arguments++));
+            auto lda = function.LocalScalar(&(*arguments++));
+            auto x = function.LocalArray(&(*arguments++));
+            auto incx = function.LocalScalar(&(*arguments++));
+            auto beta = function.LocalScalar(&(*arguments++));
+            auto y = function.LocalArray(&(*arguments++));
+            auto incy = function.LocalScalar(&(*arguments++));
             UNUSED(order, transpose, alpha, beta);
 
             llvm::Value* accum = function.Variable(emitters::GetVariableType<ValueType>(), "accum");
 
-            auto iLoop = function.ForLoop();
-            iLoop.Begin(m);
-            {
-                auto i = iLoop.LoadIterationVariable();
+            function.For(m, [A, x, y, incx, incy, lda, n, accum](IRFunctionEmitter& function, auto rowIndex) {
                 function.StoreZero(accum);
-                auto jLoop = function.ForLoop();
-                jLoop.Begin(n);
-                {
-                    auto j = jLoop.LoadIterationVariable();
-                    auto aIndex = function.Operator(plus, function.Operator(times, i, lda), j);
-                    auto xIndex = function.Operator(times, j, incx);
-                    auto aVal = function.ValueAt(A, aIndex);
-                    auto xVal = function.ValueAt(x, xIndex);
-                    auto aTimesX = function.Operator(timesFloat, aVal, xVal);
-                    function.OperationAndUpdate(accum, plusFloat, aTimesX);
-                }
-                jLoop.End();
+                function.For(n, [rowIndex, A, x, incx, lda, accum](IRFunctionEmitter& function, auto columnIndex) {
+                    auto aIndex = (rowIndex*lda) + columnIndex;
+                    auto xIndex = columnIndex * incx;
+                    auto aVal = A[aIndex];
+                    auto xVal = x[xIndex];
+                    auto aTimesX = aVal * xVal;
+                    function.Store(accum, function.Load(accum) + aTimesX);
+                });
 
-                auto yIndex = function.Operator(times, i, incy);
-                function.SetValueAt(y, yIndex, function.Load(accum));
-            }
-            iLoop.End();
+                auto yIndex = rowIndex * incy;
+                y[yIndex] = function.Load(accum);
+            });
+
             function.Return(function.Literal<int>(0));
             module.EndFunction();
             return function.GetFunction();
@@ -79,27 +67,22 @@ namespace emitters
         template <typename ValueType>
         llvm::Function* EmitGEMMFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
         {
-            const auto plus = emitters::TypedOperator::add;
-            const auto times = emitters::TypedOperator::multiply;
-            const auto plusFloat = emitters::TypedOperator::addFloat;
-            const auto timesFloat = emitters::TypedOperator::multiplyFloat;
-
             auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);
             auto arguments = function.Arguments().begin();
             auto order = &(*arguments++);
             auto transposeA = &(*arguments++);
             auto transposeB = &(*arguments++);
-            auto m = &(*arguments++);
-            auto n = &(*arguments++);
-            auto k = &(*arguments++);
-            auto alpha = &(*arguments++);
-            auto A = &(*arguments++);
-            auto lda = &(*arguments++);
-            auto B = &(*arguments++);
-            auto ldb = &(*arguments++);
-            auto beta = &(*arguments++);
-            auto C = &(*arguments++);
-            auto ldc = &(*arguments++);
+            auto m = function.LocalScalar(&(*arguments++));
+            auto n = function.LocalScalar(&(*arguments++));
+            auto k = function.LocalScalar(&(*arguments++));
+            auto alpha = function.LocalScalar(&(*arguments++));
+            auto A = function.LocalArray(&(*arguments++));
+            auto lda = function.LocalScalar(&(*arguments++));
+            auto B = function.LocalArray(&(*arguments++));
+            auto ldb = function.LocalScalar(&(*arguments++));
+            auto beta = function.LocalScalar(&(*arguments++));
+            auto C = function.LocalArray(&(*arguments++));
+            auto ldc = function.LocalScalar(&(*arguments++));
             UNUSED(order, transposeA, transposeB, alpha, beta);
 
             // C = A x B, A: mxk, B: kxn, C: mxn
@@ -112,31 +95,20 @@ namespace emitters
             // A'*B': k, j, i (?)
 
             // Clear output
-            auto count = function.Operator(times, ldc, m);
+            auto count = ldc * m;
             function.MemorySet<ValueType>(C, function.Literal<int>(0), function.Literal<uint8_t>(0), count);
 
             // TODO: deal with transposes
 
             // Accumulate partial values into output
-            auto iLoop = function.ForLoop();
-            iLoop.Begin(m);
-            {
-                auto iIndex = iLoop.LoadIterationVariable();
-
-                auto kLoop = function.ForLoop();
-                kLoop.Begin(k);
-                {
-                    auto kIndex = kLoop.LoadIterationVariable();
-
-                    auto jLoop = function.ForLoop();
-                    jLoop.Begin(n);
-                    {
-                        auto jIndex = jLoop.LoadIterationVariable();
-
-                        llvm::Value* aIndex = nullptr;
-                        llvm::Value* bIndex = nullptr;
-                        aIndex = function.Operator(plus, function.Operator(times, iIndex, lda), kIndex);
-                        bIndex = function.Operator(plus, function.Operator(times, kIndex, ldb), jIndex);
+            function.For(m, [A, B, C, lda, ldb, ldc, n, k](IRFunctionEmitter& function, llvm::Value* i) {
+                auto iIndex = function.LocalScalar(i);
+                function.For(k, [iIndex, A, B, C, lda, ldb, ldc, n](IRFunctionEmitter& function, llvm::Value* k) {
+                    auto kIndex = function.LocalScalar(k);
+                    function.For(n, [iIndex, kIndex, A, B, C, lda, ldb, ldc](IRFunctionEmitter& function, llvm::Value* j) {
+                        auto jIndex = function.LocalScalar(j);
+                        auto aIndex = (iIndex * lda) + kIndex;
+                        auto bIndex = (kIndex * ldb) + jIndex;
                         // if (transposeA)
                         //     aIndex = function.Operator(plus, function.Operator(times, kIndex, function.Literal(lda)), iIndex);
                         // else
@@ -147,20 +119,17 @@ namespace emitters
                         // else
                         //     bIndex = function.Operator(plus, function.Operator(times, kIndex, function.Literal(ldb)), jIndex);
 
-                        auto aValue = function.ValueAt(A, aIndex);
-                        auto bValue = function.ValueAt(B, bIndex);
-                        auto value = function.Operator(timesFloat, aValue, bValue);
+                        auto aValue = A[aIndex];
+                        auto bValue = B[bIndex];
+                        auto value = aValue * bValue;
                         // store output in C[m,n]
-                        auto cIndex = function.Operator(plus, function.Operator(times, iIndex, ldc), jIndex);
-                        auto oldVal = function.ValueAt(C, cIndex);
-                        auto sum = function.Operator(plusFloat, oldVal, value);
-                        function.SetValueAt(C, cIndex, sum);
-                    }
-                    jLoop.End();
-                }
-                kLoop.End();
-            }
-            iLoop.End();
+                        auto cIndex = (iIndex * ldc) + jIndex;
+                        auto oldVal = C[cIndex];
+                        auto sum = oldVal + value;
+                        C[cIndex] = sum;
+                    });
+                });
+            });
             function.Return(function.Literal<int>(0));
 
             module.EndFunction();

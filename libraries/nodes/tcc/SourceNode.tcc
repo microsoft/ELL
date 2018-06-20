@@ -174,14 +174,10 @@ namespace nodes
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
         auto numValues = output.Size();
-        auto forLoop = function.ForLoop();
-        forLoop.Begin(numValues);
-        {
-            auto i = forLoop.LoadIterationVariable();
+        function.For(numValues, [sample, pOutput](emitters::IRFunctionEmitter& function, llvm::Value* i) {
             auto value = function.ValueAt(sample, i);
             function.SetValueAt(pOutput, i, value);
-        }
-        forLoop.End();
+        });
     }
 
     template <typename ValueType>

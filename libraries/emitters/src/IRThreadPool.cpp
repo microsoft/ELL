@@ -153,7 +153,7 @@ namespace emitters
         return workerThreadFunction.GetFunction();
     }
 
-    bool IRThreadPool::IsInitialized()
+    bool IRThreadPool::IsInitialized() const
     {
         return _threads != nullptr;
     }
@@ -240,16 +240,14 @@ namespace emitters
 
         LockQueueMutex(function);
         function.Store(isEmptyVar, function.Operator(TypedOperator::logicalAnd, IsEmpty(function), function.Operator(UnaryOperationType::logicalNot, GetShutdownFlag(function))));
-        IRWhileLoopEmitter whileLoop(function);
-        whileLoop.Begin(isEmptyVar);
-        {
+        function.While(isEmptyVar, [=](auto& function) {
             // Wait on the condition variable
             function.PthreadCondWait(workAvailableCondVar, queueMutex);
 
             // update while loop exit condition
-            function.Store(isEmptyVar, function.Operator(TypedOperator::logicalAnd, IsEmpty(function), function.Operator(UnaryOperationType::logicalNot, GetShutdownFlag(function))));
-        }
-        whileLoop.End();
+            function.Store(isEmptyVar, function.Operator(TypedOperator::logicalAnd, this->IsEmpty(function), function.Operator(UnaryOperationType::logicalNot, this->GetShutdownFlag(function))));
+        });
+
         // At loop exit, mutex is locked. Now decrement _count, unlock mutex, and return task at index _count
         auto newCount = DecrementUnscheduledTasks(function);
         UnlockQueueMutex(function);
@@ -258,18 +256,18 @@ namespace emitters
         return _tasks.GetTask(function, newCount);
     }
 
-    bool IRThreadPoolTaskQueue::IsInitialized()
+    bool IRThreadPoolTaskQueue::IsInitialized() const
     {
         return _queueData != nullptr;
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::IsEmpty(IRFunctionEmitter& function)
+    llvm::Value* IRThreadPoolTaskQueue::IsEmpty(IRFunctionEmitter& function) const
     {
         assert(IsInitialized());
         return function.Comparison(TypedComparison::equals, GetUnscheduledCount(function), function.Literal<int>(0));
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::IsFinished(IRFunctionEmitter& function)
+    llvm::Value* IRThreadPoolTaskQueue::IsFinished(IRFunctionEmitter& function) const
     {
         assert(IsInitialized());
         return function.Comparison(TypedComparison::equals, GetUnfinishedCount(function), function.Literal<int>(0));
@@ -301,7 +299,7 @@ namespace emitters
         UnlockQueueMutex(function);
     }
 
-    llvm::StructType* IRThreadPoolTaskQueue::GetTaskQueueDataType(IRModuleEmitter& module) // TODO: come up with a naming convention for "class" structs like this
+    llvm::StructType* IRThreadPoolTaskQueue::GetTaskQueueDataType(IRModuleEmitter& module) const // TODO: come up with a naming convention for "class" structs like this
     {
         auto& context = module.GetLLVMContext();
         auto mutexType = module.GetRuntime().GetPosixEmitter().GetPthreadMutexType();
@@ -331,14 +329,14 @@ namespace emitters
         return function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::workFinishedCondVar));
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::GetUnscheduledCount(IRFunctionEmitter& function)
+    llvm::Value* IRThreadPoolTaskQueue::GetUnscheduledCount(IRFunctionEmitter& function) const
     {
         assert(IsInitialized());
         auto fieldPtr = function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::unscheduledCount));
         return function.Load(fieldPtr);
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::GetUnfinishedCount(IRFunctionEmitter& function)
+    llvm::Value* IRThreadPoolTaskQueue::GetUnfinishedCount(IRFunctionEmitter& function) const
     {
         assert(IsInitialized());
         auto fieldPtr = function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::unfinishedCount));
@@ -377,7 +375,7 @@ namespace emitters
         return DecrementCountField(function, fieldPtr);
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::GetShutdownFlag(IRFunctionEmitter& function)
+    llvm::Value* IRThreadPoolTaskQueue::GetShutdownFlag(IRFunctionEmitter& function) const
     {
         assert(IsInitialized());
         auto fieldPtr = function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::shutdownFlag));

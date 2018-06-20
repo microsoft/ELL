@@ -445,10 +445,7 @@ namespace model
         function.IncludeInHeader();
         function.IncludeInSwigInterface();
 
-        auto loop = function.ForLoop();
-        loop.Begin(numEmittedNodes);
-        {
-            auto nodeIndex = loop.LoadIterationVariable();
+        function.For(numEmittedNodes, [&irBuilder, &emitter, this](emitters::IRFunctionEmitter& function, llvm::Value* nodeIndex) {
             auto nodeInfoPtr = irBuilder.CreateInBoundsGEP(_nodeInfoArray, { function.Literal(0), nodeIndex });
             auto nodePerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_nodePerformanceCountersArray, { function.Literal(0), nodeIndex });
 
@@ -459,8 +456,7 @@ namespace model
             auto countPtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
             auto totalTimePtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(1) });
             function.Printf("Node[%s]:\ttype: %s\ttime: %f ms\tcount: %d\n", { function.Load(namePtr), function.Load(typePtr), function.Load(totalTimePtr), function.Load(countPtr) });
-        }
-        loop.End();
+        });
 
         _module->EndFunction();
     }
@@ -477,10 +473,7 @@ namespace model
         function.IncludeInHeader();
         function.IncludeInSwigInterface();
 
-        auto loop = function.ForLoop();
-        loop.Begin(numEmittedNodeTypes);
-        {
-            auto nodeIndex = loop.LoadIterationVariable();
+        function.For(numEmittedNodeTypes, [&irBuilder, &emitter, this](emitters::IRFunctionEmitter& function, llvm::Value* nodeIndex) {
             auto nodeInfoPtr = irBuilder.CreateInBoundsGEP(_nodeTypeInfoArray, { function.Literal(0), nodeIndex });
             auto nodePerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_nodeTypePerformanceCountersArray, { function.Literal(0), nodeIndex });
 
@@ -490,8 +483,7 @@ namespace model
             auto countPtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
             auto totalTimePtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(1) });
             function.Printf("type: %s\ttime: %f ms\tcount: %d\n", { function.Load(typePtr), function.Load(totalTimePtr), function.Load(countPtr) });
-        }
-        loop.End();
+        });
 
         _module->EndFunction();
     }
@@ -509,18 +501,14 @@ namespace model
         function.IncludeInSwigInterface();
         auto& irBuilder = emitter.GetIRBuilder();
 
-        auto nodeLoop = function.ForLoop();
-        nodeLoop.Begin(numEmittedNodes);
-        {
-            auto nodeIndex = nodeLoop.LoadIterationVariable();
+        function.For(numEmittedNodes, [&irBuilder, this](emitters::IRFunctionEmitter& function, llvm::Value* nodeIndex) {
             auto nodePerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_nodePerformanceCountersArray, { function.Literal(0), nodeIndex });
 
             auto countPtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
             auto totalTimePtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(1) });
             function.StoreZero(countPtr);
             function.StoreZero(totalTimePtr);
-        }
-        nodeLoop.End();
+        });
 
         _module->EndFunction();
     }
@@ -538,18 +526,14 @@ namespace model
         function.IncludeInSwigInterface();
         auto& irBuilder = emitter.GetIRBuilder();
 
-        auto loop = function.ForLoop();
-        loop.Begin(numEmittedNodes);
-        {
-            auto nodeIndex = loop.LoadIterationVariable();
+        function.For(numEmittedNodes, [&irBuilder, this](emitters::IRFunctionEmitter& function, llvm::Value* nodeIndex) {
             auto nodePerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_nodeTypePerformanceCountersArray, { function.Literal(0), nodeIndex });
 
             auto countPtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
             auto totalTimePtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(1) });
             function.StoreZero(countPtr);
             function.StoreZero(totalTimePtr);
-        }
-        loop.End();
+        });
 
         _module->EndFunction();
     }

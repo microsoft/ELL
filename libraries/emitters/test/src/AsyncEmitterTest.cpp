@@ -147,7 +147,7 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
     auto taskFunction = module.BeginFunction(taskFunctionName, int32Type, { int32PtrType, int32Type, int32Type });
     {
         auto arguments = taskFunction.Arguments().begin();
-        auto arr = &(*arguments++);
+        auto arr = taskFunction.LocalArray(&(*arguments++));
         auto begin = &(*arguments++);
         auto end = &(*arguments++);
         if (options.targetDevice.IsWindows())
@@ -158,13 +158,11 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
         {
             taskFunction.Printf("[%x Task]\tbegin: %d\tend: %d\n", { taskFunction.PthreadSelf(), begin, end });
         }
-        auto loop = taskFunction.ForLoop();
-        loop.Begin(begin, end, taskFunction.Literal<int>(1));
-        {
-            auto i = loop.LoadIterationVariable();
-            taskFunction.SetValueAt(arr, i, i);
-        }
-        loop.End();
+
+        taskFunction.For(begin, end, [arr](emitters::IRFunctionEmitter& taskFunction, auto i) {
+            arr[i] = i;
+        });
+
         taskFunction.Return(end);
     }
     module.EndFunction();
@@ -191,14 +189,10 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
 
         tasks.WaitAll(testThreadPoolFunction);
         testThreadPoolFunction.Print("[Main]    \tDone waiting for tasks\n");
-
-        auto forLoop = testThreadPoolFunction.ForLoop();
-        forLoop.Begin(arraySize);
-        {
-            auto i = forLoop.LoadIterationVariable();
-            testThreadPoolFunction.Printf("[Main]    \tdata[%d] = %d\n", { i, testThreadPoolFunction.ValueAt(data, i) });
-        }
-        forLoop.End();
+        
+        testThreadPoolFunction.For(arraySize, [data](IRFunctionEmitter& testThreadPoolFunction, llvm::Value* i) {
+            testThreadPoolFunction.Printf("[Main]    \tdata[%d] = %d\n", {i, testThreadPoolFunction.ValueAt(data, i)});
+        });
 
         llvm::Value* sum = nullptr;
         for (size_t i = 0; i < numTasks; ++i)
@@ -278,7 +272,7 @@ void TestParallelFor(int begin, int end, int increment, bool parallel)
             auto index = function.LocalScalar(i);
             auto val = function.LocalScalar(function.ValueAt(data, index));
             function.If((index >= begin) && (index < end) && (((val-begin) % increment) == 0) && (val != index), [result](IRFunctionEmitter& function) {
-                function.Store(result, function.Literal<int>(1));
+                function.Store(result, function.Literal(1));
             });
         });
         testParallelForFunction.Return(testParallelForFunction.Load(result));

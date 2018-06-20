@@ -187,21 +187,7 @@ namespace nodes
     {
         auto x = function.LocalScalar(xValue);
         auto a = function.LocalScalar(aValue);
-        auto zero = function.LocalScalar<ValueType>(0.0);
-
-        // ((x[i] > 0) ? x[i] : a[i] * x[i])
-        llvm::Value* result = function.Variable(emitters::GetVariableType<ValueType>(), "result");
-        auto ifEmitter = function.If();
-        ifEmitter.If(x > zero);
-        {
-            function.Store(result, x);
-        }
-        ifEmitter.Else();
-        {
-            function.Store(result, x * a);
-        }
-        ifEmitter.End();
-        return function.Load(result);
+        return function.Select(x > static_cast<ValueType>(0), x, x * a);
     }
 
     // Explicit instantiation

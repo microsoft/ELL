@@ -63,8 +63,7 @@ namespace nodes
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
         auto& module = function.GetModule();
 
-        auto if1 = function.If(emitters::TypedComparison::equals, pTrigger, function.Literal(true));
-        {
+        function.If(emitters::TypedComparison::equals, pTrigger, function.Literal(true), [prefixedName, pInput, &module, &compiler, this](emitters::IRFunctionEmitter& function) {
             // look up our global context object
             auto context = module.GlobalPointer(compiler.GetNamespacePrefix() + "_context", emitters::VariableType::Byte);
             auto globalContext = function.Load(context);
@@ -89,8 +88,7 @@ namespace nodes
                 llvm::Function* pSinkFunction = module.GetFunction(prefixedName);
                 function.Call(pSinkFunction, { globalContext, function.PointerOffset(pInput, function.Literal(0)) });
             }
-        }
-        if1.End();
+        });
 
         // Tag the sink function as a callback that is emitted in headers
         module.IncludeInCallbackInterface(prefixedName, "SinkNode");
@@ -174,17 +172,13 @@ namespace nodes
         for (auto range : inputElements.GetRanges())
         {
             llvm::Value* pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
-            auto forLoop = function.ForLoop();
             auto rangeSize = range.Size();
-            forLoop.Begin(rangeSize);
-            {
-                auto i = forLoop.LoadIterationVariable();
+            function.For(rangeSize, [range, rangeStart, pInput, pOutput](emitters::IRFunctionEmitter& function, llvm::Value* i) {
                 auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
                 auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
                 llvm::Value* value = function.ValueAt(pInput, inputIndex);
                 function.SetValueAt(pOutput, outputIndex, value);
-            }
-            forLoop.End();
+            });
             rangeStart += rangeSize;
         }
     }

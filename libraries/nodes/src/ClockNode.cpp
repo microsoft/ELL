@@ -111,32 +111,23 @@ namespace nodes
         auto newLastInterval = function.Variable(emitters::GetVariableType<TimeTickType>(), "newLastInterval");
         function.Store(newLastInterval, lastIntervalTime);
 
-        auto ifEmitter1 = function.If();
-        ifEmitter1.If(noLag);
-        {
+        function.If(noLag, [newLastInterval, now](emitters::IRFunctionEmitter& function) {
             function.Store(newLastInterval, now);
-        }
-        ifEmitter1.Else();
-        {
+        }).Else([newLastInterval, lastIntervalTime, interval](emitters::IRFunctionEmitter& function) {
             function.Store(newLastInterval, function.Operator(plusTime, lastIntervalTime, interval));
-        }
-        ifEmitter1.End();
+        });
 
-        auto if1 = function.If(greaterThanTime, interval, zeroInterval);
-        {
+        function.If(greaterThanTime, interval, zeroInterval, [now, newLastInterval, thresholdTime, prefixedName, &module, &compiler](emitters::IRFunctionEmitter& function) {
             // Notify if the time lag reaches the threshold
             auto delta = function.Operator(minusTime, now, function.Load(newLastInterval));
-            auto if2 = function.If(greaterThanOrEqualTime, delta, thresholdTime);
-            {
+            function.If(greaterThanOrEqualTime, delta, thresholdTime, [delta, prefixedName, &module, &compiler](emitters::IRFunctionEmitter& function) {
                 // look up our global context object
                 auto context = module.GlobalPointer(compiler.GetNamespacePrefix() + "_context", emitters::VariableType::Byte);
                 auto globalContext = function.Load(context);
                 auto pLagFunction = module.GetFunction(prefixedName);
                 function.Call(pLagFunction, { globalContext, delta });
-            }
-            if2.End();
-        }
-        if1.End();
+            });
+        });
 
         // Update _lastInterval state
         function.Store(pLastIntervalTime, function.Load(newLastInterval));
@@ -218,16 +209,11 @@ namespace nodes
             function.Comparison(equalTime, lastIntervalTime, uninitializedIntervalTime),
             function.Comparison(equalTime, interval, zeroInterval));
 
-        auto ifEmitter1 = function.If();
-        ifEmitter1.If(noLag);
-        {
+        function.If(noLag, [result, zeroInterval](emitters::IRFunctionEmitter& function) {
             function.Store(result, zeroInterval);
-        }
-        ifEmitter1.Else();
-        {
+        }).Else([result, lastIntervalTime, interval, now](emitters::IRFunctionEmitter& function) {
             function.Store(result, function.Operator(minusTime, function.Operator(plusTime, lastIntervalTime, interval), now));
-        }
-        ifEmitter1.End();
+        });
 
         function.Return(function.Load(result));
         moduleEmitter.EndFunction();

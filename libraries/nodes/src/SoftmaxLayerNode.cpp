@@ -38,12 +38,10 @@ namespace nodes
 
             llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x)
             {
-                auto ifEmitter = function.If();
-                ifEmitter.If(emitters::TypedComparison::greaterThanFloat, x, function.Load(_accumValueVar));
-                {
+                function.If(emitters::TypedComparison::greaterThanFloat, x, function.Load(_accumValueVar), [this, x](emitters::IRFunctionEmitter& function) {
                     function.Store(_accumValueVar, x);
-                }
-                ifEmitter.End();
+                });
+
                 return nullptr;
             }
 
@@ -164,9 +162,6 @@ namespace nodes
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
         //       Or, instead of unrolling, vectorizing --- if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
-        const auto plus = emitters::TypedOperator::add;
-        const auto times = emitters::TypedOperator::multiply;
-
         const auto numDimensions = this->NumInputDimensions();
         auto&& inputStride = inputLayout.GetStride();
         auto&& inputOffset = inputLayout.GetOffset();
@@ -175,20 +170,17 @@ namespace nodes
         auto&& outputStride = outputLayout.GetStride();
         auto&& outputOffset = outputLayout.GetOffset();
 
-        auto loop = function.ForLoop();
-        loop.Begin(inputSize[dimension]);
-        {
-            auto loopIndex = loop.LoadIterationVariable();
-
+        function.For(inputSize[dimension], [dimension, numDimensions, inputStride, inputOffset, inputLayout, outputStride, outputOffset, outputLayout, pInput, pOutput, prevInputDimensionOffset, prevOutputDimensionOffset, &f, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            auto loopIndex = function.LocalScalar(i);
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
-            llvm::Value* thisInputDimensionInternalOffset = function.Operator(plus, loopIndex, function.Literal<int>(inputOffset[dimension]));
-            llvm::Value* thisOutputDimensionInternalOffset = function.Operator(plus, loopIndex, function.Literal<int>(outputOffset[dimension]));
+            auto thisInputDimensionInternalOffset = loopIndex + inputOffset[dimension];
+            auto thisOutputDimensionInternalOffset = loopIndex + outputOffset[dimension];
 
             // Calculate the total offset from beginning of memory:
             //   * if in the outermost loop, the offset into this dimension
             //   * otherwise, the offset into this dimension plus the previous offset scaled by the previous dimension's stride
-            llvm::Value* thisInputDimensionOffset = nullptr;
-            llvm::Value* thisOutputDimensionOffset = nullptr;
+            auto thisInputDimensionOffset = function.LocalScalar();
+            auto thisOutputDimensionOffset = function.LocalScalar();
             if (dimension == 0)
             {
                 assert(prevInputDimensionOffset == nullptr);
@@ -198,11 +190,11 @@ namespace nodes
             }
             else
             {
-                auto scaledInputDimensionOffset = function.Operator(times, prevInputDimensionOffset, function.Literal<int>(inputStride[dimension]));
-                thisInputDimensionOffset = function.Operator(plus, scaledInputDimensionOffset, thisInputDimensionInternalOffset);
+                auto scaledInputDimensionOffset = prevInputDimensionOffset * function.LocalScalar<int>(inputStride[dimension]);
+                thisInputDimensionOffset = scaledInputDimensionOffset + thisInputDimensionInternalOffset;
 
-                auto scaledOutputDimensionOffset = function.Operator(times, prevOutputDimensionOffset, function.Literal<int>(outputStride[dimension]));
-                thisOutputDimensionOffset = function.Operator(plus, scaledOutputDimensionOffset, thisOutputDimensionInternalOffset);
+                auto scaledOutputDimensionOffset = prevOutputDimensionOffset * function.LocalScalar<int>(outputStride[dimension]);
+                thisOutputDimensionOffset = scaledOutputDimensionOffset + thisOutputDimensionInternalOffset;
             }
 
             if (dimension < numDimensions - 1)
@@ -220,8 +212,7 @@ namespace nodes
                     function.SetValueAt(pOutput, thisOutputDimensionOffset, outputValue);
                 }
             }
-        }
-        loop.End();
+        });
     }
 
     // In-place version
@@ -231,60 +222,54 @@ namespace nodes
                                                                size_t dimension,
                                                                const model::PortMemoryLayout& inputLayout,
                                                                llvm::Value* pInput,
-                                                               llvm::Value* prevInputDimensionOffset,
+                                                               llvm::Value* prevInputDimensionOffsetValue,
                                                                FunctionType& f) const
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
         //       Or, instead of unrolling, vectorizing --- if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
-
-        const auto plus = emitters::TypedOperator::add;
-        const auto times = emitters::TypedOperator::multiply;
-
         const auto numDimensions = this->NumInputDimensions();
         auto&& inputStride = inputLayout.GetStride();
         auto&& inputOffset = inputLayout.GetOffset();
         auto&& inputSize = inputLayout.GetActiveSize();
 
-        auto loop = function.ForLoop();
-        loop.Begin(inputSize[dimension]);
-        {
-            auto loopIndex = loop.LoadIterationVariable();
-
+        auto input = function.LocalArray(pInput);
+        auto prevInputDimensionOffset = function.LocalScalar(prevInputDimensionOffsetValue);
+        function.For(inputSize[dimension], [dimension, numDimensions, inputOffset, inputStride, inputLayout, input, prevInputDimensionOffset, &f, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            auto loopIndex = function.LocalScalar(i);
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
-            llvm::Value* thisInputDimensionInternalOffset = function.Operator(plus, loopIndex, function.Literal<int>(inputOffset[dimension]));
+            auto thisInputDimensionInternalOffset = loopIndex + inputOffset[dimension];
 
             // Calculate the total offset from beginning of memory:
             //   * if in the outermost loop, the offset into this dimension
             //   * otherwise, the offset into this dimension plus the previous offset scaled by the previous dimension's stride
-            llvm::Value* thisInputDimensionOffset = nullptr;
+            auto thisInputDimensionOffset = function.LocalScalar();
             if (dimension == 0)
             {
-                assert(prevInputDimensionOffset == nullptr);
+                assert(!prevInputDimensionOffset.IsValid());
                 thisInputDimensionOffset = thisInputDimensionInternalOffset;
             }
             else
             {
-                auto scaledInputDimensionOffset = function.Operator(times, prevInputDimensionOffset, function.Literal<int>(inputStride[dimension]));
-                thisInputDimensionOffset = function.Operator(plus, scaledInputDimensionOffset, thisInputDimensionInternalOffset);
+                auto scaledInputDimensionOffset = prevInputDimensionOffset * inputStride[dimension];
+                thisInputDimensionOffset = scaledInputDimensionOffset + thisInputDimensionInternalOffset;
             }
 
             if (dimension < numDimensions - 1)
             {
                 // Recursive call to emit nested loop
-                EmitComputeDimensionLoop(compiler, function, dimension + 1, inputLayout, pInput, thisInputDimensionOffset, f);
+                EmitComputeDimensionLoop(compiler, function, dimension + 1, inputLayout, input, thisInputDimensionOffset, f);
             }
             else
             {
                 // We're in the innermost loop --- compute the value
-                auto inputValue = function.ValueAt(pInput, thisInputDimensionOffset);
+                emitters::IRLocalScalar inputValue = input[thisInputDimensionOffset];
                 auto outputValue = f.Compile(function, inputValue);
                 if (outputValue != nullptr)
                 {
-                    function.SetValueAt(pInput, thisInputDimensionOffset, outputValue);
+                    input[thisInputDimensionOffset] = outputValue;
                 }
             }
-        }
-        loop.End();
+        });
     }
 
     // Explicit specialization

@@ -279,16 +279,12 @@ namespace emitters
         assert(pLeftValue != nullptr);
         assert(pRightValue != nullptr);
 
-        auto forLoop = ForLoop();
-        forLoop.Begin(size);
-        {
-            auto i = forLoop.LoadIterationVariable();
-            llvm::Value* pLeftItem = ValueAt(pLeftValue, i);
-            llvm::Value* pRightItem = ValueAt(pRightValue, i);
-            llvm::Value* pTemp = Operator(type, pLeftItem, pRightItem);
+        For(size, [pLeftValue, pRightValue, type, aggregator](IRFunctionEmitter& fn, llvm::Value* i) {
+            auto pLeftItem = fn.ValueAt(pLeftValue, i);
+            auto pRightItem = fn.ValueAt(pRightValue, i);
+            auto pTemp = fn.Operator(type, pLeftItem, pRightItem);
             aggregator(i, pTemp);
-        }
-        forLoop.End();
+        });
     }
 
     void IRFunctionEmitter::VectorOperator(TypedOperator type, llvm::Value* pSize, llvm::Value* pLeftValue, llvm::Value* pRightValue, std::function<void(llvm::Value*, llvm::Value*)> aggregator)
@@ -297,36 +293,27 @@ namespace emitters
         assert(pLeftValue != nullptr);
         assert(pRightValue != nullptr);
 
-        auto forLoop = ForLoop();
-        forLoop.Begin(pSize);
-        {
-            auto i = forLoop.LoadIterationVariable();
-            llvm::Value* pLeftItem = ValueAt(pLeftValue, i);
-            llvm::Value* pRightItem = ValueAt(pRightValue, i);
-            llvm::Value* pTemp = Operator(type, pLeftItem, pRightItem);
+        For(pSize, [pLeftValue, pRightValue, type, aggregator](IRFunctionEmitter& fn, llvm::Value* i) {
+            auto pLeftItem = fn.ValueAt(pLeftValue, i);
+            auto pRightItem = fn.ValueAt(pRightValue, i);
+            auto pTemp = fn.Operator(type, pLeftItem, pRightItem);
             aggregator(i, pTemp);
-        }
-        forLoop.End();
+        });
     }
 
-    void IRFunctionEmitter::VectorOperator(TypedOperator type, size_t size, llvm::Value* pLeftValue, int LeftStartAt, llvm::Value* pRightValue, int RightStartAt, std::function<void(llvm::Value*, llvm::Value*)> aggregator)
+    void IRFunctionEmitter::VectorOperator(TypedOperator type, size_t size, llvm::Value* pLeftValue, int leftStartAt, llvm::Value* pRightValue, int rightStartAt, std::function<void(llvm::Value*, llvm::Value*)> aggregator)
     {
         assert(pLeftValue != nullptr);
         assert(pRightValue != nullptr);
 
-        auto forLoop = ForLoop();
-        forLoop.Begin(size);
-        {
-            auto i = forLoop.LoadIterationVariable();
-
-            llvm::Value* leftOffset = Operator(TypedOperator::add, i, Literal(LeftStartAt));
-            llvm::Value* pLeftItem = ValueAt(pLeftValue, leftOffset);
-            llvm::Value* rightOffset = Operator(TypedOperator::add, i, Literal(RightStartAt));
-            llvm::Value* pRightItem = ValueAt(pRightValue, rightOffset);
-            llvm::Value* pTemp = Operator(type, pLeftItem, pRightItem);
+        For(size, [pLeftValue, pRightValue, leftStartAt, rightStartAt, type, aggregator](IRFunctionEmitter& fn, llvm::Value* i) {
+            auto leftOffset = fn.Operator(TypedOperator::add, i, fn.Literal(leftStartAt));
+            auto pLeftItem = fn.ValueAt(pLeftValue, leftOffset);
+            auto rightOffset = fn.Operator(TypedOperator::add, i, fn.Literal(rightStartAt));
+            auto pRightItem = fn.ValueAt(pRightValue, rightOffset);
+            auto pTemp = fn.Operator(type, pLeftItem, pRightItem);
             aggregator(i, pTemp);
-        }
-        forLoop.End();
+        });
     }
 
     void IRFunctionEmitter::Branch(llvm::BasicBlock* pDestinationBlock)
@@ -962,25 +949,24 @@ namespace emitters
         return ifEmitter;
     }
 
-    // Deprecated versions
-    IRForLoopEmitter IRFunctionEmitter::ForLoop()
+    IRIfEmitter IRFunctionEmitter::If(std::function<llvm::Value*()> comparison, IfElseBodyFunction body)
     {
-        return IRForLoopEmitter(*this);
+        auto ifEmitter = IRIfEmitter(*this, true);
+        ifEmitter.If(comparison);
+        {
+            body(*this);
+        }
+        return ifEmitter;
     }
 
-    IRIfEmitter IRFunctionEmitter::If()
+    IRIfEmitter IRFunctionEmitter::If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue, IfElseBodyFunction body)
     {
-        return IRIfEmitter(*this);
-    }
-
-    IRIfEmitter IRFunctionEmitter::If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue)
-    {
-        return IRIfEmitter(*this, comparison, pValue, pTestValue);
-    }
-
-    IRWhileLoopEmitter IRFunctionEmitter::WhileLoop()
-    {
-        return IRWhileLoopEmitter(*this);
+        auto ifEmitter = IRIfEmitter(*this, true);
+        ifEmitter.If(comparison, pValue, pTestValue);
+        {
+            body(*this);
+        }
+        return ifEmitter;
     }
 
     //
@@ -1096,14 +1082,10 @@ namespace emitters
     {
         EnsurePrintf();
         llvm::Value* pFormat = Literal(formatString);
-        IRForLoopEmitter forLoop = ForLoop();
-        forLoop.Begin(size);
-        {
-            auto ival = forLoop.LoadIterationVariable();
-            auto v = ValueAt(pVector, ival);
-            Printf({ pFormat, v });
-        }
-        forLoop.End();
+        For(size, [pVector, pFormat](IRFunctionEmitter& fn, llvm::Value* i) {
+            auto v = fn.ValueAt(pVector, i);
+            fn.Printf({ pFormat, v });
+        });
     }
 
     void IRFunctionEmitter::EnsurePrintf()

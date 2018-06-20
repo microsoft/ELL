@@ -962,12 +962,6 @@ namespace emitters
         /// <param name="body"> A function that emits the body of the loop. </param>
         void While(llvm::Value* pTestValuePointer, WhileLoopBodyFunction body);
 
-        /// <summary> Emits an if statement. </summary>
-        ///
-        /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
-        /// <param name="body"> A function that emits the body of the "if true" block. </param>
-        IRIfEmitter If(llvm::Value* pTestValuePointer, IfElseBodyFunction body);
-
         using ParallelForLoopBodyFunction = IRParallelForLoopEmitter::BodyFunction;
 
         /// <summary> Emits a parallel for loop counting from zero to a constant end value. </summary>
@@ -1020,33 +1014,44 @@ namespace emitters
         /// <param name="body"> A function that emits the body of the loop. </param>
         void ParallelFor(llvm::Value* beginValue, llvm::Value* endValue, llvm::Value* increment, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body);
 
-        //
-        // Deprecated loop emitter functions
-        //
-
-        /// <summary> Gets a for loop emitter. </summary>
+        /// <summary> Emits an if statement. </summary>
         ///
-        /// <returns> A for loop emitter. </returns>
-        IRForLoopEmitter ForLoop();
-
-        /// <summary> Gets a while loop emitter. </summary>
+        /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
+        /// <param name="body"> A function that emits the body of the "if true" block. </param>
         ///
-        /// <returns> A while loop emitter. </returns>
-        IRWhileLoopEmitter WhileLoop();
+        /// <returns> 
+        ///    An IRIfEmitter, used to allow chaining of ElseIf() and Else() calls. The typical pattern is to _not_ assign
+        ///    the return value of `If()` to a variable, but to let the destructor automatically end the if block at the end of the statement.
+        /// </returns>
+        IRIfEmitter If(llvm::Value* pTestValuePointer, IfElseBodyFunction body);
 
-        /// <summary> Gets an if statement emitter. </summary>
+        /// <summary> Emits an if statement. </summary>
         ///
-        /// <returns> An if statement emitter. </returns>
-        IRIfEmitter If();
+        /// <param name="comparison"> A comparison function. </param>
+        /// <param name="body"> A function that emits the body of the "if true" block. </param>
+        ///
+        /// <returns> 
+        ///    An IRIfEmitter, used to allow chaining of ElseIf() and Else() calls. The typical pattern is to _not_ assign
+        ///    the return value of `If()` to a variable, but to let the destructor automatically end the if block at the end of the statement.
+        /// </returns>
+        IRIfEmitter If(std::function<llvm::Value*()> comparison, IfElseBodyFunction body);
 
         /// <summary> Gets an if statement emitter. </summary>
         ///
         /// <param name="comparison"> The if-statement comparison. </param>
         /// <param name="pValue"> Pointer to the value used in the comparison. </param>
         /// <param name="pTestValue"> Pointer to the test value that is compared against pValue. </param>
+        /// <param name="body"> A function that emits the body of the "if true" block. </param>
         ///
-        /// <returns> An IRIfEmitter. </returns>
-        IRIfEmitter If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue);
+        /// <returns> 
+        ///    An IRIfEmitter, used to allow chaining of ElseIf() and Else() calls. The typical pattern is to _not_ assign
+        ///    the return value of `If()` to a variable, but to let the destructor automatically end the if block at the end of the statement.
+        /// </returns>
+        IRIfEmitter If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue, IfElseBodyFunction body);
+
+        //
+        // Async tasks
+        //
 
         /// <summary> Creates an asynchronous task on a new thread. </summary>
         ///
@@ -1515,11 +1520,11 @@ namespace emitters
         void IncludeInSwigInterface();
 
     private:
+        friend class IRModuleEmitter;
+        
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const std::string& name);
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedVariableTypeList& arguments, const std::string& name);
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedLLVMTypeList& arguments, const std::string& name);
-
-        friend class IRModuleEmitter;
 
         class EntryBlockScope
         {
@@ -1543,8 +1548,6 @@ namespace emitters
         llvm::Value* ValueAtH(llvm::Value* pPointer, int offset);
         llvm::Value* ValueAtH(llvm::Value* pPointer, llvm::Value* pOffset);
         llvm::Value* SetValueAtH(llvm::Value* pPointer, int offset, llvm::Value* pValue);
-
-        friend class IRModuleEmitter;
 
         llvm::BasicBlock* GetEntryBlock() { return _entryBlock; }
         void SetUpFunction();

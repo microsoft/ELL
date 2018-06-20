@@ -176,10 +176,7 @@ namespace nodes
         function.StoreZero(protoIndex);
         function.StoreZero(dLast);
 
-        auto forLoop = function.ForLoop();
-        forLoop.Begin(_prototypeLength);
-        {
-            auto iMinusOne = forLoop.LoadIterationVariable();
+        function.For(_prototypeLength, [pD, dLast, bestDist, dist, protoIndex, pInput, pPrototypeVector, this](emitters::IRFunctionEmitter& function, llvm::Value* iMinusOne) {
             auto i = function.Operator(emitters::TypedOperator::add, iMinusOne, function.Literal(1));
 
             auto d_iMinus1 = function.ValueAt(pD, iMinusOne);
@@ -187,37 +184,29 @@ namespace nodes
             auto dPrev_i = function.ValueAt(pD, i);
 
             function.Store(bestDist, d_iMinus1);
-            emitters::IRIfEmitter if1 = function.If(emitters::TypedComparison::lessThanFloat, dPrev_i, d_iMinus1);
-            {
-                function.Store(bestDist, dPrev_i);
-            }
-            if1.End();
 
-            emitters::IRIfEmitter if2 = function.If(emitters::TypedComparison::lessThanFloat, dPrev_iMinus1, function.Load(bestDist));
-            {
+            function.If(emitters::TypedComparison::lessThanFloat, dPrev_i, d_iMinus1, [bestDist, dPrev_i](auto& function) {
+                function.Store(bestDist, dPrev_i);
+            });
+
+            function.If(emitters::TypedComparison::lessThanFloat, dPrev_iMinus1, function.Load(bestDist), [bestDist, dPrev_iMinus1](auto& function) {
                 function.Store(bestDist, dPrev_iMinus1);
-            }
-            if2.End();
+            });
 
             // Get dist
             function.StoreZero(dist);
-            auto diffLoop = function.ForLoop();
-            diffLoop.Begin(_sampleDimension);
-            {
-                auto j = diffLoop.LoadIterationVariable();
+            function.For(_sampleDimension, [dist, protoIndex, pInput, pPrototypeVector](emitters::IRFunctionEmitter& function, llvm::Value* j) {
                 llvm::Value* inputValue = function.ValueAt(pInput, j);
                 llvm::Value* protoValue = function.ValueAt(pPrototypeVector, function.Load(protoIndex));
                 llvm::Value* diff = function.Operator(emitters::GetSubtractForValueType<ValueType>(), inputValue, protoValue);
                 llvm::Value* absDiff = function.Call(function.GetModule().GetRuntime().GetAbsFunction<ValueType>(), { diff });
                 function.OperationAndUpdate(dist, emitters::GetAddForValueType<ValueType>(), absDiff);
                 function.OperationAndUpdate(protoIndex, emitters::TypedOperator::add, function.Literal(1));
-            }
-            diffLoop.End();
+            });
 
             function.OperationAndUpdate(bestDist, emitters::GetAddForValueType<ValueType>(), function.Load(dist)); // x += dist;
             function.SetValueAt(pD, i, function.Load(bestDist)); // d[i] = x;
-        }
-        forLoop.End();
+        });
 
         function.Store(pResult, function.Operator(emitters::GetDivideForValueType<ValueType>(), function.Load(bestDist), function.Literal(static_cast<ValueType>(_prototypeVariance))));
     }

@@ -270,11 +270,7 @@ namespace nodes
         const auto numSecondaryInputs = NumSecondaryInputs();
         const auto secondaryInputSize = GetSecondaryInputSize();
 
-        auto loop = function.ForLoop();
-        loop.Begin(begin, end, function.Literal(1));
-        {
-            auto loopIndex = loop.LoadIterationVariable();
-
+        function.For(begin, end, function.Literal(1), [dimension, numDimensions, inputSize, inputOffset, inputStride, outputOffset, outputStride, broadcastDimension, numSecondaryInputs, secondaryInputSize, prevInputDimensionOffset, prevOutputDimensionOffset, primaryInput, secondaryInputs, output, &secondaryValues, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex) {
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
             llvm::Value* thisInputDimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(inputOffset[dimension]));
             llvm::Value* thisOutputDimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(outputOffset[dimension]));
@@ -331,8 +327,7 @@ namespace nodes
                 auto outputValue = GetFunction().Compile(function, primaryValue, secondaryValues);
                 function.SetValueAt(output, thisOutputDimensionOffset, outputValue);
             }
-        }
-        loop.End();
+        });
     }
 
     template <typename ValueType, typename FunctionType>

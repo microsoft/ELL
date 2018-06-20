@@ -28,9 +28,6 @@ void TestIR()
 
     TestEmitLLVM();
     TestLLVMShiftRegister();
-    TestIfElseComplex();
-    TestIfElseBlockRegions(false);
-    TestIfElseBlockRegions(true);
     TestLogical();
     TestForLoop();
     TestWhileLoop();
@@ -40,7 +37,7 @@ void TestIR()
     TestStruct();
     TestDuplicateStructs();
 
-    // New if constructs
+    // if/then constructs
     TestScopedIf();
     TestScopedIfElse();
     TestScopedIfElse2();

@@ -72,7 +72,6 @@ namespace nodes
             const int outputImageWidth = outputLayout.GetActiveSize(1);
             const int filterSize = static_cast<int>(convParams.receptiveField);
             const int stride = static_cast<int>(convParams.stride);
-            const int convPadding = inputLayout.GetOffset(0); // TODO: decouple input data padding from convolution padding
 
             // compute offset based on outputRowIndex
             auto outputImageRow = function.LocalScalar(outputRowIndex) / outputImageWidth;
@@ -85,7 +84,7 @@ namespace nodes
             auto output = function.LocalTensor(realValueRow, { filterSize, filterSize, numChannels }, emitters::RowMajorTensorLayout);
 
             // For row, column, channel order:
-            function.For(filterSize, [input, inputLayout, numChannels, filterSize, convParams, convPadding, inputRowStart, inputColStart, output](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            function.For(filterSize, [input, inputLayout, numChannels, filterSize, inputRowStart, inputColStart, output](emitters::IRFunctionEmitter& function, llvm::Value* i) {
                 auto rowIndex = function.LocalScalar(i);
 
                 function.For(filterSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* j) {
@@ -694,10 +693,8 @@ namespace nodes
             auto blockStartVal = &(*arguments++);
             auto blockEndVal = &(*arguments++);
 
-            auto filterLoop = taskFunction.ForLoop();
-            filterLoop.Begin(blockStartVal, blockEndVal, taskFunction.Literal<int>(1));
-            {
-                auto filterIndex = filterLoop.LoadIterationVariable();
+            taskFunction.For(blockStartVal, blockEndVal, taskFunction.Literal<int>(1), [pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums, 
+                                                                                        pOutput, hasZeroPadding, outputColumns, packedRowSize, packedRowStride, useVectorInstructions, vectorSize, numVectorBlocks, &compiler, this](emitters::IRFunctionEmitter& taskFunction, llvm::Value* filterIndex) {
                 ComputeFilterOutput(compiler,
                                     taskFunction,
                                     pInput,
@@ -714,8 +711,7 @@ namespace nodes
                                     useVectorInstructions,
                                     vectorSize,
                                     numVectorBlocks);
-            }
-            filterLoop.End();
+            });
 
             taskFunction.Return();
         }

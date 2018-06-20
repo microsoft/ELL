@@ -174,17 +174,13 @@ namespace nodes
         llvm::Value* pResult = compiler.EnsurePortEmitted(output);
         emitters::TypedComparison cmp = emitters::GetComparison<ValueType>(GetPredicate());
 
-        auto forLoop = function.ForLoop();
-        forLoop.Begin(input1.Size());
-        {
-            auto i = forLoop.LoadIterationVariable();
+        function.For(input1.Size(), [pInput1, pInput2, pResult, cmp ](emitters::IRFunctionEmitter& function, llvm::Value* i) {
             llvm::Value* inputValue1 = function.ValueAt(pInput1, i);
             llvm::Value* inputValue2 = function.ValueAt(pInput2, i);
             llvm::Value* pOpResult = function.Comparison(cmp, inputValue1, inputValue2);
             // LLVM internally uses 1 bit for boolean. We use integers to store boolean results (see CompileElementSelector). That requires a typecast in LLVM
             function.SetValueAt(pResult, i, function.CastBoolToByte(pOpResult));
-        }
-        forLoop.End();
+        });
     }
 
     template <typename ValueType>

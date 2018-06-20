@@ -145,31 +145,17 @@ namespace nodes
         int outputSize = _outputMemoryLayout.GetMemorySize();
         UNUSED(outputSize);
 
-        auto xLoop = function.ForLoop();
-        xLoop.Begin(_outputMemoryLayout.GetActiveSize(0));
-        {
-            llvm::Value* x = xLoop.LoadIterationVariable();
-
-            auto yLoop = function.ForLoop();
-            yLoop.Begin(_outputMemoryLayout.GetActiveSize(1));
-            {
-                llvm::Value* y = yLoop.LoadIterationVariable();
-
-                auto zLoop = function.ForLoop();
-                zLoop.Begin(_outputMemoryLayout.GetActiveSize(2));
-                {
-                    llvm::Value* z = zLoop.LoadIterationVariable();
+        function.For(_outputMemoryLayout.GetActiveSize(0), [pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* x) {
+            function.For(_outputMemoryLayout.GetActiveSize(1), [x, pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* y) {
+                function.For(_outputMemoryLayout.GetActiveSize(2), [x, y, pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* z) {
                     auto inputLocation = ReorderOutputToInputLocation({ x, y, z });
                     auto inputIndex = _inputMemoryLayout.EmitGetEntryOffset(function, inputLocation);
                     auto outputIndex = _outputMemoryLayout.EmitGetEntryOffset(function, { x, y, z });
                     llvm::Value* value = function.ValueAt(pInput, inputIndex);
                     function.SetValueAt(pOutput, outputIndex, value);
-                }
-                zLoop.End();
-            }
-            yLoop.End();
-        }
-        xLoop.End();
+                });
+            });
+        });
     }
 
     template <typename ValueType>

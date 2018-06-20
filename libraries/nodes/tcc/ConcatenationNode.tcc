@@ -43,10 +43,8 @@ namespace nodes
         else
         {
             llvm::Value* pOutput = compiler.EnsurePortEmitted(_output);
-            auto ifBlock = function.If();
             // check if the pOutput variable is null.
-            ifBlock.If(ell::emitters::TypedComparison::notEquals, pOutput, function.NullPointer(pOutput->getType()->getPointerElementType()->getPointerTo()));
-            {
+            function.If(ell::emitters::TypedComparison::notEquals, pOutput, function.NullPointer(pOutput->getType()->getPointerElementType()->getPointerTo()), [pOutput, &compiler, this](emitters::IRFunctionEmitter& function) {
                 if (_input.Size() == 1)
                 {
                     llvm::Value* pVal = compiler.LoadPortElementVariable(_input.GetInputElement(0));
@@ -71,8 +69,7 @@ namespace nodes
                         rangeStart += rangeSize;
                     }
                 }
-            }
-            ifBlock.End();
+            });
         }
     }
 

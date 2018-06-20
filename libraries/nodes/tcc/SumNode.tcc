@@ -70,66 +70,54 @@ namespace nodes
     template <typename ValueType>
     void SumNode<ValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        auto input = function.LocalArray(compiler.EnsurePortEmitted(_input));
+        auto output = function.LocalArray(compiler.EnsurePortEmitted(_output));
 
-        function.StoreZero(pOutput);
+        function.StoreZero(output);
 
-        const int size = input.Size();
-        const int blockSize = 4;
+        const int size = _input.Size();
+        constexpr int blockSize = 4;
         bool unrollLoop = size > 4 * blockSize; // silly heuristic
         if (unrollLoop)
         {
             const int numBlocks = size / blockSize;
-            auto outerLoop = function.ForLoop();
-            outerLoop.Begin(numBlocks);
-            {
-                auto i = outerLoop.LoadIterationVariable();
-                auto blockStart = function.Operator(emitters::GetMultiplyForValueType<int>(), function.Literal<int>(blockSize), i);
+            function.For(numBlocks, [input, output, blockSize](emitters::IRFunctionEmitter& function, auto i) {
+                auto blockStart = blockSize * i;
                 for (int innerIndex = 0; innerIndex < blockSize; ++innerIndex)
                 {
-                    llvm::Value* pValue = function.ValueAt(pInput, function.Operator(emitters::GetAddForValueType<int>(), blockStart, function.Literal<int>(innerIndex)));
-                    function.OperationAndUpdate(pOutput, emitters::GetAddForValueType<ValueType>(), pValue);
+                    emitters::IRLocalScalar value = input[blockStart + innerIndex];
+                    function.OperationAndUpdate(output, emitters::GetAddForValueType<ValueType>(), value);
                 }
-            }
-            outerLoop.End();
+            });
 
             // epilogue
             const int epilogueSize = size - (blockSize * numBlocks);
             if (epilogueSize > 0)
             {
-                auto epilogueLoop = function.ForLoop();
-                epilogueLoop.Begin(size * numBlocks, size, 1);
-                {
-                    auto i = epilogueLoop.LoadIterationVariable();
-                    llvm::Value* pValue = function.ValueAt(pInput, i);
-                    function.OperationAndUpdate(pOutput, emitters::GetAddForValueType<ValueType>(), pValue);
-                }
-                epilogueLoop.End();
+                function.For(epilogueSize, [input, output](emitters::IRFunctionEmitter& function, auto i) {
+                    emitters::IRLocalScalar value = input[i];
+                    function.OperationAndUpdate(output, emitters::GetAddForValueType<ValueType>(), value);
+                });
             }
         }
         else
         {
-            auto forLoop = function.ForLoop();
-            forLoop.Begin(size);
-            {
-                auto i = forLoop.LoadIterationVariable();
-                llvm::Value* pValue = function.ValueAt(pInput, i);
-                function.OperationAndUpdate(pOutput, emitters::GetAddForValueType<ValueType>(), pValue);
-            }
-            forLoop.End();
+            function.For(size, [input, output](emitters::IRFunctionEmitter& function, auto i) {
+                emitters::IRLocalScalar value = input[i];
+                function.OperationAndUpdate(output, emitters::GetAddForValueType<ValueType>(), value);
+            });
         }
     }
 
     template <typename ValueType>
     void SumNode<ValueType>::CompileVectorizedLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        const int size = input.Size();
+        const int size = _input.Size();
         const int vectorSize = compiler.GetCompilerOptions().vectorWidth;
         assert(size >= vectorSize);
 
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        llvm::Value* input = compiler.EnsurePortEmitted(_input);
+        llvm::Value* output = compiler.EnsurePortEmitted(_output);
 
         // Get LLVM types
         auto& emitter = function.GetEmitter();
@@ -139,21 +127,17 @@ namespace nodes
         auto vectorType = emitter.VectorType(emitters::GetVariableType<ValueType>(), vectorSize);
         auto vectorPointerType = vectorType->getPointerTo();
 
-        // cast pInput to pointer-to-vector
-        auto inputVector = function.CastPointer(pInput, vectorPointerType);
+        // cast input to pointer-to-vector
+        auto inputVector = function.CastPointer(input, vectorPointerType);
 
         llvm::Value* vectorAccumVar = function.Variable(vectorType, "vecAccum");
         function.Store(vectorAccumVar, emitters::FillVector<ValueType>(function, vectorType, 0));
 
         const int numBlocks = size / vectorSize;
-        auto outerLoop = function.ForLoop();
-        outerLoop.Begin(numBlocks);
-        {
-            auto blockIndex = outerLoop.LoadIterationVariable();
-            llvm::Value* pValue = function.ValueAt(inputVector, blockIndex);
-            function.OperationAndUpdate(vectorAccumVar, emitters::GetAddForValueType<ValueType>(), pValue);
-        }
-        outerLoop.End();
+        function.For(numBlocks, [inputVector, vectorAccumVar](emitters::IRFunctionEmitter& function, auto blockIndex) {
+            auto value = function.ValueAt(inputVector, blockIndex);
+            function.OperationAndUpdate(vectorAccumVar, emitters::GetAddForValueType<ValueType>(), value);
+        });
 
         // Accumulate horizontal sum into output
         auto sum = emitters::HorizontalVectorSum<ValueType>(function, function.Load(vectorAccumVar));
@@ -164,11 +148,11 @@ namespace nodes
         {
             for(int epilogueIndex = vectorSize * numBlocks; epilogueIndex < size; ++epilogueIndex)
             {
-                llvm::Value* pValue = function.ValueAt(pInput, function.Literal<int>(epilogueIndex));
+                llvm::Value* pValue = function.ValueAt(input, function.Literal<int>(epilogueIndex));
                 sum = function.Operator(emitters::GetAddForValueType<ValueType>(), sum, pValue);
             }
         }
-        function.Store(pOutput, sum);
+        function.Store(output, sum);
     }
 
     template <typename ValueType>
@@ -179,7 +163,7 @@ namespace nodes
         function.StoreZero(pResult);
         for (size_t i = 0; i < input.Size(); ++i)
         {
-            llvm::Value* pValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
+            auto pValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
             function.OperationAndUpdate(pResult, emitters::GetAddForValueType<ValueType>(), pValue);
         }
     }

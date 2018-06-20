@@ -153,60 +153,37 @@ namespace nodes
     }
 
     template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-    void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength)
+    void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* dataValue, size_t dataLength)
     {
-        const auto plusFloat = emitters::TypedOperator::addFloat;
-        const auto divideFloat = emitters::TypedOperator::divideFloat;
-        auto expFunc = function.GetModule().GetRuntime().GetExpFunction<ValueType>();
+        auto data = function.LocalArray(dataValue);
+        auto sum = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), 1));
+        sum[0] = function.Literal<ValueType>(0);
 
-        llvm::AllocaInst* sum = function.Variable(emitters::GetVariableType<ValueType>(), 1);
-        function.SetValueAt(sum, 0, function.Literal<ValueType>(0.0));
+        function.For(dataLength, [sum, data](emitters::IRFunctionEmitter& function, auto i) {
+            auto expInput = emitters::Exp(data[i]);
+            sum[0] = sum[0] + expInput;
+            data[i] = expInput;
+        });
 
-        auto forLoop = function.ForLoop();
-        forLoop.Begin(dataLength);
-        {
-            auto i = forLoop.LoadIterationVariable();
-            llvm::Value* inputValue = function.ValueAt(data, i);
-
-            auto expInput = function.Call(expFunc, { inputValue });
-            auto addToSum = function.Operator(plusFloat, function.ValueAt(sum, 0), expInput);
-            function.SetValueAt(sum, 0, addToSum);
-            function.SetValueAt(data, i, expInput);
-        }
-        forLoop.End();
-
-        auto forLoop2 = function.ForLoop();
-        forLoop2.Begin(dataLength);
-        {
-            auto i = forLoop2.LoadIterationVariable();
-            llvm::Value* inputValue = function.ValueAt(data, i);
-            auto expDivSum = function.Operator(divideFloat, inputValue, function.ValueAt(sum, 0));
-            function.SetValueAt(data, i, expDivSum);
-        }
-        forLoop2.End();
+        function.For(dataLength, [sum, data](emitters::IRFunctionEmitter& function, auto i) {
+            data[i] = data[i] / sum[0];
+        });
     }
 
     template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
     template <typename ActivationType>
     void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength)
     {
-        auto forLoop = function.ForLoop();
-        forLoop.Begin(dataLength);
-        {
-            auto i = forLoop.LoadIterationVariable();
-            llvm::Value* inputValue = function.ValueAt(data, i);
-            llvm::Value* x = activationFunction.Compile(function, inputValue);
+        function.For(dataLength, [data, activationFunction](emitters::IRFunctionEmitter& function, auto i) {
+            auto inputValue = function.ValueAt(data, i);
+            auto x = activationFunction.Compile(function, inputValue);
             function.SetValueAt(data, i, x);
-        }
-        forLoop.End();
+        });
     }
 
     template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
     void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        const auto plusFloat = emitters::TypedOperator::addFloat;
-        const auto timesFloat = emitters::TypedOperator::multiplyFloat;
-
         const size_t inputSize = this->input.Size();
         const size_t hiddenSize = this->inputBias.Size();
 
@@ -225,7 +202,7 @@ namespace nodes
         emitters::IRModuleEmitter& module = function.GetModule();
         emitters::VariableType varType = emitters::GetVariableType<ValueType>();
         auto ctActual = module.Variables().AddVectorVariable(emitters::VariableScope::global, varType, hiddenSize);
-        auto ctActualValue = module.EnsureEmitted(*ctActual);
+        auto ctActualValue = function.LocalArray(module.EnsureEmitted(*ctActual));
 
         // Get LLVM references for all node inputs
         llvm::Value* input = compiler.EnsurePortEmitted(this->input);
@@ -248,11 +225,11 @@ namespace nodes
         auto hiddenState = function.LocalArray(hiddenStateValue);
 
         // Allocate local variables
-        llvm::AllocaInst* inputPlusHidden = function.Variable(emitters::GetVariableType<ValueType>(), inputSize + hiddenSize);
-        llvm::AllocaInst* ft = function.Variable(emitters::GetVariableType<ValueType>(), hiddenSize);
-        llvm::AllocaInst* it = function.Variable(emitters::GetVariableType<ValueType>(), hiddenSize);
-        llvm::AllocaInst* ctNew = function.Variable(emitters::GetVariableType<ValueType>(), hiddenSize);
-        llvm::AllocaInst* ot = function.Variable(emitters::GetVariableType<ValueType>(), hiddenSize);
+        auto inputPlusHidden = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), inputSize + hiddenSize));
+        auto ft = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), hiddenSize));
+        auto it = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), hiddenSize));
+        auto ctNew = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), hiddenSize));
+        auto ot = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), hiddenSize));
 
         // Concatenate input and hidden state into combined [Xt, Ht-1]
         function.MemoryCopy<ValueType>(input, inputPlusHidden, inputSize);
@@ -274,22 +251,19 @@ namespace nodes
         ApplyActivation(function, activationFunction, ctNew, hiddenSize);
 
         // Ct = ft * Ct-1 + it * Ct~
-        auto ctActualLoop = function.ForLoop();
-        ctActualLoop.Begin(hiddenSize);
-        {
-            auto index = ctActualLoop.LoadIterationVariable();
-            auto ctActualVal = function.ValueAt(ctActualValue, index);
-            auto ftVal = function.ValueAt(ft, index);
-            auto itVal = function.ValueAt(it, index);
-            auto ctNewVal = function.ValueAt(ctNew, index);
+        function.For(hiddenSize, [ctActualValue, ft, it, ctNew](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            auto index = function.LocalScalar(i);
+            auto ctActualVal = ctActualValue[index];
+            auto ftVal = ft[index];
+            auto itVal = it[index];
+            auto ctNewVal = ctNew[index];
 
-            auto ftCt = function.Operator(timesFloat, ftVal, ctActualVal);
-            auto itctNew = function.Operator(timesFloat, itVal, ctNewVal);
+            auto ftCt = ftVal * ctActualVal;
+            auto itctNew = itVal * ctNewVal;
 
-            auto result = function.Operator(plusFloat, ftCt, itctNew);
-            function.SetValueAt(ctActualValue, index, result);
-        }
-        ctActualLoop.End();
+            auto result = ftCt + itctNew;
+            ctActualValue[index] = result;
+        });
 
         // ot = recurrentFunction(Wo * [Xt, Ht-1] + Bo)
         function.MemoryCopy<ValueType>(outputBias, ot, hiddenSize); // Copy bias values into output so GEMM call accumulates them
@@ -300,16 +274,13 @@ namespace nodes
         // ht = ot * activationFunction(Ct)  (where activationFunction is usually tanh)
         ApplyActivation(function, activationFunction, ctActualValue, hiddenSize);
 
-        auto outputLoop = function.ForLoop();
-        outputLoop.Begin(hiddenSize);
-        {
-            auto index = outputLoop.LoadIterationVariable();
-            auto otVal = function.ValueAt(ot, index);
-            auto ctVal = function.ValueAt(ctActualValue, index);
-            auto result = function.Operator(timesFloat, ctVal, otVal);
-            function.SetValueAt(hiddenState, index, result);
-        }
-        outputLoop.End();
+        function.For(hiddenSize, [ot, ctActualValue, hiddenState](emitters::IRFunctionEmitter& function, auto index) {
+            auto otVal = ot[index];
+            auto ctVal = ctActualValue[index];
+            auto result = ctVal * otVal;
+            hiddenState[index] = result;
+        });
+
         // output <- hiddenState
         function.MemoryCopy<ValueType>(hiddenState, 0, output, 0, outputSize);
 

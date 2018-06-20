@@ -107,12 +107,9 @@ namespace nodes
 
         void Accumulate(emitters::IRFunctionEmitter& function, llvm::Value* value)
         {
-            auto ifEmitter = function.If();
-            ifEmitter.If(emitters::TypedComparison::greaterThanFloat, value, function.Load(_accumValueVar));
-            {
+            function.If(emitters::TypedComparison::greaterThanFloat, value, function.Load(_accumValueVar), [this, value](emitters::IRFunctionEmitter& function) {
                 function.Store(_accumValueVar, value);
-            }
-            ifEmitter.End();
+            });
         }
 
         llvm::Value* GetValueAtPadding(emitters::IRFunctionEmitter& function)

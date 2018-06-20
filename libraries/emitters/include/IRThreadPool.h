@@ -167,23 +167,23 @@ namespace emitters
         void Initialize(IRFunctionEmitter& function); // initializes the task array
         llvm::Value* GetDataStruct() { return _queueData; }
         llvm::Value* DecrementCountField(IRFunctionEmitter& function, llvm::Value* fieldPtr);
-        llvm::StructType* GetTaskQueueDataType(IRModuleEmitter& module);
+        llvm::StructType* GetTaskQueueDataType(IRModuleEmitter& module) const;
 
         // Accessors for fields
         llvm::Value* GetQueueMutexPointer(IRFunctionEmitter& function);
         llvm::Value* GetWorkAvailableConditionVariablePointer(IRFunctionEmitter& function);
         llvm::Value* GetWorkFinishedConditionVariablePointer(IRFunctionEmitter& function);
-        llvm::Value* GetUnscheduledCount(IRFunctionEmitter& function);
-        llvm::Value* GetUnfinishedCount(IRFunctionEmitter& function);
+        llvm::Value* GetUnscheduledCount(IRFunctionEmitter& function) const;
+        llvm::Value* GetUnfinishedCount(IRFunctionEmitter& function) const;
         void SetShutdownFlag(IRFunctionEmitter& function);
-        llvm::Value* GetShutdownFlag(IRFunctionEmitter& function);
+        llvm::Value* GetShutdownFlag(IRFunctionEmitter& function) const;
         void SetInitialCount(IRFunctionEmitter& function, llvm::Value* newValue);
         llvm::Value* DecrementUnscheduledTasks(IRFunctionEmitter& function);
         llvm::Value* DecrementUnfinishedTasks(IRFunctionEmitter& function);
-        llvm::Value* IsEmpty(IRFunctionEmitter& function);
-        llvm::Value* IsFinished(IRFunctionEmitter& function);
+        llvm::Value* IsEmpty(IRFunctionEmitter& function) const;
+        llvm::Value* IsFinished(IRFunctionEmitter& function) const;
 
-        bool IsInitialized();
+        bool IsInitialized() const;
         void NotifyWaitingClients(IRFunctionEmitter& function);
         void LockQueueMutex(IRFunctionEmitter& function);
         void UnlockQueueMutex(IRFunctionEmitter& function);
@@ -229,7 +229,7 @@ namespace emitters
 
     private:
         void Initialize(); // Allocates threads and adds global initializer and finalizer functions
-        bool IsInitialized();
+        bool IsInitialized() const;
         void AddGlobalInitializer();
         void AddGlobalFinalizer();
         llvm::Function* GetWorkerThreadFunction();

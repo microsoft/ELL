@@ -98,19 +98,13 @@ namespace nodes
         function.Store(bestVal, val0);
         function.StoreZero(bestIndex);
 
-        auto forLoop = function.ForLoop();
-        forLoop.Begin(1, numInputs, 1);
-        {
-            auto i = forLoop.LoadIterationVariable();
+        function.For(1, numInputs, 1, [inputVal, bestVal, bestIndex, this](emitters::IRFunctionEmitter& function, llvm::Value* i){
             auto val = function.ValueAt(inputVal, i);
-            emitters::IRIfEmitter if1 = function.If(GetComparison(), val, function.Load(bestVal));
-            {
+            function.If(GetComparison(), val, function.Load(bestVal), [bestVal, bestIndex, val, i](auto& function) {
                 function.Store(bestVal, val);
                 function.Store(bestIndex, i);
-            }
-            if1.End();
-        }
-        forLoop.End();
+            });
+        });
 
         function.Store(outVal, function.Load(bestVal));
         function.Store(outArgVal, function.Load(bestIndex));
@@ -134,12 +128,10 @@ namespace nodes
         for (size_t i = 1; i < numInputs; ++i)
         {
             llvm::Value* val = compiler.LoadPortElementVariable(input.GetInputElement(i));
-            emitters::IRIfEmitter if1 = function.If(GetComparison(), val, function.Load(bestVal));
-            {
+            function.If(GetComparison(), val, function.Load(bestVal), [bestVal, bestIndex, val, i](auto& function) {
                 function.Store(bestVal, val);
                 function.Store(bestIndex, function.Literal(static_cast<int>(i)));
-            }
-            if1.End();
+            });
         }
 
         function.Store(outVal, function.Load(bestVal));

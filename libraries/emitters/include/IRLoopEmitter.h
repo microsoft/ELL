@@ -100,10 +100,12 @@ namespace emitters
         llvm::Value* _pIterationVariable = nullptr;
     };
 
-    /// <summary> Class that simplifies while loop creation. </summary>
+    /// <summary> Class that simplifies while loop creation. Used internally by IRFunctionEmitter. </summary>
     class IRWhileLoopEmitter : public IRLoopEmitter
     {
-    public:
+    private:
+        friend IRFunctionEmitter;
+
         /// <summary> Constructs an instance of IRWhileLoopEmitter. </summary>
         ///
         /// <param name="functionEmitter"> The function emitter. </param>
@@ -124,7 +126,6 @@ namespace emitters
         /// <returns> Pointer to an llvm::BasicBlock that represents the body of the loop. </returns>
         llvm::BasicBlock* GetBodyBlock() { return _pBodyBlock; }
 
-    private:
         void CreateBlocks();
         void EmitInitialization();
         void EmitCondition(llvm::Value* pTestValuePointer);
