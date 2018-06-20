@@ -101,6 +101,7 @@ namespace emitters
     {
         auto& context = _module.GetLLVMContext();
         auto int8Type = llvm::Type::getInt8Ty(context);
+        auto int16Type = llvm::Type::getInt16Ty(context);
         auto int32Type = llvm::Type::getInt32Ty(context);
         auto int64Type = llvm::Type::getInt64Ty(context);
 
@@ -125,6 +126,15 @@ namespace emitters
                 // %struct.__pthread_internal_list = type { %struct.__pthread_internal_list*, %struct.__pthread_internal_list* }
                 auto internalListType = _module.GetAnonymousStructType({GetPointerSizedIntType(), GetPointerSizedIntType()});
                 return _module.GetOrCreateStruct("pthread_mutex_t", {int32Type, int32Type, int32Type, int32Type, int32Type, int32Type, internalListType});
+            }
+            else if (triple.find("x86_64") != std::string::npos)
+            {
+                // Linux 64-bit generic
+                // %union.pthread_mutex_t = type { %"struct.(anonymous union)::__pthread_mutex_s" }
+                // %"struct.(anonymous union)::__pthread_mutex_s" = type { i32, i32, i32, i32, i32, i16, i16, %struct.__pthread_internal_list }
+                // %struct.__pthread_internal_list = type { %struct.__pthread_internal_list*, %struct.__pthread_internal_list* }
+                auto internalListType = _module.GetAnonymousStructType({GetPointerSizedIntType(), GetPointerSizedIntType()});
+                return _module.GetOrCreateStruct("pthread_mutex_t", {int32Type, int32Type, int32Type, int32Type, int32Type, int16Type, int16Type, internalListType});
             }
             else
             {
@@ -170,6 +180,13 @@ namespace emitters
                 // Linaro (64-bit)
                 // %union.pthread_cond_t = type { %struct.anon }
                 // %struct.anon = type { i32, i32, i64, i64, i64, i8*, i32, i32 }
+                return _module.GetOrCreateStruct("pthread_cond_t", {int32Type, int32Type, int64Type, int64Type, int64Type, int8PtrType, int32Type, int32Type});
+            }
+            else if (triple.find("x86_64") != std::string::npos)
+            {
+                // Linux 64-bit generic
+                // %union.pthread_cond_t = type { %struct.anon }
+                // % struct.anon = type { i32, i32, i64, i64, i64, i8*, i32, i32 }
                 return _module.GetOrCreateStruct("pthread_cond_t", {int32Type, int32Type, int64Type, int64Type, int64Type, int8PtrType, int32Type, int32Type});
             }
             else
