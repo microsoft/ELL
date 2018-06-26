@@ -903,7 +903,10 @@ namespace nodes
     {
         const int numFilters = outputMemoryLayout.GetActiveSize(2);
         _filterSize = filterWeights.NumColumns();
-        assert(filterWeights.NumRows() == _filterSize * numFilters);
+        if (filterWeights.NumRows() != static_cast<size_t>(_filterSize * numFilters))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "WinogradConvolutionComputeNode filterWeights.NumRows() != static_cast<size_t.(_filterSize * numFilters)");
+        }
         _filterWeights = dsp::GetTransformedFilters(filterWeights, numFilters, _tileSize, order);
     }
 

@@ -253,6 +253,14 @@ namespace utilities
         return ParseResult::success;
     }
 
+    // parse a single char from the input string.
+    inline ParseResult cParse(const char* pStr, char*& pEnd, char& value)
+    { 
+        value = *pStr;
+        pEnd = const_cast<char*>(++pStr);
+        return ParseResult::success;
+    }
+
     // parser for std:string, scans until finding the a character other than alphanumeric or '_'
     inline ParseResult cParse(const char* pStr, char*& pEnd, std::string& value)
     {

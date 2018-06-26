@@ -18,6 +18,7 @@ void TestIREmitter();
 // Tests for higher-level classes (mostly IRModuleEmitter)
 void TestEmitLLVM();
 void TestLLVMShiftRegister();
+void TestIfHelpers(bool runJit);
 void TestLogical();
 void TestForLoop(bool runJit = false);
 void TestWhileLoop();

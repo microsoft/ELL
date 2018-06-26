@@ -14,6 +14,7 @@
 // model
 #include "InputPort.h"
 #include "Node.h"
+#include "OutputPort.h"
 #include "Port.h"
 #include "PortElements.h"
 

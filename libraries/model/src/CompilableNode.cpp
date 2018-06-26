@@ -109,12 +109,6 @@ namespace model
             {
                 return true;
             }
-
-            // TODO: Re-enable compiling nodes with scalar inputs, once issues are worked out
-            if (inputPort->GetInputElements().Size() == 1) // scalar
-            {
-                return true;
-            }
         }
         return false;
     }

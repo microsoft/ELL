@@ -31,8 +31,8 @@ namespace utilities
 #ifdef WIN32
         // open file
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_path = converter.from_bytes(filepath);
-        auto fs = std::ifstream(wide_path);
+        std::wstring widePath = converter.from_bytes(filepath);
+        auto fs = std::ifstream(widePath);
 #else
         // open file
         auto fs = std::ifstream(filepath);
@@ -52,8 +52,8 @@ namespace utilities
 #ifdef WIN32
         // open file
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_path = converter.from_bytes(filepath);
-        auto fs = std::ofstream(wide_path);
+        std::wstring widePath = converter.from_bytes(filepath);
+        auto fs = std::ofstream(widePath);
 #else
         // open file
         auto fs = std::ofstream(filepath);
@@ -72,8 +72,8 @@ namespace utilities
 #ifdef WIN32
         // open file
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_path = converter.from_bytes(filepath);
-        std::ifstream fs(wide_path);
+        std::wstring widePath = converter.from_bytes(filepath);
+        std::ifstream fs(widePath);
 #else
         // open file
         std::ifstream fs(filepath);
@@ -92,8 +92,8 @@ namespace utilities
 #ifdef WIN32
         // open file
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_path = converter.from_bytes(filepath);
-        std::ofstream fs(wide_path);
+        std::wstring widePath = converter.from_bytes(filepath);
+        std::ofstream fs(widePath);
 #else
         // open file
         std::ofstream fs(filepath);
@@ -112,8 +112,8 @@ namespace utilities
 #ifdef WIN32
         struct _stat64i32 buf;
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_path = converter.from_bytes(filepath);
-        int rc = _wstat(wide_path.c_str(), &buf);
+        std::wstring widePath = converter.from_bytes(filepath);
+        int rc = _wstat(widePath.c_str(), &buf);
 #else
         struct stat buf;
         int rc = stat(filepath.c_str(), &buf);
@@ -130,8 +130,8 @@ namespace utilities
 #ifdef WIN32
         struct _stat64i32 buf;
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_path = converter.from_bytes(path);
-        int rc = _wstat(wide_path.c_str(), &buf);
+        std::wstring widePath = converter.from_bytes(path);
+        int rc = _wstat(widePath.c_str(), &buf);
 #else
         struct stat buf;
         int rc = stat(path.c_str(), &buf);
@@ -189,7 +189,16 @@ namespace utilities
     std::string GetFileName(const std::string& filepath)
     {
         // PORTABILITY should be replaced by C++17 filesystem when available
-        return filepath.substr(filepath.find_last_of(path_separator) + 1);
+        size_t pos = filepath.find_last_of(path_separator);
+        if (pos == std::string::npos)
+        {
+            pos = filepath.find_last_of('/');
+            if (pos == std::string::npos)
+            {
+                return filepath;
+            }
+        }
+        return filepath.substr(pos + 1);
     }
 
     std::string GetDirectoryPath(const std::string& filepath)
@@ -197,7 +206,11 @@ namespace utilities
         size_t pos = filepath.find_last_of(path_separator);
         if (pos == std::string::npos)
         {
-            return "";
+            pos = filepath.find_last_of('/');
+            if (pos == std::string::npos)
+            {
+                return "";
+            }
         }
         auto path = filepath.substr(0, pos);
         return path;
@@ -281,8 +294,8 @@ namespace utilities
 #ifdef WIN32
             // Windows requires UTF-16 for unicode path support.
             std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-            std::wstring wide_path = converter.from_bytes(path);
-            int rc = _wmkdir(wide_path.c_str());
+            std::wstring widePath = converter.from_bytes(path);
+            int rc = _wmkdir(widePath.c_str());
 #else
             // Linux can do unicode file names in utf-8.
             int rc = mkdir(path.c_str(), 0777); // Note: Keep the prepended zero -- 0777 is 777 in octal.
@@ -297,12 +310,12 @@ namespace utilities
     std::string GetWorkingDirectory()
     {
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        const int max_path = 8192;
+        const int maxPath = 8192;
         int rc = 0;
         std::string utf8wd;
 #ifdef WIN32
-        wchar_t path[max_path];
-        if (NULL == _wgetcwd(path, max_path))
+        wchar_t path[maxPath];
+        if (NULL == _wgetcwd(path, maxPath))
         {
             rc = errno;
         }
@@ -313,8 +326,8 @@ namespace utilities
             utf8wd = converter.to_bytes(cwd);
         }
 #else
-        char path[max_path];
-        if (getcwd(path, max_path) == nullptr)
+        char path[maxPath];
+        if (getcwd(path, maxPath) == nullptr)
         {
             rc = errno;
         }

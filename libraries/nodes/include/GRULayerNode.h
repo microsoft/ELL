@@ -39,21 +39,24 @@ namespace nodes
         /// @name Input and Output Ports
         /// @{
         using BaseType::input;
+        const model::InputPort<int>& reset = _reset;
         using BaseType::output;
         /// @}
 
-        GRULayerNode() = default;
+        /// <summary> Default constructor. </summary>
+        GRULayerNode();
 
         /// <summary> Constructor from a layer. </summary>
         ///
-        /// <param name="input"> </param>
+        /// <param name="input"> The input signal </param>
+        /// <param name="reset"> The reset signal (will reset when this boolean transitions from 1 to 0) </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        GRULayerNode(const model::PortElements<ValueType>& input, const LayerType& layer);
+        GRULayerNode(const model::PortElements<ValueType>& input, const model::PortElements<int>& reset, const LayerType& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("GRULayerNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, ActivationFunctionType<ValueType>, RecurrentActivationFunctionType<ValueType>>("GRULayerNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -65,8 +68,19 @@ namespace nodes
         /// <returns> true if  this node is able to compile itself to code. </returns>
         bool IsCompilable(const model::MapCompiler* compiler) const override { return false; }
 
+        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
+        void Copy(model::ModelTransformer& transformer) const override;
+
     protected:
         bool Refine(model::ModelTransformer& transformer) const override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
+    private:
+        // Reset input signal
+        model::InputPort<int> _reset;
     };
 
     //
@@ -78,6 +92,7 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
+        static constexpr const char* resetTriggerPortName = "resetTrigger";
         static constexpr const char* updateWeightsPortName = "updateWeights";
         static constexpr const char* resetWeightsPortName = "resetWeights";
         static constexpr const char* hiddenWeightsPortName = "hiddenWeights";
@@ -91,6 +106,7 @@ namespace nodes
         const model::InputPort<ValueType>& updateBias = _updateBias;
         const model::InputPort<ValueType>& resetBias = _resetBias;
         const model::InputPort<ValueType>& hiddenBias = _hiddenBias;
+        const model::InputPort<int>& resetTrigger = _resetTrigger;
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
@@ -106,27 +122,16 @@ namespace nodes
         /// <param name="updateBias"> The update bias. </param>
         /// <param name="resetBias"> The reset bias. </param>
         /// <param name="hiddenBias"> The hidden bias. </param>
-        /// <param name="inputMemoryLayout"> The layout of the input data. </param>
-        /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        GRUNode(const model::PortElements<ValueType>& input,
+        /// <param name="resetTrigger"> Port elements for the reset trigger. </param>
+        GRUNode(const model::PortElements<ValueType>& input, 
+                       const model::PortElements<int>& resetTrigger,
                        const model::PortElements<ValueType>& updateWeights,
                        const model::PortElements<ValueType>& resetWeights,
                        const model::PortElements<ValueType>& hiddenWeights,
                        const model::PortElements<ValueType>& updateBias,
                        const model::PortElements<ValueType>& resetBias,
-                       const model::PortElements<ValueType>& hiddenBias,
-                       const model::PortMemoryLayout& inputMemoryLayout,
-                       const model::PortMemoryLayout& outputMemoryLayout);
+                       const model::PortElements<ValueType>& hiddenBias);
 
-        /// <summary> Gets information about the input memory layout </summary>
-        ///
-        /// <returns> The layout of the input data. </returns>
-        const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
-
-        /// <summary> Gets information about the output memory layout </summary>
-        ///
-        /// <returns> The layout of the output data. </returns>
-        const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -157,9 +162,11 @@ namespace nodes
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
 
+
     private:
         // Input
         model::InputPort<ValueType> _input;
+        model::InputPort<int> _resetTrigger;
         model::InputPort<ValueType> _updateWeights;
         model::InputPort<ValueType> _resetWeights;
         model::InputPort<ValueType> _hiddenWeights;
@@ -170,11 +177,9 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
 
-        model::PortMemoryLayout _inputMemoryLayout;
-        model::PortMemoryLayout _outputMemoryLayout;
-
         template <typename ActivationType>
         void ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength);
+
     };
 }
 }

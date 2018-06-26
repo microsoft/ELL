@@ -110,7 +110,6 @@ namespace neural
         leaky,
         sigmoid,
         tanh,
-        softmax,
         prelu,
         hardSigmoid
     };

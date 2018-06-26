@@ -32,6 +32,9 @@ shift
 goto :parse
 
 :step2
+if EXIST %TEMP%\ELL_BUILD_VS14 set UseVs14=1
+if EXIST %TEMP%\ELL_BUILD_VS15 set UseVs15=1
+
 set installationPath=
 set InstallationVersion=
 for /f "usebackq tokens=1* delims=: " %%i in (`external\vswhere.2.1.3\tools\vswhere.exe -legacy`) do (
@@ -57,20 +60,22 @@ if "!UseVs14! and !UseVs15! and !Vs14Path!" == "0 and 0 and " (
     set UseVs15=1
 ) 
 
+if "!UseVs14! and !UseVs15! and !Vs14! and !Vs15!" == "0 and 0 and 1 and 1" (
+    set /p id="Use VS 2017 ? "
+    if /i "!id!"=="y" set UseVs15=1
+    if /i "!id!"=="yes" set UseVs15=1
+)
+
 if "!UseVs15!" == "1" (
     set CMakeGenerator=Visual Studio 15 2017 Win64
     REM put the VS 2017 version of cmake ahead of the list so we use it.
     set PATH=!Vs15Path!\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;!PATH!
     if "%VisualStudioVersion%"=="" call "!Vs15Path!\Common7\Tools\VsDevCmd.bat"
+    echo %CMakeGenerator%> %TEMP%\ELL_BUILD_VS15
 )
 if "!UseVs14!" == "1" (
     if "%VisualStudioVersion%"=="" call "!Vs14Path!\Common7\Tools\VsDevCmd.bat"
-)
-
-if "!UseVs14! and !UseVs15! and !Vs14! and !Vs15!" == "0 and 0 and 1 and 1" (
-    set /p id="Use VS 2017 ? "
-    if /i "!id!"=="y" set CMakeGenerator=Visual Studio 15 2017 Win64
-    if /i "!id!"=="yes" set CMakeGenerator=Visual Studio 15 2017 Win64
+    echo %CMakeGenerator%> %TEMP%\ELL_BUILD_VS14
 )
 
 if "!DEBUG!"=="1" set

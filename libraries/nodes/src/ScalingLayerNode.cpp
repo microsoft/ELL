@@ -39,6 +39,14 @@ namespace nodes
         return true;
     }
 
+    template <typename ValueType>
+    void ScalingLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<ScalingLayerNode<ValueType>>(newPortElements, this->_layer);
+        transformer.MapNodeOutput(this->_output, newNode->output);
+    }
+
     // Explicit specialization
     template class ScalingLayerNode<float>;
     template class ScalingLayerNode<double>;

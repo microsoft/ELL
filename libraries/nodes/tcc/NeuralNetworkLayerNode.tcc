@@ -135,14 +135,6 @@ namespace nodes
     }
 
     template <typename DerivedType, typename LayerType, typename ValueType>
-    void NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::Copy(model::ModelTransformer& transformer) const
-    {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<DerivedType>(newPortElements, _layer);
-        transformer.MapNodeOutput(_output, newNode->output);
-    }
-
-    template <typename DerivedType, typename LayerType, typename ValueType>
     void NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::Compute() const
     {
         auto inputVector = _input.GetValue();

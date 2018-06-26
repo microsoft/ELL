@@ -12,6 +12,7 @@
 
 // utilities
 #include "Exception.h"
+#include "StringUtil.h"
 
 namespace ell
 {
@@ -125,7 +126,11 @@ namespace model
         }
 
         result.Consolidate();
-        assert(result.Size() == queryElements.Size());
+        if (result.Size() != queryElements.Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, 
+                utilities::FormatString("Model transformation resulted in a mismatching port size, expecting %lld, but found %lld", queryElements.Size(), result.Size()));
+        }
         return result;
     }
 

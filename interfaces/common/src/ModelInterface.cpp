@@ -6,9 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ModelInterface.h"
 #include "DatasetInterface.h"
 #include "DatasetInterfaceImpl.h"
+#include "ModelInterface.h"
 
 // common
 #include "LoadModel.h"
@@ -21,8 +21,8 @@
 #include "JsonArchiver.h"
 
 // math
-#include "FilterBank.h"
 #include "DenseDataVector.h"
+#include "FilterBank.h"
 
 // model
 #include "InputNode.h"
@@ -38,13 +38,16 @@
 #include "DCTNode.h"
 #include "FFTNode.h"
 #include "FilterBankNode.h"
+#include "GRULayerNode.h"
 #include "HammingWindowNode.h"
 #include "IIRFilterNode.h"
 #include "InputNodeBase.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "ReorderDataNode.h"
 #include "Tensor.h"
+#include "TypeCastNode.h"
 #include "UnaryOperationNode.h"
+#include "VoiceActivityDetectorNode.h"
 
 // stl
 #include <algorithm>
@@ -62,7 +65,7 @@ extern "C" {
 bool model_CompiledMap_SourceCallback_Double(void* context, double* input)
 {
     // Note: this context is passed through by IRCompiledMap::SetNodeInput where it calls GetContext()
-    // for the first parameter to the compiled _computeInputFunction and SetContext() happens in 
+    // for the first parameter to the compiled _computeInputFunction and SetContext() happens in
     // CompiledMap::Step so we know the context is the CompiledMap interface object.
     auto map = reinterpret_cast<ELL_API::CompiledMap*>(context);
     return map->InvokeSourceCallback(input);
@@ -109,7 +112,7 @@ namespace
     {
         std::vector<std::vector<OutputType>> result;
         result.reserve(vector.size());
-        for(const auto& row: vector)
+        for (const auto& row : vector)
         {
             std::vector<OutputType> outRow;
             outRow.reserve(row.size());
@@ -741,11 +744,96 @@ Node ModelBuilder::AddClockNode(Model model, PortElements input, double interval
     return Node(newNode);
 }
 
+Node ModelBuilder::AddTypeCastNode(Model model, PortElements input, PortType outputType)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (input.GetType())
+    {
+    case PortType::integer:
+        switch (outputType)
+        {
+        case PortType::integer:
+            throw std::invalid_argument("Error: CastNode from int to int is redundant");
+        case PortType::real:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<int, double>>(ell::model::PortElements<int>(elements));
+            break;
+        case PortType::smallReal:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<int, float>>(ell::model::PortElements<int>(elements));
+            break;
+        case PortType::boolean:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<int, bool>>(ell::model::PortElements<int>(elements));
+            break;
+        default:
+            throw std::invalid_argument("Error: CastNode unknown output type");
+        }
+        break;
+    case PortType::real:
+        switch (outputType)
+        {
+        case PortType::integer:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<double, int>>(ell::model::PortElements<double>(elements));
+            break;
+        case PortType::real:
+            throw std::invalid_argument("Error: CastNode from real to real is redundant");
+        case PortType::smallReal:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<double, float>>(ell::model::PortElements<double>(elements));
+            break;
+        case PortType::boolean:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<double, bool>>(ell::model::PortElements<double>(elements));
+            break;
+        default:
+            throw std::invalid_argument("Error: CastNode unknown output type");
+        }
+        break;
+    case PortType::smallReal:
+        switch (outputType)
+        {
+        case PortType::integer:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<float, int>>(ell::model::PortElements<float>(elements));
+            break;
+        case PortType::real:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<float, double>>(ell::model::PortElements<float>(elements));
+            break;
+        case PortType::smallReal:
+            throw std::invalid_argument("Error: CastNode from smallReal to smallReal is redundant");
+        case PortType::boolean:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<float, bool>>(ell::model::PortElements<float>(elements));
+            break;
+        default:
+            throw std::invalid_argument("Error: CastNode unknown output type");
+        }
+        break;
+    case PortType::boolean:
+        switch (outputType)
+        {
+        case PortType::integer:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<bool, int>>(ell::model::PortElements<bool>(elements));
+            break;
+        case PortType::real:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<bool, double>>(ell::model::PortElements<bool>(elements));
+            break;
+        case PortType::smallReal:
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<bool, float>>(ell::model::PortElements<bool>(elements));
+            break;
+        case PortType::boolean:
+            throw std::invalid_argument("Error: CastNode from boolean to boolean is redundant");
+            break;
+        default:
+            throw std::invalid_argument("Error: CastNode unknown output type");
+        }
+        break;
+    default:
+        throw std::invalid_argument("Error: CastNode unknown input type");
+    }
+    return Node(newNode);
+}
+
 template <typename ElementType>
 ell::model::PortElements<ElementType> GetPortElementsFromList(const std::vector<PortElements*>& inputs)
 {
     auto elements_list = std::vector<ell::model::PortElements<ElementType>>{};
-    for (const auto input: inputs)
+    for (const auto input : inputs)
     {
         const auto& elements = input->GetPortElements();
         elements_list.push_back(ell::model::PortElements<ElementType>(elements));
@@ -1126,13 +1214,36 @@ Node ModelBuilder::AddDCTNode(Model model, PortElements input, int numFilters)
     return Node(newNode);
 }
 
+Node ModelBuilder::AddVoiceActivityDetectorNode(Model model, PortElements input, double sampleRate, double frameDuration,
+    double tauUp, double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown,
+    double levelThreshold)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::VoiceActivityDetectorNode<double>>(ell::model::PortElements<double>(elements), sampleRate, 
+            frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::VoiceActivityDetectorNode<float>>(ell::model::PortElements<float>(elements), sampleRate,
+            frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create BufferNode of the requested type");
+    }
+    return Node(newNode);
+}
+
 template <typename ElementType>
 typename ell::predictors::neural::Layer<ElementType>::LayerParameters GetLayerParametersForLayerNode(const ell::api::predictors::neural::Layer<ElementType>& layer)
 {
     using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<ElementType>::LayerParameters;
     using TensorType = typename ell::predictors::neural::Layer<ElementType>::TensorType;
-    return UnderlyingLayerParameters
-    {
+    return UnderlyingLayerParameters{
         TensorType(static_cast<size_t>(layer.parameters.inputShape.rows), static_cast<size_t>(layer.parameters.inputShape.columns), static_cast<size_t>(layer.parameters.inputShape.channels)),
         layer.parameters.inputPaddingParameters,
         { static_cast<size_t>(layer.parameters.outputShape.rows), static_cast<size_t>(layer.parameters.outputShape.columns), static_cast<size_t>(layer.parameters.outputShape.channels) },
@@ -1158,13 +1269,13 @@ Node ModelBuilder::AddFloatActivationLayerNode(Model model, PortElements input, 
     case ell::api::predictors::neural::ActivationType::relu:
     {
         auto activationLayer = neural::ActivationLayer<float, neural::ReLUActivation>(parameters);
-        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::ReLUActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::ReLUActivation>>(ell::model::PortElements<float>(elements), activationLayer);
         break;
     }
     case ell::api::predictors::neural::ActivationType::hardSigmoid:
     {
         auto activationLayer = neural::ActivationLayer<float, neural::HardSigmoidActivation>(parameters);
-        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::HardSigmoidActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::HardSigmoidActivation>>(ell::model::PortElements<float>(elements), activationLayer);
         break;
     }
     case ell::api::predictors::neural::ActivationType::leaky:
@@ -1177,25 +1288,25 @@ Node ModelBuilder::AddFloatActivationLayerNode(Model model, PortElements input, 
             float alpha = apiLeakyLayer->_alpha;
             neural::LeakyReLUActivation<float> leaky(alpha);
             auto activationLayer = neural::ActivationLayer<float, neural::LeakyReLUActivation>(parameters, leaky);
-            newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::LeakyReLUActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+            newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::LeakyReLUActivation>>(ell::model::PortElements<float>(elements), activationLayer);
         }
         else
         {
             auto defaultLeakyLayer = neural::ActivationLayer<float, neural::LeakyReLUActivation>(parameters);
-            newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::LeakyReLUActivation>>(ell::model::PortElements<float>(elements), defaultLeakyLayer);
+            newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::LeakyReLUActivation>>(ell::model::PortElements<float>(elements), defaultLeakyLayer);
         }
         break;
     }
     case ell::api::predictors::neural::ActivationType::sigmoid:
     {
         auto activationLayer = neural::ActivationLayer<float, neural::SigmoidActivation>(parameters);
-        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::SigmoidActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::SigmoidActivation>>(ell::model::PortElements<float>(elements), activationLayer);
         break;
     }
     case ell::api::predictors::neural::ActivationType::tanh:
     {
         auto activationLayer = neural::ActivationLayer<float, neural::TanhActivation>(parameters);
-        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float,neural::TanhActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::TanhActivation>>(ell::model::PortElements<float>(elements), activationLayer);
         break;
     }
     case ell::api::predictors::neural::ActivationType::prelu:
@@ -1227,9 +1338,8 @@ Node ModelBuilder::AddFloatBatchNormalizationLayerNode(Model model, PortElements
     // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
     // layer node's constructor.
     UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
-    auto epsilonSummand = (layer.epsilonSummand == ell::api::predictors::neural::EpsilonSummand::variance) ? 
-        ell::predictors::neural::EpsilonSummand::Variance : ell::predictors::neural::EpsilonSummand::SqrtVariance;
-    
+    auto epsilonSummand = (layer.epsilonSummand == ell::api::predictors::neural::EpsilonSummand::variance) ? ell::predictors::neural::EpsilonSummand::Variance : ell::predictors::neural::EpsilonSummand::SqrtVariance;
+
     ell::predictors::neural::BatchNormalizationLayer<float> batchNormalizationLayer(parameters, layer.mean, layer.variance, layer.epsilon, epsilonSummand);
 
     newNode = model.GetModel().AddNode<ell::nodes::BatchNormalizationLayerNode<float>>(ell::model::PortElements<float>(elements), batchNormalizationLayer);
@@ -1320,7 +1430,7 @@ Node ModelBuilder::AddFloatPoolingLayerNode(Model model, PortElements input, con
     // layer node's constructor.
     UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
     if (layer.poolingType == ell::api::predictors::neural::PoolingType::max)
-    {   
+    {
         neural::PoolingLayer<float, neural::MaxPoolingFunction> poolingLayer(parameters, layer.poolingParameters);
         newNode = model.GetModel().AddNode<ell::nodes::PoolingLayerNode<float, neural::MaxPoolingFunction>>(ell::model::PortElements<float>(elements), poolingLayer);
     }
@@ -1328,7 +1438,7 @@ Node ModelBuilder::AddFloatPoolingLayerNode(Model model, PortElements input, con
     {
         neural::PoolingLayer<float, neural::MeanPoolingFunction> poolingLayer(parameters, layer.poolingParameters);
         newNode = model.GetModel().AddNode<ell::nodes::PoolingLayerNode<float, neural::MeanPoolingFunction>>(ell::model::PortElements<float>(elements), poolingLayer);
-    }  
+    }
 
     return Node(newNode);
 }
@@ -1362,6 +1472,59 @@ Node ModelBuilder::AddFloatSoftmaxLayerNode(Model model, PortElements input, con
     ell::predictors::neural::SoftmaxLayer<float> softmaxLayer(parameters);
 
     newNode = model.GetModel().AddNode<ell::nodes::SoftmaxLayerNode<float>>(ell::model::PortElements<float>(elements), softmaxLayer);
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFloatGRULayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::GRULayer<float>& layer)
+{
+    using ElementType = float;
+    using namespace ell::predictors::neural;
+    using namespace ell::nodes;
+
+    auto elements = input.GetPortElements();
+    auto resetElements = reset.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+
+    // Now we can construct the underlying Layer rather than python api version of GRULayer.
+    size_t m = layer.updateWeights.shape.rows;
+    size_t n = layer.updateWeights.shape.columns;
+    GRUParameters<ElementType> gruParameters = { { layer.updateWeights.data.data(), m, n }, { layer.resetWeights.data.data(), m, n }, { layer.hiddenWeights.data.data(), m, n }, { layer.updateBias.data.data(), layer.updateBias.data.size() }, { layer.resetBias.data.data(), layer.resetBias.data.size() }, { layer.hiddenBias.data.data(), layer.hiddenBias.data.size() } };
+    GRULayer<ElementType, TanhActivation, SigmoidActivation> gruLayer(parameters, gruParameters);
+
+    newNode = model.GetModel().AddNode<GRULayerNode<ElementType, TanhActivation, SigmoidActivation>>(ell::model::PortElements<ElementType>(elements), ell::model::PortElements<int>(resetElements), gruLayer);
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddFloatLSTMLayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::LSTMLayer<float>& layer)
+{
+    using ElementType = float;
+    using namespace ell::predictors::neural;
+    using namespace ell::nodes;
+
+    auto elements = input.GetPortElements();
+    auto resetElements = reset.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
+
+    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
+    // layer node's constructor.
+    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
+
+    // Now we can construct the underlying Layer rather than python api version of GRULayer.
+    size_t m = layer.inputWeights.shape.rows;
+    size_t n = layer.inputWeights.shape.columns;
+    size_t s = layer.inputBias.data.size();
+    LSTMParameters<ElementType> lstmParameters = { { layer.inputWeights.data.data(), m, n }, { layer.forgetMeWeights.data.data(), m, n }, { layer.candidateWeights.data.data(), m, n }, { layer.outputWeights.data.data(), m, n }, { layer.inputBias.data.data(), s }, { layer.forgetMeBias.data.data(), s }, { layer.candidateBias.data.data(), s }, { layer.outputBias.data.data(), s } };
+    LSTMLayer<ElementType, TanhActivation, SigmoidActivation> lstmLayer(parameters, lstmParameters);
+
+    newNode = model.GetModel().AddNode<LSTMLayerNode<ElementType, TanhActivation, SigmoidActivation>>(ell::model::PortElements<ElementType>(elements), ell::model::PortElements<int>(resetElements), lstmLayer);
     return Node(newNode);
 }
 
@@ -1430,7 +1593,7 @@ void Map::Load(const std::string& filename)
     ell::common::MapLoadArguments args;
     args.inputMapFilename = filename;
     _map = std::make_shared<ell::model::Map>(ell::common::LoadMap(args));
-    _hasSourceNodes = 0;
+    _sourceNodeState = TriState::Uninitialized;
 }
 
 void Map::Save(const std::string& filename) const
@@ -1445,17 +1608,13 @@ void Map::Reset()
 
 bool Map::HasSourceNodes()
 {
-    // the valid values for _hasSourceNodes are:
-    // 0 - means it is unitialized
-    // 1 - means the model does not have any source nodes.
-    // 2 - means the model has source nodes.
-    if (_hasSourceNodes == 0) 
+    if (_sourceNodeState == TriState::Uninitialized)
     {
         // lazily search for SourceNode and cache the answer so next call is much faster.
         auto sourceNodes = _map->GetModel().GetNodesByType<ell::model::SourceNodeBase>();
-        _hasSourceNodes = sourceNodes.empty() ? 1 : 2;
+        _sourceNodeState = sourceNodes.empty() ? TriState::No : TriState::Yes;
     }
-    return _hasSourceNodes == 2;
+    return _sourceNodeState == TriState::Yes;
 }
 
 std::vector<double> Map::ComputeDouble(const AutoDataVector& inputData)
@@ -1518,7 +1677,7 @@ CompiledMap Map::Compile(const std::string& targetDevice,
                          const std::string& functionName,
                          const std::string& sourceFunctionName,
                          const std::string& sinkFunctionName,
-                         const MapCompilerOptions& compilerSettings, 
+                         const MapCompilerOptions& compilerSettings,
                          const ModelOptimizerOptions& optimizerSettings,
                          std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolveCallbacks) const
 {
@@ -1565,6 +1724,35 @@ std::string CompiledMap::GetCodeString()
         _map->WriteCode(s, ell::emitters::ModuleOutputFormat::ir);
     }
     return s.str();
+}
+
+bool CompiledMap::HasSourceNodes()
+{
+    if (_sourceNodeState == TriState::Uninitialized)
+    {
+        // lazily search for SourceNode and cache the answer so next call is much faster.
+        auto sourceNodes = _map->GetModel().GetNodesByType<ell::model::SourceNodeBase>();
+        _sourceNodeState = sourceNodes.empty() ? TriState::No : TriState::Yes;
+    }
+    return _sourceNodeState == TriState::Yes;
+}
+
+std::vector<double> CompiledMap::ComputeDouble(const std::vector<double>& inputData)
+{
+    if (_map != nullptr)
+    {
+        return _map->Compute<double>(inputData);
+    }
+    return {};
+}
+
+std::vector<float> CompiledMap::ComputeFloat(const std::vector<float>& inputData)
+{
+    if (_map != nullptr)
+    {
+        return _map->Compute<float>(inputData);
+    }
+    return {};
 }
 
 void CompiledMap::WriteIR(const std::string& filePath)

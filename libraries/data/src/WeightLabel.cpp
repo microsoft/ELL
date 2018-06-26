@@ -27,10 +27,35 @@ namespace data
     WeightLabel LabelParser::Parse(TextLine& textLine)
     {
         double label = 0.0;
+        double weight = 0.0;
 
         textLine.TrimLeadingWhitespace();
-        textLine.ParseAdvance(label);
-        return WeightLabel{ 1.0, label };
+        char c = textLine.Peek();
+        if (c == '(')
+        {
+            textLine.ParseAdvance(c);
+            textLine.TrimLeadingWhitespace();
+            textLine.ParseAdvance(weight);
+            textLine.TrimLeadingWhitespace();
+            textLine.ParseAdvance(c);
+            if (c != ',')
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expecting comma separating weight and label");
+            }
+            textLine.TrimLeadingWhitespace();
+            textLine.ParseAdvance(label);
+            textLine.ParseAdvance(c);
+            if (c != ')')
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expecting close paren character ')'");
+            }
+        }
+        else
+        {
+            weight = 1.0;
+            textLine.ParseAdvance(label);
+        }
+        return WeightLabel{ weight, label };
     }
 
     void LabelParser::HandleErrors(utilities::ParseResult result, const std::string& str)

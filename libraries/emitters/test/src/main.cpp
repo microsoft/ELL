@@ -28,6 +28,7 @@ void TestIR()
 
     TestEmitLLVM();
     TestLLVMShiftRegister();
+    TestIfHelpers(true);
     TestLogical();
     TestForLoop();
     TestWhileLoop();

@@ -39,7 +39,7 @@ parser.add_argument("--speaker", help="Output audio to the speaker.", action='st
 
 args = parser.parse_args()
 
-predictor = classifier.AudioClassifier(args.classifier, args.categories, [0], args.threshold, SMOOTHING)
+predictor = classifier.AudioClassifier(args.classifier, args.categories, args.threshold, SMOOTHING)
 transform = featurizer.AudioTransform(args.featurizer, predictor.input_size)
 
 if transform.using_map != predictor.using_map:

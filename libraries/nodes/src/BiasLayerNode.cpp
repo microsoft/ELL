@@ -39,6 +39,14 @@ namespace nodes
         return true;
     }
 
+    template <typename ValueType>
+    void BiasLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<BiasLayerNode<ValueType>>(newPortElements, this->_layer);
+        transformer.MapNodeOutput(this->_output, newNode->output);
+    }
+
     // Explicit specialization
     template class BiasLayerNode<float>;
     template class BiasLayerNode<double>;

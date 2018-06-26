@@ -16,7 +16,6 @@ import os
 import time
 from threading import Thread, Lock, get_ident
 import sys
-import wave
 
 import tkinter as tk
 from tkinter import BOTH, LEFT, RIGHT, TOP, BOTTOM, RAISED, X, N, END
@@ -45,7 +44,7 @@ class AudioDemo(Frame):
 
     def __init__(self, featurizer_model=None, classifier_model=None, 
                 sample_rate=None, channels=None, input_device=None, categories=None, 
-                image_width=80, ignore_label=None, threshold=None, wav_file=None, clear=5):
+                image_width=80, threshold=None, wav_file=None, clear=5):
         """ Initialize AudioDemo object
         featurizer_model - the path to the compiled ELL featurizer
         classifier_model - the path to the compiled ELL classifier
@@ -54,11 +53,9 @@ class AudioDemo(Frame):
         input_device - optional id of microphone to use
         categories - path to file containing category labels
         image_width - width of the spectrogram image
-        ignore_label - list of predictions to ignore (e.g. [0] ignores prediction 0)
         threshold - ignore predictions that have confidence below this number (e.g. 0.5)
         wav_file - optional wav_file to process when you click Play
         """
-        input_device
         super().__init__()
 
         self.CLASSIFIER_MODEL_KEY = "classifier_model"
@@ -106,9 +103,6 @@ class AudioDemo(Frame):
         self.max_value = 1.0
         self.update_minmax = True
         
-        self.ignore_list = []
-        if ignore_label:
-            self.ignore_list = [ ignore_label ]
         self.threshold = threshold
 
         self.output_clear_time = int(clear * 1000) if clear else 5000
@@ -120,7 +114,7 @@ class AudioDemo(Frame):
         self.microphone = None
         self.animation = None
         self.show_spectrogram = True
-        self.colormap_name = "plasma"
+        self.colormap_name = "inferno"
         self.show_classifier_output = True
         self.last_prediction = None
         self.probability = 0
@@ -191,8 +185,7 @@ class AudioDemo(Frame):
     def load_classifier(self, classifier_path):
         """ load the given compiled ELL classifier for use in processing subsequent audio input """
         if classifier_path:
-            self.classifier = classifier.AudioClassifier(classifier_path, self.categories, 
-                                                         self.ignore_list, self.threshold)
+            self.classifier = classifier.AudioClassifier(classifier_path, self.categories, self.threshold)
             self.show_output("Classifier input size: {}, output size: {}".format(
                 self.classifier.input_size,
                 self.classifier.output_size))
@@ -360,7 +353,7 @@ class AudioDemo(Frame):
                 feature_data = self.featurizer.read()                
                 if feature_data is None:
                     break # eof
-                else:                    
+                else:                                        
                     self.lock.acquire()
                     self.accumulate_feature(feature_data)
                     if self.show_spectrogram:
@@ -568,12 +561,12 @@ class AudioDemo(Frame):
         self.load_classifier(self.classifier_model)
 
 def main(featurizer_model=None, classifier=None, sample_rate=None, channels=None, input_device=None, categories=None, 
-    image_width=80, ignore_label=None, threshold=None, wav_file=None, clear=5):
+        image_width=80, threshold=None, wav_file=None, clear=5):
     """ Main function to create root UI and AudioDemo object, then run the main UI loop """
     root = tk.Tk()
     root.geometry("800x800")
     app = AudioDemo(featurizer_model, classifier, sample_rate, channels, input_device, categories, image_width, 
-                    ignore_label, threshold, wav_file, clear)
+                    threshold, wav_file, clear)
     root.bind("+", app.on_plus_key)
     root.bind("-", app.on_minus_key)
     while True:
@@ -603,8 +596,6 @@ if __name__ == "__main__":
             default=None)
     arg_parser.add_argument("--image_width", help="Provide the display width of spectrogram image", 
             type=int, default=80)
-    arg_parser.add_argument("--ignore_label", help="Ignore the given label when predicted", 
-            type=int, default=None)
     arg_parser.add_argument("--threshold", help="Ignore predictions below given confidence threshold (0 to 1)",
             type=float, default=0)
     arg_parser.add_argument("--clear", help="Seconds before clearing output (default 5)", 
@@ -613,4 +604,4 @@ if __name__ == "__main__":
 
     main(args.featurizer, args.classifier, 
         args.sample_rate, args.channels, args.input_device, args.categories, 
-        args.image_width, args.ignore_label, args.threshold, args.wav_file, args.clear)
+        args.image_width, args.threshold, args.wav_file, args.clear)

@@ -517,6 +517,15 @@ namespace nodes
         }
     } // end function
 
+
+    template <typename ValueType, template <typename> class PoolingFunctionType>
+    void PoolingLayerNode<ValueType, PoolingFunctionType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<PoolingLayerNode<ValueType, PoolingFunctionType>>(newPortElements, this->_layer);
+        transformer.MapNodeOutput(this->_output, newNode->output);
+    }
+
     // Explicit specialization
     template class MeanPoolingFunction<float>;
     template class MeanPoolingFunction<double>;

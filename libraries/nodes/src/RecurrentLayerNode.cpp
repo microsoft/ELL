@@ -59,6 +59,14 @@ namespace nodes
         return true;
     }
 
+    template <typename ValueType, template <typename> class ActivationFunctionType>
+    void RecurrentLayerNode<ValueType, ActivationFunctionType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<RecurrentLayerNode<ValueType, ActivationFunctionType>>(newPortElements, this->_layer);
+        transformer.MapNodeOutput(this->_output, newNode->output);
+    }
+
     //
     // RecurrentNode
     //

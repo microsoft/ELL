@@ -45,8 +45,11 @@ def find_ell_build():
 
         head,tail = os.path.split(head)
     return build_dir
-
-ell_py_dir = os.path.join(find_ell_build(), "interfaces", "python", "package")
+    
+ell_build_dir = find_ell_build()
+if not ell_build_dir:
+  ell_build_dir = os.path.join(os.getenv("ELL_ROOT"),"build")
+ell_py_dir = os.path.join(ell_build_dir, "interfaces", "python", "package")
 if ell_py_dir is None:
     raise ImportError("Could not find ell package, did you follow the ELL Python Binding build instructions?")
 

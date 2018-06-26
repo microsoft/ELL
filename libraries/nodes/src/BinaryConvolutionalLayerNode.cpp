@@ -289,6 +289,15 @@ namespace nodes
         return { xnorNode->output };
     }
 
+
+    template <typename ValueType>
+    void BinaryConvolutionalLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<BinaryConvolutionalLayerNode<ValueType>>(newPortElements, this->_layer);
+        transformer.MapNodeOutput(this->_output, newNode->output);
+    }
+
     //
     // BinaryReceptiveFieldMatrixNode
     //

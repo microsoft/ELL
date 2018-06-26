@@ -9,6 +9,7 @@
 #include "DSPNodesTests.h"
 #include "DTWPrototype.h"
 #include "NodesTestData.h"
+#include "ModelTestUtilities.h"
 
 // common
 #include "LoadModel.h"
@@ -28,14 +29,19 @@
 
 // nodes
 #include "BufferNode.h"
+#include "ConstantNode.h"
 #include "DTWDistanceNode.h"
 #include "DelayNode.h"
 #include "DiagonalConvolutionNode.h"
 #include "FFTNode.h"
 #include "FilterBankNode.h"
+#include "GRULayerNode.h"
 #include "IIRFilterNode.h"
+#include "LSTMLayerNode.h"
+#include "RecurrentLayerNode.h"
 #include "SimpleConvolutionNode.h"
 #include "UnrolledConvolutionNode.h"
+#include "VoiceActivityDetectorNode.h"
 #include "WinogradConvolutionNode.h"
 
 // predictors
@@ -47,9 +53,17 @@
 // testing
 #include "testing.h"
 
+// data
+#include "Example.h"
+#include "Dataset.h"
+#include "DataLoaders.h"
+#include "WeightLabel.h"
+
 // utilities
 #include "Exception.h"
+#include "Files.h"
 #include "RandomEngines.h"
+#include "StringUtil.h"
 
 // stl
 #include <cmath>
@@ -60,6 +74,7 @@
 
 using namespace ell;
 using namespace nodes;
+using namespace data;
 using namespace std::string_literals;
 
 //
@@ -115,51 +130,6 @@ union ConvolutionOptions
     UnrolledOptions unrolledOptions;
     DiagonalOptions diagonalOptions;
 };
-
-template <typename ValueType>
-std::ostream& operator<<(std::ostream& os, const std::vector<ValueType>& vec)
-{
-    os << "[";
-    for (auto x : vec)
-    {
-        os << x << " ";
-    }
-    os << "]";
-    return os;
-}
-
-template <typename ElementType>
-void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
-{
-    auto randomEngine = utilities::GetRandomEngine("123");
-    std::uniform_real_distribution<ElementType> uniform(min, max);
-    auto rand = [&randomEngine, &uniform]() { return uniform(randomEngine); };
-    std::generate(vector.begin(), vector.end(), rand);
-}
-
-template <typename ElementType>
-void FillVector(std::vector<ElementType>& vector, ElementType value)
-{
-    std::fill(vector.begin(), vector.end(), value);
-}
-
-template <typename ElementType>
-void FillDataVector(std::vector<ElementType>& vector, int numRows, int numColumns, int numChannels)
-{
-    int vectorIndex = 0;
-    for (int rowIndex = 0; rowIndex < numRows; ++rowIndex)
-    {
-        for (int columnIndex = 0; columnIndex < numColumns; ++columnIndex)
-        {
-            for (int channelIndex = 0; channelIndex < numChannels; ++channelIndex)
-            {
-                ElementType rowValue = rowIndex < 3 && columnIndex < 2 ? 2 * rowIndex : 0;
-                ElementType columnValue = rowIndex < 3 && columnIndex < 2 ? columnIndex + 1 : 0;
-                vector[vectorIndex++] = rowValue + columnValue;
-            }
-        }
-    }
-}
 
 std::string GetConvAlgName(dsp::ConvolutionMethodOption alg)
 {
@@ -705,10 +675,471 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
 }
 
 //
+// Recurrent layer nodes (Recurrent, GRU, LSTM)
+//
+
+// clang-format off
+const float wData[] = { 0.0381341f, 0.55826f, -0.467607f, 0.264272f, -0.733331f, 0.464226f, 0.496708f,
+0.0581872f, -0.514144f, 0.702823f, -1.50401f, 0.373703f, 0.885559f, -0.27592f,
+-0.116469f, 0.320376f, -0.534044f, 1.92602f, -0.567954f, -0.0167191f, -0.822891f };
+// clang-format on
+
+void TestRecurrentNode()
+{
+    using ElementType = double;
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+
+    VectorType biases = VectorType({ -0.0773237, 0.909263, -0.297635 });
+
+    MatrixType weights(3, 7);
+
+    int columnIndex = 0;
+
+    // transform our weights into 3 x 7 matrices (21 values)
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 7; ++j)
+        {
+            weights(i, j) = wData[columnIndex];
+
+            columnIndex++;
+        }
+    }
+
+    TensorType input(1, 1, 4);
+
+    // should output ~ 1,1,0
+    input(0, 0, 0) = 5.1;
+    input(0, 0, 1) = 3.5;
+    input(0, 0, 2) = 1.4;
+    input(0, 0, 3) = 0.2;
+
+    Shape outputShape = { 1, 1, 3 };
+    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
+
+    RecurrentLayer<ElementType, TanhActivation> recurrent(parameters, weights, biases);
+    recurrent.Compute();
+    TensorType output = recurrent.GetOutput();
+
+    recurrent.Reset();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+    auto computeNode = model.AddNode<nodes::RecurrentLayerNode<ElementType, TanhActivation>>(inputNode->output, recurrent);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    // Compile model
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    // compare computed vs. compiled output
+    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
+}
+
+// clang-format off
+const float uData[] = { -0.306974f, -0.314942f, -0.307079f, -0.0778356f, -0.0929513f, 0.0426045f, -0.0200071f,
+0.508866f, 0.525531f, 0.345996f, -0.633406f, -0.519455f, 0.617442f, -0.0790342f,
+2.13148f, 2.61342f, -2.99549f, -6.15958f, 0.224837f, 0.0745432f, 0.154865f };
+const float rData[] = { -0.438305f, -0.438798f, -0.509791f, 0.385411f, -0.210201f, -0.302488f, 0.0717234f,
+0.259852f, 0.532692f, 0.675258f, 0.0314993f, -0.609884f, -0.419196f, 0.407534f,
+0.221932f, 0.51503f, -0.278936f, 0.673416f, 0.307534f, -0.176314f, 0.440408f };
+const float hData[] = { 0.0364258f, 0.557955f, -0.467648f, 0.265914f, 0.343273f, -0.0306102f, -0.265686f,
+0.241587f, 0.283854f, 0.232303f, -0.397746f, -0.191887f, -0.0618932f, -0.551409f,
+0.847701f, 0.234382f, -0.107097f, -0.38192f, 0.074817f, 0.555262f, 0.479104f };
+// clang-format on
+
+void TestGRUNode()
+{
+    using ElementType = double;
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+
+    VectorType updateBias = VectorType({ 0.0, 0.0, 3.95111 });
+    VectorType resetBias = VectorType({ 0.0, 0.0, 0.0 });
+    VectorType hiddenBias = VectorType({ -0.0686757, 0.0, 0.281977 });
+
+    MatrixType updateWeights(3, 7);
+    MatrixType resetWeights(3, 7);
+    MatrixType hiddenWeights(3, 7);
+
+    int columnIndex = 0;
+
+    // transform our weights into 3 x 7 matrices (21 values)
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 7; ++j)
+        {
+            updateWeights(i, j) = uData[columnIndex];
+            resetWeights(i, j) = rData[columnIndex];
+            hiddenWeights(i, j) = hData[columnIndex];
+
+            columnIndex++;
+        }
+    }
+
+    TensorType input(1, 1, 4);
+
+    // should output ~1,0,0
+    input(0, 0, 0) = 5.1;
+    input(0, 0, 1) = 3.5;
+    input(0, 0, 2) = 1.4;
+    input(0, 0, 3) = 0.2;
+
+    Shape outputShape = { 1, 1, 3 };
+    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
+
+    GRUParameters<ElementType> gruParams{ updateWeights, resetWeights, hiddenWeights, updateBias, resetBias, hiddenBias };
+    GRULayer<ElementType, TanhActivation, SigmoidActivation> gru(parameters, gruParams);
+    gru.Compute();
+    auto output = gru.GetOutput();
+    UNUSED(output);
+    gru.Reset();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+    auto resetTriggerNode = model.AddNode<nodes::ConstantNode<int>>(0);
+    auto computeNode = model.AddNode<nodes::GRULayerNode<ElementType, TanhActivation, SigmoidActivation>>(inputNode->output, resetTriggerNode->output, gru);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    // Compile model
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    // compare computed vs. compiled output
+    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
+}
+
+// clang-format off
+const float iData[] = { 0.739646f, 0.8501f, -2.15136f, -2.44612f, 0.0639512f, -0.0492275f, 0.167204f,
+-0.49359f, 0.253341f, -0.239276f, 0.114082f, -0.360225f, 0.434314f, -0.28489f,
+-0.573704f, -0.0273829f, 0.0242156f, -0.600619f, -0.258574f, -0.312928f, -0.0446059f };
+const float fData[] = { 0.0628231f, 0.145727f, -0.258802f, -0.57547f, -0.511279f, -0.470488f, 0.231888f,
+0.42041f, -0.440816f, -0.343813f, 0.463799f, -0.456978f, 0.081054f, 0.532126f,
+0.51855f, -0.123881f, 0.509249f, 0.324012f, 0.318677f, -0.411882f, 0.082f };
+const float cData[] = { 0.187203f, 0.863434f, 0.490011f, -0.216801f, -0.290302f, 0.338456f, -0.216217f,
+-0.000121037f, 0.0000392739f, 0.00000052499f, 0.0000676336f, 0.196989f, 0.312441f, 0.355654f,
+0.468885f, -0.236218f, 0.415782f, 0.302927f, -0.0503453f, -0.183221f, -0.500112f };
+const float oData[] = { 0.517059f, 0.470772f, -0.919974f, -0.319515f, 0.224966f, 0.195129f, 0.306053f,
+0.261489f, 0.499691f, 0.132338f, 0.47862f, 0.21803f, 0.00246173f, -0.0274337f,
+-0.385968f, 0.120127f, -0.360038f, -0.21129f, 0.0611264f, -0.17212f, -0.165724f };
+// clang-format on
+void TestLSTMNode()
+{
+    using ElementType = double;
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+
+    VectorType inputBias = VectorType({ 0.747351, -0.112848, 0.0 });
+    VectorType forgetMeBias = VectorType({ 1.0, 1.0, 1.0 });
+    VectorType candidateBias = VectorType({ 0.733668, 0.000431956, 0.0 });
+    VectorType outputBias = VectorType({ 0.385433, 0.0, 0.0 });
+
+    MatrixType inputWeights(3, 7);
+    MatrixType forgetMeWeights(3, 7);
+    MatrixType candidateWeights(3, 7);
+    MatrixType outputWeights(3, 7);
+
+    int columnIndex = 0;
+
+    // transform our weights into 3 x 7 matrices (21 values)
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 7; ++j)
+        {
+            inputWeights(i, j) = iData[columnIndex];
+            forgetMeWeights(i, j) = fData[columnIndex];
+            candidateWeights(i, j) = cData[columnIndex];
+            outputWeights(i, j) = oData[columnIndex];
+
+            columnIndex++;
+        }
+    }
+
+    TensorType input(1, 1, 4);
+
+    // should output 1,0,0
+    input(0, 0, 0) = 5.1;
+    input(0, 0, 1) = 3.5;
+    input(0, 0, 2) = 1.4;
+    input(0, 0, 3) = 0.2;
+
+    Shape outputShape = { 1, 1, 3 };
+    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
+
+    LSTMParameters<ElementType> lstmParams{ inputWeights, forgetMeWeights, candidateWeights, outputWeights, inputBias, forgetMeBias, candidateBias, outputBias };
+
+    LSTMLayer<ElementType, TanhActivation, SigmoidActivation> lstm(parameters, lstmParams);
+    lstm.Compute();
+    auto output = lstm.GetOutput();
+    UNUSED(output);
+    lstm.Reset();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+    auto resetTriggerNode = model.AddNode<nodes::ConstantNode<int>>(0);
+    auto computeNode = model.AddNode<nodes::LSTMLayerNode<ElementType, TanhActivation, SigmoidActivation>>(inputNode->output, resetTriggerNode->output, lstm);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    // Compile model
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    
+    // compare computed vs. compiled output
+    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
+}
+
+template< typename ElementType>
+static Dataset<Example<DenseDataVector<ElementType>, WeightLabel>> LoadVadData(const std::string& path, int numFeatures)
+{
+    std::string filename = utilities::JoinPaths(path, { "..", "..", "dsp", "VadData.txt" });
+    if (!utilities::FileExists(filename))
+    {
+        filename = utilities::JoinPaths(path, { "..", "dsp", "VadData.txt" });
+    }
+    // load the dataset
+    auto stream2 = utilities::OpenIfstream(filename);
+    Dataset<Example<DenseDataVector<ElementType>, WeightLabel>> dataset;
+    AutoSupervisedExampleIterator exampleIterator = ell::common::GetAutoSupervisedExampleIterator(stream2);
+    while (exampleIterator.IsValid())
+    {
+        auto example = exampleIterator.Get();
+        auto vector = example.GetDataVector().ToArray();
+        std::vector<ElementType> buffer;
+        std::transform(vector.begin(), vector.end(), std::back_inserter(buffer), [](double x) { return static_cast<ElementType>(x); });
+        dataset.AddExample(Example<DenseDataVector<ElementType>, WeightLabel>(DenseDataVector<ElementType>(buffer), example.GetMetadata()));
+        exampleIterator.Next();
+    }
+    return dataset;
+}
+
+void TestWithSerialization(model::Map& map, std::string name, std::function<void(model::Map& map, int)> body)
+{
+    // 2 iterations is important, because it finds bugs in reserialization of the deserialized model.
+    int iteration = 0;
+    while (iteration++ < 3)
+    {
+        body(map, iteration);
+
+        auto filename = name + ".json";
+
+        // archive the model
+        common::SaveMap(map, filename);
+
+        // unarchive the model
+        map = common::LoadMap(filename);
+    }
+}
+
+const int FrameSize = 40;
+const int SampleRate = 8000;
+const double FrameDuration = 0.032; // shift of 256 and 256/8000=0.032.
+const double TauUp = 1.54;
+const double TauDown = 0.074326;
+const double LargeInput = 2.400160;
+const double GainAtt = 0.002885;
+const double ThresholdUp = 3.552713;
+const double ThresholdDown = 0.931252;
+const double LevelThreshold = 0.007885;
+
+static void TestVoiceActivityDetectorNode(const std::string& path)
+{
+    using ElementType = double;
+
+    model::Model model;
+
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(FrameSize);
+    auto outputNode = model.AddNode<nodes::VoiceActivityDetectorNode<ElementType>>(inputNode->output, SampleRate, FrameDuration, TauUp, TauDown, LargeInput, GainAtt, ThresholdUp, ThresholdDown, LevelThreshold);
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+
+    // Dump the module so we can debug it
+    // compiledMap.GetModule().DebugDump();
+    auto dataset = LoadVadData<ElementType>(path, FrameSize);
+
+    TestWithSerialization(map, "TestVoiceActivityDetectorNode", [&dataset](model::Map& map, int iteration){
+
+        // compiling it.
+        model::MapCompilerOptions settings;
+        settings.verifyJittedModule = true;
+        settings.compilerSettings.optimize = false;
+        settings.compilerSettings.debug = true;
+        model::IRMapCompiler compiler(settings);
+        auto compiledMap = compiler.Compile(map);
+
+        // now test that it works.
+        int refErrors = 0;
+        int compileErrors = 0;
+        size_t numFrames = dataset.NumExamples();
+        for (size_t frame = 0; frame < numFrames; frame++)
+        {
+            auto e = dataset.GetExample(frame);
+            std::vector<ElementType> buffer = e.GetDataVector().ToArray();
+            if (buffer.size() < FrameSize)
+            {
+                buffer.resize(FrameSize);
+            }
+            int expectedSignal = static_cast<int>(e.GetMetadata().label);
+
+            map.SetInputValue("input", buffer);
+            std::vector<int> outputVec = map.ComputeOutput<int>("output");
+            int signal = outputVec[0];
+            if (signal != expectedSignal)
+            {
+                ++refErrors;
+            }
+
+            compiledMap.SetInputValue(0, buffer);
+            auto outputVec2 = compiledMap.ComputeOutput<int>(0);
+            signal = outputVec2[0];
+            if (signal != expectedSignal)
+            {
+                ++compileErrors;
+            }
+
+        } 
+
+        testing::ProcessTest(utilities::FormatString("Testing TestVoiceActivityDetectorNode Compute iteration %d, %d errors", iteration, refErrors), refErrors == 0);
+        testing::ProcessTest(utilities::FormatString("Testing TestVoiceActivityDetectorNode Compiled iteration %d, %d errors", iteration, compileErrors), compileErrors == 0);
+
+    });
+}
+
+void TestGRUNodeWithVADReset(const std::string& path)
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+
+    using ElementType = double;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+
+    auto dataset = LoadVadData<ElementType>(path, FrameSize);
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(FrameSize);
+    auto vadNode = model.AddNode<nodes::VoiceActivityDetectorNode<ElementType>>(inputNode->output, SampleRate, FrameDuration, TauUp, TauDown, LargeInput, GainAtt, ThresholdUp, ThresholdDown, LevelThreshold);
+
+    size_t inputSize = FrameSize;
+    size_t hiddenUnits = 10;
+
+    VectorType updateBias(std::vector<ElementType>(hiddenUnits, static_cast<ElementType>(0.01)));
+    VectorType resetBias(std::vector<ElementType>(hiddenUnits, static_cast<ElementType>(0.02)));
+    VectorType hiddenBias(std::vector<ElementType>(hiddenUnits, static_cast<ElementType>(0.01)));
+
+    size_t matrixSize = hiddenUnits * (hiddenUnits + inputSize);
+    MatrixType updateWeights(hiddenUnits, hiddenUnits + inputSize, std::vector<ElementType>(matrixSize, static_cast<ElementType>(0.01)));
+    MatrixType resetWeights(hiddenUnits, hiddenUnits + inputSize, std::vector<ElementType>(matrixSize, static_cast<ElementType>(0.01)));
+    MatrixType hiddenWeights(hiddenUnits, hiddenUnits + inputSize, std::vector<ElementType>(matrixSize, static_cast<ElementType>(0.01)));
+
+    TensorType input(1, 1, FrameSize);
+    Shape outputShape = { 1, 1, hiddenUnits };
+    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
+
+    GRUParameters<ElementType> gruParams{ updateWeights, resetWeights, hiddenWeights, updateBias, resetBias, hiddenBias };
+    GRULayer<ElementType, TanhActivation, SigmoidActivation> gru(parameters, gruParams);
+
+    auto gruNode = model.AddNode<nodes::GRULayerNode<ElementType, TanhActivation, SigmoidActivation>>(inputNode->output, vadNode->output, gru);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", gruNode->output } });
+
+    int iteration = 0;
+    while (iteration++ < 3)
+    {
+        // now test compiling it.
+        model::MapCompilerOptions settings;
+        settings.verifyJittedModule = true;
+        settings.compilerSettings.optimize = false;
+        settings.compilerSettings.debug = true;
+        model::IRMapCompiler compiler(settings);
+        auto compiledMap = compiler.Compile(map);
+        int errors = 0;
+
+        size_t numFrames = dataset.NumExamples();
+        int lastSignal = 0;
+        bool wasReset = false;
+        for (size_t frame = 0; frame < numFrames; frame++)
+        {
+            auto e = dataset.GetExample(frame);
+            std::vector<ElementType> buffer = e.GetDataVector().ToArray();
+            if (buffer.size() < FrameSize)
+            {
+                buffer.resize(FrameSize);
+            }
+            int expectedSignal = static_cast<int>(e.GetMetadata().label);
+
+            compiledMap.SetInputValue(0, buffer);
+            auto outputVec = compiledMap.ComputeOutput<ElementType>(0);
+            ElementType sum = 0;
+            for (auto x : outputVec)
+            {
+                sum += x;
+            }
+            if (wasReset && sum > static_cast<ElementType>(0.1))
+            {
+                errors++;
+            }
+            if (lastSignal == 1 && expectedSignal == 0)
+            {
+                // reset should have happened which means the next sum must be close to zero.
+                wasReset = true;
+            }
+            else
+            {
+                wasReset = false;
+            }
+
+            lastSignal = expectedSignal;
+        }
+        hiddenUnits = 0;
+
+        testing::ProcessTest(utilities::FormatString("Testing TestGRUNodeWithVADReset iteration %d, %d errors", iteration, errors), errors == 0);
+
+        // archive the model
+        common::SaveMap(map, "TestGRUNodeWithVADReset.json");
+
+        // unarchive the model
+        map = common::LoadMap("TestGRUNodeWithVADReset.json");
+    }
+}
+
+//
 // Main driver function to call all the tests
 //
-void TestDSPNodes()
+void TestDSPNodes(const std::string& path)
 {
+    TestVoiceActivityDetectorNode(path);
+    TestGRUNodeWithVADReset(path);
+
     //
     // Compute tests
     //
@@ -728,6 +1159,10 @@ void TestDSPNodes()
     TestMelFilterBankNode<double>();
 
     TestBufferNode<float>();
+
+    TestRecurrentNode();
+    TestGRUNode();
+    TestLSTMNode();
 
     TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::simple);
     // TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::diagonal); // ERROR: diagonal test currently broken

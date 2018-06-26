@@ -201,10 +201,6 @@ void TestIRCompiler()
     TestProtoNNPredictorMap();
     TestMultiSourceSinkMap();
 
-    TestRecurrentNode();
-    TestGRUNode();
-    TestLSTMNode();
-
     TestRegionDetectionNode();
 
     TestMatrixVectorProductNodeCompile();

@@ -319,6 +319,8 @@ class DemoHelper:
         while frame is None and self.image_pos < len(self.images):
             filename = os.path.join(self.image_folder, self.images[self.image_pos])
             frame = cv2.imread(filename)
+            if frame is None:
+                print("Error loading image: {}".format(filename))
             self.image_pos += 1
         if not frame is None:
             return frame

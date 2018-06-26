@@ -6,13 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "IRModuleEmitter.h"
 #include "EmitterException.h"
 #include "IRAssemblyWriter.h"
 #include "IRDiagnosticHandler.h"
 #include "IRHeaderWriter.h"
 #include "IRLoader.h"
 #include "IRMetadata.h"
+#include "IRModuleEmitter.h"
 #include "IRSwigInterfaceWriter.h"
 
 // utilities
@@ -247,31 +247,30 @@ namespace emitters
         IRFunctionEmitter& function = BeginFunction(functionName, VariableType::Void, args);
 
         // store context variable so the callbacks can find it later.
-        auto context = function.GetFunctionArgument("context");        
+        auto context = function.GetFunctionArgument("context");
         auto globalContext = GlobalPointer(GetModuleName() + "_context", emitters::VariableType::Byte);
         function.Store(globalContext, context);
     }
 
     void IRModuleEmitter::EndMapPredictFunction()
     {
-        EndFunction(); 
+        EndFunction();
 
         // now generate the public reset function that combines all the node level reset functions.
         IRFunctionEmitter& resetFunction = BeginFunction(GetModuleName() + "_Reset", VariableType::Void);
         resetFunction.IncludeInHeader();
-        for (auto name : _resetFunctions) 
+        for (auto name : _resetFunctions)
         {
             resetFunction.Call(name);
         }
         EndFunction();
     }
 
-    /// <summary> Begin a new function for resetting a given node. Each node that needs to implement 
+    /// <summary> Begin a new function for resetting a given node. Each node that needs to implement
     /// reset calls this and implements their own reset logic.  The IRModuleEmitter wraps all that
     /// in a master model_Reset function which is exposed in the API. </summary>
-    IRFunctionEmitter& IRModuleEmitter::BeginResetFunction(const std::string& nodeName)
+    IRFunctionEmitter& IRModuleEmitter::BeginResetFunction(const std::string& functionName)
     {
-        std::string functionName = "internalreset_" + nodeName;
         IRFunctionEmitter& function = BeginFunction(functionName, VariableType::Void);
         _resetFunctions.push_back(functionName);
         return function;
@@ -1015,7 +1014,15 @@ namespace emitters
 
     void IRModuleEmitter::DebugDump()
     {
-        GetLLVMModule()->dump();
+        auto module = GetLLVMModule();
+        if (module)
+        {
+            module->dump();
+        }
+        else
+        {
+            throw EmitterException(EmitterError::unexpected, "Cannot dump module because TransferOwnership has been called.");
+        }
     }
 
     //

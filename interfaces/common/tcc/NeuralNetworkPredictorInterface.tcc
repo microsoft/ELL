@@ -64,8 +64,6 @@ namespace api
                 underlying::ParametricReLUActivation<ElementType> prelu(alpha);
                 return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
             }
-            case api::ActivationType::softmax:
-                return std::make_unique<underlying::SoftmaxLayer<ElementType>>(parameters);
             default:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.activation)));
             }
@@ -81,7 +79,8 @@ namespace api
         {
             size_t m = layer.updateWeights.shape.rows;
             size_t n = layer.updateWeights.shape.columns;
-            underlying::GRUParameters<ElementType> gruParameters = { { layer.updateWeights.data.data(), m, n }, { layer.resetWeights.data.data(), m, n }, { layer.hiddenWeights.data.data(), m, n }, { layer.updateBias.data.data(), m }, { layer.resetBias.data.data(), m }, { layer.hiddenBias.data.data(), m } };
+            size_t s = layer.updateBias.shape.rows * layer.updateBias.shape.columns * layer.updateBias.shape.channels;
+            underlying::GRUParameters<ElementType> gruParameters = { { layer.updateWeights.data.data(), m, n }, { layer.resetWeights.data.data(), m, n }, { layer.hiddenWeights.data.data(), m, n }, { layer.updateBias.data.data(), s }, { layer.resetBias.data.data(), s }, { layer.hiddenBias.data.data(), s } };
 
             return std::make_unique<underlying::GRULayer<ElementType, ActivationFunctionType, RecurrentActivationFunctionType>>(parameters, gruParameters);
         }
@@ -111,8 +110,6 @@ namespace api
                 underlying::ParametricReLUActivation<ElementType> prelu(alpha);
                 return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
             }
-            case api::ActivationType::softmax:
-                return std::make_unique<underlying::SoftmaxLayer<ElementType>>(parameters);
             default:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown recurrent activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.recurrentActivation)));
             }
@@ -142,8 +139,6 @@ namespace api
                 underlying::ParametricReLUActivation<ElementType> prelu(alpha);
                 return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
             }
-            case api::ActivationType::softmax:
-                return std::make_unique<underlying::SoftmaxLayer<ElementType>>(parameters);
             default:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.activation)));
             }
@@ -197,8 +192,6 @@ namespace api
                 underlying::ParametricReLUActivation<ElementType> prelu(alpha);
                 return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
             }
-            case api::ActivationType::softmax:
-                return std::make_unique<underlying::SoftmaxLayer<ElementType>>(parameters);
             default:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown recurrent activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.recurrentActivation)));
             }
@@ -228,8 +221,6 @@ namespace api
                 underlying::ParametricReLUActivation<ElementType> prelu(alpha);
                 return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
             }
-            case api::ActivationType::softmax:
-                return std::make_unique<underlying::SoftmaxLayer<ElementType>>(parameters);
             default:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.activation)));
             }

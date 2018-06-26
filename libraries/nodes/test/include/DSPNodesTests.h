@@ -8,4 +8,6 @@
 
 #pragma once
 
-void TestDSPNodes();
+#include <string>
+
+void TestDSPNodes(const std::string& path);

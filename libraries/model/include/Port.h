@@ -41,9 +41,9 @@ namespace model
         Port(const Port& other) = delete;
         Port(Port&& other) = delete;
 
-        /// <summary> Returns the node the output port connected to this port belongs to </summary>
+        /// <summary> Returns the node to which this port belongs </summary>
         ///
-        /// <returns> The node the output port connected to this port belongs to </returns>
+        /// <returns> The node the port belongs to </returns>
         const class Node* GetNode() const { return _node; }
 
         /// <summary> Returns the datatype of the output </summary>

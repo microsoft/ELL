@@ -41,6 +41,14 @@ namespace nodes
         return true;
     }
 
+    template <typename ValueType>
+    void BatchNormalizationLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<BatchNormalizationLayerNode<ValueType>>(newPortElements, this->_layer);
+        transformer.MapNodeOutput(this->_output, newNode->output);
+    }
+
     //
     // Explicit specialization of various classes
     //

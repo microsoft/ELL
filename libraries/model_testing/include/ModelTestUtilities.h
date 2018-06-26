@@ -71,4 +71,36 @@ void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>&
 
 void PrintDiagnostics(emitters::IRDiagnosticHandler& handler);
 
+size_t GetShapeSize(const math::IntegerTriplet& shape);
+
+template <typename ElementType>
+void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, ElementType max = 1);
+
+template <typename ElementType>
+std::vector<ElementType> GetRandomVector(size_t size, ElementType min = -1, ElementType max = 1);
+
+template <typename ElementType>
+void FillRandomVector(ell::math::ColumnVector<ElementType>& vector, ElementType min = -1, ElementType max = 1);
+
+template <typename ElementType>
+void FillRandomTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType min = -1, ElementType max = 1);
+
+template <typename ElementType>
+void FillVector(std::vector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1);
+
+template <typename ElementType>
+void FillVector(ell::math::ColumnVector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1);
+
+template <typename ElementType>
+void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1);
+
+template <typename ElementType>
+void FillTensor(math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>& tensor, ElementType startValue = 0, ElementType step = 1);
+
+template <typename ElementType>
+void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1);
+
+template <typename ElementType>
+void FillMatrix(math::RowMatrix<ElementType>& matrix, ElementType startValue = 0, ElementType step = 1);
+
 #include "../tcc/ModelTestUtilities.tcc"

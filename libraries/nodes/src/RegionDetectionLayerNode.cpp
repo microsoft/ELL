@@ -38,6 +38,14 @@ namespace nodes
         return false;
     }
 
+    template <typename ValueType>
+    void RegionDetectionLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<RegionDetectionLayerNode<ValueType>>(newPortElements, this->_layer);
+        transformer.MapNodeOutput(this->_output, newNode->output);
+    }
+
     //
     // RegionDetectionNode
     //

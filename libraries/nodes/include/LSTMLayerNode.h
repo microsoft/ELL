@@ -37,16 +37,19 @@ namespace nodes
         /// @name Input and Output Ports
         /// @{
         using BaseType::input;
+        const model::InputPort<int>& reset = _reset;
         using BaseType::output;
         /// @}
 
-        LSTMLayerNode() = default;
+        /// <summary> Default constructor. </summary>
+        LSTMLayerNode();
 
         /// <summary> Constructor from a layer. </summary>
         ///
-        /// <param name="input"> </param>
+        /// <param name="input"> The input signal </param>
+        /// <param name="reset"> The reset signal (will reset when this boolean transitions from 1 to 0) </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        LSTMLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer);
+        LSTMLayerNode(const model::PortElements<ValueType>& input, const model::PortElements<int>& reset, const LayerType& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -63,8 +66,18 @@ namespace nodes
         /// <returns> true if this node is able to compile itself to code. </returns>
         bool IsCompilable(const model::MapCompiler* compiler) const override { return false; }
 
+        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
+        void Copy(model::ModelTransformer& transformer) const override;
+
     protected:
         bool Refine(model::ModelTransformer& transformer) const override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
+    private:
+        // Reset input signal
+        model::InputPort<int> _reset;
     };
 
     //
@@ -77,6 +90,7 @@ namespace nodes
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* inputWeightsPortName = "inputWeights";
+        static constexpr const char* resetTriggerPortName = "resetTrigger";
         static constexpr const char* forgetMeWeightsPortName = "forgetMeWeights";
         static constexpr const char* candidateWeightsPortName = "candidateWeights";
         static constexpr const char* outputWeightsPortName = "outputWeights";
@@ -93,6 +107,7 @@ namespace nodes
         const model::InputPort<ValueType>& forgetMeBias = _forgetMeBias;
         const model::InputPort<ValueType>& candidateBias = _candidateBias;
         const model::InputPort<ValueType>& outputBias = _outputBias;
+        const model::InputPort<int>& resetTrigger = _resetTrigger;
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
@@ -102,6 +117,7 @@ namespace nodes
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> The ports to get input data from. </param>
+        /// <param name="resetTrigger"> Port elements for the reset trigger. </param>
         /// <param name="inputWeights"> The weights to be applied to the input layer. </param>
         /// <param name="forgetMeWeights"> The weights to be applied to the forgotten layer. </param>
         /// <param name="candidateWeights"> The weights to be applied to the candidate layer. </param>
@@ -113,6 +129,7 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         LSTMNode(const model::PortElements<ValueType>& input,
+                        const model::PortElements<int>& resetTrigger,
                         const model::PortElements<ValueType>& inputWeights,
                         const model::PortElements<ValueType>& forgetMeWeights,
                         const model::PortElements<ValueType>& candidateWeights,
@@ -162,6 +179,9 @@ namespace nodes
     private:
         // Input
         model::InputPort<ValueType> _input;
+        
+        // Reset input
+        model::InputPort<int> _resetTrigger;
 
         // Weights
         model::InputPort<ValueType> _inputWeights;

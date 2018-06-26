@@ -15,29 +15,27 @@ import numpy as np
 class AudioClassifier:
     """
     This class wraps an ELL audio classifier model and adds some nice features, like mapping the
-    predictions to a string label, adding an ignore_list which specifies any predictions that are
-    meaningless and it does some posterior smoothing on the predictions since audio model outputs 
+    predictions to a string label, any categorry starting with "_" will be ignored.  It also 
+    does some optional posterior smoothing on the predictions since audio model outputs 
     tend to be rather noisy. It also supports a threshold value so any prediction less than this
     probability is ignored.
     """
-    def __init__(self, model_path, categories_file, ignore_list=[], threshold=0, smoothing_delay=0):
+    def __init__(self, model_path, categories_file, threshold=0, smoothing_delay=0):
         """
         Initialize the new AudioClassifier.
         model - the path to the ELL model module to load.
         categories_file - the path to a text file containing strings labels for each prediction
-        ignore_list - a list of prediction indices to ignore
         threshold - threshold for predictions, (default 0).
         smoothing_delay - controls the size of this window (defaults to 0).
         """
         self.smoothing_delay = smoothing_delay
-        self.ignore_list = ignore_list
-        if not self.ignore_list:
-            self.ignore_list = []
         self.threshold = threshold
         self.categories = None
+        self.ignore_list = []
         if categories_file:
             with open(categories_file, "r") as fp:
                 self.categories = [e.strip() for e in fp.readlines()]
+            self.ignore_list += [i for i in self.categories if i.startswith("_")]
 
         self.using_map = False
         if os.path.splitext(model_path)[1] == ".ell":

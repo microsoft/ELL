@@ -73,6 +73,14 @@ namespace nodes
         return true;
     }
 
+    template <typename ValueType>
+    void FullyConnectedLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<FullyConnectedLayerNode<ValueType>>(newPortElements, this->_layer);
+        transformer.MapNodeOutput(this->_output, newNode->output);
+    }
+
     // Explicit specialization
     template class FullyConnectedLayerNode<float>;
     template class FullyConnectedLayerNode<double>;

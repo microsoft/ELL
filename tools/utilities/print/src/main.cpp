@@ -102,9 +102,24 @@ int main(int argc, char* argv[])
         }
         return 1;
     }
-    catch (utilities::LogicException exception)
+    catch (utilities::LogicException& exception)
     {
         std::cerr << "runtime error: " << exception.GetMessage() << std::endl;
+        return 1;
+    }
+    catch (utilities::InputException& exception)
+    {
+        std::cerr << "input error: " << exception.GetMessage() << std::endl;
+        return 1;
+    }
+    catch (std::exception& exception)
+    {
+        std::cerr << "unknown error: " << exception.what() << std::endl;
+        return 1;
+    }
+    catch (...)
+    {
+        std::cerr << "unknown exeption" << std::endl;
         return 1;
     }
 

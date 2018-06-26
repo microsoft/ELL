@@ -8,6 +8,9 @@
 
 using namespace ell;
 
+#include <random>
+#include "RandomEngines.h"
+
 template<typename ValueType>
 ValueType LargestDifference(const std::vector<ValueType>& a, const std::vector<ValueType>& b)
 {
@@ -182,4 +185,110 @@ void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& com
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
     }
+}
+
+template <typename ValueType>
+class Uniform
+{
+public:
+    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
+        : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal - minVal) {}
+
+    ValueType operator()()
+    {
+        double uniform = static_cast<double>(_rng()) / _range;
+        return static_cast<ValueType>((uniform * _outputRange) + _minOutput);
+    }
+
+private:
+    std::default_random_engine _rng;
+    double _range;
+    ValueType _minOutput;
+    ValueType _outputRange;
+};
+
+template <typename ElementType>
+void FillRandomVector(std::vector<ElementType>& vector, ElementType min, ElementType max)
+{
+    Uniform<ElementType> rand(min, max);
+    std::generate(vector.begin(), vector.end(), rand);
+}
+
+template <typename ElementType>
+std::vector<ElementType> GetRandomVector(size_t size, ElementType min, ElementType max)
+{
+    std::vector<ElementType> result(size);
+    FillRandomVector(result, min, max);
+    return result;
+}
+
+template <typename ElementType>
+void FillRandomVector(ell::math::ColumnVector<ElementType>& vector, ElementType min, ElementType max)
+{
+    Uniform<ElementType> rand(min, max);
+    vector.Generate(rand);
+}
+
+template <typename ElementType>
+void FillRandomTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType min, ElementType max)
+{
+    Uniform<ElementType> rand(min, max);
+    tensor.Generate(rand);
+}
+
+template <typename ElementType>
+void FillVector(std::vector<ElementType>& vector, ElementType startValue, ElementType step)
+{
+    ElementType val = startValue;
+    std::generate(vector.begin(), vector.end(), [&val, step]() {
+        auto result = val;
+        val += step;
+        return result; });
+}
+
+template <typename ElementType>
+void FillVector(ell::math::ColumnVector<ElementType>& vector, ElementType startValue, ElementType step)
+{
+    ElementType val = startValue;
+    vector.Generate([&val]() { return val++; });
+}
+
+template <typename ElementType>
+void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue, ElementType step)
+{
+    ElementType val = startValue;
+    tensor.Generate([&val, step]() {
+        auto result = val;
+        val += step;
+        return result; });
+}
+
+template <typename ElementType>
+void FillTensor(math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>& tensor, ElementType startValue, ElementType step)
+{
+    ElementType val = startValue;
+    tensor.Generate([&val, step]() {
+        auto result = val;
+        val += step;
+        return result; });
+}
+
+template <typename ElementType>
+void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue, ElementType step)
+{
+    ElementType val = startValue;
+    tensor.Generate([&val, step]() {
+        auto result = val;
+        val += step;
+        return result; });
+}
+
+template <typename ElementType>
+void FillMatrix(math::RowMatrix<ElementType>& matrix, ElementType startValue, ElementType step)
+{
+    ElementType val = startValue;
+    matrix.Generate([&val, step]() {
+        auto result = val;
+        val += step;
+        return result; });
 }

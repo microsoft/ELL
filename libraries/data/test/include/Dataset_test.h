@@ -11,4 +11,5 @@
 namespace ell
 {
 void DatasetCastingTests();
+void DatasetSerializationTests();
 }

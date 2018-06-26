@@ -27,6 +27,7 @@ int main()
     IteratorTests();
     ExampleCopyAsTests();
     DatasetCastingTests();
+    DatasetSerializationTests();
     DataVectorParseTest();
     AutoDataVectorParseTest();
     SingleFileParseTest();

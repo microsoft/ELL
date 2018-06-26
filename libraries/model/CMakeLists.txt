@@ -117,24 +117,19 @@ set(test_name ${library_name}_test)
 set(test_src
     test/src/main.cpp
     test/src/Map_test.cpp
-    test/src/ModelTestUtilities.cpp
     test/src/ModelBuilder_test.cpp
     test/src/Model_test.cpp
-    test/src/ModelTestUtilities.cpp
     test/src/PortElements_test.cpp
 )
 
 set(test_include 
     test/include/Map_test.h
     test/include/ModelBuilder_test.h
-    test/include/ModelTestUtilities.h
     test/include/Model_test.h
     test/include/PortElements_test.h
-    test/include/ModelTestUtilities.h
 )
 
-set(test_tcc
-    test/tcc/ModelTestUtilities.tcc
+set(test_tcc    
 )
 
 source_group("src" FILES ${test_src})
@@ -142,7 +137,7 @@ source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} common model nodes testing utilities)
+target_link_libraries(${test_name} common model nodes testing model_testing utilities)
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
@@ -161,7 +156,6 @@ set(compiler_test_src
     test/src/CompilerTest.cpp
     test/src/ModelHeaderOutputTest.cpp
     test/src/ModelMaker.cpp
-    test/src/ModelTestUtilities.cpp
     test/src/PerformanceCountersTest.cpp
 )
 
@@ -170,7 +164,6 @@ set(compiler_test_include
     test/include/CompilerTest.h
     test/include/ModelHeaderOutputTest.h
     test/include/ModelMaker.h
-    test/include/ModelTestUtilities.h
     test/include/PerformanceCountersTest.h
 )
 
@@ -178,7 +171,6 @@ set(compiler_test_tcc
     test/tcc/CompilableNodesTest.tcc
     test/tcc/CompilerTest.tcc
     test/tcc/ModelMaker.tcc
-    test/tcc/ModelTestUtilities.tcc
 )
 
 source_group("src" FILES ${compiler_test_src})
@@ -187,7 +179,7 @@ source_group("tcc" FILES ${compiler_test_tcc})
 
 add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include} ${compiler_test_tcc})
 target_include_directories(${compiler_test_name} PRIVATE test/include)
-target_link_libraries(${compiler_test_name} common model nodes testing utilities)
+target_link_libraries(${compiler_test_name} common model nodes testing model_testing utilities)
 copy_shared_libraries(${compiler_test_name})
 
 set_property(TARGET ${compiler_test_name} PROPERTY FOLDER "tests")

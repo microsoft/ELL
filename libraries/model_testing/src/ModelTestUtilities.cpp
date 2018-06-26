@@ -140,3 +140,8 @@ void PrintDiagnostics(emitters::IRDiagnosticHandler& handler)
         std::cout << "Diagnostic messages -- none" << std::endl;
     }
 }
+
+size_t GetShapeSize(const math::IntegerTriplet& shape)
+{
+    return shape[0] * shape[1] * shape[2];
+}

@@ -67,11 +67,18 @@ void AutoDataVector::CopyTo(std::vector<float>& buffer)
 class AutoSupervisedExample::AutoSupervisedExampleImpl
 {
 public:
-    ell::data::AutoSupervisedExample _example;
+    AutoSupervisedExampleImpl() = default;
+    AutoSupervisedExampleImpl(const ell::data::AutoSupervisedExample& e) : _example(e) {}
+    ell::data::AutoSupervisedExample _example; 
 };
 
 AutoSupervisedExample::AutoSupervisedExample()
     : _impl(std::make_shared<AutoSupervisedExampleImpl>())
+{
+}
+
+AutoSupervisedExample::AutoSupervisedExample(AutoDataVector vector, double label)
+    : _impl(std::make_shared<AutoSupervisedExampleImpl>(ell::data::AutoSupervisedExample(vector.ToArray(), { 1.0, label })))
 {
 }
 
@@ -122,6 +129,12 @@ void AutoSupervisedDataset::Load(std::string filename)
         _impl->_dataset.AddExample(mappedExample);
         exampleIterator.Next();
     }
+}
+
+void AutoSupervisedDataset::AddExample(const AutoSupervisedExample& e)
+{
+    ell::data::AutoSupervisedExample ex(e.GetData().ToArray(), { 1.0, e.GetLabel() });
+    _impl->_dataset.AddExample(ex);
 }
 
 void AutoSupervisedDataset::Save(std::string filename)

@@ -617,22 +617,10 @@ namespace nodes
     template <typename ValueType>
     void FFTNode<ValueType>::Compute() const
     {
-        auto inputSize = input.Size();
-        auto outputSize = output.Size();
-
-        std::vector<ValueType> temp(inputSize);
-        for (size_t index = 0; index < inputSize; ++index)
-        {
-            temp[index] = _input[index];
-        }
+        std::vector<ValueType> temp = _input.GetValue();
         dsp::FFT(temp);
-
-        std::vector<ValueType> output(outputSize);
-        for (size_t index = 0; index < outputSize; ++index)
-        {
-            output[index] = temp[index];
-        }
-        _output.SetOutput(output);
+        temp.resize(output.Size());
+        _output.SetOutput(temp);
     };
 
     template <typename ValueType>

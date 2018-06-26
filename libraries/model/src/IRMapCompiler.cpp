@@ -113,6 +113,12 @@ namespace model
         return GetModule().GetModuleName();
     }
 
+    std::string IRMapCompiler::GetGlobalName(const Node& node, const std::string& baseName) const 
+    {
+        // e.g "ELL_GRUNodeReset_1541".
+        return GetNamespacePrefix() + "_" + baseName + "_" + node.GetId().ToString();
+    }
+
     std::string IRMapCompiler::GetPredictFunctionName() const
     {
         return GetMapCompilerOptions().mapFunctionName;

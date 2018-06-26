@@ -34,6 +34,7 @@ set(src
     src/SingleElementThresholdNode.cpp
     src/SoftmaxLayerNode.cpp
     src/UnrolledConvolutionNode.cpp
+    src/VoiceActivityDetectorNode.cpp
     src/WinogradConvolutionNode.cpp
 )
 
@@ -97,6 +98,7 @@ set(include
     include/TypeCastNode.h
     include/UnaryOperationNode.h
     include/UnrolledConvolutionNode.h
+    include/VoiceActivityDetectorNode.h
     include/ValueSelectorNode.h
     include/WinogradConvolutionNode.h
 )
@@ -134,6 +136,7 @@ set (tcc
     tcc/SumNode.tcc
     tcc/TypeCastNode.tcc
     tcc/UnaryOperationNode.tcc
+    tcc/VoiceActivityDetectorNode.tcc
     tcc/ValueSelectorNode.tcc
 )
 
@@ -189,7 +192,6 @@ source_group("include" FILES ${test_include})
 add_executable(${test_name}
     ${test_src}
     ${test_include}
-    ${include}
 )
 
 target_include_directories(${test_name}
@@ -199,6 +201,7 @@ target_include_directories(${test_name}
 
 target_link_libraries(${test_name}
     common
+    data
     model
     nodes
     testing
@@ -234,7 +237,6 @@ source_group("include" FILES ${test_include})
 add_executable(${test_name}
     ${test_src}
     ${test_include}
-    ${include}
 )
 
 target_include_directories(${test_name}
@@ -248,6 +250,7 @@ target_link_libraries(${test_name}
     model
     nodes
     testing
+    model_testing
     utilities
 )
 

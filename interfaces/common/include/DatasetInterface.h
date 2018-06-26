@@ -50,6 +50,8 @@ class AutoSupervisedExample
 public:
     AutoSupervisedExample();
 
+    AutoSupervisedExample(AutoDataVector vector, double label);
+
     /// <summary> Returns the expected label fro this example data. </summary>
     /// <returns> The expected label. </returns>
     double GetLabel() const;
@@ -82,7 +84,13 @@ public:
     /// <param name="index"> Zero-based index of the row. </param>
     AutoSupervisedExample GetExample(size_t index);
 
+    /// <summary> Append a new example. </summary>
+    void AddExample(const AutoSupervisedExample& e);
+
+    /// <summary> Load the dataset from the file. </summary>
     void Load(std::string filename);
+
+    /// <summary> Save the dataset to the file. </summary>
     void Save(std::string filename);
 
 private:

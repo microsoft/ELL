@@ -108,7 +108,6 @@ class LayerType:
     input = LayerType_input
     pooling = LayerType_pooling
     scaling = LayerType_scaling
-    softmax = LayerType_softmax
 
 # Remove flat defines so callers only see the class above
 del LayerType_base
@@ -121,7 +120,6 @@ del LayerType_fullyConnected
 del LayerType_input
 del LayerType_pooling
 del LayerType_scaling
-del LayerType_softmax
 
 # Python friendly class for ActivationType
 class ActivationType:
@@ -129,7 +127,6 @@ class ActivationType:
     leaky = ActivationType_leaky
     sigmoid = ActivationType_sigmoid
     tanh = ActivationType_tanh
-    softmax = ActivationType_softmax
     prelu = ActivationType_prelu
     hardSigmoid = ActivationType_hardSigmoid
 
@@ -138,7 +135,6 @@ del ActivationType_relu
 del ActivationType_leaky
 del ActivationType_sigmoid
 del ActivationType_tanh
-del ActivationType_softmax
 del ActivationType_prelu
 del ActivationType_hardSigmoid
 

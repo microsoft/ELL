@@ -13,9 +13,12 @@ if(${PYTHON_ENABLED})
         eval_test.py
         featurizer.py
         microphone.py
+        play_audio.py
         record.py
         speaker.py
         test_audio.py
+        vad.py
+        vad_test.py
         view_audio.py
         wav_reader.py
     )

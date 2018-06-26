@@ -23,9 +23,9 @@ if ERRORLEVEL 1 exit 1
 
 cd build
 
+echo ===================================== TEST ==================================
 if "%4"=="" goto :fulltest
 
-echo ===================================== TEST ==================================
 cmake .. -DRPI_CLUSTER=%RPI_CLUSTER% -DRPI_PASSWORD=%PASSWORD% -DRPI_KEY=%KEY%
 if ERRORLEVEL 1 exit /B 1
 

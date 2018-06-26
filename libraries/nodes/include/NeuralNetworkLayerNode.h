@@ -133,7 +133,6 @@ namespace nodes
     protected:
         size_t NumInputDimensions() const { return _inputLayout.NumDimensions(); }
         model::PortMemoryLayout CalculateMemoryLayout(size_t padding, typename predictors::neural::Layer<ValueType>::Shape dataBufferSize);
-        void Copy(model::ModelTransformer& transformer) const override;
         void Compute() const override;
         utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;

@@ -61,7 +61,7 @@ source_group("doc" FILES ${doc})
 
 add_library(${library_name} ${src} ${include} ${tcc} ${doc})
 target_include_directories(${library_name} PUBLIC include)
-target_link_libraries(${library_name} math utilities)
+target_link_libraries(${library_name} math common utilities)
 
 # MSVC emits warnings incorrectly when mixing inheritance, templates,
 # and member function definitions outside of class definitions
@@ -91,7 +91,7 @@ set (test_include test/include/Dataset_test.h
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
-add_executable(${test_name} ${test_src} ${test_include} ${include})
+add_executable(${test_name} ${test_src} ${test_include})
 target_include_directories(${test_name} PRIVATE test/include)
 target_link_libraries(${test_name} data testing utilities)
 copy_shared_libraries(${test_name})

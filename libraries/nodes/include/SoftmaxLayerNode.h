@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "BroadcastFunctionNode.h" 
+#include "BroadcastFunctionNode.h"
 #include "NeuralNetworkLayerNode.h"
 
 // model
@@ -43,7 +43,7 @@ namespace nodes
         /// @}
 
         SoftmaxLayerNode() = default;
-        
+
         /// <summary> Constructor from a layer. </summary>
         ///
         /// <param name="input"> </param>
@@ -62,6 +62,11 @@ namespace nodes
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
         bool IsCompilable(const model::MapCompiler* compiler) const override { return true; }
+
+        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
+        void Copy(model::ModelTransformer& transformer) const override;
 
     protected:
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;

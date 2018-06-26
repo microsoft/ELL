@@ -57,9 +57,6 @@ class ModelTester:
                 eof = True
             else:
                 prediction, probability, label = predictor.predict(feature_data)
-                if probability is not None and name == 'bed/0ea0e2f4_nohash_0.wav':    
-                    percent = int(100 * probability)
-                    print("<<< DETECTED ({}) {}% '{}' >>>".format(prediction, percent, label))
                 if probability is not None and probability > best_probability:
                     best_probability = probability
                     best_prediction = label
@@ -84,9 +81,9 @@ class ModelTester:
             else:
                 print("FAILED: expected {}, got {}".format(expected, prediction))
 
-    def RunTest(self, featurizer_model, classifier_model, list_file, max_tests, dataset, categories, sample_rate, ignore_label):
+    def RunTest(self, featurizer_model, classifier_model, list_file, max_tests, dataset, categories, sample_rate):
 
-        predictor = classifier.AudioClassifier(classifier_model, categories, [ignore_label], THRESHOLD, SMOOTHING)
+        predictor = classifier.AudioClassifier(classifier_model, categories, THRESHOLD, SMOOTHING)
         transform = featurizer.AudioTransform(featurizer_model, predictor.input_size)
 
         print("Evaluation with transform input size {}, output size {}".format(transform.input_size, transform.output_size))
@@ -156,7 +153,6 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", "-d", help="specify path to cached dataset file (*.npz)")
     parser.add_argument("--categories", "-cat", help="specify path to categories file", required=True)
     parser.add_argument("--sample_rate", "-s", help="specify audio sample rate (default 16000)", default=16000, type=int)  
-    parser.add_argument("--ignore_label", "-i", help="specify label to ignore", default=None, type=int)
     parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
     parser.add_argument("--reset", "-r", help="do a GRU reset between each test file", action="store_true")
     parser.add_argument("--max_tests", type=int, help="maimum number of words chosen at random from each word list", default=None)
@@ -177,4 +173,4 @@ if __name__ == "__main__":
         sys.exit(1)
 
     test = ModelTester(args.verbose, args.reset)
-    test.RunTest(args.featurizer, args.classifier, args.list_file, args.max_tests, args.dataset, args.categories, sample_rate, args.ignore_label)
+    test.RunTest(args.featurizer, args.classifier, args.list_file, args.max_tests, args.dataset, args.categories, sample_rate)

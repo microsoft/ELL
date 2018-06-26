@@ -61,6 +61,11 @@ namespace nodes
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
         bool IsCompilable(const model::MapCompiler* compiler) const override { return false; }
 
+        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
+        void Copy(model::ModelTransformer& transformer) const override;
+
     protected:
         bool Refine(model::ModelTransformer& transformer) const override;
     };

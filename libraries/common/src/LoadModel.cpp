@@ -51,6 +51,7 @@
 #include "SourceNode.h"
 #include "UnaryOperationNode.h"
 #include "UnrolledConvolutionNode.h"
+#include "VoiceActivityDetectorNode.h"
 #include "WinogradConvolutionNode.h"
 
 // predictors
@@ -67,77 +68,164 @@
 // stl
 #include <cstdint>
 
+using namespace ell::predictors::neural;
+
 namespace ell
 {
 namespace common
 {
+    template<typename ElementType>
+    void RegisterRealNodeTypes(utilities::SerializationContext& context)
+    {
+        context.GetTypeFactory().AddType<model::Node, model::InputNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, model::OutputNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ArgMaxNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ArgMinNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::HardSigmoidActivationFunction<ElementType>>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::LeakyReLUActivationFunction<ElementType>>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::ReLUActivationFunction<ElementType>>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::SigmoidActivationFunction<ElementType>>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DiagonalConvolutionNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DTWDistanceNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::HammingWindowNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::L2NormSquaredNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::IIRFilterNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LinearFilterBankNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MelFilterBankNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::rowMajor>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::columnMajor>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MatrixMatrixMultiplyNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ReceptiveFieldMatrixNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SumNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int, ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int64_t, ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<float, ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::UnrolledConvolutionNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::VoiceActivityDetectorNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::WinogradConvolutionNode<ElementType>>();
+
+        // NN layer nodes
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType, HardSigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType, LeakyReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType, ReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType, TanhActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BatchNormalizationLayerNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BiasLayerNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BinaryConvolutionalLayerNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConvolutionalLayerNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::FullyConnectedLayerNode<ElementType>>();
+
+        //
+        // GRULayerNode with inner product of ['TanhActivation', 'SigmoidActivation', 'HardSigmoidActivation', 'ReLUActivation']
+        //
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, TanhActivation, TanhActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, TanhActivation, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, TanhActivation, HardSigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, TanhActivation, ReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, SigmoidActivation, TanhActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, SigmoidActivation, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, SigmoidActivation, HardSigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, SigmoidActivation, ReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, HardSigmoidActivation, TanhActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, HardSigmoidActivation, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, HardSigmoidActivation, HardSigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, HardSigmoidActivation, ReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, ReLUActivation, TanhActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, ReLUActivation, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, ReLUActivation, HardSigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType, ReLUActivation, ReLUActivation>>();
+
+        //
+        // LSTMLayer with inner product of ['TanhActivation', 'SigmoidActivation', 'HardSigmoidActivation', 'ReLUActivation']
+        //
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, TanhActivation, TanhActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, TanhActivation, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, TanhActivation, HardSigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, TanhActivation, ReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, SigmoidActivation, TanhActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, SigmoidActivation, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, SigmoidActivation, HardSigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, SigmoidActivation, ReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, HardSigmoidActivation, TanhActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, HardSigmoidActivation, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, HardSigmoidActivation, HardSigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, HardSigmoidActivation, ReLUActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, ReLUActivation, TanhActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, ReLUActivation, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, ReLUActivation, HardSigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType, ReLUActivation, ReLUActivation>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::ParametricReLUActivationLayerNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<ElementType, MeanPoolingFunction>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<ElementType, MaxPoolingFunction>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::RegionDetectionLayerNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ScalingLayerNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SoftmaxLayerNode<ElementType>>();
+
+    }
+
     void RegisterNodeTypes(utilities::SerializationContext& context)
     {
+        RegisterRealNodeTypes<float>(context);
+        RegisterRealNodeTypes<double>(context);
+
+        // additional non-real types, only for nodes that support that.
         context.GetTypeFactory().AddType<model::Node, model::InputNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, model::InputNode<int>>();
         context.GetTypeFactory().AddType<model::Node, model::InputNode<int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, model::InputNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<int>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, model::OutputNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ArgMaxNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ArgMaxNode<int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ArgMaxNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ArgMaxNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ArgMinNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ArgMinNode<int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ArgMinNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ArgMinNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<int>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<float, nodes::HardSigmoidActivationFunction<float>>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<double, nodes::HardSigmoidActivationFunction<double>>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<float, nodes::LeakyReLUActivationFunction<float>>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<double, nodes::LeakyReLUActivationFunction<double>>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<float, nodes::ReLUActivationFunction<float>>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<double, nodes::ReLUActivationFunction<double>>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<float, nodes::SigmoidActivationFunction<float>>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<double, nodes::SigmoidActivationFunction<double>>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ClockNode>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::DCTNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DCTNode<double>>();
@@ -145,48 +233,8 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::DemultiplexerNode<bool, bool>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::DiagonalConvolutionNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::DiagonalConvolutionNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::DTWDistanceNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::DTWDistanceNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::HammingWindowNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::HammingWindowNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::L2NormSquaredNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::L2NormSquaredNode<float>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::IIRFilterNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::IIRFilterNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::LinearFilterBankNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::LinearFilterBankNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::MelFilterBankNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::MelFilterBankNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<float, math::MatrixLayout::rowMajor>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<float, math::MatrixLayout::columnMajor>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::MatrixMatrixMultiplyNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::MatrixMatrixMultiplyNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<int, bool>>();
@@ -194,113 +242,35 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<float, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<double, bool>>();
 
-        context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<double>>();
-
         context.GetTypeFactory().AddType<model::Node, nodes::ProtoNNPredictorNode>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::ReceptiveFieldMatrixNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ReceptiveFieldMatrixNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestPredictorNode>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
 
-        context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<double>>();
-
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SumNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SumNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int, int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int, float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int, double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int64_t, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int64_t, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int64_t, int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int64_t, float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<int64_t, double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<float, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<float, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<float, int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<float, float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<float, double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, int64_t>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, double>>();
 
-        context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::UnrolledConvolutionNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::UnrolledConvolutionNode<double>>();
-
-        context.GetTypeFactory().AddType<model::Node, nodes::WinogradConvolutionNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::WinogradConvolutionNode<double>>();
-
-        // NN layer nodes
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::LeakyReLUActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::LeakyReLUActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::ReLUActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::ReLUActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::SigmoidActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::SigmoidActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::TanhActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::TanhActivation>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ParametricReLUActivationLayerNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ParametricReLUActivationLayerNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BatchNormalizationLayerNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BatchNormalizationLayerNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BiasLayerNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BiasLayerNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BinaryConvolutionalLayerNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::BinaryConvolutionalLayerNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ConvolutionalLayerNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ConvolutionalLayerNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::FullyConnectedLayerNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::FullyConnectedLayerNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<float, ell::predictors::neural::MeanPoolingFunction>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<double, ell::predictors::neural::MeanPoolingFunction>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<float, ell::predictors::neural::MaxPoolingFunction>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<double, ell::predictors::neural::MaxPoolingFunction>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::RegionDetectionLayerNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::RegionDetectionLayerNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ScalingLayerNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ScalingLayerNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SoftmaxLayerNode<float>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SoftmaxLayerNode<double>>();
     }
 
     void RegisterMapTypes(utilities::SerializationContext& context)

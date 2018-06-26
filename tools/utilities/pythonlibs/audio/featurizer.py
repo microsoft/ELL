@@ -24,7 +24,6 @@ class AudioTransform:
         model_path - the path to the ELL compiled model
         output_window_size - the classifier window size
         """
-                
         self.using_map = False        
         if os.path.splitext(model_path)[1] == ".ell":
             import compute_ell_model as ell
@@ -42,9 +41,7 @@ class AudioTransform:
         self.output_shape = (ts.rows, ts.columns, ts.channels)
         self.input_size = int(self.model.input_shape.Size())
         self.output_size = int(self.model.output_shape.Size())
-        self.frame_count = 0
-        self.eof = True        
-        self.total_time = 0
+        self.reset()
 
     def set_log(self, logfile):
         """ Provide optional log file for saving raw featurizer output """
@@ -55,6 +52,7 @@ class AudioTransform:
         self.audio_source = audio_source
         self.frame_count = 0
         self.total_time = 0
+        self.reset()
 
     def read(self):
         """ Read the next output from the featurizer """
@@ -69,10 +67,11 @@ class AudioTransform:
 
         if self.logfile:
             self.logfile.write("{}\n".format(",".join([str(x) for x in data])))
-        self.frame_count += 1        
-        
+        self.frame_count += 1 
+
         start_time = time.time()
         result = self.model.transform(data)
+        
         now = time.time()
         diff = now - start_time
         self.total_time += diff
@@ -85,3 +84,7 @@ class AudioTransform:
         if self.frame_count == 0:
             self.frame_count = 1
         return self.total_time /  self.frame_count
+
+    def reset(self):
+        self.frame_count = 0
+        self.total_time = 0

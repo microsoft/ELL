@@ -14,9 +14,11 @@
 // utilities
 #include "Exception.h"
 #include "Unused.h"
+#include "Files.h"
 
 // stl
 #include <iostream>
+#include <string>
 
 using namespace ell;
 
@@ -25,12 +27,13 @@ using namespace ell;
 int main(int argc, char** argv)
 {
     UNUSED(argc);
-    UNUSED(argv);
+    std::string path = utilities::GetDirectoryPath(argv[0]);
+    std::cerr << "main argv[0]=" << path << "\n";
     try
     {
-        TestDSPNodes();
+        TestDSPNodes(path);
     }
-    catch (const utilities::Exception& exception)
+    catch (const utilities::Exception exception)
     {
         std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
         throw;

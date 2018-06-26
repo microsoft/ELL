@@ -6,11 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GRULayerNode.h"
 #include "BroadcastFunctionNode.h"
 #include "CompilableNodeUtilities.h" // for PortTypeToVariableType
 #include "CompiledActivationFunctions.h"
 #include "ConstantNode.h"
+#include "GRULayerNode.h"
 #include "HardSigmoidActivation.h"
 #include "MatrixVectorMultiplyNode.h"
 #include "SigmoidActivation.h"
@@ -23,10 +23,17 @@ namespace ell
 {
 namespace nodes
 {
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-    GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::GRULayerNode(const model::PortElements<ValueType>& input, const LayerType& layer)
-        : BaseType(input, layer)
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
+    GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::GRULayerNode()
+        : _reset(this, {}, "reset")
     {
+    }
+
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
+    GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::GRULayerNode(const model::PortElements<ValueType>& input, const model::PortElements<int>& reset, const LayerType& layer)
+        : BaseType(input, layer), _reset(this, reset, "reset")
+    {
+        this->AddInputPort(&_reset);
         const auto& layerParameters = layer.GetLayerParameters();
         if (HasPadding(layerParameters.inputPaddingParameters))
         {
@@ -39,10 +46,22 @@ namespace nodes
         }
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
     bool GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        ell::model::PortElements<int> newReset;
+        if (this->reset.Size() == 0)
+        {
+            // this was a GRULayerNode deserialized from a model that didn't have the reset member.
+            // So we provide a default here.
+            auto defaultTriggerNode = transformer.AddNode<ConstantNode<int>>(0);
+            newReset = defaultTriggerNode->output;
+        }
+        else
+        {
+            newReset = transformer.TransformPortElements(this->reset.GetPortElements());
+        }
 
         // Transform weights and bias members into constant nodes
         const auto& updateWeights = this->_layer.GetUpdateWeights();
@@ -62,79 +81,116 @@ namespace nodes
         auto gruNode = transformer.AddNode<GRUNode<ValueType,
                                                    ActivationFunctionType,
                                                    RecurrentActivationFunctionType>>(newInput,
+                                                                                     newReset,
                                                                                      updateWeightsNode->output,
                                                                                      resetWeightsNode->output,
                                                                                      hiddenWeightsNode->output,
                                                                                      updateBiasNode->output,
                                                                                      resetBiasNode->output,
-                                                                                     hiddenBiasNode->output,
-                                                                                     this->GetInputMemoryLayout(),
-                                                                                     this->GetOutputMemoryLayout());
+                                                                                     hiddenBiasNode->output);
 
         transformer.MapNodeOutput(this->output, gruNode->output);
         return true;
     }
 
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
+    void GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        ell::model::PortElements<int> newResetElements;
+        if (this->reset.Size() == 0)
+        {
+            // this was a GRULayerNode deserialized from a model that didn't have the reset member.
+            // So we provide a default here.
+            auto defaultTriggerNode = transformer.AddNode<ConstantNode<int>>(0);
+            newResetElements = defaultTriggerNode->output;
+        }
+        else
+        {
+            newResetElements = transformer.TransformPortElements(this->reset.GetPortElements());
+        }
+        auto newNode = transformer.AddNode<GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>>(newPortElements, newResetElements, this->_layer);
+        transformer.MapNodeOutput(this->_output, newNode->output);
+    }
+
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
+    void GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        BaseType::WriteToArchive(archiver);
+        archiver["reset"] << _reset;
+    }
+
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
+    void GRULayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        BaseType::ReadFromArchive(archiver);
+        archiver["reset"] >> _reset;
+        this->_output.SetSize(this->_layer.GetOutput().Size());
+        this->AddInputPort(&_reset);
+    }
+
     //
     // GRUNode
     //
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
     GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::GRUNode()
-        : GRUNode({}, {}, {}, {}, {}, {}, {}, {}, {})
+        : GRUNode({ /*input*/ }, { /*resetTrigger*/ }, { /*updateWeights*/ }, { /*resetWeights*/ }, { /*hiddenWeights*/ }, { /*updateBias*/ }, { /*resetBias*/ }, { /*hiddenBias*/ })
     {
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
     GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::GRUNode(const model::PortElements<ValueType>& input,
+                                                                                         const model::PortElements<int>& resetTrigger,
                                                                                          const model::PortElements<ValueType>& updateWeights,
                                                                                          const model::PortElements<ValueType>& resetWeights,
                                                                                          const model::PortElements<ValueType>& hiddenWeights,
                                                                                          const model::PortElements<ValueType>& updateBias,
                                                                                          const model::PortElements<ValueType>& resetBias,
-                                                                                         const model::PortElements<ValueType>& hiddenBias,
-                                                                                         const model::PortMemoryLayout& inputMemoryLayout,
-                                                                                         const model::PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input, &_updateWeights, &_resetWeights, &_hiddenWeights, &_updateBias, &_resetBias, &_hiddenBias },
-                         { &_output }),
-            _input(this, input, defaultInputPortName),
-            _updateWeights(this, updateWeights, updateWeightsPortName),
-            _resetWeights(this, resetWeights, resetWeightsPortName),
-            _hiddenWeights(this, hiddenWeights, hiddenWeightsPortName),
-            _updateBias(this, updateBias, updateBiasPortName),
-            _resetBias(this, resetBias, resetBiasPortName),
-            _hiddenBias(this, hiddenBias, hiddenBiasPortName),
-            _output(this, defaultOutputPortName, updateBias.Size())
+                                                                                         const model::PortElements<ValueType>& hiddenBias)
+        : CompilableNode(std::vector<model::InputPortBase*>({ &_input, &_resetTrigger, &_updateWeights, &_resetWeights, &_hiddenWeights, &_updateBias, &_resetBias, &_hiddenBias }),
+                         { &_output })
+        , _input(this, input, defaultInputPortName)
+        , _resetTrigger(this, resetTrigger, resetTriggerPortName)
+        , _updateWeights(this, updateWeights, updateWeightsPortName)
+        , _resetWeights(this, resetWeights, resetWeightsPortName)
+        , _hiddenWeights(this, hiddenWeights, hiddenWeightsPortName)
+        , _updateBias(this, updateBias, updateBiasPortName)
+        , _resetBias(this, resetBias, resetBiasPortName)
+        , _hiddenBias(this, hiddenBias, hiddenBiasPortName)
+        , _output(this, defaultOutputPortName, updateBias.Size())
     {
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
     void GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
+        auto newResetTrigger = transformer.TransformPortElements(_resetTrigger.GetPortElements());
         auto newUpdateWeights = transformer.TransformPortElements(_updateWeights.GetPortElements());
         auto newResetWeights = transformer.TransformPortElements(_resetWeights.GetPortElements());
         auto newHiddenWeights = transformer.TransformPortElements(_hiddenWeights.GetPortElements());
         auto newUpdateBias = transformer.TransformPortElements(_updateBias.GetPortElements());
         auto newResetBias = transformer.TransformPortElements(_resetBias.GetPortElements());
         auto newHiddenBias = transformer.TransformPortElements(_hiddenBias.GetPortElements());
-        auto newNode = transformer.AddNode<GRUNode>(newInput, newUpdateWeights, newResetWeights, newHiddenWeights, newUpdateBias, newResetBias, newHiddenBias, _inputMemoryLayout, _outputMemoryLayout);
+
+        auto newNode = transformer.AddNode<GRUNode>(newInput, newResetTrigger, newUpdateWeights, newResetWeights, newHiddenWeights, newUpdateBias, newResetBias, newHiddenBias);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
     void GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Compute() const
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "GRUNode does not currently compute");
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
     void GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Reset()
     {
         // noop until Compute() is implemented...
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-    template <typename ActivationType>
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
+    template<typename ActivationType>
     void GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength)
     {
         function.For(dataLength, [activationFunction, data](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar index) {
@@ -155,12 +211,12 @@ namespace nodes
     //
     // Zt == updateGateActivation
     // Rt == resetGateActivation
-    // 
+    //
     // [Xt, Ht-1] == inputPlusHidden
     // Ht~ == newHiddenState
     // Ht == hiddenState (aka, output)
     //
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
     void GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         const size_t inputSize = this->input.Size();
@@ -172,18 +228,19 @@ namespace nodes
         auto recurrentActivationFunction = GetNodeActivationFunction(recurrentLayerActivationFunction);
 
         // Get LLVM references for all node inputs
-        llvm::Value* input = compiler.EnsurePortEmitted(this->input);
-        llvm::Value* updateWeights = compiler.EnsurePortEmitted(this->updateWeights);
-        llvm::Value* resetWeights = compiler.EnsurePortEmitted(this->resetWeights);
-        llvm::Value* hiddenWeights = compiler.EnsurePortEmitted(this->hiddenWeights);
-        llvm::Value* updateBias = compiler.EnsurePortEmitted(this->updateBias);
-        llvm::Value* resetBias = compiler.EnsurePortEmitted(this->resetBias);
-        llvm::Value* hiddenBias = compiler.EnsurePortEmitted(this->hiddenBias);
+        auto input = compiler.EnsurePortEmitted(this->input);
+        auto resetTrigger = compiler.EnsurePortEmitted(this->resetTrigger);
+        auto updateWeights = compiler.EnsurePortEmitted(this->updateWeights);
+        auto resetWeights = compiler.EnsurePortEmitted(this->resetWeights);
+        auto hiddenWeights = compiler.EnsurePortEmitted(this->hiddenWeights);
+        auto updateBias = compiler.EnsurePortEmitted(this->updateBias);
+        auto resetBias = compiler.EnsurePortEmitted(this->resetBias);
+        auto hiddenBias = compiler.EnsurePortEmitted(this->hiddenBias);
 
         // Get LLVM reference for node output
         auto output = function.LocalArray(compiler.EnsurePortEmitted(this->output));
 
-        // Allocate global buffer for hidden state 
+        // Allocate global buffer for hidden state
         emitters::IRModuleEmitter& module = function.GetModule();
         emitters::VariableType varType = PortTypeToVariableType(this->output.GetType());
         auto hiddenStateVariable = module.Variables().AddVectorVariable(emitters::VariableScope::global, varType, outputSize);
@@ -239,10 +296,22 @@ namespace nodes
         function.MemoryCopy<ValueType>(output, 0, hiddenState, 0, outputSize);
 
         // Add the internal reset function
-        emitters::IRFunctionEmitter& resetFunction = module.BeginResetFunction("GRUNode" + this->GetId().ToString());
+        std::string resetFunctionName = compiler.GetGlobalName(*this, "GRUNodeReset");
+        emitters::IRFunctionEmitter& resetFunction = module.BeginResetFunction(resetFunctionName);
         auto resetHiddenState = resetFunction.LocalArray(hiddenStateValue);
         resetFunction.MemorySet<ValueType>(resetHiddenState, 0, function.Literal<uint8_t>(0), outputSize);
+        // resetFunction.Print("### GRU Node was reset\n"); // this is a handy way to debug whether the VAD node is working or not.
         module.EndResetFunction();
+
+        // if the reset trigger drops to zero then it means it is time to reset this node, but only do this when signal transitions from 1 to 0
+        // Allocate global variable to hold the previous trigger value so we can detect the change in state.
+        auto lastSignal = module.Global<int>(compiler.GetGlobalName(*this, "lastSignal"), 0);
+        auto lastSignalValue = function.LocalScalar(function.Load(lastSignal));
+        auto resetTriggerValue = function.LocalScalar(resetTrigger);
+        function.If((resetTriggerValue == 0) && (lastSignalValue == 1), [resetFunctionName](emitters::IRFunctionEmitter& fn) {
+            fn.Call(resetFunctionName);
+        });
+        function.Store(lastSignal, resetTriggerValue);
     }
 
 // Explicit specialization

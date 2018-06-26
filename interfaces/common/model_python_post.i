@@ -92,34 +92,46 @@ def CompiledMap_Compute(self, inputData: 'Vector', dtype: 'numpy.dtype') -> "std
     dtype: numpy.dtype
 
     """
+    if self.HasSourceNodes():
+        def input_callback(input):
+            nonlocal dtype, inputData
+            input.copy_from(np.asarray(inputData).astype(dtype))
+            return True
 
-    def input_callback(input):
-        nonlocal dtype, inputData
-        input.copy_from(np.asarray(inputData).astype(dtype))
-        return True
+        results = None
+        def results_callback(output):
+            nonlocal dtype, results
+            if dtype is np.float:
+                results = DoubleVector(output)
+            else:
+                # type checking is already done before we get here
+                results = FloatVector(output)
 
-    results = None
-    def results_callback(output):
-        nonlocal dtype, results
         if dtype is np.float:
-            results = DoubleVector(output)
+            self.RegisterCallbacksDouble(input_callback, results_callback)
+            self.StepDouble()
+            self.UnregisterCallbacksDouble()
+        elif dtype is np.float32:
+            self.RegisterCallbacksFloat(input_callback, results_callback)
+            self.StepFloat()
+            self.UnregisterCallbacksFloat()
         else:
-            # type checking is already done before we get here
-            results = FloatVector(output)
+            raise TypeError("Invalid type, expected numpy.float or numpy.float32")
 
+        return results
 
-    if dtype is np.float:
-        self.RegisterCallbacksDouble(input_callback, results_callback)
-        self.StepDouble()
-        self.UnregisterCallbacksDouble()
-    elif dtype is np.float32:
-        self.RegisterCallbacksFloat(input_callback, results_callback)
-        self.StepFloat()
-        self.UnregisterCallbacksFloat()
     else:
-        raise TypeError("Invalid type, expected numpy.float or numpy.float32")
+        import ell
+        # legacy direct compute path
+        if dtype is np.float:
+            return self.ComputeDouble(ell.math.DoubleVector(np.asarray(inputData).astype(dtype)))
+        elif dtype is np.float32:
+            return self.ComputeFloat(ell.math.FloatVector(np.asarray(inputData).astype(dtype)))
+        else:
+            raise TypeError("Invalid type, expected numpy.float or numpy.float32")
 
-    return results
+
+        
 
 CompiledMap.Compute = CompiledMap_Compute
 

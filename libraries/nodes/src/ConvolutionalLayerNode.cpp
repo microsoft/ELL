@@ -76,6 +76,14 @@ namespace nodes
         return true;
     }
 
+    template <typename ValueType>
+    void ConvolutionalLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<ConvolutionalLayerNode<ValueType>>(newPortElements, this->_layer);
+        transformer.MapNodeOutput(this->_output, newNode->output);
+    }
+
     // Explicit specializations
     template class ConvolutionalLayerNode<float>;
     template class ConvolutionalLayerNode<double>;

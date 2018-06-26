@@ -159,6 +159,10 @@ namespace model
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
+        if (inputValues.empty()) 
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference);
+        }
 
         std::get<ComputeFunction<double>>(_computeInputFunction)(GetContext(), inputValues.data());
     }

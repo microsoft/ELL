@@ -150,6 +150,10 @@ namespace testing
             std::cout << testDescription << " ... Failed\n";
             testFailedFlag = true;
         }
+        else
+        {
+            std::cout << testDescription << " ... Success\n";
+        }
 
         return success;
     }

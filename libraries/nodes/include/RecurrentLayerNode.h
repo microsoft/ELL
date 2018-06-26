@@ -61,6 +61,11 @@ namespace nodes
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
         bool IsCompilable(const model::MapCompiler* compiler) const override { return false; }
 
+        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
+        void Copy(model::ModelTransformer& transformer) const override;
+
     protected:
         bool Refine(model::ModelTransformer& transformer) const override;
     };
@@ -93,10 +98,10 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         RecurrentNode(const model::PortElements<ValueType>& input,
-                       const model::PortElements<ValueType>& hiddenWeights,
-                       const model::PortElements<ValueType>& hiddenBias,
-                       const model::PortMemoryLayout& inputMemoryLayout,
-                       const model::PortMemoryLayout& outputMemoryLayout);
+                      const model::PortElements<ValueType>& hiddenWeights,
+                      const model::PortElements<ValueType>& hiddenBias,
+                      const model::PortMemoryLayout& inputMemoryLayout,
+                      const model::PortMemoryLayout& outputMemoryLayout);
 
         /// <summary> Gets information about the input memory layout </summary>
         ///
@@ -155,6 +160,5 @@ namespace nodes
         template <typename ActivationType>
         void ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength);
     };
-
 }
 }
