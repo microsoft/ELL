@@ -155,6 +155,16 @@ namespace common
             "",
             "A string describing target-specific features to enable or disable (these are LLVM attributes, in the format the llc -mattr option uses)",
             "");
+
+        parser.AddOption(
+            positionIndependentCode,
+            "positionIndependentCode",
+            "pic",
+            "Generate position independent code (equivalent to -fPIC)",
+            { { "auto", utilities::Optional<bool>() }, 
+              { "true", utilities::Optional<bool>(true) }, 
+              { "false", utilities::Optional<bool>(false) } },
+            "auto");
     }
 
     model::MapCompilerOptions MapCompilerArguments::GetMapCompilerOptions(const std::string& modelName) const
@@ -196,6 +206,7 @@ namespace common
         settings.optimizerSettings.preferredConvolutionMethod = convolutionMethod;
         settings.profile = profile;
         settings.compilerSettings.profile = profile;
+        settings.compilerSettings.positionIndependentCode = positionIndependentCode;
 
         if (target != "")
         {

@@ -42,7 +42,6 @@ namespace emitters
 
     private:
         friend class IRModuleEmitter;
-        // friend void GenerateMachineCode(llvm::raw_ostream& os, llvm::Module& module, OutputFileType fileType, const MachineCodeOutputOptions& options);
 
         IRDiagnosticHandler() = delete;
         IRDiagnosticHandler(IRDiagnosticHandler&) = delete;

@@ -1395,7 +1395,7 @@ namespace dsp
             const int numChannels = static_cast<int>(input.NumChannels());
             const int numOutputRows = static_cast<int>(output.NumRows());
             const int numOutputColumns = static_cast<int>(output.NumColumns());
-            assert(numFilters == output.NumChannels());
+            assert(numFilters == static_cast<int>(output.NumChannels()));
 
             const int numTileRows = ((numOutputRows - 1) / tileSize) + 1;
             const int numTileColumns = ((numOutputColumns - 1) / tileSize) + 1;
@@ -1461,7 +1461,7 @@ namespace dsp
             const auto numOutputRows = static_cast<int>(input.NumRows()) - filterSize + 1;
             const auto numOutputColumns = static_cast<int>(input.NumColumns()) - filterSize + 1;
             const auto numChannels = static_cast<int>(input.NumChannels());
-            assert(numFilters == output.NumChannels());
+            assert(numFilters == static_cast<int>(output.NumChannels()));
 
             // transformedInput is a (windowRows*windowColumns) x (numTileRows * numTileColumns) x (numChannels) tensor containing the entire transformed input signal
             TransformInput(input, numOutputRows, numOutputColumns, numChannels, transformedInputScratch);

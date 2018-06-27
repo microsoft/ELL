@@ -21,6 +21,8 @@
 #include <llvm/ADT/Triple.h>
 #include <llvm/Analysis/TargetLibraryInfo.h>
 
+#include <llvm/Bitcode/ReaderWriter.h>
+
 #include <llvm/CodeGen/MachineModuleInfo.h>
 #include <llvm/CodeGen/TargetPassConfig.h>
 
@@ -98,9 +100,14 @@ namespace emitters
     //
     // Exported functions
     //
-    bool IsBinaryOutputType(const OutputFileType& filetype)
+    bool IsMachineCodeFormat(ModuleOutputFormat format)
     {
-        return filetype == OutputFileType::CGFT_ObjectFile;
+        return (ModuleOutputFormat::assembly == format || ModuleOutputFormat::objectCode == format);
+    }
+
+    bool IsBinaryOutputType(MachineCodeType filetype)
+    {
+        return filetype == MachineCodeType::CGFT_ObjectFile;
     }
 
     //
@@ -108,7 +115,7 @@ namespace emitters
     //
 
     // GenerateMachineCode may modify the Module object passed in. Should we clone it first?
-    void GenerateMachineCode(llvm::raw_ostream& os, IRModuleEmitter& moduleEmitter, OutputFileType fileType, const MachineCodeOutputOptions& ellOptions)
+    void GenerateMachineCode(llvm::raw_ostream& os, IRModuleEmitter& moduleEmitter, ModuleOutputFormat outputFormat, const MachineCodeOutputOptions& ellOptions)
     {
         llvm::Module& module = *(moduleEmitter.GetLLVMModule());
 
@@ -137,7 +144,7 @@ namespace emitters
         targetOptions.MCOptions.AsmVerbose = ellOptions.verboseOutput;
         targetOptions.FloatABIType = ellOptions.floatABI;
 
-        llvm::Reloc::Model relocModel = llvm::Reloc::Static;
+        OutputRelocationModel relocModel = ellOptions.relocModel;
         llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
 
         std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(module.getTargetTriple(),
@@ -168,7 +175,7 @@ namespace emitters
         module.setDataLayout(targetMachine->createDataLayout());
 
         // Override function attributes based on cpu and features
-        if (ellOptions.targetDevice.cpu != "")
+        if (!ellOptions.targetDevice.cpu.empty() || !ellOptions.targetDevice.features.empty())
         {
             SetFunctionAttributes(ellOptions.targetDevice.cpu, ellOptions.targetDevice.features, module);
         }
@@ -176,21 +183,54 @@ namespace emitters
         // Set up passes to emit code to a memory stream
         llvm::SmallVector<char, 0> buffer;
         llvm::raw_svector_ostream bufferedStream(buffer);
-        if (targetMachine->addPassesToEmitFile(passManager, bufferedStream, fileType, ellOptions.verifyModule, nullptr, nullptr, nullptr, nullptr))
+        if (IsMachineCodeFormat(outputFormat))
         {
-            throw EmitterException(EmitterError::unexpected, "target does not support generation of this file type!");
+            MachineCodeType fileType = MachineCodeType::CGFT_Null;
+            switch (outputFormat)
+            {
+            case ModuleOutputFormat::assembly:
+                fileType = MachineCodeType::CGFT_AssemblyFile;
+                break;
+            case ModuleOutputFormat::objectCode:
+                fileType = MachineCodeType::CGFT_ObjectFile;
+                break;
+            default:
+                throw EmitterException(EmitterError::notSupported);
+            }
+
+            if (targetMachine->addPassesToEmitFile(passManager, bufferedStream, fileType, ellOptions.verifyModule, nullptr, nullptr, nullptr, nullptr))
+            {
+                throw EmitterException(EmitterError::unexpected, "target does not support generation of this file type!");
+            }
         }
 
         // Finally, run the passes to emit code to the straem
         passManager.run(module); // run() returns a bool indicating if the module was modified (true if it was)
 
+        if (!IsMachineCodeFormat(outputFormat))
+        {
+            switch (outputFormat)
+            {
+            case ModuleOutputFormat::bitcode:
+                llvm::WriteBitcodeToFile(&module, os);
+                break;
+            case ModuleOutputFormat::ir:
+                module.print(os, nullptr);
+                break;
+            default:
+                throw EmitterException(EmitterError::notSupported);
+            }
+        }
+        else
+        {
+            // Write memory buffer to our output stream
+            os << buffer;
+        }
+
         if (moduleEmitter.GetDiagnosticHandler().HadError())
         {
             throw EmitterException(EmitterError::unexpected, "Error compiling module");
         }
-
-        // Write memory buffer to our output stream
-        os << buffer;
     }
 }
 }

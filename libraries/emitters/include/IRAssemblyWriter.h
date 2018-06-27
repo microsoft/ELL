@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "ModuleEmitter.h"
 #include "TargetDevice.h"
 
 // llvm
@@ -21,17 +22,20 @@ namespace emitters
     class IRModuleEmitter;
 
     /// <summary> An enum containing the optimization level {None, Less, Default, Aggressive} </summary>
-    typedef llvm::CodeGenOpt::Level OptimizationLevel;
+    using OptimizationLevel = llvm::CodeGenOpt::Level;
 
     /// <summary> An enum containing the float ABI type {Default, Soft, Hard} </summary>
-    typedef llvm::FloatABI::ABIType FloatABIType;
+    using FloatABIType = llvm::FloatABI::ABIType;
 
     /// <summary> An enum indicating how much floating-point operations can be fused {Fast, Standard, Strict} </summary>
-    typedef llvm::FPOpFusion::FPOpFusionMode FloatFusionMode;
+    using FloatFusionMode = llvm::FPOpFusion::FPOpFusionMode;
 
     /// <summary> An enum containing the type of output to generate {CGFT_AssemblyFile, CGFT_ObjectFile, CGFT_Null} </summary>
-    typedef llvm::TargetMachine::CodeGenFileType OutputFileType;
+    using MachineCodeType = llvm::TargetMachine::CodeGenFileType;
 
+    /// <summary> An enum containing the relocation model of the LLVM machine code output {Static, PIC_, DynamicNoPIC, ROPI, RWPI, ROPI_RWPI} </summary>
+    using OutputRelocationModel = llvm::Reloc::Model;
+    
     /// <summary> Options for LLVM machine code output (assembly or object code) </summary>
     struct MachineCodeOutputOptions
     {
@@ -42,13 +46,17 @@ namespace emitters
 
         OptimizationLevel optimizationLevel = OptimizationLevel::Default;
         FloatABIType floatABI = FloatABIType::Default;
-        FloatFusionMode floatFusionMode = FloatFusionMode::Standard;
+        FloatFusionMode floatFusionMode = FloatFusionMode::Fast;
+        OutputRelocationModel relocModel = OutputRelocationModel::Static;
     };
 
+    /// <summary> Indicates if the requested output type is a machine code type (vs. IR) </summary>
+    bool IsMachineCodeFormat(ModuleOutputFormat format);
+
     /// <summary> Indicates if the requested output type is binary or text </summary>
-    bool IsBinaryOutputType(const OutputFileType& filetype);
+    bool IsBinaryOutputType(MachineCodeType filetype);
 
     /// <summary> Compile the given module to the given stream </summary>
-    void GenerateMachineCode(llvm::raw_ostream& os, IRModuleEmitter& module, OutputFileType fileType, const MachineCodeOutputOptions& options);
+    void GenerateMachineCode(llvm::raw_ostream& os, IRModuleEmitter& module, ModuleOutputFormat format, const MachineCodeOutputOptions& options);
 }
 }

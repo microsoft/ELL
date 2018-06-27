@@ -60,6 +60,7 @@ set(include
   include/MillisecondTimer.h
   include/ObjectArchive.h
   include/ObjectArchiver.h
+  include/Optional.h
   include/OutputStreamImpostor.h
   include/ParallelTransformIterator.h
   include/PropertyBag.h
@@ -93,6 +94,7 @@ set(tcc
   tcc/JsonArchiver.tcc
   tcc/ObjectArchive.tcc
   tcc/ObjectArchiver.tcc
+  tcc/Optional.tcc
   tcc/OutputStreamImpostor.tcc
   tcc/ParallelTransformIterator.tcc
   tcc/PropertyBag.tcc

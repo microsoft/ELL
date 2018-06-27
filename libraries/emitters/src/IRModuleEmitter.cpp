@@ -56,6 +56,7 @@ namespace emitters
         std::string c_iosTriple = "aarch64-apple-ios"; // alternates: "arm64-apple-ios7.0.0", "thumbv7-apple-ios7.0"
 
         // CPUs
+        std::string c_pi0Cpu = "arm1136jf-s";
         std::string c_pi3Cpu = "cortex-a53";
         std::string c_orangePi0Cpu = "cortex-a7";
 
@@ -131,9 +132,9 @@ namespace emitters
                     throw EmitterException(EmitterError::targetNotSupported, std::string("Couldn't create target ") + error);
                 }
 
-                const llvm::TargetOptions options;
-                const llvm::Reloc::Model relocModel = llvm::Reloc::Static;
+                const OutputRelocationModel relocModel = OutputRelocationModel::Static;
                 const llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
+                const llvm::TargetOptions options;
                 std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(parameters.targetDevice.triple,
                                                                                                parameters.targetDevice.cpu,
                                                                                                parameters.targetDevice.features,
@@ -170,6 +171,7 @@ namespace emitters
                 parameters.targetDevice.triple = c_armv6Triple;
                 parameters.targetDevice.dataLayout = c_armDataLayout;
                 parameters.targetDevice.numBits = 32;
+                parameters.targetDevice.cpu = c_pi0Cpu; // maybe not necessary
             }
             else if (parameters.targetDevice.deviceName == "pi3") // pi3 (Raspbian)
             {
@@ -797,11 +799,21 @@ namespace emitters
         {
             options.optimizationLevel = OptimizationLevel::Aggressive;
         }
+
+        options.verifyModule = true;
+        options.floatFusionMode = compilerOptions.useFastMath ? FloatFusionMode::Fast : FloatFusionMode::Standard;
+        if (compilerOptions.positionIndependentCode.HasValue())
+        {
+            options.relocModel = compilerOptions.positionIndependentCode.GetValue() ? OutputRelocationModel::PIC_ : OutputRelocationModel::Static;
+        }
+        else
+        {
+            // 'auto'
+            options.relocModel = compilerOptions.targetDevice.IsWindows() ? OutputRelocationModel::Static : OutputRelocationModel::PIC_;
+        }
+
         // Other params to possibly set:
-        //   bool verboseOutput = false;
-        //   bool verifyModule = false;
         //   FloatABIType floatABI = FloatABIType::Default;
-        //   FloatFusionMode floatFusionMode = FloatFusionMode::Standard;
 
         switch (format)
         {
@@ -832,7 +844,7 @@ namespace emitters
             break;
         }
         default:
-            throw new EmitterException(EmitterError::notSupported);
+            throw EmitterException(EmitterError::notSupported);
         }
     }
 
@@ -881,7 +893,7 @@ namespace emitters
         }
         else if (ModuleOutputFormat::swigInterface == format)
         {
-            throw new EmitterException(EmitterError::notSupported, "swig only supports WriteToFile");
+            throw EmitterException(EmitterError::notSupported, "swig only supports WriteToFile");
         }
         else
         {
@@ -909,29 +921,7 @@ namespace emitters
             options.targetDevice.features = params.targetDevice.features;
         }
 
-        // optimization level
-        if (ModuleOutputFormat::bitcode == format)
-        {
-            llvm::WriteBitcodeToFile(GetLLVMModule(), os);
-        }
-        else if (ModuleOutputFormat::ir == format)
-        {
-            GetLLVMModule()->print(os, nullptr);
-        }
-        else if (ModuleOutputFormat::assembly == format)
-        {
-            // TODO: fuse or replace options with compiler options
-            GenerateMachineCode(os, *this, OutputFileType::CGFT_AssemblyFile, options);
-        }
-        else if (ModuleOutputFormat::objectCode == format)
-        {
-            // TODO: fuse or replace options with compiler options
-            GenerateMachineCode(os, *this, OutputFileType::CGFT_ObjectFile, options);
-        }
-        else
-        {
-            throw new EmitterException(EmitterError::notSupported);
-        }
+        GenerateMachineCode(os, *this, format, options);
     }
 
     void IRModuleEmitter::LoadIR(const std::string& text)
@@ -1040,8 +1030,8 @@ namespace emitters
             return nullptr;
         }
 
+        auto relocModel = parameters.targetDevice.IsWindows() ? OutputRelocationModel::Static : OutputRelocationModel::PIC_;
         const llvm::TargetOptions options;
-        const llvm::Reloc::Model relocModel = llvm::Reloc::Static;
         const llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
         return target->createTargetMachine(parameters.targetDevice.triple,
                                            parameters.targetDevice.cpu,

@@ -157,7 +157,7 @@ namespace dsp
         /// <summary> lookup the weight for given bin number out of windowSize bins </summary>
         double getWeight(int bin)
         {
-            assert(bin < this->_weights.size());
+            assert(bin < static_cast<int>(this->_weights.size()));
             return this->_weights[bin];
         }
 

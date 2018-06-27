@@ -10,6 +10,9 @@
 
 #include "TargetDevice.h"
 
+// utilities
+#include "Optional.h"
+
 namespace ell
 {
 namespace emitters
@@ -37,7 +40,9 @@ namespace emitters
         bool parallelize = false;
         bool useThreadPool = true;
         int maxThreads = 4;
+        bool useFastMath = true;
         bool debug = false;
+        utilities::Optional<bool> positionIndependentCode;
 
         TargetDevice targetDevice;
     };

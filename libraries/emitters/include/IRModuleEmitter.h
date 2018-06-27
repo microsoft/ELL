@@ -547,7 +547,7 @@ namespace emitters
         /// <returns> 
         /// An llvm::TargetMachine object that describes the target machine. It may return `nullptr` if a specific 
         /// target machine can't be found. It isn't an error if no target machine is found. 
-        ///</param>
+        ///</returns>
         llvm::TargetMachine* GetTargetMachine();
 
         //
