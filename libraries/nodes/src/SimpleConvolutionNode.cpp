@@ -122,9 +122,12 @@ namespace nodes
             // const auto outputColumns = outputLayout.GetActiveSize(1);
             const auto numFilters = outputLayout.GetActiveSize(2);
             assert(numFilters == inputDepth);
+            DEBUG_USED(numFilters);
 
             // For each filter
-            function.ParallelFor(numFilters, { input, filterWeights, result }, [inputLayout, outputLayout, filterSize, stride](IRFunctionEmitter& function, auto filterIndex, const std::vector<llvm::Value*>& capturedValues) {
+            // For each output row
+            const auto outputRows = outputLayout.GetActiveSize(0);
+            function.ParallelFor(outputRows, { input, filterWeights, result }, [inputLayout, outputLayout, filterSize, stride](IRFunctionEmitter& function, auto outputRow, const std::vector<llvm::Value*>& capturedValues) {
                 auto input = capturedValues[0];
                 auto filterWeights = capturedValues[1];
                 auto result = capturedValues[2];
@@ -133,12 +136,12 @@ namespace nodes
                 auto outputTensor = function.LocalTensor(result, outputLayout.GetStride(), RowMajorTensorLayout);
                 auto filter = function.LocalMultidimArray(filterWeights, { inputLayout.GetStride(2), filterSize, filterSize});
 
-                // For each output row
-                const auto outputRows = outputLayout.GetActiveSize(0);
-                function.For(outputRows, [outputLayout, filterIndex, inputTensor, filter, outputTensor, filterSize, stride](IRFunctionEmitter& function, auto outputRow) {
-                    // For each output column
-                    const auto outputColumns = outputLayout.GetActiveSize(1);
-                    function.For(outputColumns, [outputRow, filterIndex, inputTensor, filter, outputTensor, filterSize, stride](IRFunctionEmitter& function, auto outputColumn) {
+                // For each output column
+                const auto outputColumns = outputLayout.GetActiveSize(1);
+                function.For(outputColumns, [outputLayout, outputRow, inputTensor, filter, outputTensor, filterSize, stride](IRFunctionEmitter& function, auto outputColumn) {
+                    // For each filter
+                    const auto numFilters = outputLayout.GetActiveSize(2);
+                    function.For(numFilters, [outputRow, outputColumn, inputTensor, filter, outputTensor, filterSize, stride](IRFunctionEmitter& function, auto filterIndex) {
                         // The filters are typically small, so we unroll the loops here
                         auto val = function.LocalScalar(ValueType{0});
                         for (int windowRow = 0; windowRow < filterSize; ++windowRow)

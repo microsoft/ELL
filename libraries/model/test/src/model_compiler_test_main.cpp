@@ -178,20 +178,20 @@ void TestIRCompiler()
     TestBinaryConvolutionalLayerNode(32, 32, 3, 4, 1, 0, PaddingScheme::minusOnes, false);
     TestBinaryConvolutionalLayerNode(32, 32, 3, 4, 1, 0, PaddingScheme::minusOnes, true);
 
-    // TestConvolutionalLayerNode(ConvolutionType::unrolled);
-    TestConvolutionalLayerNode(ConvolutionType::unrolled, 1, 0);
-    TestConvolutionalLayerNode2(ConvolutionType::unrolled, 1, 0);
-    TestConvolutionalLayerNode3(ConvolutionType::unrolled, 1, 0);
-    // TestConvolutionalLayerNode(ConvolutionType::unrolled, 2, 0);
-    // TestConvolutionalLayerNode(ConvolutionType::unrolled, 1, 1); // Convolutional layer output padding not supported
+    // TestConvolutionalLayerNode(ConvolutionMethod::unrolled);
+    TestConvolutionalLayerNode(ConvolutionMethod::unrolled, 1, 0);
+    TestConvolutionalLayerNode2(ConvolutionMethod::unrolled, 1, 0);
+    TestConvolutionalLayerNode3(ConvolutionMethod::unrolled, 1, 0);
+    // TestConvolutionalLayerNode(ConvolutionMethod::unrolled, 2, 0);
+    // TestConvolutionalLayerNode(ConvolutionMethod::unrolled, 1, 1); // Convolutional layer output padding not supported
 
-    TestConvolutionalLayerNode(ConvolutionType::diagonal); // Input padding must be set correctly (to floor(filterWidth/2))
+    TestConvolutionalLayerNode(ConvolutionMethod::diagonal); // Input padding must be set correctly (to floor(filterWidth/2))
 
-    TestConvolutionalLayerNode(ConvolutionType::simple); // Input padding must be set correctly (to floor(filterWidth/2))
+    TestConvolutionalLayerNode(ConvolutionMethod::simple); // Input padding must be set correctly (to floor(filterWidth/2))
 
-    TestConvolutionalLayerNode(ConvolutionType::winograd, 1, 0);
-    TestConvolutionalLayerNode2(ConvolutionType::winograd, 1, 0);
-    TestConvolutionalLayerNode3(ConvolutionType::winograd, 1, 0);
+    TestConvolutionalLayerNode(ConvolutionMethod::winograd, 1, 0);
+    TestConvolutionalLayerNode2(ConvolutionMethod::winograd, 1, 0);
+    TestConvolutionalLayerNode3(ConvolutionMethod::winograd, 1, 0);
 
     TestFullyConnectedLayerNode();
     // TestFullyConnectedLayerNode(0, 1); // Fully-connected layer nodes can't have padding (yet)

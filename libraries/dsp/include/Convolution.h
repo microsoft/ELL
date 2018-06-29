@@ -33,15 +33,15 @@ namespace dsp
     enum class ConvolutionMethodOption : int
     {
         /// <summary> Allow the function to choose the algorithm to use. </summary>
-        automatic = -1,
-        /// <summary> Normal method of doing convolution via reshaping input into columns and performing a gemm operation. </summary>
-        unrolled = 0,
+        automatic = 0,
         /// <summary> A different method of doing convolution which avoids reshaping the input, and uses gemm on smaller matrices with diagonal sums to create output. </summary>
         diagonal,
         /// <summary> A simple, straightforward nested-loop implementation. </summary>
         simple,
         /// <summary> An algorithm that reduces the number of arithmetic operations. </summary>
-        winograd
+        winograd,
+        /// <summary> Normal method of doing convolution via reshaping input into columns and performing a gemm operation. </summary>
+        unrolled,
     };
 
     /// <summary> Convolve a 1D input with a 1D filter. </summary>

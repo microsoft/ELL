@@ -2105,7 +2105,7 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
     VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
-void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
+void TestConvolutionalLayerNode(ConvolutionMethod convolutionMethod, size_t inputPaddingSize, size_t outputPaddingSize)
 {
     // Abbreviations:
     //
@@ -2145,24 +2145,6 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
 
     LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
-    auto convolutionMethod = ConvolutionMethod::unrolled;
-    switch (convolutionType)
-    {
-    case ConvolutionType::simple:
-        convolutionMethod = ConvolutionMethod::simple;
-        break;
-    case ConvolutionType::unrolled:
-        convolutionMethod = ConvolutionMethod::unrolled;
-        break;
-    case ConvolutionType::diagonal:
-        convolutionMethod = ConvolutionMethod::diagonal;
-        break;
-    case ConvolutionType::winograd:
-        convolutionMethod = ConvolutionMethod::winograd;
-        break;
-    default:
-        throw std::runtime_error("Unsupported convolution type");
-    }
     ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 2 }; // 2 == batch size
 
     // Filter weights in `weightsVector` are in numFilters x numChannels x filterSize x filterSize order
@@ -2185,7 +2167,7 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     //       1 2 1   0 3 2
     // f1 =  2 3 2   3 1 2
     //       1 2 1   1 0 2
-    
+
     // Filter weights in `weights` tensor are in numFilters x filterSize x filterSize x numChannels order
     TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
 
@@ -2233,7 +2215,7 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
-void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
+void TestConvolutionalLayerNode2(ConvolutionMethod convolutionMethod, size_t inputPaddingSize, size_t outputPaddingSize)
 {
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
@@ -2267,8 +2249,8 @@ void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPa
     Shape outputShape = { numRows + 2 * outputPaddingSize, numCols + 2 * outputPaddingSize, numFilters };
 
     LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
-    auto convolutionMethod = (convolutionType == ConvolutionType::diagonal) ? ConvolutionMethod::diagonal : ConvolutionMethod::unrolled;
-    ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 2 }; // 2 == batch size
+    auto actualConvolutionMethod = convolutionMethod == ConvolutionMethod::diagonal ? convolutionMethod : ConvolutionMethod::unrolled;
+    ConvolutionalParameters convolutionalParams{ 3, 1, actualConvolutionMethod, 2 }; // 2 == batch size
     TensorType weights(convolutionalParams.receptiveField * numFilters, convolutionalParams.receptiveField, input.NumChannels());
     weights.Fill(1.0);
     for (size_t rowIndex = 0; rowIndex < convolutionalParams.receptiveField * numFilters; ++rowIndex)
@@ -2303,8 +2285,10 @@ void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPa
 }
 
 // Test separable convolutions
-void TestConvolutionalLayerNode3(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
+void TestConvolutionalLayerNode3(ConvolutionMethod convolutionMethod, size_t inputPaddingSize, size_t outputPaddingSize)
 {
+    UNUSED(convolutionMethod);
+
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -2336,8 +2320,8 @@ void TestConvolutionalLayerNode3(ConvolutionType convolutionType, size_t inputPa
     Shape outputShape = { numRows + 2 * outputPaddingSize, numCols + 2 * outputPaddingSize, numFilters };
 
     LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
-    auto convolutionMethod = ConvolutionMethod::unrolled;
-    ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 2 }; // 2 == batch size
+    auto actualConvolutionMethod = ConvolutionMethod::unrolled;
+    ConvolutionalParameters convolutionalParams{ 3, 1, actualConvolutionMethod, 2 }; // 2 == batch size
     TensorType weights(convolutionalParams.receptiveField * numFilters, convolutionalParams.receptiveField, 1);
     weights.Fill(1.0);
     for (size_t rowIndex = 0; rowIndex < convolutionalParams.receptiveField * numFilters; ++rowIndex)

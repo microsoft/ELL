@@ -35,19 +35,21 @@ namespace ell
         return "";
     }
 
-    static std::string ConvolutionMethodToString(ell::predictors::neural::ConvolutionMethod method) 
+    static std::string ConvolutionMethodToString(ell::predictors::neural::ConvolutionMethod method)
     {
         switch(method) {
             /// <summary> Normal method of doing convolution via reshaping input into columns and performing a gemm operation. </summary>
-        case ell::predictors::neural::ConvolutionMethod::unrolled:
-            return "unrolled";
+        case ell::predictors::neural::ConvolutionMethod::automatic:
+            return "automatic";
         case ell::predictors::neural::ConvolutionMethod::diagonal:
             return "diagonal";
         case ell::predictors::neural::ConvolutionMethod::simple:
             return "simple";
         case ell::predictors::neural::ConvolutionMethod::winograd:
             return "winograd";
-        };
+        case ell::predictors::neural::ConvolutionMethod::unrolled:
+            return "unrolled";
+        }
         return "";
     }
 	static std::string BinaryConvolutionMethodToString(ell::predictors::neural::BinaryConvolutionMethod method)
@@ -95,7 +97,7 @@ namespace ell
         result.push_back(NameValue{ "method", ConvolutionMethodToString(params.method) });
 		result.push_back(NameValue{ "receptiveField", std::to_string(params.receptiveField) });
 		result.push_back(NameValue{ "numFilters", std::to_string(params.numFiltersAtATime) });
-		result.push_back(NameValue{ "isSeparable", std::to_string(weights.NumChannels() == 1) });        
+		result.push_back(NameValue{ "isSeparable", std::to_string(weights.NumChannels() == 1) });
         return result;
     }
 
