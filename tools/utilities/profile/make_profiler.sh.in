@@ -5,13 +5,13 @@
 #   - run compile on model and save model .h and .o to subdirectory
 #   - copy c++ and cmake files to subdirectory
 
-# Usage: make_profiler.sh model_file.ell [output_directory] <compile options> 
+# Usage: make_profiler.sh model_file.ell [output_directory] <compile options>
 #
 # Note: currently this script must be run from the ELL build directory, and the model file must reside in the ELL build directory
 
 set -e
 
-current_dir=`pwd`
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 pushd .
 # Capture all arguments into a bash array
@@ -82,17 +82,17 @@ cd $profiler_directory
 @OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj $llc_opts
 
-cp ${current_dir}/tools/utilities/profile/CompiledProfile_main.cpp .
-cp ${current_dir}/tools/utilities/profile/CompiledExerciseModel_main.cpp .
-cp ${current_dir}/tools/utilities/profile/ProfileReport.h .
-cp ${current_dir}/tools/utilities/profile/ProfileReport.cpp .
-cp ${current_dir}/tools/utilities/profile/OpenBLASSetup.cmake .
-cp ${current_dir}/tools/utilities/profile/build_and_run.sh .
+cp ${script_dir}/../tools/utilities/profile/CompiledProfile_main.cpp .
+cp ${script_dir}/../tools/utilities/profile/CompiledExerciseModel_main.cpp .
+cp ${script_dir}/../tools/utilities/profile/ProfileReport.h .
+cp ${script_dir}/../tools/utilities/profile/ProfileReport.cpp .
+cp ${script_dir}/../tools/utilities/profile/OpenBLASSetup.cmake .
+cp ${script_dir}/../tools/utilities/profile/build_and_run.sh .
 
 if [ ${parallel} == "true" ] ; then
-    cp ${current_dir}/tools/utilities/profile/CMakeLists-device-parallel.txt.in ./CMakeLists.txt
+    cp ${script_dir}/../tools/utilities/profile/CMakeLists-device-parallel.txt.in ./CMakeLists.txt
 else
-    cp ${current_dir}/tools/utilities/profile/CMakeLists-device.txt.in ./CMakeLists.txt
+    cp ${script_dir}/../tools/utilities/profile/CMakeLists-device.txt.in ./CMakeLists.txt
 fi
 
 if [ ${cleanup} == "true" ] ; then
