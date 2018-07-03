@@ -20,19 +20,22 @@ namespace neural
     struct RegionDetectionParameters
     {
         /// <summary> Width of the input. </summary>
-        int width;
+        int width = 0;
 
         /// <summary> Height of the input. </summary>
-        int height;
+        int height = 0;
 
         /// <summary> Number of possible bounding boxes per cell. </summary>
-        int numBoxesPerCell;
+        int numBoxesPerCell = 0;
 
         /// <summary> Number of classes that can be detected. </summary>
-        int numClasses;
+        int numClasses = 0;
 
-        /// <summary> Number of coordinates per region. Typically this is 4  </summary>
-        int numCoordinates;
+        /// <summary> Number of anchors per region. Typically this is 4  </summary>
+        int numAnchors = 0;
+
+        /// <summary> Specifies whether softmax should be applied to class probabilites </summary>
+        bool applySoftmax = false;
     };
 
     /// <summary> A layer in a neural network that is used to predict the region (e.g. bounding box) of detection classes. </summary>

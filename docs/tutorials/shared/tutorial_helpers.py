@@ -36,6 +36,21 @@ else:
     sys.path += [os.path.join(d, "build") for d in SEARCH_DIRS]
 
 
+def sigmoid(x):
+    "Returns sigmoid activation applied to the input"
+    if x > 0:
+        return 1 / (1 + np.exp(-x))
+    else:
+        ex = np.exp(x)
+        return ex / (1 + ex)
+
+
+def softmax(x):
+    "Returns softmax activation applied to the input"
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum(axis=0)
+
+
 def set_camera_resolution(camera, width, height):
     """ set the resolution of the OpenCV camera object """
     camera.set(3, width)
@@ -313,7 +328,7 @@ class Region:
         if x2 <= x1 or y2 <= y1:
             return (0, 0, 0, 0)
         return (x1, y1, x2 - x1, y2 - y1)
-            
+
 
 def get_regions(inference_output, categories, threshold, anchor_boxes):
     """Returns an array of Region instances that represent detected objects
@@ -348,10 +363,12 @@ def get_regions(inference_output, categories, threshold, anchor_boxes):
         # category probabilities...]`. There are `num_boxes` regions for each
         # `i, j` coordinate pair.
         box_offset = c * box_size
-        predicted_x = inference_output[i, j, box_offset + 0]
-        predicted_y = inference_output[i, j, box_offset + 1]
-        predicted_width = inference_output[i, j, box_offset + 2]
-        predicted_height = inference_output[i, j, box_offset + 3]
+        # The X and Y values need to have sigmoid activation applied
+        predicted_x = sigmoid(inference_output[i, j, box_offset + 0])
+        predicted_y = sigmoid(inference_output[i, j, box_offset + 1])
+        # The width and height need to be exponentiated
+        predicted_width = np.exp(inference_output[i, j, box_offset + 2])
+        predicted_height = np.exp(inference_output[i, j, box_offset + 3])
         predicted_confidence = inference_output[i, j, box_offset + 4]
 
         # Get the final normalized values for the coordinates of the bounding
@@ -362,13 +379,13 @@ def get_regions(inference_output, categories, threshold, anchor_boxes):
         h = predicted_height * anchor_boxes[2 * c + 1] / shape[1]
         confidence = predicted_confidence
 
-        # The `category_scores` have had softmax applied to them, so just
-        # find the index of the largest value and get the corresponding
-        # category label.
-        category_scores = inference_output[i,
-                                           j,
-                                           box_offset + 5 :
-                                           box_offset + box_size]
+        # The `category_scores` have not had softmax applied to them, so just
+        # apply softmax and find the index of the largest value and get the
+        # corresponding category label.
+        category_scores = softmax(inference_output[i,
+                                                   j,
+                                                   box_offset + 5 :
+                                                   box_offset + box_size])
         category_index = np.argmax(category_scores)
         probability = confidence * category_scores[category_index]
 

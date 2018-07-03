@@ -83,6 +83,7 @@
 #include "ReLUActivation.h"
 #include "ScalingLayer.h"
 #include "SigmoidActivation.h"
+#include "SoftMaxActivation.h"
 #include "SoftmaxLayer.h"
 
 // testing
@@ -104,7 +105,6 @@ using namespace ell;
 using namespace ell::predictors;
 using namespace ell::predictors::neural;
 using namespace ell::logging;
-
 
 void TestCompileIsEqual()
 {
@@ -454,10 +454,7 @@ void TestCompilableBinaryOperationNode2()
     auto compiledMap = compiler.Compile(map);
 
     // compare output
-    std::vector<std::vector<double>> signal = {{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                                 0.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 0.0,
-                                                 0.0, 0.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0,
-                                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
+    std::vector<std::vector<double>> signal = { { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0, 0.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } };
     VerifyCompiledOutput(map, compiledMap, signal, "BinaryOperationNode");
 }
 
@@ -1044,23 +1041,23 @@ void TestCompilableClockNode()
     // compare output
     std::vector<std::vector<nodes::TimeTickType>> signal =
         {
-          { start },
-          { start + interval * 1 + lagThreshold / 2 }, // within threshold
-          { start + interval * 2 }, // on time
-          { start + interval * 3 + lagThreshold }, // late (expect notification)
-          { start + interval * 4 + lagThreshold * 20 }, // really late (expect notification)
-          { start + interval * 5 } // on time
+            { start },
+            { start + interval * 1 + lagThreshold / 2 }, // within threshold
+            { start + interval * 2 }, // on time
+            { start + interval * 3 + lagThreshold }, // late (expect notification)
+            { start + interval * 4 + lagThreshold * 20 }, // really late (expect notification)
+            { start + interval * 5 } // on time
         };
 
     std::vector<nodes::TimeTickType> getTicksResults;
     std::vector<nodes::TimeTickType> expectedGetTicksResults =
         {
-          interval,
-          interval - lagThreshold / 2,
-          interval,
-          interval - lagThreshold,
-          interval - lagThreshold * 20,
-          interval
+            interval,
+            interval - lagThreshold / 2,
+            interval,
+            interval - lagThreshold,
+            interval - lagThreshold * 20,
+            interval
         };
 
     lagNotificationCallbackCount = 0;
@@ -2134,7 +2131,7 @@ void TestConvolutionalLayerNode(ConvolutionMethod convolutionMethod, size_t inpu
 
     assert(inputPaddingSize == 1);
     TensorType inputWithPadding(1 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
-    TensorReferenceType input = inputWithPadding.GetSubTensor({inputPaddingSize, inputPaddingSize, 0}, {1, 2, 2});
+    TensorReferenceType input = inputWithPadding.GetSubTensor({ inputPaddingSize, inputPaddingSize, 0 }, { 1, 2, 2 });
     inputWithPadding.Fill(0);
     input(0, 0, 0) = 2;
     input(0, 1, 0) = 1;
@@ -2156,7 +2153,6 @@ void TestConvolutionalLayerNode(ConvolutionMethod convolutionMethod, size_t inpu
         1, 2, 1,   2, 3, 2,   1, 2, 1,   // Filter 2, channel 1
         0, 3, 2,   3, 1, 2,   1, 0, 2 }; // Filter 2, channel 2
     // clang-format on
-
 
     // Viewed as planar filters (ch x fw x fw):
     //
@@ -2591,36 +2587,80 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     VerifyCompiledOutput(map, compiledMap, signal, "Fused linear layers");
 }
 
+template <typename TensorType>
+static auto PostProcessRegionLayerOutput(TensorType tensor, RegionDetectionParameters detectionParams)
+{
+    SigmoidActivation<typename TensorType::TensorElementType> sigmoid;
+    SoftMaxActivation<typename TensorType::TensorElementType> softmax;
+
+    for (int i = 0; i < detectionParams.width; ++i)
+    {
+        for (int j = 0; j < detectionParams.height; ++j)
+        {
+            auto slice = tensor.template GetSlice<math::Dimension::channel>(i, j);
+
+            for (int c = 0; c < detectionParams.numBoxesPerCell; ++c)
+            {
+                int offset = c * (detectionParams.numAnchors + 1 + detectionParams.numClasses);
+                slice[offset + 0] = sigmoid(slice[offset + 0]);
+                slice[offset + 1] = sigmoid(slice[offset + 1]);
+                slice[offset + 2] = std::exp(slice[offset + 2]);
+                slice[offset + 3] = std::exp(slice[offset + 3]);
+
+                // If softmax wasn't applied by the layer, do so in post-processing
+                if (!detectionParams.applySoftmax)
+                {
+                    auto classProbabilities = slice.GetSubVector(offset + 5, detectionParams.numClasses);
+                    softmax(classProbabilities);
+                }
+            }
+        }
+    }
+
+    return tensor;
+}
+
 void TestRegionDetectionNode()
 {
     using ElementType = double;
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
 
     // Input created by running
-    // ./darknet detector test cfg/voc.data cfg/tiny-yolo-voc.cfg tiny-yolo-voc.weights data/dog.jpg
-    // from commit 80d9bec20f0a44ab07616215c6eadb2d633492fe in https://github.com/pjreddie/darknet
+    /*
+    git clone https://github.com/pjreddie/darknet
+    git checkout 80d9bec20f0a44ab07616215c6eadb2d633492fe
+    wget https://pjreddie.com/media/files/yolov2-tiny-voc.weights
+    make DEBUG=1
+    gdb --args ./darknet detector test cfg/voc.data cfg/tiny-yolo-voc.cfg yolov2-tiny-voc.weights data/dog.jpg
+    */
     // setting a breakpoint in src/region_layer.c:162, and dumping the contents of l.output to a file,
     // using gdb:
-    // dump binary memory data.bin l.output (l.output + l.outputs * l.batch)
+    /*
+    dump binary memory data.bin l.output (l.output + l.outputs * l.batch)
+    */
     // loading the contents of said file in numpy, followed by reordering and reshaping into a 13x13x125 tensor
-    // raw_data = np.fromfile('./data.bin', dtype=np.float32)
-    // data = np.zeros(13, 13, 125)
-    // for i, j, k in itertools.product(range(13), range(13), range(125)):
-    //    data[i, j, ...] = raw_data[k * 13 * 13 : (k + 1) * 13 * 13]
-    // data = data.reshape(13, 13, 125)
+    /*
+    import numpy as np
+    import itertools
+    raw_data = np.fromfile('./data.bin', dtype=np.float32)
+    data = np.zeros((13, 13, 125), dtype=np.float32)
+    for i, j in itertools.product(range(13), range(13)):
+        data[i, j, ...] = raw_data[(i * 13 + j) * 125 : (i * 13 + j + 1) * 125]
+    data = data.reshape(13, 13, 125)
+    */
     // Creating the brace-formatted output for C++ requires the following snippet:
-    // s = '{'
-    // for i in range(13):
-    //     s += '\n{'
-    //     for j in range(13):
-    //         s += '\n{' + ', '.join(np.char.mod('%f', data[i, j, ...])) + '},'
-    //     s += '\n},'
-    // s += '\n}'
-    // with open('data.inc', 'w') as f: f.write(s)
+    /*
+    s = '{'
+    for i in range(13):
+        s += '\n{'
+        for j in range(13):
+            s += '\n{' + ', '.join(np.char.mod('%f', data[i, j, ...])) + '},'
+        s += '\n},'
+    s += '\n}'
+    with open('data.inc', 'w') as f: f.write(s)
+    */
     // clang-format off
     TensorType input =
     {
@@ -2631,14 +2671,21 @@ void TestRegionDetectionNode()
 
     // Expected output created by running the following operation for every 1D slice in aforementioned
     // input in the channel dimension in numpy:
-    // for c in range(5):
-    //   boxOffset = c * 25
-    //   expected[boxOffset + 0] = sigmoid(input[boxOffset + 0])
-    //   expected[boxOffset + 1] = sigmoid(input[boxOffset + 1])
-    //   expected[boxOffset + 2] = math.exp(input[boxOffset + 2])
-    //   expected[boxOffset + 3] = math.exp(input[boxOffset + 3])
-    //   expected[boxOffset + 4] = sigmoid(input[boxOffset + 4])
-    //   expected[boxOffset + 5 : boxOffset + 5 + 20] = softmax(input[boxOffset + 5 : boxOffset + 5 + 20])
+    /*
+    def sigmoid(x):
+        return 1 / (1 + np.exp(-x))
+    def softmax(x):
+        e_x = np.exp(x - np.max(x))
+        return e_x / e_x.sum(axis=0)
+    for c in range(5):
+      boxOffset = c * 25
+      expected[boxOffset + 0] = sigmoid(input[boxOffset + 0])
+      expected[boxOffset + 1] = sigmoid(input[boxOffset + 1])
+      expected[boxOffset + 2] = math.exp(input[boxOffset + 2])
+      expected[boxOffset + 3] = math.exp(input[boxOffset + 3])
+      expected[boxOffset + 4] = sigmoid(input[boxOffset + 4])
+      expected[boxOffset + 5 : boxOffset + 5 + 20] = softmax(input[boxOffset + 5 : boxOffset + 5 + 20])
+    */
     // clang-format off
     TensorType expectedOutput =
     {
@@ -2650,32 +2697,38 @@ void TestRegionDetectionNode()
     Shape outputShape = { 13, 13, 125 };
     LayerParameters layerParams{ input, NoPadding(), outputShape, NoPadding() };
 
-    RegionDetectionParameters detectionParams{ 13, 13, 5, 20, 4 };
+    for (bool applySoftmax : { false, true })
+    {
+        RegionDetectionParameters detectionParams{ 13, 13, 5, 20, 4, applySoftmax };
 
-    RegionDetectionLayer<ElementType> detectionLayer(layerParams, detectionParams);
-    detectionLayer.Compute();
-    auto output = detectionLayer.GetOutput();
-    testing::ProcessTest("Layer output == expectedOutput", testing::IsEqual(output.ToArray(), expectedOutput.ToArray(), 1e-5));
+        RegionDetectionLayer<ElementType> detectionLayer(layerParams, detectionParams);
+        detectionLayer.Compute();
+        auto output = detectionLayer.GetOutput();
 
-    // Create model
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
-    auto computeNode = model.AddNode<nodes::RegionDetectionLayerNode<ElementType>>(inputNode->output, detectionLayer);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+        // Expected output has been pre-processed already, so do the same with the output
+        auto processedOutput = PostProcessRegionLayerOutput(RegionDetectionLayer<ElementType>::TensorType(output), detectionParams);
+        testing::ProcessTest("Layer output == expectedOutput", testing::IsEqual(processedOutput.ToArray(), expectedOutput.ToArray(), 1e-5));
 
-    // Make a copy to ensure remaining tests aren't affected
-    auto mapCopy = map;
-    mapCopy.SetInputValue(0, input.ToArray());
-    auto mapOutput = mapCopy.ComputeOutput<ElementType>(0);
-    testing::ProcessTest("Map output == expectedOutput", testing::IsEqual(mapOutput, expectedOutput.ToArray(), 1e-5));
+        // Create model
+        model::Model model;
+        auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+        auto computeNode = model.AddNode<nodes::RegionDetectionLayerNode<ElementType>>(inputNode->output, detectionLayer);
+        auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
-    // Compile model
-    model::MapCompilerOptions settings;
-    settings.compilerSettings.useBlas = true;
-    model::IRMapCompiler compiler(settings);
-    auto compiledMap = compiler.Compile(map);
+        // Make a copy to ensure remaining tests aren't affected
+        auto mapCopy = map;
+        mapCopy.SetInputValue(0, input.ToArray());
+        auto mapOutput = mapCopy.ComputeOutput<ElementType>(0);
+        testing::ProcessTest("Map output == expectedOutput", testing::IsEqual(mapOutput, output.ToArray(), 1e-5));
 
-    // compare computed vs. compiled output
-    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
-    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName(), 1e-5);
+        // Compile model
+        model::MapCompilerOptions settings;
+        settings.compilerSettings.useBlas = true;
+        model::IRMapCompiler compiler(settings);
+        auto compiledMap = compiler.Compile(map);
+
+        // compare computed vs. compiled output
+        std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+        VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName(), 1e-5);
+    }
 }

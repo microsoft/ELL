@@ -46,7 +46,7 @@ to learn how to produce a Python wrapper for an ELL model.
 
 ## Deploy a pretrained model on the Raspberry Pi device
 
-The process for deploying a pretrained model on Raspberry Pi device is simillar
+The process for deploying a pretrained model on Raspberry Pi device is similar
 to instructions you might have followed in the Darknet model section of the
 [importing models](/ELL/tutorials/Importing-models/) tutorial. Start by
 downloading the model description, weights, and labels.
@@ -57,7 +57,9 @@ curl --location -o model.weights https://pjreddie.com/media/files/yolov2-tiny-vo
 curl --location -o categories.txt https://raw.githubusercontent.com/pjreddie/darknet/master/data/voc.names
 ```
 
-Next, import the Darknet model into ELL by running `darknet_import.py`, replacing `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
+Next, import the Darknet model into ELL by running `darknet_import.py`,
+replacing `<ELL-root>` with the path to the ELL root directory (the directory
+where you cloned the ELL repository).
 
 ```shell
 python <ELL-root>/tools/importers/darknet/darknet_import.py model.cfg model.weights
@@ -183,7 +185,10 @@ def main():
     camera = cv2.VideoCapture(0)
 ```
 
-The argument **0** in the function call above selects the default camera. If you have more than one camera connected to your Pi device, choose which camera to use by changing this argument. Read the list of categories from `categories.txt`.
+The argument **0** in the function call above selects the default camera.
+If you have more than one camera connected to your Pi device, choose which
+camera to use by changing this argument. Read the list of categories from
+`categories.txt`.
 
 ```python
     with open("categories.txt", "r") as categories_file:
@@ -230,7 +235,7 @@ Send the processed image to the model to get a `numpy` array of predictions.
 ```
 
 Next, reshape the predictions so that it is no longer a flat array. The
-predictions now are in a grid, where the channel dimmension for each row and
+predictions now are in a grid, where the channel dimension for each row and
 column index contains dimensions describing a bounding box, the confidence that
 there's actually an object within the bounding box, and the probability of the
 category describing the object.
@@ -242,7 +247,12 @@ category describing the object.
 ```
 
 The reshaped predictions can now be used to get a list of detected regions by
-calling `helpers.get_regions`.
+calling `helpers.get_regions`. To get the correct values for the detected
+regions, the helper function applies sigmoid activation to the X and Y
+offset coordinates and exponentiates the width and height values returned from
+`model.predict`. It also applies softmax activation to the category
+probabilities to identify the most likely classification of the detected
+object.
 
 ```python
         regions = helpers.get_regions(

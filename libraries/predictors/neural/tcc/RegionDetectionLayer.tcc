@@ -22,9 +22,9 @@ namespace neural
     RegionDetectionLayer<ElementType>::RegionDetectionLayer(const LayerParameters& layerParameters, RegionDetectionParameters regionDetectionParams) :
         Base(layerParameters), _regionDetectionParams(std::move(regionDetectionParams))
     {
-        if (_regionDetectionParams.numCoordinates != 4)
+        if (_regionDetectionParams.numAnchors <= 0)
         {
-            throw std::invalid_argument("regionDetectionParams.numCoordinates.numCoordinates != 4");
+            throw std::invalid_argument("regionDetectionParams.numAnchors <= 0");
         }
 
         if (_regionDetectionParams.width <= 0)
@@ -58,7 +58,7 @@ namespace neural
         }
 
         if (this->_layerParameters.input.NumChannels() != (size_t)((
-                        (_regionDetectionParams.numCoordinates + 1 + _regionDetectionParams.numClasses) *
+                        (_regionDetectionParams.numAnchors + 1 + _regionDetectionParams.numClasses) *
                         _regionDetectionParams.numBoxesPerCell)))
         {
             throw std::invalid_argument("input number of channels doesn't match box size * number of boxes in detection parameters");
@@ -70,6 +70,7 @@ namespace neural
     {
         auto output = this->GetOutputMinusPadding();
         auto& input = this->_layerParameters.input;
+        auto numAnchors = _regionDetectionParams.numAnchors;
 
         assert(output.GetShape() == input.GetShape());
 
@@ -94,28 +95,30 @@ namespace neural
 
                 for (int k = 0; k < _regionDetectionParams.numBoxesPerCell; ++k)
                 {
-                    auto boxOffset = k * (_regionDetectionParams.numCoordinates + 1 + _regionDetectionParams.numClasses);
+                    auto boxOffset = k * (numAnchors + 1 + _regionDetectionParams.numClasses);
 
-                    // Apply sigmoid function to tx and ty
-                    outputChannelVector[boxOffset + 0] = sigmoid(inputChannelVector[boxOffset + 0]);
-                    outputChannelVector[boxOffset + 1] = sigmoid(inputChannelVector[boxOffset + 1]);
+                    // Get the vector for the anchors for both output and input
+                    auto outputAnchors = outputChannelVector.GetSubVector(boxOffset, numAnchors);
+                    auto inputAnchors = inputChannelVector.GetSubVector(boxOffset, numAnchors);
 
-                    // Apply exp function to tw and th
-                    outputChannelVector[boxOffset + 2] = std::exp(inputChannelVector[boxOffset + 2]);
-                    outputChannelVector[boxOffset + 3] = std::exp(inputChannelVector[boxOffset + 3]);
+                    // Copy input over to output
+                    outputAnchors.CopyFrom(inputAnchors);
 
-                    // Apply sigmoid function to tc
-                    outputChannelVector[boxOffset + 4] = sigmoid(inputChannelVector[boxOffset + 4]);
+                    // Apply sigmoid to the confidence value, which is immediately after the anchor points
+                    outputChannelVector[boxOffset + numAnchors] = sigmoid(inputChannelVector[boxOffset + numAnchors]);
 
                     // Get the vector for the class probabilities for both output and input
-                    auto outputClassProbabilities = outputChannelVector.GetSubVector(boxOffset + 5, _regionDetectionParams.numClasses);
-                    auto inputClassProbabilities = inputChannelVector.GetSubVector(boxOffset + 5, _regionDetectionParams.numClasses);
+                    auto outputClassProbabilities = outputChannelVector.GetSubVector(boxOffset + numAnchors + 1, _regionDetectionParams.numClasses);
+                    auto inputClassProbabilities = inputChannelVector.GetSubVector(boxOffset + numAnchors + 1, _regionDetectionParams.numClasses);
 
                     // Copy input over to output
                     outputClassProbabilities.CopyFrom(inputClassProbabilities);
 
-                    // Apply softmax to probabilities
-                    softmax(outputClassProbabilities);
+                    if (_regionDetectionParams.applySoftmax)
+                    {
+                        // Apply softmax to probabilities
+                        softmax(outputClassProbabilities);
+                    }
                 }
             }
         }
@@ -130,7 +133,7 @@ namespace neural
         archiver["height"] << _regionDetectionParams.height;
         archiver["numBoxesPerCell"] << _regionDetectionParams.numBoxesPerCell;
         archiver["numClasses"] << _regionDetectionParams.numClasses;
-        archiver["numCoordinates"] << _regionDetectionParams.numCoordinates;
+        archiver["numCoordinates"] << _regionDetectionParams.numAnchors;
     }
 
     template <typename ElementType>
@@ -142,7 +145,7 @@ namespace neural
         unarchiver["height"] >> _regionDetectionParams.height;
         unarchiver["numBoxesPerCell"] >> _regionDetectionParams.numBoxesPerCell;
         unarchiver["numClasses"] >> _regionDetectionParams.numClasses;
-        unarchiver["numCoordinates"] >> _regionDetectionParams.numCoordinates;
+        unarchiver["numCoordinates"] >> _regionDetectionParams.numAnchors;
     }
 }
 }

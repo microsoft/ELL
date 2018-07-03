@@ -77,6 +77,20 @@ namespace emitters
         /// <return> An instance of IRLocalMultidimArray::IRLocalArrayElement to represent the value at the offset within the array </returns>
         IRLocalArrayElement operator()(std::vector<int> indices) const;
 
+        /// <summary> Returns a LLVM pointer to the specified element </summary>
+        ///
+        /// <param name="indices"> The indices of the element. </param>
+        ///
+        /// <return> An instance of IRLocalPointer to represent the pointer at the offset within the array </returns>
+        IRLocalPointer PointerTo(std::vector<IRLocalScalar> indices) const;
+
+        /// <summary> Returns a LLVM pointer to the specified element </summary>
+        ///
+        /// <param name="indices"> The indices of the element. </param>
+        ///
+        /// <return> An instance of IRLocalPointer to represent the pointer at the offset within the array </returns>
+        IRLocalPointer PointerTo(std::vector<int> indices) const;
+
         /// <summary> The function this value is in scope for. </summary>
         IRFunctionEmitter& function;
 

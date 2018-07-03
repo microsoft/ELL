@@ -73,6 +73,11 @@ namespace emitters
         _entryBlock = pBlock;
     }
 
+    IRLocalPointer IRFunctionEmitter::LocalPointer(llvm::Value* value)
+    {
+        return IRLocalPointer(*this, value);
+    }
+
     IRLocalScalar IRFunctionEmitter::LocalScalar(llvm::Value* value)
     {
         return IRLocalScalar(*this, value);
@@ -898,7 +903,7 @@ namespace emitters
     void IRFunctionEmitter::ParallelFor(int count, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
     {
         auto loop = IRParallelForLoopEmitter(*this);
-        loop.EmitLoop(0, count, 1, {0}, capturedValues, body);
+        loop.EmitLoop(0, count, 1, { 0 }, capturedValues, body);
     }
 
     void IRFunctionEmitter::ParallelFor(int count, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
@@ -916,7 +921,7 @@ namespace emitters
     void IRFunctionEmitter::ParallelFor(llvm::Value* count, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
     {
         auto loop = IRParallelForLoopEmitter(*this);
-        loop.EmitLoop(LocalScalar<int32_t>(0), LocalScalar(count), LocalScalar<int32_t>(1), {0}, capturedValues, body);
+        loop.EmitLoop(LocalScalar<int32_t>(0), LocalScalar(count), LocalScalar<int32_t>(1), { 0 }, capturedValues, body);
     }
 
     void IRFunctionEmitter::ParallelFor(llvm::Value* count, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)

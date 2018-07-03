@@ -8,8 +8,8 @@
 
 #include "RegionDetectionLayerNode.h"
 #include "ActivationLayerNode.h"
-#include "SigmoidActivation.h"
 #include "CompiledActivationFunctions.h"
+#include "SigmoidActivation.h"
 
 namespace ell
 {
@@ -52,20 +52,17 @@ namespace nodes
     template <typename ValueType>
     RegionDetectionNode<ValueType>::RegionDetectionNode()
         : RegionDetectionNode({}, {}, {}, {})
-    {}
+    {
+    }
 
     template <typename ValueType>
     RegionDetectionNode<ValueType>::RegionDetectionNode(const model::PortElements<ValueType>& input,
                                                         predictors::neural::RegionDetectionParameters params,
                                                         const model::PortMemoryLayout& inputMemoryLayout,
                                                         const model::PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input }, { &_output }),
-          _input(this, input, defaultInputPortName),
-          _params(std::move(params)),
-          _output(this, defaultOutputPortName, input.Size()),
-          _inputMemoryLayout(inputMemoryLayout),
-          _outputMemoryLayout(outputMemoryLayout)
-    {}
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _params(std::move(params)), _output(this, defaultOutputPortName, input.Size()), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
+    {
+    }
 
     template <typename ValueType>
     void RegionDetectionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
@@ -78,74 +75,75 @@ namespace nodes
     template <typename ValueType>
     void RegionDetectionNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto input = function.LocalArray(compiler.EnsurePortEmitted(this->input));
-        auto width = function.LocalScalar(_params.width);
-        auto height = function.LocalScalar(_params.height);
-        auto numBoxes = function.LocalScalar(_params.numBoxesPerCell);
-        auto numClasses = function.LocalScalar(_params.numClasses);
-        auto numCoords = function.LocalScalar(_params.numCoordinates);
-
-        auto output = function.LocalArray(compiler.EnsurePortEmitted(this->output));
-
-        auto J = height;
-        // the stride between each box in a cell (numCoordinates + 1 + numClasses)
-        auto boxStride = numCoords + 1 + numClasses;
+        // the stride between each box in a cell (numAnchors + 1 + numClasses)
         // the stride of each cell (numBoxesPerCell * boxStride)
-        auto K = numBoxes * boxStride;
-        function.For(width, [input, output, boxStride, numClasses, J, K, height, numBoxes](auto& fn, auto i)
+
+        std::vector<int> expectedStride{ _params.width, _params.height, _params.numBoxesPerCell * (_params.numAnchors + 1 + _params.numClasses) };
+        if (_inputMemoryLayout.GetStride() != expectedStride)
         {
-            fn.For(height, [input, output, boxStride, numClasses, i, J, K, numBoxes](auto& fn, auto j)
-            {
-                auto sliceIndex = ((i * J) + j) * K;
-                fn.For(numBoxes, [sliceIndex, input, output, boxStride, numClasses](auto& fn, auto k)
-                {
-                    auto boxOffset = sliceIndex + (k * boxStride);
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input to region detection layer has incorrect shape");
+        }
 
-                    output[boxOffset + 0] = emitters::Sigmoid<ValueType>(input[boxOffset + 0]);
+        if (_outputMemoryLayout.GetStride() != expectedStride)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Output of region detection layer has incorrect shape");
+        }
 
-                    output[boxOffset + 1] = emitters::Sigmoid<ValueType>(input[boxOffset + 1]);
+        auto input = function.LocalTensor(compiler.EnsurePortEmitted(this->input), _inputMemoryLayout.GetStride(), emitters::RowMajorTensorLayout);
+        auto output = function.LocalTensor(compiler.EnsurePortEmitted(this->output), _outputMemoryLayout.GetStride(), emitters::RowMajorTensorLayout);
 
-                    output[boxOffset + 2] = Exp(input[boxOffset + 2]);
+        function.For(_params.width, [ input, output, params = _params ](auto& fn, auto i) {
+            fn.For(params.height, [input, output, params, i](auto& fn, auto j) {
+                fn.For(params.numBoxesPerCell, [input, output, params, i, j](auto& fn, auto k) {
+                    auto numClasses = params.numClasses;
+                    auto numAnchors = params.numAnchors;
 
-                    output[boxOffset + 3] = Exp(input[boxOffset + 3]);
+                    auto boxStride = params.numAnchors + 1 + params.numClasses;
+                    auto boxOffset = k * boxStride;
+                    auto confidenceOffset = boxOffset + numAnchors;
+                    auto classProbabilityOffset = confidenceOffset + 1;
 
-                    output[boxOffset + 4] = emitters::Sigmoid<ValueType>(input[boxOffset + 4]);
-
-                    // output[boxOffset + 5 : boxOffset + 5 + numClasses] = softmax(input[boxOffset + 5 : boxOffset + 5 + numClasses])
-                    // set the initial max value to the first element
-                    // NB: 5 is the result of numCoords + 1, where the 1 is due to the confidence scale value of the prediction.
-                    //     If numCoords ever needs support to be anything other than 4, this value will need to be calculated accordingly
-                    auto classProbMax = fn.LocalScalar(fn.Variable(emitters::GetVariableType<ValueType>()));
-                    fn.Store(classProbMax, static_cast<emitters::IRLocalScalar>(input[boxOffset + 5]));
-
-                    // find the max value in the rest of the probabilities
-                    fn.For(boxOffset + 5 + 1, boxOffset + 5 + numClasses,
-                           [classProbMax, input](auto& fn, auto c)
+                    for (int anchorIndex = 0; anchorIndex < numAnchors; ++anchorIndex)
                     {
-                        emitters::IRLocalScalar val = input[c];
-                        fn.If(val > fn.Load(classProbMax), [classProbMax, val](auto& fn)
-                        {
-                            fn.Store(classProbMax, val);
+                        output({ i, j, boxOffset + anchorIndex }) = input({ i, j, boxOffset + anchorIndex });
+                    }
+
+                    output({ i, j, confidenceOffset }) = emitters::Sigmoid<ValueType>(input({ i, j, confidenceOffset }));
+
+                    // output[classProbabilityOffset : classProbabilityOffset + numClasses] = softmax(input[classProbabilityOffset : classProbabilityOffset + numClasses])
+                    if (params.applySoftmax)
+                    {
+                        // set the initial max value to the first element
+                        auto classProbMax = fn.LocalScalar(fn.Variable(emitters::GetVariableType<ValueType>()));
+                        fn.Store(classProbMax, static_cast<emitters::IRLocalScalar>(input({ i, j, classProbabilityOffset })));
+
+                        // find the max value in the rest of the probabilities
+                        fn.For(classProbabilityOffset + 1, classProbabilityOffset + numClasses, [classProbMax, input, i, j](auto& fn, auto c) {
+                            emitters::IRLocalScalar val = input({ i, j, c });
+                            fn.If(val > fn.Load(classProbMax), [classProbMax, val](auto& fn) {
+                                fn.Store(classProbMax, val);
+                            });
                         });
-                    });
 
-                    // Calculate the sum of the all the euler values, which are calculated using the max above
-                    auto sum = fn.Variable(emitters::GetVariableType<ValueType>());
-                    fn.Store(sum, fn.Literal(ValueType{ 0 }));
-                    fn.For(boxOffset + 5, boxOffset + 5 + numClasses, [sum, classProbMax, input, output](auto& fn, auto c)
-                    {
-                        emitters::IRLocalScalar inputVal = input[c];
-                        auto eulerVal = Exp(inputVal - fn.Load(classProbMax));
-                        fn.Store(sum, eulerVal + fn.Load(sum));
-                        output[c] = eulerVal;
-                    });
+                        // Calculate the sum of the all the euler values, which are calculated using the max above
+                        auto sum = fn.Variable(emitters::GetVariableType<ValueType>());
+                        fn.Store(sum, fn.Literal(ValueType{ 0 }));
+                        fn.For(classProbabilityOffset, classProbabilityOffset + numClasses, [sum, classProbMax, input, output, i, j](auto& fn, auto c) {
+                            emitters::IRLocalScalar inputVal = input({ i, j, c });
+                            auto eulerVal = Exp(inputVal - fn.Load(classProbMax));
+                            fn.Store(sum, eulerVal + fn.Load(sum));
+                            output({ i, j, c }) = eulerVal;
+                        });
 
-                    // Divide each element by the sum
-                    fn.For(boxOffset + 5, boxOffset + 5 + numClasses,
-                        [sum, output](auto& fn, auto c)
+                        // Divide each element by the sum
+                        fn.For(classProbabilityOffset, classProbabilityOffset + numClasses, [sum, output, i, j](auto& fn, auto c) {
+                            output({ i, j, c }) = (output({ i, j, c }) / fn.Load(sum));
+                        });
+                    }
+                    else
                     {
-                        output[c] = (output[c] / fn.Load(sum));
-                    });
+                        fn.template MemoryCopy<ValueType>(input.PointerTo({ i, j, classProbabilityOffset }), output.PointerTo({ i, j, classProbabilityOffset }), fn.LocalScalar(numClasses));
+                    }
                 });
             });
         });

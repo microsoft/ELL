@@ -66,6 +66,11 @@ namespace emitters
         /// <summary> Gets the name of the function being emitted. </summary>
         std::string GetFunctionName() { return _name; }
 
+        /// <summary> Gets an `IRLocalPointer` wrapper for an LLVM value object. </summary>
+        ///
+        /// <param name="value"> The value to wrap. </param>
+        IRLocalPointer LocalPointer(llvm::Value* value);
+
         /// <summary> Gets an `IRLocalScalar` wrapper for an LLVM value object. </summary>
         ///
         /// <param name="value"> The value to wrap. </param>

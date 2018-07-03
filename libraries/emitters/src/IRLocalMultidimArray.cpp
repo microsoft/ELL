@@ -12,6 +12,10 @@
 // LLVM
 #include <llvm/IR/Value.h>
 
+// stl
+#include <functional>
+#include <numeric>
+
 namespace ell
 {
 namespace emitters
@@ -45,6 +49,7 @@ namespace emitters
             offset += i * *stridesIt;
             ++stridesIt;
         }
+        assert((offset < std::accumulate(strides.begin(), strides.end(), 1, std::multiplies<int>{})));
         return IRLocalArrayElement(function, data, function.Literal(offset));
     }
 
@@ -58,6 +63,32 @@ namespace emitters
             ++stridesIt;
         }
         return IRLocalArrayElement(function, data, offset);
+    }
+
+    IRLocalPointer IRLocalMultidimArray::PointerTo(std::vector<int> indices) const
+    {
+        assert(indices.size() == strides.size());
+        int offset = 0;
+        auto stridesIt = strides.begin();
+        for (auto& i : indices)
+        {
+            offset += i * *stridesIt;
+            ++stridesIt;
+        }
+        assert((offset < std::accumulate(strides.begin(), strides.end(), 1, std::multiplies<int>{})));
+        return function.LocalPointer(function.PointerOffset(data, function.Literal(offset)));
+    }
+
+    IRLocalPointer IRLocalMultidimArray::PointerTo(std::vector<IRLocalScalar> indices) const
+    {
+        auto offset = function.LocalScalar(0);
+        auto stridesIt = strides.begin();
+        for (auto& i : indices)
+        {
+            offset = offset + (i * *stridesIt);
+            ++stridesIt;
+        }
+        return function.LocalPointer(function.PointerOffset(data, offset));
     }
 
     IRLocalMultidimArray::IRLocalArrayElement::IRLocalArrayElement(emitters::IRFunctionEmitter& function, llvm::Value* data, llvm::Value* offset)
