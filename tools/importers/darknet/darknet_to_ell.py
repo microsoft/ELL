@@ -388,7 +388,7 @@ def get_region_detection_layer(layer):
             layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros)
 
     detectionParams = ell.neural.RegionDetectionParameters(int(layer['w']), int(layer['h']), int(layer['num']), int(layer['classes']),
-        int(layer['coords']))
+        int(layer['coords']), True)
 
     return ell.neural.FloatRegionDetectionLayer(layerParameters, detectionParams)
 

@@ -30,7 +30,7 @@ class ImporterNode:
     """
 
     def __init__(self, id: str,
-        operation_type: str, 
+        operation_type: str,
         inputs: typing.Sequence[str] = [],
         outputs: typing.Sequence[str] = [],
         weights: typing.Mapping[str, typing.Any] = {},
@@ -40,11 +40,11 @@ class ImporterNode:
         output_shapes: typing.Sequence[typing.Any] = []):
         """
         id: unique identifier for this node
-        operation_type: string name of the operation type to be imported. 
+        operation_type: string name of the operation type to be imported.
             This will get mapped to an ELL operation via the operation_map.
         inputs: array of strings representing where the input comes from.
         outputs: array of strings representing the output tensors.
-        weights: dictionary of weight parameter labels to weight names e.g. a 
+        weights: dictionary of weight parameter labels to weight names e.g. a
             convolutional node may have {'weights': 'w123', 'bias': 'b832'}.
             Dictionary keys are specific to the ELL operation.
         attributes: dictionary of attribute names and values e.g. a
@@ -80,7 +80,7 @@ class LookupTable:
     A helper class that stores the typing.Mappings between:
     - tensor id to a tuple containing (tensor value, tensor order)
     - ELL id to ELL node. These get created during the conversion process.
-    - importer node id to ELL ids. These get created during the conversion 
+    - importer node id to ELL ids. These get created during the conversion
         process. Note that one ImporterNode could get converted to multiple
         ELL nodes.
     In addition, there are convenience methods for accessing the tenspors
@@ -143,9 +143,9 @@ class LookupTable:
         id = None
         if importer_node_id in self.importer_id_to_ell_ids:
             id = self.importer_id_to_ell_ids[importer_node_id][-1]
-        return id 
+        return id
 
-    def get_ell_node_from_importer_node_id(self, importer_node_id: str):       
+    def get_ell_node_from_importer_node_id(self, importer_node_id: str):
         """
         Return the last ELL node associated with this importer node.
         """
@@ -155,7 +155,7 @@ class LookupTable:
             if id in self.ell_id_to_ell_nodes:
                 node = self.ell_id_to_ell_nodes[id]
         return node
-    
+
     def get_tensor_in_ell_order(self, uid: str):
         """
         Returns a numpy array in ELL order
@@ -213,7 +213,7 @@ class LookupTable:
             i += 1
 
         return ordered_weights
-    
+
     def get_tensor_info(self, uid: str):
         """
         Returns a tuple containing (shape, order) for the tensor.
@@ -226,7 +226,7 @@ class LookupTable:
         Returns an ell.nodes.PortElements for the corresponding ImporterNode.
         """
         try:
-            # First check whether this importer node has any corresponding 
+            # First check whether this importer node has any corresponding
             # ELL nodes yet:
             # - If it does, grab the output of the last ELL node which
             #   is designated as the input to this node.
@@ -258,7 +258,7 @@ class LookupTable:
     def get_output_port_elements_for_node(self, ell_node: ell.nodes.Node,
         output_label: str = "output"):
         """
-        Returns an ell.nodes.PortElements for the corresponding ELL node's 
+        Returns an ell.nodes.PortElements for the corresponding ELL node's
         output port that corresponds to 'output_label'.
         """
         try:
@@ -298,7 +298,7 @@ class LookupTable:
 
     def add_ell_input(self, ell_node: ell.nodes.Node):
         self.input_ell_nodes = [ell_node] + self.input_ell_nodes
-    
+
     def get_ell_inputs(self):
         return self.input_ell_nodes
 
@@ -307,7 +307,7 @@ class LookupTable:
 
     def get_ell_outputs(self):
         return self.output_ell_nodes
-        
+
 class ConvertBase:
     """
     Base class for converting an ImporterNode into an ELL Node
@@ -323,8 +323,8 @@ class ConvertBase:
 
     def can_convert(self) -> bool:
         """
-        Verify that the node contains the necessary inputs, weights and 
-        attributes to convert. Nodes that cannot be converted due to 
+        Verify that the node contains the necessary inputs, weights and
+        attributes to convert. Nodes that cannot be converted due to
         missing weights or attributes are deemed optional and are skipped.
         See comments in operation_map for examples.
         """
@@ -339,7 +339,7 @@ class ConvertBase:
     def get_input_parameters(self, first_in_block = True, input_index = 0):
         """
         Return the input shape and padding parameters as a tuple.
-        first_in_block - indicates whether this will be the first ell 
+        first_in_block - indicates whether this will be the first ell
         node in a block. If it is, it will have its padding requirements set
         differently.
         input_index - indicates the index of the input shape requested.
@@ -356,7 +356,7 @@ class ConvertBase:
     def get_output_parameters(self, last_in_block = True, output_index = 0):
         """
         Return the output shape and padding parameters as a tuple.
-        last_in_block - indicates whether this will be the last ell 
+        last_in_block - indicates whether this will be the last ell
         node in a block. If it is, it will have its output padding set
         differently.
         """
@@ -392,7 +392,7 @@ class ConvertBase:
 
     def get_vector(self, uid: str, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
-        Returns a weight tensor as a 1 dimensional numpy array. If the 
+        Returns a weight tensor as a 1 dimensional numpy array. If the
         original tensor is a scalar, it will be expanded to a vector of size
         equal to the number of output channels.
         """
@@ -405,7 +405,7 @@ class ConvertBase:
             vector = lookup_table.get_vector_from_constant(uid, ell_shape.channels)
         else:
             vector = lookup_table.get_vector_in_ell_order(uid)
-        
+
         return vector
 
     def get_ell_vector(self, uid: str, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -430,7 +430,7 @@ class ConvertActivation(ConvertBase):
         super().__init__(node)
         self.required_weights = []
         self.required_attributes = ["activation"]
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -468,7 +468,7 @@ class ConvertAveragePooling(ConvertBase):
         super().__init__(node)
         self.required_weights = []
         self.required_attributes = ["size", "stride"]
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -480,7 +480,7 @@ class ConvertAveragePooling(ConvertBase):
             attributes["size"], attributes["stride"])
 
         # Create the ELL pooling layer
-        return ell.neural.FloatPoolingLayer(layer_parameters, 
+        return ell.neural.FloatPoolingLayer(layer_parameters,
             pooling_parameters, ell.neural.PoolingType.mean)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -510,7 +510,7 @@ class ConvertBatchNormalization(ConvertBase):
         self.required_weights = ["mean", "variance"]
         self.required_attributes = []
         self.epsilon = 1e-5
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Derived classes override to return the appropriate ELL node
@@ -522,8 +522,8 @@ class ConvertBatchNormalization(ConvertBase):
         variance_vector = self.get_ell_vector(
             self.importer_node.weights["variance"][0], conversion_parameters)
 
-        return ell.neural.FloatBatchNormalizationLayer(layer_parameters, 
-            mean_vector, variance_vector, self.epsilon, 
+        return ell.neural.FloatBatchNormalizationLayer(layer_parameters,
+            mean_vector, variance_vector, self.epsilon,
             ell.neural.EpsilonSummand.variance)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -552,7 +552,7 @@ class ConvertBias(ConvertBase):
         super().__init__(node)
         self.required_weights = ["bias"]
         self.required_attributes = []
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Derived classes override to return the appropriate ELL node
@@ -589,7 +589,7 @@ class ConvertBinaryConvolution(ConvertBase):
         super().__init__(node)
         self.required_weights = ["weights"]
         self.required_attributes = ["size", "stride"]
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Derived classes override to return the appropriate ELL node
@@ -602,7 +602,7 @@ class ConvertBinaryConvolution(ConvertBase):
 
         attributes = self.importer_node.attributes
         convolutional_parameters = ell.neural.BinaryConvolutionalParameters(
-            attributes["size"], attributes["stride"], ell.neural.BinaryConvolutionMethod.bitwise, 
+            attributes["size"], attributes["stride"], ell.neural.BinaryConvolutionMethod.bitwise,
             ell.neural.BinaryWeightsScale.none)
 
         return ell.neural.FloatBinaryConvolutionalLayer(layer_parameters, convolutional_parameters, weights)
@@ -621,7 +621,7 @@ class ConvertBinaryConvolution(ConvertBase):
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
 
         # If we require padding but the input doesn't provide it
-        # (which can happen when a single node output is used as input to 
+        # (which can happen when a single node output is used as input to
         # multiple nodes), ensure correct padding with a ReorderDataNode.
         owning_node_for_input = lookup_table.get_originating_importer_node_for_output(self.importer_node.inputs[0])
         padding = self.importer_node.padding["size"]
@@ -651,7 +651,7 @@ class ConvertConvolution(ConvertBase):
         super().__init__(node)
         self.required_weights = ["weights"]
         self.required_attributes = ["size", "stride"]
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Derived classes override to return the appropriate ELL node
@@ -682,7 +682,7 @@ class ConvertConvolution(ConvertBase):
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
 
         # If we require padding but the input doesn't provide it
-        # (which can happen when a single node output is used as input to 
+        # (which can happen when a single node output is used as input to
         # multiple nodes), ensure correct padding with a ReorderDataNode.
         owning_node_for_input = lookup_table.get_originating_importer_node_for_output(self.importer_node.inputs[0])
         padding = self.importer_node.padding["size"]
@@ -713,7 +713,7 @@ class ConvertFullyConnected(ConvertBase):
         super().__init__(node)
         self.required_weights = ["weights"]
         self.required_attributes = []
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Derived classes override to return the appropriate ELL node
@@ -753,7 +753,7 @@ class ConvertElementTimes(ConvertBase):
         super().__init__(node)
         self.required_weights = ["scale"]
         self.required_attributes = []
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -790,7 +790,7 @@ class ConvertInput(ConvertBase):
         super().__init__(node)
         self.required_weights = []
         self.required_attributes = []
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Derived classes override to return the appropriate ELL node
@@ -855,7 +855,7 @@ class ConvertLeakyReLU(ConvertActivation):
         self.required_weights = []
         self.required_attributes = []
         self.importer_node.attributes["activation"] = ell.neural.ActivationType.leaky
-        
+
 class ConvertMaxPooling(ConvertBase):
     """
     Converter for Max Pooling
@@ -864,7 +864,7 @@ class ConvertMaxPooling(ConvertBase):
         super().__init__(node)
         self.required_weights = []
         self.required_attributes = ["size", "stride"]
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -876,7 +876,7 @@ class ConvertMaxPooling(ConvertBase):
             attributes["size"], attributes["stride"])
 
         # Create the ELL pooling layer
-        return ell.neural.FloatPoolingLayer(layer_parameters, 
+        return ell.neural.FloatPoolingLayer(layer_parameters,
             pooling_parameters, ell.neural.PoolingType.max)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -906,7 +906,7 @@ class ConvertMinus(ConvertBase):
         super().__init__(node)
         self.required_weights = ["bias"]
         self.required_attributes = []
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -916,9 +916,9 @@ class ConvertMinus(ConvertBase):
             self.importer_node.weights["bias"][0], conversion_parameters)
         # Minus is a negative bias in ELL. Negate the bias values so we
         # can use an additive bias layer.
-        bias = -1.0 * bias        
+        bias = -1.0 * bias
 
-        return ell.neural.FloatBiasLayer(layer_parameters, 
+        return ell.neural.FloatBiasLayer(layer_parameters,
             ell.math.FloatVector(bias))
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -948,7 +948,7 @@ class ConvertPassthrough(ConvertBase):
     """
     def __init__(self, node: ImporterNode):
         super().__init__(node)
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return nothing
@@ -965,7 +965,7 @@ class ConvertPassthrough(ConvertBase):
         input_owner = lookup_table.get_owning_node_for_output(self.importer_node.inputs[0])
         lookup_table.add_imported_ell_node(self.importer_node, input_owner, set_group_id=False)
 
-        return       
+        return
 
 class ConvertPlus(ConvertBase):
     """
@@ -975,7 +975,7 @@ class ConvertPlus(ConvertBase):
         super().__init__(node)
         self.required_weights = []
         self.required_attributes = []
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -1021,7 +1021,7 @@ class ConvertPooling(ConvertBase):
         super().__init__(node)
         self.required_weights = []
         self.required_attributes = ["size", "stride", "poolingType"]
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -1037,7 +1037,7 @@ class ConvertPReLU(ConvertBase):
         super().__init__(node)
         self.required_weights = ["alpha"]
         self.required_attributes = []
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -1076,7 +1076,54 @@ class ConvertReLU(ConvertActivation):
         self.required_weights = []
         self.required_attributes = []
         self.importer_node.attributes["activation"] = ell.neural.ActivationType.relu
+
+
+class ConvertRegion(ConvertBase):
+    """
+    Converter for region detection layer
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init(node)
+        self.required_weights = []
+        self.required_attributes = ["width", "height", "numBoxesPerCell", "numClasses", "numAnchors", "applySoftmax"]
+
+    def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Return the appropriate ELL node
+        """
+        layer_parameters = self.get_layer_parameters(conversion_parameters)
+
+        attributes = self.importer_node.attributes
+
+        region_detection_parameters = ell.neural.RegionDetectionParameters(
+                attributes["width"],
+                attributes["height"],
+                attributes["numBoxesPerCell"],
+                attributes["numClasses"],
+                attributes["numAnchors"],
+                attributes["applySoftmax"]
+            )
         
+        return ell.neural.FloatFullyConnectedLayer(
+            layer_parameters, region_detection_parameters)
+
+    def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Derived classes override to convert the importer node to appropriate ELL node(s)
+        and insert into the model
+        """
+        model = conversion_parameters["model"]
+        builder = conversion_parameters["builder"]
+        lookup_table = conversion_parameters["lookup_table"]
+        # Create the region detection layer
+        region_layer = self.convert(conversion_parameters)
+        # Get the port elements from the input
+        input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
+        # Add the RegionDetectionLayerNode to the model
+        ell_node = builder.AddFloatRegionDetectionLayerNode(model, input_port_elements, region_layer)
+        # Register the mapping
+        lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
 
 class ConvertScaling(ConvertBase):
     """
@@ -1086,7 +1133,7 @@ class ConvertScaling(ConvertBase):
         super().__init__(node)
         self.required_weights = ["scale"]
         self.required_attributes = []
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -1114,7 +1161,8 @@ class ConvertScaling(ConvertBase):
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
         return
-        
+
+
 class ConvertSoftmax(ConvertBase):
     """
     Converter for Softmax
@@ -1123,7 +1171,7 @@ class ConvertSoftmax(ConvertBase):
         super().__init__(node)
         self.required_weights = []
         self.required_atteamstributes = []
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -1149,6 +1197,7 @@ class ConvertSoftmax(ConvertBase):
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
         return
 
+
 class ConvertSplice(ConvertBase):
     """
     Converter for Splice, which for now is Output followed by
@@ -1158,7 +1207,7 @@ class ConvertSplice(ConvertBase):
         super().__init__(node)
         self.required_weights = []
         self.required_attributes = ["dimension_to_stack"]
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node
@@ -1183,12 +1232,12 @@ class ConvertSplice(ConvertBase):
             # order (channel, row, column), they effectively stack in the
             # channel dimension.
             pre_order = [2,0,1]
-            # The final order must put the elements back into row, column, 
+            # The final order must put the elements back into row, column,
             # channel order.
             post_order = [1,2,0]
         else:
             raise Exception("Splice does not yet support stacking along dimension {}".format(self.required_attributes["dimension_to_stack"]))
-        
+
         # Loop over all inputs and for each, insert a reorder node to
         # put into specified order.
         reorder_nodes = []
@@ -1205,7 +1254,7 @@ class ConvertSplice(ConvertBase):
             reorder_nodes.append(reorder_node)
             # Register the mapping
             lookup_table.add_imported_ell_node(self.importer_node, reorder_node)
-            
+
         # Insert an ConcatenationNode together the reorder nodes
         output_shape, output_padding = self.get_output_parameters(last_in_block)
         reordered_output_shape = ell.math.TensorShape(output_shape.channels, output_shape.rows, output_shape.columns)
@@ -1225,9 +1274,10 @@ class ConvertSplice(ConvertBase):
                                                             [padding_size, padding_size, 0])
         final_reorder_node = builder.AddReorderDataNode(model, port_elements, reorderedPortMemoryLayout, outputPortMemoryLayout, post_order, 0)
         # Register the mapping
-        lookup_table.add_imported_ell_node(self.importer_node, final_reorder_node)    
+        lookup_table.add_imported_ell_node(self.importer_node, final_reorder_node)
 
         return
+
 
 class ConvertReshape(ConvertBase):
     """
@@ -1237,7 +1287,7 @@ class ConvertReshape(ConvertBase):
         super().__init__(node)
         self.required_weights = []
         self.required_attributes = []
-        
+
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL node

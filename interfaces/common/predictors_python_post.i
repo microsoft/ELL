@@ -66,9 +66,9 @@ namespace neural
 
     %extend RegionDetectionParameters
     {
-        RegionDetectionParameters(int width, int height, int numBoxesPerCell, int numClasses, int numCoordinates)
+        RegionDetectionParameters(int width, int height, int numBoxesPerCell, int numClasses, int numAnchors, bool applySoftmax)
         {
-            return new ell::predictors::neural::RegionDetectionParameters{width, height, numBoxesPerCell, numClasses, numCoordinates};
+            return new ell::predictors::neural::RegionDetectionParameters{width, height, numBoxesPerCell, numClasses, numAnchors, applySoftmax};
         }
     };
 }
@@ -98,27 +98,35 @@ del PaddingScheme_max
 
 # Python friendly class for LayerType
 class LayerType:
-    base = LayerType_base
     activation = LayerType_activation
+    base = LayerType_base
     batchNormalization = LayerType_batchNormalization
     bias = LayerType_bias
     binaryConvolution = LayerType_binaryConvolution
     convolution = LayerType_convolution
     fullyConnected = LayerType_fullyConnected
+    gru = LayerType_gru
     input = LayerType_input
+    lstm = LayerType_lstm
     pooling = LayerType_pooling
+    recurrent = LayerType_recurrent
+    region = LayerType_region
     scaling = LayerType_scaling
 
 # Remove flat defines so callers only see the class above
-del LayerType_base
 del LayerType_activation
+del LayerType_base
 del LayerType_batchNormalization
 del LayerType_bias
 del LayerType_binaryConvolution
 del LayerType_convolution
 del LayerType_fullyConnected
+del LayerType_gru
 del LayerType_input
+del LayerType_lstm
 del LayerType_pooling
+del LayerType_recurrent
+del LayerType_region
 del LayerType_scaling
 
 # Python friendly class for ActivationType
@@ -179,18 +187,6 @@ del ConvolutionMethod_diagonal
 del ConvolutionMethod_simple
 del ConvolutionMethod_winograd
 del ConvolutionMethod_unrolled
-
-# Python friendly class for LayerType
-class LayerType:
-    gru = LayerType_gru
-    lstm = LayerType_lstm
-    recurrent = LayerType_recurrent
-
-
-del LayerType_gru
-del LayerType_lstm
-del LayerType_recurrent
-
 
 # Python friendly class for EpsilonSummand
 class EpsilonSummand:

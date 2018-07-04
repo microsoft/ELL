@@ -56,7 +56,8 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
         height: height of the input
         numBoxesPerCell: number of possible bounding boxes per cell
         numClasses: number of classes that can be detected
-        numCoordinates: number of coordinates per region. Currently, only supported value is 4
+        numAnchors: Number of anchors per region. Typically this is 4
+        applySoftmax: Specifies whether softmax should be applied to class probabilites
 %}
 
 // Include the C++ code to be wrapped

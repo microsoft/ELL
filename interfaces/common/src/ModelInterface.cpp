@@ -1418,6 +1418,20 @@ Node ModelBuilder::AddFloatFullyConnectedLayerNode(Model model, PortElements inp
     return Node(newNode);
 }
 
+Node ModelBuilder::AddFloatRegionDetectionLayerNode(Model model, PortElements input, const ell::api::predictors::neural::RegionDetectionLayer<float>& layer)
+{
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+
+    auto parameters = GetLayerParametersForLayerNode(layer);
+
+    ell::predictors::neural::RegionDetectionLayer<float> regionDetectionLayer(parameters, layer.detectionParameters);
+
+    newNode = model.GetModel().AddNode<ell::nodes::RegionDetectionLayerNode<float>>(ell::model::PortElements<float>(elements), regionDetectionLayer);
+
+    return Node(newNode);
+}
+
 Node ModelBuilder::AddFloatPoolingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::PoolingLayer<float>& layer)
 {
     auto elements = input.GetPortElements();
