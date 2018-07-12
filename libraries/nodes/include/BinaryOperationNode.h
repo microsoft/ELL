@@ -21,6 +21,7 @@
 #include "EmitterTypes.h"
 
 // utilities
+#include "ArchiveVersion.h"
 #include "Exception.h"
 #include "IArchivable.h"
 #include "TypeName.h"
@@ -53,7 +54,22 @@ namespace nodes
         /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
         /// <param name="operation"> The type of operation to perform. </param>
+        ///
+        /// Note: the output will use the same memory layout as input1
         BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, emitters::BinaryOperationType operation);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input1"> The left-hand input of the function. </param>
+        /// <param name="input2"> The right-hand input of the function. </param>
+        /// <param name="layout"> The memory layout for the inputs and outputs. </param>
+        /// <param name="operation"> The type of operation to perform. </param>
+        /// <param name="padding"> The padding value. </param>
+        BinaryOperationNode(const model::PortElements<ValueType>& input1,
+                            const model::PortElements<ValueType>& input2,
+                            const model::PortMemoryLayout& layout,
+                            emitters::BinaryOperationType operation,
+                            ValueType padding = 0);
 
         /// <summary> Constructor. </summary>
         ///
@@ -129,7 +145,6 @@ namespace nodes
 
         // Output
         model::OutputPort<ValueType> _output;
-        model::PortMemoryLayout _outputLayout;
 
         // Operation
         emitters::BinaryOperationType _operation;

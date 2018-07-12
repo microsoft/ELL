@@ -11,11 +11,9 @@
 #include "CompilableNode.h"
 #include "Node.h"
 
-// math
-#include "Tensor.h"
-
 // utilities
 #include "IArchivable.h"
+#include "ArchiveVersion.h"
 
 // stl
 #include <string>
@@ -25,8 +23,6 @@ namespace ell
 namespace model
 {
     class IRMapCompiler;
-
-    using OutputShape = ell::math::TensorShape;
 
     /// <summary> A node that represents an output from the system. </summary>
     class OutputNodeBase : public CompilableNode
@@ -48,21 +44,20 @@ namespace model
         /// <summary> Gets the output shape. </summary>
         ///
         /// <returns> The output shape. </returns>
-        OutputShape GetShape() const { return _shape; }
+        MemoryShape GetShape() const;
 
     protected:
-        OutputNodeBase(InputPortBase& input, OutputPortBase& output, const ell::math::TensorShape& shape);
-        OutputNodeBase(const std::vector<InputPortBase*>& inputs, OutputPortBase& output, const ell::math::TensorShape& shape);
+        OutputNodeBase(InputPortBase& input, OutputPortBase& output, const MemoryShape& shape);
+        OutputNodeBase(const std::vector<InputPortBase*>& inputs, OutputPortBase& output, const MemoryShape& shape);
         bool ShouldCompileInline() const override { return true; }
         bool HasState() const override { return false; }
         void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         ell::utilities::ArchiveVersion GetArchiveVersion() const override;
 
-        void SetShape(const OutputShape& shape) { _shape = shape; } // STYLE discrepancy
+        void SetShape(const MemoryShape& shape);
     private:
         InputPortBase& _inputBase;
         OutputPortBase& _outputBase;
-        OutputShape _shape;
     };
 
     /// <summary> Base class for a node that represents a sink from the system. </summary>
@@ -80,7 +75,7 @@ namespace model
         void SetCallbackName(const std::string& name) { _callbackName = name; };
 
     protected:
-        SinkNodeBase(InputPortBase& input, InputPortBase& trigger, OutputPortBase& output, ell::math::TensorShape shape, const std::string& callbackName)
+        SinkNodeBase(InputPortBase& input, InputPortBase& trigger, OutputPortBase& output, const MemoryShape& shape, const std::string& callbackName)
             : OutputNodeBase({ &input, &trigger }, output, shape), _callbackName(callbackName)
         {
         }

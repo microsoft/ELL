@@ -30,5 +30,10 @@ namespace model
             _parentNodes.push_back(node);
         }
     }
+
+    PortMemoryLayout InputPortBase::GetMemoryLayout() const
+    {
+        return _inputElements.GetMemoryLayout();
+    }
 }
 }

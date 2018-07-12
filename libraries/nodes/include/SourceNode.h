@@ -58,7 +58,7 @@ namespace nodes
         /// <param name="shape"> The input shape. </param>
         /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
         /// <param name="source"> The optional source function that will provide input values. </param>
-        SourceNode(const model::PortElements<nodes::TimeTickType>& input, const math::TensorShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
+        SourceNode(const model::PortElements<nodes::TimeTickType>& input, const model::MemoryShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
 
         /// <summary> Constructor. </summary>
         ///

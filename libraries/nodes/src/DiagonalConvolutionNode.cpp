@@ -20,14 +20,6 @@ namespace ell
 {
 namespace nodes
 {
-    namespace
-    {
-        int GetOutputSize(const model::PortMemoryLayout& outputLayout)
-        {
-            return outputLayout.GetActiveSize(0) * outputLayout.GetActiveSize(1) * outputLayout.GetActiveSize(2);
-        }
-    } // end anonymous namespace
-
     //
     // DiagonalConvolutionNode
     //
@@ -44,7 +36,7 @@ namespace nodes
                                                                 const model::PortMemoryLayout& outputMemoryLayout,
                                                                 const ConstTensorReferenceType& filterWeights,
                                                                 int stride)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterWeights(filterWeights), _stride(stride)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterWeights(filterWeights), _stride(stride)
     {
     }
 
@@ -52,7 +44,7 @@ namespace nodes
     void DiagonalConvolutionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<DiagonalConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, _outputMemoryLayout, _filterWeights, _stride);
+        auto newNode = transformer.AddNode<DiagonalConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, GetOutputMemoryLayout(), _filterWeights, _stride);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -67,7 +59,7 @@ namespace nodes
         auto weightsValues = weightsTranspose.ToArray();
         int filterSize = _filterWeights.NumColumns();
         auto weightsNode = transformer.AddNode<ConstantNode<ValueType>>(weightsValues);
-        auto convNode = transformer.AddNode<DiagonalConvolutionComputeNode<ValueType>>(newInput, weightsNode->output, _inputMemoryLayout, _outputMemoryLayout, filterSize, _stride);
+        auto convNode = transformer.AddNode<DiagonalConvolutionComputeNode<ValueType>>(newInput, weightsNode->output, _inputMemoryLayout, GetOutputMemoryLayout(), filterSize, _stride);
         transformer.MapNodeOutput(this->output, convNode->output);
         return true;
     }
@@ -146,7 +138,7 @@ namespace nodes
         model::CompilableNode::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
         archiver["inputLayout"] << _inputMemoryLayout;
-        archiver["outputLayout"] << _outputMemoryLayout;
+        archiver["outputLayout"] << GetOutputMemoryLayout();
         archiver["stride"] << _stride;
         math::TensorArchiver::Write(_filterWeights, "weights", archiver);
     }
@@ -157,7 +149,9 @@ namespace nodes
         model::CompilableNode::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
         archiver["inputLayout"] >> _inputMemoryLayout;
-        archiver["outputLayout"] >> _outputMemoryLayout;
+        model::PortMemoryLayout outputMemoryLayout;
+        archiver["outputLayout"] >> outputMemoryLayout;
+        _output.SetMemoryLayout(outputMemoryLayout);
         archiver["stride"] >> _stride;
         math::TensorArchiver::Read(_filterWeights, "weights", archiver);
     }
@@ -179,7 +173,7 @@ namespace nodes
                                                                               const model::PortMemoryLayout& outputMemoryLayout,
                                                                               int filterSize,
                                                                               int stride)
-        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterSize(filterSize), _stride(stride)
+        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterSize(filterSize), _stride(stride)
     {
         const int numFilters = outputMemoryLayout.GetActiveSize(2);
         _batchSize = numFilters;
@@ -190,7 +184,7 @@ namespace nodes
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newFilterWeights = transformer.TransformPortElements(_filterWeights.GetPortElements());
-        auto newNode = transformer.AddNode<DiagonalConvolutionComputeNode<ValueType>>(newInput, newFilterWeights, _inputMemoryLayout, _outputMemoryLayout, _filterSize, _stride);
+        auto newNode = transformer.AddNode<DiagonalConvolutionComputeNode<ValueType>>(newInput, newFilterWeights, _inputMemoryLayout, GetOutputMemoryLayout(), _filterSize, _stride);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -224,7 +218,7 @@ namespace nodes
         const auto inputPadding = inputLayout.GetOffset(0);
         assert((inputPadding == filterSize / 2) && "Input padding must be filterSize/2");
 
-        const auto outputTensor = function.LocalTensor(pOutput, outputLayout.GetStride(), emitters::RowMajorTensorLayout);
+        const auto outputTensor = function.LocalTensor(pOutput, outputLayout.GetStride().ToVector(), emitters::RowMajorTensorLayout);
 
         // input data parameters
         const int paddedWidth = inputLayout.GetStride(1);

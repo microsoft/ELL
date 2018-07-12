@@ -19,7 +19,7 @@ set(src
     src/IRModelProfiler.cpp
     src/ModelTransformer.cpp
     src/Node.cpp
-    src/OutputNode.cpp
+    src/OutputNodeBase.cpp
     src/OutputPort.cpp
     src/Port.cpp
     src/PortElements.cpp
@@ -30,8 +30,8 @@ set(include
     include/CompilableNodeUtilities.h
     include/CompilableNode.h
     include/CompiledMap.h
-    include/InputNodeBase.h
     include/InputNode.h
+    include/InputNodeBase.h
     include/InputPort.h
     include/IRCompiledMap.h
     include/IRMapCompiler.h
@@ -44,8 +44,8 @@ set(include
     include/ModelTransformer.h
     include/Node.h
     include/NodeMap.h
-    include/OutputNodeBase.h
     include/OutputNode.h
+    include/OutputNodeBase.h
     include/OutputPort.h
     include/Port.h
     include/PortElements.h

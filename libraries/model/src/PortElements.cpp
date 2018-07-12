@@ -23,6 +23,53 @@ namespace model
 {
     namespace
     {
+        MemoryShape GetShapeSuffix(const MemoryShape& shape)
+        {
+            if (shape.NumDimensions() == 0)
+            {
+                return shape;
+            }
+            auto result = shape.ToVector();
+            return { std::vector<int>(result.begin()+1, result.end()) };
+        }
+
+        // Concatenate two layouts, if they're compatible.
+        // Concatenating anything with the empty layout returns the original layout.
+        PortMemoryLayout ConcatenateLayouts(const PortMemoryLayout& layout1, const PortMemoryLayout& layout2)
+        {
+            if (layout1.NumDimensions() == 0)
+            {
+                return layout2;
+            }
+            
+            if (layout2.NumDimensions() == 0)
+            {
+                return layout1;
+            }
+
+            if (layout1.NumDimensions() != layout2.NumDimensions())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't concatenate layouts of different dimensions");
+            }
+            auto layout1Size = layout1.GetActiveSize();
+            auto layout2Size = layout2.GetActiveSize();
+            if (GetShapeSuffix(layout1Size) != GetShapeSuffix(layout2Size))
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't concatenate layouts of different suffix sizes");
+            }
+
+            auto layout1Stride = layout1.GetStride();
+            auto layout2Stride = layout2.GetStride();
+            if (GetShapeSuffix(layout1Stride) != GetShapeSuffix(layout2Stride))
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't concatenate layouts of different suffix strides");
+            }
+
+            auto resultSize = layout1Size;
+            resultSize[0] += layout2Size[0];
+            return { resultSize };
+        }
+
         //
         // Helper functions for parsing and stringifying proxies
         //
@@ -225,22 +272,22 @@ namespace model
     // PortRange
     //
     PortRange::PortRange(const OutputPortBase& port)
-        : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
+        : _referencedPort(&port), _startIndex(0), _sliceSize(port.Size()), _isFixedSize(false) {}
 
     PortRange::PortRange(const OutputPortBase& port, size_t index)
-        : _referencedPort(&port), _startIndex(index), _numValues(1), _isFixedSize(true) {}
+        : _referencedPort(&port), _startIndex(index), _sliceSize(1), _isFixedSize(true) {}
 
     PortRange::PortRange(const OutputPortBase& port, size_t startIndex, size_t numValues)
-        : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
+        : _referencedPort(&port), _startIndex(startIndex), _sliceSize(numValues), _isFixedSize(true) {}
 
     PortRange::PortRange(const PortElementBase& element)
-        : _referencedPort(element.ReferencedPort()), _startIndex(element.GetIndex()), _numValues(1), _isFixedSize(true) {}
+        : _referencedPort(element.ReferencedPort()), _startIndex(element.GetIndex()), _sliceSize(1), _isFixedSize(true) {}
 
     size_t PortRange::Size() const
     {
         if (_isFixedSize)
         {
-            return _numValues;
+            return _sliceSize;
         }
         else
         {
@@ -248,7 +295,28 @@ namespace model
         }
     }
 
-    bool PortRange::IsFullPortRange() const { return GetStartIndex() == 0 && Size() == ReferencedPort()->Size(); }
+    PortMemoryLayout PortRange::GetMemoryLayout() const
+    {
+        auto portLayout = ReferencedPort()->GetMemoryLayout();
+
+        if (IsFullPortRange())
+        {
+            return portLayout;
+        }
+
+        // return a layout that represents the slice along the major axis for this range
+        auto stride = portLayout.GetStride();
+        auto activeSize = portLayout.GetActiveSize();
+        auto offset = portLayout.GetOffset();
+        activeSize[0] = Size();
+        offset[0] += GetStartIndex();
+        return { activeSize, stride, offset };
+    }
+
+    bool PortRange::IsFullPortRange() const
+    {
+        return GetStartIndex() == 0 && Size() == ReferencedPort()->Size();
+    }
 
     void PortRange::WriteToArchive(utilities::Archiver& archiver) const
     {
@@ -274,13 +342,13 @@ namespace model
     {
         if (IsAdjacent(other) && _isFixedSize)
         {
-            _numValues += other.Size();
+            _sliceSize += other.Size();
         }
     }
 
     bool PortRange::operator==(const PortRange& other) const
     {
-        return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_numValues == other._numValues);
+        return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_sliceSize == other._sliceSize);
     }
 
     //
@@ -349,6 +417,20 @@ namespace model
         }
 
         return _ranges[0].GetPortType();
+    }
+
+    PortMemoryLayout PortElementsBase::GetMemoryLayout() const
+    {
+        // Concatenate layout along largest (first) dimension
+        PortMemoryLayout result = {};
+        for(const auto& range: _ranges)
+        {
+            // for non-simple ranges, the size and strides of all but the first dimension must match
+            auto rangeLayout = range.GetMemoryLayout();
+            result = ConcatenateLayouts(result, rangeLayout);
+        }
+
+        return result;
     }
 
     void PortElementsBase::Reserve(size_t numRanges)
@@ -442,22 +524,22 @@ namespace model
     //
 
     PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName)
-        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(0), _numValues(0), _isFixedSize(false)
+        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(0), _sliceSize(0), _isFixedSize(false)
     {
     }
 
     PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, size_t startIndex)
-        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(startIndex), _numValues(0), _isFixedSize(true)
+        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(startIndex), _sliceSize(0), _isFixedSize(true)
     {
     }
 
     PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, size_t startIndex, size_t numValues)
-        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true)
+        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(startIndex), _sliceSize(numValues), _isFixedSize(true)
     {
     }
 
     PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, Port::PortType portType, size_t startIndex, size_t numValues)
-        : _nodeId(nodeId), _portName(portName), _portType(portType), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true)
+        : _nodeId(nodeId), _portName(portName), _portType(portType), _startIndex(startIndex), _sliceSize(numValues), _isFixedSize(true)
     {
     }
 
@@ -472,7 +554,7 @@ namespace model
         _portName = range.ReferencedPort()->GetName();
         _portType = range.GetPortType();
         _startIndex = range.GetStartIndex();
-        _numValues = range.Size();
+        _sliceSize = range.Size();
         _isFixedSize = range.IsFixedSize();
     }
 

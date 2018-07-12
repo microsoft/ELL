@@ -18,14 +18,12 @@
 #include "MapCompilerArguments.h"
 #include "ModelLoadArguments.h"
 
-// math
-#include "Tensor.h"
-
 // model
 #include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
 #include "IRModelProfiler.h"
+#include "PortMemoryLayout.h"
 
 // passes
 #include "StandardPasses.h"
@@ -50,13 +48,13 @@
 using namespace ell;
 
 template <typename InputType, utilities::IsIntegral<InputType> = true>
-std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
+std::vector<InputType> GetInputVector(const model::MemoryShape& inputShape)
 {
-    auto inputSize = inputShape.Size();
+    auto inputSize = inputShape.NumElements();
     std::vector<InputType> result(inputSize);
     auto engine = utilities::GetRandomEngine("123");
     std::uniform_int_distribution<InputType> dist(0, 255);
-    for (size_t index = 0; index < inputSize; ++index)
+    for (int index = 0; index < inputSize; ++index)
     {
         result[index] = dist(engine);
     }
@@ -64,13 +62,13 @@ std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
 }
 
 template <typename InputType, utilities::IsFloatingPoint<InputType> = true>
-std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
+std::vector<InputType> GetInputVector(const model::MemoryShape& inputShape)
 {
-    auto inputSize = inputShape.Size();
+    auto inputSize = inputShape.NumElements();
     std::vector<InputType> result(inputSize);
     auto engine = utilities::GetRandomEngine("123");
     std::uniform_real_distribution<InputType> dist(0, std::nextafter(255, std::numeric_limits<InputType>::max()));
-    for (size_t index = 0; index < inputSize; ++index)
+    for (int index = 0; index < inputSize; ++index)
     {
         result[index] = dist(engine);
     }
@@ -108,7 +106,7 @@ std::vector<InputType> GetInputConverted(std::string filename, const std::vector
 template <typename InputType>
 std::vector<InputType> GetModelInput(model::Map& map, const ProfileArguments& profileArguments, const std::vector<std::string>& converterArgs)
 {
-    math::TensorShape inputShape = map.GetInputShape();
+    auto inputShape = map.GetInputShape();
     if (profileArguments.inputConverter.empty())
     {
         return GetInputVector<InputType>(inputShape);

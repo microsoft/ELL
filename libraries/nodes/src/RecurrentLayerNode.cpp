@@ -92,7 +92,7 @@ namespace nodes
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newHiddenWeights = transformer.TransformPortElements(_hiddenWeights.GetPortElements());
         auto newHiddenBias = transformer.TransformPortElements(_hiddenBias.GetPortElements());
-        auto newNode = transformer.AddNode<RecurrentNode>(newInput, newHiddenWeights, newHiddenBias, _inputMemoryLayout, _outputMemoryLayout);
+        auto newNode = transformer.AddNode<RecurrentNode>(newInput, newHiddenWeights, newHiddenBias, _inputMemoryLayout, GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "PortMemoryLayout.h"
+
 // utilities
 #include "IArchivable.h"
 #include "PropertyBag.h"
@@ -56,6 +58,11 @@ namespace model
         /// <returns> The dimensionality of the output </returns>
         virtual size_t Size() const = 0;
 
+        /// <summary> Returns the memory layout of the output </summary>
+        ///
+        /// <returns> The memory layout of the output </returns>
+        virtual PortMemoryLayout GetMemoryLayout() const = 0;
+
         /// <summary> Returns the name of this port </summary>
         ///
         /// <returns> The name of this port </returns>
@@ -82,12 +89,12 @@ namespace model
         ///
         /// <returns> A reference to the PropertyBag containing the metadata for this object. </returns>
         utilities::PropertyBag& GetMetadata() { return _metadata; }
-        
+
         /// <summary> Get this object's metadata object. </summary>
         ///
         /// <returns> A const reference to the PropertyBag containing the metadata for this object. </returns>
         const utilities::PropertyBag& GetMetadata() const { return _metadata; }
-        
+
     protected:
         Port(const class Node* node, std::string name, PortType type)
             : _node(node), _name(name), _type(type) {}
@@ -97,9 +104,8 @@ namespace model
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
-    
-    private:
 
+    private:
         // _node keeps info on where the input is coming from
         const class Node* _node = nullptr;
         std::string _name;

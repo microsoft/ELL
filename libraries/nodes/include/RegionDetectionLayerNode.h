@@ -76,7 +76,7 @@ namespace nodes
 
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
-        const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
+        model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
 
         static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("RegionDetectionNode"); }
 
@@ -112,7 +112,6 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         model::PortMemoryLayout _inputMemoryLayout;
-        model::PortMemoryLayout _outputMemoryLayout;
     };
 }
 }

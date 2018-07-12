@@ -13,6 +13,7 @@
 
 // stl
 #include <vector>
+
 namespace ell
 {
 namespace nodes
@@ -27,11 +28,12 @@ namespace nodes
     }
 
     template <typename ValueType>
-    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout.GetMemorySize()), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _outputDimensionOrder({}), _paddingValue(paddingValue)
+    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _outputDimensionOrder({}), _paddingValue(paddingValue)
     {
-        assert(_inputMemoryLayout.NumDimensions() == _outputMemoryLayout.NumDimensions());
-        int numDimensions = _outputMemoryLayout.NumDimensions();
+        _inputMemoryLayout = _input.GetMemoryLayout();
+        assert(_inputMemoryLayout.NumDimensions() == outputMemoryLayout.NumDimensions());
+        int numDimensions = outputMemoryLayout.NumDimensions();
         _outputDimensionOrder.resize(numDimensions);
         for (int index = 0; index < numDimensions; ++index)
         {
@@ -40,21 +42,43 @@ namespace nodes
     }
 
     template <typename ValueType>
-    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const std::vector<int>& order, ValueType paddingValue)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout.GetMemorySize()), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _outputDimensionOrder(order), _paddingValue(paddingValue)
+    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _outputDimensionOrder({}), _paddingValue(paddingValue)
     {
-        assert(_inputMemoryLayout.NumDimensions() == _outputMemoryLayout.NumDimensions());
+        assert(inputMemoryLayout.NumDimensions() == outputMemoryLayout.NumDimensions());
+        int numDimensions = outputMemoryLayout.NumDimensions();
+        _outputDimensionOrder.resize(numDimensions);
+        for (int index = 0; index < numDimensions; ++index)
+        {
+            _outputDimensionOrder[index] = index;
+        }
+    }
+
+    template <typename ValueType>
+    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, const std::vector<int>& order, ValueType paddingValue)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _outputDimensionOrder(order), _paddingValue(paddingValue)
+    {
+        _inputMemoryLayout = _input.GetMemoryLayout();
+        assert(_inputMemoryLayout.NumDimensions() == outputMemoryLayout.NumDimensions());
+        assert(_inputMemoryLayout.NumDimensions() == _outputDimensionOrder.size());
+    }
+
+    template <typename ValueType>
+    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const std::vector<int>& order, ValueType paddingValue)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _outputDimensionOrder(order), _paddingValue(paddingValue)
+    {
+        assert(inputMemoryLayout.NumDimensions() == outputMemoryLayout.NumDimensions());
         assert(_inputMemoryLayout.NumDimensions() == _outputDimensionOrder.size());
     }
 
     // Note: order {2, 0, 1} maps {row, column, channel} -> {channel, row, column}
     // So, we want to map entry 0  of the input (row) -> entry 1 (row) of the output
     template <typename ValueType>
-    model::Shape ReorderDataNode<ValueType>::ReorderInputToOutputLocation(model::Shape inputLocation) const
+    model::MemoryShape ReorderDataNode<ValueType>::ReorderInputToOutputLocation(model::MemoryShape inputLocation) const
     {
-        model::Shape result;
-        result.resize(inputLocation.size());
-        for (int index = 0; index < result.size(); ++index)
+        model::MemoryShape result;
+        result.Resize(inputLocation.NumDimensions());
+        for (int index = 0; index < result.NumDimensions(); ++index)
         {
             result[index] = inputLocation[_outputDimensionOrder[index]];
         }
@@ -76,11 +100,11 @@ namespace nodes
     // Note: order {2, 0, 1} maps {row, column, channel} -> {channel, row, column}
     // So, we want to map entry 0  of the output (channel) -> entry 2 (channel) of the intput
     template <typename ValueType>
-    model::Shape ReorderDataNode<ValueType>::ReorderOutputToInputLocation(model::Shape outputLocation) const
+    model::MemoryShape ReorderDataNode<ValueType>::ReorderOutputToInputLocation(model::MemoryShape outputLocation) const
     {
-        model::Shape result;
-        result.resize(outputLocation.size());
-        for (size_t index = 0; index < result.size(); ++index)
+        model::MemoryShape result;
+        result.Resize(outputLocation.NumDimensions());
+        for (int index = 0; index < result.NumDimensions(); ++index)
         {
             result[_outputDimensionOrder[index]] = outputLocation[index];
         }
@@ -103,7 +127,7 @@ namespace nodes
     void ReorderDataNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<ReorderDataNode>(newPortElements, _inputMemoryLayout, _outputMemoryLayout, _outputDimensionOrder, _paddingValue);
+        auto newNode = transformer.AddNode<ReorderDataNode>(newPortElements, _inputMemoryLayout, _output.GetMemoryLayout(), _outputDimensionOrder, _paddingValue);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -111,22 +135,23 @@ namespace nodes
     template <typename ValueType>
     void ReorderDataNode<ValueType>::Compute() const
     {
-        model::Shape inputIncrement = _inputMemoryLayout.GetCumulativeIncrement();
-        model::Shape outputIncrement = _outputMemoryLayout.GetCumulativeIncrement();
+        auto outputMemoryLayout = _output.GetMemoryLayout();
+        model::MemoryShape inputIncrement = _inputMemoryLayout.GetCumulativeIncrement();
+        model::MemoryShape outputIncrement = outputMemoryLayout.GetCumulativeIncrement();
 
-        int outputSize = _outputMemoryLayout.GetMemorySize();
+        int outputSize = outputMemoryLayout.GetMemorySize();
         std::vector<ValueType> output(outputSize, _paddingValue); // initialize to padding value
 
         // loop over output
-        for (int x = 0; x < _outputMemoryLayout.GetActiveSize(0); ++x)
+        for (int x = 0; x < outputMemoryLayout.GetActiveSize(0); ++x)
         {
-            for (int y = 0; y < _outputMemoryLayout.GetActiveSize(1); ++y)
+            for (int y = 0; y < outputMemoryLayout.GetActiveSize(1); ++y)
             {
-                for (int z = 0; z < _outputMemoryLayout.GetActiveSize(2); ++z)
+                for (int z = 0; z < outputMemoryLayout.GetActiveSize(2); ++z)
                 {
                     auto inputLocation = ReorderOutputToInputLocation({ x, y, z });
                     auto inputIndex = _inputMemoryLayout.GetEntryOffset(inputLocation);
-                    auto outputIndex = _outputMemoryLayout.GetEntryOffset({ x, y, z });
+                    auto outputIndex = outputMemoryLayout.GetEntryOffset({ x, y, z });
                     output[outputIndex] = _input[inputIndex];
                 }
             }
@@ -142,15 +167,16 @@ namespace nodes
         llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output, _paddingValue);
         assert(this->input.Size() > 1);
 
-        int outputSize = _outputMemoryLayout.GetMemorySize();
+        auto outputMemoryLayout = _output.GetMemoryLayout();
+        int outputSize = outputMemoryLayout.GetMemorySize();
         UNUSED(outputSize);
 
-        function.For(_outputMemoryLayout.GetActiveSize(0), [pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* x) {
-            function.For(_outputMemoryLayout.GetActiveSize(1), [x, pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* y) {
-                function.For(_outputMemoryLayout.GetActiveSize(2), [x, y, pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* z) {
+        function.For(outputMemoryLayout.GetActiveSize(0), [outputMemoryLayout, pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* x) {
+            function.For(outputMemoryLayout.GetActiveSize(1), [x, outputMemoryLayout, pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* y) {
+                function.For(outputMemoryLayout.GetActiveSize(2), [x, y, outputMemoryLayout, pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* z) {
                     auto inputLocation = ReorderOutputToInputLocation({ x, y, z });
                     auto inputIndex = _inputMemoryLayout.EmitGetEntryOffset(function, inputLocation);
-                    auto outputIndex = _outputMemoryLayout.EmitGetEntryOffset(function, { x, y, z });
+                    auto outputIndex = outputMemoryLayout.EmitGetEntryOffset(function, { x, y, z });
                     llvm::Value* value = function.ValueAt(pInput, inputIndex);
                     function.SetValueAt(pOutput, outputIndex, value);
                 });
@@ -164,7 +190,6 @@ namespace nodes
         CompilableNode::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
         archiver["inputLayout"] << _inputMemoryLayout;
-        archiver["outputLayout"] << _outputMemoryLayout;
         archiver["order"] << _outputDimensionOrder;
         archiver["paddingValue"] << _paddingValue;
     }
@@ -175,7 +200,14 @@ namespace nodes
         CompilableNode::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
         archiver["inputLayout"] >> _inputMemoryLayout;
-        archiver["outputLayout"] >> _outputMemoryLayout;
+        model::PortMemoryLayout outputMemoryLayout;
+        if (archiver.HasNextPropertyName("outputLayout"))
+        {
+            // backward-compatability
+            archiver["outputLayout"] >> outputMemoryLayout;
+            _output.SetMemoryLayout(outputMemoryLayout);
+        }
+
         archiver["order"] >> _outputDimensionOrder;
         archiver["paddingValue"] >> _paddingValue;
     }

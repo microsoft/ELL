@@ -115,9 +115,9 @@ std::string GetConvAlgName(dsp::ConvolutionMethodOption alg)
 model::PortMemoryLayout CalculateMemoryLayout(int numRows, int numColumns, int numChannels, int padding)
 {
     // Calculate dimension parameters
-    model::Shape size{ numRows, numColumns, numChannels };
-    model::Shape offset{ padding, padding, 0 };
-    model::Shape stride{ numRows + 2 * padding, numColumns + 2 * padding, numChannels };
+    model::MemoryShape size{ numRows, numColumns, numChannels };
+    model::MemoryShape offset{ padding, padding, 0 };
+    model::MemoryShape stride{ numRows + 2 * padding, numColumns + 2 * padding, numChannels };
 
     return { size, stride, offset };
 }

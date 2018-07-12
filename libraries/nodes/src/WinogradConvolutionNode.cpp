@@ -84,11 +84,6 @@ namespace nodes
             }
         }
 
-        int GetOutputSize(const model::PortMemoryLayout& outputLayout)
-        {
-            return outputLayout.GetActiveSize(0) * outputLayout.GetActiveSize(1) * outputLayout.GetActiveSize(2);
-        }
-
         emitters::IRLocalScalar AddAndSimplify(emitters::IRLocalScalar a, emitters::IRLocalScalar b)
         {
             if (auto constA = llvm::dyn_cast<llvm::ConstantFP>(a.value))
@@ -887,7 +882,7 @@ namespace nodes
 
     template <typename ValueType>
     WinogradConvolutionNode<ValueType>::WinogradConvolutionNode(const WinogradConvolutionNode<ValueType>& other, const model::PortElements<ValueType>& input)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(other._outputMemoryLayout)), _inputMemoryLayout(other._inputMemoryLayout), _outputMemoryLayout(other._outputMemoryLayout), _filterWeights(other._filterWeights), _stride(other._stride), _tileSize(other._tileSize), _filterSize(other._filterSize), _order(other._order)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, other.GetOutputMemoryLayout()), _inputMemoryLayout(other._inputMemoryLayout), _filterWeights(other._filterWeights), _stride(other._stride), _tileSize(other._tileSize), _filterSize(other._filterSize), _order(other._order)
     {
     }
 
@@ -899,7 +894,7 @@ namespace nodes
                                                                 int stride,
                                                                 int tileSize,
                                                                 FilterOrder order)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _stride(stride), _tileSize(tileSize), _order(order)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _stride(stride), _tileSize(tileSize), _order(order)
     {
         const int numFilters = outputMemoryLayout.GetActiveSize(2);
         _filterSize = filterWeights.NumColumns();
@@ -928,7 +923,7 @@ namespace nodes
 
         auto weightsNode = transformer.AddNode<ConstantNode<ValueType>>(weightsValues);
         const auto numFilterChannels = _order == FilterOrder::tilesFirst ? _filterWeights.NumChannels() : _filterWeights.NumColumns();
-        auto convNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(newInput, weightsNode->output, _inputMemoryLayout, _outputMemoryLayout, _stride, _tileSize, _filterSize, _order, static_cast<int>(numFilterChannels));
+        auto convNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(newInput, weightsNode->output, _inputMemoryLayout, GetOutputMemoryLayout(), _stride, _tileSize, _filterSize, _order, static_cast<int>(numFilterChannels));
         transformer.MapNodeOutput(this->output, convNode->output);
         return true;
     }
@@ -945,7 +940,7 @@ namespace nodes
         model::CompilableNode::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
         archiver["inputLayout"] << _inputMemoryLayout;
-        archiver["outputLayout"] << _outputMemoryLayout;
+        archiver["outputLayout"] << GetOutputMemoryLayout();
         archiver["tileSize"] << _tileSize;
         archiver["filterSize"] << _filterSize;
         archiver["stride"] << _stride;
@@ -959,7 +954,9 @@ namespace nodes
         model::CompilableNode::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
         archiver["inputLayout"] >> _inputMemoryLayout;
-        archiver["outputLayout"] >> _outputMemoryLayout;
+        model::PortMemoryLayout outputMemoryLayout;
+        archiver["outputLayout"] >> outputMemoryLayout;
+        _output.SetMemoryLayout(outputMemoryLayout);
         archiver["tileSize"] >> _tileSize;
         archiver["filterSize"] >> _filterSize;
         archiver["stride"] >> _stride;
@@ -989,7 +986,7 @@ namespace nodes
                                                                               int filterSize,
                                                                               FilterOrder order,
                                                                               int numFilterChannels)
-        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _stride(stride), _tileSize(tileSize), _filterSize(filterSize), _order(order), _numFilterChannels(numFilterChannels)
+        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _stride(stride), _tileSize(tileSize), _filterSize(filterSize), _order(order), _numFilterChannels(numFilterChannels)
     {
         const auto numChannels = inputMemoryLayout.GetActiveSize(2);
         const int numFilters = outputMemoryLayout.GetActiveSize(2);
@@ -1001,7 +998,7 @@ namespace nodes
     WinogradConvolutionComputeNode<ValueType>::WinogradConvolutionComputeNode(const WinogradConvolutionComputeNode<ValueType>& other,
                                                                               const model::PortElements<ValueType>& input,
                                                                               const model::PortElements<ValueType>& filterWeights)
-        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, GetOutputSize(other._outputMemoryLayout)), _inputMemoryLayout(other._inputMemoryLayout), _outputMemoryLayout(other._outputMemoryLayout), _stride(other._stride), _tileSize(other._tileSize), _filterSize(other._filterSize), _order(other._order), _numFilterChannels(other._numFilterChannels), _inputBlockSize(other._inputBlockSize), _outputBlockSize(other._outputBlockSize)
+        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, other.GetOutputMemoryLayout()), _inputMemoryLayout(other._inputMemoryLayout), _stride(other._stride), _tileSize(other._tileSize), _filterSize(other._filterSize), _order(other._order), _numFilterChannels(other._numFilterChannels), _inputBlockSize(other._inputBlockSize), _outputBlockSize(other._outputBlockSize)
     {
     }
 

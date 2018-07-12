@@ -24,11 +24,6 @@ namespace nodes
         using namespace ::ell::emitters;
         using namespace ::ell::model;
 
-        size_t GetOutputSize(const PortMemoryLayout& outputLayout)
-        {
-            return outputLayout.GetActiveSize(0) * outputLayout.GetActiveSize(1) * outputLayout.GetActiveSize(2);
-        }
-
         //
         // Low-level code-generation
         //
@@ -56,7 +51,7 @@ namespace nodes
                 auto input = capturedValues[0];
                 auto filterWeights = capturedValues[1];
                 auto result = capturedValues[2];
-                auto outputTensor = function.LocalTensor(result, outputLayout.GetStride(), RowMajorTensorLayout);
+                auto outputTensor = function.LocalTensor(result, outputLayout.GetStride().ToVector(), RowMajorTensorLayout);
 
                 // For each output row
                 const auto outputRows = outputLayout.GetActiveSize(0);
@@ -132,8 +127,8 @@ namespace nodes
                 auto filterWeights = capturedValues[1];
                 auto result = capturedValues[2];
 
-                auto inputTensor = function.LocalTensor(input, inputLayout.GetStride(), RowMajorTensorLayout);
-                auto outputTensor = function.LocalTensor(result, outputLayout.GetStride(), RowMajorTensorLayout);
+                auto inputTensor = function.LocalTensor(input, inputLayout.GetStride().ToVector(), RowMajorTensorLayout);
+                auto outputTensor = function.LocalTensor(result, outputLayout.GetStride().ToVector(), RowMajorTensorLayout);
                 auto filter = function.LocalMultidimArray(filterWeights, { inputLayout.GetStride(2), filterSize, filterSize});
 
                 // For each output column
@@ -183,7 +178,7 @@ namespace nodes
                                                             const model::PortMemoryLayout& outputMemoryLayout,
                                                             const ConstTensorReferenceType& filterWeights,
                                                             size_t stride)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterWeights(filterWeights), _stride(static_cast<int>(stride))
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterWeights(filterWeights), _stride(static_cast<int>(stride))
     {
         _isDepthwiseSeparable = (filterWeights.NumChannels() == 1) && (inputMemoryLayout.GetActiveSize()[2] > 1);
     }
@@ -192,7 +187,7 @@ namespace nodes
     void SimpleConvolutionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<SimpleConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, _outputMemoryLayout, _filterWeights, _stride);
+        auto newNode = transformer.AddNode<SimpleConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, GetOutputMemoryLayout(), _filterWeights, _stride);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -206,7 +201,7 @@ namespace nodes
         const auto weightsValues = weightsMatrix.ToArray();
         const int filterSize = _filterWeights.NumColumns();
         auto weightsNode = transformer.AddNode<ConstantNode<ValueType>>(weightsValues);
-        auto convNode = transformer.AddNode<SimpleConvolutionComputeNode<ValueType>>(newInput, weightsNode->output, _inputMemoryLayout, _outputMemoryLayout, filterSize, _stride, _isDepthwiseSeparable);
+        auto convNode = transformer.AddNode<SimpleConvolutionComputeNode<ValueType>>(newInput, weightsNode->output, _inputMemoryLayout, GetOutputMemoryLayout(), filterSize, _stride, _isDepthwiseSeparable);
         transformer.MapNodeOutput(this->output, convNode->output);
         return true;
     }
@@ -223,7 +218,7 @@ namespace nodes
         model::CompilableNode::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
         archiver["inputLayout"] << _inputMemoryLayout;
-        archiver["outputLayout"] << _outputMemoryLayout;
+        archiver["outputLayout"] << GetOutputMemoryLayout();
         archiver["stride"] << _stride;
         math::TensorArchiver::Write(_filterWeights, "weights", archiver);
     }
@@ -234,7 +229,9 @@ namespace nodes
         model::CompilableNode::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
         archiver["inputLayout"] >> _inputMemoryLayout;
-        archiver["outputLayout"] >> _outputMemoryLayout;
+        model::PortMemoryLayout outputMemoryLayout;
+        archiver["outputLayout"] >> outputMemoryLayout;
+        _output.SetMemoryLayout(outputMemoryLayout);
         archiver["stride"] >> _stride;
         math::TensorArchiver::Read(_filterWeights, "weights", archiver);
 
@@ -259,7 +256,7 @@ namespace nodes
                                                                           int filterSize,
                                                                           int stride,
                                                                           bool isDepthwiseSeparable)
-        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterSize(filterSize), _stride(stride), _isDepthwiseSeparable(isDepthwiseSeparable)
+        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterSize(filterSize), _stride(stride), _isDepthwiseSeparable(isDepthwiseSeparable)
     {
     }
 
@@ -268,7 +265,7 @@ namespace nodes
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newFilterWeights = transformer.TransformPortElements(_filterWeights.GetPortElements());
-        auto newNode = transformer.AddNode<SimpleConvolutionComputeNode<ValueType>>(newInput, newFilterWeights, _inputMemoryLayout, _outputMemoryLayout, _filterSize, _stride, _isDepthwiseSeparable);
+        auto newNode = transformer.AddNode<SimpleConvolutionComputeNode<ValueType>>(newInput, newFilterWeights, _inputMemoryLayout, GetOutputMemoryLayout(), _filterSize, _stride, _isDepthwiseSeparable);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 

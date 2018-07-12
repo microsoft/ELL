@@ -51,10 +51,7 @@ namespace nodes
         virtual const model::PortMemoryLayout& GetInputMemoryLayout() const = 0;
 
         /// <summary> Gets information about the output memory layout </summary>
-        virtual const model::PortMemoryLayout& GetOutputMemoryLayout() const = 0;
-
-        /// <summary> Gets information about the output memory layout </summary>
-        virtual model::PortMemoryLayout& GetOutputMemoryLayout() = 0;
+        virtual model::PortMemoryLayout GetOutputMemoryLayout() const = 0;
 
         /// <summary> Gets the LayerParameters from the layer wrapped by this node </summary>
         virtual typename predictors::neural::Layer<ValueType>::LayerParameters GetLayerParameters() const = 0;
@@ -119,10 +116,7 @@ namespace nodes
         const model::PortMemoryLayout& GetInputMemoryLayout() const override { return _inputLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
-        const model::PortMemoryLayout& GetOutputMemoryLayout() const override { return _outputLayout; }
-
-        /// <summary> Gets information about the output memory layout </summary>
-        model::PortMemoryLayout& GetOutputMemoryLayout() override { return _outputLayout; }
+        model::PortMemoryLayout GetOutputMemoryLayout() const override { return output.GetMemoryLayout(); }
 
         /// <summary> Gets the LayerParameters from the layer wrapped by this node </summary>
         typename predictors::neural::Layer<ValueType>::LayerParameters GetLayerParameters() const override { return _layer.GetLayerParameters(); }
@@ -148,7 +142,6 @@ namespace nodes
 
     private:
         model::PortMemoryLayout _inputLayout;
-        model::PortMemoryLayout _outputLayout;
         math::TensorShape _inputShape;
     };
 

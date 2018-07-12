@@ -16,29 +16,29 @@ namespace nodes
 {
     template <typename ValueType>
     SinkNode<ValueType>::SinkNode()
-        : SinkNode({}, {}, math::TensorShape{ 0, 0, 0 }, "", nullptr)
+        : SinkNode({}, {}, model::MemoryShape{ 0 }, "", nullptr)
     {
     }
 
     // Following the pattern of OutputNode, we provide a constructor override that infers the shape from the input
     template <typename ValueType>
     SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
-        : SinkNode(input, trigger, math::TensorShape{ input.Size(), 1, 1 }, sinkFunctionName, sink)
+        : SinkNode(input, trigger, model::MemoryShape{ static_cast<int>(input.Size()) }, sinkFunctionName, sink)
     {
     }
 
     template <typename ValueType>
     SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, size_t outputVectorSize, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
-        : SinkNode(input, trigger, math::TensorShape{ outputVectorSize, 1, 1 }, sinkFunctionName, sink)
+        : SinkNode(input, trigger, model::MemoryShape{ static_cast<int>(outputVectorSize) }, sinkFunctionName, sink)
     {
     }
 
     template <typename ValueType>
-    SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, const math::TensorShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
+    SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, const model::MemoryShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
         : model::SinkNodeBase(_input, _trigger, _output, shape, sinkFunctionName),
         _input(this, input, defaultInputPortName),
         _trigger(this, trigger, triggerPortName),
-        _output(this, defaultOutputPortName, shape.Size()),
+        _output(this, defaultOutputPortName, shape),
         _sink(sink == nullptr ? [](const auto&){} : sink)
     {
     }
@@ -137,7 +137,7 @@ namespace nodes
         archiver[defaultInputPortName] << _input;
         archiver[triggerPortName] << _trigger;
         archiver["sinkFunctionName"] << GetCallbackName();
-        archiver["shape"] << static_cast<std::vector<size_t>>(GetShape());
+        archiver["shape"] << GetShape().ToVector();
     }
 
     template <typename ValueType>
@@ -151,9 +151,9 @@ namespace nodes
         archiver["sinkFunctionName"] >> sinkFunctionName;
         SetCallbackName(sinkFunctionName);
 
-        std::vector<size_t> shapeVector;
+        std::vector<int> shapeVector;
         archiver["shape"] >> shapeVector;
-        SetShape(math::TensorShape{ shapeVector });
+        SetShape({ shapeVector });
 
         // _sink needs to be set separately
     }

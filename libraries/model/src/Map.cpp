@@ -316,7 +316,7 @@ namespace model
 
     size_t Map::GetInputSize() const
     {
-        return GetInputShape().Size();
+        return GetInputShape().NumElements();
     }
 
     size_t Map::GetOutputSize() const
@@ -324,7 +324,7 @@ namespace model
         return GetOutput(0).Size();
     }
 
-    math::TensorShape Map::GetInputShape() const
+    MemoryShape Map::GetInputShape() const
     {
         auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
         if (!sourceNodes.empty())
@@ -364,7 +364,7 @@ namespace model
         return result;
     }
 
-    math::TensorShape Map::GetOutputShape() const
+    MemoryShape Map::GetOutputShape() const
     {
         auto outputNodeVec = GetOutputNodes();
         if (!outputNodeVec.empty())
@@ -372,7 +372,7 @@ namespace model
             const OutputNodeBase* node = dynamic_cast<const OutputNodeBase*>(outputNodeVec[0]);
             return node->GetShape();
         }
-        return math::TensorShape(0, 0, 0);
+        return MemoryShape({ 0 });
     }
 
     Port::PortType Map::GetInputType() const

@@ -7,9 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompiledActivationFunctions.h"
-#include "ActivationLayerNode.h"
-#include "BinaryFunctionNode.h"
-#include "ConstantNode.h"
 
 // predictors
 #include "LeakyReLUActivation.h"

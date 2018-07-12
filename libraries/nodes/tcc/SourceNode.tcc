@@ -12,24 +12,24 @@ namespace nodes
 {
     template <typename ValueType>
     SourceNode<ValueType>::SourceNode()
-        : SourceNode({}, math::TensorShape{ 0, 0, 0 }, "", nullptr)
+        : SourceNode({}, model::MemoryShape{ 0 }, "", nullptr)
     {
     }
 
     template <typename ValueType>
     SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
-        : SourceNode(input, math::TensorShape{ inputVectorSize, 1, 1 }, sourceFunctionName, source)
+        : SourceNode(input, model::MemoryShape{ static_cast<int>(inputVectorSize) }, sourceFunctionName, source)
     {
     }
 
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, const math::TensorShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
+    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, const model::MemoryShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
         : model::SourceNodeBase(_input, _output, shape, sourceFunctionName),
         _input(this, input, defaultInputPortName),
-        _output(this, defaultOutputPortName, shape.Size()),
+        _output(this, defaultOutputPortName, shape),
         _source(source == nullptr ? [](auto&){ return false; } : source)
     {
-        _bufferedSample.resize(shape.Size());
+        _bufferedSample.resize(shape.NumElements());
     }
 
     template <typename ValueType>
@@ -142,7 +142,7 @@ namespace nodes
         archiver[defaultInputPortName] << _input;
         archiver[defaultOutputPortName] << _output;
         archiver["sourceFunctionName"] << GetCallbackName();
-        archiver["shape"] << static_cast<std::vector<size_t>>(GetShape());
+        archiver["shape"] << GetShape().ToVector();
     }
 
     template <typename ValueType>
@@ -156,10 +156,9 @@ namespace nodes
         archiver["sourceFunctionName"] >> sourceFunctionName;
         SetCallbackName(sourceFunctionName);
 
-        std::vector<size_t> shapeVector;
+        std::vector<int> shapeVector;
         archiver["shape"] >> shapeVector;
-        SetShape(math::TensorShape{ shapeVector });
-        _output.SetSize(GetShape().Size());
+        SetShape({ shapeVector });
     }
 
     template <typename ValueType>

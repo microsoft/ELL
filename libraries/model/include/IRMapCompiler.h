@@ -191,7 +191,7 @@ namespace model
         void EmitShapeEnum();
         void EmitGetInputShapeFunction(const Map& map);
         void EmitGetOutputShapeFunction(const Map& map);
-        void EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<InputShape> shapes);
+        void EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<MemoryShape> shapes);
 
         // stack of node regions
         std::vector<NodeMap<emitters::IRBlockRegion*>> _nodeRegions;

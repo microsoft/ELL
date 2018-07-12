@@ -902,7 +902,7 @@ static void TestConcatenationNodeCompute()
     auto inputNode = model.AddNode<model::InputNode<double>>(data.size());
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 6, 7, 8 });
     auto concatenationInputs = model::PortElements<double>({ inputNode->output, constantNode->output });
-    auto outputNode = model.AddNode<nodes::ConcatenationNode<double>>(concatenationInputs, math::TensorShape( 1, 1, 8 ));
+    auto outputNode = model.AddNode<nodes::ConcatenationNode<double>>(concatenationInputs,  model::MemoryShape{ 1, 1, 8 });
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
 

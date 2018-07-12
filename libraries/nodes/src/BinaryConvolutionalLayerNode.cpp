@@ -80,7 +80,7 @@ namespace nodes
             auto inputColStart = outputImageCol * stride;
 
             // The input is a filterSize x filterSize x numChannels image in in row x column x channel order
-            auto input = function.LocalTensor(inputVolume, inputLayout.GetStride(), emitters::RowMajorTensorLayout);
+            auto input = function.LocalTensor(inputVolume, inputLayout.GetStride().ToVector(), emitters::RowMajorTensorLayout);
             auto output = function.LocalTensor(realValueRow, { filterSize, filterSize, numChannels }, emitters::RowMajorTensorLayout);
 
             // For row, column, channel order:
@@ -476,7 +476,7 @@ namespace nodes
                                                               const predictors::neural::PaddingParameters& inputPaddingParameters,
                                                               const model::PortMemoryLayout& inputMemoryLayout,
                                                               const model::PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input, &_inputPaddingMasks, &_inputPaddingMaskSums, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, defaultInputPortName), _inputPaddingMasks(this, compressedInputPaddingMasks, inputPaddingMasksPortName), _inputPaddingMaskSums(this, inputPaddingMaskSums, inputPaddingMaskSumsPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, defaultOutputPortName, outputMemoryLayout.GetMemorySize()), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
+        : CompilableNode({ &_input, &_inputPaddingMasks, &_inputPaddingMaskSums, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, defaultInputPortName), _inputPaddingMasks(this, compressedInputPaddingMasks, inputPaddingMasksPortName), _inputPaddingMaskSums(this, inputPaddingMaskSums, inputPaddingMaskSumsPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _inputMemoryLayout(inputMemoryLayout)
     {
     }
 
@@ -488,7 +488,7 @@ namespace nodes
         auto newInputPaddingMaskSums = transformer.TransformPortElements(_inputPaddingMaskSums.GetPortElements());
         auto newFilterWeights = transformer.TransformPortElements(_filterWeights.GetPortElements());
         auto newFilterMeans = transformer.TransformPortElements(_filterMeans.GetPortElements());
-        auto newNode = transformer.AddNode<BinaryXnorNode>(newInput, newInputPaddingMasks, newInputPaddingMaskSums, newFilterWeights, newFilterMeans, _convolutionalParameters, _inputPaddingParameters, _inputMemoryLayout, _outputMemoryLayout);
+        auto newNode = transformer.AddNode<BinaryXnorNode>(newInput, newInputPaddingMasks, newInputPaddingMaskSums, newFilterWeights, newFilterMeans, _convolutionalParameters, _inputPaddingParameters, _inputMemoryLayout, GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 

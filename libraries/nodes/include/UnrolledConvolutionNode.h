@@ -74,7 +74,7 @@ namespace nodes
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the input memory layout </summary>
-        const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
+        model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -112,7 +112,6 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         model::PortMemoryLayout _inputMemoryLayout;
-        model::PortMemoryLayout _outputMemoryLayout;
 
         MatrixType _filterWeights;
 

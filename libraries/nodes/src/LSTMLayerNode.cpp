@@ -196,7 +196,7 @@ namespace nodes
         auto newForgetMeBias = transformer.TransformPortElements(_forgetMeBias.GetPortElements());
         auto newCandidateBias = transformer.TransformPortElements(_candidateBias.GetPortElements());
         auto newOutputBias = transformer.TransformPortElements(_outputBias.GetPortElements());
-        auto newNode = transformer.AddNode<LSTMNode>(newInput, newResetTrigger, newInputWeights, newForgetMeWeights, newCandidateWeights, newOutputWeights, newInputBias, newForgetMeBias, newCandidateBias, newOutputBias, _inputMemoryLayout, _outputMemoryLayout);
+        auto newNode = transformer.AddNode<LSTMNode>(newInput, newResetTrigger, newInputWeights, newForgetMeWeights, newCandidateWeights, newOutputWeights, newInputBias, newForgetMeBias, newCandidateBias, newOutputBias, _inputMemoryLayout, GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 

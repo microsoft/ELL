@@ -65,7 +65,7 @@ namespace nodes
         /// <param name="shape"> The output shape. </param>
         /// <param name="sinkFunctionName"> The sink function name to be emitted. </param>
         /// <param name="sink"> The optional sink function that will receive output values. </param>
-        SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, const math::TensorShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
+        SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, const model::MemoryShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
 
         /// <summary> Constructor. </summary>
         ///

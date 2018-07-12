@@ -12,15 +12,15 @@ namespace nodes
 {
     template <typename ValueType>
     ConcatenationNode<ValueType>::ConcatenationNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _shape(0, 0, 0) {};
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0) {};
 
     template <typename ValueType>
     ConcatenationNode<ValueType>::ConcatenationNode(const model::PortElements<ValueType>& input)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size()), _shape(input.Size(), 1, 1) {};
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size()) {};
 
     template <typename ValueType>
-    ConcatenationNode<ValueType>::ConcatenationNode(const model::PortElements<ValueType>& input, const Shape& shape)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size()), _shape(shape) {};
+    ConcatenationNode<ValueType>::ConcatenationNode(const model::PortElements<ValueType>& input, const model::MemoryShape& shape)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, shape) {};
 
     template <typename ValueType>
     void ConcatenationNode<ValueType>::Compute() const
@@ -86,7 +86,7 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
-        archiver[shapeName] << static_cast<std::vector<size_t>>(GetShape());
+        archiver[shapeName] << GetShape().ToVector();
     }
 
     template <typename ValueType>
@@ -94,12 +94,12 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
-        std::vector<size_t> shapeVector; 
+        std::vector<int> shapeVector; 
         archiver[shapeName] >> shapeVector;
         _output.SetSize(_input.Size());
         if (shapeVector.size() >= 3) 
         {
-            SetShape(OutputShape{ shapeVector });
+            SetShape({ shapeVector });
         }
     }
 }

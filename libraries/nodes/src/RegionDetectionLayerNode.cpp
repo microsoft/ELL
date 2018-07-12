@@ -60,7 +60,7 @@ namespace nodes
                                                         predictors::neural::RegionDetectionParameters params,
                                                         const model::PortMemoryLayout& inputMemoryLayout,
                                                         const model::PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _params(std::move(params)), _output(this, defaultOutputPortName, input.Size()), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _params(std::move(params)), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout)
     {
     }
 
@@ -68,7 +68,7 @@ namespace nodes
     void RegionDetectionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<RegionDetectionNode>(newInput, _params, _inputMemoryLayout, _outputMemoryLayout);
+        auto newNode = transformer.AddNode<RegionDetectionNode>(newInput, _params, GetInputMemoryLayout(), GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -79,18 +79,18 @@ namespace nodes
         // the stride of each cell (numBoxesPerCell * boxStride)
 
         std::vector<int> expectedStride{ _params.width, _params.height, _params.numBoxesPerCell * (_params.numAnchors + 1 + _params.numClasses) };
-        if (_inputMemoryLayout.GetStride() != expectedStride)
+        if (GetInputMemoryLayout().GetStride() != expectedStride)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input to region detection layer has incorrect shape");
         }
 
-        if (_outputMemoryLayout.GetStride() != expectedStride)
+        if (GetOutputMemoryLayout().GetStride() != expectedStride)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Output of region detection layer has incorrect shape");
         }
 
-        auto input = function.LocalTensor(compiler.EnsurePortEmitted(this->input), _inputMemoryLayout.GetStride(), emitters::RowMajorTensorLayout);
-        auto output = function.LocalTensor(compiler.EnsurePortEmitted(this->output), _outputMemoryLayout.GetStride(), emitters::RowMajorTensorLayout);
+        auto input = function.LocalTensor(compiler.EnsurePortEmitted(this->input), GetInputMemoryLayout().GetStride().ToVector(), emitters::RowMajorTensorLayout);
+        auto output = function.LocalTensor(compiler.EnsurePortEmitted(this->output), GetOutputMemoryLayout().GetStride().ToVector(), emitters::RowMajorTensorLayout);
 
         function.For(_params.width, [ input, output, params = _params ](auto& fn, auto i) {
             fn.For(params.height, [input, output, params, i](auto& fn, auto j) {

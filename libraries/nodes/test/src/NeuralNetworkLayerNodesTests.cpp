@@ -56,7 +56,10 @@
 #include <thread>
 
 using namespace ell;
+using namespace model;
 using namespace nodes;
+using namespace ell::predictors;
+using namespace ell::predictors::neural;
 
 //
 // Helpers
@@ -67,6 +70,11 @@ size_t GetShapeSize(const math::IntegerTriplet& shape)
 {
     return shape[0] * shape[1] * shape[2];
 }
+
+MemoryShape GetMemoryShape(const math::IntegerTriplet& shape)
+{
+    return { static_cast<int>(shape[0]), static_cast<int>(shape[1]), static_cast<int>(shape[2]) };
+}
 }
 
 //
@@ -75,33 +83,35 @@ size_t GetShapeSize(const math::IntegerTriplet& shape)
 template <typename ElementType>
 ell::predictors::NeuralNetworkPredictor<ElementType> CreateNeuralNetworkPredictor()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
-
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using VectorType = typename Layer<ElementType>::VectorType;
+    using Shape = typename Layer<ElementType>::Shape;
 
     // Build a net
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename NeuralNetworkPredictor<ElementType>::Layers layers;
 
-    InputParameters inputParams = { { 1, 1, 3 }, { PaddingScheme::zeros, 0 }, { 1, 1, 3 }, { PaddingScheme::zeros, 0 }, 1 };
+    Shape inputShape = { 1, 1, 3 };
+    InputParameters inputParams = { inputShape, NoPadding(), inputShape, NoPadding(), 1 };
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
-    LayerParameters layerParameters = { inputLayer->GetOutput(), NoPadding(), { 1, 1, 3 }, NoPadding() };
-    layerParameters = { inputLayer->GetOutput(), NoPadding(), { 1, 1, 3 }, NoPadding() };
-    VectorType bias1({ -0.43837756f, -0.90868396f, -0.0323102f });
-    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
+    // Bias layer
+    LayerParameters layerParameters = LayerParameters { inputLayer->GetOutput(), NoPadding(), inputShape, NoPadding() };
+    VectorType bias({ -0.43837756f, -0.90868396f, -0.0323102f });
+    layers.push_back(std::make_unique<BiasLayer<ElementType>>(layerParameters, bias));
+
+    // Scaling layer
+    layerParameters = LayerParameters { layers.back()->GetOutput(), NoPadding(), inputShape, NoPadding() };
+    VectorType scale({ 1.0f, 5.0f, 10.0f });
+    layers.push_back(std::make_unique<ScalingLayer<ElementType>>(layerParameters, scale));
+
     NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
     return neuralNetwork;
 }
 
 static void TestNeuralNetworkPredictorNode()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
-
     using ElementType = double;
     using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
@@ -123,9 +133,6 @@ static void TestNeuralNetworkPredictorNode()
 
 static void TestArchiveNeuralNetworkPredictorNode()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
-
     using ElementType = double;
     using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
@@ -175,9 +182,6 @@ static void TestArchiveNeuralNetworkPredictorNode()
 
 static void TestArchiveNeuralNetworkLayerNodes()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
-
     using ElementType = double;
     using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
@@ -190,7 +194,7 @@ static void TestArchiveNeuralNetworkLayerNodes()
     // Create a model
     model::Model model;
     {
-        auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
+        auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetMemoryShape(neuralNetwork.GetInputShape()));
         auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
         UNUSED(predictorNode);
     }
@@ -219,6 +223,10 @@ static void TestArchiveNeuralNetworkLayerNodes()
 
     auto inputNodes = model2.GetNodesByType<model::InputNode<ElementType>>();
     testing::ProcessTest("Testing NeuralNetworkLayerNodes archive (input node)", testing::IsEqual((int)inputNodes.size(), 1));
+
+#if 0
+    common::SaveModel(refinedModel, "RefinedNNModel.model");
+#endif
 }
 
 //
@@ -228,8 +236,6 @@ static void TestArchiveNeuralNetworkLayerNodes()
 static void TestActivationLayerNode()
 {
     using ElementType = double;
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
@@ -343,8 +349,6 @@ static void TestBiasLayerNode()
 
 static void TestConvolutionalLayerNode()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -435,8 +439,6 @@ static void TestConvolutionalLayerNode()
 
 static void TestBinaryConvolutionalLayerNode()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -578,8 +580,6 @@ static void TestFullyConnectedLayerNode()
 
 static void TestPoolingLayerNode()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using ElementType = double;
     using LayerType = PoolingLayer<ElementType, MaxPoolingFunction>;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
@@ -642,7 +642,7 @@ static void TestScalingLayerNode()
     input(1, 0, 1) = 3;
     input(1, 1, 1) = 4;
     Shape outputShape = { 4, 4, 2 };
-    LayerParameters parameters{ input, predictors::neural::NoPadding(), outputShape, predictors::neural::ZeroPadding(1) };
+    LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
     VectorType scale({ 5, 10 });
 
     LayerType layer(parameters, scale);
@@ -674,8 +674,6 @@ static void TestSoftmaxLayerNode()
     using ElementType = double;
     using LayerType = predictors::neural::SoftmaxLayer<ElementType>;
 
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;

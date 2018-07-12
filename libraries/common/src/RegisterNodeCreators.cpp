@@ -72,10 +72,11 @@ namespace common
         builder.RegisterNodeCreator<nodes::ConcatenationNode<int>, const model::PortElements<int>&>();
         builder.RegisterNodeCreator<nodes::ConcatenationNode<float>, const model::PortElements<float>&>();
         builder.RegisterNodeCreator<nodes::ConcatenationNode<double>, const model::PortElements<double>&>();
-        builder.RegisterNodeCreator<nodes::ConcatenationNode<bool>, const model::PortElements<bool>&, const std::vector<size_t>&>();
-        builder.RegisterNodeCreator<nodes::ConcatenationNode<int>, const model::PortElements<int>&, const std::vector<size_t>&>();
-        builder.RegisterNodeCreator<nodes::ConcatenationNode<float>, const model::PortElements<float>&, const std::vector<size_t>&>();
-        builder.RegisterNodeCreator<nodes::ConcatenationNode<double>, const model::PortElements<double>&, const std::vector<size_t>&>();
+        
+        builder.RegisterNodeCreator<nodes::ConcatenationNode<bool>, const model::PortElements<bool>&, const model::MemoryShape&>();
+        builder.RegisterNodeCreator<nodes::ConcatenationNode<int>, const model::PortElements<int>&, const model::MemoryShape&>();
+        builder.RegisterNodeCreator<nodes::ConcatenationNode<float>, const model::PortElements<float>&, const model::MemoryShape&>();
+        builder.RegisterNodeCreator<nodes::ConcatenationNode<double>, const model::PortElements<double>&, const model::MemoryShape&>();
 
         builder.RegisterNodeCreator<nodes::ConstantNode<bool>, const std::vector<bool>&>();
         builder.RegisterNodeCreator<nodes::ConstantNode<int>, const std::vector<int>&>();

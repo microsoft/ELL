@@ -802,9 +802,9 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
             LayerCaptureData& layerData = _layerOutputData[i];
             layerData.compiledDebugNode = sinkNode;
             auto memLayout = layerNode->GetOutputMemoryLayout();
-            layerData.size = memLayout.GetActiveSize();
-            layerData.stride = memLayout.GetStride();
-            layerData.offset = memLayout.GetOffset();
+            layerData.size = memLayout.GetActiveSize().ToVector();
+            layerData.stride = memLayout.GetStride().ToVector();
+            layerData.offset = memLayout.GetOffset().ToVector();
             layerData.compiledNodeId = to_string(layerNode->GetId());
             layerData.compiledNodeLabel = label;
             auto referenceLabel = GetSinkNodeLabel(layerData.referenceDebugNode);

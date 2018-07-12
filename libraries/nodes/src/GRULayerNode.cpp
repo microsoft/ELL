@@ -87,7 +87,10 @@ namespace nodes
                                                                                      hiddenWeightsNode->output,
                                                                                      updateBiasNode->output,
                                                                                      resetBiasNode->output,
-                                                                                     hiddenBiasNode->output);
+                                                                                     hiddenBiasNode->output,
+                                                                                     this->GetInputMemoryLayout(),
+                                                                                     this->GetOutputMemoryLayout());
+
 
         transformer.MapNodeOutput(this->output, gruNode->output);
         return true;
@@ -134,7 +137,7 @@ namespace nodes
     //
     template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
     GRUNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::GRUNode()
-        : GRUNode({ /*input*/ }, { /*resetTrigger*/ }, { /*updateWeights*/ }, { /*resetWeights*/ }, { /*hiddenWeights*/ }, { /*updateBias*/ }, { /*resetBias*/ }, { /*hiddenBias*/ })
+        : GRUNode({ /*input*/ }, { /*resetTrigger*/ }, { /*updateWeights*/ }, { /*resetWeights*/ }, { /*hiddenWeights*/ }, { /*updateBias*/ }, { /*resetBias*/ }, { /*hiddenBias*/ }, { /*inputMemoryLayout*/ }, { /*outputMemoryLayout*/ })
     {
     }
 
@@ -146,7 +149,9 @@ namespace nodes
                                                                                          const model::PortElements<ValueType>& hiddenWeights,
                                                                                          const model::PortElements<ValueType>& updateBias,
                                                                                          const model::PortElements<ValueType>& resetBias,
-                                                                                         const model::PortElements<ValueType>& hiddenBias)
+                                                                                         const model::PortElements<ValueType>& hiddenBias,
+                                                                                         const model::PortMemoryLayout& inputMemoryLayout,
+                                                                                         const model::PortMemoryLayout& outputMemoryLayout)
         : CompilableNode(std::vector<model::InputPortBase*>({ &_input, &_resetTrigger, &_updateWeights, &_resetWeights, &_hiddenWeights, &_updateBias, &_resetBias, &_hiddenBias }),
                          { &_output })
         , _input(this, input, defaultInputPortName)
@@ -157,7 +162,8 @@ namespace nodes
         , _updateBias(this, updateBias, updateBiasPortName)
         , _resetBias(this, resetBias, resetBiasPortName)
         , _hiddenBias(this, hiddenBias, hiddenBiasPortName)
-        , _output(this, defaultOutputPortName, updateBias.Size())
+        , _output(this, defaultOutputPortName, outputMemoryLayout)
+        , _inputMemoryLayout(inputMemoryLayout)
     {
     }
 
@@ -172,8 +178,7 @@ namespace nodes
         auto newUpdateBias = transformer.TransformPortElements(_updateBias.GetPortElements());
         auto newResetBias = transformer.TransformPortElements(_resetBias.GetPortElements());
         auto newHiddenBias = transformer.TransformPortElements(_hiddenBias.GetPortElements());
-
-        auto newNode = transformer.AddNode<GRUNode>(newInput, newResetTrigger, newUpdateWeights, newResetWeights, newHiddenWeights, newUpdateBias, newResetBias, newHiddenBias);
+        auto newNode = transformer.AddNode<GRUNode>(newInput, newResetTrigger, newUpdateWeights, newResetWeights, newHiddenWeights, newUpdateBias, newResetBias, newHiddenBias, _inputMemoryLayout, GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 

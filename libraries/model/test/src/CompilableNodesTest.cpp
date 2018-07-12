@@ -176,7 +176,7 @@ void TestCompilableConcatenationNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(5);
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 6, 7, 8 });
     auto concatenationInputs = model::PortElements<double>({ inputNode->output, constantNode->output });
-    auto outputNode = model.AddNode<nodes::ConcatenationNode<double>>(concatenationInputs, math::TensorShape(1, 1, 8));
+    auto outputNode = model.AddNode<nodes::ConcatenationNode<double>>(concatenationInputs, model::MemoryShape{ 1, 1, 8 });
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::IRMapCompiler compiler;
@@ -405,7 +405,7 @@ void TestMatrixVectorProductNodeCompile()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto testNode = model.AddNode<nodes::MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
-    auto outputNode = model.AddNode<model::OutputNode<double>>(testNode->output, model::OutputShape{ 1, 4, 1 });
+    auto outputNode = model.AddNode<model::OutputNode<double>>(testNode->output, model::MemoryShape{ 1, 4, 1 });
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = false;
@@ -454,7 +454,12 @@ void TestCompilableBinaryOperationNode2()
     auto compiledMap = compiler.Compile(map);
 
     // compare output
-    std::vector<std::vector<double>> signal = { { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0, 0.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } };
+    // clang-format off
+    std::vector<std::vector<double>> signal = {{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                 0.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 0.0,
+                                                 0.0, 0.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0,
+                                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
+    // clang-format on
     VerifyCompiledOutput(map, compiledMap, signal, "BinaryOperationNode");
 }
 
@@ -884,7 +889,7 @@ void TestFloatNode()
 void TestMultipleOutputNodes()
 {
     model::Model model;
-    ell::math::TensorShape shape{ 224, 224, 3 };
+    model::MemoryShape shape{ 224, 224, 3 };
     auto inputNode = model.AddNode<model::InputNode<double>>(shape);
     auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output, shape);
     auto outputNode2 = model.AddNode<model::OutputNode<double>>(inputNode->output);
@@ -903,7 +908,7 @@ void TestShapeFunctionGeneration()
     auto npos = std::string::npos;
 
     model::Model model;
-    ell::math::TensorShape shape{ 224, 224, 3 };
+    model::MemoryShape shape{ 224, 224, 3 };
     auto inputNode = model.AddNode<model::InputNode<double>>(shape);
     auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output, shape);
 

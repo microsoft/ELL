@@ -45,7 +45,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="size"> The input shape </param>
-        InputNode(InputShape shape);
+        InputNode(MemoryShape shape);
 
         /// <summary> Sets the value output by this node </summary>
         ///

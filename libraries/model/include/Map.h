@@ -16,9 +16,6 @@
 // data
 #include "DataVector.h"
 
-// math
-#include "Tensor.h"
-
 // utilities
 #include "Exception.h"
 #include "IArchivable.h"
@@ -111,12 +108,12 @@ namespace model
         /// <summary> Returns the shape of the map's input </summary>
         ///
         /// <returns> The dimensionality of the map's input </returns>
-        math::TensorShape GetInputShape() const;
+        MemoryShape GetInputShape() const;
 
         /// <summary> Returns the shape of the map's output </summary>
         ///
         /// <returns> The dimensionality of the map's output port </returns>
-        math::TensorShape GetOutputShape() const;
+        MemoryShape GetOutputShape() const;
 
         /// <summary> Returns the type of the map's input </summary>
         ///

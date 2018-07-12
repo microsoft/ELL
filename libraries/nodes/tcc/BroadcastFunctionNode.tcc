@@ -106,8 +106,14 @@ namespace nodes
                                                                           const model::PortMemoryLayout& outputLayout,
                                                                           FunctionType function,
                                                                           ValueType paddingValue)
-        : CompilableNode(inputs, outputs), _inputLayout(inputLayout), _outputLayout(outputLayout), _broadcastDimension(broadcastDimension), _function(function), _paddingValue(paddingValue)
+        : CompilableNode(inputs, outputs), _inputLayout(inputLayout), _broadcastDimension(broadcastDimension), _function(function), _paddingValue(paddingValue)
     {
+    }
+
+    template <typename ValueType, typename FunctionType>
+    model::PortMemoryLayout BroadcastFunctionNode<ValueType, FunctionType>::GetOutputLayout() const
+    {
+        return GetOutputPort(0)->GetMemoryLayout();
     }
 
     //
@@ -458,7 +464,7 @@ namespace nodes
         model::CompilableNode::WriteToArchive(archiver);
 
         archiver["inputLayout"] << _inputLayout;
-        archiver["outputLayout"] << _outputLayout;
+        archiver["outputLayout"] << GetOutputLayout();
         archiver["broadcastDimension"] << _broadcastDimension;
         archiver["paddingValue"] << _paddingValue;
     }
@@ -469,7 +475,13 @@ namespace nodes
         model::CompilableNode::ReadFromArchive(archiver);
 
         archiver["inputLayout"] >> _inputLayout;
-        archiver["outputLayout"] >> _outputLayout;
+        model::PortMemoryLayout outputLayout;
+        archiver["outputLayout"] >> outputLayout;
+        auto outputs = GetOutputPorts();
+        for(auto p: outputs)
+        {
+            p->SetMemoryLayout(outputLayout);
+        }
         archiver["broadcastDimension"] >> _broadcastDimension;
         archiver["paddingValue"] >> _paddingValue;
     }
@@ -498,7 +510,7 @@ namespace nodes
                                                                                     ValueType paddingValue)
         : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, inputLayout, 0, { &_output }, outputLayout, function, paddingValue)
         , _primaryInput(this, primaryInput, primaryInputPortName)
-        , _output(this, ell::model::Node::defaultOutputPortName, model::NumElements(outputLayout.GetStride()))
+        , _output(this, ell::model::Node::defaultOutputPortName, outputLayout)
     {
         // Verify sizes are compatible
         size_t totalInputSize = inputLayout.GetMemorySize();
@@ -587,7 +599,7 @@ namespace nodes
                                                          { &_output }, outputLayout, function, paddingValue)
         , _primaryInput(this, primaryInput, primaryInputPortName)
         , _secondaryInput(this, secondaryInput, secondaryInputPortName)
-        , _output(this, ell::model::Node::defaultOutputPortName, model::NumElements(outputLayout.GetStride()))
+        , _output(this, ell::model::Node::defaultOutputPortName, outputLayout)
     {
         // Verify sizes are compatible
         size_t totalInputSize = inputLayout.GetMemorySize();
@@ -671,7 +683,7 @@ namespace nodes
         , _primaryInput(this, primaryInput, primaryInputPortName)
         , _secondaryInput1(this, secondaryInput1, secondaryInput1PortName)
         , _secondaryInput2(this, secondaryInput2, secondaryInput2PortName)
-        , _output(this, ell::model::Node::defaultOutputPortName, model::NumElements(outputLayout.GetStride()))
+        , _output(this, ell::model::Node::defaultOutputPortName, outputLayout)
     {
         // Verify sizes are compatible
         size_t totalInputSize = inputLayout.GetMemorySize();

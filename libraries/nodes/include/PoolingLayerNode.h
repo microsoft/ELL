@@ -80,7 +80,7 @@ namespace nodes
                                            llvm::Value* inputColumn,
                                            llvm::Value* inputChannel,
                                            llvm::Value* inputBuffer,
-                                           const model::Shape& inputIncrement,
+                                           const model::MemoryShape& inputIncrement,
                                            PoolingFunctionT& poolingFunction);
 
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;

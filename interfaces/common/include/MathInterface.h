@@ -11,6 +11,9 @@
 // math
 #include <Tensor.h>
 
+// model
+#include <PortMemoryLayout.h>
+
 // stl
 #include <array>
 #include <vector>
@@ -67,6 +70,18 @@ namespace math
         static TensorShape FromMathTensorShape(const ell::math::TensorShape& shape)
         {
             return TensorShape(shape.NumRows(), shape.NumColumns(), shape.NumChannels());
+        }
+
+        ell::model::MemoryShape ToMemoryShape() const
+        {
+            return ell::model::MemoryShape({rows, columns, channels});
+        }
+
+        static TensorShape FromMemoryShape(const ell::model::MemoryShape& shape)
+        {
+            auto tensorShape = shape;
+            tensorShape.Resize(3);
+            return TensorShape(tensorShape[0], tensorShape[1], tensorShape[2]);
         }
 #endif
     };

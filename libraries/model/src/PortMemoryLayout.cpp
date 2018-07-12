@@ -11,6 +11,9 @@
 // emitters
 #include "IRFunctionEmitter.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <numeric>
 
@@ -18,51 +21,81 @@ namespace ell
 {
 namespace model
 {
-    PortMemoryLayout::PortMemoryLayout(const Shape& size)
-    : _size(size), _stride(size)
+    //
+    // MemoryShape
+    //
+
+    int MemoryShape::NumElements() const
     {
-        _offset.resize(_size.size(), 0);
+        return std::accumulate(_shape.begin(), _shape.end(), 1, std::multiplies<int>());
+    }
+
+    void MemoryShape::Resize(int numDimensions)
+    {
+        if (numDimensions > static_cast<int>(_shape.size()))
+        {
+            int extraDimensions = numDimensions - static_cast<int>(_shape.size());
+            _shape.insert(_shape.begin(), extraDimensions, 1);
+        }
+        while (numDimensions < static_cast<int>(_shape.size()))
+        {
+            _shape[1] *= _shape[0];
+            _shape.erase(_shape.begin());
+        }
+    }
+
+    //
+    // PortMemoryLayout
+    //
+    PortMemoryLayout::PortMemoryLayout(const MemoryShape& size)
+        : _size(size), _stride(size), _offset(std::vector<int>(size.NumDimensions(), 0)), _increment({})
+    {
         _increment = ComputeCumulativeIncrement();
     }
 
-    PortMemoryLayout::PortMemoryLayout(const Shape& size, const Shape& padding)
-    : _size(size), _offset(padding)
+    PortMemoryLayout::PortMemoryLayout(const MemoryShape& size, const MemoryShape& padding)
+        : _size(size), _stride({}), _offset(padding), _increment({})
     {
-        _stride.resize(_size.size());
-        for (size_t index = 0; index < _size.size(); ++index)
+        _stride.Resize(_size.NumDimensions());
+        for (int index = 0; index < _size.NumDimensions(); ++index)
         {
             _stride[index] = _size[index] + (2 * padding[index]);
         }
         _increment = ComputeCumulativeIncrement();
     }
 
-    PortMemoryLayout::PortMemoryLayout(const Shape& size, const Shape& stride, const Shape& offset)
-        : _size(size), _stride(stride), _offset(offset)
+    PortMemoryLayout::PortMemoryLayout(const MemoryShape& size, const MemoryShape& stride, const MemoryShape& offset)
+        : _size(size), _stride(stride), _offset(offset), _increment({})
     {
         _increment = ComputeCumulativeIncrement();
     }
 
-    size_t PortMemoryLayout::NumEntries() const
+    bool PortMemoryLayout::HasPadding() const
     {
-        return std::accumulate(_size.begin(), _size.end(), 1, std::multiplies<size_t>());
+        return _size != _stride;
+    }
+
+    size_t PortMemoryLayout::NumElements() const
+    {
+        return static_cast<size_t>(_size.NumElements());
     }
 
     size_t PortMemoryLayout::GetMemorySize() const
     {
-        return std::accumulate(_stride.begin(), _stride.end(), 1, std::multiplies<size_t>());
+        return static_cast<size_t>(_stride.NumElements());
     }
 
-    Shape PortMemoryLayout::ComputeCumulativeIncrement() const
+    MemoryShape PortMemoryLayout::ComputeCumulativeIncrement() const
     {
         const auto numDimensions = NumDimensions();
-        Shape result(numDimensions);
+        std::vector<int> result(numDimensions);
         int prevScale = 1;
         for (int index = numDimensions - 1; index >= 0; --index)
         {
             result[index] = prevScale;
             prevScale = prevScale * _stride[index];
         }
-        return result;
+        return { result };
     }
 
     size_t PortMemoryLayout::GetDataOffset() const
@@ -77,7 +110,7 @@ namespace model
         return result;
     }
 
-    size_t PortMemoryLayout::GetEntryOffset(const Shape& location) const
+    size_t PortMemoryLayout::GetEntryOffset(const MemoryShape& location) const
     {
         auto increment = GetCumulativeIncrement();
         auto numDimensions = NumDimensions();
@@ -89,12 +122,12 @@ namespace model
         return result;
     }
 
-    bool PortMemoryLayout::IsOutOfBounds(const Shape& location) const
+    bool PortMemoryLayout::IsOutOfBounds(const MemoryShape& location) const
     {
         const int numDimensions = NumDimensions();
         for (int index = 0; index < numDimensions; ++index)
         {
-            if (static_cast<int>(location[index]+_offset[index]) < 0 || static_cast<int>(location[index])-_offset[index] >= _stride[index])
+            if (location[index] + _offset[index] < 0 || location[index] - _offset[index] >= _stride[index])
             {
                 return true;
             }
@@ -130,7 +163,7 @@ namespace model
         for (int index = 0; index < numDimensions; ++index)
         {
             auto test1 = function.Comparison(emitters::TypedComparison::lessThan, function.Operator(emitters::TypedOperator::add, location[index], function.Literal<int>(_offset[index])), function.Literal<int>(0));
-            if(result == nullptr)
+            if (result == nullptr)
             {
                 result = test1;
             }
@@ -147,38 +180,37 @@ namespace model
 
     void PortMemoryLayout::WriteToArchive(utilities::Archiver& archiver) const
     {
-        archiver["size"] << _size;
-        archiver["stride"] << _stride;
-        archiver["offset"] << _offset;
+        archiver["size"] << _size.ToVector();
+        archiver["stride"] << _stride.ToVector();
+        archiver["offset"] << _offset.ToVector();
     }
 
     void PortMemoryLayout::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        archiver["size"] >> _size;
-        archiver["stride"] >> _stride;
-        archiver["offset"] >> _offset;
+        std::vector<int> temp;
+        archiver["size"] >> temp;
+        _size = { temp };
+        archiver["stride"] >> temp;
+        _stride = { temp };
+        archiver["offset"] >> temp;
+        _offset = { temp };
         _increment = ComputeCumulativeIncrement();
     }
 
-    size_t NumElements(const Shape& size)
+    size_t NumElements(const MemoryShape& size)
     {
-        size_t result = 1;
-        for (auto s : size)
-        {
-            result *= s;
-        }
-        return result;
+        return size.NumElements();
     }
 
-    bool ShapesEqual(const Shape& shape1, const Shape& shape2)
+    bool ShapesEqual(const MemoryShape& shape1, const MemoryShape& shape2)
     {
-        auto size = shape1.size();
-        if (size != shape2.size())
+        auto size = shape1.NumDimensions();
+        if (size != shape2.NumDimensions())
         {
             return false;
         }
 
-        for (size_t index = 0; index < size; ++index)
+        for (int index = 0; index < size; ++index)
         {
             if (shape1[index] != shape2[index])
             {
@@ -186,6 +218,16 @@ namespace model
             }
         }
         return true;
+    }
+
+    bool operator==(const MemoryShape& shape1, const MemoryShape& shape2)
+    {
+        return ShapesEqual(shape1, shape2);
+    }
+
+    bool operator!=(const MemoryShape& shape1, const MemoryShape& shape2)
+    {
+        return !ShapesEqual(shape1, shape2);
     }
 
     bool PortMemoryLayoutsEqual(const PortMemoryLayout& layout1, const PortMemoryLayout& layout2)

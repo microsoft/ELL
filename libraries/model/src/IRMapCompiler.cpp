@@ -71,14 +71,14 @@ namespace model
         Log() << "Ensuring map is valid..." << EOL;
         // if output isn't a simple port, add an output node to model
         auto out = map.GetOutput(0);
-        ell::math::TensorShape shape{ out.Size(), 1, 1 }; // default shape from PortElementsBase::Size()
+        MemoryShape shape{ static_cast<int>(out.Size()) }; // default shape from PortElementsBase::Size()
         auto outNodes = map.GetOutputNodes();
-        if (outNodes.size() > 0)
+        if (!outNodes.empty())
         {
             shape = outNodes[0]->GetShape();
             Log() << "Output nodes present. Setting shape to first output node" << EOL;
         }
-        Log() << "Map output shape is " << shape << EOL;
+
         if (!out.IsFullPortOutput())
         {
             Log() << "Map output is not a port output, creating one..." << EOL;
@@ -246,7 +246,7 @@ namespace model
         }
     }
 
-    void IRMapCompiler::EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<ell::math::TensorShape> shapes)
+    void IRMapCompiler::EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<MemoryShape> shapes)
     {
         auto shapeType = _moduleEmitter.GetStruct(TensorShapeName);
         auto arguments = fn.Arguments().begin();
@@ -283,10 +283,12 @@ namespace model
                 auto followBlock = fn.BeginBlock("FollowBlock" + labelSuffix);
                 auto thenBlock = fn.BeginBlock("ThenBlock" + labelSuffix);
                 {
-                    math::TensorShape shape = *ptr;
-                    fn.Store(rowsPtr, fn.Literal((int)shape.NumRows()));
-                    fn.Store(columnsPtr, fn.Literal((int)shape.NumColumns()));
-                    fn.Store(channelsPtr, fn.Literal((int)shape.NumChannels()));
+                    MemoryShape shape = *ptr;
+                    shape.Resize(3);
+
+                    fn.Store(rowsPtr, fn.Literal<int>(shape[0]));
+                    fn.Store(columnsPtr, fn.Literal<int>(shape[1]));
+                    fn.Store(channelsPtr, fn.Literal<int>(shape[2]));
                     fn.Return();
                 }
                 auto elseBlock = fn.BeginBlock("ElseBlock" + labelSuffix);
@@ -354,7 +356,7 @@ namespace model
         fn.IncludeInHeader();
 
         auto nodes = map.GetInputNodes();
-        std::vector<math::TensorShape> shapes;
+        std::vector<MemoryShape> shapes;
         for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)
         {
             const ell::model::InputNodeBase* node = *ptr;
@@ -380,7 +382,7 @@ namespace model
         fn.IncludeInHeader();
 
         auto nodes = map.GetOutputNodes();
-        std::vector<math::TensorShape> shapes;
+        std::vector<MemoryShape> shapes;
         for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)
         {
             const ell::model::OutputNodeBase* node = *ptr;

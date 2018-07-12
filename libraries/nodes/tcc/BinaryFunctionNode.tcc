@@ -18,8 +18,22 @@ namespace nodes
 
     template <typename ValueType, typename FunctionType>
     BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2,
+        FunctionType function, ValueType padding)
+        : BinaryFunctionNode(input1, input2, input1.GetMemoryLayout(), function, padding)
+    {
+    }
+
+    template <typename ValueType, typename FunctionType>
+    BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2,
+        const model::PortMemoryLayout& layout, FunctionType function, ValueType padding)
+        : BinaryFunctionNode(input1, input2, input1.GetMemoryLayout(), input1.GetMemoryLayout(), function, padding)
+    {
+    }
+
+    template <typename ValueType, typename FunctionType>
+    BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2,
         const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _inputLayout(inputLayout), _output(this, defaultOutputPortName, model::NumElements(outputLayout.GetStride())), _outputLayout(outputLayout), _function(std::move(function)), _paddingValue(padding)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _inputLayout(inputLayout), _output(this, defaultOutputPortName, outputLayout), _function(std::move(function)), _paddingValue(padding)
     {
         if (input1.Size() != input2.Size())
         {
@@ -35,7 +49,8 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BinaryFunctionNode<ValueType, FunctionType>::Compute() const
     {
-        auto outputSize = model::NumElements(_outputLayout.GetStride());
+        auto outputLayout = _output.GetMemoryLayout();
+        auto outputSize = model::NumElements(outputLayout.GetStride());
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInputOffset = 0;
@@ -72,12 +87,13 @@ namespace nodes
                                                                            size_t prevInputDimensionOffset,
                                                                            size_t prevOutputDimensionOffset) const
     {
+        auto outputLayout = _output.GetMemoryLayout();
         const auto numDimensions = _inputLayout.NumDimensions();
         auto&& inputStride = _inputLayout.GetStride();
         auto&& inputOffset = _inputLayout.GetOffset();
         auto&& inputSize = _inputLayout.GetActiveSize();
-        auto&& outputOffset = _outputLayout.GetOffset();
-        auto&& outputStride = _outputLayout.GetStride();
+        auto&& outputOffset = outputLayout.GetOffset();
+        auto&& outputStride = outputLayout.GetStride();
 
         for (int loopIndex = 0; loopIndex < inputSize[dimension]; ++loopIndex)
         {
@@ -133,12 +149,13 @@ namespace nodes
                                                                                llvm::Value* prevInputDimensionOffset,
                                                                                llvm::Value* prevOutputDimensionOffset) const
     {
+        auto outputLayout = _output.GetMemoryLayout();
         const auto numDimensions = _inputLayout.NumDimensions();
         auto&& inputStride = _inputLayout.GetStride();
         auto&& inputOffset = _inputLayout.GetOffset();
         auto&& inputSize = _inputLayout.GetActiveSize();
-        auto&& outputStride = _outputLayout.GetStride();
-        auto&& outputOffset = _outputLayout.GetOffset();
+        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputOffset = outputLayout.GetOffset();
 
         function.For(inputSize[dimension], [dimension, numDimensions, inputOffset, inputStride, outputOffset, outputStride, prevInputDimensionOffset, prevOutputDimensionOffset, input1, input2, output, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex) {
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
@@ -185,10 +202,17 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BinaryFunctionNode<ValueType, FunctionType>::Copy(model::ModelTransformer& transformer) const
     {
+        auto outputLayout = _output.GetMemoryLayout();
         auto portElements1 = transformer.TransformPortElements(_input1.GetPortElements());
         auto portElements2 = transformer.TransformPortElements(_input2.GetPortElements());
-        auto newNode = transformer.AddNode<BinaryFunctionNode<ValueType, FunctionType>>(portElements1, portElements2, _inputLayout, _outputLayout, _function, _paddingValue);
+        auto newNode = transformer.AddNode<BinaryFunctionNode<ValueType, FunctionType>>(portElements1, portElements2, _inputLayout, outputLayout, _function, _paddingValue);
         transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename ValueType, typename FunctionType>
+    ell::utilities::ArchiveVersion BinaryFunctionNode<ValueType, FunctionType>::GetArchiveVersion() const
+    {
+        return { ell::utilities::ArchiveVersionNumbers::v8_port_memory_layout };
     }
 
     template <typename ValueType, typename FunctionType>
@@ -198,6 +222,8 @@ namespace nodes
         archiver[defaultInput1PortName] << _input1;
         archiver[defaultInput2PortName] << _input2;
         archiver["paddingValue"] << _paddingValue;
+        archiver["inputLayout"] << _inputLayout;
+        archiver["outputLayout"] << _output.GetMemoryLayout();
     }
 
     template <typename ValueType, typename FunctionType>
@@ -207,6 +233,10 @@ namespace nodes
         archiver[defaultInput1PortName] >> _input1;
         archiver[defaultInput2PortName] >> _input2;
         archiver["paddingValue"] >> _paddingValue;
+        archiver["inputLayout"] >> _inputLayout;
+        model::PortMemoryLayout outputLayout;
+        archiver["outputLayout"] >> outputLayout;
+        _output.SetMemoryLayout(outputLayout);
     }
 }
 }

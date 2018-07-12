@@ -21,6 +21,7 @@
 #include "EmitterTypes.h"
 
 // utilities
+#include "ArchiveVersion.h"
 #include "Exception.h"
 #include "IArchivable.h"
 
@@ -51,6 +52,25 @@ namespace nodes
         ///
         /// <param name="input1"> The left-hand input of the function. </param>
         /// <param name="input2"> The right-hand input of the function. </param>
+        /// <param name="function"> The function to apply coordinate-wise. </param>
+        /// <param name="padding"> The padding value. </param>
+        BinaryFunctionNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2,
+                           FunctionType function, ValueType padding = 0);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input1"> The left-hand input of the function. </param>
+        /// <param name="input2"> The right-hand input of the function. </param>
+        /// <param name="layout"> The layout for both inputs and the output. </param>
+        /// <param name="function"> The function to apply coordinate-wise. </param>
+        /// <param name="padding"> The padding value. </param>
+        BinaryFunctionNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2,
+                           const model::PortMemoryLayout& inputLayout, FunctionType function, ValueType padding = 0);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input1"> The left-hand input of the function. </param>
+        /// <param name="input2"> The right-hand input of the function. </param>
         /// <param name="inputLayout"> The layout for both inputs. </param>
         /// <param name="outputLayout"> The output layout. </param>
         /// <param name="function"> The function to apply coordinate-wise. </param>
@@ -74,6 +94,7 @@ namespace nodes
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        ell::utilities::ArchiveVersion GetArchiveVersion() const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
         bool HasState() const override { return true; } // stored state: paddingValue
@@ -100,7 +121,6 @@ namespace nodes
 
         // Output
         model::OutputPort<ValueType> _output;
-        model::PortMemoryLayout _outputLayout;
 
         // Function to apply coordinate-wise
         FunctionType _function;

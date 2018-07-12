@@ -28,6 +28,10 @@ namespace nodes
         : CompilableNode({}, { &_output }), _output(this, defaultOutputPortName, values.size()), _values(values){};
 
     template <typename ValueType>
+    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values, const model::MemoryShape& shape)
+        : CompilableNode({}, { &_output }), _output(this, defaultOutputPortName, shape), _values(values){};
+
+    template <typename ValueType>
     void ConstantNode<ValueType>::Compute() const
     {
         _output.SetOutput(_values);
@@ -58,10 +62,23 @@ namespace nodes
     }
 
     template <typename ValueType>
+    utilities::ArchiveVersion ConstantNode<ValueType>::GetArchiveVersion() const
+    {
+        return utilities::ArchiveVersionNumbers::v8_port_memory_layout;
+    }
+
+    template <typename ValueType>
+    bool ConstantNode<ValueType>::CanReadArchiveVersion(const utilities::ArchiveVersion& version) const
+    {
+        return version <= utilities::ArchiveVersionNumbers::v8_port_memory_layout;
+    }
+
+    template <typename ValueType>
     void ConstantNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
         archiver["values"] << _values;
+        archiver["layout"] << _output.GetMemoryLayout();
     }
 
     template <typename ValueType>
@@ -69,7 +86,16 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver["values"] >> _values;
-        _output.SetSize(_values.size());
+        if (archiver.HasNextPropertyName("layout"))
+        {
+            model::PortMemoryLayout layout;
+            archiver["layout"] >> layout;
+            _output.SetMemoryLayout(layout);
+        }
+        else
+        {
+            _output.SetSize(_values.size());
+        }
     }
 }
 }

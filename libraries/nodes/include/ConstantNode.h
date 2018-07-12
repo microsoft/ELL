@@ -58,6 +58,12 @@ namespace nodes
         /// <param name="value"> The vector value </param>
         ConstantNode(const std::vector<ValueType>& values);
 
+        /// Constructor for an arbitrary-shaped array constant
+        ///
+        /// <param name="value"> The vector value </param>
+        /// <param name="shape"> The shape of the output data </param>
+        ConstantNode(const std::vector<ValueType>& values, const model::MemoryShape& shape);
+
         /// <summary> Gets the values contained in this node </summary>
         ///
         /// <returns> The values contained in this node </returns>
@@ -81,11 +87,12 @@ namespace nodes
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         bool HasState() const override { return true; }
         bool ShouldCompileInline() const override { return true; }
+        utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-
         // Output
         model::OutputPort<ValueType> _output;
 

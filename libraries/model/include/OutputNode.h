@@ -49,8 +49,8 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The `PortElements<>` to get the input data from </param>
-        /// <param name="shape"> The shape of the input data </param>
-        OutputNode(const model::PortElements<ValueType>& input, const OutputShape& shape);
+        /// <param name="shape"> The shape of the output data </param>
+        OutputNode(const model::PortElements<ValueType>& input, const MemoryShape& shape);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

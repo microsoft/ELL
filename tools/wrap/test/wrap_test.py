@@ -25,6 +25,7 @@ sys.path += [ os.path.join(ell_build_dir, "tools", "wrap") ]
 import wrap
 import buildtools
 
+
 def wrap_model(model, target_dir, language):
     builder = wrap.ModuleBuilder()
     args = [ model, 
@@ -34,6 +35,7 @@ def wrap_model(model, target_dir, language):
             "--module_name", "model" ]
     builder.parse_command_line(args)
     builder.run()
+
 
 def make_project(target_dir):
 
@@ -55,6 +57,7 @@ def make_project(target_dir):
         make = [ "cmake", "--build", ".", "--config", "Release" ]
     cmd.run(make, print_output=True)
     os.chdir(current_path)
+
 
 def create_model():
     
@@ -80,9 +83,13 @@ def create_model():
     sourceLink = sourceNode.GetOutputPort("output")
         
     # add a constant vector to the input provided in the InputCallback
-    constNode = mb.AddConstantNode(model, [ 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 ], 
+    constNode = mb.AddConstantNode(model, [ 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 ], shape,
             ell.nodes.PortType.real)
     constLink = constNode.GetOutputPort("output")
+
+    print(sourceLink.GetMemoryLayout().size.size())
+    print(constLink.GetMemoryLayout().size.size())
+
 
     addNode = mb.AddBinaryOperationNode(model, 
                     ell.nodes.PortElements(sourceLink), 
@@ -107,6 +114,7 @@ def create_model():
     # create Map that wraps the model.
     map = ell.model.Map(model, inputNode, ell.nodes.PortElements(outputResult))
     return map
+
 
 def test_python(model_path):    
     target_dir = os.path.join(os.path.dirname(model_path), "tutorial_python")

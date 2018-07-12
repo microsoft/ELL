@@ -12,16 +12,24 @@ namespace model
 {
     template <typename ValueType>
     InputNode<ValueType>::InputNode()
-        : InputNodeBase(_output, InputShape{ 0,0,0 }), _output(this, defaultOutputPortName, 0) {};
+        : InputNodeBase(_output, MemoryShape{ 0 }), _output(this, defaultOutputPortName, 0)
+    {
+        SetShape(MemoryShape{ 0 });
+    }
 
     template <typename ValueType>
     InputNode<ValueType>::InputNode(size_t size)
-        : InputNodeBase(_output, InputShape{ size,1,1 }), _output(this, defaultOutputPortName, size) {};
-
+        : InputNodeBase(_output, MemoryShape{ static_cast<int>(size)}), _output(this, defaultOutputPortName, size)
+    {
+        SetShape(MemoryShape{ static_cast<int>(size) });
+    }
 
     template <typename ValueType>
-    InputNode<ValueType>::InputNode(InputShape shape)
-        : InputNodeBase(_output, shape), _output(this, defaultOutputPortName, shape.Size()) {};
+    InputNode<ValueType>::InputNode(MemoryShape shape)
+        : InputNodeBase(_output, shape), _output(this, defaultOutputPortName, PortMemoryLayout{ shape })
+    {
+        SetShape(shape);
+    }
 
     template <typename ValueType>
     void InputNode<ValueType>::SetInput(ValueType inputValue)
@@ -59,23 +67,27 @@ namespace model
     void InputNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver["size"] << _output.Size();
-        InputShape shape = GetShape();
-        archiver["shape"] << std::vector<size_t>({ shape.NumRows(),shape.NumColumns(),shape.NumChannels() });
+        archiver["layout"] << _output.GetMemoryLayout();
     }
 
     template <typename ValueType>
     void InputNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
+
         int size;
-        archiver["size"] >> size;
-        std::vector<size_t> shapeVector;
-        archiver["shape"] >> shapeVector;
-        _output.SetSize(size);
-        if (shapeVector.size() >= 3) {
-            InputShape shape{ shapeVector[0], shapeVector[1], shapeVector[2] };
-            SetShape(shape);
+        archiver.OptionalProperty("size", 0) >> size;
+        std::vector<int> shapeVector;
+        archiver.OptionalProperty("shape", std::vector<int>{size}) >> shapeVector;
+        if (archiver.HasNextPropertyName("layout"))
+        {
+            PortMemoryLayout layout;
+            archiver["layout"] >> layout;
+            SetShape(layout.GetActiveSize());
+        }
+        else
+        {
+            SetShape({shapeVector});
         }
     }
 }

@@ -112,10 +112,7 @@ namespace nodes
         model::PortMemoryLayout& GetInputMemoryLayout() { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
-        const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
-
-        /// <summary></summary>
-        model::PortMemoryLayout& GetOutputMemoryLayout() { return _outputMemoryLayout; }
+        model::PortMemoryLayout GetOutputMemoryLayout() const { return _outputMemoryLayout; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -198,7 +195,7 @@ namespace nodes
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
-        const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
+        model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -261,7 +258,6 @@ namespace nodes
         predictors::neural::BinaryConvolutionalParameters _convolutionalParameters;
         predictors::neural::PaddingParameters _inputPaddingParameters;
         model::PortMemoryLayout _inputMemoryLayout;
-        model::PortMemoryLayout _outputMemoryLayout;
     };
 }
 }

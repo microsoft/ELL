@@ -12,15 +12,24 @@ namespace model
 {
     template <typename ValueType>
     OutputNode<ValueType>::OutputNode()
-        : OutputNodeBase(_input, _output, OutputShape{ 0, 0, 0 }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0) {};
+        : OutputNodeBase(_input, _output, {}), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0) 
+    {
+        SetShape({});
+    }
 
     template <typename ValueType>
     OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input)
-        : OutputNodeBase(_input, _output, OutputShape{ input.Size(), 1, 1 }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size()) {};
+        : OutputNodeBase(_input, _output, MemoryShape{ static_cast<int>(input.Size()) }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size())
+    {
+        SetShape(MemoryShape{ static_cast<int>(input.Size()) });
+    }
 
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input, const OutputShape& shape)
-        : OutputNodeBase(_input, _output, shape), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size()) {};
+    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input, const MemoryShape& shape)
+        : OutputNodeBase(_input, _output, shape), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size())
+    {
+        SetShape(shape);
+    }
 
     template <typename ValueType>
     void OutputNode<ValueType>::Compute() const
@@ -41,7 +50,7 @@ namespace model
     {
         Node::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
-        archiver[shapeName] << static_cast<std::vector<size_t>>(GetShape());
+        archiver["layout"] << _input.GetMemoryLayout();
     }
 
     template <typename ValueType>
@@ -49,12 +58,20 @@ namespace model
     {
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
-        std::vector<size_t> shapeVector; 
-        archiver[shapeName] >> shapeVector;
-        _output.SetSize(_input.Size());
-        if (shapeVector.size() >= 3) 
+
+        int size;
+        archiver.OptionalProperty("size", 0) >> size;
+        std::vector<int> shapeVector;
+        archiver.OptionalProperty("shape", std::vector<int>{size}) >> shapeVector;
+        if (archiver.HasNextPropertyName("layout"))
         {
-            SetShape(OutputShape{ shapeVector });
+            PortMemoryLayout layout;
+            archiver["layout"] >> layout;
+            SetShape(layout.GetActiveSize());
+        }
+        else
+        {
+            SetShape({shapeVector});
         }
     }
 }

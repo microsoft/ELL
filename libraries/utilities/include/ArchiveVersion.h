@@ -25,6 +25,7 @@ namespace utilities
         v5_refined_nodes = 5,
         v6_sink_triggers = 6,
         v7_binary_operation_active_regions = 7,
+        v8_port_memory_layout = 8,
         nextVersion
     };
 

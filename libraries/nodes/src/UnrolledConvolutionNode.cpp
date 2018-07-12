@@ -16,14 +16,6 @@ namespace ell
 {
 namespace nodes
 {
-    namespace
-    {
-        size_t GetOutputSize(const model::PortMemoryLayout& outputLayout)
-        {
-            return outputLayout.GetActiveSize(0) * outputLayout.GetActiveSize(1) * outputLayout.GetActiveSize(2);
-        }
-    } // end anonymous namespace
-
     template <typename ValueType>
     UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode()
         : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filterWeights(0, 0)
@@ -36,7 +28,7 @@ namespace nodes
                                                                 const model::PortMemoryLayout& outputMemoryLayout,
                                                                 const ConstTensorReferenceType& filterWeights,
                                                                 int stride)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterWeights(0, 0), _filterSize(filterWeights.NumColumns()), _stride(stride)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterWeights(0, 0), _filterSize(filterWeights.NumColumns()), _stride(stride)
     {
         _isDepthwiseSeparable = (filterWeights.NumChannels() == 1) && (inputMemoryLayout.GetActiveSize()[2] > 1);
         _filterWeights = GetWeightsMatrix(filterWeights);
@@ -49,7 +41,7 @@ namespace nodes
                                                                 ConstMatrixReferenceType filterWeights,
                                                                 int filterSize,
                                                                 int stride)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetOutputSize(outputMemoryLayout)), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout), _filterWeights(filterWeights), _filterSize(filterSize), _stride(stride)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterWeights(filterWeights), _filterSize(filterSize), _stride(stride)
     {
         _isDepthwiseSeparable = (static_cast<int>(filterWeights.NumColumns()) == (filterSize * filterSize)) && (inputMemoryLayout.GetActiveSize()[2] > static_cast<int>(1));
     }
@@ -85,7 +77,7 @@ namespace nodes
     void UnrolledConvolutionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<UnrolledConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, _outputMemoryLayout, _filterWeights, _filterSize, _stride);
+        auto newNode = transformer.AddNode<UnrolledConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, GetOutputMemoryLayout(), _filterWeights, _filterSize, _stride);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -188,8 +180,8 @@ namespace nodes
         const auto& outputOffset = outputLayout.GetOffset();
 
         // Calculate cumulative increment for each dimension
-        model::Shape inputIncrement = inputLayout.GetCumulativeIncrement();
-        model::Shape outputIncrement = outputLayout.GetCumulativeIncrement();
+        model::MemoryShape inputIncrement = inputLayout.GetCumulativeIncrement();
+        model::MemoryShape outputIncrement = outputLayout.GetCumulativeIncrement();
 
         // Weights matrix
         auto pVarWeights = function.GetModule().Variables().AddVariable<emitters::LiteralVectorVariable<ValueType>>(_filterWeights.ToArray());
@@ -264,7 +256,7 @@ namespace nodes
         model::CompilableNode::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
         archiver["inputLayout"] << _inputMemoryLayout;
-        archiver["outputLayout"] << _outputMemoryLayout;
+        archiver["outputLayout"] << GetOutputMemoryLayout();
         archiver["filterSize"] << _filterSize;
         archiver["stride"] << _stride;
         math::MatrixArchiver::Write(_filterWeights, "weights", archiver);
@@ -276,7 +268,9 @@ namespace nodes
         model::CompilableNode::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
         archiver["inputLayout"] >> _inputMemoryLayout;
-        archiver["outputLayout"] >> _outputMemoryLayout;
+        model::PortMemoryLayout outputMemoryLayout;
+        archiver["outputLayout"] >> outputMemoryLayout;
+        _output.SetMemoryLayout(outputMemoryLayout);
         archiver["filterSize"] >> _filterSize;
         archiver["stride"] >> _stride;
         math::MatrixArchiver::Read(_filterWeights, "weights", archiver);

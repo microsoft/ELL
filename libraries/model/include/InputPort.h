@@ -64,6 +64,11 @@ namespace model
         /// <returns> The size of the output </returns>
         size_t Size() const override { return _inputElements.Size(); }
 
+        /// <summary> Returns the memory layout of the output </summary>
+        ///
+        /// <returns> The memory layout of the output </returns>
+        PortMemoryLayout GetMemoryLayout() const override;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>

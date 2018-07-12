@@ -111,7 +111,7 @@ namespace nodes
         /// <summary> Gets information about the output memory layout </summary>
         ///
         /// <returns> The layout of the output data. </returns>
-        const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
+        model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -153,7 +153,6 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         model::PortMemoryLayout _inputMemoryLayout;
-        model::PortMemoryLayout _outputMemoryLayout;
 
         void ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength);
 

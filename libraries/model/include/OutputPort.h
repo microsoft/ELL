@@ -9,8 +9,10 @@
 #pragma once
 
 #include "Port.h"
+#include "PortMemoryLayout.h"
 
 // utilities
+#include "ArchiveVersion.h"
 #include "IArchivable.h"
 
 // stl
@@ -40,6 +42,14 @@ namespace model
         /// <param name="size"> The size of the port's output. </param>
         OutputPortBase(const Node* node, std::string name, PortType type, size_t size);
 
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="node"> The node to which this port belongs. </param>
+        /// <param name="name"> The name of this port. </param>
+        /// <param name="type"> The datatype for this port. </param>
+        /// <param name="layout"> The memory layout of the port's output. </param>
+        OutputPortBase(const Node* node, std::string name, PortType type, const PortMemoryLayout& layout);
+
         ~OutputPortBase() override = default;
 
         /// <summary> Notify this port that it is being referenced </summary>
@@ -48,12 +58,22 @@ namespace model
         /// <summary> Returns the size of the output </summary>
         ///
         /// <returns> The size of the output </returns>
-        size_t Size() const override { return _size; }
+        size_t Size() const override { return _layout.GetMemorySize(); }
 
         /// <summary> Sets the size of the output </summary>
         ///
         /// <param name="size> The size of the output </param>
         void SetSize(size_t size);
+
+        /// <summary> Sets the memory layout of the output </summary>
+        ///
+        /// <param name="layout"> The memory layout of the output </param>
+        void SetMemoryLayout(const PortMemoryLayout& layout);
+
+        /// <summary> Returns the memory layout of the output </summary>
+        ///
+        /// <returns> The memory layout of the output </returns>
+        PortMemoryLayout GetMemoryLayout() const override { return _layout; }
 
         /// <summary> Indicate if this port is referenced. </summary>
         ///
@@ -83,17 +103,12 @@ namespace model
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-        size_t _size = 0;
+        PortMemoryLayout _layout;
         mutable bool _isReferenced = false;
     };
 
@@ -110,7 +125,14 @@ namespace model
         /// <param name="node"> The node this output port is part of </param>
         /// <param name="name"> The name of this port </param>
         /// <param name="size"> The size of this port </param>
-        OutputPort(const class Node* node, std::string name, size_t size);
+        OutputPort(const Node* node, std::string name, size_t size);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="node"> The node this output port is part of </param>
+        /// <param name="name"> The name of this port </param>
+        /// <param name="layout"> The memory layout of the port's output. </param>
+        OutputPort(const Node* node, std::string name, const PortMemoryLayout& layout);
 
         /// <summary> Returns the cached output from this port </summary>
         ///

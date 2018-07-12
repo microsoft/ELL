@@ -238,7 +238,7 @@ namespace nodes
         virtual int NumSecondaryInputs() const = 0;
 
         const model::PortMemoryLayout& GetInputLayout() const { return _inputLayout; }
-        const model::PortMemoryLayout& GetOutputLayout() const { return _outputLayout; }
+        model::PortMemoryLayout GetOutputLayout() const;
 
         size_t GetBroadcastDimension() const { return _broadcastDimension; }
         size_t NumPrimaryInputDimensions() const { return _inputLayout.NumDimensions(); }
@@ -276,7 +276,6 @@ namespace nodes
 
     private:
         model::PortMemoryLayout _inputLayout;
-        model::PortMemoryLayout _outputLayout;
         size_t _broadcastDimension = 0;
 
         FunctionType _function;

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     OutputNode.cpp (model)
+//  File:     OutputNodeBase.cpp (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,19 +14,29 @@ namespace ell
 {
 namespace model
 {
-    OutputNodeBase::OutputNodeBase(InputPortBase& input, OutputPortBase& output, const math::TensorShape& shape)
-        : CompilableNode({ &input }, { &output }), _inputBase(input), _outputBase(output), _shape(shape)
+    OutputNodeBase::OutputNodeBase(InputPortBase& input, OutputPortBase& output, const MemoryShape& shape)
+        : CompilableNode({ &input }, { &output }), _inputBase(input), _outputBase(output)
     {
     }
 
-    OutputNodeBase::OutputNodeBase(const std::vector<InputPortBase*>& inputs, OutputPortBase& output, const math::TensorShape& shape)
-        : CompilableNode(inputs, { &output }), _inputBase(*inputs.at(0)), _outputBase(output), _shape(shape)
+    OutputNodeBase::OutputNodeBase(const std::vector<InputPortBase*>& inputs, OutputPortBase& output, const MemoryShape& shape)
+        : CompilableNode(inputs, { &output }), _inputBase(*inputs.at(0)), _outputBase(output)
     {
     }
+
+    MemoryShape OutputNodeBase::GetShape() const 
+    { 
+        return _outputBase.GetMemoryLayout().GetActiveSize();
+    }
+
+    void OutputNodeBase::SetShape(const MemoryShape& shape) 
+    { 
+        _outputBase.SetMemoryLayout({shape});
+    } 
 
     ell::utilities::ArchiveVersion OutputNodeBase::GetArchiveVersion() const
     {
-        return ell::utilities::ArchiveVersion{ 2 };
+        return {ell::utilities::ArchiveVersionNumbers::v2};
     }
 
     void OutputNodeBase::Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)

@@ -93,7 +93,8 @@ bool RedirectNeuralNetworkOutputByLayer(model::Map& map, size_t numLayersFromEnd
         auto predictor = nodes[0]->GetPredictor();
         predictor.RemoveLastLayers(numLayersFromEnd);
         model::Model model;
-        auto inputNode = model.AddNode<model::InputNode<ElementType>>(predictor.GetInputShape());
+        model::MemoryShape inputShape(predictor.GetInputShape());
+        auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputShape);
         auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, predictor);
 
         map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });

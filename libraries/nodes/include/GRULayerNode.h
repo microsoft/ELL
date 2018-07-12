@@ -130,8 +130,15 @@ namespace nodes
                        const model::PortElements<ValueType>& hiddenWeights,
                        const model::PortElements<ValueType>& updateBias,
                        const model::PortElements<ValueType>& resetBias,
-                       const model::PortElements<ValueType>& hiddenBias);
+                       const model::PortElements<ValueType>& hiddenBias,
+                       const model::PortMemoryLayout& inputMemoryLayout,
+                       const model::PortMemoryLayout& outputMemoryLayout);
 
+        /// <summary> Gets information about the input memory layout </summary>
+        const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
+
+        /// <summary> Gets information about the output memory layout </summary>
+        model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -176,6 +183,8 @@ namespace nodes
 
         // Output
         model::OutputPort<ValueType> _output;
+
+        model::PortMemoryLayout _inputMemoryLayout;
 
         template <typename ActivationType>
         void ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength);

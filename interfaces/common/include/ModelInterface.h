@@ -152,6 +152,26 @@ private:
 };
 
 //
+// Port Memory Layout
+//
+struct PortMemoryLayout
+{
+    std::vector<int> size;
+    std::vector<int> padding;
+    std::vector<int> offset;
+
+    PortMemoryLayout(const std::vector<int>& size,
+                     const std::vector<int>& padding = {},
+                     const std::vector<int>& offset = {});
+#ifndef SWIG
+    const ell::model::PortMemoryLayout& Get() const { return _layout; }
+    PortMemoryLayout(const ell::model::PortMemoryLayout& layout);
+#endif
+private:
+    ell::model::PortMemoryLayout _layout;
+};
+
+//
 // Node
 //
 
@@ -244,6 +264,7 @@ public:
     PortElements() = default;
     PortElements(const OutputPort& port);
     int Size() const;
+    PortMemoryLayout GetMemoryLayout() const;
     PortType GetType() const;
     PortElement GetElement(int index) const;
 
@@ -263,7 +284,8 @@ class InputPort
 {
 public:
     InputPort() = default;
-    int Size();
+    int Size() const;
+    PortMemoryLayout GetMemoryLayout() const;
     Node GetNode();
     std::string GetName();
     PortType GetOutputType();
@@ -285,7 +307,8 @@ class OutputPort
 {
 public:
     OutputPort() = default;
-    int Size();
+    int Size() const;
+    PortMemoryLayout GetMemoryLayout() const;
     Node GetNode();
     std::string GetName();
     PortType GetOutputType();
@@ -299,25 +322,6 @@ public:
 #endif
 private:
     const ell::model::OutputPortBase* _port = nullptr;
-};
-
-//
-// Port Memory Layout
-//
-struct PortMemoryLayout
-{
-    std::vector<int> size;
-    std::vector<int> padding;
-    std::vector<int> offset;
-
-    PortMemoryLayout(const std::vector<int>& size,
-                     const std::vector<int>& padding = {},
-                     const std::vector<int>& offset = {});
-#ifndef SWIG
-    const ell::model::PortMemoryLayout& Get() const { return _layout; }
-#endif
-private:
-    ell::model::PortMemoryLayout _layout;
 };
 
 //
@@ -394,6 +398,7 @@ public:
     Node AddClockNode(Model model, PortElements input, double interval, double lagThreshold, const std::string& lagNotificationName);
     Node AddConcatenationNode(Model model, const ell::api::math::TensorShape& outputShape, const std::vector<PortElements*>& inputs);
     Node AddConstantNode(Model model, std::vector<double> values, PortType type);
+    Node AddConstantNode(Model model, std::vector<double> values, const ell::api::math::TensorShape& outputShape, PortType type);
     Node AddDCTNode(Model model, PortElements input, int numFilters);
     Node AddDoubleNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<double> predictor);
     Node AddFFTNode(Model model, PortElements input);

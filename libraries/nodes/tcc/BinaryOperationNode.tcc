@@ -147,19 +147,33 @@ namespace nodes
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, emitters::BinaryOperationType operation)
         : CompilableNode({ &_input1, &_input2 }, { &_output }),
-        _input1(this, input1, defaultInput1PortName),  _inputLayout1({ static_cast<int>(input1.Size()), 1, 1 }),
-        _input2(this, input2, defaultInput2PortName),  _inputLayout2({ static_cast<int>(input2.Size()), 1, 1 }),
-        _output(this, defaultOutputPortName, _input1.Size()), _outputLayout({ static_cast<int>(input1.Size()), 1, 1 }),
+        _input1(this, input1, defaultInput1PortName),  _inputLayout1(input1.GetMemoryLayout()),
+        _input2(this, input2, defaultInput2PortName),  _inputLayout2(input2.GetMemoryLayout()),
+        _output(this, defaultOutputPortName, input1.GetMemoryLayout()), 
         _operation(operation),
         _paddingValue(0)
     {
-        if (input1.Size() != input2.Size())
+        if (!model::ShapesEqual(_inputLayout1.GetActiveSize(), _inputLayout2.GetActiveSize()))
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input sizes must match");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Active areas must match for both inputs");
         }
-        assert(input1.Size() == input2.Size());
     }
 
+    template <typename ValueType>
+    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1,
+                                                        const model::PortElements<ValueType>& input2,
+                                                        const model::PortMemoryLayout& layout,
+                                                        emitters::BinaryOperationType operation,
+                                                        ValueType padding)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), 
+          _input1(this, input1, defaultInput1PortName), _inputLayout1(layout),
+          _input2(this, input2, defaultInput2PortName), _inputLayout2(layout),
+          _output(this, defaultOutputPortName, layout), 
+          _operation(operation),
+          _paddingValue(padding)
+    {
+    }
+    
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1,
                                                         const model::PortMemoryLayout& inputLayout1,
@@ -171,7 +185,7 @@ namespace nodes
         : CompilableNode({ &_input1, &_input2 }, { &_output }), 
           _input1(this, input1, defaultInput1PortName), _inputLayout1(inputLayout1),
           _input2(this, input2, defaultInput2PortName), _inputLayout2(inputLayout2),
-          _output(this, defaultOutputPortName, outputLayout.GetMemorySize()), _outputLayout(outputLayout),
+          _output(this, defaultOutputPortName, outputLayout), 
           _operation(operation),
           _paddingValue(padding)
     {
@@ -189,7 +203,8 @@ namespace nodes
     template <typename Operation>
     std::vector<ValueType> BinaryOperationNode<ValueType>::ComputeOutput(Operation&& function) const
     {
-        auto outputSize = model::NumElements(_outputLayout.GetStride());
+        auto outputLayout = _output.GetMemoryLayout();
+        auto outputSize = model::NumElements(outputLayout.GetStride());
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInput1Offset = 0;
@@ -238,7 +253,8 @@ namespace nodes
     {
         auto PortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
         auto PortElements2 = transformer.TransformPortElements(_input2.GetPortElements());
-        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(PortElements1, _inputLayout1, PortElements2, _inputLayout2, _outputLayout, _operation);
+        auto outputLayout = _output.GetMemoryLayout();
+        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(PortElements1, _inputLayout1, PortElements2, _inputLayout2, outputLayout, _operation);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -328,14 +344,15 @@ namespace nodes
                                                               size_t prevInput2DimensionOffset,
                                                               size_t prevOutputDimensionOffset) const
     {
+        auto outputLayout = _output.GetMemoryLayout();
         const auto numDimensions = _inputLayout1.NumDimensions();
         auto&& inputStride1 = _inputLayout1.GetStride();
         auto&& inputOffset1 = _inputLayout1.GetOffset();
         auto&& inputStride2 = _inputLayout2.GetStride();
         auto&& inputOffset2 = _inputLayout2.GetOffset();
         auto&& inputSize = _inputLayout1.GetActiveSize();
-        auto&& outputOffset = _outputLayout.GetOffset();
-        auto&& outputStride = _outputLayout.GetStride();
+        auto&& outputOffset = outputLayout.GetOffset();
+        auto&& outputStride = outputLayout.GetStride();
 
         for (int loopIndex = 0; loopIndex < inputSize[dimension]; ++loopIndex)
         {
@@ -381,14 +398,15 @@ namespace nodes
                                                                   llvm::Value* prevInput2DimensionOffset,
                                                                   llvm::Value* prevOutputDimensionOffset) const
     {
+        auto outputLayout = _output.GetMemoryLayout();
         const auto numDimensions = _inputLayout1.NumDimensions();
         auto&& inputStride1 = _inputLayout1.GetStride();
         auto&& inputOffset1 = _inputLayout1.GetOffset();
         auto&& inputStride2 = _inputLayout2.GetStride();
         auto&& inputOffset2 = _inputLayout2.GetOffset();
         auto&& inputSize = _inputLayout1.GetActiveSize();
-        auto&& outputStride = _outputLayout.GetStride();
-        auto&& outputOffset = _outputLayout.GetOffset();
+        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputOffset = outputLayout.GetOffset();
 
         function.For(inputSize[dimension], [input1, input2, output, inputOffset1, inputOffset2, inputStride1, inputStride2, outputStride, outputOffset, prevInput1DimensionOffset, prevInput2DimensionOffset, prevOutputDimensionOffset, dimension, numDimensions, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex) {
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
@@ -463,7 +481,8 @@ namespace nodes
         archiver["inputLayout1"] << _inputLayout1;
         archiver["inputLayout2"] << _inputLayout2;
         archiver["operation"] << BinaryOperations::to_string(_operation);
-        archiver["outputLayout"] << _outputLayout;
+        auto outputLayout = _output.GetMemoryLayout();
+        archiver["outputLayout"] << outputLayout;
         archiver["padding"] << _paddingValue;
     }
 
@@ -478,8 +497,9 @@ namespace nodes
         std::string operation;
         archiver["operation"] >> operation;
         _operation = BinaryOperations::from_string(operation);
-        _output.SetSize(_input1.Size());
-        archiver["outputLayout"] >> _outputLayout;
+        model::PortMemoryLayout outputLayout;
+        archiver["outputLayout"] >> outputLayout;
+        _output.SetMemoryLayout(outputLayout);
         archiver["padding"] >> _paddingValue;
     }
 }

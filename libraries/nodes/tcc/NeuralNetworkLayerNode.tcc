@@ -46,7 +46,7 @@ namespace nodes
     //
     template <typename DerivedType, typename LayerType, typename ValueType>
     NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::NeuralNetworkLayerNode()
-        : NeuralNetworkLayerNodeBase<ValueType>(), _inputShape(0,0,0)
+        : NeuralNetworkLayerNodeBase<ValueType>(), _inputShape(0, 0, 0)
     {
     }
 
@@ -66,7 +66,7 @@ namespace nodes
         // Calculate output dimension parameters
         size_t outputPaddingSize = layerParameters.outputPaddingParameters.paddingSize;
         auto outputShape = this->_layer.GetOutputShape();
-        _outputLayout = CalculateMemoryLayout(outputPaddingSize, outputShape);
+        _output.SetMemoryLayout(CalculateMemoryLayout(outputPaddingSize, outputShape));
     }
 
     template <typename DerivedType, typename LayerType, typename ValueType>
@@ -74,12 +74,13 @@ namespace nodes
     {
         // Calculate dimension parameters
         math::IntegerTriplet dataSizeArray = dataBufferSize;
-        model::Shape stride{ dataSizeArray.begin(), dataSizeArray.end() };
-        model::Shape offset{ static_cast<int>(padding), static_cast<int>(padding), 0 };
-        model::Shape size(stride.size());
-        for (size_t dimensionIndex = 0; dimensionIndex < offset.size(); ++dimensionIndex)
+        model::MemoryShape stride{ { static_cast<int>(dataSizeArray[0]), static_cast<int>(dataSizeArray[1]), static_cast<int>(dataSizeArray[2]) } };
+        model::MemoryShape offset{ static_cast<int>(padding), static_cast<int>(padding), 0 };
+        model::MemoryShape size({});
+        size.Resize(stride.NumDimensions());
+        for (int dimensionIndex = 0; dimensionIndex < offset.NumDimensions(); ++dimensionIndex)
         {
-            if(stride[dimensionIndex] < (2 * offset[dimensionIndex]))
+            if (stride[dimensionIndex] < (2 * offset[dimensionIndex]))
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Data size not large enough to accommodate padding");
             }
@@ -110,7 +111,7 @@ namespace nodes
     {
         NeuralNetworkLayerNodeBase<ValueType>::WriteToArchive(archiver);
         archiver["inputLayout"] << _inputLayout;
-        archiver["outputLayout"] << _outputLayout;
+        archiver["outputLayout"] << GetOutputMemoryLayout();
 
         std::vector<size_t> inputShape = _inputShape;
         archiver["inputShape"] << inputShape;
@@ -123,7 +124,9 @@ namespace nodes
     {
         NeuralNetworkLayerNodeBase<ValueType>::ReadFromArchive(archiver);
         archiver["inputLayout"] >> _inputLayout;
-        archiver["outputLayout"] >> _outputLayout;
+        model::PortMemoryLayout outputLayout;
+        archiver["outputLayout"] >> outputLayout;
+        _output.SetMemoryLayout(outputLayout);
 
         std::vector<size_t> inputShape;
         archiver["inputShape"] >> inputShape;
