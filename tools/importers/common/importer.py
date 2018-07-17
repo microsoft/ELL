@@ -121,6 +121,8 @@ class ImporterEngine:
         self.set_output_padding_for_nodes(model.nodes)
 
         ordered_nodes = self.get_nodes_in_import_order(model.nodes)
+
+        # ordered_nodes = list(model.nodes.values()) # ADDED CODE | nodes are already topologically sorted
         _logger.info("Processing the following importer nodes in order:")
         for ordered_node in ordered_nodes:
             _logger.info(ordered_node)
@@ -159,10 +161,13 @@ class ImporterEngine:
 
         return group_id_mapping
 
-    def convert_nodes(self, model: ImporterModel):
+    def convert_nodes(self, model: ImporterModel, apply_ordering: bool = True):
         """
         Converts the model using the operation conversion map that was
         specified when this class was initialized.
+        If apply_ordering is True, the engine will re-order nodes starting with
+        input nodes, and then repeatedly adding nodes whose inputs are in the
+        newly updated list list.
         """
         self.ell_model = ell.model.Model()
         self.ell_model_builder = ell.model.ModelBuilder()
@@ -174,8 +179,13 @@ class ImporterEngine:
         # next node wants in terms of padding.
         self.set_output_padding_for_nodes(model.nodes)
 
-        ordered_nodes = self.get_nodes_in_import_order(model.nodes)
+        if apply_ordering:
+            ordered_nodes = self.get_nodes_in_import_order(model.nodes)
+        else:
+            ordered_nodes = list(model.nodes.values())
+
         self.ordered_importer_nodes = ordered_nodes
+
         _logger.info("Processing the following importer nodes in order:")
         for ordered_node in ordered_nodes:
             _logger.info(ordered_node)

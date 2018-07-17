@@ -1,0 +1,15 @@
+out/
+__pycache__/
+models/
+host/
+.vscode/
+.DS_Store
+.DS_store?
+
+# Packages #
+*.zip
+*.tar
+*.7z
+*.rar
+*.gz
+
