@@ -67,7 +67,7 @@ namespace common
         /// <param name="modelname"> The name of the model. </param>
         ///
         /// <returns> A `model::MapCompilerOptions`. </returns>
-        model::MapCompilerOptions GetMapCompilerOptions(const std::string& modelName) const;        
+        model::MapCompilerOptions GetMapCompilerOptions(const std::string& modelName) const;
     };
 
     /// <summary> A version of DataLoadArguments that adds its members to the command line parser. </summary>

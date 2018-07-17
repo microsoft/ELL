@@ -62,10 +62,10 @@ namespace common
             "convolutionMethod",
             "",
             "Set the preferred convolution method",
-            { { "unrolled", PreferredConvolutionMethod::unrolled }, 
-              { "simple", PreferredConvolutionMethod::simple }, 
-              { "diagonal", PreferredConvolutionMethod::diagonal }, 
-              { "winograd", PreferredConvolutionMethod::winograd }, 
+            { { "unrolled", PreferredConvolutionMethod::unrolled },
+              { "simple", PreferredConvolutionMethod::simple },
+              { "diagonal", PreferredConvolutionMethod::diagonal },
+              { "winograd", PreferredConvolutionMethod::winograd },
               { "none", PreferredConvolutionMethod::none } },
             "none");
 
@@ -161,8 +161,8 @@ namespace common
             "positionIndependentCode",
             "pic",
             "Generate position independent code (equivalent to -fPIC)",
-            { { "auto", utilities::Optional<bool>() }, 
-              { "true", utilities::Optional<bool>(true) }, 
+            { { "auto", utilities::Optional<bool>() },
+              { "true", utilities::Optional<bool>(true) },
               { "false", utilities::Optional<bool>(false) } },
             "auto");
     }

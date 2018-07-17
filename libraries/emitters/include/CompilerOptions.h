@@ -24,7 +24,7 @@ namespace emitters
         openBLAS,
         atlas
     };
-    
+
     /// <summary> Standard compiler switches. </summary>
     struct CompilerOptions
     {

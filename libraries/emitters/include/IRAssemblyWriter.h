@@ -35,7 +35,7 @@ namespace emitters
 
     /// <summary> An enum containing the relocation model of the LLVM machine code output {Static, PIC_, DynamicNoPIC, ROPI, RWPI, ROPI_RWPI} </summary>
     using OutputRelocationModel = llvm::Reloc::Model;
-    
+
     /// <summary> Options for LLVM machine code output (assembly or object code) </summary>
     struct MachineCodeOutputOptions
     {

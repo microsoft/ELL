@@ -13,6 +13,8 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 ## Build and Installation Instructions
 
+[![Build Status](https://travis-ci.org/Microsoft/ELL.svg?branch=master)](https://travis-ci.org/Microsoft/ELL)
+
 * [Windows](INSTALL-Windows.md)
 * [Ubuntu Linux](INSTALL-Ubuntu.md)
 * [Mac OS X](INSTALL-Mac.md)
