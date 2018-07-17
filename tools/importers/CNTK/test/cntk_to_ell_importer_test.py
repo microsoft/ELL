@@ -14,9 +14,11 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 # being built, so don't run the tests.
 SkipTests = False
 SkipFullModelTests = False
+EllModelsUrl = "https://github.com/Microsoft/ELL-models/raw/master/"
 import getopt
 import configparser
 import inspect
+import json
 import logging
 import math
 import os
@@ -623,37 +625,38 @@ class CntkXorModelTestCase(CntkToEllTestBase):
 
 
 class CntkToEllFullModelTestBase(CntkToEllTestBase):
-    CATEGORIES_URL = 'https://raw.githubusercontent.com/Microsoft/ELL-models/master/models/ILSVRC2012/categories.txt'
+    CATEGORIES_URL = 'models/ILSVRC2012/categories.txt'
     MODEL_URLS = [
-        'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.cntk.zip'
-
-        # the binarized model is randomly failing on Windows, so it is temporarily disabled (see user story 899)
-        #'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMB1AS/d_I160x160x3CMCMBMBMBMBMB1AS.cntk.zip',
-        # Uncomment the next URL to test a VGG model in the gallery.
-        # This could add >20mins to each test run, so it is not included by default.
-        #'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S.cntk.zip'
+        'models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.cntk.zip'
     ]
 
     def setUp(self):
         CntkToEllTestBase.setUp(self)
         if SkipFullModelTests:
             self.skipTest('Full model tests are being skipped')
+                
+        if os.path.isfile("config.json"):
+            with open("config.json", "r") as f:
+                config = json.load(f)
+                if "gitrepo" in config:
+                    EllModelsUrl = clone_repo(config["gitrepo"])
 
         filename = os.path.basename(self.CATEGORIES_URL)
         if not self.needs_updating(filename):
             self.label_file = filename
         else:
-            self.label_file = download_file(self.CATEGORIES_URL)
+            self.label_file = download_file(EllModelsUrl + self.CATEGORIES_URL)
 
         with open(self.label_file) as categories_file:
             self.categories = categories_file.read().splitlines()
 
         self.model_names = []
         for m in self.MODEL_URLS:
-            zip_name = os.path.basename(m)
+            url = EllModelsUrl + m
+            zip_name = os.path.basename(url)
             filename = os.path.splitext(zip_name)[0]
             if self.needs_updating(filename):
-                self.model_names += [ download_and_extract_model(m) ]
+                self.model_names += [ download_and_extract_model(url) ]
             else:
                 self.model_names += [ os.path.splitext(filename)[0] ]
 
@@ -955,8 +958,7 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument(
-        '--no-full-model', action='store_true',
-        help='Skip full model tests')
+        '--no-full-model', action='store_true', help='Skip full model tests')
 
     args, argv = parser.parse_known_args()
     SkipFullModelTests = args.no_full_model

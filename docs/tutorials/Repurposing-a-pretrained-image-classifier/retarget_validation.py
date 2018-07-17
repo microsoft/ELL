@@ -17,12 +17,12 @@ import logging
 import numpy as np
 import tutorial_helpers as helpers
 
-# Import the Python wrapper for the ELL model
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-    '<ELL_root>/tools/utilities/pythonlibs'))
-import retarget as model
-import find_ell
+# we will use the ELL python module to load datasets.
+helpers.find_ell()
 import ell
+
+# Import the compiled Python wrapper for ELL model
+from host import model
 
 def save_confusion_matrix(categories, confusion_matrix_filename,
         confusion_matrix, num_correct, num_total,

@@ -35,7 +35,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_path, "../pythonlibs"))
 import find_ell
 import picluster
-from download_helper import download_file, download_and_extract_model
+from download_helper import *
 from remoterunner import RemoteRunner
 import logger
 
@@ -48,7 +48,8 @@ class DriveTest:
     def __init__(self, ipaddress=None, cluster=None, outdir=None, profile=False, 
             model=None, labels=None, target="pi3", target_dir="/home/pi/pi3", 
             username="pi", password="raspberry", iterations=1, expected=None, 
-            blas=True, compile=COMPILE_INCREMENTAL, test=True, verbose=True, timeout=None, apikey=None):
+            blas=True, compile=COMPILE_INCREMENTAL, test=True, verbose=True, timeout=None, apikey=None,
+            gitrepo = None):
         self.ipaddress = ipaddress
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)   
@@ -81,7 +82,9 @@ class DriveTest:
         self.machine = None
         self.ell_json = None
         self.created_dirs = []
-        self.gallery_url = "https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/"
+        self.gallery_url = "https://github.com/Microsoft/ELL-models/raw/master/"
+        if gitrepo:
+            self.gallery_url = clone_repo(gitrepo)
 
         # initialize state from the args
         if not self.output_dir:
@@ -248,7 +251,7 @@ class DriveTest:
             if (not os.path.isfile(self.ell_model)) :
                 self.logger.info("downloading default model...")
                 download_and_extract_model(
-                    self.gallery_url + self.model_name + "/" + self.model_name + ".ell.zip",
+                    self.gallery_url + "models/ILSVRC2012/" + self.model_name + "/" + self.model_name + ".ell.zip",
                     model_extension=".ell",
                     local_folder=self.test_dir)
 
@@ -257,7 +260,7 @@ class DriveTest:
             self.labels_file = "categories.txt"
         if (not os.path.isfile(self.labels_file)):
             self.logger.info("downloading default categories.txt...")
-            self.labels_file = download_file(self.gallery_url + "/categories.txt",
+            self.labels_file = download_file(self.gallery_url + "models/ILSVRC2012/categories.txt",
                 local_folder=self.test_dir)
 
     def get_model(self):

@@ -19,6 +19,21 @@ import cv2
 import numpy as np
 from itertools import product
 
+
+# helper function that will find the ELL package if we need it.
+def find_ell():
+    try:
+        import ell
+    except:
+        ell_root = os.getenv("ELL_ROOT")
+        if ell_root and os.path.isdir(ell_root):
+            sys.path += [ os.path.join(ell_root, 'tools/utilities/pythonlibs') ]
+            import find_ell
+            import ell
+        else:
+            raise Exception("Couldn't locate the ELL python module. Please refer to the ELL wiki " +
+                            "for information on how to install the ELL python module.")
+
 # Find any child directory that matches the four deployment targets (pi3,
 # pi3_64, aarch64, host) or begins with "model". For all these directories,
 # add it and its platform-specific build directory to Python's import lookup

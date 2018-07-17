@@ -2,10 +2,13 @@
 
 import os
 import requests
+import subprocess
 import ziptools
 import logging
+from shutil import copyfile 
 
 _logger = logging.getLogger(__name__)
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 def download_file(url, local_folder=None):
     """Downloads file pointed to by `url`.
@@ -14,6 +17,10 @@ def download_file(url, local_folder=None):
     filename = os.path.basename(url)
     if local_folder:
         filename = os.path.join(local_folder, filename)
+
+    if os.path.isfile(url):
+        copyfile(url, filename)
+        return filename
 
     # Download the file
     _logger.info("Downloading: " + url)
@@ -54,3 +61,51 @@ def download_and_extract_model(url, model_extension='.cntk', local_folder=None):
         _logger.info("Non-zipped model: " + filename)
 
     return model_name
+
+
+def run(args):
+    """ Run a command """
+    proc = subprocess.Popen(
+        args,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        bufsize=0, universal_newlines=True)
+    try:
+        outs, errors = proc.communicate()
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        outs, errors = proc.communicate()
+
+    print(outs)
+    print(errors)
+
+    if proc.returncode != 0:
+        raise Exception("Command failed: {}".format(" ".join(args)))
+
+def clone_repo(url):
+    """ Clone the given git repo into the user's HOME directory """
+    home = os.getenv("HOME")
+    if os.name == 'nt':
+        home = os.getenv("USERPROFILE")
+        if "NetworkService" in home:
+            home = os.path.join(os.path.splitdrive(script_dir)[0] + os.path.sep,"VSTS","agent")
+
+    if not os.path.isdir(home):
+        raise Exception("Cannot find user's HOME directory: {}".format(home))
+
+    repo_name = os.path.basename(url)
+
+    saved = os.getcwd()
+    repo = os.path.join(home, repo_name)
+    if os.path.isdir(repo):
+        # update the repo
+        print("### Updating git repo: '{}' at '{}'".format(repo_name, home))
+        os.chdir(repo)
+        run(["git", "pull"])
+    else:
+        os.chdir(home)
+        print("### Cloning git repo: '{}' into '{}'".format(repo_name, home))
+        run(["git", "clone", url])
+
+    os.chdir(saved)
+    return repo + os.path.sep
+    

@@ -38,8 +38,8 @@ setup(
 
     keywords='machine learning toolkit for microcontrollers and other small devices',
 
-    packages=['ell', 'ell.util', 'ell.vision'],
-    
+    packages=['ell', 'ell.data', 'ell.deploy', 'ell.math', 'ell.model', 'ell.neural', 'ell.nodes', 'ell.trainers', 'ell.util', 'ell.vision'],
+
     include_package_data=True,
     install_requires=[], # handled in meta.yaml
 )

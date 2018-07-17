@@ -20,11 +20,12 @@ if(${PYTHON_ENABLED})
         configure_file(${FILE} ${FILE} COPYONLY)
     endforeach()
 
-    if(RPI_CLUSTER AND RPI_PASSWORD AND RPI_KEY)
+    if(RPI_CLUSTER AND RPI_PASSWORD AND RPI_KEY AND GIT_REPO)
         add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${test_src} 
                                             --cluster ${RPI_CLUSTER} 
                                             --password ${RPI_PASSWORD}
-                                            --key ${RPI_KEY})
+                                            --key ${RPI_KEY}
+                                            --gitrepo ${GIT_REPO})
     endif()
 
 endif()  # PYTHON_ENABLED

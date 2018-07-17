@@ -104,6 +104,7 @@ OpenCV is a computer vision library that makes it easy to read images from a cam
 
 ```shell
 conda config --add channels "microsoft-ell"
+sudo apt install -y libjasper1
 conda install -y -c microsoft-ell/label/stretch opencv
 ```
 

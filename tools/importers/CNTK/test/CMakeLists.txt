@@ -30,6 +30,14 @@ if(${PYTHON_ENABLED})
         configure_file(${PYTHON_FILE} ${PYTHON_FILE} COPYONLY)
     endforeach()
 
+    
+    if(GIT_REPO)
+        message(STATUS "Writing: ${CMAKE_BINARY_DIR}/config.json")
+        set(JSON "{ \"gitrepo\": \"${GIT_REPO}\" }")
+        file(WRITE "${CMAKE_BINARY_DIR}/config.json" ${JSON})
+        configure_file("${CMAKE_BINARY_DIR}/config.json" "config.json" COPYONLY)
+    endif()
+
     add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} -m unittest ${test_src})
 
 endif()  # PYTHON_ENABLED

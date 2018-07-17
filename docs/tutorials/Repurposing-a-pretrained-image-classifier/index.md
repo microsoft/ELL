@@ -20,7 +20,7 @@ In addition to being very quick to train, the model in this tutorial is also muc
 
 ---
 
-![screenshot](/ELL/tutorials/Repurposing-a-pretrained-image-classifier/Screenshot.jpg)
+![screenshot](Screenshot.jpg)
 
 ## Before you begin
 Complete the following steps before starting the tutorial.
@@ -152,7 +152,7 @@ The two dataset files `fruit_train.gsdf` and `fruit_validate.gsdf`are now in you
 
 Next, you'll use the `retargetTrainer` tool to direct the output of an ELL Node to be the input of a new predictor. The predictor is trained to correlate the output of the pretrained network at that ELL node to the new classes you want to classify, using your training set and ELL's Stochastic Dual Coordinate Ascent trainer. Conceptually, this uses most of the pretrained network as a featurizer for the new predictor. The tool connects the two pieces together to form a new model. A simplified diagram of what the looks like is shown in `Figure 1`.
 
-![Figure 1](/ELL/tutorials/Repurposing-a-pretrained-image-classifier/figure1.svg)
+![Figure 1](figure1.svg)
 *Figure 1: Retarget an existing model*
 
 The `retargetTrainer` requires the output of the ELL node (or nodes) in order to to redirect from the pretrained model. It also needs the training dataset.
@@ -166,40 +166,42 @@ Use the `print` tool to list the ELL nodes in a model:
 
 This will output information of the network after one refinement operation. In this case, the neural network layer nodes are indicated, as follows.
 ```
-<id:1087> InputNode<double>(1)
-<id:1088> ClockNode(output[0:1])
-<id:1089> SourceNode<float>(output[0:2])
-<id:1090> BatchNormalizationLayerNode<float>(output[0:12288])
-<id:1091> ScalingLayerNode<float>(output[0:12288])
-<id:1092> BiasLayerNode<float>(output[0:12288])
+<id:1324> InputNode<double>(1)
+<id:1325> ClockNode(output[0:1])
+<id:1326> SourceNode<float>(output[0:2])
+<id:1327> ConstantNode<float>()
+<id:1328> ConstantNode<float>()
+<id:1329> BroadcastLinearFunctionNode<float>(output[0:12288], output[0:3], output[0:3])
 ...
 ...
-<id:1139> ConvolutionalLayerNode<float>(output[0:9216])
-<id:1140> BiasLayerNode<float>(output[0:8192])
-<id:1141> ActivationLayerNode<float,ReLUActivation>(output[0:8192])
-<id:1142> PoolingLayerNode<float,MaxPoolingFunction>(output[0:8192])
-<id:1143> ConvolutionalLayerNode<float>(output[0:2048])
-<id:1144> BiasLayerNode<float>(output[0:4000])
-<id:1145> ActivationLayerNode<float,ReLUActivation>(output[0:4000])
-<id:1146> PoolingLayerNode<float,MeanPoolingFunction>(output[0:4000])
-<id:1147> SoftmaxLayerNode<float>(output[0:1000])
-<id:1148> ConstantNode<bool>()
-<id:1149> SinkNode<float>(output[0:1000], output[0:1])
-<id:1150> OutputNode<float>(output[0:1000])
+<id:1438> UnrolledConvolutionNode<float>(output[0:9216])
+<id:1440> ConstantNode<float>()
+<id:1441> BroadcastLinearFunctionNode<float>(output[0:8192], , output[0:512])
+<id:1442> BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(output[0:8192])
+<id:1443> PoolingLayerNode<float,MaxPoolingFunction>(output[0:8192])
+    PoolingLayer<float,MaxPoolingFunction>(shape=[4,4,512]->[2,2,512], function=maxpooling, stride=2, size=2)
+<id:1444> UnrolledConvolutionNode<float>(output[0:2048])
+<id:1446> ConstantNode<float>()
+<id:1447> BroadcastLinearFunctionNode<float>(output[0:4000], , output[0:1000])
+<id:1448> BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(output[0:4000])
+<id:1449> PoolingLayerNode<float,MeanPoolingFunction>(output[0:4000])
+    PoolingLayer<float,MeanPoolingFunction>(shape=[2,2,1000]->[1,1,1000], function=meanpooling, stride=1, size=2)
+<id:1450> SoftmaxLayerNode<float>(output[0:1000])
+    SoftmaxLayer<float>(shape=[1,1,1000]->[1,1,1000])
 ```
 
-For this tutorial, you'll use output from node `1141`, which is the output after applying activation for the second-to-last convolutional layer. Refer to the Troubleshooting section of this tutorial for more information about choosing the right ELL node (or nodes) for your specific case.
+For this tutorial, you'll use output from node `1442`, which is the output after applying ReLU activation for the second-to-last convolutional layer. Refer to the Troubleshooting section of this tutorial for more information about choosing the right ELL node (or nodes) for your specific case.
 
-Run the `retargetTrainer`, taking output from node `1141` in the pretrained model, and produce a retargeted model using the `fruit_train.gsdf` dataset.
+Run the `retargetTrainer`, taking output from node `1442` in the pretrained model, and produce a retargeted model using the `fruit_train.gsdf` dataset.
 ```shell
-[Linux/macOS] <ELL-root>/build/bin/retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --verbose --inputModelFilename pretrained.ell --targetPortElements 1141.output --inputDataFilename fruit_train.gsdf --outputModelFilename model.ell 
+[Linux/macOS] <ELL-root>/build/bin/retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --verbose --inputModelFilename pretrained.ell --targetPortElements 1442.output --inputDataFilename fruit_train.gsdf --outputModelFilename model.ell 
 
-[Windows] <ELL-root>\build\bin\release\retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --inputModelFilename pretrained.ell --targetPortElements 1141.output --inputDataFilename fruit_train.gsdf --outputModelFilename model.ell
+[Windows] <ELL-root>\build\bin\release\retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --inputModelFilename pretrained.ell --targetPortElements 1442.output --inputDataFilename fruit_train.gsdf --outputModelFilename model.ell
 ```
 
 Output similar to the following indicates how training for each of the new classes progressed.
 ```
-Redirected output for port elements 1141.output from model
+Redirected output for port elements 1442.output from model
 
 === Training binary classifier for class 0 vs Rest ===
 Training ...
@@ -312,11 +314,10 @@ Import the Python wrapper for the compiled ELL model.
 import model
 ```
 
-The main ELL Python module includes functionality that makes it easier to process the dataset. Rather than copying this module, use the `find_ell` helper module to find it. Add the correct path to your Python system path, making sure to replace `<ELL-root>` appropriately.
+The main ELL Python module includes functionality that makes it easier to process the dataset. Rather than copying this module, use the `find_ell` helper function to find it. 
 
 ```python
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '<ELL-root>/tools/utilities/pythonlibs'))
-import find_ell
+helpers.find_ell()
 import ell
 ```
 
@@ -453,7 +454,7 @@ This tutorial used a training set of 400 examples and a validation set of 100. B
 
 ## Next steps
 
-Choosing the right ELL node to use for retargeting depends on the pretrained model and your new target domain. For example, in models that are highly specialized and don't relate well to your domain,  you'll probably get better results by picking ELL nodes nearer the input, where the features are more general and less correlated to the pretrained domain. Alternatively, models that are more general  (or where the original and target domains are similar) may benefit from retargeting ELL nodes closer to the output. Some models may even perform better retargeting at two or more ELL nodes. For example, specifying `--targetPortElements {1141.output,1145.output}` will tell the `retargetTrainer` to use output from ELL nodes 1141 and 1145. Experiment to see what works best for you.
+Choosing the right ELL node to use for retargeting depends on the pretrained model and your new target domain. For example, in models that are highly specialized and don't relate well to your domain,  you'll probably get better results by picking ELL nodes nearer the input, where the features are more general and less correlated to the pretrained domain. Alternatively, models that are more general  (or where the original and target domains are similar) may benefit from retargeting ELL nodes closer to the output. Some models may even perform better retargeting at two or more ELL nodes. For example, specifying `--targetPortElements {1442.output,1448.output}` will tell the `retargetTrainer` to use output from ELL nodes 1442 and 1448. Experiment to see what works best for you.
 
 Follow the steps in [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/) to deploy your new model onto the Raspberry Pi.
 
