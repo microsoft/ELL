@@ -101,7 +101,7 @@ if [[ -z "${cmakeargs}" ]]; then
 fi
 
 pushd $build_dir > /dev/null
-cmake "-DGIT_REPO=https://github.com/Microsoft/ell-test-models.git" ${cmakeargs}
+cmake "-DGIT_REPO=https://github.com/Microsoft/ell-test-models" ${cmakeargs}
 make -j $nproc 
 make -j $nproc _ELL_python
 popd > /dev/null
