@@ -21,6 +21,8 @@ set Vs14Path=
 set Vs15Path=
 set NOPYTHON=
 set STRICT=
+set TEST_GIT_REPO=%GIT_REPO%
+if "%GIT_REPO%"=="" set TEST_GIT_REPO=https://github.com/Microsoft/ell-test-models
 :parse
 if "%1" == "" goto :step2
 if "%1"=="14" set UseVs14=1
@@ -91,7 +93,7 @@ if ERRORLEVEL 1 goto :nodelete
 if "!DEBUG!"=="1" dir "%VCToolsInstallDir%\bin\Hostx86\x86\"
 cd build
 echo cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" ..
-cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" ..
+cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!"  "-DGIT_REPO=https://github.com/Microsoft/ell-test-models" ..
 if ERRORLEVEL 1 goto :cmakerror
 goto :buildit
 
@@ -99,7 +101,7 @@ goto :buildit
 REM try specifying the compiler
 set CPATH=%VCToolsInstallDir:\=/%
 echo %CPATH%
-cmake -G "!CMakeGenerator!" "!STRICT!" "-DCMAKE_C_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" "-DCMAKE_CXX_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" ..
+cmake -G "!CMakeGenerator!" "!STRICT!" "-DGIT_REPO=%TEST_GIT_REPO" "-DCMAKE_C_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" "-DCMAKE_CXX_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" ..
 if ERRORLEVEL 1 goto :nocmake
 
 :buildit
