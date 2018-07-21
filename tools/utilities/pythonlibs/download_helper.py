@@ -5,7 +5,7 @@ import requests
 import subprocess
 import ziptools
 import logging
-from shutil import copyfile 
+from shutil import copyfile, rmtree
 
 _logger = logging.getLogger(__name__)
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -98,15 +98,20 @@ def clone_repo(url):
 
     saved = os.getcwd()
     repo = os.path.join(home, repo_name)
+
     if os.path.isdir(repo):
-        # update the repo
-        print("### Updating git repo: '{}' at '{}'".format(repo_name, home))
-        os.chdir(repo)
-        run(["git", "pull"])
-    else:
-        os.chdir(home)
-        print("### Cloning git repo: '{}' into '{}'".format(repo_name, home))
-        run(["git", "clone", url])
+        rmtree(repo)
+    
+    #     # update the repo
+    #     print("### Updating git repo: '{}' at '{}'".format(repo_name, home))
+    #     os.chdir(repo)
+    #     run(["git", "pull"])
+    # else:
+
+    os.chdir(home)
+    print("### Cloning git repo: '{}' into '{}'".format(repo_name, home))
+    run(["git", "lfs", "install"])
+    run(["git", "clone", url])
 
     os.chdir(saved)
     return repo + os.path.sep
