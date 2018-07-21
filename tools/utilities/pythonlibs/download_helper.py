@@ -19,6 +19,7 @@ def download_file(url, local_folder=None):
         filename = os.path.join(local_folder, filename)
 
     if os.path.isfile(url):
+        _logger.info("Using cached local file: " + url)
         copyfile(url, filename)
         return filename
 
