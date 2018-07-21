@@ -51,6 +51,7 @@ def download_and_extract_model(url, model_extension='.cntk', local_folder=None):
 
     # Download the file
     filename = download_file(url, local_folder)
+    _logger.info("Extracting zipped model: " + filename)
 
     # Extract the file if it's a zip
     unzip = ziptools.Extractor(filename)
