@@ -18,7 +18,7 @@ While the goal of ELL is to deploy software onto resource constrained platforms 
 ## Installation and Setup
 Install ELL on a
 [Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), or [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)
-laptop or desktop computer. If you intend to deploy models onto a Raspberry Pi, follow our instruction on [setting up the Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+laptop or desktop computer. If you intend to deploy models onto a Raspberry Pi, follow our instruction on [Raspberry Pi Setup](/ELL/tutorials/Raspberry-Pi-setup).
 
 ## Getting Started
 A great place to start is our [tutorials section](/ELL/tutorials). As we develop and release new functionality in ELL, we also publish tutorials that showcase that functionality. Currently, our tutorials are focused on simple embedded computer vision tasks on Raspberry Pi, but we expect the scope to grow with time. Have fun!
