@@ -100,18 +100,14 @@ def clone_repo(url):
     repo = os.path.join(home, repo_name)
 
     if os.path.isdir(repo):
-        rmtree(repo)
-    
-    #     # update the repo
-    #     print("### Updating git repo: '{}' at '{}'".format(repo_name, home))
-    #     os.chdir(repo)
-    #     run(["git", "pull"])
-    # else:
-
-    os.chdir(home)
-    print("### Cloning git repo: '{}' into '{}'".format(repo_name, home))
-    run(["git", "lfs", "install"])
-    run(["git", "clone", url])
+        print("### Updating git repo: '{}' at '{}'".format(repo_name, home))
+        os.chdir(repo)
+        run(["git", "pull"])
+    else:
+        os.chdir(home)
+        print("### Cloning git repo: '{}' into '{}'".format(repo_name, home))
+        run(["git", "lfs", "install"])
+        run(["git", "clone", url])
 
     os.chdir(saved)
     return repo + os.path.sep
