@@ -5,7 +5,7 @@ import requests
 import subprocess
 import ziptools
 import logging
-from shutil import copyfile 
+from shutil import copyfile, rmtree
 
 _logger = logging.getLogger(__name__)
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,6 +19,7 @@ def download_file(url, local_folder=None):
         filename = os.path.join(local_folder, filename)
 
     if os.path.isfile(url):
+        _logger.info("Using cached local file: {} ({} bytes)".format(url, os.path.getsize(url)))
         copyfile(url, filename)
         return filename
 
@@ -51,6 +52,7 @@ def download_and_extract_model(url, model_extension='.cntk', local_folder=None):
 
     # Download the file
     filename = download_file(url, local_folder)
+    _logger.info("Extracting zipped model: " + filename)
 
     # Extract the file if it's a zip
     unzip = ziptools.Extractor(filename)
@@ -96,14 +98,15 @@ def clone_repo(url):
 
     saved = os.getcwd()
     repo = os.path.join(home, repo_name)
+
     if os.path.isdir(repo):
-        # update the repo
         print("### Updating git repo: '{}' at '{}'".format(repo_name, home))
         os.chdir(repo)
         run(["git", "pull"])
     else:
         os.chdir(home)
         print("### Cloning git repo: '{}' into '{}'".format(repo_name, home))
+        run(["git", "lfs", "install"])
         run(["git", "clone", url])
 
     os.chdir(saved)
