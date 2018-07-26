@@ -175,8 +175,8 @@ namespace nodes
             function.For(outputMemoryLayout.GetActiveSize(1), [x, outputMemoryLayout, pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* y) {
                 function.For(outputMemoryLayout.GetActiveSize(2), [x, y, outputMemoryLayout, pInput, pOutput, this](emitters::IRFunctionEmitter& function, llvm::Value* z) {
                     auto inputLocation = ReorderOutputToInputLocation({ x, y, z });
-                    auto inputIndex = _inputMemoryLayout.EmitGetEntryOffset(function, inputLocation);
-                    auto outputIndex = outputMemoryLayout.EmitGetEntryOffset(function, { x, y, z });
+                    auto inputIndex = model::EmitGetEntryOffset(function, inputLocation, _inputMemoryLayout);
+                    auto outputIndex = model::EmitGetEntryOffset(function, { x, y, z }, outputMemoryLayout);
                     llvm::Value* value = function.ValueAt(pInput, inputIndex);
                     function.SetValueAt(pOutput, outputIndex, value);
                 });

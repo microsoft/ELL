@@ -107,12 +107,12 @@ namespace passes
             }
 
             // Check that the Shapes are compatible
-            if (!PortMemoryLayoutsEqual(node.GetInputLayout(), primaryInputNode->GetInputLayout()))
+            if (node.GetInputLayout() != primaryInputNode->GetInputLayout())
             {
                 return false;
             }
 
-            if (!PortMemoryLayoutsEqual(node.GetOutputLayout(), primaryInputNode->GetOutputLayout()))
+            if (node.GetOutputLayout() != primaryInputNode->GetOutputLayout())
             {
                 return false;
             }

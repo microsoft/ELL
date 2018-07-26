@@ -681,7 +681,7 @@ void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape)
     //         [ 14 15 0  17 18 0  0 0 0 ]
     //
 
-    size_t inputSize = model::NumElements(inputMemoryLayout.GetStride());
+    size_t inputSize = utilities::NumElements(inputMemoryLayout.GetStride());
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
     auto testNode = model.AddNode<nodes::ReceptiveFieldMatrixNode<ElementType>>(inputNode->output,

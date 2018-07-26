@@ -153,7 +153,7 @@ namespace nodes
         _operation(operation),
         _paddingValue(0)
     {
-        if (!model::ShapesEqual(_inputLayout1.GetActiveSize(), _inputLayout2.GetActiveSize()))
+        if (_inputLayout1.GetActiveSize() != _inputLayout2.GetActiveSize())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Active areas must match for both inputs");
         }
@@ -189,11 +189,11 @@ namespace nodes
           _operation(operation),
           _paddingValue(padding)
     {
-        if (!model::ShapesEqual(inputLayout1.GetActiveSize(), inputLayout2.GetActiveSize()))
+        if (inputLayout1.GetActiveSize() != inputLayout2.GetActiveSize())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Active areas must match for both inputs");
         }
-        if (!model::ShapesEqual(inputLayout1.GetActiveSize(), outputLayout.GetActiveSize()))
+        if (inputLayout1.GetActiveSize() != outputLayout.GetActiveSize())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active areas must match");
         }
@@ -204,7 +204,7 @@ namespace nodes
     std::vector<ValueType> BinaryOperationNode<ValueType>::ComputeOutput(Operation&& function) const
     {
         auto outputLayout = _output.GetMemoryLayout();
-        auto outputSize = model::NumElements(outputLayout.GetStride());
+        auto outputSize = utilities::NumElements(outputLayout.GetStride());
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInput1Offset = 0;

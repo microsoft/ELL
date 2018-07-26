@@ -40,7 +40,7 @@ namespace nodes
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input sizes must match");
         }
 
-        if (!model::ShapesEqual(inputLayout.GetActiveSize(), outputLayout.GetActiveSize()))
+        if (inputLayout.GetActiveSize() != outputLayout.GetActiveSize())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active areas must match");
         }
@@ -50,7 +50,7 @@ namespace nodes
     void BinaryFunctionNode<ValueType, FunctionType>::Compute() const
     {
         auto outputLayout = _output.GetMemoryLayout();
-        auto outputSize = model::NumElements(outputLayout.GetStride());
+        auto outputSize = utilities::NumElements(outputLayout.GetStride());
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInputOffset = 0;
