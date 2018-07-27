@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CommandLineParser.h"
+#include "Logger.h"
 #include "Unused.h"
 
 // stl
@@ -135,8 +136,17 @@ namespace utilities
         if (_originalArgs.size() == 0)
             return;
 
+        bool hasHelpOption = HasOption("help");
+        bool hasVerboseOption = HasOption("verbose");
+
+        if (!hasHelpOption || !hasVerboseOption)
+        {
+            AddDocumentationString("");
+            AddDocumentationString("General options");
+        }
+
         bool printHelpAndExit = false;
-        if (!HasOption("help"))
+        if (!hasHelpOption)
         {
             if (HasShortName("h"))
             {
@@ -145,6 +155,19 @@ namespace utilities
             else
             {
                 AddOption(printHelpAndExit, "help", "h", "Print help and exit", false);
+            }
+        }
+
+        bool setVerbose = false;
+        if (!hasVerboseOption)
+        {
+            if (HasShortName("v"))
+            {
+                AddOption(setVerbose, "verbose", "", "Verbose output", false);
+            }
+            else
+            {
+                AddOption(setVerbose, "verbose", "v", "Verbose output", false);
             }
         }
 
@@ -171,7 +194,7 @@ namespace utilities
                 std::string arg = _originalArgs[index];
                 if (arg == "--") // "--" is the special separator for passthrough args
                 {
-                    while (++index < argc) 
+                    while (++index < argc)
                     {
                         arg = _originalArgs[index];
                         _passthroughArgs.push_back(arg);
@@ -250,6 +273,11 @@ namespace utilities
         if (printHelpAndExit)
         {
             throw CommandLineParserPrintHelpException(GetHelpString());
+        }
+
+        if (setVerbose)
+        {
+            logging::ShouldLog() = true;
         }
 
         if (!isValid)
@@ -481,35 +509,35 @@ namespace utilities
         {
             switch (entry.EntryType)
             {
-                case DocumentationEntry::Type::option:
+            case DocumentationEntry::Type::option:
+            {
+                const OptionInfo& info = _options[entry.EntryString];
+                if (info.enabled)
                 {
-                    const OptionInfo& info = _options[entry.EntryString];
-                    if (info.enabled)
+                    std::string option_name = info.optionNameString();
+                    size_t thisOptionNameLen = info.optionNameHelpLength();
+                    size_t pad_len = 2 + (longest_name - thisOptionNameLen);
+                    std::string padding(pad_len, ' ');
+                    out << "\t--" << option_name << padding << info.description;
+                    if (info.enumValues.size() > 0)
                     {
-                        std::string option_name = info.optionNameString();
-                        size_t thisOptionNameLen = info.optionNameHelpLength();
-                        size_t pad_len = 2 + (longest_name - thisOptionNameLen);
-                        std::string padding(pad_len, ' ');
-                        out << "\t--" << option_name << padding << info.description;
-                        if (info.enumValues.size() > 0)
+                        out << "  {";
+                        std::string sep = "";
+                        out << info.enumValues[0];
+                        for (size_t index = 1; index < info.enumValues.size(); ++index)
                         {
-                            out << "  {";
-                            std::string sep = "";
-                            out << info.enumValues[0];
-                            for (size_t index = 1; index < info.enumValues.size(); ++index)
-                            {
-                                out << " | " << info.enumValues[index];
-                            }
-                            out << "}";
+                            out << " | " << info.enumValues[index];
                         }
-                        out << std::endl;
+                        out << "}";
                     }
+                    out << std::endl;
                 }
-                break;
+            }
+            break;
 
-                case DocumentationEntry::Type::str:
-                    out << entry.EntryString << std::endl;
-                    break;
+            case DocumentationEntry::Type::str:
+                out << entry.EntryString << std::endl;
+                break;
             }
         }
 

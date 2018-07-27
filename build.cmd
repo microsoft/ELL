@@ -93,7 +93,7 @@ if ERRORLEVEL 1 goto :nodelete
 if "!DEBUG!"=="1" dir "%VCToolsInstallDir%\bin\Hostx86\x86\"
 cd build
 echo cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" ..
-cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!"  "-DGIT_REPO=https://github.com/Microsoft/ell-test-models" ..
+cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" "-DGIT_REPO=%TEST_MODEL_REPO"  ..
 if ERRORLEVEL 1 goto :cmakerror
 goto :buildit
 

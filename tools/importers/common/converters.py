@@ -73,7 +73,8 @@ class ImporterNode:
         line2 = "    output_shape {}\n".format(self.output_shapes[0])
         line3 = "    padding {}\n".format(self.padding)
         line4 = "    output_padding {}\n".format(self.output_padding)
-        return line1 + line2 + line3 + line4
+        line5 = "    weights {}\n".format(self.weights.keys())
+        return line1 + line2 + line3 + line4 + line5
 
 class LookupTable:
     """
@@ -833,6 +834,7 @@ class ConvertInput(ConvertBase):
         # ensure proper memory layout. This can be skipped once Input supports
         # different memory layouts of the output.
         padding = self.importer_node.output_padding["size"]
+        
         if padding > 0:
             # Create the reorder node
             port_elements = lookup_table.get_output_port_elements_for_node(source_node)

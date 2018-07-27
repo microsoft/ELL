@@ -5,9 +5,10 @@
 ##  File:     vad_test.py
 ##  Authors:  Chris Lovett
 ##
-##  Requires: Python 3.x
+##  Requires: Python 3.x,  numpy, tkinter, matplotlib
 ##
 ###################################################################################################
+
 import argparse
 import json
 import os
@@ -35,7 +36,14 @@ import microphone
 import vad
 
 class VadTest(Frame):
+    """ A demo application class that provides simple GUI for testing voice activity detection on microphone or wav file input. """
+
     def __init__(self, featurizer_path, input_device, wav_file):
+        """ Initialize the VadTest object
+        featurizer_path - path to the ELL featurizer to use
+        input_device - id of the microphone to use
+        wav_file - optional wav_file to use when you click play
+        """
         super().__init__()
         
         self.FEATURIZER_PATH_KEY = "featurizer_path"
@@ -312,7 +320,7 @@ class VadTest(Frame):
             self.start_recording()
         else:
             self.rec_button["text"] = "Rec"
-            self.on_stop()
+            self.on_stopped()
 
     def on_play_button_click(self):
         """ called when user clicks the record button, same button is used to "stop" playback """
@@ -322,18 +330,7 @@ class VadTest(Frame):
             self.on_play()
         else:
             self.play_button["text"] = "Play"
-            self.on_stop()
-
-
-    def on_play_button_click(self):
-        """ called when user clicks the record button, same button is used to "stop" playback """
-        if self.play_button["text"] == "Play":
-            self.play_button["text"] = "Stop"
-            self.rec_button["text"] = "Rec"
-            self.on_play()
-        else:
-            self.play_button["text"] = "Play"
-            self.on_stop()
+            self.on_stopped()
 
     def on_play(self):
         """ called when user clicks the Play button """
@@ -358,7 +355,7 @@ class VadTest(Frame):
     def on_stopped(self):
         """ called when we reach the end of the wav file playback """
         self.play_button["text"] = "Play"
-        self.stop()            
+        self.on_stop()            
         self.subplot2.clear()
         if (len(self.levels) > 0):
             levels = np.array(self.levels)
@@ -366,6 +363,7 @@ class VadTest(Frame):
             signals = np.array(self.signals)      
             self.subplot2.plot(levels)
             self.subplot2.plot(signals)        
+            self.vad.reset()
         self.canvas.draw()
         self.canvas.show()
         self.levels = []
@@ -485,6 +483,38 @@ class VadTest(Frame):
         self.read_input_thread.daemon = True
         self.read_input_thread.start()        
 
+    def start_recording(self):
+        """ Start recording audio from the microphone nd classify the audio. Note we use a background thread to 
+        process the audio and we setup a UI animation function to draw the sliding spectrogram image, this way
+        the UI update doesn't interfere with the smoothness of the microphone readings """ 
+        if self.microphone is None:
+            self.microphone = microphone.Microphone(False)
+    
+        self.stop()
+        num_channels = 1
+        self.microphone.open(self.featurizer.input_size, self.sample_rate, num_channels, self.input_device)        
+        
+        def update_func(frame_index):
+            # this is an animation callback to update the UI every 33 milliseconds.
+            self.process_output()
+            self.set_spectrogram_image()
+            if not self.reading_input:
+                self.after(1, self.on_stopped)
+            return (self.spectrogram_image,)
+
+        if self.animation:
+            self.animation.event_source.stop()
+
+        self.reading_input = True
+        # Start animation timer for updating the UI (e.g. spectrogram image) (30 fps is usually fine) 
+        self.animation = animation.FuncAnimation(self.features_figure, update_func, interval=33, blit=True)
+        
+        # start background thread to read and classify the recorded audio.
+        self.featurizer.open(self.microphone)
+        self.read_input_thread = Thread(target=self.on_read_features, args=())
+        self.read_input_thread.daemon = True
+        self.read_input_thread.start()       
+
     def on_read_features(self): 
         """ this is the background thread entry point.  So we read the feature data in a loop """
         try:
@@ -497,12 +527,6 @@ class VadTest(Frame):
                     signal = self.vad.process(feature_data)
                     self.levels += [ self.vad.level ]
                     self.signals += [ signal ]
-
-                    formatted = []
-                    for i in range(len(feature_data)):
-                        formatted.append("{}:{:.8f}".format(i, feature_data[i]))
-                    print("(1,{})  {}".format(signal, " ".join(formatted)))
-
                     self.lock.acquire()                    
                     if self.show_spectrogram:
                         self.accumulate_spectrogram_image(feature_data)
@@ -536,7 +560,11 @@ if __name__ == "__main__":
     
     # options
     arg_parser.add_argument("--featurizer", "-m", help="Compiled ELL model to use for generating features", default=None)
-    arg_parser.add_argument("--input_device", "-d", help="Input device", default=None, type=int)
+    arg_parser.add_argument("--input_device", "-d", help="Index of input device (see --list_devices)", default=1, type=int)
+    arg_parser.add_argument("--list_devices", help="List available input devices", action="store_true")
     arg_parser.add_argument("--wav_file", help="Provide an input wav file to test", default=None)
     args = arg_parser.parse_args()
-    main(args.featurizer, args.input_device, args.wav_file)
+    if args.list_devices:
+        microphone.list_devices()
+    else:
+        main(args.featurizer, args.input_device, args.wav_file)

@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/SevenSisters
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (66.04% top 1 accuracy, 86.59% top 5 accuracy, 0.56s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (66.04% top 1 accuracy, 86.59% top 5 accuracy, 0.552s/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/SevenSisters
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.56s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.552s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
@@ -32,7 +32,7 @@ permalink: /gallery/ILSVRC2012/SevenSisters
     <tr>
         <td> Architecture </td>
         <td>
-            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/SevenSisters/SevenSisters.cntk.svg?sanitize=true" target="_blank">resnetconf_I128x128x3_ADS architecture (SVG)</a>
+            <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/SevenSisters/SevenSisters.cntk.svg?sanitize=true" target="_blank">SevenSisters architecture (SVG)</a>
         </td>
     </tr>
     <tr>
@@ -41,7 +41,7 @@ permalink: /gallery/ILSVRC2012/SevenSisters
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by v-jlema@microsoft.com using CNTK 2.3.1 </td>
+        <td colspan="3"> Trained by Juan Lema using CNTK 2.3.1 </td>
     </tr>
 </table>
 

@@ -41,7 +41,7 @@ permalink: /gallery/ILSVRC2012/v_I192x192x3CCMCCMCCCMCCCMCCCMF1024F1024S
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by v-jlema@microsoft.com using CNTK 2.2 </td>
+        <td colspan="3"> Trained by Juan Lema using CNTK 2.2 </td>
     </tr>
 </table>
 

@@ -138,6 +138,8 @@ namespace nodes
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
+        ///
+        /// <returns> The layout of the output data. </returns>
         model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>

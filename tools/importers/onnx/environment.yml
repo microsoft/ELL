@@ -1,0 +1,56 @@
+name: onnx-env
+channels:
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - graphviz=2.38.0=4
+  - pydot=1.2.4=py36_0
+  - pyparsing=2.2.0=py36h785a196_1
+  - ca-certificates=2018.4.16=0
+  - certifi=2018.4.16=py36_0
+  - h5py=2.8.0=py36hfa6e2cd_0
+  - hdf5=1.10.1=vc14_2
+  - icu=58.2=vc14_0
+  - jpeg=9b=vc14_2
+  - keras=2.1.5=py36_0
+  - libflang=5.0.0=vc14_20180208
+  - libgpuarray=0.7.6=vc14_0
+  - libpng=1.6.34=vc14_0
+  - libprotobuf=3.5.2=vc14_0
+  - libtiff=4.0.9=vc14_0
+  - libwebp=0.5.2=vc14_7
+  - llvm-meta=5.0.0=0
+  - mako=1.0.7=py36_0
+  - markupsafe=1.0=py36_0
+  - mkl_fft=1.0.2=py36_0
+  - mkl_random=1.0.1=py36_0
+  - onnx=1.1.1=py36_0
+  - openblas=0.2.20=vc14_7
+  - opencv=3.4.1=py36_200
+  - openmp=5.0.0=vc14_1
+  - openssl=1.0.2o=vc14_0
+  - pip=9.0.3=py36_0
+  - protobuf=3.5.2=py36_vc14_0
+  - pygpu=0.7.6=py36_0
+  - pyreadline=2.1=py36_0
+  - python=3.6.5=1
+  - pyyaml=3.12=py36_1
+  - qt=5.6.2=vc14_1
+  - setuptools=39.2.0=py36_0
+  - six=1.11.0=py36_1
+  - theano=1.0.2=py36_0
+  - vc=14=0
+  - vs2015_runtime=14.0.25420=0
+  - wheel=0.31.0=py36_0
+  - wincertstore=0.2=py36_0
+  - yaml=0.1.7=vc14_0
+  - zlib=1.2.11=vc14_0
+  - blas=1.0=mkl
+  - icc_rt=2017.0.4=h97af966_0
+  - intel-openmp=2018.0.0=8
+  - mkl=2018.0.2=1
+  - numpy=1.14.3=py36h9fa60d3_1
+  - numpy-base=1.14.3=py36h555522e_1
+  - scipy=1.1.0=py36h672f292_0
+

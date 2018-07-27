@@ -20,6 +20,7 @@ set(src
   src/IntegerStack.cpp
   src/JsonArchiver.cpp
   src/Logger.cpp
+  src/MemoryLayout.cpp
   src/ObjectArchive.cpp
   src/ObjectArchiver.cpp
   src/OutputStreamImpostor.cpp
@@ -57,6 +58,7 @@ set(include
   include/IntegerStack.h
   include/JsonArchiver.h
   include/Logger.h
+  include/MemoryLayout.h
   include/MillisecondTimer.h
   include/ObjectArchive.h
   include/ObjectArchiver.h

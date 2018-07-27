@@ -57,7 +57,7 @@ def get_ell_port_memory_layout(shape: tuple, order: str, padding: int = 0):
 def get_tensor_in_ell_order(tensor: np.array, order: str):
     """
     Returns a numpy array in ELL order
-    """
+    """ 
     original_tensor = tensor
     original_shape = original_tensor.shape
     if order == "filter_channel_row_column":
@@ -74,7 +74,7 @@ def get_tensor_in_ell_order(tensor: np.array, order: str):
             np.float).reshape(original_shape[1], 1, original_shape[0])
     elif order == "channel":
         ordered_weights = original_tensor.ravel().astype(
-            np.float).reshape(1, 1, original_shape.size)
+            np.float).reshape(1, 1, original_tensor.size)
     elif order == "channel_row_column_filter":
         ordered_weights = np.moveaxis(original_tensor, 0, -1)
         ordered_weights = np.moveaxis(ordered_weights, 2, 0)
