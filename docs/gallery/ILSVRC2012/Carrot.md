@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/Carrot
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (64.61% top 1 accuracy, 85.63% top 5 accuracy, 0.45s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (64.61% top 1 accuracy, 85.63% top 5 accuracy, 0.444s/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/Carrot
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.45s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.444s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>

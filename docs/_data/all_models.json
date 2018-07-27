@@ -1,246 +1,290 @@
 [
   {
     "accuracy": {
-      "top1": "68.19",
-      "top5": "88.24"
+      "top1": "55.12",
+      "top5": "78.21"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_1117\\resnet34_f_I128x128x3_ADS.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Bean\\Bean.ell",
     "filter_size": 3,
-    "filters_per_layer": [],
     "image_size": "128x128",
-    "increase_factor": 112,
-    "model": "resnet34",
-    "name": "resnet34_f_I128x128x3_ADS",
-    "secs_per_frame": {
-      "pi3": "0.86"
-    },
-    "friendly_name": "Chenet"
-  },
-  {
-    "accuracy": {
-      "top1": "63.23",
-      "top5": "84.72"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_1126\\resnet101_f_I64x64x3_1AS.ell.zip",
-    "filter_size": 3,
-    "filters_per_layer": [],
-    "image_size": "64x64",
-    "increase_factor": 112,
-    "model": "resnet101",
-    "name": "resnet101_f_I64x64x3_1AS",
-    "secs_per_frame": {
-      "pi3": "0.54"
-    },
-    "friendly_name": "Wattleseed"
-  },
-  {
-    "accuracy": {
-      "top1": "64.59",
-      "top5": "85.50"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_1132\\resnet152_f_I64x64x3_1AS.ell.zip",
-    "filter_size": 3,
-    "filters_per_layer": [],
-    "image_size": "64x64",
-    "increase_factor": 112,
-    "model": "resnet152",
-    "name": "resnet152_f_I64x64x3_1AS",
-    "secs_per_frame": {
-      "pi3": "0.80"
-    },
-    "friendly_name": "Mashua"
-  },
-  {
-    "accuracy": {
-      "top1": "59.59",
-      "top5": "82.15"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_3075\\resnetconf_I128x128x3_ADS.ell.zip",
-    "filter_size": 3,
-    "filters_per_layer": [
-      1,
-      1,
-      0,
-      0
-    ],
-    "image_size": "128x128",
-    "increase_factor": 112,
+    "increase_factor": 0,
     "model": "resnetconf",
     "name": "resnetconf_I128x128x3_ADS",
     "secs_per_frame": {
-      "pi3": "0.32"
+      "pi3": "0.145"
     },
-    "friendly_name": "Pawpaw"
+    "friendly_name": "Bean"
   },
   {
     "accuracy": {
-      "top1": "64.61",
-      "top5": "85.63"
+      "top1": "57.57",
+      "top5": "80.55"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_3092\\resnetconf_I128x128x3_1AS.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Buckthorn\\Buckthorn.ell",
     "filter_size": 3,
-    "filters_per_layer": [
-      1,
-      1,
-      2,
-      1
-    ],
-    "image_size": "128x128",
-    "increase_factor": 112,
-    "model": "resnetconf",
-    "name": "resnetconf_I128x128x3_1AS",
-    "secs_per_frame": {
-      "pi3": "0.45"
-    },
-    "friendly_name": "Carrot"
-  },
-  {
-    "accuracy": {
-      "top1": "66.04",
-      "top5": "86.59"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_3169\\resnetconf_I128x128x3_ADS.ell.zip",
-    "filter_size": 3,
-    "filters_per_layer": [
-      1,
-      2,
-      2,
-      2
-    ],
-    "image_size": "128x128",
-    "increase_factor": 112,
-    "model": "resnetconf",
-    "name": "resnetconf_I128x128x3_ADS",
-    "secs_per_frame": {
-      "pi3": "0.56"
-    },
-    "friendly_name": "SevenSisters"
-  },
-  {
-    "accuracy": {
-      "top1": "49.32",
-      "top5": "73.99"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1520472137500_3282\\resnetconf_I64x64x3_ADS.ell.zip",
-    "filter_size": 3,
-    "filters_per_layer": [
-      1,
-      2,
-      2,
-      2
-    ],
     "image_size": "64x64",
-    "increase_factor": 112,
-    "model": "resnetconf",
-    "name": "resnetconf_I64x64x3_ADS",
+    "increase_factor": 0,
+    "model": "resnetconf_bottleneck",
+    "name": "resnetconf_bottleneck_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.11"
+      "pi3": "0.192"
     },
-    "friendly_name": "Elderflower"
-  },
-  {
-    "accuracy": {
-      "top1": "44.01",
-      "top5": "68.64"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1521072110030_2396\\resnetconf_I64x64x3_ADS.ell.zip",
-    "filter_size": 3,
-    "filters_per_layer": [
-      1,
-      1,
-      0,
-      0
-    ],
-    "image_size": "64x64",
-    "increase_factor": 112,
-    "model": "resnetconf",
-    "name": "resnetconf_I64x64x3_ADS",
-    "secs_per_frame": {
-      "pi3": "0.08"
-    },
-    "friendly_name": "BrazilianGuava"
+    "friendly_name": "Buckthorn"
   },
   {
     "accuracy": {
       "top1": "54.39",
       "top5": "78.02"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1522187747072_0789\\resnetconf_bottleneck_I64x64x3_1AS.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Candlenut\\Candlenut.ell",
     "filter_size": 3,
-    "filters_per_layer": [
-      1,
-      1,
-      1,
-      0
-    ],
     "image_size": "64x64",
     "increase_factor": 112,
     "model": "resnetconf_bottleneck",
     "name": "resnetconf_bottleneck_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.18"
+      "pi3": "0.166"
     },
     "friendly_name": "Candlenut"
+  },
+  {
+    "accuracy": {
+      "top1": "64.61",
+      "top5": "85.63"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Carrot\\Carrot.ell",
+    "filter_size": 3,
+    "image_size": "128x128",
+    "increase_factor": 112,
+    "model": "resnetconf",
+    "name": "resnetconf_I128x128x3_1AS",
+    "secs_per_frame": {
+      "pi3": "0.444"
+    },
+    "friendly_name": "Carrot"
+  },
+  {
+    "accuracy": {
+      "top1": "60.22",
+      "top5": "82.44"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\CashewNut\\CashewNut.ell",
+    "filter_size": 3,
+    "image_size": "128x128",
+    "increase_factor": 0,
+    "model": "resnetconf",
+    "name": "resnetconf_I128x128x3_1AS",
+    "secs_per_frame": {
+      "pi3": "0.176"
+    },
+    "friendly_name": "CashewNut"
   },
   {
     "accuracy": {
       "top1": "58.74",
       "top5": "81.59"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1522191724086_0185\\resnetconf_bottleneck_I64x64x3_1AS.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Chalta\\Chalta.ell",
     "filter_size": 3,
-    "filters_per_layer": [
-      1,
-      1,
-      5,
-      1
-    ],
     "image_size": "64x64",
     "increase_factor": 112,
     "model": "resnetconf_bottleneck",
     "name": "resnetconf_bottleneck_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.24"
+      "pi3": "0.219"
     },
     "friendly_name": "Chalta"
+  },
+  {
+    "accuracy": {
+      "top1": "66.65",
+      "top5": "87.17"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Clary\\Clary.ell",
+    "filter_size": 3,
+    "image_size": "128x128",
+    "increase_factor": 0,
+    "model": "resnetconf_bottleneck",
+    "name": "resnetconf_bottleneck_I128x128x3_1AS",
+    "secs_per_frame": {
+      "pi3": "0.597"
+    },
+    "friendly_name": "Clary"
+  },
+  {
+    "accuracy": {
+      "top1": "53.04",
+      "top5": "77.12"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Clover\\Clover.ell",
+    "filter_size": 3,
+    "image_size": "64x64",
+    "increase_factor": 0,
+    "model": "resnetconf_bottleneck",
+    "name": "resnetconf_bottleneck_I64x64x3_1AS",
+    "secs_per_frame": {
+      "pi3": "0.145"
+    },
+    "friendly_name": "Clover"
+  },
+  {
+    "accuracy": {
+      "top1": "44.41",
+      "top5": "69.41"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Coconut\\Coconut.ell",
+    "filter_size": 3,
+    "image_size": "64x64",
+    "increase_factor": 0,
+    "model": "resnetconf",
+    "name": "resnetconf_I64x64x3_ADS",
+    "secs_per_frame": {
+      "pi3": "0.049"
+    },
+    "friendly_name": "Coconut"
+  },
+  {
+    "accuracy": {
+      "top1": "49.32",
+      "top5": "73.99"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Elderflower\\Elderflower.ell",
+    "filter_size": 3,
+    "image_size": "64x64",
+    "increase_factor": 112,
+    "model": "resnetconf",
+    "name": "resnetconf_I64x64x3_ADS",
+    "secs_per_frame": {
+      "pi3": "0.109"
+    },
+    "friendly_name": "Elderflower"
+  },
+  {
+    "accuracy": {
+      "top1": "62.33",
+      "top5": "84.14"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Ginger\\Ginger.ell",
+    "filter_size": 3,
+    "image_size": "128x128",
+    "increase_factor": 0,
+    "model": "resnetconf",
+    "name": "resnetconf_I128x128x3_ADS",
+    "secs_per_frame": {
+      "pi3": "0.210"
+    },
+    "friendly_name": "Ginger"
+  },
+  {
+    "accuracy": {
+      "top1": "64.59",
+      "top5": "85.50"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Mashua\\Mashua.ell",
+    "filter_size": 3,
+    "image_size": "64x64",
+    "increase_factor": 112,
+    "model": "resnet152",
+    "name": "resnet152_f_I64x64x3_1AS",
+    "secs_per_frame": {
+      "pi3": "0.804"
+    },
+    "friendly_name": "Mashua"
   },
   {
     "accuracy": {
       "top1": "62.05",
       "top5": "83.80"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\application_1522193514033_0457\\resnetconf_bottleneck_I64x64x3_1AS.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\PandanFlower\\PandanFlower.ell",
     "filter_size": 3,
-    "filters_per_layer": [
-      3,
-      4,
-      8,
-      0
-    ],
     "image_size": "64x64",
     "increase_factor": 112,
     "model": "resnetconf_bottleneck",
     "name": "resnetconf_bottleneck_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.38"
+      "pi3": "0.363"
     },
     "friendly_name": "PandanFlower"
   },
   {
     "accuracy": {
-      "top1": "55.00",
-      "top5": "78.75"
+      "top1": "66.04",
+      "top5": "86.59"
     },
-    "directory": "D:\\Work\\ELL-models\\models\\resnet_bottleneck_selected_for_pr\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS\\dr_19A_I128x128x3CMCMCMCMCMCMC1AS.ell.zip",
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\SevenSisters\\SevenSisters.ell",
     "filter_size": 3,
-    "filters_per_layer": [],
     "image_size": "128x128",
     "increase_factor": 112,
-    "model": "d_19A",
-    "name": "dr_19A_I128x128x3CMCMCMCMCMCMC1AS",
+    "model": "resnetconf",
+    "name": "resnetconf_I128x128x3_ADS",
     "secs_per_frame": {
-      "pi3": "0.22"
+      "pi3": "0.552"
     },
-    "friendly_name": "GardenCress"
+    "friendly_name": "SevenSisters"
+  },
+  {
+    "accuracy": {
+      "top1": "72.24",
+      "top5": "90.78"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Sweetsop\\Sweetsop.ell",
+    "filter_size": 3,
+    "image_size": "128x128",
+    "increase_factor": 0,
+    "model": "resnetconf_bottleneck",
+    "name": "resnetconf_bottleneck_I128x128x3_1AS",
+    "secs_per_frame": {
+      "pi3": "1.126"
+    },
+    "friendly_name": "Sweetsop"
+  },
+  {
+    "accuracy": {
+      "top1": "70.46",
+      "top5": "89.57"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Tamarind\\Tamarind.ell",
+    "filter_size": 3,
+    "image_size": "128x128",
+    "increase_factor": 0,
+    "model": "resnetconf_bottleneck",
+    "name": "resnetconf_bottleneck_I128x128x3_1AS",
+    "secs_per_frame": {
+      "pi3": "0.753"
+    },
+    "friendly_name": "Tamarind"
+  },
+  {
+    "accuracy": {
+      "top1": "61.21",
+      "top5": "83.23"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\WaterApple\\WaterApple.ell",
+    "filter_size": 3,
+    "image_size": "64x64",
+    "increase_factor": 0,
+    "model": "resnetconf_bottleneck",
+    "name": "resnetconf_bottleneck_I64x64x3_1AS",
+    "secs_per_frame": {
+      "pi3": "0.301"
+    },
+    "friendly_name": "WaterApple"
+  },
+  {
+    "accuracy": {
+      "top1": "63.23",
+      "top5": "84.72"
+    },
+    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Wattleseed\\Wattleseed.ell",
+    "filter_size": 3,
+    "image_size": "64x64",
+    "increase_factor": 112,
+    "model": "resnet101",
+    "name": "resnet101_f_I64x64x3_1AS",
+    "secs_per_frame": {
+      "pi3": "0.527"
+    },
+    "friendly_name": "Wattleseed"
   }
 ]

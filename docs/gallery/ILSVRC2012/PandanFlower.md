@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/PandanFlower
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (62.05% top 1 accuracy, 83.80% top 5 accuracy, 0.38s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (62.05% top 1 accuracy, 83.80% top 5 accuracy, 0.363s/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/PandanFlower
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.38s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.363s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
