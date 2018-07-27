@@ -41,7 +41,7 @@ permalink: /gallery/ILSVRC2012/dcda_I64x64x3CMCMCMCMCMC1AS_v2
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by v-jlema@microsoft.com using CNTK 2.2 </td>
+        <td colspan="3"> Trained by Juan Lema using CNTK 2.2 </td>
     </tr>
 </table>
 
