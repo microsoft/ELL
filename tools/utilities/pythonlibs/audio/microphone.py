@@ -17,6 +17,14 @@ from threading import Thread, Lock, Condition
 import numpy as np
 import pyaudio
 
+def list_devices():
+    audio = pyaudio.PyAudio()
+    print("Pick from available microphones:")
+    for i in range(audio.get_device_count()):
+        info = audio.get_device_info_by_index(i)
+        if info["maxInputChannels"] > 0:
+            print("  {}. {}".format(i, info["name"]))
+
 class Microphone:
     """ This class wraps the pyaudio library and it's input stream callback providing a simple to
     use Microphone class that you can simply read from """

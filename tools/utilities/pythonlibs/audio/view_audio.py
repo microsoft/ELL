@@ -5,7 +5,7 @@
 ##  File:     view_audio.py
 ##  Authors:  Chris Lovett, Chuck Jacobs
 ##
-##  Requires: Python 3.x
+##  Requires: Python 3.x, numpy, tkinter, matplotlib
 ##
 ###################################################################################################
 
@@ -44,17 +44,18 @@ class AudioDemo(Frame):
 
     def __init__(self, featurizer_model=None, classifier_model=None, 
                 sample_rate=None, channels=None, input_device=None, categories=None, 
-                image_width=80, threshold=None, wav_file=None, clear=5):
+                image_width=80, threshold=None, wav_file=None, clear=5, serial=None):
         """ Initialize AudioDemo object
-        featurizer_model - the path to the compiled ELL featurizer
-        classifier_model - the path to the compiled ELL classifier
+        featurizer_model - the path to the ELL featurizer
+        classifier_model - the path to the ELL classifier
         sample_rate - sample rate to featurizer is expecting
         channels - number of channels featurizer is expecting
         input_device - optional id of microphone to use
         categories - path to file containing category labels
         image_width - width of the spectrogram image
         threshold - ignore predictions that have confidence below this number (e.g. 0.5)
-        wav_file - optional wav_file to process when you click Play
+        wav_file - optional wav_file to use  when you click Play
+        serial - optional serial input, reading numbers from the given serial port.
         """
         super().__init__()
 
@@ -67,6 +68,7 @@ class AudioDemo(Frame):
         self.load_settings()
         self.reading_input = False
         self.featurizer_model = None
+        self.serial_port = serial
         if featurizer_model:
             self.featurizer_model = featurizer_model
             self.settings[self.FEATURIZER_MODEL_KEY] = featurizer_model
@@ -317,12 +319,23 @@ class AudioDemo(Frame):
         """ Start recording audio from the microphone nd classify the audio. Note we use a background thread to 
         process the audio and we setup a UI animation function to draw the sliding spectrogram image, this way
         the UI update doesn't interfere with the smoothness of the microphone readings """ 
-        if self.microphone is None:
-            self.microphone = microphone.Microphone(False)
-    
+
         self.stop()
-        num_channels = 1
-        self.microphone.open(self.featurizer.input_size, self.sample_rate, num_channels, self.input_device)        
+
+        input_channel = None
+
+        if self.serial_port:
+            import serial_reader
+            self.serial = serial_reader.SerialReader(0.001)
+            self.serial.open(self.featurizer.input_size, self.serial_port)
+            input_channel = self.serial
+        else:
+            if self.microphone is None:
+                self.microphone = microphone.Microphone(False)
+    
+            num_channels = 1
+            self.microphone.open(self.featurizer.input_size, self.sample_rate, num_channels, self.input_device)        
+            input_channel = self.microphone
         
         def update_func(frame_index):
             # this is an animation callback to update the UI every 33 milliseconds.
@@ -334,13 +347,13 @@ class AudioDemo(Frame):
 
         if self.animation:
             self.animation.event_source.stop()
-            
+
         self.reading_input = True
         # Start animation timer for updating the UI (e.g. spectrogram image) (30 fps is usually fine) 
         self.animation = animation.FuncAnimation(self.features_figure, update_func, interval=33, blit=True)
         
         # start background thread to read and classify the recorded audio.
-        self.featurizer.open(self.microphone)
+        self.featurizer.open(input_channel)
         self.read_input_thread = Thread(target=self.on_read_features, args=())
         self.read_input_thread.daemon = True
         self.read_input_thread.start()            
@@ -561,12 +574,12 @@ class AudioDemo(Frame):
         self.load_classifier(self.classifier_model)
 
 def main(featurizer_model=None, classifier=None, sample_rate=None, channels=None, input_device=None, categories=None, 
-        image_width=80, threshold=None, wav_file=None, clear=5):
+        image_width=80, threshold=None, wav_file=None, clear=5, serial=None):
     """ Main function to create root UI and AudioDemo object, then run the main UI loop """
     root = tk.Tk()
     root.geometry("800x800")
     app = AudioDemo(featurizer_model, classifier, sample_rate, channels, input_device, categories, image_width, 
-                    threshold, wav_file, clear)
+                    threshold, wav_file, clear, serial)
     root.bind("+", app.on_plus_key)
     root.bind("-", app.on_minus_key)
     while True:
@@ -588,8 +601,11 @@ if __name__ == "__main__":
             default=16000, type=int)
     arg_parser.add_argument("--channels", "-ch", help="Audio channels expected by classifier", 
             default=1, type=int)
-    arg_parser.add_argument("--input_device", "-d", help="Input device", 
-            default=None, type=int)
+            
+    arg_parser.add_argument("--input_device", "-d", help="Index of input device (see --list_devices)", 
+            default=1, type=int)
+    arg_parser.add_argument("--list_devices", help="List available input devices", action="store_true")
+
     arg_parser.add_argument("--categories", help="Provide categories file that provide labels for each predicted class",
             default=None)
     arg_parser.add_argument("--wav_file", help="Provide an input wav file to test", 
@@ -600,8 +616,16 @@ if __name__ == "__main__":
             type=float, default=0)
     arg_parser.add_argument("--clear", help="Seconds before clearing output (default 5)", 
             type=float, default=5)
+    arg_parser.add_argument("--serial", help="Name of serial port to read (default None)", 
+            default=None)
     args = arg_parser.parse_args()
 
-    main(args.featurizer, args.classifier, 
-        args.sample_rate, args.channels, args.input_device, args.categories, 
-        args.image_width, args.threshold, args.wav_file, args.clear)
+    if args.serial and args.input_device:
+        raise Exception("The --serial and --input_device options are mutually exclusive")
+
+    if args.list_devices:
+        microphone.list_devices()
+    else:        
+        main(args.featurizer, args.classifier, 
+            args.sample_rate, args.channels, args.input_device, args.categories, 
+            args.image_width, args.threshold, args.wav_file, args.clear, args.serial)
