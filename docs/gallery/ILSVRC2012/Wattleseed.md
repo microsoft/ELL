@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/Wattleseed
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (63.23% top 1 accuracy, 84.72% top 5 accuracy, 0.54s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (63.23% top 1 accuracy, 84.72% top 5 accuracy, 0.527s/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/Wattleseed
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.54s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.527s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
