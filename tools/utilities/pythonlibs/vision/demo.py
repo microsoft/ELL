@@ -9,6 +9,7 @@
 ##
 ####################################################################################################
 
+import argparse
 import sys
 import os
 import numpy as np
@@ -19,9 +20,10 @@ import demoHelper as d
 # export DISPLAY=:0
 # then add the '-save' argument to get tagged frames to be saved to disk.
 
-def main(args):
+def main():
     helper = d.DemoHelper()
-    helper.parse_arguments(args,
+
+    arg_parser = argparse.ArgumentParser(
             "Runs the given ELL model passing images from camera or static image file\n"
             "Either the ELL model file, or the compiled model's Python module must be given,\n"
             "using the --model or --compiledModel options respectively.\n"
@@ -30,10 +32,39 @@ def main(args):
             "   python demo.py categories.txt --model model1.ell\n"
             "This shows opencv window with image classified by the model using given labels")
 
-    # Initialize image source
-    helper.init_image_source()
+    # required arguments
+    arg_parser.add_argument("labels", help="path to the labels file for evaluating the model, or comma separated list if using more than one model")
+
+    # options
+    arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
+    arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=helper.threshold)
+    arg_parser.add_argument("--bgr", help="specify True if input data should be in BGR format (default False)", default = helper.bgr)
+    arg_parser.add_argument("--nogui", help="disable GUI to enable automated testing of a batch of images", action='store_true')
+    arg_parser.add_argument("--iterations", type=int, help="when used with --nogui this tests multiple iterations of each image to get better timing information")
+    arg_parser.add_argument("--print_labels", help="print predictions instead of drawing them on the image", action='store_true')
+
+    # mutually exclusive options
+    group = arg_parser.add_mutually_exclusive_group()
+    group.add_argument("--camera", type=int, help="the camera id of the webcam", default=0)
+    group.add_argument("--image", help="path to an image file. If set, evaluates the model using the image, instead of a webcam")
+    group.add_argument("--folder", help="path to an image folder. If set, evaluates the model using the images found there")
+
+    group2 = arg_parser.add_mutually_exclusive_group()
+    group2.add_argument("--model", help="path to a model file")
+    group2.add_argument("--compiledModel", help="path to the compiled model's Python module")
+    group2.add_argument("--models", help="list of comma separated paths to model files")
+    group2.add_argument("--compiledModels", help="list of comma separated paths to the compiled models' Python modules")
+
+    args = arg_parser.parse_args()
+
+    if not args.compiledModel and not args.model:
+        print("### Error: Required one of --model or --compiledModel")
+        return
+
+    helper.initialize(args)
 
     lastPrediction = ""
+    help_prompt = 60
 
     while (not helper.done()):
         # Grab next frame
@@ -54,22 +85,30 @@ def main(args):
         text = ", ".join(["(" + str(int(element[1]*100)) + "%) " + helper.get_label(element[0]) for element in top5])
 
         save = False
-        if (text != lastPrediction):
+        if text != lastPrediction:
             print(text)
             save = True
             lastPrediction = text
 
         # Draw the text on the frame
-        if not helper.nogui:
+        if helper.nogui or helper.print_labels:
+            if helper.new_frame:
+                if not text:
+                    text = "unknown"
+                if helper.image_filename:
+                    text = helper.image_filename + ": " + text
+                print(text)
+        else:
             frameToShow = frame
             helper.draw_label(frameToShow, text)
             helper.draw_fps(frameToShow)
+            if help_prompt > 0:
+                help_prompt -= 1
+                helper.draw_footer(frameToShow, "Press ESC to close this window")
             # Show the new frame
             helper.show_image(frameToShow, save)
 
     helper.report_times()
 
 if __name__ == "__main__":
-    args = sys.argv
-    args.pop(0) # when an args list is passed to parse_args, the first argument (program name) needs to be dropped
-    main(args)
+    main()
