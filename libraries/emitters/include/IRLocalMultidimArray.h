@@ -13,6 +13,7 @@
 // utilities
 #include "Exception.h"
 #include "IntegerNArray.h"
+#include "MemoryLayout.h"
 
 // stl
 #include <algorithm>

@@ -50,7 +50,7 @@ namespace nodes
     void BinaryFunctionNode<ValueType, FunctionType>::Compute() const
     {
         auto outputLayout = _output.GetMemoryLayout();
-        auto outputSize = utilities::NumElements(outputLayout.GetStride());
+        auto outputSize = outputLayout.GetStride().NumElements();
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInputOffset = 0;
@@ -109,7 +109,7 @@ namespace nodes
                 thisOutputDimensionOffset += prevOutputDimensionOffset * outputStride[dimension];
             }
 
-            if (dimension < numDimensions - 1)
+            if (static_cast<int>(dimension) < numDimensions - 1)
             {
                 // Recursive call to emit nested loop
                 ComputeDimensionLoop(dimension + 1, output, thisInputDimensionOffset, thisOutputDimensionOffset);
@@ -183,7 +183,7 @@ namespace nodes
                 thisOutputDimensionOffset = function.Operator(emitters::GetAddForValueType<int>(), scaledOutputDimensionOffset, thisOutputDimensionInternalOffset);
             }
 
-            if (dimension < numDimensions - 1)
+            if (static_cast<int>(dimension) < numDimensions - 1)
             {
                 // Recursive call to emit nested loop
                 EmitComputeDimensionLoop(compiler, function, dimension + 1, input1, input2, output, thisInputDimensionOffset, thisOutputDimensionOffset);

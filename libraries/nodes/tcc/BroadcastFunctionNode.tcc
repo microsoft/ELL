@@ -364,7 +364,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastFunctionNode<ValueType, FunctionType>::Compute() const
     {
-        auto outputSize = utilities::NumElements(GetOutputLayout().GetStride());
+        auto outputSize = GetOutputLayout().GetStride().NumElements();
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInputOffset = 0;

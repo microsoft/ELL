@@ -246,10 +246,10 @@ namespace nodes
             xnorOutput = AddRefinedNodes<int64_t>(transformer, newInput);
         }
 
-        // Output of xnor is in (f x h x w) order, need to transpose to (h x w x f)
-        model::PortMemoryLayout outputShape({ numFilters, outputImageHeight, outputImageWidth });
-        model::PortMemoryLayout transposedOutputShape({ outputImageHeight, outputImageWidth, numFilters }, { outputDataPadding, outputDataPadding, 0 });
-        auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(xnorOutput, outputShape, transposedOutputShape, std::vector<int>{ 1, 2, 0 });
+        // Output of xnor is in (f x h x w) order, need to transpose to the canonical (h x w x f) order
+        model::PortMemoryLayout outputShape(model::MemoryShape{ numFilters, outputImageHeight, outputImageWidth }, model::DimensionOrder{ 2, 0, 1 }); // Note: memory layout constructor takes the sizes in physical dimension order
+        model::PortMemoryLayout transposedOutputShape(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputDataPadding, outputDataPadding, 0 }, model::DimensionOrder{ 0, 1, 2 });
+        auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(xnorOutput, outputShape, transposedOutputShape);
         transformer.MapNodeOutput(this->output, reorderOutputNode->output);
         return true;
     }
@@ -552,7 +552,7 @@ namespace nodes
         const auto& inputSize = inputLayout.GetActiveSize();
 
         const auto& outputLayout = this->GetOutputMemoryLayout();
-        // const auto& outputLayout = this->GetOutputMemoryLayout().Reorder({2,0,1}); // TODO: reorder from r,c,d -> d,r,c
+        // const auto& outputLayout = this->GetOutputMemoryLayout().ReorderedCopy({2,0,1}); // TODO: reorder from r,c,d -> d,r,c
         const auto& outputSize = outputLayout.GetActiveSize();
 
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
@@ -653,7 +653,7 @@ namespace nodes
         const auto& inputSize = inputLayout.GetActiveSize();
 
         const auto& outputLayout = this->GetOutputMemoryLayout();
-        // const auto& outputLayout = this->GetOutputMemoryLayout().Reorder({2,0,1}); // TODO: reorder from r,c,d -> d,r,c
+        // const auto& outputLayout = this->GetOutputMemoryLayout().ReorderedCopy({2,0,1}); // TODO: reorder from r,c,d -> d,r,c
         const auto& outputSize = outputLayout.GetActiveSize();
 
         // The workspace buffer element sizes are dependent on the processor architecture's bitness

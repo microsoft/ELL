@@ -590,11 +590,11 @@ PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<
     }
     else if (offset.size() == 0)
     {
-        _layout = ell::model::PortMemoryLayout(size, padding);
+        _layout = ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding });
     }
     else
     {
-        _layout = ell::model::PortMemoryLayout(size, padding, offset);
+        _layout = ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding }, ell::model::MemoryShape{ offset });
     }
 }
 

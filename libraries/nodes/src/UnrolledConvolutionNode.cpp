@@ -139,27 +139,27 @@ namespace nodes
             auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(newInput, inputLayout, filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
             auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc);
 
-            // Output of matrix multiply is in (f x h x w) order, need to transpose to (h x w x f)
-            model::PortMemoryLayout outputShape({ numFilters, outputImageHeight, outputImageWidth });
-            model::PortMemoryLayout transposedOutputShape({ outputImageHeight, outputImageWidth, numFilters }, { outputPadding, outputPadding, 0 });
-            auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape, std::vector<int>{ 1, 2, 0 });
+            // Output of matrix multiply is in (f x h x w) order, need to transpose to the canonical (h x w x f) order
+            model::PortMemoryLayout outputShape(model::MemoryShape{ numFilters, outputImageHeight, outputImageWidth }, model::DimensionOrder{ { 2, 0, 1 } }); // Note: memory layout constructor takes the sizes in physical dimension order
+            model::PortMemoryLayout transposedOutputShape(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 }, model::DimensionOrder{ { 0, 1, 2 } });
+            auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape);
             transformer.MapNodeOutput(this->output, reorderOutputNode->output);
         }
         else // reorder input to be channels x rows x columns (then we can use the 'new' receptive field matrix generation)
         {
             assert(dataOrder == drcOrder);
             // Remove padding and transpose to DRC order
-            model::PortMemoryLayout inputShape({ inputHeight, inputWidth, inputDepth }, { inputPadding, inputPadding, 0 });
-            model::PortMemoryLayout transposedInputShape({ inputDepth, inputHeight, inputWidth });
-            auto reorderInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, inputShape, transposedInputShape, std::vector<int>{ 2, 0, 1 });
+            model::PortMemoryLayout inputShape(model::MemoryShape{ inputHeight, inputWidth, inputDepth }, model::MemoryShape{ inputPadding, inputPadding, 0 });
+            model::PortMemoryLayout transposedInputShape(model::MemoryShape{ inputDepth, inputHeight, inputWidth },  model::DimensionOrder{ 2, 0, 1 });
+            auto reorderInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, inputShape, transposedInputShape);
 
             auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(reorderInputNode->output, inputLayout, _filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
             auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc);
 
-            // Output of matrix multiply is in (f x h x w) order, need to transpose to (h x w x f)
-            model::PortMemoryLayout outputShape({ numFilters, outputImageHeight, outputImageWidth });
-            model::PortMemoryLayout transposedOutputShape({ outputImageHeight, outputImageWidth, numFilters }, { outputPadding, outputPadding, 0 });
-            auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape, std::vector<int>{ 1, 2, 0 });
+            // Output of matrix multiply is in (f x h x w) order, need to transpose to the canonical (h x w x f) order
+            model::PortMemoryLayout outputShape(model::MemoryShape{ numFilters, outputImageHeight, outputImageWidth }, model::DimensionOrder{ { 2, 0, 1 } }); // Note: memory layout constructor takes the sizes in physical dimension order
+            model::PortMemoryLayout transposedOutputShape(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 }, model::DimensionOrder{ { 0, 1, 2 } });
+            auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape);
             transformer.MapNodeOutput(this->output, reorderOutputNode->output);
         }
         return true;

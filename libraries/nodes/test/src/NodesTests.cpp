@@ -331,9 +331,9 @@ static void TestBinaryOperationNodeCompute2()
     int numChannels = 2;
     int padding = 1;
 
-    model::PortMemoryLayout input1Shape({ numRows, numColumns, numChannels }, { padding, padding, 0 });
-    model::PortMemoryLayout input2Shape({ numRows, numColumns, numChannels });
-    model::PortMemoryLayout outputShape({ numRows, numColumns, numChannels });
+    model::PortMemoryLayout input1Shape(model::MemoryShape{ numRows, numColumns, numChannels }, model::MemoryShape{ padding, padding, 0 });
+    model::PortMemoryLayout input2Shape(model::MemoryShape{ numRows, numColumns, numChannels });
+    model::PortMemoryLayout outputShape(model::MemoryShape{ numRows, numColumns, numChannels });
 
     auto input1Node = model.AddNode<model::InputNode<double>>(input1Shape.GetMemorySize());
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0 });

@@ -441,9 +441,9 @@ void TestCompilableBinaryOperationNode2()
     int numChannels = 2;
     int padding = 1;
 
-    model::PortMemoryLayout input1Shape({ numRows, numColumns, numChannels }, { padding, padding, 0 });
-    model::PortMemoryLayout input2Shape({ numRows, numColumns, numChannels });
-    model::PortMemoryLayout outputShape({ numRows, numColumns, numChannels });
+    model::PortMemoryLayout input1Shape(model::MemoryShape{ numRows, numColumns, numChannels }, model::MemoryShape{ padding, padding, 0 });
+    model::PortMemoryLayout input2Shape(model::MemoryShape{ numRows, numColumns, numChannels });
+    model::PortMemoryLayout outputShape(model::MemoryShape{ numRows, numColumns, numChannels });
 
     auto inputNode = model.AddNode<model::InputNode<double>>(input1Shape.GetMemorySize());
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0 });
@@ -540,8 +540,8 @@ void TestReorderDataNode1()
     int numColumns = 3;
     int numChannels = 2;
     model::Model model;
-    model::PortMemoryLayout inputShape({ numRows, numColumns, numChannels }); // Default order: 0, 1, 2 == rows, columns, channels
-    model::PortMemoryLayout outputShape({ numChannels, numRows, numColumns }); // Want to reorder to 2, 0, 1 == channels, rows, columns
+    model::PortMemoryLayout inputLayout(model::MemoryShape{ numRows, numColumns, numChannels }); // Default order: 0, 1, 2 == rows, columns, channels
+    auto outputLayout = inputLayout.ReorderedCopy({ 2, 0, 1 });
 
     //        [  (1,2)   (3,4)    (5,6) ]
     // Input: [  (7,8)  (9,10), (11,12))]
@@ -555,10 +555,10 @@ void TestReorderDataNode1()
     //
     // = 1 3 5 7 9 11 13 15 17 2 4 6 8 10 12 14 16 18
 
-    size_t inputSize = inputShape.GetMemorySize();
+    size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
     // auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputShape, outputShape);
-    auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputShape, outputShape, std::vector<int>{ 2, 0, 1 });
+    auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -580,8 +580,8 @@ void TestReorderDataNode2()
     int numChannels = 2;
     int padding = 1;
     model::Model model;
-    model::PortMemoryLayout inputShape({ numRows, numColumns, numChannels }, { padding, padding, 0 }); // Default order: 0, 1, 2 == rows, columns, channels
-    model::PortMemoryLayout outputShape({ numRows, numColumns, numChannels }); // Transform to order (channels, rows, cols) and remove padding
+    model::PortMemoryLayout inputLayout(model::MemoryShape{ numRows, numColumns, numChannels }, model::MemoryShape{ padding, padding, 0 }); // Default order: 0, 1, 2 == rows, columns, channels
+    model::PortMemoryLayout outputLayout(model::MemoryShape{ numRows, numColumns, numChannels }); // Transform to order (channels, rows, cols) and remove padding
 
     //        [    (1,2)   (3,4)   (5,6)   (7,8)   9,10) ]
     // Input: [  (11,12) (13,14) (15,16) (17,18) (19,20) ]
@@ -597,9 +597,9 @@ void TestReorderDataNode2()
     //
     // = 13 15 17 23 25 27 33 35 37 14 16 18 24 26 28 34 36 38
 
-    size_t inputSize = inputShape.GetMemorySize();
+    size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
-    auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputShape, outputShape, std::vector<int>{ 2, 0, 1 });
+    auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout, std::vector<int>{ 2, 0, 1 });
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -681,7 +681,7 @@ void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape)
     //         [ 14 15 0  17 18 0  0 0 0 ]
     //
 
-    size_t inputSize = utilities::NumElements(inputMemoryLayout.GetStride());
+    size_t inputSize = inputMemoryLayout.GetStride().NumElements();
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
     auto testNode = model.AddNode<nodes::ReceptiveFieldMatrixNode<ElementType>>(inputNode->output,

@@ -8,11 +8,11 @@
 
 #pragma once
 
+// emitters
+#include "IRLocalScalar.h"
+
 // utilities
 #include "MemoryLayout.h"
-
-// llvm
-#include <llvm/IR/Value.h>
 
 namespace ell
 {
@@ -23,7 +23,9 @@ namespace emitters
 
 namespace model
 {
+    using DimensionOrder = utilities::DimensionOrder;
     using MemoryShape = utilities::MemoryShape;
+    using MemoryCoordinates = utilities::MemoryCoordinates;
     using PortMemoryLayout = utilities::MemoryLayout;
 
     /// <summary> Emits LLVM IR to get the offset into memory for an entry </summary>
@@ -32,7 +34,7 @@ namespace model
     /// <param name="location"> The coordinates of the entry </param>
     /// <param name="layout"> The layout of the memory </param>
     /// <returns> The offset to the entry (from the beginning of memory) </returns>
-    llvm::Value* EmitGetEntryOffset(emitters::IRFunctionEmitter& function, const std::vector<llvm::Value*>& location, const PortMemoryLayout& layout);
+    emitters::IRLocalScalar EmitGetEntryOffset(emitters::IRFunctionEmitter& function, const std::vector<emitters::IRLocalScalar>& location, const PortMemoryLayout& layout);
 
     /// <summary> Emits LLVM IR to check if a location is outside of the stored memory extent in any dimension </summary>
     ///
@@ -40,6 +42,6 @@ namespace model
     /// <param name="location"> The coordinates of the entry </param>
     /// <param name="layout"> The layout of the memory </param>
     /// <returns> A value representing `true` if the location is out of bounds </returns>
-    llvm::Value* EmitIsOutOfBounds(emitters::IRFunctionEmitter& function, const std::vector<llvm::Value*>& location, const PortMemoryLayout& layout);
+    emitters::IRLocalScalar EmitIsOutOfBounds(emitters::IRFunctionEmitter& function, const std::vector<emitters::IRLocalScalar>& location, const PortMemoryLayout& layout);
 }
 }
