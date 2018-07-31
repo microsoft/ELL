@@ -159,10 +159,12 @@ struct PortMemoryLayout
     std::vector<int> size;
     std::vector<int> padding;
     std::vector<int> offset;
+    std::vector<int> order;
 
     PortMemoryLayout(const std::vector<int>& size,
                      const std::vector<int>& padding = {},
-                     const std::vector<int>& offset = {});
+                     const std::vector<int>& offset = {},
+                     const std::vector<int>& order = {});
 #ifndef SWIG
     const ell::model::PortMemoryLayout& Get() const { return _layout; }
     PortMemoryLayout(const ell::model::PortMemoryLayout& layout);

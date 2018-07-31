@@ -32,12 +32,14 @@ namespace utilities
 
         /// <summary> Element access operator. </summary>
         int operator[](int index) const { return _data[index]; }
+        int operator[](size_t index) const { return _data[index]; }
 
         /// <summary> Element access operator. </summary>
         int& operator[](int index) { return _data[index]; }
+        int& operator[](size_t index) { return _data[index]; }
 
         /// <summary> Get the number of dimensions. </summary>
-        int NumDimensions() const { return _data.size(); }
+        int NumDimensions() const { return static_cast<int>(_data.size()); }
             
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

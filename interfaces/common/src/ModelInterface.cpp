@@ -581,20 +581,24 @@ void OutputPort::ReferencePort()
 //
 // PortMemoryLayout
 //
-PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<int>& p, const std::vector<int>& o)
-    : size(s), padding(p), offset(o)
+PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<int>& p, const std::vector<int>& o, const std::vector<int>& order)
+    : size(s), padding(p), offset(o), order(order)
 {
     if (padding.size() == 0 && offset.size() == 0)
     {
-        _layout = ell::model::PortMemoryLayout(size);
+        _layout = ell::model::PortMemoryLayout(ell::model::MemoryShape{ size });
     }
     else if (offset.size() == 0)
     {
         _layout = ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding });
     }
-    else
+    else if (order.size() == 0)
     {
         _layout = ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding }, ell::model::MemoryShape{ offset });
+    }
+    else
+    {
+        _layout = ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding }, ell::model::MemoryShape{ offset }, ell::model::DimensionOrder{ order });
     }
 }
 

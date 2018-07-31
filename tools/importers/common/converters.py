@@ -1251,8 +1251,7 @@ class ConvertSplice(ConvertBase):
             # Take the active region of inputs
             port_elements, input_port_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(
                 self.importer_node, input_index)
-            outputPortMemoryLayout = ell.model.PortMemoryLayout([input_port_memory_layout.size[2], input_port_memory_layout.size[0], input_port_memory_layout.size[1]])
-            reorder_node = builder.AddReorderDataNode(model, input_port_elements, input_port_memory_layout, outputPortMemoryLayout, pre_order)
+            reorder_node = builder.AddReorderDataNode(model, input_port_elements, input_port_memory_layout, input_port_memory_layout, pre_order)
             reorder_nodes.append(reorder_node)
             # Register the mapping
             lookup_table.add_imported_ell_node(self.importer_node, reorder_node)
@@ -1271,10 +1270,11 @@ class ConvertSplice(ConvertBase):
         # Insert a reorder node to to be in row, column, channel order.
         port_elements = lookup_table.get_output_port_elements_for_node(concatenation_node)
         padding_size = output_padding.paddingSize
-        reorderedPortMemoryLayout = ell.model.PortMemoryLayout([reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels])
+
+        reorderedPortMemoryLayout = ell.model.PortMemoryLayout([reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels], [reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels], [0, 0, 0], pre_order)
         outputPortMemoryLayout = ell.model.PortMemoryLayout([output_shape.rows - 2*padding_size, output_shape.columns - 2*padding_size, output_shape.channels],
                                                             [padding_size, padding_size, 0])
-        final_reorder_node = builder.AddReorderDataNode(model, port_elements, reorderedPortMemoryLayout, outputPortMemoryLayout, post_order, 0)
+        final_reorder_node = builder.AddReorderDataNode(model, port_elements, reorderedPortMemoryLayout, outputPortMemoryLayout, [0, 1, 2], 0)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, final_reorder_node)
 
