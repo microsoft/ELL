@@ -48,7 +48,7 @@ namespace common
         bool useThreadPool = true;
         int maxThreads = 4;
         bool debug = false;
-        PreferredConvolutionMethod convolutionMethod = PreferredConvolutionMethod::none; // known methods: none, unrolled, simple, diagonal, winograd
+        PreferredConvolutionMethod convolutionMethod = PreferredConvolutionMethod::automatic; // known methods: auto, unrolled, simple, diagonal, winograd
         utilities::Optional<bool> positionIndependentCode = false; // for generating -fPIC object code
 
         // target machine options

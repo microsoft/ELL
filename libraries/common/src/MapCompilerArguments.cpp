@@ -66,8 +66,8 @@ namespace common
               { "simple", PreferredConvolutionMethod::simple },
               { "diagonal", PreferredConvolutionMethod::diagonal },
               { "winograd", PreferredConvolutionMethod::winograd },
-              { "none", PreferredConvolutionMethod::none } },
-            "none");
+              { "auto", PreferredConvolutionMethod::automatic } },
+            "auto");
 
         parser.AddOption(
             enableVectorization,

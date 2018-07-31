@@ -161,12 +161,12 @@ class EllBuildTools:
         else: # host
             return common + ["-relocation-model=pic"]
 
-    def llc(self, output_dir, input_file, target, optimization_level="3"):
+    def llc(self, output_dir, input_file, target, optimization_level="3", objext=".o"):
         # llc -filetype=obj _darknetReference.ll -O3 -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53 -relocation-model=pic
         model_name = os.path.splitext(os.path.basename(input_file))[0]
         if model_name.endswith('.opt'):
             model_name = model_name[:-4]
-        out_file = os.path.join(output_dir, model_name + ".obj")
+        out_file = os.path.join(output_dir, model_name + objext)
         args = [self.llcexe,
                 input_file,
                 "-o", out_file,
@@ -190,18 +190,22 @@ class EllBuildTools:
         self.run(args)
         return out_file
 
-    def compile(self, model_file, func_name, model_name, target, output_dir, use_blas=False, fuse_linear_ops=True, profile=False, llvm_format="bc",
-                optimize=True, debug=False, is_model_file=False, swig=True, header=False):
+    def compile(self, model_file, func_name, model_name, target, output_dir, 
+                use_blas=False, fuse_linear_ops=True, profile=False, llvm_format="bc",
+                optimize=True, debug=False, is_model_file=False, swig=True, header=False, 
+                objext=".o", extra_options=[]):
         file_arg = "-imf" if is_model_file else "-imap"
         format_flag = {
             "bc": "--bitcode",
             "ir": "--ir",
-            "asm": "--assembly"
+            "asm": "--assembly",
+            "obj": "--objectCode"
         }[llvm_format]
         output_ext = {
             "bc": ".bc",
             "ir": ".ll",
-            "asm": ".s"
+            "asm": ".s",
+            "obj": objext
         }[llvm_format]
         model_file_base = os.path.splitext(os.path.basename(model_file))[0]
         out_file = os.path.join(output_dir, model_file_base + output_ext)
@@ -233,6 +237,8 @@ class EllBuildTools:
 
         if profile:
             args.append("--profile")
+        
+        args += extra_options
 
         self.logger.info("compiling model...")
         self.run(args)

@@ -5,11 +5,11 @@ include(CommonInterfaces)
 
 add_subdirectory(test)
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-    set(OBJECT_EXTENSION obj)
+if(WIN32)
+    set(OBJECT_EXTENSION "o")
     set(ADDITIONAL_DISTUTILS_FLAGS "--plat-name=win-amd64 install")
 else()
-    set(OBJECT_EXTENSION o)
+    set(OBJECT_EXTENSION "o")
     set(ADDITIONAL_DISTUTILS_FLAGS install)
 endif()
 

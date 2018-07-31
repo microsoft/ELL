@@ -15,11 +15,11 @@ namespace model
 {
     enum class PreferredConvolutionMethod : int
     {
-        none = -1,
-        unrolled = 0,
+        automatic = 0,
         diagonal,
         simple,
         winograd,
+        unrolled
     };
 
     struct ModelOptimizerOptions
@@ -27,7 +27,7 @@ namespace model
         // individual optimization settings
         bool fuseLinearFunctionNodes = true;
 
-        PreferredConvolutionMethod preferredConvolutionMethod = PreferredConvolutionMethod::none;
+        PreferredConvolutionMethod preferredConvolutionMethod = PreferredConvolutionMethod::automatic;
     };
 }
 }

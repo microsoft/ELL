@@ -92,7 +92,7 @@ namespace passes
 
         void SetConvolutionMethod(const model::Node& node, model::ModelTransformer& transformer, model::PreferredConvolutionMethod preferredMethod)
         {
-            if (preferredMethod != model::PreferredConvolutionMethod::none)
+            if (preferredMethod != model::PreferredConvolutionMethod::automatic)
             {
                 if (TrySetConvolutionMethod<float>(node, transformer, preferredMethod))
                 {
@@ -121,7 +121,7 @@ namespace passes
     {
         model::OptimizationPassInfo info = {
             "SetConvolutionMethodPass",
-            [](const model::ModelOptimizerOptions& settings) { return settings.preferredConvolutionMethod != model::PreferredConvolutionMethod::none; },
+            [](const model::ModelOptimizerOptions& settings) { return settings.preferredConvolutionMethod != model::PreferredConvolutionMethod::automatic; },
             [] { return std::make_unique<SetConvolutionMethodPass>(); }
         };
         model::OptimizationPassRegistry::AddPass(info);

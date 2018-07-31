@@ -8,24 +8,41 @@
 ##  Requires: Python 3.x
 ##
 ####################################################################################################
+
 import argparse
-import os
 import json
 import logging
 import operator
+import os
+import platform
 import subprocess
 import sys
 from shutil import copyfile
 
 __script_path = os.path.dirname(os.path.abspath(__file__))
-
 sys.path += [os.path.join(__script_path, "..", "utilities", "pythonlibs")]
+
 import find_ell
 import buildtools
 import logger
 
 # This script creates a compilable Python project for executing a given ELL model on a target platform.
 # Compilation of the resulting project will require a C++ compiler.
+
+class _PassArgsParser(argparse.ArgumentParser):
+    def __init__(self, *args, **kwargs):
+        super(_PassArgsParser, self).__init__(*args, **kwargs)
+
+    def format_usage(self):
+        usage = super(_PassArgsParser, self).format_usage().strip('\n')
+        usage += " [-- <compile args>]\n"
+        return usage
+
+    def format_help(self):
+        usage = super(_PassArgsParser, self).format_usage()
+        help = super(_PassArgsParser, self).format_help()
+        dashdash_help = "  --                    everything after '--' is passed to the compiler\n"
+        return help.replace(usage, self.format_usage()) + dashdash_help
 
 class ModuleBuilder:
     def __init__(self):
@@ -48,14 +65,17 @@ class ModuleBuilder:
         self.debug = False
         self.model_name = ""
         self.func_name = "Predict"
-        self.objext = "obj"
+        self.objext = "o"
         self.logger = logger.get()
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
 
+    def get_objext(self, target):
+        return "o"
+
     def parse_command_line(self, args=None):
-        arg_parser = argparse.ArgumentParser(prog="wrap", description="This tool wraps a given ELL model in a CMake buildable project that builds a language\n"
+        arg_parser = _PassArgsParser(prog="wrap", description="This tool wraps a given ELL model in a CMake buildable project that builds a language\n"
             "specific module that can call the ELL model on a given target platform.\n"
             "\nThe supported languages are:\n"
             "    python   (default)\n"
@@ -77,8 +97,8 @@ class ModuleBuilder:
         arg_parser.add_argument("--outdir", "-outdir", help="the output directory")
         arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
         arg_parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
+        arg_parser.add_argument("--llvm-format", help="the format of the emitted code (default 'bc')", choices=["ir", "bc", "asm", "obj"], default="bc")
         arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
-        arg_parser.add_argument("--llvm-format", help="the format of the emitted code (default 'bc')", choices=["ir", "bc", "asm"], default="bc")
         arg_parser.add_argument("--no-fuse-linear-ops", help="disable the fusing of sequences of linear operations", action="store_true")
         arg_parser.add_argument("--no-opt-tool", help="disable the use of LLVM's opt tool", action="store_true")
         arg_parser.add_argument("--no-llc-tool", help="disable the use of LLVM's llc tool", action="store_true")
@@ -87,6 +107,11 @@ class ModuleBuilder:
             "is not run (default '3')"), choices=["0", "1", "2", "3", "g"], default="3")
         arg_parser.add_argument("--debug", help="emit debug code", action="store_true")
 
+        compile_args = []
+        if '--' in args:
+            index = args.index('--')
+            compile_args = args[index+1:]
+            args = args[:index]
         args = arg_parser.parse_args(args)
 
         self.model_file = args.model_file
@@ -97,6 +122,7 @@ class ModuleBuilder:
             self.model_name = self.model_file_base.replace('-', '_')
         self.language = args.language
         self.target = args.target
+        self.objext = self.get_objext(self.target)
         self.output_dir = args.outdir
         if self.output_dir is None:
             self.output_dir = self.target
@@ -112,6 +138,7 @@ class ModuleBuilder:
         self.blas = self.str2bool(args.blas)
         self.swig = self.language != "cpp"
         self.cpp_header = self.language == "cpp"
+        self.compile_args = compile_args
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
@@ -183,14 +210,29 @@ class ModuleBuilder:
         self.copy_files(self.includes, "include")
         self.copy_files(self.tcc, "tcc")
         out_file = self.tools.compile(
-            self.model_file, self.func_name, self.model_name, self.target, self.output_dir, self.blas, self.fuse_linear_ops, self.profile,
-            self.llvm_format, self.optimize, self.debug, False, self.swig, self.cpp_header)        
+            model_file=self.model_file, 
+            func_name=self.func_name, 
+            model_name=self.model_name, 
+            target=self.target, 
+            output_dir=self.output_dir, 
+            use_blas=self.blas, 
+            fuse_linear_ops=self.fuse_linear_ops, 
+            profile=self.profile,
+            llvm_format=self.llvm_format, 
+            optimize=self.optimize, 
+            debug=self.debug, 
+            is_model_file=False, 
+            swig=self.swig, 
+            header=self.cpp_header,
+            objext="." + self.objext,
+            extra_options=self.compile_args
+            )
         if self.swig:
             self.tools.swig(self.output_dir, self.model_file_base, self.language)
         if not self.no_opt_tool:
             out_file = self.tools.opt(self.output_dir, out_file, self.optimization_level)
         if not self.no_llc_tool:
-            out_file = self.tools.llc(self.output_dir, out_file, self.target, self.optimization_level)
+            out_file = self.tools.llc(self.output_dir, out_file, self.target, self.optimization_level, "." + self.objext)
         self.create_cmake_file()
         if self.language == "python":
             self.create_module_init_file()
@@ -202,7 +244,7 @@ class ModuleBuilder:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     builder = ModuleBuilder()
-    builder.parse_command_line()
+    builder.parse_command_line(sys.argv[1:])
     try:
         builder.run()
     except:
