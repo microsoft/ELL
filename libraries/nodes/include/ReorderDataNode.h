@@ -62,7 +62,7 @@ namespace nodes
         ///
         /// <param name="input"> The input to reorder. </param>
         /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out. </param>
-        /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done. 
+        /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
         //    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///   set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
         /// <param name="paddingValue"> The value to use for output padding, if output shape is larger than input shape. </param>
@@ -73,11 +73,17 @@ namespace nodes
         /// <param name="input"> The input to reorder. </param>
         /// <param name="inputMemoryLayout"> The memory layout of the input. Only data in the "active" area will be copied. </param>
         /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out. </param>
-        /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done. 
+        /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
         //    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///   set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
         /// <param name="paddingValue"> The value to use for output padding, if output shape is larger than input shape. </param>
         ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const std::vector<int>& order, ValueType paddingValue = 0);
+
+        /// <summary> Gets information about the input memory layout </summary>
+        const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
+
+        /// <summary> Gets information about the input memory layout </summary>
+        model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -103,7 +109,7 @@ namespace nodes
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
         bool HasState() const override { return true; } // stored state: inputShape, outputShape, paddingValue
-    
+
     private:
         // Input
         model::InputPort<ValueType> _input;

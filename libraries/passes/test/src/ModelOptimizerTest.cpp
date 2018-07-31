@@ -9,8 +9,8 @@
 // #include "ModelTestUtilities.h"
 
 // model
-#include "InputNode.h"
 #include "IRMapCompiler.h"
+#include "InputNode.h"
 #include "Map.h"
 #include "MapCompilerOptions.h"
 #include "ModelOptimizer.h"
@@ -19,6 +19,8 @@
 // nodes
 #include "BroadcastFunctionNode.h"
 #include "ConstantNode.h"
+#include "MatrixMatrixMultiplyNode.h"
+#include "ReorderDataNode.h"
 
 // passes
 #include "FuseLinearOperationsPass.h"
@@ -79,7 +81,7 @@ void TestModelOptimizer()
     map.Optimize(optimizer);
     auto newSize = map.GetModel().Size();
 
-    testing::ProcessTest("Testing model optimizer", oldSize == 6 || newSize == 4);
+    testing::ProcessTest("Testing model optimizer", oldSize == 6 && newSize == 4);
 }
 
 void TestModelCompilePlusOptimize()
@@ -116,5 +118,157 @@ void TestModelCompilePlusOptimize()
     auto compiledMap = compiler.Compile(map);
     auto newSize = compiledMap.GetModel().Size();
 
-    testing::ProcessTest("Testing compiled model optimizer", oldSize == 6 || newSize == 4);
+    testing::ProcessTest("Testing compiled model optimizer", oldSize == 6 && newSize == 4);
 }
+
+// disabled until demo branch is fully integrated into master
+#if 0
+void TestRemoveRedundantDataOrdersPass1()
+{
+    using ValueType = float;
+    constexpr int m = 4, n = 5, k = 6;
+    bool transposeA = false, transposeB = false, transposeC = false;
+
+    auto orderA = transposeA ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto orderB = transposeB ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto orderC = transposeC ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto outputLayout = model::PortMemoryLayout(model::MemoryShape{ m, n }).ReorderedCopy(orderC);
+
+    model::Model model;
+    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(model::MemoryShape{ m, k });
+    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, orderA);
+
+    std::vector<ValueType> matrixBVals(k * n);
+    auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals, model::MemoryShape{ k, n });
+    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(matrixBNode->output, orderB);
+
+    auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode->output, reorderedMatrixBNode->output, outputLayout);
+
+    auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
+
+    //
+    // test pass
+    //
+
+    auto oldSize = map.GetModel().Size();
+#if 0
+    PrintModel(map.GetModel());
+#endif
+
+    // Initialize pass registry
+    passes::AddStandardPassesToRegistry();
+
+    // Compile it
+    model::MapCompilerOptions settings;
+    settings.optimizerSettings.fuseLinearFunctionNodes = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    auto newSize = compiledMap.GetModel().Size();
+
+#if 0
+    PrintModel(compiledMap.GetModel());
+#endif
+
+    testing::ProcessTest("Testing compiled model optimizer", oldSize == 5 && newSize == 3);
+}
+
+
+void TestRemoveRedundantDataOrdersPass2()
+{
+    using ValueType = float;
+    constexpr int m = 4, n = 5, k = 6;
+    bool transposeA = false, transposeB = true, transposeC = false;
+
+    auto orderA = transposeA ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto orderB = transposeB ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto orderC = transposeC ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto outputLayout = model::PortMemoryLayout(model::MemoryShape{ m, n }).ReorderedCopy(orderC);
+
+    model::Model model;
+    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(model::MemoryShape{ m, k });
+    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, orderA);
+
+    std::vector<ValueType> matrixBVals(k * n);
+    auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals, model::MemoryShape{ k, n });
+    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(matrixBNode->output, orderB);
+
+    auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode->output, reorderedMatrixBNode->output, outputLayout);
+
+    auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
+
+    //
+    // test pass
+    //
+
+    auto oldSize = map.GetModel().Size();
+#if 0
+    PrintModel(map.GetModel());
+#endif
+
+    // Initialize pass registry
+    passes::AddStandardPassesToRegistry();
+
+    // Compile it
+    model::MapCompilerOptions settings;
+    settings.optimizerSettings.fuseLinearFunctionNodes = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    auto newSize = compiledMap.GetModel().Size();
+
+#if 0
+    PrintModel(compiledMap.GetModel());
+#endif
+
+    testing::ProcessTest("Testing compiled model optimizer", oldSize == 5 && newSize == 4);
+}
+
+
+void TestRemoveRedundantDataOrdersPass3()
+{
+    using ValueType = float;
+    constexpr int m = 4, n = 5, k = 6;
+    bool transposeA = true, transposeB = true, transposeC = true;
+
+    auto orderA = transposeA ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto orderB = transposeB ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto orderC = transposeC ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto outputLayout = model::PortMemoryLayout(model::MemoryShape{ m, n }).ReorderedCopy(orderC);
+
+    model::Model model;
+    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(model::MemoryShape{ m, k });
+    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, orderA);
+
+    std::vector<ValueType> matrixBVals(k * n);
+    auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals, model::MemoryShape{ k, n });
+    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(matrixBNode->output, orderB);
+
+    auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode->output, reorderedMatrixBNode->output, outputLayout);
+
+    auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
+
+    //
+    // test pass
+    //
+
+    auto oldSize = map.GetModel().Size();
+#if 0
+    PrintModel(map.GetModel());
+#endif
+
+    // Initialize pass registry
+    passes::AddStandardPassesToRegistry();
+
+    // Compile it
+    model::MapCompilerOptions settings;
+    settings.optimizerSettings.fuseLinearFunctionNodes = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    auto newSize = compiledMap.GetModel().Size();
+
+#if 0
+    PrintModel(compiledMap.GetModel());
+#endif
+
+    testing::ProcessTest("Testing compiled model optimizer", oldSize == 5 && newSize == 5);
+}
+#endif

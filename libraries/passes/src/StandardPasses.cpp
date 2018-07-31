@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FuseLinearOperationsPass.h"
+#include "OptimizeReorderDataNodes.h"
 #include "SetConvolutionMethodPass.h"
 
 // utilities
@@ -20,6 +21,7 @@ namespace passes
     {
         SetConvolutionMethodPass::AddToRegistry();
         FuseLinearOperationsPass::AddToRegistry();
+        OptimizeReorderDataNodes::AddToRegistry();
     }
 
     void AddFuseOperationsPass(model::ModelOptimizer& optimizer)

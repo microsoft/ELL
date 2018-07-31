@@ -29,6 +29,13 @@ int main()
     {
         TestModelOptimizer();
         TestModelCompilePlusOptimize();
+        
+        // disabled until demo branch is fully integrated into master
+        #if 0
+        TestRemoveRedundantDataOrdersPass1();
+        TestRemoveRedundantDataOrdersPass2();
+        TestRemoveRedundantDataOrdersPass3();
+        #endif
     }
     catch (const utilities::Exception& exception)
     {
