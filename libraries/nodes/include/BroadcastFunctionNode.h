@@ -266,7 +266,7 @@ namespace nodes
 
         // Helpers for generating nested loops to visit all input/output values
         void ComputeDimensionLoop(size_t dimension, std::vector<ValueType>& output, size_t prevInputDimensionOffset, size_t prevOutputDimensionOffset, std::vector<ValueType>& secondaryValues) const;
-        void EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, llvm::Value* begin, llvm::Value* end, llvm::Value* primaryInput, const std::vector<llvm::Value*>& secondaryInputs, llvm::Value* output, llvm::Value* prevInputDimensionOffset, llvm::Value* prevOutputDimensionOffset, std::vector<llvm::Value*>& secondaryValues) const;
+        void EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, emitters::IRLocalScalar begin, emitters::IRLocalScalar end, llvm::Value* primaryInput, const std::vector<llvm::Value*>& secondaryInputs, llvm::Value* output, emitters::IRLocalScalar prevInputDimensionOffset, emitters::IRLocalScalar prevOutputDimensionOffset, std::vector<llvm::Value*>& secondaryValues) const;
         emitters::IRFunctionEmitter GetTaskFunction(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, const emitters::LLVMTypeList& portTypes) const;
 
         void WriteToArchive(utilities::Archiver& archiver) const override;

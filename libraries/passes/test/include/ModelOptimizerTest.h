@@ -8,8 +8,7 @@
 
 #pragma once
 
-void TestModelOptimizer();
-void TestModelCompilePlusOptimize();
+void TestFuseLinearOpsPasses();
 
 // disabled until demo branch is fully integrated into master
 #if 0

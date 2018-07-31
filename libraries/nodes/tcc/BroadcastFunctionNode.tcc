@@ -150,6 +150,7 @@ namespace nodes
         auto&& inputOffset = inputLayout.GetOffset();
         auto&& inputSize = inputLayout.GetActiveSize();
         auto&& outputLayout = GetOutputLayout();
+        auto&& outputStride = outputLayout.GetStride();
         auto&& outputOffset = outputLayout.GetOffset();
         auto&& primaryInput = GetPrimaryInput();
         const auto broadcastDimension = GetBroadcastDimension();
@@ -166,6 +167,7 @@ namespace nodes
             if (dimension != 0)
             {
                 thisInputDimensionOffset += prevInputDimensionOffset * inputStride[dimension];
+                thisOutputDimensionOffset += prevOutputDimensionOffset * outputStride[dimension];
             }
 
             if (dimension == broadcastDimension)
@@ -173,9 +175,21 @@ namespace nodes
                 for (int index = 0; index < numSecondaryInputs; ++index)
                 {
                     auto&& secondaryInput = GetSecondaryInput(index);
-                    if (secondaryInput->Size() > 0) // input is present
+                    if (IsSecondaryInputPresent(index))
                     {
                         secondaryValues[index] = (*secondaryInput)[loopIndex];
+                    }
+                    else
+                    {
+                        // Dubious hack to deal with linear function nodes missing a coefficient
+                        if (std::is_same<FunctionType, BroadcastLinearFunction<ValueType>>::value && index == 0) // "scale" value, which should be 1 if not specified
+                        {
+                            secondaryValues[index] = static_cast<ValueType>(1.0);
+                        }
+                        else
+                        {
+                            secondaryValues[index] = 0;
+                        }
                     }
                 }
             }
@@ -209,8 +223,6 @@ namespace nodes
 
         // ASSUME dimension == 0 --- we're only parallelizing on the outermost loop
         int dimension = 0;
-        llvm::Value* prevInputDimensionOffset = nullptr;
-        llvm::Value* prevOutputDimensionOffset = nullptr;
 
         emitters::LLVMTypeList argTypes = portTypes;
         // int numValuePorts = 2 + NumSecondaryInputs(); // primary input, secondary inputs, output
@@ -239,8 +251,10 @@ namespace nodes
                 secondaryValues.push_back(nullptr);
             }
             auto output = &(*arguments++);
-            auto begin = &(*arguments++);
-            auto end = &(*arguments++);
+            auto begin = function.LocalScalar(&(*arguments++));
+            auto end = function.LocalScalar(&(*arguments++));
+            auto prevInputDimensionOffset = function.LocalScalar();
+            auto prevOutputDimensionOffset = function.LocalScalar();
 
             EmitComputeDimensionLoop(compiler, taskFunction, dimension, begin, end, primaryInput, secondaryInputs, output, prevInputDimensionOffset, prevOutputDimensionOffset, secondaryValues);
             taskFunction.Return();
@@ -254,11 +268,11 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastFunctionNode<ValueType, FunctionType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function,
                                                                                   size_t dimension,
-                                                                                  llvm::Value* begin,
-                                                                                  llvm::Value* end,
+                                                                                  emitters::IRLocalScalar begin,
+                                                                                  emitters::IRLocalScalar end,
                                                                                   llvm::Value* primaryInput, const std::vector<llvm::Value*>& secondaryInputs,
                                                                                   llvm::Value* output,
-                                                                                  llvm::Value* prevInputDimensionOffset, llvm::Value* prevOutputDimensionOffset,
+                                                                                  emitters::IRLocalScalar prevInputDimensionOffset, emitters::IRLocalScalar prevOutputDimensionOffset,
                                                                                   std::vector<llvm::Value*>& secondaryValues) const
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
@@ -274,32 +288,30 @@ namespace nodes
         auto&& outputOffset = outputLayout.GetOffset();
         const auto broadcastDimension = GetBroadcastDimension();
         const auto numSecondaryInputs = NumSecondaryInputs();
+        const auto primaryInputSize = GetPrimaryInputSize();
         const auto secondaryInputSize = GetSecondaryInputSize();
 
-        function.For(begin, end, function.Literal(1), [dimension, numDimensions, inputSize, inputOffset, inputStride, outputOffset, outputStride, broadcastDimension, numSecondaryInputs, secondaryInputSize, prevInputDimensionOffset, prevOutputDimensionOffset, primaryInput, secondaryInputs, output, &secondaryValues, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex) {
+        function.For(begin, end, [dimension, numDimensions, inputSize, inputOffset, inputStride, outputOffset, outputStride, broadcastDimension, primaryInputSize, numSecondaryInputs, secondaryInputSize, prevInputDimensionOffset, prevOutputDimensionOffset, primaryInput, secondaryInputs, output, &secondaryValues, &compiler, this](emitters::IRFunctionEmitter& function, auto loopIndex) {
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
-            llvm::Value* thisInputDimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(inputOffset[dimension]));
-            llvm::Value* thisOutputDimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(outputOffset[dimension]));
+            auto thisInputDimensionInternalOffset = loopIndex + inputOffset[dimension];
+            auto thisOutputDimensionInternalOffset = loopIndex + outputOffset[dimension];
 
             // Calculate the total offset from beginning of memory:
             //   * if in the outermost loop, the offset into this dimension
             //   * otherwise, the offset into this dimension plus the previous offset scaled by the previous dimension's stride
-            llvm::Value* thisInputDimensionOffset = nullptr;
-            llvm::Value* thisOutputDimensionOffset = nullptr;
+            auto thisInputDimensionOffset = function.LocalScalar();
+            auto thisOutputDimensionOffset = function.LocalScalar();
             if (dimension == 0)
             {
-                assert(prevInputDimensionOffset == nullptr);
-                assert(prevOutputDimensionOffset == nullptr);
+                assert(!prevInputDimensionOffset.IsValid());
+                assert(!prevOutputDimensionOffset.IsValid());
                 thisInputDimensionOffset = thisInputDimensionInternalOffset;
                 thisOutputDimensionOffset = thisOutputDimensionInternalOffset;
             }
             else
             {
-                auto scaledInputDimensionOffset = function.Operator(emitters::GetMultiplyForValueType<int>(), prevInputDimensionOffset, function.Literal<int>(inputStride[dimension]));
-                thisInputDimensionOffset = function.Operator(emitters::GetAddForValueType<int>(), scaledInputDimensionOffset, thisInputDimensionInternalOffset);
-
-                auto scaledOutputDimensionOffset = function.Operator(emitters::GetMultiplyForValueType<int>(), prevOutputDimensionOffset, function.Literal<int>(outputStride[dimension]));
-                thisOutputDimensionOffset = function.Operator(emitters::GetAddForValueType<int>(), scaledOutputDimensionOffset, thisOutputDimensionInternalOffset);
+                thisInputDimensionOffset = thisInputDimensionInternalOffset + (prevInputDimensionOffset * inputStride[dimension]);
+                thisOutputDimensionOffset = thisOutputDimensionInternalOffset + (prevOutputDimensionOffset * outputStride[dimension]);
             }
 
             if (dimension == broadcastDimension)
@@ -309,12 +321,11 @@ namespace nodes
                     auto&& secondaryInput = secondaryInputs[index];
                     if (secondaryInputSize == 1) // scalar
                     {
-                        secondaryValues[index] = IsSecondaryInputPresent(index) ? secondaryInput : nullptr;
+                        secondaryValues[index] = this->IsSecondaryInputPresent(index) ? secondaryInput : nullptr;
                     }
                     else
                     {
-                        //                        assert(IsSecondaryInputPresent(index) == (secondaryInput != nullptr));
-                        secondaryValues[index] = IsSecondaryInputPresent(index) ? function.ValueAt(secondaryInput, loopIndex) : nullptr;
+                        secondaryValues[index] = this->IsSecondaryInputPresent(index) ? function.ValueAt(secondaryInput, loopIndex) : nullptr;
                     }
                 }
             }
@@ -322,15 +333,15 @@ namespace nodes
             if (dimension < numDimensions - 1)
             {
                 // Recursive call to emit nested loop
-                auto nextBegin = function.Literal<int>(0);
-                auto nextEnd = function.Literal<int>(inputSize[dimension + 1]);
-                EmitComputeDimensionLoop(compiler, function, dimension + 1, nextBegin, nextEnd, primaryInput, secondaryInputs, output, thisInputDimensionOffset, thisOutputDimensionOffset, secondaryValues);
+                auto nextBegin = function.LocalScalar<int>(0);
+                auto nextEnd = function.LocalScalar<int>(inputSize[dimension + 1]);
+                this->EmitComputeDimensionLoop(compiler, function, dimension + 1, nextBegin, nextEnd, primaryInput, secondaryInputs, output, thisInputDimensionOffset, thisOutputDimensionOffset, secondaryValues);
             }
             else
             {
                 // We're in the innermost loop --- compute the value
-                auto primaryValue = function.ValueAt(primaryInput, thisInputDimensionOffset);
-                auto outputValue = GetFunction().Compile(function, primaryValue, secondaryValues);
+                auto primaryValue = primaryInputSize == 1 && !primaryInput->getType()->isPointerTy() ? primaryInput : function.ValueAt(primaryInput, thisInputDimensionOffset);
+                auto outputValue = this->GetFunction().Compile(function, primaryValue, secondaryValues);
                 function.SetValueAt(output, thisOutputDimensionOffset, outputValue);
             }
         });
@@ -398,9 +409,6 @@ namespace nodes
         // Call recursive function to emit nested loops
         // Note: We could just offset the input pointer at beginning instead of adding offset every time through the loop
         // Note: We can potentially fuse adjacent loops if memory is contiguous --- it can be done by preprocessing size/stride vectors
-        llvm::Value* prevInputDimensionOffset = nullptr;
-        llvm::Value* prevOutputDimensionOffset = nullptr;
-
         bool allSecondaryInputsValid = true;
         for (int index = 0; index < NumSecondaryInputs(); ++index)
         {
@@ -452,8 +460,10 @@ namespace nodes
         }
         else
         {
-            auto begin = function.Literal<int>(0);
-            auto end = function.Literal<int>(inputSize[0]);
+            auto prevInputDimensionOffset = function.LocalScalar();
+            auto prevOutputDimensionOffset = function.LocalScalar();
+            auto begin = function.LocalScalar<int>(0);
+            auto end = function.LocalScalar<int>(inputSize[0]);
             EmitComputeDimensionLoop(compiler, function, 0, begin, end, pPrimaryInput, secondaryInputs, pOutput, prevInputDimensionOffset, prevOutputDimensionOffset, secondaryValues);
         }
     }

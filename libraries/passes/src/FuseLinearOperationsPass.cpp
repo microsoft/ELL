@@ -62,7 +62,7 @@ namespace passes
             const auto& scaleElements = node.secondaryInput1.GetPortElements();
             const auto& biasElements = node.secondaryInput2.GetPortElements();
 
-            if (!scaleElements.IsFullPortOutput() || !biasElements.IsFullPortOutput())
+            if ((scaleElements.Size() != 0 && !scaleElements.IsFullPortOutput()) || (biasElements.Size() != 0 && !biasElements.IsFullPortOutput()))
             {
                 return false; // we require all inputs to a port to come from the same place (though we could relax this requirement in the future, perhaps)
             }
@@ -148,68 +148,67 @@ namespace passes
         LinearCoefficients<ValueType> GetCombinedLinearCoeffs(const nodes::BroadcastLinearFunctionNode<ValueType>& node1, const nodes::BroadcastLinearFunctionNode<ValueType>& node2)
         {
             LinearCoefficients<ValueType> coefficients;
-            auto& scale = coefficients.scale;
-            auto& bias = coefficients.bias;
 
             // Here, we have two linear functions, f1(x) = s1*x + b1; f2(x) = s2*x + b2
-            // and we want to find their composition f' = s'*x + b' = f2(f1(x)) = (f2 * f1)(x) = s2*(s1*x + b1) + b2 = s1*s2*x + (b1*s2 + b2)
-            // (Where `node1` is the node computing f1, and `node2` is the node representing f2)
+            // and we want to find their composition f' = s'*x + b' = f2(f1(x)) = (f2 * f1)(x) = s2*(s1*x + b1) + b2 = s1*s2*x + (b1*s2) + b2
+            //                                                      = s2*s1*x + (s2*b1 + b2)
+            // (Where `node1` is the node computing f1, and `node2` is the node computing f2)
 
-            auto prevSecondaryInputs = GetConstantSecondaryInputNodes(node1);
-            auto thisSecondaryInputs = GetConstantSecondaryInputNodes(node2);
+            auto node1Inputs = GetConstantSecondaryInputNodes(node1);
+            auto node2Inputs = GetConstantSecondaryInputNodes(node2);
 
             // Compute the combined scale, s' = s1*s2
-            if (prevSecondaryInputs.scaleNode == nullptr && thisSecondaryInputs.scaleNode == nullptr) // s1 == 1, s2 == 1, so s' = 1
+            if (node1Inputs.scaleNode == nullptr && node2Inputs.scaleNode == nullptr) // s1 == 1, s2 == 1, so s' = 1
             {
-                scale.resize(0); // signal there's no scale (scale = 1)
+                coefficients.scale = {}; // signal there's no scale (scale = 1)
             }
-            else if (prevSecondaryInputs.scaleNode == nullptr) // s1 == 1, so s' = s2
+            else if (node1Inputs.scaleNode == nullptr) // s1 == 1, so s' = s2
             {
-                scale = thisSecondaryInputs.scaleNode->GetValues(); // s2
+                coefficients.scale = node2Inputs.scaleNode->GetValues(); // s2
             }
-            else if (thisSecondaryInputs.scaleNode == nullptr) // s2 == 1, so s' = s1,
+            else if (node2Inputs.scaleNode == nullptr) // s2 == 1, so s' = s1,
             {
-                scale = prevSecondaryInputs.scaleNode->GetValues(); // s1
+                coefficients.scale = node1Inputs.scaleNode->GetValues(); // s1
             }
             else // s' = s1*s2*x
             {
-                scale = prevSecondaryInputs.scaleNode->GetValues(); // scale = s1
-                const auto& s2 = thisSecondaryInputs.scaleNode->GetValues();
-                assert(s2.size() == scale.size());
-                for (size_t index = 0; index < scale.size(); ++index)
+                coefficients.scale = node1Inputs.scaleNode->GetValues(); // scale = s1
+                const auto& s2 = node2Inputs.scaleNode->GetValues();
+                assert(s2.size() == coefficients.scale.size());
+                for (size_t index = 0; index < coefficients.scale.size(); ++index)
                 {
-                    scale[index] *= s2[index];
+                    coefficients.scale[index] *= s2[index];
                 }
             }
 
             // Now compute the combined bias, b' = (b1*s2) + b2
-            if (prevSecondaryInputs.biasNode == nullptr && thisSecondaryInputs.biasNode == nullptr) // b1 == 0, b2 == 0, so b' == 0
+            if (node1Inputs.biasNode == nullptr && node2Inputs.biasNode == nullptr) // b1 == 0, b2 == 0, so b' == 0
             {
-                bias.resize(0); // signal there's no bias (bias = 0)
+                coefficients.bias = {}; // signal there's no bias (bias = 0)
             }
-            else if (prevSecondaryInputs.biasNode == nullptr) // b1 == 0, so b' = b2
+            else if (node1Inputs.biasNode == nullptr) // b1 == 0, so b' = b2
             {
-                bias = thisSecondaryInputs.biasNode->GetValues(); // b2
+                coefficients.bias = node2Inputs.biasNode->GetValues(); // b2
             }
             else // b' = (b1*s2) + b1 (but s2 may be 1, and b1 may be zero)
             {
-                bias = prevSecondaryInputs.biasNode->GetValues(); // bias == b1
-                if (thisSecondaryInputs.scaleNode != nullptr) // if s2 is present, set bias = bias*s2
+                coefficients.bias = node1Inputs.biasNode->GetValues(); // bias == b1
+                if (node2Inputs.scaleNode != nullptr) // if s2 is present, set bias = bias*s2
                 {
-                    const auto& s2 = thisSecondaryInputs.scaleNode->GetValues();
-                    assert(s2.size() == bias.size());
-                    for (size_t index = 0; index < bias.size(); ++index)
+                    const auto& s2 = node2Inputs.scaleNode->GetValues();
+                    assert(s2.size() == coefficients.bias.size());
+                    for (size_t index = 0; index < coefficients.bias.size(); ++index)
                     {
-                        bias[index] *= s2[index];
+                        coefficients.bias[index] *= s2[index];
                     }
                 }
 
-                if (thisSecondaryInputs.biasNode != nullptr) // b2 == 0, so b' = b1*s2, but perhaps s2 == 1
+                if (node2Inputs.biasNode != nullptr) // b2 == 0, so b' = b1*s2, but perhaps s2 == 1
                 {
-                    const auto& b2 = thisSecondaryInputs.biasNode->GetValues(); // now add b2
-                    for (size_t index = 0; index < bias.size(); ++index)
+                    const auto& b2 = node2Inputs.biasNode->GetValues(); // now add b2
+                    for (size_t index = 0; index < coefficients.bias.size(); ++index)
                     {
-                        bias[index] += b2[index];
+                        coefficients.bias[index] += b2[index];
                     }
                 }
             }
@@ -242,7 +241,7 @@ namespace passes
                 return true;
             }
 
-            auto newCoeffs = GetCombinedLinearCoeffs(*thisNode, *prevNode);
+            auto newCoeffs = GetCombinedLinearCoeffs(*prevNode, *thisNode);
             auto prevPrimaryInputElements = prevNode->primaryInput.GetPortElements();
             auto scaleValuesNode = transformer.AddNode<nodes::ConstantNode<ValueType>>(newCoeffs.scale);
             auto biasValuesNode = transformer.AddNode<nodes::ConstantNode<ValueType>>(newCoeffs.bias);

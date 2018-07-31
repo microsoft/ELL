@@ -27,8 +27,7 @@ int main()
 {
     try
     {
-        TestModelOptimizer();
-        TestModelCompilePlusOptimize();
+        TestFuseLinearOpsPasses();
         
         // disabled until demo branch is fully integrated into master
         #if 0
