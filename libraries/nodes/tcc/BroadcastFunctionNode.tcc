@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Unused.h"
-
 namespace ell
 {
 namespace nodes
@@ -570,7 +568,6 @@ namespace nodes
     {
         BroadcastFunctionNode<ValueType, FunctionType>::ReadFromArchive(archiver);
         archiver[primaryInputPortName] >> _primaryInput;
-        _output.SetSize(_primaryInput.Size()); // ???
     }
 
     template <typename ValueType, typename FunctionType>
@@ -652,7 +649,6 @@ namespace nodes
         BroadcastFunctionNode<ValueType, FunctionType>::ReadFromArchive(archiver);
         archiver[primaryInputPortName] >> _primaryInput;
         archiver[secondaryInputPortName] >> _secondaryInput;
-        _output.SetSize(_primaryInput.Size());
     }
 
     template <typename ValueType, typename FunctionType>
@@ -750,7 +746,6 @@ namespace nodes
         archiver[primaryInputPortName] >> _primaryInput;
         archiver[secondaryInput1PortName] >> _secondaryInput1;
         archiver[secondaryInput2PortName] >> _secondaryInput2;
-        _output.SetSize(_primaryInput.Size());
     }
 
     template <typename ValueType, typename FunctionType>
