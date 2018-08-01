@@ -66,10 +66,11 @@ class CompiledModel(EllModel):
             import importlib
             if module_directory == ".":
                 # we are inside the directory that contains __init__.py, which means we can't execute __init__.py.
-                sys.path += [ os.path.join(script_path, "build") ]
-                sys.path += [ os.path.join(script_path, "build", "release") ]
+                sys.path += [ os.path.join(os.getcwd(), "build") ]
+                sys.path += [ os.path.join(os.getcwd(), "build", "release") ]
                 self.compiled_module = importlib.import_module(self.model_name)
             else:
+                sys.path += [ os.getcwd() ]
                 self.compiled_module = getattr(importlib.import_module(module_directory), self.model_name)
             
             inputShapeGetter = getattr(self.compiled_module, "get_default_input_shape")
@@ -178,7 +179,7 @@ class FolderStream(ImageStream):
                 self.new_frame = True
                 self.frame = frame
             self.image_pos += 1
-        return self.frame
+        return frame
 
 class StaticImage(ImageStream):
     def __init__(self, image_filename):
