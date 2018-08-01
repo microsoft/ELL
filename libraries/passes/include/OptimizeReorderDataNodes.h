@@ -26,6 +26,10 @@ namespace passes
     class OptimizeReorderDataNodes : public model::NodeLocalOptimizationPass
     {
     public:
+        OptimizeReorderDataNodes();
+
+        ~OptimizeReorderDataNodes();
+
         /// <summary> Remove or replace with one a sequence of `ReorderDataNode`s. </summary>
         ///
         /// <param name="node"> The current node being visited. </param>
@@ -34,6 +38,10 @@ namespace passes
 
         /// <summary> Add this pass type to the global pass registry. </summary>
         static void AddToRegistry();
+
+    private:
+        struct State;
+        std::unique_ptr<State> _state;
     };
 }
 }

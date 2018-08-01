@@ -21,12 +21,7 @@ namespace passes
     {
         SetConvolutionMethodPass::AddToRegistry();
         FuseLinearOperationsPass::AddToRegistry();
-        OptimizeReorderDataNodes::AddToRegistry();
-    }
-
-    void AddFuseOperationsPass(model::ModelOptimizer& optimizer)
-    {
-        optimizer.AddPass(std::make_unique<passes::FuseLinearOperationsPass>());
+        // OptimizeReorderDataNodes::AddToRegistry();
     }
 }
 }

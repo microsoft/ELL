@@ -33,6 +33,9 @@
 #include <algorithm>
 #include <iostream>
 
+// set to 1 to print models
+#define PRINT_MODELS 0
+
 using namespace ell;
 
 //
@@ -198,7 +201,7 @@ void TestFuseLinearOpsPasses()
 
 // disabled until demo branch is fully integrated into master
 #if 0
-void TestRemoveRedundantDataOrdersPass1()
+void TestOptimizeReorderDataNodes1()
 {
     using ValueType = float;
     constexpr int m = 4, n = 5, k = 6;
@@ -226,7 +229,7 @@ void TestRemoveRedundantDataOrdersPass1()
     //
 
     auto oldSize = map.GetModel().Size();
-#if 0
+#if PRINT_MODELS
     PrintModel(map.GetModel());
 #endif
 
@@ -240,15 +243,14 @@ void TestRemoveRedundantDataOrdersPass1()
     auto compiledMap = compiler.Compile(map);
     auto newSize = compiledMap.GetModel().Size();
 
-#if 0
+#if PRINT_MODELS
     PrintModel(compiledMap.GetModel());
 #endif
 
     testing::ProcessTest("Testing compiled model optimizer", oldSize == 5 && newSize == 3);
 }
 
-
-void TestRemoveRedundantDataOrdersPass2()
+void TestOptimizeReorderDataNodes2()
 {
     using ValueType = float;
     constexpr int m = 4, n = 5, k = 6;
@@ -276,7 +278,7 @@ void TestRemoveRedundantDataOrdersPass2()
     //
 
     auto oldSize = map.GetModel().Size();
-#if 0
+#if PRINT_MODELS
     PrintModel(map.GetModel());
 #endif
 
@@ -290,15 +292,14 @@ void TestRemoveRedundantDataOrdersPass2()
     auto compiledMap = compiler.Compile(map);
     auto newSize = compiledMap.GetModel().Size();
 
-#if 0
+#if PRINT_MODELS
     PrintModel(compiledMap.GetModel());
 #endif
 
     testing::ProcessTest("Testing compiled model optimizer", oldSize == 5 && newSize == 4);
 }
 
-
-void TestRemoveRedundantDataOrdersPass3()
+void TestOptimizeReorderDataNodes3()
 {
     using ValueType = float;
     constexpr int m = 4, n = 5, k = 6;
@@ -326,7 +327,7 @@ void TestRemoveRedundantDataOrdersPass3()
     //
 
     auto oldSize = map.GetModel().Size();
-#if 0
+#if PRINT_MODELS
     PrintModel(map.GetModel());
 #endif
 
@@ -340,10 +341,65 @@ void TestRemoveRedundantDataOrdersPass3()
     auto compiledMap = compiler.Compile(map);
     auto newSize = compiledMap.GetModel().Size();
 
-#if 0
+#if PRINT_MODELS
     PrintModel(compiledMap.GetModel());
 #endif
 
     testing::ProcessTest("Testing compiled model optimizer", oldSize == 5 && newSize == 5);
+}
+
+void TestOptimizeReorderDataNodes4()
+{
+    using ValueType = float;
+    constexpr int m = 4, n = 5, k = 6;
+
+    auto rowMajor = model::DimensionOrder{ 0, 1 };
+    auto colMajor = model::DimensionOrder{ 1, 0 };
+    auto outputLayout = model::PortMemoryLayout(model::MemoryShape{ m, n }).ReorderedCopy(colMajor);
+
+    model::Model model;
+    auto rowMajorLayout = model::PortMemoryLayout(model::MemoryShape{ m, k }).ReorderedCopy(rowMajor);
+    auto colMajorLayout = model::PortMemoryLayout(model::MemoryShape{ m, k }).ReorderedCopy(colMajor);
+    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(rowMajorLayout);
+    auto reorderedInputMatrixNode1 = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, rowMajorLayout, colMajorLayout);
+    auto reorderedInputMatrixNode2 = model.AddNode<nodes::ReorderDataNode<ValueType>>(reorderedInputMatrixNode1->output, colMajorLayout, rowMajorLayout);
+    auto reorderedInputMatrixNode3 = model.AddNode<nodes::ReorderDataNode<ValueType>>(reorderedInputMatrixNode2->output, rowMajorLayout, rowMajorLayout);
+
+    std::vector<ValueType> matrixBVals(k * n);
+    rowMajorLayout = model::PortMemoryLayout(model::MemoryShape{ k, n }).ReorderedCopy(rowMajor);
+    colMajorLayout = model::PortMemoryLayout(model::MemoryShape{ k, n }).ReorderedCopy(colMajor);
+    auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals, rowMajorLayout);
+    auto reorderedMatrixBNode1 = model.AddNode<nodes::ReorderDataNode<ValueType>>(matrixBNode->output, rowMajorLayout, rowMajorLayout);
+    auto reorderedMatrixBNode2 = model.AddNode<nodes::ReorderDataNode<ValueType>>(reorderedMatrixBNode1->output, rowMajorLayout, colMajorLayout);
+    auto reorderedMatrixBNode3 = model.AddNode<nodes::ReorderDataNode<ValueType>>(reorderedMatrixBNode2->output, colMajorLayout, colMajorLayout);
+
+    auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode3->output, reorderedMatrixBNode3->output, outputLayout);
+
+    auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
+
+    //
+    // test pass
+    //
+
+    auto oldSize = map.GetModel().Size();
+#if PRINT_MODELS
+    PrintModel(map.GetModel());
+#endif
+
+    // Initialize pass registry
+    passes::AddStandardPassesToRegistry();
+
+    // Compile it
+    model::MapCompilerOptions settings;
+    settings.optimizerSettings.fuseLinearFunctionNodes = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    auto newSize = compiledMap.GetModel().Size();
+
+#if PRINT_MODELS
+    PrintModel(compiledMap.GetModel());
+#endif
+
+    testing::ProcessTest("Testing compiled model optimizer", oldSize == 9 && newSize == 4);
 }
 #endif

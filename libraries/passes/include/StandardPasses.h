@@ -19,12 +19,5 @@ namespace passes
 {
     /// <summary> Add standard passes to the registry </summary>
     void AddStandardPassesToRegistry();
-
-    //
-    // Individual passes
-    //
-
-    /// <summary> Add a FuseOperationsPass to the given optimizer. </summary>
-    void AddFuseOperationsPass(model::ModelOptimizer& optimizer);
 }
 }

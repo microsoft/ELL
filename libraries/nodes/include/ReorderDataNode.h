@@ -94,6 +94,11 @@ namespace nodes
         /// <summary> Gets information about the input memory layout </summary>
         model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
 
+        /// <summary> Returns padding value </summary>
+        ///
+        /// <returns> Padding value </returns>
+        ValueType GetPaddingValue() const { return _paddingValue; }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>

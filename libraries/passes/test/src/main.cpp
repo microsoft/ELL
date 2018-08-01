@@ -28,12 +28,13 @@ int main()
     try
     {
         TestFuseLinearOpsPasses();
-        
+
         // disabled until demo branch is fully integrated into master
         #if 0
-        TestRemoveRedundantDataOrdersPass1();
-        TestRemoveRedundantDataOrdersPass2();
-        TestRemoveRedundantDataOrdersPass3();
+        TestOptimizeReorderDataNodes1();
+        TestOptimizeReorderDataNodes2();
+        TestOptimizeReorderDataNodes3();
+        TestOptimizeReorderDataNodes4();
         #endif
     }
     catch (const utilities::Exception& exception)
