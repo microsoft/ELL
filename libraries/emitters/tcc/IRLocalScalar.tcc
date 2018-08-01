@@ -19,6 +19,46 @@ namespace emitters
         {
             return { function, GetEmitter(function).Literal(value) };
         }
+
+        template <typename ValueType, utilities::IsSignedIntegral<ValueType> = true>
+        ValueType GetConstantIntValue(llvm::ConstantInt* intValue)
+        {
+            return static_cast<ValueType>(intValue->getSExtValue());
+        }
+
+        template <typename ValueType, utilities::IsUnsignedIntegral<ValueType> = true>
+        ValueType GetConstantIntValue(llvm::ConstantInt* intValue)
+        {
+            return static_cast<ValueType>(intValue->getZExtValue());
+        }
+    }
+
+    template <typename ValueType, utilities::IsIntegral<ValueType> /* = true*/>
+    ValueType IRLocalScalar::GetIntValue() const
+    {
+        auto intValue = llvm::cast<llvm::ConstantInt>(this->value);
+        return detail::GetConstantIntValue<ValueType>(intValue);
+    }
+
+    template <typename ValueType, utilities::IsIntegral<ValueType> /* = true*/>
+    ValueType IRLocalScalar::GetIntValue(ValueType defaultValue) const
+    {
+        if (IsConstantInt())
+        {
+            return GetIntValue<ValueType>();
+        }
+        
+        return defaultValue;
+    }
+
+    template <typename ValueType, utilities::IsFloatingPoint<ValueType> /* = true*/>
+    ValueType IRLocalScalar::GetFloatValue(ValueType defaultValue) const
+    {
+        if (IsConstantFloat())
+        {
+            return GetFloatValue<ValueType>();
+        }
+        return defaultValue;
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>

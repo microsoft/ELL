@@ -35,6 +35,90 @@ namespace emitters
     const std::string MallocFnName = "malloc";
     const std::string FreeFnName = "free";
 
+    // Internal codes
+    namespace
+    {
+        // Helper function for recursive function
+        void MultiDimFor(IRFunctionEmitter& function, std::vector<IRFunctionEmitter::ConstLoopRange> ranges, std::vector<IRLocalScalar> prevIndices, IRFunctionEmitter::MultiDimForLoopBodyFunction body)
+        {
+            if (ranges.empty())
+            {
+                body(function, prevIndices);
+            }
+            else
+            {
+                auto range = ranges.front();
+                std::vector<IRFunctionEmitter::ConstLoopRange> suffix(ranges.begin()+1, ranges.end());
+                function.For(range.begin, range.end, [suffix, prevIndices, body](IRFunctionEmitter& function, auto index) {
+                    std::vector<IRLocalScalar> prefix(prevIndices.begin(), prevIndices.end());
+                    prefix.push_back(index);
+                    MultiDimFor(function, suffix, prefix, body);
+                });
+            }
+        }
+
+        // Helper function for recursive function
+        void MultiDimFor(IRFunctionEmitter& function, std::vector<IRFunctionEmitter::LoopRange> ranges, std::vector<IRLocalScalar> prevIndices, IRFunctionEmitter::MultiDimForLoopBodyFunction body)
+        {
+            if (ranges.empty())
+            {
+                body(function, prevIndices);
+            }
+            else
+            {
+                auto range = ranges.front();
+                std::vector<IRFunctionEmitter::LoopRange> suffix(ranges.begin()+1, ranges.end());
+                function.For(range.begin, range.end, [suffix, prevIndices, body](IRFunctionEmitter& function, auto index) {
+                    std::vector<IRLocalScalar> prefix(prevIndices.begin(), prevIndices.end());
+                    prefix.push_back(index);
+                    MultiDimFor(function, suffix, prefix, body);
+                });
+            }
+        }
+
+        // Helper function for recursive function
+        void TiledMultiDimFor(IRFunctionEmitter& function, std::vector<IRFunctionEmitter::ConstTiledLoopRange> ranges, std::vector<IRFunctionEmitter::BlockInterval> prevIntervals, IRFunctionEmitter::TiledMultiDimForLoopBodyFunction body)
+        {
+            if (ranges.empty())
+            {
+                body(function, prevIntervals);
+            }
+            else
+            {
+                auto range = ranges.front();
+                std::vector<IRFunctionEmitter::ConstTiledLoopRange> suffix(ranges.begin()+1, ranges.end());
+                function.For(range, [suffix, prevIntervals, body](IRFunctionEmitter& function, auto interval) {
+                    std::vector<IRFunctionEmitter::BlockInterval> prefix(prevIntervals.begin(), prevIntervals.end());
+                    prefix.push_back(interval);
+                    TiledMultiDimFor(function, suffix, prefix, body);
+                });
+            }
+        }
+
+        // Helper function for recursive function
+        void TiledMultiDimFor(IRFunctionEmitter& function, std::vector<IRFunctionEmitter::TiledLoopRange> ranges, std::vector<IRFunctionEmitter::BlockInterval> prevIntervals, IRFunctionEmitter::TiledMultiDimForLoopBodyFunction body)
+        {
+            if (ranges.empty())
+            {
+                body(function, prevIntervals);
+            }
+            else
+            {
+                auto range = ranges.front();
+                std::vector<IRFunctionEmitter::TiledLoopRange> suffix(ranges.begin()+1, ranges.end());
+                function.For(range, [suffix, prevIntervals, body](IRFunctionEmitter& function, auto interval) {
+                    std::vector<IRFunctionEmitter::BlockInterval> prefix(prevIntervals.begin(), prevIntervals.end());
+                    prefix.push_back(interval);
+                    TiledMultiDimFor(function, suffix, prefix, body);
+                });
+            }
+        }
+    }
+
+    //
+    // IRFunctionEmitter methods
+    //
+
     IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, llvm::Function* pFunction, const std::string& name)
         : _pModuleEmitter(pModuleEmitter), _pEmitter(pEmitter), _pFunction(pFunction), _name(name)
     {
@@ -156,7 +240,10 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::CastPointer(llvm::Value* pValue, llvm::Type* valueType)
     {
-        assert(valueType->isPointerTy());
+        if (!valueType->isPointerTy())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Type argument must be a pointer type");
+        }
         return _pEmitter->CastPointer(pValue, valueType);
     }
 
@@ -659,18 +746,32 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::StoreZero(llvm::Value* pPointer, int numElements /* = 1 */)
     {
         assert(numElements >= 1);
-        assert(llvm::dyn_cast<llvm::GlobalVariable>(pPointer) == nullptr && "StoreZero can't handle llvm::GlobalVariables");
-
-        auto type = llvm::cast<llvm::PointerType>(pPointer->getType())->getElementType();
-
-        auto zero = llvm::Constant::getNullValue(type);
-        llvm::Value* returnValue = nullptr;
-
-        for (int index = 0; index < numElements; ++index)
+        if(llvm::dyn_cast<llvm::GlobalVariable>(pPointer) != nullptr)
         {
-            // We use SetValueAtA directly because SetValueAt tries to see if the variable
-            // is a global variable first, which is not handled by this function.
-            returnValue = SetValueAtA(pPointer, index, zero);
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "StoreZero can't handle llvm::GlobalVariables");
+        } 
+        
+        llvm::Value* returnValue = nullptr;
+        auto type = llvm::cast<llvm::PointerType>(pPointer->getType())->getElementType();
+        const int loopThresh = 16;
+        if (numElements < loopThresh)
+        {
+            auto zero = llvm::Constant::getNullValue(type);
+            for (int index = 0; index < numElements; ++index)
+            {
+                // We use SetValueAtA directly because SetValueAt tries to see if the variable
+                // is a global variable first, which is not handled by this function.
+                returnValue = SetValueAtA(pPointer, index, zero);
+            }
+        }
+        else
+        {
+            auto typeSize = type->getPrimitiveSizeInBits() / 8;
+            auto byteCount = static_cast<int>(typeSize * numElements);
+            auto int8Type = llvm::Type::getInt8Ty(GetLLVMContext());
+            auto bytePointer = CastPointer(pPointer, int8Type->getPointerTo());
+            auto zero = llvm::ConstantInt::get(int8Type, 0);
+            returnValue = _pEmitter->MemorySet(bytePointer, zero, Literal(byteCount));
         }
 
         return returnValue;
@@ -858,8 +959,17 @@ namespace emitters
     }
 
     // Control flow constructs
-    void IRFunctionEmitter::For(size_t count, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
+
+    //
+    // For loops
+    //
+    void IRFunctionEmitter::For(int count, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
     {
+        if (count < 0)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "For loop count must be >= 0");
+        }
+
         auto loop = IRForLoopEmitter(*this);
         loop.Begin(count);
         body(*this, LocalScalar(loop.LoadIterationVariable()));
@@ -874,8 +984,12 @@ namespace emitters
         loop.End();
     }
 
-    void IRFunctionEmitter::For(size_t beginValue, size_t endValue, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
+    void IRFunctionEmitter::For(int beginValue, int endValue, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
     {
+        if (endValue < beginValue)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "For loop begin must be <= end");
+        }
         For(beginValue, endValue, 1, body);
     }
 
@@ -884,8 +998,12 @@ namespace emitters
         For(beginValue, endValue, Literal<int>(1), body);
     }
 
-    void IRFunctionEmitter::For(size_t beginValue, size_t endValue, size_t increment, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
+    void IRFunctionEmitter::For(int beginValue, int endValue, int increment, std::function<void(IRFunctionEmitter&, IRLocalScalar)> body)
     {
+        if (endValue < beginValue)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "For loop begin must be <= end");
+        }
         auto loop = IRForLoopEmitter(*this);
         loop.Begin(beginValue, endValue, increment);
         body(*this, LocalScalar(loop.LoadIterationVariable()));
@@ -900,20 +1018,107 @@ namespace emitters
         loop.End();
     }
 
+    //
+    // Extended for loops
+    //
+
+    void IRFunctionEmitter::For(const std::vector<ConstLoopRange>& ranges, MultiDimForLoopBodyFunction body)
+    {
+        emitters::MultiDimFor(*this, ranges, {}, body);
+    }
+    
+    void IRFunctionEmitter::For(const std::vector<LoopRange>& ranges, MultiDimForLoopBodyFunction body)
+    {
+        emitters::MultiDimFor(*this, ranges, {}, body);
+    }
+    
+    void IRFunctionEmitter::For(ConstTiledLoopRange range, TiledForLoopBodyFunction body)
+    {
+        auto stepSize = range.blockSize;
+        auto numFullBlocks = (range.end-range.begin) / stepSize;
+        auto fullBlocksEnd = range.begin + (numFullBlocks * stepSize);
+
+        // full blocks
+        if (numFullBlocks > 0)
+        {
+            // For(range.begin, fullBlocksEnd, stepSize, [stepSize, body](IRFunctionEmitter function, auto index) {
+            For(numFullBlocks, [stepSize, range, body](IRFunctionEmitter function, auto blockIndex) {
+                auto index = range.begin + blockIndex * stepSize;
+                body(function, { index, index + stepSize, function.LocalScalar(stepSize), blockIndex });
+            });
+        }
+
+        // epilogue -- with non-overlapping blocks, there can be at most one epilogue block
+        if (fullBlocksEnd != range.end)
+        {
+            body(*this, { LocalScalar(fullBlocksEnd), LocalScalar(range.end), LocalScalar(range.end-fullBlocksEnd), LocalScalar(numFullBlocks) });
+        }
+    }
+
+    void IRFunctionEmitter::For(TiledLoopRange range, TiledForLoopBodyFunction body)
+    {
+        if (!range.blockSize.IsConstantInt())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Tiled for loops must have a constant step size");
+        }
+
+        auto stepSize = range.blockSize.GetIntValue<int>();
+        auto numFullBlocks = (range.end-range.begin) / stepSize;
+        auto fullBlocksEnd = range.begin + (numFullBlocks * stepSize);
+
+        // full blocks
+        If(numFullBlocks > 0, [numFullBlocks, stepSize, range, body](auto& function) {
+            function.For(numFullBlocks, range.blockSize, [stepSize, range, body](IRFunctionEmitter function, auto blockIndex) {
+                auto index = range.begin + blockIndex * stepSize;
+                body(function, { index, index + range.blockSize, range.blockSize, blockIndex });
+            });
+        });
+
+        // epilogue -- with non-overlapping blocks, there can be at most one epilogue block
+        If(fullBlocksEnd != range.end, [numFullBlocks, fullBlocksEnd, range, body](auto& function) {
+            body(function, {fullBlocksEnd, range.end, range.end-fullBlocksEnd, numFullBlocks});
+        });
+    }
+
+    void IRFunctionEmitter::For(const std::vector<ConstTiledLoopRange>& ranges, TiledMultiDimForLoopBodyFunction body)
+    {
+        emitters::TiledMultiDimFor(*this, ranges, {}, body);
+    }
+
+    void IRFunctionEmitter::For(const std::vector<TiledLoopRange>& ranges, TiledMultiDimForLoopBodyFunction body)
+    {
+        emitters::TiledMultiDimFor(*this, ranges, {}, body);
+    }
+
+    //
+    // Parallel-for loops
+    //
     void IRFunctionEmitter::ParallelFor(int count, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
     {
+        if (count < 0)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "For loop count must be >= 0");
+        }
         auto loop = IRParallelForLoopEmitter(*this);
         loop.EmitLoop(0, count, 1, { 0 }, capturedValues, body);
     }
 
     void IRFunctionEmitter::ParallelFor(int count, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
     {
+        if (count < 0)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "For loop count must be >= 0");
+        }
         auto loop = IRParallelForLoopEmitter(*this);
         loop.EmitLoop(0, count, 1, options, capturedValues, body);
     }
 
     void IRFunctionEmitter::ParallelFor(int beginValue, int endValue, int increment, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body)
     {
+        if (endValue < beginValue)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "For loop begin must be <= end");
+        }
         auto loop = IRParallelForLoopEmitter(*this);
         loop.EmitLoop(beginValue, endValue, increment, options, capturedValues, body);
     }

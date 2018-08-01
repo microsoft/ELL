@@ -34,6 +34,30 @@ namespace emitters
     }
     using namespace detail;
 
+    bool IRLocalScalar::IsConstantInt() const
+    {
+        return llvm::isa<llvm::ConstantInt>(this->value);
+    }
+
+    bool IRLocalScalar::IsConstantFloat() const
+    {
+        return llvm::isa<llvm::ConstantFP>(this->value);
+    }
+
+    template <>
+    float IRLocalScalar::GetFloatValue<float>() const
+    {
+        auto floatValue = llvm::cast<llvm::ConstantFP>(this->value);
+        return floatValue->getValueAPF().convertToFloat();
+    }
+
+    template <>
+    double IRLocalScalar::GetFloatValue<double>() const
+    {
+        auto floatValue = llvm::cast<llvm::ConstantFP>(this->value);
+        return floatValue->getValueAPF().convertToDouble();
+    }
+
     IRLocalScalar& IRLocalScalar::operator+=(const IRLocalScalar& rhs)
     {
         VerifyArgTypesCompatible(*this, rhs);

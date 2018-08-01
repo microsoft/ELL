@@ -46,25 +46,33 @@ namespace utilities
     template <typename ValueType>
     using IsEnum = typename std::enable_if_t<std::is_enum<ValueType>::value, bool>;
 
-    /// <summary> Enabled if ValueType is an floating point value. </summary>
+    /// <summary> Enabled if ValueType is an floating point type. </summary>
     template <typename ValueType>
     using IsFloatingPoint = typename std::enable_if_t<std::is_floating_point<std::decay_t<ValueType>>::value, bool>;
 
-    /// <summary> Enabled if ValueType is a fundamental value. </summary>
+    /// <summary> Enabled if ValueType is a fundamental type. </summary>
     template <typename ValueType>
     using IsFundamental = typename std::enable_if_t<std::is_fundamental<std::decay_t<ValueType>>::value, bool>;
 
-    /// <summary> Enabled if ValueType is not a fundamental value. </summary>
+    /// <summary> Enabled if ValueType is not a fundamental type. </summary>
     template <typename ValueType>
     using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<std::decay_t<ValueType>>::value, bool>;
 
-    /// <summary> Enabled if ValueType is an integer value. </summary>
+    /// <summary> Enabled if ValueType is an integer type. </summary>
     template <typename ValueType>
     using IsIntegral = typename std::enable_if_t<std::is_integral<std::decay_t<ValueType>>::value, bool>;
 
     /// <summary> Enabled if ValueType is an integer value that's not a boolean. </summary>
     template <typename ValueType>
     using IsNonBooleanIntegral = typename std::enable_if_t<std::is_integral<std::decay_t<ValueType>>::value && !std::is_same<std::decay_t<ValueType>, bool>::value, bool>;
+
+    /// <summary> Enabled if ValueType is a signed integer type. </summary>
+    template <typename ValueType>
+    using IsSignedIntegral = typename std::enable_if_t<std::is_integral<std::decay_t<ValueType>>::value && std::is_signed<std::decay_t<ValueType>>::value, bool>;
+
+    /// <summary> Enabled if ValueType is an unsigned integer type. </summary>
+    template <typename ValueType>
+    using IsUnsignedIntegral = typename std::enable_if_t<std::is_integral<std::decay_t<ValueType>>::value && std::is_unsigned<std::decay_t<ValueType>>::value, bool>;
 
     /// <summary> Enabled if the two classes are the same. </summary>
     template <typename T, typename S>

@@ -750,7 +750,7 @@ namespace emitters
 
         /// <summary> Emit instruction to initialize a 0 value into the pointer location. </summary>
         ///
-        /// <param name="pPointer"> Pointer to the adress where the value is being stored. </param>
+        /// <param name="pPointer"> Pointer to the address where the value is being stored. </param>
         /// <param name="numElements"> Number of elements to fill in with zero at address.
         /// defaults to 1. </param>
         ///
@@ -908,10 +908,48 @@ namespace emitters
         // Control flow
         //
 
-        // Type aliases for lambda functions that define body regions
+        /// <summary> Types used to represent ranges for loops to iterate over </summary>
+        struct ConstLoopRange
+        {
+            int begin;
+            int end;
+        };
 
-        /// <summary> Type alias for for-loop body lambda. </summary>
+        struct ConstTiledLoopRange
+        {
+            int begin;
+            int end;
+            int blockSize; // increment
+        };
+
+        struct LoopRange
+        {
+            emitters::IRLocalScalar begin;
+            emitters::IRLocalScalar end;
+        };
+
+        struct TiledLoopRange
+        {
+            emitters::IRLocalScalar begin;
+            emitters::IRLocalScalar end;
+            emitters::IRLocalScalar blockSize; // increment
+        };
+
+        /// <summary> Structure passed in to tiled loops instead of just a scalar index </summary>
+        struct BlockInterval
+        {
+            emitters::IRLocalScalar begin;
+            emitters::IRLocalScalar end;
+            emitters::IRLocalScalar size; // always == end-begin
+            emitters::IRLocalScalar index; // zero-based index of this block (so, begin = loop start + index*size)
+        };
+
+        /// <summary> Type aliases for for-loop body lambdas. </summary>
         using ForLoopBodyFunction = std::function<void(IRFunctionEmitter& function, IRLocalScalar iterationVariable)>;
+        using MultiDimForLoopBodyFunction = std::function<void(emitters::IRFunctionEmitter& function, std::vector<emitters::IRLocalScalar> indices)>;
+        using TiledForLoopBodyFunction = std::function<void(emitters::IRFunctionEmitter& function, BlockInterval interval)>;
+        using TiledMultiDimForLoopBodyFunction = std::function<void(emitters::IRFunctionEmitter& function, std::vector<BlockInterval> intervals)>;
+        using ParallelForLoopBodyFunction = IRParallelForLoopEmitter::BodyFunction;
 
         /// <summary> Type alias for while-loop body lambda. </summary>
         using WhileLoopBodyFunction = std::function<void(IRFunctionEmitter& function)>;
@@ -923,7 +961,7 @@ namespace emitters
         ///
         /// <param name="count"> The number of iterations to make. </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
-        void For(size_t count, ForLoopBodyFunction body);
+        void For(int count, ForLoopBodyFunction body);
 
         /// <summary> Emits a for loop counting from zero to a constant end value. </summary>
         ///
@@ -936,7 +974,7 @@ namespace emitters
         /// <param name="beginValue"> The starting value of the loop iterator. </param>
         /// <param name="endValue"> The ending value of the loop iterator. </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
-        void For(size_t beginValue, size_t endValue, ForLoopBodyFunction body);
+        void For(int beginValue, int endValue, ForLoopBodyFunction body);
 
         /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value. </summary>
         ///
@@ -951,7 +989,7 @@ namespace emitters
         /// <param name="endValue"> The ending value of the loop iterator. </param>
         /// <param name="increment"> The increment for the iterator. </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
-        void For(size_t beginValue, size_t endValue, size_t increment, ForLoopBodyFunction body);
+        void For(int beginValue, int endValue, int increment, ForLoopBodyFunction body);
 
         /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value with a given increment. </summary>
         ///
@@ -961,13 +999,45 @@ namespace emitters
         /// <param name="body"> A function that emits the body of the loop. </param>
         void For(llvm::Value* beginValue, llvm::Value* endValue, llvm::Value* increment, ForLoopBodyFunction body);
 
-        /// <summary> Emits a while loop. </summary>
-        ///
-        /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
-        /// <param name="body"> A function that emits the body of the loop. </param>
-        void While(llvm::Value* pTestValuePointer, WhileLoopBodyFunction body);
+        //
+        // Extended for loops
+        //
 
-        using ParallelForLoopBodyFunction = IRParallelForLoopEmitter::BodyFunction;
+        /// <summary> Emits a set of nested for loops, each counting from a begin value up to (but not including) an end value. </summary>
+        ///
+        /// <param name="ranges"> The range objects describing the ranges to iterate over (begin, end). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::vector<ConstLoopRange>& ranges, MultiDimForLoopBodyFunction body);
+
+        /// <summary> Emits a set of nested for loops, each counting from a begin value up to (but not including) an end value. </summary>
+        ///
+        /// <param name="ranges"> The range objects describing the ranges to iterate over (begin, end). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::vector<LoopRange>& ranges, MultiDimForLoopBodyFunction body);
+
+        /// <summary> Emits a tiled for loop counting from a begin value up to (but not including) an end value with a given increment. </summary>
+        ///
+        /// <param name="range"> The range object describing the range to iterate over (begin, end, and increment). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(ConstTiledLoopRange range, TiledForLoopBodyFunction body);
+
+        /// <summary> Emits a tiled for loop counting from a begin value up to (but not including) an end value with a given increment. </summary>
+        ///
+        /// <param name="range"> The range object describing the range to iterate over (begin, end, and increment). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(TiledLoopRange range, TiledForLoopBodyFunction body);
+
+        /// <summary> Emits a set of nested tiled for loops, each counting from a begin value up to (but not including) an end value, with a given increment. </summary>
+        ///
+        /// <param name="ranges"> The range objects describing the ranges to iterate over (begin, end, increment). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::vector<ConstTiledLoopRange>& ranges, TiledMultiDimForLoopBodyFunction body);
+
+        /// <summary> Emits a set of nested tiled for loops, each counting from a begin value up to (but not including) an end value, with a given increment. </summary>
+        ///
+        /// <param name="ranges"> The range objects describing the ranges to iterate over (begin, end, increment). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::vector<TiledLoopRange>& ranges, TiledMultiDimForLoopBodyFunction body);
 
         /// <summary> Emits a parallel for loop counting from zero to a constant end value. </summary>
         ///
@@ -1018,6 +1088,12 @@ namespace emitters
         /// <param name="capturedValues"> A list of values to be used inside the loop. </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
         void ParallelFor(llvm::Value* beginValue, llvm::Value* endValue, llvm::Value* increment, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, ParallelForLoopBodyFunction body);
+
+        /// <summary> Emits a while loop. </summary>
+        ///
+        /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void While(llvm::Value* pTestValuePointer, WhileLoopBodyFunction body);
 
         /// <summary> Emits an if statement. </summary>
         ///

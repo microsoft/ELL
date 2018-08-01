@@ -44,6 +44,21 @@ namespace emitters
         using IRLocalValue::IRLocalValue;
         using IRLocalValue::operator=;
 
+        bool IsConstantInt() const;
+        bool IsConstantFloat() const;
+
+        template <typename ValueType, utilities::IsIntegral<ValueType> = true>
+        ValueType GetIntValue() const;
+
+        template <typename ValueType, utilities::IsIntegral<ValueType> = true>
+        ValueType GetIntValue(ValueType defaultValue) const;
+
+        template <typename ValueType, utilities::IsFloatingPoint<ValueType> = true>
+        ValueType GetFloatValue() const;
+
+        template <typename ValueType, utilities::IsFloatingPoint<ValueType> = true>
+        ValueType GetFloatValue(ValueType defaultValue) const;
+
         // Compound operators
         IRLocalScalar& operator+=(const IRLocalScalar& rhs);
         IRLocalScalar& operator-=(const IRLocalScalar& rhs);
