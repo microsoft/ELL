@@ -69,12 +69,14 @@ class ImporterNode:
         self.output_shapes = output_shapes
 
     def __repr__(self):
-        line1 = "{} {}: {} -> {}, attributes {}\n".format(self.operation_type, self.id, self.inputs, self.outputs, self.attributes)
-        line2 = "    output_shape {}\n".format(self.output_shapes[0])
-        line3 = "    padding {}\n".format(self.padding)
-        line4 = "    output_padding {}\n".format(self.output_padding)
-        line5 = "    weights {}\n".format(self.weights.keys())
-        return line1 + line2 + line3 + line4 + line5
+        _print_line = ""
+        _print_line += "{} {}: {} -> {}, attributes {}\n".format(self.operation_type, self.id, self.inputs, self.outputs, self.attributes)
+        _print_line += "    input_shape {}\n".format(self.input_shapes)
+        _print_line += "    output_shape {}\n".format(self.output_shapes)
+        _print_line += "    padding {}\n".format(self.padding)
+        _print_line += "    output_padding {}\n".format(self.output_padding)
+        _print_line += "    weights {}\n".format(self.weights.keys())
+        return _print_line
 
 class LookupTable:
     """

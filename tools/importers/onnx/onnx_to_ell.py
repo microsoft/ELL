@@ -8,13 +8,14 @@
 #
 ####################################################################################################
 
-import onnx  
-import os
 import argparse
-from typing import Text
+import os
+import logging
 import sys
-import logging 
 
+from typing import Text
+
+import onnx
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
@@ -32,8 +33,10 @@ _logger = logging.getLogger(__name__)
 
 
 def get_onnx_nodes(path):
+    """ Return a list of ONNX nodes """
 
-    return utils.Utilities()._parse_onnx_model(path)
+    onnx_nodes = utils.ONNX()._parse_onnx_model(path)
+    return onnx_nodes
 
 def make_importer_model(onnx_nodes):
     """
@@ -70,9 +73,9 @@ def convert_onnx_to_ell(path):
     _logger.info("\n Done pre-processing.")
     try:
         importer_engine = common.importer.ImporterEngine(step_interval_msec=0, lag_threshold_msec=0)     
-        ell_map = importer_engine.convert_nodes(importer_model)
+        ell_map = importer_engine.convert_nodes(importer_model, apply_ordering=False)
     except :
         _logger.error("Error occurred while attempting to convert the model")
         raise 
 
-    return ell_map
+    return ell_map, onnx_nodes

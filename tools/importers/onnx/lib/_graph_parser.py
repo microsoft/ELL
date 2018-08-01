@@ -31,7 +31,7 @@ ONNX_OP_TYPE_TO_ELL_MAP  = {
     "Conv"                    : "Convolution",
     "Convolution"             : "Convolution",
     "Mul"                     : "ElementTimes",
-    # "MatMul"                  : "ElementTimes",
+    "MatMul"                  : "FullyConnected",
     "Bias"                    : "Bias",
     "Constant"                : "Skip",
     "Dropout"                 : "Skip",

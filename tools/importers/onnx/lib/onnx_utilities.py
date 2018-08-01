@@ -28,7 +28,7 @@ _logger = logging.getLogger(__name__)
 #####################################################################################
 ##############  Util class
 #####################################################################################
-class Utilities(object):
+class ONNX(object):
     """
     Utility class for processing ONNX models.
     """
@@ -37,7 +37,7 @@ class Utilities(object):
         self._shape_dict = {} # weights indexes and shape: Example {'node_id': ['w', 'b']}
         self._tensor_dict = {} # weights
         self._all_nodes = {} # all processed nodes
-        self._auxiliary_nodes = {} # nodes get from value_info, they only carry weights or bias ...
+        self._auxiliary_nodes = {} # nodes made from initialization parameters(tensors) , they only carry weights or bias ...
 
     def get_shape_dict(self):
         return self._shape_dict
@@ -48,7 +48,7 @@ class Utilities(object):
     def get_padding(self, node):
         """
         Derived classes can override. Return is a mapping:
-        {"size": size_value, "scheme": scheme_value}
+        {"size": size_value, "scheme": scheme_value} 
         where:
         size - size of padding
         scheme - padding scheme to use, one of:
@@ -65,9 +65,8 @@ class Utilities(object):
         return {"size": pad, "scheme": ell.neural.PaddingScheme.zeros}
 
     def get_weights(self, node):
-        if node.op_type == "Convolution":
-            return self._conv_weights(node)
-        elif node.op_type == "BatchNormalization":
+
+        if node.op_type == "BatchNormalization":
             return self._batch_norm_weights(node)
         else:
             return self._get_weights(node)
@@ -91,124 +90,21 @@ class Utilities(object):
             return {}
         result = {}
         tensor = None
-        if node.op_type == "BatchNormalization" :
-            bias = _weights[0]
-            scale = _weights[1]
-            mean = _weights[2]
-            variance = _weights[3]
-            result['bias'] = (bias, node.input_tensors[bias], "channel")
-            result['scale'] = (scale, node.input_tensors[scale], "channel")
-            result['mean'] = (mean, node.input_tensors[mean], "channel")
-            result['variance'] = (variance, node.input_tensors[variance], "channel")
-        else:
-            for weight_index in _weights:
-                tensor = node.input_tensors[weight_index]
-                tensor_len = len(tensor.shape)
-                if tensor_len  == 4:
-                    result['weights'] = (weight_index, tensor, 'filter_channel_row_column')
-                elif tensor_len == 3 :
-                    result['weights'] = (weight_index, tensor, 'channel_row_column')
-                elif tensor_len == 2 :
-                    result['weights'] = (weight_index, tensor, 'row_column')
-                else :
-                    result['bias'] = (weight_index, tensor, 'column')
-
-        return result
-
-    # TODO: call this in get_weights
-    def _conv_weights(self, node):
-        """
-        """
-        _weights = list(node.input_tensors)
-        if not _weights:
-            return {}
-        result = {}
-        tensor = None 
-
+        
         for weight_index in _weights:
             tensor = node.input_tensors[weight_index]
             tensor_len = len(tensor.shape)
             if tensor_len  == 4:
                 result['weights'] = (weight_index, tensor, 'filter_channel_row_column')
-            elif tensor_len == 3:
+            elif tensor_len == 3 :
                 result['weights'] = (weight_index, tensor, 'channel_row_column')
-            elif tensor_len == 2:
+            elif tensor_len == 2 :
                 result['weights'] = (weight_index, tensor, 'row_column')
-            elif tensor_len == 1:
-                result['bias'] = (weight_index, tensor, 'column')
+            else :
+                result['bias'] = (weight_index, tensor, 'channel')
 
-        
         return result
 
-    # TODO: Call this in conv2d
-    def _conv_attributes(self, node):
-        """
-        Return dict of attribute in the format 
-        attributes['size'] = node.attribute['kernel_shape'][0]
-        attributes['stride'] = node.attribute['strides'][0]
-        """
-        attributes = {}
-        if 'kernel_shape' in node.attribute:
-            attributes['size'] = node.attribute['kernel_shape'][0]
-            attributes['stride'] = node.attribute['strides'][0]
-        if 'pads' in node.attribute:
-            attributes['padding'] = node.attribute['pads'][0]
-        if 'dilations' in node.attribute:
-            attributes['dilations'] = node.attribute['dilations'][0]
-
-        return attributes
-    
-    def conv2d(self, node):
-        """
-        Parse convolution node
-        """
-        # make shape inference using node attributes
-        
-        f = None
-        p = None
-        s = None 
-
-        if 'kernel_shape' in node.attribute:
-            f = node.attribute['kernel_shape'][0]
-
-        if 'pads' in node.attribute:
-            p = node.attribute['pads'][0]
-
-        if 'strides' in node.attribute:
-            s = node.attribute['strides'][0]
-
-        self.get_input_shape(node)
-        self.get_conv_con2d_out_dims(node, node.input_shape, f, p, s)
-        self._conv_weights(node)
-        self._conv_attributes(node)
-        return node
-
-    def batch_norn(self, node):
-        """
-        """
-        self.get_input_shape(node)
-        self._batch_norm_weights(node)
-
-    # TODO: call this in get_weights
-    def _batch_norm_weights(self, node):
-        """
-        Get weights for a batch normalization node
-        """
-        
-        _weights = list(node.input_tensors)
-        if not _weights:
-            return {}
-        result = {}
-
-        scale = _weights[0]
-        bias = _weights[1]
-        mean = _weights[2]
-        variance = _weights[3]
-        result['bias'] = (bias, node.input_tensors[bias], "channel")
-        result['scale'] = (scale, node.input_tensors[scale], "channel")
-        result['mean'] = (mean, node.input_tensors[mean], "channel")
-        result['variance'] = (variance, node.input_tensors[variance], "channel")
-        return result
 
     def get_activation_type(self, node):
         """Returns an ell.neural.ActivationType from the list of nodes"""
@@ -266,7 +162,6 @@ class Utilities(object):
         """
         Computes the spatial output shape
         """
-
         if  node.op_type == 'Input':
             return node.output_shape
         
@@ -277,6 +172,7 @@ class Utilities(object):
         f = None
         p = None
         s = None 
+        d = None
 
         if 'kernel_shape' in node.attribute:
             f = node.attribute['kernel_shape'][0]
@@ -286,23 +182,18 @@ class Utilities(object):
 
         if 'strides' in node.attribute:
             s = node.attribute['strides'][0]
+        
+        if 'dilations' in node.attribute:
+            s = node.attribute['dilations'][0]
 
-        if node.op_type == "Convolution":
-            return self.get_conv_con2d_out_dims(node, f, p, s)
-        elif node.op_type == "MaxPooling":
-            return self.get_maxpool_out_dims( node, f, p, s)
-        elif node.op_type == "FullyConnected":
-            return self.get_fc_out_dims(node, f, p, s)
-        elif node.op_type == "Splice":
+        if node.op_type == "Splice":
             return self.get_concat_out_dims(node, f, p, s)
-        # elif node.op_type == "Softmax":
-        #     return self.get_softmax_shape_(node)
         elif node.op_type == "Flatten":
             return self.flatten_shape(node)
         # elif node.op_type == "Reshape":
         #     return self.get_reshape_out_dims(node)
-        elif node.name in self._shape_dict:
-            return self.get_sink_node_dims(node)
+        # elif node.name in self._shape_dict:
+        #     return self.get_sink_node_dims(node)
         else:
             return input_shape
 
@@ -335,45 +226,6 @@ class Utilities(object):
         dims[0] = channel
         return [(dims, order)]
 
-
-    def get_conv_con2d_out_dims(self, node, kernel_size, padding, strides):
-        """
-        Compute the spatial output shape of the convolutional node 
-        using filter_size, paddings, strides ...
-        Formula: Dim = (input_dim - filter_size + 2*padding)/strides + 1
-        """
-        channel, row, col = node.input_shape[0][0]
-        f = kernel_size
-        p = padding
-        s = strides
-
-        if self.get_number_of_filter(node):
-            channel = self.get_number_of_filter(node)[0]
-        
-        out_row = (row - f + 2*p)/s + 1
-        out_col = (col - f + 2*p)/s + 1
-
-        dims = (channel, int(out_row), int(out_col)) 
-
-        return [(dims, 'channel_row_column')]
-
-    def get_maxpool_out_dims(self, node, kernel_size, padding, strides):
-
-        channel, row, col = node.input_shape[0][0]
-        f = kernel_size
-        p = padding
-        s = strides
-
-        if not node.input_shape[0] or node.input_shape[0][0] == 0:
-            if self.get_number_of_filter(node):
-                channel = self.get_number_of_filter(node)[0]
-
-        out_row = (row - f)/s + 1
-        out_col = (col - f)/s + 1
-
-        dims = (channel, int(out_row), int(out_col)) 
-
-        return [(dims, 'channel_row_column')]
 
     def get_reshape_out_dims(self, node):
         channel = 1
@@ -417,24 +269,7 @@ class Utilities(object):
         dims = (channel*row*col,)
 
         return [(dims, 'channel')]
-
-    def get_fc_out_dims(self, node, kernel_size, padding, strides):
-        input_shape = node.input_shape
-        channel, row, col = 0, 0, 0
-        if len(input_shape[0][0]) > 2:
-            channel, row, col = node.input_shape[0][0]
-        
-        if self.get_number_of_filter(node) is not None:
-            channel = self.get_number_of_filter(node)[0]
-
-        dims = (channel,) # make it tuple
-
-        shape = node.input_shape
-        # if node.name in self._shape_dict:
-        #     shape = self._shape_dict[node.name]
-        
-
-        return [(dims, 'channel')]
+    
 
     def get_concat_out_dims(self, node, kernel_size, padding, strides):
         """ Computes the output shape for a concat/slpice node 
@@ -478,7 +313,6 @@ class Utilities(object):
         
         shape_ = []
         shape_.append(dim0)
-        # shape_ = input1_out_shape
         shape_.extend(shape[1:])
         shape_ = tuple(shape_)
         order = 'channel_row_column'
@@ -508,7 +342,311 @@ class Utilities(object):
                 shape_ = self._all_nodes[node].output_shape
         return shape_
 
-    ##################### Auxillary Nodes parsing ##########################
+    ##################### Convolution layer parsing ########################
+
+    def _conv_weights(self, node):
+        """
+        """
+        _weights = list(node.input_tensors)
+        if not _weights:
+            return {}
+        result = {}
+        tensor = None 
+
+        for weight_index in _weights:
+            tensor = node.input_tensors[weight_index]
+            tensor_len = len(tensor.shape)
+            if tensor_len  == 4:
+                result['weights'] = (weight_index, tensor, 'filter_channel_row_column')
+            elif tensor_len == 3:
+                result['weights'] = (weight_index, tensor, 'channel_row_column')
+            elif tensor_len == 2:
+                result['weights'] = (weight_index, tensor, 'row_column')
+            elif tensor_len == 1:
+                result['bias'] = (weight_index, tensor, 'channel')
+
+        
+        return result
+
+    def _conv_attributes(self, node):
+        """
+        Return dict of attribute in the format 
+        attributes['size'] = node.attribute['kernel_shape'][0]
+        attributes['stride'] = node.attribute['strides'][0]
+        """
+        attributes = {}
+        if 'kernel_shape' in node.attribute:
+            attributes['size'] = node.attribute['kernel_shape'][0]
+            attributes['stride'] = node.attribute['strides'][0]
+        if 'pads' in node.attribute:
+            attributes['padding'] = node.attribute['pads'][0]
+        if 'dilations' in node.attribute:
+            attributes['dilation'] = node.attribute['dilations'][0]
+
+        return attributes
+    
+    def _get_con2d_out_dims(self, node, kernel_size, padding, strides, dilations):
+        """
+        Compute the spatial output shape of the convolution node 
+        using filter_size, paddings, strides ...
+        Formula: out_dim = floor((in_dim + 2*padding - (kernel_size - 1) - 1)/strides + 1
+        """
+        channel, row, col = node.input_shape[0][0]
+
+        k_row, k_col = kernel_size, kernel_size # kernel height and width
+        if isinstance(kernel_size, list):
+             k_row, k_col = kernel_size[0], kernel_size[1] 
+            
+        p_row, p_col = padding, padding # padding height and width
+        if isinstance(padding, list):
+             p_row, p_col = padding[0], padding[1] 
+            
+        d_row, d_col = 1, 1
+        if isinstance(dilations, list):
+             d_row, d_col = dilations[0], dilations[1] 
+    
+        s_row, s_col = strides, strides
+        if isinstance(strides, list):
+            s_row, s_col = strides[0], strides[1]
+
+        if self.get_number_of_filter(node):
+            channel = self.get_number_of_filter(node)[0]
+        
+        out_row = (row + 2*p_row - d_row*(k_row -1) - 1)/s_row + 1
+        out_col = (col + 2*p_col - d_col*(k_col -1) - 1)/s_col + 1
+
+        shape = (channel, int(out_row), int(out_col)) 
+        output_shape =  [(shape, 'channel_row_column')]
+        return output_shape
+    
+    def conv2d(self, node):
+        """
+        Parse convolution node
+        """
+        # make shape inference using node attributes
+        
+        f = None
+        p = None
+        s = None 
+        d = None
+
+        if 'kernel_shape' in node.attribute:
+            f = node.attribute['kernel_shape']
+
+        if 'pads' in node.attribute:
+            p = node.attribute['pads']
+
+        if 'strides' in node.attribute:
+            s = node.attribute['strides']
+        
+        if 'dilations' in node.attribute:
+            d = node.attribute['dilations']
+
+        node.input_shape  = self.get_input_shape(node)
+        node.output_shape = self._get_con2d_out_dims(node, f, p, s, d)
+        node.attribute    = self._conv_attributes(node)
+        node.padding      = self.get_padding(node)
+        node.weights      = self._conv_weights(node)
+        node.inputs       = [node.inputs[0]]     
+        return node 
+
+    ##################### MaxPooling layer parsing ########################
+
+    def _get_maxpool_attributes(self, node):
+        """
+        Return dict of attribute in the format 
+        attributes['size'] = node.attribute['kernel_shape'][0]
+        attributes['stride'] = node.attribute['strides'][0]
+        """
+        attributes = {}
+        if 'kernel_shape' in node.attribute:
+            attributes['size'] = node.attribute['kernel_shape'][0]
+            attributes['stride'] = node.attribute['strides'][0]
+        if 'pads' in node.attribute:
+            attributes['padding'] = node.attribute['pads'][0]
+        if 'dilations' in node.attribute:
+            attributes['dilations'] = node.attribute['dilations'][0]
+
+        return attributes
+    
+    def _get_maxpool_out_shape(self, node, kernel_size, padding, strides, dilations):
+        """
+        return MaxPooling node spatial output shape:
+        """
+        channel, row, col = node.input_shape[0][0]
+        k_row, k_col = kernel_size, kernel_size 
+        if isinstance(kernel_size, list):
+             k_row, k_col = kernel_size[0], kernel_size[1] 
+            
+        p_row, p_col = padding, padding
+        if isinstance(padding, list):
+             p_row, p_col = padding[0], padding[1] 
+            
+        d_row, d_col = 1, 1
+        if isinstance(dilations, list):
+             d_row, d_col = dilations[0], dilations[1] 
+    
+        s = strides
+        if isinstance(strides, list):
+            s = strides[0]
+
+        if not node.input_shape[0] or node.input_shape[0][0] == 0:
+            if self.get_number_of_filter(node):
+                channel = self.get_number_of_filter(node)[0]
+
+        out_row = (row + 2*p_row - d_row*(k_row - 1) - 1)/s + 1
+        out_col = (col + 2*p_col - d_col*(k_col - 1) - 1)/s + 1
+
+        shape = (channel, int(out_row), int(out_col)) 
+
+        return [(shape, 'channel_row_column')]
+
+    
+    def maxpool(self, node):
+        """
+        Parse MaxPooling node:
+        """        
+        k = None # kernel size
+        p = None # padding
+        s = None # stride
+        d = None # dilations
+
+        if 'kernel_shape' in node.attribute:
+            k = node.attribute['kernel_shape']
+
+        if 'pads' in node.attribute:
+            p = node.attribute['pads']
+
+        if 'strides' in node.attribute:
+            s = node.attribute['strides']
+        
+        if 'dilations' in node.attribute:
+            s = node.attribute['dilations']
+
+        node.input_shape  = self.get_input_shape(node)
+        node.output_shape = self._get_maxpool_out_shape(node, k, p, s, d)
+        node.attribute    = self._get_maxpool_attributes(node)
+        node.padding      = self.get_padding(node)
+        node.inputs       = [node.inputs[0]]     
+        return node
+
+######################## BatchNorm layer parsing #########################
+   
+    def _batch_norm_weights(self, node):
+        """
+        Get weights for a batch normalization node
+        """
+        _weights = list(node.input_tensors)
+        if not _weights:
+            return {}
+        result = {}
+
+        scale = _weights[0]
+        bias = _weights[1]
+        mean = _weights[2]
+        variance = _weights[3]
+        result['bias'] = (bias, node.input_tensors[bias], "channel")
+        result['scale'] = (scale, node.input_tensors[scale], "channel")
+        result['mean'] = (mean, node.input_tensors[mean], "channel")
+        result['variance'] = (variance, node.input_tensors[variance], "channel")
+        return result
+
+    def batchNorm(self, node):
+        """
+        Parse BatchNormalization node
+        """  
+
+        node.input_shape  = self.get_input_shape(node)
+        node.output_shape = self.get_output_shape(node)
+        node.attribute    = self.get_attributes(node)
+        node.padding      = self.get_padding(node)
+        node.weights      = self._batch_norm_weights(node)
+        node.inputs       = [node.inputs[0]]     
+        return node
+
+######################## FullyConnected layer parsing ##################### 
+
+    def _fc_weights(self, node):
+        """
+        FullyConnected weights
+
+        return a dict of weights in the format:
+        { 
+          'weights' : (weight_index, tensor, 'filter_channel_row_column')
+          'bias': (weight_index, tensor, 'channel')
+         }
+        weights['weights'] = (weight_index, tensor, 'filter_channel_row_column')
+        weights['bias'] = (weight_index, tensor, 'channel')
+        """
+
+        _weights = list(node.input_tensors)
+        
+        if not _weights:
+            # if can't find tensore in input_tensors list
+            # look for it in the inputs list
+            _weights = node.inputs
+
+        tensor_map = node.input_tensors
+        if not node.input_tensors:
+            tensor_map = self._tensor_dict
+
+        result = {}
+        tensor = None
+
+        for weight_index in _weights:
+            if weight_index not in tensor_map:
+                continue
+
+            tensor = tensor_map[weight_index]
+            tensor_len = len(tensor.shape)
+
+            tensor_len = len(tensor.shape)
+            if tensor_len  == 4:
+                result['weights'] = (weight_index, tensor, 'filter_channel_row_column')
+            elif tensor_len == 3 :
+                result['weights'] = (weight_index, tensor, 'channel_row_column')
+            elif tensor_len == 2 :
+                result['weights'] = (weight_index, tensor, 'row_column')
+            else :
+                result['bias'] = (weight_index, tensor, 'channel')
+
+        return result
+
+    def get_fc_out_dims(self, node):
+
+        input_shape = node.input_shape
+
+        channel = 0       
+        for name in node.inputs:
+            if name in self._shape_dict:
+                channel = self._shape_dict[name][0]
+
+        dims = (channel, 1, 1) # make it tuple        
+
+        return [(dims, 'channel_row_column')]
+    
+    def fc_to_conv2d(self, node):
+        node.op_type = "Convolution"
+        node.input_shape  = self.get_input_shape(node)
+        node.output_shape = self.get_fc_out_dims(node)
+        k = node.input_shape[0][0][1]
+        node.attribute    = {'size': k, 'stride': 1, 'padding': 0, 'dilation': 1}
+        node.padding      = self.get_padding(node)
+        node.weights      = self._fc_weights(node)
+        node.inputs       = [node.inputs[0]]
+        return node
+
+    def fullyConnected(self, node):
+        node.input_shape  = self.get_input_shape(node)
+        node.output_shape = self.get_fc_out_dims(node)
+        node.attribute    = self.get_attributes(node)
+        node.padding      = self.get_padding(node)
+        node.weights      = self._fc_weights(node)
+        node.inputs       = [node.inputs[0]]
+        return node
+
+    ##################### Auxillary layer parsing ########################## 
+
     def _get_aux_node_weights(self, node):
         name = node.name
         tensor = None
@@ -530,12 +668,13 @@ class Utilities(object):
         order = "channel_row_column"
         if len(shape) == 1:
             order = "channel"
-
+        shape = (shape, )
         return [(shape, order)]
 
     def add_auxiliary_node(self, name, nodes_):
         """
-        Return a parsed external(node without parent) node
+        Create a node to hold an orphan operation e.g: bias
+        Return a parsed external node for IR type ImporterNode
         """
         if name in self._auxiliary_nodes:
             node =  self._auxiliary_nodes[name]
@@ -543,8 +682,8 @@ class Utilities(object):
             raise KeyError("Node {} not in Auxillary nodes dict", name)
         prev_node = nodes_[-1]
         node.inputs = prev_node.outputs
-        print("Aux input", node.name, node.inputs)                        
-        node.input_shape = prev_node.output_shape# self._get_aux_node_shape(node)
+        print("Aux node input", node.name, node.inputs)                        
+        node.input_shape = prev_node.output_shape # self._get_aux_node_shape(node)
         node.output_shape = prev_node.output_shape # self._get_aux_node_shape(node)
         node.padding = self.get_padding(node)
         node.weights = self._get_aux_node_weights(node)
@@ -557,18 +696,25 @@ class Utilities(object):
     def parse_node(self, node):
         """
         Do parsing
-        return a node with Importer node parameter
+        return a node with the IR(Internal Representation) Importer node parameter
         """
-        node.input_shape = self.get_input_shape(node)
-        node.output_shape = self.get_output_shape(node)
-        node.attribute = self.get_attributes(node)
-        node.padding = self.get_padding(node)
-        node.weights = self.get_weights(node)
+        if node.op_type == "FullyConnected":
+            return self.fullyConnected(node)
+        elif node.op_type == "Convolution":
+            return self.conv2d(node)
+        elif node.op_type == "MaxPooling":
+            return self.maxpool(node)
+        elif node.op_type == "BatchNormalization":
+            return self.batchNorm(node)
+        else:
+            node.input_shape = self.get_input_shape(node)
+            node.output_shape = self.get_output_shape(node)
+            node.attribute = self.get_attributes(node)
+            node.padding = self.get_padding(node)
+            node.weights = self.get_weights(node)
+
         if node.op_type == "Flatten":
             node.op_type = "Reshape"
-        
-        if node.op_type == "Convolution" or node.op_type == "BatchNormalization":
-            node.inputs = [node.inputs[0]]
 
         return node
         
@@ -593,6 +739,9 @@ class Utilities(object):
 
             # Check that the IR is well formed
             # onnx.checker.check_model(onnx_model)
+
+            # onnx IR version
+            _logger.info("ONNX IR_version".format(onnx_model.ir_version))
 
         except Exception :
             _logger.error("Error occurred when loading onnx model file ")
@@ -663,11 +812,7 @@ class Utilities(object):
 
             # update self._all_nodes
             self._all_nodes[op_node.name] = op_node
-            
-            print(op_node.name," :", op_node.op_type, op_node.inputs ,"->", 
-                  op_node.outputs,"Attr: ", node.attribute, "Value Info", node.padding)
-            print("Input shape :", op_node.input_shape,"-> Output shape :", op_node.output_shape, "\n") 
-
+            print(op_node.op_type, op_node.name, op_node.inputs, op_node.input_shape,"->", op_node.output_shape, op_node.attribute, "\n")
         return nodes_ 
 
 # _operation_map = {
