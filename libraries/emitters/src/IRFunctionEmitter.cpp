@@ -1450,11 +1450,6 @@ namespace emitters
             throw EmitterException(EmitterError::functionNotFound, "Couldn't find GEMM function");
         }
 
-        if (!useBlas && (transposeA || transposeB))
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Transposed matrix multiply not currently implemented in non-blas codepath");
-        }
-
         const auto CblasRowMajor = 101;
         const auto CblasNoTrans = 111;
         const auto CblasTrans = 112;

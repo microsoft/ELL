@@ -38,6 +38,7 @@ void TestCompilableMultiplexerNode();
 void TestCompilableTypeCastNode(size_t dimension);
 void TestReorderDataNode1();
 void TestReorderDataNode2();
+void TestReorderDataNode3();
 void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape);
 void TestCompilableAccumulatorNodeFunction();
 void TestCompilableSourceNode();
@@ -55,6 +56,7 @@ void TestCompilableFFTNode();
 //
 void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas);
 void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas);
+void TestOrderedMatrixMatrixMultiplyNode(int m, int n, int k, bool transposeA, bool transposeB, bool transposeC, bool useBlas);
 
 //
 // NN layer nodes

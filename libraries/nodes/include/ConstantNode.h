@@ -64,6 +64,12 @@ namespace nodes
         /// <param name="shape"> The shape of the output data </param>
         ConstantNode(const std::vector<ValueType>& values, const model::MemoryShape& shape);
 
+        /// Constructor for an arbitrary-shaped array constant
+        ///
+        /// <param name="value"> The vector value </param>
+        /// <param name="layout"> The memory layout of the output data </param>
+        ConstantNode(const std::vector<ValueType>& values, const model::PortMemoryLayout& layout);
+
         /// <summary> Gets the values contained in this node </summary>
         ///
         /// <returns> The values contained in this node </returns>

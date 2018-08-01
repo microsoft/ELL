@@ -1268,7 +1268,7 @@ void TestVectorMatrixMultiplyScaleAddUpdate()
     testing::ProcessTest(implementationName + "::MultiplyScaleAddUpdate(scalar, Vector, Matrix, scalar, Vector)", v == r && w == r);
 }
 
-template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
+template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::MatrixLayout layout3, math::ImplementationType implementation>
 void TestMatrixMatrixMultiplyScaleAddUpdate()
 {
     auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
@@ -1301,16 +1301,16 @@ void TestMatrixMatrixMultiplyScaleAddUpdate()
         { 1, 1, 1, 1, 1, 1 }
     };
 
-    math::Matrix<ElementType, layout1> C(A.NumRows(), B.NumColumns());
+    math::Matrix<ElementType, layout3> C(A.NumRows(), B.NumColumns());
     C.Fill(1);
     math::MultiplyScaleAddUpdate<implementation>(static_cast<ElementType>(1), A, B, static_cast<ElementType>(-1), C);
 
-    math::Matrix<ElementType, layout1> CC(A.NumRows()+2, B.NumColumns()+2);
+    math::Matrix<ElementType, layout3> CC(A.NumRows()+2, B.NumColumns()+2);
     CC.Fill(1);
     auto CCC = CC.GetSubMatrix(1, 1, 3, 4);
     math::MultiplyScaleAddUpdate<implementation>(static_cast<ElementType>(1), AA.GetSubMatrix(1,1,3,2), BB.GetSubMatrix(1,1,2,4), static_cast<ElementType>(-1), CCC);
 
-    math::Matrix<ElementType, layout1> R{
+    math::Matrix<ElementType, layout3> R{
         { 18, 21, 24, 27 },
         { 16, 20, 24, 28 },
         { 5, 7, 9, 11 }

@@ -120,7 +120,6 @@ void TestCompileIsEqual()
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 1 }, { 2, 2 }, { 1, 3 }, { 1, 4 }, { 5, 5 }, { 1, 4 }, { 3, 3 }, { 2, 2 }, { 1, 0 } };
-    PrintIR(compiledMap);
     VerifyCompiledOutput(map, compiledMap, signal, "IsEqual model");
 }
 
@@ -135,7 +134,6 @@ void TestCompilableScalarOutputNode()
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 4 }, { 3 }, { 2 }, { 1 } };
-    PrintIR(compiledMap);
     VerifyCompiledOutput(map, compiledMap, signal, "scalar OutputNode");
 }
 
@@ -150,7 +148,6 @@ void TestCompilableVectorOutputNode()
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-    PrintIR(compiledMap);
     VerifyCompiledOutput(map, compiledMap, signal, "vector OutputNode");
 }
 
@@ -196,7 +193,6 @@ void TestCompilableConstantNode()
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", dotNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
-    PrintIR(compiledMap);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -212,7 +208,6 @@ void TestCompilableDotProductNode()
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", dotNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
-    PrintIR(compiledMap);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -228,7 +223,6 @@ void TestCompilableDelayNode()
     model::IRMapCompiler compiler;
 
     auto compiledMap = compiler.Compile(map);
-    PrintIR(compiledMap);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -305,8 +299,6 @@ void TestCompilableMulticlassDTW()
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
-    PrintIR(compiledMap);
-
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "Multiclass DTW");
@@ -369,7 +361,6 @@ void TestCompilableUnaryOperation_square_Node()
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
-    PrintIR(compiledMap);
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "UnaryOperationNode_square");
@@ -386,7 +377,6 @@ void TestL2NormSquaredNodeCompiled()
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
-    PrintIR(compiledMap);
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "L2NormSquaredNode");
@@ -412,7 +402,6 @@ void TestMatrixVectorProductNodeCompile()
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
-    PrintIR(compiledMap);
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "MatrixVectorProductNode");
@@ -478,7 +467,6 @@ void TestCompilableScalarBinaryPredicateNode()
     std::vector<std::vector<double>> signal = { { 1 }, { 4 }, { 7 }, { 2 }, { 4 }, { 1 }, { 11 }, { 24 }, { 92 }, { 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "scalar BinaryPredicateNode");
     // TODO: Fix VerifyCompiledOutput --- types don't match for booleans
-    PrintIR(compiledMap);
     PrintCompiledOutput(map, compiledMap, signal, "scalar BinaryPredicateNode");
 }
 
@@ -496,7 +484,6 @@ void TestCompilableBinaryPredicateNode()
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "vector BinaryPredicateNode");
-    PrintIR(compiledMap);
 
     // TODO: Fix VerifyCompiledOutput --- types don't match for booleans
     PrintCompiledOutput(map, compiledMap, signal, "vector BinaryPredicateNode");
@@ -557,7 +544,6 @@ void TestReorderDataNode1()
 
     size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
-    // auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputShape, outputShape);
     auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
@@ -600,6 +586,46 @@ void TestReorderDataNode2()
     size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
     auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout, std::vector<int>{ 2, 0, 1 });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    std::vector<ElementType> input(inputSize);
+    FillVector(input, 1.0f);
+    std::cout << "Input:\n"
+              << input << std::endl;
+
+    // compare output
+    std::vector<std::vector<ElementType>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, "ReorderDataNode");
+}
+
+void TestReorderDataNode3()
+{
+    using ElementType = float;
+    int numRows = 4;
+    int numColumns = 5;
+    int numChannels = 2;
+    int padding = 1;
+    model::Model model;
+    model::PortMemoryLayout inputLayout(model::MemoryShape{ numRows, numColumns, numChannels }, model::MemoryShape{ padding, padding, 0 }); // Default order: 0, 1, 2 == rows, columns, channels
+    model::PortMemoryLayout outputLayout(model::MemoryShape{ numRows, numColumns, numChannels }, model::DimensionOrder{ 2, 0, 1 }); // Transform to order (channels, rows, cols) and remove padding
+
+    //        [    (1,2)   (3,4)   (5,6)   (7,8)   9,10) ]
+    // Input: [  (11,12) (13,14) (15,16) (17,18) (19,20) ]
+    //        [  (21,22) (23,24) (25,26) (27,28) (29,30) ]
+    //        [  (31,32) (33,34) (35,36) (37,38) (39,40) ]
+    //
+    // = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 ... 40
+    //
+    //         [ 13 15 17 ]   [ 14 16 18 ]
+    // Output: [ 23 25 27 ]   [ 24 26 28 ]
+    //
+    // = 13 15 17 23 25 27 14 16 18 24 26 28
+
+    size_t inputSize = inputLayout.GetMemorySize();
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -742,7 +768,6 @@ void TestCompilableAccumulatorNodeFunction()
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    PrintIR(compiledMap);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -879,7 +904,6 @@ void TestFloatNode()
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    PrintIR(compiledMap);
 
     // compare output
     std::vector<std::vector<float>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -960,7 +984,6 @@ void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas)
     settings.compilerSettings.useBlas = useBlas;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
 
     // compare output
     std::vector<ValueType> matrixVals(m * n);
@@ -982,20 +1005,57 @@ void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
     int lda = k;
     int ldb = n;
     int ldc = n;
+
     auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, k, lda, matrixBNode->output, ldb, ldc);
 
     auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
-    model::MapCompilerOptions settings;
-    settings.compilerSettings.useBlas = useBlas;
-    model::IRMapCompiler compiler(settings);
-    auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
 
     // compare output
     std::vector<ValueType> matrixAVals(m * k);
     FillVector(matrixAVals);
     std::vector<std::vector<ValueType>> signal = { matrixAVals };
+
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.useBlas = useBlas;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
     VerifyCompiledOutput(map, compiledMap, signal, "MatrixMatrixMultiplyNode");
+}
+
+void TestOrderedMatrixMatrixMultiplyNode(int m, int n, int k, bool transposeA, bool transposeB, bool transposeC, bool useBlas)
+{
+    using ValueType = float;
+
+    auto orderA = transposeA ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto orderB = transposeB ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto orderC = transposeC ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
+    auto outputLayout = model::PortMemoryLayout( model::MemoryShape{ m, n } ).ReorderedCopy(orderC);
+
+    model::Model model;
+    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(model::MemoryShape{ m, k });
+    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, orderA);
+
+    std::vector<ValueType> matrixBVals(k * n);
+    FillVector(matrixBVals);
+    auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals, model::MemoryShape{ k, n });
+    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(matrixBNode->output, orderB);
+
+    auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode->output, reorderedMatrixBNode->output, outputLayout);
+
+    auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
+
+    // compare output
+    std::vector<ValueType> matrixAVals(m * k);
+    FillVector(matrixAVals);
+    std::vector<std::vector<ValueType>> signal = { matrixAVals };
+
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.useBlas = useBlas;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    VerifyCompiledOutput(map, compiledMap, signal, "OrderedMatrixMatrixMultiplyNode");
 }
 
 // C callback (called by emitted code)
@@ -1098,7 +1158,6 @@ void TestCompilableFFTNode()
     model::MapCompilerOptions settings;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
     // compiledMap.WriteCode("FFTNode.ll", emitters::ModuleOutputFormat::ir);
 
     // compare output
@@ -1210,7 +1269,6 @@ void VerifyLayerMap(const ell::model::Map& map, const ell::model::Node* computeN
     settings.compilerSettings.useBlas = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
 
     // compare output
     VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
@@ -1371,9 +1429,9 @@ void TestNeuralNetworkPredictorNode3()
     typename NeuralNetworkPredictor<ElementType>::Layers layers;
 
     size_t imageSize = 3;
-    size_t numChannels = 2;
+    size_t numChannels = 1;
     size_t k = 3;
-    size_t numFilters = 2;
+    size_t numFilters = 1;
     size_t padding = 1;
     size_t stride = 1;
 
@@ -1392,7 +1450,6 @@ void TestNeuralNetworkPredictorNode3()
     ConvolutionalParameters convolutionalParams{ k, stride, convolutionMethod, numFilters };
     TensorType convWeights(numFilters * k, k, numChannels);
     FillTensor(convWeights);
-    // convWeights.Fill(1);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights)));
 
     NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
@@ -1407,7 +1464,6 @@ void TestNeuralNetworkPredictorNode3()
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
 
     // compare output
     const auto inputSize = imageSize * imageSize * numChannels;
@@ -1474,7 +1530,6 @@ void TestNeuralNetworkPredictorNode4()
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
 
     // compare output
     const auto inputSize = imageSize * imageSize * numChannels;
@@ -1557,7 +1612,6 @@ void TestNeuralNetworkPredictorNode5()
     settings.compilerSettings.useBlas = true; // !!! if BLAS is off, this fails
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
 
     // Create an input vector
     std::vector<ElementType> input(w * w * d);
@@ -1653,7 +1707,6 @@ void TestNeuralNetworkPredictorNode6()
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
 
     // compare output
     std::vector<std::vector<double>> signal = { input };
@@ -1825,7 +1878,6 @@ void TestNeuralNetworkPredictorNode7()
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
 
     // compare output
     double epsilon = 0.0001;
@@ -1870,7 +1922,6 @@ void TestInputLayerNode(size_t outputPadding)
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
 
     // compare output
     std::vector<std::vector<ElementType>> signal = { input };

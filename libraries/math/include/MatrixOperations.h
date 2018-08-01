@@ -285,13 +285,14 @@ namespace math
     /// <typeparam name="ElementType"> Matrix element type. </typeparam>
     /// <typeparam name="layoutA"> Matrix layout of first matrix. </typeparam>
     /// <typeparam name="layoutB"> Matrix layout of second matrix. </typeparam>
+    /// <typeparam name="layoutC"> Matrix layout of result matrix. </typeparam>
     /// <param name="scalarA"> The scalar that multiplies the first matrix. </param>
     /// <param name="matrixA"> The first matrix. </param>
     /// <param name="matrixB"> The second matrix. </param>
     /// <param name="scalarC"> The scalar that multiplies the third matrix. </param>
     /// <param name="matrixC"> A third matrix, multiplied by scalarC and used to store the result. </param>
-    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
-    void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarC, MatrixReference<ElementType, layoutA> matrixC);
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB, MatrixLayout layoutC>
+    void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarC, MatrixReference<ElementType, layoutC> matrixC);
 
     /// <summary> Matrix matrix element wise multiplication, matrixC = matrixA .* matrixB. </summary>
     ///
@@ -353,8 +354,8 @@ namespace math
             template <typename ElementType, MatrixLayout layout>
             static void MultiplyScaleAddUpdate(ElementType scalarA, ConstRowVectorReference<ElementType> vectorA, ConstMatrixReference<ElementType, layout> matrix, ElementType scalarB, RowVectorReference<ElementType> vectorB);
 
-            template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
-            static void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarC, MatrixReference<ElementType, layoutA> matrixC);
+            template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB, MatrixLayout layoutC>
+            static void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarC, MatrixReference<ElementType, layoutC> matrixC);
         };
 
 #ifdef USE_BLAS
@@ -369,8 +370,8 @@ namespace math
             template <typename ElementType, MatrixLayout layout>
             static void MultiplyScaleAddUpdate(ElementType scalarA, ConstRowVectorReference<ElementType> vectorA, const ConstMatrixReference<ElementType, layout> matrix, ElementType scalarB, RowVectorReference<ElementType> vectorB);
 
-            template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
-            static void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarC, MatrixReference<ElementType, layoutA> matrixC);
+            template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB, MatrixLayout layoutC>
+            static void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarC, MatrixReference<ElementType, layoutC> matrixC);
         };
 
 #else

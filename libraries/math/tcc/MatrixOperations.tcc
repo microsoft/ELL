@@ -578,8 +578,8 @@ namespace math
         Internal::MatrixOperations<implementation>::MultiplyScaleAddUpdate(scalarA, vectorA, matrix, scalarB, vectorB);
     }
 
-    template <ImplementationType implementation, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
-    void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarC, MatrixReference<ElementType, layoutA> matrixC)
+    template <ImplementationType implementation, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB, MatrixLayout layoutC>
+    void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarC, MatrixReference<ElementType, layoutC> matrixC)
     {
         DEBUG_CHECK_SIZES(matrixA.NumColumns() != matrixB.NumRows() || matrixA.NumRows() != matrixC.NumRows() || matrixB.NumColumns() != matrixC.NumColumns(), "Incompatible matrix sizes."); 
 
@@ -653,8 +653,8 @@ namespace math
             MultiplyScaleAddUpdate(scalarA, matrix.Transpose(), vectorA.Transpose(), scalarB, vectorB.Transpose());
         }
 
-        template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
-        void MatrixOperations<ImplementationType::native>::MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarB, MatrixReference<ElementType, layoutA> matrixC)
+        template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB, MatrixLayout layoutC>
+        void MatrixOperations<ImplementationType::native>::MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarB, MatrixReference<ElementType, layoutC> matrixC)
         {
             for (size_t i = 0; i < matrixA.NumRows(); ++i)
             {
@@ -683,17 +683,14 @@ namespace math
             MultiplyScaleAddUpdate(scalarA, matrix.Transpose(), vectorA.Transpose(), scalarB, vectorB.Transpose());
         }
 
-        template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
-        void MatrixOperations<ImplementationType::openBlas>::MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarB, MatrixReference<ElementType, layoutA> matrixC)
+        template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB, MatrixLayout layoutC>
+        void MatrixOperations<ImplementationType::openBlas>::MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarB, MatrixReference<ElementType, layoutC> matrixC)
         {
-            MatrixLayout order = matrixA.GetLayout();
-            MatrixTranspose transposeB = MatrixTranspose::noTranspose;
-            if (matrixA.GetLayout() != matrixB.GetLayout())
-            {
-                transposeB = MatrixTranspose::transpose;
-            }
+            MatrixLayout order = matrixC.GetLayout();
+            MatrixTranspose transposeA = matrixA.GetLayout() == order ? MatrixTranspose::noTranspose : MatrixTranspose::transpose;
+            MatrixTranspose transposeB = matrixB.GetLayout() == order ? MatrixTranspose::noTranspose : MatrixTranspose::transpose;
 
-            Blas::Gemm(order, MatrixTranspose::noTranspose, transposeB, static_cast<int>(matrixA.NumRows()), static_cast<int>(matrixB.NumColumns()), static_cast<int>(matrixA.NumColumns()), scalarA,
+            Blas::Gemm(order, transposeA, transposeB, static_cast<int>(matrixA.NumRows()), static_cast<int>(matrixB.NumColumns()), static_cast<int>(matrixA.NumColumns()), scalarA,
                 matrixA.GetConstDataPointer(), static_cast<int>(matrixA.GetIncrement()), matrixB.GetConstDataPointer(), static_cast<int>(matrixB.GetIncrement()), scalarB,
                 matrixC.GetDataPointer(), static_cast<int>(matrixC.GetIncrement()));
         }

@@ -54,11 +54,31 @@ void TestIRCompiler()
     TestLinearPredictor<float>();
     // TestMultiplexer(); // FAILS -- crash
     // TestForest(); // FAILS -- crash
-
     TestMatrixVectorMultiplyNode(10, 5, true);
     TestMatrixVectorMultiplyNode(10, 5, false);
     TestMatrixMatrixMultiplyNode(4, 5, 6, true);
     TestMatrixMatrixMultiplyNode(4, 5, 6, false);
+
+    // Using BLAS
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, false, false, true);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, false, false, true);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, true, false, true);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, true, false, true);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, false, true, true);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, false, true, true);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, true, true, true);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, true, true, true);
+    
+    // Not using BLAS
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, false, false, false);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, false, false, false);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, true, false, false);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, true, false, false);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, false, true, false);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, false, true, false);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, true, true, false);
+    TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, true, true, false);
+    
     // TestMatrixMatrixMultiplyNode(15, 25600, 27, false); // Fails due to numerical  issues
 
     TestCompilableScalarOutputNode();
@@ -82,6 +102,7 @@ void TestIRCompiler()
     TestCompilableTypeCastNode(10);
     TestReorderDataNode1();
     TestReorderDataNode2();
+    TestReorderDataNode3();
     TestReceptiveFieldMatrixNode(1, true); // new version
     TestReceptiveFieldMatrixNode(1, false); // old (slow) version
     TestReceptiveFieldMatrixNode(2, true); // new version

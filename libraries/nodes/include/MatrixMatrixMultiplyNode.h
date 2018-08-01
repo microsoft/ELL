@@ -20,8 +20,10 @@
 #include "Node.h"
 #include "OutputPort.h"
 #include "PortElements.h"
+#include "PortMemoryLayout.h"
 
 // utilities
+#include "ArchiveVersion.h"
 #include "Exception.h"
 #include "IArchivable.h"
 #include "TypeName.h"
@@ -53,7 +55,20 @@ namespace nodes
         ///
         /// <param name="input1"> The left-hand input of the matrix multiplication, a row-major matrix of size m x k.  </param>
         /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
-        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, size_t m, size_t n, size_t k, size_t matrix1Stride, const model::PortElements<ValueType>& input2, size_t matrix2Stride, size_t outputMatrixStride);
+        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input1"> The left-hand input of the matrix multiplication, a row-major matrix of size m x k.  </param>
+        /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
+        /// <param name="outputMemoryLayout"> The output memory layout to use. </param>
+        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, const model::PortMemoryLayout& outputMemoryLayout);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input1"> The left-hand input of the matrix multiplication, a row-major matrix of size m x k.  </param>
+        /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
+        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, int m, int n, int k, int matrix1Stride, const model::PortElements<ValueType>& input2, int matrix2Stride, int outputMatrixStride);
 
         /// <summary> Constructor. </summary>
         ///
@@ -61,7 +76,16 @@ namespace nodes
         /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
         /// <param name="transpose1"> If true, transpose the left-hand input matrix. </param>
         /// <param name="transpose2"> If true, transpose the right-hand input matrix. </param>
-        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, size_t m, size_t n, size_t k, size_t matrix1Stride, bool transpose1, const model::PortElements<ValueType>& input2, size_t matrix2Stride, bool transpose2, size_t outputMatrixStride);
+        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::PortElements<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input1"> The left-hand input of the matrix multiplication, a row-major matrix of size m x k.  </param>
+        /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
+        /// <param name="transpose1"> If true, transpose the left-hand input matrix. </param>
+        /// <param name="transpose2"> If true, transpose the right-hand input matrix. </param>
+        /// <param name="transposeOutput"> If true, transpose the output matrix. </param>
+        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::PortElements<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride, bool transposeOutput);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -79,6 +103,8 @@ namespace nodes
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
         bool HasState() const override { return true; } // stored state:  m, n, k, lda, ldb, ldc, transpose
@@ -93,9 +119,9 @@ namespace nodes
 
         // Matrix dimensions
         // Matrix 1 is MxK, Matrix 2 is KxN, Output is MxN
-        size_t _m, _n, _k;
-        size_t _lda, _ldb, _ldc;
-        bool _transpose1, _transpose2;
+        int _m = 0, _n = 0, _k = 0;
+        int _lda = 0, _ldb = 0, _ldc = 0;
+        bool _transpose1 = false, _transpose2 = false, _transposeOutput = false;
     };
 }
 }

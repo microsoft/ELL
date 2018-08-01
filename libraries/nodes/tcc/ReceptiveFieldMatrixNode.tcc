@@ -29,7 +29,7 @@ namespace nodes
         // Functions
         //
 
-        // Note: this function is inline to supress a compiler warning about it being unneeded
+        // Note: this function is inline to suppress a compiler warning about it being unneeded
         inline llvm::Value* GetValueFromVolume(emitters::IRFunctionEmitter& function,
                                         llvm::Value* inputVolume,
                                         const model::PortMemoryLayout& inputLayout,
@@ -118,9 +118,9 @@ namespace nodes
                                          llvm::Value* outputMatrix)
         {
             // Model parameters
-            const auto inputHeight = inputLayout.GetActiveSize(0);
-            const auto inputWidth = inputLayout.GetActiveSize(1);
-            const auto inputDepth = inputLayout.GetActiveSize(2);
+            const auto inputHeight = inputLayout.GetLogicalDimensionActiveSize(0);
+            const auto inputWidth = inputLayout.GetLogicalDimensionActiveSize(1);
+            const auto inputDepth = inputLayout.GetLogicalDimensionActiveSize(2);
             const auto fieldVolumeSize = filterWidth * filterWidth * inputDepth;
             const auto numOutputColumns = static_cast<int>(outputWidth * outputHeight);
 
@@ -319,7 +319,7 @@ namespace nodes
 
     template <typename ValueType>
     ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, int filterWidth, int stride, int convolutionPadding, std::array<int, 3> dataOrder, int outputWidth, int outputHeight)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, filterWidth * filterWidth * inputMemoryLayout.GetActiveSize(2) * outputWidth * outputHeight), _inputMemoryLayout(inputMemoryLayout), _filterWidth(filterWidth), _stride(stride), _convolutionPadding(convolutionPadding), _dataOrder(dataOrder), _outputWidth(outputWidth), _outputHeight(outputHeight)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, model::PortMemoryLayout(model::MemoryShape{ outputWidth * outputHeight, filterWidth * filterWidth * inputMemoryLayout.GetLogicalDimensionActiveSize(2)}, model::DimensionOrder{ dataOrder }) ), _inputMemoryLayout(inputMemoryLayout), _filterWidth(filterWidth), _stride(stride), _convolutionPadding(convolutionPadding), _dataOrder(dataOrder), _outputWidth(outputWidth), _outputHeight(outputHeight)
     {
         if (inputMemoryLayout.NumDimensions() != 3)
         {

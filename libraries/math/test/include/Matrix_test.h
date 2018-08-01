@@ -179,7 +179,7 @@ void TestMatrixVectorMultiplyScaleAddUpdate();
 template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
 void TestVectorMatrixMultiplyScaleAddUpdate();
 
-template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
+template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::MatrixLayout layout3, math::ImplementationType implementation>
 void TestMatrixMatrixMultiplyScaleAddUpdate();
 
 template <typename ElementType, math::MatrixLayout layout>

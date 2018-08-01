@@ -12,6 +12,9 @@
 #include "ReceptiveFieldMatrixNode.h"
 #include "ReorderDataNode.h"
 
+// utilities
+#include "Unused.h"
+
 namespace ell
 {
 namespace nodes
@@ -115,52 +118,67 @@ namespace nodes
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
 
         // Needs (channel, row, column) order and no data padding
-        const auto m = _filterWeights.NumRows();
+        const auto m = static_cast<int>(_filterWeights.NumRows());
         const auto n = outputRows;
-        const auto k = _filterWeights.NumColumns();
-        const auto lda = _filterWeights.NumColumns();
+        const auto k = static_cast<int>(_filterWeights.NumColumns());
+        const auto lda = k;
         const auto ldb = n;
-        const auto ldc = n;
-        const std::array<int, 3> rcdOrder = { 0, 1, 2 };
-        const std::array<int, 3> drcOrder = { 2, 0, 1 };
+        const auto ldc = m; // output is transposed, so ldc == m
+        const auto rcdOrder = utilities::RowMajorTensorOrder;
+        const auto drcOrder = utilities::ChannelMajorTensorOrder;
 
-        // Input data is in the canonical RCD order
+        // Input data is in the canonical row-major order
         // `dataOrder` is the order the we're going to generate the receptive field matrix from
         bool useNewMethod = (_stride == 1 && inputPadding == filterSize / 2);
         std::array<int, 3> dataOrder = useNewMethod ? drcOrder : rcdOrder;
         assert(outputPadding == 0 && "Unrolled convolution node output padding not supported yet");
 
-        // weights: numFilters x fieldVolumeSize == m x k
+        // weights: numFilters x fieldVolumeSize == m x k 
         // ShapedInput: fieldVolumeSize x outputRows == k x n
         // Matrix multiply output: numFilters x outputRows = m x n
 
         if (dataOrder == rcdOrder) // don't reorder input -- use old method
         {
             auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(newInput, inputLayout, filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
-            auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc);
+            auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
 
-            // Output of matrix multiply is in (f x h x w) order, need to transpose to the canonical (h x w x f) order
-            model::PortMemoryLayout outputShape(model::MemoryShape{ numFilters, outputImageHeight, outputImageWidth }, model::DimensionOrder{ { 2, 0, 1 } }); // Note: memory layout constructor takes the sizes in physical dimension order
-            model::PortMemoryLayout transposedOutputShape(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 }, model::DimensionOrder{ { 0, 1, 2 } });
-            auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape);
-            transformer.MapNodeOutput(this->output, reorderOutputNode->output);
+            if (outputPadding != 0)
+            {
+                // Add padding
+                model::PortMemoryLayout outputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters });
+                model::PortMemoryLayout paddedOutputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 });
+                auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputLayout, paddedOutputLayout);
+                transformer.MapNodeOutput(this->output, reorderOutputNode->output);
+            }
+            else
+            {
+                transformer.MapNodeOutput(this->output, matrixMultNode->output);
+            }
         }
-        else // reorder input to be channels x rows x columns (then we can use the 'new' receptive field matrix generation)
+        else // reorder input to be channels x rows x columns (drc) (then we can use the 'new' receptive field matrix generation)
         {
             assert(dataOrder == drcOrder);
-            // Remove padding and transpose to DRC order
-            model::PortMemoryLayout inputShape(model::MemoryShape{ inputHeight, inputWidth, inputDepth }, model::MemoryShape{ inputPadding, inputPadding, 0 });
-            model::PortMemoryLayout transposedInputShape(model::MemoryShape{ inputDepth, inputHeight, inputWidth },  model::DimensionOrder{ 2, 0, 1 });
-            auto reorderInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, inputShape, transposedInputShape);
 
-            auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(reorderInputNode->output, inputLayout, _filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
-            auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc);
+            // Remove padding and transpose to channel-major order
+            model::PortMemoryLayout inputLayout(model::MemoryShape{ inputHeight, inputWidth, inputDepth }, model::MemoryShape{ inputPadding, inputPadding, 0 });
+            model::PortMemoryLayout transposedInputLayout(model::MemoryShape{ inputDepth, inputHeight, inputWidth }, model::DimensionOrder{ 2, 0, 1 }); // Note: memory layout constructor takes the sizes in physical dimension order
+            auto reorderInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, inputLayout, transposedInputLayout);
 
-            // Output of matrix multiply is in (f x h x w) order, need to transpose to the canonical (h x w x f) order
-            model::PortMemoryLayout outputShape(model::MemoryShape{ numFilters, outputImageHeight, outputImageWidth }, model::DimensionOrder{ { 2, 0, 1 } }); // Note: memory layout constructor takes the sizes in physical dimension order
-            model::PortMemoryLayout transposedOutputShape(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 }, model::DimensionOrder{ { 0, 1, 2 } });
-            auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape);
-            transformer.MapNodeOutput(this->output, reorderOutputNode->output);
+            auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(reorderInputNode->output, reorderInputNode->GetOutputMemoryLayout(), _filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
+            auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
+
+            if (outputPadding != 0)
+            {
+                // Add padding
+                model::PortMemoryLayout outputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters });
+                model::PortMemoryLayout paddedOutputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 });
+                auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputLayout, paddedOutputLayout);
+                transformer.MapNodeOutput(this->output, reorderOutputNode->output);
+            }
+            else
+            {
+                transformer.MapNodeOutput(this->output, matrixMultNode->output);
+            }
         }
         return true;
     }
@@ -173,6 +191,8 @@ namespace nodes
 
         // Input / output memory layouts
         const auto& inputLayout = this->GetInputMemoryLayout();
+        const auto& inputOffset = inputLayout.GetOffset();
+        UNUSED(inputOffset);
 
         const auto& outputLayout = this->GetOutputMemoryLayout();
         const auto numFilters = outputLayout.GetActiveSize(2);
@@ -187,17 +207,16 @@ namespace nodes
         auto pVarWeights = function.GetModule().Variables().AddVariable<emitters::LiteralVectorVariable<ValueType>>(_filterWeights.ToArray());
         auto weights = function.GetModule().EnsureEmitted(*pVarWeights);
 
-        // Calculate input dimension parameters
+        // Calculate output dimension parameters
         const int outputRows = outputSize[0];
         const int outputColumns = outputSize[1];
         const int outputElements = outputRows * outputColumns;
         const int depth = outputSize[2];
-        //const int fieldSize = _filterSize;
         const int fieldArea = _filterSize * _filterSize;
 
         // Pointers to beginning of 'active' area of input and output
         const auto outputBufferOffset = (outputIncrement[0] * outputOffset[0]) + (outputIncrement[1] * outputOffset[1]) + (outputIncrement[2] * outputOffset[2]);
-        auto inputBuffer = function.PointerOffset(pInput, 0);
+        auto inputBuffer = function.PointerOffset(pInput, 0); // we want the input buffer to include padding, so we don't offset it by the padding amount
         auto outputBuffer = function.PointerOffset(pOutput, outputBufferOffset);
 
         // Create temporary space for a matrix which is (output rows * output columns, _filterSize * _filterSize)
@@ -206,9 +225,7 @@ namespace nodes
         // Loop over all input channels.
         // The large capture parameters for the lambda are to work around a bug in gcc 5.4
         function.For(numFilters, [this, inputBuffer, outputBuffer, reshapedInputMatrix, inputIncrement, outputIncrement, weights, fieldArea, outputRows,
-                                  outputColumns, outputElements, depth]
-            (emitters::IRFunctionEmitter& function, llvm::Value* fValue) 
-        {
+                                  outputColumns, outputElements, depth] (emitters::IRFunctionEmitter& function, llvm::Value* fValue) {
             auto f = function.LocalScalar(fValue);
 
             llvm::Value* inputPtr = function.PointerOffset(inputBuffer, f);
@@ -221,13 +238,10 @@ namespace nodes
 
             // ReceptiveFieldToRows for this channel/filter.
             // Iterate over all h * w locations in the output image
-            function.For(outputRows, [&] (emitters::IRFunctionEmitter& function, llvm::Value* outputImageRowValue) 
-            {
+            function.For(outputRows, [&] (emitters::IRFunctionEmitter& function, llvm::Value* outputImageRowValue) {
                 auto outputImageRow = function.LocalScalar(outputImageRowValue);
                 auto inputRow = outputImageRow * _stride;
-                function.For(outputColumns, [&]
-                    (emitters::IRFunctionEmitter& function, llvm::Value* outputImageColumnValue)
-                {
+                function.For(outputColumns, [&](emitters::IRFunctionEmitter& function, llvm::Value* outputImageColumnValue) {
                     auto outputImageColumn = function.LocalScalar(outputImageColumnValue);
                     auto inputColumn = outputImageColumn * _stride;
                     auto fieldOffset = (outputImageRow * shapedInputRowIncrement) + (outputImageColumn * fieldArea);

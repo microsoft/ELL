@@ -32,6 +32,10 @@ namespace nodes
         : CompilableNode({}, { &_output }), _output(this, defaultOutputPortName, shape), _values(values){};
 
     template <typename ValueType>
+    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values, const model::PortMemoryLayout& layout)
+        : CompilableNode({}, { &_output }), _output(this, defaultOutputPortName, layout), _values(values){};
+
+    template <typename ValueType>
     void ConstantNode<ValueType>::Compute() const
     {
         _output.SetOutput(_values);
@@ -40,7 +44,7 @@ namespace nodes
     template <typename ValueType>
     void ConstantNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
+        auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values, _output.GetMemoryLayout().GetActiveSize());
         transformer.MapNodeOutput(output, newNode->output);
     }
 

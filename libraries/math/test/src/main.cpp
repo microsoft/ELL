@@ -118,6 +118,7 @@ void RunTripleLayoutMatrixImplementationTests()
     TestMatrixScaleAddSetScalarMatrixOne<ElementType, layout1, layout2, layout3, implementation>();
     TestMatrixScaleAddSetOneMatrixScalar<ElementType, layout1, layout2, layout3, implementation>();
     TestMatrixScaleAddSetScalarMatrixScalar<ElementType, layout1, layout2, layout3,  implementation>();
+    TestMatrixMatrixMultiplyScaleAddUpdate<ElementType, layout1, layout2, layout3, implementation>();
 }
 
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
@@ -133,7 +134,6 @@ void RunDoubleLayoutMatrixImplementationTests()
     TestMatrixScaleAddUpdateScalarMatrixOne<ElementType, layout1, layout2, implementation>();
     TestMatrixScaleAddUpdateOneMatrixScalar<ElementType, layout1, layout2, implementation>();
     TestMatrixScaleAddUpdateScalarMatrixScalar<ElementType, layout1, layout2, implementation>();
-    TestMatrixMatrixMultiplyScaleAddUpdate<ElementType, layout1, layout2, implementation>();
 
     RunTripleLayoutMatrixImplementationTests<ElementType, layout1, layout2, layout2, implementation>();
     RunTripleLayoutMatrixImplementationTests<ElementType, layout1, layout2, math::TransposeMatrixLayout<layout2>::value, implementation>();

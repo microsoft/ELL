@@ -67,11 +67,14 @@ namespace emitters
         template <typename ValueType>
         llvm::Function* EmitGEMMFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
         {
+            const auto CblasNoTrans = 111;
+            const auto CblasTrans = 112;
+
             auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);
             auto arguments = function.Arguments().begin();
             auto order = &(*arguments++);
-            auto transposeA = &(*arguments++);
-            auto transposeB = &(*arguments++);
+            auto transposeA = function.LocalScalar(&(*arguments++)) == CblasTrans;
+            auto transposeB = function.LocalScalar(&(*arguments++)) == CblasTrans;
             auto m = function.LocalScalar(&(*arguments++));
             auto n = function.LocalScalar(&(*arguments++));
             auto k = function.LocalScalar(&(*arguments++));
@@ -83,7 +86,7 @@ namespace emitters
             auto beta = function.LocalScalar(&(*arguments++));
             auto C = function.LocalArray(&(*arguments++));
             auto ldc = function.LocalScalar(&(*arguments++));
-            UNUSED(order, transposeA, transposeB, alpha, beta);
+            UNUSED(CblasNoTrans, order, alpha, beta);
 
             // C = A x B, A: mxk, B: kxn, C: mxn
             // A': kxm, B': nxk
@@ -98,35 +101,16 @@ namespace emitters
             auto count = ldc * m;
             function.MemorySet<ValueType>(C, function.Literal<int>(0), function.Literal<uint8_t>(0), count);
 
-            // TODO: deal with transposes
-
             // Accumulate partial values into output
-            function.For(m, [A, B, C, lda, ldb, ldc, n, k](IRFunctionEmitter& function, llvm::Value* i) {
-                auto iIndex = function.LocalScalar(i);
-                function.For(k, [iIndex, A, B, C, lda, ldb, ldc, n](IRFunctionEmitter& function, llvm::Value* k) {
-                    auto kIndex = function.LocalScalar(k);
-                    function.For(n, [iIndex, kIndex, A, B, C, lda, ldb, ldc](IRFunctionEmitter& function, llvm::Value* j) {
-                        auto jIndex = function.LocalScalar(j);
-                        auto aIndex = (iIndex * lda) + kIndex;
-                        auto bIndex = (kIndex * ldb) + jIndex;
-                        // if (transposeA)
-                        //     aIndex = function.Operator(plus, function.Operator(times, kIndex, function.Literal(lda)), iIndex);
-                        // else
-                        //     aIndex = function.Operator(plus, function.Operator(times, iIndex, function.Literal(lda)), kIndex);
+            function.For(m, [A, B, C, lda, ldb, ldc, transposeA, transposeB, n, k](IRFunctionEmitter& function, auto i) {
+                function.For(k, [i, A, B, C, lda, ldb, ldc, transposeA, transposeB, n](IRFunctionEmitter& function, auto k) {
+                    function.For(n, [i, k, A, B, C, lda, ldb, ldc, transposeA, transposeB](IRFunctionEmitter& function, auto j) {
+                        auto aOffset = function.LocalScalar(function.Select(transposeA, (k * lda) + i, (i * lda) + k));
+                        auto bOffset = function.LocalScalar(function.Select(transposeB, (j * ldb) + k, (k * ldb) + j));
+                        auto cOffset = (i * ldc) + j;
 
-                        // if (transposeB)
-                        //     bIndex = function.Operator(plus, function.Operator(times, jIndex, function.Literal(ldb)), kIndex);
-                        // else
-                        //     bIndex = function.Operator(plus, function.Operator(times, kIndex, function.Literal(ldb)), jIndex);
-
-                        auto aValue = A[aIndex];
-                        auto bValue = B[bIndex];
-                        auto value = aValue * bValue;
-                        // store output in C[m,n]
-                        auto cIndex = (iIndex * ldc) + jIndex;
-                        auto oldVal = C[cIndex];
-                        auto sum = oldVal + value;
-                        C[cIndex] = sum;
+                        // accumulate product in C[i, j]
+                        C[cOffset] = C[cOffset] + (A[aOffset] * B[bOffset]);
                     });
                 });
             });
