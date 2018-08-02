@@ -78,6 +78,12 @@ namespace nodes
         BinaryFunctionNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2,
                            const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding = 0);
 
+        /// <summary> Gets information about the input memory layout </summary>
+        const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputLayout; }
+
+        /// <summary> Gets information about the input memory layout </summary>
+        model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -90,6 +96,15 @@ namespace nodes
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         void Copy(model::ModelTransformer& transformer) const override;
+
+        /// <summary> Returns true if the node can accept input with this memory layout order, else false </summary>
+        ///
+        /// <param name="order"> The memory layout order for all the input ports </summary>
+        /// <returns> If the node can accept the input memory layout order, true, else false </returns>
+        bool CanAcceptInputLayout(const utilities::DimensionOrder& order) const override
+        {
+            return GetInputMemoryLayout().GetLogicalDimensionOrder() == order;
+        }
 
     protected:
         void Compute() const override;

@@ -12,6 +12,7 @@
 #include "IArchivable.h"
 
 // stl
+#include <algorithm>
 #include <array>
 #include <initializer_list>
 #include <string>
@@ -40,12 +41,12 @@ namespace utilities
 
         /// <summary> Get the number of dimensions. </summary>
         int NumDimensions() const { return static_cast<int>(_data.size()); }
-            
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "DimensionVector"; }
-    
+
     protected:
         DimensionVector() = default;
         DimensionVector(const std::vector<int>& elements)
@@ -59,7 +60,7 @@ namespace utilities
         std::vector<int> _data;
     };
 
-    /// <summary> A vector of dimension indices representing the ordering of the logical dimensions (e.g., 'row', 'column' in memory. </summary>
+    /// <summary> A vector of dimension indices representing the ordering of the logical dimensions (e.g., 'row', 'column') in memory. </summary>
     class DimensionOrder : public DimensionVector
     {
     public:
@@ -72,19 +73,19 @@ namespace utilities
 
         /// <summary> Constructor from a vector of integers. </summary>
         ///
-        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for 
+        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for
         ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major). </param>
         DimensionOrder(const std::vector<int>& order);
-        
+
         /// <summary> Constructor from a list of integers </summary>
         ///
-        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for 
+        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for
         ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major. </param>
         DimensionOrder(const std::initializer_list<int>& order);
 
         /// <summary> Constructor from an array of integers. </summary>
         ///
-        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for 
+        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for
         ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major). </param>
         template <size_t N>
         DimensionOrder(const std::array<int, N>& order) : DimensionOrder({order.begin(), order.end()}) {}
@@ -131,11 +132,11 @@ namespace utilities
         /// <summary> Get the total number of elements. </summary>
         int NumElements() const;
 
-        /// <summary> 
-        /// Resize to a different number of dimensions. 
+        /// <summary>
+        /// Resize to a different number of dimensions.
         /// If the new dimensionality is greater than the existing dimensionality, '1' will be appended to the front.
         /// For instance, resizing the shape (3, 4) to have 4 dimensions will result in the shape (1, 1, 3, 4).
-        /// If the new dimensionality is less than the existing dimensionality, the leading dimensions will be squashed 
+        /// If the new dimensionality is less than the existing dimensionality, the leading dimensions will be squashed
         /// together. For instance, resizing the shape (1, 2, 3, 4) to 2 dimensions will result in the shape (6, 4)
         /// </summary>
         void Resize(int numDimensions);
@@ -188,14 +189,14 @@ namespace utilities
 
         /// <summary> Constructor from size only (no padding). </summary>
         ///
-        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions 
+        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions
         ///   (so, the first element is the size of the slowest-changing dimension, and the last element is the size of the
         ///   fastest-changing dimension). </param>
         MemoryLayout(const MemoryShape& physicalDimensionSize);
 
         /// <summary> Constructor from size and padding. </summary>
         ///
-        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions 
+        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions
         ///   (so, the first element is the size of the slowest-changing dimension, and the last element is the size of the
         ///   fastest-changing dimension). </param>
         /// <param name="physicalDimensionPadding"> The amount of padding to apply to the beginning and end of each dimension </param>
@@ -203,7 +204,7 @@ namespace utilities
 
         /// <summary> General constructor. </summary>
         ///
-        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions 
+        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions
         ///   (so, the first element is the size of the slowest-changing dimension, and the last element is the size of the
         ///   fastest-changing dimension). </param>
         /// <param name="physicalDimensionStride"> The extent of the allocated memory of the memory region. </param>
@@ -216,31 +217,31 @@ namespace utilities
 
         /// <summary> Constructor from size only (no padding). </summary>
         ///
-        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions 
+        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions
         ///   (so, the first element is the size of the slowest-changing dimension, and the last element is the size of the
         ///   fastest-changing dimension). </param>
-        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for 
+        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for
         ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major. </param>
         MemoryLayout(const MemoryShape& physicalDimensionSize, const DimensionOrder& order);
 
         /// <summary> Constructor from size and padding. </summary>
         ///
-        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions 
+        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions
         ///   (so, the first element is the size of the slowest-changing dimension, and the last element is the size of the
         ///   fastest-changing dimension). </param>
         /// <param name="physicalDimensionPadding"> The amount of padding to apply to the beginning and end of each dimension </param>
-        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for 
+        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for
         ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major. </param>
         MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionPadding, const DimensionOrder& order);
 
         /// <summary> General constructor. </summary>
         ///
-        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions 
+        /// <param name="physicalDimensionSize"> The extent of the active area of the memory region, expressed in physical dimensions
         ///   (so, the first element is the size of the slowest-changing dimension, and the last element is the size of the
         ///   fastest-changing dimension). </param>
         /// <param name="physicalDimensionStride"> The extent of the allocated memory of the memory region. </param>
         /// <param name="physicalDimensionOffset"> The offset into memory to the active area of the memory region. </param>
-        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for 
+        /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for
         ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major. </param>
         MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionStride, const MemoryShape& physicalDimensionOffset, const DimensionOrder& order);
 
@@ -329,7 +330,7 @@ namespace utilities
 
         /// <summary> Returns the number of total (active plus extra stride) elements in this memory layout </summary>
         ///
-        /// <returns> The number of elements </summary>
+        /// <returns> The number of elements </returns>
         size_t GetMemorySize() const;
 
         /// <summary> Gets the offset into memory for an entry </summary>
@@ -337,7 +338,7 @@ namespace utilities
         /// <param name="physicalCoordinates"> The coordinates of the entry </param>
         /// <returns> The offset to the entry (from the beginning of memory) </returns>
         size_t GetEntryOffset(const MemoryCoordinates& physicalCoordinates) const;
-        
+
         /// <summary> Transforms the given logic coordinates into a physical set of indices for the current layout. </summary>
         MemoryCoordinates GetPhysicalCoordinates(const MemoryCoordinates& logicalCoordinates) const;
 
@@ -385,20 +386,20 @@ namespace utilities
         /// <returns> The offset to the entry (from the beginning of memory) </returns>
         size_t GetLogicalEntryOffset(const MemoryCoordinates& logicalCoordinates) const;
 
-        /// <summary> Returns the ordering of the logical dimensions in memory (e.g., [0, 1] for 
-        ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major. </summary>        
+        /// <summary> Returns the ordering of the logical dimensions in memory (e.g., [0, 1] for
+        ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major. </summary>
         const DimensionOrder& GetLogicalDimensionOrder() const { return _dimensionOrder; }
 
         /// <summary> Transforms the given physical coordinates into a logical set of indices for the current layout. </summary>
         MemoryCoordinates GetLogicalCoordinates(const MemoryCoordinates& physicalCoordinates) const;
-        
+
         //
         // Converting between logical and physical dimensions
-        //        
+        //
 
         /// <summary> Returns the corresponding physical dimension for the given logical dimension. </summary>
         int GetPhysicalDimension(int logicalDimension) const;
-        
+
         /// <summary> Returns the corresponding logical dimension for the given physical dimension. </summary>
         int GetLogicalDimension(int physicalDimension) const;
 
@@ -444,10 +445,10 @@ namespace utilities
         MemoryShape _increment; // The distance in memory between adjacent elements for each dimension (computed from the above)
 
         // The memory order of the logical dimensions, encoded as a permutation of the physical order.
-        // So, [0, 1, 2] means the physical and logical order are the same. An order of [2, 0, 1] 
+        // So, [0, 1, 2] means the physical and logical order are the same. An order of [2, 0, 1]
         // means that physical dimension 2 is logically first. In other words, logical element (r, c, d)
         // would map to physical element (d, r, c)
-        DimensionOrder _dimensionOrder; 
+        DimensionOrder _dimensionOrder;
     };
 
     /// <summary> Checks if two dimension-order vectors are equal. </summary>

@@ -240,8 +240,17 @@ namespace nodes
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputLayout; }
         model::PortMemoryLayout GetOutputMemoryLayout() const;
 
+        /// <summary> Returns true if the node can accept input with this memory layout order, else false </summary>
+        ///
+        /// <param name="order"> The memory layout order for all the input ports </summary>
+        /// <returns> If the node can accept the input memory layout order, true, else false </returns>
+        bool CanAcceptInputLayout(const utilities::DimensionOrder& order) const override
+        {
+            return GetInputMemoryLayout().GetLogicalDimensionOrder() == order;
+        }
+
         size_t GetBroadcastDimension() const { return _broadcastDimension; }
-        size_t NumPrimaryInputDimensions() const { return _inputLayout.NumDimensions(); }
+        size_t NumPrimaryInputDimensions() const { return GetInputMemoryLayout().NumDimensions(); }
 
     protected:
         BroadcastFunctionNode(const std::vector<model::InputPortBase*>& inputs, const std::vector<model::OutputPortBase*>& outputs);

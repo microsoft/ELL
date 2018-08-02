@@ -45,12 +45,12 @@ namespace model
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="size"> The input shape </param>
+        /// <param name="shape"> The input node's output shape </param>
         InputNode(MemoryShape shape);
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="size"> The input memory layout </param>
+        /// <param name="layout"> The input node's output memory layout </param>
         InputNode(const PortMemoryLayout& layout);
 
         /// <summary> Sets the value output by this node </summary>

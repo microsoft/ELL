@@ -78,6 +78,16 @@ namespace model
         return _inputs[portIndex];
     }
 
+    bool Node::CanAcceptInputLayout(const utilities::DimensionOrder& order) const
+    {
+        return 
+            _inputs.empty() || 
+            std::all_of(_inputs.begin(), _inputs.end(), [&order](const auto port)
+            {
+                return port->GetMemoryLayout().GetLogicalDimensionOrder() == order; 
+            });
+    }
+
     OutputPortBase* Node::GetOutputPort(const std::string& portName)
     {
         for (auto port : _outputs)
@@ -110,6 +120,17 @@ namespace model
     const OutputPortBase* Node::GetOutputPort(size_t portIndex) const
     {
         return _outputs[portIndex];
+    }
+
+    bool Node::TrySetOutputLayout(const utilities::DimensionOrder& order)
+    {
+        for (auto port : _outputs)
+        {
+            auto oldLayout = port->GetMemoryLayout();
+            port->SetMemoryLayout(oldLayout.ReorderedCopy(order));
+        }
+
+        return true;
     }
 
     Port* Node::GetPort(const std::string& portName)

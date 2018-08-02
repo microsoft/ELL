@@ -226,7 +226,7 @@ namespace nodes
             });
         }
     }
-    
+
     template <typename ValueType>
     void ReorderDataNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {

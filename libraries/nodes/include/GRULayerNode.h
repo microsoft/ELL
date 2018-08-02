@@ -142,6 +142,15 @@ namespace nodes
         /// <returns> The layout of the output data. </returns>
         model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
 
+        /// <summary> Returns true if the node can accept input with this memory layout order, else false </summary>
+        ///
+        /// <param name="order"> The memory layout order for all the input ports </summary>
+        /// <returns> If the node can accept the input memory layout order, true, else false </returns>
+        bool CanAcceptInputLayout(const utilities::DimensionOrder& order) const override
+        {
+            return GetInputMemoryLayout().GetLogicalDimensionOrder() == order;
+        }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -170,7 +179,6 @@ namespace nodes
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
-
 
     private:
         // Input

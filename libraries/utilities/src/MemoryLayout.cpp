@@ -13,7 +13,6 @@
 #include "Unused.h"
 
 // stl
-#include <algorithm>
 #include <numeric>
 
 namespace ell
@@ -105,7 +104,7 @@ namespace utilities
     }
 
     int DimensionOrder::operator[](int index) const
-    { 
+    {
         return DimensionVector::operator[](index);
     }
 
@@ -281,7 +280,7 @@ namespace utilities
 
         return ReversePermute(physicalCoordinates, _dimensionOrder);
     }
-    
+
     MemoryShape MemoryLayout::GetLogicalDimensionActiveSize() const
     {
         return ReversePermute(_size, _dimensionOrder);
@@ -339,7 +338,7 @@ namespace utilities
     {
         if (!IsCanonicalOrder())
         {
-            throw LogicException(LogicExceptionErrors::notImplemented, "Not implemented... yet."); 
+            throw LogicException(LogicExceptionErrors::notImplemented, "Not implemented... yet.");
         }
         MemoryLayout result{ Permute(GetActiveSize(), newOrder), Permute(GetStride(), newOrder), Permute(GetOffset(), newOrder), newOrder };
         return result;

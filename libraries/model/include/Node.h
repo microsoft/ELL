@@ -10,13 +10,14 @@
 
 // utilities
 #include "IArchivable.h"
+#include "MemoryLayout.h"
 #include "PropertyBag.h"
 #include "UniqueId.h"
 
 // stl
+#include <ostream>
 #include <string>
 #include <vector>
-#include <ostream>
 
 namespace ell
 {
@@ -88,6 +89,12 @@ namespace model
         /// <returns> A pointer to the port </returns>
         const InputPortBase* GetInputPort(size_t portIndex) const;
 
+        /// <summary> Returns true if the node can accept input with this memory layout order, else false </summary>
+        ///
+        /// <param name="order"> The memory layout order for all the input ports </summary>
+        /// <returns> If the node can accept the input memory layout order, true, else false </returns>
+        virtual bool CanAcceptInputLayout(const utilities::DimensionOrder& order) const;
+
         /// <summary> Returns the output "ports" for this node </summary>
         ///
         /// <returns> The output "ports" for this node </returns>
@@ -116,6 +123,12 @@ namespace model
         /// <param name="portIndex"> The index of the port </param>
         /// <returns> A pointer to the port </returns>
         const OutputPortBase* GetOutputPort(size_t portIndex) const;
+
+        /// <summary> Attempts to set the memory layout order of all the output ports </summary>
+        ///
+        /// <param name="order"> The memory layout order to be applied to all the output ports </summary>
+        /// <returns> If the node supports the output memory layout order, true, else false </returns>
+        virtual bool TrySetOutputLayout(const utilities::DimensionOrder& order);
 
         /// <summary> Returns the named port </summary>
         ///
@@ -161,18 +174,18 @@ namespace model
         virtual void Compute() const = 0;
 
         /// <summary> Resets any state on the node, if any </summary>
-        virtual void Reset() { };
+        virtual void Reset() {}
 
         /// <summary> Get this object's metadata object. </summary>
         ///
         /// <returns> A reference to the PropertyBag containing the metadata for this object. </returns>
         utilities::PropertyBag& GetMetadata() { return _metadata; }
-        
+
         /// <summary> Get this object's metadata object. </summary>
         ///
         /// <returns> A const reference to the PropertyBag containing the metadata for this object. </returns>
         const utilities::PropertyBag& GetMetadata() const { return _metadata; }
-        
+
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
@@ -187,9 +200,9 @@ namespace model
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         // We're supplying a base implementation from WriteToArchive and ReadFromArchive, but also
         // declaring them as abstract so that subclasses need to implement this themselves.
-        void WriteToArchive(utilities::Archiver& archiver) const override = 0; 
+        void WriteToArchive(utilities::Archiver& archiver) const override = 0;
         void ReadFromArchive(utilities::Unarchiver& archiver) override = 0;
-        
+
     private:
         friend class Model;
         friend class ModelTransformer;

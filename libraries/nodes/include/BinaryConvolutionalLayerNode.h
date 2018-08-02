@@ -114,6 +114,25 @@ namespace nodes
         /// <summary> Gets information about the output memory layout </summary>
         model::PortMemoryLayout GetOutputMemoryLayout() const { return _outputMemoryLayout; }
 
+        /// <summary> Returns true if the node can accept input with this memory layout order, else false </summary>
+        ///
+        /// <param name="order"> The memory layout order for all the input ports </summary>
+        /// <returns> If the node can accept the input memory layout order, true, else false </returns>
+        bool CanAcceptInputLayout(const utilities::DimensionOrder& order) const override
+        {
+            return GetInputMemoryLayout().GetLogicalDimensionOrder() == order;
+        }
+
+        /// <summary> Attempts to set the memory layout order of all the output ports </summary>
+        ///
+        /// <param name="order"> The memory layout order to be applied to all the output ports </summary>
+        /// <returns> If the node supports the output memory layout order, true, else false </returns>
+        bool TrySetOutputLayout(const utilities::DimensionOrder& order) override
+        {
+            this->_outputMemoryLayout = this->_outputMemoryLayout.ReorderedCopy(order);
+            return true;
+        }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -196,6 +215,15 @@ namespace nodes
 
         /// <summary> Gets information about the output memory layout </summary>
         model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
+
+        /// <summary> Returns true if the node can accept input with this memory layout order, else false </summary>
+        ///
+        /// <param name="order"> The memory layout order for all the input ports </summary>
+        /// <returns> If the node can accept the input memory layout order, true, else false </returns>
+        bool CanAcceptInputLayout(const utilities::DimensionOrder& order) const override
+        {
+            return GetInputMemoryLayout().GetLogicalDimensionOrder() == order;
+        }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

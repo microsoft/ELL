@@ -1055,7 +1055,10 @@ void TestOrderedMatrixMatrixMultiplyNode(int m, int n, int k, bool transposeA, b
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
-    VerifyCompiledOutput(map, compiledMap, signal, "OrderedMatrixMatrixMultiplyNode");
+    std::stringstream id;
+    id << std::boolalpha << "OrderedMatrixMatrixMultiplyNode(m = " << m << ", n = " << n << ", k = " << k << ", transposeA = "
+       << transposeA << ", transposeB = " << transposeB << ", transposeC = " << transposeC << ", useBlas = " << useBlas << ")";
+    VerifyCompiledOutput(map, compiledMap, signal, id.str());
 }
 
 // C callback (called by emitted code)

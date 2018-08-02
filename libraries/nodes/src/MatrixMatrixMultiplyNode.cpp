@@ -22,7 +22,7 @@ namespace nodes
         // Relevant archive format versions
         //
         constexpr utilities::ArchiveVersion currentArchiveVersion = {utilities::ArchiveVersionNumbers::v2};
-        
+
         template <typename ValueType>
         void MatrixMatrixMultiply(bool transposeA, bool transposeB, bool transposeC, int m, int n, int k, const std::vector<ValueType>& matrixAValues, const std::vector<ValueType>& matrixBValues, std::vector<ValueType>& matrixCValues)
         {
@@ -174,8 +174,8 @@ namespace nodes
     template<typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Compute() const
     {
-        assert(input1.Size() == _m * _k);
-        assert(input2.Size() == _k * _n);
+        assert(static_cast<int>(input1.Size()) == _m * _k);
+        assert(static_cast<int>(input2.Size()) == _k * _n);
         auto inputMatrix1Values = input1.GetValue();
         auto inputMatrix2Values = input2.GetValue();
         std::vector<ValueType> outputMatrixValues(_m * _n);
@@ -204,7 +204,7 @@ namespace nodes
 
     template<typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
-    {  
+    {
         llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
         llvm::Value* pInput2 = compiler.EnsurePortEmitted(input2);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);

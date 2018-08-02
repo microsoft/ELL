@@ -71,7 +71,7 @@ namespace nodes
         ///
         /// <param name="input"> The input to reorder. </param>
         /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out. </param>
-        /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done. 
+        /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
         ///    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///    set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
         /// <param name="paddingValue"> The value to use for output padding, if output shape is larger than input shape. </param>
@@ -83,7 +83,7 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The memory layout of the input. Only data in the "active" area is guaranteed to be copied. </param>
         /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out. </param>
         /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
-        //    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
+        ///   For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///   set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
         /// <param name="paddingValue"> The value to use for output padding, if output shape is larger than input shape. </param>
         ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue = 0);
@@ -98,6 +98,15 @@ namespace nodes
         ///
         /// <returns> Padding value </returns>
         ValueType GetPaddingValue() const { return _paddingValue; }
+
+        /// <summary> Returns true if the node can accept input with this memory layout order, else false </summary>
+        ///
+        /// <param name="order"> The memory layout order for all the input ports </summary>
+        /// <returns> If the node can accept the input memory layout order, true, else false </returns>
+        bool CanAcceptInputLayout(const utilities::DimensionOrder& order) const override
+        {
+            return GetInputMemoryLayout().GetLogicalDimensionOrder() == order;
+        }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -134,7 +143,7 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         model::PortMemoryLayout _inputMemoryLayout;
-        
+
         ValueType _paddingValue;
     };
 }

@@ -118,6 +118,15 @@ namespace nodes
         /// <summary> Gets information about the output memory layout </summary>
         model::PortMemoryLayout GetOutputMemoryLayout() const override { return output.GetMemoryLayout(); }
 
+        /// <summary> Returns true if the node can accept input with this memory layout order, else false </summary>
+        ///
+        /// <param name="order"> The memory layout order for all the input ports </summary>
+        /// <returns> If the node can accept the input memory layout order, true, else false </returns>
+        bool CanAcceptInputLayout(const utilities::DimensionOrder& order) const override
+        {
+            return GetInputMemoryLayout().GetLogicalDimensionOrder() == order;
+        }
+
         /// <summary> Gets the LayerParameters from the layer wrapped by this node </summary>
         typename predictors::neural::Layer<ValueType>::LayerParameters GetLayerParameters() const override { return _layer.GetLayerParameters(); }
 

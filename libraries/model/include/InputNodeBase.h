@@ -54,6 +54,15 @@ namespace model
         /// <returns> The output memory layout </returns>
         PortMemoryLayout GetMemoryLayout() const;
 
+        /// <summary> Attempts to set the memory layout order of all the output ports </summary>
+        ///
+        /// <param name="order"> The memory layout order to be applied to all the output ports </summary>
+        /// <returns> If the node supports the output memory layout order, true, else false </returns>
+        bool TrySetOutputLayout(const utilities::DimensionOrder& order) override
+        {
+            return _outputBase.GetMemoryLayout().GetLogicalDimensionOrder() == order;
+        }
+
     protected:
         InputNodeBase(OutputPortBase& output);
 
