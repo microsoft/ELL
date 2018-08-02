@@ -237,8 +237,8 @@ namespace nodes
         /// <summary> Returns the number of secondary input ports. </summary>
         virtual int NumSecondaryInputs() const = 0;
 
-        const model::PortMemoryLayout& GetInputLayout() const { return _inputLayout; }
-        model::PortMemoryLayout GetOutputLayout() const;
+        const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputLayout; }
+        model::PortMemoryLayout GetOutputMemoryLayout() const;
 
         size_t GetBroadcastDimension() const { return _broadcastDimension; }
         size_t NumPrimaryInputDimensions() const { return _inputLayout.NumDimensions(); }
@@ -329,8 +329,8 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        using BroadcastFunctionNode<ValueType, FunctionType>::GetInputLayout;
-        using BroadcastFunctionNode<ValueType, FunctionType>::GetOutputLayout;
+        using BroadcastFunctionNode<ValueType, FunctionType>::GetInputMemoryLayout;
+        using BroadcastFunctionNode<ValueType, FunctionType>::GetOutputMemoryLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetBroadcastDimension;
         using BroadcastFunctionNode<ValueType, FunctionType>::NumPrimaryInputDimensions;
 
@@ -409,8 +409,8 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        using BroadcastFunctionNode<ValueType, FunctionType>::GetInputLayout;
-        using BroadcastFunctionNode<ValueType, FunctionType>::GetOutputLayout;
+        using BroadcastFunctionNode<ValueType, FunctionType>::GetInputMemoryLayout;
+        using BroadcastFunctionNode<ValueType, FunctionType>::GetOutputMemoryLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetBroadcastDimension;
         using BroadcastFunctionNode<ValueType, FunctionType>::NumPrimaryInputDimensions;
 
@@ -491,8 +491,8 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        using BroadcastFunctionNode<ValueType, FunctionType>::GetInputLayout;
-        using BroadcastFunctionNode<ValueType, FunctionType>::GetOutputLayout;
+        using BroadcastFunctionNode<ValueType, FunctionType>::GetInputMemoryLayout;
+        using BroadcastFunctionNode<ValueType, FunctionType>::GetOutputMemoryLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetBroadcastDimension;
         using BroadcastFunctionNode<ValueType, FunctionType>::NumPrimaryInputDimensions;
 

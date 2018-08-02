@@ -109,7 +109,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    model::PortMemoryLayout BroadcastFunctionNode<ValueType, FunctionType>::GetOutputLayout() const
+    model::PortMemoryLayout BroadcastFunctionNode<ValueType, FunctionType>::GetOutputMemoryLayout() const
     {
         return GetOutputPort(0)->GetMemoryLayout();
     }
@@ -143,11 +143,11 @@ namespace nodes
         //       Or, instead of unrolling, vectorizing:  if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
         //       If broadcastDimension = outermost dimension (0), we may want to parallelize over that dimension
         const auto numDimensions = NumPrimaryInputDimensions();
-        auto&& inputLayout = GetInputLayout();
+        auto&& inputLayout = GetInputMemoryLayout();
         auto&& inputStride = inputLayout.GetStride();
         auto&& inputOffset = inputLayout.GetOffset();
         auto&& inputSize = inputLayout.GetActiveSize();
-        auto&& outputLayout = GetOutputLayout();
+        auto&& outputLayout = GetOutputMemoryLayout();
         auto&& outputStride = outputLayout.GetStride();
         auto&& outputOffset = outputLayout.GetOffset();
         auto&& primaryInput = GetPrimaryInput();
@@ -277,11 +277,11 @@ namespace nodes
         //       Or, instead of unrolling, vectorizing --- if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
         //       If broadcastDimension = outermost dimension (0), we may want to parallelize over that dimension
         const auto numDimensions = NumPrimaryInputDimensions();
-        auto&& inputLayout = GetInputLayout();
+        auto&& inputLayout = GetInputMemoryLayout();
         auto&& inputStride = inputLayout.GetStride();
         auto&& inputOffset = inputLayout.GetOffset();
         auto&& inputSize = inputLayout.GetActiveSize();
-        auto&& outputLayout = GetOutputLayout();
+        auto&& outputLayout = GetOutputMemoryLayout();
         auto&& outputStride = outputLayout.GetStride();
         auto&& outputOffset = outputLayout.GetOffset();
         const auto broadcastDimension = GetBroadcastDimension();
@@ -362,7 +362,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastFunctionNode<ValueType, FunctionType>::Compute() const
     {
-        auto outputSize = GetOutputLayout().GetStride().NumElements();
+        auto outputSize = GetOutputMemoryLayout().GetStride().NumElements();
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInputOffset = 0;
@@ -385,7 +385,7 @@ namespace nodes
 
         const auto& primaryInput = GetPrimaryInput();
         auto primaryInputSize = primaryInput.Size();
-        auto&& inputLayout = GetInputLayout();
+        auto&& inputLayout = GetInputMemoryLayout();
         auto&& inputSize = inputLayout.GetActiveSize();
         auto secondaryInputSize = GetSecondaryInputSize();
         DEBUG_USED(secondaryInputSize);
@@ -472,7 +472,7 @@ namespace nodes
         model::CompilableNode::WriteToArchive(archiver);
 
         archiver["inputLayout"] << _inputLayout;
-        archiver["outputLayout"] << GetOutputLayout();
+        archiver["outputLayout"] << GetOutputMemoryLayout();
         archiver["broadcastDimension"] << _broadcastDimension;
         archiver["paddingValue"] << _paddingValue;
     }
@@ -534,8 +534,8 @@ namespace nodes
         auto primaryInputElements = transformer.TransformPortElements(_primaryInput.GetPortElements());
         auto broadcastFunction = GetFunction();
         auto newNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, FunctionType>>(primaryInputElements,
-                                                                                                this->GetInputLayout(),
-                                                                                                this->GetOutputLayout(),
+                                                                                                this->GetInputMemoryLayout(),
+                                                                                                this->GetOutputMemoryLayout(),
                                                                                                 broadcastFunction);
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -627,10 +627,10 @@ namespace nodes
         auto primaryInputElements = transformer.TransformPortElements(_primaryInput.GetPortElements());
         auto secondaryInputElements = transformer.TransformPortElements(_secondaryInput.GetPortElements());
         auto newNode = transformer.AddNode<BroadcastBinaryFunctionNode<ValueType, FunctionType>>(primaryInputElements,
-                                                                                                 this->GetInputLayout(),
+                                                                                                 this->GetInputMemoryLayout(),
                                                                                                  secondaryInputElements,
                                                                                                  this->GetBroadcastDimension(),
-                                                                                                 this->GetOutputLayout(),
+                                                                                                 this->GetOutputMemoryLayout(),
                                                                                                  GetFunction());
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -721,11 +721,11 @@ namespace nodes
         auto secondaryInput1Elements = transformer.TransformPortElements(_secondaryInput1.GetPortElements());
         auto secondaryInput2Elements = transformer.TransformPortElements(_secondaryInput2.GetPortElements());
         auto newNode = transformer.AddNode<BroadcastTernaryFunctionNode<ValueType, FunctionType>>(primaryInputElements,
-                                                                                                  this->GetInputLayout(),
+                                                                                                  this->GetInputMemoryLayout(),
                                                                                                   secondaryInput1Elements,
                                                                                                   secondaryInput2Elements,
                                                                                                   this->GetBroadcastDimension(),
-                                                                                                  this->GetOutputLayout(),
+                                                                                                  this->GetOutputMemoryLayout(),
                                                                                                   GetFunction());
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -790,11 +790,11 @@ namespace nodes
         auto scaleInputElements = transformer.TransformPortElements(secondaryInput1.GetPortElements());
         auto biasInputElements = transformer.TransformPortElements(secondaryInput2.GetPortElements());
         auto newNode = transformer.AddNode<BroadcastLinearFunctionNode<ValueType>>(primaryInputElements,
-                                                                                   this->GetInputLayout(),
+                                                                                   this->GetInputMemoryLayout(),
                                                                                    scaleInputElements,
                                                                                    biasInputElements,
                                                                                    this->GetBroadcastDimension(),
-                                                                                   this->GetOutputLayout());
+                                                                                   this->GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 

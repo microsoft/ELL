@@ -49,15 +49,21 @@ namespace model
         /// <returns> The output shape </returns>
         MemoryShape GetShape() const;
 
+        /// <summary> Gets the output memory layout </summary>
+        ///
+        /// <returns> The output memory layout </returns>
+        PortMemoryLayout GetMemoryLayout() const;
+
     protected:
-        InputNodeBase(OutputPortBase& output, MemoryShape shape);
+        InputNodeBase(OutputPortBase& output);
 
         // Constructor for derived classes that need to set the input port on CompilableNode.
-        InputNodeBase(InputPortBase& input, OutputPortBase& output, MemoryShape shape);
+        InputNodeBase(InputPortBase& input, OutputPortBase& output);
 
         bool ShouldCompileInline() const override { return true; }
         bool HasState() const override { return false; }
         void SetShape(const MemoryShape& shape);
+        void SetMemoryLayout(const PortMemoryLayout& layout);
         utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
 
@@ -82,8 +88,8 @@ namespace model
     protected:
         // Note: Source nodes still receive timestamps as input, even though data is retrieved through callbacks.
         // Therefore, they have input ports.
-        SourceNodeBase(InputPortBase& input, OutputPortBase& output, MemoryShape shape, const std::string& callbackName)
-            : InputNodeBase(input, output, shape), _callbackName(callbackName)
+        SourceNodeBase(InputPortBase& input, OutputPortBase& output, const std::string& callbackName)
+            : InputNodeBase(input, output), _callbackName(callbackName)
         {
         }
 

@@ -12,6 +12,7 @@
 #include "InputPort.h"
 #include "ModelTransformer.h"
 #include "OutputPort.h"
+#include "PortMemoryLayout.h"
 
 // utilities
 #include "IArchivable.h"
@@ -46,6 +47,11 @@ namespace model
         ///
         /// <param name="size"> The input shape </param>
         InputNode(MemoryShape shape);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="size"> The input memory layout </param>
+        InputNode(const PortMemoryLayout& layout);
 
         /// <summary> Sets the value output by this node </summary>
         ///

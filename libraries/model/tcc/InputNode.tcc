@@ -12,23 +12,30 @@ namespace model
 {
     template <typename ValueType>
     InputNode<ValueType>::InputNode()
-        : InputNodeBase(_output, MemoryShape{ 0 }), _output(this, defaultOutputPortName, 0)
+        : InputNodeBase(_output), _output(this, defaultOutputPortName, 0)
     {
         SetShape(MemoryShape{ 0 });
     }
 
     template <typename ValueType>
     InputNode<ValueType>::InputNode(size_t size)
-        : InputNodeBase(_output, MemoryShape{ static_cast<int>(size)}), _output(this, defaultOutputPortName, size)
+        : InputNodeBase(_output), _output(this, defaultOutputPortName, size)
     {
         SetShape(MemoryShape{ static_cast<int>(size) });
     }
 
     template <typename ValueType>
     InputNode<ValueType>::InputNode(MemoryShape shape)
-        : InputNodeBase(_output, shape), _output(this, defaultOutputPortName, PortMemoryLayout{ shape })
+        : InputNodeBase(_output), _output(this, defaultOutputPortName, PortMemoryLayout{ shape })
     {
         SetShape(shape);
+    }
+
+    template <typename ValueType>
+    InputNode<ValueType>::InputNode(const PortMemoryLayout& layout)
+        : InputNodeBase(_output), _output(this, defaultOutputPortName, layout)
+    {
+        SetMemoryLayout(layout);
     }
 
     template <typename ValueType>

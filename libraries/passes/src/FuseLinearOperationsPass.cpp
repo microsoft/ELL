@@ -107,12 +107,12 @@ namespace passes
             }
 
             // Check that the Shapes are compatible
-            if (node.GetInputLayout() != primaryInputNode->GetInputLayout())
+            if (node.GetInputMemoryLayout() != primaryInputNode->GetInputMemoryLayout())
             {
                 return false;
             }
 
-            if (node.GetOutputLayout() != primaryInputNode->GetOutputLayout())
+            if (node.GetOutputMemoryLayout() != primaryInputNode->GetOutputMemoryLayout())
             {
                 return false;
             }
@@ -246,11 +246,11 @@ namespace passes
             auto scaleValuesNode = transformer.AddNode<nodes::ConstantNode<ValueType>>(newCoeffs.scale);
             auto biasValuesNode = transformer.AddNode<nodes::ConstantNode<ValueType>>(newCoeffs.bias);
             auto newNode = transformer.AddNode<nodes::BroadcastLinearFunctionNode<ValueType>>(prevPrimaryInputElements,
-                                                                                              thisNode->GetInputLayout(),
+                                                                                              thisNode->GetInputMemoryLayout(),
                                                                                               scaleValuesNode->output,
                                                                                               biasValuesNode->output,
                                                                                               thisNode->GetBroadcastDimension(),
-                                                                                              thisNode->GetOutputLayout());
+                                                                                              thisNode->GetOutputMemoryLayout());
             transformer.MapNodeOutput(thisNode->output, newNode->output);
             return true;
         }

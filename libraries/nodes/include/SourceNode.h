@@ -55,6 +55,14 @@ namespace nodes
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> Port elements for input values (sample time, current time). </param>
+        /// <param name="inputVectorSize"> The input vector size. </param>
+        /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
+        /// <param name="source"> The optional source function that will provide input values. </param>
+        SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input"> Port elements for input values (sample time, current time). </param>
         /// <param name="shape"> The input shape. </param>
         /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
         /// <param name="source"> The optional source function that will provide input values. </param>
@@ -63,10 +71,10 @@ namespace nodes
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> Port elements for input values (sample time, current time). </param>
-        /// <param name="inputVectorSize"> The input vector size. </param>
+        /// <param name="layout"> The input memory layout. </param>
         /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
         /// <param name="source"> The optional source function that will provide input values. </param>
-        SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
+        SourceNode(const model::PortElements<nodes::TimeTickType>& input, const model::PortMemoryLayout& layout, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

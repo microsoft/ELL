@@ -24,12 +24,22 @@ namespace nodes
 
     template <typename ValueType>
     SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, const model::MemoryShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
-        : model::SourceNodeBase(_input, _output, shape, sourceFunctionName),
+        : model::SourceNodeBase(_input, _output, sourceFunctionName),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, shape),
         _source(source == nullptr ? [](auto&){ return false; } : source)
     {
         _bufferedSample.resize(shape.NumElements());
+    }
+
+    template <typename ValueType>
+    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, const model::PortMemoryLayout& layout, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
+        : model::SourceNodeBase(_input, _output, sourceFunctionName),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, layout),
+        _source(source == nullptr ? [](auto&){ return false; } : source)
+    {
+        _bufferedSample.resize(layout.NumElements());
     }
 
     template <typename ValueType>
