@@ -46,8 +46,10 @@ operation_map = {
     "Convolution": [ConvertConvolution, ConvertBias, ConvertActivation],
     "ElementTimes": ConvertScaling,
     "FullyConnected": [ConvertFullyConnected, ConvertBias, ConvertActivation],
+    "GRU": ConvertGRU,
     "Input": ConvertInput,
     "LeakyReLU": ConvertLeakyReLU,
+    "LSTM": ConvertLSTM,
     "MaxPooling": ConvertMaxPooling,
     "Minus": ConvertMinus,
     "Passthrough": ConvertPassthrough,
@@ -59,6 +61,7 @@ operation_map = {
     "Reshape": ConvertReshape,
     "Softmax": ConvertSoftmax,
     "Splice": ConvertSplice,
+    "VAD": ConvertVAD,
     }
 
 class ImporterModel:

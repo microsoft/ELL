@@ -461,7 +461,6 @@ class ConvertActivation(ConvertBase):
         ell_node = builder.AddFloatActivationLayerNode(model, input_port_elements, activation_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
 
 class ConvertAveragePooling(ConvertBase):
     """
@@ -502,7 +501,7 @@ class ConvertAveragePooling(ConvertBase):
         ell_node = builder.AddFloatPoolingLayerNode(model, input_port_elements, pooling_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
+
 
 class ConvertBatchNormalization(ConvertBase):
     """
@@ -545,7 +544,6 @@ class ConvertBatchNormalization(ConvertBase):
         ell_node = builder.AddFloatBatchNormalizationLayerNode(model, input_port_elements, batch_normalization_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
 
 class ConvertBias(ConvertBase):
     """
@@ -582,7 +580,6 @@ class ConvertBias(ConvertBase):
         ell_node = builder.AddFloatBiasLayerNode(model, input_port_elements, bias_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
 
 class ConvertBinaryConvolution(ConvertBase):
     """
@@ -644,7 +641,7 @@ class ConvertBinaryConvolution(ConvertBase):
         ell_node = builder.AddFloatBinaryConvolutionalLayerNode(model, input_port_elements, convolutional_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
+
 
 class ConvertConvolution(ConvertBase):
     """
@@ -705,7 +702,6 @@ class ConvertConvolution(ConvertBase):
         ell_node = builder.AddFloatConvolutionalLayerNode(model, input_port_elements, convolutional_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
 
 
 class ConvertFullyConnected(ConvertBase):
@@ -745,7 +741,6 @@ class ConvertFullyConnected(ConvertBase):
         ell_node = builder.AddFloatFullyConnectedLayerNode(model, input_port_elements, fully_connected_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
 
 
 class ConvertElementTimes(ConvertBase):
@@ -783,7 +778,72 @@ class ConvertElementTimes(ConvertBase):
         ell_node = builder.AddFloatScalingLayerNode(model, input_port_elements, scaling_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
+
+
+class ConvertGRU(ConvertBase):
+    """
+    Converter for Gated Recurrent Unit (GRU). If the GRU node has 2 inputs,
+    the second input is used as the trigger, otherwise a constant node is inserted as the
+    trigger.
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node)
+        self.required_weights = ["updateWeights", "resetWeights", "hiddenWeights", "updateBias", "resetBias", "hiddenBias"]
+        self.required_attributes = ["activation", "recurrentActivation"]
+
+    def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Return the appropriate ELL layer
+        """
+        layer_parameters = self.get_layer_parameters(conversion_parameters)
+
+        updateWeights = self.get_ell_tensor(
+            self.importer_node.weights["updateWeights"][0], conversion_parameters)
+        resetWeights = self.get_ell_tensor(
+            self.importer_node.weights["resetWeights"][0], conversion_parameters)
+        hiddenWeights = self.get_ell_tensor(
+            self.importer_node.weights["hiddenWeights"][0], conversion_parameters)
+        updateBias = self.get_ell_tensor(
+            self.importer_node.weights["updateBias"][0], conversion_parameters)
+        resetBias = self.get_ell_tensor(
+            self.importer_node.weights["resetBias"][0], conversion_parameters)
+        hiddenBias = self.get_ell_tensor(
+            self.importer_node.weights["hiddenBias"][0], conversion_parameters)
+
+        activation = self.importer_node.attributes["activation"]
+        recurrentActivation = self.importer_node.attributes["activation"]
+
+        return ell.neural.FloatGRULayer(layer_parameters, updateWeights,
+                                        resetWeights, hiddenWeights,
+                                        updateBias, resetBias, hiddenBias,
+                                        activation, recurrentActivation)
+
+    def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Derived classes override to convert the importer node to appropriate ELL node(s)
+        and insert into the model
+        """
+        model = conversion_parameters["model"]
+        builder = conversion_parameters["builder"]
+        lookup_table = conversion_parameters["lookup_table"]
+        # Create the GRU layer
+        gru_layer = self.convert(conversion_parameters)
+        # Get the port elements from the input
+        input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
+        # Get the port elements for the reset trigger
+        if len(self.importer_node.inputs) > 1:
+            reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(self.importer_node, 1)
+        else:
+            # Create a constant node as the trigger. The trigger fires on value change,
+            # so will never fire in this case.
+            reset_node = builder.AddConstantNode(model, [0], ell.nodes.PortType.integer)
+            reset_port_elements = ell.nodes.PortElements(reset_node.GetOutputPort("output"))
+
+        # Add the GRULayerNode to the model
+        ell_node = builder.AddFloatGRULayerNode(model, input_port_elements, reset_port_elements, gru_layer)
+        # Register the mapping
+        lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
 
 class ConvertInput(ConvertBase):
     """
@@ -836,7 +896,6 @@ class ConvertInput(ConvertBase):
         # ensure proper memory layout. This can be skipped once Input supports
         # different memory layouts of the output.
         padding = self.importer_node.output_padding["size"]
-        
         if padding > 0:
             # Create the reorder node
             port_elements = lookup_table.get_output_port_elements_for_node(source_node)
@@ -847,7 +906,7 @@ class ConvertInput(ConvertBase):
             lookup_table.add_imported_ell_node(self.importer_node, reorder_node)
 
         lookup_table.add_ell_input(input_node)
-        return
+
 
 class ConvertLeakyReLU(ConvertActivation):
     """
@@ -859,6 +918,77 @@ class ConvertLeakyReLU(ConvertActivation):
         self.required_weights = []
         self.required_attributes = []
         self.importer_node.attributes["activation"] = ell.neural.ActivationType.leaky
+
+
+class ConvertLSTM(ConvertBase):
+    """
+    Converter for Long Short-Term Memory (LSTM) unit. If the LSTM node has 2 inputs,
+    the second input is used as the trigger, otherwise a constant node is inserted as the
+    trigger.
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node)
+        self.required_weights = ["inputWeights", "forgetMeWeights", "candidateWeights", "outputWeights", "inputBias", "forgetMeBias", "candidateBias", "outputBias"]
+        self.required_attributes = ["activation", "recurrentActivation"]
+
+    def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Return the appropriate ELL layer
+        """
+        layer_parameters = self.get_layer_parameters(conversion_parameters)
+
+        inputWeights = self.get_ell_tensor(
+            self.importer_node.weights["inputWeights"][0], conversion_parameters)
+        forgetMeWeights = self.get_ell_tensor(
+            self.importer_node.weights["forgetMeWeights"][0], conversion_parameters)
+        candidateWeights = self.get_ell_tensor(
+            self.importer_node.weights["candidateWeights"][0], conversion_parameters)
+        outputWeights = self.get_ell_tensor(
+            self.importer_node.weights["outputWeights"][0], conversion_parameters)
+        inputBias = self.get_ell_tensor(
+            self.importer_node.weights["inputBias"][0], conversion_parameters)
+        forgetMeBias = self.get_ell_tensor(
+            self.importer_node.weights["forgetMeBias"][0], conversion_parameters)
+        candidateBias = self.get_ell_tensor(
+            self.importer_node.weights["candidateBias"][0], conversion_parameters)
+        outputBias = self.get_ell_tensor(
+            self.importer_node.weights["outputBias"][0], conversion_parameters)
+
+        activation = self.importer_node.attributes["activation"]
+        recurrentActivation = self.importer_node.attributes["activation"]
+
+        return ell.neural.FloatLSTMLayer(layer_parameters, inputWeights,
+                                        forgetMeWeights, candidateWeights,
+                                        outputWeights, inputBias, forgetMeBias,
+                                        candidateBias, outputBias,
+                                        activation, recurrentActivation)
+
+    def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Derived classes override to convert the importer node to appropriate ELL node(s)
+        and insert into the model
+        """
+        model = conversion_parameters["model"]
+        builder = conversion_parameters["builder"]
+        lookup_table = conversion_parameters["lookup_table"]
+        # Create the LSTM layer
+        lstm_layer = self.convert(conversion_parameters)
+        # Get the port elements from the input
+        input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
+        # Get the port elements for the reset trigger
+        if len(self.importer_node.inputs) > 1:
+            reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(self.importer_node, 1)
+        else:
+            # Create a constant node as the trigger. The trigger fires on value change,
+            # so will never fire in this case.
+            reset_node = builder.AddConstantNode(model, [0], ell.nodes.PortType.integer)
+            reset_port_elements = ell.nodes.PortElements(reset_node.GetOutputPort("output"))
+
+        # Add the LSTMLayerNode to the model
+        ell_node = builder.AddFloatLSTMLayerNode(model, input_port_elements, reset_port_elements, lstm_layer)
+        # Register the mapping
+        lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
 
 class ConvertMaxPooling(ConvertBase):
     """
@@ -899,7 +1029,7 @@ class ConvertMaxPooling(ConvertBase):
         ell_node = builder.AddFloatPoolingLayerNode(model, input_port_elements, pooling_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
+
 
 class ConvertMinus(ConvertBase):
     """
@@ -941,7 +1071,7 @@ class ConvertMinus(ConvertBase):
         ell_node = builder.AddFloatBiasLayerNode(model, input_port_elements, bias_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
+
 
 class ConvertPassthrough(ConvertBase):
     """
@@ -969,7 +1099,6 @@ class ConvertPassthrough(ConvertBase):
         input_owner = lookup_table.get_owning_node_for_output(self.importer_node.inputs[0])
         lookup_table.add_imported_ell_node(self.importer_node, input_owner, set_group_id=False)
 
-        return
 
 class ConvertPlus(ConvertBase):
     """
@@ -1015,7 +1144,7 @@ class ConvertPlus(ConvertBase):
             ell.nodes.BinaryOperationType.add)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
+
 
 class ConvertPooling(ConvertBase):
     """
@@ -1031,6 +1160,7 @@ class ConvertPooling(ConvertBase):
         Return the appropriate ELL node
         """
         return None
+
 
 class ConvertPReLU(ConvertBase):
     """
@@ -1067,7 +1197,6 @@ class ConvertPReLU(ConvertBase):
         ell_node = builder.AddFloatActivationLayerNode(model, input_port_elements, activation_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
 
 
 class ConvertReLU(ConvertActivation):
@@ -1087,7 +1216,7 @@ class ConvertRegion(ConvertBase):
     Converter for region detection layer
     """
     def __init__(self, node: ImporterNode):
-        super().__init(node)
+        super().__init__(node)
         self.required_weights = []
         self.required_attributes = ["width", "height", "numBoxesPerCell", "numClasses", "numAnchors", "applySoftmax"]
 
@@ -1164,7 +1293,6 @@ class ConvertScaling(ConvertBase):
         ell_node = builder.AddFloatScalingLayerNode(model, input_port_elements, scaling_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
 
 
 class ConvertSoftmax(ConvertBase):
@@ -1199,7 +1327,6 @@ class ConvertSoftmax(ConvertBase):
         ell_node = builder.AddFloatSoftmaxLayerNode(model, input_port_elements, softmax_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
-        return
 
 
 class ConvertSplice(ConvertBase):
@@ -1280,8 +1407,6 @@ class ConvertSplice(ConvertBase):
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, final_reorder_node)
 
-        return
-
 
 class ConvertReshape(ConvertBase):
     """
@@ -1309,4 +1434,45 @@ class ConvertReshape(ConvertBase):
         input_owner = lookup_table.get_owning_node_for_output(self.importer_node.inputs[0])
         lookup_table.add_imported_ell_node(self.importer_node, input_owner, set_group_id=False)
 
-        return
+
+class ConvertVAD(ConvertBase):
+    """
+    Converter for Voice Activity Detector.
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node)
+        self.required_weights = []
+        self.required_attributes = ["sampleRate", "frameDuration", "tauUp", "tauDown", "largeInput", "gainAtt", "thresholdUp", "thresholdDown", "levelThreshold"]
+
+    def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Return the appropriate ELL layer
+        """
+        raise Exception("No corresponding ELL layer for Voice Actvitity Detector (VAD). Use node instead.")
+
+    def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Derived classes override to convert the importer node to appropriate ELL node(s)
+        and insert into the model
+        """
+        model = conversion_parameters["model"]
+        builder = conversion_parameters["builder"]
+        lookup_table = conversion_parameters["lookup_table"]
+
+        sample_rate = self.importer_node.attributes["sampleRate"]
+        frame_duration = self.importer_node.attributes["frameDuration"]
+        tau_up = self.importer_node.attributes["tauUp"]
+        tau_down = self.importer_node.attributes["tauDown"]
+        large_input = self.importer_node.attributes["largeInput"]
+        gain_att = self.importer_node.attributes["gainAtt"]
+        threshold_up = self.importer_node.attributes["thresholdUp"]
+        threshold_down = self.importer_node.attributes["thresholdDown"]
+        level_threshold = self.importer_node.attributes["levelThreshold"]
+
+        # Create the VAD node
+        ell_node = builder.AddVoiceActivityDetectorNode(model, input_port_elements, 
+            sample_rate, frame_duration, tau_up, tau_down, large_input, gain_att, 
+            threshold_up, threshold_down, level_threshold)
+
+        # Register the mapping
+        lookup_table.add_imported_ell_node(self.importer_node, ell_node)
