@@ -60,7 +60,7 @@ set CMakeGenerator=Visual Studio 14 2015 Win64
 
 if "!UseVs14! and !UseVs15! and !Vs14Path!" == "0 and 0 and " (
     set UseVs15=1
-) 
+)
 
 if "!UseVs14! and !UseVs15! and !Vs14! and !Vs15!" == "0 and 0 and 1 and 1" (
     set /p id="Use VS 2017 ? "
