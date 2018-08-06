@@ -26,9 +26,9 @@ def main():
     arg_parser = argparse.ArgumentParser(
             "Runs the given ELL model passing images from camera or static image file\n"
             "Either the ELL model file, or the compiled model's Python module must be given,\n"
-            "using the --model or --compiledModel options respectively.\n"
+            "using the --model or --compiled_model options respectively.\n"
             "Example:\n"
-            "   python demo.py categories.txt --compiledModel tutorial1/pi3/model1\n"
+            "   python demo.py categories.txt --compiled_model tutorial1/pi3/model1\n"
             "   python demo.py categories.txt --model model1.ell\n"
             "This shows opencv window with image classified by the model using given labels")
 
@@ -51,17 +51,29 @@ def main():
 
     group2 = arg_parser.add_mutually_exclusive_group()
     group2.add_argument("--model", help="path to a model file")
-    group2.add_argument("--compiledModel", help="path to the compiled model's Python module")
-    group2.add_argument("--models", help="list of comma separated paths to model files")
-    group2.add_argument("--compiledModels", help="list of comma separated paths to the compiled models' Python modules")
+    group2.add_argument("--compiled_model", help="path to the compiled model's Python module")
 
     args = arg_parser.parse_args()
 
-    if not args.compiledModel and not args.model:
-        print("### Error: Required one of --model or --compiledModel")
+    if not args.compiled_model and not args.model:
+        print("### Error: Required one of --model or --compiled_model")
         return
 
-    helper.initialize(args)
+    # setup some options on the demo helper
+    if args.save:
+        helper.save_images = True
+    helper.threshold = args.threshold
+    if args.iterations:
+        helper.iterations = args.iterations
+    helper.set_input(args.camera, args.folder, args.image)
+
+    if args.print_labels:
+        helper.print_labels = True
+    helper.bgr = args.bgr
+    helper.nogui = args.nogui
+
+    # initialize the labels and the model (either reference or compiled)
+    helper.load_model(args.labels, args.model, args.compiled_model)
 
     lastPrediction = ""
     help_prompt = 60

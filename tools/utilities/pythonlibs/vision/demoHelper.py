@@ -228,49 +228,43 @@ class DemoHelper:
             return argValue
         return defaultValue
 
-    def initialize(self, args):
+    def set_input(self, camera_id, image_folder = None, image_filename = None):        
+        self.camera = self.value_from_arg(camera_id, 0)
+        self.image_filename = self.value_from_arg(image_folder, None)
+        self.image_folder = self.value_from_arg(image_filename, None)
+        
+        # process image source options
+        if image_filename:
+            self.source = StaticImage(image_filename)
+        elif image_folder:
+            self.source = FolderStream(image_folder)
+        else:
+            self.source = VideoStream(camera_id)
+
+    def load_model(self, labels_file, model_file = None, compiled_model = None):
         # called after parse_args to extract args from the arg_parser.
         # process required arguments
-        self.labels_file = args.labels
-
-        # process options
-        self.save_images = self.value_from_arg(args.save, None)
-        self.threshold = self.value_from_arg(args.threshold, None)
-        self.iterations = self.value_from_arg(args.iterations, None)
-        self.camera = self.value_from_arg(args.iterations, 0)
-        self.image_filename = self.value_from_arg(args.image, None)
-        self.image_folder = self.value_from_arg(args.folder, None)
-        self.print_labels = args.print_labels
-        self.bgr = args.bgr
-        self.nogui = args.nogui
+        
+        # process options 
         if self.nogui and self.iterations is None:
             self.iterations = 1
 
         self.current = self.iterations
         
-        # process image source options
-        if args.image:
-            self.source = StaticImage(args.image)
-        elif args.folder:
-            self.source = FolderStream(args.folder)
-        else:
-            self.source = VideoStream(args.camera)
-
         # load the labels
+        self.labels_file = labels_file
         self.labels = self.load_labels(self.labels_file)
         
         # process model options and load the model
-        if args.model:
-            self.model = ReferenceModel(args.model)
+        if model_file:
+            self.model = ReferenceModel(model_file)
         else:
-            self.model = CompiledModel(args.compiledModel)
+            self.model = CompiledModel(compiled_model)
 
         # now load the model
         self.model.load()
             
         self.input_size = (self.model.input_shape.rows, self.model.input_shape.columns)        
-        return True
-
 
     def show_image(self, frameToShow, save):
         try:
