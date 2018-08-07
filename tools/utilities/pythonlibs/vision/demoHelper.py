@@ -190,7 +190,7 @@ class StaticImage(ImageStream):
             raise Exception('image from %s failed to load' % (self.image_filename))
         else:                
             self.new_frame = True
-    
+
     def load_next_image(self):
         return None
 
@@ -222,23 +222,16 @@ class DemoHelper:
         self.print_labels = False
         self.new_frame = False
         self.window_shown = False
-    
-    def value_from_arg(self, argValue, defaultValue):
-        if (argValue is not None):
-            return argValue
-        return defaultValue
 
-    def set_input(self, camera_id, image_folder = None, image_filename = None):        
-        self.camera = self.value_from_arg(camera_id, 0)
-        self.image_filename = self.value_from_arg(image_folder, None)
-        self.image_folder = self.value_from_arg(image_filename, None)
-        
+    def set_input(self, camera_id = 0, image_folder = None, image_filename = None):
         # process image source options
         if image_filename:
             self.source = StaticImage(image_filename)
         elif image_folder:
             self.source = FolderStream(image_folder)
         else:
+            if not camera_id:
+                camera_id = 0
             self.source = VideoStream(camera_id)
 
     def load_model(self, labels_file, model_file = None, compiled_model = None):
