@@ -46,6 +46,8 @@
 
 // predictors
 #include "NeuralNetworkPredictor.h"
+#include "SigmoidActivation.h"
+#include "TanhActivation.h"
 
 // predictors/neural
 #include "ConvolutionalLayer.h"
@@ -68,6 +70,7 @@
 // stl
 #include <cmath>
 #include <iostream>
+#include <memory>
 #include <numeric>
 #include <sstream>
 #include <string>
@@ -722,8 +725,7 @@ void TestRecurrentNode()
 
     Shape outputShape = { 1, 1, 3 };
     LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
-
-    RecurrentLayer<ElementType, TanhActivation> recurrent(parameters, weights, biases);
+    RecurrentLayer<ElementType> recurrent(parameters, weights, biases, new TanhActivation<ElementType>());
     recurrent.Compute();
     TensorType output = recurrent.GetOutput();
 
@@ -732,7 +734,7 @@ void TestRecurrentNode()
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
-    auto computeNode = model.AddNode<nodes::RecurrentLayerNode<ElementType, TanhActivation>>(inputNode->output, recurrent);
+    auto computeNode = model.AddNode<nodes::RecurrentLayerNode<ElementType>>(inputNode->output, recurrent);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     // Compile model
@@ -802,9 +804,8 @@ void TestGRUNode()
 
     Shape outputShape = { 1, 1, 3 };
     LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
-
     GRUParameters<ElementType> gruParams{ updateWeights, resetWeights, hiddenWeights, updateBias, resetBias, hiddenBias };
-    GRULayer<ElementType, TanhActivation, SigmoidActivation> gru(parameters, gruParams);
+    GRULayer<ElementType> gru(parameters, gruParams, new TanhActivation<ElementType>(), new SigmoidActivation<ElementType>());
     gru.Compute();
     auto output = gru.GetOutput();
     UNUSED(output);
@@ -814,7 +815,7 @@ void TestGRUNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
     auto resetTriggerNode = model.AddNode<nodes::ConstantNode<int>>(0);
-    auto computeNode = model.AddNode<nodes::GRULayerNode<ElementType, TanhActivation, SigmoidActivation>>(inputNode->output, resetTriggerNode->output, gru);
+    auto computeNode = model.AddNode<nodes::GRULayerNode<ElementType>>(inputNode->output, resetTriggerNode->output, gru);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     // Compile model
@@ -891,8 +892,7 @@ void TestLSTMNode()
     LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
 
     LSTMParameters<ElementType> lstmParams{ inputWeights, forgetMeWeights, candidateWeights, outputWeights, inputBias, forgetMeBias, candidateBias, outputBias };
-
-    LSTMLayer<ElementType, TanhActivation, SigmoidActivation> lstm(parameters, lstmParams);
+    LSTMLayer<ElementType> lstm(parameters, lstmParams, new TanhActivation<ElementType>(), new SigmoidActivation<ElementType>());
     lstm.Compute();
     auto output = lstm.GetOutput();
     UNUSED(output);
@@ -902,7 +902,7 @@ void TestLSTMNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
     auto resetTriggerNode = model.AddNode<nodes::ConstantNode<int>>(0);
-    auto computeNode = model.AddNode<nodes::LSTMLayerNode<ElementType, TanhActivation, SigmoidActivation>>(inputNode->output, resetTriggerNode->output, lstm);
+    auto computeNode = model.AddNode<nodes::LSTMLayerNode<ElementType>>(inputNode->output, resetTriggerNode->output, lstm);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     // Compile model
@@ -1067,9 +1067,9 @@ void TestGRUNodeWithVADReset(const std::string& path)
     LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
 
     GRUParameters<ElementType> gruParams{ updateWeights, resetWeights, hiddenWeights, updateBias, resetBias, hiddenBias };
-    GRULayer<ElementType, TanhActivation, SigmoidActivation> gru(parameters, gruParams);
+    GRULayer<ElementType> gru(parameters, gruParams, new TanhActivation<ElementType>(), new SigmoidActivation<ElementType>());
 
-    auto gruNode = model.AddNode<nodes::GRULayerNode<ElementType, TanhActivation, SigmoidActivation>>(inputNode->output, vadNode->output, gru);
+    auto gruNode = model.AddNode<nodes::GRULayerNode<ElementType>>(inputNode->output, vadNode->output, gru);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", gruNode->output } });
 
     int iteration = 0;

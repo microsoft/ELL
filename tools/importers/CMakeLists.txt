@@ -3,5 +3,6 @@
 #
 
 add_subdirectory(CNTK)
-add_subdirectory(darknet)
 add_subdirectory(common)
+add_subdirectory(darknet)
+add_subdirectory(onnx)

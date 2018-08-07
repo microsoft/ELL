@@ -12,15 +12,16 @@ namespace predictors
 {
     namespace neural
     {
-        template <typename ElementType, template <typename> class ActivationFunctionType>
-        RecurrentLayer<ElementType, ActivationFunctionType>::RecurrentLayer()
+        template <typename ElementType>
+        RecurrentLayer<ElementType>::RecurrentLayer()
             : _hiddenWeights(0, 0), _hiddenBias(0), _inputPlusHiddenVector(0)
         {
         }
 
-        template <typename ElementType, template <typename> class ActivationFunctionType>
-        RecurrentLayer<ElementType, ActivationFunctionType>::RecurrentLayer(const LayerParameters& layerParameters, MatrixType& weights, VectorType& biases)
-            : Layer<ElementType>(layerParameters), _hiddenWeights(weights), _hiddenBias(biases), _inputPlusHiddenVector(weights.NumColumns())
+        template <typename ElementType>
+        RecurrentLayer<ElementType>::RecurrentLayer(const LayerParameters& layerParameters, MatrixType& weights, VectorType& biases, const ActivationType& activation)
+            : Layer<ElementType>(layerParameters), _hiddenWeights(weights), _hiddenBias(biases), _inputPlusHiddenVector(weights.NumColumns()), 
+            _activation(activation)
         {
             // verify parameters
             if (_hiddenWeights.NumRows() != _hiddenBias.Size())
@@ -29,8 +30,15 @@ namespace predictors
             }
         }
 
-        template <typename ElementType, template <typename> class ActivationFunctionType>
-        void RecurrentLayer<ElementType, ActivationFunctionType>::Compute()
+        template <typename ElementType>
+        RecurrentLayer<ElementType>::RecurrentLayer(const RecurrentLayer& other)
+            : Layer<ElementType>(other), _hiddenWeights(other._hiddenWeights), _hiddenBias(other._hiddenBias), _inputPlusHiddenVector(other._inputPlusHiddenVector),
+            _activation(other._activation)
+        {
+        }
+
+        template <typename ElementType>
+        void RecurrentLayer<ElementType>::Compute()
         {
             auto& input = _layerParameters.input;
             const auto inputSize = input.Size();
@@ -79,8 +87,8 @@ namespace predictors
             }
         }
 
-        template <typename ElementType, template <typename> class ActivationFunctionType>
-        void RecurrentLayer<ElementType, ActivationFunctionType>::Reset()
+        template <typename ElementType>
+        void RecurrentLayer<ElementType>::Reset()
         {
             const auto outputSize = GetOutputMinusPadding().Size();
             const auto inputSize = _layerParameters.input.Size();
@@ -88,8 +96,8 @@ namespace predictors
             ht.Reset();
         }
 
-        template <typename ElementType, template <typename> class ActivationFunctionType>
-        void RecurrentLayer<ElementType, ActivationFunctionType>::WriteToArchive(utilities::Archiver& archiver) const
+        template <typename ElementType>
+        void RecurrentLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
         {
             Layer<ElementType>::WriteToArchive(archiver);
 
@@ -98,14 +106,23 @@ namespace predictors
             _activation.WriteToArchive(archiver);
         }
 
-        template <typename ElementType, template <typename> class ActivationFunctionType>
-        void RecurrentLayer<ElementType, ActivationFunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
+        template <typename ElementType>
+        void RecurrentLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
         {
             Layer<ElementType>::ReadFromArchive(archiver);
 
             math::MatrixArchiver::Read(_hiddenWeights, "hiddenWeights", archiver);
             math::VectorArchiver::Read(_hiddenBias, "hiddenBias", archiver);
-            _activation.ReadFromArchive(archiver);
+
+            if (archiver.HasNextPropertyName("activation"))
+            {
+                _activation.ReadFromArchive(archiver);
+            }
+
+            if (!_activation.GetImpl())
+            {
+                _activation.LegacyReadFromArchive(archiver);
+            }
             _inputPlusHiddenVector.Resize(_hiddenWeights.NumColumns());
         }
     }

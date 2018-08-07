@@ -116,8 +116,9 @@ namespace utilities
         template <typename BaseType, typename RuntimeType>
         void AddType();
 
-        /// <summary> Adds a type to the factory, with its default name. </summary>
+        /// <summary> Adds a type to the factory, with a custom name (handy for mapping old type names). </summary>
         ///
+        /// <typeparam name="BaseType"> Base of the Type being added. </typeparam>
         /// <typeparam name="RuntimeType"> Type being added. </typeparam>
         /// <param name="typeName"> Name of the type being added. </param>
         template <typename BaseType, typename RuntimeType>

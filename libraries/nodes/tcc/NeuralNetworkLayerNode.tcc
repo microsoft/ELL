@@ -56,7 +56,7 @@ namespace nodes
     {
         _layer.GetLayerParameters().input = _inputTensor;
 
-        const auto& layerParameters = this->GetLayerParameters();
+        const auto& layerParameters = _layer.GetLayerParameters();
 
         // Calculate input dimension parameters
         size_t inputPaddingSize = layerParameters.inputPaddingParameters.paddingSize;

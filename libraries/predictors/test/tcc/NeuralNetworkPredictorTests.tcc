@@ -9,6 +9,7 @@
 #include "GRULayer.h"
 #include "HardSigmoidActivation.h"
 #include "LeakyReLUActivation.h"
+#include "LoadModel.h"
 #include "LSTMLayer.h"
 #include "MaxPoolingFunction.h"
 #include "NeuralNetworkPredictor.h"
@@ -26,6 +27,7 @@
 #include "JsonArchiver.h"
 
 using namespace ell;
+using namespace ell::common;
 
 inline bool Equals(double a, double b)
 {
@@ -56,7 +58,7 @@ void ActivationTest()
         {
             for (size_t k = 0; k < T0.NumChannels(); ++k)
             {
-                T1(i, j, k) = hardSigmoid.Apply(T0(i, j, k), { i, j, k });
+                T1(i, j, k) = hardSigmoid.ApplyIndex(T0(i, j, k), { i, j, k });
             }
         }
     }
@@ -70,7 +72,7 @@ void ActivationTest()
         {
             for (size_t k = 0; k < T0.NumChannels(); ++k)
             {
-                T1(i, j, k) = relu.Apply(T0(i, j, k), { i, j, k });
+                T1(i, j, k) = relu.ApplyIndex(T0(i, j, k), { i, j, k });
             }
         }
     }
@@ -83,7 +85,7 @@ void ActivationTest()
         {
             for (size_t k = 0; k < T0.NumChannels(); ++k)
             {
-                T1(i, j, k) = leakyRelu.Apply(T0(i, j, k), { i, j, k });
+                T1(i, j, k) = leakyRelu.ApplyIndex(T0(i, j, k), { i, j, k });
             }
         }
     }
@@ -102,7 +104,7 @@ void ActivationTest()
         {
             for (size_t k = 0; k < T0.NumChannels(); ++k)
             {
-                T1(i, j, k) = parametricRelu.Apply(T0(i, j, k), { i, j, k });
+                T1(i, j, k) = parametricRelu.ApplyIndex(T0(i, j, k), { i, j, k });
             }
         }
     }
@@ -115,7 +117,7 @@ void ActivationTest()
         {
             for (size_t k = 0; k < T0.NumChannels(); ++k)
             {
-                T1(i, j, k) = sigmoid.Apply(T0(i, j, k), { i, j, k });
+                T1(i, j, k) = sigmoid.ApplyIndex(T0(i, j, k), { i, j, k });
             }
         }
     }
@@ -161,7 +163,7 @@ void ActivationLayerTest()
     Shape activationOutputShape = { 4, 4, 2 };
     LayerParameters activationParameters{ activationInput, NoPadding(), activationOutputShape, ZeroPadding(1) };
 
-    ActivationLayer<ElementType, ReLUActivation> activationLayer(activationParameters);
+    ActivationLayer<ElementType> activationLayer(activationParameters, new ReLUActivation<ElementType>());
     activationLayer.Compute();
     auto output0 = activationLayer.GetOutput();
     testing::ProcessTest("Testing ActivationLayer, values", output0(1, 1, 0) == 1.0 && output0(1, 2, 0) == 0 && output0(2, 1, 1) == 3.0 && output0(2, 2, 1) == 0);
@@ -500,6 +502,7 @@ void BinaryConvolutionalLayerGemmTest(ell::predictors::neural::BinaryWeightsScal
     // archive the network
     utilities::SerializationContext context;
     NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(context);
+    RegisterNodeTypes(context);
     std::stringstream strstream;
     utilities::JsonArchiver archiver(strstream);
     archiver << neuralNetwork;
@@ -602,6 +605,7 @@ void BinaryConvolutionalLayerBitwiseTest(ell::predictors::neural::BinaryWeightsS
     // archive the network
     utilities::SerializationContext context;
     NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(context);
+    RegisterNodeTypes(context);
     std::stringstream strstream;
     utilities::JsonArchiver archiver(strstream);
     archiver << neuralNetwork;
@@ -686,7 +690,7 @@ void NeuralNetworkPredictorTest()
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
 
     layerParameters = { layers[1]->GetOutput(), NoPadding(), { 1, 1, 3 }, NoPadding() };
-    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, ReLUActivation>(layerParameters)));
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType>(layerParameters, new ReLUActivation<ElementType>())));
 
     layerParameters = { layers[2]->GetOutput(), NoPadding(), { 1, 1, 1 }, NoPadding() };
     MatrixType weights2(1, 3);
@@ -722,6 +726,7 @@ void NeuralNetworkPredictorTest()
     // Verify that we can archive and unarchive the predictor
     utilities::SerializationContext context;
     NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(context);
+    RegisterNodeTypes(context);
     std::stringstream strstream;
     utilities::JsonArchiver archiver(strstream);
     archiver << neuralNetwork;
@@ -807,7 +812,7 @@ void GRULayerTest()
     LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
 
     GRUParameters<ElementType> gruParams{ updateWeights, resetWeights, hiddenWeights, updateBias, resetBias, hiddenBias };
-    GRULayer<ElementType, TanhActivation, SigmoidActivation> gru(parameters, gruParams);
+    GRULayer<ElementType> gru(parameters, gruParams, new TanhActivation<ElementType>(), new SigmoidActivation<ElementType>());
     gru.Compute();
     TensorType output = gru.GetOutput();
 
@@ -887,8 +892,7 @@ void LSTMLayerTest()
     LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
 
     LSTMParameters<ElementType> lstmParams{ inputWeights, forgetMeWeights, candidateWeights, outputWeights, inputBias, forgetMeBias, candidateBias, outputBias };
-
-    LSTMLayer<ElementType, TanhActivation, SigmoidActivation> lstm(parameters, lstmParams);
+    LSTMLayer<ElementType> lstm(parameters, lstmParams, new TanhActivation<ElementType>(), new SigmoidActivation<ElementType>());
     lstm.Compute();
     TensorType output = lstm.GetOutput();
 
@@ -939,8 +943,7 @@ void RecurrentLayerTest()
 
     Shape outputShape = { 1, 1, 3 };
     LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
-
-    RecurrentLayer<ElementType, TanhActivation> recurrent(parameters, weights, biases);
+    RecurrentLayer<ElementType> recurrent(parameters, weights, biases, new TanhActivation<ElementType>());
     recurrent.Compute();
     TensorType output = recurrent.GetOutput();
 
@@ -992,6 +995,7 @@ void ConvolutionalArchiveTest()
 
     utilities::SerializationContext context;
     NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(context);
+    RegisterNodeTypes(context);
     std::stringstream strstream;
     utilities::JsonArchiver archiver(strstream);
     archiver << neuralNetwork;
@@ -1034,6 +1038,7 @@ void BinaryConvolutionalArchiveTest()
 
     utilities::SerializationContext context;
     NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(context);
+    RegisterNodeTypes(context);
     std::stringstream strstream;
     utilities::JsonArchiver archiver(strstream);
     archiver << neuralNetwork;

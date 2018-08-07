@@ -33,21 +33,9 @@ namespace predictors
         }
 
         template <typename ElementType>
-        ElementType SigmoidActivation<ElementType>::operator()(const ElementType input) const
+        std::unique_ptr<ActivationImpl<ElementType>> SigmoidActivation<ElementType>::Copy() const
         {
-            return Apply(input);
-        }
-
-        template <typename ElementType>
-        ElementType SigmoidActivation<ElementType>::Apply(const ElementType input, const math::IntegerTriplet& /*index*/) const
-        {
-            return Apply(input);
-        }
-
-        template <typename ElementType>
-        void SigmoidActivation<ElementType>::Apply(math::ColumnVector<ElementType>& input) const
-        {
-            input.Transform([this](ElementType value){ return Apply(value); });
+            return std::make_unique<SigmoidActivation<ElementType>>();
         }
     }
 }

@@ -31,14 +31,14 @@ namespace nodes
     //
 
     /// <summary> A node that wraps a neural net ActivationLayer. </summary>
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    class ActivationLayerNode : public NeuralNetworkLayerNode<ActivationLayerNode<ValueType, ActivationFunctionType>,
-                                                              predictors::neural::ActivationLayer<ValueType, ActivationFunctionType>,
+    template <typename ValueType>
+    class ActivationLayerNode : public NeuralNetworkLayerNode<ActivationLayerNode<ValueType>,
+                                                              predictors::neural::ActivationLayer<ValueType>,
                                                               ValueType>
     {
     public:
-        using LayerType = predictors::neural::ActivationLayer<ValueType, ActivationFunctionType>;
-        using BaseType = NeuralNetworkLayerNode<ActivationLayerNode<ValueType, ActivationFunctionType>, LayerType, ValueType>;
+        using LayerType = predictors::neural::ActivationLayer<ValueType>;
+        using BaseType = NeuralNetworkLayerNode<ActivationLayerNode<ValueType>, LayerType, ValueType>;
 
         /// @name Input and Output Ports
         /// @{
@@ -52,12 +52,12 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The layer to wrap. </param>
-        ActivationLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ActivationLayer<ValueType, ActivationFunctionType>& layer);
+        ActivationLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ActivationLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, typename LayerType::ActivationFunction>("ActivationLayerNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ActivationLayerNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -84,11 +84,11 @@ namespace nodes
     template <typename ValueType>
     class ParametricReLUActivationLayerNode : public NeuralNetworkLayerNode<
                                                   ParametricReLUActivationLayerNode<ValueType>,
-                                                  predictors::neural::ActivationLayer<ValueType, ell::predictors::neural::ParametricReLUActivation>,
+                                                  predictors::neural::ActivationLayer<ValueType>,
                                                   ValueType>
     {
     public:
-        using LayerType = predictors::neural::ActivationLayer<ValueType, ell::predictors::neural::ParametricReLUActivation>;
+        using LayerType = predictors::neural::ActivationLayer<ValueType>;
         using BaseType = NeuralNetworkLayerNode<ParametricReLUActivationLayerNode<ValueType>, LayerType, ValueType>;
 
         /// @name Input and Output Ports

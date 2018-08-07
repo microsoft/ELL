@@ -19,21 +19,9 @@ namespace neural
     }
 
     template <typename ElementType>
-    ElementType TanhActivation<ElementType>::operator()(const ElementType input) const
+    std::unique_ptr<ActivationImpl<ElementType>> TanhActivation<ElementType>::Copy() const
     {
-        return Apply(input);
-    }
-
-    template <typename ElementType>
-    ElementType TanhActivation<ElementType>::Apply(const ElementType input, const math::IntegerTriplet&) const
-    {
-        return Apply(input);
-    }
-
-    template <typename ElementType>
-    void TanhActivation<ElementType>::Apply(math::ColumnVectorReference<ElementType>& input) const
-    {
-        input.Transform([this](ElementType value){ return Apply(value); });
+        return std::make_unique<TanhActivation<ElementType>>();
     }
 }
 }

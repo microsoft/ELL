@@ -165,63 +165,47 @@ namespace predictors
     {
         using namespace ell::predictors::neural;
         context.GetTypeFactory().AddType<neural::InputLayer<ElementType>, neural::InputLayer<ElementType>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<ElementType, HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<ElementType, LeakyReLUActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<ElementType, ParametricReLUActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<ElementType, ReLUActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<ElementType, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::BatchNormalizationLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::BiasLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::BinaryConvolutionalLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ConvolutionalLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::FullyConnectedLayer<ElementType>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::PoolingLayer<ElementType, MaxPoolingFunction>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::PoolingLayer<ElementType, MeanPoolingFunction>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::RecurrentLayer<ElementType, TanhActivation>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::RecurrentLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::RegionDetectionLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ScalingLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::SoftmaxLayer<ElementType>>();
         context.GetTypeFactory().AddType<NeuralNetworkPredictor<ElementType>, NeuralNetworkPredictor<ElementType>>();
 
-        //
-        // GRULayer with inner product of ['TanhActivation', 'SigmoidActivation', 'HardSigmoidActivation', 'ReLUActivation']
-        //
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, TanhActivation, TanhActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, TanhActivation, SigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, TanhActivation, HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, TanhActivation, ReLUActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, SigmoidActivation, TanhActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, SigmoidActivation, SigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, SigmoidActivation, HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, SigmoidActivation, ReLUActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, HardSigmoidActivation, TanhActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, HardSigmoidActivation, SigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, HardSigmoidActivation, HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, HardSigmoidActivation, ReLUActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, ReLUActivation, TanhActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, ReLUActivation, SigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, ReLUActivation, HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType, ReLUActivation, ReLUActivation>>();
+        // Map the old type names to the new ones for compatibility reasons.
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,SigmoidActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,HardSigmoidActivation<float>>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,ReLUActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,LeakyReLUActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,TanhActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,ParametricReLUActivation>");
+                                                                     
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,SigmoidActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,HardSigmoidActivation<double>>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,ReLUActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,LeakyReLUActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,TanhActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,ParametricReLUActivation>");
 
-        //
-        // LSTMLayer with inner product of ['TanhActivation', 'SigmoidActivation', 'HardSigmoidActivation', 'ReLUActivation']
-        //
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, TanhActivation, TanhActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, TanhActivation, SigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, TanhActivation, HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, TanhActivation, ReLUActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, SigmoidActivation, TanhActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, SigmoidActivation, SigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, SigmoidActivation, HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, SigmoidActivation, ReLUActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, HardSigmoidActivation, TanhActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, HardSigmoidActivation, SigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, HardSigmoidActivation, HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, HardSigmoidActivation, ReLUActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, ReLUActivation, TanhActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, ReLUActivation, SigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, ReLUActivation, HardSigmoidActivation>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType, ReLUActivation, ReLUActivation>>();
+        // Note: we don't need any of the other combinations because we never actually serialized those out till now.
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<float>>("GRULayer<float,TanhActivation,SigmoidActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<float>>("LSTMLayer<float,TanhActivation,SigmoidActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<float>>("GRULayer<float,TanhActivation,HardSigmoidActivation<float>>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<float>>("LSTMLayer<float,TanhActivation,HardSigmoidActivation<float>>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<double>>("GRULayer<double,TanhActivation,SigmoidActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<double>>("LSTMLayer<double,TanhActivation,SigmoidActivation>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<double>>("GRULayer<double,TanhActivation,HardSigmoidActivation<double>>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<double>>("LSTMLayer<double,TanhActivation,HardSigmoidActivation<double>>");
+
     }
 
     template <typename ElementType>

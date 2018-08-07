@@ -331,7 +331,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), bias);
 
     // ActivationLayer<float,ReLUActivation>(shape=[160,160,16]->[160,160,16])
-    AddLayer<ActivationLayer<ElementType, ReLUActivation>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding());
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), new ReLUActivation<ElementType>());
 
     // BatchNormalizationLayer<float>(shape=[160,160,16]->[160,160,16])
     bnMean = GetRandomVector<VectorType>(16);
@@ -358,7 +358,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {80, 80, 64}, NoPadding(), bias);
 
     // ActivationLayer<float,ReLUActivation>(shape=[80,80,64]->[80,80,64])
-    AddLayer<ActivationLayer<ElementType, ReLUActivation>, ElementType>(layers, NoPadding(), {80, 80, 64}, NoPadding());
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {80, 80, 64}, NoPadding(), new ReLUActivation<ElementType>());
 
     // BatchNormalizationLayer<float>(shape=[80,80,64]->[80,80,64])
     bnMean = GetRandomVector<VectorType>(64);
@@ -385,7 +385,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {40, 40, 64}, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[40,40,64]->[42,42,64], outputPadding=min,1)
-    AddLayer<ActivationLayer<ElementType, ReLUActivation>, ElementType>(layers, NoPadding(), {42, 42, 64}, ZeroPadding(1));
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {42, 42, 64}, ZeroPadding(1), new ReLUActivation<ElementType>());
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[42,42,64]->[20,20,64], inputPadding=min,1, function=maxpooling, stride=2, size=3)
     AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {20, 20, 64}, NoPadding(), PoolingParameters{3, 2});
@@ -412,7 +412,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {20, 20, 128}, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[20,20,128]->[22,22,128], outputPadding=min,1)
-    AddLayer<ActivationLayer<ElementType, ReLUActivation>, ElementType>(layers, NoPadding(), {22, 22, 128}, ZeroPadding(1));
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {22, 22, 128}, ZeroPadding(1), new ReLUActivation<ElementType>());
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[22,22,128]->[10,10,128], inputPadding=min,1, function=maxpooling, stride=2, size=3)
     AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {10, 10, 128}, NoPadding(), PoolingParameters{3, 2});
@@ -439,7 +439,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {10, 10, 256}, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[10,10,256]->[12,12,256], outputPadding=min,1)
-    AddLayer<ActivationLayer<ElementType, ReLUActivation>, ElementType>(layers, NoPadding(), {12, 12, 256}, ZeroPadding(1));
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {12, 12, 256}, ZeroPadding(1), new ReLUActivation<ElementType>());
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[12,12,256]->[5,5,256], inputPadding=min,1, function=maxpooling, stride=2, size=3)
     AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {5, 5, 256}, NoPadding(), PoolingParameters{3, 2});
@@ -466,7 +466,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {5, 5, 512}, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[5,5,512]->[7,7,512], outputPadding=min,1)
-    AddLayer<ActivationLayer<ElementType, ReLUActivation>, ElementType>(layers, NoPadding(), {7, 7, 512}, ZeroPadding(1));
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {7, 7, 512}, ZeroPadding(1), new ReLUActivation<ElementType>());
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[7,7,512]->[3,3,512], inputPadding=min,1, function=maxpooling, stride=2, size=3)
     AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {3, 3, 512}, NoPadding(), PoolingParameters{3, 2});
@@ -493,7 +493,7 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {3, 3, 1024}, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[3,3,1024]->[5,5,1024], outputPadding=min,1)
-    AddLayer<ActivationLayer<ElementType, ReLUActivation>, ElementType>(layers, NoPadding(), {5, 5, 1024}, ZeroPadding(1));
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {5, 5, 1024}, ZeroPadding(1), new ReLUActivation<ElementType>());
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[5,5,1024]->[2,2,1024], inputPadding=min,1, function=maxpooling, stride=2, size=3)
     AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {2, 2, 1024}, NoPadding(), PoolingParameters{3, 2});

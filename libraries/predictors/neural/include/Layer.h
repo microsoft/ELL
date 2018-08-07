@@ -169,6 +169,16 @@ namespace neural
         /// <param name="layerParameters"> The parameters for this layer. </param>
         Layer(const LayerParameters& layerParameters);
 
+        /// <summary> Initializes this class by copying another. </summary>
+        ///
+        /// <param name="other"> The other layer to copy. </param>
+        Layer(const Layer& other);
+
+        /// <summary> Initializes this class by moving contents of another. </summary>
+        ///
+        /// <param name="other"> The other layer to steal from. </param>
+        Layer(Layer&& other) = default;
+
         /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
         Layer()
             : _layerParameters{math::TensorShape{ 0, 0, 0 }, NoPadding(), { 0, 0, 0 }, NoPadding() }, _output{ 0, 0, 0 } {}

@@ -22,7 +22,15 @@ namespace neural
     }
 
     template <typename ElementType>
-    ElementType ParametricReLUActivation<ElementType>::Apply(const ElementType input, const math::IntegerTriplet& index) const
+    ElementType ParametricReLUActivation<ElementType>::Apply(const ElementType input) const
+    {
+        UNUSED(input);
+        // we want people to call the ApplyIndex method in this case.
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+    }
+
+    template <typename ElementType>
+    ElementType ParametricReLUActivation<ElementType>::ApplyIndex(const ElementType input, const math::IntegerTriplet& index) const
     {
         return (( input > 0) ? input : _alpha(index) * input);
     }
@@ -37,6 +45,12 @@ namespace neural
     void ParametricReLUActivation<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         math::TensorArchiver::Read(_alpha, "alpha", archiver);
+    }
+
+    template <typename ElementType>
+    std::unique_ptr<ActivationImpl<ElementType>> ParametricReLUActivation<ElementType>::Copy() const
+    {
+        return std::make_unique<ParametricReLUActivation<ElementType>>(_alpha);
     }
 }
 }

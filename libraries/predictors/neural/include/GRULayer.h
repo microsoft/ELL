@@ -7,15 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
-#include "HardSigmoidActivation.h"
+#include "Activation.h"
 #include "Layer.h"
-#include "SigmoidActivation.h"
-#include "SoftMaxActivation.h"
-#include "TanhActivation.h"
 
 // math
 #include "Matrix.h"
+
+// stl
+#include <memory>
 
 namespace ell
 {
@@ -40,7 +39,7 @@ namespace predictors
         /// A layer in a recurrent network that implements an GRU layer, meaning this layer retains gated "memory"
         /// over time and uses this information to inform predictions.
         /// </summary>
-        template <typename ElementType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+        template <typename ElementType>
         class GRULayer : public Layer<ElementType>
         {
         public:
@@ -53,7 +52,8 @@ namespace predictors
             using Layer<ElementType>::NumOutputRowsMinusPadding;
             using Layer<ElementType>::NumOutputColumnsMinusPadding;
             using Layer<ElementType>::NumOutputChannels;
-
+            using ActivationType = Activation<ElementType>;
+                
             /// <summary> Default constructor </summary>
             GRULayer();
 
@@ -62,7 +62,13 @@ namespace predictors
             /// <param name="layerParameters"> The parameters common to every layer. </param>
             /// <param name="parameters"> The weights and biases applicable to an GRU. Weights should be organised as: [weights, recurrent layer weights] or [W, U].
             /// Biases should be compatible in dimensionality with the output of the network.</param>
-            GRULayer(const LayerParameters& layerParameters, GRUParameters<ElementType>& parameters);
+            /// <param name="activation"> The activation to use on the new hidden state</param>
+            /// <param name="recurrentActivation"> The activation to use on the update and reset gates</param>
+            GRULayer(const LayerParameters& layerParameters, GRUParameters<ElementType>& parameters, 
+                const ActivationType& activation, const ActivationType& recurrentActivation);
+
+            /// <summary> Make a copy of this layer. </summary>
+            GRULayer(const GRULayer& other);
 
             /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
             void Compute() override;
@@ -102,15 +108,15 @@ namespace predictors
             /// <returns> A vector of biases. </returns>
             const VectorType& GetHiddenBias() const { return _hiddenBias; }
 
-            /// <summary> Retrieves the enum of the activation function currently in use by this layer </summary>
+            /// <summary> Retrieves the activation function currently in use by this layer </summary>
             ///
-            /// <returns> The ActivationFunctionType </returns>
-            const ActivationFunctionType<ElementType> GetActivationFunction() const { return _activationFunction; }
+            /// <returns> The Activation object</returns>
+            const ActivationType& GetActivationFunction() const { return _activation; }
 
-            /// <summary> Retrieves the enum of the recurrent activation function currently in use by this layer </summary>
+            /// <summary> Retrieves the recurrent activation function currently in use by this layer </summary>
             ///
-            /// <returns> The ActivationFunctionType </returns>
-            const RecurrentActivationFunctionType<ElementType> GetRecurrentActivationFunction() const { return _recurrentActivationFunction; }
+            /// <returns> The Activation object </returns>
+            const ActivationType& GetRecurrentActivationFunction() const { return _recurrentActivation; }
 
             /// <summary> Resets the layer's hidden values </summary>
             void Reset() override;
@@ -118,7 +124,7 @@ namespace predictors
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
             /// <returns> The name of this type. </returns>
-            static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType, ActivationFunctionType<ElementType>, RecurrentActivationFunctionType<ElementType>>("GRULayer"); }
+            static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("GRULayer"); }
 
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
@@ -143,8 +149,8 @@ namespace predictors
 
             VectorType _inputPlusHidden;
 
-            ActivationFunctionType<ElementType> _activationFunction;
-            RecurrentActivationFunctionType<ElementType> _recurrentActivationFunction;
+            ActivationType _activation;
+            ActivationType _recurrentActivation;
         };
     }
 }

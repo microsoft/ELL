@@ -56,6 +56,7 @@ namespace utilities
         #undef ARCHIVE_TYPE_OP
 
         void ArchiveValue(const char* name, const std::string& value) override;
+        void ArchiveNull(const char* name) override;
 
         #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_ARRAY_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
@@ -72,6 +73,7 @@ namespace utilities
         #undef ARCHIVE_TYPE_OP
 
         void UnarchiveValue(const char* name, std::string& value) override;
+        bool UnarchiveNull(const char* name) override;
 
         #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST

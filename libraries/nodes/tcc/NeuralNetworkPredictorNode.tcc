@@ -43,19 +43,18 @@ namespace nodes
     {
         NeuralNetworkLayerNodeBase<ValueType>* node = nullptr;
 
-        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::LeakyReLUActivation>, ActivationLayerNode<ValueType, predictors::neural::LeakyReLUActivation>>(transformer, layer, layerInputs, options, state);
-        if (node != nullptr) return node;
+        if (layer.template IsA<const predictors::neural::ActivationLayer<ValueType>>())
+        {
+            auto& activationLayer = layer.template As<predictors::neural::ActivationLayer<ValueType>>();
+            auto paf = dynamic_cast<const predictors::neural::ParametricReLUActivation<ValueType>*>(activationLayer.GetActivationFunction().GetImpl());
+            if (paf) 
+            {
+                // Ah, then this one is special, we have to use ParametricReLUActivationLayerNode in this case.
+                return TryAddLayerNode<predictors::neural::ActivationLayer<ValueType>, ParametricReLUActivationLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
+            }
+        }
 
-        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::ParametricReLUActivation>, ParametricReLUActivationLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::ReLUActivation>, ActivationLayerNode<ValueType, predictors::neural::ReLUActivation>>(transformer, layer, layerInputs, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::SigmoidActivation>, ActivationLayerNode<ValueType, predictors::neural::SigmoidActivation>>(transformer, layer, layerInputs, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::HardSigmoidActivation>, ActivationLayerNode<ValueType, predictors::neural::HardSigmoidActivation>>(transformer, layer, layerInputs, options, state);
+        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType>, ActivationLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
 
         node = TryAddLayerNode<predictors::neural::BatchNormalizationLayer<ValueType>, BatchNormalizationLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
@@ -73,112 +72,15 @@ namespace nodes
         node = TryAddLayerNode<predictors::neural::FullyConnectedLayer<ValueType>, FullyConnectedLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
 
-        //
-        // GRULayer's with an inner product of ['TanhActivation', 'SigmoidActivation', 'HardSigmoidActivation', 'ReLUActivation']
-        //
-
         // todo: figure out how to pass a resetTrigger as second input to the GRULayer (e.g. could be output of VoiceActivityDetectorNode).
+        // for now the user can skip Layers and use GRULayerNode directly and that way they can provide the reset input.
         auto resetTriggerNode = transformer.AddNode<ConstantNode<int>>(0);
 
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::TanhActivation, predictors::neural::TanhActivation>, GRULayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::TanhActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
+        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType>, GRULayerNode<ValueType>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
         if (node != nullptr) return node;
 
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>, GRULayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::TanhActivation, predictors::neural::HardSigmoidActivation>, GRULayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::HardSigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::TanhActivation, predictors::neural::ReLUActivation>, GRULayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::ReLUActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::SigmoidActivation, predictors::neural::TanhActivation>, GRULayerNode<ValueType, predictors::neural::SigmoidActivation, predictors::neural::TanhActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::SigmoidActivation, predictors::neural::SigmoidActivation>, GRULayerNode<ValueType, predictors::neural::SigmoidActivation, predictors::neural::SigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::SigmoidActivation, predictors::neural::HardSigmoidActivation>, GRULayerNode<ValueType, predictors::neural::SigmoidActivation, predictors::neural::HardSigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::SigmoidActivation, predictors::neural::ReLUActivation>, GRULayerNode<ValueType, predictors::neural::SigmoidActivation, predictors::neural::ReLUActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::TanhActivation>, GRULayerNode<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::TanhActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::SigmoidActivation>, GRULayerNode<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::SigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::HardSigmoidActivation>, GRULayerNode<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::HardSigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::ReLUActivation>, GRULayerNode<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::ReLUActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::ReLUActivation, predictors::neural::TanhActivation>, GRULayerNode<ValueType, predictors::neural::ReLUActivation, predictors::neural::TanhActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::ReLUActivation, predictors::neural::SigmoidActivation>, GRULayerNode<ValueType, predictors::neural::ReLUActivation, predictors::neural::SigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::ReLUActivation, predictors::neural::HardSigmoidActivation>, GRULayerNode<ValueType, predictors::neural::ReLUActivation, predictors::neural::HardSigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType, predictors::neural::ReLUActivation, predictors::neural::ReLUActivation>, GRULayerNode<ValueType, predictors::neural::ReLUActivation, predictors::neural::ReLUActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        //
-        // LSTMLayer's with an inner product of ['TanhActivation', 'SigmoidActivation', 'HardSigmoidActivation', 'ReLUActivation']
-        //
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::TanhActivation, predictors::neural::TanhActivation>, LSTMLayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::TanhActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>, LSTMLayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::SigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::TanhActivation, predictors::neural::HardSigmoidActivation>, LSTMLayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::HardSigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::TanhActivation, predictors::neural::ReLUActivation>, LSTMLayerNode<ValueType, predictors::neural::TanhActivation, predictors::neural::ReLUActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::SigmoidActivation, predictors::neural::TanhActivation>, LSTMLayerNode<ValueType, predictors::neural::SigmoidActivation, predictors::neural::TanhActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::SigmoidActivation, predictors::neural::SigmoidActivation>, LSTMLayerNode<ValueType, predictors::neural::SigmoidActivation, predictors::neural::SigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::SigmoidActivation, predictors::neural::HardSigmoidActivation>, LSTMLayerNode<ValueType, predictors::neural::SigmoidActivation, predictors::neural::HardSigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::SigmoidActivation, predictors::neural::ReLUActivation>, LSTMLayerNode<ValueType, predictors::neural::SigmoidActivation, predictors::neural::ReLUActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::TanhActivation>, LSTMLayerNode<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::TanhActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::SigmoidActivation>, LSTMLayerNode<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::SigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::HardSigmoidActivation>, LSTMLayerNode<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::HardSigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::ReLUActivation>, LSTMLayerNode<ValueType, predictors::neural::HardSigmoidActivation, predictors::neural::ReLUActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::ReLUActivation, predictors::neural::TanhActivation>, LSTMLayerNode<ValueType, predictors::neural::ReLUActivation, predictors::neural::TanhActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::ReLUActivation, predictors::neural::SigmoidActivation>, LSTMLayerNode<ValueType, predictors::neural::ReLUActivation, predictors::neural::SigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::ReLUActivation, predictors::neural::HardSigmoidActivation>, LSTMLayerNode<ValueType, predictors::neural::ReLUActivation, predictors::neural::HardSigmoidActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType, predictors::neural::ReLUActivation, predictors::neural::ReLUActivation>, LSTMLayerNode<ValueType, predictors::neural::ReLUActivation, predictors::neural::ReLUActivation>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
+        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType>, LSTMLayerNode<ValueType>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
+        if (node != nullptr) return node;        
 
         //
         // Pooling layer

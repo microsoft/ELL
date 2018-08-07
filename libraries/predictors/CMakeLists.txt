@@ -31,6 +31,7 @@ set(tcc
 )
 
 set(neural_include
+    neural/include/Activation.h
     neural/include/ActivationLayer.h
     neural/include/BatchNormalizationLayer.h
     neural/include/BiasLayer.h
@@ -53,11 +54,14 @@ set(neural_include
     neural/include/ScalingLayer.h
     neural/include/SigmoidActivation.h
     neural/include/SoftmaxLayer.h
+    neural/include/TanhActivation.h
 )
 
-set(neural_src)
+set(neural_src
+    neural/src/Activation.cpp)
 
 set(neural_tcc
+    neural/tcc/Activation.tcc
     neural/tcc/ActivationLayer.tcc
     neural/tcc/BatchNormalizationLayer.tcc
     neural/tcc/BiasLayer.tcc
@@ -80,6 +84,7 @@ set(neural_tcc
     neural/tcc/ScalingLayer.tcc
     neural/tcc/SigmoidActivation.tcc
     neural/tcc/SoftmaxLayer.tcc
+    neural/tcc/TanhActivation.tcc
 )
 
 source_group("src" FILES ${src})
@@ -123,10 +128,10 @@ source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 source_group("tcc" FILES ${test_tcc})
 
-add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${include} ${tcc} ${neural_include} ${neural_tcc})
+add_executable(${test_name} ${test_src} ${test_include} ${test_tcc})
 target_include_directories(${test_name} PRIVATE test/include)
 
-target_link_libraries(${test_name} data predictors testing)
+target_link_libraries(${test_name} common data predictors testing )
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")

@@ -49,6 +49,8 @@ namespace utilities
         ARCHIVABLE_TYPES_LIST
         #undef ARCHIVE_TYPE_OP
 
+        void ArchiveNull(const char* name) override;
+
         void ArchiveArray(const char* name, const std::vector<std::string>& array) override;
         void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) override;
 
@@ -63,7 +65,7 @@ namespace utilities
         void WriteScalar(const char* name, const ValueType& value);
 
         void WriteScalar(const char* name, const char* value);
-        void WriteScalar(const char* name, const std::string& value);
+        void WriteScalar(const char* name, const std::string& value);               
 
         template <typename ValueType>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
@@ -111,6 +113,8 @@ namespace utilities
         #undef ARCHIVE_TYPE_OP
 
         void UnarchiveValue(const char* name, std::string& value) override;
+
+        bool UnarchiveNull(const char* name) override;
 
         #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST

@@ -12,6 +12,7 @@
 #include "CompiledActivationFunctions.h"
 #include "ConstantNode.h"
 #include "MatrixVectorMultiplyNode.h"
+#include "SigmoidActivation.h"
 
 // utilities
 #include "Exception.h"
@@ -20,9 +21,9 @@ namespace ell
 {
 namespace nodes
 {
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    RecurrentLayerNode<ValueType, ActivationFunctionType>::RecurrentLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::RecurrentLayer<ValueType, ActivationFunctionType>& layer)
-        : NeuralNetworkLayerNode<RecurrentLayerNode<ValueType, ActivationFunctionType>, predictors::neural::RecurrentLayer<ValueType, ActivationFunctionType>, ValueType>(input, layer)
+    template <typename ValueType>
+    RecurrentLayerNode<ValueType>::RecurrentLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::RecurrentLayer<ValueType>& layer)
+        : NeuralNetworkLayerNode<RecurrentLayerNode<ValueType>, predictors::neural::RecurrentLayer<ValueType>, ValueType>(input, layer)
     {
         const auto& layerParameters = layer.GetLayerParameters();
         if (HasPadding(layerParameters.inputPaddingParameters))
@@ -36,8 +37,8 @@ namespace nodes
         }
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    bool RecurrentLayerNode<ValueType, ActivationFunctionType>::Refine(model::ModelTransformer& transformer) const
+    template <typename ValueType>
+    bool RecurrentLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
 
@@ -47,74 +48,76 @@ namespace nodes
 
         auto hiddenWeightsNode = transformer.AddNode<ConstantNode<ValueType>>(hiddenWeights.ToArray());
         auto hiddenBiasNode = transformer.AddNode<ConstantNode<ValueType>>(hiddenBias.ToArray());
-        ActivationFunctionType<ValueType> layerActivationFunction;
-        auto activationFunction = GetNodeActivationFunction(layerActivationFunction);
-        auto recurrentNode = transformer.AddNode<RecurrentNode<ValueType, ActivationFunctionType>>(newInput,
-                                                                                                   hiddenWeightsNode->output,
-                                                                                                   hiddenBiasNode->output,
-                                                                                                   this->GetInputMemoryLayout(),
-                                                                                                   this->GetOutputMemoryLayout());
+        
+        auto recurrentNode = transformer.AddNode<RecurrentNode<ValueType>>(newInput,
+                                                                           hiddenWeightsNode->output,
+                                                                           hiddenBiasNode->output,
+                                                                           this->_layer.GetActivationFunction(),
+                                                                           this->GetInputMemoryLayout(),
+                                                                           this->GetOutputMemoryLayout());
 
         transformer.MapNodeOutput(this->output, recurrentNode->output);
         return true;
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    void RecurrentLayerNode<ValueType, ActivationFunctionType>::Copy(model::ModelTransformer& transformer) const
+    template <typename ValueType>
+    void RecurrentLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
-        auto newNode = transformer.AddNode<RecurrentLayerNode<ValueType, ActivationFunctionType>>(newPortElements, this->_layer);
+        auto newNode = transformer.AddNode<RecurrentLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
 
     //
     // RecurrentNode
     //
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    RecurrentNode<ValueType, ActivationFunctionType>::RecurrentNode()
+    template <typename ValueType>
+    RecurrentNode<ValueType>::RecurrentNode()
         : CompilableNode({ &_input, &_hiddenWeights, &_hiddenBias }, { &_output }), _input(this, {}, defaultInputPortName), _hiddenWeights(this, {}, hiddenWeightsPortName), _hiddenBias(this, {}, hiddenBiasPortName), _output(this, defaultOutputPortName, 0)
     {
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    RecurrentNode<ValueType, ActivationFunctionType>::RecurrentNode(const model::PortElements<ValueType>& input,
+    template <typename ValueType>
+    RecurrentNode<ValueType>::RecurrentNode(const model::PortElements<ValueType>& input,
                                                                     const model::PortElements<ValueType>& hiddenWeights,
                                                                     const model::PortElements<ValueType>& hiddenBias,
+                                                                    const ActivationType& activation,
                                                                     const model::PortMemoryLayout& inputMemoryLayout,
                                                                     const model::PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input, &_hiddenWeights, &_hiddenBias }, { &_output }), _input(this, input, defaultInputPortName), _hiddenWeights(this, hiddenWeights, hiddenWeightsPortName), _hiddenBias(this, hiddenBias, hiddenBiasPortName), _output(this, defaultOutputPortName, hiddenBias.Size())
+        : CompilableNode({ &_input, &_hiddenWeights, &_hiddenBias }, { &_output }), _input(this, input, defaultInputPortName), _hiddenWeights(this, hiddenWeights, hiddenWeightsPortName), _hiddenBias(this, hiddenBias, hiddenBiasPortName), _output(this, defaultOutputPortName, hiddenBias.Size()),
+        _activation(activation)
     {
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    void RecurrentNode<ValueType, ActivationFunctionType>::Copy(model::ModelTransformer& transformer) const
+    template <typename ValueType>
+    void RecurrentNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newHiddenWeights = transformer.TransformPortElements(_hiddenWeights.GetPortElements());
         auto newHiddenBias = transformer.TransformPortElements(_hiddenBias.GetPortElements());
-        auto newNode = transformer.AddNode<RecurrentNode>(newInput, newHiddenWeights, newHiddenBias, _inputMemoryLayout, GetOutputMemoryLayout());
+        auto newNode = transformer.AddNode<RecurrentNode>(newInput, newHiddenWeights, newHiddenBias, _activation, _inputMemoryLayout, GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    void RecurrentNode<ValueType, ActivationFunctionType>::Compute() const
+    template <typename ValueType>
+    void RecurrentNode<ValueType>::Compute() const
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "RecurrentNode does not currently compute");
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    template <typename ActivationType>
-    void RecurrentNode<ValueType, ActivationFunctionType>::ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength)
+    template <typename ValueType>
+    void RecurrentNode<ValueType>::ApplyActivation(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength)
     {
-        function.For(dataLength, [data, activationFunction](emitters::IRFunctionEmitter& function, auto i) {
+        auto activationFunction = GetNodeActivationFunction(_activation);
+        function.For(dataLength, [&](emitters::IRFunctionEmitter& function, auto i) {
             llvm::Value* inputValue = function.ValueAt(data, i);
-            llvm::Value* x = activationFunction.Compile(function, inputValue);
+            llvm::Value* x = activationFunction->Compile(function, inputValue);
             function.SetValueAt(data, i, x);
         });
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    void RecurrentNode<ValueType, ActivationFunctionType>::ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* dataValue, size_t dataLength)
+    template <typename ValueType>
+    void RecurrentNode<ValueType>::ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* dataValue, size_t dataLength)
     {
         auto data = function.LocalArray(dataValue);
         auto sum = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), 1));
@@ -131,14 +134,11 @@ namespace nodes
         });
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    void RecurrentNode<ValueType, ActivationFunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    template <typename ValueType>
+    void RecurrentNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         const size_t inputSize = this->input.Size();
         const size_t hiddenSize = this->hiddenBias.Size();
-
-        ActivationFunctionType<ValueType> layerActivationFunction;
-        auto activationFunction = GetNodeActivationFunction(layerActivationFunction);
 
         // Get LLVM references for all node inputs
         llvm::Value* input = compiler.EnsurePortEmitted(this->input);
@@ -164,18 +164,12 @@ namespace nodes
         function.MemoryCopy<ValueType>(hiddenBias, output, hiddenSize); // Copy bias values into output so GEMM call accumulates them
         function.CallGEMV(m, n, static_cast<ValueType>(1.0), hiddenWeights, n, hiddenPlusInput, 1, static_cast<ValueType>(1.0), output, 1);
 
-        ApplyActivation(function, activationFunction, hiddenState, hiddenSize);
+        ApplyActivation(function, hiddenState, hiddenSize);
         // output <- hiddenState (no-op, since output and hidden state are aliases)
     }
 
     // Explicit instantiations
-    template class RecurrentLayerNode<float, predictors::neural::SigmoidActivation>;
-    template class RecurrentLayerNode<double, predictors::neural::SigmoidActivation>;
-    template class RecurrentLayerNode<float, predictors::neural::TanhActivation>;
-    template class RecurrentLayerNode<double, predictors::neural::TanhActivation>;
-    template class RecurrentNode<float, predictors::neural::SigmoidActivation>;
-    template class RecurrentNode<double, predictors::neural::SigmoidActivation>;
-    template class RecurrentNode<float, predictors::neural::TanhActivation>;
-    template class RecurrentNode<double, predictors::neural::TanhActivation>;
+    template class RecurrentLayerNode<float>;
+    template class RecurrentLayerNode<double>;
 } // nodes
 } // ell

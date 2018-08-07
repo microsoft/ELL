@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
+#include "Activation.h"
 // math
 #include "Tensor.h"
 #include "Vector.h"
@@ -23,43 +23,28 @@ namespace neural
 {
     /// <summary> Implements the hyperbolic tangent function: tanh(x) = 2 . sigmoid(2x) - 1 </summary>
     template <typename ElementType>
-    class TanhActivation
+    class TanhActivation : public ActivationImpl<ElementType>
     {
     public:
         /// <summary> Returns the output as a function of the input. </summary>
         ///
         /// <param name="input"> The input value. </param>
-        ElementType operator()(const ElementType input) const;
+        ElementType Apply(const ElementType input) const override;
 
-        /// <summary> Returns the output as a function of the input. </summary>
+        /// <summary> Gets the name of this type. </summary>
         ///
-        /// <param name="input"> The input value. </param>
-        ElementType Apply(const ElementType input) const;
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("TanhActivation"); }
 
-        /// <summary> Returns the output as a function of the input. </summary>
+        /// <summary> Gets the name of this type (for serialization). </summary>
         ///
-        /// <param name="input"> The input value. </param>
-        /// <param name="index"> The input index. </param>
-        ElementType Apply(const ElementType input, const math::IntegerTriplet& index) const;
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Applies the activation to the input vector in-place. </summary>
+        /// <summary> Make a copy of this activation. </summary>
         ///
-        /// <param name="input"> The input vector. </param>
-        void Apply(math::ColumnVectorReference<ElementType>& input) const;
-
-        /// <summary> Typename used for serialization. </summary>
-        /// Note: In the future, this will change to include the templated element type
-        static std::string GetTypeName() { return "TanhActivation"; }
-
-        /// <summary> Archives this object. </summary>
-        ///
-        /// <param name="archiver"> The archiver. </param>
-        void WriteToArchive(utilities::Archiver& /*archiver*/) const {};
-
-        /// <summary> Unarchives this object. </summary>
-        ///
-        /// <param name="archiver"> The unarchiver. </param>
-        void ReadFromArchive(utilities::Unarchiver& /*archiver*/) {};
+        /// <returns> The copy in a unique pointer. </param>
+        std::unique_ptr<ActivationImpl<ElementType>> Copy() const override;
     };
 }
 }

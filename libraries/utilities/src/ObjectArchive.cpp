@@ -70,5 +70,12 @@ namespace utilities
         }
         return *(iter->second);
     }
+
+    void ObjectArchive::SetNull()
+    {
+        _value = Variant();
+    }
+
+
 }
 }

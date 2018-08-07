@@ -43,6 +43,14 @@ namespace utilities
         WriteScalar(name, value);
     }
 
+    void JsonArchiver::ArchiveNull(const char* name)
+    {
+        FinishPreviousLine();
+        auto indent = GetCurrentIndent();
+        _out << indent;
+        _out << "\"" << name << "\": null";
+    }
+
     // IArchivable
     void JsonArchiver::BeginArchiveObject(const char* name, const IArchivable& value)
     {
@@ -177,6 +185,21 @@ namespace utilities
     void JsonUnarchiver::UnarchiveValue(const char* name, std::string& value)
     {
         ReadScalar(name, value);
+    }
+
+    bool JsonUnarchiver::UnarchiveNull(const char* name) 
+    {
+        bool result = false;
+        PeekStack stack(_tokenizer);
+        if (stack.Peek() == "\"" && stack.Peek() == name && stack.Peek() == "\"" && stack.Peek() == ":")
+        {
+            result = stack.Peek() == "null";
+            if (result) 
+            {
+                stack.Consume();
+            }
+        }
+        return result;
     }
 
     // IArchivable

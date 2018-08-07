@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include "HardSigmoidActivation.h"
+#include "Activation.h"
 #include "Layer.h"
-#include "TanhActivation.h"
-#include "SigmoidActivation.h"
 
 // math
 #include "Matrix.h"
+
+// stl
+#include <memory>
 
 namespace ell
 {
@@ -41,7 +42,7 @@ namespace predictors
         /// A layer in a recurrent network that implements an LSTM layer. This layer retains "memory"
         /// over time and uses this information to inform predictions.
         /// </summary>
-        template <typename ElementType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
+        template <typename ElementType>
         class LSTMLayer : public Layer<ElementType>
         {
         public:
@@ -54,6 +55,7 @@ namespace predictors
             using Layer<ElementType>::NumOutputRowsMinusPadding;
             using Layer<ElementType>::NumOutputColumnsMinusPadding;
             using Layer<ElementType>::NumOutputChannels;
+            using ActivationType = Activation<ElementType>;
 
             /// <summary> Default constructor. </summary>
             LSTMLayer();
@@ -63,7 +65,13 @@ namespace predictors
             /// <param name="layerParameters"> The parameters common to every layer. </param>
             /// <param name="parameters"> The weights and biases applicable to an LSTM. Weights should be organised as: [weights, recurrent layer weights] or [W, U].
             /// Biases should be compatible in dimensionality with the output of the network.</param>
-            LSTMLayer(const LayerParameters& layerParameters, LSTMParameters<ElementType>& parameters);
+            /// <param name="activation"> The activation to use on the new hidden state</param>
+            /// <param name="recurrentActivation"> The activation to use on the update and reset gates</param>
+            LSTMLayer(const LayerParameters& layerParameters, LSTMParameters<ElementType>& parameters, 
+                const ActivationType& activation, const ActivationType& recurrentActivation);
+
+            /// <summary> Make a copy of this layer. </summary>
+            LSTMLayer(const LSTMLayer& other);
 
             /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
             void Compute() override;
@@ -113,13 +121,23 @@ namespace predictors
             /// <returns> A vector of biases. </returns>
             const VectorType& GetOutputBias() const { return _outputBias; }
 
+            /// <summary> Retrieves the activation function currently in use by this layer </summary>
+            ///
+            /// <returns> The Activation object</returns>
+            const ActivationType& GetActivationFunction() const { return _activation; }
+
+            /// <summary> Retrieves the recurrent activation function currently in use by this layer </summary>
+            ///
+            /// <returns> The Activation object</returns>
+            const ActivationType& GetRecurrentActivationFunction() const { return _recurrentActivation; }
+
             /// <summary> Resets the layer's hidden values </summary>
             void Reset() override;
 
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
             /// <returns> The name of this type. </returns>
-            static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType, ActivationFunctionType<ElementType>, RecurrentActivationFunctionType<ElementType>>("LSTMLayer"); }
+            static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("LSTMLayer"); }
 
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
@@ -148,8 +166,8 @@ namespace predictors
             VectorType _inputPlusHiddenVector;
             VectorType _ctActual;
 
-            ActivationFunctionType<ElementType> _activationFunction;
-            RecurrentActivationFunctionType<ElementType> _recurrentActivationFunction;
+            ActivationType _activation;
+            ActivationType _recurrentActivation;
         };
     }
 }

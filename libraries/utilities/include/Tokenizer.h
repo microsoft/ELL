@@ -89,5 +89,40 @@ namespace utilities
 
         char _currentStringDelimiter = '\0'; // '\0' if we're not currently parsing a string
     };
+
+
+    /// This helper class lets you peek random number of times and it restores all
+    /// those tokens when it goes out of scope.
+    class PeekStack
+    {
+    public:
+        PeekStack(Tokenizer& tokenizer) : _tokenizer(tokenizer)
+        {
+        }
+        std::string Peek()
+        {
+            auto token = _tokenizer.ReadNextToken();
+            _tokens.push(token);
+            return token;
+        }
+        ~PeekStack()
+        {
+            while (!_tokens.empty())
+            {
+                _tokenizer.PutBackToken(_tokens.top());                    
+                _tokens.pop();
+            }
+        }
+        // go ahead and consume all the tokens (don't put them back on the _tokenizer)
+        void Consume()
+        {
+            _tokens = std::stack<std::string>();
+        }
+    private:
+        std::stack<std::string> _tokens;
+        Tokenizer& _tokenizer;
+    };
+
+
 }
 }

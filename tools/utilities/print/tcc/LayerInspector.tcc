@@ -1,6 +1,7 @@
 #pragma once
 
 // model
+#include "ActivationLayer.h"
 #include "InputPort.h"
 #include "Model.h"
 #include "NeuralNetworkPredictorNode.h"
@@ -76,6 +77,18 @@ namespace ell
 	}
 
     template<typename ElementType>
+    std::vector<NameValue> InspectActivationLayerParameters(const ell::predictors::neural::ActivationLayer<ElementType>* layer)
+    {
+        std::vector<NameValue> result;
+        auto impl = layer->GetActivationFunction().GetImpl();
+        if (impl) 
+        {
+            result.push_back(NameValue{ "activation", impl->GetRuntimeTypeName() });
+        }
+        return result;
+    }
+
+    template<typename ElementType>
     std::vector<NameValue> InspectBinaryConvolutionalLayerParameters(const ell::predictors::neural::BinaryConvolutionalLayer<ElementType>* layer)
     {
         std::vector<NameValue> result;
@@ -129,6 +142,13 @@ namespace ell
         }
         if (outputpadding.paddingSize != 0) {
             result.push_back(NameValue{ "outputPadding", PaddingSchemeToString(outputpadding.paddingScheme) + "," + std::to_string(outputpadding.paddingSize) });
+        }
+
+        const ell::predictors::neural::ActivationLayer<ElementType>* act = dynamic_cast<const ell::predictors::neural::ActivationLayer<ElementType>*>(&layer);
+        if (act != nullptr)
+        {
+            std::vector<NameValue> more = InspectActivationLayerParameters<ElementType>(act);
+            result.insert(result.end(), more.begin(), more.end());
         }
 
         const ell::predictors::neural::BinaryConvolutionalLayer<ElementType>* bcl = dynamic_cast<const ell::predictors::neural::BinaryConvolutionalLayer<ElementType>*>(&layer);

@@ -19,21 +19,21 @@ namespace neural
     }
 
     template <typename ElementType>
-    ElementType LeakyReLUActivation<ElementType>::operator()(const ElementType input) const
+    void LeakyReLUActivation<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        return Apply(input);
+        archiver["leakyFactor"] << _leakyFactor;
     }
 
     template <typename ElementType>
-    ElementType LeakyReLUActivation<ElementType>::Apply(const ElementType input, const math::IntegerTriplet& /*index*/) const
+    void LeakyReLUActivation<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        return Apply(input);
+        archiver["leakyFactor"] >> _leakyFactor;
     }
 
     template <typename ElementType>
-    void LeakyReLUActivation<ElementType>::Apply(math::ColumnVector<ElementType>& input) const
+    std::unique_ptr<ActivationImpl<ElementType>> LeakyReLUActivation<ElementType>::Copy() const
     {
-        input.Transform([this](ElementType value){ return Apply(value); });
+        return std::make_unique<LeakyReLUActivation<ElementType>>(_leakyFactor);
     }
 }
 }

@@ -19,14 +19,14 @@ namespace ell
 {
 namespace nodes
 {
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::LSTMLayerNode()
+    template<typename ValueType>
+    LSTMLayerNode<ValueType>::LSTMLayerNode()
         : _reset(this, {}, "reset")
     {
     }
 
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::LSTMLayerNode(const model::PortElements<ValueType>& input, const model::PortElements<int>& reset, const LayerType& layer)
+    template<typename ValueType>
+    LSTMLayerNode<ValueType>::LSTMLayerNode(const model::PortElements<ValueType>& input, const model::PortElements<int>& reset, const LayerType& layer)
         : BaseType(input, layer), _reset(this, reset, "reset")
     {
         this->AddInputPort(&_reset);
@@ -42,8 +42,8 @@ namespace nodes
         }
     }
 
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    bool LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Refine(model::ModelTransformer& transformer) const
+    template<typename ValueType>
+    bool LSTMLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
         ell::model::PortElements<int> newReset;
@@ -79,7 +79,7 @@ namespace nodes
         auto candidateBiasNode = transformer.AddNode<ConstantNode<ValueType>>(candidateBias.ToArray());
         auto outputBiasNode = transformer.AddNode<ConstantNode<ValueType>>(outputBias.ToArray());
 
-        using ComputeNodeType = LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>;
+        using ComputeNodeType = LSTMNode<ValueType>;
         auto lstmNode = transformer.AddNode<ComputeNodeType>(newInput,
                                                              newReset,
                                                              inputWeightsNode->output,
@@ -90,6 +90,8 @@ namespace nodes
                                                              forgetMeBiasNode->output,
                                                              candidateBiasNode->output,
                                                              outputBiasNode->output,
+                                                             this->_layer.GetActivationFunction(),
+                                                             this->_layer.GetRecurrentActivationFunction(),
                                                              this->GetInputMemoryLayout(),
                                                              this->GetOutputMemoryLayout());
 
@@ -97,8 +99,8 @@ namespace nodes
         return true;
     }
 
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    void LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Copy(model::ModelTransformer& transformer) const
+    template<typename ValueType>
+    void LSTMLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
         ell::model::PortElements<int> newResetElements;
@@ -113,19 +115,19 @@ namespace nodes
         {
             newResetElements = transformer.TransformPortElements(this->reset.GetPortElements());
         }
-        auto newNode = transformer.AddNode<LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>>(newPortElements, newResetElements, this->_layer);
+        auto newNode = transformer.AddNode<LSTMLayerNode<ValueType>>(newPortElements, newResetElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
 
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    void LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::WriteToArchive(utilities::Archiver& archiver) const
+    template<typename ValueType>
+    void LSTMLayerNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         BaseType::WriteToArchive(archiver);
         archiver["reset"] << _reset;
     }
 
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    void LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    template<typename ValueType>
+    void LSTMLayerNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         BaseType::ReadFromArchive(archiver);
         archiver["reset"] >> _reset;
@@ -136,8 +138,8 @@ namespace nodes
     //
     // LSTMNode
     //
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::LSTMNode()
+    template<typename ValueType>
+    LSTMNode<ValueType>::LSTMNode()
         : CompilableNode({ &_input, &_resetTrigger, &_inputWeights, &_forgetMeWeights, &_candidateWeights, &_outputWeights, &_inputBias, &_forgetMeBias, &_candidateBias, &_outputBias },
                          { &_output })
         , _input(this, {}, defaultInputPortName)
@@ -154,8 +156,8 @@ namespace nodes
     {
     }
 
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::LSTMNode(const model::PortElements<ValueType>& input,
+    template<typename ValueType>
+    LSTMNode<ValueType>::LSTMNode(const model::PortElements<ValueType>& input,
                                                                                            const model::PortElements<int>& resetTrigger,
                                                                                            const model::PortElements<ValueType>& inputWeights,
                                                                                            const model::PortElements<ValueType>& forgetMeWeights,
@@ -165,6 +167,8 @@ namespace nodes
                                                                                            const model::PortElements<ValueType>& forgetMeBias,
                                                                                            const model::PortElements<ValueType>& candidateBias,
                                                                                            const model::PortElements<ValueType>& outputBias,
+                                                                                           const ActivationType& activation,
+                                                                                           const ActivationType& recurrentActivation,
                                                                                            const model::PortMemoryLayout& inputMemoryLayout,
                                                                                            const model::PortMemoryLayout& outputMemoryLayout)
         : CompilableNode({ &_input, &_resetTrigger, &_inputWeights, &_forgetMeWeights, &_candidateWeights, &_outputWeights, &_inputBias, &_forgetMeBias, &_candidateBias, &_outputBias },
@@ -180,11 +184,13 @@ namespace nodes
         , _candidateBias(this, candidateBias, candidateBiasPortName)
         , _outputBias(this, outputBias, outputBiasPortName)
         , _output(this, defaultOutputPortName, inputBias.Size())
+        , _activation(activation)
+        , _recurrentActivation(recurrentActivation)
     {
     }
 
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Copy(model::ModelTransformer& transformer) const
+    template<typename ValueType>
+    void LSTMNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newResetTrigger = transformer.TransformPortElements(_resetTrigger.GetPortElements());
@@ -196,24 +202,24 @@ namespace nodes
         auto newForgetMeBias = transformer.TransformPortElements(_forgetMeBias.GetPortElements());
         auto newCandidateBias = transformer.TransformPortElements(_candidateBias.GetPortElements());
         auto newOutputBias = transformer.TransformPortElements(_outputBias.GetPortElements());
-        auto newNode = transformer.AddNode<LSTMNode>(newInput, newResetTrigger, newInputWeights, newForgetMeWeights, newCandidateWeights, newOutputWeights, newInputBias, newForgetMeBias, newCandidateBias, newOutputBias, _inputMemoryLayout, GetOutputMemoryLayout());
+        auto newNode = transformer.AddNode<LSTMNode>(newInput, newResetTrigger, newInputWeights, newForgetMeWeights, newCandidateWeights, newOutputWeights, newInputBias, newForgetMeBias, newCandidateBias, newOutputBias, _activation, _recurrentActivation, _inputMemoryLayout, GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Compute() const
+    template<typename ValueType>
+    void LSTMNode<ValueType>::Compute() const
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "LSTMNode does not currently compute");
     }
 
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Reset()
+    template<typename ValueType>
+    void LSTMNode<ValueType>::Reset()
     {
         // noop until Compute() is implemented...
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-    void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* dataValue, size_t dataLength)
+    template <typename ValueType>
+    void LSTMNode<ValueType>::ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* dataValue, size_t dataLength)
     {
         auto data = function.LocalArray(dataValue);
         auto sum = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), 1));
@@ -230,19 +236,19 @@ namespace nodes
         });
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-    template <typename ActivationType>
-    void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength)
+    template <typename ValueType>
+    void LSTMNode<ValueType>::ApplyActivation(emitters::IRFunctionEmitter& function, const ActivationType& activation, llvm::Value* data, size_t dataLength)
     {
-        function.For(dataLength, [data, activationFunction](emitters::IRFunctionEmitter& function, auto i) {
+        auto activationFunction = GetNodeActivationFunction<ValueType>(activation);
+        function.For(dataLength, [&](emitters::IRFunctionEmitter& function, auto i) {
             auto inputValue = function.ValueAt(data, i);
-            auto x = activationFunction.Compile(function, inputValue);
+            auto x = activationFunction->Compile(function, inputValue);
             function.SetValueAt(data, i, x);
         });
     }
 
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
-    void LSTMNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    template<typename ValueType>
+    void LSTMNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         const size_t inputSize = this->input.Size();
         const size_t hiddenSize = this->inputBias.Size();
@@ -252,12 +258,7 @@ namespace nodes
         {
             outputSize = hiddenSize;
         }
-
-        ActivationFunctionType<ValueType> layerActivationFunction;
-        auto activationFunction = GetNodeActivationFunction(layerActivationFunction);
-        RecurrentActivationFunctionType<ValueType> recurrentLayerActivationFunction;
-        auto recurrentActivationFunction = GetNodeActivationFunction(recurrentLayerActivationFunction);
-
+        
         // Global state (in addition to output)
         emitters::IRModuleEmitter& module = function.GetModule();
         emitters::VariableType varType = emitters::GetVariableType<ValueType>();
@@ -298,17 +299,17 @@ namespace nodes
         // ft = recurrentFunction(Wf * [Xt, Ht-1] + Bf)    (where recurrentFunction is usually sigmoid)
         function.MemoryCopy<ValueType>(forgetMeBias, ft, hiddenSize); // Copy bias values into output so GEMM call accumulates them
         function.CallGEMV(hiddenSize, inputSize + hiddenSize, static_cast<ValueType>(1.0), forgetMeWeights, inputSize + hiddenSize, inputPlusHidden, 1, static_cast<ValueType>(1.0), ft, 1);
-        ApplyActivation(function, recurrentActivationFunction, ft, hiddenSize);
+        ApplyActivation(function, _recurrentActivation, ft, hiddenSize);
 
         // it = recurrentFunction(Wi * [Xt, Ht-1] + Bi)    (where recurrentFunction is usually sigmoid)
         function.MemoryCopy<ValueType>(inputBias, it, hiddenSize); // Copy bias values into output so GEMM call accumulates them
         function.CallGEMV(hiddenSize, inputSize + hiddenSize, static_cast<ValueType>(1.0), inputWeights, inputSize + hiddenSize, inputPlusHidden, 1, static_cast<ValueType>(1.0), it, 1);
-        ApplyActivation(function, recurrentActivationFunction, it, hiddenSize);
+        ApplyActivation(function, _recurrentActivation, it, hiddenSize);
 
         // Ct~ = activationFunction(Wc * [Xt, Ht-1] + Bc)  (where activationFunction is usually tanh)
         function.MemoryCopy<ValueType>(candidateBias, ctNew, hiddenSize); // Copy bias values into output so GEMM call accumulates them
         function.CallGEMV(hiddenSize, inputSize + hiddenSize, static_cast<ValueType>(1.0), candidateWeights, inputSize + hiddenSize, inputPlusHidden, 1, static_cast<ValueType>(1.0), ctNew, 1);
-        ApplyActivation(function, activationFunction, ctNew, hiddenSize);
+        ApplyActivation(function, _activation, ctNew, hiddenSize);
 
         // Ct = ft * Ct-1 + it * Ct~
         function.For(hiddenSize, [ctActualValue, ft, it, ctNew](emitters::IRFunctionEmitter& function, llvm::Value* i) {
@@ -328,11 +329,11 @@ namespace nodes
         // ot = recurrentFunction(Wo * [Xt, Ht-1] + Bo)
         function.MemoryCopy<ValueType>(outputBias, ot, hiddenSize); // Copy bias values into output so GEMM call accumulates them
         function.CallGEMV(hiddenSize, inputSize + hiddenSize, static_cast<ValueType>(1.0), outputWeights, inputSize + hiddenSize, inputPlusHidden, 1, static_cast<ValueType>(1.0), ot, 1);
-        ApplyActivation(function, recurrentActivationFunction, ot, hiddenSize);
+        ApplyActivation(function, _recurrentActivation, ot, hiddenSize);
 
         // compute the hidden layer and copy into state vector
         // ht = ot * activationFunction(Ct)  (where activationFunction is usually tanh)
-        ApplyActivation(function, activationFunction, ctActualValue, hiddenSize);
+        ApplyActivation(function, _activation, ctActualValue, hiddenSize);
 
         function.For(hiddenSize, [ot, ctActualValue, hiddenState](emitters::IRFunctionEmitter& function, auto index) {
             auto otVal = ot[index];
@@ -365,30 +366,10 @@ namespace nodes
     }
 
         // Explicit specialization
-#define INSTANTIATE_LSTM(activation1, activation2)                  \
-    template class LSTMLayerNode<float, activation1, activation2>;  \
-    template class LSTMLayerNode<double, activation1, activation2>; \
-    template class LSTMNode<float, activation1, activation2>;       \
-    template class LSTMNode<double, activation1, activation2>
+template class LSTMLayerNode<float>;  
+template class LSTMLayerNode<double>; 
+template class LSTMNode<float>;       
+template class LSTMNode<double>;
 
-    INSTANTIATE_LSTM(predictors::neural::HardSigmoidActivation, predictors::neural::HardSigmoidActivation);
-    INSTANTIATE_LSTM(predictors::neural::HardSigmoidActivation, predictors::neural::ReLUActivation);
-    INSTANTIATE_LSTM(predictors::neural::HardSigmoidActivation, predictors::neural::SigmoidActivation);
-    INSTANTIATE_LSTM(predictors::neural::HardSigmoidActivation, predictors::neural::TanhActivation);
-
-    INSTANTIATE_LSTM(predictors::neural::ReLUActivation, predictors::neural::HardSigmoidActivation);
-    INSTANTIATE_LSTM(predictors::neural::ReLUActivation, predictors::neural::ReLUActivation);
-    INSTANTIATE_LSTM(predictors::neural::ReLUActivation, predictors::neural::SigmoidActivation);
-    INSTANTIATE_LSTM(predictors::neural::ReLUActivation, predictors::neural::TanhActivation);
-
-    INSTANTIATE_LSTM(predictors::neural::SigmoidActivation, predictors::neural::HardSigmoidActivation);
-    INSTANTIATE_LSTM(predictors::neural::SigmoidActivation, predictors::neural::ReLUActivation);
-    INSTANTIATE_LSTM(predictors::neural::SigmoidActivation, predictors::neural::SigmoidActivation);
-    INSTANTIATE_LSTM(predictors::neural::SigmoidActivation, predictors::neural::TanhActivation);
-
-    INSTANTIATE_LSTM(predictors::neural::TanhActivation, predictors::neural::HardSigmoidActivation);
-    INSTANTIATE_LSTM(predictors::neural::TanhActivation, predictors::neural::ReLUActivation);
-    INSTANTIATE_LSTM(predictors::neural::TanhActivation, predictors::neural::SigmoidActivation);
-    INSTANTIATE_LSTM(predictors::neural::TanhActivation, predictors::neural::TanhActivation);
 } // nodes
 } // ell

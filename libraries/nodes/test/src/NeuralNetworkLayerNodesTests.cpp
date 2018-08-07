@@ -249,8 +249,8 @@ static void TestActivationLayerNode()
     input(1, 1, 1) = -4.0;
     Shape activationOutputShape = { 4, 4, 2 };
     LayerParameters activationParameters{ input, NoPadding(), activationOutputShape, ZeroPadding(1) };
-
-    ActivationLayer<ElementType, ReLUActivation> activationLayer(activationParameters);
+    
+    ActivationLayer<ElementType> activationLayer(activationParameters, new ReLUActivation<ElementType>());
     activationLayer.Compute();
     auto output = activationLayer.GetOutput();
     testing::ProcessTest("Testing ActivationLayer, values", output(1, 1, 0) == 1.0 && output(1, 2, 0) == 0 && output(2, 1, 1) == 3.0 && output(2, 2, 1) == 0);
@@ -259,7 +259,7 @@ static void TestActivationLayerNode()
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(input.Size());
-    auto activationNode = model.AddNode<nodes::ActivationLayerNode<double, ReLUActivation>>(inputNode->output, activationLayer);
+    auto activationNode = model.AddNode<nodes::ActivationLayerNode<double>>(inputNode->output, activationLayer);
 
     inputNode->SetInput(input.ToArray());
     auto modelOutput = model.ComputeOutput(activationNode->output);

@@ -1262,7 +1262,7 @@ void TestIRNode()
 
 // Helper function
 template <typename ElementType>
-void VerifyLayerMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
+void VerifyLayerMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename Layer<ElementType>::TensorType& inputWithPadding, const typename Layer<ElementType>::ConstTensorReferenceType& output)
 {
     std::vector<std::vector<ElementType>> signal = { inputWithPadding.ToArray() };
     std::vector<std::vector<ElementType>> expectedOutput = { output.ToArray() };
@@ -1278,7 +1278,7 @@ void VerifyLayerMap(const ell::model::Map& map, const ell::model::Node* computeN
 }
 
 template <typename ElementType>
-void VerifyArchiveAndUnarchivingMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
+void VerifyArchiveAndUnarchivingMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename Layer<ElementType>::TensorType& inputWithPadding, const typename Layer<ElementType>::ConstTensorReferenceType& output)
 {
     // Test archiving / unarchiving produces same result as map before
     // archiving.
@@ -1383,7 +1383,7 @@ void TestNeuralNetworkPredictorNode2()
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
 
     layerParameters = { layers[1]->GetOutput(), NoPadding(), { 1, 1, 3 }, NoPadding() };
-    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, ReLUActivation>(layerParameters)));
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType>(layerParameters, new ReLUActivation<ElementType>())));
 
     layerParameters = { layers[2]->GetOutput(), NoPadding(), { 1, 1, 1 }, NoPadding() };
     MatrixType weights2(1, 3);
@@ -1669,7 +1669,7 @@ void TestNeuralNetworkPredictorNode6()
 
     // ActivationLayer
     layerParameters = { layers[1]->GetOutput(), NoPadding(), { 3, 3, 8 }, NoPadding() };
-    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, ReLUActivation>(layerParameters)));
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType>(layerParameters, new ReLUActivation<ElementType>())));
 
     // BatchNormalizationLayer
     layerParameters = { layers[2]->GetOutput(), NoPadding(), { 3, 3, 8 }, NoPadding() };
@@ -1773,7 +1773,7 @@ void TestNeuralNetworkPredictorNode7()
     // layer_4 = ActivationLayer<float,LeakyReLUActivation>(shape=[224,224,16])
     // ActivationLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 224, 224, 16 }, NoPadding() };
-    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, LeakyReLUActivation>(layerParameters)));
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType>(layerParameters, new LeakyReLUActivation<ElementType>(0))));
 
     // layer_5 = PoolingLayer<float,MaxPoolingFunction>(shape=[114,114,16])
     // Max PoolingLayer
@@ -1815,7 +1815,7 @@ void TestNeuralNetworkPredictorNode7()
     // layer_10 = ActivationLayer<float,LeakyReLUActivation>(shape=[112,112,32])
     // ActivationLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 112, 112, 32 }, NoPadding() };
-    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, LeakyReLUActivation>(layerParameters)));
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType>(layerParameters, new LeakyReLUActivation<ElementType>(0))));
 
     // layer_11 = PoolingLayer<float,MaxPoolingFunction>(shape=[56,56,32])
     // Max PoolingLayer
@@ -1857,7 +1857,7 @@ void TestNeuralNetworkPredictorNode7()
     // layer_16 = ActivationLayer<float,LeakyReLUActivation>(shape=[58,58,16])
     // ActivationLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 58, 58, 16 }, ZeroPadding(1) };
-    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, LeakyReLUActivation>(layerParameters)));
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType>(layerParameters, new LeakyReLUActivation<ElementType>(0))));
 
     // layer_17 = ConvolutionalLayer<float>(shape=[56,56,128])
     layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { 56, 56, 128 }, NoPadding() };
@@ -1931,10 +1931,9 @@ void TestInputLayerNode(size_t outputPadding)
     VerifyCompiledOutput(map, compiledMap, signal, "InputLayer");
 }
 
-template <template <typename> class ActivationFunction>
-void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+template <typename ElementType>
+void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize, Activation<ElementType> activation)
 {
-    using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
     using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
@@ -1950,14 +1949,14 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
     LayerParameters layerParameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
 
-    ActivationLayer<ElementType, ActivationFunction> layer(layerParameters);
+    ActivationLayer<ElementType> layer(layerParameters, activation);
     layer.Compute();
     auto output = layer.GetOutput();
 
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::ActivationLayerNode<ElementType, ActivationFunction>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<nodes::ActivationLayerNode<ElementType>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -1967,22 +1966,22 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 
 void TestHardSigmoidActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    TestActivationLayerNode<ell::predictors::neural::HardSigmoidActivation>(inputPaddingSize, outputPaddingSize);
+    TestActivationLayerNode<double>(inputPaddingSize, outputPaddingSize, new HardSigmoidActivation<double>());
 }
 
 void TestReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    TestActivationLayerNode<ell::predictors::neural::ReLUActivation>(inputPaddingSize, outputPaddingSize);
+    TestActivationLayerNode<double>(inputPaddingSize, outputPaddingSize, new ReLUActivation<double>());
 }
 
 void TestLeakyReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    TestActivationLayerNode<ell::predictors::neural::LeakyReLUActivation>(inputPaddingSize, outputPaddingSize);
+    TestActivationLayerNode<double>(inputPaddingSize, outputPaddingSize, new LeakyReLUActivation<double>());
 }
 
 void TestSigmoidActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    TestActivationLayerNode<ell::predictors::neural::SigmoidActivation>(inputPaddingSize, outputPaddingSize);
+    TestActivationLayerNode<double>(inputPaddingSize, outputPaddingSize, new SigmoidActivation<double>());
 }
 
 void TestParametricReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
@@ -2010,8 +2009,7 @@ void TestParametricReLUActivationLayerNode(size_t inputPaddingSize, size_t outpu
     alpha(1, 0, 1) = 0.3;
     alpha(1, 1, 1) = 0.4;
 
-    ParametricReLUActivation<ElementType> prelu(alphaWithPadding);
-    ActivationLayer<ElementType, ParametricReLUActivation> layer(layerParameters, prelu);
+    ActivationLayer<ElementType> layer(layerParameters, new ParametricReLUActivation<ElementType>(alphaWithPadding));
     layer.Compute();
     auto output = layer.GetOutput();
 
@@ -2108,7 +2106,7 @@ void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
-void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, size_t numChannels, size_t numFilters, size_t inputPaddingSize, size_t outputPaddingSize, ell::predictors::neural::PaddingScheme paddingScheme, bool scaleByFilterMeans)
+void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, size_t numChannels, size_t numFilters, size_t inputPaddingSize, size_t outputPaddingSize, PaddingScheme paddingScheme, bool scaleByFilterMeans)
 {
     using ElementType = float;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
@@ -2510,8 +2508,8 @@ void TestMaxPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, s
 
 void TestMeanPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    TestPoolingLayerNode<double, ell::predictors::neural::MeanPoolingFunction>(inRows, inCols, numChannels, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-10);
-    TestPoolingLayerNode<float, ell::predictors::neural::MeanPoolingFunction>(inRows, inCols, numChannels, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-5);
+    TestPoolingLayerNode<double, MeanPoolingFunction>(inRows, inCols, numChannels, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-10);
+    TestPoolingLayerNode<float, MeanPoolingFunction>(inRows, inCols, numChannels, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-5);
 }
 
 void TestScalingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)

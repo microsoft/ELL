@@ -8,6 +8,7 @@
 
 %{
 #include "ModelInterface.h"
+#include <vector>
 %}
 
 // Language-specific callable wrappers for Map callbacks

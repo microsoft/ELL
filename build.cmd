@@ -93,7 +93,7 @@ if ERRORLEVEL 1 goto :nodelete
 if "!DEBUG!"=="1" dir "%VCToolsInstallDir%\bin\Hostx86\x86\"
 cd build
 echo cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" ..
-cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" "-DGIT_REPO=%TEST_MODEL_REPO"  ..
+cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" "-DGIT_REPO=!TEST_MODEL_REPO!"  ..
 if ERRORLEVEL 1 goto :cmakerror
 goto :buildit
 
@@ -101,7 +101,7 @@ goto :buildit
 REM try specifying the compiler
 set CPATH=%VCToolsInstallDir:\=/%
 echo %CPATH%
-cmake -G "!CMakeGenerator!" "!STRICT!" "-DGIT_REPO=%TEST_MODEL_REPO" "-DCMAKE_C_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" "-DCMAKE_CXX_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" ..
+cmake -G "!CMakeGenerator!" "!STRICT!" "-DGIT_REPO=!TEST_MODEL_REPO!" "-DCMAKE_C_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" "-DCMAKE_CXX_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" ..
 if ERRORLEVEL 1 goto :nocmake
 
 :buildit

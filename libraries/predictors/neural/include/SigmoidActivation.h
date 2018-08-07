@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "Activation.h"
+
 // math
 #include "Tensor.h"
 
@@ -19,7 +21,7 @@ namespace neural
 {
     /// <summary> Implements the sigmoid function: loss(x) = 1.0 / (1.0 + exp(-1.0 * x)) </summary>
     template <typename ElementType>
-    class SigmoidActivation
+    class SigmoidActivation : public ActivationImpl<ElementType>
     {
     public:
         /// <summary> Returns the output as a function of the input. </summary>
@@ -27,41 +29,22 @@ namespace neural
         /// <param name="input"> The input value. </param>
         ///
         /// <returns> The computed output. </param>
-        ElementType operator()(const ElementType input) const;
+        ElementType Apply(const ElementType input) const override;
 
-        /// <summary> Returns the output as a function of the input. </summary>
+        /// <summary> Gets the name of this type. </summary>
         ///
-        /// <param name="input"> The input value. </param>
-        ///
-        /// <returns> The computed output. </param>
-        ElementType Apply(const ElementType input) const;
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("SigmoidActivation"); }
 
-        /// <summary> Returns the output as a function of the input. </summary>
+        /// <summary> Gets the name of this type (for serialization). </summary>
         ///
-        /// <param name="input"> The input value. </param>
-        /// <param name="index"> The input index. </param>
-        ///
-        /// <returns> The computed output. </param>
-        ElementType Apply(const ElementType input, const math::IntegerTriplet& index) const;
+        /// <returns> The name of this type. </returns>
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Applies the activation to the input vector in-place. </summary>
+        /// <summary> Make a copy of this activation. </summary>
         ///
-        /// <param name="input"> The input vector. </param>
-        void Apply(math::ColumnVector<ElementType>& input) const;
-
-        /// <summary> Typename used for serialization. </summary>
-        /// Note: In the future, this will change to include the templated element type
-        static std::string GetTypeName() { return "SigmoidActivation"; }
-
-        /// <summary> Archives this object. </summary>
-        ///
-        /// <param name="archiver"> The archiver. </param>
-        void WriteToArchive(utilities::Archiver& /*archiver*/) const {};
-
-        /// <summary> Unarchives this object. </summary>
-        ///
-        /// <param name="archiver"> The unarchiver. </param>
-        void ReadFromArchive(utilities::Unarchiver& /*archiver*/) {};
+        /// <returns> The copy in a unique pointer. </param>
+        std::unique_ptr<ActivationImpl<ElementType>> Copy() const override;
     };
 }
 }

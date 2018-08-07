@@ -20,14 +20,15 @@
 
 // stl
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <vector>
 
 namespace ell
 {
-    //
-    // Types used in tests
-    //
+//
+// Types used in tests
+//
 struct TestStruct : public utilities::IArchivable
 {
     int a = 0;
@@ -62,32 +63,38 @@ struct TestStruct : public utilities::IArchivable
 
 struct OptionalValueStruct : public utilities::IArchivable
 {
-    int a = 0;
-    int b = 0;
-    bool hasB = true;
+    int _a = 0;
+    int _b = 0;
+    bool _hasB = true;
+    std::unique_ptr<int> _x;
 
     OptionalValueStruct() = default;
     OptionalValueStruct(int a)
-        : a(a), hasB(false) {}
-    OptionalValueStruct(int a, int b)
-        : a(a), b(b) {}
+        : _a(a), _hasB(false) {}
+    OptionalValueStruct(int a, int b, int* x = nullptr)
+        : _a(a), _b(b)
+    {
+        if (x) _x = std::make_unique<int>(*x);
+    }
     static std::string GetTypeName() { return "OptionalValueStruct"; }
     std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     void WriteToArchive(utilities::Archiver& archiver) const override
     {
-        archiver["a"] << a;
-        if (hasB)
+        archiver["a"] << _a;
+        if (_hasB)
         {
-            archiver["b"] << b;
+            archiver["b"] << _b;
         }
+        archiver["x"] << _x;
     }
 
     void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
         auto objInfo = archiver.GetCurrentObjectInfo();
-        archiver["a"] >> a;
-        archiver.OptionalProperty("b", -1) >> b;
+        archiver["a"] >> _a;
+        archiver.OptionalProperty("b", -1) >> _b;
+        archiver["x"] >> _x;
     }
 };
 
@@ -97,14 +104,14 @@ struct OptionalValueStruct : public utilities::IArchivable
 
 void TestArchivedObjectInfo()
 {
-    using utilities::ArchivedObjectInfo;
     using utilities::ArchiveVersionNumbers;
-    
-    ArchivedObjectInfo objInfoA1 {"typeA", ArchiveVersionNumbers::v1};
-    ArchivedObjectInfo objInfoB1 {"typeB", ArchiveVersionNumbers::v1};
-    ArchivedObjectInfo objInfoA2 {"typeA", ArchiveVersionNumbers::v2};
-    ArchivedObjectInfo objInfoB2 {"typeB", ArchiveVersionNumbers::v2};
-    ArchivedObjectInfo objInfoA2_2 {"typeA", ArchiveVersionNumbers::v2};
+    using utilities::ArchivedObjectInfo;
+
+    ArchivedObjectInfo objInfoA1{ "typeA", ArchiveVersionNumbers::v1 };
+    ArchivedObjectInfo objInfoB1{ "typeB", ArchiveVersionNumbers::v1 };
+    ArchivedObjectInfo objInfoA2{ "typeA", ArchiveVersionNumbers::v2 };
+    ArchivedObjectInfo objInfoB2{ "typeB", ArchiveVersionNumbers::v2 };
+    ArchivedObjectInfo objInfoA2_2{ "typeA", ArchiveVersionNumbers::v2 };
     testing::ProcessTest("Testing ArchiveObjectInfo op==", (objInfoA1 == objInfoA1));
     testing::ProcessTest("Testing ArchiveObjectInfo op==", !(objInfoA1 == objInfoB1));
     testing::ProcessTest("Testing ArchiveObjectInfo op==", !(objInfoA1 == objInfoA2));
@@ -188,6 +195,7 @@ void TestUnarchiver()
 {
     utilities::SerializationContext context;
 
+    auto name = std::string(typeid(UnarchiverType).name()) + ": ";
     {
         std::stringstream strstream;
         {
@@ -198,9 +206,23 @@ void TestUnarchiver()
         UnarchiverType unarchiver(strstream, context);
         bool val = false;
         unarchiver.Unarchive("true", val);
-        testing::ProcessTest("Deserialize bool check", val == true);
+        testing::ProcessTest(name + "Deserialize bool check", val == true);
     }
+    {
 
+        // boolean properties
+        bool val = true;
+        std::stringstream strstream;
+        {
+            ArchiverType archiver(strstream);
+            archiver["b"] << val;
+        }
+
+        UnarchiverType unarchiver(strstream, context);
+        val = false;
+        unarchiver["b"] >> val;
+        testing::ProcessTest("Deserialize bool property", val == true);
+    }
     {
         std::stringstream strstream;
         {
@@ -211,7 +233,7 @@ void TestUnarchiver()
         UnarchiverType unarchiver(strstream, context);
         double val = 0;
         unarchiver.Unarchive("pi", val);
-        testing::ProcessTest("Deserialize float check", val == 3.14159);
+        testing::ProcessTest(name + "Deserialize float check", val == 3.14159);
     }
 
     {
@@ -224,7 +246,7 @@ void TestUnarchiver()
         UnarchiverType unarchiver(strstream, context);
         std::string val;
         unarchiver.Unarchive("pie", val);
-        testing::ProcessTest("Deserialize string check", val == "cherry pie");
+        testing::ProcessTest(name + "Deserialize string check", val == "cherry pie");
     }
 
     {
@@ -238,7 +260,7 @@ void TestUnarchiver()
         UnarchiverType unarchiver(strstream, context);
         std::vector<int> val;
         unarchiver.Unarchive("arr", val);
-        testing::ProcessTest("Deserialize vector<int> check", val[0] == 1 && val[1] == 2 && val[2] == 3);
+        testing::ProcessTest(name + "Deserialize vector<int> check", val[0] == 1 && val[1] == 2 && val[2] == 3);
     }
 
     {
@@ -252,7 +274,7 @@ void TestUnarchiver()
         UnarchiverType unarchiver(strstream, context);
         TestStruct val;
         unarchiver.Unarchive("s", val);
-        testing::ProcessTest("Deserialize IArchivable check", val.a == 1 && val.b == 2.2f && val.c == 3.3);
+        testing::ProcessTest(name + "Deserialize IArchivable check", val.a == 1 && val.b == 2.2f && val.c == 3.3);
     }
 
     {
@@ -266,7 +288,22 @@ void TestUnarchiver()
         UnarchiverType unarchiver(strstream, context);
         OptionalValueStruct val;
         unarchiver.Unarchive("s", val);
-        testing::ProcessTest("Deserialize IArchivable with optional values check", val.a == 1 && val.b == -1); // -1 is default value
+        testing::ProcessTest(name + "Deserialize IArchivable with optional values check", val._a == 1 && val._b == -1 && val._x.get() == nullptr); // -1 is default value
+    }
+
+    {
+        int x = 12;
+        std::stringstream strstream;
+        {
+            ArchiverType archiver(strstream);
+            OptionalValueStruct testStruct(1, 2, &x);
+            archiver.Archive("s", testStruct);
+        }
+
+        UnarchiverType unarchiver(strstream, context);
+        OptionalValueStruct val;
+        unarchiver.Unarchive("s", val);
+        testing::ProcessTest(name + "Deserialize IArchivable with std::unique_ptr", val._a == 1 && val._b == 2 && *val._x.get() == 12); // -1 is default value
     }
 
     {
@@ -289,13 +326,13 @@ void TestUnarchiver()
         unarchiver.Unarchive("vec1", newDoubleVector);
         unarchiver.Unarchive("vec2", newStructVector);
 
-        testing::ProcessTest("Deserialize array check", testing::IsEqual(doubleVector, newDoubleVector));
-        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[0].a, newStructVector[0].a));
-        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[0].b, newStructVector[0].b));
-        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[0].c, newStructVector[0].c));
-        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[1].a, newStructVector[1].a));
-        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[1].b, newStructVector[1].b));
-        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[1].c, newStructVector[1].c));
+        testing::ProcessTest(name + "Deserialize array check", testing::IsEqual(doubleVector, newDoubleVector));
+        testing::ProcessTest(name + "Deserialize array check", testing::IsEqual(structVector[0].a, newStructVector[0].a));
+        testing::ProcessTest(name + "Deserialize array check", testing::IsEqual(structVector[0].b, newStructVector[0].b));
+        testing::ProcessTest(name + "Deserialize array check", testing::IsEqual(structVector[0].c, newStructVector[0].c));
+        testing::ProcessTest(name + "Deserialize array check", testing::IsEqual(structVector[1].a, newStructVector[1].a));
+        testing::ProcessTest(name + "Deserialize array check", testing::IsEqual(structVector[1].b, newStructVector[1].b));
+        testing::ProcessTest(name + "Deserialize array check", testing::IsEqual(structVector[1].c, newStructVector[1].c));
     }
 
     {
@@ -309,7 +346,7 @@ void TestUnarchiver()
         UnarchiverType unarchiver(strstream, context);
         std::string val;
         unarchiver.Unarchive("str", val);
-        testing::ProcessTest("Deserialize string check", val == stringVal);
+        testing::ProcessTest(name + "Deserialize string check", val == stringVal);
     }
 }
 

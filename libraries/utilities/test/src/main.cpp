@@ -73,8 +73,8 @@ int main(int argc, char* argv[])
         TestJsonArchiver();
         TestJsonUnarchiver();
 
-        // TestXmlArchiver();
-        // TestXmlUnarchiver();
+        TestXmlArchiver();
+        TestXmlUnarchiver();
 
         // ObjectArchive tests
         TestGetTypeDescription();

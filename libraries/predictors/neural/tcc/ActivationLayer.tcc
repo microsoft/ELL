@@ -12,22 +12,21 @@ namespace predictors
 {
 namespace neural
 {
-    template <typename ElementType, template <typename> class ActivationFunctionType>
-    ActivationLayer<ElementType, ActivationFunctionType>::ActivationLayer(const LayerParameters& layerParameters) :
-        Layer<ElementType>(layerParameters)
+    template <typename ElementType>
+    ActivationLayer<ElementType>::ActivationLayer(const LayerParameters& layerParameters, const ActivationType& activation) :
+        Layer<ElementType>(layerParameters), _activation(activation)
     {
         ValidateDimensions();
     }
 
-    template <typename ElementType, template <typename> class ActivationFunctionType>
-    ActivationLayer<ElementType, ActivationFunctionType>::ActivationLayer(const LayerParameters& layerParameters, ActivationFunctionType<ElementType> activation) :
-        Layer<ElementType>(layerParameters), _activation(std::move(activation))
+    template <typename ElementType>
+    ActivationLayer<ElementType>::ActivationLayer(const ActivationLayer& other)
+        : Layer<ElementType>(other), _activation(other._activation)
     {
-        ValidateDimensions();
     }
 
-    template <typename ElementType, template <typename> class ActivationFunctionType>
-    void ActivationLayer<ElementType, ActivationFunctionType>::ValidateDimensions()
+    template <typename ElementType>
+    void ActivationLayer<ElementType>::ValidateDimensions()
     {
         auto output = GetOutputMinusPadding();
         auto& input = _layerParameters.input;
@@ -37,8 +36,8 @@ namespace neural
         }
     }
 
-    template <typename ElementType, template <typename> class ActivationFunctionType>
-    void ActivationLayer<ElementType, ActivationFunctionType>::Compute()
+    template <typename ElementType>
+    void ActivationLayer<ElementType>::Compute()
     {
         auto output = GetOutputMinusPadding();
         auto input = _layerParameters.input;
@@ -50,24 +49,33 @@ namespace neural
                 for (size_t k = 0; k < input.NumChannels(); k++)
                 {
                     ElementType value = input(i, j, k);
-                    output(i, j, k) = _activation.Apply(value, math::IntegerTriplet{i, j, k});
+                    output(i, j, k) = _activation.ApplyIndex(value, math::IntegerTriplet{i, j, k});
                 }
             }
         }
     }
 
-    template <typename ElementType, template <typename> class ActivationFunctionType>
-    void ActivationLayer<ElementType, ActivationFunctionType>::WriteToArchive(utilities::Archiver& archiver) const
+    template <typename ElementType>
+    void ActivationLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Layer<ElementType>::WriteToArchive(archiver);
         _activation.WriteToArchive(archiver);
     }
 
-    template <typename ElementType, template <typename> class ActivationFunctionType>
-    void ActivationLayer<ElementType, ActivationFunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
+
+    template <typename ElementType>
+    void ActivationLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Layer<ElementType>::ReadFromArchive(archiver);
-        _activation.ReadFromArchive(archiver);
+
+        if (archiver.HasNextPropertyName("activation"))
+        {
+            _activation.ReadFromArchive(archiver);
+        }
+        if (!_activation.GetImpl())
+        {
+            _activation.LegacyReadFromArchive(archiver);
+        }
     }
 }
 }

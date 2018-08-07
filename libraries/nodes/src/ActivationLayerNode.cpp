@@ -24,9 +24,8 @@ namespace nodes
     //
     // ActivationLayerNode
     //
-
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    ActivationLayerNode<ValueType, ActivationFunctionType>::ActivationLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ActivationLayer<ValueType, ActivationFunctionType>& layer)
+    template <typename ValueType>
+    ActivationLayerNode<ValueType>::ActivationLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ActivationLayer<ValueType>& layer)
         : BaseType(input, layer)
     {
         auto&& inputLayout = this->GetInputMemoryLayout();
@@ -37,26 +36,67 @@ namespace nodes
         }
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    bool ActivationLayerNode<ValueType, ActivationFunctionType>::Refine(model::ModelTransformer& transformer) const
+    template <typename ValueType>
+    bool ActivationLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
 
-        auto predictorActivationFunction = this->GetLayer().GetActivationFunction();
-        auto nodeActivationFunction = GetNodeActivationFunction(predictorActivationFunction);
-        auto computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, decltype(nodeActivationFunction)>>(newInput,
-                                                                                                                        this->GetInputMemoryLayout(),
-                                                                                                                        this->GetOutputMemoryLayout(),
-                                                                                                                        nodeActivationFunction);
-        transformer.MapNodeOutput(this->output, computeNode->output);
+        predictors::neural::ActivationImpl<ValueType>* ptr = this->_layer.GetActivationFunction().GetImpl();
+
+        // hmmm, now we have the opposite problem, unless we push the same idea down into BroadcastUnaryFunctionNode...
+        auto hardSigmoid = dynamic_cast<predictors::neural::HardSigmoidActivation<ValueType>*>(ptr);
+        auto leakyReLU = dynamic_cast<predictors::neural::LeakyReLUActivation<ValueType>*>(ptr);
+        auto sigmoid = dynamic_cast<predictors::neural::SigmoidActivation<ValueType>*>(ptr);
+        auto relu = dynamic_cast<predictors::neural::ReLUActivation<ValueType>*>(ptr);
+        auto tanh = dynamic_cast<predictors::neural::TanhActivation<ValueType>*>(ptr);
+        auto prelu = dynamic_cast<predictors::neural::ParametricReLUActivation<ValueType>*>(ptr);
+
+        auto inputLayout = this->GetInputMemoryLayout();
+        auto outputLayout = this->GetOutputMemoryLayout();
+
+        ell::model::Node* computeNode = nullptr;
+        if (hardSigmoid) {
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, HardSigmoidActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout, 
+                HardSigmoidActivationFunction<ValueType>{});
+        }
+        else if (leakyReLU)
+        {
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, LeakyReLUActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout,
+                LeakyReLUActivationFunction<ValueType>(leakyReLU->GetLeakyFactor()));
+        }
+        else if (sigmoid)
+        {
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, SigmoidActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout,
+                SigmoidActivationFunction<ValueType>{});
+        }
+        else if (relu)
+        {
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, ReLUActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout,
+                ReLUActivationFunction<ValueType>{});
+        }
+        else if (tanh)
+        {
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, TanhActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout,
+                TanhActivationFunction<ValueType>{});
+        }
+        else if (prelu) 
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "ActivationLayerNode cannot be used on ParametricReLUActivations");
+        }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "ActivationLayerNode given a new Activation type it doesn't recognize");
+        }
+        
+        transformer.MapNodeOutput(this->output, *(computeNode->GetOutputPort(0)));
         return true;
     }
 
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    void ActivationLayerNode<ValueType, ActivationFunctionType>::Copy(model::ModelTransformer& transformer) const
+    template <typename ValueType>
+    void ActivationLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
-        auto newNode = transformer.AddNode<ActivationLayerNode<ValueType, ActivationFunctionType>>(newPortElements, this->_layer);
+        auto newNode = transformer.AddNode<ActivationLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
 
@@ -74,6 +114,11 @@ namespace nodes
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active area sizes don't match");
         }
+        auto paf = dynamic_cast<const predictors::neural::ParametricReLUActivation<ValueType>*>(layer.GetActivationFunction().GetImpl());
+        if (!paf)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "The layer activation function must be 'ParametricReLUActivation'");
+        }
     }
 
     template <typename ValueType>
@@ -82,8 +127,8 @@ namespace nodes
         using ActivationFunction = ParametricReLUActivationFunction<ValueType>;
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
 
-        auto predictorActivationFunction = this->GetLayer().GetActivationFunction();
-        auto alphaValues = predictorActivationFunction.GetAlpha().ToArray();
+        auto paf = dynamic_cast<const predictors::neural::ParametricReLUActivation<ValueType>*>(this->_layer.GetActivationFunction().GetImpl());
+        auto alphaValues = paf->GetAlpha().ToArray();
         auto alphaValuesNode = transformer.AddNode<ConstantNode<ValueType>>(alphaValues);
 
         // PReLU is a coordinate-wise operation
@@ -108,16 +153,8 @@ namespace nodes
 
 
     // Explicit specialization
-    template class ActivationLayerNode<float, ell::predictors::neural::HardSigmoidActivation>;
-    template class ActivationLayerNode<double, ell::predictors::neural::HardSigmoidActivation>;
-    template class ActivationLayerNode<float, ell::predictors::neural::LeakyReLUActivation>;
-    template class ActivationLayerNode<double, ell::predictors::neural::LeakyReLUActivation>;
-    template class ActivationLayerNode<float, ell::predictors::neural::ReLUActivation>;
-    template class ActivationLayerNode<double, ell::predictors::neural::ReLUActivation>;
-    template class ActivationLayerNode<float, ell::predictors::neural::SigmoidActivation>;
-    template class ActivationLayerNode<double, ell::predictors::neural::SigmoidActivation>;
-    template class ActivationLayerNode<float, ell::predictors::neural::TanhActivation>;
-    template class ActivationLayerNode<double, ell::predictors::neural::TanhActivation>;
+    template class ActivationLayerNode<float>;
+    template class ActivationLayerNode<double>;
     template class ParametricReLUActivationLayerNode<float>;
     template class ParametricReLUActivationLayerNode<double>;
 

@@ -50,7 +50,7 @@ namespace utilities
 
     /// <summary> Enabled if ValueType does not inherit from IArchivable. </summary>
     template <typename ValueType>
-    using IsNotArchivable = typename std::enable_if_t<(!std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
+    using IsNotArchivable = typename std::enable_if_t<(!std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value), int>;
 
     /// <summary> A registry of functions to enable Variant deserialization. </summary>
     class VariantTypeRegistry
@@ -278,6 +278,9 @@ namespace utilities
         ARCHIVABLE_TYPES_LIST
 #undef ARCHIVE_TYPE_OP
 
+        // archive a null value in a way that we can check for null on the unarchive side.
+        virtual void ArchiveNull(const char* name) = 0;
+
         virtual void ArchiveValue(const char* name, const std::string& value) = 0;
         virtual void ArchiveValue(const char* name, const IArchivable& value);
 
@@ -297,6 +300,19 @@ namespace utilities
         ArchiveVersion GetArchiveVersion(const IArchivable& value) const;
 
     private:
+
+        // unique pointer to non-archivable object
+        template <typename ValueType, IsNotArchivable<ValueType> concept = true>
+        void ArchiveItem(const char* name, const std::unique_ptr<ValueType>& value);
+
+        // unique pointer to standard archivable object
+        template <typename ValueType, IsStandardArchivable<ValueType> concept = true>
+        void ArchiveItem(const char* name, const std::unique_ptr<ValueType>& value);
+
+        // unique pointer to archived-as-primitive object
+        template <typename ValueType, IsArchivedAsPrimitive<ValueType> concept = true>
+        void ArchiveItem(const char* name, const std::unique_ptr<ValueType>& value);
+
         template <typename ValueType, IsNotVector<ValueType> concept = true>
         void ArchiveItem(const char* name, ValueType&& value);
 
@@ -453,9 +469,12 @@ namespace utilities
 #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_VALUE_BASE(t);
         ARCHIVABLE_TYPES_LIST
 #undef ARCHIVE_TYPE_OP
-
+        
         virtual void UnarchiveValue(const char* name, std::string& value) = 0;
         virtual void UnarchiveValue(const char* name, IArchivable& value);
+
+        // return true if the stream contains the result of ArchiveNull(name).
+        virtual bool UnarchiveNull(const char* name) = 0;
 
 #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_BASE(t);
         ARCHIVABLE_TYPES_LIST

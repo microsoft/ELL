@@ -46,6 +46,54 @@ namespace utilities
     // Implementations
     //
 
+    // unique pointer to non-archivable object
+    template <typename ValueType, IsNotArchivable<ValueType> concept>
+    void Archiver::ArchiveItem(const char* name, const std::unique_ptr<ValueType>& value)
+    {
+        if (!value.get())
+        {
+            // write out a special value indicating null value.
+            ArchiveNull(name);
+        }
+        else
+        {
+            // write out a special value indicating null value.
+            ArchiveItem(name, *value.get());
+        }
+    }
+
+    // unique pointer to standard archivable object
+    template <typename ValueType, IsStandardArchivable<ValueType> concept>
+    void Archiver::ArchiveItem(const char* name, const std::unique_ptr<ValueType>& value)
+    {
+        if (!value.get())
+        {
+            // write out a special value indicating null value.
+            ArchiveNull(name);
+        }
+        else
+        {
+            // write out a special value indicating null value.
+            ArchiveItem(name, *value.get());
+        }
+    }
+
+    // unique pointer to archived-as-primitive object
+    template <typename ValueType, IsArchivedAsPrimitive<ValueType> concept>
+    void Archiver::ArchiveItem(const char* name, const std::unique_ptr<ValueType>& value)
+    {
+        if (!value.get())
+        {
+            // write out a special value indicating null value.
+            ArchiveNull(name);
+        }
+        else
+        {
+            // write out a special value indicating null value.
+            ArchiveItem(name, *value.get());
+        }
+    }
+
     // Non-vectors
     template <typename ValueType, IsNotVector<ValueType> concept>
     void Archiver::ArchiveItem(const char* name, ValueType&& value)
@@ -113,8 +161,7 @@ namespace utilities
     //
     template <typename DefaultValueType>
     Unarchiver::OptionalPropertyUnarchiver<DefaultValueType>::OptionalPropertyUnarchiver(Unarchiver& archiver, const std::string& name, const DefaultValueType& defaultValue)
-    : _unarchiver(archiver), _propertyName(name), _defaultValue(defaultValue)
-    {};
+        : _unarchiver(archiver), _propertyName(name), _defaultValue(defaultValue){};
 
     template <typename DefaultValueType>
     template <typename ValueType>
@@ -193,35 +240,44 @@ namespace utilities
     template <typename ValueType, IsNotArchivable<ValueType> concept>
     void Unarchiver::UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value)
     {
-        auto ptr = std::make_unique<ValueType>();
-        UnarchiveValue(name, *ptr);
-        value = std::move(ptr);
+        if (!UnarchiveNull(name))
+        {
+            auto ptr = std::make_unique<ValueType>();
+            UnarchiveValue(name, *ptr);
+            value = std::move(ptr);
+        }
     }
 
     // unique pointer to standard archivable object
     template <typename ValueType, IsStandardArchivable<ValueType> concept>
     void Unarchiver::UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value)
     {
-        auto baseTypeName = GetArchivedTypeName<ValueType>();
-        auto objInfo = BeginUnarchiveObject(name, baseTypeName);
-        _objectInfo.push_back(objInfo);
-        auto encodedTypeName = objInfo.type;
-        std::unique_ptr<ValueType> newPtr = GetContext().GetTypeFactory().Construct<ValueType>(encodedTypeName);
-        UnarchiveObject(name, *newPtr);
-        EndUnarchiveObject(name, encodedTypeName);
-        // TODO: assert back of _objectInfo == objInfo
-        _objectInfo.pop_back();
-        value = std::move(newPtr);
+        if (!UnarchiveNull(name))
+        {
+            auto baseTypeName = GetArchivedTypeName<ValueType>();
+            auto objInfo = BeginUnarchiveObject(name, baseTypeName);
+            _objectInfo.push_back(objInfo);
+            auto encodedTypeName = objInfo.type;
+            std::unique_ptr<ValueType> newPtr = GetContext().GetTypeFactory().Construct<ValueType>(encodedTypeName);
+            UnarchiveObject(name, *newPtr);
+            EndUnarchiveObject(name, encodedTypeName);
+            // TODO: assert back of _objectInfo == objInfo
+            _objectInfo.pop_back();
+            value = std::move(newPtr);
+        }
     }
 
     // pointer to serializable-as-primitive type
     template <typename ValueType, IsArchivedAsPrimitive<ValueType> concept>
     void Unarchiver::UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value)
     {
-        auto baseTypeName = GetArchivedTypeName<ValueType>();
-        std::unique_ptr<ValueType> newPtr = std::make_unique<ValueType>();
-        UnarchiveObject(name, *newPtr);
-        value = std::move(newPtr);
+        if (!UnarchiveNull(name))
+        {
+            auto baseTypeName = GetArchivedTypeName<ValueType>();
+            std::unique_ptr<ValueType> newPtr = std::make_unique<ValueType>();
+            UnarchiveObject(name, *newPtr);
+            value = std::move(newPtr);
+        }
     }
 
     // Vector of fundamental types
@@ -310,8 +366,8 @@ namespace utilities
     //
 
     template <typename ValueType>
-    EnsureMaxPrecision<ValueType>::EnsureMaxPrecision(std::ostream& out) :
-        _flags(out.flags()), _precision(out.precision()), _out(out)
+    EnsureMaxPrecision<ValueType>::EnsureMaxPrecision(std::ostream& out)
+        : _flags(out.flags()), _precision(out.precision()), _out(out)
     {
         _out.precision(std::numeric_limits<ValueType>::digits10 + 1);
     }
@@ -352,7 +408,7 @@ namespace utilities
     {
         return ArchiverImpl::GetTypeName<T>(true);
     }
-    
+
     template <typename T>
     std::string GetArchivedTypeName(const T& value)
     {

@@ -91,7 +91,13 @@ namespace neural
         template <class LayerType>
         LayerType& As()
         {
-            return *(dynamic_cast<LayerType*>(this));
+            auto ptr = dynamic_cast<LayerType*>(this);
+            if (!ptr) 
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, 
+                    std::string("Expecting this layer to be of type : '") + typeid(LayerType).name() + "' but it is : '" + typeid(*this).name() + "'");
+            }
+            return *ptr;
         }
 
         template <class LayerType>

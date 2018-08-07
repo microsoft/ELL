@@ -6,21 +6,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "TanhActivation.h"
+#include "SigmoidActivation.h"
+
 namespace ell
 {
 namespace predictors
 {
     namespace neural
     {
-        template <typename ElementType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-        GRULayer<ElementType, ActivationFunctionType, RecurrentActivationFunctionType>::GRULayer()
-            : _updateWeights(0, 0), _resetWeights(0, 0), _hiddenWeights(0, 0), _updateBias(0), _resetBias(0), _hiddenBias(0), _inputPlusHidden(0)
+        template <typename ElementType>
+        GRULayer<ElementType>::GRULayer()
+            : _updateWeights(0, 0), _resetWeights(0, 0), _hiddenWeights(0, 0), _updateBias(0), _resetBias(0), _hiddenBias(0), _inputPlusHidden(0)            
         {
         }
 
-        template <typename ElementType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-        GRULayer<ElementType, ActivationFunctionType, RecurrentActivationFunctionType>::GRULayer(const LayerParameters& layerParameters, GRUParameters<ElementType>& parameters)
-            : Layer<ElementType>(layerParameters), _updateWeights(parameters.updateWeights), _resetWeights(parameters.resetWeights), _hiddenWeights(parameters.hiddenWeights), _updateBias(parameters.updateBias), _resetBias(parameters.resetBias), _hiddenBias(parameters.hiddenBias), _inputPlusHidden(layerParameters.input.Size() + GetOutputMinusPadding().Size())
+        template <typename ElementType>
+        GRULayer<ElementType>::GRULayer(const LayerParameters& layerParameters, GRUParameters<ElementType>& parameters, 
+            const ActivationType& activation, const ActivationType& recurrentActivation)
+            : Layer<ElementType>(layerParameters), _updateWeights(parameters.updateWeights), _resetWeights(parameters.resetWeights), _hiddenWeights(parameters.hiddenWeights), _updateBias(parameters.updateBias), _resetBias(parameters.resetBias), _hiddenBias(parameters.hiddenBias), _inputPlusHidden(layerParameters.input.Size() + GetOutputMinusPadding().Size()),
+            _activation(activation), _recurrentActivation(recurrentActivation)
         {
             const auto outputSize = GetOutputMinusPadding().Size();
 
@@ -47,6 +52,14 @@ namespace predictors
             }
         }
 
+        template <typename ElementType>
+        GRULayer<ElementType>::GRULayer(const GRULayer& other)
+            : Layer<ElementType>(other), _updateWeights(other._updateWeights), _resetWeights(other._resetWeights), _hiddenWeights(other._hiddenWeights), _updateBias(other._updateBias), _resetBias(other._resetBias), _hiddenBias(other._hiddenBias),
+            _inputPlusHidden(other._inputPlusHidden),
+            _activation(other._activation), _recurrentActivation(other._recurrentActivation)
+        {
+        }
+
         // Notation:
         // The notation in the comments is adapted from the explanation at http://colah.github.io/posts/2015-08-Understanding-LSTMs/
         //
@@ -64,8 +77,8 @@ namespace predictors
         // Ht~ == newHiddenState
         // Ht == hiddenState (aka, output)
         //
-        template <typename ElementType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-        void GRULayer<ElementType, ActivationFunctionType, RecurrentActivationFunctionType>::Compute()
+        template <typename ElementType>
+        void GRULayer<ElementType>::Compute()
         {
             auto& input = _layerParameters.input;
             auto output = GetOutputMinusPadding();
@@ -99,19 +112,19 @@ namespace predictors
             // Zt = recurrentFunction(Wu * [Xt, Ht-1] + Bu)   (where recurrentFunction is usually sigmoid)
             math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _updateWeights, _inputPlusHidden, static_cast<ElementType>(0), updateGateActivation);
             math::AddUpdate(_updateBias, updateGateActivation);
-            _recurrentActivationFunction.Apply(updateGateActivation);
+            _recurrentActivation.Apply(updateGateActivation);
 
             // Rt = recurrentFunction(Wr * [Xt, Ht-1] + Br)   (where recurrentFunction is usually sigmoid)
             math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _resetWeights, _inputPlusHidden, static_cast<ElementType>(0), resetGateActivation);
             math::AddUpdate(_resetBias, resetGateActivation);
-            _recurrentActivationFunction.Apply(resetGateActivation);
+            _recurrentActivation.Apply(resetGateActivation);
 
             // Ht~ = activationFunction(Wh * [Xt, (Rt .* Ht-1)] + Bh)   (where activationFunction is typically tanh)
             prevHiddenState.CopyFrom(hiddenPart); // make a copy of Ht-1
             math::ElementwiseMultiplySet(resetGateActivation, prevHiddenState, hiddenPart); // hiddenPart aliases to the last part of _inputPlusHidden
             math::MultiplyScaleAddUpdate(static_cast<ElementType>(1), _hiddenWeights, _inputPlusHidden, static_cast<ElementType>(0), newHiddenState);
             math::AddUpdate(_hiddenBias, newHiddenState);
-            _activationFunction.Apply(newHiddenState);
+            _activation.Apply(newHiddenState);
 
             // Compute Ht = (1-Zt) .* Ht~ + Zt * Ht-1,
             index = 0;
@@ -130,8 +143,8 @@ namespace predictors
             }
         }
 
-        template <typename ElementType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-        void GRULayer<ElementType, ActivationFunctionType, RecurrentActivationFunctionType>::Reset()
+        template <typename ElementType>
+        void GRULayer<ElementType>::Reset()
         {
             const auto outputSize = GetOutputMinusPadding().Size();
             const auto inputSize = _layerParameters.input.Size();
@@ -139,8 +152,8 @@ namespace predictors
             ht.Reset();
         }
 
-        template <typename ElementType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-        void GRULayer<ElementType, ActivationFunctionType, RecurrentActivationFunctionType>::WriteToArchive(utilities::Archiver& archiver) const
+        template <typename ElementType>
+        void GRULayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
         {
             Layer<ElementType>::WriteToArchive(archiver);
 
@@ -152,12 +165,12 @@ namespace predictors
             math::VectorArchiver::Write(_resetBias, "resetBias", archiver);
             math::VectorArchiver::Write(_hiddenBias, "hiddenBias", archiver);
 
-            _activationFunction.WriteToArchive(archiver);
-            _recurrentActivationFunction.WriteToArchive(archiver);
+            _activation.WriteToArchive(archiver);
+            _recurrentActivation.WriteToArchive(archiver);
         }
 
-        template <typename ElementType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-        void GRULayer<ElementType, ActivationFunctionType, RecurrentActivationFunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
+        template <typename ElementType>
+        void GRULayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
         {
             Layer<ElementType>::ReadFromArchive(archiver);
 
@@ -169,8 +182,18 @@ namespace predictors
             math::VectorArchiver::Read(_resetBias, "resetBias", archiver);
             math::VectorArchiver::Read(_hiddenBias, "hiddenBias", archiver);
 
-            _activationFunction.ReadFromArchive(archiver);
-            _recurrentActivationFunction.ReadFromArchive(archiver);
+            if (archiver.HasNextPropertyName("activation"))
+            {
+                _activation.ReadFromArchive(archiver);
+                _recurrentActivation.ReadFromArchive(archiver);
+            }
+
+            if (!_activation.GetImpl())
+            {
+                // serialization compatibility (these are the only combinations we used before).
+                _activation.Reset(new TanhActivation<ElementType>());
+                _recurrentActivation.Reset(new SigmoidActivation<ElementType>());
+            }
 
             _inputPlusHidden.Resize(_layerParameters.input.Size() + _updateBias.Size());
         }

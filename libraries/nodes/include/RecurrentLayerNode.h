@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
+#include "Activation.h"
 #include "CompiledActivationFunctions.h"
 #include "NeuralNetworkLayerNode.h"
 
@@ -27,12 +27,12 @@ namespace ell
 namespace nodes
 {
     /// <summary> A node that wraps a neural net GRULayer. </summary>
-    template <typename ValueType, template <typename> class ActivationFunctionType>
-    class RecurrentLayerNode : public NeuralNetworkLayerNode<RecurrentLayerNode<ValueType, ActivationFunctionType>, predictors::neural::RecurrentLayer<ValueType, ActivationFunctionType>, ValueType>
+    template <typename ValueType>
+    class RecurrentLayerNode : public NeuralNetworkLayerNode<RecurrentLayerNode<ValueType>, predictors::neural::RecurrentLayer<ValueType>, ValueType>
     {
     public:
-        using LayerType = predictors::neural::RecurrentLayer<ValueType, ActivationFunctionType>;
-        using BaseType = NeuralNetworkLayerNode<RecurrentLayerNode<ValueType, ActivationFunctionType>, predictors::neural::RecurrentLayer<ValueType, ActivationFunctionType>, ValueType>;
+        using LayerType = predictors::neural::RecurrentLayer<ValueType>;
+        using BaseType = NeuralNetworkLayerNode<RecurrentLayerNode<ValueType>, predictors::neural::RecurrentLayer<ValueType>, ValueType>;
 
         /// @name Input and Output Ports
         /// @{
@@ -46,12 +46,12 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        RecurrentLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::RecurrentLayer<ValueType, ActivationFunctionType>& layer);
+        RecurrentLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::RecurrentLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, ActivationFunctionType<ValueType>>("RecurrentLayerNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("RecurrentLayerNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -73,10 +73,12 @@ namespace nodes
     //
     // Implementation: RecurrentNode
     //
-    template <typename ValueType, template <typename> class ActivationFunctionType>
+    template <typename ValueType>
     class RecurrentNode : public model::CompilableNode
     {
     public:
+        using ActivationType = predictors::neural::Activation<ValueType>;
+
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* hiddenWeightsPortName = "hiddenWeights";
@@ -100,8 +102,9 @@ namespace nodes
         RecurrentNode(const model::PortElements<ValueType>& input,
                       const model::PortElements<ValueType>& hiddenWeights,
                       const model::PortElements<ValueType>& hiddenBias,
+                      const ActivationType& activation,
                       const model::PortMemoryLayout& inputMemoryLayout,
-                      const model::PortMemoryLayout& outputMemoryLayout);
+                      const model::PortMemoryLayout& outputMemoryLayoutn);
 
         /// <summary> Gets information about the input memory layout </summary>
         ///
@@ -125,7 +128,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, ActivationFunctionType<ValueType>>("RecurrentNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("RecurrentNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -163,10 +166,11 @@ namespace nodes
 
         model::PortMemoryLayout _inputMemoryLayout;
 
+        ActivationType _activation;
+
         void ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength);
 
-        template <typename ActivationType>
-        void ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength);
+        void ApplyActivation(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength);
     };
 }
 }

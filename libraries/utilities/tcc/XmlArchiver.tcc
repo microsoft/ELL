@@ -41,7 +41,7 @@ namespace utilities
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
-        auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName<bool>());
+        auto typeName = "bool";
 
         _out << indent;
         _out << "<" << typeName;
@@ -174,7 +174,7 @@ namespace utilities
     template <>
     inline void XmlUnarchiver::ReadScalar(const char* name, bool& value)
     {
-        auto typeName = XmlUtilities::EncodeTypeName(TypeName<bool>::GetName());
+        auto typeName = "bool";
         bool hasName = name != std::string("");
 
         _tokenizer.MatchTokens({ "<", typeName });

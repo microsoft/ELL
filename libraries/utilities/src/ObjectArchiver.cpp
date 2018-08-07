@@ -49,6 +49,14 @@ namespace utilities
         }
     }
 
+    void ObjectArchiver::ArchiveNull(const char* name)
+    {
+        if (std::string{ "" } != name)
+        {
+            _objectDescription[name].SetNull();
+        }
+    }
+
     // IArchivable
 
     void ObjectArchiver::ArchiveObject(const char* name, const IArchivable& value)
@@ -115,6 +123,18 @@ namespace utilities
         else
         {
             _objectDescription[name] >> value;
+        }
+    }
+
+    bool ObjectArchiver::UnarchiveNull(const char* name)
+    {
+        if (std::string{ "" } == name)
+        {
+            return !_objectDescription.HasValue();
+        }
+        else
+        {
+            return !_objectDescription[name].HasValue();
         }
     }
 

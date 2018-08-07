@@ -29,10 +29,15 @@ namespace ell
 namespace nodes
 {
     //
-    // Activation functions
+    // Activation functions with Compile method
     //
     template <typename ValueType>
-    class ReLUActivationFunction : public BroadcastUnaryFunction<ValueType>
+    class ActivationFunction : public BroadcastUnaryFunction<ValueType>
+    {
+    };
+
+    template <typename ValueType>
+    class ReLUActivationFunction : public ActivationFunction<ValueType>
     {
     public:
         /// <summary> Computes the ReLU activation (on the host machine) </summary>
@@ -51,11 +56,6 @@ namespace nodes
         llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
-        /// <summary> Indicates if the function can operate on vector types </summary>
-        ///
-        /// <returns> true if the function can operate on vector types </returns>
-        bool CanUseVectorTypes() const { return false; }
-
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -68,7 +68,7 @@ namespace nodes
     };
 
     template <typename ValueType>
-    class LeakyReLUActivationFunction : public BroadcastUnaryFunction<ValueType>
+    class LeakyReLUActivationFunction : public ActivationFunction<ValueType>
     {
     public:
         LeakyReLUActivationFunction() = default;
@@ -95,11 +95,6 @@ namespace nodes
         llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
-        /// <summary> Indicates if the function can operate on vector types </summary>
-        ///
-        /// <returns> true if the function can operate on vector types </returns>
-        bool CanUseVectorTypes() const { return false; }
-
         /// <summary> Gets the leaky factor </summary>
         ///
         /// <returns> The leaky factor </returns>
@@ -120,7 +115,7 @@ namespace nodes
     };
 
     template <typename ValueType>
-    class SigmoidActivationFunction : public BroadcastUnaryFunction<ValueType>
+    class SigmoidActivationFunction : public ActivationFunction<ValueType>
     {
     public:
         /// <summary> Computes the sigmoid activation (on the host machine) </summary>
@@ -140,11 +135,6 @@ namespace nodes
         llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
-        /// <summary> Indicates if the function can operate on vector types </summary>
-        ///
-        /// <returns> true if the function can operate on vector types </returns>
-        bool CanUseVectorTypes() const { return false; }
-
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -157,7 +147,7 @@ namespace nodes
     };
 
     template <typename ValueType>
-    class HardSigmoidActivationFunction : public BroadcastUnaryFunction<ValueType>
+    class HardSigmoidActivationFunction : public ActivationFunction<ValueType>
     {
     public:
         /// <summary> Computes the hard sigmoid activation (on the host machine) </summary>
@@ -177,11 +167,6 @@ namespace nodes
         llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
-        /// <summary> Indicates if the function can operate on vector types </summary>
-        ///
-        /// <returns> true if the function can operate on vector types </returns>
-        bool CanUseVectorTypes() const { return false; }
-
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -194,7 +179,7 @@ namespace nodes
     };
 
     template <typename ValueType>
-    class TanhActivationFunction : public BroadcastUnaryFunction<ValueType>
+    class TanhActivationFunction : public ActivationFunction<ValueType>
     {
     public:
         /// <summary> Computes the tanh activation function (on the host machine) </summary>
@@ -212,11 +197,6 @@ namespace nodes
         /// <returns> The value of the function tanh(x) </returns>
         llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
-
-        /// <summary> Indicates if the function can operate on vector types </summary>
-        ///
-        /// <returns> true if the function can operate on vector types </returns>
-        bool CanUseVectorTypes() const { return false; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -261,24 +241,10 @@ namespace nodes
     };
 
     //
-    // Helper functions
+    // Helper function (cannot be used for ParametricReLUActivations because that has two arguments to Compute).
     //
     template <typename ValueType>
-    ReLUActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::ReLUActivation<ValueType>& f);
+    std::unique_ptr<ActivationFunction<ValueType>> GetNodeActivationFunction(const predictors::neural::Activation<ValueType>& f);
 
-    template <typename ValueType>
-    LeakyReLUActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::LeakyReLUActivation<ValueType>& f);
-
-    template <typename ValueType>
-    HardSigmoidActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::HardSigmoidActivation<ValueType>& f);
-
-    template <typename ValueType>
-    ParametricReLUActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::ParametricReLUActivation<ValueType>& f);
-
-    template <typename ValueType>
-    SigmoidActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::SigmoidActivation<ValueType>& f);
-
-    template <typename ValueType>
-    TanhActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::TanhActivation<ValueType>& f);
 }
 }

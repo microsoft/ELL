@@ -119,6 +119,9 @@ namespace utilities
         template <typename ValueType>
         void operator<<(ValueType&& value);
 
+        /// <summary> Set the object to represent a null pointer </summary>
+        void SetNull();
+
     private:
         std::string _typeName;
         Variant _value;

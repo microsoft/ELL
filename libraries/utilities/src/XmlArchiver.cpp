@@ -58,6 +58,20 @@ namespace utilities
     {
         WriteScalar(name, value);
     }
+    
+    void XmlArchiver::ArchiveNull(const char* name)
+    {
+        auto indent = GetCurrentIndent();
+        auto typeName = "null";
+
+        _out << indent;
+        _out << "<" << typeName;
+        if (name != std::string(""))
+        {
+            _out << " name='" << name << "'";
+        }
+        _out << "/>" << std::endl; // empty content implies null value.
+    }
 
     // IArchivable
     void XmlArchiver::BeginArchiveObject(const char* name, const IArchivable& value)
@@ -202,9 +216,39 @@ namespace utilities
         _tokenizer.MatchTokens({ "<", "/", EncodedTypeName, ">" });
     }
 
-    bool XmlUnarchiver::HasNextPropertyName(const std::string&)
+    bool XmlUnarchiver::HasNextPropertyName(const std::string& expected)
     {
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "XmlUnarchiver::HasNextPropertyName is not implemented");
+        bool result = false;
+        PeekStack stack(_tokenizer);
+        if (stack.Peek() == "<")
+        {
+            auto typeName = stack.Peek();
+            if (stack.Peek() == "name" && stack.Peek() == "=" && stack.Peek() == "'")
+            {
+                auto value = stack.Peek();
+                result = value == expected;
+            }
+        }
+        return result;
+    }
+
+    bool XmlUnarchiver::UnarchiveNull(const char* name)
+    {
+        // return true if XML stream contains <null name='foo'/>
+        bool result = false;
+        bool hasName = name != std::string("");
+        PeekStack stack(_tokenizer);
+        if (stack.Peek() == "<" && stack.Peek() == "null")
+        {
+            result = true;
+            stack.Consume();
+            if (hasName)
+            {
+                _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
+            }
+            _tokenizer.MatchTokens({ "/", ">" });
+        } 
+        return result;
     }
 
     //

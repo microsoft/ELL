@@ -19,6 +19,7 @@
 
 // utilities
 #include "JsonArchiver.h"
+#include "StringUtil.h"
 
 // math
 #include "DenseDataVector.h"
@@ -92,6 +93,9 @@ void model_CompiledMap_SinkCallback_Float(void* context, float* output)
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
+using namespace ell::api::predictors;
+using namespace ell::utilities;
 
 namespace ELL_API
 {
@@ -434,7 +438,7 @@ OutputPort PortElement::ReferencedPort()
     auto port = _port.ReferencedPort();
     if (port == nullptr)
     {
-        throw ell::utilities::Exception("no referenced port");
+        throw Exception("no referenced port");
     }
     return OutputPort(port);
 }
@@ -634,8 +638,8 @@ void Model::LoadFromString(const std::string& str)
 {
     _model = std::make_shared<ell::model::Model>();
     std::stringstream stream(str);
-    ell::utilities::SerializationContext context;
-    ell::utilities::JsonUnarchiver ar(stream, context);
+    SerializationContext context;
+    JsonUnarchiver ar(stream, context);
     ar >> *_model;
 }
 
@@ -653,7 +657,7 @@ NodeIterator Model::GetNodes()
 std::string Model::GetJson() const
 {
     std::stringstream stream;
-    ell::utilities::JsonArchiver ar(stream);
+    JsonArchiver ar(stream);
     ar << *_model;
     return stream.str();
 }
@@ -752,7 +756,7 @@ OutputNode ModelBuilder::AddOutputNode(Model model, const ell::api::math::Tensor
         newNode = model.GetModel().AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements), tensorShape.ToMemoryShape());
         break;
     default:
-        throw std::invalid_argument("Error: could not create OutputNode of the requested type");
+        throw std::invalid_argument(std::string("Error: could not create OutputNode of the requested type") + typeid(type).name());
     }
     return OutputNode(newNode);
 }
@@ -1301,75 +1305,63 @@ typename ell::predictors::neural::Layer<ElementType>::LayerParameters GetLayerPa
 
 Node ModelBuilder::AddFloatActivationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ActivationLayer<float>& layer)
 {
+    using ElementType = float;
     auto elements = input.GetPortElements();
     ell::model::Node* newNode = nullptr;
 
-    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<float>::LayerParameters;
-    using TensorType = typename ell::predictors::neural::Layer<float>::TensorType;
+    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<ElementType>::LayerParameters;
+    using TensorType = typename ell::predictors::neural::Layer<ElementType>::TensorType;
+    using ActivationImplType = ell::predictors::neural::ActivationImpl<ElementType>;
     using namespace ell::predictors;
 
     // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
     // layer node's constructor.
     UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
-
+    
     switch (layer.activation)
     {
     case ell::api::predictors::neural::ActivationType::relu:
-    {
-        auto activationLayer = neural::ActivationLayer<float, neural::ReLUActivation>(parameters);
-        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::ReLUActivation>>(ell::model::PortElements<float>(elements), activationLayer);
-        break;
-    }
     case ell::api::predictors::neural::ActivationType::hardSigmoid:
+    case ell::api::predictors::neural::ActivationType::sigmoid:
+    case ell::api::predictors::neural::ActivationType::tanh:
     {
-        auto activationLayer = neural::ActivationLayer<float, neural::HardSigmoidActivation>(parameters);
-        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::HardSigmoidActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        auto activationLayer = ell::predictors::neural::ActivationLayer<ElementType>(parameters, CreateActivation<ElementType>(layer.activation));
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<ElementType>>(ell::model::PortElements<ElementType>(elements), activationLayer);
         break;
     }
     case ell::api::predictors::neural::ActivationType::leaky:
     {
-        using apiLeakyReLUActivationLayer = typename ell::api::predictors::neural::LeakyReLUActivationLayer<float>;
-        auto* activationlayer = const_cast<ell::api::predictors::neural::ActivationLayer<float>*>(&layer);
-        auto* apiLeakyLayer = dynamic_cast<apiLeakyReLUActivationLayer*>(activationlayer);
-        if (apiLeakyLayer)
+        // can't use the CreateActivation helper method in this case because the neural::LeakyReLUActivation requires the alpha value parameter.
+        using ApiLeakyReLUActivationLayer = typename ell::api::predictors::neural::LeakyReLUActivationLayer<ElementType>;
+        auto* activationlayer = const_cast<ell::api::predictors::neural::ActivationLayer<ElementType>*>(&layer);
+        ActivationImplType* implementation = nullptr;
+        if (activationlayer->template Is<ApiLeakyReLUActivationLayer>())
         {
-            float alpha = apiLeakyLayer->_alpha;
-            neural::LeakyReLUActivation<float> leaky(alpha);
-            auto activationLayer = neural::ActivationLayer<float, neural::LeakyReLUActivation>(parameters, leaky);
-            newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::LeakyReLUActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+            auto& apiLeakyLayer = activationlayer->template As<ApiLeakyReLUActivationLayer>();
+            implementation = new ell::predictors::neural::LeakyReLUActivation<ElementType>(apiLeakyLayer._alpha);
         }
-        else
+        else 
         {
-            auto defaultLeakyLayer = neural::ActivationLayer<float, neural::LeakyReLUActivation>(parameters);
-            newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::LeakyReLUActivation>>(ell::model::PortElements<float>(elements), defaultLeakyLayer);
+            implementation = new ell::predictors::neural::LeakyReLUActivation<ElementType>();
         }
-        break;
-    }
-    case ell::api::predictors::neural::ActivationType::sigmoid:
-    {
-        auto activationLayer = neural::ActivationLayer<float, neural::SigmoidActivation>(parameters);
-        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::SigmoidActivation>>(ell::model::PortElements<float>(elements), activationLayer);
-        break;
-    }
-    case ell::api::predictors::neural::ActivationType::tanh:
-    {
-        auto activationLayer = neural::ActivationLayer<float, neural::TanhActivation>(parameters);
-        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<float, neural::TanhActivation>>(ell::model::PortElements<float>(elements), activationLayer);
+        newNode = model.GetModel().AddNode<ell::nodes::ActivationLayerNode<ElementType>>(ell::model::PortElements<ElementType>(elements), 
+            ell::predictors::neural::ActivationLayer<ElementType>(parameters, implementation));
         break;
     }
     case ell::api::predictors::neural::ActivationType::prelu:
     {
-        using apiPReLUActivationLayer = typename ell::api::predictors::neural::PReLUActivationLayer<float>;
-        auto* activationlayer = const_cast<ell::api::predictors::neural::ActivationLayer<float>*>(&layer);
-        auto& preluApiLayer = activationlayer->template As<apiPReLUActivationLayer>();
+        // can't use the CreateActivation helper method in this case because the neural::PReLUActivationLayer requires the alpha value parameter.
+        using ApiPReLUActivationLayer = typename ell::api::predictors::neural::PReLUActivationLayer<ElementType>;
+        auto* activationlayer = const_cast<ell::api::predictors::neural::ActivationLayer<ElementType>*>(&layer);
+        auto& preluApiLayer = activationlayer->template As<ApiPReLUActivationLayer>();
         TensorType alpha(preluApiLayer.alpha.shape.rows, preluApiLayer.alpha.shape.columns, preluApiLayer.alpha.shape.channels, preluApiLayer.alpha.data);
-        neural::ParametricReLUActivation<float> prelu(alpha);
-        auto activationLayer = neural::ActivationLayer<float, neural::ParametricReLUActivation>(parameters, prelu);
-        newNode = model.GetModel().AddNode<ell::nodes::ParametricReLUActivationLayerNode<float>>(ell::model::PortElements<float>(elements), activationLayer);
+        auto activationLayer = ell::predictors::neural::ActivationLayer<ElementType>(parameters, new ell::predictors::neural::ParametricReLUActivation<ElementType>(alpha));
+        newNode = model.GetModel().AddNode<ell::nodes::ParametricReLUActivationLayerNode<ElementType>>(ell::model::PortElements<ElementType>(elements), activationLayer);
         break;
     }
     default:
-        throw ell::utilities::InputException(ell::utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.activation)));
+        throw InputException(InputExceptionErrors::invalidArgument, 
+            FormatString("Encountered unsupported activation type in neural network predictor: %d", static_cast<int>(layer.activation)));
     }
 
     return Node(newNode);
@@ -1493,13 +1485,13 @@ Node ModelBuilder::AddFloatPoolingLayerNode(Model model, PortElements input, con
     UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode(layer);
     if (layer.poolingType == ell::api::predictors::neural::PoolingType::max)
     {
-        neural::PoolingLayer<float, neural::MaxPoolingFunction> poolingLayer(parameters, layer.poolingParameters);
-        newNode = model.GetModel().AddNode<ell::nodes::PoolingLayerNode<float, neural::MaxPoolingFunction>>(ell::model::PortElements<float>(elements), poolingLayer);
+        ell::predictors::neural::PoolingLayer<float, ell::predictors::neural::MaxPoolingFunction> poolingLayer(parameters, layer.poolingParameters);
+        newNode = model.GetModel().AddNode<ell::nodes::PoolingLayerNode<float, ell::predictors::neural::MaxPoolingFunction>>(ell::model::PortElements<float>(elements), poolingLayer);
     }
     else
     {
-        neural::PoolingLayer<float, neural::MeanPoolingFunction> poolingLayer(parameters, layer.poolingParameters);
-        newNode = model.GetModel().AddNode<ell::nodes::PoolingLayerNode<float, neural::MeanPoolingFunction>>(ell::model::PortElements<float>(elements), poolingLayer);
+        ell::predictors::neural::PoolingLayer<float, ell::predictors::neural::MeanPoolingFunction> poolingLayer(parameters, layer.poolingParameters);
+        newNode = model.GetModel().AddNode<ell::nodes::PoolingLayerNode<float, ell::predictors::neural::MeanPoolingFunction>>(ell::model::PortElements<float>(elements), poolingLayer);
     }
 
     return Node(newNode);
@@ -1557,9 +1549,9 @@ Node ModelBuilder::AddFloatGRULayerNode(Model model, PortElements input, PortEle
     size_t m = layer.updateWeights.shape.rows;
     size_t n = layer.updateWeights.shape.columns;
     GRUParameters<ElementType> gruParameters = { { layer.updateWeights.data.data(), m, n }, { layer.resetWeights.data.data(), m, n }, { layer.hiddenWeights.data.data(), m, n }, { layer.updateBias.data.data(), layer.updateBias.data.size() }, { layer.resetBias.data.data(), layer.resetBias.data.size() }, { layer.hiddenBias.data.data(), layer.hiddenBias.data.size() } };
-    GRULayer<ElementType, TanhActivation, SigmoidActivation> gruLayer(parameters, gruParameters);
+    GRULayer<ElementType> gruLayer(parameters, gruParameters, CreateActivation<ElementType>(layer.activation), CreateActivation<ElementType>(layer.recurrentActivation));
 
-    newNode = model.GetModel().AddNode<GRULayerNode<ElementType, TanhActivation, SigmoidActivation>>(ell::model::PortElements<ElementType>(elements), ell::model::PortElements<int>(resetElements), gruLayer);
+    newNode = model.GetModel().AddNode<GRULayerNode<ElementType>>(ell::model::PortElements<ElementType>(elements), ell::model::PortElements<int>(resetElements), gruLayer);
     return Node(newNode);
 }
 
@@ -1584,9 +1576,9 @@ Node ModelBuilder::AddFloatLSTMLayerNode(Model model, PortElements input, PortEl
     size_t n = layer.inputWeights.shape.columns;
     size_t s = layer.inputBias.data.size();
     LSTMParameters<ElementType> lstmParameters = { { layer.inputWeights.data.data(), m, n }, { layer.forgetMeWeights.data.data(), m, n }, { layer.candidateWeights.data.data(), m, n }, { layer.outputWeights.data.data(), m, n }, { layer.inputBias.data.data(), s }, { layer.forgetMeBias.data.data(), s }, { layer.candidateBias.data.data(), s }, { layer.outputBias.data.data(), s } };
-    LSTMLayer<ElementType, TanhActivation, SigmoidActivation> lstmLayer(parameters, lstmParameters);
+    LSTMLayer<ElementType> lstmLayer(parameters, lstmParameters, CreateActivation<ElementType>(layer.activation), CreateActivation<ElementType>(layer.recurrentActivation));
 
-    newNode = model.GetModel().AddNode<LSTMLayerNode<ElementType, TanhActivation, SigmoidActivation>>(ell::model::PortElements<ElementType>(elements), ell::model::PortElements<int>(resetElements), lstmLayer);
+    newNode = model.GetModel().AddNode<LSTMLayerNode<ElementType>>(ell::model::PortElements<ElementType>(elements), ell::model::PortElements<int>(resetElements), lstmLayer);
     return Node(newNode);
 }
 

@@ -26,6 +26,7 @@ namespace utilities
         v6_sink_triggers = 6,
         v7_binary_operation_active_regions = 7,
         v8_port_memory_layout = 8,
+        v9_activation_objects = 9, // move activation from template parameters to member objects.
         nextVersion
     };
 

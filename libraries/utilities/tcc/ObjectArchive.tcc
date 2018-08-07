@@ -13,6 +13,7 @@ namespace utilities
     //
     // ObjectArchive
     //
+
     template <typename ValueType>
     void ObjectArchive::SetType(const ValueType& object)
     {

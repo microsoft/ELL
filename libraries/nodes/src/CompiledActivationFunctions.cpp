@@ -8,10 +8,8 @@
 
 #include "CompiledActivationFunctions.h"
 
-// predictors
-#include "LeakyReLUActivation.h"
-#include "ReLUActivation.h"
-#include "SigmoidActivation.h"
+// activation
+#include "Activation.h"
 
 // emitters
 #include "IRLocalValue.h"
@@ -21,42 +19,35 @@ namespace ell
 namespace nodes
 {
     //
-    // Helper functions to convert predictors::neural activation functions into node activation functions
+    // Helper functions to convert predictors::neural activation functions into compilable node activation functions
     //
     template <typename ValueType>
-    ReLUActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::ReLUActivation<ValueType>& f)
+    std::unique_ptr<ActivationFunction<ValueType>> GetNodeActivationFunction(const predictors::neural::Activation<ValueType>& f)
     {
-        return ReLUActivationFunction<ValueType>{};
-    }
+        const predictors::neural::ActivationImpl<ValueType>* ptr = f.GetImpl();
 
-    template <typename ValueType>
-    LeakyReLUActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::LeakyReLUActivation<ValueType>& f)
-    {
-        return LeakyReLUActivationFunction<ValueType>{ f.GetLeakyFactor() };
-    }
+        auto hardSigmoid = dynamic_cast<const predictors::neural::HardSigmoidActivation<ValueType>*>(ptr);
+        if (hardSigmoid) return std::make_unique<HardSigmoidActivationFunction<ValueType>>();
 
-    template <typename ValueType>
-    SigmoidActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::SigmoidActivation<ValueType>& f)
-    {
-        return SigmoidActivationFunction<ValueType>{};
-    }
+        auto leakyReLU = dynamic_cast<const predictors::neural::LeakyReLUActivation<ValueType>*>(ptr);
+        if (leakyReLU) return std::make_unique<LeakyReLUActivationFunction<ValueType>>(leakyReLU->GetLeakyFactor());
 
-    template <typename ValueType>
-    HardSigmoidActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::HardSigmoidActivation<ValueType>& f)
-    {
-        return HardSigmoidActivationFunction<ValueType>{};
-    }
+        auto sigmoid = dynamic_cast<const predictors::neural::SigmoidActivation<ValueType>*>(ptr);
+        if (sigmoid) return std::make_unique<SigmoidActivationFunction<ValueType>>();
 
-    template <typename ValueType>
-    TanhActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::TanhActivation<ValueType>& f)
-    {
-        return TanhActivationFunction<ValueType>{};
-    }
+        auto relu = dynamic_cast<const predictors::neural::ReLUActivation<ValueType>*>(ptr);
+        if (relu) return std::make_unique<ReLUActivationFunction<ValueType>>();
 
-    template <typename ValueType>
-    ParametricReLUActivationFunction<ValueType> GetNodeActivationFunction(const predictors::neural::ParametricReLUActivation<ValueType>& f)
-    {
-        return ParametricReLUActivationFunction<ValueType>{};
+        auto tanh = dynamic_cast<const predictors::neural::TanhActivation<ValueType>*>(ptr);
+        if (tanh) return std::make_unique<TanhActivationFunction<ValueType>>();
+
+        auto prelu = dynamic_cast<const predictors::neural::ParametricReLUActivation<ValueType>*>(ptr);
+        if (prelu) {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "GetNodeActivationFunction cannot be used on ParametricReLUActivations");
+        }
+
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, 
+            std::string("GetNodeActivationFunction given a new Activation type it doesn't recognize: ") + typeid(*f.GetImpl()).name());
     }
 
     //
@@ -201,18 +192,8 @@ namespace nodes
     template class TanhActivationFunction<float>;
     template class TanhActivationFunction<double>;
 
-    template HardSigmoidActivationFunction<float> GetNodeActivationFunction(const predictors::neural::HardSigmoidActivation<float>& f);
-    template HardSigmoidActivationFunction<double> GetNodeActivationFunction(const predictors::neural::HardSigmoidActivation<double>& f);
-    template LeakyReLUActivationFunction<float> GetNodeActivationFunction(const predictors::neural::LeakyReLUActivation<float>& f);
-    template LeakyReLUActivationFunction<double> GetNodeActivationFunction(const predictors::neural::LeakyReLUActivation<double>& f);
-    template ParametricReLUActivationFunction<float> GetNodeActivationFunction(const predictors::neural::ParametricReLUActivation<float>& f);
-    template ParametricReLUActivationFunction<double> GetNodeActivationFunction(const predictors::neural::ParametricReLUActivation<double>& f);
-    template ReLUActivationFunction<float> GetNodeActivationFunction(const predictors::neural::ReLUActivation<float>& f);
-    template ReLUActivationFunction<double> GetNodeActivationFunction(const predictors::neural::ReLUActivation<double>& f);
-    template SigmoidActivationFunction<float> GetNodeActivationFunction(const predictors::neural::SigmoidActivation<float>& f);
-    template SigmoidActivationFunction<double> GetNodeActivationFunction(const predictors::neural::SigmoidActivation<double>& f);
-    template TanhActivationFunction<float> GetNodeActivationFunction(const predictors::neural::TanhActivation<float>& f);
-    template TanhActivationFunction<double> GetNodeActivationFunction(const predictors::neural::TanhActivation<double>& f);
+    template std::unique_ptr<ActivationFunction<float>> GetNodeActivationFunction<float>(const predictors::neural::Activation<float>& f);
+    template std::unique_ptr<ActivationFunction<double>> GetNodeActivationFunction<double>(const predictors::neural::Activation<double>& f);
 
 } // nodes
 } // ell

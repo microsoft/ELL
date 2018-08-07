@@ -52,6 +52,14 @@ namespace neural
     }
 
     template <typename ElementType>
+    Layer<ElementType>::Layer(const Layer& other) :
+        _layerParameters(other._layerParameters),
+        _output(other._layerParameters.outputShape)
+    {
+        InitializeOutputValues(_output, other._layerParameters.outputPaddingParameters);
+    }
+
+    template <typename ElementType>
     typename Layer<ElementType>::Shape Layer<ElementType>::GetInputShapeMinusPadding() const
     {
         auto&& inputShape = _layerParameters.input.GetShape(); 

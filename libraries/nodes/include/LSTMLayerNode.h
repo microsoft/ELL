@@ -27,12 +27,12 @@ namespace ell
 namespace nodes
 {
     /// <summary> A node that wraps a neural net GRULayer. </summary>
-    template <typename ValueType, template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-    class LSTMLayerNode : public NeuralNetworkLayerNode<LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>, predictors::neural::LSTMLayer<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>, ValueType>
+    template <typename ValueType>
+    class LSTMLayerNode : public NeuralNetworkLayerNode<LSTMLayerNode<ValueType>, predictors::neural::LSTMLayer<ValueType>, ValueType>
     {
     public:
-        using LayerType = predictors::neural::LSTMLayer<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>;
-        using BaseType = NeuralNetworkLayerNode<LSTMLayerNode<ValueType, ActivationFunctionType, RecurrentActivationFunctionType>, LayerType, ValueType>;
+        using LayerType = predictors::neural::LSTMLayer<ValueType>;
+        using BaseType = NeuralNetworkLayerNode<LSTMLayerNode<ValueType>, LayerType, ValueType>;
 
         /// @name Input and Output Ports
         /// @{
@@ -54,7 +54,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, ActivationFunctionType<ValueType>, RecurrentActivationFunctionType<ValueType>>("LSTMLayerNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("LSTMLayerNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -83,7 +83,7 @@ namespace nodes
     //
     // Implementation: LSTMNode
     //
-    template<typename ValueType, template<typename> class ActivationFunctionType, template<typename> class RecurrentActivationFunctionType>
+    template<typename ValueType>
     class LSTMNode : public model::CompilableNode
     {
     public:
@@ -109,6 +109,7 @@ namespace nodes
         const model::InputPort<ValueType>& outputBias = _outputBias;
         const model::InputPort<int>& resetTrigger = _resetTrigger;
         const model::OutputPort<ValueType>& output = _output;
+        using ActivationType = predictors::neural::Activation<ValueType>;
         /// @}
 
         /// <summary> Default contructor. </summary>
@@ -138,6 +139,8 @@ namespace nodes
                         const model::PortElements<ValueType>& forgetMeBias,
                         const model::PortElements<ValueType>& candidateBias,
                         const model::PortElements<ValueType>& outputBias,
+                        const ActivationType& activation,
+                        const ActivationType& recurrentActivation,
                         const model::PortMemoryLayout& inputMemoryLayout,
                         const model::PortMemoryLayout& outputMemoryLayout);
 
@@ -159,7 +162,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, ActivationFunctionType<ValueType>, RecurrentActivationFunctionType<ValueType>>("LSTMNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("LSTMNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -208,11 +211,12 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         model::PortMemoryLayout _inputMemoryLayout;
+        ActivationType _activation;
+        ActivationType _recurrentActivation;
 
         void ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength);
 
-        template <typename ActivationType>
-        void ApplyActivation(emitters::IRFunctionEmitter& function, ActivationType& activationFunction, llvm::Value* data, size_t dataLength);
+        void ApplyActivation(emitters::IRFunctionEmitter& function, const ActivationType& activation, llvm::Value* data, size_t dataLength);
     };
 }
 }

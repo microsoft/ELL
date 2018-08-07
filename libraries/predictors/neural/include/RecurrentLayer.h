@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Layer.h"
-#include "TanhActivation.h"
+#include "Activation.h"
 
 // math
 #include "Matrix.h"
@@ -21,7 +21,7 @@ namespace predictors
     namespace neural
     {
         /// <summary> A layer in a neural network that implements a recurrent layer, meaning that over time the network will recognise temporal behaviour. </summary>
-        template <typename ElementType, template <typename> class ActivationFunctionType>
+        template <typename ElementType>
         class RecurrentLayer : public Layer<ElementType>
         {
         public:
@@ -34,8 +34,9 @@ namespace predictors
             using Layer<ElementType>::NumOutputRowsMinusPadding;
             using Layer<ElementType>::NumOutputColumnsMinusPadding;
             using Layer<ElementType>::NumOutputChannels;
+            using ActivationType = Activation<ElementType>;
 
-            /// <summary> Default constructor </summary>
+            /// <summary> Default constructor - only used during deserialization</summary>
             RecurrentLayer();
 
             /// <summary> Instantiates an instance of a recurrent layer </summary>
@@ -43,7 +44,10 @@ namespace predictors
             /// <param name="layerParameters"> The parameters common to every layer. </param>
             /// <param name="weights"> Weights for the layers should be in the form [Weights, Recurrent weights]. </param>
             /// <param name="biases"> Biases used for computation, should be a vector with the same dimensionality as the output of this layer. </param>
-            RecurrentLayer(const LayerParameters& layerParameters, MatrixType& weights, VectorType& biases); //, predictors::neural::ActivationFunctionType activation = predictors::neural::ActivationFunctionType::tanh);
+            RecurrentLayer(const LayerParameters& layerParameters, MatrixType& weights, VectorType& biases, const ActivationType& activation);
+
+            /// <summary> Copy this layer. </summary>
+            RecurrentLayer(const RecurrentLayer& other);
 
             /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
             void Compute() override;
@@ -69,7 +73,7 @@ namespace predictors
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
             /// <returns> The name of this type. </returns>
-            static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType, ActivationFunctionType<ElementType>>("RecurrentLayer"); }
+            static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("RecurrentLayer"); }
 
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
@@ -79,7 +83,7 @@ namespace predictors
             /// <summary> Gets the activation function. </summary>
             ///
             /// <returns> A const reference to the activation function. </returns>
-            const ActivationFunctionType<ElementType>& GetActivationFunction() const { return _activation; }
+            const ActivationType& GetActivationFunction() const { return _activation; }
 
         protected:
             void WriteToArchive(utilities::Archiver& archiver) const override;
@@ -94,7 +98,7 @@ namespace predictors
 
             VectorType _inputPlusHiddenVector;
 
-            ActivationFunctionType<ElementType> _activation;
+            ActivationType _activation;
         };
     }
 }

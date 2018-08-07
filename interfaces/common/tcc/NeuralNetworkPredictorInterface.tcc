@@ -10,6 +10,7 @@
 // interfaces
 #include "MathInterface.h"
 #include "NeuralNetworkPredictorInterface.h"
+#include "NeuralLayersInterface.h"
 
 // neural predictor
 #include "HardSigmoidActivation.h"
@@ -21,8 +22,10 @@
 #include "SigmoidActivation.h"
 
 // utilities
+#include "Exception.h"
 #include "Files.h"
 #include "JsonArchiver.h"
+#include "StringUtil.h"
 
 // stl
 #include <ostream>
@@ -35,38 +38,83 @@ namespace api
     {
         using LayerShape = ell::api::math::TensorShape;
         namespace underlying = ell::predictors::neural;
-        namespace api = ell::api::predictors::neural;
+
+#ifndef SWIG
+        
+        template<typename ElementType>
+        ell::predictors::neural::Activation<ElementType> CreateActivation(neural::ActivationType type)
+        {
+            std::unique_ptr<ell::predictors::neural::ActivationImpl<ElementType>> activation;
+            switch (type)
+            {
+            case neural::ActivationType::relu:
+                activation = std::make_unique<underlying::ReLUActivation<ElementType>>();
+                break;
+            case neural::ActivationType::leaky:
+                activation = std::make_unique<underlying::LeakyReLUActivation<ElementType>>();
+                break;
+            case neural::ActivationType::hardSigmoid:
+                activation = std::make_unique<underlying::HardSigmoidActivation<ElementType>>();
+                break;
+            case neural::ActivationType::sigmoid:
+                activation = std::make_unique<underlying::SigmoidActivation<ElementType>>();
+                break;
+            case neural::ActivationType::tanh:
+                activation = std::make_unique<underlying::TanhActivation<ElementType>>();
+                break;
+            default:
+                throw ell::utilities::InputException(ell::utilities::InputExceptionErrors::invalidArgument, 
+                    utilities::FormatString("Encountered unsupported activation type in neural network predictor: %d", static_cast<int>(type)));
+            }
+            return ell::predictors::neural::Activation<ElementType>(activation);
+        }
 
         //
         // CreateActivationLayer
         //
         template <typename ElementType>
-        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateActivationLayer(api::ActivationLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
+        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateActivationLayer(neural::ActivationLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
         {
             using TensorType = typename underlying::Layer<ElementType>::TensorType;
+            using ActivationImplType = ell::predictors::neural::ActivationImpl<ElementType>;
 
+            ell::predictors::neural::Activation<ElementType> activation;
             switch (layer.activation)
             {
-            case api::ActivationType::relu:
-                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ReLUActivation>>(parameters);
-            case api::ActivationType::hardSigmoid:
-                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::HardSigmoidActivation>>(parameters);
-            case api::ActivationType::leaky:
-                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::LeakyReLUActivation>>(parameters);
-            case api::ActivationType::sigmoid:
-                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::SigmoidActivation>>(parameters);
-            case api::ActivationType::tanh:
-                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::TanhActivation>>(parameters);
-            case api::ActivationType::prelu:
+            case neural::ActivationType::relu:
+            case neural::ActivationType::hardSigmoid:
+            case neural::ActivationType::sigmoid:
+            case neural::ActivationType::tanh:
+                activation = CreateActivation<ElementType>(layer.activation);
+                break;
+            case neural::ActivationType::leaky:
             {
-                auto& preluApiLayer = NeuralNetworkPredictor<ElementType>::LayerAs<api::PReLUActivationLayer<ElementType>>(&layer);
+                ActivationImplType* implementation = nullptr;
+                if (NeuralNetworkPredictor<ElementType>::LayerIs<neural::LeakyReLUActivationLayer<ElementType>>(&layer))
+                {
+                    auto& leakyReluApiLayer = NeuralNetworkPredictor<ElementType>::LayerAs<neural::LeakyReLUActivationLayer<ElementType>>(&layer);
+                    implementation = new underlying::LeakyReLUActivation<ElementType>(leakyReluApiLayer._alpha);
+                }
+                else 
+                {
+                    implementation = new underlying::LeakyReLUActivation<ElementType>();
+                }
+                activation = ell::predictors::neural::Activation<ElementType>(implementation);
+                break;
+            }
+            case neural::ActivationType::prelu:
+            {
+                auto& preluApiLayer = NeuralNetworkPredictor<ElementType>::LayerAs<neural::PReLUActivationLayer<ElementType>>(&layer);
                 TensorType alpha(preluApiLayer.alpha.shape.rows, preluApiLayer.alpha.shape.columns, preluApiLayer.alpha.shape.channels, preluApiLayer.alpha.data);
-                underlying::ParametricReLUActivation<ElementType> prelu(alpha);
-                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
+                activation = ell::predictors::neural::Activation<ElementType>(new underlying::ParametricReLUActivation<ElementType>(alpha));
+                break;
             }
             default:
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.activation)));
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
+                    utilities::FormatString("Encountered unsupported activation type in neural network predictor: %d", static_cast<int>(layer.activation)));
             }
+
+            return std::make_unique<underlying::ActivationLayer<ElementType>>(parameters, activation);
         }
 
         //
@@ -74,74 +122,14 @@ namespace api
         //
 
         template <typename ElementType>
-        template <template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateGRULayer(api::GRULayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
+        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateGRULayer(neural::GRULayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
         {
             size_t m = layer.updateWeights.shape.rows;
             size_t n = layer.updateWeights.shape.columns;
             size_t s = layer.updateBias.shape.rows * layer.updateBias.shape.columns * layer.updateBias.shape.channels;
             underlying::GRUParameters<ElementType> gruParameters = { { layer.updateWeights.data.data(), m, n }, { layer.resetWeights.data.data(), m, n }, { layer.hiddenWeights.data.data(), m, n }, { layer.updateBias.data.data(), s }, { layer.resetBias.data.data(), s }, { layer.hiddenBias.data.data(), s } };
 
-            return std::make_unique<underlying::GRULayer<ElementType, ActivationFunctionType, RecurrentActivationFunctionType>>(parameters, gruParameters);
-        }
-
-        template <typename ElementType>
-        template <template <typename> class ActivationFunctionType>
-        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateGRULayer(api::GRULayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
-        {
-            using TensorType = typename underlying::Layer<ElementType>::TensorType;
-
-            switch (layer.recurrentActivation)
-            {
-            case api::ActivationType::relu:
-                return CreateGRULayer<ActivationFunctionType, underlying::ReLUActivation>(layer, parameters);
-            case api::ActivationType::leaky:
-                return CreateGRULayer<ActivationFunctionType, underlying::LeakyReLUActivation>(layer, parameters);
-            case api::ActivationType::sigmoid:
-                return CreateGRULayer<ActivationFunctionType, underlying::SigmoidActivation>(layer, parameters);
-            case api::ActivationType::hardSigmoid:
-                return CreateGRULayer<ActivationFunctionType, underlying::HardSigmoidActivation>(layer, parameters);
-            case api::ActivationType::tanh:
-                return CreateGRULayer<ActivationFunctionType, underlying::TanhActivation>(layer, parameters);
-            case api::ActivationType::prelu:
-            {
-                auto& preluApiLayer = NeuralNetworkPredictor<ElementType>::LayerAs<api::PReLUActivationLayer<ElementType>>(&layer);
-                TensorType alpha(preluApiLayer.alpha.shape.rows, preluApiLayer.alpha.shape.columns, preluApiLayer.alpha.shape.channels, preluApiLayer.alpha.data);
-                underlying::ParametricReLUActivation<ElementType> prelu(alpha);
-                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
-            }
-            default:
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown recurrent activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.recurrentActivation)));
-            }
-        }
-
-        template <typename ElementType>
-        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateGRULayer(api::GRULayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
-        {
-            using TensorType = typename underlying::Layer<ElementType>::TensorType;
-
-            switch (layer.activation)
-            {
-            case api::ActivationType::relu:
-                return CreateGRULayer<underlying::ReLUActivation>(layer, parameters);
-            case api::ActivationType::leaky:
-                return CreateGRULayer<underlying::LeakyReLUActivation>(layer, parameters);
-            case api::ActivationType::sigmoid:
-                return CreateGRULayer<underlying::SigmoidActivation>(layer, parameters);
-            case api::ActivationType::hardSigmoid:
-                return CreateGRULayer<underlying::HardSigmoidActivation>(layer, parameters);
-            case api::ActivationType::tanh:
-                return CreateGRULayer<underlying::TanhActivation>(layer, parameters);
-            case api::ActivationType::prelu:
-            {
-                auto& preluApiLayer = NeuralNetworkPredictor<ElementType>::LayerAs<api::PReLUActivationLayer<ElementType>>(&layer);
-                TensorType alpha(preluApiLayer.alpha.shape.rows, preluApiLayer.alpha.shape.columns, preluApiLayer.alpha.shape.channels, preluApiLayer.alpha.data);
-                underlying::ParametricReLUActivation<ElementType> prelu(alpha);
-                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
-            }
-            default:
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.activation)));
-            }
+            return std::make_unique<underlying::GRULayer<ElementType>>(parameters, gruParameters, CreateActivation<ElementType>(layer.activation), CreateActivation<ElementType>(layer.recurrentActivation));
         }
 
         //
@@ -149,12 +137,11 @@ namespace api
         //
 
         template <typename ElementType>
-        template <template <typename> class ActivationFunctionType, template <typename> class RecurrentActivationFunctionType>
-        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateLSTMLayer(api::LSTMLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
+        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateLSTMLayer(neural::LSTMLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
         {
             size_t m = layer.inputWeights.shape.rows;
             size_t n = layer.inputWeights.shape.columns;
-            underlying::LSTMParameters<ElementType> lstmParameters = { 
+            underlying::LSTMParameters<ElementType> lstmParameters = {
                 { layer.inputWeights.data.data(), m, n },
                 { layer.forgetMeWeights.data.data(), m, n },
                 { layer.candidateWeights.data.data(), m, n },
@@ -162,75 +149,19 @@ namespace api
                 { layer.inputBias.data.data(), m },
                 { layer.forgetMeBias.data.data(), m },
                 { layer.candidateBias.data.data(), m },
-                { layer.outputBias.data.data(), m } };
+                { layer.outputBias.data.data(), m }
+            };
 
-            return std::make_unique<underlying::LSTMLayer<ElementType, ActivationFunctionType, RecurrentActivationFunctionType>>(parameters, lstmParameters);
+            return std::make_unique<underlying::LSTMLayer<ElementType>>(parameters, lstmParameters, 
+                CreateActivation<ElementType>(layer.activation), CreateActivation<ElementType>(layer.recurrentActivation));
         }
-
-        template <typename ElementType>
-        template <template <typename> class ActivationFunctionType>
-        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateLSTMLayer(api::LSTMLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
-        {
-            using TensorType = typename underlying::Layer<ElementType>::TensorType;
-
-            switch (layer.recurrentActivation)
-            {
-            case api::ActivationType::relu:
-                return CreateLSTMLayer<ActivationFunctionType, underlying::ReLUActivation>(layer, parameters);
-            case api::ActivationType::leaky:
-                return CreateLSTMLayer<ActivationFunctionType, underlying::LeakyReLUActivation>(layer, parameters);
-            case api::ActivationType::sigmoid:
-                return CreateLSTMLayer<ActivationFunctionType, underlying::SigmoidActivation>(layer, parameters);
-            case api::ActivationType::hardSigmoid:
-                return CreateLSTMLayer<ActivationFunctionType, underlying::HardSigmoidActivation>(layer, parameters);
-            case api::ActivationType::tanh:
-                return CreateLSTMLayer<ActivationFunctionType, underlying::TanhActivation>(layer, parameters);
-            case api::ActivationType::prelu:
-            {
-                auto& preluApiLayer = NeuralNetworkPredictor<ElementType>::LayerAs<api::PReLUActivationLayer<ElementType>>(&layer);
-                TensorType alpha(preluApiLayer.alpha.shape.rows, preluApiLayer.alpha.shape.columns, preluApiLayer.alpha.shape.channels, preluApiLayer.alpha.data);
-                underlying::ParametricReLUActivation<ElementType> prelu(alpha);
-                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
-            }
-            default:
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown recurrent activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.recurrentActivation)));
-            }
-        }
-
-        template <typename ElementType>
-        std::unique_ptr<underlying::Layer<ElementType>> NeuralNetworkPredictor<ElementType>::CreateLSTMLayer(api::LSTMLayer<ElementType>& layer, const UnderlyingLayerParameters& parameters)
-        {
-            using TensorType = typename underlying::Layer<ElementType>::TensorType;
-
-            switch (layer.activation)
-            {
-            case api::ActivationType::relu:
-                return CreateLSTMLayer<underlying::ReLUActivation>(layer, parameters);
-            case api::ActivationType::leaky:
-                return CreateLSTMLayer<underlying::LeakyReLUActivation>(layer, parameters);
-            case api::ActivationType::sigmoid:
-                return CreateLSTMLayer<underlying::SigmoidActivation>(layer, parameters);
-            case api::ActivationType::hardSigmoid:
-                return CreateLSTMLayer<underlying::HardSigmoidActivation>(layer, parameters);
-            case api::ActivationType::tanh:
-                return CreateLSTMLayer<underlying::TanhActivation>(layer, parameters);
-            case api::ActivationType::prelu:
-            {
-                auto& preluApiLayer = NeuralNetworkPredictor<ElementType>::LayerAs<api::PReLUActivationLayer<ElementType>>(&layer);
-                TensorType alpha(preluApiLayer.alpha.shape.rows, preluApiLayer.alpha.shape.columns, preluApiLayer.alpha.shape.channels, preluApiLayer.alpha.data);
-                underlying::ParametricReLUActivation<ElementType> prelu(alpha);
-                return std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu);
-            }
-            default:
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Encountered unknown activation type in neural network predictor: ") + std::to_string(static_cast<int>(layer.activation)));
-            }
-        }
+#endif 
 
         //
         // API classes for the neural predictor
         //
         template <typename ElementType>
-        NeuralNetworkPredictor<ElementType>::NeuralNetworkPredictor(const std::vector<ell::api::predictors::neural::Layer<ElementType>*>& layers, ElementType scaleFactor)
+        NeuralNetworkPredictor<ElementType>::NeuralNetworkPredictor(const std::vector<neural::Layer<ElementType>*>& layers, ElementType scaleFactor)
         {
             if (layers.size() > 0)
             {
@@ -303,15 +234,18 @@ namespace api
 
         template <typename ElementType>
         template <typename DerivedLayer>
+        bool NeuralNetworkPredictor<ElementType>::LayerIs(Layer* layer)
+        {
+            return layer->template Is<DerivedLayer>();
+        }
+
+        template <typename ElementType>
+        template <typename DerivedLayer>
         auto& NeuralNetworkPredictor<ElementType>::LayerAs(Layer* layer)
         {
             if (layer == nullptr)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Trying to cast null layer");
-            }
-            if (!layer->template Is<DerivedLayer>())
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Bad layer type cast");
             }
             return layer->template As<DerivedLayer>();
         }
@@ -339,60 +273,60 @@ namespace api
                 {
                 case (underlying::LayerType::activation):
                 {
-                    auto& apiLayer = LayerAs<api::ActivationLayer<ElementType>>(layer);
+                    auto& apiLayer = LayerAs<neural::ActivationLayer<ElementType>>(layer);
                     underlyingLayers.push_back(CreateActivationLayer(apiLayer, parameters));
                 }
                 break;
                 case (underlying::LayerType::batchNormalization):
                 {
-                    auto& apiLayer = LayerAs<api::BatchNormalizationLayer<ElementType>>(layer);
-                    auto epsilonSummand = (apiLayer.epsilonSummand == api::EpsilonSummand::variance) ? underlying::EpsilonSummand::Variance : underlying::EpsilonSummand::SqrtVariance;
+                    auto& apiLayer = LayerAs<neural::BatchNormalizationLayer<ElementType>>(layer);
+                    auto epsilonSummand = (apiLayer.epsilonSummand == neural::EpsilonSummand::variance) ? underlying::EpsilonSummand::Variance : underlying::EpsilonSummand::SqrtVariance;
                     underlyingLayers.push_back(std::make_unique<underlying::BatchNormalizationLayer<ElementType>>(parameters, apiLayer.mean, apiLayer.variance, apiLayer.epsilon, epsilonSummand));
                 }
                 break;
                 case (underlying::LayerType::bias):
                 {
-                    auto& apiLayer = LayerAs<api::BiasLayer<ElementType>>(layer);
+                    auto& apiLayer = LayerAs<neural::BiasLayer<ElementType>>(layer);
                     underlyingLayers.push_back(std::make_unique<underlying::BiasLayer<ElementType>>(parameters, apiLayer.bias));
                 }
                 break;
                 case (underlying::LayerType::binaryConvolution):
                 {
-                    auto& apiLayer = LayerAs<api::BinaryConvolutionalLayer<ElementType>>(layer);
+                    auto& apiLayer = LayerAs<neural::BinaryConvolutionalLayer<ElementType>>(layer);
                     TensorType weights(apiLayer.weights.shape.rows, apiLayer.weights.shape.columns, apiLayer.weights.shape.channels, apiLayer.weights.data);
                     underlyingLayers.push_back(std::make_unique<underlying::BinaryConvolutionalLayer<ElementType>>(parameters, apiLayer.convolutionalParameters, weights));
                 }
                 break;
                 case (underlying::LayerType::convolution):
                 {
-                    auto& apiLayer = LayerAs<api::ConvolutionalLayer<ElementType>>(layer);
+                    auto& apiLayer = LayerAs<neural::ConvolutionalLayer<ElementType>>(layer);
                     TensorType weights(apiLayer.weights.shape.rows, apiLayer.weights.shape.columns, apiLayer.weights.shape.channels, apiLayer.weights.data);
                     underlyingLayers.push_back(std::make_unique<underlying::ConvolutionalLayer<ElementType>>(parameters, apiLayer.convolutionalParameters, weights));
                 }
                 break;
                 case (underlying::LayerType::fullyConnected):
                 {
-                    auto& apiLayer = LayerAs<api::FullyConnectedLayer<ElementType>>(layer);
+                    auto& apiLayer = LayerAs<neural::FullyConnectedLayer<ElementType>>(layer);
                     TensorType weights(apiLayer.weights.shape.rows, apiLayer.weights.shape.columns, apiLayer.weights.shape.channels, apiLayer.weights.data);
                     underlyingLayers.push_back(std::make_unique<underlying::FullyConnectedLayer<ElementType>>(parameters, weights));
                 }
                 break;
                 case (underlying::LayerType::lstm):
                 {
-                    auto& apiLayer = LayerAs<api::LSTMLayer<ElementType>>(layer);
+                    auto& apiLayer = LayerAs<neural::LSTMLayer<ElementType>>(layer);
                     underlyingLayers.push_back(CreateLSTMLayer(apiLayer, parameters));
                 }
                 break;
                 case (underlying::LayerType::gru):
                 {
-                    auto& apiLayer = LayerAs<api::GRULayer<ElementType>>(layer);
+                    auto& apiLayer = LayerAs<neural::GRULayer<ElementType>>(layer);
                     underlyingLayers.push_back(CreateGRULayer(apiLayer, parameters));
                 }
                 break;
                 case (underlying::LayerType::pooling):
                 {
-                    auto& apiLayer = LayerAs<api::PoolingLayer<ElementType>>(layer);
-                    if (apiLayer.poolingType == api::PoolingType::max)
+                    auto& apiLayer = LayerAs<neural::PoolingLayer<ElementType>>(layer);
+                    if (apiLayer.poolingType == neural::PoolingType::max)
                     {
                         underlyingLayers.push_back(std::make_unique<underlying::PoolingLayer<ElementType, underlying::MaxPoolingFunction>>(parameters, apiLayer.poolingParameters));
                     }
@@ -404,13 +338,13 @@ namespace api
                 break;
                 case (underlying::LayerType::region):
                 {
-                    auto& apiLayer = LayerAs<api::RegionDetectionLayer<ElementType>>(layer);
+                    auto& apiLayer = LayerAs<neural::RegionDetectionLayer<ElementType>>(layer);
                     underlyingLayers.push_back(std::make_unique<underlying::RegionDetectionLayer<ElementType>>(parameters, apiLayer.detectionParameters));
                 }
                 break;
                 case (underlying::LayerType::scaling):
                 {
-                    auto& apiLayer = LayerAs<api::ScalingLayer<ElementType>>(layer);
+                    auto& apiLayer = LayerAs<neural::ScalingLayer<ElementType>>(layer);
                     underlyingLayers.push_back(std::make_unique<underlying::ScalingLayer<ElementType>>(parameters, apiLayer.scales));
                 }
                 break;
