@@ -6,7 +6,8 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(PYTHON_EXECUTABLE python)
 endif()
 
-if(${PYTHON_ENABLED})
+
+if(${PYTHON_ENABLED} AND NOT APPLE)
     # test project
 
     set (test_name ${module_name}_test)
