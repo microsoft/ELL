@@ -1,6 +1,6 @@
 # Building a 64-bit version of the Embedded Learning Library (ELL) on Windows
 
-ELL enables you to design and deploy intelligent machine-learned models onto single-board computers, like Raspberry Pi and Arduino. Most of your interaction with ELL occurs on a laptop or desktop computer, rather than the single-board machine itself. The steps below describe how to build ELL on a laptop or desktop running Windows.
+ELL enables you to design and deploy intelligent machine-learned models onto single-board computers, like Raspberry Pi and Arduino. Most of your interaction with ELL occurs on a laptop or desktop computer, rather than the single-board machine itself. The steps below describe how to build ELL on a laptop or desktop running Windows. You can also use `SETUP-Windows.cmd` to setup your computer.
 
 ## Cloning the ELL repository
 
@@ -12,11 +12,11 @@ git clone https://github.com/Microsoft/ELL.git
 
 ### Visual Studio
 
-ELL requires a C++ compiler. On Windows, you can use *Visual Studio 2015 update 3 with C++ compiler* and *Visual Studio 2017 with C++ Desktop Development Workload*. A free version of Visual Studio 2017 is available at <https://www.visualstudio.com/vs/community/> (make sure to select *Desktop Development with C++* during installation).
+ELL requires a C++ compiler. On Windows, you can use *Visual Studio 2017 with C++ Desktop Development Workload*. A free version of Visual Studio 2017 is available at <https://www.visualstudio.com/vs/community/> (make sure to select *Desktop Development with C++* during installation).
 
 ### CMake 3.8
 
-ELL uses the [*CMake*](https://cmake.org/) build system, version 3.8 or newer. Download and install it from <https://cmake.org/download/>.
+ELL uses the [*CMake*](https://cmake.org/) build system, version 3.8 or newer. A version of CMake that satisfies this requirement is already provided with Visual Studio 2017. You may also download and install it from <https://cmake.org/download/>.
 
 ### LLVM 3.9, SWIG 3.0.12, OpenBLAS 0.2.19.3, and Doxygen 1.8.13 via NuGet
 
@@ -75,20 +75,14 @@ mkdir build
 cd build
 ```
 
-If your installed compiler is Visual Studio 2015, invoke CMake as follows
-
-```shell
-cmake -G "Visual Studio 14 2015 Win64" ..
-```
-
-Don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, and other files, in the `build` directory.
-If your compiler is Visual Studio 2017, invoke CMake as follows
+Invoke CMake as follows
 
 ```shell
 cmake -G "Visual Studio 15 2017 Win64" ..
 ```
+Don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, and other files, in the `build` directory. 
 
-Again, don't forget the two dots (..) at the end of the command. After creating the Visual Studio solution, build ELL by typing
+After creating the Visual Studio solution, build ELL by typing
 
 ```shell
 cmake --build . --config Release
