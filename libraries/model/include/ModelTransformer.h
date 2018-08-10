@@ -236,6 +236,17 @@ namespace model
         template <typename NodeType, typename... Args>
         NodeType* AddNode(Args&&... args);
 
+        /// <summary> Deletes the target node in the new model </summary>
+        ///
+        /// <param name="node"> The target node to delete in the new model </param>
+        /// <remarks> This is only safe to call before any action has been taken on this node (such as copying) </remarks>
+        void DeleteNode(const Node& node);
+
+        /// <summary> Copies the target node in the new model </summary>
+        ///
+        /// <param name="node"> The target node to copy in the new model </param>
+        void CopyNode(const Node& node);
+
         /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
         ///
         /// <param name="oldPort"> The port in the old model to map to the new model. </param>

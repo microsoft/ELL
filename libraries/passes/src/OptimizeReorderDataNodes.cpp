@@ -19,66 +19,102 @@
 #include "Exception.h"
 #include "Logger.h"
 
-using namespace ell::utilities::logging;
-
 namespace ell
 {
+
+using namespace model;
+using namespace nodes;
+using namespace utilities;
+using namespace utilities::logging;
+
 namespace passes
 {
-    namespace
-    {
-        template <typename ValueType>
-        void MergeNodeOutputWithParents(const nodes::ReorderDataNode<ValueType>& reorderNode, model::ModelTransformer& transformer)
-        {
-            auto& inputRanges = reorderNode.input.GetInputElements().GetRanges();
-            auto parentOutputPort = static_cast<const model::OutputPort<ValueType>*>(inputRanges[0].ReferencedPort());
-
-            auto correspondingParentOutput = transformer.GetCorrespondingOutputs(*parentOutputPort).GetElement(0).ReferencedPort();
-            transformer.MapNodeOutput(reorderNode.output, *correspondingParentOutput);
-        }
-    }
     struct OptimizeReorderDataNodes::State
     {
         template <typename ValueType>
-        bool TryOptimizeReorderNode(const model::Node& node, model::ModelTransformer& transformer)
+        bool TryOptimizeReorderNode(const Node& nodeToOptimize, ModelTransformer& transformer)
         {
-            if (std::find(nodesToIgnore.begin(), nodesToIgnore.end(), node.GetId()) != nodesToIgnore.end())
+            if (std::find(nodesToIgnore.begin(), nodesToIgnore.end(), nodeToOptimize.GetId()) != nodesToIgnore.end())
             {
-                MergeNodeOutputWithParents(*dynamic_cast<const nodes::ReorderDataNode<ValueType>*>(&node), transformer);
+                Log() << "Previous seen ReorderDataNode [id = " << nodeToOptimize.GetId().ToString() << "] ignored" << EOL;
                 return true;
             }
 
-            if (auto reorderNode = dynamic_cast<const nodes::ReorderDataNode<ValueType>*>(&node))
+            if (auto reorderNode = dynamic_cast<const ReorderDataNode<ValueType>*>(&nodeToOptimize))
             {
-                Log() << "ReorderDataNode detected" << EOL;
+                const auto& node = *reorderNode;
 
-                if (!reorderNode->input.GetInputElements().IsFullPortOutput())
+                Log() << "ReorderDataNode [id = " << node.GetId().ToString() << "] detected" << EOL;
+
+                if (node.GetParentNodes().empty() || !node.input.GetInputElements().IsFullPortOutput())
                 {
+                    Log() << "ReorderDataNode [id = " << node.GetId().ToString() << "] has either no parents "
+                                                                                    "nodes or does not have a full input port output"
+                          << EOL;
+
                     return false;
                 }
 
-                auto inputMemoryLayout = reorderNode->GetInputMemoryLayout();
-                auto outputMemoryLayout = reorderNode->GetOutputMemoryLayout();
+                auto inputLayout = node.GetInputMemoryLayout();
+                auto outputLayout = node.GetOutputMemoryLayout();
+                const OutputPort<ValueType>* finalOutputPort = nullptr;
 
-                auto dependentReorderNode = reorderNode;
-                while ((dependentReorderNode = dynamic_cast<const nodes::ReorderDataNode<ValueType>*>(dependentReorderNode->GetDependentNodes()[0])))
                 {
-                    outputMemoryLayout = dependentReorderNode->GetOutputMemoryLayout();
+                    auto currentNode = &node;
+                    while (currentNode != nullptr)
+                    {
+                        // iff we have one dependent node and it's a reorder node
+                        const ReorderDataNode<ValueType>* nextNode = nullptr;
+                        if (currentNode->GetDependentNodes().size() == 1 &&
+                            (nextNode = dynamic_cast<const ReorderDataNode<ValueType>*>(currentNode->GetDependentNodes()[0])))
+                        {
+                            Log() << "Removing node ReorderDataNode [id = " << currentNode->GetId().ToString() <<
+                                     "] since it is followed by another ReorderDataNode" << EOL;
 
-                    nodesToIgnore.push_back(dependentReorderNode->GetId());
+                            transformer.DeleteNode(*currentNode);
+                        }
+                        else
+                        {
+                            Log() << "ReorderDataNode [id = " << currentNode->GetId().ToString() <<
+                                     "] is a terminal node in this chain of ReorderDataNodes" << EOL;
+
+                            // this is the final reorder node that we're going to optimize in this pass
+                            // get its output layout
+                            outputLayout = currentNode->GetOutputMemoryLayout();
+
+                            // and its output port
+                            finalOutputPort = &currentNode->output;
+                        }
+
+                        // add this node to the list of ignored nodes
+                        nodesToIgnore.push_back(currentNode->GetId());
+
+                        // move to the next node
+                        currentNode = nextNode;
+                    }
                 }
 
-                if (inputMemoryLayout == outputMemoryLayout)
+                if (inputLayout == outputLayout)
                 {
-                    Log() << "Reorder node's input and output memory layout are the same. Eligible for optimization." << EOL;
+                    Log() << "ReorderDataNode chain's input and output memory layout are the same. Eligible for removal." << EOL;
 
-                    MergeNodeOutputWithParents(*reorderNode, transformer);
+                    // if the input and output layouts match, map the output of the parent node to this chain of
+                    // reorder nodes to the end of this chain
+                    auto parentOutput = static_cast<const OutputPort<ValueType>*>(node.input.GetInputElement(0).ReferencedPort());
+                    auto correspondingParentOutput = transformer.GetCorrespondingOutputs(*parentOutput).GetElement(0).ReferencedPort();
+                    transformer.MapNodeOutput(*finalOutputPort, *correspondingParentOutput);
                 }
                 else
                 {
-                    auto newInput = transformer.TransformPortElements(reorderNode->input.GetPortElements());
-                    auto newNode = transformer.AddNode<nodes::ReorderDataNode<ValueType>>(newInput, inputMemoryLayout, outputMemoryLayout, reorderNode->GetPaddingValue());
-                    transformer.MapNodeOutput(reorderNode->output, newNode->output);
+                    // otherwise, create a new reorder node and use the input to the chain and map its output to the
+                    // final output of the chain
+                    auto newInput = transformer.TransformPortElements(node.input.GetPortElements());
+                    auto newNode = transformer.AddNode<nodes::ReorderDataNode<ValueType>>(newInput, inputLayout, outputLayout, node.GetPaddingValue());
+                    transformer.MapNodeOutput(*finalOutputPort, newNode->output);
+
+                    Log() << "ReorderDataNode chain's input and output memory layout are different. Entire chain is being "
+                             "replaced by a new node [id = "
+                          << newNode->GetId() << "]" << EOL;
                 }
 
                 return true;

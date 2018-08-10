@@ -43,12 +43,16 @@ using namespace ell;
 //
 void PrintModel(const model::Model& model)
 {
+    std::cout << "------ Model start ------" << std::endl;
     model.Print(std::cout);
+    std::cout << "------ Model end ------" << std::endl;
 }
 
 void PrintMap(const model::Map& map)
 {
+    std::cout << "------ Map start ------" << std::endl;
     map.GetModel().Print(std::cout);
+    std::cout << "------ Map end ------" << std::endl;
 }
 
 template <typename ValueType>
@@ -63,7 +67,7 @@ model::Map GenerateTestModel(const model::PortMemoryLayout& inputLayout, const m
     auto numRows = inputLayout.GetActiveSize(0);
     auto numColumns = inputLayout.GetActiveSize(1);
     auto numChannels = inputLayout.GetActiveSize(2);
-    
+
     // Create a model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ValueType>>(numRows * numColumns * numChannels);
@@ -71,7 +75,7 @@ model::Map GenerateTestModel(const model::PortMemoryLayout& inputLayout, const m
     model::MemoryShape biasShape({ 1, 1, numChannels });
 
     model::PortElements<ValueType> prevOutput = inputNode->output;
-    int scaleStart = static_cast<ValueType>(1); 
+    int scaleStart = static_cast<ValueType>(1);
     int biasStart = static_cast<ValueType>(2);
     for (auto info: functionInfos)
     {
@@ -143,7 +147,7 @@ void TestFuseLinearOpsPass(std::vector<std::pair<bool, bool>> functionInfos)
     optimizer.AddPass(std::make_unique<passes::FuseLinearOperationsPass>());
     model::Map optimizedMap(map);
     optimizedMap.Optimize(optimizer);
-    
+
     auto newSize = optimizedMap.GetModel().Size();
     auto numLinearNodes = functionInfos.size();
     testing::ProcessTest("Testing linear ops count", oldSize == (3*numLinearNodes)+1 && newSize == 4);
@@ -179,11 +183,11 @@ void TestFuseLinearOpsPasses()
     TestFuseLinearOpsPass({ linear, linear });
     TestFuseLinearOpsPass({ linear, scale });
     TestFuseLinearOpsPass({ linear, bias });
-    
-    TestFuseLinearOpsPass({ scale, linear }); 
+
+    TestFuseLinearOpsPass({ scale, linear });
     TestFuseLinearOpsPass({ scale, scale });
     TestFuseLinearOpsPass({ scale, bias });
-    
+
     TestFuseLinearOpsPass({ bias, linear });
     TestFuseLinearOpsPass({ bias, scale });
     TestFuseLinearOpsPass({ bias, bias });
@@ -199,8 +203,6 @@ void TestFuseLinearOpsPasses()
     TestFuseLinearOpsPass({ linear, bias, bias });
 }
 
-// disabled until demo branch is fully integrated into master
-#if 0
 void TestOptimizeReorderDataNodes1()
 {
     using ValueType = float;
@@ -360,7 +362,7 @@ void TestOptimizeReorderDataNodes4()
     model::Model model;
     auto rowMajorLayout = model::PortMemoryLayout(model::MemoryShape{ m, k }).ReorderedCopy(rowMajor);
     auto colMajorLayout = model::PortMemoryLayout(model::MemoryShape{ m, k }).ReorderedCopy(colMajor);
-    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(rowMajorLayout);
+    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(rowMajorLayout.GetActiveSize());
     auto reorderedInputMatrixNode1 = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, rowMajorLayout, colMajorLayout);
     auto reorderedInputMatrixNode2 = model.AddNode<nodes::ReorderDataNode<ValueType>>(reorderedInputMatrixNode1->output, colMajorLayout, rowMajorLayout);
     auto reorderedInputMatrixNode3 = model.AddNode<nodes::ReorderDataNode<ValueType>>(reorderedInputMatrixNode2->output, rowMajorLayout, rowMajorLayout);
@@ -402,4 +404,3 @@ void TestOptimizeReorderDataNodes4()
 
     testing::ProcessTest("Testing compiled model optimizer", oldSize == 9 && newSize == 4);
 }
-#endif

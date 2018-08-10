@@ -9,6 +9,7 @@
 #include "ModelTransformer.h"
 #include "InputNode.h"
 #include "Node.h"
+#include "OutputNode.h"
 
 // utilities
 #include "Exception.h"
@@ -128,7 +129,7 @@ namespace model
         result.Consolidate();
         if (result.Size() != queryElements.Size())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, 
+            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch,
                 utilities::FormatString("Model transformation resulted in a mismatching port size, expecting %lld, but found %lld", queryElements.Size(), result.Size()));
         }
         return result;
@@ -184,7 +185,7 @@ namespace model
                     }
                 }
             }
-        });        
+        });
 
         return std::move(_model);
     }
@@ -295,6 +296,57 @@ namespace model
     InputNodeBase* ModelTransformer::GetCorrespondingInputNode(const InputNodeBase* inputNode) const
     {
         return GetCorrespondingInputNodeAs(inputNode);
+    }
+
+    void ModelTransformer::DeleteNode(const Node& node)
+    {
+        using PortType = Port::PortType;
+
+        const auto& outputPorts = node.GetOutputPorts();
+        for (auto outputPort : outputPorts)
+        {
+            auto layout = outputPort->GetMemoryLayout().GetStride();
+            switch (outputPort->GetType())
+            {
+            case PortType::boolean:
+            {
+                auto outputNode = AddNode<OutputNode<bool>>(PortElements<bool>{}, layout);
+                MapNodeOutput(*static_cast<const OutputPort<bool>*>(outputPort), outputNode->output);
+                break;
+            }
+            case PortType::integer:
+            {
+                auto outputNode = AddNode<OutputNode<int>>(PortElements<int>{}, layout);
+                MapNodeOutput(*static_cast<const OutputPort<int>*>(outputPort), outputNode->output);
+                break;
+            }
+            case PortType::bigInt:
+            {
+                auto outputNode = AddNode<OutputNode<std::int64_t>>(PortElements<std::int64_t>{}, layout);
+                MapNodeOutput(*static_cast<const OutputPort<std::int64_t>*>(outputPort), outputNode->output);
+                break;
+            }
+            case PortType::smallReal:
+            {
+                auto outputNode = AddNode<OutputNode<float>>(PortElements<float>{}, layout);
+                MapNodeOutput(*static_cast<const OutputPort<float>*>(outputPort), outputNode->output);
+                break;
+            }
+            case PortType::real:
+            {
+                auto outputNode = AddNode<OutputNode<double>>(PortElements<double>{}, layout);
+                MapNodeOutput(*static_cast<const OutputPort<double>*>(outputPort), outputNode->output);
+                break;
+            }
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unknown port type");
+            }
+        }
+    }
+
+    void ModelTransformer::CopyNode(const Node& node)
+    {
+        return node.Copy(*this);
     }
 
     std::vector<const Node*> ModelTransformer::FindUncompilableNodes(const Model& model, const TransformContext& context) const

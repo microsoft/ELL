@@ -49,6 +49,8 @@ namespace emitters
             offset += i * *stridesIt;
             ++stridesIt;
         }
+
+        assert((offset < std::accumulate(extents.begin(), extents.end(), 1, std::multiplies<int>{})));
         return IRLocalArrayElement(function, data, function.Literal(offset));
     }
 
@@ -74,7 +76,7 @@ namespace emitters
             offset += i * *stridesIt;
             ++stridesIt;
         }
-        assert((offset < std::accumulate(strides.begin(), strides.end(), 1, std::multiplies<int>{})));
+        assert((offset < std::accumulate(extents.begin(), extents.end(), 1, std::multiplies<int>{})));
         return function.LocalPointer(function.PointerOffset(data, function.Literal(offset)));
     }
 
