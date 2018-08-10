@@ -12,10 +12,7 @@ import logging
 from enum import Enum, auto
 import typing
 
-from cntk import parameter, constant, load_model
-from cntk.layers.typing import *
-from cntk.ops import *
-import cntk.logging.graph as graph
+import numpy as np
 
 import ell
 import common.memory_shapes as memory_shapes
