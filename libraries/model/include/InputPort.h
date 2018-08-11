@@ -92,6 +92,9 @@ namespace model
         void ComputeParents();
 
     private:
+        friend class ModelEditor;
+        friend class ModelTransformer;
+
         const PortElementsBase& _inputElements; // Just a reference to the typed elements in concrete subclass
         std::vector<const Node*> _parentNodes;
     };

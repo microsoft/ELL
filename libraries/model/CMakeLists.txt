@@ -4,19 +4,20 @@
 
 set(library_name model)
 
-set(src 
+set(src
     src/CompilableNode.cpp
     src/CompilableNodeUtilities.cpp
     src/CompiledMap.cpp
-    src/Map.cpp
     src/InputNodeBase.cpp
     src/InputPort.cpp
     src/IRCompiledMap.cpp
     src/IRMapCompiler.cpp
+    src/IRModelProfiler.cpp
+    src/Map.cpp
     src/MapCompiler.cpp
     src/Model.cpp
     src/ModelBuilder.cpp
-    src/IRModelProfiler.cpp
+    src/ModelEditor.cpp
     src/ModelTransformer.cpp
     src/Node.cpp
     src/OutputNodeBase.cpp
@@ -27,8 +28,8 @@ set(src
 )
 
 set(include
-    include/CompilableNodeUtilities.h
     include/CompilableNode.h
+    include/CompilableNodeUtilities.h
     include/CompiledMap.h
     include/InputNode.h
     include/InputNodeBase.h
@@ -41,6 +42,7 @@ set(include
     include/MapCompilerOptions.h
     include/Model.h
     include/ModelBuilder.h
+    include/ModelEditor.h
     include/ModelTransformer.h
     include/Node.h
     include/NodeMap.h
@@ -52,7 +54,7 @@ set(include
     include/PortMemoryLayout.h
 )
 
-set(tcc 
+set(tcc
     tcc/InputNode.tcc
     tcc/InputPort.tcc
     tcc/IRCompiledMap.tcc
@@ -69,7 +71,7 @@ set(tcc
     tcc/PortElements.tcc
 )
 
-set(doc 
+set(doc
     doc/CompileAsFunction.md
     doc/README.md
 )
@@ -122,14 +124,14 @@ set(test_src
     test/src/PortElements_test.cpp
 )
 
-set(test_include 
+set(test_include
     test/include/Map_test.h
     test/include/ModelBuilder_test.h
     test/include/Model_test.h
     test/include/PortElements_test.h
 )
 
-set(test_tcc    
+set(test_tcc
 )
 
 source_group("src" FILES ${test_src})

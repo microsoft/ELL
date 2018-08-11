@@ -16,6 +16,7 @@
 #include "InputNode.h"
 #include "InputPort.h"
 #include "Model.h"
+#include "ModelEditor.h"
 #include "ModelTransformer.h"
 #include "OutputNode.h"
 #include "OutputPort.h"
@@ -400,4 +401,62 @@ void TestCustomRefine()
     context2.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::abstain : model::NodeAction::compile; });
     auto model2 = transformer.RefineModel(model, context2);
     testing::ProcessTest("testing custom refine function", model1.Size() == 4 && model2.Size() == 3);
+}
+
+void TestChangeInputForNode()
+{
+    // Create a simple computation model
+    model::Model model;
+    auto in = model.AddNode<model::InputNode<double>>(3);
+    auto maxAndArgMax = model.AddNode<nodes::ArgMaxNode<double>>(in->output);
+    auto minAndArgMin = model.AddNode<nodes::ArgMinNode<double>>(in->output);
+    auto trueCondition = model.AddNode<nodes::ConstantNode<bool>>(true);
+    model.AddNode<nodes::ValueSelectorNode<double>>(trueCondition->output, maxAndArgMax->val, minAndArgMin->val);
+    model.AddNode<nodes::ValueSelectorNode<int>>(trueCondition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
+
+    // Now make a copy
+    model::TransformContext context;
+    model::ModelTransformer transformer;
+    auto newModel = transformer.CopyModel(model, context);
+
+    // Print them both:
+    std::cout << "\n\nOld model" << std::endl;
+    std::cout << "---------" << std::endl;
+    PrintModel(model);
+
+    nodes::ValueSelectorNode<double>* doubleSelectorNode = nullptr;
+    {
+        auto nodes = newModel.GetNodesByType<nodes::ValueSelectorNode<double>>();
+        testing::IsTrue(nodes.size() == 1u);
+        doubleSelectorNode = nodes[0];
+    }
+    nodes::ValueSelectorNode<int>* intSelectorNode = nullptr;
+    {
+        auto nodes = newModel.GetNodesByType<nodes::ValueSelectorNode<int>>();
+        testing::IsTrue(nodes.size() == 1u);
+        intSelectorNode = nodes[0];
+    }
+
+    {
+        auto doubleSelectorNodeConditionInputNodes = doubleSelectorNode->condition.GetParentNodes();
+        auto intSelectorNodeConditionInputNodes = intSelectorNode->condition.GetParentNodes();
+        testing::IsTrue(doubleSelectorNodeConditionInputNodes.size() == 1u && intSelectorNodeConditionInputNodes.size() == 1u);
+        testing::IsTrue(doubleSelectorNodeConditionInputNodes[0]->GetId() == intSelectorNodeConditionInputNodes[0]->GetId());
+    }
+
+    auto falseCondition = newModel.AddNode<nodes::ConstantNode<bool>>(true);
+    model::ModelEditor::ResetInputPort(&doubleSelectorNode->condition, falseCondition->output);
+    {
+        auto doubleSelectorNodeConditionInputNodes = doubleSelectorNode->condition.GetParentNodes();
+        testing::IsTrue(doubleSelectorNodeConditionInputNodes.size() == 1u);
+        auto conditionNode = doubleSelectorNodeConditionInputNodes[0];
+        testing::IsTrue(conditionNode->GetId() == falseCondition->GetId());
+    }
+
+    std::cout << "\n\nCopied model" << std::endl;
+    std::cout << "---------" << std::endl;
+    PrintModel(newModel);
+
+    std::cout << "\n\n"
+              << std::endl;
 }

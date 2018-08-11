@@ -205,7 +205,9 @@ namespace model
 
     private:
         friend class Model;
+        friend class ModelEditor;
         friend class ModelTransformer;
+
         void AddDependent(const Node* dependent) const;
         void RegisterDependencies() const;
         void InvokeCopy(ModelTransformer& transformer) const;

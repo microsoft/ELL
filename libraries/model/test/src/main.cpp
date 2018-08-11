@@ -40,6 +40,7 @@ int main()
 
         TestCopyModel();
         TestRefineSplitOutputs();
+        TestChangeInputForNode();
 
         // PortElements tests
         TestSlice();
