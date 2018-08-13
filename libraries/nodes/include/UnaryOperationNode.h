@@ -63,9 +63,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary> Gets the operation performed by this node </summary>
         ///
         /// <returns> The operation </returns>
@@ -79,6 +76,8 @@ namespace nodes
         bool HasState() const override { return true; } // stored state: operation
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         llvm::Function* GetOperator(emitters::IRFunctionEmitter& function) const;
         void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
         void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);

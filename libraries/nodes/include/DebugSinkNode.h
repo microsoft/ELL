@@ -68,11 +68,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` receiving the copy  </param>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary> Get the label of this node </summary>
         ///
         /// <returns> The node label. </returns>
@@ -98,6 +93,8 @@ namespace nodes
         virtual bool EvaluateInput() const;
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         model::InputPort<ValueType> _input;
         model::OutputPort<ValueType> _output;
         std::string _label;

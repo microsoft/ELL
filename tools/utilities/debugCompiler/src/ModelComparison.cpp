@@ -45,16 +45,16 @@ void SetInput(const float* buffer, size_t size)
     _input_size = size;
 }
 
-bool ELL_InputCallback(float* buffer) 
+bool ELL_InputCallback(float* buffer)
 {
-    if (_input != nullptr) 
+    if (_input != nullptr)
     {
         ::memcpy(buffer, _input, _input_size * sizeof(float));
         return true;
     }
     return false;
 }
-void ELL_OutputCallback(float* output) 
+void ELL_OutputCallback(float* output)
 {
 }
 }
@@ -265,7 +265,7 @@ void ModelComparison::SetUpReferenceMap(model::Map& map)
     // Now add the debug sink nodes
     model::TransformContext addSinkNodeContext;
     auto transformFunc = [this](const ell::model::Node& node, ell::model::ModelTransformer& transformer) {
-        node.Copy(transformer);
+        transformer.CopyNode(node);
 
         if (IsNeuralNetworkLayerNode(&node))
         {
@@ -295,7 +295,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     // Now add the debug sink nodes
     model::TransformContext context;
     auto transformFunc = [this](const ell::model::Node& node, ell::model::ModelTransformer& transformer) {
-        node.Copy(transformer);
+        transformer.CopyNode(node);
 
         if (IsNeuralNetworkLayerNode(&node))
         {
@@ -378,9 +378,9 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     // We keep the overall output from the first run only, because that's what we do
     // with the reference.
     // This means that the "overall" stats don't actually report a summary of the per-node stats.
-    // We should fix this eventually to collect per-node and overall outputs during the same run 
+    // We should fix this eventually to collect per-node and overall outputs during the same run
     // of the reference model.
-    auto temp = GetMapOutput(compiledMap, input); 
+    auto temp = GetMapOutput(compiledMap, input);
 }
 
 void ModelComparison::SaveOutput(std::string name, const std::vector<float>& reference, const std::vector<float>& compiled)
@@ -412,7 +412,7 @@ void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelN
     outputStream << "**model**: " << modelName << std::endl;
     outputStream << std::endl;
     outputStream << "**args**:";
-    for (auto arg : testArgs) 
+    for (auto arg : testArgs)
     {
         outputStream << " " << arg;
     }

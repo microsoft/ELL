@@ -160,11 +160,6 @@ namespace model
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
         virtual bool IsCompilable(const MapCompiler* compiler) const { return false; }
 
-        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
-        virtual void Copy(ModelTransformer& transformer) const = 0;
-
         /// <summary> Print a human-readable representation of the Node. </summary>
         ///
         /// <param name="os"> The stream to write data to. </param>
@@ -208,9 +203,10 @@ namespace model
         friend class ModelEditor;
         friend class ModelTransformer;
 
+        virtual void Copy(ModelTransformer& transformer) const = 0;
+
         void AddDependent(const Node* dependent) const;
         void RegisterDependencies() const;
-        void InvokeCopy(ModelTransformer& transformer) const;
         bool InvokeRefine(ModelTransformer& transformer) const;
 
         NodeId _id;

@@ -169,7 +169,7 @@ namespace model
         _context = context;
         _model = Model();
         _elementsMap.Clear();
-        oldModel.VisitSubset(outputNodes, [this](const Node& node) { node.InvokeCopy(*this); });
+        oldModel.VisitSubset(outputNodes, [this](const Node& node) { CopyNode(node); });
         _context = TransformContext();
         // Copy all the node metadata
         oldModel.VisitSubset(outputNodes, [this](const Node& node) {
@@ -226,7 +226,7 @@ namespace model
                 }
                 else
                 {
-                    node.InvokeCopy(*this);
+                    CopyNode(node);
                 }
                 didRefineAny |= didRefineNode;
             });

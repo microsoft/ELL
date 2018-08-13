@@ -95,11 +95,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
         bool IsCompilable(const model::MapCompiler* compiler) const override { return false; }
 
@@ -111,6 +106,8 @@ namespace nodes
         bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         // Input
         model::InputPort<ValueType> _input;
 
@@ -124,7 +121,7 @@ namespace nodes
         int _stride = 1;
         int _tileSize = 0;
         int _filterSize = 0;
-        FilterOrder _order = FilterOrder::tilesFirst;        
+        FilterOrder _order = FilterOrder::tilesFirst;
     };
 
     //
@@ -193,11 +190,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         // Cloning constructor
         WinogradConvolutionComputeNode(const WinogradConvolutionComputeNode<ValueType>& other,
                                                                               const model::PortElements<ValueType>& input,
@@ -217,6 +209,8 @@ namespace nodes
         bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         void CompileFiltersFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* input, llvm::Value* transformedFilters, llvm::Value* output);
         void CompileTilesFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* input, llvm::Value* transformedFilters, llvm::Value* output);
 
@@ -235,7 +229,7 @@ namespace nodes
         // Winograd-specific parameters
         int _tileSize = 0;
         int _filterSize = 0;
-        FilterOrder _order = FilterOrder::tilesFirst;        
+        FilterOrder _order = FilterOrder::tilesFirst;
         int _numFilterChannels = 0;
 
         // Tunable parameters

@@ -77,7 +77,7 @@ namespace
             return;
         }
 
-        node.Copy(transformer);
+        transformer.CopyNode(node);
     }
 }
 

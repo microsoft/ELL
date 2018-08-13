@@ -86,11 +86,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer. </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` receiving the copy. </param>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary> Sets the sink function for this node for use in Compute(). </summary>
         ///
         /// <param name="function"> The sink function to set. </param>
@@ -107,10 +102,11 @@ namespace nodes
         bool HasState() const override { return true; } // stored state: callback function name, shape
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
         void SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
 
-    private:
         model::InputPort<ValueType> _input;
         model::InputPort<bool> _trigger;
         model::OutputPort<ValueType> _output;

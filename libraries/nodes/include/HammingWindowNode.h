@@ -58,8 +58,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        void Copy(model::ModelTransformer& transformer) const override;
-
     protected:
         void Compute() const override;
         bool Refine(model::ModelTransformer& transformer) const override;
@@ -68,6 +66,8 @@ namespace nodes
         bool HasState() const override { return true; }
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         // Input
         model::InputPort<ValueType> _input;
 

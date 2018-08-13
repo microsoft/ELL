@@ -60,9 +60,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        void Copy(model::ModelTransformer& transformer) const override;
-
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
@@ -71,6 +68,8 @@ namespace nodes
         bool HasState() const override { return false; }
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         // Emitting IR for FFT implemenations
         void EmitFFT_2(emitters::IRFunctionEmitter& function, llvm::Value* input);
         void EmitFFT_4(emitters::IRFunctionEmitter& function, llvm::Value* input);

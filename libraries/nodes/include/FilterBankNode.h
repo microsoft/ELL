@@ -98,9 +98,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        void Copy(model::ModelTransformer& transformer) const override;
-
     protected:
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
@@ -108,6 +105,9 @@ namespace nodes
     private:
         using FilterBankNode<ValueType>::_input;
         using FilterBankNode<ValueType>::_output;
+
+        void Copy(model::ModelTransformer& transformer) const override;
+
         // FilterBank
         dsp::LinearFilterBank _linearFilters;
     };
@@ -143,9 +143,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        void Copy(model::ModelTransformer& transformer) const override;
-
     protected:
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
@@ -153,6 +150,9 @@ namespace nodes
     private:
         using FilterBankNode<ValueType>::_input;
         using FilterBankNode<ValueType>::_output;
+
+        void Copy(model::ModelTransformer& transformer) const override;
+
         // FilterBank
         dsp::MelFilterBank _melFilters;
     };

@@ -115,7 +115,7 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
+    private:
         void Copy(model::ModelTransformer& transformer) const override;
     };
 
@@ -144,7 +144,7 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
+    private:
         void Copy(model::ModelTransformer& transformer) const override;
     };
 }

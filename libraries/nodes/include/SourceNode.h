@@ -86,11 +86,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer. </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` receiving the copy. </param>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary> Interpolates the buffered sample to match the new time. </summary>
         ///
         /// <param name="originalTime"> Original time for the buffered sample. </param>
@@ -118,15 +113,16 @@ namespace nodes
         bool HasState() const override { return true; } // stored state: callback function name, shape
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample);
         void SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample);
 
-    private:
         model::InputPort<TimeTickType> _input;
         model::OutputPort<ValueType> _output;
 
         SourceFunction<ValueType> _source;
-        
+
         mutable std::vector<ValueType> _bufferedSample;
         mutable TimeTickType _bufferedSampleTime;
     };

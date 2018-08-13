@@ -1186,14 +1186,6 @@ public:
     }
 
 protected:
-    void Copy(model::ModelTransformer& transformer) const override
-    {
-        auto newInput1 = transformer.TransformPortElements(_input1.GetPortElements());
-        auto newInput2 = transformer.TransformPortElements(_input2.GetPortElements());
-        auto newNode = transformer.AddNode<BinaryFunctionIRNode>(newInput1, newInput2, GetFunctionName(), GetIRCode(), GetExtraArgs());
-        transformer.MapNodeOutput(output, newNode->output);
-    }
-
     std::vector<llvm::Value*> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override
     {
         size_t inputSize = _input1.Size();
@@ -1202,6 +1194,14 @@ protected:
     }
 
 private:
+    void Copy(model::ModelTransformer& transformer) const override
+    {
+        auto newInput1 = transformer.TransformPortElements(_input1.GetPortElements());
+        auto newInput2 = transformer.TransformPortElements(_input2.GetPortElements());
+        auto newNode = transformer.AddNode<BinaryFunctionIRNode>(newInput1, newInput2, GetFunctionName(), GetIRCode(), GetExtraArgs());
+        transformer.MapNodeOutput(output, newNode->output);
+    }
+
     // Inputs
     model::InputPort<double> _input1;
     model::InputPort<double> _input2;

@@ -94,9 +94,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary> Returns true if the node can accept input with this memory layout order, else false </summary>
         ///
         /// <param name="order"> The memory layout order for all the input ports </summary>
@@ -115,6 +112,8 @@ namespace nodes
         bool HasState() const override { return true; } // stored state: paddingValue
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         void ComputeDimensionLoop(size_t dimension,
                                   std::vector<ValueType>& output,
                                   size_t prevInputDimensionOffset,

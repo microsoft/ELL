@@ -237,7 +237,7 @@ namespace passes
             auto prevNode = dynamic_cast<const nodes::BroadcastLinearFunctionNode<ValueType>*>(primaryInputElements.GetElement(0).ReferencedPort()->GetNode());
             if (prevNode == nullptr)
             {
-                node.Copy(transformer);
+                transformer.CopyNode(node);
                 return true;
             }
 
@@ -265,7 +265,7 @@ namespace passes
             {
                 return;
             }
-            node.Copy(transformer);
+            transformer.CopyNode(node);
         }
     }
 

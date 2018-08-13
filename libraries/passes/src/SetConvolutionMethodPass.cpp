@@ -104,7 +104,7 @@ namespace passes
                 }
             }
 
-            node.Copy(transformer);
+            transformer.CopyNode(node);
         }
     }
 

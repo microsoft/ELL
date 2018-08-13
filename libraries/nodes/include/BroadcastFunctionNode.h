@@ -346,7 +346,6 @@ namespace nodes
     protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
 
-        void Copy(model::ModelTransformer& transformer) const override;
         utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
@@ -359,6 +358,8 @@ namespace nodes
     private:
         using BroadcastFunctionNode<ValueType, FunctionType>::ComputeDimensionLoop;
         using BroadcastFunctionNode<ValueType, FunctionType>::EmitComputeDimensionLoop;
+
+        void Copy(model::ModelTransformer& transformer) const override;
 
         // Inputs
         model::InputPort<ValueType> _primaryInput;
@@ -427,7 +428,6 @@ namespace nodes
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
         using BroadcastFunctionNode<ValueType, FunctionType>::NumElements;
 
-        void Copy(model::ModelTransformer& transformer) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
@@ -438,6 +438,8 @@ namespace nodes
     private:
         using BroadcastFunctionNode<ValueType, FunctionType>::ComputeDimensionLoop;
         using BroadcastFunctionNode<ValueType, FunctionType>::EmitComputeDimensionLoop;
+
+        void Copy(model::ModelTransformer& transformer) const override;
 
         // Inputs
         model::InputPort<ValueType> _primaryInput;
@@ -508,7 +510,6 @@ namespace nodes
     protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
 
-        void Copy(model::ModelTransformer& transformer) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
@@ -519,6 +520,8 @@ namespace nodes
     private:
         using BroadcastFunctionNode<ValueType, FunctionType>::ComputeDimensionLoop;
         using BroadcastFunctionNode<ValueType, FunctionType>::EmitComputeDimensionLoop;
+
+        void Copy(model::ModelTransformer& transformer) const override;
 
         // Inputs
         model::InputPort<ValueType> _primaryInput;
@@ -561,10 +564,12 @@ namespace nodes
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        void Copy(model::ModelTransformer& transformer) const override;
         bool HasState() const override { return false; }
         bool HasScale() const { return secondaryInput1.Size() != 0; }
         bool HasBias() const { return secondaryInput2.Size() != 0; }
+
+    private:
+        void Copy(model::ModelTransformer& transformer) const override;
     };
 }
 }

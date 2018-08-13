@@ -66,16 +66,14 @@ namespace nodes
         /// <returns> true if this node is able to compile itself to code. </returns>
         bool IsCompilable(const model::MapCompiler* compiler) const override { return false; }
 
-        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
-        void Copy(model::ModelTransformer& transformer) const override;
-
     protected:
         bool Refine(model::ModelTransformer& transformer) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         // Reset input signal
         model::InputPort<int> _reset;
     };
@@ -173,7 +171,6 @@ namespace nodes
         virtual void Reset() override;
 
     protected:
-        void Copy(model::ModelTransformer& transformer) const override;
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         bool HasState() const override { return true; }
@@ -189,9 +186,11 @@ namespace nodes
         }
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         // Input
         model::InputPort<ValueType> _input;
-        
+
         // Reset input
         model::InputPort<int> _resetTrigger;
 

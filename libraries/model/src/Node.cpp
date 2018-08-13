@@ -188,11 +188,6 @@ namespace model
         }
     }
 
-    void Node::InvokeCopy(ModelTransformer& transformer) const
-    {
-        Copy(transformer);
-    }
-
     bool Node::InvokeRefine(ModelTransformer& transformer) const
     {
         return Refine(transformer);
@@ -272,7 +267,7 @@ namespace model
 
     void Node::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        NodeId oldId;        
+        NodeId oldId;
         archiver["id"] >> oldId;
         _id = oldId;
         archiver.OptionalProperty("metadata") >> _metadata;

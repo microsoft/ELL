@@ -73,9 +73,6 @@ namespace model
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        void Copy(ModelTransformer& transformer) const override;
-
         /// <summary></summary>
         size_t Size() const { return _output.Size(); }
 
@@ -86,6 +83,8 @@ namespace model
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        void Copy(ModelTransformer& transformer) const override;
+
         std::vector<ValueType> _inputValues;
         OutputPort<ValueType> _output;
     };

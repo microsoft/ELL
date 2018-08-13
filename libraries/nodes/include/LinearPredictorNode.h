@@ -57,9 +57,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
         bool Refine(model::ModelTransformer& transformer) const override;
 
@@ -69,6 +66,8 @@ namespace nodes
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         // Inputs
         model::InputPort<ElementType> _input;
 
@@ -87,7 +86,7 @@ namespace nodes
     /// <param name="predictor"> The linear predictor. </param>
     /// <param name="transformer"> [in,out] The model transformer. </param>
     ///
-    /// <returns> The node added to the model. </returns>    
+    /// <returns> The node added to the model. </returns>
     template <typename ElementType>
     LinearPredictorNode<ElementType>* AddNodeToModelTransformer(const model::PortElements<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor, model::ModelTransformer& transformer);
 }

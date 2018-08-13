@@ -64,11 +64,6 @@ namespace nodes
 
         using BaseType::GetLayer;
 
-        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
-        void Copy(model::ModelTransformer& transformer) const override;
-
     protected:
         template <typename PoolingFunctionT>
         llvm::Value* GetPoolingWindowValue(emitters::IRFunctionEmitter& function,
@@ -85,6 +80,9 @@ namespace nodes
 
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         using BaseType::HasState;
+
+    private:
+        void Copy(model::ModelTransformer& transformer) const override;
     };
 }
 }

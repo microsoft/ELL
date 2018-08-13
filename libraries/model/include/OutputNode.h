@@ -62,17 +62,16 @@ namespace model
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        void Copy(ModelTransformer& transformer) const override;
-
     protected:
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-    protected:
         void Compute() const override;
         InputPort<ValueType> _input;
         OutputPort<ValueType> _output;
+
+    private:
+        void Copy(ModelTransformer& transformer) const override;
     };
 }
 }

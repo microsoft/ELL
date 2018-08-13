@@ -93,9 +93,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary> Options to control how the network is compiled into nodes </summary>
         struct NetworkCompileOptions
         {
@@ -125,6 +122,8 @@ namespace nodes
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         NeuralNetworkLayerNodeBase<ValueType>* AddLayerNode(model::ModelTransformer& transformer, Layer& layer, const model::PortElements<ValueType>& layerInputs, const NetworkCompileOptions& options, NetworkCompileState& state) const;
 
         // Input

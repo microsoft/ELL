@@ -122,7 +122,6 @@ namespace nodes
         model::MemoryCoordinates ReorderOutputToInputLocation(model::MemoryCoordinates outputLocation) const;
         std::vector<emitters::IRLocalScalar> ReorderOutputToInputLocation(std::vector<emitters::IRLocalScalar> outputLocation) const;
 
-        void Copy(model::ModelTransformer& transformer) const override;
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
@@ -133,6 +132,8 @@ namespace nodes
         bool HasState() const override { return true; } // stored state: inputMemoryLayout, paddingValue
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         void ComputeDimensionLoop(const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, int dimension, std::vector<int>& coordinates, std::vector<ValueType>& output) const;
         void CompileDimensionLoop(emitters::IRFunctionEmitter& function, emitters::IRLocalArray input, const model::PortMemoryLayout& inputMemoryLayout, emitters::IRLocalArray output, const model::PortMemoryLayout& outputMemoryLayout, int dimension, std::vector<emitters::IRLocalScalar>& coordinates) const;
 

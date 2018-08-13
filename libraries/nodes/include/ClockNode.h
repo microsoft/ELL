@@ -52,11 +52,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` receiving the copy. </param>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary> Sets the interval for this node. </summary>
         ///
         /// <param name="interval"> The interval to set. </param>
@@ -82,13 +77,15 @@ namespace nodes
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        
+
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         bool HasState() const override { return true; } // stored state: interval, lag threshold, lag function name
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         void EmitGetTicksUntilNextIntervalFunction(model::IRMapCompiler& compiler, emitters::IRModuleEmitter& moduleEmitter, llvm::GlobalVariable* pLastIntervalTime);
         void EmitGetLagThresholdFunction(model::IRMapCompiler& compiler, emitters::IRModuleEmitter& moduleEmitter);
         void EmitGetStepIntervalFunction(model::IRMapCompiler& compiler, emitters::IRModuleEmitter& moduleEmitter);

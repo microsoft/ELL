@@ -55,9 +55,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        void Copy(model::ModelTransformer& transformer) const override;
-
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
@@ -65,6 +62,9 @@ namespace nodes
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
         bool HasState() const override { return false; }
+
+    private:
+        void Copy(model::ModelTransformer& transformer) const override;
 
         void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
         void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);

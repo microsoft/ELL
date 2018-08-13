@@ -62,11 +62,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` currently copying the model </param>
-        void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary></summary>
         std::vector<std::vector<ValueType>> GetPrototype() const { return _prototype; }
 
@@ -81,6 +76,8 @@ namespace nodes
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        void Copy(model::ModelTransformer& transformer) const override;
+
         std::vector<ValueType> GetPrototypeData() const;
 
         model::InputPort<ValueType> _input;

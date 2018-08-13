@@ -146,7 +146,7 @@ namespace passes
             return;
         }
 
-        node.Copy(transformer);
+        transformer.CopyNode(node);
     }
 
     void OptimizeReorderDataNodes::AddToRegistry()
