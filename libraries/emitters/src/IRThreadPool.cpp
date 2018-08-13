@@ -129,9 +129,11 @@ namespace emitters
             workerThreadFunction.While(notDoneVar, [this, notDoneVar](IRFunctionEmitter& workerThreadFunction) {
                 auto task = _taskQueue.PopNextTask(workerThreadFunction);
                 // check for a poison "null" task, indicating we should break out of the loop and terminate the thread
-                workerThreadFunction.If(task.IsNull(workerThreadFunction), [notDoneVar](auto& workerThreadFunction) {
-                                        workerThreadFunction.Store(notDoneVar, workerThreadFunction.FalseBit());
-                                    })
+                workerThreadFunction.If(
+                        workerThreadFunction.Operator(TypedOperator::logicalOr, task.IsNull(workerThreadFunction), _taskQueue.GetShutdownFlag(workerThreadFunction)),
+                        [notDoneVar](auto& workerThreadFunction) {
+                        workerThreadFunction.Store(notDoneVar, workerThreadFunction.FalseBit());                        
+                    })
                     .Else([this, &task](IRFunctionEmitter& workerThreadFunction) {
                         task.Run(workerThreadFunction);
 
@@ -276,6 +278,8 @@ namespace emitters
     void IRThreadPoolTaskQueue::ShutDown(IRFunctionEmitter& function)
     {
         SetShutdownFlag(function);
+
+        // Now wake up the threads so they see it is time to shutdown.
         function.PthreadCondBroadcast(GetWorkAvailableConditionVariablePointer(function));
         // Now PopNextTask will emit null tasks
     }
