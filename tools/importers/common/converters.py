@@ -195,7 +195,7 @@ class LookupTable:
         original_vector, order = self.tensors[uid]
         # Workaround: For some reason, np.full is not returning a type that SWIG can parse.
         # So just manually walk the array setting the scalar
-        array = np.zeros(size, dtype=np.float32)
+        array = np.zeros(size, dtype=np.float)
         for i in range(array.size):
             array[i] = original_vector
         return array
@@ -206,7 +206,7 @@ class LookupTable:
         """
         original_vector, order = self.tensors[uid]
 
-        ordered_weights = np.zeros(original_vector.size, dtype=np.float32)
+        ordered_weights = np.zeros(original_vector.size, dtype=np.float)
         i = 0
         for value in original_vector:
             ordered_weights[i] = value
@@ -374,8 +374,8 @@ class ConvertBase:
         """
         input_shape, input_padding = self.get_input_parameters(conversion_parameters["first_in_block"])
         output_shape, output_padding = self.get_output_parameters(conversion_parameters["last_in_block"])
-
-        return ell.neural.LayerParameters(input_shape, input_padding, output_shape, output_padding)
+        
+        return ell.neural.LayerParameters(input_shape, input_padding, output_shape, output_padding, ell.nodes.PortType.smallReal)
 
     def get_ell_shape(self, shape: tuple, order: str, padding: int = 0):
         """
@@ -388,7 +388,7 @@ class ConvertBase:
         Returns a weight tensor as an ELL tensor
         """
         lookup_table = conversion_parameters["lookup_table"]
-        return ell.math.FloatTensor(lookup_table.get_tensor_in_ell_order(uid))
+        return ell.math.DoubleTensor(lookup_table.get_tensor_in_ell_order(uid))
 
     def get_vector(self, uid: str, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -414,7 +414,7 @@ class ConvertBase:
         scalar, it will be expanded to a vector of size equal to the number of
         output channels.
         """
-        return ell.math.FloatVector(self.get_vector(uid, conversion_parameters))
+        return ell.math.DoubleVector(self.get_vector(uid, conversion_parameters))
 
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -438,9 +438,9 @@ class ConvertActivation(ConvertBase):
         layer_parameters = self.get_layer_parameters(conversion_parameters)
         activation = self.importer_node.attributes["activation"]
         if (activation == ell.neural.ActivationType.leaky):
-            return ell.neural.FloatLeakyReLUActivationLayer(layer_parameters, 0.01)
+            return ell.neural.LeakyReLUActivationLayer(layer_parameters, 0.01)
         else:
-            return ell.neural.FloatActivationLayer(layer_parameters, activation)
+            return ell.neural.ActivationLayer(layer_parameters, activation)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -454,8 +454,8 @@ class ConvertActivation(ConvertBase):
         activation_layer = self.convert(conversion_parameters)
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
-        # Add the BiasLayerNode to the model
-        ell_node = builder.AddFloatActivationLayerNode(model, input_port_elements, activation_layer)
+        # Add the ActivationLayerNode to the model
+        ell_node = builder.AddActivationLayerNode(model, input_port_elements, activation_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -479,7 +479,7 @@ class ConvertAveragePooling(ConvertBase):
             attributes["size"], attributes["stride"])
 
         # Create the ELL pooling layer
-        return ell.neural.FloatPoolingLayer(layer_parameters,
+        return ell.neural.PoolingLayer(layer_parameters,
             pooling_parameters, ell.neural.PoolingType.mean)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -495,7 +495,7 @@ class ConvertAveragePooling(ConvertBase):
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
         # Add the PoolingLayerNode to the model
-        ell_node = builder.AddFloatPoolingLayerNode(model, input_port_elements, pooling_layer)
+        ell_node = builder.AddPoolingLayerNode(model, input_port_elements, pooling_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -521,7 +521,7 @@ class ConvertBatchNormalization(ConvertBase):
         variance_vector = self.get_ell_vector(
             self.importer_node.weights["variance"][0], conversion_parameters)
 
-        return ell.neural.FloatBatchNormalizationLayer(layer_parameters,
+        return ell.neural.BatchNormalizationLayer(layer_parameters,
             mean_vector, variance_vector, self.epsilon,
             ell.neural.EpsilonSummand.variance)
 
@@ -537,8 +537,8 @@ class ConvertBatchNormalization(ConvertBase):
         batch_normalization_layer = self.convert(conversion_parameters)
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
-        # Add the BiasLayerNode to the model
-        ell_node = builder.AddFloatBatchNormalizationLayerNode(model, input_port_elements, batch_normalization_layer)
+        # Add the BatchNormalizationLayerNode to the model
+        ell_node = builder.AddBatchNormalizationLayerNode(model, input_port_elements, batch_normalization_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -559,7 +559,7 @@ class ConvertBias(ConvertBase):
         bias = self.get_ell_vector(
             self.importer_node.weights["bias"][0], conversion_parameters)
 
-        return ell.neural.FloatBiasLayer(layer_parameters, bias)
+        return ell.neural.BiasLayer(layer_parameters, bias)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -574,7 +574,7 @@ class ConvertBias(ConvertBase):
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
         # Add the BiasLayerNode to the model
-        ell_node = builder.AddFloatBiasLayerNode(model, input_port_elements, bias_layer)
+        ell_node = builder.AddBiasLayerNode(model, input_port_elements, bias_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -602,7 +602,7 @@ class ConvertBinaryConvolution(ConvertBase):
             attributes["size"], attributes["stride"], ell.neural.BinaryConvolutionMethod.bitwise,
             ell.neural.BinaryWeightsScale.none)
 
-        return ell.neural.FloatBinaryConvolutionalLayer(layer_parameters, convolutional_parameters, weights)
+        return ell.neural.BinaryConvolutionalLayer(layer_parameters, convolutional_parameters, weights)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -635,7 +635,7 @@ class ConvertBinaryConvolution(ConvertBase):
             input_port_elements = lookup_table.get_output_port_elements_for_node(reorder_node)
 
         # Add the ConvolutionalLayerNode to the model
-        ell_node = builder.AddFloatBinaryConvolutionalLayerNode(model, input_port_elements, convolutional_layer)
+        ell_node = builder.AddBinaryConvolutionalLayerNode(model, input_port_elements, convolutional_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -662,7 +662,7 @@ class ConvertConvolution(ConvertBase):
         convolutional_parameters = ell.neural.ConvolutionalParameters(
             attributes["size"], attributes["stride"], 0, 1)
 
-        return ell.neural.FloatConvolutionalLayer(layer_parameters,
+        return ell.neural.ConvolutionalLayer(layer_parameters,
             convolutional_parameters, weights)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -696,7 +696,7 @@ class ConvertConvolution(ConvertBase):
             input_port_elements = lookup_table.get_output_port_elements_for_node(reorder_node)
 
         # Add the ConvolutionalLayerNode to the model
-        ell_node = builder.AddFloatConvolutionalLayerNode(model, input_port_elements, convolutional_layer)
+        ell_node = builder.AddConvolutionalLayerNode(model, input_port_elements, convolutional_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -719,7 +719,7 @@ class ConvertFullyConnected(ConvertBase):
         weights = self.get_ell_tensor(
             self.importer_node.weights["weights"][0], conversion_parameters)
 
-        return ell.neural.FloatFullyConnectedLayer(
+        return ell.neural.FullyConnectedLayer(
             layer_parameters, weights)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -735,7 +735,7 @@ class ConvertFullyConnected(ConvertBase):
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
         # Add the FullyConnectedLayerNode to the model
-        ell_node = builder.AddFloatFullyConnectedLayerNode(model, input_port_elements, fully_connected_layer)
+        ell_node = builder.AddFullyConnectedLayerNode(model, input_port_elements, fully_connected_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -757,7 +757,7 @@ class ConvertElementTimes(ConvertBase):
         scale = self.get_ell_vector(
             self.importer_node.weights["scale"][0], conversion_parameters)
 
-        return ell.neural.FloatScalingLayer(layer_parameters, scale)
+        return ell.neural.ScalingLayer(layer_parameters, scale)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -772,7 +772,7 @@ class ConvertElementTimes(ConvertBase):
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
         # Add the ScalingLayerNode to the model
-        ell_node = builder.AddFloatScalingLayerNode(model, input_port_elements, scaling_layer)
+        ell_node = builder.AddScalingLayerNode(model, input_port_elements, scaling_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -810,7 +810,7 @@ class ConvertGRU(ConvertBase):
         activation = self.importer_node.attributes["activation"]
         recurrentActivation = self.importer_node.attributes["activation"]
 
-        return ell.neural.FloatGRULayer(layer_parameters, updateWeights,
+        return ell.neural.GRULayer(layer_parameters, updateWeights,
                                         resetWeights, hiddenWeights,
                                         updateBias, resetBias, hiddenBias,
                                         activation, recurrentActivation)
@@ -837,7 +837,7 @@ class ConvertGRU(ConvertBase):
             reset_port_elements = ell.nodes.PortElements(reset_node.GetOutputPort("output"))
 
         # Add the GRULayerNode to the model
-        ell_node = builder.AddFloatGRULayerNode(model, input_port_elements, reset_port_elements, gru_layer)
+        ell_node = builder.AddGRULayerNode(model, input_port_elements, reset_port_elements, gru_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -954,7 +954,7 @@ class ConvertLSTM(ConvertBase):
         activation = self.importer_node.attributes["activation"]
         recurrentActivation = self.importer_node.attributes["activation"]
 
-        return ell.neural.FloatLSTMLayer(layer_parameters, inputWeights,
+        return ell.neural.LSTMLayer(layer_parameters, inputWeights,
                                         forgetMeWeights, candidateWeights,
                                         outputWeights, inputBias, forgetMeBias,
                                         candidateBias, outputBias,
@@ -982,7 +982,7 @@ class ConvertLSTM(ConvertBase):
             reset_port_elements = ell.nodes.PortElements(reset_node.GetOutputPort("output"))
 
         # Add the LSTMLayerNode to the model
-        ell_node = builder.AddFloatLSTMLayerNode(model, input_port_elements, reset_port_elements, lstm_layer)
+        ell_node = builder.AddLSTMLayerNode(model, input_port_elements, reset_port_elements, lstm_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -1007,7 +1007,7 @@ class ConvertMaxPooling(ConvertBase):
             attributes["size"], attributes["stride"])
 
         # Create the ELL pooling layer
-        return ell.neural.FloatPoolingLayer(layer_parameters,
+        return ell.neural.PoolingLayer(layer_parameters,
             pooling_parameters, ell.neural.PoolingType.max)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -1023,7 +1023,7 @@ class ConvertMaxPooling(ConvertBase):
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
         # Add the PoolingLayerNode to the model
-        ell_node = builder.AddFloatPoolingLayerNode(model, input_port_elements, pooling_layer)
+        ell_node = builder.AddPoolingLayerNode(model, input_port_elements, pooling_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -1049,8 +1049,7 @@ class ConvertMinus(ConvertBase):
         # can use an additive bias layer.
         bias = -1.0 * bias
 
-        return ell.neural.FloatBiasLayer(layer_parameters,
-            ell.math.FloatVector(bias))
+        return ell.neural.BiasLayer(layer_parameters, bias)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1065,7 +1064,7 @@ class ConvertMinus(ConvertBase):
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
         # Add the BiasLayerNode to the model
-        ell_node = builder.AddFloatBiasLayerNode(model, input_port_elements, bias_layer)
+        ell_node = builder.AddBiasLayerNode(model, input_port_elements, bias_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -1176,7 +1175,7 @@ class ConvertPReLU(ConvertBase):
         layer_parameters = self.get_layer_parameters(conversion_parameters)
         alpha = self.get_ell_tensor(
             self.importer_node.weights["alpha"][0], conversion_parameters)
-        return ell.neural.FloatPReLUActivationLayer(layer_parameters, alpha)
+        return ell.neural.PReLUActivationLayer(layer_parameters, alpha)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1190,8 +1189,8 @@ class ConvertPReLU(ConvertBase):
         activation_layer = self.convert(conversion_parameters)
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
-        # Add the BiasLayerNode to the model
-        ell_node = builder.AddFloatActivationLayerNode(model, input_port_elements, activation_layer)
+        # Add the ActivationLayerNode to the model
+        ell_node = builder.AddActivationLayerNode(model, input_port_elements, activation_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -1234,7 +1233,7 @@ class ConvertRegion(ConvertBase):
                 attributes["applySoftmax"]
             )
         
-        return ell.neural.FloatFullyConnectedLayer(
+        return ell.neural.FullyConnectedLayer(
             layer_parameters, region_detection_parameters)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -1250,7 +1249,7 @@ class ConvertRegion(ConvertBase):
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
         # Add the RegionDetectionLayerNode to the model
-        ell_node = builder.AddFloatRegionDetectionLayerNode(model, input_port_elements, region_layer)
+        ell_node = builder.AddRegionDetectionLayerNode(model, input_port_elements, region_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -1272,7 +1271,7 @@ class ConvertScaling(ConvertBase):
         scale = self.get_ell_vector(
             self.importer_node.weights["scale"][0], conversion_parameters)
 
-        return ell.neural.FloatScalingLayer(layer_parameters, scale)
+        return ell.neural.ScalingLayer(layer_parameters, scale)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1287,7 +1286,7 @@ class ConvertScaling(ConvertBase):
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
         # Add the ScalingLayerNode to the model
-        ell_node = builder.AddFloatScalingLayerNode(model, input_port_elements, scaling_layer)
+        ell_node = builder.AddScalingLayerNode(model, input_port_elements, scaling_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -1306,7 +1305,7 @@ class ConvertSoftmax(ConvertBase):
         Return the appropriate ELL node
         """
         layer_parameters = self.get_layer_parameters(conversion_parameters)
-        return ell.neural.FloatSoftmaxLayer(layer_parameters)
+        return ell.neural.SoftmaxLayer(layer_parameters)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1321,7 +1320,7 @@ class ConvertSoftmax(ConvertBase):
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
         # Add the SoftmaxLayerNode to the model
-        ell_node = builder.AddFloatSoftmaxLayerNode(model, input_port_elements, softmax_layer)
+        ell_node = builder.AddSoftmaxLayerNode(model, input_port_elements, softmax_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 

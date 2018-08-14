@@ -76,7 +76,7 @@ def test_voice_activity_node(testing):
 def create_tensor(value, size, rows, columns, channels):
     a = np.ones(size) * value
     a = a.reshape(rows, columns, channels)
-    return ell.math.FloatTensor(a)
+    return ell.math.DoubleTensor(a)
 
 
 def test_gru_node_with_vad_reset(testing):
@@ -100,8 +100,9 @@ def test_gru_node_with_vad_reset(testing):
     
     input_shape = ell.math.TensorShape(1, 1, size)
     output_shape = ell.math.TensorShape(1, 1, hidden_units)
+    dataType = ell.nodes.PortType.smallReal
 
-    input_node = builder.AddInputNode(ell_model, input_shape, ell.nodes.PortType.smallReal)
+    input_node = builder.AddInputNode(ell_model, input_shape, dataType)
     vad_node = builder.AddVoiceActivityDetectorNode(ell_model, 
         ell.nodes.PortElements(input_node.GetOutputPort("output")), sample_rate, frame_duration,
         tau_up, tau_down, large_input, gain_att, threshold_up, threshold_down, level_threshold)
@@ -117,14 +118,14 @@ def test_gru_node_with_vad_reset(testing):
 
     input_padding_parameters = ell.neural.PaddingParameters(ell.neural.PaddingScheme.zeros, 0)
     output_padding_parameters = ell.neural.PaddingParameters(ell.neural.PaddingScheme.zeros, 0)
-    layer_parameters = ell.neural.LayerParameters(input_shape, input_padding_parameters, output_shape, output_padding_parameters)
+    layer_parameters = ell.neural.LayerParameters(input_shape, input_padding_parameters, output_shape, output_padding_parameters, dataType)
 
-    gru_layer = ell.neural.FloatGRULayer(layer_parameters, update_weights, reset_weights, hidden_weights, update_bias,
+    gru_layer = ell.neural.GRULayer(layer_parameters, update_weights, reset_weights, hidden_weights, update_bias,
         reset_bias, hidden_bias, ell.neural.ActivationType.tanh, ell.neural.ActivationType.sigmoid)
     
     # now create a gru_node that takes the same input as the vad_node, and also takes
     # the output of the vad_node as a reset signal.
-    gru_node = builder.AddFloatGRULayerNode(ell_model, 
+    gru_node = builder.AddGRULayerNode(ell_model, 
         ell.nodes.PortElements(input_node.GetOutputPort("output")), 
         ell.nodes.PortElements(vad_node.GetOutputPort("output")), gru_layer)
     

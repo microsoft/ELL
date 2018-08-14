@@ -49,15 +49,12 @@ def ell_map_from_float_predictor(predictor, step_interval_msec=0, lag_threshold_
             model, ell.nodes.PortElements(clockNode.GetOutputPort("output")),
             ell.nodes.PortType.smallReal, inputShape,
             "{}InputCallback".format(function_prefix))
-        nnNode = builder.AddFloatNeuralNetworkPredictorNode(
+        nnNode = builder.AddNeuralNetworkPredictorNode(
             model, ell.nodes.PortElements(sourceNode.GetOutputPort("output")),
             predictor)
         # add a sink node that always triggers
-        conditionNode = builder.AddConstantNode(
-            model, ell.math.DoubleVector([1.0]), ell.nodes.PortType.boolean)
         sinkNode = builder.AddSinkNode(
             model, ell.nodes.PortElements(nnNode.GetOutputPort("output")),
-            ell.nodes.PortElements(conditionNode.GetOutputPort("output")),
             outputShape,
             "{}OutputCallback".format(function_prefix))
 
@@ -113,12 +110,9 @@ def ell_map_from_double_predictor(predictor, step_interval_msec=0, lag_threshold
             model, ell.nodes.PortElements(sourceNode.GetOutputPort("output")),
             predictor)
         # add a sink node that always triggers
-        conditionNode = builder.AddConstantNode(
-            model, ell.math.DoubleVector([1.0]), ell.nodes.PortType.boolean)
         sinkNode = builder.AddSinkNode(
             model, ell.nodes.PortElements(nnNode.GetOutputPort("output")),
             ell.nodes.PortElements(conditionNode.GetOutputPort("output")),
-            outputShape,
             "{}OutputCallback".format(function_prefix))
 
         outputNode = builder.AddOutputNode(
@@ -168,11 +162,8 @@ def ell_map_from_float_model(model, model_input_node, input_shape, model_output_
             ell.nodes.PortType.smallReal, inputShape,
             "{}InputCallback".format(function_prefix))
         # add a sink node that always triggers
-        conditionNode = builder.AddConstantNode(
-            model, ell.math.DoubleVector([1.0]), ell.nodes.PortType.boolean)
         sinkNode = builder.AddSinkNode(
             model, ell.nodes.PortElements(model_output_node.GetOutputPort("output")),
-            ell.nodes.PortElements(conditionNode.GetOutputPort("output")),
             outputShape,
             "{}OutputCallback".format(function_prefix))
 

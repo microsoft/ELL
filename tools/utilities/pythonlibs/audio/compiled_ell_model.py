@@ -25,6 +25,8 @@ class CompiledModel:
         sys.path += [os.path.join(full_path, "build")]
         sys.path += [os.path.join(full_path, "build", "Release")]
         self.module = importlib.import_module(model_name)
+        if not hasattr(self.module, "TensorShape") and hasattr(self.module, model_name):
+            self.module = getattr(self.module, model_name)
         self.input_shape = self.module.get_default_input_shape()
         self.output_shape = self.module.get_default_output_shape()
         sys.path = saved 

@@ -14,13 +14,13 @@ namespace model
     {
         // GetArgsSuffixFromVariantVector
         template <typename ArgsTupleType, size_t... Sequence>
-        ArgsTupleType GetArgsSuffixFromVariantVectorHelper(const std::vector<utilities::Variant>& args, std::index_sequence<Sequence...>)
+        ArgsTupleType GetArgsSuffixFromVariantVectorHelper(const std::vector<ell::utilities::Variant>& args, std::index_sequence<Sequence...>)
         {
             return ArgsTupleType({ args[Sequence].GetValue<typename std::tuple_element<Sequence + 1, ArgsTupleType>::type>() }...);
         }
 
         template <typename FunctionType>
-        auto GetArgsSuffixFromVariantVector(FunctionType& function, const std::vector<utilities::Variant>& args) -> utilities::TupleTailType<utilities::FunctionArgTypes<FunctionType>>
+        auto GetArgsSuffixFromVariantVector(FunctionType& function, const std::vector<ell::utilities::Variant>& args) -> utilities::TupleTailType<utilities::FunctionArgTypes<FunctionType>>
         {
             using ArgTypes = utilities::FunctionArgTypes<FunctionType>;
             using ArgSuffixTypes = utilities::TupleTailType<ArgTypes>;
@@ -28,21 +28,21 @@ namespace model
         }
 
         template <typename FunctionType>
-        std::vector<utilities::Variant> GetAddFunctionArgTypes(FunctionType& f)
+        std::vector<ell::utilities::Variant> GetAddFunctionArgTypes(FunctionType& f)
         {
             return utilities::GetVariantsFromTupleType<utilities::TupleTailType<utilities::FunctionArgTypes<FunctionType>>>();
         }
 
         // CallAddNodeFunction
         template <typename FunctionType, size_t... Sequence>
-        Node* CallAddNodeFunctionHelper(FunctionType& function, Model& model, const std::vector<utilities::Variant>& args, std::index_sequence<Sequence...>)
+        Node* CallAddNodeFunctionHelper(FunctionType& function, Model& model, const std::vector<ell::utilities::Variant>& args, std::index_sequence<Sequence...>)
         {
             auto argsTuple = GetArgsSuffixFromVariantVector(function, args);
             return function(model, std::get<Sequence>(argsTuple)...);
         }
 
         template <typename FunctionType>
-        Node* CallAddNodeFunction(FunctionType& function, Model& model, const std::vector<utilities::Variant>& args)
+        Node* CallAddNodeFunction(FunctionType& function, Model& model, const std::vector<ell::utilities::Variant>& args)
         {
             using ArgTypes = utilities::FunctionArgTypes<FunctionType>;
             return CallAddNodeFunctionHelper(function, model, args, std::make_index_sequence<std::tuple_size<ArgTypes>::value - 1>());
@@ -75,7 +75,7 @@ namespace model
     template <typename NodeType, typename FunctionType>
     void ModelBuilder::RegisterNodeCreator(const std::string& creatorName, FunctionType addFunction)
     {
-        auto addNodeFunction = [addFunction](Model& model, const std::vector<utilities::Variant>& args) {
+        auto addNodeFunction = [addFunction](Model& model, const std::vector<ell::utilities::Variant>& args) {
             return ModelBuilderDetail::CallAddNodeFunction(addFunction, model, args);
         };
 

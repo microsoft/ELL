@@ -99,11 +99,7 @@ def create_model():
 
     # add a SinkNode to send this output to the application via OutputCallback
     # (setup a condition for the sink node that is always true).
-    conditionNode = mb.AddConstantNode(
-        model, ell.math.DoubleVector([1.0]), ell.nodes.PortType.boolean)
-    conditionNodeLink = conditionNode.GetOutputPort("output")
     sinkNode = mb.AddSinkNode(model, ell.nodes.PortElements(addLink),                              
-            ell.nodes.PortElements(conditionNodeLink),
         shape, "OutputCallback")
     sinkLink = sinkNode.GetOutputPort("output")
         

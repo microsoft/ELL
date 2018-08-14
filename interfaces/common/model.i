@@ -8,6 +8,9 @@
 
 %{
 #include "ModelInterface.h"
+#include "ModelBuilderInterface.h"
+
+#include "Variant.h"
 #include <vector>
 %}
 
@@ -22,6 +25,7 @@ WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(DoubleCallbackBase, DoubleCallbackBase,
 WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(FloatCallbackBase, FloatCallbackBase, float)
 
 %include "ModelInterface.h"
+%include "ModelBuilderInterface.h"
 %include "macros.i"
 
 // Template instantiations

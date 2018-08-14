@@ -206,7 +206,7 @@ def create_layer_parameters(inputShape, inputPadding, inputPaddingScheme, output
     inputPaddingParameters = ell.neural.PaddingParameters(inputPaddingScheme, inputPadding)
     outputPaddingParameters = ell.neural.PaddingParameters(outputPaddingScheme, outputPadding)
 
-    return ell.neural.LayerParameters(inputShape, inputPaddingParameters, outputShape, outputPaddingParameters)
+    return ell.neural.LayerParameters(inputShape, inputPaddingParameters, outputShape, outputPaddingParameters, ell.nodes.PortType.smallReal)
 
 
 def get_weights_tensor(weightsShape, values):
@@ -225,7 +225,7 @@ def get_weights_tensor(weightsShape, values):
         orderedWeights = weights
         orderedWeights = orderedWeights.reshape((1, 1, weightsShape[0]))
 
-    return ell.math.FloatTensor(orderedWeights)
+    return ell.math.DoubleTensor(orderedWeights)
 
 
 def process_batch_normalization_layer(layer, apply_padding, mean_vals, variance_vals, scale_vals):
@@ -236,10 +236,10 @@ def process_batch_normalization_layer(layer, apply_padding, mean_vals, variance_
 
     # Create BatchNormalizationLayer
     layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros)
-    meanVector = ell.math.FloatVector(mean_vals.ravel())
-    varianceVector = ell.math.FloatVector(variance_vals.ravel())
+    meanVector = mean_vals.ravel()
+    varianceVector = variance_vals.ravel()
 
-    layers.append(ell.neural.FloatBatchNormalizationLayer(layerParameters, meanVector, varianceVector, 1e-6, ell.neural.EpsilonSummand.sqrtVariance))
+    layers.append(ell.neural.BatchNormalizationLayer(layerParameters, meanVector, varianceVector, 1e-6, ell.neural.EpsilonSummand.sqrtVariance))
 
     # Create Scaling Layer
     if (apply_padding):
@@ -247,7 +247,7 @@ def process_batch_normalization_layer(layer, apply_padding, mean_vals, variance_
     else:
         layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros)
 
-    layers.append(ell.neural.FloatScalingLayer(layerParameters, scale_vals.ravel()))
+    layers.append(ell.neural.ScalingLayer(layerParameters, scale_vals.ravel()))
 
     return layers
 
@@ -273,7 +273,7 @@ def get_activation_layer(layer, apply_padding):
 
     activationType = get_activation_type(layer)
 
-    return ell.neural.FloatActivationLayer(layerParameters, activationType)
+    return ell.neural.ActivationLayer(layerParameters, activationType)
 
 
 def get_bias_layer(layer, apply_padding, bias_vals):
@@ -284,9 +284,9 @@ def get_bias_layer(layer, apply_padding, bias_vals):
     else:
         layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ell.neural.PaddingScheme.zeros)
 
-    biasVector = ell.math.FloatVector(bias_vals.ravel())
+    biasVector = bias_vals.ravel()
 
-    return ell.neural.FloatBiasLayer(layerParameters, biasVector)
+    return ell.neural.BiasLayer(layerParameters, biasVector)
 
 
 def process_convolutional_layer(layer, bin_data, convolution_order):
@@ -328,11 +328,11 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
     if 'xnor' not in layer:
         # Create the ELL convolutional layer
         convolutionalParameters = ell.neural.ConvolutionalParameters(int(layer["size"]), int(layer["stride"]), ell.neural.ConvolutionMethod.unrolled, int(layer['filters']))
-        layers.append(ell.neural.FloatConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
+        layers.append(ell.neural.ConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
     else:
         # Create the ELL binary convolutional layer
         convolutionalParameters = ell.neural.BinaryConvolutionalParameters(int(layer["size"]), int(layer["stride"]), ell.neural.BinaryConvolutionMethod.bitwise, ell.neural.BinaryWeightsScale.mean)
-        layers.append(ell.neural.FloatBinaryConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
+        layers.append(ell.neural.BinaryConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
 
     # Override global ordering with layer-specific ordering
     if 'order' in layers:
@@ -369,7 +369,7 @@ def get_pooling_layer(layer, poolingType):
     layerParameters = create_layer_parameters(layer['inputShape'], layer['inputPadding'], layer['inputPaddingScheme'], layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
     poolingParameters = ell.neural.PoolingParameters(int(layer["size"]), int(layer["stride"]))
 
-    return ell.neural.FloatPoolingLayer(layerParameters, poolingParameters, poolingType)
+    return ell.neural.PoolingLayer(layerParameters, poolingParameters, poolingType)
 
 
 def get_softmax_layer(layer):
@@ -378,7 +378,7 @@ def get_softmax_layer(layer):
     # Create the ELL pooling layer
     layerParameters = create_layer_parameters(layer['inputShape'], layer['inputPadding'], layer['inputPaddingScheme'], layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
 
-    return ell.neural.FloatSoftmaxLayer(layerParameters)
+    return ell.neural.SoftmaxLayer(layerParameters)
 
 
 def get_region_detection_layer(layer):
@@ -390,7 +390,7 @@ def get_region_detection_layer(layer):
     detectionParams = ell.neural.RegionDetectionParameters(int(layer['w']), int(layer['h']), int(layer['num']), int(layer['classes']),
         int(layer['coords']), True)
 
-    return ell.neural.FloatRegionDetectionLayer(layerParameters, detectionParams)
+    return ell.neural.RegionDetectionLayer(layerParameters, detectionParams)
 
 def process_fully_connected_layer(layer, weightsData):
     """Returns ELL layers corresponding to a Darknet connected layer"""
@@ -420,9 +420,9 @@ def process_fully_connected_layer(layer, weightsData):
     orderedWeights = np.moveaxis(orderedWeights, 1, -1)
     orderedWeights = orderedWeights.reshape((layer['out_h'] * layer['out_w'] * layer['out_c'] * layer['h'], layer['w'], layer['c']))
 
-    weightsTensor = ell.math.FloatTensor(orderedWeights)
+    weightsTensor = ell.math.DoubleTensor(orderedWeights)
 
-    layers.append(ell.neural.FloatFullyConnectedLayer(layerParameters, weightsTensor))
+    layers.append(ell.neural.FullyConnectedLayer(layerParameters, weightsTensor))
 
     if activationType is not None:
         # Create BiasLayer
@@ -444,11 +444,11 @@ def get_first_scaling_layer(nextLayerParameters):
                                     nextLayerParameters.inputShape.channels)
 
     layerParameters = create_layer_parameters(inputShape, 0, ell.neural.PaddingScheme.zeros, nextLayerParameters.inputShape, nextLayerParameters.inputPaddingParameters.paddingSize, nextLayerParameters.inputPaddingParameters.paddingScheme)
-    return ell.neural.FloatScalingLayer(layerParameters, scaleValues.ravel())
+    return ell.neural.ScalingLayer(layerParameters, scaleValues.ravel())
 
 
 def process_network(network, weightsData, convolutionOrder):
-    """Returns an ell.neural.FloatNeuralNetworkPredictor as a result of parsing the network layers"""
+    """Returns an ell.neural.NeuralNetworkPredictor as a result of parsing the network layers"""
     ellLayers = []
 
     for layer in network:
@@ -476,7 +476,7 @@ def process_network(network, weightsData, convolutionOrder):
         parameters = ellLayers[0].parameters
         ellLayers = [get_first_scaling_layer(parameters)] + ellLayers
 
-    predictor = ell.neural.FloatNeuralNetworkPredictor(ellLayers)
+    predictor = ell.neural.NeuralNetworkPredictor(ellLayers)
     return predictor
 
 

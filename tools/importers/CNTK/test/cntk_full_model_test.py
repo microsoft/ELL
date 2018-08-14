@@ -156,7 +156,7 @@ class FullModelTest:
         with open("Compare_" + name + ".csv", "w") as f:
             f.write("cntk,ell,compiled\n")
 
-            a = cntk_converters.get_float_vector_from_cntk_array(self.data)
+            a = cntk_converters.get_vector_from_cntk_array(self.data)
             b = self.ell_data.ravel()
             c = self.compiled_data.ravel()
             pos = 0
@@ -168,7 +168,7 @@ class FullModelTest:
     def compare_model(self, layers):
         ellLayers = cntk_layers.convert_cntk_layers_to_ell_layers(layers)
         # Create an ELL neural network predictor from the layers
-        predictor = ell.neural.FloatNeuralNetworkPredictor(ellLayers)
+        predictor = ell.neural.NeuralNetworkPredictor(ellLayers)
         shape = predictor.GetInputShape()
         self.input_shape = (shape.channels,shape.rows,shape.columns) # to CNTK (channel, rows, coumns) order
         self.data = self.get_input_data()
@@ -239,7 +239,7 @@ class FullModelTest:
                 layer.layer.output.shape, layer.layer.ell_outputPaddingParameters)
         layer.process(ell_layers)
         # Create an ELL neural network predictor from the relevant CNTK layers
-        return ell.neural.FloatNeuralNetworkPredictor(ell_layers)
+        return ell.neural.NeuralNetworkPredictor(ell_layers)
 
 
     def verify_ell(self, op_name, predictor, data, expected):

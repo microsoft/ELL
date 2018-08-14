@@ -13,7 +13,9 @@ endif()
 
 set(_sources
     common/src/DatasetInterface.cpp
+    common/src/ModelBuilderInterface.cpp
     common/src/ModelInterface.cpp
+    common/src/NeuralNetworkPredictorInterface.cpp
     common/src/TrainerInterface.cpp
 )
 foreach(src ${_sources})
@@ -25,6 +27,7 @@ set(_sources
     common/include/DatasetInterface.h
     common/include/DatasetInterfaceImpl.h
     common/include/MathInterface.h
+    common/include/ModelBuilderInterface.h
     common/include/ModelInterface.h
     common/include/NeuralLayersInterface.h
     common/include/NeuralNetworkPredictorInterface.h
@@ -37,7 +40,6 @@ endforeach()
 set(_sources
     common/tcc/CallbackInterface.tcc
     common/tcc/ModelInterface.tcc
-    common/tcc/NeuralNetworkPredictorInterface.tcc
 )
 foreach(src ${_sources})
     list(APPEND INTERFACE_TCC "${CMAKE_CURRENT_LIST_DIR}/${src}")

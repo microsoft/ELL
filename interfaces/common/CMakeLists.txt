@@ -3,11 +3,12 @@
 #
 include (CommonInterfaces)
 
-set (INTERFACE_SRC src/ModelInterface.cpp
+set (INTERFACE_SRC src/ModelBuilderInterface.cpp
+                   src/ModelInterface.cpp
+                   src/NeuralNetworkPredictorInterface.cpp
                    src/TrainerInterface.cpp
                    src/DatasetInterface.cpp)
 set (INTERFACE_TCC tcc/CallbackInterface.tcc
-                   tcc/ModelInterface.tcc
-                   tcc/NeuralNetworkPredictorInterface.tcc)
+                   tcc/ModelInterface.tcc)
 
 generate_interface(common ell ${CMAKE_CURRENT_SOURCE_DIR} "" "" "")

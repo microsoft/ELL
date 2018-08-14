@@ -50,6 +50,15 @@ namespace model
         return Port::PortType::bigInt;
     }
 
+#ifndef WIN32 
+    // WIN32 treats int64_t and "long long" as the same thing, GCC and CLang do not.
+    template <>
+    Port::PortType Port::GetPortType<long long>()
+    {
+        return Port::PortType::bigInt;
+    }
+#endif
+
     template <>
     Port::PortType Port::GetPortType<bool>()
     {

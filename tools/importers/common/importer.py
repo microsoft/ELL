@@ -207,11 +207,8 @@ class ImporterEngine:
         last_ell_node = self.lookup_table.get_ell_node_from_importer_node_id(last_importer_node.id)
 
         # Add the sink node
-        condition_node = self.ell_model_builder.AddConstantNode(
-            self.ell_model, ell.math.DoubleVector([1.0]), ell.nodes.PortType.boolean)
         sink_node = self.ell_model_builder.AddSinkNode(
             self.ell_model, ell.nodes.PortElements(last_ell_node.GetOutputPort("output")),
-            ell.nodes.PortElements(condition_node.GetOutputPort("output")),
             ell_output_shape,
             "{}OutputCallback".format(function_prefix))
 

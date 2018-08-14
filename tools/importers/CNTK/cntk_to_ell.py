@@ -133,9 +133,9 @@ def predictor_from_cntk_model(modelFile, plotModel=False):
         ellLayers = cntk_layers.convert_cntk_layers_to_ell_layers(
             layersToConvert)
         # Create an ELL neural network predictor from the layers
-        predictor = ell.neural.FloatNeuralNetworkPredictor(ellLayers)
+        predictor = ell.neural.NeuralNetworkPredictor(ellLayers)
     except BaseException as exception:
-        _logger.error("Error occurred attempting to convert cntk layers to ELL layers")
+        _logger.error("Error occurred attempting to convert cntk layers to ELL layers: " + str(exception))
         raise exception
 
     return predictor
@@ -166,9 +166,9 @@ def predictor_from_cntk_model_using_new_engine(modelFile, plotModel=True):
         importer_engine = common.importer.ImporterEngine()
         ell_layers = importer_engine.convert(importer_model)
         # Create an ELL neural network predictor from the layers
-        predictor = ell.neural.FloatNeuralNetworkPredictor(ell_layers)
+        predictor = ell.neural.NeuralNetworkPredictor(ell_layers)
     except BaseException as exception:
-        _logger.error("Error occurred attempting to convert cntk layers to ELL layers")
+        _logger.error("Error occurred attempting to convert cntk layers to ELL layers: " + str(exception))
         raise exception
 
     return predictor

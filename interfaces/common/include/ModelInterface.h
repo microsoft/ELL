@@ -20,7 +20,6 @@
 #include "InputNode.h"
 #include "InputPort.h"
 #include "Model.h"
-#include "ModelBuilder.h"
 #include "Node.h"
 #include "OutputNode.h"
 #include "OutputPort.h"
@@ -31,8 +30,6 @@
 // apis
 #include "CallbackInterface.h"
 #include "MathInterface.h"
-#include "NeuralNetworkPredictorInterface.h"
-#include "DTWDistanceNode.h"
 
 // stl
 #include <memory>
@@ -348,111 +345,6 @@ public:
 
 private:
     std::shared_ptr<ell::model::Model> _model;
-};
-
-//
-// Operation types for operation nodes
-//
-enum class UnaryOperationType
-{
-    none = (int)ell::emitters::UnaryOperationType::none,
-    exp = (int)ell::emitters::UnaryOperationType::exp,
-    log = (int)ell::emitters::UnaryOperationType::log,
-    sqrt = (int)ell::emitters::UnaryOperationType::sqrt,
-    logicalNot = (int)ell::emitters::UnaryOperationType::logicalNot,
-    tanh = (int)ell::emitters::UnaryOperationType::tanh,
-    square = (int)ell::emitters::UnaryOperationType::square,
-    sin = (int)ell::emitters::UnaryOperationType::sin,
-    cos = (int)ell::emitters::UnaryOperationType::cos
-};
-
-enum class BinaryOperationType
-{
-    none = (int)ell::emitters::BinaryOperationType::none,
-    add = (int)ell::emitters::BinaryOperationType::add,
-    subtract = (int)ell::emitters::BinaryOperationType::subtract,
-    coordinatewiseMultiply = (int)ell::emitters::BinaryOperationType::coordinatewiseMultiply,
-    coordinatewiseDivide = (int)ell::emitters::BinaryOperationType::coordinatewiseDivide,
-    logicalAnd = (int)ell::emitters::BinaryOperationType::logicalAnd,
-    logicalOr = (int)ell::emitters::BinaryOperationType::logicalOr,
-    logicalXor = (int)ell::emitters::BinaryOperationType::logicalXor,
-    shiftLeft = (int)ell::emitters::BinaryOperationType::shiftLeft,
-    logicalShiftRight = (int)ell::emitters::BinaryOperationType::logicalShiftRight,
-    arithmeticShiftRight = (int)ell::emitters::BinaryOperationType::arithmeticShiftRight
-};
-
-//
-// ModelBuilder
-//
-class ModelBuilder
-{
-public:
-    ModelBuilder();
-
-    // Generic AddNode method
-    Node AddNode(Model model, const std::string& nodeType, const std::vector<std::string>& args);
-
-    // Specific methods per node type
-    Node AddBinaryOperationNode(Model model, PortElements input1, PortElements input2, BinaryOperationType operation);
-    Node AddBinaryOperationNodeWithMemoryLayout(Model model, PortElements input1, PortMemoryLayout input1Layout, PortElements input2, PortMemoryLayout input2Layout, PortMemoryLayout outputLayout, BinaryOperationType operation);
-    Node AddBufferNode(Model model, PortElements input, int windowSize);
-    Node AddTypeCastNode(Model model, PortElements input, PortType outputType);
-    Node AddClockNode(Model model, PortElements input, double interval, double lagThreshold, const std::string& lagNotificationName);
-    Node AddConcatenationNode(Model model, const ell::api::math::TensorShape& outputShape, const std::vector<PortElements*>& inputs);
-    Node AddConstantNode(Model model, std::vector<double> values, PortType type);
-    Node AddConstantNode(Model model, std::vector<double> values, const ell::api::math::TensorShape& outputShape, PortType type);
-    Node AddDCTNode(Model model, PortElements input, int numFilters);
-    Node AddDoubleNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<double> predictor);
-    Node AddFFTNode(Model model, PortElements input);
-    Node AddFloatNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<float> predictor);
-    Node AddHammingWindowNode(Model model, PortElements input);
-    Node AddIIRFilterNode(Model model, PortElements input, std::vector<double> bCoeffs, std::vector<double> aCoeffs);
-    InputNode AddInputNode(Model model, const ell::api::math::TensorShape& shape, PortType type);
-    Node AddLinearFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse);
-    Node AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse);
-    OutputNode AddOutputNode(Model model, const ell::api::math::TensorShape& shape, PortElements input);
-    Node AddReorderDataNode(Model model, PortElements input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order, double outputPaddingValue = 0.0);
-    Node AddSinkNode(Model model, PortElements input, PortElements trigger, const ell::api::math::TensorShape& shape, const std::string& sinkFunctionName);
-    Node AddSourceNode(Model model, PortElements input, PortType outputType, const ell::api::math::TensorShape& shape, const std::string& sourceFunctionName);
-    Node AddUnaryOperationNode(Model model, PortElements input, UnaryOperationType operation);
-    Node AddDTWNode(Model model, std::vector<std::vector<double>> prototype, PortElements input);
-    Node AddVoiceActivityDetectorNode(Model model, PortElements input, double sampleRate, double frameDuration,
-        double tauUp,  double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown,
-        double levelThreshold);
-
-    Node AddFloatActivationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ActivationLayer<float>& layer);
-    Node AddFloatBatchNormalizationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BatchNormalizationLayer<float>& layer);
-    Node AddFloatBiasLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BiasLayer<float>& layer);
-    Node AddFloatBinaryConvolutionalLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BinaryConvolutionalLayer<float>& layer);
-    Node AddFloatConvolutionalLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ConvolutionalLayer<float>& layer);
-    Node AddFloatFullyConnectedLayerNode(Model model, PortElements input, const ell::api::predictors::neural::FullyConnectedLayer<float>& layer);
-    Node AddFloatRegionDetectionLayerNode(Model model, PortElements input, const ell::api::predictors::neural::RegionDetectionLayer<float>& layer);
-    Node AddFloatPoolingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::PoolingLayer<float>& layer);
-    Node AddFloatScalingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ScalingLayer<float>& layer);
-    Node AddFloatSoftmaxLayerNode(Model model, PortElements input, const ell::api::predictors::neural::SoftmaxLayer<float>& layer);
-    Node AddFloatGRULayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::GRULayer<float>& layer);
-    Node AddFloatLSTMLayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::LSTMLayer<float>& layer);
-
-private:
-#ifndef SWIG
-    template <typename ElementType>
-    Node AddNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor<ElementType> predictor);
-#endif
-
-    ell::model::ModelBuilder _modelBuilder;
-};
-
-//
-// TransformContext
-//
-class TransformContext
-{
-public:
-#ifndef SWIG
-//    TransformContext(const model::NodeActionFunction& isNodeCompilable);
-#endif
-private:
-    ell::model::TransformContext _context;
 };
 
 //

@@ -13,10 +13,11 @@ namespace neural
         LayerParameters(const LayerShape& inputShape,
                         const PaddingParameters& inputPaddingParameters,
                         const LayerShape& outputShape,
-                        const PaddingParameters& outputPaddingParameters)
+                        const PaddingParameters& outputPaddingParameters,
+                        ELL_API::PortType dataType)
 
         {
-            return new ell::api::predictors::neural::LayerParameters{inputShape, inputPaddingParameters, outputShape, outputPaddingParameters};
+            return new ell::api::predictors::neural::LayerParameters{inputShape, inputPaddingParameters, outputShape, outputPaddingParameters, dataType};
         }
     };
 
@@ -195,5 +196,27 @@ class EpsilonSummand:
 
 del EpsilonSummand_sqrtVariance
 del EpsilonSummand_variance
+
+import numpy as np
+
+# Wrapper for Predict function that chooses between PredictFloat and PredictDouble depending on input types.
+def NeuralNetworkPredictor_Predict(self, inputData):
+    """
+    NeuralNetworkpredictor_Predict(NeuralNetworkPredictor self, inputData) 
+
+    Parameters
+    ----------
+    inputData: the input data for prediction
+
+    """
+    import ell
+    if hasattr(inputData, "dtype") and getattr(inputData, "dtype") == np.float32:
+        return self.PredictFloat(ell.math.FloatVector(inputData))
+    else:
+        return self.PredictDouble(ell.math.DoubleVector(inputData))
+        
+
+NeuralNetworkPredictor.Predict = NeuralNetworkPredictor_Predict
+
 
 %}

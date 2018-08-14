@@ -36,13 +36,13 @@ namespace model
         ///
         /// <param named="args"> A vector of `Variant`s to pass to the node creator function registered with `ModelBuilder` </param>
         /// <remarks> Throws an exception on error </remarks>
-        Node* AddNode(Model& model, const std::string& nodeTypeName, const std::vector<utilities::Variant>& args);
+        Node* AddNode(Model& model, const std::string& nodeTypeName, const std::vector<ell::utilities::Variant > & args);
 
         /// <summary> Creates a node and adds it to the model being built </summary>
         ///
         /// <param named="args"> A vector of `Variant`s to pass to the node creator function registered with `ModelBuilder` </param>
         /// <returns> Returns false on error </returns>
-        bool TryAddNode(Model& model, const std::string& nodeTypeName, const std::vector<utilities::Variant>& args, Node*& node);
+        bool TryAddNode(Model& model, const std::string& nodeTypeName, const std::vector<ell::utilities::Variant>& args, Node*& node);
 
         /// <summary> Creates a node and adds it to the model being built, using a vector of strings </summary>
         ///
@@ -60,12 +60,12 @@ namespace model
         /// Returns a vector of default-initialized `Variant`s of the types expected by the node creator function for the given node type.
         /// <summary>
         template <typename NodeType>
-        std::vector<utilities::Variant> GetAddNodeArgs();
+        std::vector<ell::utilities::Variant> GetAddNodeArgs();
 
         /// <summary>
         /// Returns a vector of default-initialized `Variant`s of the types expected by the node creator function for the given node type.
         /// <summary>
-        std::vector<utilities::Variant> GetAddNodeArgs(std::string nodeTypeName) const;
+        std::vector<ell::utilities::Variant> GetAddNodeArgs(std::string nodeTypeName) const;
 
         /// <summary>
         /// Returns `true` if the node type has a creator function registered with the model builder
@@ -103,13 +103,13 @@ namespace model
         void RegisterNodeCreator(const std::string& creatorName, FunctionType creatorFunction);
 
     private:
-        std::vector<utilities::Variant> EncodePortElements(const std::vector<utilities::Variant>& args) const;
-        std::vector<utilities::Variant> TransformArgsForFunction(const Model& model, const std::string& nodeTypeName, const std::vector<utilities::Variant>& args) const;
-        std::vector<utilities::Variant> TransformArgsForFunction(const Model& model, const std::string& nodeTypeName, const std::vector<std::string>& args) const;
+        std::vector<ell::utilities::Variant> EncodePortElements(const std::vector<ell::utilities::Variant>& args) const;
+        std::vector<ell::utilities::Variant> TransformArgsForFunction(const Model& model, const std::string& nodeTypeName, const std::vector<ell::utilities::Variant>& args) const;
+        std::vector<ell::utilities::Variant> TransformArgsForFunction(const Model& model, const std::string& nodeTypeName, const std::vector<std::string>& args) const;
 
         // List of add-node functions and get-node-creator-arguments functions
-        std::map<std::string, std::function<Node*(Model& model, const std::vector<utilities::Variant>&)>> _addNodeFunctions;
-        std::map<std::string, std::function<std::vector<utilities::Variant>()>> _getNodeArgsFunctions;
+        std::map<std::string, std::function<Node*(Model& model, const std::vector<ell::utilities::Variant>&)>> _addNodeFunctions;
+        std::map<std::string, std::function<std::vector<ell::utilities::Variant>()>> _getNodeArgsFunctions;
     };
 }
 }
