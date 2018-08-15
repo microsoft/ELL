@@ -76,7 +76,9 @@
 // stl
 #include <cstdint>
 
+using namespace std::string_literals;
 using namespace ell::predictors::neural;
+using namespace ell::utilities;
 
 namespace ell
 {
@@ -156,20 +158,21 @@ namespace common
         context.GetTypeFactory().AddType<predictors::neural::ActivationImpl<ElementType>, predictors::neural::SigmoidActivation<ElementType>>();
         context.GetTypeFactory().AddType<predictors::neural::ActivationImpl<ElementType>, predictors::neural::TanhActivation<ElementType>>();
 
-        // Note: we don't need any of the other combinations because we never actually serialized those out till now.
-        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<float>>("GRULayerNode<float,TanhActivation,SigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<float>>("LSTMLayerNode<float,TanhActivation,SigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<float>>("GRULayerNode<float,TanhActivation,HardSigmoidActivation<float>>");
-        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<float>>("LSTMLayerNode<float,TanhActivation,HardSigmoidActivation<float>>");
-        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<float>>("GRULayerNode<float,TanhActivation,HardSigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<float>>("LSTMLayerNode<float,TanhActivation,HardSigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<double>>("GRULayerNode<double,TanhActivation,SigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<double>>("LSTMLayerNode<double,TanhActivation,SigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<double>>("GRULayerNode<double,TanhActivation,HardSigmoidActivation<double>>");
-        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<double>>("LSTMLayerNode<double,TanhActivation,HardSigmoidActivation<double>>");
-        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<double>>("GRULayerNode<double,TanhActivation,HardSigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<double>>("LSTMLayerNode<double,TanhActivation,HardSigmoidActivation>");
+        // Map the old type names to the new ones for compatibility reasons.
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",SigmoidActivation>");
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",HardSigmoidActivation>");
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",ReLUActivation>");
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",LeakyReLUActivation>");
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation>");
+        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",ParametricReLUActivation>");
 
+        // Note: we don't need any of the other combinations because we never actually serialized those out till now.
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType>>("GRULayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,SigmoidActivation>");
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType>>("LSTMLayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,SigmoidActivation>");
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType>>("GRULayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,HardSigmoidActivation<" + TypeName<ElementType>::GetName() + ">>");
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType>>("LSTMLayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,HardSigmoidActivation<" + TypeName<ElementType>::GetName() + ">>");
+        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType>>("GRULayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,HardSigmoidActivation>");
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType>>("LSTMLayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,HardSigmoidActivation>");
     }
 
     void RegisterNodeTypes(utilities::SerializationContext& context)
@@ -257,21 +260,6 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, int64_t>>();
-
-        // Map the old type names to the new ones for compatibility reasons.
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float>>("ActivationLayerNode<float,SigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float>>("ActivationLayerNode<float,HardSigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float>>("ActivationLayerNode<float,ReLUActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float>>("ActivationLayerNode<float,LeakyReLUActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float>>("ActivationLayerNode<float,TanhActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float>>("ActivationLayerNode<float,ParametricReLUActivation>");
-
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double>>("ActivationLayerNode<double,SigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double>>("ActivationLayerNode<double,HardSigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double>>("ActivationLayerNode<double,ReLUActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double>>("ActivationLayerNode<double,LeakyReLUActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double>>("ActivationLayerNode<double,TanhActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double>>("ActivationLayerNode<double,ParametricReLUActivation>");
     }
 
     void RegisterMapTypes(utilities::SerializationContext& context)
