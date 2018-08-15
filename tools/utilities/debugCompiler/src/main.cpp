@@ -9,6 +9,7 @@
 #include "CompareArguments.h"
 #include "InvokePython.h"
 #include "ModelComparison.h"
+#include "ReplaceSourceAndSinkNodesPass.h"
 
 // common
 #include "LoadModel.h"
@@ -62,6 +63,24 @@ std::vector<InputType> GetInputVector(const model::MemoryShape& inputShape)
         result[index] = dist(engine);
     }
     return result;
+}
+
+void ReplaceSourceAndSinkNodes(model::Map& map)
+{
+    model::MapCompilerOptions settings;
+    model::ModelOptimizer optimizer(settings);
+    optimizer.AddPass(std::make_unique<ReplaceSourceAndSinkNodesPass>());
+    map.RemoveInputs();
+    map.Optimize(optimizer);
+    
+    // now put back inputs
+    auto inputNodes = map.GetModel().GetNodesByType<model::InputNodeBase>();
+    int index = 1;
+    for(auto node: inputNodes)
+    {
+        map.AddInput("input_" + std::to_string(index), node);
+        ++index;
+    }
 }
 
 template <typename InputType>
@@ -119,6 +138,8 @@ int main(int argc, char* argv[])
         // load map file
         std::cout << "loading map..." << std::endl;
         model::Map map = common::LoadMap(compareArguments.inputMapFile);
+
+        ReplaceSourceAndSinkNodes(map);
 
         if (compareArguments.outputDirectory != "")
         {

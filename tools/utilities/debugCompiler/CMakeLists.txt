@@ -9,12 +9,14 @@ set (src
   src/CompareArguments.cpp
   src/main.cpp
   src/ModelComparison.cpp
+  src/ReplaceSourceAndSinkNodesPass.cpp
   src/visualizeReport.py
 )
 
 set (include
   include/CompareArguments.h
   include/ModelComparison.h
+  include/ReplaceSourceAndSinkNodesPass.h
   include/VectorStatistics.h
 )
     
