@@ -7,8 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "VoiceActivityDetector.h"
+
+// stl
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
 
 namespace ell
 {
@@ -187,7 +190,7 @@ namespace dsp
         double _frameDuration;
         double _sampleRate;
         double _windowSize;
-        long long _time; 
+        int64_t _time; 
 
         VoiceActivityDetectorImpl(
             double sampleRate,

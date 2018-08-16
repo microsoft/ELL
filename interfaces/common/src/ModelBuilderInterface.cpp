@@ -427,7 +427,7 @@ Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outpu
             ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMemoryShape(), sourceFunctionName);
         break;
     case PortType::bigInt:
-        newNode = model.GetModel().AddNode<ell::nodes::SourceNode<long long>>(
+        newNode = model.GetModel().AddNode<ell::nodes::SourceNode<int64_t>>(
             ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMemoryShape(), sourceFunctionName);
         break;
     case PortType::boolean:

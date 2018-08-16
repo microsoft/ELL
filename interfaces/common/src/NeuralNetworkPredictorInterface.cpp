@@ -502,7 +502,7 @@ NeuralNetworkPredictor::NeuralNetworkPredictor(const std::vector<ell::api::predi
         _predictor = std::make_unique<TypedNeuralNetworkPredictorImpl<float>>(layers, static_cast<float>(inputScaleFactor));
         break;
         //case PortType::bigInt:
-        //    _predictor = std::make_unique<TypedNeuralNetworkPredictorImpl<long long>>(layers, static_cast<long long>(inputScaleFactor));
+        //    _predictor = std::make_unique<TypedNeuralNetworkPredictorImpl<int64_t>>(layers, static_cast<int64_t>(inputScaleFactor));
         //    break;
         //case PortType::integer:
         //    _predictor = std::make_unique<TypedNeuralNetworkPredictorImpl<int>>(layers, static_cast<int>(inputScaleFactor));

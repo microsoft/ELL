@@ -237,20 +237,6 @@ namespace emitters
         return VariableType::Int64Pointer;
     }
 
-#ifndef WIN32 
-    // WIN32 treats int64_t and "long long" as the same thing, GCC and CLang do not.
-    template <>
-    VariableType GetVariableType<long long>()
-    {
-        return VariableType::Int64;
-    }
-
-    template <>
-    VariableType GetVariableType<long long*>()
-    {
-        return VariableType::Int64Pointer;
-    }
-#endif 
     template <>
     VariableType GetVariableType<float>()
     {
@@ -298,15 +284,6 @@ namespace emitters
     {
         return 0L;
     }
-
-#ifndef WIN32 
-    // WIN32 treats int64_t and "long long" as the same thing, GCC and CLang do not.
-    template <>
-    long long GetDefaultValue<long long>()
-    {
-        return 0L;
-    }
-#endif
 
     VariableType GetPointerType(VariableType type)
     {
