@@ -100,12 +100,6 @@ namespace model
         /// <returns> The LLVM Value object corresponding to the elements. </returns>
         llvm::Value* EnsurePortElementEmitted(const PortElementBase& element);
 
-        /// <summary> Load the variable for the outport port referenced by this input port </summary>
-        ///
-        /// <param name="port"> The port to load into a register. </param>
-        /// <returns> The LLVM Value object corresponding to the port. </returns>
-        llvm::Value* LoadPortVariable(const InputPortBase& port);
-
         /// <summary>
         /// Ensure that the variable for this outport port element is loaded into a register. This will automatically
         /// dereference any pointers it needs to.

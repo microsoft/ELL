@@ -50,7 +50,8 @@ namespace emitters
     template <typename T>
     llvm::Value* IRModuleEmitter::EmitVariable(Variable& var)
     {
-        if (var.IsScalar())
+        // TODO: have a more specific check to see if the variable is mapped to a port, rather than if it's a function input/output
+        if (var.IsScalar() && (var.Scope() != VariableScope::input && var.Scope() != VariableScope::output))
         {
             return EmitScalar<T>(var);
         }

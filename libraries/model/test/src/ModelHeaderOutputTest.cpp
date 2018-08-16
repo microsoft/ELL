@@ -148,11 +148,11 @@ void TestCppHeader()
     std::string typeString = ToTypeString<ElementType>();
     std::string timeTypeString = ToTypeString<nodes::TimeTickType>();
 
-    testing::ProcessTest("Testing C predict function", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_Predict(void* context, ") + timeTypeString + " input0, " + typeString + "* output0);")));
+    testing::ProcessTest("Testing C predict function", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_Predict(void* context, ") + timeTypeString + "* input0, " + typeString + "* output0);")));
     testing::ProcessTest("Testing C++ wrapper 1", testing::IsTrue(std::string::npos != result.find("class TestModule_PredictWrapper")));
     testing::ProcessTest("Testing C++ wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("int8_t TestModule_MyDataCallback(") + typeString + "* buffer")));
     testing::ProcessTest("Testing C++ wrapper 3", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_MyResultsCallback(") + typeString + "* buffer")));
-    testing::ProcessTest("Testing C++ wrapper 4", testing::IsTrue(std::string::npos != result.find("TestModule_Predict(this, 0.0, nullptr);")));
+    testing::ProcessTest("Testing C++ wrapper 4", testing::IsTrue(std::string::npos != result.find("TestModule_Predict(this, &time, nullptr);")));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
 
@@ -233,8 +233,8 @@ void TestSwigCallbackHeader()
     testing::ProcessTest("Testing generated callback definitions 2", testing::IsTrue(std::string::npos != result.find(std::string("void TestModuleWithCallbacks_MyResultsCallback(void* context, " + typeString + "* output"))));
     testing::ProcessTest("Testing generated callback definitions 3", testing::IsTrue(std::string::npos != result.find(std::string("void TestModuleWithCallbacks_MyLagNotificationCallback(void* context, " + timeTypeString + " lag"))));
 
-    testing::ProcessTest("Testing step function wrapper 1", testing::IsTrue(std::string::npos != result.find(std::string("void step(void* context, " + timeTypeString + " input, std::vector<" + typeString + ">& output)"))));
-    testing::ProcessTest("Testing step function wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("step(context, input, &output[0]);"))));
+    testing::ProcessTest("Testing step function wrapper 1", testing::IsTrue(std::string::npos != result.find(std::string("void step(void* context, const std::vector<" + timeTypeString + ">& input, std::vector<" + typeString + ">& output)"))));
+    testing::ProcessTest("Testing step function wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("step(context, const_cast<double*>(&input[0]), &output[0]);"))));
 
     testing::ProcessTest("Testing reset function exists", testing::IsTrue(std::string::npos != result.find(std::string("void TestModuleWithCallbacks_Reset()"))));
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));

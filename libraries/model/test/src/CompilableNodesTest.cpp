@@ -101,6 +101,9 @@
 #include <stdexcept>
 #include <string>
 
+// set to 1 to print models
+#define PRINT_MODELS 0
+
 using namespace ell;
 using namespace ell::predictors;
 using namespace ell::predictors::neural;
@@ -110,11 +113,10 @@ void TestCompileIsEqual()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(2);
-
-    // Error: passing in a single-element PortElements for the inputs to the BinaryPredicateNode causes us to think it's a scalar and pass in the first value of the port, not the selected one
     auto predicateNode = model.AddNode<nodes::BinaryPredicateNode<double>>(model::PortElements<double>{ inputNode->output, 0 }, model::PortElements<double>{ inputNode->output, 1 }, emitters::BinaryPredicateType::equal);
     auto outputNode = model.AddNode<model::OutputNode<bool>>(predicateNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -127,7 +129,7 @@ void TestCompilableScalarOutputNode()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(ell::model::PortElements<double>{inputNode->output});
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -829,13 +831,13 @@ void TestCompilableSourceNode()
 extern "C" {
 size_t g_sinkOutputSize = 0;
 std::vector<double> outputValues;
-void Test_CompiledSinkNode_OutputCallback_Scalar(void* context, double output)
+void Test_CompiledSinkNode_OutputCallback_Scalar(void* context, double* output)
 {
-    Log() << "Sink Output Callback (Scalar) " << output << EOL;
+    Log() << "Sink Output Callback (Scalar) " << *output << EOL;
     assert(g_sinkOutputSize == 1);
-    outputValues.push_back(output);
+    outputValues.push_back(*output);
 }
-TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Scalar, void, void*, double);
+TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Scalar, void, void*, double*);
 
 void Test_CompiledSinkNode_OutputCallback_Vector(void* context, double* output)
 {
@@ -875,7 +877,9 @@ void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionNam
     if (triggerValue)
     {
         // Verify that sink callbacks are actually called
-        testing::ProcessTest("Testing callback values", testing::IsEqual(outputValues, signal[0]));
+        testing::ProcessTest("Testing callback values", outputValues.size() == signal[0].size() && testing::IsEqual(outputValues, signal[0]));
+        for (auto x: outputValues) Log() << x << "  ";
+        Log() << EOL;
     }
     else
     {
@@ -886,9 +890,9 @@ void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionNam
 
 void TestCompilableSinkNode()
 {
-    TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar", true);
+    TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar", true); // fails
     TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar", false);
-    TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector", true);
+    TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector", true); // fails
     TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector", false);
 }
 
@@ -924,7 +928,9 @@ void TestMultipleOutputNodes()
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
+#if PRINT_MODELS
     PrintIR(compiledMap);
+#endif
 }
 
 void TestShapeFunctionGeneration()
@@ -945,7 +951,9 @@ void TestShapeFunctionGeneration()
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
+#if PRINT_MODELS
     PrintIR(compiledMap);
+#endif
 
     std::ostringstream buffer;
     compiledMap.WriteCode(buffer, emitters::ModuleOutputFormat::ir);
@@ -1239,7 +1247,10 @@ void TestIRNode()
 
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(irNodeMap);
+
+#if PRINT_MODELS
     PrintIR(compiledMap);
+#endif
 
     // compare output
     std::vector<std::vector<double>> signal;
@@ -1330,7 +1341,10 @@ void TestNeuralNetworkPredictorNode1()
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
+
+#if PRINT_MODELS
     PrintIR(compiledMap);
+#endif
 
     // compare output
     std::vector<std::vector<double>> signal = { input };
@@ -1412,7 +1426,10 @@ void TestNeuralNetworkPredictorNode2()
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
+#if PRINT_MODELS
     PrintIR(compiledMap);
+#endif
+
     // compare output
     std::vector<std::vector<double>> signal = { input };
     VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_2");

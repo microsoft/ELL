@@ -175,13 +175,17 @@ namespace model
         emitters::NamedVariableTypeList args;
         for (auto port : GetInputPorts())
         {
-            assert(port->GetInputElements().NumRanges() == 1); // if we're using an input port as a function argument, we need to preprocess model to ensure it's a full range
+            if (port->GetInputElements().NumRanges() != 1) // if we're using an input port as a function argument, we need to preprocess model to ensure it's a full range
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Input arguments of node functions can't be complex port elements.");
+            }
+
             auto varType = PortTypeToVariableType(port->GetType());
             auto ptrType = emitters::GetPointerType(varType);
 
-            auto var = compiler.AllocateNodeFunctionArgument(module, port->GetInputElement(0), MapCompiler::ArgType::input);
+            auto var = compiler.AllocatePortFunctionArgument(module, port->GetInputElement(0), MapCompiler::ArgType::input);
             auto varName = var->EmittedName();
-            args.emplace_back(varName, IsScalar(*port) ? varType : ptrType);
+            args.emplace_back(varName, ptrType);
         };
 
         // add node state
@@ -196,7 +200,7 @@ namespace model
             auto varType = PortTypeToVariableType(port->GetType());
             auto ptrType = emitters::GetPointerType(varType);
 
-            auto var = compiler.AllocateNodeFunctionArgument(module, port, MapCompiler::ArgType::output);
+            auto var = compiler.AllocatePortFunctionArgument(module, port, MapCompiler::ArgType::output);
             auto varName = var->EmittedName();
             args.emplace_back(varName, ptrType);
         };
@@ -218,27 +222,17 @@ namespace model
 
         for (auto port : GetInputPorts())
         {
+            if (port->GetInputElements().NumRanges() != 1) // if we're using an input port as a function argument, we need to preprocess the model to ensure it's a full range
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: compiling node function with complex input port.");
+            }
+
             auto range = port->GetInputElements().GetRanges()[0];
-
-            assert(port->GetInputElements().NumRanges() == 1); // if we're using an input port as a function argument, we need to preprocess model to ensure it's a full range
             auto inputArg = compiler.EnsurePortEmitted(*port);
-            if (IsScalar(*port))
-            {
-                auto inputArgType = inputArg->getType();
-                bool needsDereference = inputArgType->isPointerTy(); // This should perhaps be `isPtrOrPtrVectorTy()` or even `isPtrOrPtrVectorTy() || isArrayTy()`
-                if (needsDereference)
-                {
-                    inputArg = currentFunction.ValueAt(inputArg, range.GetStartIndex());
-                }
-
-                args.push_back(inputArg);
-            }
-            else
-            {
-                auto index = port->GetInputElements().GetRanges()[0].GetStartIndex();
-                auto inputArgPtr = currentFunction.PointerOffset(inputArg, index);
-                args.push_back(inputArgPtr);
-            }
+            assert(inputArg->getType()->isPointerTy());
+            auto index = port->GetInputElements().GetRanges()[0].GetStartIndex();
+            auto inputArgPtr = currentFunction.PointerOffset(inputArg, index);
+            args.push_back(inputArgPtr);
         };
 
         // add node state
@@ -267,7 +261,11 @@ namespace model
     {
         auto functionName = GetCompiledFunctionName();
         auto function = compiler.GetModule().GetFunction(functionName);
-        assert(function != nullptr);
+        if (function == nullptr)
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: node function not found.");
+        }
+
         auto args = GetNodeFunctionArguments(compiler, currentFunction);
         currentFunction.Call(function, args);
         Log() << "Emitting call to node function " << functionName << EOL;

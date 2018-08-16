@@ -358,7 +358,7 @@ namespace nodes
         // Allocate global variable to hold the previous trigger value so we can detect the change in state.
         auto lastSignal = module.Global<int>(compiler.GetGlobalName(*this, "lastSignal"), 0);
         auto lastSignalValue = function.LocalScalar(function.Load(lastSignal));
-        auto resetTriggerValue = function.LocalScalar(resetTrigger);
+        auto resetTriggerValue = function.LocalScalar(function.Load(resetTrigger));
         function.If((resetTriggerValue == 0) && (lastSignalValue == 1), [resetFunctionName](emitters::IRFunctionEmitter& fn) {
             fn.Call(resetFunctionName);
         });

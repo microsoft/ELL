@@ -93,6 +93,6 @@ struct hash<ell::utilities::UniqueId>
     /// <summary> Computes a hash of the input value. </summary>
     ///
     /// <returns> A hash value for the given input. </returns>
-    result_type operator()(argument_type const& id) const;
+    result_type operator()(const argument_type& id) const;
 };
 }

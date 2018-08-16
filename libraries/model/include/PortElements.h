@@ -67,6 +67,11 @@ namespace model
         /// <returns> true if this element is equivalent to other. </returns>
         bool operator==(const PortElementBase& other) const;
 
+        /// <summary> Inequality operator. </summary>
+        ///
+        /// <returns> true if this element is not equivalent to other. </returns>
+        bool operator!=(const PortElementBase& other) const;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -184,6 +189,11 @@ namespace model
         ///
         /// <returns> true if this range is equivalent to other. </returns>
         bool operator==(const PortRange& other) const;
+
+        /// <summary> inequality operator. </summary>
+        ///
+        /// <returns> true if this range is not equivalent to other. </returns>
+        bool operator!=(const PortRange& other) const;
 
         /// <summary> Checks if another range immediately follows this one </summary>
         ///
@@ -329,6 +339,11 @@ namespace model
         /// <param name="other"> The PortElements to append to this one. </param>
         void Append(const PortElementsBase& other);
 
+        /// <summary> Sets this PortElementsBase to a new set of outputs. </summary>
+        ///
+        /// <param name="other"> The PortElements to take the value of. </param>
+        void Reset(const PortElementsBase& other);
+
         /// <summary> Consolidates adjacent ranges </summary>
         void Consolidate();
 
@@ -341,6 +356,16 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Equality operator. </summary>
+        ///
+        /// <returns> true if this PortElementsBase is equivalent to other. </returns>
+        bool operator==(const PortElementsBase& other) const;
+
+        /// <summary> Inequality operator. </summary>
+        ///
+        /// <returns> true if this PortElementsBase is not equivalent to other. </returns>
+        bool operator!=(const PortElementsBase& other) const;
 
     protected:
         void ComputeSize();
@@ -609,7 +634,7 @@ struct hash<ell::model::PortElementBase>
     /// <summary> Computes a hash of the input value. </summary>
     ///
     /// <returns> A hash value for the given input. </returns>
-    result_type operator()(argument_type const& id) const;
+    result_type operator()(const argument_type& id) const;
 };
 
 template <>
@@ -621,7 +646,19 @@ struct hash<ell::model::PortRange>
     /// <summary> Computes a hash of the input value. </summary>
     ///
     /// <returns> A hash value for the given input. </returns>
-    result_type operator()(argument_type const& id) const;
+    result_type operator()(const argument_type& id) const;
+};
+
+template <>
+struct hash<ell::model::PortElementsBase>
+{
+    using argument_type = ell::model::PortElementsBase;
+    using result_type = std::size_t ;
+
+    /// <summary> Computes a hash of the input value. </summary>
+    ///
+    /// <returns> A hash value for the given input. </returns>
+    result_type operator()(const argument_type& id) const;
 };
 }
 

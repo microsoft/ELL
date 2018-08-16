@@ -740,6 +740,18 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::Store(llvm::Value* pPointer, llvm::Value* pValue)
     {
+        // check if we're a pointer to an array:
+        auto pointerType = pPointer->getType();
+        assert(pointerType->isPointerTy());
+        auto pointedType = pointerType->getPointerElementType();
+        if (pointedType->isArrayTy())
+        {
+            auto valueType = pointedType->getArrayElementType();
+            auto dereferencedPointer = _pEmitter->DereferenceGlobalPointer(pPointer);
+            auto castPointer = CastPointer(dereferencedPointer, valueType->getPointerTo());
+            return SetValueAt(castPointer, 0, pValue);
+        }
+
         return _pEmitter->Store(pPointer, pValue);
     }
 

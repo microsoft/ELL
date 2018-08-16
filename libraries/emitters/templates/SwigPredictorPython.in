@@ -49,7 +49,9 @@ u8R"(class Model:
 
     def @@PREDICT_FUNCTION_PY@@(self, current_time=0):
         """Runs @@PREDICT_FUNCTION_PY@@ with the current time in milliseconds"""
-        @@PREDICT_FUNCTION@@(self.predictor, current_time, self.result)
+        current_time_vector = DoubleVector(1)
+        current_time_vector[0] = current_time
+        @@PREDICT_FUNCTION@@(self.predictor, current_time_vector, self.result)
 
 
 def predict(inputData: 'numpy.ndarray') -> "numpy.ndarray":

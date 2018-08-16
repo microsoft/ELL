@@ -147,9 +147,9 @@ namespace nodes
     template <typename ValueType>
     void BinaryPredicateNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto PortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
-        auto PortElements2 = transformer.TransformPortElements(_input2.GetPortElements());
-        auto newNode = transformer.AddNode<BinaryPredicateNode<ValueType>>(PortElements1, PortElements2, _predicate);
+        auto portElements1 = transformer.TransformPortElements(_input1.GetPortElements());
+        auto portElements2 = transformer.TransformPortElements(_input2.GetPortElements());
+        auto newNode = transformer.AddNode<BinaryPredicateNode<ValueType>>(portElements1, portElements2, _predicate);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -193,6 +193,15 @@ namespace nodes
         {
             llvm::Value* inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
             llvm::Value* inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
+
+            if (inputValue1->getType()->isIntegerTy())
+            {
+                function.Printf("input 1: %d, input 2: %d\n", { inputValue1, inputValue2 });
+            }
+            else if (inputValue1->getType()->isFloatingPointTy())
+            {
+                function.Printf("input1 : %f, input 2: %f\n", { function.CastValue<float, double>(inputValue1), function.CastValue<float, double>(inputValue2) });
+            }
             llvm::Value* pOpResult = function.Comparison(emitters::GetComparison<ValueType>(GetPredicate()), inputValue1, inputValue2);
             
             function.SetValueAt(pResult, function.Literal((int)i), function.CastBoolToByte(pOpResult));

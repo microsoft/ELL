@@ -53,17 +53,6 @@ namespace nodes
             return;
         }
 
-        // special scalar case
-        if(IsScalar(input))
-        {
-            llvm::Value* inputValue = compiler.LoadPortElementVariable(input.GetInputElement(0));
-            llvm::Value* outputValue = compiler.EnsurePortEmitted(output);
-
-            llvm::Value* castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
-            function.Store(outputValue, castElement);
-            return;
-        }
-
         if (IsPureVector(input) && !compiler.GetCompilerOptions().unrollLoops)
         {
             CompileLoop(compiler, function);

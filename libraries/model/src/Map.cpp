@@ -416,6 +416,7 @@ namespace model
     {
         ModelOptimizerContext context;
         auto optimizedModel = optimizer.OptimizeModel(_model, context);
+
         FixTransformedIO(context);
         _model = std::move(optimizedModel);
         Prune();

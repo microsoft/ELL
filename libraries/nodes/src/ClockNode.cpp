@@ -81,7 +81,7 @@ namespace nodes
 
     void ClockNode::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto now = compiler.EnsurePortEmitted(input);
+        auto now = function.Load(compiler.EnsurePortEmitted(input));
         auto& module = function.GetModule();
 
         // Constants

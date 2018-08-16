@@ -104,15 +104,7 @@ namespace nodes
         // Loop over input entries
         function.For(inputSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* inputIndex)
         {
-            llvm::Value* inputVal = nullptr;
-            if (inputSize == 1) // scalar input
-            {
-                inputVal = pInput;
-            }
-            else
-            {
-                inputVal = function.ValueAt(pInput, inputIndex);
-            }
+            auto* inputVal = function.ValueAt(pInput, inputIndex);
 
             // zero out accumulator
             function.StoreZero(yVar);

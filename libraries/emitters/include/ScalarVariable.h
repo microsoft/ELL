@@ -60,10 +60,10 @@ namespace emitters
     class VectorElementVariable : public ScalarVariable<T>
     {
     public:
-        ///<summary>Construct a vector element</summary>
+        ///<summary> Construct a vector element </summary>
         VectorElementVariable(Variable& src, int offset);
 
-        ///<summary>The source vector this is an offset into</summary>
+        ///<summary> The source vector this is an offset into </summary>
         Variable& Src() const { return _src; }
 
         ///<summary>Offset into vector</summary>

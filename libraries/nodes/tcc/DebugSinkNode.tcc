@@ -53,28 +53,14 @@ namespace ell
 
             // EvaluateInput defaults to 'pass through' in base implementation, which means
             // we always call the sink function
-            if (IsScalar(input))
-            {
-                const emitters::NamedVariableTypeList parameters = { { "label", emitters::GetVariableType<char*>() },
-                                                                     { "output", emitters::GetVariableType<ValueType>() },
-                                                                     { "userData", emitters::GetVariableType<char*>() } };
+            const emitters::NamedVariableTypeList parameters = { { "label", emitters::GetVariableType<char*>() },
+                                                                    { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) },
+                                                                    { "userData", emitters::GetVariableType<char*>() } };
 
-                // Callback signature: void DebugSinkNode(char* label, ValueType t, char* userData)
-                function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
-                llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
-                function.Call(pSinkFunction, { function.Literal(_label), pInput, userData });
-            }
-            else
-            {
-                const emitters::NamedVariableTypeList parameters = { { "label", emitters::GetVariableType<char*>() },
-                                                                     { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) },
-                                                                     { "userData", emitters::GetVariableType<char*>() } };
-
-                // Callback signature: void DebugSinkNode(char* label, ValueType* array, char* userData)
-                function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
-                llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
-                function.Call(pSinkFunction, { function.Literal(_label), function.PointerOffset(pInput, function.Literal(0)), userData });
-            }
+            // Callback signature: void DebugSinkNode(char* label, ValueType* array, char* userData)
+            function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
+            llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
+            function.Call(pSinkFunction, { function.Literal(_label), function.PointerOffset(pInput, function.Literal(0)), userData });
 
             // Tag the sink function as a callback that is emitted in headers
             function.IncludeInHeader();

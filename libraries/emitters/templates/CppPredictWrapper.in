@@ -46,7 +46,8 @@ public:
     {
         _input = input.data();
         _output = output.data();
-        @@FUNCTION@@(this, 0.0, nullptr);
+        double time = 0.0;
+        @@FUNCTION@@(this, &time, nullptr);
     }
 
 private:

@@ -62,32 +62,20 @@ namespace nodes
         llvm::Value* pTrigger = compiler.EnsurePortEmitted(trigger);
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
         auto& module = function.GetModule();
+        auto triggerValue = function.ValueAt(pTrigger, 0);
 
-        function.If(emitters::TypedComparison::equals, pTrigger, function.Literal(true), [prefixedName, pInput, &module, &compiler, this](emitters::IRFunctionEmitter& function) {
+        function.If(emitters::TypedComparison::equals, triggerValue, function.Literal(true), [prefixedName, pInput, &module, &compiler](emitters::IRFunctionEmitter& function) {
             // look up our global context object
             auto context = module.GlobalPointer(compiler.GetNamespacePrefix() + "_context", emitters::VariableType::Byte);
             auto globalContext = function.Load(context);
 
-            if (IsScalar(input))
-            {
-                // Callback signature: void SinkFunction(void* context, ValueType t)
-                const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer }, 
-                                                                     { "output", emitters::GetVariableType<ValueType>() } };
-                module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
-                
-                llvm::Function* pSinkFunction = module.GetFunction(prefixedName);
-                function.Call(pSinkFunction, { globalContext, compiler.LoadPortElementVariable(input.GetInputElement(0)) });
-            }
-            else
-            {
-                // Callback signature: void SinkFunction(void* context, ValueType* array)
-                const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer }, 
-                                                                     { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
-                module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
+            // Callback signature: void SinkFunction(void* context, ValueType* array)
+            const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer }, 
+                                                                    { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
+            module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
 
-                llvm::Function* pSinkFunction = module.GetFunction(prefixedName);
-                function.Call(pSinkFunction, { globalContext, function.PointerOffset(pInput, function.Literal(0)) });
-            }
+            llvm::Function* pSinkFunction = module.GetFunction(prefixedName);
+            function.Call(pSinkFunction, { globalContext, function.PointerOffset(pInput, function.Literal(0)) });
         });
 
         // Tag the sink function as a callback that is emitted in headers

@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "IRLocalScalar.h"
+
 #include <limits>
 
 namespace ell
@@ -149,12 +151,12 @@ namespace nodes
     {
         static_assert(!std::is_same<ValueType, bool>(), "Cannot instantiate boolean DTW nodes");
 
-        auto inputType = GetPortVariableType(input);
-        assert(inputType == GetPortVariableType(output));
-        VerifyIsScalar(output);
+        auto inputType = GetPortVariableType(_input);
+        assert(inputType == GetPortVariableType(_output));
+        VerifyIsScalar(_output);
 
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        auto input = function.LocalArray(compiler.EnsurePortEmitted(_input));
+        auto result = compiler.EnsurePortEmitted(_output);
 
         // The prototype (constant)
         emitters::Variable* pVarPrototype = function.GetModule().Variables().AddVariable<emitters::LiteralVectorVariable<ValueType>>(GetPrototypeData());
@@ -163,52 +165,50 @@ namespace nodes
         emitters::Variable* pVarD = function.GetModule().Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, _prototypeLength + 1);
 
         // get global state vars
-        llvm::Value* pPrototypeVector = function.GetModule().EnsureEmitted(*pVarPrototype);
-        llvm::Value* pD = function.GetModule().EnsureEmitted(*pVarD);
+        auto prototypeVector = function.LocalArray(function.GetModule().EnsureEmitted(*pVarPrototype));
+        auto pD = function.LocalArray(function.GetModule().EnsureEmitted(*pVarD));
 
         // incorrect usage of function.Variable --- should use IRModuleEmitter::EmitX(variable)
-        llvm::Value* dist = function.Variable(inputType, "dist");
-        llvm::Value* protoIndex = function.Variable(ell::emitters::VariableType::Int32, "i");
-        llvm::Value* dLast = function.Variable(inputType, "dLast");
-        llvm::Value* bestDist = function.Variable(inputType, "bestDist");
+        auto dist = function.Variable(inputType, "dist");
+        auto protoIndex = function.Variable(emitters::VariableType::Int32, "i");
+        auto dLast = function.Variable(inputType, "dLast");
+        auto bestDist = function.Variable(inputType, "bestDist");
 
         // initialize variables
         function.StoreZero(protoIndex);
         function.StoreZero(dLast);
 
-        function.For(_prototypeLength, [pD, dLast, bestDist, dist, protoIndex, pInput, pPrototypeVector, this](emitters::IRFunctionEmitter& function, llvm::Value* iMinusOne) {
-            auto i = function.Operator(emitters::TypedOperator::add, iMinusOne, function.Literal(1));
+        function.For(_prototypeLength, [pD, dLast, bestDist, dist, protoIndex, input, prototypeVector, this](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar iMinusOne) {
+            auto i = iMinusOne + 1;
+            auto d_iMinus1 = pD[iMinusOne];
+            auto dPrev_iMinus1 = function.LocalScalar(function.Load(dLast));
+            auto dPrev_i = pD[i];
 
-            auto d_iMinus1 = function.ValueAt(pD, iMinusOne);
-            auto dPrev_iMinus1 = function.Load(dLast);
-            auto dPrev_i = function.ValueAt(pD, i);
+            function.Store(bestDist, static_cast<emitters::IRLocalScalar>(d_iMinus1));
 
-            function.Store(bestDist, d_iMinus1);
-
-            function.If(emitters::TypedComparison::lessThanFloat, dPrev_i, d_iMinus1, [bestDist, dPrev_i](auto& function) {
-                function.Store(bestDist, dPrev_i);
+            function.If(dPrev_i < d_iMinus1, [bestDist, dPrev_i](auto& function) {
+                function.Store(bestDist, static_cast<emitters::IRLocalScalar>(dPrev_i));
             });
 
-            function.If(emitters::TypedComparison::lessThanFloat, dPrev_iMinus1, function.Load(bestDist), [bestDist, dPrev_iMinus1](auto& function) {
+            function.If(dPrev_iMinus1 < function.Load(bestDist), [bestDist, dPrev_iMinus1](auto& function) {
                 function.Store(bestDist, dPrev_iMinus1);
             });
 
             // Get dist
             function.StoreZero(dist);
-            function.For(_sampleDimension, [dist, protoIndex, pInput, pPrototypeVector](emitters::IRFunctionEmitter& function, llvm::Value* j) {
-                llvm::Value* inputValue = function.ValueAt(pInput, j);
-                llvm::Value* protoValue = function.ValueAt(pPrototypeVector, function.Load(protoIndex));
-                llvm::Value* diff = function.Operator(emitters::GetSubtractForValueType<ValueType>(), inputValue, protoValue);
-                llvm::Value* absDiff = function.Call(function.GetModule().GetRuntime().GetAbsFunction<ValueType>(), { diff });
+            function.For(_sampleDimension, [dist, protoIndex, input, prototypeVector](emitters::IRFunctionEmitter& function, auto j) {
+                auto inputValue = input[j];
+                auto protoValue = prototypeVector[function.LocalScalar(function.Load(protoIndex))];
+                auto absDiff = emitters::Abs(inputValue - protoValue);
                 function.OperationAndUpdate(dist, emitters::GetAddForValueType<ValueType>(), absDiff);
                 function.OperationAndUpdate(protoIndex, emitters::TypedOperator::add, function.Literal(1));
             });
 
             function.OperationAndUpdate(bestDist, emitters::GetAddForValueType<ValueType>(), function.Load(dist)); // x += dist;
-            function.SetValueAt(pD, i, function.Load(bestDist)); // d[i] = x;
+            pD[i] = function.Load(bestDist); // d[i] = x;
         });
 
-        function.Store(pResult, function.Operator(emitters::GetDivideForValueType<ValueType>(), function.Load(bestDist), function.Literal(static_cast<ValueType>(_prototypeVariance))));
+        function.Store(result, function.Load(bestDist) / function.LocalScalar<ValueType>(_prototypeVariance));
     }
 
     template <typename ValueType>

@@ -45,29 +45,21 @@ namespace nodes
             llvm::Value* pOutput = compiler.EnsurePortEmitted(_output);
             // check if the pOutput variable is null.
             function.If(ell::emitters::TypedComparison::notEquals, pOutput, function.NullPointer(pOutput->getType()->getPointerElementType()->getPointerTo()), [pOutput, &compiler, this](emitters::IRFunctionEmitter& function) {
-                if (_input.Size() == 1)
+                auto inputElements = _input.GetInputElements();
+                int rangeStart = 0;
+                for (auto range : inputElements.GetRanges())
                 {
-                    llvm::Value* pVal = compiler.LoadPortElementVariable(_input.GetInputElement(0));
-                    function.Store(pOutput, pVal);
-                }
-                else
-                {
-                    auto inputElements = _input.GetInputElements();
-                    int rangeStart = 0;
-                    for (auto range : inputElements.GetRanges())
-                    {
-                        llvm::Value* pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
-                        auto rangeSize = range.Size();
+                    llvm::Value* pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
+                    auto rangeSize = range.Size();
 
-                        function.For(rangeSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex) {
-                            auto i = function.LocalScalar(loopIndex);
-                            auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
-                            auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
-                            llvm::Value* pValue = function.ValueAt(pInput, inputIndex);
-                            function.SetValueAt(pOutput, outputIndex, pValue);
-                        });
-                        rangeStart += rangeSize;
-                    }
+                    function.For(rangeSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex) {
+                        auto i = function.LocalScalar(loopIndex);
+                        auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
+                        auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
+                        llvm::Value* pValue = function.ValueAt(pInput, inputIndex);
+                        function.SetValueAt(pOutput, outputIndex, pValue);
+                    });
+                    rangeStart += rangeSize;
                 }
             });
         }

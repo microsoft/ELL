@@ -169,9 +169,11 @@ void TestModelMetadata()
     }
 
     // Print archive of model:
+#if 0
     std::cout << "Model with metadata:" << std::endl;
     utilities::JsonArchiver printArchiver(std::cout);
     printArchiver << model;
+#endif
 
     std::stringstream buffer;
     utilities::JsonArchiver archiver(buffer);
@@ -203,8 +205,8 @@ void TestInputRouting1()
     // model::PortRangeList ranges = { { minAndArgMin->val, 0}, {maxAndArgMax->val, 0} };
     // model::PortRangeList ranges2 = { { minAndArgMin->val, 0}, {in->output, 1, 2} };
 
-    // auto minAndMax = model.AddNode<model::CombinerNode<double>>(ranges);
-    // auto minAndTail = model.AddNode<model::CombinerNode<double>>(ranges2);
+    // auto minAndMax = model.AddNode<model::ConcatenatePortsNode<double>>(ranges);
+    // auto minAndTail = model.AddNode<model::ConcatenatePortsNode<double>>(ranges2);
 
     // set some example input and read the output
     // std::vector<double> inputValues = { 0.5, 0.25, 0.75 };

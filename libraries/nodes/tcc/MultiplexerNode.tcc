@@ -65,7 +65,8 @@ namespace nodes
         VerifyIsScalar(selector);
         VerifyIsScalar(output);
 
-        llvm::Value* pSelectorVal = compiler.EnsurePortEmitted(selector);
+        llvm::Value* pSelector = compiler.EnsurePortEmitted(selector);
+        llvm::Value* pSelectorVal = function.Load(pSelector);
         llvm::Value* pResult = compiler.EnsurePortEmitted(output);
         auto lVal = elements.GetInputElement(0); // lval is selected if the result of the "if" comparison is NON-zero
         auto rVal = elements.GetInputElement(1);
@@ -100,7 +101,8 @@ namespace nodes
         VerifyIsScalar(output);
         auto numElements = elements.Size();
 
-        llvm::Value* pSelectorVal = compiler.LoadPortVariable(selector); // TODO: change this to EnsurePortEmitted
+        llvm::Value* pSelector = compiler.EnsurePortEmitted(selector);
+        auto pSelectorVal = function.Load(pSelector);
         llvm::Value* result = compiler.EnsurePortEmitted(output);
         for (size_t index = 0; index < numElements; ++index)
         {

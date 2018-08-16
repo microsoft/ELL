@@ -50,8 +50,8 @@ set(include
     include/BroadcastFunctionNode.h
     include/BufferNode.h
     include/ClockNode.h
-    include/CompiledActivationFunctions.h
     include/ConcatenationNode.h
+    include/CompiledActivationFunctions.h
     include/ConstantNode.h
     include/ConvolutionalLayerNode.h
     include/DCTNode.h

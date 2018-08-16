@@ -24,110 +24,50 @@ namespace model
             case model::Port::PortType::boolean:
             {
                 std::get<utilities::ConformingVector<bool>>(_cachedOutput).resize(outputSize);
-                if (GetInput(0)->Size() == 1)
-                {
-                    // scalar input
-                    auto fn = reinterpret_cast<void(*)(void*, const InputType, bool*)>(functionPointer);
-                    computeFunction = [this, fn](void* context, const InputType* input) {
-                        fn(context, *input, (bool*)std::get<utilities::ConformingVector<bool>>(_cachedOutput).data());
-                    };
-                }
-                else
-                {
-                    // vector input
-                    auto fn = reinterpret_cast<void(*)(void*, const InputType*, bool*)>(functionPointer);
-                    computeFunction = [this, fn](void* context, const InputType* input) {
-                        fn(context, input, (bool*)std::get<utilities::ConformingVector<bool>>(_cachedOutput).data());
-                    };
-                }
+                auto fn = reinterpret_cast<void(*)(void*, const InputType*, bool*)>(functionPointer);
+                computeFunction = [this, fn](void* context, const InputType* input) {
+                    fn(context, input, (bool*)std::get<utilities::ConformingVector<bool>>(_cachedOutput).data());
+                };
             }
             break;
 
             case model::Port::PortType::integer:
             {
                 std::get<utilities::ConformingVector<int>>(_cachedOutput).resize(outputSize);
-                if (GetInput(0)->Size() == 1)
-                {
-                    // scalar input
-                    auto fn = reinterpret_cast<void(*)(void*, const InputType, int*)>(functionPointer);
-                    computeFunction = [this, fn](void* context, const InputType* input) {
-                        fn(context, *input, std::get<utilities::ConformingVector<int>>(_cachedOutput).data());
-                    };
-                }
-                else
-                {
-                    // vector input
-                    auto fn = reinterpret_cast<void(*)(void*, const InputType*, int*)>(functionPointer);
-                    computeFunction = [this, fn](void* context, const InputType* input) {
-                        fn(context, input, std::get<utilities::ConformingVector<int>>(_cachedOutput).data());
-                    };
-                }
+                auto fn = reinterpret_cast<void(*)(void*, const InputType*, int*)>(functionPointer);
+                computeFunction = [this, fn](void* context, const InputType* input) {
+                    fn(context, input, std::get<utilities::ConformingVector<int>>(_cachedOutput).data());
+                };
             }
             break;
 
             case model::Port::PortType::bigInt:
             {
                 std::get<utilities::ConformingVector<int64_t>>(_cachedOutput).resize(outputSize);
-                if (GetInput(0)->Size() == 1)
-                {
-                    // scalar input
-                    auto fn = reinterpret_cast<void(*)(void*, const InputType, int64_t*)>(functionPointer);
-                    computeFunction = [this, fn](void* context, const InputType* input) {
-                        fn(context, *input, std::get<utilities::ConformingVector<int64_t>>(_cachedOutput).data());
-                    };
-                }
-                else
-                {
-                    // vector input
-                    auto fn = reinterpret_cast<void(*)(void*, const InputType*, int64_t*)>(functionPointer);
-                    computeFunction = [this, fn](void* context, const InputType* input) {
-                        fn(context, input, std::get<utilities::ConformingVector<int64_t>>(_cachedOutput).data());
-                    };
-                }
+                auto fn = reinterpret_cast<void(*)(void*, const InputType*, int64_t*)>(functionPointer);
+                computeFunction = [this, fn](void* context, const InputType* input) {
+                    fn(context, input, std::get<utilities::ConformingVector<int64_t>>(_cachedOutput).data());
+                };
             }
             break;
 
             case model::Port::PortType::smallReal:
             {
                 std::get<utilities::ConformingVector<float>>(_cachedOutput).resize(outputSize);
-                if (GetInput(0)->Size() == 1)
-                {
-                    // scalar input
-                    auto fn = reinterpret_cast<void(*)(void*, const InputType, float*)>(functionPointer);
-                    computeFunction = [this, fn](void* context, const InputType* input) {
-                        fn(context, *input, std::get<utilities::ConformingVector<float>>(_cachedOutput).data());
-                    };
-                }
-                else
-                {
-                    // vector input
-                    auto fn = reinterpret_cast<void(*)(void*, const InputType*, float*)>(functionPointer);
-                    computeFunction = [this, fn](void* context, const InputType* input) {
-                        fn(context, input, std::get<utilities::ConformingVector<float>>(_cachedOutput).data());
-                    };
-                }
+                auto fn = reinterpret_cast<void(*)(void*, const InputType*, float*)>(functionPointer);
+                computeFunction = [this, fn](void* context, const InputType* input) {
+                    fn(context, input, std::get<utilities::ConformingVector<float>>(_cachedOutput).data());
+                };
             }
             break;
 
             case model::Port::PortType::real:
             {
                 std::get<utilities::ConformingVector<double>>(_cachedOutput).resize(outputSize);
-                if (GetInput(0)->Size() == 1)
-                {
-                    // scalar input
-                    auto fn = reinterpret_cast<void(*)(void*, const InputType, double*)>(functionPointer);
-                    computeFunction = [this, fn](void* context, const InputType* input) {
-                        fn(context, *input, std::get<utilities::ConformingVector<double>>(_cachedOutput).data());
-                    };
-                }
-                else
-                {
-                    // vector input
-                    auto fn = reinterpret_cast<void(*)(void*, const InputType*, double*)>(functionPointer);
-                    computeFunction = [this, fn](void* context, const InputType* input) {
-                        fn(context, input, std::get<utilities::ConformingVector<double>>(_cachedOutput).data());
-                    };
-                }
+                auto fn = reinterpret_cast<void(*)(void*, const InputType*, double*)>(functionPointer);
+                computeFunction = [this, fn](void* context, const InputType* input) {
+                    fn(context, input, std::get<utilities::ConformingVector<double>>(_cachedOutput).data());
+                };
             }
             break;
 

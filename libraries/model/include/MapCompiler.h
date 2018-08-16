@@ -103,7 +103,7 @@ namespace model
         /// <summary>
         /// Allocate variables for the map function arguments, based on the input and output nodes.
         /// </summary>
-        emitters::NamedVariableTypeList AllocateNodeFunctionArguments(Map& map, emitters::ModuleEmitter& emitter);
+        emitters::NamedVariableTypeList AllocateMapFunctionArguments(Map& map, emitters::ModuleEmitter& emitter);
 
         //
         // These methods may be implemented by specific compilers
@@ -126,8 +126,8 @@ namespace model
         friend class CompilableNode;
 
         void CompileNodes(Model& model);
-        emitters::Variable* AllocateNodeFunctionArgument(emitters::ModuleEmitter& emitter, const OutputPortBase* pPort, ArgType argType);
-        emitters::Variable* AllocateNodeFunctionArgument(emitters::ModuleEmitter& emitter, const PortElementBase& element, ArgType argType);
+        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const OutputPortBase* pPort, ArgType argType);
+        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const PortElementBase& element, ArgType argType);
 
         MapCompilerOptions _parameters;
         // map from ports to runtime variables, for all ports in the model

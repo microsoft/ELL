@@ -286,10 +286,8 @@ namespace nodes
         auto&& outputOffset = outputLayout.GetOffset();
         const auto broadcastDimension = GetBroadcastDimension();
         const auto numSecondaryInputs = NumSecondaryInputs();
-        const auto primaryInputSize = GetPrimaryInputSize();
-        const auto secondaryInputSize = GetSecondaryInputSize();
 
-        function.For(begin, end, [dimension, numDimensions, inputSize, inputOffset, inputStride, outputOffset, outputStride, broadcastDimension, primaryInputSize, numSecondaryInputs, secondaryInputSize, prevInputDimensionOffset, prevOutputDimensionOffset, primaryInput, secondaryInputs, output, &secondaryValues, &compiler, this](emitters::IRFunctionEmitter& function, auto loopIndex) {
+        function.For(begin, end, [dimension, numDimensions, inputSize, inputOffset, inputStride, outputOffset, outputStride, broadcastDimension, numSecondaryInputs, prevInputDimensionOffset, prevOutputDimensionOffset, primaryInput, secondaryInputs, output, &secondaryValues, &compiler, this](emitters::IRFunctionEmitter& function, auto loopIndex) {
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
             auto thisInputDimensionInternalOffset = loopIndex + inputOffset[dimension];
             auto thisOutputDimensionInternalOffset = loopIndex + outputOffset[dimension];
@@ -317,14 +315,7 @@ namespace nodes
                 for (int index = 0; index < numSecondaryInputs; ++index)
                 {
                     auto&& secondaryInput = secondaryInputs[index];
-                    if (secondaryInputSize == 1) // scalar
-                    {
-                        secondaryValues[index] = this->IsSecondaryInputPresent(index) ? secondaryInput : nullptr;
-                    }
-                    else
-                    {
-                        secondaryValues[index] = this->IsSecondaryInputPresent(index) ? function.ValueAt(secondaryInput, loopIndex) : nullptr;
-                    }
+                    secondaryValues[index] = this->IsSecondaryInputPresent(index) ? function.ValueAt(secondaryInput, loopIndex) : nullptr;
                 }
             }
 
@@ -338,7 +329,7 @@ namespace nodes
             else
             {
                 // We're in the innermost loop --- compute the value
-                auto primaryValue = primaryInputSize == 1 && !primaryInput->getType()->isPointerTy() ? primaryInput : function.ValueAt(primaryInput, thisInputDimensionOffset);
+                auto primaryValue = function.ValueAt(primaryInput, thisInputDimensionOffset);
                 auto outputValue = this->GetFunction().Compile(function, primaryValue, secondaryValues);
                 function.SetValueAt(output, thisOutputDimensionOffset, outputValue);
             }

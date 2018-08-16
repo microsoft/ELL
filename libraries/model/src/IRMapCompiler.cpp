@@ -69,7 +69,9 @@ namespace model
         }
 
         Log() << "Ensuring map is valid..." << EOL;
+
         // if output isn't a simple port, add an output node to model
+        // TODO: remove this in favor of normalizing pass
         auto out = map.GetOutput(0);
         MemoryShape shape{ static_cast<int>(out.Size()) }; // default shape from PortElementsBase::Size()
         auto outNodes = map.GetOutputNodes();
@@ -127,6 +129,7 @@ namespace model
     IRCompiledMap IRMapCompiler::Compile(Map map)
     {
         Log() << "Compile called for map" << EOL;
+
         EnsureValidMap(map);
 
         //
@@ -634,35 +637,16 @@ namespace model
     //
     // Port variables
     //
-    llvm::Value* IRMapCompiler::LoadPortVariable(const InputPortBase& port)
-    {
-        return LoadPortElementVariable(port.GetInputElement(0)); // Note: this fails on scalar input variables
-    }
-
     llvm::Value* IRMapCompiler::LoadPortElementVariable(const PortElementBase& element)
     {
         auto& currentFunction = GetModule().GetCurrentFunction();
-
-        // Error: if we pass in a single element from a range, we need to use startindex as part of the key for looking up the element. In fact, we should have a separate map for vector port and scalar element variables...
-        emitters::Variable* pVar = GetVariableForElement(element);
-        llvm::Value* pVal = GetModule().EnsureEmitted(*pVar);
+        emitters::Variable* pVar = GetPortElementVariable(element);
         if (pVar->IsScalar())
         {
-            if (pVar->IsLiteral())
-            {
-                return pVal;
-            }
-            else if (pVar->IsInputArgument())
-            {
-                return pVal;
-            }
-            else
-            {
-                return currentFunction.Load(pVal);
-            }
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: got a scalar port variable");
         }
-
-        // Else return an element from a vector (unless it was in fact passed in by value)
+        
+        llvm::Value* pVal = GetModule().EnsureEmitted(*pVar);
         auto valType = pVal->getType();
         bool needsDereference = valType->isPointerTy(); // TODO: Maybe this should be `isPtrOrPtrVectorTy()` or even `isPtrOrPtrVectorTy() || isArrayTy()`
         if (needsDereference)
@@ -682,7 +666,7 @@ namespace model
         {
             throw emitters::EmitterException(emitters::EmitterError::notSupported, "Variable for output port not found");
         }
-        if (pVar->IsScalar() && element.GetIndex() > 0)
+        else if (pVar->IsScalar() && element.GetIndex() > 0)
         {
             throw emitters::EmitterException(emitters::EmitterError::vectorVariableExpected);
         }

@@ -53,15 +53,7 @@ namespace nodes
     {
         auto values = this->GetValues();
         emitters::Variable* pVar = nullptr;
-
-        if (output.Size() == 1)
-        {
-            pVar = function.GetModule().Variables().AddVariable<emitters::LiteralVariable<ValueType>>(values[0]);
-        }
-        else
-        {
-            pVar = function.GetModule().Variables().AddVariable<emitters::LiteralVectorVariable<ValueType>>(values);
-        }
+        pVar = function.GetModule().Variables().AddVariable<emitters::LiteralVectorVariable<ValueType>>(values);
         compiler.SetVariableForPort(output, pVar); // Just set the variable corresponding to the output port to be the global variable we created
     }
 

@@ -120,7 +120,7 @@ namespace emitters
         /// <returns> The variable allocator </returns>
         VariableAllocator& Variables() { return _variables; }
 
-        // TODO: What does "runtime" variable mean? Stack/heap? This is only called in 1 place, from MapCompiler::AllocateNodeFunctionArgument
+        // TODO: What does "runtime" variable mean? Stack/heap? This is only called in 1 place, from MapCompiler::AllocatePortFunctionArgument
         /// <summary> Allocate a *runtime* variable.. </summary>
         void AllocateVariable(Variable& var);
 

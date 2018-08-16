@@ -72,7 +72,7 @@ namespace utilities
 }
 }
 
-std::hash<ell::utilities::UniqueId>::result_type std::hash<ell::utilities::UniqueId>::operator()(argument_type const& id) const
+std::hash<ell::utilities::UniqueId>::result_type std::hash<ell::utilities::UniqueId>::operator()(const argument_type& id) const
 {
     return std::hash<std::string>()(id._id);
 }

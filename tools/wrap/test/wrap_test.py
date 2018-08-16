@@ -87,8 +87,8 @@ def create_model():
             ell.nodes.PortType.real)
     constLink = constNode.GetOutputPort("output")
 
-    print(sourceLink.GetMemoryLayout().size.size())
-    print(constLink.GetMemoryLayout().size.size())
+    print("sourceLink size: {}".format(sourceLink.GetMemoryLayout().size.size()))
+    print("constLink size: {}".format(constLink.GetMemoryLayout().size.size()))
 
 
     addNode = mb.AddBinaryOperationNode(model, 

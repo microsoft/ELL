@@ -18,28 +18,13 @@ namespace model
 
         emitters::VariableType varType = PortTypeToVariableType(port.GetType());
         emitters::Variable* pVar = nullptr;
-        const bool isScalar = port.Size() == 1;
-        if (isScalar) // TODO: only do this if scope != output (or, only if scope == input or local?)
+        if (initialValue == 0)
         {
-            if (initialValue == 0)
-            {
-                pVar = pModuleEmitter->Variables().AddScalarVariable(emitters::VariableScope::local, varType);
-            }
-            else
-            {
-                pVar = pModuleEmitter->Variables().AddScalarVariable(emitters::VariableScope::local, initialValue);
-            }
+            pVar = pModuleEmitter->Variables().AddVectorVariable(emitters::VariableScope::global, varType, port.Size());
         }
         else
         {
-            if (initialValue == 0)
-            {
-                pVar = pModuleEmitter->Variables().AddVectorVariable(emitters::VariableScope::global, varType, port.Size());
-            }
-            else
-            {
-                pVar = pModuleEmitter->Variables().AddVectorVariable(emitters::VariableScope::global, port.Size(), initialValue);
-            }
+            pVar = pModuleEmitter->Variables().AddVectorVariable(emitters::VariableScope::global, port.Size(), initialValue);
         }
 
         pModuleEmitter->AllocateVariable(*pVar);

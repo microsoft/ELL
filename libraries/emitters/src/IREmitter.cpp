@@ -9,17 +9,24 @@
 #include "IREmitter.h"
 #include "EmitterException.h"
 
+// utilities
+#include "Logger.h"
+
 // llvm
 #include <llvm/IR/InstrTypes.h>
 #include <llvm/IR/Type.h>
+#include <llvm/Support/raw_os_ostream.h>
 
 // stl
 #include <algorithm>
+#include <sstream>
 
 namespace ell
 {
 namespace emitters
 {
+    using namespace logging;
+
     //
     // Helpful utility functions in anonymous namespace
     //
@@ -53,7 +60,13 @@ namespace emitters
                 }
                 if (paramType != argType)
                 {
-                    throw EmitterException(EmitterError::badFunctionArguments, "mismatched types for function");
+                    llvm::raw_os_ostream out(Log());
+                    out << "Wanted ";
+                    paramType->print(out);
+                    out << ", got ";
+                    argType->print(out);
+                    out.flush();
+                    throw EmitterException(EmitterError::badFunctionArguments, "mismatched types for function.");
                 }
             }
         }

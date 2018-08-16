@@ -351,23 +351,20 @@ namespace model
         return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_sliceSize == other._sliceSize);
     }
 
-    //
-    // PortElementsBase
-    //
+    bool PortRange::operator!=(const PortRange& other) const
+    {
+        return !(*this == other);
+    }
+
     //
     // PortElementBase
     //
     PortElementBase::PortElementBase(const OutputPortBase& port, size_t index)
         : _referencedPort(&port), _index(index) {}
 
-    void PortElementsBase::Append(const PortElementsBase& other)
-    {
-        for (const auto& range : other.GetRanges())
-        {
-            AddRange(range);
-        }
-    }
-
+    //
+    // PortElementsBase
+    //
     PortElementsBase::PortElementsBase(const OutputPortBase& port)
     {
         _ranges.emplace_back(port);
@@ -404,9 +401,28 @@ namespace model
         ComputeSize();
     }
 
+    void PortElementsBase::Append(const PortElementsBase& other)
+    {
+        for (const auto& range : other.GetRanges())
+        {
+            AddRange(range);
+        }
+    }
+
+    void PortElementsBase::Reset(const PortElementsBase& other)
+    {
+        _ranges = other._ranges;
+        ComputeSize();
+    }
+
     bool PortElementBase::operator==(const PortElementBase& other) const
     {
         return (_referencedPort == other._referencedPort) && (_index == other._index);
+    }
+
+    bool PortElementBase::operator!=(const PortElementBase& other) const
+    {
+        return !(*this == other);
     }
 
     Port::PortType PortElementsBase::GetPortType() const
@@ -499,6 +515,31 @@ namespace model
 
             ComputeSize();
         }
+    }
+
+    bool PortElementsBase::operator==(const PortElementsBase& other) const
+    {
+        if ((GetPortType() != other.GetPortType()) || (NumRanges() != other.NumRanges()))
+        {
+            return false;
+        }
+
+        const auto numRanges = static_cast<int>(NumRanges());
+        const auto& ranges = GetRanges();
+        const auto& otherRanges = other.GetRanges();
+        for (int index = 0; index < numRanges; ++index)
+        {
+            if (ranges[index] != otherRanges[index])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool PortElementsBase::operator!=(const PortElementsBase& other) const
+    {
+        return !(*this == other);
     }
 
     void PortElementsBase::WriteToArchive(utilities::Archiver& archiver) const
@@ -677,19 +718,35 @@ namespace model
 }
 
 //
-// hash functions for PortElementUntyped and PortRange
+// hash functions for PortElementBase and PortRange
 //
-std::hash<ell::model::PortElementBase>::result_type std::hash<ell::model::PortElementBase>::operator()(argument_type const& element) const
+std::hash<ell::model::PortElementBase>::result_type std::hash<ell::model::PortElementBase>::operator()(const argument_type& element) const
 {
     auto hash1 = std::hash<const ell::model::OutputPortBase*>()(element.ReferencedPort());
     auto hash2 = std::hash<size_t>()(element.GetIndex());
     return hash1 ^ (hash2 << 1);
 }
 
-std::hash<ell::model::PortRange>::result_type std::hash<ell::model::PortRange>::operator()(argument_type const& range) const
+std::hash<ell::model::PortRange>::result_type std::hash<ell::model::PortRange>::operator()(const argument_type& range) const
 {
     auto hash1 = std::hash<const ell::model::OutputPortBase*>()(range.ReferencedPort());
     auto hash2 = std::hash<size_t>()(range.Size());
     auto hash3 = std::hash<size_t>()(range.GetStartIndex());
     return hash1 ^ ((hash2 ^ (hash3 << 1)) << 1);
+}
+
+std::hash<ell::model::PortElementsBase>::result_type std::hash<ell::model::PortElementsBase>::operator()(const argument_type& elements) const
+{
+    if (elements.NumRanges() == 0)
+    {
+        return 0;
+    }
+
+    auto hash = 0;
+    const auto& ranges = elements.GetRanges();
+    for(const auto& range: ranges)
+    {
+        hash = std::hash<ell::model::PortRange>()(range) ^ (hash << 1);
+    }
+    return hash;
 }

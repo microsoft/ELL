@@ -33,7 +33,7 @@ namespace model
     {
         auto pModuleEmitter = GetModuleEmitter();
 
-        emitters::NamedVariableTypeList mainFunctionArguments = AllocateNodeFunctionArguments(map, *pModuleEmitter);
+        emitters::NamedVariableTypeList mainFunctionArguments = AllocateMapFunctionArguments(map, *pModuleEmitter);
         pModuleEmitter->BeginMapPredictFunction(functionName, mainFunctionArguments);
 
         Log() << "Creating 'predict' function" << EOL;
@@ -75,17 +75,7 @@ namespace model
         assert(port.Size() != 0);
 
         emitters::VariableType varType = PortTypeToVariableType(port.GetType());
-        emitters::Variable* pVar = nullptr;
-        bool isScalar = port.Size() == 1;
-        if (isScalar) // TODO: only do this if scope != output (or, only if scope == input or local?)
-        {
-            pVar = pModuleEmitter->Variables().AddScalarVariable(emitters::VariableScope::local, varType);
-        }
-        else
-        {
-            pVar = pModuleEmitter->Variables().AddVectorVariable(emitters::VariableScope::global, varType, port.Size());
-        }
-
+        auto pVar = pModuleEmitter->Variables().AddVectorVariable(emitters::VariableScope::global, varType, port.Size());
         pModuleEmitter->AllocateVariable(*pVar);
         SetVariableForPort(port, pVar);
         return pVar;
@@ -105,7 +95,7 @@ namespace model
     //
     // Allocating variables for function arguments
     //
-    emitters::NamedVariableTypeList MapCompiler::AllocateNodeFunctionArguments(Map& map, emitters::ModuleEmitter& module)
+    emitters::NamedVariableTypeList MapCompiler::AllocateMapFunctionArguments(Map& map, emitters::ModuleEmitter& module)
     {
         emitters::NamedVariableTypeList functionArguments;
 
@@ -115,18 +105,9 @@ namespace model
         // Allocate variables for inputs
         for (auto inputNode : map.GetInputs())
         {
-            auto argVar = AllocateNodeFunctionArgument(module, &(inputNode->GetOutputPort()), ArgType::input);
-            auto inputSize = inputNode->Size();
-            bool isScalar = inputSize == 1;
-            if (isScalar)
-            {
-                functionArguments.push_back({ argVar->EmittedName(), argVar->Type() });
-            }
-            else
-            {
-                // TODO: can we use an array type here?
-                functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
-            }
+            
+            auto argVar = AllocatePortFunctionArgument(module, &(inputNode->GetOutputPort()), ArgType::input);
+            functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
         }
 
         // Allocate variables for outputs -- scalar outputs treated the same as vector
@@ -135,38 +116,28 @@ namespace model
             assert(outputElements.NumRanges() == 1);
 
             // TODO: can we use an array type here?
-            auto argVar = AllocateNodeFunctionArgument(module, outputElements.GetRanges()[0].ReferencedPort(), ArgType::output);
+            auto argVar = AllocatePortFunctionArgument(module, outputElements.GetRanges()[0].ReferencedPort(), ArgType::output);
             functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
         }
         return functionArguments;
     }
 
-    emitters::Variable* MapCompiler::AllocateNodeFunctionArgument(emitters::ModuleEmitter& module, const OutputPortBase* pPort, ArgType argType)
+    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const OutputPortBase* pPort, ArgType argType)
     {
         assert(pPort->Size() != 0);
-        bool isScalar = pPort->Size() == 1;
         emitters::VariableType varType = PortTypeToVariableType(pPort->GetType());
         emitters::VariableScope scope = argType == ArgType::input ? emitters::VariableScope::input : emitters::VariableScope::output;
 
         // outputs are modelled as Vectors
-        emitters::Variable* pVar = nullptr;
-        if (isScalar && argType == ArgType::input)
-        {
-            pVar = module.Variables().AddScalarVariable(scope, varType);
-        }
-        else
-        {
-            pVar = module.Variables().AddVectorVariable(scope, varType, pPort->Size());
-        }
+        emitters::Variable* pVar = module.Variables().AddVectorVariable(scope, varType, pPort->Size());
         module.AllocateVariable(*pVar);
         SetVariableForPort(*pPort, pVar);
         return pVar;
     }
 
-    emitters::Variable* MapCompiler::AllocateNodeFunctionArgument(emitters::ModuleEmitter& module, const PortElementBase& element, ArgType argType)
+    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const PortElementBase& element, ArgType argType)
     {
-        // TODO: fix this to return a VectorElementVariable
-        return AllocateNodeFunctionArgument(module, element.ReferencedPort(), argType);
+        return AllocatePortFunctionArgument(module, element.ReferencedPort(), argType);
     }
 
     void MapCompiler::PushScope()
@@ -205,7 +176,7 @@ namespace model
 
     void MapCompiler::SetVariableForElement(const PortElementBase& element, emitters::Variable* pVar)
     {
-        _portToVarMaps.back()[element.ReferencedPort()] = pVar;
+        SetVariableForPort(*element.ReferencedPort(), pVar);
     }
 }
 }
