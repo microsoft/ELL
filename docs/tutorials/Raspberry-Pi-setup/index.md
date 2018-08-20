@@ -108,6 +108,23 @@ sudo apt install -y libjasper1
 conda install -y -c microsoft-ell/label/stretch opencv
 ```
 
+Test that you can now load OpenCV with the following python script:
+
+```python
+import cv2
+print(cv2.__version__)
+```
+
+You should see the output version number.   If this produces an error instead and you are using a `Lite` version of `Raspbian` then you may also need to install the following because they are not provided by default with Raspbian Lite:
+
+```shell
+sudo apt-get install -y libharfbuzz-dev 
+sudo apt-get install -y libgtk2.0-dev libgtk-3-dev
+sudo apt-get install -y libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev libdc1394-22-dev
+sudo apt-get install -y libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+sudo apt-get install -y libxvidcore-dev libx264-dev
+```
+
 ### C++ OpenCV SDK
 If you intend to run the C++ tutorials, you also need the C++ OpenCV SDK, which you can install on your Raspberry Pi using the following command.
 
