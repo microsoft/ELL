@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     DgmlGraph.h
+//  File:     Graph.h
 //  Authors:  Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,15 +104,14 @@ namespace utilities
         /// <summary> Set a property and associated values defined on this node </summary>
         void SetProperty(const std::string& name, const std::string& value);
 
-        void SetIsGroup(bool isGroup) { _is_group = isGroup; }
-        bool GetIsGroup() { return _is_group; }
+        void SetIsGroup(bool isGroup) { _isGroup = isGroup; }
+        bool GetIsGroup() { return _isGroup; }
 
     private:
         std::map<std::string, std::string> _properties;
-        bool _isGroup = false;
         std::string _id;
         std::string _label;
-        bool _is_group = false;
+        bool _isGroup = false;
     };
 
     /// <summary> Represents a directed link between two nodes in the Graph</summary>

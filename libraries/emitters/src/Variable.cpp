@@ -49,6 +49,8 @@ namespace emitters
     {
     }
 
+    Variable::~Variable() = default;
+
     void Variable::SetEmittedName(std::string name)
     {
         _emittedName = std::move(name);

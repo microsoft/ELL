@@ -23,6 +23,8 @@ namespace model
     class OptimizationPass
     {
     public:
+        virtual ~OptimizationPass();
+        
         /// <summary> Perform any pre-optimization initialization required by the pass. </summary>
         /// This method is always called before the optimization pass is started.
         ///

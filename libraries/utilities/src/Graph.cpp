@@ -188,11 +188,11 @@ GraphNode::GraphNode(std::string id, std::string label, bool isGroup)
 {
     _id = id;
     _label = label;
-    _is_group = isGroup;
+    _isGroup = isGroup;
 }
 
 GraphNode::GraphNode(const GraphNode& other)
-    : _id(other._id), _label(other._label), _is_group(other._is_group)
+    : _id(other._id), _label(other._label), _isGroup(other._isGroup)
 {
 }
 
@@ -200,7 +200,7 @@ GraphNode& GraphNode::operator=(GraphNode& other)
 {
     this->_id = other.GetId();
     this->_label = other.GetLabel();
-    this->_is_group = other.GetIsGroup();
+    this->_isGroup = other.GetIsGroup();
     return *this;
 }
 

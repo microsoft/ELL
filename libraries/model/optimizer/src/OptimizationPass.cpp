@@ -27,6 +27,8 @@ namespace model
     //
     // OptimizationPass
     //
+    OptimizationPass::~OptimizationPass() = default;
+    
     void OptimizationPass::Initialize(const Model& model, const MapCompilerOptions& settings, ModelOptimizerContext& context) const
     {
         UNUSED(model, settings, context);

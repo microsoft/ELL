@@ -140,6 +140,8 @@ namespace trainers
         /// <param name="dimension2"> The second dimension of data matrix. </param>
         ProtoNNModelParameter(size_t dimension1, size_t dimension2);
 
+        virtual ~ProtoNNModelParameter();
+        
         /// <summary> Get the underlying data matrix. </summary>
         ///
         /// <returns> The underlying data matrix. </returns>

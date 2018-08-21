@@ -78,7 +78,8 @@ namespace emitters
             isVectorRef = 0x00000004 /// <summary> Is this a offset into a vector or array </summary>
         };
 
-    public:
+        virtual ~Variable();
+        
         /// <summary> Variable data type </summary>
         VariableType Type() const { return _type; }
 

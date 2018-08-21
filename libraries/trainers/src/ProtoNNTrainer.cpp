@@ -510,6 +510,8 @@ ProtoNNModelParameter::ProtoNNModelParameter(size_t dim1, size_t dim2)
 {
 }
 
+ProtoNNModelParameter::~ProtoNNModelParameter() = default;
+
 Param_W::Param_W(size_t dim1, size_t dim2)
     : ProtoNNModelParameter(dim1, dim2)
 {
