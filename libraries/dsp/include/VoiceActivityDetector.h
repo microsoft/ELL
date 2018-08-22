@@ -46,11 +46,11 @@ namespace dsp
         /// <param name="windowSize"> The size of the window (should equal the size of the data given to each process call). </param>
         /// <param name="frameDuration"> The frames duration (inverse of frames per second), this is not necessarily the same as windowSize / sampleRate, it also depends on the 'shift'. </param>
         /// <param name="tauUp"> The noise floor is computed by tracking the frame power.  It goes up slow, with this time constant tauUp. </param>
-        /// <param name="tauDown"> If the frame power is lower than the noise floor – it goes down fast, with this time constant tauDown. </param>
+        /// <param name="tauDown"> If the frame power is lower than the noise floor, it goes down fast, with this time constant tauDown. </param>
         /// <param name="largeInput"> The exception is the case when the proportion frame power/noise floor is larger than this largeInput. </param>
         /// <param name="gainAtt"> Then we switch to much slower adaptation by applying this gainAtt. </param>
-        /// <param name="thresholdUp"> Then we compare the energy of the current frame to the noise floor. If it is thresholdUp times higher – we switch to state VOICE. </param>
-        /// <param name="thresholdDown"> Then we compare the energy of the current frame to the noise floor. If it is thresholdDown times lower – we switch to state NO VOICE.  </param>
+        /// <param name="thresholdUp"> Then we compare the energy of the current frame to the noise floor. If it is thresholdUp times higher, we switch to state VOICE. </param>
+        /// <param name="thresholdDown"> Then we compare the energy of the current frame to the noise floor. If it is thresholdDown times lower, we switch to state NO VOICE.  </param>
         /// <param name="levelThreshold"> Special case is when the energy of the frame is lower than levelThreshold, when we force the state to NO VOICE. </param>
         VoiceActivityDetector(
             double sampleRate,
