@@ -64,12 +64,6 @@ if(NOT WIN32)
         /usr/include/openblas
         ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES}/${CMAKE_LIBRARY_ARCHITECTURE} # Ubuntu 18.04
     )
-    if(NOT APPLE)
-        set(BLAS_INCLUDE_SEARCH_PATHS
-            ${BLAS_INCLUDE_SEARCH_PATHS}
-            /usr/include/x86_64-linux-gnu
-        )
-    endif()
 
     set(BLAS_LIB_SEARCH_PATHS
         /opt/OpenBLAS/lib
