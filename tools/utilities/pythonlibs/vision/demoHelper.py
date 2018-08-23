@@ -46,8 +46,6 @@ class CompiledModel(EllModel):
         self.compiled_module = None
         self.compiled_func = None
         self.func_name = 'predict'
-        
-        self.compiled_module_path = path
         self.model_name = os.path.split(path)[1]
 
     def load(self):
@@ -61,7 +59,7 @@ class CompiledModel(EllModel):
 
         if not os.path.isdir(os.path.join(module_directory, 'build')):
             raise Exception("you don't have a 'build' directory in '" + module_directory + "', have you compiled this project yet?")
-                
+
         try:
             import importlib
             if module_directory == ".":
@@ -194,6 +192,27 @@ class StaticImage(ImageStream):
     def load_next_image(self):
         return None
 
+class StaticImageList(ImageStream):
+    def __init__(self, image_list):
+        super(StaticImageList, self).__init__()
+        self.image_list = image_list
+        self.image_pos = 0
+        self.image_filename = None
+        self.load_next_image()
+
+    def load_next_image(self):
+        frame = None
+        while frame is None and self.image_pos < len(self.image_list):
+            filename = self.image_list[self.image_pos]
+            self.image_filename = filename
+            frame = cv2.imread(filename)
+            if frame:
+                self.new_frame = True
+                self.frame = frame
+            else:
+                print("Error loading image: {}".format(filename))
+            self.image_pos += 1
+        return frame
 
 # Helper class that interfaces with ELL models to get predictions and provides handy conversion from opencv to ELL buffers and 
 # rendering utilities
@@ -223,10 +242,12 @@ class DemoHelper:
         self.new_frame = False
         self.window_shown = False
 
-    def set_input(self, camera_id = 0, image_folder = None, image_filename = None):
+    def set_input(self, camera_id = 0, image_folder = None, image_list = None, image_filename = None):
         # process image source options
         if image_filename:
             self.source = StaticImage(image_filename)
+        elif image_list:
+            self.source = StaticImageList(image_list)
         elif image_folder:
             self.source = FolderStream(image_folder)
         else:
@@ -275,8 +296,9 @@ class DemoHelper:
 
     def load_labels(self, fileName):
         labels = []
-        with open(fileName) as f:
-            labels = f.read().splitlines()
+        if fileName and os.path.isfile(fileName):
+            with open(fileName) as f:
+                labels = f.read().splitlines()
         return labels
 
     def predict(self, data):

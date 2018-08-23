@@ -48,6 +48,7 @@ def main():
     group.add_argument("--camera", type=int, help="the camera id of the webcam", default=0)
     group.add_argument("--image", help="path to an image file. If set, evaluates the model using the image, instead of a webcam")
     group.add_argument("--folder", help="path to an image folder. If set, evaluates the model using the images found there")
+    group.add_argument("--list", help="list of paths to images. If set, evaluates the model using the images in the list")
 
     group2 = arg_parser.add_mutually_exclusive_group()
     group2.add_argument("--model", help="path to a model file")
@@ -65,7 +66,7 @@ def main():
     helper.threshold = args.threshold
     if args.iterations:
         helper.iterations = args.iterations
-    helper.set_input(args.camera, args.folder, args.image)
+    helper.set_input(args.camera, args.folder, args.list, args.image)
 
     if args.print_labels:
         helper.print_labels = True

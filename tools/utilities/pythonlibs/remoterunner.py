@@ -198,7 +198,11 @@ class RemoteRunner:
                     src_file = self.linux_join(self.target_dir, src_filename)
                     dest_file = os.path.join(self.copyback_dir, src_filename)
                     self.print("Copying remote file from {} to {}".format(src_file, dest_file))
-                    sftp.get(src_file, dest_file)
+                    try:
+                        sftp.get(src_file, dest_file)
+                    except: 
+                        self.print("Failed to copy remote file from {} to {}".format(src_file, dest_file))
+                        pass
 
     def print(self, output):
         if self.verbose:

@@ -21,8 +21,8 @@ from cntk.logging.graph import *
 from custom_functions import CustomSign, BinaryConvolution
 
 import ell
-import lib.cntk_converters as converters
-import lib.cntk_utilities as utilities
+import cntk_converters as converters
+import cntk_utilities as utilities
 from custom_functions import BinaryConvolution, CustomSign
 
 _logger = logging.getLogger(__name__)

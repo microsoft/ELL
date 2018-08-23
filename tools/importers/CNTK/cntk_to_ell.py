@@ -19,11 +19,12 @@ from cntk import load_model, ModelFormat
 from cntk.ops import softmax
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
 import find_ell
 import ell
-from lib.cntk_converters import *
-import lib.cntk_layers as cntk_layers
-import lib.cntk_utilities as cntk_utilities
+from cntk_converters import *
+import cntk_layers as cntk_layers
+import cntk_utilities as cntk_utilities
 import common.importer
 import common.memory_shapes as memory_shapes
 

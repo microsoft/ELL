@@ -19,14 +19,15 @@ import onnx
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
 
 import find_ell 
 import ell
 import common.importer
 import common.converters
-import lib.onnx_utilities as utils 
-from lib._graph_parser import Graph
-import lib._onnx_converters as convert
+import onnx_utilities as utils 
+from _graph_parser import Graph
+import _onnx_converters as convert
 
 
 _logger = logging.getLogger(__name__)

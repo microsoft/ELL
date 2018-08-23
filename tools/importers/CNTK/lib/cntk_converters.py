@@ -22,7 +22,7 @@ from cntk.logging.graph import *
 
 import ell
 from custom_functions import CustomSign, BinaryConvolution
-from lib.cntk_utilities import *
+from cntk_utilities import *
 from common.importer import *
 
 _logger = logging.getLogger(__name__)

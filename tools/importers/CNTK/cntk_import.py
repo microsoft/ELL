@@ -20,10 +20,11 @@ from cntk import load_model
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
 import find_ell
 import cntk_to_ell
 import ell
-from lib.cntk_utilities import Utilities
+from cntk_utilities import Utilities
 import ziptools
 
 _logger = logging.getLogger(__name__)

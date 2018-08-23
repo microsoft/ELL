@@ -21,7 +21,7 @@ import find_ell
 import ell
 from common.importer import *
 from common.converters import *
-from lib._graph_parser import Graph 
+from _graph_parser import Graph 
 
 _logger = logging.getLogger(__name__)
 
