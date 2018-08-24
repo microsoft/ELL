@@ -638,6 +638,7 @@ class CntkToEllFullModelTestBase(CntkToEllTestBase):
     ]
 
     def setUp(self):
+        base_model_uri = EllModelsUrl
         CntkToEllTestBase.setUp(self)
         if SkipFullModelTests:
             self.skipTest('Full model tests are being skipped')
@@ -646,20 +647,20 @@ class CntkToEllFullModelTestBase(CntkToEllTestBase):
             with open("config.json", "r") as f:
                 config = json.load(f)
                 if "gitrepo" in config:
-                    EllModelsUrl = clone_repo(config["gitrepo"])
+                    base_model_uri = clone_repo(config["gitrepo"])
 
         filename = os.path.basename(self.CATEGORIES_URL)
         if not self.needs_updating(filename):
             self.label_file = filename
         else:
-            self.label_file = download_file(EllModelsUrl + self.CATEGORIES_URL)
+            self.label_file = download_file(base_model_uri + self.CATEGORIES_URL)
 
         with open(self.label_file) as categories_file:
             self.categories = categories_file.read().splitlines()
 
         self.model_names = []
         for m in self.MODEL_URLS:
-            url = EllModelsUrl + m
+            url = base_model_uri + m
             zip_name = os.path.basename(url)
             filename = os.path.splitext(zip_name)[0]
             if self.needs_updating(filename):

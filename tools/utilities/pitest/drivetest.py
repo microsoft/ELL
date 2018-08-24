@@ -68,6 +68,7 @@ class DriveTest:
         self.compile = compile
         self.test = test
         self.verbose = verbose
+        self.prediction_time = None
         self.logger = logger.get()
         self.rePlatform = "ARMv7.*"
         if target == "pi0":
@@ -305,6 +306,7 @@ class DriveTest:
         for line in output:
             if prompt in line:
                 prediction_time = float(line[len(prompt):])
+                self.prediction_time = prediction_time
                 prediction = previous
             if "socket.timeout" in line:
                 raise Exception("### Test failed due to timeout")
@@ -355,7 +357,9 @@ class DriveTest:
                 output = runner.run_command()
                 self.verify_remote_test(output)
                 end_time = time.time()
+                total_time = end_time - start_time
                 self.logger.info("Remote test time: %f seconds" % (end_time - start_time))
+                return total_time
 
         except:
             errorType, value, traceback = sys.exc_info()
