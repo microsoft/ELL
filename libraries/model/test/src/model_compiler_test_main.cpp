@@ -68,7 +68,7 @@ void TestIRCompiler()
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, false, true, true);
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, true, true, true);
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, true, true, true);
-    
+
     // Not using BLAS
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, false, false, false);
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, false, false, false);
@@ -78,7 +78,7 @@ void TestIRCompiler()
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, false, true, false);
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, true, true, false);
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, true, true, false);
-    
+
     // TestMatrixMatrixMultiplyNode(15, 25600, 27, false); // Fails due to numerical  issues
 
     TestCompilableScalarOutputNode();
@@ -208,7 +208,10 @@ void TestIRCompiler()
 
     TestConvolutionalLayerNode(ConvolutionMethod::diagonal); // Input padding must be set correctly (to floor(filterWidth/2))
 
-    TestConvolutionalLayerNode(ConvolutionMethod::simple); // Input padding must be set correctly (to floor(filterWidth/2))
+    // Input padding must be set correctly (to floor(filterWidth/2))
+    TestConvolutionalLayerNode(ConvolutionMethod::simple, 1, 0);
+    TestConvolutionalLayerNode2(ConvolutionMethod::simple, 1, 0);
+    TestConvolutionalLayerNode3(ConvolutionMethod::simple, 1, 0);
 
     TestConvolutionalLayerNode(ConvolutionMethod::winograd, 1, 0);
     TestConvolutionalLayerNode2(ConvolutionMethod::winograd, 1, 0);

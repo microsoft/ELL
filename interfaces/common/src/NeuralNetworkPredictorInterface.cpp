@@ -48,6 +48,7 @@ namespace predictors
 class NeuralNetworkPredictorImpl
 {
 public:
+    virtual ~NeuralNetworkPredictorImpl() = default;
     virtual std::vector<double> PredictDouble(const std::vector<double>& input) = 0;
     virtual std::vector<float> PredictFloat(const std::vector<float>& input) = 0;
     virtual LayerShape GetInputShape() const = 0;
@@ -320,7 +321,7 @@ std::vector<DataType> TypedNeuralNetworkPredictorImpl<ElementType>::Predict(cons
     if (typeid(ElementType) == typeid(DataType))
     {
         result = input;
-    } 
+    }
     else
     {
         result = CastVector<DataType>(_predictor.Predict(CastVector<ElementType>(input)));
