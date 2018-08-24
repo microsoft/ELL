@@ -72,16 +72,16 @@ namespace nodes
     template <typename ValueType>
     void SourceNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
         compiler.EnsurePortEmitted(output);
         auto& module = function.GetModule();
 
         // Globals
         emitters::Variable* pBufferedSampleTimeVar = module.Variables().AddVariable<emitters::InitializedScalarVariable<TimeTickType>>(emitters::VariableScope::global, _bufferedSampleTime);
         emitters::Variable* pBufferedSampleVar = module.Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, output.Size());
-        llvm::Value* pBufferedSampleTime = module.EnsureEmitted(*pBufferedSampleTimeVar);
-        llvm::Value* pBufferedSample = module.EnsureEmitted(*pBufferedSampleVar);
-        llvm::Value* bufferedSampleTime = function.Load(pBufferedSampleTime);
+        emitters::LLVMValue pBufferedSampleTime = module.EnsureEmitted(*pBufferedSampleTimeVar);
+        emitters::LLVMValue pBufferedSample = module.EnsureEmitted(*pBufferedSampleVar);
+        emitters::LLVMValue bufferedSampleTime = function.Load(pBufferedSampleTime);
         UNUSED(bufferedSampleTime);
 
         // Callback function
@@ -91,12 +91,12 @@ namespace nodes
         module.DeclareFunction(prefixedName, emitters::GetVariableType<bool>(), parameters);
         module.IncludeInCallbackInterface(prefixedName, "SourceNode");
 
-        llvm::Function* pSamplingFunction = module.GetFunction(prefixedName);
+        emitters::LLVMFunction pSamplingFunction = module.GetFunction(prefixedName);
 
         // look up our global context object
         auto context = module.GlobalPointer(compiler.GetNamespacePrefix() + "_context", emitters::VariableType::Byte);
         auto globalContext = function.Load(context);
-        
+
         // Locals
         auto sampleTime = function.ValueAt(pInput, function.Literal(0));
 
@@ -132,7 +132,7 @@ namespace nodes
     utilities::ArchiveVersion SourceNode<ValueType>::GetArchiveVersion() const
     {
         constexpr utilities::ArchiveVersion sourceNodeShapeArchiveVersion = { utilities::ArchiveVersionNumbers::v4_source_sink_shapes };
-        
+
         return sourceNodeShapeArchiveVersion;
     }
 
@@ -178,21 +178,21 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void SourceNode<ValueType>::SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample)
+    void SourceNode<ValueType>::SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, emitters::LLVMValue sample)
     {
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         auto numValues = output.Size();
-        function.For(numValues, [sample, pOutput](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+        function.For(numValues, [sample, pOutput](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             auto value = function.ValueAt(sample, i);
             function.SetValueAt(pOutput, i, value);
         });
     }
 
     template <typename ValueType>
-    void SourceNode<ValueType>::SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample)
+    void SourceNode<ValueType>::SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, emitters::LLVMValue sample)
     {
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         auto numValues = output.Size();
         for (size_t i = 0; i < numValues; ++i)

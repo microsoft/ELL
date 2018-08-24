@@ -9,16 +9,27 @@
 
 #include "EmitterTypes.h"
 
-// llvm
-#include <llvm/IR/Type.h>
-#include <llvm/IR/Value.h>
+namespace llvm
+{
+    class Function;
+    class FunctionType;
+    class StructType;
+    class Type;
+    class Value;
+}
 
 namespace ell
 {
 namespace emitters
 {
+    /// <summary> Nice name for llvm::Function pointers. </summary>
+    using LLVMFunction = llvm::Function*;
+
     /// <summary> Nice name for llvm::Type pointers. </summary>
     using LLVMType = llvm::Type*;
+
+    /// <summary> Nice name for llvm::Value pointers. </summary>
+    using LLVMValue = llvm::Value*;
 
     /// <summary> An LLVM type with a name (e.g., for arguments and struct fields). </summary>
     using NamedLLVMType = std::pair<std::string, LLVMType>;
@@ -38,7 +49,7 @@ namespace emitters
     /// <param name="values"> The values to get the types of. </param>
     ///
     /// <returns> The types for the given values. </returns>
-    LLVMTypeList GetLLVMTypes(const std::vector<llvm::Value*> values);
+    LLVMTypeList GetLLVMTypes(const std::vector<LLVMValue>& values);
 
     /// <summary> Get the typed version of a BinaryOperationType for a given LLVM type. </summary>
     ///

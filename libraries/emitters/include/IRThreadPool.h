@@ -9,12 +9,10 @@
 #pragma once
 
 #include "IREmitter.h"
+#include "LLVMUtilities.h"
 
 // llvm
-#include <llvm/IR/Function.h>
 #include <llvm/IR/GlobalVariable.h>
-#include <llvm/IR/Type.h>
-#include <llvm/IR/Value.h>
 
 // stl
 #include <string>
@@ -58,21 +56,21 @@ namespace emitters
         /// <summary> Get the return value of a finished task </summary>
         ///
         /// <param name="function"> The function currently being emitted into. </param>
-        llvm::Value* GetReturnValue(IRFunctionEmitter& function);
+        LLVMValue GetReturnValue(IRFunctionEmitter& function);
 
         /// <summary> Check if a task is a "null task" </summary>
         ///
         /// <param name="function"> The function currently being emitted into. </param>
-        llvm::Value* IsNull(IRFunctionEmitter& function);
+        LLVMValue IsNull(IRFunctionEmitter& function);
 
     private:
         friend class IRThreadPoolTaskArray;
         friend class IRThreadPoolTaskQueue;
-        IRThreadPoolTask(llvm::Value* wrappedTaskFunctionPtr, llvm::Value* argsStructPtr, llvm::Value* returnValuePtr, IRThreadPoolTaskArray* taskArray);
+        IRThreadPoolTask(LLVMValue wrappedTaskFunctionPtr, LLVMValue argsStructPtr, LLVMValue returnValuePtr, IRThreadPoolTaskArray* taskArray);
 
-        llvm::Value* _taskFunctionPtr = nullptr;
-        llvm::Value* _argsStruct = nullptr;
-        llvm::Value* _returnValuePtr = nullptr;
+        LLVMValue _taskFunctionPtr = nullptr;
+        LLVMValue _argsStruct = nullptr;
+        LLVMValue _returnValuePtr = nullptr;
 
         IRThreadPoolTaskArray* _taskArray = nullptr;
     };
@@ -100,19 +98,19 @@ namespace emitters
         ///
         /// <param name="function"> The function currently being emitted into. </param>
         /// <param name="taskIndex"> The index of the task to get. </param>
-        IRThreadPoolTask GetTask(IRFunctionEmitter& function, llvm::Value* taskIndex);
+        IRThreadPoolTask GetTask(IRFunctionEmitter& function, LLVMValue taskIndex);
 
     private:
         friend class IRThreadPoolTaskQueue;
         IRThreadPoolTaskArray(IRThreadPoolTaskQueue& taskQueue);
         void Initialize(IRFunctionEmitter& function);
-        void SetTasks(IRFunctionEmitter& function, llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& taskArgs);
+        void SetTasks(IRFunctionEmitter& function, LLVMFunction taskFunction, const std::vector<std::vector<LLVMValue>>& taskArgs);
         llvm::StructType* GetTaskArrayDataType(IRModuleEmitter& module);
-        llvm::Value* GetTaskFunctionPointer(IRFunctionEmitter& function);
-        llvm::Value* GetReturnValuesStoragePointer(IRFunctionEmitter& function);
-        llvm::Value* GetTaskArgsStoragePointer(IRFunctionEmitter& function);
-        llvm::Value* GetTaskArgsStructSize(IRFunctionEmitter& function);
-        void SetTaskArgsStructSize(IRFunctionEmitter& function, llvm::Value* size);
+        LLVMValue GetTaskFunctionPointer(IRFunctionEmitter& function);
+        LLVMValue GetReturnValuesStoragePointer(IRFunctionEmitter& function);
+        LLVMValue GetTaskArgsStoragePointer(IRFunctionEmitter& function);
+        LLVMValue GetTaskArgsStructSize(IRFunctionEmitter& function);
+        void SetTaskArgsStructSize(IRFunctionEmitter& function, LLVMValue size);
 
         enum class Fields
         {
@@ -122,7 +120,7 @@ namespace emitters
             argStructSize,
             // nextArray
         };
-        llvm::Value* _taskArrayData = nullptr;
+        LLVMValue _taskArrayData = nullptr;
 
         IRThreadPoolTaskQueue& _taskQueue; // make this a pointer if we're not using threadpool
     };
@@ -142,7 +140,7 @@ namespace emitters
         /// <param name="arguments"> For each task, a vector of arguments for that task. </param>
         ///
         /// <returns> A task array object representing the running tasks. </param>
-        IRThreadPoolTaskArray& StartTasks(IRFunctionEmitter& function, llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments);
+        IRThreadPoolTaskArray& StartTasks(IRFunctionEmitter& function, LLVMFunction taskFunction, const std::vector<std::vector<LLVMValue>>& arguments);
 
         /// <summary> Pop a task off the task queue, waiting for one to become available if necessary. </summary>
         ///
@@ -165,23 +163,23 @@ namespace emitters
         friend class IRThreadPool;
         IRThreadPoolTaskQueue(); // create an empty queue
         void Initialize(IRFunctionEmitter& function); // initializes the task array
-        llvm::Value* GetDataStruct() { return _queueData; }
-        llvm::Value* DecrementCountField(IRFunctionEmitter& function, llvm::Value* fieldPtr);
+        LLVMValue GetDataStruct() { return _queueData; }
+        LLVMValue DecrementCountField(IRFunctionEmitter& function, LLVMValue fieldPtr);
         llvm::StructType* GetTaskQueueDataType(IRModuleEmitter& module) const;
 
         // Accessors for fields
-        llvm::Value* GetQueueMutexPointer(IRFunctionEmitter& function);
-        llvm::Value* GetWorkAvailableConditionVariablePointer(IRFunctionEmitter& function);
-        llvm::Value* GetWorkFinishedConditionVariablePointer(IRFunctionEmitter& function);
-        llvm::Value* GetUnscheduledCount(IRFunctionEmitter& function) const;
-        llvm::Value* GetUnfinishedCount(IRFunctionEmitter& function) const;
+        LLVMValue GetQueueMutexPointer(IRFunctionEmitter& function);
+        LLVMValue GetWorkAvailableConditionVariablePointer(IRFunctionEmitter& function);
+        LLVMValue GetWorkFinishedConditionVariablePointer(IRFunctionEmitter& function);
+        LLVMValue GetUnscheduledCount(IRFunctionEmitter& function) const;
+        LLVMValue GetUnfinishedCount(IRFunctionEmitter& function) const;
         void SetShutdownFlag(IRFunctionEmitter& function);
-        llvm::Value* GetShutdownFlag(IRFunctionEmitter& function) const;
-        void SetInitialCount(IRFunctionEmitter& function, llvm::Value* newValue);
-        llvm::Value* DecrementUnscheduledTasks(IRFunctionEmitter& function);
-        llvm::Value* DecrementUnfinishedTasks(IRFunctionEmitter& function);
-        llvm::Value* IsEmpty(IRFunctionEmitter& function) const;
-        llvm::Value* IsFinished(IRFunctionEmitter& function) const;
+        LLVMValue GetShutdownFlag(IRFunctionEmitter& function) const;
+        void SetInitialCount(IRFunctionEmitter& function, LLVMValue newValue);
+        LLVMValue DecrementUnscheduledTasks(IRFunctionEmitter& function);
+        LLVMValue DecrementUnfinishedTasks(IRFunctionEmitter& function);
+        LLVMValue IsEmpty(IRFunctionEmitter& function) const;
+        LLVMValue IsFinished(IRFunctionEmitter& function) const;
 
         bool IsInitialized() const;
         void NotifyWaitingClients(IRFunctionEmitter& function);
@@ -198,7 +196,7 @@ namespace emitters
             unfinishedCount,
             shutdownFlag
         };
-        llvm::Value* _queueData = nullptr; // a struct with the above fields
+        LLVMValue _queueData = nullptr; // a struct with the above fields
         IRThreadPoolTaskArray _tasks;
     };
 
@@ -222,7 +220,7 @@ namespace emitters
         /// <param name="arguments"> For each task, a vector of arguments for that task. </param>
         ///
         /// <returns> A task array object representing the running tasks. </param>
-        IRThreadPoolTaskArray& AddTasks(IRFunctionEmitter& function, llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments);
+        IRThreadPoolTaskArray& AddTasks(IRFunctionEmitter& function, LLVMFunction taskFunction, const std::vector<std::vector<LLVMValue>>& arguments);
 
         /// <summary> Tell the thread pool to finish and kill the treads. </summary>
         void ShutDown(IRFunctionEmitter& function);
@@ -232,7 +230,7 @@ namespace emitters
         bool IsInitialized() const;
         void AddGlobalInitializer();
         void AddGlobalFinalizer();
-        llvm::Function* GetWorkerThreadFunction();
+        LLVMFunction GetWorkerThreadFunction();
 
         IRModuleEmitter& _module;
         size_t _maxThreads = 0;

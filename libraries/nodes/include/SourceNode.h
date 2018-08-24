@@ -8,6 +8,9 @@
 
 #pragma once
 
+// emitters
+#include "LLVMUtilities.h"
+
 // model
 #include "CompilableNode.h"
 #include "InputNodeBase.h"
@@ -115,8 +118,8 @@ namespace nodes
     private:
         void Copy(model::ModelTransformer& transformer) const override;
 
-        void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample);
-        void SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample);
+        void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, emitters::LLVMValue sample);
+        void SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, emitters::LLVMValue sample);
 
         model::InputPort<TimeTickType> _input;
         model::OutputPort<ValueType> _output;

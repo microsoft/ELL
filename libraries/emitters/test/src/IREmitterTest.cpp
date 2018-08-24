@@ -48,7 +48,7 @@ std::string OutputPath(const char* pRelPath)
     return g_outputBasePath + pRelPath;
 }
 
-std::vector<llvm::Instruction*> RemoveTerminators(llvm::Function* pfn)
+std::vector<llvm::Instruction*> RemoveTerminators(LLVMFunction pfn)
 {
     std::vector<llvm::Instruction*> terms;
     auto& blocks = pfn->getBasicBlockList();
@@ -72,7 +72,7 @@ std::vector<llvm::Instruction*> RemoveTerminators(llvm::Function* pfn)
     return terms;
 }
 
-void InsertTerminators(llvm::Function* pfn, std::vector<llvm::Instruction*>& terms)
+void InsertTerminators(LLVMFunction pfn, std::vector<llvm::Instruction*>& terms)
 {
     size_t i = 0;
     auto& blocks = pfn->getBasicBlockList();
@@ -112,8 +112,8 @@ void TestLLVMShiftRegister()
 
     auto shiftFunction = module.BeginMainFunction();
     llvm::GlobalVariable* pRegister = module.GlobalArray("g_shiftRegister", data);
-    llvm::Value* c1 = module.ConstantArray("c_1", newData1);
-    llvm::Value* c2 = module.ConstantArray("c_2", newData2);
+    LLVMValue c1 = module.ConstantArray("c_1", newData1);
+    LLVMValue c2 = module.ConstantArray("c_2", newData2);
 
     shiftFunction.Print("Begin\n");
     shiftFunction.PrintForEach("%f\n", pRegister, data.size());
@@ -156,7 +156,7 @@ void TestEmitLLVM()
         fnMain.SetValueAt(pOutput, i, sum);
         fnMain.OperationAndUpdate(pTotal, TypedOperator::addFloat, sum);
 
-        llvm::Value* pRegisterSum = fnMain.PointerOffset(pRegisters, i, fnMain.Literal(1));
+        LLVMValue pRegisterSum = fnMain.PointerOffset(pRegisters, i, fnMain.Literal(1));
         fnMain.Store(pRegisterSum, sum);
 
         fnMain.If(TypedComparison::lessThanFloat, item, fnMain.Literal(5.7), [](IRFunctionEmitter& fnMain) {
@@ -182,7 +182,7 @@ void TestEmitLLVM()
         auto ival = forLoop2.LoadIterationVariable();
         auto v = fnMain.ValueAt(pOutput, ival);
 
-        llvm::Value* pRegisterSum = fnMain.Load(fnMain.PointerOffset(pRegisters, ival, fnMain.Literal(1)));
+        LLVMValue pRegisterSum = fnMain.Load(fnMain.PointerOffset(pRegisters, ival, fnMain.Literal(1)));
 
         fnMain.OperationAndUpdate(pOtherTotal, TypedOperator::addFloat, v);
         fnMain.Printf({ fnMain.Literal("%f, %f\n"), v, pRegisterSum });
@@ -367,7 +367,7 @@ void TestForLoop(bool runJit)
 
     fn.Print("Begin ForLoop\n");
     const int numIter = 10;
-    fn.For(numIter, [sum, add](IRFunctionEmitter& fn, llvm::Value* i) {
+    fn.For(numIter, [sum, add](IRFunctionEmitter& fn, LLVMValue i) {
         fn.Printf({ fn.Literal("i: %f\n"), i });
         fn.Store(sum, fn.Operator(add, fn.Load(sum), i));
     });

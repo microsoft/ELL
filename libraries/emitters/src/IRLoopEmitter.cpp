@@ -5,6 +5,7 @@
 //  Authors:  Umesh Madan
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "IRLoopEmitter.h"
 #include "IRFunctionEmitter.h"
 
@@ -53,7 +54,7 @@ namespace emitters
         return PrepareBody();
     }
 
-    llvm::BasicBlock* IRForLoopEmitter::Begin(llvm::Value* iStartAt, llvm::Value* iMaxValue, llvm::Value* stepSize)
+    llvm::BasicBlock* IRForLoopEmitter::Begin(LLVMValue iStartAt, LLVMValue iMaxValue, LLVMValue stepSize)
     {
         CreateBlocks();
         EmitIterationVariable(VariableType::Int32, iStartAt);
@@ -62,7 +63,7 @@ namespace emitters
         return PrepareBody();
     }
 
-    llvm::BasicBlock* IRForLoopEmitter::Begin(llvm::Value* pRepeatCount)
+    llvm::BasicBlock* IRForLoopEmitter::Begin(LLVMValue pRepeatCount)
     {
         assert(pRepeatCount != nullptr);
 
@@ -73,12 +74,12 @@ namespace emitters
         return PrepareBody();
     }
 
-    llvm::Value* IRForLoopEmitter::LoadIterationVariable()
+    LLVMValue IRForLoopEmitter::LoadIterationVariable()
     {
         return _functionEmitter.Load(_pIterationVariable);
     }
 
-    void IRForLoopEmitter::EmitIterationVariable(VariableType type, llvm::Value* pStartValue)
+    void IRForLoopEmitter::EmitIterationVariable(VariableType type, LLVMValue pStartValue)
     {
         _functionEmitter.Branch(_pInitializationBlock);
         _functionEmitter.SetCurrentBlock(_pInitializationBlock);
@@ -88,7 +89,7 @@ namespace emitters
         }
     }
 
-    void IRForLoopEmitter::EmitCondition(TypedComparison type, llvm::Value* pTestValue)
+    void IRForLoopEmitter::EmitCondition(TypedComparison type, LLVMValue pTestValue)
     {
         _functionEmitter.Branch(_pConditionBlock);
         _functionEmitter.SetCurrentBlock(_pConditionBlock);
@@ -97,7 +98,7 @@ namespace emitters
         }
     }
 
-    void IRForLoopEmitter::EmitIncrement(VariableType type, llvm::Value* pIncrementValue)
+    void IRForLoopEmitter::EmitIncrement(VariableType type, LLVMValue pIncrementValue)
     {
         _functionEmitter.SetCurrentBlock(_pIncrementBlock);
         _functionEmitter.OperationAndUpdate(_pIterationVariable,
@@ -143,7 +144,7 @@ namespace emitters
         _pAfterBlock = _functionEmitter.Block(LoopAfterBlockName);
     }
 
-    llvm::BasicBlock* IRWhileLoopEmitter::Begin(llvm::Value* pTestValuePointer)
+    llvm::BasicBlock* IRWhileLoopEmitter::Begin(LLVMValue pTestValuePointer)
     {
         assert(pTestValuePointer != nullptr);
 
@@ -162,7 +163,7 @@ namespace emitters
         }
     }
 
-    void IRWhileLoopEmitter::EmitCondition(llvm::Value* pTestValuePointer)
+    void IRWhileLoopEmitter::EmitCondition(LLVMValue pTestValuePointer)
     {
         _functionEmitter.Branch(_pConditionBlock);
         _functionEmitter.SetCurrentBlock(_pConditionBlock);

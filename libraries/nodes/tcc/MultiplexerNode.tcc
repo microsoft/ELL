@@ -65,9 +65,9 @@ namespace nodes
         VerifyIsScalar(selector);
         VerifyIsScalar(output);
 
-        llvm::Value* pSelector = compiler.EnsurePortEmitted(selector);
-        llvm::Value* pSelectorVal = function.Load(pSelector);
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pSelector = compiler.EnsurePortEmitted(selector);
+        emitters::LLVMValue pSelectorVal = function.Load(pSelector);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
         auto lVal = elements.GetInputElement(0); // lval is selected if the result of the "if" comparison is NON-zero
         auto rVal = elements.GetInputElement(1);
         auto pLMergeableSrc = compiler.GetMergeableNodeRegion(lVal);
@@ -101,13 +101,13 @@ namespace nodes
         VerifyIsScalar(output);
         auto numElements = elements.Size();
 
-        llvm::Value* pSelector = compiler.EnsurePortEmitted(selector);
+        emitters::LLVMValue pSelector = compiler.EnsurePortEmitted(selector);
         auto pSelectorVal = function.Load(pSelector);
-        llvm::Value* result = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue result = compiler.EnsurePortEmitted(output);
         for (size_t index = 0; index < numElements; ++index)
         {
             function.If(emitters::TypedComparison::equals, function.Literal((int)index), pSelectorVal, [index, result, &compiler, this](emitters::IRFunctionEmitter& function) {
-                llvm::Value* val = compiler.LoadPortElementVariable(elements.GetInputElement(index));
+                emitters::LLVMValue val = compiler.LoadPortElementVariable(elements.GetInputElement(index));
                 function.Store(result, val);
             });
         }

@@ -205,9 +205,9 @@ namespace nodes
     template<typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
-        llvm::Value* pInput2 = compiler.EnsurePortEmitted(input2);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput1 = compiler.EnsurePortEmitted(input1);
+        emitters::LLVMValue pInput2 = compiler.EnsurePortEmitted(input2);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         if(_transposeOutput)
         {

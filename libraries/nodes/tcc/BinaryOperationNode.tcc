@@ -149,7 +149,7 @@ namespace nodes
         : CompilableNode({ &_input1, &_input2 }, { &_output }),
         _input1(this, input1, defaultInput1PortName),  _inputLayout1(input1.GetMemoryLayout()),
         _input2(this, input2, defaultInput2PortName),  _inputLayout2(input2.GetMemoryLayout()),
-        _output(this, defaultOutputPortName, input1.GetMemoryLayout()), 
+        _output(this, defaultOutputPortName, input1.GetMemoryLayout()),
         _operation(operation),
         _paddingValue(0)
     {
@@ -165,15 +165,15 @@ namespace nodes
                                                         const model::PortMemoryLayout& layout,
                                                         emitters::BinaryOperationType operation,
                                                         ValueType padding)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), 
+        : CompilableNode({ &_input1, &_input2 }, { &_output }),
           _input1(this, input1, defaultInput1PortName), _inputLayout1(layout),
           _input2(this, input2, defaultInput2PortName), _inputLayout2(layout),
-          _output(this, defaultOutputPortName, layout), 
+          _output(this, defaultOutputPortName, layout),
           _operation(operation),
           _paddingValue(padding)
     {
     }
-    
+
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1,
                                                         const model::PortMemoryLayout& inputLayout1,
@@ -182,10 +182,10 @@ namespace nodes
                                                         const model::PortMemoryLayout& outputLayout,
                                                         emitters::BinaryOperationType operation,
                                                         ValueType padding)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), 
+        : CompilableNode({ &_input1, &_input2 }, { &_output }),
           _input1(this, input1, defaultInput1PortName), _inputLayout1(inputLayout1),
           _input2(this, input2, defaultInput2PortName), _inputLayout2(inputLayout2),
-          _output(this, defaultOutputPortName, outputLayout), 
+          _output(this, defaultOutputPortName, outputLayout),
           _operation(operation),
           _paddingValue(padding)
     {
@@ -274,14 +274,14 @@ namespace nodes
         }
         else
         {
-            llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
-            llvm::Value* pInput2 = compiler.EnsurePortEmitted(input2);
-            llvm::Value* pResult = compiler.EnsurePortEmitted(output, _paddingValue);
+            emitters::LLVMValue pInput1 = compiler.EnsurePortEmitted(input1);
+            emitters::LLVMValue pInput2 = compiler.EnsurePortEmitted(input2);
+            emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output, _paddingValue);
 
             // Call recursive function to emit nested loops
-            llvm::Value* prevInput1DimensionOffset = nullptr;
-            llvm::Value* prevInput2DimensionOffset = nullptr;
-            llvm::Value* prevOutputDimensionOffset = nullptr;
+            emitters::LLVMValue prevInput1DimensionOffset = nullptr;
+            emitters::LLVMValue prevInput2DimensionOffset = nullptr;
+            emitters::LLVMValue prevOutputDimensionOffset = nullptr;
             EmitComputeDimensionLoop(compiler, function, 0, pInput1, pInput2, pResult, prevInput1DimensionOffset, prevInput2DimensionOffset, prevOutputDimensionOffset);
         }
     }
@@ -289,12 +289,12 @@ namespace nodes
     template <typename ValueType>
     void BinaryOperationNode<ValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
-        llvm::Value* pInput2 = compiler.EnsurePortEmitted(input2);
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput1 = compiler.EnsurePortEmitted(input1);
+        emitters::LLVMValue pInput2 = compiler.EnsurePortEmitted(input2);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
         auto count = input1.Size();
-        function.VectorOperator(emitters::GetOperator<ValueType>(GetOperation()), count, pInput1, pInput2, [&pResult, &function](llvm::Value* i, llvm::Value* pValue) {
+        function.VectorOperator(emitters::GetOperator<ValueType>(GetOperation()), count, pInput1, pInput2, [&pResult, &function](emitters::LLVMValue i, emitters::LLVMValue pValue) {
             function.SetValueAt(pResult, i, pValue);
         });
     }
@@ -302,14 +302,14 @@ namespace nodes
     template <typename ValueType>
     void BinaryOperationNode<ValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
         auto count = input1.Size();
         for (size_t i = 0; i < count; ++i)
         {
-            llvm::Value* inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
-            llvm::Value* inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
-            llvm::Value* pOpResult = function.Operator(emitters::GetOperator<ValueType>(GetOperation()), inputValue1, inputValue2);
+            emitters::LLVMValue inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
+            emitters::LLVMValue inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
+            emitters::LLVMValue pOpResult = function.Operator(emitters::GetOperator<ValueType>(GetOperation()), inputValue1, inputValue2);
             function.SetValueAt(pResult, function.Literal<int>(i), pOpResult);
         }
     }
@@ -391,12 +391,12 @@ namespace nodes
     void BinaryOperationNode<ValueType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler,
                                                                   emitters::IRFunctionEmitter& function,
                                                                   size_t dimension,
-                                                                  llvm::Value* input1,
-                                                                  llvm::Value* input2,
-                                                                  llvm::Value* output,
-                                                                  llvm::Value* prevInput1DimensionOffset,
-                                                                  llvm::Value* prevInput2DimensionOffset,
-                                                                  llvm::Value* prevOutputDimensionOffset) const
+                                                                  emitters::LLVMValue input1,
+                                                                  emitters::LLVMValue input2,
+                                                                  emitters::LLVMValue output,
+                                                                  emitters::LLVMValue prevInput1DimensionOffset,
+                                                                  emitters::LLVMValue prevInput2DimensionOffset,
+                                                                  emitters::LLVMValue prevOutputDimensionOffset) const
     {
         auto outputLayout = _output.GetMemoryLayout();
         const auto numDimensions = _inputLayout1.NumDimensions();
@@ -408,18 +408,18 @@ namespace nodes
         auto&& outputStride = outputLayout.GetStride();
         auto&& outputOffset = outputLayout.GetOffset();
 
-        function.For(inputSize[dimension], [input1, input2, output, inputOffset1, inputOffset2, inputStride1, inputStride2, outputStride, outputOffset, prevInput1DimensionOffset, prevInput2DimensionOffset, prevOutputDimensionOffset, dimension, numDimensions, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex) {
+        function.For(inputSize[dimension], [input1, input2, output, inputOffset1, inputOffset2, inputStride1, inputStride2, outputStride, outputOffset, prevInput1DimensionOffset, prevInput2DimensionOffset, prevOutputDimensionOffset, dimension, numDimensions, &compiler, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex) {
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
-            llvm::Value* thisInput1DimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(inputOffset1[dimension]));
-            llvm::Value* thisInput2DimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(inputOffset2[dimension]));
-            llvm::Value* thisOutputDimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(outputOffset[dimension]));
+            emitters::LLVMValue thisInput1DimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(inputOffset1[dimension]));
+            emitters::LLVMValue thisInput2DimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(inputOffset2[dimension]));
+            emitters::LLVMValue thisOutputDimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(outputOffset[dimension]));
 
             // Calculate the total offset from beginning of memory:
             //   * if in the outermost loop, the offset into this dimension
             //   * otherwise, the offset into this dimension plus the previous offset scaled by the previous dimension's stride
-            llvm::Value* thisInput1DimensionOffset = nullptr;
-            llvm::Value* thisInput2DimensionOffset = nullptr;
-            llvm::Value* thisOutputDimensionOffset = nullptr;
+            emitters::LLVMValue thisInput1DimensionOffset = nullptr;
+            emitters::LLVMValue thisInput2DimensionOffset = nullptr;
+            emitters::LLVMValue thisOutputDimensionOffset = nullptr;
             if (dimension == 0)
             {
                 assert(prevInput1DimensionOffset == nullptr);

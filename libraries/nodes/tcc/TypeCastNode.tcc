@@ -67,25 +67,25 @@ namespace nodes
     void TypeCastNode<InputValueType, OutputValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         auto count = input.Size();
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
-        function.For(count, [pInput, pResult](emitters::IRFunctionEmitter& function, llvm::Value* i) {
-            llvm::Value* inputValue = function.ValueAt(pInput, i);
-            llvm::Value* castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
+        function.For(count, [pInput, pResult](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
+            emitters::LLVMValue inputValue = function.ValueAt(pInput, i);
+            emitters::LLVMValue castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
             function.SetValueAt(pResult, i, castElement);
         });
     }
-    
+
     template <typename InputValueType, typename OutputValueType>
     void TypeCastNode<InputValueType, OutputValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
         for (size_t i = 0; i < input.Size(); ++i)
         {
-            llvm::Value* inputValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
-            llvm::Value* castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
+            emitters::LLVMValue inputValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
+            emitters::LLVMValue castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
             function.SetValueAt(pResult, function.Literal((int)i), castElement);
         }
     }

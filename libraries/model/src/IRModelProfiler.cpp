@@ -29,7 +29,7 @@ namespace model
     //
     // NodeInfoEmitter
     //
-    NodeInfoEmitter::NodeInfoEmitter(emitters::IRModuleEmitter& module, const Node* node, llvm::Value* nodeInfoPtr, llvm::StructType* nodeInfoType)
+    NodeInfoEmitter::NodeInfoEmitter(emitters::IRModuleEmitter& module, const Node* node, emitters::LLVMValue nodeInfoPtr, llvm::StructType* nodeInfoType)
         : _module(&module), _node(node), _nodeInfoPtr(nodeInfoPtr), _nodeInfoType(nodeInfoType)
     {
     }
@@ -56,7 +56,7 @@ namespace model
     //
     // PerformanceCountersEmitter
     //
-    PerformanceCountersEmitter::PerformanceCountersEmitter(emitters::IRModuleEmitter& module, llvm::Value* performanceCountersPtr, llvm::StructType* performanceCountersType)
+    PerformanceCountersEmitter::PerformanceCountersEmitter(emitters::IRModuleEmitter& module, emitters::LLVMValue performanceCountersPtr, llvm::StructType* performanceCountersType)
         : _module(&module), _performanceCountersPtr(performanceCountersPtr), _performanceCountersType(performanceCountersType)
     {
     }
@@ -65,7 +65,7 @@ namespace model
     {
     }
 
-    void PerformanceCountersEmitter::Start(emitters::IRFunctionEmitter& function, llvm::Value* startTime)
+    void PerformanceCountersEmitter::Start(emitters::IRFunctionEmitter& function, emitters::LLVMValue startTime)
     {
         assert(_performanceCountersPtr != nullptr);
 
@@ -79,7 +79,7 @@ namespace model
         function.OperationAndUpdate(countPtr, emitters::TypedOperator::add, function.Literal<int64_t>(1));
     }
 
-    void PerformanceCountersEmitter::End(emitters::IRFunctionEmitter& function, llvm::Value* endTime)
+    void PerformanceCountersEmitter::End(emitters::IRFunctionEmitter& function, emitters::LLVMValue endTime)
     {
         assert(_performanceCountersPtr != nullptr);
 
@@ -109,7 +109,7 @@ namespace model
     //
     // NodePerformanceEmitter
     //
-    NodePerformanceEmitter::NodePerformanceEmitter(emitters::IRModuleEmitter& module, const Node* node, llvm::Value* nodeInfoPtr, llvm::Value* performanceCountersPtr, llvm::StructType* nodeInfoType, llvm::StructType* performanceCountersType)
+    NodePerformanceEmitter::NodePerformanceEmitter(emitters::IRModuleEmitter& module, const Node* node, emitters::LLVMValue nodeInfoPtr, emitters::LLVMValue performanceCountersPtr, llvm::StructType* nodeInfoType, llvm::StructType* performanceCountersType)
         : _nodeInfoEmitter(module, node, nodeInfoPtr, nodeInfoType), _performanceCountersEmitter(module, performanceCountersPtr, performanceCountersType)
     {
     }
@@ -120,12 +120,12 @@ namespace model
         _performanceCountersEmitter.Init(function);
     }
 
-    void NodePerformanceEmitter::Start(emitters::IRFunctionEmitter& function, llvm::Value* startTime)
+    void NodePerformanceEmitter::Start(emitters::IRFunctionEmitter& function, emitters::LLVMValue startTime)
     {
         _performanceCountersEmitter.Start(function, startTime);
     }
 
-    void NodePerformanceEmitter::End(emitters::IRFunctionEmitter& function, llvm::Value* endTime)
+    void NodePerformanceEmitter::End(emitters::IRFunctionEmitter& function, emitters::LLVMValue endTime)
     {
         _performanceCountersEmitter.End(function, endTime);
     }
@@ -445,7 +445,7 @@ namespace model
         function.IncludeInHeader();
         function.IncludeInSwigInterface();
 
-        function.For(numEmittedNodes, [&irBuilder, &emitter, this](emitters::IRFunctionEmitter& function, llvm::Value* nodeIndex) {
+        function.For(numEmittedNodes, [&irBuilder, &emitter, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue nodeIndex) {
             auto nodeInfoPtr = irBuilder.CreateInBoundsGEP(_nodeInfoArray, { function.Literal(0), nodeIndex });
             auto nodePerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_nodePerformanceCountersArray, { function.Literal(0), nodeIndex });
 
@@ -473,7 +473,7 @@ namespace model
         function.IncludeInHeader();
         function.IncludeInSwigInterface();
 
-        function.For(numEmittedNodeTypes, [&irBuilder, &emitter, this](emitters::IRFunctionEmitter& function, llvm::Value* nodeIndex) {
+        function.For(numEmittedNodeTypes, [&irBuilder, &emitter, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue nodeIndex) {
             auto nodeInfoPtr = irBuilder.CreateInBoundsGEP(_nodeTypeInfoArray, { function.Literal(0), nodeIndex });
             auto nodePerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_nodeTypePerformanceCountersArray, { function.Literal(0), nodeIndex });
 
@@ -501,7 +501,7 @@ namespace model
         function.IncludeInSwigInterface();
         auto& irBuilder = emitter.GetIRBuilder();
 
-        function.For(numEmittedNodes, [&irBuilder, this](emitters::IRFunctionEmitter& function, llvm::Value* nodeIndex) {
+        function.For(numEmittedNodes, [&irBuilder, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue nodeIndex) {
             auto nodePerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_nodePerformanceCountersArray, { function.Literal(0), nodeIndex });
 
             auto countPtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
@@ -526,7 +526,7 @@ namespace model
         function.IncludeInSwigInterface();
         auto& irBuilder = emitter.GetIRBuilder();
 
-        function.For(numEmittedNodes, [&irBuilder, this](emitters::IRFunctionEmitter& function, llvm::Value* nodeIndex) {
+        function.For(numEmittedNodes, [&irBuilder, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue nodeIndex) {
             auto nodePerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_nodeTypePerformanceCountersArray, { function.Literal(0), nodeIndex });
 
             auto countPtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
@@ -579,7 +579,7 @@ namespace model
         return _nodeTypePerformanceCounters[nodeType];
     }
 
-    llvm::Value* ModelProfiler::CallGetCurrentTime(emitters::IRFunctionEmitter& function)
+    emitters::LLVMValue ModelProfiler::CallGetCurrentTime(emitters::IRFunctionEmitter& function)
     {
         auto time = _module->GetRuntime().GetCurrentTime(function);
         return time;

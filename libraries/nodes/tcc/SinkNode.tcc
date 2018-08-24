@@ -58,8 +58,8 @@ namespace nodes
     template <typename ValueType>
     void SinkNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pTrigger = compiler.EnsurePortEmitted(trigger);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pTrigger = compiler.EnsurePortEmitted(trigger);
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
         auto& module = function.GetModule();
         auto triggerValue = function.ValueAt(pTrigger, 0);
@@ -70,11 +70,11 @@ namespace nodes
             auto globalContext = function.Load(context);
 
             // Callback signature: void SinkFunction(void* context, ValueType* array)
-            const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer }, 
+            const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer },
                                                                     { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
             module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
 
-            llvm::Function* pSinkFunction = module.GetFunction(prefixedName);
+            emitters::LLVMFunction pSinkFunction = module.GetFunction(prefixedName);
             function.Call(pSinkFunction, { globalContext, function.PointerOffset(pInput, function.Literal(0)) });
         });
 
@@ -149,7 +149,7 @@ namespace nodes
     template <typename ValueType>
     void SinkNode<ValueType>::SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         assert(input.Size() == output.Size());
 
@@ -159,12 +159,12 @@ namespace nodes
         int rangeStart = 0;
         for (auto range : inputElements.GetRanges())
         {
-            llvm::Value* pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
+            emitters::LLVMValue pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
             auto rangeSize = range.Size();
-            function.For(rangeSize, [range, rangeStart, pInput, pOutput](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            function.For(rangeSize, [range, rangeStart, pInput, pOutput](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
                 auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
                 auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
-                llvm::Value* value = function.ValueAt(pInput, inputIndex);
+                emitters::LLVMValue value = function.ValueAt(pInput, inputIndex);
                 function.SetValueAt(pOutput, outputIndex, value);
             });
             rangeStart += rangeSize;
@@ -175,7 +175,7 @@ namespace nodes
     void SinkNode<ValueType>::SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         compiler.EnsurePortEmitted(input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         auto numInputs = input.Size();
         assert(numInputs == output.Size());
@@ -183,7 +183,7 @@ namespace nodes
         for (size_t i = 0; i < numInputs; ++i)
         {
             // Concatenate the input ports
-            llvm::Value* value = compiler.LoadPortElementVariable(input.GetInputElement(i));
+            emitters::LLVMValue value = compiler.LoadPortElementVariable(input.GetInputElement(i));
             function.SetValueAt(pOutput, function.Literal(static_cast<int>(i)), value);
         }
     }

@@ -30,8 +30,8 @@ namespace nodes
         //
 
         // Note: this function is inline to suppress a compiler warning about it being unneeded
-        inline llvm::Value* GetValueFromVolume(emitters::IRFunctionEmitter& function,
-                                        llvm::Value* inputVolume,
+        inline emitters::LLVMValue GetValueFromVolume(emitters::IRFunctionEmitter& function,
+                                        emitters::LLVMValue inputVolume,
                                         const model::PortMemoryLayout& inputLayout,
                                         std::array<int, 3> dataOrder,
                                         emitters::IRLocalScalar valueRow, emitters::IRLocalScalar valueColumn, emitters::IRLocalScalar valueChannel)
@@ -41,7 +41,7 @@ namespace nodes
             const auto channelStride = inputLayout.GetStride(2);
 
             auto index = function.LocalScalar();
-            if (dataOrder == std::array<int, 3>({ 0, 1, 2 })) 
+            if (dataOrder == std::array<int, 3>({ 0, 1, 2 }))
             {
                 // row, column, channel order
                 index = valueRow * (columnStride * channelStride) + (valueColumn * channelStride) + valueChannel;
@@ -56,8 +56,8 @@ namespace nodes
         }
 
         template <typename ValueType>
-        llvm::Value* GetValueFromPaddedVolume(emitters::IRFunctionEmitter& function,
-                                              llvm::Value* inputVolume,
+        emitters::LLVMValue GetValueFromPaddedVolume(emitters::IRFunctionEmitter& function,
+                                              emitters::LLVMValue inputVolume,
                                               const model::PortMemoryLayout& inputLayout,
                                               int convPadding,
                                               std::array<int, 3> dataOrder,
@@ -79,7 +79,7 @@ namespace nodes
                 auto colBad = (valueColumn < 0) || (valueColumn >= inputWidth);
                 auto outOfBounds = rowBad || colBad;
 
-                llvm::Value* returnValue = function.Variable(emitters::GetVariableType<ValueType>(), "returnVal");
+                emitters::LLVMValue returnValue = function.Variable(emitters::GetVariableType<ValueType>(), "returnVal");
                 function.If(outOfBounds, [=](emitters::IRFunctionEmitter& function) {
                             function.StoreZero(returnValue);
                         })
@@ -107,7 +107,7 @@ namespace nodes
 
         template <typename ValueType>
         void EmitReceptiveFieldToColumns(emitters::IRFunctionEmitter& function,
-                                         llvm::Value* inputVolume,
+                                         emitters::LLVMValue inputVolume,
                                          const model::PortMemoryLayout& inputLayout,
                                          int filterWidth,
                                          int stride,
@@ -115,7 +115,7 @@ namespace nodes
                                          std::array<int, 3> dataOrder,
                                          int outputWidth,
                                          int outputHeight,
-                                         llvm::Value* outputMatrix)
+                                         emitters::LLVMValue outputMatrix)
         {
             // Model parameters
             const auto inputHeight = inputLayout.GetLogicalDimensionActiveSize(0);
@@ -166,10 +166,10 @@ namespace nodes
             {
                 // assert(inputPadding == 0 && "Input data must not be padded");
                 // Points to the beginning of the input volume
-                llvm::Value* inputPtr = function.PointerOffset(inputVolume, 0);
+                emitters::LLVMValue inputPtr = function.PointerOffset(inputVolume, 0);
 
                 // Points to the beginning of the outputMatrix
-                llvm::Value* outputPtr = function.PointerOffset(outputMatrix, 0);
+                emitters::LLVMValue outputPtr = function.PointerOffset(outputMatrix, 0);
 
                 // Unroll outer loops
                 for (int fy = 0; fy < filterWidth; ++fy)
@@ -203,7 +203,7 @@ namespace nodes
 
                         // Zero out the padding areas
                         // BUG: explicit capture-by-ref entries are here to work around a GCC bug
-                        function.For(inputDepth, [=, &fx, &fy, &extraPadding, &inputWidth, &inputHeight, &outputWidth, &numOutputColumns](emitters::IRFunctionEmitter& function, llvm::Value* channelValue) {
+                        function.For(inputDepth, [=, &fx, &fy, &extraPadding, &inputWidth, &inputHeight, &outputWidth, &numOutputColumns](emitters::IRFunctionEmitter& function, emitters::LLVMValue channelValue) {
                             auto channel = function.LocalScalar(channelValue);
                             auto outputDepthOffset = channel * numOutputColumns;
 
@@ -232,7 +232,7 @@ namespace nodes
                                 // zero out elements at beginning of each row
                                 int count = extraPadding - fx;
                                 // BUG: explicit capture-by-ref entries are here to work around a GCC bug
-                                function.For(inputHeight, [=, &inputWidth, &outputRowOffset](emitters::IRFunctionEmitter& function, llvm::Value* indexValue) {
+                                function.For(inputHeight, [=, &inputWidth, &outputRowOffset](emitters::IRFunctionEmitter& function, emitters::LLVMValue indexValue) {
                                     auto index = function.LocalScalar(indexValue);
                                     auto begin = index * inputWidth;
                                     auto offset = begin + outputRowOffset;
@@ -244,7 +244,7 @@ namespace nodes
                                 // zero out elements at end of each row
                                 int count = fx - extraPadding;
                                 // BUG: explicit capture-by-ref entries are here to work around a GCC bug
-                                function.For(inputHeight, [=, &inputWidth, &outputRowOffset](emitters::IRFunctionEmitter& function, llvm::Value* indexValue) {
+                                function.For(inputHeight, [=, &inputWidth, &outputRowOffset](emitters::IRFunctionEmitter& function, emitters::LLVMValue indexValue) {
                                     auto index = function.LocalScalar(indexValue);
                                     auto begin = ((index + 1) * inputWidth) - count;
                                     auto offset = begin + outputRowOffset;
@@ -258,7 +258,7 @@ namespace nodes
             else // Normal, single value-at-a-time method
             {
                 // The outer loop iterates over all d * k * k entries in the receptive field
-                function.For(fieldVolumeSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* fValue) {
+                function.For(fieldVolumeSize, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue fValue) {
                     auto f = function.LocalScalar(fValue);
                     auto fieldChannel = function.LocalScalar();
                     auto fieldColumn = function.LocalScalar();
@@ -281,10 +281,10 @@ namespace nodes
                     }
 
                     // Now for each receptive field entry, iterate over all h * w locations in the output image
-                    function.For(outputHeight, [=, &fieldRow, &fieldColumn] (emitters::IRFunctionEmitter& function, llvm::Value* outputImageRowValue) {
+                    function.For(outputHeight, [=, &fieldRow, &fieldColumn] (emitters::IRFunctionEmitter& function, emitters::LLVMValue outputImageRowValue) {
                         auto outputImageRow = function.LocalScalar(outputImageRowValue);
                         auto inputRow = outputImageRow * stride;
-                        function.For(outputWidth, [=, &fieldRow, &fieldColumn, &inputRow](emitters::IRFunctionEmitter& function, llvm::Value* outputImageColumnValue) {
+                        function.For(outputWidth, [=, &fieldRow, &fieldColumn, &inputRow](emitters::IRFunctionEmitter& function, emitters::LLVMValue outputImageColumnValue) {
                             auto outputImageColumn = function.LocalScalar(outputImageColumnValue);
                             auto inputColumn = outputImageColumn * stride;
 
@@ -344,8 +344,8 @@ namespace nodes
     template <typename ValueType>
     void ReceptiveFieldMatrixNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(this->input);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(this->output);
 
         const auto& inputLayout = this->GetInputMemoryLayout();
         assert(inputLayout.NumDimensions() == 3);

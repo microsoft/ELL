@@ -127,7 +127,7 @@ namespace emitters
                 _functionName = _function->getName();
 
                 // Three arguments context, input, output (input may be a scalar or pointer)
-                auto it = _function->args().begin();                
+                auto it = _function->args().begin();
                 ++it; // skip context argument
 
                 {
@@ -160,7 +160,7 @@ namespace emitters
             std::string _outputType;
             bool _inputIsScalar;
 
-            llvm::Function* _function;
+            LLVMFunction _function;
         };
 
         // Writes SWIG interfaces for predictors with step support

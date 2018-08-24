@@ -23,15 +23,12 @@
 // llvm
 #include <llvm/IR/Constant.h>
 #include <llvm/IR/DataLayout.h>
-#include <llvm/IR/Function.h>
 #include <llvm/IR/GlobalVariable.h>
 #include <llvm/IR/Intrinsics.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/PassManager.h>
-#include <llvm/IR/Type.h>
-#include <llvm/IR/Value.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Support/raw_ostream.h>
 
@@ -117,7 +114,7 @@ namespace emitters
         /// <summary> Ends the current model prediction function. </summary>
         void EndMapPredictFunction() override;
 
-        /// <summary> Begin a new function for resetting a given node. Each node that needs to implement 
+        /// <summary> Begin a new function for resetting a given node. Each node that needs to implement
         /// reset calls this and implements their own reset logic.  The IRModuleEmitter wraps all that
         /// in a master model_Reset function which is exposed in the API. </summary>
         ///
@@ -137,7 +134,7 @@ namespace emitters
         ///
         /// <param name="functionName"> The name of the function. </param>
         /// <param name="returnType"> The return type of the function. </param>
-        IRFunctionEmitter& BeginFunction(const std::string& functionName, llvm::Type* returnType);
+        IRFunctionEmitter& BeginFunction(const std::string& functionName, LLVMType returnType);
 
         /// <summary> Begins an IR function and directs subsequent commands to it. </summary>
         ///
@@ -158,21 +155,21 @@ namespace emitters
         /// <param name="functionName"> The name of the function. </param>
         /// <param name="returnType"> The return type of the function. </param>
         /// <param name="args"> The arguments to the function. </param>
-        IRFunctionEmitter& BeginFunction(const std::string& functionName, llvm::Type* returnType, const NamedVariableTypeList& args);
+        IRFunctionEmitter& BeginFunction(const std::string& functionName, LLVMType returnType, const NamedVariableTypeList& args);
 
         /// <summary> Begins an IR function and directs subsequent commands to it. </summary>
         ///
         /// <param name="functionName"> The name of the function. </param>
         /// <param name="returnType"> The return type of the function. </param>
         /// <param name="argsTypes"> The argument types for the function. </param>
-        IRFunctionEmitter& BeginFunction(const std::string& functionName, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes);
+        IRFunctionEmitter& BeginFunction(const std::string& functionName, LLVMType returnType, const std::vector<LLVMType>& argTypes);
 
         /// <summary> Begins an IR function and directs subsequent commands to it. </summary>
         ///
         /// <param name="functionName"> The name of the function. </param>
         /// <param name="returnType"> The return type of the function. </param>
         /// <param name="args"> The arguments to the function. </param>
-        IRFunctionEmitter& BeginFunction(const std::string& functionName, llvm::Type* returnType, const NamedLLVMTypeList& args);
+        IRFunctionEmitter& BeginFunction(const std::string& functionName, LLVMType returnType, const NamedLLVMTypeList& args);
 
         /// <summary> Emit a "main" function, the entry point to an LLVM program. </summary>
         ///
@@ -185,20 +182,20 @@ namespace emitters
         /// <summary> Ends the current function with a return value. </summary>
         ///
         /// <param name="return"> The value the function returns. </param>
-        void EndFunction(llvm::Value* pReturn);
+        void EndFunction(LLVMValue pReturn);
 
         //
         // Variable management
         //
 
         /// <summary> Ensure that the given variable has been declared in IR. </summary>
-        llvm::Value* EnsureEmitted(Variable& var);
+        LLVMValue EnsureEmitted(Variable& var);
 
         /// <summary> Ensure that the given variable is loaded into a register. </summary>
-        llvm::Value* LoadVariable(Variable& var);
+        LLVMValue LoadVariable(Variable& var);
 
         /// <summary> Updates the value at a given offset of the given variable. Checks for index out of range etc. </summary>
-        void SetVariable(Variable& var, llvm::Value* pDest, int offset, llvm::Value* pValue);
+        void SetVariable(Variable& var, LLVMValue pDest, int offset, LLVMValue pValue);
 
         //
         // Variable and Constant creation
@@ -246,7 +243,7 @@ namespace emitters
         /// <param name="name"> The name of the variable. </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
-        llvm::GlobalVariable* Global(llvm::Type* pType, const std::string& name);
+        llvm::GlobalVariable* Global(LLVMType pType, const std::string& name);
 
          /// <summary> Emit a named global variable of a template type. </summary>
         ///
@@ -283,7 +280,7 @@ namespace emitters
         /// <param name="size"> The array size. </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
-        llvm::GlobalVariable* GlobalArray(const std::string& name, llvm::Type* pType, const size_t size);
+        llvm::GlobalVariable* GlobalArray(const std::string& name, LLVMType pType, const size_t size);
 
         /// <summary> Emit a zero-initialized named, module scoped array of a template type. </summary>
         ///
@@ -313,14 +310,14 @@ namespace emitters
         ///
         /// <param name="name"> The function name. </param>
         /// <param name="returnType"> The function return type. </param>
-        llvm::Function* DeclareFunction(const std::string& name, VariableType returnType);
+        LLVMFunction DeclareFunction(const std::string& name, VariableType returnType);
 
         /// <summary> Emit a declaration of an external function with the given return type and arguments. </summary>
         ///
         /// <param name="name"> The function name. </param>
         /// <param name="returnType"> The function return type. </param>
         /// <param name="arguments"> The function arguments. </param>
-        llvm::Function* DeclareFunction(const std::string& name, VariableType returnType, const VariableTypeList& arguments);
+        LLVMFunction DeclareFunction(const std::string& name, VariableType returnType, const VariableTypeList& arguments);
 
         /// <summary>
         /// Emit a declaration of an external function with the given return type and named arguments.
@@ -329,13 +326,13 @@ namespace emitters
         /// <param name="name"> The function name. </param>
         /// <param name="returnType"> The function return type. </param>
         /// <param name="arguments"> The named function arguments. </param>
-        llvm::Function* DeclareFunction(const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments);
+        LLVMFunction DeclareFunction(const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments);
 
         /// <summary> Emit a declaration of an external function with the given function signature. </summary>
         ///
         /// <param name="name"> The function name. </param>
         /// <param name="functionType"> The function type. </param>
-        llvm::Function* DeclareFunction(const std::string& name, llvm::FunctionType* functionType);
+        LLVMFunction DeclareFunction(const std::string& name, llvm::FunctionType* functionType);
 
         /// <summary> Check if a given function name exists. </summary>
         ///
@@ -349,7 +346,7 @@ namespace emitters
         /// <param name="name"> The function name. </param>
         ///
         /// <returns> Pointer to an llvm::Function that represents the requested function, or nullptr if it doesn't exist. </returns>
-        llvm::Function* GetFunction(const std::string& name);
+        LLVMFunction GetFunction(const std::string& name);
 
         /// <summary> Get an LLVM intrinsic function with the given id and signature. </summary>
         ///
@@ -357,7 +354,7 @@ namespace emitters
         /// <param name="arguments"> The function arguments. </param>
         ///
         /// <returns> Pointer to an llvm::Function that represents the requested function. </returns>
-        llvm::Function* GetIntrinsic(llvm::Intrinsic::ID id, const std::initializer_list<VariableType>& arguments);
+        LLVMFunction GetIntrinsic(llvm::Intrinsic::ID id, const std::initializer_list<VariableType>& arguments);
 
         /// <summary> Get an LLVM intrinsic function with the given id and signature. </summary>
         ///
@@ -365,7 +362,7 @@ namespace emitters
         /// <param name="arguments"> The function arguments. </param>
         ///
         /// <returns> Pointer to an llvm::Function that represents the requested function. </returns>
-        llvm::Function* GetIntrinsic(llvm::Intrinsic::ID id, const std::initializer_list<LLVMType>& arguments);
+        LLVMFunction GetIntrinsic(llvm::Intrinsic::ID id, const std::initializer_list<LLVMType>& arguments);
 
         //
         // Types
@@ -544,9 +541,9 @@ namespace emitters
         /// Jitting etc.
         /// </summary>
         ///
-        /// <returns> 
-        /// An llvm::TargetMachine object that describes the target machine. It may return `nullptr` if a specific 
-        /// target machine can't be found. It isn't an error if no target machine is found. 
+        /// <returns>
+        /// An llvm::TargetMachine object that describes the target machine. It may return `nullptr` if a specific
+        /// target machine can't be found. It isn't an error if no target machine is found.
         ///</returns>
         llvm::TargetMachine* GetTargetMachine();
 
@@ -636,7 +633,7 @@ namespace emitters
         /// <param name="function"> The function to call. Must be of type `void()`. </param>
         /// <param name="priority"> The priority for this initialization function. Initialization functions are called in increasing order of priority. The default value is LLVM's default priority. </param>
         /// <param name="forData"> Optional global constant that this function initializes. If the data is optimized away, then the initialization function will be also. </param>
-        void AddInitializationFunction(llvm::Function* function, int priority = 65536, llvm::Constant* forData = nullptr);
+        void AddInitializationFunction(LLVMFunction function, int priority = 65536, llvm::Constant* forData = nullptr);
 
         /// <summary> Adds an initialization function to run before any (non-initialization) application code. </summary>
         ///
@@ -650,7 +647,7 @@ namespace emitters
         /// <param name="function"> The function to call. Must be of type `void()`. </param>
         /// <param name="priority"> The priority for this finalization function. Finalization functions are called in increasing order of priority. The default value is LLVM's default priority. </param>
         /// <param name="forData"> Optional global constant that this function is for. If the data is optimized away, then the finalization function will be also. </param>
-        void AddFinalizationFunction(llvm::Function* function, int priority = 65536, llvm::Constant* forData = nullptr);
+        void AddFinalizationFunction(LLVMFunction function, int priority = 65536, llvm::Constant* forData = nullptr);
 
         /// <summary> Adds a finalization function to run after any application code. </summary>
         ///
@@ -671,66 +668,66 @@ namespace emitters
         //
 
         /// Gets an emitted variable with the given name and scope.
-        llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
+        LLVMValue GetEmittedVariable(const VariableScope scope, const std::string& name);
 
         /// Emit IR for a variable.
-        llvm::Value* EmitVariable(Variable& var);
+        LLVMValue EmitVariable(Variable& var);
 
         // Templated version implementing above
         template <typename T>
-        llvm::Value* EmitVariable(Variable& var);
+        LLVMValue EmitVariable(Variable& var);
 
         /// Emit IR for a scalar variable.
         template <typename T>
-        llvm::Value* EmitScalar(Variable& var);
+        LLVMValue EmitScalar(Variable& var);
 
         /// Emit IR for a vector variable.
         template <typename T>
-        llvm::Value* EmitVector(Variable& var);
+        LLVMValue EmitVector(Variable& var);
 
         /// Emit IR for a constant.
         template <typename T>
-        llvm::Value* EmitLiteral(LiteralVariable<T>& var);
+        LLVMValue EmitLiteral(LiteralVariable<T>& var);
 
         /// Emit IR for a Global scalar with an initial value.
         template <typename T>
-        llvm::Value* EmitGlobal(InitializedScalarVariable<T>& var);
+        LLVMValue EmitGlobal(InitializedScalarVariable<T>& var);
 
         /// Emit IR for a stack scalar variable.
         template <typename T>
-        llvm::Value* EmitLocal(ScalarVariable<T>& var);
+        LLVMValue EmitLocal(ScalarVariable<T>& var);
 
         /// Emit IR for a stack scalar variable with an initial value.
         template <typename T>
-        llvm::Value* EmitLocal(InitializedScalarVariable<T>& var);
+        LLVMValue EmitLocal(InitializedScalarVariable<T>& var);
 
         /// Emit IR for a constant vector.
         template <typename T>
-        llvm::Value* EmitLiteralVector(LiteralVectorVariable<T>& var);
+        LLVMValue EmitLiteralVector(LiteralVectorVariable<T>& var);
 
         /// Emit IR for a global vector. Global is initialized to zero.
         template <typename T>
-        llvm::Value* EmitGlobalVector(VectorVariable<T>& var);
+        LLVMValue EmitGlobalVector(VectorVariable<T>& var);
 
         /// Emit IR for a global vector with initial values.
         template <typename T>
-        llvm::Value* EmitGlobalVector(InitializedVectorVariable<T>& var);
+        LLVMValue EmitGlobalVector(InitializedVectorVariable<T>& var);
 
         /// Emit IR for a reference to an element in a vector.
         template <typename T>
-        llvm::Value* EmitRef(VectorElementVariable<T>& var);
+        LLVMValue EmitRef(VectorElementVariable<T>& var);
 
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const VariableTypeList& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments, bool isPublic = false);
-        IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const NamedVariableTypeList& arguments, bool isPublic = false);
+        IRFunctionEmitter Function(const std::string& name, LLVMType returnType, const NamedVariableTypeList& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const std::initializer_list<VariableType>& arguments, bool isPublic = false);
-        IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes, bool isPublic = false);
-        IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const NamedLLVMTypeList& arguments, bool isPublic = false);
+        IRFunctionEmitter Function(const std::string& name, LLVMType returnType, const std::vector<LLVMType>& argTypes, bool isPublic = false);
+        IRFunctionEmitter Function(const std::string& name, LLVMType returnType, const NamedLLVMTypeList& arguments, bool isPublic = false);
 
         // Associate metadata with a given function.
         // Note: to insert well-known metadata, prefer the "IncludeInXXX" metadata methods.
-        void InsertFunctionMetadata(llvm::Function* function, const std::string& tag, const std::vector<std::string>& value = { "" });
+        void InsertFunctionMetadata(LLVMFunction function, const std::string& tag, const std::vector<std::string>& value = { "" });
 
         // Get a reference to the thread pool
         IRThreadPool& GetThreadPool() { return _threadPool; }
@@ -742,10 +739,10 @@ namespace emitters
         //
         // Lower-level internal functions
         //
-        llvm::GlobalVariable* AddGlobal(const std::string& name, llvm::Type* pType, llvm::Constant* pInitial, bool isConst);
+        llvm::GlobalVariable* AddGlobal(const std::string& name, LLVMType pType, llvm::Constant* pInitial, bool isConst);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const VariableTypeList* pArguments, bool isPublic);
         llvm::Function::LinkageTypes Linkage(bool isPublic);
-        llvm::ConstantAggregateZero* ZeroInitializer(llvm::Type* pType);
+        llvm::ConstantAggregateZero* ZeroInitializer(LLVMType pType);
         static void CompleteCompilerOptions(CompilerOptions& parameters);
         void SetTargetTriple(const std::string& triple);
 

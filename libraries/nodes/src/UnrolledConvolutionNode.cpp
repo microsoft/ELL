@@ -133,7 +133,7 @@ namespace nodes
         std::array<int, 3> dataOrder = useNewMethod ? drcOrder : rcdOrder;
         assert(outputPadding == 0 && "Unrolled convolution node output padding not supported yet");
 
-        // weights: numFilters x fieldVolumeSize == m x k 
+        // weights: numFilters x fieldVolumeSize == m x k
         // ShapedInput: fieldVolumeSize x outputRows == k x n
         // Matrix multiply output: numFilters x outputRows = m x n
 
@@ -186,8 +186,8 @@ namespace nodes
     template <typename ValueType>
     void UnrolledConvolutionNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(this->input);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(this->output);
 
         // Input / output memory layouts
         const auto& inputLayout = this->GetInputMemoryLayout();
@@ -225,12 +225,12 @@ namespace nodes
         // Loop over all input channels.
         // The large capture parameters for the lambda are to work around a bug in gcc 5.4
         function.For(numFilters, [this, inputBuffer, outputBuffer, reshapedInputMatrix, inputIncrement, outputIncrement, weights, fieldArea, outputRows,
-                                  outputColumns, outputElements, depth] (emitters::IRFunctionEmitter& function, llvm::Value* fValue) {
+                                  outputColumns, outputElements, depth] (emitters::IRFunctionEmitter& function, emitters::LLVMValue fValue) {
             auto f = function.LocalScalar(fValue);
 
-            llvm::Value* inputPtr = function.PointerOffset(inputBuffer, f);
-            llvm::Value* shapedInputPtr = function.PointerOffset(reshapedInputMatrix, 0);
-            llvm::Value* outputPtr = function.PointerOffset(outputBuffer, f);
+            emitters::LLVMValue inputPtr = function.PointerOffset(inputBuffer, f);
+            emitters::LLVMValue shapedInputPtr = function.PointerOffset(reshapedInputMatrix, 0);
+            emitters::LLVMValue outputPtr = function.PointerOffset(outputBuffer, f);
 
             auto input = function.LocalArray(inputPtr);
             auto shapedInput = function.LocalArray(shapedInputPtr);
@@ -238,10 +238,10 @@ namespace nodes
 
             // ReceptiveFieldToRows for this channel/filter.
             // Iterate over all h * w locations in the output image
-            function.For(outputRows, [&] (emitters::IRFunctionEmitter& function, llvm::Value* outputImageRowValue) {
+            function.For(outputRows, [&] (emitters::IRFunctionEmitter& function, emitters::LLVMValue outputImageRowValue) {
                 auto outputImageRow = function.LocalScalar(outputImageRowValue);
                 auto inputRow = outputImageRow * _stride;
-                function.For(outputColumns, [&](emitters::IRFunctionEmitter& function, llvm::Value* outputImageColumnValue) {
+                function.For(outputColumns, [&](emitters::IRFunctionEmitter& function, emitters::LLVMValue outputImageColumnValue) {
                     auto outputImageColumn = function.LocalScalar(outputImageColumnValue);
                     auto inputColumn = outputImageColumn * _stride;
                     auto fieldOffset = (outputImageRow * shapedInputRowIncrement) + (outputImageColumn * fieldArea);

@@ -27,12 +27,12 @@ namespace emitters
     }
 
     IRLocalArray::IRLocalArrayValue::IRLocalArrayValue(
-        emitters::IRFunctionEmitter& function, llvm::Value* value, llvm::Value* pOffset)
+        emitters::IRFunctionEmitter& function, LLVMValue value, LLVMValue pOffset)
         : _function(function), _pPointer(value), _pOffset(pOffset) {}
 
     IRLocalArray::IRLocalArrayValue& IRLocalArray::IRLocalArrayValue::operator=(const IRLocalArrayValue& value)
     {
-        // cast the rhs to IRLocalScalar, which decomposes into llvm::Value* thanks to the overload below
+        // cast the rhs to IRLocalScalar, which decomposes into LLVMValue thanks to the overload below
         *this = static_cast<IRLocalScalar>(value);
 
         return *this;
@@ -43,7 +43,7 @@ namespace emitters
         return _function.LocalScalar(_function.ValueAt(_pPointer, _pOffset));
     }
 
-    IRLocalArray::IRLocalArrayValue& IRLocalArray::IRLocalArrayValue::operator=(llvm::Value* value)
+    IRLocalArray::IRLocalArrayValue& IRLocalArray::IRLocalArrayValue::operator=(LLVMValue value)
     {
         _function.SetValueAt(_pPointer, _pOffset, value);
 

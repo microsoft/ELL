@@ -83,7 +83,7 @@ namespace nodes
         return _extraArgs;
     }
 
-    std::vector<llvm::Value*> IRNode::GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const
+    std::vector<emitters::LLVMValue> IRNode::GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const
     {
         assert(_extraArgs.size() == 0); // currently doesn't work if you have 'other' args
         return {};

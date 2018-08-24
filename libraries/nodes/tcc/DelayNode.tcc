@@ -47,7 +47,7 @@ namespace nodes
     template <typename ValueType>
     void DelayNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* result = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue result = compiler.EnsurePortEmitted(output);
 
         size_t sampleSize = output.Size();
         size_t windowSize = this->GetWindowSize();
@@ -59,12 +59,12 @@ namespace nodes
         // We need two buffers - one for the entire lot, one for the "last" chunk forwarded to the next operator
         //
         emitters::Variable* delayLineVar = function.GetModule().Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, bufferSize);
-        llvm::Value* delayLine = function.GetModule().EnsureEmitted(*delayLineVar);
+        emitters::LLVMValue delayLine = function.GetModule().EnsureEmitted(*delayLineVar);
 
         //
         // We implement a delay as a Shift Register
         //
-        llvm::Value* inputBuffer = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue inputBuffer = compiler.EnsurePortEmitted(input);
         function.ShiftAndUpdate<ValueType>(delayLine, bufferSize, sampleSize, inputBuffer, result);
     }
 

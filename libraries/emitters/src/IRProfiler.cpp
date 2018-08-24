@@ -361,19 +361,19 @@ namespace emitters
         _module->EndFunction();
     }
 
-    llvm::Value* IRProfiler::GetRegionBuffer(IRFunctionEmitter& function)
+    LLVMValue IRProfiler::GetRegionBuffer(IRFunctionEmitter& function)
     {
         assert(_getRegionBufferFunction != nullptr);
         return function.Call(_getRegionBufferFunction, {});
     }
 
-    llvm::Value* IRProfiler::GetNumRegions(emitters::IRFunctionEmitter& function)
+    LLVMValue IRProfiler::GetNumRegions(emitters::IRFunctionEmitter& function)
     {
         assert(_getNumRegionsFunction != nullptr);
         return function.Call(_getNumRegionsFunction, {});
     }
 
-    llvm::Value* IRProfiler::GetRegionPointer(emitters::IRFunctionEmitter& function, llvm::Value* index)
+    LLVMValue IRProfiler::GetRegionPointer(emitters::IRFunctionEmitter& function, LLVMValue index)
     {
         auto regions = GetRegionBuffer(function);
         auto regionPtr = function.PointerOffset(regions, index);

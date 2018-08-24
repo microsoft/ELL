@@ -21,7 +21,7 @@ namespace emitters
     IRParallelForLoopEmitter::IRParallelForLoopEmitter(IRFunctionEmitter& functionEmitter)
         : _functionEmitter(functionEmitter) {}
 
-    void IRParallelForLoopEmitter::EmitLoop(int begin, int end, int increment, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, BodyFunction body)
+    void IRParallelForLoopEmitter::EmitLoop(int begin, int end, int increment, const ParallelLoopOptions& options, const std::vector<LLVMValue>& capturedValues, BodyFunction body)
     {
         // numIter = ceil((end-begin)/increment)
         auto span = end - begin;
@@ -36,7 +36,7 @@ namespace emitters
         EmitLoop(_functionEmitter.LocalScalar<int32_t>(begin), _functionEmitter.LocalScalar<int32_t>(end), _functionEmitter.LocalScalar<int32_t>(increment), newOptions, capturedValues, body);
     }
 
-    void IRParallelForLoopEmitter::EmitLoop(IRLocalScalar begin, IRLocalScalar end, IRLocalScalar increment, const ParallelLoopOptions& options, const std::vector<llvm::Value*>& capturedValues, BodyFunction body)
+    void IRParallelForLoopEmitter::EmitLoop(IRLocalScalar begin, IRLocalScalar end, IRLocalScalar increment, const ParallelLoopOptions& options, const std::vector<LLVMValue>& capturedValues, BodyFunction body)
     {
         auto& compilerSettings = _functionEmitter.GetModule().GetCompilerOptions();
         const int numTasks = options.numTasks == 0 ? compilerSettings.maxThreads : options.numTasks;
@@ -49,12 +49,12 @@ namespace emitters
         {
             auto taskFunction = GetTaskFunction(capturedValues, body);
 
-            std::vector<std::vector<llvm::Value*>> taskArgs;
+            std::vector<std::vector<LLVMValue>> taskArgs;
             for (int taskIndex = 0; taskIndex < numTasks; ++taskIndex)
             {
                 auto blockStart = begin + taskIndex * taskSize * increment;
                 auto blockEnd = Min(blockStart + taskSize * increment, end);
-                std::vector<llvm::Value*> args{ blockStart, blockEnd, increment };
+                std::vector<LLVMValue> args{ blockStart, blockEnd, increment };
                 std::copy(capturedValues.begin(), capturedValues.end(), std::back_inserter(args));
                 taskArgs.push_back(args);
             }
@@ -64,13 +64,13 @@ namespace emitters
         else
         {
             // Normal for loop here
-            _functionEmitter.For(begin, end, increment, [capturedValues, body](IRFunctionEmitter& function, llvm::Value* i) {
+            _functionEmitter.For(begin, end, increment, [capturedValues, body](IRFunctionEmitter& function, LLVMValue i) {
                 body(function, function.LocalScalar(i), capturedValues);
             });
         }
     }
 
-    IRFunctionEmitter IRParallelForLoopEmitter::GetTaskFunction(const std::vector<llvm::Value*>& capturedValues, BodyFunction body)
+    IRFunctionEmitter IRParallelForLoopEmitter::GetTaskFunction(const std::vector<LLVMValue>& capturedValues, BodyFunction body)
     {
         std::string name = "parForTask";
 
@@ -85,7 +85,7 @@ namespace emitters
             auto blockStart = &(*arguments++);
             auto blockEnd = &(*arguments++);
             auto increment = &(*arguments++);
-            std::vector<llvm::Value*> innerCapturedValues;
+            std::vector<LLVMValue> innerCapturedValues;
             int numCapturedValues = static_cast<int>(capturedValues.size());
             for (int index = 0; index < numCapturedValues; ++index)
             {
@@ -94,7 +94,7 @@ namespace emitters
                 innerCapturedValues.push_back(capturedValue);
             }
 
-            taskFunction.For(blockStart, blockEnd, increment, [innerCapturedValues, body](IRFunctionEmitter& taskFunction, llvm::Value* i) {
+            taskFunction.For(blockStart, blockEnd, increment, [innerCapturedValues, body](IRFunctionEmitter& taskFunction, LLVMValue i) {
                 body(taskFunction, taskFunction.LocalScalar(i), innerCapturedValues);
             });
         }

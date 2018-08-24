@@ -10,9 +10,7 @@
 
 #include "EmitterTypes.h"
 #include "IRFunctionEmitter.h"
-
-// llvm
-#include <llvm/IR/Value.h>
+#include "LLVMUtilities.h"
 
 // stl
 #include <string>
@@ -27,7 +25,7 @@ namespace emitters
     {
     public:
         template <typename ArgType>
-        using Value = llvm::Value*;
+        using Value = LLVMValue;
 
         /// <summary> Computes the return value of the function </summary>
         ///
@@ -40,7 +38,7 @@ namespace emitters
         /// <param name="function"> The function currently being emitted </param>
         /// <param name="args"> The arguments for the function </param>
         /// <returns> The result of applying the function to the input arguments </returns>
-        virtual llvm::Value* Compile(IRFunctionEmitter& function, Value<ArgTypes>... args) const = 0;
+        virtual LLVMValue Compile(IRFunctionEmitter& function, Value<ArgTypes>... args) const = 0;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -65,7 +63,7 @@ namespace emitters
         /// <param name="x"> One of the values to add </param>
         /// <param name="y"> The other value to add </param>
         /// <returns> The sum x+y </returns>
-        llvm::Value* Compile(IRFunctionEmitter& function, llvm::Value* x, llvm::Value* y) const override;
+        LLVMValue Compile(IRFunctionEmitter& function, LLVMValue x, LLVMValue y) const override;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -11,6 +11,9 @@
 #include "BroadcastFunctionNode.h"
 #include "NeuralNetworkLayerNode.h"
 
+// emitters
+#include "LLVMUtilities.h"
+
 // model
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
@@ -77,10 +80,10 @@ namespace nodes
                                       size_t dimension,
                                       const model::PortMemoryLayout& inputLayout,
                                       const model::PortMemoryLayout& outputLayout,
-                                      llvm::Value* pInput,
-                                      llvm::Value* pOutput,
-                                      llvm::Value* prevInputDimensionOffset,
-                                      llvm::Value* prevOutputDimensionOffset,
+                                      emitters::LLVMValue pInput,
+                                      emitters::LLVMValue pOutput,
+                                      emitters::LLVMValue prevInputDimensionOffset,
+                                      emitters::LLVMValue prevOutputDimensionOffset,
                                       FunctionType& f) const;
 
         // in-place version
@@ -89,8 +92,8 @@ namespace nodes
                                       emitters::IRFunctionEmitter& function,
                                       size_t dimension,
                                       const model::PortMemoryLayout& inputLayout,
-                                      llvm::Value* pInput,
-                                      llvm::Value* prevInputDimensionOffset,
+                                      emitters::LLVMValue pInput,
+                                      emitters::LLVMValue prevInputDimensionOffset,
                                       FunctionType& f) const;
     };
 }

@@ -46,7 +46,7 @@ namespace nodes
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "GetNodeActivationFunction cannot be used on ParametricReLUActivations");
         }
 
-        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, 
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
             std::string("GetNodeActivationFunction given a new Activation type it doesn't recognize: ") + typeid(*f.GetImpl()).name());
     }
 
@@ -66,7 +66,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* HardSigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
+    emitters::LLVMValue HardSigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue xValue) const
     {
         // y = clip (scale*x + bias) to [0,1]
         //   = scale * (clip x to [a, b]) + bias, where scale*a+bias = 0, scale*b+bias = 1; so, a = -bias/scale, b = (1-bias)/scale
@@ -94,7 +94,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* ReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
+    emitters::LLVMValue ReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue xValue) const
     {
         auto x = function.LocalScalar(xValue);
         auto zero = function.LocalScalar<ValueType>(0);
@@ -112,7 +112,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* LeakyReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
+    emitters::LLVMValue LeakyReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue xValue) const
     {
         auto x = function.LocalScalar(xValue);
         auto zero = function.LocalScalar<ValueType>(0.0);
@@ -139,7 +139,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* SigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
+    emitters::LLVMValue SigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue xValue) const
     {
         auto x = function.LocalScalar(xValue);
         return emitters::Sigmoid<ValueType>(x);
@@ -155,7 +155,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* TanhActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue) const
+    emitters::LLVMValue TanhActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue xValue) const
     {
         auto x = function.LocalScalar(xValue);
         return emitters::Tanh<ValueType>(x);
@@ -171,7 +171,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* ParametricReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* xValue, llvm::Value* aValue) const
+    emitters::LLVMValue ParametricReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue xValue, emitters::LLVMValue aValue) const
     {
         auto x = function.LocalScalar(xValue);
         auto a = function.LocalScalar(aValue);

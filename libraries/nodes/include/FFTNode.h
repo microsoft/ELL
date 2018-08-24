@@ -8,6 +8,9 @@
 
 #pragma once
 
+// emitters
+#include "LLVMUtilities.h"
+
 // model
 #include "CompilableNode.h"
 #include "IRMapCompiler.h"
@@ -71,22 +74,22 @@ namespace nodes
         void Copy(model::ModelTransformer& transformer) const override;
 
         // Emitting IR for FFT implemenations
-        void EmitFFT_2(emitters::IRFunctionEmitter& function, llvm::Value* input);
-        void EmitFFT_4(emitters::IRFunctionEmitter& function, llvm::Value* input);
-        void EmitFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch);
-        void EmitRealFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch, llvm::Value* complexInput);
+        void EmitFFT_2(emitters::IRFunctionEmitter& function, emitters::LLVMValue input);
+        void EmitFFT_4(emitters::IRFunctionEmitter& function, emitters::LLVMValue input);
+        void EmitFFT(emitters::IRFunctionEmitter& function, size_t length, emitters::LLVMValue input, emitters::LLVMValue scratch);
+        void EmitRealFFT(emitters::IRFunctionEmitter& function, size_t length, emitters::LLVMValue input, emitters::LLVMValue scratch, emitters::LLVMValue complexInput);
 
         // Getting FFT functions
-        llvm::Function* GetRealFFTFunction(emitters::IRModuleEmitter& moduleEmitter, size_t length);
-        llvm::Function* GetFFTFunction(emitters::IRModuleEmitter& moduleEmitter, size_t length);
+        emitters::LLVMFunction GetRealFFTFunction(emitters::IRModuleEmitter& moduleEmitter, size_t length);
+        emitters::LLVMFunction GetFFTFunction(emitters::IRModuleEmitter& moduleEmitter, size_t length);
 
         // Hand-unrolled fixed-size versions
-        llvm::Function* GetFFTFunction_2(emitters::IRModuleEmitter& moduleEmitter);
-        llvm::Function* GetFFTFunction_4(emitters::IRModuleEmitter& moduleEmitter);
+        emitters::LLVMFunction GetFFTFunction_2(emitters::IRModuleEmitter& moduleEmitter);
+        emitters::LLVMFunction GetFFTFunction_4(emitters::IRModuleEmitter& moduleEmitter);
 
         // Performing FFT (either by calling a function or emitting inline code)
-        void DoFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch);
-        void DoRealFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch, llvm::Value* complexInput);
+        void DoFFT(emitters::IRFunctionEmitter& function, size_t length, emitters::LLVMValue input, emitters::LLVMValue scratch);
+        void DoRealFFT(emitters::IRFunctionEmitter& function, size_t length, emitters::LLVMValue input, emitters::LLVMValue scratch, emitters::LLVMValue complexInput);
 
         // Inputs
         model::InputPort<ValueType> _input;

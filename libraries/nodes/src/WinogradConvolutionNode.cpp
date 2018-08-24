@@ -30,7 +30,7 @@ namespace nodes
         //
         template <typename ValueType>
         void PrintBlock(emitters::IRFunctionEmitter& function,
-                        llvm::Value* block,
+                        emitters::LLVMValue block,
                         int rows, int columns, int channels)
         {
             auto blockArray = function.LocalMultidimArray(block, { rows, columns, channels });
@@ -154,7 +154,7 @@ namespace nodes
         }
 
         template <typename ValueType>
-        int GetConstantIntValue(llvm::Value* value)
+        int GetConstantIntValue(emitters::LLVMValue value)
         {
             static_assert(std::is_integral<ValueType>(), "Template parameter must be integral");
             assert(llvm::isa<llvm::ConstantInt>(value));
@@ -325,7 +325,7 @@ namespace nodes
 
             // The size of the input blocks is generally larger than the blocks we want to operate on when
             // doing the transformation itself. So, we'll break the block up into sub-blocks
-            function.For(blockSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            function.For(blockSize, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
                 auto channelIndex = function.LocalScalar(i);
 
                 // Compute a * b * a' for a sub-block of b
@@ -344,7 +344,7 @@ namespace nodes
             });
         }
 
-        void ElementwiseMultiply(emitters::IRFunctionEmitter& function, llvm::Value* AMem, llvm::Value* BMem, int numEntries, llvm::Value* CMem)
+        void ElementwiseMultiply(emitters::IRFunctionEmitter& function, emitters::LLVMValue AMem, emitters::LLVMValue BMem, int numEntries, emitters::LLVMValue CMem)
         {
             auto A = function.LocalArray(AMem);
             auto B = function.LocalArray(BMem);
@@ -358,7 +358,7 @@ namespace nodes
         // Winograd-specific routines
         //
         template <typename ValueType>
-        void TransformInputBlock(emitters::IRFunctionEmitter& function, llvm::Value* inputBlock, int tileSize, int filterSize, int blockSize, llvm::Value* transformedInputBlock)
+        void TransformInputBlock(emitters::IRFunctionEmitter& function, emitters::LLVMValue inputBlock, int tileSize, int filterSize, int blockSize, emitters::LLVMValue transformedInputBlock)
         {
             int windowSize = tileSize + filterSize - 1;
             auto Bt = GetLocalMatrix(function, dsp::GetLeftDataTransformMatrix<ValueType>(tileSize, filterSize));
@@ -370,7 +370,7 @@ namespace nodes
         }
 
         template <typename ValueType>
-        void TransformOutputBlock(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutputBlock, int tileSize, int filterSize, int blockSize, llvm::Value* outputBlock)
+        void TransformOutputBlock(emitters::IRFunctionEmitter& function, emitters::LLVMValue transformedOutputBlock, int tileSize, int filterSize, int blockSize, emitters::LLVMValue outputBlock)
         {
             int windowSize = tileSize + filterSize - 1;
             auto At = GetLocalMatrix(function, dsp::GetLeftResultTransformMatrix<ValueType>(tileSize, filterSize));
@@ -388,7 +388,7 @@ namespace nodes
         //
         template <typename ValueType>
         void GetInputBlock(emitters::IRFunctionEmitter& function,
-                           llvm::Value* input,
+                           emitters::LLVMValue input,
                            emitters::IRLocalScalar tileRow,
                            emitters::IRLocalScalar tileColumn,
                            emitters::IRLocalScalar channel,
@@ -399,7 +399,7 @@ namespace nodes
                            int tileSize,
                            int filterSize,
                            int blockSize,
-                           llvm::Value* inputBlock)
+                           emitters::LLVMValue inputBlock)
         {
             // input: inputImageRows x inputImageColumns x numChannels tensor
             // inputBlock: windowSize x windowSize x blockSize block extracted from the given channel with the given upper-left coordinates
@@ -411,14 +411,14 @@ namespace nodes
             const auto inputColumnStride = numChannels;
 
             // check for constant tile row on last row
-            if (llvm::isa<llvm::ConstantInt>(static_cast<llvm::Value*>(tileRow)))
+            if (llvm::isa<llvm::ConstantInt>(static_cast<emitters::LLVMValue>(tileRow)))
             {
                 auto tileRowStart = GetConstantIntValue<int>(tileRow) * tileSize;
                 windowRows = std::min(windowSize, inputRows - tileRowStart);
             }
 
             // check for constant tile column on last column
-            if (llvm::isa<llvm::ConstantInt>(static_cast<llvm::Value*>(tileColumn)))
+            if (llvm::isa<llvm::ConstantInt>(static_cast<emitters::LLVMValue>(tileColumn)))
             {
                 auto tileColumnStart = GetConstantIntValue<int>(tileColumn) * tileSize;
                 windowColumns = std::min(windowSize, inputColumns - tileColumnStart);
@@ -463,7 +463,7 @@ namespace nodes
         // of each tranformed input tile, and so on.
         template <typename ValueType>
         void SplatTransformedInputBlock(emitters::IRFunctionEmitter& function,
-                                        llvm::Value* transformedInputBlock,
+                                        emitters::LLVMValue transformedInputBlock,
                                         emitters::IRLocalScalar tileRow,
                                         emitters::IRLocalScalar tileColumn,
                                         emitters::IRLocalScalar channel,
@@ -473,7 +473,7 @@ namespace nodes
                                         int tileSize,
                                         int filterSize,
                                         int blockSize,
-                                        llvm::Value* transformedInput)
+                                        emitters::LLVMValue transformedInput)
         {
             const int windowSize = tileSize + filterSize - 1;
             const auto numTileRows = (numOutputRows + tileSize - 1) / tileSize;
@@ -490,7 +490,7 @@ namespace nodes
 
         template <typename ValueType>
         void ProcessInputBlock(emitters::IRFunctionEmitter& function,
-                               llvm::Value* input,
+                               emitters::LLVMValue input,
                                emitters::IRLocalScalar tileRow,
                                emitters::IRLocalScalar tileColumn,
                                emitters::IRLocalScalar channelIndex,
@@ -501,9 +501,9 @@ namespace nodes
                                int tileSize,
                                int filterSize,
                                int blockSize,
-                               llvm::Value* inputBlock,
-                               llvm::Value* transformedInputBlock,
-                               llvm::Value* transformedInput)
+                               emitters::LLVMValue inputBlock,
+                               emitters::LLVMValue transformedInputBlock,
+                               emitters::LLVMValue transformedInput)
         {
             // input: inputImageRows x inputImageColumns x numChannels tensor
             // transformedInput is a windowSize x windowSize x tileRows x tileColumns x numChannels tensor containing the entire transformed input signal
@@ -515,7 +515,7 @@ namespace nodes
         }
 
         template <typename ValueType>
-        void GetTransformedOutputBlock(emitters::IRFunctionEmitter& function, llvm::Value* transformedOutput, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int numOutputRows, int numOutputColumns, int numFilters, int tileSize, int filterSize, int blockSize, llvm::Value* transformedOutputBlock)
+        void GetTransformedOutputBlock(emitters::IRFunctionEmitter& function, emitters::LLVMValue transformedOutput, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int numOutputRows, int numOutputColumns, int numFilters, int tileSize, int filterSize, int blockSize, emitters::LLVMValue transformedOutputBlock)
         {
             const auto windowSize = tileSize + filterSize - 1;
             const auto numTileRows = ((numOutputRows - 1) / tileSize) + 1;
@@ -532,20 +532,20 @@ namespace nodes
         }
 
         template <typename ValueType>
-        void SplatOutputTile(emitters::IRFunctionEmitter& function, llvm::Value* outputTile, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int numOutputRows, int numOutputColumns, int numFilters, int tileSize, int blockSize, llvm::Value* output)
+        void SplatOutputTile(emitters::IRFunctionEmitter& function, emitters::LLVMValue outputTile, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int numOutputRows, int numOutputColumns, int numFilters, int tileSize, int blockSize, emitters::LLVMValue output)
         {
             auto tileRowSize = tileSize;
             auto tileColumnSize = tileSize;
 
             // check for constant tile row on last row
-            if (llvm::isa<llvm::ConstantInt>(static_cast<llvm::Value*>(tileRow)))
+            if (llvm::isa<llvm::ConstantInt>(static_cast<emitters::LLVMValue>(tileRow)))
             {
                 auto tileStart = GetConstantIntValue<int>(tileRow) * tileSize;
                 tileRowSize = std::min(tileSize, numOutputRows - tileStart);
             }
 
             // check for constant tile column on last column
-            if (llvm::isa<llvm::ConstantInt>(static_cast<llvm::Value*>(tileColumn)))
+            if (llvm::isa<llvm::ConstantInt>(static_cast<emitters::LLVMValue>(tileColumn)))
             {
                 auto tileStart = GetConstantIntValue<int>(tileColumn) * tileSize;
                 tileColumnSize = std::min(tileSize, numOutputColumns - tileStart);
@@ -567,20 +567,20 @@ namespace nodes
         }
 
         template <typename ValueType>
-        void AccumulateOutputTile(emitters::IRFunctionEmitter& function, llvm::Value* outputTile, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int numOutputRows, int numOutputColumns, int numFilters, int tileSize, int blockSize, llvm::Value* output)
+        void AccumulateOutputTile(emitters::IRFunctionEmitter& function, emitters::LLVMValue outputTile, emitters::IRLocalScalar tileRow, emitters::IRLocalScalar tileColumn, emitters::IRLocalScalar filterIndex, int numOutputRows, int numOutputColumns, int numFilters, int tileSize, int blockSize, emitters::LLVMValue output)
         {
             auto tileRowSize = tileSize;
             auto tileColumnSize = tileSize;
 
             // check for constant tile row on last row
-            if (llvm::isa<llvm::ConstantInt>(static_cast<llvm::Value*>(tileRow)))
+            if (llvm::isa<llvm::ConstantInt>(static_cast<emitters::LLVMValue>(tileRow)))
             {
                 auto tileStart = GetConstantIntValue<int>(tileRow) * tileSize;
                 tileRowSize = std::min(tileSize, numOutputRows - tileStart);
             }
 
             // check for constant tile column on last column
-            if (llvm::isa<llvm::ConstantInt>(static_cast<llvm::Value*>(tileColumn)))
+            if (llvm::isa<llvm::ConstantInt>(static_cast<emitters::LLVMValue>(tileColumn)))
             {
                 auto tileStart = GetConstantIntValue<int>(tileColumn) * tileSize;
                 tileColumnSize = std::min(tileSize, numOutputColumns - tileStart);
@@ -614,7 +614,7 @@ namespace nodes
         //
         template <typename ValueType>
         void ProcessOutputBlock(emitters::IRFunctionEmitter& function,
-                                llvm::Value* transformedOutput,
+                                emitters::LLVMValue transformedOutput,
                                 emitters::IRLocalScalar tileRow,
                                 emitters::IRLocalScalar tileColumn,
                                 emitters::IRLocalScalar filterIndex,
@@ -624,9 +624,9 @@ namespace nodes
                                 int tileSize,
                                 int filterSize,
                                 int blockSize,
-                                llvm::Value* transformedOutputBlock,
-                                llvm::Value* outputTile,
-                                llvm::Value* output)
+                                emitters::LLVMValue transformedOutputBlock,
+                                emitters::LLVMValue outputTile,
+                                emitters::LLVMValue output)
         {
             // transformedOutput is a numTileRows, numTileColumns, numFilters image tensor containing the convolution result
             GetTransformedOutputBlock<ValueType>(function, transformedOutput, tileRow, tileColumn, filterIndex, numOutputRows, numOutputColumns, numFilters, tileSize, filterSize, blockSize, transformedOutputBlock);
@@ -643,8 +643,8 @@ namespace nodes
         //
         template <typename ValueType>
         void ConvolveAccumulateBlock(emitters::IRFunctionEmitter& function,
-                                     llvm::Value* input,
-                                     llvm::Value* filterChannel,
+                                     emitters::LLVMValue input,
+                                     emitters::LLVMValue filterChannel,
                                      emitters::IRLocalScalar tileRow,
                                      emitters::IRLocalScalar tileColumn,
                                      emitters::IRLocalScalar channelIndex,
@@ -657,11 +657,11 @@ namespace nodes
                                      int tileSize,
                                      int filterSize,
                                      int blockSize,
-                                     llvm::Value* inputBlock,
-                                     llvm::Value* transformedInputBlock,
-                                     llvm::Value* transformedOutputBlock,
-                                     llvm::Value* outputTile,
-                                     llvm::Value* output)
+                                     emitters::LLVMValue inputBlock,
+                                     emitters::LLVMValue transformedInputBlock,
+                                     emitters::LLVMValue transformedOutputBlock,
+                                     emitters::LLVMValue outputTile,
+                                     emitters::LLVMValue output)
         {
             const auto windowSize = filterSize + tileSize - 1;
 
@@ -684,7 +684,7 @@ namespace nodes
         //
         template <typename ValueType>
         void TransformInput(emitters::IRFunctionEmitter& function,
-                            llvm::Value* input,
+                            emitters::LLVMValue input,
                             int numOutputRows,
                             int numOutputColumns,
                             int numChannels,
@@ -692,7 +692,7 @@ namespace nodes
                             int tileSize,
                             int filterSize,
                             int blockSize,
-                            llvm::Value* transformedInput)
+                            emitters::LLVMValue transformedInput)
         {
             const int windowSize = tileSize + filterSize - 1;
             const auto numFullTileRows = numOutputRows / tileSize;
@@ -705,9 +705,9 @@ namespace nodes
             llvm::AllocaInst* transformedInputBlock = function.Variable(emitters::GetVariableType<ValueType>(), windowSize * windowSize * blockSize);
 
             // Get transformed input for all "full" windows (ones that don't fall off the edge or bottom of the input image)
-            function.For(numFullTileRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* index1) {
+            function.For(numFullTileRows, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue index1) {
                 auto rowTileIndex = function.LocalScalar(index1);
-                function.For(numFullTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index2) {
+                function.For(numFullTileColumns, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue index2) {
                     auto columnTileIndex = function.LocalScalar(index2);
                     for (int channelIndex = 0; channelIndex < numChannels; channelIndex += blockSize)
                     {
@@ -732,7 +732,7 @@ namespace nodes
             if (numTileRows > numFullTileRows)
             {
                 auto rowTileIndex = function.LocalScalar(numFullTileRows);
-                function.For(numTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index2) {
+                function.For(numTileColumns, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue index2) {
                     auto columnTileIndex = function.LocalScalar(index2);
                     for (int channelIndex = 0; channelIndex < numChannels; channelIndex += blockSize)
                     {
@@ -758,15 +758,15 @@ namespace nodes
         // Apply the (tranformed) filters to the transformed input to produce the transformed output
         template <typename ValueType>
         void ComputeTransformedOutput(emitters::IRFunctionEmitter& function,
-                                      llvm::Value* transformedInput,
-                                      llvm::Value* transformedFilters,
+                                      emitters::LLVMValue transformedInput,
+                                      emitters::LLVMValue transformedFilters,
                                       int numOutputRows,
                                       int numOutputColumns,
                                       int numChannels,
                                       int numFilters,
                                       int tileSize,
                                       int filterSize,
-                                      llvm::Value* transformedOutput)
+                                      emitters::LLVMValue transformedOutput)
         {
             // Do a matrix multiply to reduce many entries in parallel
             //
@@ -808,14 +808,14 @@ namespace nodes
 
         template <typename ValueType>
         void TransformOutput(emitters::IRFunctionEmitter& function,
-                             llvm::Value* transformedOutput,
+                             emitters::LLVMValue transformedOutput,
                              int numOutputRows,
                              int numOutputColumns,
                              int numFilters,
                              int tileSize,
                              int filterSize,
                              int blockSize,
-                             llvm::Value* output)
+                             emitters::LLVMValue output)
         {
             const int windowSize = tileSize + filterSize - 1;
             const auto numFullTileRows = numOutputRows / tileSize;
@@ -831,11 +831,11 @@ namespace nodes
                 auto irFilterIndex = function.LocalScalar<int>(filterIndex);
 
                 int thisBlockSize = numFilters - filterIndex > blockSize ? blockSize : numFilters - filterIndex;
-                function.For(numFullTileRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* index2) {
+                function.For(numFullTileRows, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue index2) {
                     auto rowTileIndex = function.LocalScalar(index2);
 
                     // First output all of the complete tiles for this row
-                    function.For(numFullTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index3) {
+                    function.For(numFullTileColumns, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue index3) {
                         auto columnTileIndex = function.LocalScalar(index3);
 
                         ProcessOutputBlock<ValueType>(function, transformedOutput, rowTileIndex, columnTileIndex, irFilterIndex, numOutputRows, numOutputColumns, numFilters, tileSize, filterSize, thisBlockSize, transformedOutputBlock, outputTile, output);
@@ -853,7 +853,7 @@ namespace nodes
                 if (numTileRows > numFullTileRows)
                 {
                     auto rowTileIndex = function.LocalScalar(numFullTileRows);
-                    function.For(numFullTileColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* index3) {
+                    function.For(numFullTileColumns, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue index3) {
                         auto columnTileIndex = function.LocalScalar(index3);
                         ProcessOutputBlock<ValueType>(function, transformedOutput, rowTileIndex, columnTileIndex, irFilterIndex, numOutputRows, numOutputColumns, numFilters, tileSize, filterSize, thisBlockSize, transformedOutputBlock, outputTile, output);
                     });
@@ -1020,9 +1020,9 @@ namespace nodes
     template <typename ValueType>
     void WinogradConvolutionComputeNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* input = compiler.EnsurePortEmitted(this->input);
-        llvm::Value* transformedFilters = compiler.EnsurePortEmitted(this->filterWeights);
-        llvm::Value* output = compiler.EnsurePortEmitted(this->output);
+        emitters::LLVMValue input = compiler.EnsurePortEmitted(this->input);
+        emitters::LLVMValue transformedFilters = compiler.EnsurePortEmitted(this->filterWeights);
+        emitters::LLVMValue output = compiler.EnsurePortEmitted(this->output);
 
         switch (_order)
         {
@@ -1039,7 +1039,7 @@ namespace nodes
 
     template <typename ValueType>
     void WinogradConvolutionComputeNode<ValueType>::CompileTilesFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function,
-                                                                      llvm::Value* input, llvm::Value* transformedFilters, llvm::Value* output)
+                                                                      emitters::LLVMValue input, emitters::LLVMValue transformedFilters, emitters::LLVMValue output)
     {
         auto& module = function.GetModule();
 
@@ -1078,7 +1078,7 @@ namespace nodes
 
     template <typename ValueType>
     void WinogradConvolutionComputeNode<ValueType>::CompileFiltersFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function,
-                                                                        llvm::Value* input, llvm::Value* transformedFilters, llvm::Value* output)
+                                                                        emitters::LLVMValue input, emitters::LLVMValue transformedFilters, emitters::LLVMValue output)
     {
         const auto windowSize = _filterSize + _tileSize - 1;
 
@@ -1115,19 +1115,19 @@ namespace nodes
         llvm::AllocaInst* transformedOutputBlock = function.Variable(emitters::GetVariableType<ValueType>(), windowSize * windowSize * blockSize);
         llvm::AllocaInst* outputTile = function.Variable(emitters::GetVariableType<ValueType>(), _tileSize * _tileSize * blockSize);
 
-        function.For(numFilters, [transformedFilters, numFullTileRows, numFullTileColumns, numTileRows, numTileColumns, numChannels, numFilters, numFilterChannels, numOutputRows, numOutputColumns, inputRowStride, filterStride, filterChannelStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+        function.For(numFilters, [transformedFilters, numFullTileRows, numFullTileColumns, numTileRows, numTileColumns, numChannels, numFilters, numFilterChannels, numOutputRows, numOutputColumns, inputRowStride, filterStride, filterChannelStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             auto filterIndex = function.LocalScalar(i);
             auto channelStart = (filterIndex * numFilterChannels) % numChannels;
 
-            function.For(numFilterChannels, [filterIndex, channelStart, transformedFilters, numFullTileRows, numFullTileColumns, numTileRows, numTileColumns, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, filterStride, filterChannelStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, llvm::Value* j) {
+            function.For(numFilterChannels, [filterIndex, channelStart, transformedFilters, numFullTileRows, numFullTileColumns, numTileRows, numTileColumns, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, filterStride, filterChannelStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue j) {
                 auto filterChannel = function.LocalScalar(j);
                 auto channelIndex = channelStart + filterChannel;
                 auto filterChannelPtr = function.PointerOffset(transformedFilters, filterIndex * filterStride + filterChannel * filterChannelStride);
 
                 // Convolve all "full" windows (ones that don't fall off the edge or bottom of the input image)
-                function.For(numFullTileRows, [channelIndex, filterIndex, numFullTileColumns, numTileColumns, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, llvm::Value* k) {
+                function.For(numFullTileRows, [channelIndex, filterIndex, numFullTileColumns, numTileColumns, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue k) {
                     auto tileRowIndex = function.LocalScalar(k);
-                    function.For(numFullTileColumns, [tileRowIndex, channelIndex, filterIndex, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, llvm::Value* l) {
+                    function.For(numFullTileColumns, [tileRowIndex, channelIndex, filterIndex, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue l) {
                         auto tileColumnIndex = function.LocalScalar(l);
                         ConvolveAccumulateBlock<ValueType>(function, input, filterChannelPtr, tileRowIndex, tileColumnIndex, channelIndex, filterIndex, inputRowStride, numOutputRows, numOutputColumns, numChannels, numFilters, _tileSize, _filterSize, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, output);
                     });
@@ -1144,7 +1144,7 @@ namespace nodes
                 if (numTileRows > numFullTileRows)
                 {
                     auto tileRowIndex = function.LocalScalar(numFullTileRows);
-                    function.For(numFullTileColumns, [tileRowIndex, channelIndex, filterIndex, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, llvm::Value* l) {
+                    function.For(numFullTileColumns, [tileRowIndex, channelIndex, filterIndex, filterChannelPtr, numChannels, numFilters, numOutputRows, numOutputColumns, inputRowStride, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, input, output, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue l) {
                         auto tileColumnIndex = function.LocalScalar(l);
                         ConvolveAccumulateBlock<ValueType>(function, input, filterChannelPtr, tileRowIndex, tileColumnIndex, channelIndex, filterIndex, inputRowStride, numOutputRows, numOutputColumns, numChannels, numFilters, _tileSize, _filterSize, blockSize, inputBlock, transformedInputBlock, transformedOutputBlock, outputTile, output);
                     });

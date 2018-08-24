@@ -185,7 +185,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Function* UnaryOperationNode<ValueType>::GetOperator(emitters::IRFunctionEmitter& function) const
+    emitters::LLVMFunction UnaryOperationNode<ValueType>::GetOperator(emitters::IRFunctionEmitter& function) const
     {
         switch (this->GetOperation())
         {
@@ -241,12 +241,12 @@ namespace nodes
     {
         // Loop version broken
         auto count = input.Size();
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
-        function.For(count, [pInput, pResult, this](emitters::IRFunctionEmitter& function, llvm::Value* i) {
-            llvm::Value* inputValue = function.ValueAt(pInput, i);
-            llvm::Value* pOpResult = function.Call(GetOperator(function), { inputValue });
+        function.For(count, [pInput, pResult, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
+            emitters::LLVMValue inputValue = function.ValueAt(pInput, i);
+            emitters::LLVMValue pOpResult = function.Call(GetOperator(function), { inputValue });
             function.SetValueAt(pResult, i, pOpResult);
         });
     }
@@ -254,12 +254,12 @@ namespace nodes
     template <typename ValueType>
     void UnaryOperationNode<ValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
         for (size_t i = 0; i < input.Size(); ++i)
         {
-            llvm::Value* inputValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
-            llvm::Value* pOpResult = function.Call(GetOperator(function), { inputValue });
+            emitters::LLVMValue inputValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
+            emitters::LLVMValue pOpResult = function.Call(GetOperator(function), { inputValue });
             function.SetValueAt(pResult, function.Literal((int)i), pOpResult);
         }
     }

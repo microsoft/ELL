@@ -9,6 +9,7 @@
 #pragma once
 
 #include "IRLocalScalar.h"
+#include "LLVMUtilities.h"
 
 // utilities
 #include "Exception.h"
@@ -35,17 +36,17 @@ namespace emitters
         /// </summary>
         struct IRLocalArrayElement
         {
-            IRLocalArrayElement(IRFunctionEmitter& function, llvm::Value* data, llvm::Value* offset);
+            IRLocalArrayElement(IRFunctionEmitter& function, LLVMValue data, LLVMValue offset);
 
             IRLocalArrayElement& operator=(const IRLocalArrayElement& other);
 
-            IRLocalArrayElement& operator=(llvm::Value* value);
+            IRLocalArrayElement& operator=(LLVMValue value);
 
             operator IRLocalScalar() const;
 
             IRFunctionEmitter& _function;
-            llvm::Value* _data;
-            llvm::Value* _offset;
+            LLVMValue _data;
+            LLVMValue _offset;
         };
 
     public:
@@ -54,7 +55,7 @@ namespace emitters
         /// <param name="function"> The current function being emitted. </param>
         /// <param name="data"> The pointer to the LLVM array to wrap. </param>
         /// <param name="extents"> The sizes of the array's dimensions. </param>
-        IRLocalMultidimArray(IRFunctionEmitter& function, llvm::Value* data, std::vector<int> extents);
+        IRLocalMultidimArray(IRFunctionEmitter& function, LLVMValue data, std::vector<int> extents);
 
         /// <summary> Constructor from a pointer to data and a list of logical and physical dimensions. </summary>
         ///
@@ -62,7 +63,7 @@ namespace emitters
         /// <param name="data"> The pointer to the LLVM array to wrap. </param>
         /// <param name="extents"> The sizes of the array's logical dimensions. </param>
         /// <param name="memorySize"> The sizes of the array's physical dimensions. </param>
-        IRLocalMultidimArray(IRFunctionEmitter& function, llvm::Value* data, std::vector<int> extents, std::vector<int> memorySize);
+        IRLocalMultidimArray(IRFunctionEmitter& function, LLVMValue data, std::vector<int> extents, std::vector<int> memorySize);
 
         /// <summary> Indexing operator to return a reference to the specified element </summary>
         ///
@@ -95,8 +96,8 @@ namespace emitters
         /// <summary> The function this value is in scope for. </summary>
         IRFunctionEmitter& function;
 
-        /// <summary> The llvm::Value* being wrapped. </summary>
-        llvm::Value* data = nullptr;
+        /// <summary> The LLVMValue being wrapped. </summary>
+        LLVMValue data = nullptr;
 
         std::vector<int> extents;
         std::vector<int> strides;
@@ -108,7 +109,7 @@ namespace emitters
     template <size_t N>
     struct IRLocalNDimArray : IRLocalMultidimArray
     {
-        IRLocalNDimArray(IRFunctionEmitter& function, llvm::Value* data, std::array<int, N> extents, std::array<int, N> layout)
+        IRLocalNDimArray(IRFunctionEmitter& function, LLVMValue data, std::array<int, N> extents, std::array<int, N> layout)
             : IRLocalMultidimArray(function, data, ToLayoutOrder(extents, layout)), layout(layout)
         {
             constexpr auto expectedLayout = utilities::MakeNArray<N>();

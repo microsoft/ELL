@@ -19,7 +19,7 @@ namespace emitters
     }
 
     template <typename ListType>
-    void IREmitter::BindArgumentNames(llvm::Function* pFunction, const ListType& arguments)
+    void IREmitter::BindArgumentNames(LLVMFunction pFunction, const ListType& arguments)
     {
         size_t i = 0;
         for (auto& argument : pFunction->args())

@@ -169,15 +169,15 @@ namespace nodes
     template <typename ValueType>
     void BinaryPredicateNode<ValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
-        llvm::Value* pInput2 = compiler.EnsurePortEmitted(input2);
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput1 = compiler.EnsurePortEmitted(input1);
+        emitters::LLVMValue pInput2 = compiler.EnsurePortEmitted(input2);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
         emitters::TypedComparison cmp = emitters::GetComparison<ValueType>(GetPredicate());
 
-        function.For(input1.Size(), [pInput1, pInput2, pResult, cmp ](emitters::IRFunctionEmitter& function, llvm::Value* i) {
-            llvm::Value* inputValue1 = function.ValueAt(pInput1, i);
-            llvm::Value* inputValue2 = function.ValueAt(pInput2, i);
-            llvm::Value* pOpResult = function.Comparison(cmp, inputValue1, inputValue2);
+        function.For(input1.Size(), [pInput1, pInput2, pResult, cmp ](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
+            emitters::LLVMValue inputValue1 = function.ValueAt(pInput1, i);
+            emitters::LLVMValue inputValue2 = function.ValueAt(pInput2, i);
+            emitters::LLVMValue pOpResult = function.Comparison(cmp, inputValue1, inputValue2);
             // LLVM internally uses 1 bit for boolean. We use integers to store boolean results (see CompileElementSelector). That requires a typecast in LLVM
             function.SetValueAt(pResult, i, function.CastBoolToByte(pOpResult));
         });
@@ -186,13 +186,13 @@ namespace nodes
     template <typename ValueType>
     void BinaryPredicateNode<ValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
         auto count = input1.Size();
         for (size_t i = 0; i < count; ++i)
         {
-            llvm::Value* inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
-            llvm::Value* inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
+            emitters::LLVMValue inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
+            emitters::LLVMValue inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
 
             if (inputValue1->getType()->isIntegerTy())
             {
@@ -202,8 +202,8 @@ namespace nodes
             {
                 function.Printf("input1 : %f, input 2: %f\n", { function.CastValue<float, double>(inputValue1), function.CastValue<float, double>(inputValue2) });
             }
-            llvm::Value* pOpResult = function.Comparison(emitters::GetComparison<ValueType>(GetPredicate()), inputValue1, inputValue2);
-            
+            emitters::LLVMValue pOpResult = function.Comparison(emitters::GetComparison<ValueType>(GetPredicate()), inputValue1, inputValue2);
+
             function.SetValueAt(pResult, function.Literal((int)i), function.CastBoolToByte(pOpResult));
         }
     }

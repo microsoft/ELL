@@ -21,7 +21,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* BroadcastUnaryFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, const std::vector<llvm::Value*>& secondaryArgs) const
+    emitters::LLVMValue BroadcastUnaryFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const
     {
         assert(secondaryArgs.size() == 0);
         return this->Compile(function, x);
@@ -38,7 +38,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* BroadcastBinaryFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, const std::vector<llvm::Value*>& secondaryArgs) const
+    emitters::LLVMValue BroadcastBinaryFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const
     {
         assert(secondaryArgs.size() == 1);
         return this->Compile(function, x, secondaryArgs[0]);
@@ -55,7 +55,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* BroadcastTernaryFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, const std::vector<llvm::Value*>& secondaryArgs) const
+    emitters::LLVMValue BroadcastTernaryFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const
     {
         assert(secondaryArgs.size() == 2);
         return this->Compile(function, x, secondaryArgs[0], secondaryArgs[1]);
@@ -71,7 +71,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Value* BroadcastLinearFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* scale, llvm::Value* bias) const
+    emitters::LLVMValue BroadcastLinearFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, emitters::LLVMValue scale, emitters::LLVMValue bias) const
     {
         if (scale == nullptr) // bias only
         {
@@ -232,8 +232,8 @@ namespace nodes
             // get stuff from arguments
             auto arguments = taskFunction.Arguments().begin();
             auto primaryInput = &(*arguments++);
-            std::vector<llvm::Value*> secondaryInputs;
-            std::vector<llvm::Value*> secondaryValues;
+            std::vector<emitters::LLVMValue> secondaryInputs;
+            std::vector<emitters::LLVMValue> secondaryValues;
             for (int index = 0; index < NumSecondaryInputs(); ++index)
             {
                 auto secondaryInput = &(*arguments++);
@@ -268,10 +268,10 @@ namespace nodes
                                                                                   size_t dimension,
                                                                                   emitters::IRLocalScalar begin,
                                                                                   emitters::IRLocalScalar end,
-                                                                                  llvm::Value* primaryInput, const std::vector<llvm::Value*>& secondaryInputs,
-                                                                                  llvm::Value* output,
+                                                                                  emitters::LLVMValue primaryInput, const std::vector<emitters::LLVMValue>& secondaryInputs,
+                                                                                  emitters::LLVMValue output,
                                                                                   emitters::IRLocalScalar prevInputDimensionOffset, emitters::IRLocalScalar prevOutputDimensionOffset,
-                                                                                  std::vector<llvm::Value*>& secondaryValues) const
+                                                                                  std::vector<emitters::LLVMValue>& secondaryValues) const
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
         //       Or, instead of unrolling, vectorizing --- if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
@@ -382,18 +382,18 @@ namespace nodes
         DEBUG_USED(secondaryInputSize);
         assert(secondaryInputSize == 0 || primaryInputSize % secondaryInputSize == 0);
 
-        llvm::Value* pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);
-        std::vector<llvm::Value*> secondaryInputs;
-        std::vector<llvm::Value*> secondaryValues;
+        emitters::LLVMValue pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);
+        std::vector<emitters::LLVMValue> secondaryInputs;
+        std::vector<emitters::LLVMValue> secondaryValues;
         for (int index = 0; index < NumSecondaryInputs(); ++index)
         {
             auto secondaryInputPort = GetSecondaryInput(index);
             auto secondaryInputSize = secondaryInputPort->Size();
-            llvm::Value* secondaryInput = (secondaryInputSize > 0) ? compiler.EnsurePortEmitted(*secondaryInputPort) : function.NullPointer(valuePtrType);
+            emitters::LLVMValue secondaryInput = (secondaryInputSize > 0) ? compiler.EnsurePortEmitted(*secondaryInputPort) : function.NullPointer(valuePtrType);
             secondaryInputs.push_back(secondaryInput);
             secondaryValues.push_back(nullptr);
         }
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(GetOutput(), this->GetOutputPadding());
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(GetOutput(), this->GetOutputPadding());
 
         // Call recursive function to emit nested loops
         // Note: We could just offset the input pointer at beginning instead of adding offset every time through the loop
@@ -434,13 +434,13 @@ namespace nodes
             taskFunctionArgTypes.push_back(pOutput->getType());
 
             auto taskFunction = this->GetTaskFunction(compiler, function, taskFunctionArgTypes);
-            std::vector<std::vector<llvm::Value*>> taskArgs;
+            std::vector<std::vector<emitters::LLVMValue>> taskArgs;
             for (int taskIndex = 0; taskIndex < numTasks; ++taskIndex)
             {
                 auto begin = function.Literal<int>(taskIndex * taskSize);
                 auto end = function.Literal<int>(std::min((taskIndex + 1) * taskSize, numOuterIterations));
 
-                std::vector<llvm::Value*> args{ pPrimaryInput };
+                std::vector<emitters::LLVMValue> args{ pPrimaryInput };
                 args.insert(args.end(), secondaryInputs.begin(), secondaryInputs.end());
                 args.insert(args.end(), { pOutput, begin, end });
             }

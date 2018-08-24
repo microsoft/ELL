@@ -53,7 +53,7 @@ namespace emitters
         }
     }
 
-    void IROptimizer::OptimizeFunction(llvm::Function* pFunction)
+    void IROptimizer::OptimizeFunction(LLVMFunction pFunction)
     {
         assert(pFunction != nullptr);
         _functionPasses.run(*pFunction);

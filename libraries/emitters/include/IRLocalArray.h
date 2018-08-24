@@ -9,6 +9,7 @@
 #pragma once
 
 #include "IRLocalScalar.h"
+#include "LLVMUtilities.h"
 
 namespace llvm
 {
@@ -30,17 +31,17 @@ namespace emitters
         /// </summary>
         struct IRLocalArrayValue
         {
-            IRLocalArrayValue(IRFunctionEmitter& function, llvm::Value* pPointer, llvm::Value* pOffset);
+            IRLocalArrayValue(IRFunctionEmitter& function, LLVMValue pPointer, LLVMValue pOffset);
 
             IRLocalArrayValue& operator=(const IRLocalArrayValue& value);
 
-            IRLocalArrayValue& operator=(llvm::Value* value);
+            IRLocalArrayValue& operator=(LLVMValue value);
 
             operator IRLocalScalar() const;
 
             IRFunctionEmitter& _function;
-            llvm::Value* _pPointer;
-            llvm::Value* _pOffset;
+            LLVMValue _pPointer;
+            LLVMValue _pOffset;
         };
 
     public:

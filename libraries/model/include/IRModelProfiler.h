@@ -13,10 +13,7 @@
 
 // emitters
 #include "EmitterTypes.h"
-
-// llvm
-#include <llvm/IR/DerivedTypes.h>
-#include <llvm/IR/Value.h>
+#include "LLVMUtilities.h"
 
 // stl
 #include <map>
@@ -64,13 +61,13 @@ namespace model
     private:
         friend class NodePerformanceEmitter;
 
-        NodeInfoEmitter(emitters::IRModuleEmitter& module, const Node* node, llvm::Value* nodeInfoPtr, llvm::StructType* nodeInfoType);
+        NodeInfoEmitter(emitters::IRModuleEmitter& module, const Node* node, emitters::LLVMValue nodeInfoPtr, llvm::StructType* nodeInfoType);
         void Init(emitters::IRFunctionEmitter& function);
 
         emitters::IRModuleEmitter* _module = nullptr;
         const Node* _node = nullptr;
 
-        llvm::Value* _nodeInfoPtr = nullptr;
+        emitters::LLVMValue _nodeInfoPtr = nullptr;
         llvm::StructType* _nodeInfoType = nullptr;
     };
 
@@ -85,18 +82,18 @@ namespace model
         friend class ModelProfiler;
         friend class NodePerformanceEmitter;
 
-        PerformanceCountersEmitter(emitters::IRModuleEmitter& module, llvm::Value* performanceCountersPtr, llvm::StructType* performanceCountersType);
+        PerformanceCountersEmitter(emitters::IRModuleEmitter& module, emitters::LLVMValue performanceCountersPtr, llvm::StructType* performanceCountersType);
         void Init(emitters::IRFunctionEmitter& function);
-        void Start(emitters::IRFunctionEmitter& function, llvm::Value* startTime);
-        void End(emitters::IRFunctionEmitter& function, llvm::Value* startTime);
+        void Start(emitters::IRFunctionEmitter& function, emitters::LLVMValue startTime);
+        void End(emitters::IRFunctionEmitter& function, emitters::LLVMValue startTime);
         void Reset(emitters::IRFunctionEmitter& function);
 
         emitters::IRModuleEmitter* _module = nullptr;
-        llvm::Value* _performanceCountersPtr = nullptr;
+        emitters::LLVMValue _performanceCountersPtr = nullptr;
         llvm::StructType* _performanceCountersType = nullptr;
 
         // Temporary value used during processing
-        llvm::Value* _startTime = nullptr;
+        emitters::LLVMValue _startTime = nullptr;
     };
 
     /// <summary> A utility class that holds a NodeInfoEmitter and a PerformanceCounterEmitter. </summary>
@@ -108,13 +105,13 @@ namespace model
 
     private:
         void Init(emitters::IRFunctionEmitter& function);
-        void Start(emitters::IRFunctionEmitter& function, llvm::Value* startTime);
-        void End(emitters::IRFunctionEmitter& function, llvm::Value* endTime);
+        void Start(emitters::IRFunctionEmitter& function, emitters::LLVMValue startTime);
+        void End(emitters::IRFunctionEmitter& function, emitters::LLVMValue endTime);
         void Reset(emitters::IRFunctionEmitter& function);
 
         friend class ModelProfiler;
 
-        NodePerformanceEmitter(emitters::IRModuleEmitter& module, const Node* node, llvm::Value* nodeInfoPtr, llvm::Value* NodePerformanceEmitterPtr, llvm::StructType* nodeInfoType, llvm::StructType* NodePerformanceEmitterType);
+        NodePerformanceEmitter(emitters::IRModuleEmitter& module, const Node* node, emitters::LLVMValue nodeInfoPtr, emitters::LLVMValue NodePerformanceEmitterPtr, llvm::StructType* nodeInfoType, llvm::StructType* NodePerformanceEmitterType);
 
         // emitters for info and perf counters
         NodeInfoEmitter _nodeInfoEmitter;
@@ -202,7 +199,7 @@ namespace model
         void EmitPrintNodeTypeProfilingInfoFunction();
         void EmitResetNodeTypeProfilingInfoFunction();
 
-        llvm::Value* CallGetCurrentTime(emitters::IRFunctionEmitter& function);
+        emitters::LLVMValue CallGetCurrentTime(emitters::IRFunctionEmitter& function);
 
         emitters::IRModuleEmitter* _module = nullptr;
         Model* _model = nullptr;

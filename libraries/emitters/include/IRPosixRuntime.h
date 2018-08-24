@@ -9,10 +9,7 @@
 #pragma once
 
 #include "EmitterTypes.h"
-
-// llvm
-#include <llvm/IR/Function.h>
-#include <llvm/IR/Type.h>
+#include "LLVMUtilities.h"
 
 namespace ell
 {
@@ -38,7 +35,7 @@ namespace emitters
         llvm::StructType* GetTimespecType();
 
         /// <summary> Gets the LLVM type for a pointer to the `timespec` structure on the current target. </summary>
-        llvm::Type* GetTimespecPointerType();
+        LLVMType GetTimespecPointerType();
 
         //
         // pthreads
@@ -51,112 +48,112 @@ namespace emitters
         // pthreads -- thread functions
         //
 
-        /// <summary> Gets an llvm::Function* representing the pthread_create function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_create function. </summary>
         /// int pthread_create(pthread_t * thread, const pthread_attr_t * attr, void * (*start_routine)(void *), void * arg);
-        llvm::Function* GetPthreadCreateFunction();
+        LLVMFunction GetPthreadCreateFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_equal function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_equal function. </summary>
         /// int pthread_equal(pthread_t _Nullable, pthread_t _Nullable);
-        llvm::Function* GetPthreadEqualFunction();
+        LLVMFunction GetPthreadEqualFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_exit function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_exit function. </summary>
         /// void pthread_exit(void* status);
-        llvm::Function* GetPthreadExitFunction();
+        LLVMFunction GetPthreadExitFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_getconcurrency function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_getconcurrency function. </summary>
         /// int pthread_getconcurrency(void);
-        llvm::Function* GetPthreadGetConcurrencyFunction();
+        LLVMFunction GetPthreadGetConcurrencyFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_detach function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_detach function. </summary>
         /// int pthread_detach(pthread_t);
-        llvm::Function* GetPthreadDetachFunction();
+        LLVMFunction GetPthreadDetachFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_join function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_join function. </summary>
         /// int pthread_join(pthread_t thread, void ** status);
-        llvm::Function* GetPthreadJoinFunction();
+        LLVMFunction GetPthreadJoinFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_self function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_self function. </summary>
         /// pthread_t pthread_self(void);
-        llvm::Function* GetPthreadSelfFunction();
+        LLVMFunction GetPthreadSelfFunction();
 
         // pthreads -- synchronization functions
 
-        /// <summary> Gets an llvm::Function* representing the pthread_mutex_init function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_mutex_init function. </summary>
         // int pthread_mutex_init(pthread_mutex_t * mutex, const pthread_mutex_attr *attr);
-        llvm::Function* GetPthreadMutexInitFunction();
+        LLVMFunction GetPthreadMutexInitFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_mutex_destroy function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_mutex_destroy function. </summary>
         /// int pthread_mutex_destroy(pthread_mutex_t * mutex);
-        llvm::Function* GetPthreadMutexDestroyFunction();
+        LLVMFunction GetPthreadMutexDestroyFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_mutex_lock function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_mutex_lock function. </summary>
         /// int pthread_mutex_lock(pthread_mutex_t * mutex);
-        llvm::Function* GetPthreadMutexLockFunction();
+        LLVMFunction GetPthreadMutexLockFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_mutex_trylock function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_mutex_trylock function. </summary>
         /// int pthread_mutex_trylock(pthread_mutex_t * mutex);
-        llvm::Function* GetPthreadMutexTryLockFunction();
+        LLVMFunction GetPthreadMutexTryLockFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_mutex_unlock function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_mutex_unlock function. </summary>
         /// int pthread_mutex_unlock(pthread_mutex_t * mutex);
-        llvm::Function* GetPthreadMutexUnlockFunction();
+        LLVMFunction GetPthreadMutexUnlockFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_cond_init function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_cond_init function. </summary>
         /// int pthread_cond_init(pthread_cond_t * cond, const pthread_cond_attr *attr);
-        llvm::Function* GetPthreadCondInitFunction();
+        LLVMFunction GetPthreadCondInitFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_cond_destroy function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_cond_destroy function. </summary>
         /// int pthread_cond_destroy(pthread_cond_t * cond);
-        llvm::Function* GetPthreadCondDestroyFunction();
+        LLVMFunction GetPthreadCondDestroyFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_cond_wait function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_cond_wait function. </summary>
         /// int pthread_cond_wait(pthread_cond_t * cond, pthread_mutex_t * mutex);
-        llvm::Function* GetPthreadCondWaitFunction();
+        LLVMFunction GetPthreadCondWaitFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_cond_timedwait function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_cond_timedwait function. </summary>
         /// int pthread_cond_timedwait(pthread_cond_t * cond, pthread_mutex_t * mutex, const struct timespec * abstime);
-        llvm::Function* GetPthreadCondTimedwaitFunction();
+        LLVMFunction GetPthreadCondTimedwaitFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_cond_signal function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_cond_signal function. </summary>
         /// int pthread_cond_signal(pthread_cond_t * cond);
-        llvm::Function* GetPthreadCondSignalFunction();
+        LLVMFunction GetPthreadCondSignalFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_cond_broadcast function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_cond_broadcast function. </summary>
         /// int pthread_cond_broadcast(pthread_cond_t * cond);
-        llvm::Function* GetPthreadCondBroadcastFunction();
+        LLVMFunction GetPthreadCondBroadcastFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_spin_init function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_spin_init function. </summary>
         /// int  pthread_spin_init(pthread_spinlock_t *lock, int pshared);
-        llvm::Function* GetPthreadSpinInitFunction();
+        LLVMFunction GetPthreadSpinInitFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_spin_lock function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_spin_lock function. </summary>
         /// int  pthread_spin_lock(pthread_spinlock_t *lock);
-        llvm::Function* GetPthreadSpinLockFunction();
+        LLVMFunction GetPthreadSpinLockFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_spin_trylock function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_spin_trylock function. </summary>
         /// int  pthread_spin_trylock(pthread_spinlock_t *lock);
-        llvm::Function* GetPthreadSpinTryLockFunction();
+        LLVMFunction GetPthreadSpinTryLockFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_spin_unlock function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_spin_unlock function. </summary>
         /// int  pthread_spin_unlock(pthread_spinlock_t *lock);
-        llvm::Function* GetPthreadSpinUnlockFunction();
+        LLVMFunction GetPthreadSpinUnlockFunction();
 
-        /// <summary> Gets an llvm::Function* representing the pthread_spin_destroy function. </summary>
+        /// <summary> Gets an LLVMFunction representing the pthread_spin_destroy function. </summary>
         /// int  pthread_spin_destroy(pthread_spinlock_t *lock);
-        llvm::Function* GetPthreadSpinDestroyFunction();
+        LLVMFunction GetPthreadSpinDestroyFunction();
 
         // pthreads -- types
         /// <summary> Gets the LLVM type for the `pthread_t` type on the current target. </summary>
-        llvm::Type* GetPthreadType();
+        LLVMType GetPthreadType();
 
         /// <summary> Gets the LLVM type for the `pthread_mutex_t` type on the current target. </summary>
-        llvm::Type* GetPthreadMutexType();
+        LLVMType GetPthreadMutexType();
 
         /// <summary> Gets the LLVM type for the `pthread_cond_t` type on the current target. </summary>
-        llvm::Type* GetPthreadCondType();
+        LLVMType GetPthreadCondType();
 
         /// <summary> Gets the LLVM type for the `pthread_spinlock_t` type on the current target. </summary>
-        llvm::Type* GetPthreadSpinlockType();
+        LLVMType GetPthreadSpinlockType();
 
         /// <summary> Gets the LLVM type for a pthread thread function ( `void* threadFn(void*)` )on the current target. </summary>
         llvm::FunctionType* GetPthreadStartRoutineType();
@@ -169,8 +166,8 @@ namespace emitters
         friend IRRuntime;
         IRPosixRuntime(IRModuleEmitter& module);
 
-        llvm::Type* GetIntType(); // returns LLVM type for native `int`
-        llvm::Type* GetPointerSizedIntType(); // returns LLVM type for an int the size of a pointer
+        LLVMType GetIntType(); // returns LLVM type for native `int`
+        LLVMType GetPointerSizedIntType(); // returns LLVM type for an int the size of a pointer
 
         IRModuleEmitter& _module;
 

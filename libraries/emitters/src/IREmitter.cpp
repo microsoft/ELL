@@ -8,13 +8,13 @@
 
 #include "IREmitter.h"
 #include "EmitterException.h"
+#include "LLVMUtilities.h"
 
 // utilities
 #include "Logger.h"
 
 // llvm
 #include <llvm/IR/InstrTypes.h>
-#include <llvm/IR/Type.h>
 #include <llvm/Support/raw_os_ostream.h>
 
 // stl
@@ -32,7 +32,7 @@ namespace emitters
     //
     namespace
     {
-        void ValidateArguments(llvm::Function* f, const IRValueList& args)
+        void ValidateArguments(LLVMFunction f, const IRValueList& args)
         {
             llvm::FunctionType* fType = f->getFunctionType();
             auto numArgs = args.size();
@@ -80,7 +80,7 @@ namespace emitters
     {
     }
 
-    llvm::Type* IREmitter::Type(VariableType type)
+    LLVMType IREmitter::Type(VariableType type)
     {
         switch (type)
         {
@@ -126,7 +126,7 @@ namespace emitters
         return Type(type)->getPointerTo();
     }
 
-    llvm::PointerType* IREmitter::PointerType(llvm::Type* type)
+    llvm::PointerType* IREmitter::PointerType(LLVMType type)
     {
         return type->getPointerTo();
     }
@@ -142,12 +142,12 @@ namespace emitters
         return llvm::ArrayType::get(rowType, rows);
     }
 
-    llvm::ArrayType* IREmitter::ArrayType(llvm::Type* type, size_t size)
+    llvm::ArrayType* IREmitter::ArrayType(LLVMType type, size_t size)
     {
         return llvm::ArrayType::get(type, size);
     }
 
-    llvm::ArrayType* IREmitter::ArrayType(llvm::Type* type, size_t rows, size_t columns)
+    llvm::ArrayType* IREmitter::ArrayType(LLVMType type, size_t rows, size_t columns)
     {
         auto rowType = llvm::ArrayType::get(type, columns);
         return llvm::ArrayType::get(rowType, rows);
@@ -158,7 +158,7 @@ namespace emitters
         return llvm::VectorType::get(Type(type), size);
     }
 
-    llvm::VectorType* IREmitter::VectorType(llvm::Type* type, size_t size)
+    llvm::VectorType* IREmitter::VectorType(LLVMType type, size_t size)
     {
         return llvm::VectorType::get(type, size);
     }
@@ -198,16 +198,16 @@ namespace emitters
         return llvm::ConstantFP::get(_llvmContext, llvm::APFloat(value));
     }
 
-    llvm::Value* IREmitter::Literal(const char* pValue)
+    LLVMValue IREmitter::Literal(const char* pValue)
     {
         assert(pValue != nullptr);
         std::string str(pValue);
         return Literal(str);
     }
 
-    llvm::Value* IREmitter::Literal(const std::string& value)
+    LLVMValue IREmitter::Literal(const std::string& value)
     {
-        llvm::Value* literal = _stringLiterals.Get(value);
+        LLVMValue literal = _stringLiterals.Get(value);
         if (literal == nullptr)
         {
             literal = _irBuilder.CreateGlobalStringPtr(value);
@@ -241,7 +241,7 @@ namespace emitters
         return llvm::ConstantDataArray::get(_llvmContext, reinterpret_cast<const std::vector<uint64_t>&>(value));
     }
 
-    llvm::Value* IREmitter::Literal(const std::string& name, const std::string& value)
+    LLVMValue IREmitter::Literal(const std::string& name, const std::string& value)
     {
         return _irBuilder.CreateGlobalStringPtr(value, name);
     }
@@ -264,7 +264,7 @@ namespace emitters
         return nullptr;
     }
 
-    llvm::Constant* IREmitter::Zero(llvm::Type* type)
+    llvm::Constant* IREmitter::Zero(LLVMType type)
     {
         return llvm::Constant::getNullValue(type);
     }
@@ -300,165 +300,165 @@ namespace emitters
 
     // bool -> ?
     template <>
-    llvm::Value* IREmitter::CastValue<bool, bool>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<bool, bool>(LLVMValue pValue)
     {
         return CastInt(pValue, VariableType::Byte, false);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<bool, int>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<bool, int>(LLVMValue pValue)
     {
         return CastInt(pValue, VariableType::Int32, false);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<bool, int64_t>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<bool, int64_t>(LLVMValue pValue)
     {
         return CastInt(pValue, VariableType::Int64, false);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<bool, float>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<bool, float>(LLVMValue pValue)
     {
         return CastIntToFloat(pValue, VariableType::Float, false);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<bool, double>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<bool, double>(LLVMValue pValue)
     {
         return CastIntToFloat(pValue, VariableType::Double, false);
     }
 
     // int -> ?
     template <>
-    llvm::Value* IREmitter::CastValue<int, bool>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<int, bool>(LLVMValue pValue)
     {
         return CastInt(pValue, VariableType::Byte, true);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<int, int>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<int, int>(LLVMValue pValue)
     {
         return CastInt(pValue, VariableType::Int32, true);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<int, int64_t>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<int, int64_t>(LLVMValue pValue)
     {
         return CastInt(pValue, VariableType::Int64, true);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<int, float>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<int, float>(LLVMValue pValue)
     {
         return CastIntToFloat(pValue, VariableType::Float, true);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<int, double>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<int, double>(LLVMValue pValue)
     {
         return CastIntToFloat(pValue, VariableType::Double, true);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<int64_t, bool>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<int64_t, bool>(LLVMValue pValue)
     {
         return CastInt(pValue, VariableType::Byte, true);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<int64_t, int>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<int64_t, int>(LLVMValue pValue)
     {
         return CastInt(pValue, VariableType::Int32, true);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<int64_t, int64_t>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<int64_t, int64_t>(LLVMValue pValue)
     {
         return CastInt(pValue, VariableType::Int64, true);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<int64_t, float>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<int64_t, float>(LLVMValue pValue)
     {
         return CastIntToFloat(pValue, VariableType::Float, true);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<int64_t, double>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<int64_t, double>(LLVMValue pValue)
     {
         return CastIntToFloat(pValue, VariableType::Double, true);
     }
 
     // float -> ?
     template <>
-    llvm::Value* IREmitter::CastValue<float, bool>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<float, bool>(LLVMValue pValue)
     {
         return CastFloatToInt(pValue, VariableType::Byte);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<float, int>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<float, int>(LLVMValue pValue)
     {
         return CastFloatToInt(pValue, VariableType::Int32);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<float, int64_t>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<float, int64_t>(LLVMValue pValue)
     {
         return CastFloatToInt(pValue, VariableType::Int64);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<float, float>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<float, float>(LLVMValue pValue)
     {
         return _irBuilder.CreateFPCast(pValue, Type(VariableType::Float));
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<float, double>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<float, double>(LLVMValue pValue)
     {
         return _irBuilder.CreateFPCast(pValue, Type(VariableType::Double));
     }
 
     // double -> ?
     template <>
-    llvm::Value* IREmitter::CastValue<double, bool>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<double, bool>(LLVMValue pValue)
     {
         return CastFloatToInt(pValue, VariableType::Byte);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<double, int>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<double, int>(LLVMValue pValue)
     {
         return CastFloatToInt(pValue, VariableType::Int32);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<double, int64_t>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<double, int64_t>(LLVMValue pValue)
     {
         return CastFloatToInt(pValue, VariableType::Int64);
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<double, float>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<double, float>(LLVMValue pValue)
     {
         return _irBuilder.CreateFPCast(pValue, Type(VariableType::Float));
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<double, double>(llvm::Value* pValue)
+    LLVMValue IREmitter::CastValue<double, double>(LLVMValue pValue)
     {
         return _irBuilder.CreateFPCast(pValue, Type(VariableType::Double));
     }
 
-    llvm::Value* IREmitter::BitCast(llvm::Value* pValue, VariableType destinationType)
+    LLVMValue IREmitter::BitCast(LLVMValue pValue, VariableType destinationType)
     {
         assert(pValue != nullptr);
         return BitCast(pValue, Type(destinationType));
     }
 
-    llvm::Value* IREmitter::BitCast(llvm::Value* pValue, llvm::Type* destinationType)
+    LLVMValue IREmitter::BitCast(LLVMValue pValue, LLVMType destinationType)
     {
         assert(pValue != nullptr);
         auto valueType = pValue->getType();
@@ -492,30 +492,30 @@ namespace emitters
         }
     }
 
-    llvm::Value* IREmitter::CastPointer(llvm::Value* pValue, llvm::Type* destinationType)
+    LLVMValue IREmitter::CastPointer(LLVMValue pValue, LLVMType destinationType)
     {
         assert(pValue != nullptr);
         return _irBuilder.CreatePointerCast(pValue, destinationType);
     }
 
-    llvm::Value* IREmitter::CastPointer(llvm::Value* pValue, VariableType destinationType)
+    LLVMValue IREmitter::CastPointer(LLVMValue pValue, VariableType destinationType)
     {
         return CastPointer(pValue, Type(destinationType));
     }
 
-    llvm::Value* IREmitter::CastIntToPointer(llvm::Value* pValue, llvm::Type* destinationType)
+    LLVMValue IREmitter::CastIntToPointer(LLVMValue pValue, LLVMType destinationType)
     {
         assert(pValue != nullptr);
         return _irBuilder.CreateIntToPtr(pValue, destinationType);
     }
 
-    llvm::Value* IREmitter::CastPointerToInt(llvm::Value* pValue, llvm::Type* destinationType)
+    LLVMValue IREmitter::CastPointerToInt(LLVMValue pValue, LLVMType destinationType)
     {
         assert(pValue != nullptr);
         return _irBuilder.CreatePtrToInt(pValue, destinationType);
     }
 
-    llvm::Value* IREmitter::CastIntToFloat(llvm::Value* pValue, VariableType destinationType, bool isSigned)
+    LLVMValue IREmitter::CastIntToFloat(LLVMValue pValue, VariableType destinationType, bool isSigned)
     {
         assert(pValue != nullptr);
         if (isSigned)
@@ -528,7 +528,7 @@ namespace emitters
         }
     }
 
-    llvm::Value* IREmitter::CastFloatToInt(llvm::Value* pValue, VariableType destinationType, bool isSigned)
+    LLVMValue IREmitter::CastFloatToInt(LLVMValue pValue, VariableType destinationType, bool isSigned)
     {
         assert(pValue != nullptr);
 
@@ -548,14 +548,14 @@ namespace emitters
         }
     }
 
-    llvm::Value* IREmitter::CastInt(llvm::Value* pValue, VariableType destinationType, bool isSigned)
+    LLVMValue IREmitter::CastInt(LLVMValue pValue, VariableType destinationType, bool isSigned)
     {
         assert(pValue != nullptr);
         auto type = Type(destinationType);
         return _irBuilder.CreateIntCast(pValue, type, isSigned);
     }
 
-    llvm::Value* IREmitter::CastBool(llvm::Value* pValue)
+    LLVMValue IREmitter::CastBool(LLVMValue pValue)
     {
         return CastInt(pValue, VariableType::Byte, false);
     }
@@ -568,7 +568,7 @@ namespace emitters
     //
     // Return
     //
-    llvm::ReturnInst* IREmitter::Return(llvm::Value* pValue)
+    llvm::ReturnInst* IREmitter::Return(LLVMValue pValue)
     {
         assert(pValue != nullptr);
         return _irBuilder.CreateRet(pValue);
@@ -577,7 +577,7 @@ namespace emitters
     //
     // Native LLVM operations / comparisons
     //
-    llvm::Value* IREmitter::UnaryOperation(const UnaryOperationType type, llvm::Value* value, const std::string& variableName)
+    LLVMValue IREmitter::UnaryOperation(const UnaryOperationType type, LLVMValue value, const std::string& variableName)
     {
         assert(value != nullptr);
 
@@ -590,7 +590,7 @@ namespace emitters
         }
     }
 
-    llvm::Value* IREmitter::BinaryOperation(const TypedOperator type, llvm::Value* pLeftValue, llvm::Value* pRightValue, const std::string& variableName)
+    LLVMValue IREmitter::BinaryOperation(const TypedOperator type, LLVMValue pLeftValue, LLVMValue pRightValue, const std::string& variableName)
     {
         assert(pLeftValue != nullptr);
         assert(pRightValue != nullptr);
@@ -632,7 +632,7 @@ namespace emitters
         }
     }
 
-    llvm::Value* IREmitter::Comparison(const TypedComparison type, llvm::Value* pLeftValue, llvm::Value* pRightValue)
+    LLVMValue IREmitter::Comparison(const TypedComparison type, LLVMValue pLeftValue, LLVMValue pRightValue)
     {
         assert(pLeftValue != nullptr);
         assert(pRightValue != nullptr);
@@ -668,11 +668,11 @@ namespace emitters
         }
     }
 
-    llvm::Value* IREmitter::Comparison(llvm::Value* pValue, bool testValue)
+    LLVMValue IREmitter::Comparison(LLVMValue pValue, bool testValue)
     {
         assert(pValue != nullptr);
 
-        llvm::Value* pTestValue = pValue;
+        LLVMValue pTestValue = pValue;
         auto pValueType = pValue->getType();
         if (pValueType->isIntegerTy())
         {
@@ -685,7 +685,7 @@ namespace emitters
     //
     // Select
     //
-    llvm::Value* IREmitter::Select(llvm::Value* pCmp, llvm::Value* pTrueValue, llvm::Value* pFalseValue)
+    LLVMValue IREmitter::Select(LLVMValue pCmp, LLVMValue pTrueValue, LLVMValue pFalseValue)
     {
         assert(pCmp != nullptr);
         assert(pTrueValue != nullptr);
@@ -705,40 +705,40 @@ namespace emitters
     //
     // Functions
     //
-    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name)
+    LLVMFunction IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name)
     {
         assert(pModule != nullptr);
         auto functionType = llvm::FunctionType::get(_irBuilder.getVoidTy(), false);
         return DeclareFunction(pModule, name, functionType);
     }
 
-    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType)
+    LLVMFunction IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType)
     {
         auto functionType = llvm::FunctionType::get(Type(returnType), false);
         return DeclareFunction(pModule, name, functionType);
     }
 
-    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const VariableTypeList& arguments)
+    LLVMFunction IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const VariableTypeList& arguments)
     {
         auto types = GetLLVMTypes(arguments);
         auto functionType = llvm::FunctionType::get(Type(returnType), types, false);
         return DeclareFunction(pModule, name, functionType);
     }
 
-    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments)
+    LLVMFunction IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments)
     {
         auto types = BindArgumentTypes(arguments);
         auto functionType = llvm::FunctionType::get(Type(returnType), types, false);
         return DeclareFunction(pModule, name, functionType);
     }
 
-    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, llvm::FunctionType* type)
+    LLVMFunction IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, llvm::FunctionType* type)
     {
         assert(pModule != nullptr);
-        return static_cast<llvm::Function*>(pModule->getOrInsertFunction(name, type));
+        return static_cast<LLVMFunction>(pModule->getOrInsertFunction(name, type));
     }
 
-    llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, VariableType returnType, llvm::Function::LinkageTypes linkage, const VariableTypeList* pArguments)
+    LLVMFunction IREmitter::Function(llvm::Module* pModule, const std::string& name, VariableType returnType, llvm::Function::LinkageTypes linkage, const VariableTypeList* pArguments)
     {
         assert(pModule != nullptr);
 
@@ -755,28 +755,28 @@ namespace emitters
         return CreateFunction(pModule, name, linkage, pFunctionType);
     }
 
-    llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, VariableType returnType, llvm::Function::LinkageTypes linkage, const NamedVariableTypeList& arguments)
+    LLVMFunction IREmitter::Function(llvm::Module* pModule, const std::string& name, VariableType returnType, llvm::Function::LinkageTypes linkage, const NamedVariableTypeList& arguments)
     {
         assert(pModule != nullptr);
 
         auto types = BindArgumentTypes(arguments);
         llvm::FunctionType* pFunctionType = llvm::FunctionType::get(Type(returnType), types, false);
-        llvm::Function* pFunction = CreateFunction(pModule, name, linkage, pFunctionType);
+        LLVMFunction pFunction = CreateFunction(pModule, name, linkage, pFunctionType);
         BindArgumentNames(pFunction, arguments);
         return pFunction;
     }
 
-    llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const NamedVariableTypeList& arguments)
+    LLVMFunction IREmitter::Function(llvm::Module* pModule, const std::string& name, LLVMType returnType, llvm::Function::LinkageTypes linkage, const NamedVariableTypeList& arguments)
     {
         assert(pModule != nullptr);
 
         auto types = BindArgumentTypes(arguments);
-        llvm::Function* pFunction = Function(pModule, name, returnType, linkage, types);
+        LLVMFunction pFunction = Function(pModule, name, returnType, linkage, types);
         BindArgumentNames(pFunction, arguments);
         return pFunction;
     }
 
-    llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const std::vector<llvm::Type*>& argTypes)
+    LLVMFunction IREmitter::Function(llvm::Module* pModule, const std::string& name, LLVMType returnType, llvm::Function::LinkageTypes linkage, const std::vector<LLVMType>& argTypes)
     {
         assert(pModule != nullptr);
 
@@ -784,12 +784,12 @@ namespace emitters
         return CreateFunction(pModule, name, linkage, functionType);
     }
 
-    llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const NamedLLVMTypeList& arguments)
+    LLVMFunction IREmitter::Function(llvm::Module* pModule, const std::string& name, LLVMType returnType, llvm::Function::LinkageTypes linkage, const NamedLLVMTypeList& arguments)
     {
         assert(pModule != nullptr);
 
         auto types = BindArgumentTypes(arguments);
-        llvm::Function* pFunction = Function(pModule, name, returnType, linkage, types);
+        LLVMFunction pFunction = Function(pModule, name, returnType, linkage, types);
         BindArgumentNames(pFunction, arguments);
         return pFunction;
     }
@@ -797,13 +797,13 @@ namespace emitters
     //
     // Blocks
     //
-    llvm::BasicBlock* IREmitter::Block(llvm::Function* pFunction, const std::string& label)
+    llvm::BasicBlock* IREmitter::Block(LLVMFunction pFunction, const std::string& label)
     {
         assert(pFunction != nullptr);
         return llvm::BasicBlock::Create(_llvmContext, label, pFunction);
     }
 
-    llvm::BasicBlock* IREmitter::BlockBefore(llvm::Function* pFunction, llvm::BasicBlock* pBlock, const std::string& label)
+    llvm::BasicBlock* IREmitter::BlockBefore(LLVMFunction pFunction, llvm::BasicBlock* pBlock, const std::string& label)
     {
         assert(pFunction != nullptr);
         assert(pBlock != nullptr);
@@ -813,7 +813,7 @@ namespace emitters
         return pNewBlock;
     }
 
-    llvm::BasicBlock* IREmitter::BlockBefore(llvm::Function* pFunction, llvm::BasicBlock* pBlock, llvm::BasicBlock* pNewBlock)
+    llvm::BasicBlock* IREmitter::BlockBefore(LLVMFunction pFunction, llvm::BasicBlock* pBlock, llvm::BasicBlock* pNewBlock)
     {
         assert(pFunction != nullptr);
         assert(pBlock != nullptr);
@@ -822,7 +822,7 @@ namespace emitters
         return pNewBlock;
     }
 
-    llvm::BasicBlock* IREmitter::BlockAfter(llvm::Function* pFunction, llvm::BasicBlock* pBlock, const std::string& label)
+    llvm::BasicBlock* IREmitter::BlockAfter(LLVMFunction pFunction, llvm::BasicBlock* pBlock, const std::string& label)
     {
         assert(pFunction != nullptr);
         assert(pBlock != nullptr);
@@ -832,7 +832,7 @@ namespace emitters
         return pNewBlock;
     }
 
-    llvm::BasicBlock* IREmitter::BlockAfter(llvm::Function* pFunction, llvm::BasicBlock* pBlock, llvm::BasicBlock* pNewBlock)
+    llvm::BasicBlock* IREmitter::BlockAfter(LLVMFunction pFunction, llvm::BasicBlock* pBlock, llvm::BasicBlock* pNewBlock)
     {
         assert(pFunction != nullptr);
         assert(pBlock != nullptr);
@@ -868,19 +868,19 @@ namespace emitters
     //
     // Calling functions
     //
-    llvm::CallInst* IREmitter::Call(llvm::Function* pFunction)
+    llvm::CallInst* IREmitter::Call(LLVMFunction pFunction)
     {
         assert(pFunction != nullptr);
         return _irBuilder.CreateCall(pFunction, llvm::None);
     }
 
-    llvm::CallInst* IREmitter::Call(llvm::Function* pFunction, llvm::Value* pArgument)
+    llvm::CallInst* IREmitter::Call(LLVMFunction pFunction, LLVMValue pArgument)
     {
         assert(pFunction != nullptr);
         return _irBuilder.CreateCall(pFunction, pArgument);
     }
 
-    llvm::CallInst* IREmitter::Call(llvm::Function* pFunction, const IRValueList& arguments)
+    llvm::CallInst* IREmitter::Call(LLVMFunction pFunction, const IRValueList& arguments)
     {
         assert(pFunction != nullptr);
         ValidateArguments(pFunction, arguments);
@@ -888,7 +888,7 @@ namespace emitters
     }
 
     // Intrinsics / library functions
-    llvm::CallInst* IREmitter::MemoryMove(llvm::Value* pSource, llvm::Value* pDestination, llvm::Value* pCountBytes)
+    llvm::CallInst* IREmitter::MemoryMove(LLVMValue pSource, LLVMValue pDestination, LLVMValue pCountBytes)
     {
         assert(pSource != nullptr);
         assert(pDestination != nullptr);
@@ -896,7 +896,7 @@ namespace emitters
         return _irBuilder.CreateMemMove(pDestination, pSource, pCountBytes, 0, true);
     }
 
-    llvm::CallInst* IREmitter::MemoryCopy(llvm::Value* pSource, llvm::Value* pDestination, llvm::Value* pCountBytes)
+    llvm::CallInst* IREmitter::MemoryCopy(LLVMValue pSource, LLVMValue pDestination, LLVMValue pCountBytes)
     {
         assert(pSource != nullptr);
         assert(pDestination != nullptr);
@@ -904,27 +904,27 @@ namespace emitters
         return _irBuilder.CreateMemCpy(pDestination, pSource, pCountBytes, 0, true);
     }
 
-    llvm::CallInst* IREmitter::MemorySet(llvm::Value* pDestination, llvm::Value* value, llvm::Value* size)
+    llvm::CallInst* IREmitter::MemorySet(LLVMValue pDestination, LLVMValue value, LLVMValue size)
     {
         assert(pDestination != nullptr);
         assert(value != nullptr);
         return _irBuilder.CreateMemSet(pDestination, value, size, 0, true);
     }
 
-    llvm::Function* IREmitter::GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const VariableTypeList& arguments)
+    LLVMFunction IREmitter::GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const VariableTypeList& arguments)
     {
         assert(pModule != nullptr);
         auto types = GetLLVMTypes(arguments);
         return llvm::Intrinsic::getDeclaration(pModule, id, types);
     }
 
-    llvm::Function* IREmitter::GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const LLVMTypeList& arguments)
+    LLVMFunction IREmitter::GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const LLVMTypeList& arguments)
     {
         assert(pModule != nullptr);
         return llvm::Intrinsic::getDeclaration(pModule, id, arguments);
     }
 
-    llvm::PHINode* IREmitter::Phi(VariableType type, llvm::Value* pLeftValue, llvm::BasicBlock* pLeftBlock, llvm::Value* pRightValue, llvm::BasicBlock* pRightBlock)
+    llvm::PHINode* IREmitter::Phi(VariableType type, LLVMValue pLeftValue, llvm::BasicBlock* pLeftBlock, LLVMValue pRightValue, llvm::BasicBlock* pRightBlock)
     {
         assert(pLeftBlock != nullptr);
         assert(pRightBlock != nullptr);
@@ -937,29 +937,29 @@ namespace emitters
         return phi;
     }
 
-    llvm::Value* IREmitter::PointerOffset(llvm::Value* pArray, llvm::Value* pOffset, const std::string& name)
+    LLVMValue IREmitter::PointerOffset(LLVMValue pArray, LLVMValue pOffset, const std::string& name)
     {
         assert(pArray != nullptr);
         assert(pOffset != nullptr);
         return _irBuilder.CreateGEP(pArray, pOffset, name);
     }
 
-    llvm::Value* IREmitter::DereferenceGlobalPointer(llvm::Value* pArray)
+    LLVMValue IREmitter::DereferenceGlobalPointer(LLVMValue pArray)
     {
         assert(pArray != nullptr);
-        llvm::Value* derefArguments[1]{
+        LLVMValue derefArguments[1]{
             Zero()
         };
 
         return _irBuilder.CreateGEP(pArray, derefArguments);
     }
 
-    llvm::Value* IREmitter::PointerOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset)
+    LLVMValue IREmitter::PointerOffset(llvm::GlobalVariable* pArray, LLVMValue pOffset)
     {
         assert(pArray != nullptr);
         assert(pOffset != nullptr);
 
-        llvm::Value* derefArguments[2]{
+        LLVMValue derefArguments[2]{
             Zero(),
             pOffset
         };
@@ -968,13 +968,13 @@ namespace emitters
     }
 
     // TODO: rename this to avoid clashes with other PointerOffset()
-    llvm::Value* IREmitter::PointerOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset)
+    LLVMValue IREmitter::PointerOffset(llvm::GlobalVariable* pArray, LLVMValue pOffset, LLVMValue pFieldOffset)
     {
         assert(pArray != nullptr);
         assert(pOffset != nullptr);
         assert(pFieldOffset != nullptr);
 
-        llvm::Value* derefArguments[3]{
+        LLVMValue derefArguments[3]{
             Zero(),
             pOffset,
             pFieldOffset
@@ -982,20 +982,20 @@ namespace emitters
         return _irBuilder.CreateInBoundsGEP(pArray->getValueType(), pArray, derefArguments);
     }
 
-    llvm::Value* IREmitter::PointerOffset(llvm::AllocaInst* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset)
+    LLVMValue IREmitter::PointerOffset(llvm::AllocaInst* pArray, LLVMValue pOffset, LLVMValue pFieldOffset)
     {
         assert(pArray != nullptr);
         assert(pOffset != nullptr);
         assert(pFieldOffset != nullptr);
 
-        llvm::Value* derefArguments[2]{
+        LLVMValue derefArguments[2]{
             pOffset,
             pFieldOffset
         };
         return _irBuilder.CreateInBoundsGEP(pArray, derefArguments);
     }
 
-    llvm::Value* IREmitter::GetStructFieldPointer(llvm::Value* structPtr, size_t fieldIndex)
+    LLVMValue IREmitter::GetStructFieldPointer(LLVMValue structPtr, size_t fieldIndex)
     {
         auto structPtrType = llvm::dyn_cast<llvm::PointerType>(structPtr->getType());
         assert(structPtrType && "Error: must pass pointer to GetStructFieldPointer");
@@ -1003,25 +1003,25 @@ namespace emitters
         return _irBuilder.CreateStructGEP(structPtrType->getElementType(), structPtr, fieldIndex);
     }
 
-    llvm::Value* IREmitter::ExtractStructField(llvm::Value* structValue, size_t fieldIndex)
+    LLVMValue IREmitter::ExtractStructField(LLVMValue structValue, size_t fieldIndex)
     {
         assert(structValue->getType()->isStructTy() && "Error: must pass a struct type to ExtractStructField");
         return _irBuilder.CreateExtractValue(structValue, {static_cast<unsigned int>(fieldIndex)});
     }
 
-    llvm::LoadInst* IREmitter::Load(llvm::Value* pPointer)
+    llvm::LoadInst* IREmitter::Load(LLVMValue pPointer)
     {
         assert(pPointer != nullptr);
         return _irBuilder.CreateLoad(pPointer);
     }
 
-    llvm::LoadInst* IREmitter::Load(llvm::Value* pPointer, const std::string& name)
+    llvm::LoadInst* IREmitter::Load(LLVMValue pPointer, const std::string& name)
     {
         assert(pPointer != nullptr);
         return _irBuilder.CreateLoad(pPointer, name);
     }
 
-    llvm::StoreInst* IREmitter::Store(llvm::Value* pPointer, llvm::Value* pValue)
+    llvm::StoreInst* IREmitter::Store(LLVMValue pPointer, LLVMValue pValue)
     {
         assert(pPointer != nullptr);
         assert(pValue != nullptr);
@@ -1033,7 +1033,7 @@ namespace emitters
         return _irBuilder.CreateAlloca(Type(type), nullptr);
     }
 
-    llvm::AllocaInst* IREmitter::StackAllocate(llvm::Type* type)
+    llvm::AllocaInst* IREmitter::StackAllocate(LLVMType type)
     {
         return _irBuilder.CreateAlloca(type, nullptr);
     }
@@ -1043,7 +1043,7 @@ namespace emitters
         return _irBuilder.CreateAlloca(Type(type), nullptr, name);
     }
 
-    llvm::AllocaInst* IREmitter::StackAllocate(llvm::Type* pType, const std::string& name)
+    llvm::AllocaInst* IREmitter::StackAllocate(LLVMType pType, const std::string& name)
     {
         assert(pType != nullptr);
 
@@ -1061,18 +1061,18 @@ namespace emitters
         return _irBuilder.CreateAlloca(rowType, Literal(static_cast<int>(rows)));
     }
 
-    llvm::AllocaInst* IREmitter::StackAllocate(llvm::Type* type, size_t size)
+    llvm::AllocaInst* IREmitter::StackAllocate(LLVMType type, size_t size)
     {
         return _irBuilder.CreateAlloca(type, Literal(static_cast<int>(size)));
     }
 
-    llvm::AllocaInst* IREmitter::StackAllocate(llvm::Type* type, size_t rows, size_t columns)
+    llvm::AllocaInst* IREmitter::StackAllocate(LLVMType type, size_t rows, size_t columns)
     {
         auto rowType = ArrayType(type, columns);
         return _irBuilder.CreateAlloca(rowType, Literal(static_cast<int>(rows)));
     }
 
-    llvm::BranchInst* IREmitter::Branch(llvm::Value* pConditionValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
+    llvm::BranchInst* IREmitter::Branch(LLVMValue pConditionValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
     {
         assert(pConditionValue != nullptr);
         assert(pThenBlock != nullptr);
@@ -1138,7 +1138,7 @@ namespace emitters
         return _structs[name];
     }
 
-    llvm::Type* IREmitter::GetVariableType(VariableType type)
+    LLVMType IREmitter::GetVariableType(VariableType type)
     {
         switch (type)
         {
@@ -1203,23 +1203,23 @@ namespace emitters
         return llvmTypes;
     }
 
-    std::vector<llvm::Type*> IREmitter::BindArgumentTypes(const NamedVariableTypeList& arguments)
+    std::vector<LLVMType> IREmitter::BindArgumentTypes(const NamedVariableTypeList& arguments)
     {
-        std::vector<llvm::Type*> types(arguments.size());
+        std::vector<LLVMType> types(arguments.size());
         std::transform(arguments.begin(), arguments.end(), types.begin(), [this](NamedVariableType argument) { return Type(argument.second); });
         return types;
     }
 
-    std::vector<llvm::Type*> IREmitter::BindArgumentTypes(const NamedLLVMTypeList& arguments)
+    std::vector<LLVMType> IREmitter::BindArgumentTypes(const NamedLLVMTypeList& arguments)
     {
-        std::vector<llvm::Type*> types(arguments.size());
+        std::vector<LLVMType> types(arguments.size());
         std::transform(arguments.begin(), arguments.end(), types.begin(), [](auto argument) { return argument.second; });
         return types;
     }
 
-    llvm::Function* IREmitter::CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pFunctionType)
+    LLVMFunction IREmitter::CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pFunctionType)
     {
-        llvm::Function* pFunction = llvm::Function::Create(pFunctionType, linkage, name, pModule);
+        LLVMFunction pFunction = llvm::Function::Create(pFunctionType, linkage, name, pModule);
         if (pFunction == nullptr)
         {
             throw EmitterException(EmitterError::functionNotFound);
@@ -1227,7 +1227,7 @@ namespace emitters
         return pFunction;
     }
 
-    llvm::Value* IREmitter::Zero()
+    LLVMValue IREmitter::Zero()
     {
         if (_pZeroLiteral == nullptr)
         {

@@ -11,49 +11,49 @@ namespace ell
 namespace emitters
 {
     template <typename ValueType>
-    llvm::Function* IRRuntime::GetSqrtFunction()
+    LLVMFunction IRRuntime::GetSqrtFunction()
     {
         return GetSqrtFunction(GetVariableType<ValueType>());
     }
 
     template <typename ValueType>
-    llvm::Function* IRRuntime::GetAbsFunction()
+    LLVMFunction IRRuntime::GetAbsFunction()
     {
         return GetAbsFunction(GetVariableType<ValueType>());
     }
 
     template <typename ValueType>
-    llvm::Function* IRRuntime::GetExpFunction()
+    LLVMFunction IRRuntime::GetExpFunction()
     {
         return GetExpFunction(GetVariableType<ValueType>());
     }
 
     template <typename ValueType>
-    llvm::Function* IRRuntime::GetLogFunction()
+    LLVMFunction IRRuntime::GetLogFunction()
     {
         return GetLogFunction(GetVariableType<ValueType>());
     }
 
     template <typename ValueType>
-    llvm::Function* IRRuntime::GetTanhFunction()
+    LLVMFunction IRRuntime::GetTanhFunction()
     {
         return GetTanhFunction(GetVariableType<ValueType>());
     }
 
     template <typename ValueType>
-    llvm::Function* IRRuntime::GetSinFunction()
+    LLVMFunction IRRuntime::GetSinFunction()
     {
         return GetSinFunction(GetVariableType<ValueType>());
     }
 
     template <typename ValueType>
-    llvm::Function* IRRuntime::GetCosFunction()
+    LLVMFunction IRRuntime::GetCosFunction()
     {
         return GetCosFunction(GetVariableType<ValueType>());
     }
 
     template <typename ValueType>
-    llvm::Function* IRRuntime::GetDotProductFunction()
+    LLVMFunction IRRuntime::GetDotProductFunction()
     {
         if (std::is_integral<std::decay_t<ValueType>>::value)
         {

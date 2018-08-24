@@ -76,7 +76,7 @@ namespace nodes
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         bool HasState() const override { return false; }
-        llvm::Function* GetOperator(model::IRMapCompiler& compiler) const;
+        emitters::LLVMFunction GetOperator(model::IRMapCompiler& compiler) const;
         void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
         void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
         void WriteToArchive(utilities::Archiver& archiver) const override;

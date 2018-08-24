@@ -17,6 +17,9 @@
 #include "OutputPort.h"
 #include "PortElements.h"
 
+// emitters
+#include "LLVMUtilities.h"
+
 // stl
 #include <string>
 #include <vector>
@@ -77,13 +80,13 @@ namespace model
         ///
         /// <param name="port"> The port to ensure is emitted. </param>
         /// <returns> The LLVM Value object corresponding to the port. </returns>
-        llvm::Value* EnsurePortEmitted(const InputPortBase& port);
+        emitters::LLVMValue EnsurePortEmitted(const InputPortBase& port);
 
         /// <summary> Ensure that variable for the given port has been declared in IR </summary>
         ///
         /// <param name="port"> The port to ensure is emitted. </param>
         /// <returns> The LLVM Value object corresponding to the port. </returns>
-        llvm::Value* EnsurePortEmitted(const OutputPortBase& port);
+        emitters::LLVMValue EnsurePortEmitted(const OutputPortBase& port);
 
         /// <summary> Ensure that variable for the given port has been declared in IR </summary>
         ///
@@ -92,13 +95,13 @@ namespace model
         ///
         /// <returns> The LLVM Value object corresponding to the port. </returns>
         template <typename ValueType>
-        llvm::Value* EnsurePortEmitted(const OutputPortBase& port, ValueType initialValue);
+        emitters::LLVMValue EnsurePortEmitted(const OutputPortBase& port, ValueType initialValue);
 
         /// <summary> Ensure that variable for the given port element has been declared in IR </summary>
         ///
         /// <param name="port"> The port elements to ensure are emitted. </param>
         /// <returns> The LLVM Value object corresponding to the elements. </returns>
-        llvm::Value* EnsurePortElementEmitted(const PortElementBase& element);
+        emitters::LLVMValue EnsurePortElementEmitted(const PortElementBase& element);
 
         /// <summary>
         /// Ensure that the variable for this outport port element is loaded into a register. This will automatically
@@ -107,7 +110,7 @@ namespace model
         ///
         /// <param name="port"> The port element to load into a register. </param>
         /// <returns> The LLVM Value object corresponding to the port element. </returns>
-        llvm::Value* LoadPortElementVariable(const PortElementBase& element);
+        emitters::LLVMValue LoadPortElementVariable(const PortElementBase& element);
 
         /// <summary> Creates a new BlockRegion for the node </summary>
         ///

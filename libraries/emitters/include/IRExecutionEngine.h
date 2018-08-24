@@ -7,9 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "LLVMUtilities.h"
+
 // llvm
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
-#include <llvm/IR/Function.h>
 #include <llvm/IR/Module.h>
 
 namespace ell
@@ -67,7 +68,7 @@ namespace emitters
         ///
         /// <param name="func"> The function being defined. </param>
         /// <param name="address"> The address of the function being defined. </param>
-        void DefineFunction(llvm::Function* func, uint64_t address);
+        void DefineFunction(LLVMFunction func, uint64_t address);
 
         /// <summary>
         /// Return a main function that takes no arguments - if one exists. Returns nullptr if not found.

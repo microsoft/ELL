@@ -62,7 +62,7 @@ namespace emitters
         }
     }
 
-    llvm::Value* IRTask::GetReturnValue(IRFunctionEmitter& function)
+    LLVMValue IRTask::GetReturnValue(IRFunctionEmitter& function)
     {
         switch (_type)
         {
@@ -77,7 +77,7 @@ namespace emitters
         }
     }
 
-    llvm::Value* IRTask::IsNull(IRFunctionEmitter& function)
+    LLVMValue IRTask::IsNull(IRFunctionEmitter& function)
     {
         switch (_type)
         {

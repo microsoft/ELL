@@ -85,20 +85,20 @@ namespace nodes
     template <typename ValueType, bool max>
     void ExtremalValueNode<ValueType, max>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* inputVal = compiler.EnsurePortEmitted(input);
-        llvm::Value* outVal = compiler.EnsurePortEmitted(val);
-        llvm::Value* outArgVal = compiler.EnsurePortEmitted(argVal);
+        emitters::LLVMValue inputVal = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue outVal = compiler.EnsurePortEmitted(val);
+        emitters::LLVMValue outArgVal = compiler.EnsurePortEmitted(argVal);
         auto inputType = GetPortVariableType(input);
         auto numInputs = input.Size();
 
-        llvm::Value* bestVal = function.Variable(inputType, "bestVal");
-        llvm::Value* bestIndex = function.Variable(ell::emitters::VariableType::Int32, "bestArgVal");
+        emitters::LLVMValue bestVal = function.Variable(inputType, "bestVal");
+        emitters::LLVMValue bestIndex = function.Variable(ell::emitters::VariableType::Int32, "bestArgVal");
 
         auto val0 = function.ValueAt(inputVal, function.Literal(0));
         function.Store(bestVal, val0);
         function.StoreZero(bestIndex);
 
-        function.For(1, numInputs, 1, [inputVal, bestVal, bestIndex, this](emitters::IRFunctionEmitter& function, llvm::Value* i){
+        function.For(1, numInputs, 1, [inputVal, bestVal, bestIndex, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue i){
             auto val = function.ValueAt(inputVal, i);
             function.If(GetComparison(), val, function.Load(bestVal), [bestVal, bestIndex, val, i](auto& function) {
                 function.Store(bestVal, val);
@@ -113,21 +113,21 @@ namespace nodes
     template <typename ValueType, bool max>
     void ExtremalValueNode<ValueType, max>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* outVal = compiler.EnsurePortEmitted(val);
-        llvm::Value* outArgVal = compiler.EnsurePortEmitted(argVal);
+        emitters::LLVMValue outVal = compiler.EnsurePortEmitted(val);
+        emitters::LLVMValue outArgVal = compiler.EnsurePortEmitted(argVal);
         auto inputType = GetPortVariableType(input);
         auto numInputs = input.Size();
 
-        llvm::Value* bestVal = function.Variable(inputType, "bestVal");
-        llvm::Value* bestIndex = function.Variable(ell::emitters::VariableType::Int32, "bestArgVal");
+        emitters::LLVMValue bestVal = function.Variable(inputType, "bestVal");
+        emitters::LLVMValue bestIndex = function.Variable(ell::emitters::VariableType::Int32, "bestArgVal");
 
-        llvm::Value* val0 = compiler.LoadPortElementVariable(input.GetInputElement(0));
+        emitters::LLVMValue val0 = compiler.LoadPortElementVariable(input.GetInputElement(0));
         function.Store(bestVal, val0);
         function.StoreZero(bestIndex);
 
         for (size_t i = 1; i < numInputs; ++i)
         {
-            llvm::Value* val = compiler.LoadPortElementVariable(input.GetInputElement(i));
+            emitters::LLVMValue val = compiler.LoadPortElementVariable(input.GetInputElement(i));
             function.If(GetComparison(), val, function.Load(bestVal), [bestVal, bestIndex, val, i](auto& function) {
                 function.Store(bestVal, val);
                 function.Store(bestIndex, function.Literal(static_cast<int>(i)));

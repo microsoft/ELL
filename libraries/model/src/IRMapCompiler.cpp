@@ -115,7 +115,7 @@ namespace model
         return GetModule().GetModuleName();
     }
 
-    std::string IRMapCompiler::GetGlobalName(const Node& node, const std::string& baseName) const 
+    std::string IRMapCompiler::GetGlobalName(const Node& node, const std::string& baseName) const
     {
         // e.g "ELL_GRUNodeReset_1541".
         return GetNamespacePrefix() + "_" + baseName + "_" + node.GetId().ToString();
@@ -411,19 +411,19 @@ namespace model
     // Node implementor methods:
     //
 
-    llvm::Value* IRMapCompiler::EnsurePortEmitted(const InputPortBase& port)
+    emitters::LLVMValue IRMapCompiler::EnsurePortEmitted(const InputPortBase& port)
     {
         auto portElement = port.GetInputElement(0);
         return EnsurePortElementEmitted(portElement);
     }
 
-    llvm::Value* IRMapCompiler::EnsurePortEmitted(const OutputPortBase& port)
+    emitters::LLVMValue IRMapCompiler::EnsurePortEmitted(const OutputPortBase& port)
     {
         auto pVar = GetOrAllocatePortVariable(port);
         return GetModule().EnsureEmitted(*pVar);
     }
 
-    llvm::Value* IRMapCompiler::EnsurePortElementEmitted(const PortElementBase& element)
+    emitters::LLVMValue IRMapCompiler::EnsurePortElementEmitted(const PortElementBase& element)
     {
         auto pVar = GetVariableForElement(element);
         if (pVar == nullptr)
@@ -637,7 +637,7 @@ namespace model
     //
     // Port variables
     //
-    llvm::Value* IRMapCompiler::LoadPortElementVariable(const PortElementBase& element)
+    emitters::LLVMValue IRMapCompiler::LoadPortElementVariable(const PortElementBase& element)
     {
         auto& currentFunction = GetModule().GetCurrentFunction();
         emitters::Variable* pVar = GetPortElementVariable(element);
@@ -645,8 +645,8 @@ namespace model
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: got a scalar port variable");
         }
-        
-        llvm::Value* pVal = GetModule().EnsureEmitted(*pVar);
+
+        emitters::LLVMValue pVal = GetModule().EnsureEmitted(*pVar);
         auto valType = pVal->getType();
         bool needsDereference = valType->isPointerTy(); // TODO: Maybe this should be `isPtrOrPtrVectorTy()` or even `isPtrOrPtrVectorTy() || isArrayTy()`
         if (needsDereference)

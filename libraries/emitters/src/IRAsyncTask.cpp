@@ -18,7 +18,7 @@ namespace ell
 {
 namespace emitters
 {
-    IRAsyncTask::IRAsyncTask(IRFunctionEmitter& owningFunction, llvm::Function* taskFunction, const std::vector<llvm::Value*>& arguments)
+    IRAsyncTask::IRAsyncTask(IRFunctionEmitter& owningFunction, LLVMFunction taskFunction, const std::vector<LLVMValue>& arguments)
         : _taskFunction(taskFunction), _arguments(arguments)
     {
         const auto& compilerParameters = owningFunction.GetModule().GetCompilerOptions();
@@ -29,7 +29,7 @@ namespace emitters
         }
     }
 
-    IRAsyncTask::IRAsyncTask(IRFunctionEmitter& owningFunction, IRFunctionEmitter& taskFunction, const std::vector<llvm::Value*>& arguments)
+    IRAsyncTask::IRAsyncTask(IRFunctionEmitter& owningFunction, IRFunctionEmitter& taskFunction, const std::vector<LLVMValue>& arguments)
         : IRAsyncTask(owningFunction, taskFunction.GetFunction(), arguments)
     {
     }
@@ -81,7 +81,7 @@ namespace emitters
         }
     }
 
-    llvm::Value* IRAsyncTask::GetReturnValue(IRFunctionEmitter& functionEmitter) const
+    LLVMValue IRAsyncTask::GetReturnValue(IRFunctionEmitter& functionEmitter) const
     {
         if (_returnType != nullptr)
         {
@@ -93,7 +93,7 @@ namespace emitters
         }
     }
 
-    llvm::Value* IRAsyncTask::IsNull(IRFunctionEmitter& functionEmitter)
+    LLVMValue IRAsyncTask::IsNull(IRFunctionEmitter& functionEmitter)
     {
         return functionEmitter.FalseBit();
     }

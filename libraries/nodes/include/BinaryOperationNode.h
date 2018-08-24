@@ -19,6 +19,7 @@
 
 // emitters
 #include "EmitterTypes.h"
+#include "LLVMUtilities.h"
 
 // utilities
 #include "ArchiveVersion.h"
@@ -120,12 +121,12 @@ namespace nodes
         void EmitComputeDimensionLoop(model::IRMapCompiler& compiler,
                                       emitters::IRFunctionEmitter& function,
                                       size_t dimension,
-                                      llvm::Value* input1,
-                                      llvm::Value* input2,
-                                      llvm::Value* output,
-                                      llvm::Value* prevInput1DimensionOffset,
-                                      llvm::Value* prevInput2DimensionOffset,
-                                      llvm::Value* prevOutputDimensionOffset) const;
+                                      emitters::LLVMValue input1,
+                                      emitters::LLVMValue input2,
+                                      emitters::LLVMValue output,
+                                      emitters::LLVMValue prevInput1DimensionOffset,
+                                      emitters::LLVMValue prevInput2DimensionOffset,
+                                      emitters::LLVMValue prevOutputDimensionOffset) const;
         template <typename Operation>
         std::vector<ValueType> ComputeOutput(Operation&& function) const;
         template <typename Operation>

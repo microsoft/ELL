@@ -12,9 +12,13 @@
 #include "IRMapCompiler.h"
 #include "MapCompiler.h"
 
+// emitters
+#include "LLVMUtilities.h"
+
 // utilities
 #include "UniqueId.h"
 #include "Logger.h"
+
 
 // stl
 #include <algorithm>
@@ -214,10 +218,10 @@ namespace model
     }
 
     // Get the actual arguments use to call the node function
-    std::vector<llvm::Value*> CompilableNode::GetNodeFunctionArguments(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const
+    std::vector<emitters::LLVMValue> CompilableNode::GetNodeFunctionArguments(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const
     {
         int numArgs = GetInputPorts().size() + GetOutputPorts().size();
-        std::vector<llvm::Value*> args;
+        std::vector<emitters::LLVMValue> args;
         args.reserve(numArgs);
 
         for (auto port : GetInputPorts())
@@ -252,7 +256,7 @@ namespace model
         return args;
     }
 
-    std::vector<llvm::Value*> CompilableNode::GetNodeFunctionStateArguments(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const
+    std::vector<emitters::LLVMValue> CompilableNode::GetNodeFunctionStateArguments(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const
     {
         return {};
     }

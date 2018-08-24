@@ -9,10 +9,10 @@
 #pragma once
 
 #include "EmitterTypes.h"
+#include "LLVMUtilities.h"
 
 // llvm
 #include <llvm/IR/BasicBlock.h>
-#include <llvm/IR/Value.h>
 
 // stl
 #include <functional>
@@ -52,7 +52,7 @@ namespace emitters
         /// <param name="comparison"> The comparison. </param>
         /// <param name="pValue"> Pointer to the llvm::Value that contains the value used to define the comparison. </param>
         /// <param name="pTestValue"> Pointer to the llvm::Value that contains the test value, which is compared against pValue. </param>
-        IRIfEmitter(IRFunctionEmitter& functionEmitter, TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue);
+        IRIfEmitter(IRFunctionEmitter& functionEmitter, TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue);
 
         IRIfEmitter(const IRIfEmitter&) = delete;
         IRIfEmitter& operator=(const IRIfEmitter&) = delete;
@@ -72,9 +72,9 @@ namespace emitters
         ///
         /// <param name="pValue"> Pointer to the llvm::Value that contains the boolean condition value. </param>
         /// <param name="body"> A function that emits the body of the "if true" block. </param>
-        IRIfEmitter& ElseIf(llvm::Value* pValue, IfElseBodyFunction body);
+        IRIfEmitter& ElseIf(LLVMValue pValue, IfElseBodyFunction body);
 
-        /// <summary> Ends the if else block, injecting appropriate branches. It is typically not necessary to call 
+        /// <summary> Ends the if else block, injecting appropriate branches. It is typically not necessary to call
         ///     this explicitly, since it is generally called by the destructor. </summary>
         void End();
 
@@ -84,13 +84,13 @@ namespace emitters
         // Private constructor used by IRFunctionEmitter
         IRIfEmitter(IRFunctionEmitter& functionEmitter, bool endOnDestruct, llvm::BasicBlock* pPrevBlock = nullptr);
 
-        llvm::BasicBlock* If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue);
-        llvm::BasicBlock* If(llvm::Value* pValue);
-        llvm::BasicBlock* If(llvm::Value* pValue, bool testValue);
-        llvm::BasicBlock* If(std::function<llvm::Value*()> comparison);
-        void IfThen(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue);
+        llvm::BasicBlock* If(TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue);
+        llvm::BasicBlock* If(LLVMValue pValue);
+        llvm::BasicBlock* If(LLVMValue pValue, bool testValue);
+        llvm::BasicBlock* If(std::function<LLVMValue()> comparison);
+        void IfThen(TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue);
         llvm::BasicBlock* Else();
-        
+
         void PrepareBlocks();
         void PrepareBlocks(llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
         void PrepareBlocks(IRBlockRegion* pThenRegion, IRBlockRegion* pElseRegion);

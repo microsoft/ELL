@@ -11,6 +11,7 @@
 
 // llvm
 #include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
 
 namespace ell
 {
@@ -19,7 +20,7 @@ namespace emitters
     //
     // Get types from LLVM values
     //
-    LLVMTypeList GetLLVMTypes(const std::vector<llvm::Value*> values)
+    LLVMTypeList GetLLVMTypes(const std::vector<LLVMValue>& values)
     {
         LLVMTypeList result;
         result.reserve(values.size());

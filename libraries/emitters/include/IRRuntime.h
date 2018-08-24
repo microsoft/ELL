@@ -10,14 +10,10 @@
 
 #include "EmitterTypes.h"
 #include "IRPosixRuntime.h"
+#include "LLVMUtilities.h"
 
 // utilities
 #include "Exception.h"
-
-// llvm
-#include <llvm/IR/Function.h>
-#include <llvm/IR/Type.h>
-#include <llvm/IR/Value.h>
 
 namespace ell
 {
@@ -33,7 +29,7 @@ namespace emitters
         //
         // Misc runtime functions
         //
-        llvm::Value* GetCurrentTime(IRFunctionEmitter& function);
+        LLVMValue GetCurrentTime(IRFunctionEmitter& function);
 
         //
         // Standard math functions
@@ -43,60 +39,60 @@ namespace emitters
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetSqrtFunction();
+        LLVMFunction GetSqrtFunction();
 
         /// <summary> Get the abs function </summary>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetAbsFunction();
+        LLVMFunction GetAbsFunction();
 
         /// <summary> Get the exp function </summary>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetExpFunction();
+        LLVMFunction GetExpFunction();
 
         /// <summary> Get the log function </summary>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetLogFunction();
+        LLVMFunction GetLogFunction();
 
         /// <summary> Get the sin function </summary>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetSinFunction();
+        LLVMFunction GetSinFunction();
 
         /// <summary> Get the cos function </summary>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetCosFunction();
+        LLVMFunction GetCosFunction();
 
         /// <summary> Get the tanh function </summary>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetTanhFunction();
+        LLVMFunction GetTanhFunction();
 
         // emitter types
-        llvm::Function* GetSqrtFunction(VariableType argType);
-        llvm::Function* GetAbsFunction(VariableType argType);
-        llvm::Function* GetExpFunction(VariableType argType);
-        llvm::Function* GetLogFunction(VariableType argType);
-        llvm::Function* GetTanhFunction(VariableType argType);
-        llvm::Function* GetSinFunction(VariableType argType);
-        llvm::Function* GetCosFunction(VariableType argType);
+        LLVMFunction GetSqrtFunction(VariableType argType);
+        LLVMFunction GetAbsFunction(VariableType argType);
+        LLVMFunction GetExpFunction(VariableType argType);
+        LLVMFunction GetLogFunction(VariableType argType);
+        LLVMFunction GetTanhFunction(VariableType argType);
+        LLVMFunction GetSinFunction(VariableType argType);
+        LLVMFunction GetCosFunction(VariableType argType);
 
         // llvm types
-        llvm::Function* GetSqrtFunction(llvm::Type* argType);
-        llvm::Function* GetAbsFunction(llvm::Type* argType);
-        llvm::Function* GetExpFunction(llvm::Type* argType);
-        llvm::Function* GetLogFunction(llvm::Type* argType);
-        llvm::Function* GetSinFunction(llvm::Type* argType);
-        llvm::Function* GetCosFunction(llvm::Type* argType);
+        LLVMFunction GetSqrtFunction(LLVMType argType);
+        LLVMFunction GetAbsFunction(LLVMType argType);
+        LLVMFunction GetExpFunction(LLVMType argType);
+        LLVMFunction GetLogFunction(LLVMType argType);
+        LLVMFunction GetSinFunction(LLVMType argType);
+        LLVMFunction GetCosFunction(LLVMType argType);
 
         //
         // Dot product
@@ -106,7 +102,7 @@ namespace emitters
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetDotProductFunction();
+        LLVMFunction GetDotProductFunction();
 
         //
         // Matrix functions
@@ -119,7 +115,7 @@ namespace emitters
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetGEMVFunction(bool useBlas);
+        LLVMFunction GetGEMVFunction(bool useBlas);
 
         /// <summary> Get the BLAS gemm function for the given type. </summary>
         ///
@@ -128,15 +124,15 @@ namespace emitters
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetGEMMFunction(bool useBlas);
+        LLVMFunction GetGEMMFunction(bool useBlas);
 
         // Special OpenBLAS utility functions
 
         /// <summary> Get the OpenBLAS function for getting the number of threads </summary>
-        llvm::Function* GetOpenBLASGetNumThreadsFunction();
+        LLVMFunction GetOpenBLASGetNumThreadsFunction();
 
         /// <summary> Get the OpenBLAS function for setting the number of threads </summary>
-        llvm::Function* GetOpenBLASSetNumThreadsFunction();
+        LLVMFunction GetOpenBLASSetNumThreadsFunction();
 
         //
         // Posix functions
@@ -147,7 +143,7 @@ namespace emitters
         friend IRModuleEmitter;
         IRRuntime(IRModuleEmitter& module);
 
-        llvm::Type* GetIntType(); // returns LLVM type for native `int`
+        LLVMType GetIntType(); // returns LLVM type for native `int`
 
         std::string GetNamespacePrefix() const;
 
@@ -156,27 +152,27 @@ namespace emitters
         //
 
         // time
-        llvm::Function* GetCurrentTimeFunction(); // returns a double containing the current time (in _milliseconds_ from some arbitrary start time)
-        llvm::Function* ResolveCurrentTimeFunction(llvm::StructType* timespecType);
+        LLVMFunction GetCurrentTimeFunction(); // returns a double containing the current time (in _milliseconds_ from some arbitrary start time)
+        LLVMFunction ResolveCurrentTimeFunction(llvm::StructType* timespecType);
 
         // math
-        llvm::Function* GetDotProductIntFunction();
-        llvm::Function* GetDotProductFloatFunction();
+        LLVMFunction GetDotProductIntFunction();
+        LLVMFunction GetDotProductFloatFunction();
 
         // Matrix math (BLAS or native)
-        llvm::Function* GetSGEMVFunction(bool useBlas);
-        llvm::Function* GetSGEMMFunction(bool useBlas);
-        llvm::Function* GetDGEMVFunction(bool useBlas);
-        llvm::Function* GetDGEMMFunction(bool useBlas);
+        LLVMFunction GetSGEMVFunction(bool useBlas);
+        LLVMFunction GetSGEMMFunction(bool useBlas);
+        LLVMFunction GetDGEMVFunction(bool useBlas);
+        LLVMFunction GetDGEMMFunction(bool useBlas);
 
         IRModuleEmitter& _module;
 
         // Special runtimes for different environments or libraries
         IRPosixRuntime _posixRuntime;
 
-        llvm::Function* _pDotProductFunctionFloat = nullptr;
-        llvm::Function* _pDotProductFunction = nullptr;
-        llvm::Function* _pGetCurrentTimeFunction = nullptr;
+        LLVMFunction _pDotProductFunctionFloat = nullptr;
+        LLVMFunction _pDotProductFunction = nullptr;
+        LLVMFunction _pGetCurrentTimeFunction = nullptr;
     };
 }
 }

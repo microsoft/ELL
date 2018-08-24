@@ -9,6 +9,11 @@
 #include "IRPosixRuntime.h"
 #include "IRModuleEmitter.h"
 
+// llvm
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+
 // Helpful discussion on emitter pthread routines:
 // https://stackoverflow.com/questions/19803848/llvm-insert-pthread-function-calls-into-ir
 
@@ -21,14 +26,14 @@ namespace emitters
     {
     }
 
-    llvm::Type* IRPosixRuntime::GetIntType()
+    LLVMType IRPosixRuntime::GetIntType()
     {
         // TODO: should this be 64 bits for 64-bit systems?
         auto& context = _module.GetLLVMContext();
         return llvm::Type::getInt32Ty(context);
     }
 
-    llvm::Type* IRPosixRuntime::GetPointerSizedIntType()
+    LLVMType IRPosixRuntime::GetPointerSizedIntType()
     {
         auto& context = _module.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
@@ -71,7 +76,7 @@ namespace emitters
         return _timespecType;
     }
 
-    llvm::Type* IRPosixRuntime::GetTimespecPointerType()
+    LLVMType IRPosixRuntime::GetTimespecPointerType()
     {
         return GetTimespecType()->getPointerTo();
     }
@@ -80,7 +85,7 @@ namespace emitters
     // pthreads -- types
     //
 
-    llvm::Type* IRPosixRuntime::GetPthreadType()
+    LLVMType IRPosixRuntime::GetPthreadType()
     {
         auto& targetDevice = _module.GetCompilerOptions().targetDevice;
         if (targetDevice.IsLinux())
@@ -97,7 +102,7 @@ namespace emitters
         }
     }
 
-    llvm::Type* IRPosixRuntime::GetPthreadMutexType()
+    LLVMType IRPosixRuntime::GetPthreadMutexType()
     {
         auto& context = _module.GetLLVMContext();
         auto int8Type = llvm::Type::getInt8Ty(context);
@@ -155,7 +160,7 @@ namespace emitters
         }
     }
 
-    llvm::Type* IRPosixRuntime::GetPthreadCondType()
+    LLVMType IRPosixRuntime::GetPthreadCondType()
     {
         auto& context = _module.GetLLVMContext();
         auto int8Type = llvm::Type::getInt8Ty(context);
@@ -207,7 +212,7 @@ namespace emitters
         }
     }
 
-    llvm::Type* IRPosixRuntime::GetPthreadSpinlockType()
+    LLVMType IRPosixRuntime::GetPthreadSpinlockType()
     {
         auto& context = _module.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
@@ -258,7 +263,7 @@ namespace emitters
     //
     // pthreads -- thread functions
     //
-    llvm::Function* IRPosixRuntime::GetPthreadCreateFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadCreateFunction()
     {
         // Signature: int pthread_create(pthread_t * thread, const pthread_attr_t * attr, void * (*start_routine)(void *), void * arg);
         auto& context = _module.GetLLVMContext();
@@ -266,51 +271,51 @@ namespace emitters
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
         auto pthreadPtrType = GetPthreadType()->getPointerTo();
         auto threadFunctionType = llvm::FunctionType::get(int8PtrType, { int8PtrType }, false);
-        std::vector<llvm::Type*> args = { pthreadPtrType,
+        std::vector<LLVMType> args = { pthreadPtrType,
                                           int8PtrType,
-                                          static_cast<llvm::Type*>(threadFunctionType)->getPointerTo(),
+                                          static_cast<LLVMType>(threadFunctionType)->getPointerTo(),
                                           int8PtrType };
         auto functionType = llvm::FunctionType::get(intType, args, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_create", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_create", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadEqualFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadEqualFunction()
     {
         // Signature: int pthread_equal(pthread_t t1, pthread_t t2);
         auto pthreadType = GetPthreadType();
         auto intType = GetIntType();
         auto functionType = llvm::FunctionType::get(intType, { pthreadType, pthreadType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_equal", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_equal", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadExitFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadExitFunction()
     {
         // Signature: void pthread_exit(void* status);
         auto& context = _module.GetLLVMContext();
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
         auto voidType = llvm::Type::getVoidTy(context);
         auto functionType = llvm::FunctionType::get(voidType, { int8PtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_exit", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_exit", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadGetConcurrencyFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadGetConcurrencyFunction()
     {
         // Signature: int pthread_getconcurrency(void);
         auto intType = GetIntType();
         auto functionType = llvm::FunctionType::get(intType, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_getconcurrency", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_getconcurrency", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadDetachFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadDetachFunction()
     {
         // Signature: int pthread_detach(pthread_t);
         auto pthreadType = GetPthreadType();
         auto intType = GetIntType();
         auto functionType = llvm::FunctionType::get(intType, { pthreadType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_detach", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_detach", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadJoinFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadJoinFunction()
     {
         // Signature: int pthread_join(pthread_t thread, void ** status);
         auto& context = _module.GetLLVMContext();
@@ -318,69 +323,69 @@ namespace emitters
         auto intType = GetIntType();
         auto int8PtrPtrType = llvm::Type::getInt8PtrTy(context)->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { pthreadType, int8PtrPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_join", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_join", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadSelfFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadSelfFunction()
     {
         // Signature: pthread_t pthread_self(void);
         auto pthreadType = GetPthreadType();
         auto functionType = llvm::FunctionType::get(pthreadType, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_self", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_self", functionType));
     }
 
     //
     // pthreads -- synchronization functions
     //
-    llvm::Function* IRPosixRuntime::GetPthreadMutexInitFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadMutexInitFunction()
     {
         // Signature: int pthread_mutex_init(pthread_mutex_t * mutex, const pthread_mutex_attr *attr);
         auto& context = _module.GetLLVMContext();
         auto intType = GetIntType();
         auto mutexPtrType = GetPthreadMutexType()->getPointerTo();
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
-        std::vector<llvm::Type*> args = { mutexPtrType, int8PtrType };
+        std::vector<LLVMType> args = { mutexPtrType, int8PtrType };
         auto functionType = llvm::FunctionType::get(intType, args, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_mutex_init", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_mutex_init", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadMutexDestroyFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadMutexDestroyFunction()
     {
         // Signature: int pthread_mutex_destroy(pthread_mutex_t * mutex);
         auto intType = GetIntType();
         auto mutexPtrType = GetPthreadMutexType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { mutexPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_mutex_destroy", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_mutex_destroy", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadMutexLockFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadMutexLockFunction()
     {
         // Signature: int pthread_mutex_lock(pthread_mutex_t * mutex);
         auto intType = GetIntType();
         auto mutexPtrType = GetPthreadMutexType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { mutexPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_mutex_lock", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_mutex_lock", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadMutexTryLockFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadMutexTryLockFunction()
     {
         // Signature: int pthread_mutex_trylock(pthread_mutex_t * mutex);
         auto intType = GetIntType();
         auto mutexPtrType = GetPthreadMutexType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { mutexPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_mutex_trylock", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_mutex_trylock", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadMutexUnlockFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadMutexUnlockFunction()
     {
         // Signature: int pthread_mutex_unlock(pthread_mutex_t * mutex);
         auto intType = GetIntType();
         auto mutexPtrType = GetPthreadMutexType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { mutexPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_mutex_unlock", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_mutex_unlock", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadCondInitFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadCondInitFunction()
     {
         // Signature: int pthread_cond_init(pthread_cond_t * cond, const pthread_cond_attr *attr);
         auto& context = _module.GetLLVMContext();
@@ -388,29 +393,29 @@ namespace emitters
         auto condPtrType = GetPthreadCondType()->getPointerTo();
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
         auto functionType = llvm::FunctionType::get(intType, { condPtrType, int8PtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_init", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_init", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadCondDestroyFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadCondDestroyFunction()
     {
         // Signature: int pthread_cond_destroy(pthread_cond_t * cond);
         auto intType = GetIntType();
         auto condPtrType = GetPthreadCondType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { condPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_destroy", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_destroy", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadCondWaitFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadCondWaitFunction()
     {
         // Signature: int pthread_cond_wait(pthread_cond_t * cond, pthread_mutex_t * mutex);
         auto intType = GetIntType();
         auto condPtrType = GetPthreadCondType()->getPointerTo();
         auto mutexPtrType = GetPthreadMutexType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { condPtrType, mutexPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_wait", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_wait", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadCondTimedwaitFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadCondTimedwaitFunction()
     {
         // Signature: int pthread_cond_timedwait(pthread_cond_t * cond, pthread_mutex_t * mutex, const struct timespec * abstime);
         auto intType = GetIntType();
@@ -418,28 +423,28 @@ namespace emitters
         auto mutexPtrType = GetPthreadMutexType()->getPointerTo();
         auto timespecPtrType = GetTimespecType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { condPtrType, mutexPtrType, timespecPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_timedwait", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_timedwait", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadCondSignalFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadCondSignalFunction()
     {
         // Signature: int pthread_cond_signal(pthread_cond_t * cond);
         auto intType = GetIntType();
         auto condPtrType = GetPthreadCondType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { condPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_signal", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_signal", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadCondBroadcastFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadCondBroadcastFunction()
     {
         // Signature: int pthread_cond_broadcast(pthread_cond_t * cond);
         auto intType = GetIntType();
         auto condPtrType = GetPthreadCondType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { condPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_broadcast", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_cond_broadcast", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadSpinInitFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadSpinInitFunction()
     {
         assert(_module.GetCompilerOptions().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
@@ -447,10 +452,10 @@ namespace emitters
         auto intType = GetIntType();
         auto spinlockPtrType = GetPthreadSpinlockType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { spinlockPtrType, intType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_init", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_init", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadSpinLockFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadSpinLockFunction()
     {
         assert(_module.GetCompilerOptions().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
@@ -458,10 +463,10 @@ namespace emitters
         auto intType = GetIntType();
         auto spinlockPtrType = GetPthreadSpinlockType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { spinlockPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_lock", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_lock", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadSpinTryLockFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadSpinTryLockFunction()
     {
         assert(_module.GetCompilerOptions().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
@@ -469,10 +474,10 @@ namespace emitters
         auto intType = GetIntType();
         auto spinlockPtrType = GetPthreadSpinlockType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { spinlockPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_trylock", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_trylock", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadSpinUnlockFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadSpinUnlockFunction()
     {
         assert(_module.GetCompilerOptions().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
@@ -480,10 +485,10 @@ namespace emitters
         auto intType = GetIntType();
         auto spinlockPtrType = GetPthreadSpinlockType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { spinlockPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_unlock", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_unlock", functionType));
     }
 
-    llvm::Function* IRPosixRuntime::GetPthreadSpinDestroyFunction()
+    LLVMFunction IRPosixRuntime::GetPthreadSpinDestroyFunction()
     {
         assert(_module.GetCompilerOptions().targetDevice.IsLinux() && "pthread spinlock only available on Linux");
 
@@ -491,7 +496,7 @@ namespace emitters
         auto intType = GetIntType();
         auto spinlockPtrType = GetPthreadSpinlockType()->getPointerTo();
         auto functionType = llvm::FunctionType::get(intType, { spinlockPtrType }, false);
-        return static_cast<llvm::Function*>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_destroy", functionType));
+        return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_spin_destroy", functionType));
     }
 
     // Signature: int pthread_once(pthread_once_t * once_init, void (*init_routine)(void)));

@@ -8,6 +8,9 @@
 
 #pragma once
 
+// emitters
+#include "LLVMUtilities.h"
+
 // model
 #include "CompilableNode.h"
 #include "CompilableNodeUtilities.h"
@@ -21,9 +24,6 @@
 
 // utilities
 #include "TypeName.h"
-
-// llvm
-#include <llvm/IR/Value.h>
 
 // stl
 #include <initializer_list>
@@ -85,7 +85,7 @@ namespace nodes
 
         std::string GetCompiledFunctionName() const override;
         emitters::NamedVariableTypeList GetNodeFunctionStateParameterList(model::IRMapCompiler& compiler) const override;
-        std::vector<llvm::Value*> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override;
+        std::vector<emitters::LLVMValue> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override;
 
         emitters::NamedVariableTypeList GetInputTypes();
         emitters::NamedVariableTypeList GetOutputTypes();

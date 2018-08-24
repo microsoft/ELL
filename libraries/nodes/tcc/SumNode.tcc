@@ -116,8 +116,8 @@ namespace nodes
         const int vectorSize = compiler.GetCompilerOptions().vectorWidth;
         assert(size >= vectorSize);
 
-        llvm::Value* input = compiler.EnsurePortEmitted(_input);
-        llvm::Value* output = compiler.EnsurePortEmitted(_output);
+        emitters::LLVMValue input = compiler.EnsurePortEmitted(_input);
+        emitters::LLVMValue output = compiler.EnsurePortEmitted(_output);
 
         // Get LLVM types
         auto& emitter = function.GetEmitter();
@@ -130,7 +130,7 @@ namespace nodes
         // cast input to pointer-to-vector
         auto inputVector = function.CastPointer(input, vectorPointerType);
 
-        llvm::Value* vectorAccumVar = function.Variable(vectorType, "vecAccum");
+        emitters::LLVMValue vectorAccumVar = function.Variable(vectorType, "vecAccum");
         function.Store(vectorAccumVar, emitters::FillVector<ValueType>(function, vectorType, 0));
 
         const int numBlocks = size / vectorSize;
@@ -148,7 +148,7 @@ namespace nodes
         {
             for(int epilogueIndex = vectorSize * numBlocks; epilogueIndex < size; ++epilogueIndex)
             {
-                llvm::Value* pValue = function.ValueAt(input, function.Literal<int>(epilogueIndex));
+                emitters::LLVMValue pValue = function.ValueAt(input, function.Literal<int>(epilogueIndex));
                 sum = function.Operator(emitters::GetAddForValueType<ValueType>(), sum, pValue);
             }
         }
@@ -158,7 +158,7 @@ namespace nodes
     template <typename ValueType>
     void SumNode<ValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
         function.StoreZero(pResult);
         for (size_t i = 0; i < input.Size(); ++i)

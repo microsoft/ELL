@@ -8,13 +8,10 @@
 
 #pragma once
 
+#include "LLVMUtilities.h"
+
 // stl
 #include <functional>
-
-namespace llvm
-{
-    class Value;
-}
 
 namespace ell
 {
@@ -42,20 +39,20 @@ namespace emitters
         IRLocalValue(const IRLocalValue&) = default;
         IRLocalValue(IRLocalValue&&) = default;
         IRLocalValue& operator=(const IRLocalValue& other);
-        IRLocalValue& operator=(llvm::Value* value);
+        IRLocalValue& operator=(LLVMValue value);
 
-        /// <summary> Constructor from an llvm::Value* </summary>
+        /// <summary> Constructor from an LLVMValue </summary>
         ///
         /// <param name="function"> The current function being emitted. </param>
         /// <param name="value"> The LLVM value to wrap. </param>
         ///
         /// <returns> An `IRLocalValue` wrapping the given value. </returns>
-        IRLocalValue(IRFunctionEmitter& function, llvm::Value* value);
+        IRLocalValue(IRFunctionEmitter& function, LLVMValue value);
 
-        /// <summary> Implicit conversion to llvm::Value* </summary>
+        /// <summary> Implicit conversion to LLVMValue </summary>
         ///
         /// <returns> An `llvm::Value` pointer to the wrapped value. </returns>
-        operator llvm::Value*() const { return value; }
+        operator LLVMValue() const { return value; }
 
         /// <summary> Checks if this value has been assigned to. </summary>
         ///
@@ -65,8 +62,8 @@ namespace emitters
         /// <summary> The function this value is in scope for. </summary>
         IRFunctionEmitter& function;
 
-        /// <summary> The llvm::Value* being wrapped. </summary>
-        llvm::Value* value;
+        /// <summary> The LLVMValue being wrapped. </summary>
+        LLVMValue value;
 
     private:
         IRLocalValue() = default;

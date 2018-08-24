@@ -10,6 +10,7 @@
 
 #include "IRThreadPool.h"
 #include "IRAsyncTask.h"
+#include "LLVMUtilities.h"
 
 // stl
 #include <vector>
@@ -39,7 +40,7 @@ namespace emitters
     //
     // 2) Run them
     //
-    // auto task1Args = std::vector<llvm::Value*> {arg1, arg2, arg3};
+    // auto task1Args = std::vector<LLVMValue> {arg1, arg2, arg3};
     // ...
     // auto tasks = function.StartTasks(function, {{task1Args}, {task2Args}, {task3Args}, ...}); // Runs on the default thread pool for the module
     //
@@ -47,7 +48,7 @@ namespace emitters
     //
     // tasks.WaitAll(); // block until all tasks are done
     //
-    
+
     /// <summary> Class representing tasks that can be run asynchronously. </summary>
     class IRTask
     {
@@ -62,14 +63,14 @@ namespace emitters
         ///
         /// <param name="function"> The function currently being emitted into. </param>
         void Wait(IRFunctionEmitter& function);
-        
+
         /// <summary> Get the return value of a finished task </summary>
         ///
         /// <param name="function"> The function currently being emitted into. </param>
-        llvm::Value* GetReturnValue(IRFunctionEmitter& function);
+        LLVMValue GetReturnValue(IRFunctionEmitter& function);
 
         /// <summary> Check if a task is a "null task" </summary>
-        llvm::Value* IsNull(IRFunctionEmitter& function);
+        LLVMValue IsNull(IRFunctionEmitter& function);
 
     private:
         friend class IRTaskArray;
@@ -81,14 +82,14 @@ namespace emitters
             TaskUnion(const IRAsyncTask& task) : asyncTask(task) {}
             TaskUnion(const IRThreadPoolTask& task) : threadPoolTask(task) {}
             ~TaskUnion(){}
-            
+
             IRAsyncTask asyncTask;
             IRThreadPoolTask threadPoolTask;
         } _task;
 
         // Constructor from an IRAsyncTask
         IRTask(const IRAsyncTask& asyncTask);
-        
+
         // Constructor from an IRThreadPoolTask
         IRTask(const IRThreadPoolTask& threadPoolTask);
     };
@@ -128,7 +129,7 @@ namespace emitters
             TasksUnion(const std::vector<IRAsyncTask>& tasks) : asyncTasks(tasks) {}
             TasksUnion(const IRThreadPoolTaskArray& tasks) : threadPoolTasks(tasks) {}
             ~TasksUnion(){}
-            
+
             std::vector<IRAsyncTask> asyncTasks;
             IRThreadPoolTaskArray threadPoolTasks;
         } _tasks;

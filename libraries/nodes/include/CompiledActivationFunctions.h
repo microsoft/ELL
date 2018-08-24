@@ -12,6 +12,7 @@
 
 // emitters
 #include "IRFunctionEmitter.h"
+#include "LLVMUtilities.h"
 
 // predictors/neural
 #include "HardSigmoidActivation.h"
@@ -53,7 +54,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         ///
         /// <returns> The value of the function ReLU(x) </returns>
-        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -92,7 +93,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         ///
         /// <returns> The value of the function LeakyReLU(x) </returns>
-        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
         /// <summary> Gets the leaky factor </summary>
@@ -132,7 +133,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         /// <returns> The value of the function Sigmoid(x) </returns>
         ///
-        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -164,7 +165,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         ///
         /// <returns> The value of the function Sigmoid(x) </returns>
-        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -195,7 +196,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         ///
         /// <returns> The value of the function tanh(x) </returns>
-        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -227,7 +228,7 @@ namespace nodes
         /// <param name="a"> The learned alpha parameter. </param>
         ///
         /// <returns> The value of the function PReLU(x, a) </returns>
-        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* a) const;
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, emitters::LLVMValue a) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -48,7 +48,7 @@ namespace nodes
 
         auto hiddenWeightsNode = transformer.AddNode<ConstantNode<ValueType>>(hiddenWeights.ToArray());
         auto hiddenBiasNode = transformer.AddNode<ConstantNode<ValueType>>(hiddenBias.ToArray());
-        
+
         auto recurrentNode = transformer.AddNode<RecurrentNode<ValueType>>(newInput,
                                                                            hiddenWeightsNode->output,
                                                                            hiddenBiasNode->output,
@@ -106,18 +106,18 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void RecurrentNode<ValueType>::ApplyActivation(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength)
+    void RecurrentNode<ValueType>::ApplyActivation(emitters::IRFunctionEmitter& function, emitters::LLVMValue data, size_t dataLength)
     {
         auto activationFunction = GetNodeActivationFunction(_activation);
         function.For(dataLength, [&](emitters::IRFunctionEmitter& function, auto i) {
-            llvm::Value* inputValue = function.ValueAt(data, i);
-            llvm::Value* x = activationFunction->Compile(function, inputValue);
+            emitters::LLVMValue inputValue = function.ValueAt(data, i);
+            emitters::LLVMValue x = activationFunction->Compile(function, inputValue);
             function.SetValueAt(data, i, x);
         });
     }
 
     template <typename ValueType>
-    void RecurrentNode<ValueType>::ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* dataValue, size_t dataLength)
+    void RecurrentNode<ValueType>::ApplySoftmax(emitters::IRFunctionEmitter& function, emitters::LLVMValue dataValue, size_t dataLength)
     {
         auto data = function.LocalArray(dataValue);
         auto sum = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), 1));
@@ -141,12 +141,12 @@ namespace nodes
         const size_t hiddenSize = this->hiddenBias.Size();
 
         // Get LLVM references for all node inputs
-        llvm::Value* input = compiler.EnsurePortEmitted(this->input);
-        llvm::Value* hiddenWeights = compiler.EnsurePortEmitted(this->hiddenWeights);
-        llvm::Value* hiddenBias = compiler.EnsurePortEmitted(this->hiddenBias);
+        emitters::LLVMValue input = compiler.EnsurePortEmitted(this->input);
+        emitters::LLVMValue hiddenWeights = compiler.EnsurePortEmitted(this->hiddenWeights);
+        emitters::LLVMValue hiddenBias = compiler.EnsurePortEmitted(this->hiddenBias);
 
         // Get LLVM reference for node output
-        llvm::Value* output = compiler.EnsurePortEmitted(this->output);
+        emitters::LLVMValue output = compiler.EnsurePortEmitted(this->output);
 
         // The node's output is the same as the hidden state --- just make an alias so the code looks nicer
         auto& hiddenState = output;

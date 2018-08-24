@@ -9,10 +9,10 @@
 #pragma once
 
 #include "EmitterTypes.h"
+#include "LLVMUtilities.h"
 
 // llvm
 #include <llvm/IR/BasicBlock.h>
-#include <llvm/IR/Value.h>
 
 namespace ell
 {
@@ -42,12 +42,12 @@ namespace emitters
         /// <summary> Gets the iteration count variable, the "i" of the for loop. </summary>
         ///
         /// <returns> Pointer to an llvm::Value that represents the iteration variable. </returns>
-        llvm::Value* GetIterationVariable() { return _pIterationVariable; }
+        LLVMValue GetIterationVariable() { return _pIterationVariable; }
 
         /// <summary> Emits a load instruction for the iteration variable. </summary>
         ///
         /// <returns> Pointer to an llvm::Value that represents the iteration variable. </returns>
-        llvm::Value* LoadIterationVariable();
+        LLVMValue LoadIterationVariable();
 
         /// <summary> Emits the beginning of a for loop that repeats a given number of times. </summary>
         ///
@@ -61,7 +61,7 @@ namespace emitters
         /// <param name="pRepeatCount"> Pointer to an llvm::Value that contains the number of repetitions. </param>
         ///
         /// <returns> Pointer to the llvm::BasicBlock that represents the for loop. </returns>
-        llvm::BasicBlock* Begin(llvm::Value* pRepeatCount);
+        llvm::BasicBlock* Begin(LLVMValue pRepeatCount);
 
         /// <summary> Emits the beginning of a for loop from iStartAt to iMaxValue, with a given step size. </summary>
         ///
@@ -79,16 +79,16 @@ namespace emitters
         /// <param name="stepSize"> Size of the step. </param>
         ///
         /// <returns> Pointer to the llvm::BasicBlock that represents the for loop. </returns>
-        llvm::BasicBlock* Begin(llvm::Value* iStartAt, llvm::Value* iMaxValue, llvm::Value* stepSize);
+        llvm::BasicBlock* Begin(LLVMValue iStartAt, LLVMValue iMaxValue, LLVMValue stepSize);
 
         /// <summary> Emits the end of this for loop. </summary>
         void End();
 
     private:
         void CreateBlocks();
-        void EmitIterationVariable(VariableType type, llvm::Value* pStartValue);
-        void EmitCondition(TypedComparison type, llvm::Value* pTestValue);
-        void EmitIncrement(VariableType type, llvm::Value* pIncrementValue);
+        void EmitIterationVariable(VariableType type, LLVMValue pStartValue);
+        void EmitCondition(TypedComparison type, LLVMValue pTestValue);
+        void EmitIncrement(VariableType type, LLVMValue pIncrementValue);
         llvm::BasicBlock* PrepareBody();
 
         IRFunctionEmitter& _functionEmitter; // Loop written into this function
@@ -97,7 +97,7 @@ namespace emitters
         llvm::BasicBlock* _pBodyBlock = nullptr; // The body of the for loop
         llvm::BasicBlock* _pIncrementBlock = nullptr; // Here we increment the iteration variable
         llvm::BasicBlock* _pAfterBlock = nullptr; // When the loop is done, we branch to this block
-        llvm::Value* _pIterationVariable = nullptr;
+        LLVMValue _pIterationVariable = nullptr;
     };
 
     /// <summary> Class that simplifies while loop creation. Used internally by IRFunctionEmitter. </summary>
@@ -116,7 +116,7 @@ namespace emitters
         /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
         ///
         /// <returns> Pointer to the llvm::BasicBlock that represents the body of the loop. </returns>
-        llvm::BasicBlock* Begin(llvm::Value* pTestValuePointer);
+        llvm::BasicBlock* Begin(LLVMValue pTestValuePointer);
 
         /// <summary> Emit the end of this loop. </summary>
         void End();
@@ -128,7 +128,7 @@ namespace emitters
 
         void CreateBlocks();
         void EmitInitialization();
-        void EmitCondition(llvm::Value* pTestValuePointer);
+        void EmitCondition(LLVMValue pTestValuePointer);
         llvm::BasicBlock* PrepareBody();
 
         IRFunctionEmitter& _functionEmitter; // Loop written into this function

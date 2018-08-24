@@ -88,14 +88,14 @@ namespace nodes
         ///
         /// <param name="x"> The primary value </param>
         /// <returns> The value the function f(x) </returns>
-        virtual llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const = 0;
+        virtual emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const = 0;
 
         /// <summary> Emits IR to compute a value </summary>
         ///
         /// <param name="x"> The primary value </param>
         /// <param name="secondaryArgs"> The secondary values. Must be empty. </param>
         /// <returns> The value the function f(x) </returns>
-        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, const std::vector<llvm::Value*>& secondaryArgs) const;
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const;
 
         /// <summary> Indicates if the function can operate on vector types </summary>
         bool CanUseVectorTypes() const { return false; }
@@ -131,14 +131,14 @@ namespace nodes
         /// <param name="x"> The primary value </param>
         /// <param name="a"> The secondary value </param>
         /// <returns> The value the function f(x,a) </returns>
-        virtual llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* a) const = 0;
+        virtual emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, emitters::LLVMValue a) const = 0;
 
         /// <summary> Emits IR to compute a value </summary>
         ///
         /// <param name="x"> The primary value </param>
         /// <param name="secondaryArgs"> The secondary values. Must have size 1. </param>
         /// <returns> The value the function f(x,a) </returns>
-        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, const std::vector<llvm::Value*>& secondaryArgs) const;
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const;
 
         /// <summary> Indicates if the function can operate on vector types </summary>
         bool CanUseVectorTypes() const { return false; }
@@ -176,14 +176,14 @@ namespace nodes
         /// <param name="a"> The first secondary value </param>
         /// <param name="b"> The second secondary value </param>
         /// <returns> The value the function f(x,a,b) </returns>
-        virtual llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* a, llvm::Value* b) const = 0;
+        virtual emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, emitters::LLVMValue a, emitters::LLVMValue b) const = 0;
 
         /// <summary> Emits IR to compute a value </summary>
         ///
         /// <param name="x"> The primary value </param>
         /// <param name="secondaryArgs"> The secondary values. Must have size 2. </param>
         /// <returns> The value the function f(x,a) </returns>
-        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, const std::vector<llvm::Value*>& secondaryArgs) const;
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const;
 
         /// <summary> Indicates if the function can operate on vector types </summary>
         bool CanUseVectorTypes() const { return false; }
@@ -214,7 +214,7 @@ namespace nodes
         /// <param name="a"> The first secondary value </param>
         /// <param name="b"> The second secondary value </param>
         /// <returns> The value the function f(x,a,b) = ax + b </returns>
-        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* a, llvm::Value* b) const override;
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, emitters::LLVMValue a, emitters::LLVMValue b) const override;
         using BroadcastTernaryFunction<ValueType>::Compile;
 
         /// <summary> Indicates if the function can operate on vector types </summary>
@@ -275,7 +275,7 @@ namespace nodes
 
         // Helpers for generating nested loops to visit all input/output values
         void ComputeDimensionLoop(size_t dimension, std::vector<ValueType>& output, size_t prevInputDimensionOffset, size_t prevOutputDimensionOffset, std::vector<ValueType>& secondaryValues) const;
-        void EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, emitters::IRLocalScalar begin, emitters::IRLocalScalar end, llvm::Value* primaryInput, const std::vector<llvm::Value*>& secondaryInputs, llvm::Value* output, emitters::IRLocalScalar prevInputDimensionOffset, emitters::IRLocalScalar prevOutputDimensionOffset, std::vector<llvm::Value*>& secondaryValues) const;
+        void EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, emitters::IRLocalScalar begin, emitters::IRLocalScalar end, emitters::LLVMValue primaryInput, const std::vector<emitters::LLVMValue>& secondaryInputs, emitters::LLVMValue output, emitters::IRLocalScalar prevInputDimensionOffset, emitters::IRLocalScalar prevOutputDimensionOffset, std::vector<emitters::LLVMValue>& secondaryValues) const;
         emitters::IRFunctionEmitter GetTaskFunction(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, const emitters::LLVMTypeList& portTypes) const;
 
         void WriteToArchive(utilities::Archiver& archiver) const override;

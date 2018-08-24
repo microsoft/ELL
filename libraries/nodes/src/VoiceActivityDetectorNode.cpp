@@ -57,8 +57,8 @@ namespace nodes
         auto lessThan = GetComparison<ValueType>(BinaryPredicateType::less);
         auto greaterThan = GetComparison<ValueType>(BinaryPredicateType::greater);
 
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         const int inputSize = input.Size();
         if (inputSize != _vad.getWindowSize())
@@ -101,10 +101,10 @@ namespace nodes
         //{
         //    level += data[i] * _impl->_cmw.getWeight(i);
         //}
-        llvm::Value* level = function.Variable(elementType, "level");
+        LLVMValue level = function.Variable(elementType, "level");
         function.Store(level, function.Literal(static_cast<ValueType>(0.0)));
 
-        function.For(inputSize, [pInput, gWeights, multiply, add, level](IRFunctionEmitter& fn, llvm::Value* index) {
+        function.For(inputSize, [pInput, gWeights, multiply, add, level](IRFunctionEmitter& fn, LLVMValue index) {
             auto value = fn.ValueAt(pInput, index);
             auto w = fn.ValueAt(gWeights, index);
             fn.OperationAndUpdate(level, add, fn.Operator(multiply, value, w));
@@ -114,19 +114,19 @@ namespace nodes
         function.OperationAndUpdate(level, divide, windowSizeLiteral);
 
         // double time = _impl->_time++ * _impl->_frameDuration;
-        llvm::Value* time = function.Variable(elementType, "time");
+        LLVMValue time = function.Variable(elementType, "time");
         function.Store(time, function.CastValue<TickType, ValueType>(function.Load(ticks)));
         function.OperationAndUpdate(time, multiply, frameDurationLiteral);
         function.OperationAndUpdate(ticks, addTick, function.template Literal<TickType>(1)); // _time++
 
         // signal = _impl->_tracker.classify(t, level);
         //double timeDelta = time - this->_lastTime;
-        llvm::Value* timeDelta = function.Variable(elementType, "timeDelta");
+        LLVMValue timeDelta = function.Variable(elementType, "timeDelta");
         function.Store(timeDelta, function.Load(time));
         function.OperationAndUpdate(timeDelta, subtract, function.Load(lastTime));
 
         //double levelDelta = level - this->_lastLevel;
-        llvm::Value* levelDelta = function.Variable(elementType, "levelDelta");
+        LLVMValue levelDelta = function.Variable(elementType, "levelDelta");
         function.Store(levelDelta, function.Load(level));
         function.OperationAndUpdate(levelDelta, subtract, function.Load(lastLevel));
 

@@ -65,8 +65,8 @@ namespace nodes
 
         auto half = function.LocalScalar<ValueType>(0.5);
         // Get port variables
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         function.For(numFilters, [pInput, pOutput, half, beginVar, centerVar, endVar](emitters::IRFunctionEmitter& function, auto filterIndex) {
             auto sum = function.Variable(emitters::GetVariableType<ValueType>());

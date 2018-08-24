@@ -7,8 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// llvm
-#include <llvm/IR/Function.h>
+#include "LLVMUtilities.h"
 
 // stl
 #include <string>
@@ -71,7 +70,7 @@ namespace emitters
     /// <summary> Holds a pointer to an llvm::Function and a set of tag values. </summary>
     struct FunctionTagValues
     {
-        llvm::Function* function;
+        LLVMFunction function;
         std::vector<std::string> values;
     };
 

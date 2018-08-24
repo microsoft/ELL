@@ -129,13 +129,13 @@ namespace nodes
     void BinaryFunctionNode<ValueType, FunctionType>::Compile(model::IRMapCompiler& compiler,
                                                               emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
-        llvm::Value* pInput2 = compiler.EnsurePortEmitted(input2);
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output, _paddingValue);
+        emitters::LLVMValue pInput1 = compiler.EnsurePortEmitted(input1);
+        emitters::LLVMValue pInput2 = compiler.EnsurePortEmitted(input2);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output, _paddingValue);
 
         // Call recursive function to emit nested loops
-        llvm::Value* prevInputDimensionOffset = nullptr;
-        llvm::Value* prevOutputDimensionOffset = nullptr;
+        emitters::LLVMValue prevInputDimensionOffset = nullptr;
+        emitters::LLVMValue prevOutputDimensionOffset = nullptr;
         EmitComputeDimensionLoop(compiler, function, 0, pInput1, pInput2, pResult, prevInputDimensionOffset, prevOutputDimensionOffset);
     }
 
@@ -143,11 +143,11 @@ namespace nodes
     void BinaryFunctionNode<ValueType, FunctionType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler,
                                                                                emitters::IRFunctionEmitter& function,
                                                                                size_t dimension,
-                                                                               llvm::Value* input1,
-                                                                               llvm::Value* input2,
-                                                                               llvm::Value* output,
-                                                                               llvm::Value* prevInputDimensionOffset,
-                                                                               llvm::Value* prevOutputDimensionOffset) const
+                                                                               emitters::LLVMValue input1,
+                                                                               emitters::LLVMValue input2,
+                                                                               emitters::LLVMValue output,
+                                                                               emitters::LLVMValue prevInputDimensionOffset,
+                                                                               emitters::LLVMValue prevOutputDimensionOffset) const
     {
         auto outputLayout = _output.GetMemoryLayout();
         const auto numDimensions = _inputLayout.NumDimensions();
@@ -157,16 +157,16 @@ namespace nodes
         auto&& outputStride = outputLayout.GetStride();
         auto&& outputOffset = outputLayout.GetOffset();
 
-        function.For(inputSize[dimension], [dimension, numDimensions, inputOffset, inputStride, outputOffset, outputStride, prevInputDimensionOffset, prevOutputDimensionOffset, input1, input2, output, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex) {
+        function.For(inputSize[dimension], [dimension, numDimensions, inputOffset, inputStride, outputOffset, outputStride, prevInputDimensionOffset, prevOutputDimensionOffset, input1, input2, output, &compiler, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex) {
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
-            llvm::Value* thisInputDimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(inputOffset[dimension]));
-            llvm::Value* thisOutputDimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(outputOffset[dimension]));
+            emitters::LLVMValue thisInputDimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(inputOffset[dimension]));
+            emitters::LLVMValue thisOutputDimensionInternalOffset = function.Operator(emitters::GetAddForValueType<int>(), loopIndex, function.Literal<int>(outputOffset[dimension]));
 
             // Calculate the total offset from beginning of memory:
             //   * if in the outermost loop, the offset into this dimension
             //   * otherwise, the offset into this dimension plus the previous offset scaled by the previous dimension's stride
-            llvm::Value* thisInputDimensionOffset = nullptr;
-            llvm::Value* thisOutputDimensionOffset = nullptr;
+            emitters::LLVMValue thisInputDimensionOffset = nullptr;
+            emitters::LLVMValue thisOutputDimensionOffset = nullptr;
             if (dimension == 0)
             {
                 assert(prevInputDimensionOffset == nullptr);

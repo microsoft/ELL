@@ -24,7 +24,7 @@ namespace emitters
         // Native implementations of matrix operation functions (as opposed to calling out to BLAS)
         //
         template <typename ValueType>
-        llvm::Function* EmitGEMVFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
+        LLVMFunction EmitGEMVFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
         {
             auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);
             auto arguments = function.Arguments().begin();
@@ -42,7 +42,7 @@ namespace emitters
             auto incy = function.LocalScalar(&(*arguments++));
             UNUSED(order, transpose, alpha, beta);
 
-            llvm::Value* accum = function.Variable(emitters::GetVariableType<ValueType>(), "accum");
+            LLVMValue accum = function.Variable(emitters::GetVariableType<ValueType>(), "accum");
 
             function.For(m, [A, x, y, incx, incy, lda, n, accum](IRFunctionEmitter& function, auto rowIndex) {
                 function.StoreZero(accum);
@@ -65,7 +65,7 @@ namespace emitters
         }
 
         template <typename ValueType>
-        llvm::Function* EmitGEMMFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
+        LLVMFunction EmitGEMMFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
         {
             const auto CblasNoTrans = 111;
             const auto CblasTrans = 112;
@@ -136,7 +136,7 @@ namespace emitters
     {
     }
 
-    llvm::Type* IRRuntime::GetIntType()
+    LLVMType IRRuntime::GetIntType()
     {
         auto& context = _module.GetLLVMContext();
         const auto numBits = _module.GetCompilerOptions().targetDevice.numBits;
@@ -155,7 +155,7 @@ namespace emitters
         return _module.GetModuleName();
     }
 
-    llvm::Function* IRRuntime::GetDotProductFloatFunction()
+    LLVMFunction IRRuntime::GetDotProductFloatFunction()
     {
         auto functionName = GetNamespacePrefix() + "_" + dotProductFloatName;
         NamedVariableTypeList argTypes = { { countName, VariableType::Int32 },
@@ -177,7 +177,7 @@ namespace emitters
         return function.GetFunction();
     }
 
-    llvm::Function* IRRuntime::GetDotProductIntFunction()
+    LLVMFunction IRRuntime::GetDotProductIntFunction()
     {
         auto functionName = GetNamespacePrefix() + "_" + dotProductIntName;
         NamedVariableTypeList argTypes = { { countName, VariableType::Int32 },
@@ -198,9 +198,9 @@ namespace emitters
         return function.GetFunction();
     }
 
-    llvm::Function* IRRuntime::ResolveCurrentTimeFunction(llvm::StructType* timespecType)
+    LLVMFunction IRRuntime::ResolveCurrentTimeFunction(llvm::StructType* timespecType)
     {
-        llvm::Function* function = nullptr;
+        LLVMFunction function = nullptr;
 
         auto& context = _module.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
@@ -240,7 +240,7 @@ namespace emitters
             auto qpcFunction = _module.GetFunction("QueryPerformanceCounter");
             auto qpfFunction = _module.GetFunction("QueryPerformanceFrequency");
 
-            std::vector<llvm::Type*> args;
+            std::vector<LLVMType> args;
             args.push_back(int32Type);
             auto timeSpecPointerType = timespecType->getPointerTo();
             args.push_back(timeSpecPointerType);
@@ -306,14 +306,14 @@ namespace emitters
         return function;
     }
 
-    llvm::Value* IRRuntime::GetCurrentTime(IRFunctionEmitter& function)
+    LLVMValue IRRuntime::GetCurrentTime(IRFunctionEmitter& function)
     {
         auto getTimeFunc = GetCurrentTimeFunction();
         auto time = function.Call(getTimeFunc, {});
         return time;
     }
 
-    llvm::Function* IRRuntime::GetCurrentTimeFunction()
+    LLVMFunction IRRuntime::GetCurrentTimeFunction()
     {
         if (_pGetCurrentTimeFunction == nullptr)
         {
@@ -342,7 +342,7 @@ namespace emitters
                 auto callResult = function.Call(getTimeFunction, { function.Literal(CLOCK_REALTIME), timeStruct });
                 UNUSED(callResult);
 
-                // llvm::Value* timeStructBase = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, function.Literal(0));
+                // LLVMValue timeStructBase = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, function.Literal(0));
                 auto secondsPtr = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, { function.Literal(0), function.Literal(0) });
                 auto nanosecondsPtr = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, { function.Literal(0), function.Literal(1) });
                 auto secondsIntVal = function.Load(secondsPtr);
@@ -363,37 +363,37 @@ namespace emitters
         return _pGetCurrentTimeFunction;
     }
 
-    llvm::Function* IRRuntime::GetSqrtFunction(VariableType argType)
+    LLVMFunction IRRuntime::GetSqrtFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::sqrt, { argType });
     }
 
-    llvm::Function* IRRuntime::GetAbsFunction(VariableType argType)
+    LLVMFunction IRRuntime::GetAbsFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::fabs, { argType });
     }
 
-    llvm::Function* IRRuntime::GetExpFunction(VariableType argType)
+    LLVMFunction IRRuntime::GetExpFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::exp, { argType });
     }
 
-    llvm::Function* IRRuntime::GetLogFunction(VariableType argType)
+    LLVMFunction IRRuntime::GetLogFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::log, { argType });
     }
 
-    llvm::Function* IRRuntime::GetSinFunction(VariableType argType)
+    LLVMFunction IRRuntime::GetSinFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::sin, { argType });
     }
 
-    llvm::Function* IRRuntime::GetCosFunction(VariableType argType)
+    LLVMFunction IRRuntime::GetCosFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::cos, { argType });
     }
 
-    llvm::Function* IRRuntime::GetTanhFunction(VariableType argType)
+    LLVMFunction IRRuntime::GetTanhFunction(VariableType argType)
     {
         // This assumes a standard C runtime library is linked
         switch (argType)
@@ -413,32 +413,32 @@ namespace emitters
         return _module.GetFunction(funcName);
     }
 
-    llvm::Function* IRRuntime::GetSqrtFunction(llvm::Type* argType)
+    LLVMFunction IRRuntime::GetSqrtFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::sqrt, { argType });
     }
 
-    llvm::Function* IRRuntime::GetAbsFunction(llvm::Type* argType)
+    LLVMFunction IRRuntime::GetAbsFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::fabs, { argType });
     }
 
-    llvm::Function* IRRuntime::GetExpFunction(llvm::Type* argType)
+    LLVMFunction IRRuntime::GetExpFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::exp, { argType });
     }
 
-    llvm::Function* IRRuntime::GetLogFunction(llvm::Type* argType)
+    LLVMFunction IRRuntime::GetLogFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::log, { argType });
     }
 
-    llvm::Function* IRRuntime::GetSinFunction(llvm::Type* argType)
+    LLVMFunction IRRuntime::GetSinFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::sin, { argType });
     }
 
-    llvm::Function* IRRuntime::GetCosFunction(llvm::Type* argType)
+    LLVMFunction IRRuntime::GetCosFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::cos, { argType });
     }
@@ -446,7 +446,7 @@ namespace emitters
     //
     // BLAS
     //
-    llvm::Function* IRRuntime::GetSGEMVFunction(bool useBlas)
+    LLVMFunction IRRuntime::GetSGEMVFunction(bool useBlas)
     {
         VariableTypeList argTypes = {
             VariableType::Int32, // order
@@ -468,7 +468,7 @@ namespace emitters
         {
             auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
             auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
-            return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_sgemv", functionType));
+            return static_cast<LLVMFunction>(pModule->getOrInsertFunction("cblas_sgemv", functionType));
         }
         else
         {
@@ -481,7 +481,7 @@ namespace emitters
         }
     }
 
-    llvm::Function* IRRuntime::GetDGEMVFunction(bool useBlas)
+    LLVMFunction IRRuntime::GetDGEMVFunction(bool useBlas)
     {
         VariableTypeList argTypes = {
             VariableType::Int32, // order
@@ -503,7 +503,7 @@ namespace emitters
         {
             auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
             auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
-            return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_dgemv", functionType));
+            return static_cast<LLVMFunction>(pModule->getOrInsertFunction("cblas_dgemv", functionType));
         }
         else
         {
@@ -516,7 +516,7 @@ namespace emitters
         }
     }
 
-    llvm::Function* IRRuntime::GetSGEMMFunction(bool useBlas)
+    LLVMFunction IRRuntime::GetSGEMMFunction(bool useBlas)
     {
         VariableTypeList argTypes = {
             VariableType::Int32, // order
@@ -540,7 +540,7 @@ namespace emitters
         {
             auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
             auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
-            return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_sgemm", functionType));
+            return static_cast<LLVMFunction>(pModule->getOrInsertFunction("cblas_sgemm", functionType));
         }
         else
         {
@@ -553,7 +553,7 @@ namespace emitters
         }
     }
 
-    llvm::Function* IRRuntime::GetDGEMMFunction(bool useBlas)
+    LLVMFunction IRRuntime::GetDGEMMFunction(bool useBlas)
     {
         VariableTypeList argTypes = {
             VariableType::Int32, // order
@@ -577,7 +577,7 @@ namespace emitters
         {
             auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
             auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
-            return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_dgemm", functionType));
+            return static_cast<LLVMFunction>(pModule->getOrInsertFunction("cblas_dgemm", functionType));
         }
         else
         {
@@ -591,38 +591,38 @@ namespace emitters
     }
 
     template <>
-    llvm::Function* IRRuntime::GetGEMVFunction<float>(bool useBlas)
+    LLVMFunction IRRuntime::GetGEMVFunction<float>(bool useBlas)
     {
         return GetSGEMVFunction(useBlas);
     }
 
     template <>
-    llvm::Function* IRRuntime::GetGEMVFunction<double>(bool useBlas)
+    LLVMFunction IRRuntime::GetGEMVFunction<double>(bool useBlas)
     {
         return GetDGEMVFunction(useBlas);
     }
 
     template <>
-    llvm::Function* IRRuntime::GetGEMMFunction<float>(bool useBlas)
+    LLVMFunction IRRuntime::GetGEMMFunction<float>(bool useBlas)
     {
         return GetSGEMMFunction(useBlas);
     }
 
     template <>
-    llvm::Function* IRRuntime::GetGEMMFunction<double>(bool useBlas)
+    LLVMFunction IRRuntime::GetGEMMFunction<double>(bool useBlas)
     {
         return GetDGEMMFunction(useBlas);
     }
 
-    llvm::Function* IRRuntime::GetOpenBLASGetNumThreadsFunction()
+    LLVMFunction IRRuntime::GetOpenBLASGetNumThreadsFunction()
     {
         // int openblas_get_num_threads();
         auto pModule = _module.GetLLVMModule();
         llvm::FunctionType* functionType = llvm::FunctionType::get(GetIntType(), {}, false);
-        return static_cast<llvm::Function*>(pModule->getOrInsertFunction("openblas_get_num_threads", functionType));
+        return static_cast<LLVMFunction>(pModule->getOrInsertFunction("openblas_get_num_threads", functionType));
     }
 
-    llvm::Function* IRRuntime::GetOpenBLASSetNumThreadsFunction()
+    LLVMFunction IRRuntime::GetOpenBLASSetNumThreadsFunction()
     {
         // void openblas_set_num_threads(int num_threads);
         auto pModule = _module.GetLLVMModule();
@@ -630,7 +630,7 @@ namespace emitters
         auto voidType = llvm::Type::getVoidTy(context);
 
         llvm::FunctionType* functionType = llvm::FunctionType::get(voidType, { GetIntType() }, false);
-        return static_cast<llvm::Function*>(pModule->getOrInsertFunction("openblas_set_num_threads", functionType));
+        return static_cast<LLVMFunction>(pModule->getOrInsertFunction("openblas_set_num_threads", functionType));
     }
 }
 }

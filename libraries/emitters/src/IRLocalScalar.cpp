@@ -163,12 +163,12 @@ namespace emitters
         return a;
     }
 
-    IRLocalScalar operator+(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator+(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) + b;
     }
 
-    IRLocalScalar operator+(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator+(IRLocalScalar a, LLVMValue b)
     {
         return a + IRLocalScalar(a.function, b);
     }
@@ -179,12 +179,12 @@ namespace emitters
         return a;
     }
 
-    IRLocalScalar operator-(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator-(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) - b;
     }
 
-    IRLocalScalar operator-(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator-(IRLocalScalar a, LLVMValue b)
     {
         return a - IRLocalScalar(a.function, b);
     }
@@ -203,12 +203,12 @@ namespace emitters
         return a;
     }
 
-    IRLocalScalar operator*(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator*(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) * b;
     }
 
-    IRLocalScalar operator*(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator*(IRLocalScalar a, LLVMValue b)
     {
         return a * IRLocalScalar(a.function, b);
     }
@@ -219,12 +219,12 @@ namespace emitters
         return a;
     }
 
-    IRLocalScalar operator/(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator/(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) / b;
     }
 
-    IRLocalScalar operator/(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator/(IRLocalScalar a, LLVMValue b)
     {
         return a / IRLocalScalar(a.function, b);
     }
@@ -235,12 +235,12 @@ namespace emitters
         return a;
     }
 
-    IRLocalScalar operator%(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator%(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) % b;
     }
 
-    IRLocalScalar operator%(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator%(IRLocalScalar a, LLVMValue b)
     {
         return a % IRLocalScalar(a.function, b);
     }
@@ -303,12 +303,12 @@ namespace emitters
         return { a.function, a.function.Comparison(cmp, a, b) };
     }
 
-    IRLocalScalar operator==(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator==(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) == b;
     }
 
-    IRLocalScalar operator==(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator==(IRLocalScalar a, LLVMValue b)
     {
         return a == IRLocalScalar(a.function, b);
     }
@@ -321,12 +321,12 @@ namespace emitters
         return { a.function, a.function.Comparison(cmp, a, b) };
     }
 
-    IRLocalScalar operator!=(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator!=(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) != b;
     }
 
-    IRLocalScalar operator!=(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator!=(IRLocalScalar a, LLVMValue b)
     {
         return a != IRLocalScalar(a.function, b);
     }
@@ -339,12 +339,12 @@ namespace emitters
         return { a.function, a.function.Comparison(cmp, a, b) };
     }
 
-    IRLocalScalar operator<(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator<(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) < b;
     }
 
-    IRLocalScalar operator<(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator<(IRLocalScalar a, LLVMValue b)
     {
         return a < IRLocalScalar(a.function, b);
     }
@@ -357,12 +357,12 @@ namespace emitters
         return { a.function, a.function.Comparison(cmp, a, b) };
     }
 
-    IRLocalScalar operator<=(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator<=(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) <= b;
     }
 
-    IRLocalScalar operator<=(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator<=(IRLocalScalar a, LLVMValue b)
     {
         return a <= IRLocalScalar(a.function, b);
     }
@@ -375,12 +375,12 @@ namespace emitters
         return { a.function, a.function.Comparison(cmp, a, b) };
     }
 
-    IRLocalScalar operator>(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator>(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) > b;
     }
 
-    IRLocalScalar operator>(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator>(IRLocalScalar a, LLVMValue b)
     {
         return a > IRLocalScalar(a.function, b);
     }
@@ -393,12 +393,12 @@ namespace emitters
         return { a.function, a.function.Comparison(cmp, a, b) };
     }
 
-    IRLocalScalar operator>=(llvm::Value* a, IRLocalScalar b)
+    IRLocalScalar operator>=(LLVMValue a, IRLocalScalar b)
     {
         return IRLocalScalar(b.function, a) >= b;
     }
 
-    IRLocalScalar operator>=(IRLocalScalar a, llvm::Value* b)
+    IRLocalScalar operator>=(IRLocalScalar a, LLVMValue b)
     {
         return a >= IRLocalScalar(a.function, b);
     }
@@ -445,14 +445,14 @@ namespace emitters
     IRLocalScalar Min(IRLocalScalar a, IRLocalScalar b)
     {
         VerifyArgTypesCompatible(a, b);
-        llvm::Value* result = a.function.Select(a < b, a, b);
+        LLVMValue result = a.function.Select(a < b, a, b);
         return { a.function, result };
     }
 
     IRLocalScalar Max(IRLocalScalar a, IRLocalScalar b)
     {
         VerifyArgTypesCompatible(a, b);
-        llvm::Value* result = a.function.Select(a >= b, a, b);
+        LLVMValue result = a.function.Select(a >= b, a, b);
         return { a.function, result };
     }
 }

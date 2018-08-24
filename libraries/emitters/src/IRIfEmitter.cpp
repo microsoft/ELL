@@ -25,7 +25,7 @@ namespace emitters
     {
     }
 
-    IRIfEmitter::IRIfEmitter(IRFunctionEmitter& functionEmitter, TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue)
+    IRIfEmitter::IRIfEmitter(IRFunctionEmitter& functionEmitter, TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue)
         : IRIfEmitter(functionEmitter)
     {
         If(comparison, pValue, pTestValue);
@@ -77,7 +77,7 @@ namespace emitters
         return *this;
     }
 
-    IRIfEmitter& IRIfEmitter::ElseIf(llvm::Value* pValue, std::function<void(IRFunctionEmitter& function)> body)
+    IRIfEmitter& IRIfEmitter::ElseIf(LLVMValue pValue, std::function<void(IRFunctionEmitter& function)> body)
     {
         auto elseBlock = If(pValue);
         elseBlock->setName(IfElseBlockName);
@@ -85,7 +85,7 @@ namespace emitters
         return *this;
     }
 
-    llvm::BasicBlock* IRIfEmitter::If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue)
+    llvm::BasicBlock* IRIfEmitter::If(TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue)
     {
         EndPrev();
         PrepareBlocks();
@@ -93,7 +93,7 @@ namespace emitters
         return _pThenBlock;
     }
 
-    llvm::BasicBlock* IRIfEmitter::If(std::function<llvm::Value*()> comparison)
+    llvm::BasicBlock* IRIfEmitter::If(std::function<LLVMValue()> comparison)
     {
         EndPrev();
         PrepareBlocks();
@@ -105,7 +105,7 @@ namespace emitters
         return _pThenBlock;
     }
 
-    llvm::BasicBlock* IRIfEmitter::If(llvm::Value* pValue)
+    llvm::BasicBlock* IRIfEmitter::If(LLVMValue pValue)
     {
         EndPrev();
         PrepareBlocks();
@@ -115,7 +115,7 @@ namespace emitters
         return _pThenBlock;
     }
 
-    llvm::BasicBlock* IRIfEmitter::If(llvm::Value* pValue, bool testValue)
+    llvm::BasicBlock* IRIfEmitter::If(LLVMValue pValue, bool testValue)
     {
         EndPrev();
         PrepareBlocks();
@@ -166,7 +166,7 @@ namespace emitters
         }
     }
 
-    void IRIfEmitter::IfThen(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue)
+    void IRIfEmitter::IfThen(TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue)
     {
         _functionEmitter->SetCurrentBlock(_pConditionBlock);
         _functionEmitter->Branch(comparison, pValue, pTestValue, _pThenBlock, _pEndBlock);

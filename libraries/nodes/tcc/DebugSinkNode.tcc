@@ -48,7 +48,7 @@ namespace ell
         template <typename ValueType>
         void DebugSinkNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
         {
-            llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+            emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
             auto userData = function.Pointer((char*)_userData);
 
             // EvaluateInput defaults to 'pass through' in base implementation, which means
@@ -59,7 +59,7 @@ namespace ell
 
             // Callback signature: void DebugSinkNode(char* label, ValueType* array, char* userData)
             function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
-            llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
+            emitters::LLVMFunction pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
             function.Call(pSinkFunction, { function.Literal(_label), function.PointerOffset(pInput, function.Literal(0)), userData });
 
             // Tag the sink function as a callback that is emitted in headers

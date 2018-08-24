@@ -95,14 +95,14 @@ namespace nodes
         llvm::GlobalVariable* yIndexVar = module.Global<int>("yIndex_"s + GetInternalStateIdentifier(), 0);
 
         // Get input
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         // Allocate local variable to accumulate y
-        llvm::Value* yVar = function.Variable(emitters::GetVariableType<ValueType>(), "y");
+        emitters::LLVMValue yVar = function.Variable(emitters::GetVariableType<ValueType>(), "y");
 
         // Loop over input entries
-        function.For(inputSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* inputIndex)
+        function.For(inputSize, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue inputIndex)
         {
             auto* inputVal = function.ValueAt(pInput, inputIndex);
 
@@ -115,7 +115,7 @@ namespace nodes
 
             // compute dot product X dot B
             auto bOffset = function.LocalScalar((int)bSize - 1) - xIndex;
-            function.For(bSize, [prevInput, bCoeffs, bOffset, yVar](emitters::IRFunctionEmitter& function, llvm::Value* iVar) 
+            function.For(bSize, [prevInput, bCoeffs, bOffset, yVar](emitters::IRFunctionEmitter& function, emitters::LLVMValue iVar)
             {
                 auto i = function.LocalScalar(iVar);
                 auto xVal = function.LocalScalar(function.ValueAt(prevInput, i));
@@ -126,7 +126,7 @@ namespace nodes
             // compute dot product Y dot A
             auto yIndex = function.LocalScalar(function.Load(yIndexVar));
             auto aOffset = function.LocalScalar((int)aSize) - yIndex;
-            function.For(aSize, [prevOutput, aCoeffs, aOffset, yVar](emitters::IRFunctionEmitter& function, llvm::Value* jVar) 
+            function.For(aSize, [prevOutput, aCoeffs, aOffset, yVar](emitters::IRFunctionEmitter& function, emitters::LLVMValue jVar)
             {
                 auto j = function.LocalScalar(jVar);
                 auto yVal = function.LocalScalar(function.ValueAt(prevOutput, j));

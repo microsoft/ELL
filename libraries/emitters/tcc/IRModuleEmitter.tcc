@@ -48,7 +48,7 @@ namespace emitters
     //
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitVariable(Variable& var)
+    LLVMValue IRModuleEmitter::EmitVariable(Variable& var)
     {
         // TODO: have a more specific check to see if the variable is mapped to a port, rather than if it's a function input/output
         if (var.IsScalar() && (var.Scope() != VariableScope::input && var.Scope() != VariableScope::output))
@@ -66,9 +66,9 @@ namespace emitters
     }
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitScalar(Variable& var)
+    LLVMValue IRModuleEmitter::EmitScalar(Variable& var)
     {
-        llvm::Value* pVal = nullptr;
+        LLVMValue pVal = nullptr;
         switch (var.Scope())
         {
             case VariableScope::literal:
@@ -102,9 +102,9 @@ namespace emitters
     }
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitVector(Variable& var)
+    LLVMValue IRModuleEmitter::EmitVector(Variable& var)
     {
-        llvm::Value* pVal = nullptr;
+        LLVMValue pVal = nullptr;
         switch (var.Scope())
         {
             case VariableScope::literal:
@@ -132,18 +132,18 @@ namespace emitters
     }
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitLiteral(LiteralVariable<T>& var)
+    LLVMValue IRModuleEmitter::EmitLiteral(LiteralVariable<T>& var)
     {
         auto& currentFunction = GetCurrentFunction();
-        llvm::Value* pVar = currentFunction.Literal(var.Data());
+        LLVMValue pVar = currentFunction.Literal(var.Data());
         return pVar;
     }
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitGlobal(InitializedScalarVariable<T>& var)
+    LLVMValue IRModuleEmitter::EmitGlobal(InitializedScalarVariable<T>& var)
     {
         auto& currentFunction = GetCurrentFunction();
-        llvm::Value* pVal = nullptr;
+        LLVMValue pVal = nullptr;
         if (var.IsMutable())
         {
             pVal = Global(var.Type(), var.EmittedName());
@@ -157,44 +157,44 @@ namespace emitters
     }
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitLocal(ScalarVariable<T>& var)
+    LLVMValue IRModuleEmitter::EmitLocal(ScalarVariable<T>& var)
     {
         auto& currentFunction = GetCurrentFunction();
         return currentFunction.EmittedVariable(var.Type(), var.EmittedName());
     }
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitLocal(InitializedScalarVariable<T>& var)
+    LLVMValue IRModuleEmitter::EmitLocal(InitializedScalarVariable<T>& var)
     {
         auto& currentFunction = GetCurrentFunction();
-        llvm::Value* pVar = currentFunction.EmittedVariable(var.Type(), var.EmittedName());
+        LLVMValue pVar = currentFunction.EmittedVariable(var.Type(), var.EmittedName());
         currentFunction.Store(pVar, currentFunction.Literal(var.Data()));
         return pVar;
     }
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitLiteralVector(LiteralVectorVariable<T>& var)
+    LLVMValue IRModuleEmitter::EmitLiteralVector(LiteralVectorVariable<T>& var)
     {
         return ConstantArray(var.EmittedName(), var.Data());
     }
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitGlobalVector(VectorVariable<T>& var)
+    LLVMValue IRModuleEmitter::EmitGlobalVector(VectorVariable<T>& var)
     {
         return GlobalArray(GetVariableType<T>(), var.EmittedName(), var.Dimension());
     }
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitGlobalVector(InitializedVectorVariable<T>& var)
+    LLVMValue IRModuleEmitter::EmitGlobalVector(InitializedVectorVariable<T>& var)
     {
         return GlobalArray(var.EmittedName(), var.Data());
     }
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::EmitRef(VectorElementVariable<T>& var)
+    LLVMValue IRModuleEmitter::EmitRef(VectorElementVariable<T>& var)
     {
         auto& currentFunction = GetCurrentFunction();
-        llvm::Value* pSrcVar = EnsureEmitted(var.Src());
+        LLVMValue pSrcVar = EnsureEmitted(var.Src());
         return currentFunction.PtrOffsetA(pSrcVar, currentFunction.Literal(var.Offset()), var.EmittedName());
     }
 }

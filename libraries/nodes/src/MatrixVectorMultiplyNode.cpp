@@ -67,9 +67,9 @@ namespace nodes
     template <typename ValueType>
     void MatrixVectorMultiplyNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInputMatrix = compiler.EnsurePortEmitted(inputMatrix);
-        llvm::Value* pInputVector = compiler.EnsurePortEmitted(inputVector);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInputMatrix = compiler.EnsurePortEmitted(inputMatrix);
+        emitters::LLVMValue pInputVector = compiler.EnsurePortEmitted(inputVector);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         function.CallGEMV<ValueType>((int)_m, (int)_n, pInputMatrix, (int)_lda, pInputVector, _incx, pOutput, 1);
     }

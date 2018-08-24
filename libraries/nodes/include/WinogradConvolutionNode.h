@@ -8,6 +8,9 @@
 
 #pragma once
 
+// emitters
+#include "LLVMUtilities.h"
+
 // dsp
 #include "WinogradConvolution.h"
 
@@ -211,8 +214,8 @@ namespace nodes
     private:
         void Copy(model::ModelTransformer& transformer) const override;
 
-        void CompileFiltersFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* input, llvm::Value* transformedFilters, llvm::Value* output);
-        void CompileTilesFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* input, llvm::Value* transformedFilters, llvm::Value* output);
+        void CompileFiltersFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, emitters::LLVMValue input, emitters::LLVMValue transformedFilters, emitters::LLVMValue output);
+        void CompileTilesFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, emitters::LLVMValue input, emitters::LLVMValue transformedFilters, emitters::LLVMValue output);
 
         // Input
         model::InputPort<ValueType> _input;

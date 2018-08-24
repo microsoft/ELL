@@ -60,10 +60,10 @@ namespace nodes
         size_t windowSize = this->GetWindowSize();
         auto offset = windowSize - inputSize;
 
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
         auto bufferVar = function.GetModule().Variables().AddVectorVariable<ValueType>(emitters::VariableScope::global, windowSize);
         function.GetModule().AllocateVariable(*bufferVar);
-        llvm::Value* buffer = function.GetModule().EnsureEmitted(*bufferVar);
+        emitters::LLVMValue buffer = function.GetModule().EnsureEmitted(*bufferVar);
 
         // Copy samples forward to make room for new samples
         function.MemoryMove<ValueType>(buffer, offset, 0, inputSize);
@@ -72,7 +72,7 @@ namespace nodes
         function.MemoryCopy<ValueType>(pInput, 0, buffer, offset, inputSize);
 
         // Copy to output
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
         function.MemoryCopy<ValueType>(buffer, 0, pOutput, 0, windowSize);
     }
 

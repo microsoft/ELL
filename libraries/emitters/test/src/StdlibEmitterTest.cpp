@@ -44,7 +44,7 @@ void TestIRMallocFunction()
         NamedVariableTypeList args;
         args.push_back({ "size", VariableType::Int64 });
         auto function = module.BeginFunction(functionTestMalloc, VariableType::Int64, args);
-        llvm::Value* arg = function.GetFunctionArgument("size");
+        LLVMValue arg = function.GetFunctionArgument("size");
         auto result = function.Malloc(module.GetIREmitter().Type(VariableType::Char8Pointer), arg);
         function.Return(result);
         module.EndFunction();
@@ -53,7 +53,7 @@ void TestIRMallocFunction()
         NamedVariableTypeList args;
         args.push_back({ "block", VariableType::Char8Pointer });
         auto function = module.BeginFunction(functionTestFree, VariableType::Int64, args);
-        llvm::Value* arg = function.GetFunctionArgument("block");
+        LLVMValue arg = function.GetFunctionArgument("block");
         function.Free(arg);
         module.EndFunction();
     }

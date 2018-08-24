@@ -12,12 +12,16 @@
 #include "EmitterException.h"
 #include "EmitterTypes.h"
 #include "IRLocalValue.h"
+#include "LLVMUtilities.h"
 
 // math
 #include "MathConstants.h"
 
 // dsp
 #include "FFT.h"
+
+// llvm
+#include <llvm/IR/Type.h>
 
 // stl
 #include <cmath>
@@ -44,7 +48,7 @@ namespace nodes
             return module.GetAnonymousStructType({ valueType, valueType }, true);
         }
 
-        inline llvm::StructType* GetComplexType(emitters::IRModuleEmitter& module, llvm::Type* valueType)
+        inline llvm::StructType* GetComplexType(emitters::IRModuleEmitter& module, emitters::LLVMType valueType)
         {
             return module.GetAnonymousStructType({ valueType, valueType }, true);
         }
@@ -235,7 +239,7 @@ namespace nodes
         }
 
         template <typename ValueType>
-        std::vector<llvm::Type*> GetFFTFunctionArguments(emitters::IRModuleEmitter& module)
+        std::vector<emitters::LLVMType> GetFFTFunctionArguments(emitters::IRModuleEmitter& module)
         {
             auto complexType = detail::GetComplexType<ValueType>(module);
             auto complexPtrType = complexType->getPointerTo();
@@ -243,7 +247,7 @@ namespace nodes
         }
 
         template <typename ValueType>
-        std::vector<llvm::Type*> GetRealFFTFunctionArguments(emitters::IRModuleEmitter& module)
+        std::vector<emitters::LLVMType> GetRealFFTFunctionArguments(emitters::IRModuleEmitter& module)
         {
             auto& emitter = module.GetIREmitter();
             auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
@@ -291,7 +295,7 @@ namespace nodes
     {
     }
 
-    inline void Deinterleave(emitters::IRFunctionEmitter& function, llvm::Value* array, llvm::Value* halfLength, llvm::Value* scratch)
+    inline void Deinterleave(emitters::IRFunctionEmitter& function, emitters::LLVMValue array, emitters::LLVMValue halfLength, emitters::LLVMValue scratch)
     {
         auto halfN = function.LocalScalar(halfLength);
         function.For(halfN, [&scratch, &array](emitters::IRFunctionEmitter& function, auto index)
@@ -307,7 +311,7 @@ namespace nodes
         });
     }
 
-    inline void Deinterleave(emitters::IRFunctionEmitter& function, llvm::Value* array, int halfN, llvm::Value* scratch)
+    inline void Deinterleave(emitters::IRFunctionEmitter& function, emitters::LLVMValue array, int halfN, emitters::LLVMValue scratch)
     {
         Deinterleave(function, array, function.Literal(halfN), scratch);
     }
@@ -318,7 +322,7 @@ namespace nodes
     // FFT8 twiddle factors: [1, sqrt2/2+i*sqrt2/2, i, -sqrt2/2+i*sqrt2/2, -1, -sqrt2/2-i*sqrt2/2, -i, sqrt2/2-i*sqrt2/2]
 
     template <typename ValueType>
-    void FFTNode<ValueType>::EmitFFT_2(emitters::IRFunctionEmitter& function, llvm::Value* input)
+    void FFTNode<ValueType>::EmitFFT_2(emitters::IRFunctionEmitter& function, emitters::LLVMValue input)
     {
         // FFT of length 2: x' = [x0+x1, x0-x1]
         auto x0 = function.LocalScalar(function.ValueAt(input, 0));
@@ -328,7 +332,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Function* FFTNode<ValueType>::GetFFTFunction_2(emitters::IRModuleEmitter& module)
+    emitters::LLVMFunction FFTNode<ValueType>::GetFFTFunction_2(emitters::IRModuleEmitter& module)
     {
         const auto length = 2;
         auto functionName = detail::GetFFTFunctionName<ValueType>(length);
@@ -349,7 +353,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void FFTNode<ValueType>::EmitFFT_4(emitters::IRFunctionEmitter& function, llvm::Value* input)
+    void FFTNode<ValueType>::EmitFFT_4(emitters::IRFunctionEmitter& function, emitters::LLVMValue input)
     {
         // FFT of length 4: X = [x0+x1+x2+x3, x0+ix1-x2-ix3, x0-x1+x2-x3, x0-ix1-x2+ix3]
         // Input x = {x0, x1, x2, x3}
@@ -377,7 +381,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Function* FFTNode<ValueType>::GetFFTFunction_4(emitters::IRModuleEmitter& module)
+    emitters::LLVMFunction FFTNode<ValueType>::GetFFTFunction_4(emitters::IRModuleEmitter& module)
     {
         const auto length = 4;
         auto functionName = detail::GetFFTFunctionName<ValueType>(length);
@@ -400,7 +404,7 @@ namespace nodes
 
     // Fixed-size FFT function implementation: size is known at compile time
     template <typename ValueType>
-    void FFTNode<ValueType>::EmitFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch)
+    void FFTNode<ValueType>::EmitFFT(emitters::IRFunctionEmitter& function, size_t length, emitters::LLVMValue input, emitters::LLVMValue scratch)
     {
 #if (USE_FIXED_SMALL_FFT)
         if (length == 2)
@@ -464,7 +468,7 @@ namespace nodes
 
     // Fixed-size FFT function implementation: size is known at compile time
     template <typename ValueType>
-    llvm::Function* FFTNode<ValueType>::GetFFTFunction(emitters::IRModuleEmitter& module, size_t length)
+    emitters::LLVMFunction FFTNode<ValueType>::GetFFTFunction(emitters::IRModuleEmitter& module, size_t length)
     {
 #if (USE_FIXED_SMALL_FFT)
         if (length == 2)
@@ -499,7 +503,7 @@ namespace nodes
 
     // Real-valued fixed-size FFT function implementation: size is known at compile time
     template <typename ValueType>
-    void FFTNode<ValueType>::EmitRealFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch, llvm::Value* complexInput)
+    void FFTNode<ValueType>::EmitRealFFT(emitters::IRFunctionEmitter& function, size_t length, emitters::LLVMValue input, emitters::LLVMValue scratch, emitters::LLVMValue complexInput)
     {
         // TODO: assert(bitcount(length) == 1)  (i.e., length is a power of 2)
         auto& module = function.GetModule();
@@ -558,7 +562,7 @@ namespace nodes
 
     // Real-valued fixed-size FFT function implementation: size is known at compile time
     template <typename ValueType>
-    llvm::Function* FFTNode<ValueType>::GetRealFFTFunction(emitters::IRModuleEmitter& module, size_t length)
+    emitters::LLVMFunction FFTNode<ValueType>::GetRealFFTFunction(emitters::IRModuleEmitter& module, size_t length)
     {
         auto functionName = detail::GetRealFFTFunctionName<ValueType>(length);
         auto existingFunction = module.GetFunction(functionName);
@@ -582,7 +586,7 @@ namespace nodes
 
     // Perform fixed-size FFT: size is known at compile time
     template <typename ValueType>
-    void FFTNode<ValueType>::DoFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch)
+    void FFTNode<ValueType>::DoFFT(emitters::IRFunctionEmitter& function, size_t length, emitters::LLVMValue input, emitters::LLVMValue scratch)
     {
         const bool inlineFFT = length <= MAX_INLINE_FFT_SIZE;
         if (inlineFFT)
@@ -599,7 +603,7 @@ namespace nodes
 
     // Fixed-size FFT function implementation: size is known at compile time
     template <typename ValueType>
-    void FFTNode<ValueType>::DoRealFFT(emitters::IRFunctionEmitter& function, size_t length, llvm::Value* input, llvm::Value* scratch, llvm::Value* complexInput)
+    void FFTNode<ValueType>::DoRealFFT(emitters::IRFunctionEmitter& function, size_t length, emitters::LLVMValue input, emitters::LLVMValue scratch, emitters::LLVMValue complexInput)
     {
         const bool inlineFFT = length <= MAX_INLINE_FFT_SIZE;
         if (inlineFFT)
@@ -643,21 +647,21 @@ namespace nodes
         auto outputSize = output.Size();
 
         // Get port variables
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         // Buffer for complex data
-        llvm::Value* complexBuffer = function.Variable(complexType, inputSize);
+        emitters::LLVMValue complexBuffer = function.Variable(complexType, inputSize);
 
 #if (USE_REAL_FFT)
 
-        llvm::Value* scratch = function.Variable(valueType, inputSize / 2);
+        emitters::LLVMValue scratch = function.Variable(valueType, inputSize / 2);
         DoRealFFT(function, inputSize, pInput, scratch, complexBuffer);
 
 #else // Complex-input FFT
 
-        llvm::Value* scratch = function.Variable(complexType, inputSize / 2);
-        llvm::Value* temp = function.Variable(complexType, "temp");
+        emitters::LLVMValue scratch = function.Variable(complexType, inputSize / 2);
+        emitters::LLVMValue temp = function.Variable(complexType, "temp");
 
         // Convert real-valued data to complex
         function.For(inputSize, [pInput, complexBuffer, temp](emitters::IRFunctionEmitter& function, auto index) {

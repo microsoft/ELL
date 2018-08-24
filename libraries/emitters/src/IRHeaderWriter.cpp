@@ -81,7 +81,7 @@ namespace emitters
             os << ");";
         }
 
-        void WriteLLVMVariableDeclaration(std::ostream& os, llvm::Type* t, std::string name)
+        void WriteLLVMVariableDeclaration(std::ostream& os, LLVMType t, std::string name)
         {
             if (t->isArrayTy())
             {
@@ -120,7 +120,7 @@ namespace emitters
         }
     }
 
-    void WriteLLVMType(std::ostream& os, llvm::Type* t)
+    void WriteLLVMType(std::ostream& os, LLVMType t)
     {
         if (t->isStructTy())
         {
@@ -199,7 +199,7 @@ namespace emitters
                 {
                     os << "void*";
                 }
-                else 
+                else
                 {
                     WriteLLVMType(os, arg.getType());
                 }
@@ -289,7 +289,7 @@ namespace emitters
                 #include "CppPredictWrapper.in"
             );
             // clang-format on
-            
+
             ReplaceDelimiter(predictWrapperCode, "MODULE", moduleEmitter.GetLLVMModule()->getName());
 
             auto predictFunctions = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
@@ -306,7 +306,7 @@ namespace emitters
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
                                                 "SourceNode callback is missing");
             }
-            
+
             if (moduleCallbacks.sinks.size() > 0)
             {
                 ReplaceDelimiter(predictWrapperCode, "SINK_TYPE", moduleCallbacks.sinks[0].inputType);

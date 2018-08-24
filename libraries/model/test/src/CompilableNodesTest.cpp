@@ -1194,7 +1194,7 @@ public:
     }
 
 protected:
-    std::vector<llvm::Value*> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override
+    std::vector<emitters::LLVMValue> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override
     {
         size_t inputSize = _input1.Size();
         assert(inputSize == _input2.Size());

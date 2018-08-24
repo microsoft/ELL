@@ -210,7 +210,7 @@ namespace nodes
     }
 
     template<typename ValueType>
-    void GRUNode<ValueType>::ApplyActivation(emitters::IRFunctionEmitter& function, const ActivationType& activation, llvm::Value* data, size_t dataLength)
+    void GRUNode<ValueType>::ApplyActivation(emitters::IRFunctionEmitter& function, const ActivationType& activation, emitters::LLVMValue data, size_t dataLength)
     {
         auto activationFunction = GetNodeActivationFunction<ValueType>(activation);
         function.For(dataLength, [&activationFunction, data](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar index) {
@@ -241,7 +241,7 @@ namespace nodes
     {
         const size_t inputSize = this->input.Size();
         const size_t outputSize = this->updateBias.Size();
-        
+
         // Get LLVM references for all node inputs
         auto input = compiler.EnsurePortEmitted(this->input);
         auto resetTrigger = compiler.EnsurePortEmitted(this->resetTrigger);

@@ -8,10 +8,7 @@
 
 #pragma once
 
-// llvm
-#include <llvm/IR/Function.h>
-#include <llvm/IR/Type.h>
-#include <llvm/IR/Value.h>
+#include "LLVMUtilities.h"
 
 // stl
 #include <vector>
@@ -60,30 +57,30 @@ namespace emitters
         /// <summary> Get the return value of task </summary>
         ///
         /// <param name="function"> The function currently being emitted into. </param>
-        llvm::Value* GetReturnValue(IRFunctionEmitter& function) const;
+        LLVMValue GetReturnValue(IRFunctionEmitter& function) const;
 
         /// <summary> Wait for this task to finish. </summary>
         ///
         /// <param name="function"> The function currently being emitted into. </param>
-        llvm::Value* IsNull(IRFunctionEmitter& function);
+        LLVMValue IsNull(IRFunctionEmitter& function);
 
     private:
         friend IRFunctionEmitter;
-        IRAsyncTask(IRFunctionEmitter& functionEmitter, llvm::Function* taskFunction, const std::vector<llvm::Value*>& arguments);
-        IRAsyncTask(IRFunctionEmitter& functionEmitter, IRFunctionEmitter& taskFunction, const std::vector<llvm::Value*>& arguments);
+        IRAsyncTask(IRFunctionEmitter& functionEmitter, LLVMFunction taskFunction, const std::vector<LLVMValue>& arguments);
+        IRAsyncTask(IRFunctionEmitter& functionEmitter, IRFunctionEmitter& taskFunction, const std::vector<LLVMValue>& arguments);
 
-        llvm::Function* _taskFunction = nullptr;
-        std::vector<llvm::Value*> _arguments;
-        llvm::Type* _returnType = nullptr;
-        llvm::Value* _returnValue = nullptr;
+        LLVMFunction _taskFunction = nullptr;
+        std::vector<LLVMValue> _arguments;
+        LLVMType _returnType = nullptr;
+        LLVMValue _returnValue = nullptr;
 
         bool UsePthreads() const { return _usePthreads; }
-        llvm::Function* GetPthreadWrapper(llvm::StructType* argsStructType);
+        LLVMFunction GetPthreadWrapper(llvm::StructType* argsStructType);
 
         bool _usePthreads = false;
 
         // For pthreads implementation
-        llvm::Value* _pthread = nullptr;
+        LLVMValue _pthread = nullptr;
     };
 
     /// <summary> Waits for all given tasks to finish </summary>

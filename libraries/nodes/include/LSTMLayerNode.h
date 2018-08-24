@@ -10,6 +10,9 @@
 
 #include "NeuralNetworkLayerNode.h"
 
+// emitters
+#include "LLVMUtilities.h"
+
 // model
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
@@ -213,9 +216,9 @@ namespace nodes
         ActivationType _activation;
         ActivationType _recurrentActivation;
 
-        void ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength);
+        void ApplySoftmax(emitters::IRFunctionEmitter& function, emitters::LLVMValue data, size_t dataLength);
 
-        void ApplyActivation(emitters::IRFunctionEmitter& function, const ActivationType& activation, llvm::Value* data, size_t dataLength);
+        void ApplyActivation(emitters::IRFunctionEmitter& function, const ActivationType& activation, emitters::LLVMValue data, size_t dataLength);
     };
 }
 }

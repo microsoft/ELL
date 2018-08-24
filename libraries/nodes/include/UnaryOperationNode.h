@@ -78,7 +78,7 @@ namespace nodes
     private:
         void Copy(model::ModelTransformer& transformer) const override;
 
-        llvm::Function* GetOperator(emitters::IRFunctionEmitter& function) const;
+        emitters::LLVMFunction GetOperator(emitters::IRFunctionEmitter& function) const;
         void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
         void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
 

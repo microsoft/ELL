@@ -36,7 +36,7 @@ namespace nodes
                 function.Store(_accumValueVar, function.Literal(-(std::numeric_limits<ValueType>::max())));
             }
 
-            llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x)
+            emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x)
             {
                 function.If(emitters::TypedComparison::greaterThanFloat, x, function.Load(_accumValueVar), [this, x](emitters::IRFunctionEmitter& function) {
                     function.Store(_accumValueVar, x);
@@ -45,20 +45,20 @@ namespace nodes
                 return nullptr;
             }
 
-            llvm::Value* GetMaxValue(emitters::IRFunctionEmitter& function) const
+            emitters::LLVMValue GetMaxValue(emitters::IRFunctionEmitter& function) const
             {
                 return function.Load(_accumValueVar);
             }
 
         private:
-            llvm::Value* _accumValueVar;
+            emitters::LLVMValue _accumValueVar;
         };
 
         template <typename ValueType>
         class ComputeEulerAndSumFunction
         {
         public:
-            ComputeEulerAndSumFunction(emitters::IRFunctionEmitter& function, llvm::Value* maxValue)
+            ComputeEulerAndSumFunction(emitters::IRFunctionEmitter& function, emitters::LLVMValue maxValue)
                 : _maxValue(maxValue)
             {
                 auto valueType = emitters::GetVariableType<ValueType>();
@@ -72,7 +72,7 @@ namespace nodes
                 function.StoreZero(_accumValueVar);
             }
 
-            llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x)
+            emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x)
             {
                 const auto plusFloat = emitters::TypedOperator::addFloat;
                 const auto minusFloat = emitters::TypedOperator::subtractFloat;
@@ -82,22 +82,22 @@ namespace nodes
                 return eulerVal;
             }
 
-            llvm::Value* GetEulerSum(emitters::IRFunctionEmitter& function) const
+            emitters::LLVMValue GetEulerSum(emitters::IRFunctionEmitter& function) const
             {
                 return function.Load(_accumValueVar);
             }
 
         private:
-            llvm::Function* _expFunc;
-            llvm::Value* _maxValue;
-            llvm::Value* _accumValueVar;
+            emitters::LLVMFunction _expFunc;
+            emitters::LLVMValue _maxValue;
+            emitters::LLVMValue _accumValueVar;
         };
 
         template <typename ValueType>
         class NormalizeOutputFunction
         {
         public:
-            NormalizeOutputFunction(emitters::IRFunctionEmitter& function, llvm::Value* sum)
+            NormalizeOutputFunction(emitters::IRFunctionEmitter& function, emitters::LLVMValue sum)
                 : _sum(sum)
             {
             }
@@ -106,14 +106,14 @@ namespace nodes
             {
             }
 
-            llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x)
+            emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x)
             {
                 const auto divideFloat = emitters::TypedOperator::divideFloat;
                 return function.Operator(divideFloat, x, _sum);
             }
 
         public:
-            llvm::Value* _sum;
+            emitters::LLVMValue _sum;
         };
 
     } // end anonymous namespace
@@ -127,11 +127,11 @@ namespace nodes
     template <typename ValueType>
     void SoftmaxLayerNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
-        llvm::Value* prevInputDimensionOffset = nullptr;
-        llvm::Value* prevOutputDimensionOffset = nullptr;
+        emitters::LLVMValue prevInputDimensionOffset = nullptr;
+        emitters::LLVMValue prevOutputDimensionOffset = nullptr;
 
         // Compute max value
         FindMaxFunction<ValueType> findMax(function);
@@ -154,10 +154,10 @@ namespace nodes
                                                                size_t dimension,
                                                                const model::PortMemoryLayout& inputLayout,
                                                                const model::PortMemoryLayout& outputLayout,
-                                                               llvm::Value* pInput,
-                                                               llvm::Value* pOutput,
-                                                               llvm::Value* prevInputDimensionOffset,
-                                                               llvm::Value* prevOutputDimensionOffset,
+                                                               emitters::LLVMValue pInput,
+                                                               emitters::LLVMValue pOutput,
+                                                               emitters::LLVMValue prevInputDimensionOffset,
+                                                               emitters::LLVMValue prevOutputDimensionOffset,
                                                                FunctionType& f) const
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
@@ -170,7 +170,7 @@ namespace nodes
         auto&& outputStride = outputLayout.GetStride();
         auto&& outputOffset = outputLayout.GetOffset();
 
-        function.For(inputSize[dimension], [dimension, numDimensions, inputStride, inputOffset, inputLayout, outputStride, outputOffset, outputLayout, pInput, pOutput, prevInputDimensionOffset, prevOutputDimensionOffset, &f, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+        function.For(inputSize[dimension], [dimension, numDimensions, inputStride, inputOffset, inputLayout, outputStride, outputOffset, outputLayout, pInput, pOutput, prevInputDimensionOffset, prevOutputDimensionOffset, &f, &compiler, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             auto loopIndex = function.LocalScalar(i);
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
             auto thisInputDimensionInternalOffset = loopIndex + inputOffset[dimension];
@@ -221,8 +221,8 @@ namespace nodes
     void SoftmaxLayerNode<ValueType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function,
                                                                size_t dimension,
                                                                const model::PortMemoryLayout& inputLayout,
-                                                               llvm::Value* pInput,
-                                                               llvm::Value* prevInputDimensionOffsetValue,
+                                                               emitters::LLVMValue pInput,
+                                                               emitters::LLVMValue prevInputDimensionOffsetValue,
                                                                FunctionType& f) const
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
@@ -234,7 +234,7 @@ namespace nodes
 
         auto input = function.LocalArray(pInput);
         auto prevInputDimensionOffset = function.LocalScalar(prevInputDimensionOffsetValue);
-        function.For(inputSize[dimension], [dimension, numDimensions, inputOffset, inputStride, inputLayout, input, prevInputDimensionOffset, &f, &compiler, this](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+        function.For(inputSize[dimension], [dimension, numDimensions, inputOffset, inputStride, inputLayout, input, prevInputDimensionOffset, &f, &compiler, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             auto loopIndex = function.LocalScalar(i);
             // Calculate the offset within this dimension = (loopIndex + offset[dimension])
             auto thisInputDimensionInternalOffset = loopIndex + inputOffset[dimension];

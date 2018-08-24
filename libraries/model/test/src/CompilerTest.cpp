@@ -547,9 +547,9 @@ void TestSlidingAverage()
     auto mainFunction = module.BeginMainFunction();
     std::vector<double> data = { 5, 10, 15, 20 };
     auto& emitter = compiledMap.GetModule().GetIREmitter();
-    llvm::Value* pContext = emitter.NullPointer(emitter.GetIRBuilder().getInt8Ty()->getPointerTo());
-    llvm::Value* pData = module.ConstantArray("c_data", data);
-    llvm::Value* pResult = mainFunction.Variable(emitters::VariableType::Double, 1);
+    emitters::LLVMValue pContext = emitter.NullPointer(emitter.GetIRBuilder().getInt8Ty()->getPointerTo());
+    emitters::LLVMValue pData = module.ConstantArray("c_data", data);
+    emitters::LLVMValue pResult = mainFunction.Variable(emitters::VariableType::Double, 1);
     mainFunction.Call("TestSlidingAverage", { pContext, mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
     mainFunction.PrintForEach("%f\n", pResult, 1);
     mainFunction.Call("TestSlidingAverage", { pContext, mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
@@ -612,8 +612,8 @@ void TestForest()
     module.DeclarePrintf();
 
     auto mainFunction = module.BeginMainFunction();
-    llvm::Value* pData = module.ConstantArray("c_data", data);
-    llvm::Value* pResult = nullptr;
+    emitters::LLVMValue pData = module.ConstantArray("c_data", data);
+    emitters::LLVMValue pResult = nullptr;
     auto args = module.GetFunction("TestForest")->args();
     emitters::IRValueList callArgs;
     callArgs.push_back(mainFunction.PointerOffset(pData, 0));
@@ -623,7 +623,7 @@ void TestForest()
         (void)arg; // stifle compiler warning
         if (i > 0)
         {
-            llvm::Value* pArg = nullptr;
+            emitters::LLVMValue pArg = nullptr;
             if (pResult == nullptr)
             {
                 pArg = mainFunction.Variable(emitters::VariableType::Double, 1);

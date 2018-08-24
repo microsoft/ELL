@@ -72,10 +72,10 @@ namespace nodes
     template <typename ValueType>
     void DotProductNode<ValueType>::CompileDotProductLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pLVector = compiler.EnsurePortEmitted(input1);
-        llvm::Value* pRVector = compiler.EnsurePortEmitted(input2);
+        emitters::LLVMValue pLVector = compiler.EnsurePortEmitted(input1);
+        emitters::LLVMValue pRVector = compiler.EnsurePortEmitted(input2);
         int count = static_cast<int>(input1.Size());
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
         if (compiler.GetCompilerOptions().inlineOperators)
         {
             function.DotProduct(count, pLVector, pRVector, pResult);
@@ -89,14 +89,14 @@ namespace nodes
     template <typename ValueType>
     void DotProductNode<ValueType>::CompileDotProductExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
         function.StoreZero(pResult);
         for (size_t i = 0; i < input1.Size(); ++i)
         {
-            llvm::Value* pLeftValue = compiler.LoadPortElementVariable(input1.GetInputElement(i));
-            llvm::Value* pRightValue = compiler.LoadPortElementVariable(input2.GetInputElement(i));
-            llvm::Value* pMultiplyResult = function.Operator(emitters::GetMultiplyForValueType<ValueType>(), pLeftValue, pRightValue);
+            emitters::LLVMValue pLeftValue = compiler.LoadPortElementVariable(input1.GetInputElement(i));
+            emitters::LLVMValue pRightValue = compiler.LoadPortElementVariable(input2.GetInputElement(i));
+            emitters::LLVMValue pMultiplyResult = function.Operator(emitters::GetMultiplyForValueType<ValueType>(), pLeftValue, pRightValue);
             function.OperationAndUpdate(pResult, emitters::GetAddForValueType<ValueType>(), pMultiplyResult);
         }
     }

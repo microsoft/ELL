@@ -9,13 +9,10 @@
 
 #include "EmitterTypes.h"
 #include "IRFunctionEmitter.h"
+#include "LLVMUtilities.h"
 
 // utilities
 #include "TypeTraits.h"
-
-// llvm
-#include <llvm/IR/Type.h>
-#include <llvm/IR/Value.h>
 
 namespace ell
 {
@@ -30,7 +27,7 @@ namespace emitters
     ///
     /// <returns> An LLVM vector with repeated entries of the indicated value </returns>
     template <typename ValueType, utilities::IsIntegral<ValueType> = true>
-    llvm::Value* FillVector(IRFunctionEmitter& function, llvm::VectorType* type, ValueType elementValue);
+    LLVMValue FillVector(IRFunctionEmitter& function, llvm::VectorType* type, ValueType elementValue);
 
     /// <summary> Create a floating-point vector filled with copies of a value </summary>
     ///
@@ -41,7 +38,7 @@ namespace emitters
     ///
     /// <returns> An LLVM vector with repeated entries of the indicated value </returns>
     template <typename ValueType, utilities::IsFloatingPoint<ValueType> = true>
-    llvm::Value* FillVector(IRFunctionEmitter& function, llvm::VectorType* type, ValueType elementValue);
+    LLVMValue FillVector(IRFunctionEmitter& function, llvm::VectorType* type, ValueType elementValue);
 
     /// <summary> Compute the sum of the entries in a vector </summary>
     ///
@@ -54,7 +51,7 @@ namespace emitters
     ///
     /// <returns> The sum of the elements in the given vector </returns>
     template <typename ValueType>
-    llvm::Value* HorizontalVectorSum(IRFunctionEmitter& function, llvm::Value* vectorValue);
+    LLVMValue HorizontalVectorSum(IRFunctionEmitter& function, LLVMValue vectorValue);
 }
 }
 

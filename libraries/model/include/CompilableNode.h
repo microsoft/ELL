@@ -15,12 +15,10 @@
 #include "EmitterTypes.h"
 #include "IRFunctionEmitter.h"
 #include "IRModuleEmitter.h"
+#include "LLVMUtilities.h"
 
 // utilities
 #include "TypeName.h"
-
-// llvm
-#include <llvm/IR/Value.h>
 
 // stl
 #include <string>
@@ -94,7 +92,7 @@ namespace model
         // Returns the list of actual arguments for the "state" parameters to the node's compute function,.
         // The default implementation returns an empty list, as by default, node's don't have any extra state parameters.
         // Subclasses must override this if they override `GetNodeFunctionStateParameterList`
-        virtual std::vector<llvm::Value*> GetNodeFunctionStateArguments(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const;
+        virtual std::vector<emitters::LLVMValue> GetNodeFunctionStateArguments(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const;
 
         // Returns the list of formal parameters for the node's compute function. By default, the parameters include the input ports,
         // any additional "state" parameters, followed by the output ports.
@@ -104,7 +102,7 @@ namespace model
         // Returns the list of actual argument values to use when calling the node's compute function. By default, the arguments include the
         // values for the input ports, any special "state" parameters, and the values for the output ports.
         // Subclasses must override this if they override `GetNodeFunctionParameterList`
-        virtual std::vector<llvm::Value*> GetNodeFunctionArguments(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const;
+        virtual std::vector<emitters::LLVMValue> GetNodeFunctionArguments(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const;
 
         // Emits code for calling the function that implements this node.
         // The default implementation uses the result of `GetCompiledFunctionName` and `GetNodeFunctionParameterList`

@@ -7,8 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "LLVMUtilities.h"
+
 // llvm
-#include <llvm/IR/Function.h>
 #include <llvm/IR/LegacyPassManager.h>
 
 namespace ell
@@ -25,14 +26,14 @@ namespace emitters
         ///
         /// <param name="module"> The module. </param>
         IROptimizer(IRModuleEmitter& module);
-        
+
         /// <summary> Add common optimizations to the optimizer pipeline. </summary>
         void AddStandardPasses();
 
         /// <summary> Optimize the given function. </summary>
         ///
         /// <param name="pFunction"> pointer to the function to optimize. </param>
-        void OptimizeFunction(llvm::Function* pFunction);
+        void OptimizeFunction(LLVMFunction pFunction);
 
         /// <summary> Optimize the module. </summary>
         void OptimizeModule(llvm::Module* pModule);

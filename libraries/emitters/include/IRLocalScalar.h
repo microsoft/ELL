@@ -10,6 +10,7 @@
 
 #include "IREmitter.h"
 #include "IRLocalValue.h"
+#include "LLVMUtilities.h"
 
 // utilities
 #include "TypeTraits.h"
@@ -30,13 +31,13 @@ namespace emitters
     ///
     /// ```
     /// IRFunctionEmitter function = ...;
-    /// llvm::Value* outPtr = ...;
-    /// llvm::Value* value1 = ...;
-    /// auto a = function.LocalScalar(value1);  // create an `IRLocalScalar` from an `llvm::Value*`
+    /// LLVMValue outPtr = ...;
+    /// LLVMValue value1 = ...;
+    /// auto a = function.LocalScalar(value1);  // create an `IRLocalScalar` from an `LLVMValue`
     /// auto b = function.LocalScalar(1.25f);   // create an `IRLocalScalar` from a constant
     /// auto c = a + b;                         // directly perform math operations on `IRLocalScalar` values
     /// auto d = Sin(c);                        // ...and call math functions on them
-    /// function.SetValue(outPtr, d);           // d implicitly converts to `llvm::Value*` for functions that use llvm values directly
+    /// function.SetValue(outPtr, d);           // d implicitly converts to `LLVMValue` for functions that use llvm values directly
     /// ...
     /// ```
     struct IRLocalScalar : public IRLocalValue
@@ -77,16 +78,16 @@ namespace emitters
 
     // Basic arithmetic
     IRLocalScalar operator+(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator+(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator+(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator+(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator+(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator+(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator+(IRLocalScalar a, ValueType b);
 
     IRLocalScalar operator-(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator-(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator-(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator-(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator-(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator-(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
@@ -94,24 +95,24 @@ namespace emitters
 
     IRLocalScalar operator-(IRLocalScalar a);
     IRLocalScalar operator*(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator*(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator*(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator*(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator*(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator*(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator*(IRLocalScalar a, ValueType b);
 
     IRLocalScalar operator/(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator/(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator/(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator/(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator/(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator/(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator/(IRLocalScalar a, ValueType b);
 
     IRLocalScalar operator%(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator%(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator%(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator%(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator%(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsIntegral<ValueType> = true>
     IRLocalScalar operator%(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsIntegral<ValueType> = true>
@@ -130,48 +131,48 @@ namespace emitters
 
     // Comparison operators
     IRLocalScalar operator==(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator==(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator==(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator==(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator==(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator==(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator==(IRLocalScalar a, ValueType b);
 
     IRLocalScalar operator!=(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator!=(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator!=(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator!=(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator!=(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator!=(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator!=(IRLocalScalar a, ValueType b);
 
     IRLocalScalar operator<(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator<(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator<(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator<(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator<(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator<(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator<(IRLocalScalar a, ValueType b);
 
     IRLocalScalar operator<=(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator<=(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator<=(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator<=(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator<=(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator<=(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator<=(IRLocalScalar a, ValueType b);
 
     IRLocalScalar operator>(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator>(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator>(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator>(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator>(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator>(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator>(IRLocalScalar a, ValueType b);
 
     IRLocalScalar operator>=(IRLocalScalar a, IRLocalScalar b);
-    IRLocalScalar operator>=(llvm::Value* a, IRLocalScalar b);
-    IRLocalScalar operator>=(IRLocalScalar a, llvm::Value* b);
+    IRLocalScalar operator>=(LLVMValue a, IRLocalScalar b);
+    IRLocalScalar operator>=(IRLocalScalar a, LLVMValue b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator>=(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>

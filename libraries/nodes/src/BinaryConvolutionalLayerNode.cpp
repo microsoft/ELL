@@ -61,12 +61,12 @@ namespace nodes
 
         template <typename ValueType>
         void LoadRow(emitters::IRFunctionEmitter& function,
-                     llvm::Value* inputVolume,
+                     emitters::LLVMValue inputVolume,
                      const model::PortMemoryLayout& inputLayout,
-                     llvm::Value* outputRowIndex,
+                     emitters::LLVMValue outputRowIndex,
                      const model::PortMemoryLayout& outputLayout,
                      const predictors::neural::BinaryConvolutionalParameters& convParams,
-                     llvm::Value* realValueRow) // realValueRow == output
+                     emitters::LLVMValue realValueRow) // realValueRow == output
         {
             const int numChannels = inputLayout.GetActiveSize(2);
             const int outputImageWidth = outputLayout.GetActiveSize(1);
@@ -84,13 +84,13 @@ namespace nodes
             auto output = function.LocalTensor(realValueRow, { filterSize, filterSize, numChannels }, emitters::RowMajorTensorLayout);
 
             // For row, column, channel order:
-            function.For(filterSize, [input, inputLayout, numChannels, filterSize, inputRowStart, inputColStart, output](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            function.For(filterSize, [input, inputLayout, numChannels, filterSize, inputRowStart, inputColStart, output](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
                 auto rowIndex = function.LocalScalar(i);
 
-                function.For(filterSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* j) {
+                function.For(filterSize, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue j) {
                     auto columnIndex = function.LocalScalar(j);
 
-                    function.For(numChannels, [=](emitters::IRFunctionEmitter& function, llvm::Value* k) {
+                    function.For(numChannels, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue k) {
                         auto channelIndex = function.LocalScalar(k);
                         auto inputRow = inputRowStart + rowIndex;
                         auto inputColumn = inputColStart + columnIndex;
@@ -103,7 +103,7 @@ namespace nodes
         }
 
         template <typename ValueType, typename PackedBitsType>
-        void CompressRow(emitters::IRFunctionEmitter& function, llvm::Value* realRow, llvm::Value* packedOutput, int numValues)
+        void CompressRow(emitters::IRFunctionEmitter& function, emitters::LLVMValue realRow, emitters::LLVMValue packedOutput, int numValues)
         {
             int storedElementSize = sizeof(PackedBitsType);
             int storedElementNumBits = 8 * storedElementSize;
@@ -112,7 +112,7 @@ namespace nodes
 
             auto input = function.LocalArray(realRow);
             auto output = function.LocalArray(packedOutput);
-            function.For(numCompleteBlocks, [storedElementNumBits, input, output](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            function.For(numCompleteBlocks, [storedElementNumBits, input, output](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
                 auto blockIndex = function.LocalScalar(i);
 
                 // TODO: block-vectorize this:
@@ -342,8 +342,8 @@ namespace nodes
         auto voidType = llvm::Type::getVoidTy(context);
 
         // Get port variables
-        llvm::Value* inputTemp = compiler.EnsurePortEmitted(input);
-        llvm::Value* outputTemp = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue inputTemp = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue outputTemp = compiler.EnsurePortEmitted(output);
 
         // Constants
         auto elementSize = sizeof(PackedBitsType);
@@ -366,7 +366,7 @@ namespace nodes
 
             // TODO: interleave load/compress more tightly to eliminate need for a scratch variable to hold a whole row
             llvm::AllocaInst* realValueRow = taskFunction.Variable(emitters::GetVariableType<ValueType>(), fieldVolumeSize);
-            taskFunction.For(begin, end, [this, pInput, pOutput, packedRowSize, fieldVolumeSize, realValueRow](emitters::IRFunctionEmitter& taskFunction, llvm::Value* i) {
+            taskFunction.For(begin, end, [this, pInput, pOutput, packedRowSize, fieldVolumeSize, realValueRow](emitters::IRFunctionEmitter& taskFunction, emitters::LLVMValue i) {
                 auto outputRowIndex = taskFunction.LocalScalar(i);
                 LoadRow<ValueType>(taskFunction,
                                    pInput,
@@ -391,8 +391,8 @@ namespace nodes
     void BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         // Get port variables
-        llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(this->input);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(this->output);
 
         const auto& compilerSettings = compiler.GetCompilerOptions();
 
@@ -415,7 +415,7 @@ namespace nodes
         if (compilerSettings.parallelize && numTasks > 1)
         {
             auto taskFunction = GetTaskFunction(compiler, function);
-            std::vector<std::vector<llvm::Value*>> taskArgs;
+            std::vector<std::vector<emitters::LLVMValue>> taskArgs;
             for (int taskIndex = 0; taskIndex < numTasks; ++taskIndex)
             {
                 auto start = taskIndex * taskSize;
@@ -429,7 +429,7 @@ namespace nodes
         {
             // TODO: interleave load/compress more tightly to eliminate need for a scratch variable to hold the whole row
             llvm::AllocaInst* realValueRow = function.Variable(emitters::GetVariableType<ValueType>(), fieldVolumeSize);
-            function.For(numOutputRows, [this, pInput, pOutput, realValueRow, packedRowSize, fieldVolumeSize](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            function.For(numOutputRows, [this, pInput, pOutput, realValueRow, packedRowSize, fieldVolumeSize](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
                 auto outputRowIndex = function.LocalScalar(i);
                 LoadRow<ValueType>(function,
                                    pInput,
@@ -500,11 +500,11 @@ namespace nodes
 
     template <typename ValueType, typename PackedBitsType>
     void BinaryXnorNode<ValueType, PackedBitsType>::EmitInnerLoop(emitters::IRFunctionEmitter& function,
-                                                                  llvm::Value* reshapedInputPtr,
-                                                                  llvm::Value* paddingMaskPtr,
-                                                                  llvm::Value* weightsPtr,
-                                                                  llvm::Value* xorSumVariable,
-                                                                  llvm::Function* popCountFunction,
+                                                                  emitters::LLVMValue reshapedInputPtr,
+                                                                  emitters::LLVMValue paddingMaskPtr,
+                                                                  emitters::LLVMValue weightsPtr,
+                                                                  emitters::LLVMValue xorSumVariable,
+                                                                  emitters::LLVMFunction popCountFunction,
                                                                   int startBlock,
                                                                   int numBlocks,
                                                                   bool hasZeroPadding)
@@ -512,7 +512,7 @@ namespace nodes
         auto reshapedInput = function.LocalArray(reshapedInputPtr);
         auto paddingMask = function.LocalArray(paddingMaskPtr);
         auto weights = function.LocalArray(weightsPtr);
-        function.For(startBlock, startBlock + numBlocks, [reshapedInput, paddingMask, weights, xorSumVariable, popCountFunction, hasZeroPadding](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+        function.For(startBlock, startBlock + numBlocks, [reshapedInput, paddingMask, weights, xorSumVariable, popCountFunction, hasZeroPadding](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             auto blockIndex = function.LocalScalar(i);
 
             auto inputVal = reshapedInput[blockIndex];
@@ -540,12 +540,12 @@ namespace nodes
         const int vectorSize = compilerSettings.vectorWidth;
 
         // Get port variables
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pFilterWeights = compiler.EnsurePortEmitted(filterWeights);
-        llvm::Value* pFilterMeans = compiler.EnsurePortEmitted(filterMeans);
-        llvm::Value* pInputPaddingMask = compiler.EnsurePortEmitted(inputPaddingMasks);
-        llvm::Value* pInputPaddingMaskSums = compiler.EnsurePortEmitted(inputPaddingMaskSums);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pFilterWeights = compiler.EnsurePortEmitted(filterWeights);
+        emitters::LLVMValue pFilterMeans = compiler.EnsurePortEmitted(filterMeans);
+        emitters::LLVMValue pInputPaddingMask = compiler.EnsurePortEmitted(inputPaddingMasks);
+        emitters::LLVMValue pInputPaddingMaskSums = compiler.EnsurePortEmitted(inputPaddingMaskSums);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         // Input / output memory layouts (of the original node)
         const auto& inputLayout = this->GetInputMemoryLayout();
@@ -594,12 +594,12 @@ namespace nodes
         if (compilerSettings.parallelize && numTasks > 1)
         {
             auto taskFunction = GetTaskFunction(compiler, function);
-            std::vector<std::vector<llvm::Value*>> taskArgs;
+            std::vector<std::vector<emitters::LLVMValue>> taskArgs;
             for (int taskIndex = 0; taskIndex < numTasks; ++taskIndex)
             {
                 auto start = taskIndex * taskSize;
                 auto end = std::min((taskIndex + 1) * taskSize, numFilters);
-                std::vector<llvm::Value*> args = { pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums, pOutput, function.Literal<int32_t>(start), function.Literal<int32_t>(end) };
+                std::vector<emitters::LLVMValue> args = { pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums, pOutput, function.Literal<int32_t>(start), function.Literal<int32_t>(end) };
                 taskArgs.push_back(args);
             }
             auto tasks = function.StartTasks(taskFunction, taskArgs);
@@ -607,7 +607,7 @@ namespace nodes
         }
         else // single-threaded
         {
-            function.For(numFilters, [=, &compiler](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+            function.For(numFilters, [=, &compiler](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
                 auto filterIndex = function.LocalScalar(i);
                 ComputeFilterOutput(compiler,
                                     function,
@@ -633,12 +633,12 @@ namespace nodes
     emitters::IRFunctionEmitter BinaryXnorNode<ValueType, PackedBitsType>::GetTaskFunction(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         // Get port variables
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pFilterWeights = compiler.EnsurePortEmitted(filterWeights);
-        llvm::Value* pFilterMeans = compiler.EnsurePortEmitted(filterMeans);
-        llvm::Value* pInputPaddingMask = compiler.EnsurePortEmitted(inputPaddingMasks);
-        llvm::Value* pInputPaddingMaskSums = compiler.EnsurePortEmitted(inputPaddingMaskSums);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pFilterWeights = compiler.EnsurePortEmitted(filterWeights);
+        emitters::LLVMValue pFilterMeans = compiler.EnsurePortEmitted(filterMeans);
+        emitters::LLVMValue pInputPaddingMask = compiler.EnsurePortEmitted(inputPaddingMasks);
+        emitters::LLVMValue pInputPaddingMaskSums = compiler.EnsurePortEmitted(inputPaddingMaskSums);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         const auto& compilerSettings = compiler.GetCompilerOptions();
 
@@ -702,8 +702,8 @@ namespace nodes
             auto blockStartVal = &(*arguments++);
             auto blockEndVal = &(*arguments++);
 
-            taskFunction.For(blockStartVal, blockEndVal, taskFunction.Literal<int>(1), [pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums, 
-                                                                                        pOutput, hasZeroPadding, outputColumns, packedRowSize, packedRowStride, useVectorInstructions, vectorSize, numVectorBlocks, &compiler, this](emitters::IRFunctionEmitter& taskFunction, llvm::Value* filterIndex) {
+            taskFunction.For(blockStartVal, blockEndVal, taskFunction.Literal<int>(1), [pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums,
+                                                                                        pOutput, hasZeroPadding, outputColumns, packedRowSize, packedRowStride, useVectorInstructions, vectorSize, numVectorBlocks, &compiler, this](emitters::IRFunctionEmitter& taskFunction, emitters::LLVMValue filterIndex) {
                 ComputeFilterOutput(compiler,
                                     taskFunction,
                                     pInput,
@@ -731,13 +731,13 @@ namespace nodes
     template <typename ValueType, typename PackedBitsType>
     void BinaryXnorNode<ValueType, PackedBitsType>::ComputeFilterOutput(model::IRMapCompiler& compiler,
                                                                         emitters::IRFunctionEmitter& function,
-                                                                        llvm::Value* pInput,
-                                                                        llvm::Value* pFilterWeights,
-                                                                        llvm::Value* pFilterMeans,
-                                                                        llvm::Value* pInputPaddingMask,
-                                                                        llvm::Value* pInputPaddingMaskSums,
-                                                                        llvm::Value* pOutput,
-                                                                        llvm::Value* filterIndexPtr,
+                                                                        emitters::LLVMValue pInput,
+                                                                        emitters::LLVMValue pFilterWeights,
+                                                                        emitters::LLVMValue pFilterMeans,
+                                                                        emitters::LLVMValue pInputPaddingMask,
+                                                                        emitters::LLVMValue pInputPaddingMaskSums,
+                                                                        emitters::LLVMValue pOutput,
+                                                                        emitters::LLVMValue filterIndexPtr,
                                                                         bool hasZeroPadding,
                                                                         int outputColumns,
                                                                         int packedRowSize,
@@ -771,15 +771,15 @@ namespace nodes
         auto vectorType = emitter.VectorType(packedBitsType, vectorSize);
         auto vectorPointerType = vectorType->getPointerTo();
 
-        llvm::Function* popcountFunction = function.GetModule().GetIntrinsic(llvm::Intrinsic::ctpop, { packedBitsType });
-        llvm::Function* vecPopcountFunction = function.GetModule().GetIntrinsic(llvm::Intrinsic::ctpop, { vectorType });
+        emitters::LLVMFunction popcountFunction = function.GetModule().GetIntrinsic(llvm::Intrinsic::ctpop, { packedBitsType });
+        emitters::LLVMFunction vecPopcountFunction = function.GetModule().GetIntrinsic(llvm::Intrinsic::ctpop, { vectorType });
 
         // The start of the binarized weights matrix for this filter
         auto weightsBegin = filterIndex * packedRowStride;
         auto weightsBeginPtr = function.PointerOffset(pFilterWeights, weightsBegin);
         auto weightsVector = function.CastPointer(weightsBeginPtr, vectorPointerType);
 
-        llvm::Value* filterMean = nullptr;
+        emitters::LLVMValue filterMean = nullptr;
         if (_convolutionalParameters.weightsScale == scaleOutputByFilterMeans)
         {
             filterMean = function.ValueAt(pFilterMeans, filterIndex);
@@ -788,12 +788,12 @@ namespace nodes
         const int numScalarBlocks = packedRowSize - (vectorSize * numVectorBlocks);
 
         // Variables to hold the running sum of xor values
-        llvm::Value* vectorSumVar = useVectorInstructions ? function.Variable(vectorType, "vecXorSum") : nullptr;
-        llvm::Value* sumVar = numScalarBlocks > 0 ? function.Variable(packedBitsType, "xorSum") : nullptr;
+        emitters::LLVMValue vectorSumVar = useVectorInstructions ? function.Variable(vectorType, "vecXorSum") : nullptr;
+        emitters::LLVMValue sumVar = numScalarBlocks > 0 ? function.Variable(packedBitsType, "xorSum") : nullptr;
 
         // Compute and accumulate xnor counts
 
-        function.For(outputColumns, [=](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+        function.For(outputColumns, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             auto outputColumnIndex = function.LocalScalar(i);
 
             // The start of the binarized receptive field matrix for this output image pixel
@@ -831,7 +831,7 @@ namespace nodes
                 EmitInnerLoop(function, inputBeginPtr, paddingMaskBeginPtr, weightsBeginPtr, sumVar, popcountFunction, start, numScalarBlocks, hasZeroPadding);
             }
 
-            llvm::Value* xorSum = (sumVar == nullptr) ? nullptr : function.Load(sumVar);
+            emitters::LLVMValue xorSum = (sumVar == nullptr) ? nullptr : function.Load(sumVar);
             if (vectorXorSum.value != nullptr)
             {
                 xorSum = (xorSum == nullptr) ? vectorXorSum : xorSum + vectorXorSum;
@@ -846,7 +846,7 @@ namespace nodes
             if (hasZeroPadding)
             {
                 // Add back the zero padding, if any (since the scaled sum is made negative, use the minus operation)
-                llvm::Value* paddingSum = function.ValueAt(pInputPaddingMaskSums, outputColumnIndex);
+                emitters::LLVMValue paddingSum = function.ValueAt(pInputPaddingMaskSums, outputColumnIndex);
                 scaledSumWithPadding = scaledSum - paddingSum;
             }
             auto sumFloat = function.CastValue<int, ValueType>(scaledSumWithPadding);

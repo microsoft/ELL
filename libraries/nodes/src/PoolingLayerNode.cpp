@@ -105,27 +105,27 @@ namespace nodes
             function.Store(_accumValueVar, _initialValue);
         }
 
-        void Accumulate(emitters::IRFunctionEmitter& function, llvm::Value* value)
+        void Accumulate(emitters::IRFunctionEmitter& function, emitters::LLVMValue value)
         {
             function.If(emitters::TypedComparison::greaterThanFloat, value, function.Load(_accumValueVar), [this, value](emitters::IRFunctionEmitter& function) {
                 function.Store(_accumValueVar, value);
             });
         }
 
-        llvm::Value* GetValueAtPadding(emitters::IRFunctionEmitter& function)
+        emitters::LLVMValue GetValueAtPadding(emitters::IRFunctionEmitter& function)
         {
             return _paddingValue;
         }
 
-        llvm::Value* GetValue(emitters::IRFunctionEmitter& function)
+        emitters::LLVMValue GetValue(emitters::IRFunctionEmitter& function)
         {
             return function.Load(_accumValueVar);
         }
 
     private:
-        llvm::Value* _accumValueVar;
-        llvm::Value* _initialValue;
-        llvm::Value* _paddingValue;
+        emitters::LLVMValue _accumValueVar;
+        emitters::LLVMValue _initialValue;
+        emitters::LLVMValue _paddingValue;
     };
 
     //
@@ -156,7 +156,7 @@ namespace nodes
             }
         }
 
-        void Accumulate(emitters::IRFunctionEmitter& function, llvm::Value* value)
+        void Accumulate(emitters::IRFunctionEmitter& function, emitters::LLVMValue value)
         {
             const auto plusFloat = emitters::TypedOperator::addFloat;
             function.OperationAndUpdate(_accumValueVar, plusFloat, value);
@@ -167,13 +167,13 @@ namespace nodes
             }
         }
 
-        llvm::Value* GetValueAtPadding(emitters::IRFunctionEmitter& function)
+        emitters::LLVMValue GetValueAtPadding(emitters::IRFunctionEmitter& function)
         {
             assert(_countVar != nullptr && "GetValueAtPadding shouldn't be called for this pooling function");
             return _paddingValue;
         }
 
-        llvm::Value* GetValue(emitters::IRFunctionEmitter& function)
+        emitters::LLVMValue GetValue(emitters::IRFunctionEmitter& function)
         {
             if (_countVar == nullptr)
             {
@@ -186,9 +186,9 @@ namespace nodes
         }
 
     private:
-        llvm::Value* _paddingValue;
-        llvm::Value* _accumValueVar;
-        llvm::Value* _countVar;
+        emitters::LLVMValue _paddingValue;
+        emitters::LLVMValue _accumValueVar;
+        emitters::LLVMValue _countVar;
         int _count;
     };
 
@@ -229,15 +229,15 @@ namespace nodes
     // inputRow, inputColumn, and inputChannel
     template <typename ValueType, template <typename> class PoolingFunctionType>
     template <typename PoolingFunctionT>
-    llvm::Value* PoolingLayerNode<ValueType, PoolingFunctionType>::GetPoolingWindowValue(emitters::IRFunctionEmitter& function,
+    emitters::LLVMValue PoolingLayerNode<ValueType, PoolingFunctionType>::GetPoolingWindowValue(emitters::IRFunctionEmitter& function,
                                                                                          int windowRowBegin,
                                                                                          int windowRowEnd,
                                                                                          int windowColumnBegin,
                                                                                          int windowColumnEnd,
-                                                                                         llvm::Value* inputRow,
-                                                                                         llvm::Value* inputColumn,
-                                                                                         llvm::Value* inputChannel,
-                                                                                         llvm::Value* inputBuffer,
+                                                                                         emitters::LLVMValue inputRow,
+                                                                                         emitters::LLVMValue inputColumn,
+                                                                                         emitters::LLVMValue inputChannel,
+                                                                                         emitters::LLVMValue inputBuffer,
                                                                                          const model::MemoryShape& inputIncrement,
                                                                                          PoolingFunctionT& poolingFunction)
     {
@@ -407,8 +407,8 @@ namespace nodes
     void PoolingLayerNode<ValueType, PoolingFunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         // convenience operator names
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         // Input / output memory layouts
         const auto& inputLayout = this->GetInputMemoryLayout();
@@ -484,7 +484,7 @@ namespace nodes
                 if (maxOutputRow > minOutputRow && maxOutputCol > minOutputCol)
                 {
                     // BUG: explicit by-ref captures of `usesPadding` and `negWindowExtent` are here to work around a GCC bug
-                    function.For(minOutputRow, maxOutputRow, 1, [=, &usesPadding, &negWindowExtent, &poolingFunction](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex1) {
+                    function.For(minOutputRow, maxOutputRow, 1, [=, &usesPadding, &negWindowExtent, &poolingFunction](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex1) {
                         auto outputRow = function.LocalScalar(loopIndex1);
                         auto inputRow = outputRow * function.LocalScalar<int>(stride);
                         if (!usesPadding)
@@ -492,7 +492,7 @@ namespace nodes
                             inputRow = inputRow + function.LocalScalar<int>(-negWindowExtent);
                         }
 
-                        function.For(minOutputCol, maxOutputCol, 1, [=, &poolingFunction, &inputRow](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
+                        function.For(minOutputCol, maxOutputCol, 1, [=, &poolingFunction, &inputRow](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex2) {
                             auto outputColumn = function.LocalScalar(loopIndex2);
                             auto inputColumn = outputColumn * function.LocalScalar<int>(stride);
                             if (!usesPadding)
@@ -500,7 +500,7 @@ namespace nodes
                                 inputColumn = inputColumn + function.LocalScalar<int>(-negWindowExtent);
                             }
 
-                            function.For(outputDepth, [=, &poolingFunction, &inputRow, &inputColumn](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
+                            function.For(outputDepth, [=, &poolingFunction, &inputRow, &inputColumn](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex3) {
                                 auto channel = function.LocalScalar(loopIndex3);
                                 // Get the pooled value
                                 auto pooledValue = GetPoolingWindowValue(function, rowRegionBounds.windowBounds.begin, rowRegionBounds.windowBounds.end, columnRegionBounds.windowBounds.begin, columnRegionBounds.windowBounds.end, inputRow, inputColumn, channel, inputBuffer, inputIncrement, poolingFunction);

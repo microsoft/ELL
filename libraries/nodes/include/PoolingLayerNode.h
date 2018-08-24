@@ -10,6 +10,9 @@
 
 #include "NeuralNetworkLayerNode.h"
 
+// emitters
+#include "LLVMUtilities.h"
+
 // model
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
@@ -66,15 +69,15 @@ namespace nodes
 
     protected:
         template <typename PoolingFunctionT>
-        llvm::Value* GetPoolingWindowValue(emitters::IRFunctionEmitter& function,
+        emitters::LLVMValue GetPoolingWindowValue(emitters::IRFunctionEmitter& function,
                                            int windowRowStart,
                                            int windowRowEnd,
                                            int windowColumnStart,
                                            int windowColumnEnd,
-                                           llvm::Value* inputRow,
-                                           llvm::Value* inputColumn,
-                                           llvm::Value* inputChannel,
-                                           llvm::Value* inputBuffer,
+                                           emitters::LLVMValue inputRow,
+                                           emitters::LLVMValue inputColumn,
+                                           emitters::LLVMValue inputChannel,
+                                           emitters::LLVMValue inputBuffer,
                                            const model::MemoryShape& inputIncrement,
                                            PoolingFunctionT& poolingFunction);
 

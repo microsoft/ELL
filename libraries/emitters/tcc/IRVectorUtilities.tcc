@@ -11,13 +11,13 @@ namespace ell
 namespace emitters
 {
     template <typename ValueType, utilities::IsFloatingPoint<ValueType>>
-    llvm::Value* FillVector(IRFunctionEmitter& function, llvm::VectorType* type, ValueType elementValue)
+    LLVMValue FillVector(IRFunctionEmitter& function, llvm::VectorType* type, ValueType elementValue)
     {
         return llvm::ConstantFP::get(type, elementValue);
     }
 
     template <typename ValueType, utilities::IsIntegral<ValueType>>
-    llvm::Value* FillVector(IRFunctionEmitter& function, llvm::VectorType* type, ValueType elementValue)
+    LLVMValue FillVector(IRFunctionEmitter& function, llvm::VectorType* type, ValueType elementValue)
     {
         return llvm::ConstantInt::get(type, elementValue, true);
     }
@@ -32,9 +32,9 @@ namespace emitters
     //   <6, 8, 10, 12> --> <6, 8> + <10, 12>    ( == <16, 20> )
     //   <16, 20> --> 16 + 20    ( == 36 )
     template <typename ValueType>
-    llvm::Value* HorizontalVectorSum(IRFunctionEmitter& function, llvm::Value* vectorValue)
+    LLVMValue HorizontalVectorSum(IRFunctionEmitter& function, LLVMValue vectorValue)
     {
-        llvm::Type* type = vectorValue->getType();
+        LLVMType type = vectorValue->getType();
         assert(type->isVectorTy() && "Must have vector type");
         llvm::VectorType* vecType = llvm::cast<llvm::VectorType>(type);
         assert(vecType != nullptr);

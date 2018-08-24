@@ -219,7 +219,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void LSTMNode<ValueType>::ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* dataValue, size_t dataLength)
+    void LSTMNode<ValueType>::ApplySoftmax(emitters::IRFunctionEmitter& function, emitters::LLVMValue dataValue, size_t dataLength)
     {
         auto data = function.LocalArray(dataValue);
         auto sum = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), 1));
@@ -237,7 +237,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void LSTMNode<ValueType>::ApplyActivation(emitters::IRFunctionEmitter& function, const ActivationType& activation, llvm::Value* data, size_t dataLength)
+    void LSTMNode<ValueType>::ApplyActivation(emitters::IRFunctionEmitter& function, const ActivationType& activation, emitters::LLVMValue data, size_t dataLength)
     {
         auto activationFunction = GetNodeActivationFunction<ValueType>(activation);
         function.For(dataLength, [&](emitters::IRFunctionEmitter& function, auto i) {
@@ -258,7 +258,7 @@ namespace nodes
         {
             outputSize = hiddenSize;
         }
-        
+
         // Global state (in addition to output)
         emitters::IRModuleEmitter& module = function.GetModule();
         emitters::VariableType varType = emitters::GetVariableType<ValueType>();
@@ -278,7 +278,7 @@ namespace nodes
         auto outputBias = compiler.EnsurePortEmitted(this->outputBias);
 
         // Get LLVM reference for node output
-        llvm::Value* output = compiler.EnsurePortEmitted(this->output);
+        emitters::LLVMValue output = compiler.EnsurePortEmitted(this->output);
 
         // Allocate global buffer for hidden state
         auto hiddenStateVariable = module.Variables().AddVectorVariable(emitters::VariableScope::global, varType, hiddenSize);
@@ -312,7 +312,7 @@ namespace nodes
         ApplyActivation(function, _activation, ctNew, hiddenSize);
 
         // Ct = ft * Ct-1 + it * Ct~
-        function.For(hiddenSize, [ctActualValue, ft, it, ctNew](emitters::IRFunctionEmitter& function, llvm::Value* i) {
+        function.For(hiddenSize, [ctActualValue, ft, it, ctNew](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             auto index = function.LocalScalar(i);
             auto ctActualVal = ctActualValue[index];
             auto ftVal = ft[index];
@@ -366,9 +366,9 @@ namespace nodes
     }
 
         // Explicit specialization
-template class LSTMLayerNode<float>;  
-template class LSTMLayerNode<double>; 
-template class LSTMNode<float>;       
+template class LSTMLayerNode<float>;
+template class LSTMLayerNode<double>;
+template class LSTMNode<float>;
 template class LSTMNode<double>;
 
 } // nodes

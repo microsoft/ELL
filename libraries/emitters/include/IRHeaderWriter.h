@@ -7,9 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// llvm
-#include <llvm/IR/Function.h>
-#include <llvm/IR/Type.h>
+#include "LLVMUtilities.h"
 
 // stl
 #include <ostream>
@@ -44,7 +42,7 @@ namespace emitters
     ///
     /// <param name="os"> The output stream to write to. </param>
     /// <param name="type"> Pointer to the llvm type. </param>
-    void WriteLLVMType(std::ostream& os, llvm::Type* t);
+    void WriteLLVMType(std::ostream& os, LLVMType t);
 
     /// <summary> Globally searches and replaces a delimiter in a given text. </summary>
     ///

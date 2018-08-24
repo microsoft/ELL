@@ -28,7 +28,7 @@ namespace nodes
         // Low-level code-generation
         //
         template <typename ValueType>
-        void EmitSimpleConvolutionCode(IRFunctionEmitter& function, llvm::Value* input, llvm::Value* filterWeights, const PortMemoryLayout& inputLayout, const PortMemoryLayout& outputLayout, int filterSize, int stride, llvm::Value* result)
+        void EmitSimpleConvolutionCode(IRFunctionEmitter& function, LLVMValue input, LLVMValue filterWeights, const PortMemoryLayout& inputLayout, const PortMemoryLayout& outputLayout, int filterSize, int stride, LLVMValue result)
         {
             // input is a d x (w+2p) x (h+2p) array
             // reshaped, it's a d*(w+2p)) x (h+2p) array == d*(w+k-1) x (h+k-1)
@@ -47,7 +47,7 @@ namespace nodes
 
             // For each filter
             const auto numFilters = outputLayout.GetActiveSize(2);
-            function.ParallelFor(numFilters, { input, filterWeights, result }, [inputLayout, outputLayout, inputMemoryIncrements, filterSize, stride](IRFunctionEmitter& function, IRLocalScalar filterIndex, const std::vector<llvm::Value*>& capturedValues) {
+            function.ParallelFor(numFilters, { input, filterWeights, result }, [inputLayout, outputLayout, inputMemoryIncrements, filterSize, stride](IRFunctionEmitter& function, IRLocalScalar filterIndex, const std::vector<LLVMValue>& capturedValues) {
                 auto input = capturedValues[0];
                 auto filterWeights = capturedValues[1];
                 auto result = capturedValues[2];
@@ -55,12 +55,12 @@ namespace nodes
 
                 // For each output row
                 const auto outputRows = outputLayout.GetActiveSize(0);
-                function.For(outputRows, [filterIndex, input, filterWeights, inputLayout, outputLayout, inputMemoryIncrements, outputTensor, filterSize, stride](IRFunctionEmitter& function, llvm::Value* loopIndex2) {
+                function.For(outputRows, [filterIndex, input, filterWeights, inputLayout, outputLayout, inputMemoryIncrements, outputTensor, filterSize, stride](IRFunctionEmitter& function, LLVMValue loopIndex2) {
                     auto outputRow = function.LocalScalar(loopIndex2);
 
                     // For each output column
                     const auto outputColumns = outputLayout.GetActiveSize(1);
-                    function.For(outputColumns, [outputRow, filterIndex, input, filterWeights, inputLayout, inputMemoryIncrements, outputTensor, filterSize, stride](IRFunctionEmitter& function, llvm::Value* loopIndex3) {
+                    function.For(outputColumns, [outputRow, filterIndex, input, filterWeights, inputLayout, inputMemoryIncrements, outputTensor, filterSize, stride](IRFunctionEmitter& function, LLVMValue loopIndex3) {
                         auto outputColumn = function.LocalScalar(loopIndex3);
 
                         const bool canCombineColumns = (inputLayout.GetActiveSize(1) == inputLayout.GetStride(1)) && (stride == 1);
@@ -105,7 +105,7 @@ namespace nodes
         }
 
         template<typename ValueType>
-        void EmitSimpleDepthwiseSeparableConvolutionCode(IRFunctionEmitter& function, llvm::Value* input, llvm::Value* filterWeights, const PortMemoryLayout& inputLayout, const PortMemoryLayout& outputLayout, int filterSize, int stride, llvm::Value* result)
+        void EmitSimpleDepthwiseSeparableConvolutionCode(IRFunctionEmitter& function, LLVMValue input, LLVMValue filterWeights, const PortMemoryLayout& inputLayout, const PortMemoryLayout& outputLayout, int filterSize, int stride, LLVMValue result)
         {
             const auto inputDepth = inputLayout.GetActiveSize(2);
             const auto inputPadding = inputLayout.GetOffset(0);
@@ -122,7 +122,7 @@ namespace nodes
             // For each filter
             // For each output row
             const auto outputRows = outputLayout.GetActiveSize(0);
-            function.ParallelFor(outputRows, { input, filterWeights, result }, [inputLayout, outputLayout, filterSize, stride](IRFunctionEmitter& function, auto outputRow, const std::vector<llvm::Value*>& capturedValues) {
+            function.ParallelFor(outputRows, { input, filterWeights, result }, [inputLayout, outputLayout, filterSize, stride](IRFunctionEmitter& function, auto outputRow, const std::vector<LLVMValue>& capturedValues) {
                 auto input = capturedValues[0];
                 auto filterWeights = capturedValues[1];
                 auto result = capturedValues[2];
@@ -285,14 +285,14 @@ namespace nodes
     {
         // input is a d x (w+2p) x (h+2p) array
         // reshaped, it's a d*(w+2p)) x (h+2p) array == d*(w+k-1) x (h+k-1)
-        llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
+        LLVMValue pInput = compiler.EnsurePortEmitted(this->input);
 
         // weights is f x k x k x d array
         // reshaped, it's (f*k) x (k*d) or f x k x (k*d)
-        llvm::Value* pWeights = compiler.EnsurePortEmitted(this->filterWeights);
+        LLVMValue pWeights = compiler.EnsurePortEmitted(this->filterWeights);
 
         // output is a (w+2p) x (h+2p) x f array
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
+        LLVMValue pOutput = compiler.EnsurePortEmitted(this->output);
 
         // Model parameters
         const auto inputLayout = this->GetInputMemoryLayout();

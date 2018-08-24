@@ -17,14 +17,14 @@ namespace emitters
     // Functions
     //
 
-    llvm::StructType* GetTaskArgStructType(IRModuleEmitter& module, llvm::Function* taskFunction)
+    llvm::StructType* GetTaskArgStructType(IRModuleEmitter& module, LLVMFunction taskFunction)
     {
-        std::vector<llvm::Type*> argTypes;
+        std::vector<LLVMType> argTypes;
         std::transform(taskFunction->arg_begin(), taskFunction->arg_end(), std::back_inserter(argTypes), [](auto& arg) { return arg.getType(); });
         return module.GetAnonymousStructType(argTypes);
     }
 
-    llvm::Function* GetTaskWrapperFunction(IRModuleEmitter& module, llvm::Function* taskFunction)
+    LLVMFunction GetTaskWrapperFunction(IRModuleEmitter& module, LLVMFunction taskFunction)
     {
         auto& context = module.GetLLVMContext();
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
@@ -47,7 +47,7 @@ namespace emitters
 
             // Should be a 1:1 correspondence between args and fields in the struct
             auto numFields = taskArgType->getNumElements();
-            std::vector<llvm::Value*> taskFunctionArgs;
+            std::vector<LLVMValue> taskFunctionArgs;
 
             for (size_t fieldIndex = 0; fieldIndex < numFields; ++fieldIndex)
             {
@@ -70,7 +70,7 @@ namespace emitters
         return taskWrapperFunction.GetFunction();
     }
 
-    llvm::Function* GetTaskWrapperFunction(IRModuleEmitter& module, IRFunctionEmitter& taskFunction)
+    LLVMFunction GetTaskWrapperFunction(IRModuleEmitter& module, IRFunctionEmitter& taskFunction)
     {
         return GetTaskWrapperFunction(module, taskFunction.GetFunction());
     }

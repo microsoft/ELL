@@ -65,7 +65,7 @@ namespace emitters
 
                 auto workerThreadFunction = this->GetWorkerThreadFunction(); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
                 llvm::ConstantPointerNull* nullAttr = initThreadPoolFunction.NullPointer(int8PtrType);
-                initThreadPoolFunction.For(_maxThreads, [this, int8PtrType, nullAttr, workerThreadFunction](auto& initThreadPoolFunction, llvm::Value* index) {
+                initThreadPoolFunction.For(_maxThreads, [this, int8PtrType, nullAttr, workerThreadFunction](auto& initThreadPoolFunction, LLVMValue index) {
                     auto threadPtr = initThreadPoolFunction.PointerOffset(_threads, index);
                     initThreadPoolFunction.PthreadCreate(threadPtr, nullAttr, workerThreadFunction, initThreadPoolFunction.CastPointer(_taskQueue.GetDataStruct(), int8PtrType));
                 });
@@ -89,7 +89,7 @@ namespace emitters
         _module.AddFinalizationFunction(shutDownThreadPoolFunction);
     }
 
-    IRThreadPoolTaskArray& IRThreadPool::AddTasks(IRFunctionEmitter& function, llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments)
+    IRThreadPoolTaskArray& IRThreadPool::AddTasks(IRFunctionEmitter& function, LLVMFunction taskFunction, const std::vector<std::vector<LLVMValue>>& arguments)
     {
         // Call Initialize() the first time we're called --- this adds global init code to the module
         if (!IsInitialized())
@@ -114,7 +114,7 @@ namespace emitters
         });
     }
 
-    llvm::Function* IRThreadPool::GetWorkerThreadFunction()
+    LLVMFunction IRThreadPool::GetWorkerThreadFunction()
     {
         assert(IsInitialized());
 
@@ -132,7 +132,7 @@ namespace emitters
                 workerThreadFunction.If(
                         workerThreadFunction.Operator(TypedOperator::logicalOr, task.IsNull(workerThreadFunction), _taskQueue.GetShutdownFlag(workerThreadFunction)),
                         [notDoneVar](auto& workerThreadFunction) {
-                        workerThreadFunction.Store(notDoneVar, workerThreadFunction.FalseBit());                        
+                        workerThreadFunction.Store(notDoneVar, workerThreadFunction.FalseBit());
                     })
                     .Else([this, &task](IRFunctionEmitter& workerThreadFunction) {
                         task.Run(workerThreadFunction);
@@ -196,7 +196,7 @@ namespace emitters
 
         // Initialize the fields
         llvm::ConstantPointerNull* nullAttr = function.NullPointer(int8PtrType);
-        llvm::Value* errCode = function.PthreadMutexInit(queueMutex, nullAttr);
+        LLVMValue errCode = function.PthreadMutexInit(queueMutex, nullAttr);
         errCode = function.PthreadCondInit(workAvailableCondVar, nullAttr);
         errCode = function.PthreadCondInit(workFinishedCondVar, nullAttr);
         UNUSED(errCode);
@@ -207,7 +207,7 @@ namespace emitters
         _tasks.Initialize(function);
     }
 
-    IRThreadPoolTaskArray& IRThreadPoolTaskQueue::StartTasks(IRFunctionEmitter& function, llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments)
+    IRThreadPoolTaskArray& IRThreadPoolTaskQueue::StartTasks(IRFunctionEmitter& function, LLVMFunction taskFunction, const std::vector<std::vector<LLVMValue>>& arguments)
     {
         assert(IsInitialized());
 
@@ -263,13 +263,13 @@ namespace emitters
         return _queueData != nullptr;
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::IsEmpty(IRFunctionEmitter& function) const
+    LLVMValue IRThreadPoolTaskQueue::IsEmpty(IRFunctionEmitter& function) const
     {
         assert(IsInitialized());
         return function.Comparison(TypedComparison::equals, GetUnscheduledCount(function), function.Literal<int>(0));
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::IsFinished(IRFunctionEmitter& function) const
+    LLVMValue IRThreadPoolTaskQueue::IsFinished(IRFunctionEmitter& function) const
     {
         assert(IsInitialized());
         return function.Comparison(TypedComparison::equals, GetUnfinishedCount(function), function.Literal<int>(0));
@@ -311,50 +311,50 @@ namespace emitters
         auto boolType = llvm::Type::getInt1Ty(context);
         auto int32Type = llvm::Type::getInt32Ty(context);
 
-        std::vector<llvm::Type*> fieldTypes = { mutexType, conditionVarType, conditionVarType, int32Type, int32Type, boolType };
+        std::vector<LLVMType> fieldTypes = { mutexType, conditionVarType, conditionVarType, int32Type, int32Type, boolType };
         return module.GetAnonymousStructType(fieldTypes);
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::GetQueueMutexPointer(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTaskQueue::GetQueueMutexPointer(IRFunctionEmitter& function)
     {
         assert(IsInitialized());
         return function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::queueMutex));
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::GetWorkAvailableConditionVariablePointer(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTaskQueue::GetWorkAvailableConditionVariablePointer(IRFunctionEmitter& function)
     {
         assert(IsInitialized());
         return function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::workAvailableCondVar));
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::GetWorkFinishedConditionVariablePointer(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTaskQueue::GetWorkFinishedConditionVariablePointer(IRFunctionEmitter& function)
     {
         assert(IsInitialized());
         return function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::workFinishedCondVar));
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::GetUnscheduledCount(IRFunctionEmitter& function) const
+    LLVMValue IRThreadPoolTaskQueue::GetUnscheduledCount(IRFunctionEmitter& function) const
     {
         assert(IsInitialized());
         auto fieldPtr = function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::unscheduledCount));
         return function.Load(fieldPtr);
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::GetUnfinishedCount(IRFunctionEmitter& function) const
+    LLVMValue IRThreadPoolTaskQueue::GetUnfinishedCount(IRFunctionEmitter& function) const
     {
         assert(IsInitialized());
         auto fieldPtr = function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::unfinishedCount));
         return function.Load(fieldPtr);
     }
 
-    void IRThreadPoolTaskQueue::SetInitialCount(IRFunctionEmitter& function, llvm::Value* numTasks)
+    void IRThreadPoolTaskQueue::SetInitialCount(IRFunctionEmitter& function, LLVMValue numTasks)
     {
         assert(IsInitialized());
         function.Store(function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::unscheduledCount)), numTasks);
         function.Store(function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::unfinishedCount)), numTasks);
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::DecrementCountField(IRFunctionEmitter& function, llvm::Value* fieldPtr)
+    LLVMValue IRThreadPoolTaskQueue::DecrementCountField(IRFunctionEmitter& function, LLVMValue fieldPtr)
     {
         auto count = function.Load(fieldPtr);
         auto newCount = function.Operator(TypedOperator::subtract, count, function.Literal<int>(1));
@@ -365,21 +365,21 @@ namespace emitters
         return newCount;
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::DecrementUnscheduledTasks(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTaskQueue::DecrementUnscheduledTasks(IRFunctionEmitter& function)
     {
         assert(IsInitialized());
         auto fieldPtr = function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::unscheduledCount));
         return DecrementCountField(function, fieldPtr);
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::DecrementUnfinishedTasks(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTaskQueue::DecrementUnfinishedTasks(IRFunctionEmitter& function)
     {
         assert(IsInitialized());
         auto fieldPtr = function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::unfinishedCount));
         return DecrementCountField(function, fieldPtr);
     }
 
-    llvm::Value* IRThreadPoolTaskQueue::GetShutdownFlag(IRFunctionEmitter& function) const
+    LLVMValue IRThreadPoolTaskQueue::GetShutdownFlag(IRFunctionEmitter& function) const
     {
         assert(IsInitialized());
         auto fieldPtr = function.GetStructFieldPointer(_queueData, static_cast<int>(Fields::shutdownFlag));
@@ -410,7 +410,7 @@ namespace emitters
     //
     // IRThreadPoolTask
     //
-    IRThreadPoolTask::IRThreadPoolTask(llvm::Value* wrappedTaskFunctionPtr, llvm::Value* argsStructPtr, llvm::Value* returnValuePtr, IRThreadPoolTaskArray* taskArray)
+    IRThreadPoolTask::IRThreadPoolTask(LLVMValue wrappedTaskFunctionPtr, LLVMValue argsStructPtr, LLVMValue returnValuePtr, IRThreadPoolTaskArray* taskArray)
         : _taskFunctionPtr(wrappedTaskFunctionPtr), _argsStruct(argsStructPtr), _returnValuePtr(returnValuePtr), _taskArray(taskArray)
     {
         if (_taskFunctionPtr == nullptr)
@@ -438,12 +438,12 @@ namespace emitters
         _taskArray->WaitAll(function);
     }
 
-    llvm::Value* IRThreadPoolTask::GetReturnValue(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTask::GetReturnValue(IRFunctionEmitter& function)
     {
         return function.Load(_returnValuePtr);
     }
 
-    llvm::Value* IRThreadPoolTask::IsNull(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTask::IsNull(IRFunctionEmitter& function)
     {
         auto& context = function.GetLLVMContext();
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
@@ -479,38 +479,38 @@ namespace emitters
         auto int8PtrPtrType = int8PtrType->getPointerTo();
         auto int32Type = llvm::Type::getInt32Ty(context);
 
-        std::vector<llvm::Type*> fieldTypes = { int8PtrType, int8PtrPtrType, int8PtrType, int32Type };
+        std::vector<LLVMType> fieldTypes = { int8PtrType, int8PtrPtrType, int8PtrType, int32Type };
         return module.GetAnonymousStructType(fieldTypes);
     }
 
-    llvm::Value* IRThreadPoolTaskArray::GetTaskFunctionPointer(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTaskArray::GetTaskFunctionPointer(IRFunctionEmitter& function)
     {
         return function.GetStructFieldPointer(_taskArrayData, static_cast<int>(Fields::functionPtr));
     }
 
-    llvm::Value* IRThreadPoolTaskArray::GetReturnValuesStoragePointer(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTaskArray::GetReturnValuesStoragePointer(IRFunctionEmitter& function)
     {
         return function.GetStructFieldPointer(_taskArrayData, static_cast<int>(Fields::returnValues));
     }
 
-    llvm::Value* IRThreadPoolTaskArray::GetTaskArgsStoragePointer(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTaskArray::GetTaskArgsStoragePointer(IRFunctionEmitter& function)
     {
         return function.GetStructFieldPointer(_taskArrayData, static_cast<int>(Fields::argStorage));
     }
 
-    llvm::Value* IRThreadPoolTaskArray::GetTaskArgsStructSize(IRFunctionEmitter& function)
+    LLVMValue IRThreadPoolTaskArray::GetTaskArgsStructSize(IRFunctionEmitter& function)
     {
         auto ptr = function.GetStructFieldPointer(_taskArrayData, static_cast<int>(Fields::argStructSize));
         return function.Load(ptr);
     }
 
-    void IRThreadPoolTaskArray::SetTaskArgsStructSize(IRFunctionEmitter& function, llvm::Value* size)
+    void IRThreadPoolTaskArray::SetTaskArgsStructSize(IRFunctionEmitter& function, LLVMValue size)
     {
         auto ptr = function.GetStructFieldPointer(_taskArrayData, static_cast<int>(Fields::argStructSize));
         function.Store(ptr, size);
     }
 
-    void IRThreadPoolTaskArray::SetTasks(IRFunctionEmitter& function, llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& taskArgs)
+    void IRThreadPoolTaskArray::SetTasks(IRFunctionEmitter& function, LLVMFunction taskFunction, const std::vector<std::vector<LLVMValue>>& taskArgs)
     {
         // Here we need to fill in 3 things:
         // 1) the pointer to the task function shared by all tasks
@@ -574,7 +574,7 @@ namespace emitters
         return GetTask(function, function.Literal<int>(taskIndex));
     }
 
-    IRThreadPoolTask IRThreadPoolTaskArray::GetTask(IRFunctionEmitter& function, llvm::Value* taskIndex)
+    IRThreadPoolTask IRThreadPoolTaskArray::GetTask(IRFunctionEmitter& function, LLVMValue taskIndex)
     {
         assert(_taskArrayData != nullptr);
 
@@ -585,9 +585,9 @@ namespace emitters
         auto taskFunctionType = llvm::FunctionType::get(int8PtrType, { int8PtrType }, false);
 
         // Allocate some local variables (for conditional values)
-        llvm::Value* taskFunctionVar = function.Variable(int8PtrType, "taskFunction");
-        llvm::Value* taskDataVar = function.Variable(int8PtrType, "taskArgStorage");
-        llvm::Value* taskReturnValueVar = function.Variable(int8PtrPtrType, "taskReturnValue");
+        LLVMValue taskFunctionVar = function.Variable(int8PtrType, "taskFunction");
+        LLVMValue taskDataVar = function.Variable(int8PtrType, "taskArgStorage");
+        LLVMValue taskReturnValueVar = function.Variable(int8PtrPtrType, "taskReturnValue");
 
         auto isNotNegative = function.Comparison(TypedComparison::greaterThanOrEquals, taskIndex, function.Literal<int>(0));
         function.If(isNotNegative, [=](auto& function) {

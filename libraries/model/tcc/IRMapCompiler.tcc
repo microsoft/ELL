@@ -19,7 +19,7 @@ namespace ell
 namespace model
 {
     template <typename ValueType>
-    llvm::Value* IRMapCompiler::EnsurePortEmitted(const OutputPortBase& port, ValueType initialValue)
+    emitters::LLVMValue IRMapCompiler::EnsurePortEmitted(const OutputPortBase& port, ValueType initialValue)
     {
         using namespace logging;
 

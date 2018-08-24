@@ -20,12 +20,12 @@ namespace ell
 {
 namespace emitters
 {
-    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, llvm::Value* data, std::vector<int> extents)
+    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, LLVMValue data, std::vector<int> extents)
         : IRLocalMultidimArray(function, data, extents, extents)
     {
     }
 
-    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, llvm::Value* data, std::vector<int> extents, std::vector<int> memorySize)
+    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, LLVMValue data, std::vector<int> extents, std::vector<int> memorySize)
         : function(function), data(data), extents(extents)
     {
         strides.reserve(extents.size());
@@ -92,12 +92,12 @@ namespace emitters
         return function.LocalPointer(function.PointerOffset(data, offset));
     }
 
-    IRLocalMultidimArray::IRLocalArrayElement::IRLocalArrayElement(emitters::IRFunctionEmitter& function, llvm::Value* data, llvm::Value* offset)
+    IRLocalMultidimArray::IRLocalArrayElement::IRLocalArrayElement(emitters::IRFunctionEmitter& function, LLVMValue data, LLVMValue offset)
         : _function(function), _data(data), _offset(offset) {}
 
     IRLocalMultidimArray::IRLocalArrayElement& IRLocalMultidimArray::IRLocalArrayElement::operator=(const IRLocalArrayElement& value)
     {
-        // cast the rhs to IRLocalScalar, which decomposes into llvm::Value* thanks to the overload below
+        // cast the rhs to IRLocalScalar, which decomposes into LLVMValue thanks to the overload below
         *this = static_cast<IRLocalScalar>(value);
 
         return *this;
@@ -108,7 +108,7 @@ namespace emitters
         return _function.LocalScalar(_function.ValueAt(_data, _offset));
     }
 
-    IRLocalMultidimArray::IRLocalArrayElement& IRLocalMultidimArray::IRLocalArrayElement::operator=(llvm::Value* value)
+    IRLocalMultidimArray::IRLocalArrayElement& IRLocalMultidimArray::IRLocalArrayElement::operator=(LLVMValue value)
     {
         _function.SetValueAt(_data, _offset, value);
 

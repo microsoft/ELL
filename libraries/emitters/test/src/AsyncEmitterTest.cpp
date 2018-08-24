@@ -64,8 +64,8 @@ void TestIRAsyncTask(bool parallel)
     std::string syncFunctionName = "TestSync";
     auto syncFunction = module.BeginFunction(syncFunctionName, VariableType::Float, args);
     {
-        llvm::Value* syncArg = syncFunction.GetFunctionArgument("x");
-        llvm::Value* syncSum = syncFunction.Operator(emitters::GetAddForValueType<float>(), syncArg, syncFunction.Literal<float>(5.0));
+        LLVMValue syncArg = syncFunction.GetFunctionArgument("x");
+        LLVMValue syncSum = syncFunction.Operator(emitters::GetAddForValueType<float>(), syncArg, syncFunction.Literal<float>(5.0));
         syncFunction.Return(syncSum);
     }
     module.EndFunction();
@@ -77,7 +77,7 @@ void TestIRAsyncTask(bool parallel)
     {
         auto arguments = taskFunction.Arguments().begin();
         auto argVal = &(*arguments++);
-        llvm::Value* asyncSum = taskFunction.Operator(emitters::GetAddForValueType<float>(), argVal, taskFunction.Literal<float>(5.0));
+        LLVMValue asyncSum = taskFunction.Operator(emitters::GetAddForValueType<float>(), argVal, taskFunction.Literal<float>(5.0));
         taskFunction.Return(asyncSum);
     }
     module.EndFunction();
@@ -85,7 +85,7 @@ void TestIRAsyncTask(bool parallel)
     std::string asyncFunctionName = "TestAsync";
     auto asyncInvokerFunction = module.BeginFunction(asyncFunctionName, VariableType::Float, args);
     {
-        llvm::Value* asyncArg = asyncInvokerFunction.GetFunctionArgument("x");
+        LLVMValue asyncArg = asyncInvokerFunction.GetFunctionArgument("x");
         auto task = asyncInvokerFunction.StartAsyncTask(taskFunction, { asyncArg });
         task.Wait(asyncInvokerFunction);
         asyncInvokerFunction.Return(task.GetReturnValue(asyncInvokerFunction));
@@ -131,8 +131,8 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
 
     // Types
     auto& context = module.GetLLVMContext();
-    llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
-    llvm::Type* int32PtrType = int32Type->getPointerTo();
+    LLVMType int32Type = llvm::Type::getInt32Ty(context);
+    LLVMType int32PtrType = int32Type->getPointerTo();
 
     // Common stuff for both functions
     NamedLLVMTypeList args;
@@ -176,7 +176,7 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
         const int numTasks = 5;
         const int taskSize = (arraySize - 1) / numTasks + 1;
         auto data = testThreadPoolFunction.Variable(int32Type, arraySize);
-        std::vector<std::vector<llvm::Value*>> taskArrayArgs;
+        std::vector<std::vector<LLVMValue>> taskArrayArgs;
         for (int index = 0; index < numTasks; ++index)
         {
             auto begin = index * taskSize;
@@ -189,12 +189,12 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
 
         tasks.WaitAll(testThreadPoolFunction);
         testThreadPoolFunction.Print("[Main]    \tDone waiting for tasks\n");
-        
-        testThreadPoolFunction.For(arraySize, [data](IRFunctionEmitter& testThreadPoolFunction, llvm::Value* i) {
+
+        testThreadPoolFunction.For(arraySize, [data](IRFunctionEmitter& testThreadPoolFunction, LLVMValue i) {
             testThreadPoolFunction.Printf("[Main]    \tdata[%d] = %d\n", {i, testThreadPoolFunction.ValueAt(data, i)});
         });
 
-        llvm::Value* sum = nullptr;
+        LLVMValue sum = nullptr;
         for (size_t i = 0; i < numTasks; ++i)
         {
             auto task = tasks.GetTask(testThreadPoolFunction, i);
@@ -247,7 +247,7 @@ void TestParallelFor(int begin, int end, int increment, bool parallel)
 
     // Types
     auto& context = module.GetLLVMContext();
-    llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
+    LLVMType int32Type = llvm::Type::getInt32Ty(context);
 
     // Function to run test
     std::string functionName = "TestParallelFor";
@@ -257,18 +257,18 @@ void TestParallelFor(int begin, int end, int increment, bool parallel)
         auto data = testParallelForFunction.GetModule().GlobalArray("data", int32Type, arraySize);
 
         // initialize the array to -1
-        testParallelForFunction.For(arraySize, [data](IRFunctionEmitter& function, llvm::Value* i) {
+        testParallelForFunction.For(arraySize, [data](IRFunctionEmitter& function, LLVMValue i) {
             function.SetValueAt(data, i, function.Literal<int>(-1));
         });
 
-        testParallelForFunction.ParallelFor(begin, end, increment, {}, { data }, [](IRFunctionEmitter& function, llvm::Value* i, std::vector<llvm::Value*> capturedValues) {
+        testParallelForFunction.ParallelFor(begin, end, increment, {}, { data }, [](IRFunctionEmitter& function, LLVMValue i, std::vector<LLVMValue> capturedValues) {
             auto data = capturedValues[0];
             function.SetValueAt(data, i, i);
         });
 
         auto result = testParallelForFunction.Variable(int32Type, "result");
         testParallelForFunction.Store(result, testParallelForFunction.Literal<int>(0));
-        testParallelForFunction.For(arraySize, [begin, end, increment, data, result](IRFunctionEmitter& function, llvm::Value* i) {
+        testParallelForFunction.For(arraySize, [begin, end, increment, data, result](IRFunctionEmitter& function, LLVMValue i) {
             auto index = function.LocalScalar(i);
             auto val = function.LocalScalar(function.ValueAt(data, index));
             function.If((index >= begin) && (index < end) && (((val-begin) % increment) == 0) && (val != index), [result](IRFunctionEmitter& function) {

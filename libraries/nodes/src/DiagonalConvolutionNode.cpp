@@ -199,14 +199,14 @@ namespace nodes
     {
         // input is a d x (w+2p) x (h+2p) array
         // reshaped, it's a d*(w+2p)) x (h+2p) array == d*(w+k-1) x (h+k-1)
-        llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
+        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(this->input);
 
         // weights is f x k x k x d array
         // reshaped, it's (f*k) x (k*d) or f x k x (k*d)
-        llvm::Value* pWeights = compiler.EnsurePortEmitted(this->filterWeights);
+        emitters::LLVMValue pWeights = compiler.EnsurePortEmitted(this->filterWeights);
 
         // output is a (w+2p) x (h+2p) x f array
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
+        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(this->output);
 
         // Model parameters
         const auto inputLayout = this->GetInputMemoryLayout();
@@ -239,7 +239,7 @@ namespace nodes
 
         const auto stackedInputStride = stackedInputWidth * inputDepth;
         const auto inputStride = paddedWidth * inputDepth;
-        llvm::Value* pStackedInput = nullptr;
+        emitters::LLVMValue pStackedInput = nullptr;
         if (stackSize != 1)
         {
             auto stackedInputVariableName = "stackedInput_" + GetInternalStateIdentifier();
@@ -256,12 +256,12 @@ namespace nodes
             // Now skip past the first p rows of padding and copy the rest
             auto inputPtr = function.PointerOffset(pInput, inputPadding * inputStride);
             auto stackedInputPtr = function.PointerOffset(pStackedInput, inputPadding * stackedInputStride);
-            function.For(stackSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex1) {
+            function.For(stackSize, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex1) {
                 auto stackIndex = function.LocalScalar(loopIndex1);
                 auto inputColOffset = stackIndex * function.LocalScalar<int>(columnsPerStack * inputDepth);
                 auto stackBeginOffset = stackIndex * function.LocalScalar<int>((inputHeight + inputPadding) * stackedInputStride);
                 const auto numRows = inputHeight + inputPadding;
-                function.For(numRows, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
+                function.For(numRows, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex2) {
                     auto rowIndex = function.LocalScalar(loopIndex2);
                     auto inputOffset = inputColOffset + (rowIndex * function.LocalScalar<int>(inputStride));
                     auto outputOffset = stackBeginOffset + (rowIndex * function.LocalScalar<int>(stackedInputStride));
@@ -282,12 +282,12 @@ namespace nodes
         auto scratchPtr = function.PointerOffset(scratch, 0); // Convert LLVM array to pointer
 
         const size_t numConvolutions = (inputWidth - 1) / stackSize + 1;
-        function.For(numConvolutions, [inputDepth, pStackedInput, pWeights, scratchPtr, inputPadding, inputHeight, outputTensor, numFilters, batchSize, filterSize, stackedInputHeight, stackSize, stackedInputWidth, numConvolutions](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex1) {
+        function.For(numConvolutions, [inputDepth, pStackedInput, pWeights, scratchPtr, inputPadding, inputHeight, outputTensor, numFilters, batchSize, filterSize, stackedInputHeight, stackSize, stackedInputWidth, numConvolutions](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex1) {
             auto j = function.LocalScalar(loopIndex1); // j = start column for convolution
 
             // Get the submatrix for Vj
             auto inputOffset = j * function.LocalScalar<int>(inputDepth);
-            llvm::Value* Vj = function.PointerOffset(pStackedInput, inputOffset);
+            emitters::LLVMValue Vj = function.PointerOffset(pStackedInput, inputOffset);
 
             // now for each batch of filter weights
             for (int filterStart = 0; filterStart < numFilters; filterStart += batchSize)
@@ -296,7 +296,7 @@ namespace nodes
 
                 // Get the submatrix for Wl
                 auto weightsOffset = filterStart * filterSize;
-                llvm::Value* Wl = function.PointerOffset(pWeights, weightsOffset);
+                emitters::LLVMValue Wl = function.PointerOffset(pWeights, weightsOffset);
 
                 // int m = paddedHeight;
                 const int m = stackedInputHeight;
@@ -310,16 +310,16 @@ namespace nodes
                 function.CallGEMM<ValueType>(false, true, m, n, k, Vj, lda, Wl, ldb, scratchPtr, ldc);
 
                 // S loop here as well
-                function.For(stackSize, [inputPadding, j, numFiltersToUse, numConvolutions, filterStart, inputHeight, filterSize, scratchPtr, outputTensor, batchSize](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex2) {
+                function.For(stackSize, [inputPadding, j, numFiltersToUse, numConvolutions, filterStart, inputHeight, filterSize, scratchPtr, outputTensor, batchSize](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex2) {
                     auto stackIndex = function.LocalScalar(loopIndex2);
                     auto stackRowOffset = stackIndex * function.LocalScalar<int>(inputHeight + inputPadding);
                     auto outputColumn = (stackIndex * function.LocalScalar<int>(numConvolutions)) + j;
 
-                    function.For(numFiltersToUse, [filterStart, inputHeight, stackRowOffset, filterSize, scratchPtr, outputColumn, outputTensor, batchSize](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex3) {
+                    function.For(numFiltersToUse, [filterStart, inputHeight, stackRowOffset, filterSize, scratchPtr, outputColumn, outputTensor, batchSize](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex3) {
                         auto l = function.LocalScalar(loopIndex3); // batchFilterIndex
                         auto filterIndex = function.LocalScalar<int>(filterStart) + l;
 
-                        function.For(inputHeight, [stackRowOffset, filterSize, l, scratchPtr, outputColumn, filterIndex, batchSize, outputTensor](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex4) {
+                        function.For(inputHeight, [stackRowOffset, filterSize, l, scratchPtr, outputColumn, filterIndex, batchSize, outputTensor](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex4) {
                             auto startRow = function.LocalScalar(loopIndex4);
                             auto stackStartRow = stackRowOffset + startRow;
                             auto sum = function.LocalScalar();

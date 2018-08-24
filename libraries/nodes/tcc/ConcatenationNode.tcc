@@ -34,7 +34,7 @@ namespace nodes
         assert(GetPortVariableType(_input) == GetPortVariableType(_output));
 
         auto inputIsInputNode = (dynamic_cast<const model::InputNodeBase*>(_input.GetInputElement(0).ReferencedPort()->GetNode()) != nullptr);
-        // TODO: re-enable this branch when scalar port bug is fixed 
+        // TODO: re-enable this branch when scalar port bug is fixed
         if (IsPureVector(_input) && _input.Size() != 1 && _output.Size() != 1 && !inputIsInputNode && false)
         {
             auto pVar = compiler.GetVariableForElement(_input.GetInputElement(0));
@@ -42,21 +42,21 @@ namespace nodes
         }
         else
         {
-            llvm::Value* pOutput = compiler.EnsurePortEmitted(_output);
+            emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(_output);
             // check if the pOutput variable is null.
             function.If(ell::emitters::TypedComparison::notEquals, pOutput, function.NullPointer(pOutput->getType()->getPointerElementType()->getPointerTo()), [pOutput, &compiler, this](emitters::IRFunctionEmitter& function) {
                 auto inputElements = _input.GetInputElements();
                 int rangeStart = 0;
                 for (auto range : inputElements.GetRanges())
                 {
-                    llvm::Value* pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
+                    emitters::LLVMValue pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
                     auto rangeSize = range.Size();
 
-                    function.For(rangeSize, [=](emitters::IRFunctionEmitter& function, llvm::Value* loopIndex) {
+                    function.For(rangeSize, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex) {
                         auto i = function.LocalScalar(loopIndex);
                         auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
                         auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
-                        llvm::Value* pValue = function.ValueAt(pInput, inputIndex);
+                        emitters::LLVMValue pValue = function.ValueAt(pInput, inputIndex);
                         function.SetValueAt(pOutput, outputIndex, pValue);
                     });
                     rangeStart += rangeSize;
@@ -86,10 +86,10 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
-        std::vector<int> shapeVector; 
+        std::vector<int> shapeVector;
         archiver[shapeName] >> shapeVector;
         _output.SetSize(_input.Size());
-        if (shapeVector.size() >= 3) 
+        if (shapeVector.size() >= 3)
         {
             SetShape({ shapeVector });
         }

@@ -17,9 +17,9 @@ namespace emitters
     }
 
     template <typename ValueType>
-    llvm::Value* IRAddFunction<ValueType>::Compile(IRFunctionEmitter& function, llvm::Value* x, llvm::Value* y) const
+    LLVMValue IRAddFunction<ValueType>::Compile(IRFunctionEmitter& function, LLVMValue x, LLVMValue y) const
     {
-        llvm::Value* sum = function.Operator(emitters::GetAddForValueType<ValueType>(), x, y);
+        LLVMValue sum = function.Operator(emitters::GetAddForValueType<ValueType>(), x, y);
         return sum;
     }
 }

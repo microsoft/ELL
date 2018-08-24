@@ -8,13 +8,9 @@
 
 #pragma once
 
-// emitters
 #include "EmitterTypes.h"
 #include "IRLocalScalar.h"
-
-// llvm
-#include <llvm/IR/DerivedTypes.h>
-#include <llvm/IR/Value.h>
+#include "LLVMUtilities.h"
 
 // stl
 #include <string>
@@ -43,8 +39,8 @@ namespace emitters
     class IRModuleEmitter;
     class IRProfiler;
 
-    /// <summary> 
-    /// A class representing a function-scoped region to profile. 
+    /// <summary>
+    /// A class representing a function-scoped region to profile.
     /// Emitted code within this region will have its total runtime measured, and the total number of times run tallied.
     /// </summary>
     class IRProfileRegion
@@ -62,19 +58,19 @@ namespace emitters
     private:
         friend IRProfiler;
         IRProfileRegion(IRFunctionEmitter& function, IRProfiler& profiler, const std::string& name, IRLocalScalar index);
-        
+
         IRFunctionEmitter& GetFunction() { return _function; }
         IRLocalScalar GetIndex() const { return _index; }
         IRLocalScalar GetStartTime() const { return _startTime; }
         void SetStartTime(const IRLocalScalar& time) { _startTime = time; }
-        
+
         IRFunctionEmitter& _function;
         IRProfiler& _profiler;
         IRLocalScalar _index;
         IRLocalScalar _startTime;
     };
 
-    /// <summary> 
+    /// <summary>
     /// An RAII class to make it easier to create function-local profile regions. Any code between
     /// this object's construction and destruction will be profilied as a region.
     /// </summary>
@@ -107,9 +103,9 @@ namespace emitters
         /// <param name="enableProfiling"> Indicates whether profiling should be enabled. </param>
         IRProfiler(emitters::IRModuleEmitter& module, bool enableProfiling);
 
-        /// <summary> 
-        /// Emit static initialization code to allocate and initialize info and perf counter data. 
-        /// Called by the IRModuleEmitter that owns this profiler. 
+        /// <summary>
+        /// Emit static initialization code to allocate and initialize info and perf counter data.
+        /// Called by the IRModuleEmitter that owns this profiler.
         /// </summary>
         void Init();
 
@@ -147,7 +143,7 @@ namespace emitters
         void EmitGetNumRegionsFunction();
         void EmitGetRegionProfilingInfoFunction();
         void EmitResetRegionProfilingInfoFunction();
-        
+
         // Lower-level codegen
         // CreateRegion returns the index of the new region
         IRLocalScalar CreateRegion(IRFunctionEmitter& function);
@@ -157,9 +153,9 @@ namespace emitters
         void FixUpGetNumRegionsFunction();
         void FixUpGetRegionBufferFunction();
 
-        llvm::Value* GetRegionBuffer(emitters::IRFunctionEmitter& function);
-        llvm::Value* GetNumRegions(emitters::IRFunctionEmitter& function);
-        llvm::Value* GetRegionPointer(emitters::IRFunctionEmitter& function, llvm::Value* index);
+        LLVMValue GetRegionBuffer(emitters::IRFunctionEmitter& function);
+        LLVMValue GetNumRegions(emitters::IRFunctionEmitter& function);
+        LLVMValue GetRegionPointer(emitters::IRFunctionEmitter& function, LLVMValue index);
 
         emitters::IRModuleEmitter* _module = nullptr;
         bool _profilingEnabled = false;
@@ -167,8 +163,8 @@ namespace emitters
         std::unordered_set<std::string> _regionNames;
 
         // Cache these often-used functions so we don't have to keep looking them up by name
-        llvm::Function* _getNumRegionsFunction = nullptr;
-        llvm::Function* _getRegionBufferFunction = nullptr;
+        LLVMFunction _getNumRegionsFunction = nullptr;
+        LLVMFunction _getRegionBufferFunction = nullptr;
 
         llvm::StructType* _profileRegionType = nullptr;
         llvm::GlobalVariable* _profileRegionsArray = nullptr;

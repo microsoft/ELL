@@ -8,6 +8,9 @@
 
 #pragma once
 
+// emitters
+#include "LLVMUtilities.h"
+
 // model
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
@@ -238,13 +241,13 @@ namespace nodes
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         void ComputeFilterOutput(model::IRMapCompiler& compiler,
                                  emitters::IRFunctionEmitter& function,
-                                 llvm::Value* pInput,
-                                 llvm::Value* pFilterWeights,
-                                 llvm::Value* pFilterMeans,
-                                 llvm::Value* pInputPaddingMask,
-                                 llvm::Value* pInputPaddingMaskSums,
-                                 llvm::Value* pOutput,
-                                 llvm::Value* filterIndex,
+                                 emitters::LLVMValue pInput,
+                                 emitters::LLVMValue pFilterWeights,
+                                 emitters::LLVMValue pFilterMeans,
+                                 emitters::LLVMValue pInputPaddingMask,
+                                 emitters::LLVMValue pInputPaddingMaskSums,
+                                 emitters::LLVMValue pOutput,
+                                 emitters::LLVMValue filterIndex,
                                  bool hasZeroPadding,
                                  int outputColumns,
                                  int packedRowSize,
@@ -261,11 +264,11 @@ namespace nodes
         void Copy(model::ModelTransformer& transformer) const override;
 
         void EmitInnerLoop(emitters::IRFunctionEmitter& function,
-                           llvm::Value* reshapedInput,
-                           llvm::Value* paddingMask,
-                           llvm::Value* weights,
-                           llvm::Value* xorSumVariable,
-                           llvm::Function* popCountFunction,
+                           emitters::LLVMValue reshapedInput,
+                           emitters::LLVMValue paddingMask,
+                           emitters::LLVMValue weights,
+                           emitters::LLVMValue xorSumVariable,
+                           emitters::LLVMFunction popCountFunction,
                            int startBlock,
                            int numBlocks,
                            bool hasZeroPadding);

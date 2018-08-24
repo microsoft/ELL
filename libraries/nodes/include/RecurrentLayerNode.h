@@ -7,9 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
 #include "Activation.h"
 #include "CompiledActivationFunctions.h"
 #include "NeuralNetworkLayerNode.h"
+
+// emitters
+#include "LLVMUtilities.h"
 
 // model
 #include "IRMapCompiler.h"
@@ -167,9 +171,9 @@ namespace nodes
 
         ActivationType _activation;
 
-        void ApplySoftmax(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength);
+        void ApplySoftmax(emitters::IRFunctionEmitter& function, emitters::LLVMValue data, size_t dataLength);
 
-        void ApplyActivation(emitters::IRFunctionEmitter& function, llvm::Value* data, size_t dataLength);
+        void ApplyActivation(emitters::IRFunctionEmitter& function, emitters::LLVMValue data, size_t dataLength);
     };
 }
 }
