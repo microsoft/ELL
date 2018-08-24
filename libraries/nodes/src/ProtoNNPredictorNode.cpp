@@ -25,6 +25,7 @@
 #include "DenseDataVector.h"
 
 // stl
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -94,29 +95,17 @@ namespace nodes
         // Get the prediction label
         auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(expDistanceNode->output, _predictor.GetLabelEmbeddings());
 
-        auto outNode = transformer.AddNode<model::OutputNode<double>>(labelScoresNode->output);
-
-        transformer.MapNodeOutput(output, outNode->output);
+        transformer.MapNodeOutput(output, labelScoresNode->output);
 
         return true;
     }
 
     void ProtoNNPredictorNode::Compute() const
     {
-        auto indexValueIterator = _input.GetIterator();
-
-        // densify the index/value pairs directly into a std::vector, which avoids making a copy via DoubleDataVector.
+        auto data = _input.GetValue();
         std::vector<double> inputData;
-        while (indexValueIterator.IsValid())
-        {
-            auto current = indexValueIterator.Get();
-            auto index = current.index;
-            double value = current.value;
-            inputData.resize(index + 1);
-            inputData.back() = value;
-            indexValueIterator.Next();
-        }
-
+        inputData.reserve(data.size());
+        std::transform(data.begin(), data.end(), std::back_inserter(inputData), [](auto x) { return static_cast<double>(x); });
         auto prediction = _predictor.Predict(inputData);
 
         _output.SetOutput(prediction.ToArray());

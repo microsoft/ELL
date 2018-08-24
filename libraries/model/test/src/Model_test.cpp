@@ -205,8 +205,8 @@ void TestInputRouting1()
     // model::PortRangeList ranges = { { minAndArgMin->val, 0}, {maxAndArgMax->val, 0} };
     // model::PortRangeList ranges2 = { { minAndArgMin->val, 0}, {in->output, 1, 2} };
 
-    // auto minAndMax = model.AddNode<model::ConcatenatePortsNode<double>>(ranges);
-    // auto minAndTail = model.AddNode<model::ConcatenatePortsNode<double>>(ranges2);
+    // auto minAndMax = model.AddNode<model::SpliceNode<double>>(ranges);
+    // auto minAndTail = model.AddNode<model::SpliceNode<double>>(ranges2);
 
     // set some example input and read the output
     // std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
@@ -258,7 +258,7 @@ void TestInputRouting2()
 // Placeholder for test function that creates a model using dynamic-creation routines
 //
 
-void TestCopyModel()
+void TestDenseCopyModel()
 {
     // Create a simple computation model
     model::Model model;
@@ -272,19 +272,80 @@ void TestCopyModel()
     // Now make a copy
     model::TransformContext context;
     model::ModelTransformer transformer;
-    auto newModel = transformer.CopyModel(model, context);
+    auto copiedModel = transformer.CopyModel(model, context);
 
-    // Print them both:
-    std::cout << "\n\nOld model" << std::endl;
-    std::cout << "---------" << std::endl;
-    PrintModel(model);
+    // make sure they're the same
+    auto originalModelIterator = model.GetNodeIterator();
+    auto copiedModelIterator = copiedModel.GetNodeIterator();
 
-    std::cout << "\n\nCopied model" << std::endl;
-    std::cout << "---------" << std::endl;
-    PrintModel(newModel);
+    std::unordered_map<std::string, int> originalNodeCounts;
+    std::unordered_map<std::string, int> copiedNodeCounts;
+    while (originalModelIterator.IsValid())
+    {
+        auto originalNode = originalModelIterator.Get();
+        originalNodeCounts[originalNode->GetRuntimeTypeName()] += 1;
+        auto copiedNode = copiedModelIterator.Get();
+        copiedNodeCounts[copiedNode->GetRuntimeTypeName()] += 1;
+        originalModelIterator.Next();
+        copiedModelIterator.Next();
+    }
+    // Check that both iterators ran out at the same time
+    testing::ProcessTest("testing model copy", !copiedModelIterator.IsValid());
 
-    std::cout << "\n\n"
-              << std::endl;
+    for (auto originalIter: originalNodeCounts)
+    {
+        testing::ProcessTest("testing model copy", originalIter.second == copiedNodeCounts[originalIter.first]);
+    }
+
+    // add a node to the first model
+    model.AddNode<model::OutputNode<double>>(minAndArgMin->val);
+
+    // make sure second one is different
+    testing::ProcessTest("testing model copy", model.Size() == copiedModel.Size()+1);
+}
+
+void TestShallowCopyModel()
+{
+    // Create a simple computation model
+    model::Model model;
+    auto in = model.AddNode<model::InputNode<double>>(3);
+    auto maxAndArgMax = model.AddNode<nodes::ArgMaxNode<double>>(in->output);
+    auto minAndArgMin = model.AddNode<nodes::ArgMinNode<double>>(in->output);
+    auto condition = model.AddNode<nodes::ConstantNode<bool>>(true);
+    model.AddNode<nodes::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    model.AddNode<nodes::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
+
+    // Now make a shallow copy
+    auto copiedModel = model.ShallowCopy();
+
+    // make sure they're the same
+    auto originalModelIterator = model.GetNodeIterator();
+    auto copiedModelIterator = copiedModel.GetNodeIterator();
+
+    std::unordered_map<std::string, int> originalNodeCounts;
+    std::unordered_map<std::string, int> copiedNodeCounts;
+    while (originalModelIterator.IsValid())
+    {
+        auto originalNode = originalModelIterator.Get();
+        originalNodeCounts[originalNode->GetRuntimeTypeName()] += 1;
+        auto copiedNode = copiedModelIterator.Get();
+        copiedNodeCounts[copiedNode->GetRuntimeTypeName()] += 1;
+        originalModelIterator.Next();
+        copiedModelIterator.Next();
+    }
+    // Check that both iterators ran out at the same time
+    testing::ProcessTest("testing model copy", !copiedModelIterator.IsValid());
+
+    for (auto originalIter: originalNodeCounts)
+    {
+        testing::ProcessTest("testing model copy", originalIter.second == copiedNodeCounts[originalIter.first]);
+    }
+
+    // add a node to the first model
+    model.AddNode<model::OutputNode<double>>(minAndArgMin->val);
+
+    // make sure second one is the same
+    testing::ProcessTest("testing model copy", model.Size() == copiedModel.Size());
 }
 
 // Define new node that splits its outputs when refined

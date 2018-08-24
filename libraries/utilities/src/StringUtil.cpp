@@ -11,6 +11,7 @@
 // stl
 #include <algorithm>
 #include <cstdio>
+#include <sstream>
 
 namespace ell
 {
@@ -62,8 +63,18 @@ namespace utilities
             output.push_back(s.substr(prev_pos, pos - prev_pos));
         }
         return output;
-
     }
 
+    std::string Join(const std::vector<std::string>& strings, const std::string& separator)
+    {
+        std::stringstream stream;
+        std::string sep = "";
+        for(const auto& s: strings)
+        {
+            stream << sep << s;
+            sep = separator;
+        }
+        return stream.str();
+    }
 }
 }

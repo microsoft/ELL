@@ -68,12 +68,12 @@ namespace model
     //
     void PortOutputsMap::Clear()
     {
-        _map.clear();
+        _outputPortMap.clear();
     }
 
     bool PortOutputsMap::IsEmpty() const
     {
-        return _map.size() == 0;
+        return _outputPortMap.empty();
     }
 
     PortElementsBase PortOutputsMap::GetCorrespondingPortElements(const PortElementsBase& queryElements) const
@@ -85,44 +85,39 @@ namespace model
         {
             auto queryRangePort = queryRange.ReferencedPort();
             assert(queryRangePort != nullptr);
-            auto queryRangeStartIndex = queryRange.GetStartIndex();
-            auto queryRangeSize = queryRange.Size();
-            auto queryRangeEnd = queryRangeStartIndex + queryRangeSize;
-
-            // get elements for port
-            if (_map.find(queryRangePort) == _map.end())
+            if (_outputPortMap.find(queryRangePort) == _outputPortMap.end())
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element "s + to_string(queryRangePort->GetNode()->GetId()) + "." + queryRangePort->GetName() + " in new model.");
             }
 
-            PortElementsBase portElements = _map.at(queryRangePort);
-            size_t targetRangeOffset = 0;
-            auto&& targetRanges = portElements.GetRanges();
-            for (auto&& targetRange : targetRanges)
+            PortElementsBase targetElements = _outputPortMap.at(queryRangePort);
+            auto start = static_cast<int>(queryRange.GetStartIndex());
+            auto size = static_cast<int>(queryRange.Size());
+
+            const auto& targetRanges = targetElements.GetRanges();
+            for (const auto& targetRange : targetRanges)
             {
                 auto targetRangePort = targetRange.ReferencedPort();
-                auto targetRangeSize = targetRange.Size();
-                auto targetRangeEnd = targetRangeOffset + targetRangeSize;
-
-                bool rangesIntersect = queryRangeEnd > targetRangeOffset && queryRangeStartIndex < targetRangeEnd;
+                auto targetRangeSize = static_cast<int>(targetRange.Size());
+                auto rangesIntersect = targetRangeSize > start;
                 if (rangesIntersect)
                 {
-                    // Get relevant subset of targetRange and append it to result;
-                    auto maxBegin = std::max(queryRangeStartIndex, targetRangeOffset);
-                    auto minEnd = std::min(queryRangeEnd, targetRangeEnd);
-                    assert(minEnd >= maxBegin);
-                    auto intersectionSize = minEnd - maxBegin;
-                    queryRangeStartIndex += intersectionSize;
-                    assert(queryRangeSize >= intersectionSize);
-                    queryRangeSize -= intersectionSize;
-                    result.Append(PortRange(*targetRangePort, targetRange.GetStartIndex(), intersectionSize));
+                    int targetStart = start;
+                    if (start > 0)
+                    {
+                        start = std::max(0, targetRangeSize-start);
+                    }
+                    auto intersectionSize = std::min(targetRangeSize-targetStart, size);
+
+                    result.Append(PortRange(*targetRangePort, targetRange.GetStartIndex()+targetStart, intersectionSize));
+
+                    size -= intersectionSize;
 
                     // If we've matched all the elements of the query range, we can break out of this loop
-                    if (queryRangeSize == 0)
+                    if (size == 0)
                         break;
                 }
-
-                targetRangeOffset += targetRangeSize;
+                start = std::max(0, start-targetRangeSize);
             }
         }
 
@@ -137,17 +132,23 @@ namespace model
 
     void PortOutputsMap::MapNodeOutput(const OutputPortBase* oldPort, const PortElementsBase& newElements)
     {
-        _map[oldPort] = newElements;
+        if (oldPort->Size() != newElements.Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch,
+                utilities::FormatString("Trying to map port %s to output of different size, expecting %lld, but found %lld", oldPort->GetName().c_str(), oldPort->Size(), newElements.Size()));
+        }
+        _outputPortMap[oldPort] = newElements;
     }
 
     PortOutputsMap PortOutputsMap::ConcatenateMaps(const PortOutputsMap& prevMap, const PortOutputsMap& newMap)
     {
         PortOutputsMap result;
-        for (const auto& entry : prevMap._map)
+        for (const auto& entry : prevMap._outputPortMap)
         {
             auto newMappedValue = newMap.GetCorrespondingPortElements(entry.second);
             result.MapNodeOutput(entry.first, newMappedValue);
         }
+
         return result;
     }
 
@@ -156,7 +157,8 @@ namespace model
     //
     Model ModelTransformer::CopyModel(const Model& oldModel, const TransformContext& context)
     {
-        return CopyModel(oldModel, std::vector<const Node*>{}, context);
+        std::vector<const Node*> nothing;
+        return CopyModel(oldModel, nothing, context);
     }
 
     Model ModelTransformer::CopyModel(const Model& oldModel, const Node* outputNode, const TransformContext& context)
@@ -169,7 +171,8 @@ namespace model
         _context = context;
         _model = Model();
         _elementsMap.Clear();
-        oldModel.VisitSubset(outputNodes, [this](const Node& node) { CopyNode(node); });
+        oldModel.VisitSubset(outputNodes, [this](const Node& node) {
+            CopyNode(node); });
         _context = TransformContext();
         // Copy all the node metadata
         oldModel.VisitSubset(outputNodes, [this](const Node& node) {
@@ -190,7 +193,7 @@ namespace model
         return std::move(_model);
     }
 
-    Model ModelTransformer::RefineModel(Model oldModel, const TransformContext& context, int maxIterations)
+    Model ModelTransformer::RefineModel(const Model& oldModel, const TransformContext& context, int maxIterations)
     {
         if (maxIterations <= 0)
         {
@@ -198,9 +201,9 @@ namespace model
         }
 
         _context = context;
-        _model = std::move(oldModel);
         _elementsMap.Clear();
-
+        _model = CopyModel(oldModel, context);
+        
         // Refine until all nodes are compilable according to context.IsNodeCompilable(), until
         // the model is fully refined, or until the maximum number of iterations is reached.
         for (int i = 0; i < maxIterations; ++i)

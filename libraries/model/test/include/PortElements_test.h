@@ -10,3 +10,5 @@
 void TestSlice();
 void TestAppend();
 void TestParsePortElements();
+
+void TestConvertPortElements();

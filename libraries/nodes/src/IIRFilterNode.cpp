@@ -17,8 +17,6 @@
 #include "FFT.h"
 #include "MathConstants.h"
 
-#include <iostream>
-
 namespace ell
 {
 namespace nodes

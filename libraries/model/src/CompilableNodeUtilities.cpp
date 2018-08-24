@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     MakeNodeCompilable.cpp (model)
+//  File:     CompilableNodeUtilities.cpp (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,10 +24,8 @@
 #include "Logger.h"
 
 // stl
-#include <functional>
-#include <iostream>
 #include <sstream>
-#include <unordered_map>
+#include <string>
 
 namespace ell
 {
@@ -38,12 +36,6 @@ namespace model
     //
     // Helper functions
     //
-    bool IsPureVector(const InputPortBase& port)
-    {
-        const auto& elements = port.GetInputElements();
-        return elements.Size() > 1 && elements.IsFullPortOutput();
-    }
-
     bool HasSingleDescendant(const Node& node)
     {
         Log() << DiagnosticString(node) << " has " << node.GetDependentNodes().size() << " dependent nodes" << EOL;

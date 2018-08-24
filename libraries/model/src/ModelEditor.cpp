@@ -13,12 +13,10 @@ namespace ell
 namespace model
 {
 
-void ModelEditor::ResetInputPort(const InputPortBase* port, PortElementsBase portElements)
+void ModelEditor::ResetInputPort(const InputPortBase* port, const OutputPortBase& newInput)
 {
     // Luckily nothing is ever really const in the codebase. If that changes, this is UB
-    assert(port->GetType() == portElements.GetPortType());
-    const_cast<PortElementsBase&>(port->_inputElements) = std::move(portElements);
-    const_cast<InputPortBase*>(port)->ComputeParents();
+    const_cast<InputPortBase*>(port)->SetInput(&newInput);
     port->GetNode()->RegisterDependencies();
 }
 

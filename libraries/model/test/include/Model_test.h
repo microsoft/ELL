@@ -17,7 +17,8 @@ void TestModelMetadata();
 void TestInputRouting1();
 void TestInputRouting2();
 
-void TestCopyModel();
+void TestDenseCopyModel();
+void TestShallowCopyModel();
 
 void TestRefineSplitOutputs();
 void TestCustomRefine();

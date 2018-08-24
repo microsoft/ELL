@@ -16,7 +16,6 @@
 #include "Example.h"
 
 // common
-#include "AppendNodeToModel.h"
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
 #include "EvaluatorArguments.h"
@@ -37,6 +36,7 @@
 #include "Map.h"
 #include "InputNode.h"
 #include "Model.h"
+#include "OutputNode.h"
 
 // trainer
 #include "ProtoNNTrainer.h"

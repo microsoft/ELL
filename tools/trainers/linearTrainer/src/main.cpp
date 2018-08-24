@@ -18,7 +18,6 @@
 #include "Dataset.h"
 
 // common
-#include "AppendNodeToModel.h"
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
 #include "EvaluatorArguments.h"
@@ -32,6 +31,7 @@
 // model
 #include "Map.h"
 #include "Model.h"
+#include "OutputNode.h"
 
 // nodes
 #include "LinearPredictorNode.h"

@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "IRModelProfiler.h"
 #include "Node.h"
 
 // emitters

@@ -149,26 +149,19 @@ namespace nodes
     template <typename ValueType>
     void SinkNode<ValueType>::SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
-
         assert(input.Size() == output.Size());
 
         // Concatenate the input ports in a similar way as OutputNodes,
         // because SinkNodes are just callback-enabled OutputNodes.
-        auto inputElements = input.GetInputElements();
-        int rangeStart = 0;
-        for (auto range : inputElements.GetRanges())
-        {
-            emitters::LLVMValue pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
-            auto rangeSize = range.Size();
-            function.For(rangeSize, [range, rangeStart, pInput, pOutput](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
-                auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
-                auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
-                emitters::LLVMValue value = function.ValueAt(pInput, inputIndex);
-                function.SetValueAt(pOutput, outputIndex, value);
+        auto input = function.LocalArray(compiler.EnsurePortEmitted(_input));
+        auto output = function.LocalArray(compiler.EnsurePortEmitted(_output));
+        // check if the output variable is null.
+        function.If(ell::emitters::TypedComparison::notEquals, output, function.NullPointer(output.value->getType()->getPointerElementType()->getPointerTo()), [input, output, this](emitters::IRFunctionEmitter& function) {
+            auto size = _input.Size();
+            function.For(size, [input, output](emitters::IRFunctionEmitter& function, auto i) {
+                output[i] = input[i];
             });
-            rangeStart += rangeSize;
-        }
+        });
     }
 
     template <typename ValueType>

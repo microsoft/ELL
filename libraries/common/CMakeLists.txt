@@ -88,7 +88,7 @@ source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include})
-add_dependencies(${test_name} makeExamples)
+add_dependencies(${test_name} exampleModels)
 target_include_directories(${test_name} PRIVATE test/include)
 target_link_libraries(${test_name} common data testing utilities functions predictors trainers model nodes)
 copy_shared_libraries(${test_name})

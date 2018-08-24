@@ -49,5 +49,12 @@ namespace utilities
     /// <param name=separator> The separator character to search for </param>
     /// <returns> A vector of strings found in the given string (not including the separator characters) </returns>
     std::vector<std::string> Split(const std::string& s, char separator);
+
+    /// <summary> Join a vector of strings with a given separator character. </summary>
+    ///
+    /// <param name=s> The vector of strings to join. </param>
+    /// <param name=separator> The separator character to insert between the strings. </param>
+    /// <returns> A single string with the given strings separated by the given separator character. </returns>
+    std::string Join(const std::vector<std::string>& strings, const std::string& separator);
 }
 }

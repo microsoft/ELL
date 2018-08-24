@@ -9,10 +9,12 @@
 #include "LoadModel.h"
 
 // model
-#include "Map.h"
 #include "InputNode.h"
+#include "Map.h"
 #include "Model.h"
 #include "OutputNode.h"
+#include "SliceNode.h"
+#include "SpliceNode.h"
 
 // nodes
 #include "AccumulatorNode.h"
@@ -89,6 +91,9 @@ namespace common
     {
         context.GetTypeFactory().AddType<model::Node, model::InputNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, model::SpliceNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, model::SliceNode<ElementType>>();
+
         context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ArgMaxNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ArgMinNode<ElementType>>();
@@ -188,6 +193,14 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<int>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<int64_t>>();
+
+        context.GetTypeFactory().AddType<model::Node, model::SpliceNode<bool>>();
+        context.GetTypeFactory().AddType<model::Node, model::SpliceNode<int>>();
+        context.GetTypeFactory().AddType<model::Node, model::SpliceNode<int64_t>>();
+
+        context.GetTypeFactory().AddType<model::Node, model::SliceNode<bool>>();
+        context.GetTypeFactory().AddType<model::Node, model::SliceNode<int>>();
+        context.GetTypeFactory().AddType<model::Node, model::SliceNode<int64_t>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<int64_t>>();
@@ -323,7 +336,6 @@ namespace common
         else if (mapLoadArguments.HasModelFilename())
         {
             auto model = common::LoadModel(mapLoadArguments.inputModelFilename);
-
             model::InputNodeBase* inputNode = nullptr;
             model::PortElementsBase outputElements;
             if (mapLoadArguments.modelInputsString != "")

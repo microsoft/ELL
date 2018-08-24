@@ -10,7 +10,6 @@
 
 #include "InputNodeBase.h"
 #include "InputPort.h"
-#include "ModelTransformer.h"
 #include "OutputPort.h"
 #include "PortMemoryLayout.h"
 
@@ -25,6 +24,8 @@ namespace ell
 {
 namespace model
 {
+    class ModelTransformer;
+    
     /// <summary> A node that represents an input to the system. </summary>
     template <typename ValueType>
     class InputNode : public InputNodeBase

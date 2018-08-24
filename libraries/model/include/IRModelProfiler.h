@@ -50,6 +50,7 @@ namespace model
     // import NodeInfo and PerformanceCounters into our namespace
     using ::NodeInfo;
     using ::PerformanceCounters;
+    class Model;
 
     /// <summary> A utility class that emits IR to populate NodeInfo structs. </summary>
     class NodeInfoEmitter

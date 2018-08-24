@@ -197,7 +197,7 @@ namespace model
         // declaring them as abstract so that subclasses need to implement this themselves.
         void WriteToArchive(utilities::Archiver& archiver) const override = 0;
         void ReadFromArchive(utilities::Unarchiver& archiver) override = 0;
-
+        
     private:
         friend class Model;
         friend class ModelEditor;
@@ -205,6 +205,7 @@ namespace model
 
         virtual void Copy(ModelTransformer& transformer) const = 0;
 
+        void SetId(Node::NodeId id);
         void AddDependent(const Node* dependent) const;
         void RegisterDependencies() const;
         bool InvokeRefine(ModelTransformer& transformer) const;

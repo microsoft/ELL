@@ -11,9 +11,7 @@
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 #include "LLVMUtilities.h"
-
-// utilities
-#include "UniqueId.h"
+#include "Model.h"
 
 // stl
 #include <algorithm>
@@ -42,7 +40,7 @@ namespace model
         auto& irBuilder = emitter.GetIRBuilder();
 
         // Allocate global storage for node info
-        auto nodeName = utilities::to_string(_node->GetId());
+        auto nodeName = to_string(_node->GetId());
         auto nodeTypeName = _node->GetRuntimeTypeName();
 
         // Add NodeInfo field global initialization

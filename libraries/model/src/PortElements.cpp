@@ -235,7 +235,7 @@ namespace model
     //
     void PortElementsBase::Iterator::Next()
     {
-        if (_ranges.size() == 0)
+        if (_ranges.empty())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
         }
@@ -690,13 +690,13 @@ namespace model
             const Node* node = model.GetNode(rangeProxy.GetNodeId());
             if (node == nullptr)
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't unarchive PortRange port -- bad node id");
+                throw utilities::InputException(utilities::InputExceptionErrors::nullReference, std::string("Couldn't unarchive PortRange port -- bad node id\"") + rangeProxy.GetNodeId().ToString() + "\"");
             }
 
             const OutputPortBase* port = node->GetOutputPort(rangeProxy.GetPortName());
             if (port == nullptr)
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't unarchive PortRange port -- bad port name");
+                throw utilities::InputException(utilities::InputExceptionErrors::nullReference, std::string("Couldn't unarchive PortRange port -- bad port name \"")  + rangeProxy.GetPortName() + "\" for port " + rangeProxy.GetNodeId().ToString());
             }
 
             if (rangeProxy.GetPortType() != Port::PortType::none && port->GetType() != rangeProxy.GetPortType())

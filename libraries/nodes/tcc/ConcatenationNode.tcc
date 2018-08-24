@@ -34,33 +34,22 @@ namespace nodes
         assert(GetPortVariableType(_input) == GetPortVariableType(_output));
 
         auto inputIsInputNode = (dynamic_cast<const model::InputNodeBase*>(_input.GetInputElement(0).ReferencedPort()->GetNode()) != nullptr);
-        // TODO: re-enable this branch when scalar port bug is fixed
-        if (IsPureVector(_input) && _input.Size() != 1 && _output.Size() != 1 && !inputIsInputNode && false)
+        // TODO: re-enable this branch when scalar port bug is fixed 
+        if (_input.Size() != 1 && _output.Size() != 1 && !inputIsInputNode && false)
         {
             auto pVar = compiler.GetVariableForElement(_input.GetInputElement(0));
             compiler.SetVariableForPort(_output, pVar);
         }
         else
         {
-            emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(_output);
-            // check if the pOutput variable is null.
-            function.If(ell::emitters::TypedComparison::notEquals, pOutput, function.NullPointer(pOutput->getType()->getPointerElementType()->getPointerTo()), [pOutput, &compiler, this](emitters::IRFunctionEmitter& function) {
-                auto inputElements = _input.GetInputElements();
-                int rangeStart = 0;
-                for (auto range : inputElements.GetRanges())
-                {
-                    emitters::LLVMValue pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
-                    auto rangeSize = range.Size();
-
-                    function.For(rangeSize, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex) {
-                        auto i = function.LocalScalar(loopIndex);
-                        auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
-                        auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
-                        emitters::LLVMValue pValue = function.ValueAt(pInput, inputIndex);
-                        function.SetValueAt(pOutput, outputIndex, pValue);
-                    });
-                    rangeStart += rangeSize;
-                }
+            auto input = function.LocalArray(compiler.EnsurePortEmitted(_input));
+            auto output = function.LocalArray(compiler.EnsurePortEmitted(_output));
+            // check if the output variable is null.
+            function.If(ell::emitters::TypedComparison::notEquals, output, function.NullPointer(output.value->getType()->getPointerElementType()->getPointerTo()), [input, output, this](emitters::IRFunctionEmitter& function) {
+                auto size = _input.Size();
+                function.For(size, [input, output](emitters::IRFunctionEmitter& function, auto i) {
+                    output[i] = input[i];
+                });
             });
         }
     }

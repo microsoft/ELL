@@ -5,7 +5,7 @@
 set (DATA_FILES testData.txt tinyTestData.txt protonnTestData.txt)
 
 add_custom_target(dataFiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
-add_dependencies(dataFiles makeExamples)
+add_dependencies(dataFiles exampleModels)
 set_property(TARGET dataFiles PROPERTY FOLDER "examples")
 
 # copy example data

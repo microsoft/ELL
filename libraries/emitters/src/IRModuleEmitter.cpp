@@ -530,28 +530,6 @@ namespace emitters
         return pVal;
     }
 
-    void IRModuleEmitter::SetVariable(Variable& var, LLVMValue pDestination, int offset, LLVMValue pValue)
-    {
-        auto currentFunction = GetCurrentFunction();
-        assert(pValue != nullptr);
-        assert(offset >= 0);
-        if (var.IsScalar())
-        {
-            if (offset > 0)
-            {
-                throw EmitterException(EmitterError::indexOutOfRange);
-            }
-            currentFunction.Store(pDestination, pValue);
-            return;
-        }
-
-        if (static_cast<unsigned>(offset) >= var.Dimension())
-        {
-            throw EmitterException(EmitterError::indexOutOfRange);
-        }
-        currentFunction.SetValueAt(pDestination, currentFunction.Literal(offset), pValue);
-    }
-
     //
     // Variable and Constant creation
     //

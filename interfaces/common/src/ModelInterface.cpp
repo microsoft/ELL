@@ -670,8 +670,7 @@ ell::api::math::TensorShape Map::GetOutputShape() const
 
 Model Map::GetModel() const
 {
-    ell::model::Model model = _map->GetModel();
-    return Model(std::move(model));
+    return Model(_map->GetModel().ShallowCopy());
 }
 
 void Map::Load(const std::string& filename)

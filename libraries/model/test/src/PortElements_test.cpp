@@ -11,19 +11,25 @@
 // model
 #include "InputNode.h"
 #include "Model.h"
+#include "OutputNode.h"
 #include "PortElements.h"
+#include "SliceNode.h"
+#include "SpliceNode.h"
 
 // testing
 #include "testing.h"
 
 // utilities
 #include "JsonArchiver.h"
+#include "Logger.h"
 
 // stl
 #include <iostream>
 #include <sstream>
+#include <typeinfo>
 
 using namespace ell;
+using namespace ell::logging;
 
 //
 // Helpers
@@ -90,4 +96,26 @@ void TestParsePortElements()
 
     elements = model::ParsePortElementsProxy("123.bar[3:5]");
     testing::ProcessTest("Testing PortElementProxy::Parse", elements.GetRanges()[0].Size() == 2);
+}
+
+void TestConvertPortElements()
+{
+    model::Model g;
+    auto in1 = g.AddNode<model::InputNode<double>>(3);
+    auto in2 = g.AddNode<model::InputNode<double>>(2);
+    auto out1 = g.AddNode<model::OutputNode<double>>(model::PortElements<double>{in1->output, 1});
+    auto out2 = g.AddNode<model::OutputNode<double>>(model::PortElements<double>{in1->output, in2->output});
+
+    model::PortElements<double> elements1 = { in1->output };
+    Log() << "Output1 size: " << out1->output.Size() << EOL;
+    Log() << "Output2 size: " << out2->output.Size() << EOL;
+
+    Log() << "Model:" << EOL;
+    g.Print(Log());
+
+    testing::ProcessTest("Testing conversion of PortElements", out1->output.Size() == 1);
+    testing::ProcessTest("Testing conversion of PortElements", out2->output.Size() == 5);
+    testing::ProcessTest("Testing conversion of PortElements", out1->input.GetPortElements().NumRanges() == 1);
+    testing::ProcessTest("Testing conversion of PortElements", out2->input.GetPortElements().NumRanges() == 1);
+
 }

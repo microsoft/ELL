@@ -59,7 +59,7 @@ namespace nodes
     void DotProductNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         static_assert(!std::is_same<ValueType, bool>(), "Cannot instantiate boolean dot product nodes");
-        if ((IsPureVector(input1) && IsPureVector(input2)) && !compiler.GetCompilerOptions().unrollLoops)
+        if (!compiler.GetCompilerOptions().unrollLoops)
         {
             CompileDotProductLoop(compiler, function);
         }

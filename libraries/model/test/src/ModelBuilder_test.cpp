@@ -49,7 +49,7 @@ void TestTemplateAddNode()
     auto meanMin = mb.AddNode<nodes::MovingAverageNode<double>>(model, minAndArgMin->val, 2);
     auto meanMax = mb.AddNode<nodes::MovingAverageNode<double>>(model, maxAndArgMax->val, 2);
     mb.AddNode<model::OutputNode<double>>(model, model::PortElements<double>({ meanMin->output, meanMax->output }));
-    testing::ProcessTest("ModelBuilder::AddNode<>", model.Size() == 6);
+    testing::ProcessTest("ModelBuilder::AddNode<>", model.Size() == 7);
 }
 
 //
@@ -265,5 +265,5 @@ void TestVariantAddInputNodesParsedArgs()
     auto intOutputNode = mb.AddNode(model, "OutputNode<int>", { intNodeIdStr + ".output" });
     testing::ProcessTest("AddNode(OutputNode<int>, string)", intOutputNode != nullptr);
 
-    testing::ProcessTest("Model size", model.Size() == 4);
+    testing::ProcessTest("Model size", model.Size() == 5);
 }

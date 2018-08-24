@@ -51,6 +51,23 @@ namespace model
         Prune();
     }
 
+    Map::Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs) : _model(std::move(model))
+    {
+        for (const auto& input : inputs)
+        {
+            AddInput(input.first, input.second);
+        }
+
+        for (const auto& output : outputs)
+        {
+            AddOutput(output.first, output.second);
+        }
+
+        // Important: we don't need to call FixTransformedIO here because we do it in the call to Prune
+        // FixTransformedIO(transformer);
+        Prune();
+    }
+
     Map::Map(const Map& other)
     {
         TransformContext context;
@@ -406,7 +423,6 @@ namespace model
 
         ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(_model, context, maxIterations);
-
         FixTransformedIO(transformer);
         _model = std::move(refinedModel);
         Prune();

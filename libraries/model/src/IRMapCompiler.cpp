@@ -11,6 +11,7 @@
 #include "CompilableNodeUtilities.h"
 #include "IRMetadata.h"
 #include "IRModelProfiler.h"
+#include "Model.h"
 #include "ModelOptimizer.h"
 #include "OptimizationPassRegistry.h"
 #include "OutputNode.h"
@@ -128,6 +129,23 @@ namespace model
 
     IRCompiledMap IRMapCompiler::Compile(Map map)
     {
+        // phases of compilation / refinement / optimization
+        //
+        // Fix map outputs (EnsureValidMap)
+        //
+        // pre-refinement phase:
+        // Refine 1 (refine NN predictor nodes)
+        // Optimize 1 (set preferred conv type)
+        //
+        // refinement phase:
+        // Refine 2
+        //
+        // post-refine phase:
+        // Optimize 2
+        //
+        // Compile
+        // IR optimization
+
         Log() << "Compile called for map" << EOL;
 
         EnsureValidMap(map);
@@ -137,8 +155,8 @@ namespace model
         // When refinement is an integrated part of optimization, then this special-case code will disappear.
         //
         Log() << "Refining the model..." << EOL;
-        model::TransformContext noRefineConvNodesContext{ this, [this](const model::Node& node) { return IsConvolutionalLayerNode(node) || node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
-        map.Refine(noRefineConvNodesContext);
+        model::TransformContext noRefineConvLayerNodesContext{ this, [this](const model::Node& node) { return IsConvolutionalLayerNode(node) || node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
+        map.Refine(noRefineConvLayerNodesContext);
 
         Log() << "Optimizing the model..." << EOL;
         map.Optimize(_optimizer);

@@ -156,7 +156,7 @@ namespace nodes
     template <typename ValueType>
     void BinaryPredicateNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        if (IsPureVector(input1) && IsPureVector(input2) && !compiler.GetCompilerOptions().unrollLoops)
+        if (!compiler.GetCompilerOptions().unrollLoops)
         {
             CompileLoop(compiler, function);
         }

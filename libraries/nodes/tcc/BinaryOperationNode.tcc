@@ -263,7 +263,7 @@ namespace nodes
     {
         if (_inputLayout1.GetMemorySize() == _inputLayout2.GetMemorySize())
         {
-            if (IsPureVector(input1) && IsPureVector(input2) && !compiler.GetCompilerOptions().unrollLoops)
+            if (!compiler.GetCompilerOptions().unrollLoops)
             {
                 CompileLoop(compiler, function);
             }

@@ -30,6 +30,10 @@ namespace ell
 namespace model
 {
     class Model;
+    namespace detail
+    {
+        class ModelNodeRouter;
+    }
 
     /// <summary> An iterator over the nodes in a Model </summary>
     class NodeIterator : public utilities::IIterator<const Node*>
@@ -61,30 +65,43 @@ namespace model
         const Node* _currentNode = nullptr;
     };
 
-    /// <summary> Model class. Represents a graph of computation </summary>
+    /// <summary> Model class. Represents a computation graph </summary>
     class Model : public utilities::IArchivable
     {
     public:
+        Model();
+        Model(Model&& other) = default;
+        Model& operator=(Model&& other) = default;
+
+        /// <summary> Explicit method to create a shallow copy </summary>
+        Model ShallowCopy() const;
+
         /// <summary> Factory method used to create nodes and add them to the model. </summary>
         template <typename NodeType, typename... Args>
         NodeType* AddNode(Args&&... args);
 
+        /// <summary> Checks if a node with a given ID is present </summary>
+        ///
+        /// <param name="id"> The id of the node </param>
+        /// <returns> `true` if a node with the given ID exists </param>
+        bool NodeIdExists(Node::NodeId id) const;
+
         /// <summary> Looks up a node by id </summary>
         ///
         /// <param name="id"> The id of the node </param>
-        /// <returns> a weak_ptr to the node </param>
+        /// <returns> a pointer to the node </param>
         Node* GetNode(Node::NodeId id);
 
         /// <summary> Looks up a node by id </summary>
         ///
         /// <param name="id"> The id of the node </param>
-        /// <returns> a weak_ptr to the node </param>
+        /// <returns> a pointer to the node </param>
         const Node* GetNode(Node::NodeId id) const;
 
         /// <summary> Get number of nodes </summary>
         ///
         /// <returns> The number of nodes in the model </summary>
-        size_t Size() const { return _idToNodeMap.size(); }
+        size_t Size() const { return _data->idToNodeMap.size(); }
 
         /// <summary> Retrieves a set of nodes by type </summary>
         ///
@@ -196,13 +213,13 @@ namespace model
         /// <summary> Get this object's metadata object. </summary>
         ///
         /// <returns> A reference to the PropertyBag containing the metadata for this object. </returns>
-        utilities::PropertyBag& GetMetadata() { return _metadata; }
+        utilities::PropertyBag& GetMetadata() { return _data->metadata; }
 
         /// <summary> Get this object's metadata object. </summary>
         ///
         /// <returns> A const reference to the PropertyBag containing the metadata for this object. </returns>
-        const utilities::PropertyBag& GetMetadata() const { return _metadata; }
-        
+        const utilities::PropertyBag& GetMetadata() const { return _data->metadata; }
+            
     protected:
         // Serialization-related methods
         utilities::ArchiveVersion GetArchiveVersion() const override;
@@ -212,12 +229,33 @@ namespace model
 
     private:
         friend class NodeIterator;
+        friend class detail::ModelNodeRouter;
+        template <typename ValueType>
+        friend class InputPort;
 
-        // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
-        // to look nodes up by id.
-        // We keep it sorted by id to make visiting all nodes deterministically ordered
-        std::map<Node::NodeId, std::shared_ptr<Node>, std::less<Node::NodeId>> _idToNodeMap;
-        utilities::PropertyBag _metadata;
+        struct ModelData
+        {
+            // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
+            // to look nodes up by id.
+            // We keep it sorted by id to make visiting all nodes deterministically ordered
+            std::map<Node::NodeId, std::shared_ptr<Node>, std::less<Node::NodeId>> idToNodeMap;
+            utilities::PropertyBag metadata;
+        };
+
+        Model(const std::shared_ptr<Model::ModelData>& data);
+        Model(const Model& other) = delete;
+
+        template <typename ValueType>
+        PortElements<ValueType> AddRoutingNodes(const PortElements<ValueType>& elements);
+        PortElementsBase AddRoutingNodes(const PortElementsBase& elements);
+        const OutputPortBase* AddPortRange(const PortRange& inputRange);
+        const OutputPortBase* AddConcat(const std::vector<const OutputPortBase*>& outputPorts);
+        Node* AddExistingNode(std::unique_ptr<Node> node);
+        void EnsureNodeHasUniqueId(Node& node);
+        Node::NodeId GetUniqueId(const Node::NodeId& desiredId);
+        static Node::NodeId GetNextId(Node::NodeId id);
+
+        std::shared_ptr<ModelData> _data;
     };
 
     /// <summary> A serialization context used during model deserialization. Wraps an existing `SerializationContext`
@@ -228,22 +266,27 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="model"> The model being constructed </param>
-        ModelSerializationContext(utilities::SerializationContext& previousContext, const Model* model);
+        ModelSerializationContext(utilities::SerializationContext& previousContext, Model* model);
 
         /// <summary> Sets the model this map is deserializing
         ///
         /// <param name="model"> The model this map wraps </param>
-        void SetModel(const Model* model);
+        void SetModel(Model* model);
 
         /// <summary> Returns the Model currently being deserialized. </summary>
         ///
         /// <returns> The Model currently being deserialized. </returns>
-        const Model* GetModel() { return _model; }
+        const Model* GetModel() const { return _model; }
+
+        /// <summary> Returns the Model currently being deserialized. </summary>
+        ///
+        /// <returns> The Model currently being deserialized. </returns>
+        Model* GetModel() { return _model; }
 
         /// <summary> Returns a pointer to an already-deserialized node, given its serialized ID </summary>
         ///
         /// <returns> A pointer to an already-deserialized node. </returns>
-        Node* GetNodeFromSerializedId(const Node::NodeId& id);
+        Node* GetNodeFromSerializedId(const Node::NodeId& id) const;
 
         /// <summary> Associate a newly-deserialized node with its serialized ID </summary>
         ///
@@ -252,7 +295,7 @@ namespace model
         void MapNode(const Node::NodeId& id, Node* node);
 
     private:
-        const Model* _model;
+        Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };
 }

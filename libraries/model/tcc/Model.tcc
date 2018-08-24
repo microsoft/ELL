@@ -10,30 +10,55 @@ namespace ell
 {
 namespace model
 {
-    // Hiding some stuff in this namespace that's unlikely to confict with anything
-    namespace ModelImpl
+    template <typename ValueType>
+    class SliceNode;
+
+    template <typename ValueType>
+    class SpliceNode;
+
+    namespace detail
     {
-        template <typename ContainerType>
-        class ReverseRange
+        class ModelNodeRouter
         {
         public:
-            ReverseRange(const ContainerType& container)
-                : _begin(container.crbegin()), _end(container.crend()) {}
+            template <typename T>
+            static T&& ConvertPortElementsArgImpl(Model& model, T&& arg, std::false_type, bool)
+            {
+                // pass through
+                return std::forward<T>(arg);
+            }
 
-            typename ContainerType::const_reverse_iterator begin() const { return _begin; }
+            template <typename T>
+            static auto ConvertPortElementsArgImpl(Model& model, T&& arg, std::true_type, std::false_type)
+            {
+                // should not use initializer list
+                return model.AddRoutingNodes(std::forward<T>(arg));
+            }
 
-            typename ContainerType::const_reverse_iterator end() const { return _end; }
+            template <typename T>
+            static auto ConvertPortElementsArgImpl(Model& model, T&& arg, std::true_type, std::true_type)
+            {
+                // should use initializer list
+                return model.AddRoutingNodes({ std::forward<T>(arg) });
+            }
 
-        private:
-            typename ContainerType::const_reverse_iterator _begin;
-            typename ContainerType::const_reverse_iterator _end;
+            template <typename T>
+            static decltype(auto) ConvertPortElementsArg(Model& model, T&& arg)
+            {
+                constexpr auto noPassThrough =
+                    std::is_base_of<PortRange, std::decay_t<T>>{} ||
+                    std::is_base_of<PortElementBase, std::decay_t<T>>{} ||
+                    std::is_base_of<PortElementsBase, std::decay_t<T>>{};
+
+                constexpr auto shouldUseInitList = !std::is_base_of<PortElementsBase, std::decay_t<T>>{};
+
+                return ConvertPortElementsArgImpl(
+                    model,
+                    std::forward<T>(arg),
+                    std::integral_constant<bool, noPassThrough>{},
+                    std::integral_constant<bool, shouldUseInitList>{});
+            }
         };
-
-        template <typename ContainerType>
-        ReverseRange<ContainerType> Reverse(const ContainerType& container)
-        {
-            return ReverseRange<ContainerType>(container);
-        }
     }
 
     //
@@ -42,10 +67,16 @@ namespace model
     template <typename NodeType, typename... Args>
     NodeType* Model::AddNode(Args&&... args)
     {
-        auto node = std::make_shared<NodeType>(std::forward<Args>(args)...);
-        node->RegisterDependencies();
-        _idToNodeMap[node->GetId()] = node;
-        return node.get();
+        auto node = std::make_unique<NodeType>(detail::ModelNodeRouter::ConvertPortElementsArg(*this, std::forward<Args>(args))...);
+        auto result = node.get();
+        AddExistingNode(std::move(node));
+        return result;
+    }
+
+    template <typename ValueType>
+    PortElements<ValueType> Model::AddRoutingNodes(const PortElements<ValueType>& elements)
+    {
+        return PortElements<ValueType>(AddRoutingNodes(static_cast<const PortElementsBase&>(elements)));
     }
 
     //

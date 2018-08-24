@@ -64,6 +64,7 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
         archiver["predictor"] >> _predictor;
+        _output.SetSize(GetShapeSize(_predictor.GetOutputShape()));
     }
 
     template <typename ValueType>
@@ -150,7 +151,7 @@ namespace nodes
     template <typename ValueType>
     void NeuralNetworkPredictorNode<ValueType>::Compute() const
     {
-        auto inputDataVector = typename PredictorType::DataVectorType(_input.GetIterator());
+        auto inputDataVector = typename PredictorType::DataVectorType(_input.GetValue());
         _output.SetOutput(_predictor.Predict(inputDataVector));
     }
 

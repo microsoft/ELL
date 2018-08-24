@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Model.h"
+#include "Node.h"
 
 // utilities
 #include "FunctionUtils.h"
@@ -15,6 +16,7 @@
 #include "Variant.h"
 
 // stl
+#include <map>
 #include <string>
 #include <vector>
 
@@ -22,6 +24,8 @@ namespace ell
 {
 namespace model
 {
+    class Node;
+
     /// <summary> Helper class for building models </summary>
     class ModelBuilder
     {

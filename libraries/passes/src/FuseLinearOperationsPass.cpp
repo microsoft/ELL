@@ -62,11 +62,6 @@ namespace passes
             const auto& scaleElements = node.secondaryInput1.GetPortElements();
             const auto& biasElements = node.secondaryInput2.GetPortElements();
 
-            if ((scaleElements.Size() != 0 && !scaleElements.IsFullPortOutput()) || (biasElements.Size() != 0 && !biasElements.IsFullPortOutput()))
-            {
-                return false; // we require all inputs to a port to come from the same place (though we could relax this requirement in the future, perhaps)
-            }
-
             const nodes::ConstantNode<ValueType>* scaleInputNode = scaleInputSize == 0 ? nullptr : dynamic_cast<const nodes::ConstantNode<ValueType>*>(scaleElements.GetElement(0).ReferencedPort()->GetNode());
             const nodes::ConstantNode<ValueType>* biasInputNode = biasInputSize == 0 ? nullptr : dynamic_cast<const nodes::ConstantNode<ValueType>*>(biasElements.GetElement(0).ReferencedPort()->GetNode());
 
@@ -88,11 +83,6 @@ namespace passes
             }
 
             const auto& primaryElements = node.primaryInput.GetPortElements();
-            if (!primaryElements.IsFullPortOutput())
-            {
-                return false; // we require all inputs to a port to come from the same place (though we could relax this requirement in the future, perhaps)
-            }
-
             const nodes::BroadcastLinearFunctionNode<ValueType>* primaryInputNode = dynamic_cast<const nodes::BroadcastLinearFunctionNode<ValueType>*>(primaryElements.GetElement(0).ReferencedPort()->GetNode());
             if (primaryInputNode == nullptr)
             {
@@ -125,11 +115,6 @@ namespace passes
         {
             const auto& scaleElements = node.secondaryInput1.GetPortElements();
             const auto& biasElements = node.secondaryInput2.GetPortElements();
-
-            if ((scaleElements.Size() != 0 && !scaleElements.IsFullPortOutput()) || (biasElements.Size() != 0 && !biasElements.IsFullPortOutput()))
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Combined linear function coefficients must be full port output");
-            }
 
             int scaleInputSize = scaleElements.Size();
             int biasInputSize = biasElements.Size();
@@ -281,7 +266,7 @@ namespace passes
     {
         model::OptimizationPassInfo info = {
             "FuseLinearOperationsPass",
-            [](const model::ModelOptimizerOptions& settings) { return settings.fuseLinearFunctionNodes; },
+            [](const model::ModelOptimizerOptions& settings) { return settings.phase == model::OptimizerPhase::optimize && settings.fuseLinearFunctionNodes; },
             []() { return std::make_unique<FuseLinearOperationsPass>(); }
         };
         model::OptimizationPassRegistry::AddPass(info);

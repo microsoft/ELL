@@ -90,7 +90,9 @@ int main(int argc, char* argv[])
                 model::TransformContext context;
                 map.Refine(context, printArguments.refine);
             }
-            model = map.GetModel();
+            model::TransformContext context;
+            model::ModelTransformer transformer;
+            model = transformer.CopyModel(map.GetModel(), context);
         }
 
         // print model

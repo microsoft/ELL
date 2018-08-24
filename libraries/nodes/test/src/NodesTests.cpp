@@ -46,6 +46,7 @@
 #include "InputNode.h"
 #include "Model.h"
 #include "Node.h"
+#include "OutputNode.h"
 
 // predictors
 #include "LinearPredictor.h"

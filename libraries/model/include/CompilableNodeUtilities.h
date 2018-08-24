@@ -29,9 +29,6 @@ namespace model
     // Helper functions for getting info about the model
     //
 
-    /// <summary> True if port has dimension greater than 1, and references exactly one output port </summary>
-    bool IsPureVector(const InputPortBase& port);
-
     /// <summary> Indicates if a port is scalar (that is, has a size of 1). </summary>
     bool IsScalar(const Port& port);
 

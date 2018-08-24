@@ -8,6 +8,8 @@
 
 #include "ModelMaker.h"
 
+#include "ModelTransformer.h"
+
 using namespace ell;
 
 ModelMaker::ModelMaker()
@@ -15,8 +17,10 @@ ModelMaker::ModelMaker()
 }
 
 ModelMaker::ModelMaker(const ModelMaker& src)
-    : _model(src._model)
 {
+    model::ModelTransformer transformer;
+    model::TransformContext context;
+    _model = transformer.CopyModel(src._model, context);
 }
 
 ModelMaker::ModelMaker(ModelMaker&& src)

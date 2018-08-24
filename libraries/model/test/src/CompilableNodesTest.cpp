@@ -64,6 +64,9 @@
 #include "TypeCastNode.h"
 #include "UnaryOperationNode.h"
 
+// passes
+#include "StandardPasses.h"
+
 // predictors
 #include "NeuralNetworkPredictor.h"
 

@@ -13,6 +13,7 @@ namespace llvm
 {
     class Function;
     class FunctionType;
+    class GlobalVariable;
     class StructType;
     class Type;
     class Value;

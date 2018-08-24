@@ -46,12 +46,9 @@ namespace passes
 
                 Log() << "ReorderDataNode [id = " << node.GetId().ToString() << "] detected" << EOL;
 
-                if (node.GetParentNodes().empty() || !node.input.GetInputElements().IsFullPortOutput())
+                if (node.GetParentNodes().empty())
                 {
-                    Log() << "ReorderDataNode [id = " << node.GetId().ToString() << "] has either no parents "
-                                                                                    "nodes or does not have a full input port output"
-                          << EOL;
-
+                    Log() << "ReorderDataNode [id = " << node.GetId().ToString() << "] has no parents " << EOL;
                     return false;
                 }
 
@@ -153,7 +150,7 @@ namespace passes
     {
         model::OptimizationPassInfo info = {
             "OptimizeReorderDataNodes",
-            [](const model::ModelOptimizerOptions&) { return true; },
+            [](const model::ModelOptimizerOptions& settings) { return settings.phase == model::OptimizerPhase::optimize; },
             []() { return std::make_unique<OptimizeReorderDataNodes>(); }
         };
         model::OptimizationPassRegistry::AddPass(info);

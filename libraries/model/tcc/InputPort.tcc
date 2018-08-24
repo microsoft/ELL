@@ -14,11 +14,9 @@ namespace model
     // InputPortBase
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, const std::string& name)
-        : Port(owningNode, name, Port::GetPortType<ValueType>()), _inputElements(inputs)
+    InputPortBase::InputPortBase(const Node* owningNode, const PortElements<ValueType>& input, const std::string& name)
+        : Port(owningNode, name, Port::GetPortType<ValueType>()), _referencedPort(input.NumRanges() > 0 ? input.GetRanges()[0].ReferencedPort() : nullptr)
     {
-        // Note: we can't compute parents here because the elements our _inputElements points to is (typically) a member in a subclass and
-        // hasn't been initialized yet.
     }
 
     //
@@ -26,39 +24,32 @@ namespace model
     //
     template <typename ValueType>
     InputPort<ValueType>::InputPort()
-        : InputPortBase(nullptr, _input, "")
+        : InputPortBase(Port::GetPortType<ValueType>())
     {
-        ComputeParents();
     }
 
     template <typename ValueType>
-    InputPort<ValueType>::InputPort(const class Node* owningNode, const PortElements<ValueType>& input, const std::string& name)
-        : InputPortBase(owningNode, _input, name), _input(input)
+    InputPort<ValueType>::InputPort(const Node* owningNode, const PortElements<ValueType>& input, const std::string& name)
+        : InputPortBase(owningNode, input, name)
     {
-        ComputeParents();
     }
 
     template <typename ValueType>
     InputPort<ValueType>& InputPort<ValueType>::operator=(const InputPort<ValueType>& other)
     {
-        _input = other._input;
-        ComputeParents();
+        _referencedPort = other._referencedPort;
         return *this;
     }
 
     template <typename ValueType>
     std::vector<ValueType> InputPort<ValueType>::GetValue() const
     {
-        std::vector<ValueType> result;
-        size_t size = Size();
-        result.reserve(size);
-        for (size_t index = 0; index < size; ++index)
+        if (!IsValid())
         {
-            auto element = _input.GetElement(index);
-            auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
-            auto temp = typedOutput->GetOutput(element.GetIndex());
-            result.push_back(temp);
+            return {};
         }
+
+        auto result = GetReferencedPort().GetOutput();
 
         if (Size() != result.size())
         {
@@ -70,38 +61,62 @@ namespace model
     template <typename ValueType>
     ValueType InputPort<ValueType>::GetValue(size_t index) const
     {
-        const auto& element = _input.GetElement(index);
-        auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
-        return typedOutput->GetOutput(element.GetIndex());
+        return GetReferencedPort().GetOutput(index);
     }
 
     template <typename ValueType>
     ValueType InputPort<ValueType>::operator[](size_t index) const
     {
-        const auto& element = _input.GetElement(index);
-        auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
-        return typedOutput->GetOutput(element.GetIndex());
+        return GetValue(index);
     }
 
     template <typename ValueType>
     PortElements<ValueType> InputPort<ValueType>::GetPortElements() const
     {
-        return _input;
+        if (!IsValid())
+        {
+            return {};
+        }
+
+        return PortElements<ValueType>{ GetReferencedPort() };
+    }
+
+    template <typename ValueType>
+    const OutputPort<ValueType>& InputPort<ValueType>::GetReferencedPort() const
+    {
+        if (!IsValid())
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: empty input port.");
+        }
+
+        return static_cast<const OutputPort<ValueType>&>(*_referencedPort);
     }
 
     template <typename ValueType>
     void InputPort<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Port::WriteToArchive(archiver);
-        archiver["input"] << _input;
+        archiver["input"] << GetPortElements();
     }
 
     template <typename ValueType>
     void InputPort<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Port::ReadFromArchive(archiver);
-        archiver["input"] >> _input;
-        ComputeParents();
+        PortElements<ValueType> input;
+        archiver["input"] >> input;
+        if (!input.IsFullPortOutput())
+        {
+            // Back-compat: if this port has a non-simple PortElements, add nodes to the model as needed to simplify.
+            auto& context = archiver.GetContext();
+            ModelSerializationContext& modelContext = dynamic_cast<ModelSerializationContext&>(context);
+            auto newInput = modelContext.GetModel()->AddRoutingNodes(input);
+            _referencedPort = newInput.GetRanges()[0].ReferencedPort();
+        }
+        else
+        {
+            _referencedPort = input.GetRanges()[0].ReferencedPort();
+        }
     }
 }
 }

@@ -33,8 +33,13 @@ set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")
 # Add build command to generate the examples
 #
 
-add_custom_command(TARGET ${tool_name}
-  POST_BUILD
-  COMMAND ${tool_name} --outputPath ${CMAKE_BINARY_DIR}/examples/models
-  COMMENT "Generating example models"
+add_custom_target(exampleModels)
+add_dependencies(exampleModels makeExamples)
+set_property(TARGET exampleModels PROPERTY FOLDER "examples")
+
+add_custom_command(TARGET exampleModels
+    POST_BUILD
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND ${tool_name} --outputPath ${CMAKE_BINARY_DIR}/examples/models
+    COMMENT "Generating example models"
 )

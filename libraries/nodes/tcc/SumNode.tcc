@@ -47,7 +47,7 @@ namespace nodes
     template <typename ValueType>
     void SumNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        if (IsPureVector(input) && !compiler.GetCompilerOptions().unrollLoops)
+        if (!compiler.GetCompilerOptions().unrollLoops)
         {
             size_t vectorSize = compiler.GetCompilerOptions().vectorWidth;
             bool vectorize = compiler.GetCompilerOptions().allowVectorInstructions && (input.Size() > vectorSize);

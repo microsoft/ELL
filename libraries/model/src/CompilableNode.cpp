@@ -231,11 +231,9 @@ namespace model
                 throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: compiling node function with complex input port.");
             }
 
-            auto range = port->GetInputElements().GetRanges()[0];
             auto inputArg = compiler.EnsurePortEmitted(*port);
             assert(inputArg->getType()->isPointerTy());
-            auto index = port->GetInputElements().GetRanges()[0].GetStartIndex();
-            auto inputArgPtr = currentFunction.PointerOffset(inputArg, index);
+            auto inputArgPtr = currentFunction.PointerOffset(inputArg, 0);
             args.push_back(inputArgPtr);
         };
 

@@ -194,9 +194,6 @@ namespace emitters
         /// <summary> Ensure that the given variable is loaded into a register. </summary>
         LLVMValue LoadVariable(Variable& var);
 
-        /// <summary> Updates the value at a given offset of the given variable. Checks for index out of range etc. </summary>
-        void SetVariable(Variable& var, LLVMValue pDest, int offset, LLVMValue pValue);
-
         //
         // Variable and Constant creation
         //

@@ -8,7 +8,6 @@
 
 #include "Node.h"
 #include "InputPort.h"
-#include "Model.h"
 #include "ModelTransformer.h"
 #include "OutputPort.h"
 
@@ -181,9 +180,10 @@ namespace model
             {
                 node->AddDependent(this);
             }
-            for (const auto& range : input->GetInputElements().GetRanges())
+
+            if (input->IsValid())
             {
-                range.ReferencedPort()->ReferencePort();
+                input->GetReferencedPort().ReferencePort();
             }
         }
     }
@@ -275,6 +275,11 @@ namespace model
         auto& context = archiver.GetContext();
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         newContext.MapNode(oldId, this);
+    }
+
+    void Node::SetId(Node::NodeId id)
+    {
+        _id = id;
     }
 }
 }

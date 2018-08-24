@@ -46,7 +46,7 @@ namespace model
         /// <summary> Returns the node to which this port belongs </summary>
         ///
         /// <returns> The node the port belongs to </returns>
-        const class Node* GetNode() const { return _node; }
+        const Node* GetNode() const { return _node; }
 
         /// <summary> Returns the datatype of the output </summary>
         ///
@@ -96,7 +96,7 @@ namespace model
         const utilities::PropertyBag& GetMetadata() const { return _metadata; }
 
     protected:
-        Port(const class Node* node, std::string name, PortType type)
+        Port(const Node* node, std::string name, PortType type)
             : _node(node), _name(name), _type(type) {}
         ~Port() override = default;
 
@@ -106,8 +106,7 @@ namespace model
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        // _node keeps info on where the input is coming from
-        const class Node* _node = nullptr;
+        const Node* _node = nullptr;
         std::string _name;
         PortType _type = PortType::none;
         utilities::PropertyBag _metadata;

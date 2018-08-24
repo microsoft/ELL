@@ -92,6 +92,7 @@ void PrintNode(const model::Node& node, std::ostream& out, bool includeNodeId)
                 isFirstRange = false;
 
                 auto port = range.ReferencedPort();
+                out << port->GetNode()->GetId() << ".";
                 out << port->GetName();
                 auto start = range.GetStartIndex();
                 auto size = range.Size();

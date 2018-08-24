@@ -318,6 +318,11 @@ namespace model
         /// <returns> true if this PortElements spans a single port's entire range </returns>
         bool IsFullPortOutput() const { return _ranges.size() == 1 && _ranges[0].IsFullPortRange(); }
 
+        /// <summary> Indicates if this PortElements is empty </summary>
+        ///
+        /// <returns> true if empty </returns>
+        bool IsEmpty() const { return _ranges.empty(); }
+        
         /// <summary> Gets a vector of range objects </summary>
         ///
         /// <returns> A std::vector of PortRange objects </returns>

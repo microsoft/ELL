@@ -68,7 +68,7 @@ namespace nodes
 
     void SingleElementThresholdNode::Compute() const
     {
-        auto inputDataVector = SingleElementThresholdPredictor::DataVectorType(_input.GetIterator());
+        auto inputDataVector = SingleElementThresholdPredictor::DataVectorType(_input.GetValue());
         _output.SetOutput({ _predictor.Predict(inputDataVector) });
     }
 

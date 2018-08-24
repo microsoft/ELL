@@ -12,7 +12,6 @@
 #include "IRModelProfiler.h"
 #include "InputNode.h"
 #include "Map.h"
-#include "Model.h"
 #include "Node.h"
 #include "OutputPort.h"
 #include "PortElements.h"

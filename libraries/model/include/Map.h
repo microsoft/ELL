@@ -10,7 +10,6 @@
 
 #include "InputNode.h"
 #include "Node.h"
-#include "OutputNode.h"
 #include "PortElements.h"
 
 // data
@@ -39,6 +38,7 @@ namespace model
     class ModelOptimizerContext;
     class ModelTransformer;
     class OutputNodeBase;
+    class TransformContext;
 
     /// <summary> Class that wraps a model and its designated outputs </summary>
     class Map : public utilities::IArchivable
@@ -61,10 +61,17 @@ namespace model
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="model"> The model to wrap </param>
+        /// <param name="model"> The model to wrap. A deep copy of this model is stored inside the map. </param>
         /// <param name="inputs"> A vector of name/value pairs for the inputs this map uses </param>
         /// <param name="outputs"> A vector of name/value pairs for the outputs this map generates </param>
         Map(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="model"> The model to wrap. </param>
+        /// <param name="inputs"> A vector of name/value pairs for the inputs this map uses </param>
+        /// <param name="outputs"> A vector of name/value pairs for the outputs this map generates </param>
+        Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
 
         ~Map() override = default;
 

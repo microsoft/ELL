@@ -38,7 +38,8 @@ int main()
         TestInputRouting1();
         TestInputRouting2();
 
-        TestCopyModel();
+        TestDenseCopyModel();
+        TestShallowCopyModel();
         TestRefineSplitOutputs();
         TestChangeInputForNode();
 
@@ -46,6 +47,7 @@ int main()
         TestSlice();
         TestAppend();
         TestParsePortElements();
+        TestConvertPortElements();
 
         // Map tests
         TestMapCreate();

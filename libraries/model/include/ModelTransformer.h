@@ -129,7 +129,7 @@ namespace model
         static PortOutputsMap ConcatenateMaps(const PortOutputsMap& oldMap, const PortOutputsMap& newMap);
 
     private:
-        std::unordered_map<const OutputPortBase*, PortElementsBase> _map;
+        std::unordered_map<const OutputPortBase*, PortElementsBase> _outputPortMap;
     };
 
     /// <summary> A class that transforms models (including refinement and copying) </summary>
@@ -182,7 +182,7 @@ namespace model
         /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
         ///
         /// <returns> The refined Model. </returns>
-        Model RefineModel(Model model, const TransformContext& context, int maxIterations = 10);
+        Model RefineModel(const Model& model, const TransformContext& context, int maxIterations = 10);
 
         /// <summary> Transforms the model by applying a transformation function to each node </summary>
         ///

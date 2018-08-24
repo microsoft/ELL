@@ -26,7 +26,7 @@ void TestLoadMapWithDefaultArgs(const std::string& examplePath)
     common::MapLoadArguments args;
     args.inputModelFilename = utilities::JoinPaths(examplePath, { "models", "model_1.model" });
     args.modelInputsString = "";
-    args.modelOutputsString = "1026.output"; // the LinearPredictorNode
+    args.modelOutputsString = "1031.output"; // the LinearPredictorNode
 
     std::cout << "Testing map loading, file " << args.inputModelFilename << std::endl;
     auto map = common::LoadMap(args);
@@ -42,7 +42,7 @@ void TestLoadMapWithPorts(const std::string& examplePath)
     common::MapLoadArguments args;
     args.inputModelFilename = utilities::JoinPaths(examplePath, { "models", "model_1.model" });
     args.modelInputsString = "";
-    args.modelOutputsString = "{1026.weightedElements[0:2], 1026.weightedElements[4:6]}";
+    args.modelOutputsString = "{1031.weightedElements[0:2], 1031.weightedElements[4:6]}";
 
     std::cout << "Testing map loading, file " << args.inputModelFilename << std::endl;
     auto map = common::LoadMap(args);

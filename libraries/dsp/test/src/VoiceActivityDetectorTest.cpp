@@ -28,7 +28,6 @@
 #include <iostream>
 #include <type_traits>
 #include <vector>
-#include <iostream>
 
 using namespace ell;
 using namespace dsp;

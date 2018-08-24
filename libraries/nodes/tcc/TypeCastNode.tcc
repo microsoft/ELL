@@ -46,14 +46,14 @@ namespace nodes
         auto outputType = emitters::GetVariableType<OutputValueType>();
 
         // no-op case
-        if (inputType == outputType && IsPureVector(input))
+        if (inputType == outputType)
         {
             emitters::Variable* elementVar = compiler.GetVariableForElement(input.GetInputElement(0));
             compiler.SetVariableForPort(output, elementVar); // The types are the same, so this is a no-op. Just set the output variable to be the same as the input variable
             return;
         }
 
-        if (IsPureVector(input) && !compiler.GetCompilerOptions().unrollLoops)
+        if (!compiler.GetCompilerOptions().unrollLoops)
         {
             CompileLoop(compiler, function);
         }

@@ -52,9 +52,11 @@ set(include
     include/Port.h
     include/PortElements.h
     include/PortMemoryLayout.h
+    include/SliceNode.h
+    include/SpliceNode.h
 )
 
-set(tcc
+set(tcc 
     tcc/InputNode.tcc
     tcc/InputPort.tcc
     tcc/IRCompiledMap.tcc
@@ -69,6 +71,8 @@ set(tcc
     tcc/OutputPort.tcc
     tcc/Port.tcc
     tcc/PortElements.tcc
+    tcc/SliceNode.tcc
+    tcc/SpliceNode.tcc
 )
 
 set(doc
@@ -181,7 +185,7 @@ source_group("tcc" FILES ${compiler_test_tcc})
 
 add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include} ${compiler_test_tcc})
 target_include_directories(${compiler_test_name} PRIVATE test/include)
-target_link_libraries(${compiler_test_name} common model nodes testing model_testing utilities)
+target_link_libraries(${compiler_test_name} common model nodes passes testing model_testing utilities)
 copy_shared_libraries(${compiler_test_name})
 
 set_property(TARGET ${compiler_test_name} PROPERTY FOLDER "tests")

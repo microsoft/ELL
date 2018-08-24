@@ -33,7 +33,9 @@
 #include "L2Regularizer.h"
 
 // model
+#include "InputNode.h"
 #include "Map.h"
+#include "OutputNode.h"
 
 // nodes
 #include "BinaryOperationNode.h"

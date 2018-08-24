@@ -13,6 +13,13 @@ namespace ell
 {
 namespace model
 {
+    enum OptimizerPhase
+    {
+        normalize,
+        // refine, // ??
+        optimize
+    }; 
+
     enum class PreferredConvolutionMethod : int
     {
         automatic = 0,
@@ -28,6 +35,9 @@ namespace model
         bool fuseLinearFunctionNodes = true;
 
         PreferredConvolutionMethod preferredConvolutionMethod = PreferredConvolutionMethod::automatic;
+
+        // phase
+        OptimizerPhase phase = OptimizerPhase::optimize;
     };
 }
 }

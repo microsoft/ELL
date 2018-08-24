@@ -88,7 +88,7 @@ namespace nodes
     void LinearPredictorNode<ElementType>::Compute() const
     {
         using DataVectorType = typename LinearPredictorType::DataVectorType;
-        auto inputDataVector = DataVectorType(_input.GetIterator());
+        auto inputDataVector = DataVectorType(_input.GetValue());
         _output.SetOutput({ _predictor.Predict(inputDataVector) });
         _weightedElements.SetOutput(_predictor.GetWeightedElements(inputDataVector).ToArray());
     }

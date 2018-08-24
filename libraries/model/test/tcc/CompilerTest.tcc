@@ -10,10 +10,11 @@
 
 // model
 #include "CompiledMap.h"
-#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IREmitter.h"
 #include "IRMapCompiler.h"
+#include "Map.h"
+#include "OutputNode.h"
 
 // nodes
 #include "LinearPredictorNode.h"
