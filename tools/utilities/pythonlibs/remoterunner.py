@@ -61,7 +61,7 @@ class RemoteRunner:
         # make sense of the combined output when remote commands are running in
         # parallel.
         self.logger = logger.get(self.logfile)
-        
+
         if not cluster and not ipaddress:
             raise Exception("Error: required ipaddress or cluster or both")
 
@@ -265,7 +265,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--username", help="Username for logon to remote machine", default=None)
     arg_parser.add_argument("--password", help="Password for logon to remote machine", default=None)
     arg_parser.add_argument("--command", help="The command to run on the remote machine", default=None)
-    arg_parser.add_argument("--timeout", type=bool, help="Timeout for the command in seconds (default 300 seconds)", default=300)
+    arg_parser.add_argument("--timeout", type=int, help="Timeout for the command in seconds (default 300 seconds)", default=300)
     
     args = arg_parser.parse_args()
         

@@ -32,7 +32,7 @@ namespace nodes
         auto&& outputLayout = this->GetOutputMemoryLayout();
         if (inputLayout.GetActiveSize() != outputLayout.GetActiveSize())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active area sizes don't match");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "ActivationLayerNode: Input and output active area sizes don't match");
         }
     }
 
@@ -112,7 +112,7 @@ namespace nodes
         auto&& outputLayout = this->GetOutputMemoryLayout();
         if (inputLayout.GetActiveSize() != outputLayout.GetActiveSize())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active area sizes don't match");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "ActivationLayerNode: Input and output active area sizes don't match");
         }
         auto paf = dynamic_cast<const predictors::neural::ParametricReLUActivation<ValueType>*>(layer.GetActivationFunction().GetImpl());
         if (!paf)

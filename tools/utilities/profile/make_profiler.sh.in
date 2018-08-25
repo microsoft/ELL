@@ -27,7 +27,7 @@ parallel="false"
 target="host"
 cleanup=true
 
-# Extract target value
+# Extract target value and parallel flag (without removing them from the argument list)
 for arg in "${all_args[@]}"; do
     if [ "${prev_arg}" == "--target" ] ; then
         target=$arg
@@ -42,19 +42,28 @@ done
 echo "Target: ${target}"
 echo "Parallel: ${parallel}"
 
+# Get model filename
 model_file=$1
 model_name="${model_file%.*}"
-if [ ${model_file: -6} == ".model" ] ; then
+if [ "${model_file: -6}" == ".model" ] ; then
     model_option="-imf"
 else
     model_option="-imap"
 fi
 shift
 
+# Get output directory (if specified)
 profiler_directory=$model_name"_profiler"
 next_opt=$1
-if [ ${next_opt:0:1} != '-' ] ; then
+if [ "${next_opt}" != "" ] && [ "${next_opt:0:1}" != "-" ] ; then
     profiler_directory=$next_opt
+    shift
+fi
+
+ir_option="--ir"
+next_opt=$1
+if [ "${next_opt}" != "" ] && [ "${next_opt}" == "--no_opt" ] ; then
+    ir_option=""
     shift
 fi
 
@@ -76,15 +85,17 @@ fi
 
 echo "Compiling model profilers to ${profiler_directory}"
 mkdir -p $profiler_directory
-@COMPILE_EXECUTABLE@ $model_option $model_file --profile --ir --objectCode $compile_opts --header -od $profiler_directory -ob compiled_model $@
-@COMPILE_EXECUTABLE@ $model_option $model_file --ir --objectCode $compile_opts --header -od $profiler_directory -ob compiled_model_noprofile $@
+@COMPILE_EXECUTABLE@ $model_option $model_file --profile ${ir_option} --objectCode ${compile_opts} --header -od $profiler_directory -ob compiled_model $@
+@COMPILE_EXECUTABLE@ $model_option $model_file ${ir_option} --objectCode ${compile_opts} --header -od $profiler_directory -ob compiled_model_noprofile $@
 
 cd $profiler_directory
+if [ "${ir_option}" != "" ] ; then
 @OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_opt.ll -o compiled_model_opt.o -O3 --filetype=obj $llc_opts
 
 @OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj $llc_opts
+fi
 
 cp ${script_dir}/../tools/utilities/profile/CompiledProfile_main.cpp .
 cp ${script_dir}/../tools/utilities/profile/CompiledExerciseModel_main.cpp .
@@ -99,7 +110,7 @@ else
     cp ${script_dir}/../tools/utilities/profile/CMakeLists-device.txt.in ./CMakeLists.txt
 fi
 
-if [ ${cleanup} == "true" ] ; then
+if [ "${cleanup}" == "true" ] ; then
     rm -rf ./*.ll
     rm -rf ./*.bc
 fi

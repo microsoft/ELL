@@ -10,12 +10,6 @@ namespace ell
 {
 namespace model
 {
-    template <typename ValueType>
-    class SliceNode;
-
-    template <typename ValueType>
-    class SpliceNode;
-
     namespace detail
     {
         class ModelNodeRouter
@@ -181,6 +175,18 @@ namespace model
     void Model::VisitSubset(const std::vector<const Node*>& outputNodes, Visitor&& visitor) const
     {
         auto iter = GetNodeIterator(outputNodes);
+        while (iter.IsValid())
+        {
+            visitor(*iter.Get());
+            iter.Next();
+        }
+    }
+
+    // Visits the entire model in reverse
+    template <typename Visitor>
+    void Model::ReverseVisit(Visitor&& visitor) const
+    {
+        auto iter = GetReverseNodeIterator();
         while (iter.IsValid())
         {
             visitor(*iter.Get());

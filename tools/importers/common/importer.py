@@ -8,12 +8,16 @@
 #
 ####################################################################################################
 
+import os
+import sys
 import logging
 from enum import Enum, auto
 import typing
 
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__))))
+
 import ell
-from .converters import *
+from converters import *
 
 _logger = logging.getLogger(__name__)
 

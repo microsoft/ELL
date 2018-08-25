@@ -160,6 +160,7 @@ namespace nodes
     MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::PortElements<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride, bool transposeOutput)
         : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, m * n), _m(m), _n(n), _k(k), _lda(matrix1Stride), _ldb(matrix2Stride), _ldc(outputMatrixStride), _transpose1(transpose1), _transpose2(transpose2), _transposeOutput(transposeOutput)
     {
+        // TODO: reset output layout (incl. transpose info)
         if (static_cast<int>(input1.Size()) != m * k)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input matrix 1 size incorrect");
@@ -252,6 +253,7 @@ namespace nodes
     template<typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
+        // TODO: check version number and read this format if in back-compat mode
         Node::ReadFromArchive(archiver);
         archiver[defaultInput1PortName] >> _input1;
         archiver[defaultInput2PortName] >> _input2;

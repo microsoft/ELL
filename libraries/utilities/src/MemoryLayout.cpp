@@ -431,5 +431,22 @@ namespace utilities
         return !MemoryLayoutsEqual(layout1, layout2);
     }
 
+    std::ostream& operator<<(std::ostream& out, const utilities::MemoryShape& shape)
+    {
+        out << shape[0];
+        auto numDimensions = shape.NumDimensions();
+        for(int index = 1; index < numDimensions; ++index)
+        {
+            out << " x " << shape[index];
+        }
+        return out;
+    }
+
+    std::ostream& operator<<(std::ostream& out, const utilities::MemoryLayout& layout)
+    {
+        out << "active size (physical): " << layout.GetActiveSize();
+        out << " memory size (physical): " << layout.GetStride();
+        return out;
+    }
 }
 }

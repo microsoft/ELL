@@ -74,8 +74,8 @@ def train(model, epochs, trainloader, optimizer, criterion):
 
     print('Finished Training')
     
+    
 def test(model, testloader):
-
     correct = 0
     total = 0
     with torch.no_grad():

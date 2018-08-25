@@ -139,13 +139,13 @@ public:
     Node Get();
 #ifndef SWIG
     NodeIterator(std::vector<const ell::model::Node*> nodes);
-    NodeIterator(ell::model::NodeIterator& other);
+    NodeIterator(ell::model::ForwardNodeIterator& other);
 #endif
 private:
     size_t _i = 0;
     bool _isVector = false;
     std::vector<const ell::model::Node*> _nodes;
-    ell::model::NodeIterator _iterator;
+    ell::model::ForwardNodeIterator _iterator;
 };
 
 //

@@ -8,7 +8,6 @@
 
 #include "DiagonalConvolutionNode.h"
 #include "ConstantNode.h"
-#include "MatrixMatrixMultiplyNode.h"
 
 // math
 #include "Matrix.h"

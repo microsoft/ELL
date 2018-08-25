@@ -55,6 +55,9 @@ namespace emitters
         /// <summary> Exit the profiling region: accumulate the time spent since calling `Enter()`. </summary>
         void Exit();
 
+        /// <summary> Check internal time is valid. For testing. </summary>
+        bool IsStartTimeValid() const;
+        
     private:
         friend IRProfiler;
         IRProfileRegion(IRFunctionEmitter& function, IRProfiler& profiler, const std::string& name, IRLocalScalar index);
@@ -132,10 +135,11 @@ namespace emitters
         IRLocalScalar GetCurrentTime(IRFunctionEmitter& function);
 
         // Actual implementations of the functions in IRProfileRegion
-        void InitRegion(IRProfileRegion& region, const std::string& name);
+        void InitRegion(IRProfileRegion& region, const std::string& desiredName);
         void EnterRegion(IRProfileRegion& region);
         void ExitRegion(IRProfileRegion& region);
         void ResetRegionCounts(IRFunctionEmitter& function, const IRLocalScalar& regionIndex);
+        std::string GetUniqueRegionName(const std::string& desiredName) const;
 
         // Generating functions
         void EmitProfilerFunctions();

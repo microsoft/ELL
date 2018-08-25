@@ -51,10 +51,11 @@ target_link_libraries(profile ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLA
 target_compile_definitions(profile PUBLIC COMPILED_ELL_PROFILER)
 
 # Version with LLVM's opt tool optimizing ELL's IR output and then compiling with llc
-add_executable(profile_opt ${src} ${include} ${tcc})
-target_link_libraries(profile_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS} Threads::Threads)
-target_compile_definitions(profile_opt PUBLIC COMPILED_ELL_PROFILER)
-
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o)
+  add_executable(profile_opt ${src} ${include} ${tcc})
+  target_link_libraries(profile_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS} Threads::Threads)
+  target_compile_definitions(profile_opt PUBLIC COMPILED_ELL_PROFILER)
+endif()
 
 #
 # Simple program that just exercises the model and exits. Used with low-level system profiling and timing tools 
@@ -76,5 +77,7 @@ add_executable(exercise_model ${src} ${include} ${tcc})
 target_link_libraries(exercise_model ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLAS_LIBS} Threads::Threads)
 
 # Version with LLVM's opt tool optimizing ELL's IR output and then compiling with llc
-add_executable(exercise_model_opt ${src} ${include} ${tcc})
-target_link_libraries(exercise_model_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS} Threads::Threads)
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o)
+  add_executable(exercise_model_opt ${src} ${include} ${tcc})
+  target_link_libraries(exercise_model_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS} Threads::Threads)
+endif()

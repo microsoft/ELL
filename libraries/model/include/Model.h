@@ -35,28 +35,24 @@ namespace model
         class ModelNodeRouter;
     }
 
-    /// <summary> An iterator over the nodes in a Model </summary>
+    /// <summary> Abstract base class for iterators over the nodes in a Model </summary>
     class NodeIterator : public utilities::IIterator<const Node*>
     {
     public:
-        NodeIterator() = default;
-
-        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+        /// <summary> Returns true if the iterator is currently pointing to a valid node. </summary>
         ///
         /// <returns> true if valid, false if not. </returns>
         bool IsValid() const override { return _currentNode != nullptr; }
 
-        /// <summary> Proceeds to the Next item. </summary>
-        void Next() override;
-
-        /// <summary> Returns a const reference to the current item. </summary>
+        /// <summary> Returns a const reference to the current node. </summary>
         ///
-        /// <returns> A const reference to the current item; </returns>
+        /// <returns> A const reference to the current node. </returns>
         const Node* Get() const override { return _currentNode; }
 
-    private:
+    protected:
         friend class Model;
-        NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes);
+        NodeIterator() = default;
+        NodeIterator(const Model* model);
 
         const Model* _model = nullptr;
         std::unordered_set<const Node*> _visitedNodes;
@@ -65,7 +61,45 @@ namespace model
         const Node* _currentNode = nullptr;
     };
 
-    /// <summary> Model class. Represents a computation graph </summary>
+    /// <summary>
+    /// An iterator over the nodes in the model that visits the nodes in dependency 
+    /// order --- no nodes will be visited until all its inputs have first been visited. 
+    /// Other than fulfilling this constraint, no guarantees are made on the order the 
+    /// nodes are visited.
+    /// </summary>
+    class ForwardNodeIterator : public NodeIterator
+    {
+    public:
+        ForwardNodeIterator() = default;
+
+        /// <summary> Proceeds to the next node. </summary>
+        void Next() override;
+
+    private:
+        friend class Model;
+        ForwardNodeIterator(const Model* model, const std::vector<const Node*>& outputNodes);
+    };
+
+    /// <summary>
+    /// An iterator over the nodes in the model that visits the nodes in reverse dependency 
+    /// order --- no nodes will be visited until all its outputs have first been visited. 
+    /// Other than fulfilling this constraint, no guarantees are made on the order the 
+    /// nodes are visited.
+    /// </summary>
+    class ReverseNodeIterator : public NodeIterator
+    {
+    public:
+        ReverseNodeIterator() = default;
+
+        /// <summary> Proceeds to the next node. </summary>
+        void Next() override;
+
+    private:
+        friend class Model;
+        ReverseNodeIterator(const Model* model);
+    };
+
+    /// <summary> Model class. Represents a graph of computation </summary>
     class Model : public utilities::IArchivable
     {
     public:
@@ -168,10 +202,19 @@ namespace model
         void VisitSubset(const std::vector<const Node*>& outputNodes, Visitor&& visitor) const;
 
         /// <summary>
+        /// Visits all the nodes in the model in reverse dependency order. No nodes will be visited until all
+        /// its outputs have first been visited.
+        /// </summary>
+        ///
+        /// <param name="visitor"> The visitor functor to use. The type signature should be of the form `void visitor(const Node&)`. </param>
+        template <typename Visitor>
+        void ReverseVisit(Visitor&& visitor) const;
+
+        /// <summary>
         /// Gets an iterator over all the nodes in the model in dependency order. No nodes will be visited until all
         /// its inputs have first been visited.
         /// </summary>
-        NodeIterator GetNodeIterator() const { return GetNodeIterator(std::vector<const Node*>{}); }
+        ForwardNodeIterator GetNodeIterator() const { return GetNodeIterator(std::vector<const Node*>{}); }
 
         /// <summary>
         /// Gets an iterator over the nodes in the model necessary to compute the output of a given node. Visits the nodes
@@ -179,7 +222,7 @@ namespace model
         /// </summary>
         ///
         /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
-        NodeIterator GetNodeIterator(const Node* outputNode) const { return GetNodeIterator(std::vector<const Node*>{ outputNode }); }
+        ForwardNodeIterator GetNodeIterator(const Node* outputNode) const { return GetNodeIterator(std::vector<const Node*>{ outputNode }); }
 
         /// <summary>
         /// Gets an iterator over the nodes in the model necessary to compute the outputs of the given nodes. Visits the nodes
@@ -187,7 +230,13 @@ namespace model
         /// </summary>
         ///
         /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
-        NodeIterator GetNodeIterator(const std::vector<const Node*>& outputNodes) const;
+        ForwardNodeIterator GetNodeIterator(const std::vector<const Node*>& outputNodes) const;
+
+        /// <summary>
+        /// Gets an iterator over all the nodes in the model in reverse dependency order. No nodes will be visited until all
+        /// its outputs have first been visited.
+        /// </summary>
+        ReverseNodeIterator GetReverseNodeIterator() const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -229,6 +278,8 @@ namespace model
 
     private:
         friend class NodeIterator;
+        friend class ForwardNodeIterator;
+        friend class ReverseNodeIterator;
         friend class detail::ModelNodeRouter;
         template <typename ValueType>
         friend class InputPort;

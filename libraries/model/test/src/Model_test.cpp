@@ -18,6 +18,7 @@
 #include "Model.h"
 #include "ModelEditor.h"
 #include "ModelTransformer.h"
+#include "Node.h"
 #include "OutputNode.h"
 #include "OutputPort.h"
 
@@ -35,69 +36,45 @@
 #include <iomanip>
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 
 using namespace ell;
 
-void TestStaticModel()
+//
+// Utility code
+//
+
+class NodeIdSet
 {
-    // Create a simple computation model
-    model::Model g;
-    auto in = g.AddNode<model::InputNode<double>>(3);
-    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
-    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
-    auto condition = g.AddNode<nodes::ConstantNode<bool>>(true);
-    auto valSelector = g.AddNode<nodes::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
-    auto indexSelector = g.AddNode<nodes::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
+public:
+    bool Contains(const model::Node::NodeId& id) const
+    {
+        return _ids.find(id) != _ids.end();
+    }
 
-    //
-    // Print various submodels
-    //
-    std::cout << "\nFullModel:" << std::endl;
-    PrintModel(g);
+    void Add(const model::Node::NodeId& id)
+    {
+        _ids.insert(id);
+    }
 
-    std::cout << "\nModel necessary for selected value:" << std::endl;
-    PrintModel(g, valSelector);
+    size_t Size() const
+    {
+        return _ids.size();
+    }
 
-    std::cout << "\nModel necessary for selected index:" << std::endl;
-    PrintModel(g, indexSelector);
+private:
+    std::unordered_set<model::Node::NodeId> _ids;
+};
 
-    //
-    // Compute outputs of various nodes
-    //
-    // Set the input node's current values
-    std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
-    in->SetInput(inputValues);
-
-    std::cout << "\nComputing output of Input node" << std::endl;
-    auto output1 = g.ComputeOutput(in->output);
-    for (auto x : output1)
-        std::cout << x << "  ";
-    std::cout << std::endl;
-
-    std::cout << "\nComputing output of condition node" << std::endl;
-    auto conditionOutput = g.ComputeOutput(condition->output);
-    for (auto x : conditionOutput)
-        std::cout << x << "  ";
-    std::cout << std::endl;
-
-    // std::cout << "\nComputing output of ArgMax node" << std::endl;
-    // auto maxOutput = g.ComputeOutput(maxAndArgMax->val);
-    // for(auto x: maxOutput) std::cout << x << "  ";
-    // std::cout << std::endl;
-
-    std::cout << "\nComputing output of valSelector node" << std::endl;
-    auto output3 = g.ComputeOutput(valSelector->output);
-    for (auto x : output3)
-        std::cout << x << "  ";
-    std::cout << std::endl;
-    testing::ProcessTest("Testing min value", testing::IsEqual(output3[0], 0.75));
-
-    std::cout << "\nComputing output of indexSelector node" << std::endl;
-    auto output4 = g.ComputeOutput(indexSelector->output);
-    for (auto x : output4)
-        std::cout << x << "  ";
-    std::cout << std::endl;
-    testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
+int CountIterableNodes(model::NodeIterator& iterator)
+{
+    int count = 0;
+    while(iterator.IsValid())
+    {
+        ++count;
+        iterator.Next();
+    }
+    return count;
 }
 
 model::Model GetCompoundModel()
@@ -111,22 +88,93 @@ model::Model GetCompoundModel()
     return g;
 }
 
+//
+// The tests
+//
+void TestStaticModel()
+{
+    // Create a simple computation model
+    model::Model g;
+    auto in = g.AddNode<model::InputNode<double>>(3);
+    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
+    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
+    auto condition = g.AddNode<nodes::ConstantNode<bool>>(true);
+    auto valSelector = g.AddNode<nodes::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    auto indexSelector = g.AddNode<nodes::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
+
+    auto iter = g.GetNodeIterator();
+    testing::ProcessTest("Testing full model size", testing::IsEqual(CountIterableNodes(iter), 6));
+    iter = g.GetNodeIterator(valSelector);
+    testing::ProcessTest("Testing partial model size 1", testing::IsEqual(CountIterableNodes(iter), 5));
+    iter = g.GetNodeIterator(indexSelector);
+    testing::ProcessTest("Testing partial model size 2", testing::IsEqual(CountIterableNodes(iter), 5));
+
+    //
+    // Compute outputs of various nodes
+    //
+
+    // Set the input node's current values
+    std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
+    in->SetInput(inputValues);
+
+    auto output1 = g.ComputeOutput(in->output);
+    testing::ProcessTest("Testing input node", testing::IsEqual(output1, inputValues));
+
+    auto conditionOutput = g.ComputeOutput(condition->output);
+    testing::ProcessTest("Testing condition node", testing::IsEqual(conditionOutput, std::vector<bool>{ true }));
+
+    auto minOutput = g.ComputeOutput(minAndArgMin->val);
+    testing::ProcessTest("Testing min value", testing::IsEqual(minOutput[0], 0.25));
+
+    auto output3 = g.ComputeOutput(valSelector->output);
+    testing::ProcessTest("Testing max value", testing::IsEqual(output3[0], 0.75));
+
+    auto output4 = g.ComputeOutput(indexSelector->output);
+    testing::ProcessTest("Testing max index", testing::IsEqual(output4[0], 2));
+}
+
 void TestNodeIterator()
 {
     auto model = GetCompoundModel();
-    auto size1 = model.Size();
-    size_t size2 = 0;
     auto iter = model.GetNodeIterator();
+    NodeIdSet visitedNodeIds;
     while (iter.IsValid())
     {
-        ++size2;
+        auto node = iter.Get();
+        for(auto parent: node->GetParentNodes())
+        {
+            testing::ProcessTest("Testing node's inputs already visited", visitedNodeIds.Contains(parent->GetId()));
+        }
+        for(auto dependent: node->GetDependentNodes())
+        {
+            testing::ProcessTest("Testing node's outputs not already visited", !visitedNodeIds.Contains(dependent->GetId()));
+        }
         iter.Next();
+        visitedNodeIds.Add(node->GetId());
     }
-    testing::ProcessTest("Testing Size() and iterator count", size1 == size2);
-    testing::ProcessTest("Testing Size() and known node count", size1 == 5);
+    testing::ProcessTest("Testing Size() and iterator count", model.Size() == visitedNodeIds.Size());
+}
 
-    std::cout << std::endl
-              << std::endl;
+void TestReverseNodeIterator()
+{
+    auto model = GetCompoundModel();
+    auto iter = model.GetReverseNodeIterator();
+    NodeIdSet visitedNodeIds;
+    while (iter.IsValid())
+    {
+        const model::Node* node = iter.Get();
+        for(const model::Node* parent: node->GetParentNodes())
+        {
+            testing::ProcessTest("Testing node's inputs not already visited", !visitedNodeIds.Contains(parent->GetId()));
+        }
+        for(const model::Node* dependent: node->GetDependentNodes())
+        {
+            testing::ProcessTest("Testing node's outputs already visited", visitedNodeIds.Contains(dependent->GetId()));
+        }
+        iter.Next();
+        visitedNodeIds.Add(node->GetId());
+    }
+    testing::ProcessTest("Testing Size() and reverse iterator count", model.Size() == visitedNodeIds.Size());
 }
 
 void TestModelSerialization()
@@ -193,36 +241,7 @@ void TestModelMetadata()
     }
 }
 
-void TestInputRouting1()
-{
-    // Create a simple model that computes both min and max and concatenates them
-    // model::Model model;
-
-    // auto in = model.AddNode<model::InputNode<double>>(3);
-
-    // auto minAndArgMin = model.AddNode<nodes::ArgMinNode<double>>(in->output);
-    // auto maxAndArgMax = model.AddNode<nodes::ArgMaxNode<double>>(in->output);
-    // model::PortRangeList ranges = { { minAndArgMin->val, 0}, {maxAndArgMax->val, 0} };
-    // model::PortRangeList ranges2 = { { minAndArgMin->val, 0}, {in->output, 1, 2} };
-
-    // auto minAndMax = model.AddNode<model::SpliceNode<double>>(ranges);
-    // auto minAndTail = model.AddNode<model::SpliceNode<double>>(ranges2);
-
-    // set some example input and read the output
-    // std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
-    // in->SetInput(inputValues);
-    // auto output = model.ComputeOutput(minAndMax->output);
-
-    // testing::ProcessTest("Testing combine node", testing::IsEqual(output[0], 0.25));
-    // testing::ProcessTest("Testing combine node", testing::IsEqual(output[1], 0.75));
-
-    // auto output2 = model.ComputeOutput(minAndTail->output);
-    // std::cout << "size: " << output2.size() << std::endl;
-    // for (auto val : output2) std::cout << val << "  ";
-    // std::cout << std::endl;
-}
-
-void TestInputRouting2()
+void TestInputRouting()
 {
     // Create a simple computation model that computes both min and max and concatenates them
     model::Model model;

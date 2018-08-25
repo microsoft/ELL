@@ -9,6 +9,8 @@
 #include "DSPNodesTests.h"
 #include "DTWPrototype.h"
 #include "NodesTestData.h"
+#include "NodesTestUtilities.h"
+
 #include "ModelTestUtilities.h"
 
 // common
@@ -85,54 +87,6 @@ using namespace std::string_literals;
 //
 namespace
 {
-
-struct ImageShape
-{
-    int numRows;
-    int numColumns;
-    int numChannels;
-};
-
-struct FiltersShape
-{
-    int numFilters;
-    int numRows;
-    int numColumns;
-    int numChannels;
-};
-
-// Parameter struct for passing options in to Winograd convolution tests.
-struct WinogradOptions
-{
-    int tileSize;
-    dsp::WinogradFilterOrder filterOrder;
-};
-
-struct SimpleOptions
-{
-};
-
-struct UnrolledOptions
-{
-};
-
-struct DiagonalOptions
-{
-};
-
-union ConvolutionOptions
-{
-    ConvolutionOptions() {}
-    ConvolutionOptions(int tileSize, dsp::WinogradFilterOrder order)
-        : winogradOptions({ tileSize, order }) {}
-    ConvolutionOptions(int tileSize)
-        : winogradOptions({ tileSize, dsp::WinogradFilterOrder::tilesFirst }) {}
-
-    WinogradOptions winogradOptions;
-    SimpleOptions simpleOptions;
-    UnrolledOptions unrolledOptions;
-    DiagonalOptions diagonalOptions;
-};
 
 std::string GetConvAlgName(dsp::ConvolutionMethodOption alg)
 {
@@ -650,8 +604,9 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
     auto compiledResult = compiledMap.ComputeOutput<ValueType>(0);
 
     auto ok = testing::IsEqual(reference, compiledResult, epsilon);
-    testing::ProcessTest("Testing compiled "s + GetConvAlgName(convolutionMethod) + " convolution node vs dsp reference", ok);
-
+    testing::ProcessTest("Testing compiled "s + GetConvAlgName(convolutionMethod) + " convolution node vs reference for  " + std::to_string(inputRows) + " x " + std::to_string(inputColumns) + " x " + std::to_string(numChannels)
+                    + " image and " + std::to_string(numFilters) + " " + std::to_string(filterSize) + " x " + std::to_string(filterSize) + " x " + std::to_string(numFilterChannels) + " filters, stride " + std::to_string(stride), ok);
+    
     // Helpful debugging output
     if (!ok)
     {
@@ -662,10 +617,9 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
         }
         auto minmax = std::minmax_element(diff.begin(), diff.end());
 
-        std::cout << "Error processing compiled "s + GetConvAlgName(convolutionMethod) + " convolution node vs dsp reference for image size " << inputRows << " x " << inputColumns << " x " << numChannels;
-        std::cout << " and " << numFilters << " " << filterSize << " x " << filterSize << " filters, with stride " << stride << "\n";
-        std::cout << "  Min diff: " << *minmax.first << " max diff: " << *minmax.second << "\n";
+        std::cout << "Error: min diff: " << *minmax.first << " max diff: " << *minmax.second << "\n";
 #if 0
+        // Helpful debugging output
         if (compiledResult.size() < 500)
         {
             std::cout << "Compiled result:\n"
@@ -1168,7 +1122,7 @@ void TestDSPNodes(const std::string& path)
     // TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::diagonal); // ERROR: diagonal test currently broken
     TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::winograd);
-
+    
     // Test simple convolution
     TestConvolutionNodeCompileVsReference<float>({ 2, 2, 1 }, { 1, 3, 3, 0 }, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>({ 2, 3, 1 }, { 1, 3, 3, 0 }, 1, dsp::ConvolutionMethodOption::simple);

@@ -62,7 +62,7 @@ namespace nodes
         /// <summary> Constructor with reordering </summary>
         ///
         /// <param name="input"> The input to reorder. </param>
-        /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
+        /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done. 
         //    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///   set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
         ReorderDataNode(const model::PortElements<ValueType>& input, const model::DimensionOrder& order);
@@ -135,7 +135,6 @@ namespace nodes
         void Copy(model::ModelTransformer& transformer) const override;
 
         void ComputeDimensionLoop(const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, int dimension, std::vector<int>& coordinates, std::vector<ValueType>& output) const;
-        void CompileDimensionLoop(emitters::IRFunctionEmitter& function, emitters::IRLocalArray input, const model::PortMemoryLayout& inputMemoryLayout, emitters::IRLocalArray output, const model::PortMemoryLayout& outputMemoryLayout, int dimension, std::vector<emitters::IRLocalScalar>& coordinates) const;
 
         // Input
         model::InputPort<ValueType> _input;

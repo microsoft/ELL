@@ -21,30 +21,29 @@ namespace ell
 {
 namespace model
 {
-    emitters::IRLocalScalar EmitGetEntryOffset(emitters::IRFunctionEmitter& function, const std::vector<emitters::IRLocalScalar>& location, const PortMemoryLayout& layout)
+    emitters::IRLocalScalar EmitGetEntryOffset(emitters::IRFunctionEmitter& function, const std::vector<emitters::IRLocalScalar>& physicalCoordinates, const PortMemoryLayout& layout)
     {
-        auto increment = layout.GetCumulativeIncrement();
-        const int numDimensions = layout.NumDimensions();
+        const auto& offset = layout.GetOffset();
+        const auto& increment = layout.GetCumulativeIncrement();
+        const auto numDimensions = layout.NumDimensions();
         auto result = function.LocalScalar(0);
         for (int index = 0; index < numDimensions; ++index)
         {
-            auto offsetLocation = location[index] + layout.GetOffset(index);
-            auto dimensionOffset = offsetLocation * increment[index];
-            result = result + dimensionOffset;
+            result = result + (increment[index] * (physicalCoordinates[index] + offset[index]));
         }
         return result;
     }
 
-    emitters::IRLocalScalar EmitIsOutOfBounds(emitters::IRFunctionEmitter& function, const std::vector<emitters::IRLocalScalar>& location, const PortMemoryLayout& layout)
+    emitters::IRLocalScalar EmitIsOutOfBounds(emitters::IRFunctionEmitter& function, const std::vector<emitters::IRLocalScalar>& physicalCoordinates, const PortMemoryLayout& layout)
     {
         const int numDimensions = layout.NumDimensions();
         auto result = function.LocalScalar(function.FalseBit());
         for (int index = 0; index < numDimensions; ++index)
         {
-            auto test1 = (location[index] + layout.GetOffset(index)) < 0;
+            auto test1 = (physicalCoordinates[index] + layout.GetOffset(index)) < 0;
             result = result || test1;
 
-            auto test2 = (location[index] - layout.GetOffset(index)) < layout.GetStride(index);
+            auto test2 = (physicalCoordinates[index] - layout.GetOffset(index)) < layout.GetStride(index);
             result = result || test2;
         }
         return result;

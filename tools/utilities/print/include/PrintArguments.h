@@ -23,6 +23,7 @@ struct PrintArguments
     std::string outputFilename;
     std::string outputFormat;
     size_t refine;
+    bool compile;
     bool includeNodeId;
     utilities::OutputStreamImpostor outputStream;
 };

@@ -76,22 +76,7 @@ namespace nodes
         break;
         case ConvolutionMethod::winograd:
         {
-            using FilterOrder = typename WinogradConvolutionNode<ValueType>::FilterOrder;
-            const int winogradTileSize = 2;
-            auto numFilterChannels = static_cast<int>(weights.NumChannels());
-            const int filtersFirstThreshold = 2;
-            const auto order = (numFilterChannels < filtersFirstThreshold) ? FilterOrder::filtersFirst : FilterOrder::tilesFirst;
-            if (order == FilterOrder::filtersFirst)
-            {
-                // add a ReorderDataNode to convert to channel-major, which is more efficient in this case
-                auto orderArr = utilities::ChannelMajorTensorOrder;
-                auto reorderNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, convInputLayout, convInputLayout, std::vector<int>{ orderArr.begin(), orderArr.end() });
-                auto outputLayout = reorderNode->GetOutputMemoryLayout();
-                newInput = reorderNode->output;
-                convInputLayout = reorderNode->GetOutputMemoryLayout();
-            }
-
-            auto convNode = transformer.AddNode<WinogradConvolutionNode<ValueType>>(newInput, convInputLayout, convOutputLayout, weights, convParams.stride, winogradTileSize, order);
+            auto convNode = transformer.AddNode<WinogradConvolutionNode<ValueType>>(newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
             convOutput = convNode->output;
         }
         break;

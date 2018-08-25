@@ -701,7 +701,7 @@ namespace nodes
 
         if (inputLayout.GetActiveSize() != outputLayout.GetActiveSize())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active area sizes don't match");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "BroadcastFunctionNode: Input and output active area sizes don't match");
         }
     }
 

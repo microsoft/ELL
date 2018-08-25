@@ -69,14 +69,17 @@ namespace emitters
 
     void IRProfileRegion::Enter()
     {
-        assert(!_startTime.IsValid());
         _profiler.EnterRegion(*this);
     }
 
     void IRProfileRegion::Exit()
     {
-        assert(_startTime.IsValid());
         _profiler.ExitRegion(*this);
+    }
+
+    bool IRProfileRegion::IsStartTimeValid() const
+    {
+        return _startTime.IsValid();
     }
 
     //
@@ -131,24 +134,20 @@ namespace emitters
         return function.LocalScalar(time);
     }
 
-    void IRProfiler::InitRegion(IRProfileRegion& region, const std::string& name)
+    void IRProfiler::InitRegion(IRProfileRegion& region, const std::string& desiredName)
     {
         if (!_profilingEnabled)
             return;
 
-        // Ensure name is unique
-        if (_regionNames.find(name) != _regionNames.end())
-        {
-            throw EmitterException(EmitterError::duplicateSymbol, "Region name already used");
-        }
-        _regionNames.insert(name);
+        auto regionName = GetUniqueRegionName(desiredName);
+        _regionNames.insert(regionName);
 
         auto& function = region.GetFunction();
         auto regionPtr = GetRegionPointer(function, region.GetIndex());
 
         // Set the name
         auto namePtr = function.GetStructFieldPointer(regionPtr, static_cast<size_t>(RegionInfoFields::name));
-        function.Store(namePtr, function.Literal(name));
+        function.Store(namePtr, function.Literal(regionName));
     }
 
     void IRProfiler::EnterRegion(IRProfileRegion& region)
@@ -200,6 +199,19 @@ namespace emitters
         function.StoreZero(timePtr);
     }
 
+
+    std::string IRProfiler::GetUniqueRegionName(const std::string& desiredName) const
+    {
+        // Ensure name is unique
+        auto regionName = desiredName;
+        int index = 1;
+        while (_regionNames.find(regionName) != _regionNames.end())
+        {
+            regionName = desiredName + "_" + std::to_string(index++);
+        }
+        return regionName;
+    }
+    
     IRLocalScalar IRProfiler::CreateRegion(IRFunctionEmitter& function)
     {
         if (!_profilingEnabled)

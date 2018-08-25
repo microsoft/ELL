@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <array>
 #include <initializer_list>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -491,5 +492,11 @@ namespace utilities
 
     /// <summary> Represents channel-major 3D tensor order </summary>
     constexpr std::array<int, 3> ChannelMajorTensorOrder{ 2, 0, 1 };
+
+    /// <summary> Writes a `MemoryShape`'s dimensions to an output stream </summary>
+    std::ostream& operator<<(std::ostream& out, const utilities::MemoryShape& shape);
+    
+    /// <summary> Writes a `MemoryLayout` to an output stream </summary>
+    std::ostream& operator<<(std::ostream& out, const utilities::MemoryLayout& layout);
 }
 }

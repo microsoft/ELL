@@ -215,7 +215,7 @@ NodeIterator::NodeIterator(std::vector<const ell::model::Node*> nodes)
 {
 }
 
-NodeIterator::NodeIterator(ell::model::NodeIterator& other)
+NodeIterator::NodeIterator(ell::model::ForwardNodeIterator& other)
     : _i(0), _isVector(false), _nodes(0), _iterator(other)
 {
 }

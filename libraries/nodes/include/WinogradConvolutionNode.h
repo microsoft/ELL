@@ -14,6 +14,9 @@
 // dsp
 #include "WinogradConvolution.h"
 
+// emitters
+#include "IRLocalArray.h"
+
 // math
 #include "Tensor.h"
 
@@ -57,8 +60,21 @@ namespace nodes
         /// <param name="filterWeights"> The weights for the convolutional filters. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         /// <param name="stride"> The number of elements to move/jump when sliding over the input. Typically this is 1 to 3. </param>
+        WinogradConvolutionNode(const model::PortElements<ValueType>& input,
+                                const model::PortMemoryLayout& inputMemoryLayout,
+                                const model::PortMemoryLayout& outputMemoryLayout,
+                                const ConstTensorReferenceType& filterWeights,
+                                int stride);
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input"> The port to get input data from. </param>
+        /// <param name="inputMemoryLayout"> The layout of the input data. </param>
+        /// <param name="filterWeights"> The weights for the convolutional filters. </param>
+        /// <param name="outputMemoryLayout"> The layout of the output data. </param>
+        /// <param name="stride"> The number of elements to move/jump when sliding over the input. Typically this is 1 to 3. </param>
         /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
-        /// <param name="order"> The order to process data during convolution. </param>
+        /// <param name="order"> The order to process filter data during convolution. </param>
         WinogradConvolutionNode(const model::PortElements<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
@@ -66,6 +82,7 @@ namespace nodes
                                 int stride,
                                 int tileSize,
                                 FilterOrder order);
+
 
         /// <summary> Cloning constructor </summary>
         ///
@@ -157,7 +174,11 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="filterWeights"> The weights for the convolutional filters. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        /// <param name="order"> The order to process data during convolution. </param>
+        /// <param name="stride"> The number of elements to move/jump when sliding over the input. Typically this is 1 to 3. </param>
+        /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
+        /// <param name="tileSize"> The spatial size of the filters. </param>
+        /// <param name="order"> The order to process filter data during convolution. </param>
+        /// <param name="numFilterChannels"> The number of channels per filter. </param>
         WinogradConvolutionComputeNode(const model::PortElements<ValueType>& input,
                                        const model::PortElements<ValueType>& filterWeights,
                                        const model::PortMemoryLayout& inputMemoryLayout,
@@ -212,10 +233,9 @@ namespace nodes
         bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
 
     private:
+        void CompileFiltersFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, emitters::IRLocalArray input, emitters::IRLocalArray transformedFilters, emitters::IRLocalArray output);
+        void CompileTilesFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, emitters::IRLocalArray input, emitters::IRLocalArray transformedFilters, emitters::IRLocalArray output);
         void Copy(model::ModelTransformer& transformer) const override;
-
-        void CompileFiltersFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, emitters::LLVMValue input, emitters::LLVMValue transformedFilters, emitters::LLVMValue output);
-        void CompileTilesFirst(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, emitters::LLVMValue input, emitters::LLVMValue transformedFilters, emitters::LLVMValue output);
 
         // Input
         model::InputPort<ValueType> _input;

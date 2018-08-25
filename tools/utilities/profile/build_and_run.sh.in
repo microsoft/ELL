@@ -20,15 +20,19 @@ make -s
 echo "Running ELL profiler tool -- normal"
 /bin/bash -c "./profile 100 20"
 
-echo "Running ELL profiler tool -- opt"
-/bin/bash -c "./profile_opt 100 20"
+if [[ -f ./profile_opt ]] ; then
+  echo "Running ELL profiler tool -- opt"
+  /bin/bash -c "./profile_opt 100 20"
+fi
 
 # Run exercise_model tool with 10 iterations
 echo "Timing ELL exercise tool -- normal"
 /bin/bash -c "time ./exercise_model 100"
 
-echo "Timing ELL exercise tool -- opt"
-/bin/bash -c "time ./exercise_model_opt 100"
+if [[ -f ./profile_opt ]] ; then
+  echo "Timing ELL exercise tool -- opt"
+  /bin/bash -c "time ./exercise_model_opt 100"
+fi
 
 # Run perf tool to get low-level events
 #

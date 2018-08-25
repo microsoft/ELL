@@ -18,8 +18,10 @@ import numpy as np
 from cntk import load_model, ModelFormat
 from cntk.ops import softmax
 
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../common'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import find_ell
 import ell
 from cntk_converters import *

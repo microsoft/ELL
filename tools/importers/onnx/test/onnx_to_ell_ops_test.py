@@ -9,9 +9,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import onnx
 
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'utilities/pythonlibs'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..', 'utilities/pythonlibs'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
 import find_ell
 import ell
@@ -66,7 +66,7 @@ _logger = logging.getLogger(__name__)
 #     }
 
 class _ConvNd(nn.Module):
-
+    
     def __init__(self, in_channels, out_channels, kernel_size, weight, stride,
                  padding, dilation, transposed, output_padding, groups,  bias):
         super(_ConvNd, self).__init__()
@@ -264,7 +264,6 @@ class Net(nn.Module):
             # x1 = nn.Softmax2d(x1)
             x = x1
             return x 
-
 
 model = Net()
 

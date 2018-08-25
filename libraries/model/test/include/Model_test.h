@@ -10,12 +10,12 @@
 void TestNodeIterator();
 void TestStaticModel();
 void TestNodeIterator();
+void TestReverseNodeIterator();
 
 void TestModelSerialization();
 void TestModelMetadata();
 
-void TestInputRouting1();
-void TestInputRouting2();
+void TestInputRouting();
 
 void TestDenseCopyModel();
 void TestShallowCopyModel();

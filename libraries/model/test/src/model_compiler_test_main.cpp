@@ -58,7 +58,7 @@ void TestIRCompiler()
     TestMatrixVectorMultiplyNode(10, 5, false);
     TestMatrixMatrixMultiplyNode(4, 5, 6, true);
     TestMatrixMatrixMultiplyNode(4, 5, 6, false);
-
+ 
     // Using BLAS
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, false, false, true);
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, false, false, true);
@@ -201,6 +201,7 @@ void TestIRCompiler()
 
     // TestConvolutionalLayerNode(ConvolutionMethod::unrolled);
     TestConvolutionalLayerNode(ConvolutionMethod::unrolled, 1, 0);
+
     TestConvolutionalLayerNode2(ConvolutionMethod::unrolled, 1, 0);
     TestConvolutionalLayerNode3(ConvolutionMethod::unrolled, 1, 0);
     // TestConvolutionalLayerNode(ConvolutionMethod::unrolled, 2, 0);
@@ -216,6 +217,7 @@ void TestIRCompiler()
     TestConvolutionalLayerNode(ConvolutionMethod::winograd, 1, 0);
     TestConvolutionalLayerNode2(ConvolutionMethod::winograd, 1, 0);
     TestConvolutionalLayerNode3(ConvolutionMethod::winograd, 1, 0);
+
 
     TestFullyConnectedLayerNode();
     // TestFullyConnectedLayerNode(0, 1); // Fully-connected layer nodes can't have padding (yet)

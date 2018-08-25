@@ -442,8 +442,8 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapLoadArguments);
         ParsedProfileArguments profileArguments;
         commandLineParser.AddOptionSet(profileArguments);
-        common::ParsedMapCompilerArguments compileArguments;
         commandLineParser.AddDocumentationString("Code generation options");
+        common::ParsedMapCompilerArguments compileArguments;
         commandLineParser.AddOptionSet(compileArguments);
         commandLineParser.DisableOption("--profile");
         commandLineParser.Parse();

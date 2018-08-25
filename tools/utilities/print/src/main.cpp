@@ -13,6 +13,20 @@
 // common
 #include "LoadModel.h"
 #include "MapLoadArguments.h"
+#include "MapCompilerArguments.h"
+
+// model
+#include "IRMapCompiler.h"
+#include "Map.h"
+#include "Model.h"
+#include "ModelTransformer.h"
+#include "Node.h"
+
+// nodes
+#include "NeuralNetworkPredictorNode.h"
+
+// passes
+#include "StandardPasses.h"
 
 // utilities
 #include "CommandLineParser.h"
@@ -20,9 +34,6 @@
 #include "NeuralNetworkPredictorNode.h"
 #include "OutputStreamImpostor.h"
 #include "StringUtil.h"
-
-// model
-#include "Model.h"
 
 // stl
 #include <iostream>
@@ -50,8 +61,12 @@ int main(int argc, char* argv[])
         // add arguments to the command line parser
         common::ParsedMapLoadArguments mapLoadArguments;
         ParsedPrintArguments printArguments;
+        common::ParsedMapCompilerArguments mapCompilerArguments;
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(printArguments);
+        commandLineParser.AddDocumentationString("");
+        commandLineParser.AddDocumentationString("Compile options (only valid if 'compile' is true)");
+        commandLineParser.AddOptionSet(mapCompilerArguments);
         commandLineParser.Parse();
 
         if (argc == 1)
@@ -69,7 +84,6 @@ int main(int argc, char* argv[])
 
         // Load model from file
         model::Model model;
-
         if (mapLoadArguments.HasModelFilename())
         {
             // not all models can be turned into maps if they have no input or output nodes, 
@@ -138,7 +152,7 @@ int main(int argc, char* argv[])
     }
     catch (...)
     {
-        std::cerr << "unknown exeption" << std::endl;
+        std::cerr << "unknown exception" << std::endl;
         return 1;
     }
 

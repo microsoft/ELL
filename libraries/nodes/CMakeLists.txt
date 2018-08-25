@@ -229,6 +229,7 @@ set(test_include
     test/include/DSPNodesTests.h
     test/include/DSPNodesTiming.h
     test/include/NodesTestData.h
+    test/include/NodesTestUtilities.h
 )
 
 source_group("src" FILES ${test_src})
@@ -253,6 +254,8 @@ target_link_libraries(${test_name}
     model_testing
     utilities
 )
+
+add_dependencies(${test_name} dspDataFiles)
 
 copy_shared_libraries(${test_name})
 
@@ -320,6 +323,7 @@ set(timing_src
 
 set(timing_include
     test/include/DSPNodesTiming.h
+    test/include/NodesTestUtilities.h
 )
 
 source_group("src" FILES ${timing_src})

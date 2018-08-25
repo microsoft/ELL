@@ -105,9 +105,14 @@ namespace model
         }
     }
 
-    NodeIterator Model::GetNodeIterator(const std::vector<const Node*>& outputNodes) const
+    ForwardNodeIterator Model::GetNodeIterator(const std::vector<const Node*>& outputNodes) const
     {
-        return NodeIterator(this, outputNodes);
+        return ForwardNodeIterator(this, outputNodes);
+    }
+
+    ReverseNodeIterator Model::GetReverseNodeIterator() const
+    {
+        return ReverseNodeIterator(this);
     }
 
     utilities::ArchiveVersion Model::GetArchiveVersion() const
@@ -323,11 +328,17 @@ namespace model
     }
         
     //
-    // NodeIterator implementation
+    // NodeIterator implementations
     //
 
-    NodeIterator::NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes)
+    // Base class
+    NodeIterator::NodeIterator(const Model* model)
         : _model(model)
+    {
+    }
+
+    // ForwardNodeIterator
+    ForwardNodeIterator::ForwardNodeIterator(const Model* model, const std::vector<const Node*>& outputNodes) : NodeIterator(model) 
     {
         _currentNode = nullptr;
         if (_model->Size() == 0)
@@ -350,10 +361,10 @@ namespace model
         Next();
     }
 
-    void NodeIterator::Next()
+    void ForwardNodeIterator::Next()
     {
         _currentNode = nullptr;
-        while (_stack.size() > 0)
+        while (!_stack.empty())
         {
             const Node* node = _stack.back();
 
@@ -391,6 +402,58 @@ namespace model
                     {
                         _stack.push_back(parentNode);
                     }
+                }
+            }
+        }
+    }
+
+    // ReverseNodeIterator
+    ReverseNodeIterator::ReverseNodeIterator(const Model* model) : NodeIterator(model) 
+    {
+        // Just push everything on the stack
+        for (auto node : _model->_data->idToNodeMap)
+        {
+            _stack.push_back(node.second.get());
+        }
+
+        Next();
+    }
+
+    void ReverseNodeIterator::Next()
+    {
+        _currentNode = nullptr;
+        while (!_stack.empty())
+        {
+            const Node* node = _stack.back();
+
+            // check if we've already visited this node
+            if (_visitedNodes.find(node) != _visitedNodes.end())
+            {
+                _stack.pop_back();
+                continue;
+            }
+
+            // we can visit this node only if all its outputs have been visited already
+            bool canVisit = true;
+            const auto children = node->GetDependentNodes();
+            for (const auto& childNode : children)
+            {
+                canVisit = canVisit && _visitedNodes.find(childNode) != _visitedNodes.end();
+            }
+
+            if (canVisit)
+            {
+                _stack.pop_back();
+                _visitedNodes.insert(node);
+                _currentNode = node;
+                break;
+            }
+            else // visit node's outputs
+            {
+                const auto children = node->GetDependentNodes();
+                for (const auto& childNode : children)
+                {
+                    _stack.push_back(childNode);
                 }
             }
         }

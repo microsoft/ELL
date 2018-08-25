@@ -59,10 +59,13 @@ void TestProfileRegion()
         auto x = function.LocalScalar(function.GetFunctionArgument("x"));
         
         IRProfileRegion region1(function, "TestRegion1");
+        testing::ProcessTest("Testing IRProfileRegion time not set", !region1.IsStartTimeValid());
         region1.Enter();
         auto result1 = 5.0 * x;
+        testing::ProcessTest("Testing IRProfileRegion time set", region1.IsStartTimeValid());
         region1.Exit();
 
+        testing::ProcessTest("Testing IRProfileRegion time not set", !region1.IsStartTimeValid());
         region1.Enter();
         auto result2 = 5.0 * x + result1;
         
@@ -74,12 +77,16 @@ void TestProfileRegion()
             auto dotSum = function.DotProduct(vecSize, vec, vec);
             UNUSED(dotSum);
         });
+        testing::ProcessTest("Testing IRProfileRegion time set", region1.IsStartTimeValid());
         region1.Exit();
 
         IRProfileRegion region2(function, "TestRegion2");
+        testing::ProcessTest("Testing IRProfileRegion time set", !region2.IsStartTimeValid());
         region2.Enter();
+        testing::ProcessTest("Testing IRProfileRegion time set", region2.IsStartTimeValid());
         auto result3 = result2 + function.LocalScalar<double>(5.0);
         region2.Exit();
+        testing::ProcessTest("Testing IRProfileRegion time not set", !region2.IsStartTimeValid());
         function.Return(result3);
     }
     module.EndFunction();

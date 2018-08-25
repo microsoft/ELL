@@ -82,14 +82,20 @@ namespace nodes
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _paddingValue(paddingValue)
     {
         _inputMemoryLayout = _input.GetMemoryLayout();
-        assert(_inputMemoryLayout.NumDimensions() == outputMemoryLayout.NumDimensions());
+        if (_inputMemoryLayout.NumDimensions() != outputMemoryLayout.NumDimensions())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: input and output layouts must have same dimension");
+        }
     }
 
     template <typename ValueType>
     ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _paddingValue(paddingValue)
     {
-        assert(inputMemoryLayout.NumDimensions() == outputMemoryLayout.NumDimensions());
+        if (inputMemoryLayout.NumDimensions() != outputMemoryLayout.NumDimensions())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: input and output layouts must have same dimension");
+        }
     }
 
     //
@@ -100,7 +106,10 @@ namespace nodes
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.GetMemoryLayout().ReorderedCopy(order))
     {
         _inputMemoryLayout = _input.GetMemoryLayout();
-        assert(_inputMemoryLayout.NumDimensions() == order.NumDimensions());
+        if (_inputMemoryLayout.NumDimensions() != order.NumDimensions())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: input and output layouts must have same dimension");
+        }
     }
 
     template <typename ValueType>
@@ -108,18 +117,22 @@ namespace nodes
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout.ReorderedCopy(order)), _paddingValue(paddingValue)
     {
         _inputMemoryLayout = _input.GetMemoryLayout();
-        assert(_inputMemoryLayout.NumDimensions() == outputMemoryLayout.NumDimensions());
+        if (_inputMemoryLayout.NumDimensions() != outputMemoryLayout.NumDimensions())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: input and output layouts must have same dimension");
+        }
     }
 
     template <typename ValueType>
     ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout.ReorderedCopy(order)), _inputMemoryLayout(inputMemoryLayout), _paddingValue(paddingValue)
     {
-        assert(inputMemoryLayout.NumDimensions() == outputMemoryLayout.NumDimensions());
+        if (inputMemoryLayout.NumDimensions() != outputMemoryLayout.NumDimensions())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: input and output layouts must have same dimension");
+        }
     }
 
-    // Note: order {2, 0, 1} maps {row, column, channel} -> {channel, row, column}
-    // So, we want to map entry 0  of the output (channel) -> entry 2 (channel) of the intput
     template <typename ValueType>
     model::MemoryCoordinates ReorderDataNode<ValueType>::ReorderOutputToInputLocation(model::MemoryCoordinates physicalOutputCoordinates) const
     {
@@ -131,6 +144,7 @@ namespace nodes
         return physicalInputCoordinates;
     }
 
+    // TODO: for each dimension, loop over minimum of input and output interval. Then we don't have to check if the value is out-of-bounds
     template <typename ValueType>
     std::vector<emitters::IRLocalScalar> ReorderDataNode<ValueType>::ReorderOutputToInputLocation(std::vector<emitters::IRLocalScalar> physicalOutputCoordinates) const
     {
@@ -201,32 +215,6 @@ namespace nodes
         }
     }
 
-
-    template <typename ValueType>
-    void ReorderDataNode<ValueType>::CompileDimensionLoop(emitters::IRFunctionEmitter& function, emitters::IRLocalArray input, const model::PortMemoryLayout& inputMemoryLayout, emitters::IRLocalArray output, const model::PortMemoryLayout& outputMemoryLayout, int dimension, std::vector<emitters::IRLocalScalar>& coordinates) const
-    {
-        if (dimension == inputMemoryLayout.NumDimensions() - 1) // last dimension
-        {
-            function.For(outputMemoryLayout.GetActiveSize(dimension), [=](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar index) {
-                std::vector<emitters::IRLocalScalar> localCoords = coordinates;
-                localCoords[dimension] = index;
-
-                auto inputLocation = this->ReorderOutputToInputLocation(localCoords);
-                auto inputIndex = model::EmitGetEntryOffset(function, inputLocation, inputMemoryLayout);
-                auto outputIndex = model::EmitGetEntryOffset(function, localCoords, outputMemoryLayout);
-                output[outputIndex] = input[inputIndex];
-            });
-        }
-        else
-        {
-            function.For(outputMemoryLayout.GetActiveSize(dimension), [=](auto& function, auto index) {
-                std::vector<emitters::IRLocalScalar> localCoords = coordinates;
-                localCoords[dimension] = index;
-                this->CompileDimensionLoop(function, input, inputMemoryLayout, output, outputMemoryLayout, dimension + 1, localCoords);
-            });
-        }
-    }
-
     template <typename ValueType>
     void ReorderDataNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
@@ -238,14 +226,21 @@ namespace nodes
         const auto outputMemoryLayout = GetOutputMemoryLayout();
 
         const int numDimensions = inputMemoryLayout.NumDimensions();
+        const int outputSize = outputMemoryLayout.GetMemorySize();
+        UNUSED(outputSize);
 
-        if (numDimensions != outputMemoryLayout.NumDimensions())
+        std::vector<emitters::IRFunctionEmitter::ConstLoopRange> ranges;
+        for (int dimensionIndex = 0; dimensionIndex < numDimensions; ++dimensionIndex)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: input and output layouts must have same dimension");
+            ranges.push_back({ 0, outputMemoryLayout.GetActiveSize(dimensionIndex) });
         }
 
-        std::vector<emitters::IRLocalScalar> coordinates(numDimensions, function.LocalScalar());
-        CompileDimensionLoop(function, input, inputMemoryLayout, output, outputMemoryLayout, 0, coordinates);
+        function.For(ranges, [input, output, inputMemoryLayout, outputMemoryLayout, this](emitters::IRFunctionEmitter& function, std::vector<emitters::IRLocalScalar> indices) {
+            auto inputLocation = ReorderOutputToInputLocation(indices);
+            auto inputIndex = model::EmitGetEntryOffset(function, inputLocation, inputMemoryLayout);
+            auto outputIndex = model::EmitGetEntryOffset(function, indices, outputMemoryLayout);
+            output[outputIndex] = input[inputIndex];
+        });
     }
 
     template <typename ValueType>
