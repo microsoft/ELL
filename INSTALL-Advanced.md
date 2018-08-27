@@ -15,7 +15,17 @@ If tests fail, add the `-VV` option to get verbose output from each test, to nar
 
 ## Generating Code Documentation with Doxygen
 
-To create code documentation using *Doxygen*, build the project named `doc`. Specifically, if CMake is used to generate a makefile, type `make doc`. If CMake is used to generate a Visual Studio solution, open that solution in Visual Studio, find the project named `doc` in the solution explorer, and build it. The generated files will appear in `ELL/build/doc`.
+To create code documentation using *Doxygen*, build the project named `doc`.
+
+```
+[Linux]
+make doc
+
+[Windows]
+cmake --build . --target doc
+```
+
+The top level entry point to the documentation will appear in `<ELL_Root>/build/doc/html/index.html`
 
 ## OpenCV with CUDA
 
