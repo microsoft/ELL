@@ -2,7 +2,7 @@
 ####################################################################################################
 #
 # Project:  Embedded Learning Library (ELL)
-# File:     onnx_importer.py (util)
+# File:     onnx_importer.py (importers)
 # Authors:  Iliass Tiendrebeogo
 #
 # Requires: Python 3.x, onnx-v1.22
@@ -25,10 +25,11 @@ import ell
 import common.importer
 import common.converters
 import onnx_to_ell 
+import ziptools
 
 _logger = logging.getLogger(__name__)
 
-def convert(model, output=None):
+def convert(model, output=None, zip_ell_model=None):
     model_directory, filename = os.path.split(model)
     if output:
         output_directory = output
@@ -44,22 +45,25 @@ def convert(model, output=None):
     _logger.info("Saving model file: '" + model_file_name + "'")
     ell_map.Save(model_file_path)
 
-def main(argv):
-    """
-    Load onnx model file and print the nodes ops
-    """
-    logging.basicConfig(level=logging.DEBUG, format="%(message)s")
+    if zip_ell_model:
+        _logger.info("Zipping model file: '" + model_file_name + ".zip'")
+        zipper = ziptools.Zipper()
+        zipper.zip_file(model_file_name, model_file_name + ".zip")
+        os.remove(model_file_name)
 
+def main(argv):
     parser = argparse.ArgumentParser(description="Converts ONNX model to ELL model\n" 
         "Example:\n"
-        "    onnx_to_ell.py model.onnx\n"
+        "onnx_import.py model.onnx\n"
         "This outputs 'model.ell' which can be compiled with ELL's 'wrap' tool\n")
-
     parser.add_argument(
         "input",
         type=Text,
-        help="Input model file (onnx or protobuf)"
-)
+        help="Input model file (onnx or protobuf)")
+    parser.add_argument("--zip_ell_model",
+        help="zips the output ELL model if set", action="store_true")
+    parser.add_argument("--verbose",
+        help="print verbose output during the import. Helps to diagnose ", action="store_true")
     parser.add_argument('-o', '--output_directory',
         help='Path to output directory (default: input file directory)',
         default=None)
@@ -73,10 +77,13 @@ def main(argv):
              "used when step_interval is set\n",
         default=0)
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG, format="%(message)s")
+    else:
+        logging.basicConfig(level=logging.INFO, format="%(message)s")
     
-    convert(args.input, args.output_directory)
-
-
+    convert(args.input, args.output_directory, args.zip_ell_model)
 
 if __name__ == "__main__":
     main(sys.argv[1:]) # skip the first argument(program name)

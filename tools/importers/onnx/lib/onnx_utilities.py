@@ -25,14 +25,10 @@ from _graph_parser import Graph
 
 _logger = logging.getLogger(__name__)
 
-#####################################################################################
-##############  Util class
-#####################################################################################
 class ONNX(object):
     """
     Utility class for processing ONNX models.
-    """
-    
+    """  
     def __init__(self):
         self._shape_dict = {} # weights indexes and shape: Example {'node_id': ['w', 'b']}
         self._tensor_dict = {} # weights
@@ -190,10 +186,6 @@ class ONNX(object):
             return self.get_concat_out_dims(node, f, p, s)
         elif node.op_type == "Flatten":
             return self.flatten_shape(node)
-        # elif node.op_type == "Reshape":
-        #     return self.get_reshape_out_dims(node)
-        # elif node.name in self._shape_dict:
-        #     return self.get_sink_node_dims(node)
         else:
             return input_shape
 
@@ -272,15 +264,13 @@ class ONNX(object):
     
 
     def get_concat_out_dims(self, node, kernel_size, padding, strides):
-        """ Computes the output shape for a concat/slpice node 
-        """
+        """ Computes the output shape for a concat/slpice node """
         input_shape = node.input_shape
         dims = []
         shape = []
         dim0 = 0
 
         if len(node.inputs) < 2:
-            print("Single input Concatenation")
             return input_shape
         # get each input node's output channel to be added together 
         for in_node in node.inputs:
@@ -345,7 +335,15 @@ class ONNX(object):
     ##################### Convolution layer parsing ########################
 
     def _conv_weights(self, node):
-        """
+        """ 
+        Get the weights of conv2d node and return a dict of weights in the format:
+        e.g: for a conv2d node
+        { 
+          'weights' : (weight_index, tensor, 'filter_channel_row_column')
+          'bias': (weight_index, tensor, 'channel')
+         }
+        weights['weights'] = (weight_index, tensor, 'filter_channel_row_column')
+        weights['bias'] = (weight_index, tensor, 'channel')
         """
         _weights = list(node.input_tensors)
         if not _weights:
@@ -465,7 +463,7 @@ class ONNX(object):
         if 'pads' in node.attribute:
             attributes['padding'] = node.attribute['pads'][0]
         if 'dilations' in node.attribute:
-            attributes['dilations'] = node.attribute['dilations'][0]
+            attributes['dilation'] = node.attribute['dilations'][0]
 
         return attributes
     
@@ -613,7 +611,6 @@ class ONNX(object):
         return result
 
     def get_fc_out_dims(self, node):
-
         input_shape = node.input_shape
 
         channel = 0       
@@ -626,6 +623,7 @@ class ONNX(object):
         return [(dims, 'channel_row_column')]
     
     def fc_to_conv2d(self, node):
+        """ Transform a FC node into Conv2d node """
         node.op_type = "Convolution"
         node.input_shape  = self.get_input_shape(node)
         node.output_shape = self.get_fc_out_dims(node)
@@ -681,15 +679,14 @@ class ONNX(object):
         else:
             raise KeyError("Node {} not in Auxillary nodes dict", name)
         prev_node = nodes_[-1]
-        node.inputs = prev_node.outputs
-        print("Aux node input", node.name, node.inputs)                        
+        node.inputs = prev_node.outputs                       
         node.input_shape = prev_node.output_shape # self._get_aux_node_shape(node)
         node.output_shape = prev_node.output_shape # self._get_aux_node_shape(node)
         node.padding = self.get_padding(node)
         node.weights = self._get_aux_node_weights(node)
         nodes_.append(node)
         self._all_nodes[name] = node
-        print("Dependent node {}:{} added to processed nodes".format(node.name, node.op_type))
+        _logger.info("Dependent node {}:{} added to processed nodes".format(node.name, node.op_type))
         return node 
 
     # @staticmethod
@@ -749,10 +746,11 @@ class ONNX(object):
         _logger.info("\nFinished loading.") 
 
         _logger.info("Graph producer: {} version {}".format(onnx_model.producer_name,
-                                    onnx_model.producer_version))
+                                                      onnx_model.producer_version))
         _logger.info("Graph total len: {}".format(len(onnx_model.graph.input)))
         graph_ = Graph.from_onnx(onnx_model.graph)
-        _logger.info("Graph external Input/Output node: {} -> {}".format(graph_.inputs, graph_.outputs))
+        _logger.info("Graph external Input/Output node: {} -> {}".format(graph_.inputs,
+                                                                    graph_.outputs))
         
         self._shape_dict = graph_.shape_dict
         self._auxiliary_nodes = graph_.tensor_nodes
@@ -765,9 +763,9 @@ class ONNX(object):
                 input_tensorlist = list(v.input_tensors)
                 node_to_aux[v.name] = input_tensorlist 
 
-        # TODO: for debugging
-        print("Tensor dict \n", node_to_aux)
-        print("Shape dict \n", self._shape_dict)
+        # for debugging
+        _logger.debug("Tensor dict \n".format(node_to_aux))
+        _logger.debug("Shape dict \n".format(self._shape_dict))
 
         to_concat = [] 
         nodes_ = []
@@ -790,13 +788,13 @@ class ONNX(object):
                     for index, input_ in enumerate(next_node.inputs):                    
                         if input_ == node.name:
                             next_node.inputs[index] = node.inputs[0]
-                    print("Skipped node {} {} : previous node {} : next node {}".format(
+                    _logger.info("Skipped node {} {} : previous node {} : next node {}".format(
                                                 node.name, node.op_type, node.inputs[0], 
                                                 next_node.name))
                     continue
                 else:
                     to_concat.append(node.name)
-                    print(node.name, "Node not skipped: NextNode not found after all nodes been exausted. Must be a sink node.")
+                    _logger.info("{} Node not skipped: NextNode not found after all nodes been exausted. Must be a sink node. ".format(node.name))
 
             # Handle External/Auxiliary nodes 
             if node.op_type == "Splice"  or node.op_type == "Plus" :
@@ -812,7 +810,7 @@ class ONNX(object):
 
             # update self._all_nodes
             self._all_nodes[op_node.name] = op_node
-            print(op_node.op_type, op_node.name, op_node.inputs, op_node.input_shape,"->", op_node.output_shape, op_node.attribute, "\n")
+            _logger.info("{} {} Inputs {} {} Output_shape: {} Atrribute: {}".format(op_node.op_type, op_node.name, op_node.inputs, op_node.input_shape, op_node.output_shape, op_node.attribute))
         return nodes_ 
 
 # _operation_map = {

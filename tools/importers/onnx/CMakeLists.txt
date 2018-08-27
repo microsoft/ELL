@@ -7,7 +7,7 @@ if(${PYTHON_ENABLED})
     set(module_name "onnx_importer")
 
     set(importer_src onnx_to_ell.py
-        onnx_importer.py)
+        onnx_import.py)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
 

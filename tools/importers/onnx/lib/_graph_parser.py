@@ -8,11 +8,6 @@
 #
 ####################################################################################################
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 from onnx import numpy_helper, ValueInfoProto, AttributeProto, GraphProto, NodeProto, TensorProto, TensorShapeProto
 from typing import Any, Text, Iterable, List, Dict, Sequence, Optional, Tuple, Union
 import numpy as np
@@ -126,7 +121,10 @@ class Node(object):
                  ):
         # type: (...) -> None
         self.name = name
-        self.op_type = ONNX_OP_TYPE_TO_ELL_MAP[op_type]
+        if op_type in ONNX_OP_TYPE_TO_ELL_MAP:
+            self.op_type = ONNX_OP_TYPE_TO_ELL_MAP[op_type]
+        else:
+            raise Exception("Operation type '{}' is not supported at the moment".format(op_type))
         self.attribute = attrs
         self.inputs = inputs
         self.outputs = outputs

@@ -383,6 +383,35 @@ void TestTensorReferenceAsMatrix()
     testing::ProcessTest("TensorReference::ReferenceAsMatrix", M == R1 && N == R2);
 }
 
+
+template <typename ElementType>
+void TestTensorReferenceAsMatrixCopy()
+{
+    math::ChannelColumnRowTensor<ElementType> T(2, 4, 1);
+    float x = 1;
+    for (size_t i = 0; i < 2; i++)
+    {
+        for (size_t j = 0; j < 4; j++)
+        {
+            T(i, j, 0) = x++;
+        }
+    }
+
+    math::RowMatrix<ElementType> E{
+        { 1, 5 },
+        { 2, 6 },
+        { 3, 7 },
+        { 4, 8 }
+    };
+
+    auto r = T.GetConstReference();
+
+    auto result = math::RowMatrix<ElementType>(r.ReferenceAsMatrix().Transpose());
+
+    testing::ProcessTest("TensorReference::ReferenceAsMatrix.Transpose and copy", result.IsEqual(E));
+}
+
+
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensorCopyFrom()
 {

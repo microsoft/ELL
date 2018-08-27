@@ -63,6 +63,9 @@ void TestTensorReferenceAsVector();
 template<typename ElementType>
 void TestTensorReferenceAsMatrix();
 
+template <typename ElementType>
+void TestTensorReferenceAsMatrixCopy();
+
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensorCopyFrom();
 

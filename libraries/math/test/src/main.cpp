@@ -265,6 +265,7 @@ void RunTensorTests()
 {
     TestTensorGetSlice<ElementType>();
     TestTensorReferenceAsMatrix<ElementType>();
+    TestTensorReferenceAsMatrixCopy<ElementType>();
     TestTensorNumSlices<ElementType>();
     TestTensorNumPrimarySlices<ElementType>();
 

@@ -250,7 +250,6 @@ class CntkLayersTestCase(CntkToEllTestBase):
             ell.neural.NoPadding(),
             ell.nodes.PortType.smallReal)
 
-        print("Adding FullyConnectedLayer with " + str(type(weightTensor)))
         layer = ell.neural.FullyConnectedLayer(layerParameters, weightTensor)
         predictor = ell.neural.NeuralNetworkPredictor([layer])
 

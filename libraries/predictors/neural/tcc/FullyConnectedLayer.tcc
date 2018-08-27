@@ -30,28 +30,10 @@ namespace neural
     template <typename ElementType>
     FullyConnectedLayer<ElementType>::FullyConnectedLayer(const LayerParameters& layerParameters, ConstTensorReferenceType& weights) :
         Layer<ElementType>(layerParameters),
-        _weights(GetOutputMinusPadding().Size(), layerParameters.input.Size()),
+        _weights(GetOutputMinusPadding().Size(), layerParameters.input.Size(), weights.ToArray()),
         _shapedInput(layerParameters.input.Size()),
         _outputVector(GetOutputMinusPadding().Size())
     {
-        // Reshape the weights into the _weights matrix
-        // Each row is represents an output neuron, each column corresponds to the weight for that input
-        const size_t rowIncrement = layerParameters.input.NumColumns() * layerParameters.input.NumChannels();
-        const size_t columnIncrement = layerParameters.input.NumChannels();
-        for (size_t outRow = 0; outRow < _weights.NumRows(); outRow++)
-        {
-            for (size_t i = 0; i < layerParameters.input.NumRows(); i++)
-            {
-                for (size_t j = 0; j < layerParameters.input.NumColumns(); j++)
-                {
-                    for (size_t k = 0; k < layerParameters.input.NumChannels(); k++)
-                    {
-                        size_t column = (i * rowIncrement) + (j * columnIncrement) + k;
-                        _weights(outRow, column) = weights(outRow * layerParameters.input.NumRows() + i, j, k);
-                    }
-                }
-            }
-        }
     }    
 
     template <typename ElementType>

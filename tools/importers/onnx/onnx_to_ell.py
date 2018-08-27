@@ -55,7 +55,6 @@ def make_importer_model(onnx_nodes):
         if node:
             node = convert.OnnxConverter(node).convert()
             Importer_model.add_node(uid, node)
-            print(node)
             if weights is not None:
                 for w in weights:
                     weight = node.weights[w]

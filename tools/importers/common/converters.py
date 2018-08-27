@@ -13,7 +13,6 @@ from enum import Enum, auto
 import typing
 
 import numpy as np
-
 import ell
 import common.memory_shapes as memory_shapes
 

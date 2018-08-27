@@ -9,9 +9,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import onnx
 
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..', 'utilities/pythonlibs'))
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'utilities/pythonlibs'))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
 import find_ell
 import ell
@@ -65,8 +65,10 @@ _logger = logging.getLogger(__name__)
 #                         'bias': ('2', tensor, 'channel')}
 #     }
 
+logging.basicConfig(level=logging.DEBUG, format="%(message)s")
+
 class _ConvNd(nn.Module):
-    
+
     def __init__(self, in_channels, out_channels, kernel_size, weight, stride,
                  padding, dilation, transposed, output_padding, groups,  bias):
         super(_ConvNd, self).__init__()
@@ -174,183 +176,121 @@ class FC_custom(nn.Module):
         return self.linear(input, self.weight, self.bias)
 
 
-def fc_manual_test(onnx_nodes, test_tensor):
-    fc_w = None
-    fc_b = None
-    def add_bias(ax, b):
-        return np.add(ax, b)
+def fc_manual_test(node, test_tensor, in_channels, out_channels, fc_w, fc_b):
+    flatten_shape = int(test_tensor.size(1))*int(test_tensor.size(2))*int(test_tensor.size(3))
+    flattened_input = test_tensor.view(-1, flatten_shape)
+    _logger.info("Weights: ", fc_w)
+    _logger.info("Test input flattened: ", flattened_input)
 
-    for node in onnx_nodes:
-        if node.weights is not None:
-            for w in node.weights:
-                print("Weight", w)
-                weight = node.weights[w]
-                if w == 'weights':
-                    fc_w = weight[1]
-                elif w == 'bias':
-                    fc_b = weight[1]
-                print(weight[0],":", weight[1].shape) 
-    # matmul_result = np.matmul(test_tensor, np.transpose(fc_w))
-    # if fc_b is not None:
-    #     matmul_result = add_bias(matmul_result, fc_b)
-
-    custom_fc = FC_custom(D_in, H_out, w_, bias=b_)
+    custom_fc = FC_custom(in_channels, out_channels, fc_w, bias=fc_b)
     custom_fc.eval()
     with torch.no_grad():
-        matmul_result = custom_fc.forward(test_tensor)
+        matmul_result = custom_fc.forward(flattened_input)
     return matmul_result
 
-def conv2d_test(node, test_tensor):
-    conv_w = None
-    conv_b = None
-    k = None
-    p = None
-    s = None
-    p = None
-    s = None
-    nb_filters = None
-    for node in onnx_nodes:
-        if node.op_type == "Convolution":
-            k = node.attributes['size']
-            p = node.attributes['padding']
-            s = node.attributes['strides']
-            d = node.attributes['dilations']
-            nb_filters = node.input_shape[0][0][0]
+def conv2d_manual_test(node, test_tensor, in_channels, out_channels, k, w_, s, p, d, b_):
+    conv_op = Conv2d_custom(in_channels, out_channels, k, w_, s, p, d, bias=b_)
+    conv_op.eval()
+    with torch.no_grad():
+        output = conv_op.forward(test_tensor)
+    return output
 
+def test_graph(onnx_nodes, test_tensor):
+    w_ = None
+    b_ = None
+    k = None # kernel size
+    p = None # padding
+    s = None # strides
+    d = None # dilation
+    in_channels = None
+    out_channels = None
+    
+    for node in onnx_nodes:
+        if node.op_type == "Input":
+            continue
+        if 'size' in node.attribute:
+            k = node.attribute['size']
+            s = node.attribute['stride']
+        if 'padding' in node.attribute:
+            p = node.attribute['padding']
+        if 'dilation' in node.attribute:
+            d = node.attribute['dilation']
+        in_channels = node.input_shape[0][0][0]
+        out_channels = node.output_shape[0][0][0]
         if node.weights is not None:
             for w in node.weights:
-                print("Weight", w)
+                _logger.info("Weight Type", w)
                 weight = node.weights[w]
                 if w == 'weights':
-                    conv_w = weight[1]
+                    w_ = weight[1]
                 elif w == 'bias':
-                    conv_b = weight[1]
-                print(weight[0], w,":", weight[1].shape) 
-    
-    return 
+                    b_ = weight[1]
 
-fc_weight = torch.Tensor([[1,2,3,4], 
-                          [5,6,7,8]])
-# A torch model with only a conv layer
-class Net(nn.Module): 
-        def __init__(self):
-            super(Net, self).__init__()
-            # self.conv0 = nn.Conv2d(3, 10, kernel_size=5, stride=1, bias=True, padding=0)
-            # self.conv1 = nn.Conv2d(10, 20, kernel_size=5, stride=1, bias=True, padding=1)
-            # self.conv2_drop = nn.Dropout2d()
-            # self.bn1 = nn.BatchNorm2d(20)
-            self.fc1 = nn.Linear(1*2*2, 2, bias=False)
-            self.fc2 = nn.Linear(50, 10, bias=False)
+        if node.op_type == "Convolution":
+            return conv2d_manual_test(node, test_tensor, in_channels, out_channels, k, w_, s, p, d, b_)
+        if node.op_type == "FullyConnected":
+            return fc_manual_test(node, test_tensor, in_channels, out_channels, w_, b_)
 
-            self.fc1.weight.data = fc_weight
-            # nn.init.uniform_(self.conv1.bias)
-            # nn.init.uniform_(self.bn1.bias)
+def export_to_onnx(model, input_shape=(1,3,224,224)):
+    tensor = torch.randn(input_shape)
+
+    model.forward(tensor)
+    _logger.info("Exporting model to ONNX")
+    torch_out = torch.onnx._export(model, tensor, "model.onnx", export_params=True, verbose=True)
 
 
-        def forward(self, x):
-            # x1 = F.max_pool2d(self.conv0(x), 3, stride=2, padding=1)
-            # x2 = x1
-            # x1 = self.conv1(x1)
-            # x1 = self.conv2_drop(x1)
-            # x1 = torch.cat((x1,x2), 1)
-            
-            # x1 = self.bn1(x1)
-            # # x = F.relu(x)
-            # x = F.leaky_relu(x2)
-            x1 = x.view(-1, 1*2*2)
-            x1 = self.fc1(x1)
-            # # x1 = x1.view(-1)
-            # x1 = self.fc2(x1)
-            # x1 = nn.Softmax2d(x1)
-            x = x1
-            return x 
+def verify_ell_model(onnx_model):
+    """
+    Test each operation in the onnx graph by creating a 
+    custom pytorch layer for each node then run forward 
+    with the onnx node weight on both ell and pytorch node
+    """
 
-model = Net()
-
-# print(model.weight)
-# tensor = torch.randn(1, 1, 32, 32)
-tensor = torch.Tensor([[[[2,2],
-                         [2,2]]]])
-
-model.forward(tensor)
-# print("Torch model", model)
-_logger.info("Exporting model to ONNX")
-torch_out = torch.onnx._export(model, tensor, "model.onnx", export_params=True, verbose=True)
-onnx_model = onnx.load("model.onnx")
-
-ell_map, onnx_nodes = onnx_converter("model.onnx")
-
-test_input = torch.Tensor([[[[1,1],[1,1]]]])
-
-ell_input_tensor = memory_shapes.get_tensor_in_ell_order(test_input.numpy(), "filter_channel_row_column").ravel().astype(np.float32)
-
-ell_out = np.array(ell_map.Compute(ell_input_tensor, dtype=np.float32))
-ell_out = ell_out.reshape((1,2))
-
-
-model.eval
-flatten_shape = int(test_input.size(1))*int(test_input.size(2))*int(test_input.size(3))
-test_tensor = test_input.view(-1, flatten_shape)
-torch_out = model.forward(test_tensor)
-# np.testing.assert_almost_equal(torch_out.data.cpu().numpy(), ell_out, decimal=3, err_msg=(
-#                 'results for compiled ELL model do not match ONNX output!'))
-
-# Manual test
-print("Manual test: \n")
-torch_output_tensor = model.forward(test_tensor)
-# manual_compute_result = fc_manual_test(onnx_nodes, test_tensor)
-# np.testing.assert_array_almost_equal(
-#             torch_output_tensor.detach().numpy(), ell_out, decimal=4, err_msg=(
-#                 'results for compiled ELL model do not match ONNX output!'))
-_logger.info("Verified compiled result against ONNX")
-
-
-def verify_ell_output_in_vision_model(ell_map, torch_model, onnx_nodes, testing_info):
-    _logger.info("Verification of model output starting")
+    _logger.info("Model verification started")
     try:
-        torch_model.eval()
+
+        ell_map, onnx_nodes = onnx_converter(onnx_model)
+        ell_map.Save("model.ell")
+
+        # get model input shape
         ell_input_shape = ell_map.GetInputShape()
         ell_shape = (ell_input_shape.rows, ell_input_shape.columns, ell_input_shape.channels)
-        pytorch_input_shape =  (ell_shape[2], ell_shape[0], ell_shape[1])
-        
-        torch_input_tensor_ = np.random.random((1, pytorch_input_shape[0], pytorch_input_shape[1], pytorch_input_shape[2])) * 255
-        torch_input_tensor = np.float32(torch_input_tensor_) 
+        model_input_shape =  (ell_shape[2], ell_shape[0], ell_shape[1])
+        test_input = torch.randn((1, model_input_shape[0], model_input_shape[1], model_input_shape[2])) * 255
+
         order = "channel"
-        if len(torch_input_tensor.shape) == 4:
+        if len(test_input.shape) == 4:
             order = "filter_channel_row_column"
-        elif len(torch_input_tensor.shape) == 3:
+        elif len(test_input.shape) == 3:
             order = "channel_row_column"
+        elif len(test_input.shape) == 2:
+            order = "row_column"
 
-        print("Checking shapes: torch shape =", torch_input_tensor.shape)
-        print("Order", order)
-        ell_input_tensor = memory_shapes.get_tensor_in_ell_order(torch_input_tensor, order).ravel().astype(np.float32)
-        ell_input_tensor = np.float32(ell_input_tensor)
+        ell_input_tensor = memory_shapes.get_tensor_in_ell_order(test_input.numpy(), order).ravel().astype(np.float32)
+        ell_out = np.array(ell_map.Compute(ell_input_tensor, dtype=np.float32))
+        _logger.info("############ ell_output:", ell_out)
 
-        _logger.info("Get manual test output")
-        flatten_shape = int(torch_input_tensor.shape[1])*int(torch_input_tensor.shape[2])*int(torch_input_tensor.shape[3])
-        torch_input_tensor_ = torch.from_numpy(torch_input_tensor)
-        test_tensor = torch_input_tensor_.view(-1, flatten_shape)
-        # manual_compute_result = fc_manual_test(onnx_nodes, test_tensor)
-        
+        model.eval()
 
-        # Get output from PyTorch model
-        _logger.info("Getting PyTorch results")
-        with torch.no_grad():
-            torch_output_ = torch_model.forward(torch.from_numpy(torch_input_tensor).float())
-            order = "channel"
-            if len(torch_output_.shape) == 4:
-                order = "filter_channel_row_column"
-            elif len(torch_output_.shape) == 3:
-                order = "channel_row_column" 
-            torch_output = memory_shapes.get_tensor_in_ell_order(torch_output_.numpy(), order)
+        torch_out = model.forward(test_input)
+        _logger.info("############ torch_output:", torch_out)
 
-        print("Check shapes: Ell input shape =", ell_input_tensor.shape)
-        # Get computed ELL result
-        _logger.info("Getting computed ELL results")
-        result_from_compute = np.array(ell_map.Compute(ell_input_tensor, dtype=np.float32))
-        # result_from_compute = result_from_compute.reshape((1, 1, 10))
-        
+        ell_out = ell_out.reshape(torch_out.size())
+        # np.testing.assert_almost_equal(torch_out.data.cpu().numpy(), ell_out, decimal=3, err_msg=(
+        #                 'results for compiled ELL model do not match ONNX output!'))
 
+        # Manual test
+        _logger.info("Manual test: \n")
+        manual_compute_result = test_graph(onnx_nodes, test_input)
+        np.testing.assert_array_almost_equal(
+                    manual_compute_result.detach().numpy(), ell_out, decimal=4, err_msg=(
+                        'results for compute ELL model do not match ONNX output!'))
+        _logger.info("Verified compute result against ONNX")
+        _logger.info("########### Compute test passed ########### ")
+        _logger.info("ell_output:", ell_out)
+        _logger.info("torch_output", torch_out)
+        _logger.info("onnx_output", manual_compute_result)
+        _logger.info("###################### ")
 
         # Get compiled ELL result
         _logger.info("Getting compiled ELL results")
@@ -359,84 +299,41 @@ def verify_ell_output_in_vision_model(ell_map, torch_model, onnx_nodes, testing_
         compiled_ell_map = ell_map.Compile("host", "model", "predict", compilerOptions=compiler_options, dtype=np.float32)
 
         result_from_compiled = np.array(compiled_ell_map.Compute(ell_input_tensor, dtype=np.float32))
-        
-        print("Check shapes: torch shape = ", torch_output.shape, "ell shape = ", result_from_compute.shape)
-        # Verify the computed result against the pytorch result
+        ell_out_compiled = result_from_compiled.reshape(torch_out.size())
+
+        # Verify the computed result against the onnx result
         np.testing.assert_array_almost_equal(
-           torch_output[-1], result_from_compute[-1], decimal=4, err_msg=(
-               'results for computed ELL model do not match ONNX output!'))
-        _logger.info("Verified computed result against ONNX")
-
-        # Manual test
-        # torch_output_ = torch_output_.reshape((1,10))
-        # np.testing.assert_array_almost_equal(
-        #    torch_output[-1], manual_compute_result, decimal=4, err_msg=(
-        #        'results for manual computation do not match ELL output!'))
-        # print("torch_output_: ", torch_output_[-1, :])
-        # print("manual_compute_result:", manual_compute_result[-1, :])
-        # _logger.info("Verified manual result against ONNX")
-            
-        # Verify the compiled result  against the onnx result
-        # torch_output = torch_output.reshape((10,))
-        # np.testing.assert_array_almost_equal(
-        #     torch_output[0,-1], result_from_compiled , decimal=4, err_msg=(
-        #         'results for compiled ELL model do not match ONNX output!'))
-        # _logger.info("Verified compiled result against ONNX")
-        
-        # Verify the compiled result agrees with the computed result
-        # np.testing.assert_array_almost_equal(
-        #     result_from_compute, result_from_compiled, decimal=4, err_msg=(
-        #         'results for computed ELL model do not match results from compiled ELL model!'))
-        # _logger.info("Verified compiled result against computed result")
-
-        # Get timing info
-    #     total_time = 0
-    #     num_frames = 50
-    #     _logger.info("Sending {} frames through model...".format(num_frames))
-    #     for i in range(num_frames):
-    #         torch_input_tensor = np.random.random((torch_model.arguments[0].shape)).astype(np.float32) * 255
-    #         ell_input_tensor = memory_shapes.get_tensor_in_ell_order(torch_input_tensor, "channel_row_column").ravel().astype(np.float32)
-    #         start = time.time()
-    #         result_from_compiled = np.array(compiled_ell_map.Compute(ell_input_tensor, dtype=np.float32))
-    #         end = time.time()
-    #         total_time += end - start
-    #     total_time /= num_frames
-    #     _logger.info("Average speed: {:.0f}ms/frame".format(total_time * 1000))
+            torch_out, ell_out_compiled, decimal=4, err_msg=(
+                'results for compiled ELL model do not match ONNX output!'))
+        _logger.info("Verified compiled result against ONNX")
     except BaseException as exception:
         _logger.error("Verification of model output failed")
         raise exception
 
     _logger.info("Verification of model output complete")
 
-class CifarNet(nn.Module):
-    def __init__(self):
-        super(CifarNet, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        self.fc2 = nn.Linear(120, 84, )
-        self.fc3 = nn.Linear(84, 10)
+# A torch model for testing
+class Net(nn.Module): 
+        def __init__(self):
+            super(Net, self).__init__()
+            self.fc1 = nn.Linear( 3*3*3, 1, bias=False)
 
-    def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 5 * 5)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
+            fc_weight = torch.randn(1, 27)
+            self.fc1.weight.data = fc_weight
+            _logger.info(fc_weight)
 
 
-def cifar10_test():
+        def forward(self, x):
+            x1 = x.view(-1, 3*3*3)
+            x1 = self.fc1(x1)
+            return x1 
 
-    torch_model_obj = CifarNet()
+model = Net()
+export_to_onnx(model, (1,3,3,3))
+verify_ell_model("model.onnx")
 
-    torch_model = "C:models..\\cifar10\\cifar10.pth" # replace the path to your pytorch model's path
-    model = "C:models\\cifar10\\cifar10_onnx.ell"  
-    full_model_test(model, torch_model, torch_model_obj)
 
-def full_model_test(model, torch_model, torch_model_obj, testing_info={}):
+def external_model_test(onnx_model , torch_model=None, torch_model_obj=None):
 
     """
     Loading tytorch model depend on how it's been saved. 
@@ -453,10 +350,14 @@ def full_model_test(model, torch_model, torch_model_obj, testing_info={}):
     "torch_model_obj.load_state_dict(torch.load(torch_model))" notice you'll need the model definition here
     """
 
-    torch_model_obj.load_state_dict(torch.load(torch_model))
-    ell_map_ = ell.model.Map(model)
-    verify_ell_output_in_vision_model(ell_map, model, onnx_nodes, testing_info={})
+    if torch_model_obj is not None:
+        torch_model = torch_model_obj.load_state_dict(torch.load(torch_model))
+    else:
+        torch_model = torch.load(torch_model)
+    # onnx_model = export_to_onnx(torch_model)
+    ell_map, onnx_nodes = onnx_converter(onnx_model)
+    verify_ell_model(onnx_nodes)
 
-logging.basicConfig(level=logging.DEBUG, format="%(message)s")
 
-verify_ell_output_in_vision_model(ell_map, model, onnx_nodes, testing_info={})
+if __name__ == "__main__":
+    external_model_test('model.onnx', 'model.pth')

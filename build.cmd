@@ -149,6 +149,6 @@ echo Requested we use VS 2017 but it was not found
 exit /B 1
 
 :nocmake
-echo Cmake returned an erorr or was not found
+echo Cmake returned an error or was not found
 if "!DEBUG!"=="1"  type D:/a/1/s/build/CMakeFiles/CMakeOutput.log
 exit /B 1
