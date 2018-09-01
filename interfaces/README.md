@@ -23,8 +23,23 @@ In predictors.i
 
 ## Class conventions
 ### Member variables
+
 Prefer public class members to manually specifying accessor/getter/setter methods. This allows for easier intellisense and debugging in scripting environments.
-- Use "const" to create immutable members
+- Use "const" to create immutable members.
+
+`However`, any public members that are not primitive types or std::string need to be marked as 'naturalvar' like this:
+
+```
+%naturalvar ELL_API::PortMemoryLayout::size;
+```
+
+This ensures that the SWIG wrapper copies that value rather than keeping a reference to the member.  This ensures that the member is still alive when the containing object goes away.  This is important because Python tends to garbage collect temporary objects very aggressively, for example:
+
+```python
+list(port.GetMemoryLayout().size)
+```
+
+Without 'naturalvar' on the 'size' member, SWIG will generate a getter for the size member that actually returns a pointer to the address of that member, instead of copying it.  This is efficient, but problematic in this case because Python actually deletes the temporary PortMemoryLayout object here before executing the list() operator, and so the list operator operates on an IntVector that is pointing to dead memory. This leads to crashes that can be hard to debug.
 
 
 ## POD types

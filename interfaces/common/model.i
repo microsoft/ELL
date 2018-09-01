@@ -24,6 +24,13 @@ WRAP_CALLABLE_AS_MAP_OUTPUT_CALLBACK(FloatCallbackBase, float)
 WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(DoubleCallbackBase, DoubleCallbackBase, double)
 WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(FloatCallbackBase, FloatCallbackBase, float)
 
+// naturalvar declarations for members that are object types (see ..\Readme.md)
+%naturalvar ELL_API::PortMemoryLayout::size;
+%naturalvar ELL_API::PortMemoryLayout::padding;
+%naturalvar ELL_API::PortMemoryLayout::offset;
+%naturalvar ELL_API::PortMemoryLayout::order;
+
+// Include the C++ code to be wrapped
 %include "ModelInterface.h"
 %include "ModelBuilderInterface.h"
 %include "macros.i"

@@ -1,3 +1,4 @@
+import ell_helper
 import ell
 
 def test():

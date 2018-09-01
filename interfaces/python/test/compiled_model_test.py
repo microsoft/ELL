@@ -1,4 +1,5 @@
 import functools
+import ell_helper
 import ell
 import os
 import numpy as np

@@ -1,3 +1,4 @@
+import ell_helper
 import ell
 from math import exp, log
 from testing import Testing

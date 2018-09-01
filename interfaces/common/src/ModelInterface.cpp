@@ -560,7 +560,8 @@ PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<
 }
 
 PortMemoryLayout::PortMemoryLayout(const ell::model::PortMemoryLayout& layout)
-    : _layout(layout)
+    : size(layout.GetActiveSize().ToVector()), padding(layout.GetStride().ToVector()), offset(layout.GetOffset().ToVector()),
+    order(layout.GetLogicalDimensionOrder().ToVector()), _layout(layout)
 {
 }
 

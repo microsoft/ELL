@@ -2,14 +2,10 @@ import os
 import sys
 from testing import Testing
 import numpy as np
-
-# ell 
-script_path = os.path.dirname(os.path.abspath(__file__))
-# this is handy when you want to debug the test standalone, outside of ctest.
-sys.path += [os.path.join(script_path, '..', '..', '..', 'tools', 'utilities', 'pythonlibs')]
-import find_ell
+import ell_helper
 import ell
 
+script_path = os.path.dirname(os.path.abspath(__file__))
 
 def load_vad_data():
     vad_data = os.path.join(script_path, "..", "..", "..", "libraries", "dsp", "VadData.txt")
@@ -90,7 +86,8 @@ def test_gru_node_with_vad_reset(testing):
     threshold_down = 0.931252;
     level_threshold = 0.007885;
     
-    hidden_units = 10
+    hidden_units = 10    
+    errors = 0
 
     builder = ell.model.ModelBuilder()
     ell_model = ell.model.Model()
@@ -132,6 +129,13 @@ def test_gru_node_with_vad_reset(testing):
     output_node = builder.AddOutputNode(ell_model, output_shape, 
         ell.nodes.PortElements(gru_node.GetOutputPort("output")))
 
+    # test we can access GetMemoryLayout information on the ports.
+    output_size = list(gru_node.GetOutputPort("output").GetMemoryLayout().size)
+    expected_size = [1, 1, hidden_units]
+    if output_size != expected_size:
+        print("The output port on the gru_node has size {}, we are expecting {}".format(output_size, expected_size))
+        errors += 1
+
     map = ell.model.Map(ell_model, input_node, ell.nodes.PortElements(output_node.GetOutputPort("output")))
     compiler_settings = ell.model.MapCompilerOptions()
     compiler_settings.useBlas = False # not resolvable on our Linux test machines...
@@ -139,7 +143,6 @@ def test_gru_node_with_vad_reset(testing):
     compiled_map = map.CompileFloat("host", "gruvadtest", "predict", compiler_settings, optimizer_options)
 
     line = 1
-    errors = 0
     last_signal = 0
     was_reset = False
     for i in range(dataset.NumExamples()):

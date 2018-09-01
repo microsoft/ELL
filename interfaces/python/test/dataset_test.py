@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from testing import Testing
+import ell_helper
 import find_ell
 import ell
 

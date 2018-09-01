@@ -1,5 +1,5 @@
 import numpy as np
-import find_ell
+import ell_helper
 import ell
 from testing import Testing
 

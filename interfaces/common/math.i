@@ -18,6 +18,10 @@
     %include "math_javascript_pre.i"
 #endif
 
+// naturalvar declarations for members that are object types (see ..\Readme.md)
+%naturalvar ell::api::math::Tensor::data;
+%naturalvar ell::api::math::Tensor::shape;
+
 // Include the C++ code to be wrapped
 %include "MathInterface.h"
 

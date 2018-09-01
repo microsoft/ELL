@@ -60,6 +60,39 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
         applySoftmax: Specifies whether softmax should be applied to class probabilites
 %}
 
+// naturalvar declarations for members that are object types (see ..\Readme.md)
+%naturalvar ell::api::predictors::neural::BatchNormalizationLayer::mean;
+%naturalvar ell::api::predictors::neural::BatchNormalizationLayer::variance;
+%naturalvar ell::api::predictors::neural::BiasLayer::bias;
+%naturalvar ell::api::predictors::neural::BinaryConvolutionalLayer::convolutionalParameters;
+%naturalvar ell::api::predictors::neural::BinaryConvolutionalLayer::weights;
+%naturalvar ell::api::predictors::neural::ConvolutionalLayer::convolutionalParameters;
+%naturalvar ell::api::predictors::neural::ConvolutionalLayer::weights;
+%naturalvar ell::api::predictors::neural::FullyConnectedLayer::weights;
+%naturalvar ell::api::predictors::neural::GRULayer::hiddenBias;
+%naturalvar ell::api::predictors::neural::GRULayer::hiddenWeights;
+%naturalvar ell::api::predictors::neural::GRULayer::resetBias;
+%naturalvar ell::api::predictors::neural::GRULayer::resetWeights;
+%naturalvar ell::api::predictors::neural::GRULayer::updateBias;
+%naturalvar ell::api::predictors::neural::GRULayer::updateWeights;
+%naturalvar ell::api::predictors::neural::Layer::parameters;
+%naturalvar ell::api::predictors::neural::LayerParameters::inputPaddingParameters;
+%naturalvar ell::api::predictors::neural::LayerParameters::inputShape;
+%naturalvar ell::api::predictors::neural::LayerParameters::outputPaddingParameters;
+%naturalvar ell::api::predictors::neural::LayerParameters::outputShape;
+%naturalvar ell::api::predictors::neural::LSTMLayer::candidateBias;
+%naturalvar ell::api::predictors::neural::LSTMLayer::candidateWeights;
+%naturalvar ell::api::predictors::neural::LSTMLayer::forgetMeBias;
+%naturalvar ell::api::predictors::neural::LSTMLayer::forgetMeWeights;
+%naturalvar ell::api::predictors::neural::LSTMLayer::inputBias;
+%naturalvar ell::api::predictors::neural::LSTMLayer::inputWeights;
+%naturalvar ell::api::predictors::neural::LSTMLayer::outputBias;
+%naturalvar ell::api::predictors::neural::LSTMLayer::outputWeights;
+%naturalvar ell::api::predictors::neural::PoolingLayer::poolingParameters;
+%naturalvar ell::api::predictors::neural::PReLUActivationLayer::alpha;
+%naturalvar ell::api::predictors::neural::RegionDetectionLayer::detectionParameters;
+%naturalvar ell::api::predictors::neural::ScalingLayer::scales;
+
 // Include the C++ code to be wrapped
 %include "NeuralLayersInterface.h"
 
