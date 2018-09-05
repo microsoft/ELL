@@ -89,7 +89,7 @@ namespace emitters
         return functionAddress;
     }
 
-    void IRExecutionEngine::DefineFunction(LLVMFunction func, uint64_t address)
+    void IRExecutionEngine::DefineFunction(LLVMFunction func, uintptr_t address)
     {
         EnsureEngine();
         _pEngine->addGlobalMapping(func, (void*)address);

@@ -68,7 +68,7 @@ namespace emitters
         ///
         /// <param name="func"> The function being defined. </param>
         /// <param name="address"> The address of the function being defined. </param>
-        void DefineFunction(LLVMFunction func, uint64_t address);
+        void DefineFunction(LLVMFunction func, uintptr_t address);
 
         /// <summary>
         /// Return a main function that takes no arguments - if one exists. Returns nullptr if not found.

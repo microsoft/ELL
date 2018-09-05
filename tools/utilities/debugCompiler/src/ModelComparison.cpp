@@ -320,7 +320,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     auto func = module->getFunction("DebugOutput");
     if (func != nullptr)
     {
-        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uint64_t>(&DebugOutput));
+        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uintptr_t>(&DebugOutput));
     }
     else
     {
@@ -331,13 +331,13 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     func = module->getFunction("ELL_InputCallback");
     if (func != nullptr)
     {
-        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uint64_t>(&ELL_InputCallback));
+        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uintptr_t>(&ELL_InputCallback));
     }
     // Define the ELL_OutputCallback in case the model contains sink nodes.
     func = module->getFunction("ELL_OutputCallback");
     if (func != nullptr)
     {
-        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uint64_t>(&ELL_OutputCallback));
+        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uintptr_t>(&ELL_OutputCallback));
     }
 
     std::cout << "jitting..." << std::endl;

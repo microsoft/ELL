@@ -481,7 +481,7 @@ class CntkDenseConverter(CntkStandardConverter):
 
     def get_attributes(self):
         attributes = {}
-        if self.activation:
+        if self.activation is not None:
             attributes["activation"] = self.activation
             
         return attributes

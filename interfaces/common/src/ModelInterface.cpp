@@ -71,6 +71,10 @@ void model_CompiledMap_SinkCallback_Float(void* context, float* output)
     return map->InvokeSinkCallback(output);
 }
 
+void model_CompiledMap_LagNotificationCallback(void* context, double lag)
+{
+}
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
@@ -720,42 +724,49 @@ std::vector<float> Map::ComputeFloat(const std::vector<float>& inputData)
     return _map->Compute<float>(inputData);
 }
 
+void ResolveCallbacks(llvm::Module* module, ell::emitters::IRExecutionEngine& jitter)
+{
+    for (llvm::Function& func : module->getFunctionList())
+    {
+        std::string name = func.getName().str();
+        if (func.hasExternalLinkage())
+        {
+            if (name.find("LagNotification") != std::string::npos)
+            {
+                jitter.DefineFunction(&func, reinterpret_cast<uintptr_t>(&model_CompiledMap_LagNotificationCallback));
+            }
+            else if (name.find("SourceCallback_Float") != std::string::npos)
+            {
+                jitter.DefineFunction(&func, reinterpret_cast<uintptr_t>(&model_CompiledMap_SourceCallback_Float));
+            }
+            else if (name.find("SinkCallback_Float") != std::string::npos)
+            {
+                jitter.DefineFunction(&func, reinterpret_cast<uintptr_t>(&model_CompiledMap_SinkCallback_Float));
+            }
+            else if (name.find("SourceCallback_Double") != std::string::npos)
+            {
+                jitter.DefineFunction(&func, reinterpret_cast<uintptr_t>(&model_CompiledMap_SourceCallback_Double));
+            }
+            else if (name.find("SinkCallback_Double") != std::string::npos)
+            {
+                jitter.DefineFunction(&func, reinterpret_cast<uintptr_t>(&model_CompiledMap_SinkCallback_Double));
+            }
+            else
+            {
+                // the predict function and the openblas_gemm functions also have external linkage.
+            }
+        }
+    }
+}
+
 CompiledMap Map::CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const
 {
-    auto resolverFunction = [moduleName](llvm::Module* module, ell::emitters::IRExecutionEngine& jitter) {
-        auto func = module->getFunction(moduleName + "_CompiledMap_SourceCallback_Double");
-        if (func != nullptr)
-        {
-            jitter.DefineFunction(func, reinterpret_cast<uint64_t>(&model_CompiledMap_SourceCallback_Double));
-        }
-
-        func = module->getFunction(moduleName + "_CompiledMap_SinkCallback_Double");
-        if (func != nullptr)
-        {
-            jitter.DefineFunction(func, reinterpret_cast<uint64_t>(&model_CompiledMap_SinkCallback_Double));
-        }
-    };
-
-    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Double", "CompiledMap_SinkCallback_Double", compilerSettings, optimizerSettings, resolverFunction);
+    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Double", "CompiledMap_SinkCallback_Double", compilerSettings, optimizerSettings, &ResolveCallbacks);
 }
 
 CompiledMap Map::CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const
 {
-    auto resolverFunction = [moduleName](llvm::Module* module, ell::emitters::IRExecutionEngine& jitter) {
-        auto func = module->getFunction(moduleName + "_CompiledMap_SourceCallback_Float");
-        if (func != nullptr)
-        {
-            jitter.DefineFunction(func, reinterpret_cast<uint64_t>(&model_CompiledMap_SourceCallback_Float));
-        }
-
-        func = module->getFunction(moduleName + "_CompiledMap_SinkCallback_Float");
-        if (func != nullptr)
-        {
-            jitter.DefineFunction(func, reinterpret_cast<uint64_t>(&model_CompiledMap_SinkCallback_Float));
-        }
-    };
-
-    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Float", "CompiledMap_SinkCallback_Float", compilerSettings, optimizerSettings, resolverFunction);
+    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Float", "CompiledMap_SinkCallback_Float", compilerSettings, optimizerSettings, &ResolveCallbacks);
 }
 
 CompiledMap Map::Compile(const std::string& targetDevice,

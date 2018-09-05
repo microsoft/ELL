@@ -216,7 +216,7 @@ std::string TestCaptureStdout(emitters::IRModuleEmitter& emitter, std::function<
     body();
 
     IRExecutionEngine iee(std::move(emitter));
-    iee.DefineFunction(debugPrintFunction, reinterpret_cast<uint64_t>(&DebugPrint));
+    iee.DefineFunction(debugPrintFunction, reinterpret_cast<uintptr_t>(&DebugPrint));
     iee.RunMain();
 
     return g_debugOutput.str();

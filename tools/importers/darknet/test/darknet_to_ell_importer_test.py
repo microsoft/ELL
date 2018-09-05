@@ -51,8 +51,8 @@ except ImportError:
 # - softmax
 class DarknetModelTestCase(unittest.TestCase):
     def setUp(self):
-            if SkipTests:
-                self.skipTest('Module not tested, ELL module missing')
+        if SkipTests:
+            self.skipTest('Module not tested, ELL module missing')
 
     def test_darknet_model(self):
         # Create synthetic input data
@@ -86,6 +86,17 @@ class DarknetModelTestCase(unittest.TestCase):
         ell_map = ell.neural.utilities.ell_map_from_float_predictor(predictor,
             step_interval_msec=100, lag_threshold_msec=150, function_prefix="DarknetTest")
         ell_map.Save("darknet_steppable_test.map")
+
+        # now compile it
+        compiler_options = ell.model.MapCompilerOptions()
+        compiler_options.useBlas = False
+        compiled = ell_map.Compile("host", "model", "test1", compilerOptions=compiler_options, dtype=np.float32)
+        
+        # call the compiled model
+        compiledResults = np.array(compiled.Compute(input2.ravel(), dtype=np.float32))
+
+        np.testing.assert_array_almost_equal(
+            compiledResults, expectedResult2, 5, "Compiled prediction does not match expected results to 5 decimal places!")
 
         return
 
