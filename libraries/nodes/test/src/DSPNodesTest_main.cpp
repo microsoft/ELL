@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     {
         TestDSPNodes(path);
     }
-    catch (const utilities::Exception exception)
+    catch (const utilities::Exception& exception)
     {
         std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
         throw;

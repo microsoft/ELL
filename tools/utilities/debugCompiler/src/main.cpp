@@ -72,7 +72,7 @@ void ReplaceSourceAndSinkNodes(model::Map& map)
     optimizer.AddPass(std::make_unique<ReplaceSourceAndSinkNodesPass>());
     map.RemoveInputs();
     map.Optimize(optimizer);
-    
+
     // now put back inputs
     auto inputNodes = map.GetModel().GetNodesByType<model::InputNodeBase>();
     int index = 1;
@@ -188,12 +188,12 @@ int main(int argc, char* argv[])
         }
         return 1;
     }
-    catch (utilities::Exception exception)
+    catch (const utilities::Exception& exception)
     {
         std::cerr << "runtime error: " << exception.GetMessage() << std::endl;
         return 1;
     }
-    catch (std::exception ex)
+    catch (const std::exception& ex)
     {
         std::cerr << "runtime error: " << ex.what() << std::endl;
         return 1;

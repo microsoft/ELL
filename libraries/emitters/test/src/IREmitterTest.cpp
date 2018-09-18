@@ -98,8 +98,8 @@ void TestIREmitter()
     auto module2 = emitter.CreateModule("Module1");
     emitter.DeclareFunction(module2.get(), "foobar");
 
-    module1->dump();
-    module2->dump();
+    DebugDump(module1.get());
+    DebugDump(module2.get());
 }
 
 void TestLLVMShiftRegister()

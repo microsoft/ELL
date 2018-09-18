@@ -27,6 +27,8 @@ namespace emitters
         /// <param name="module"> The module. </param>
         IROptimizer(IRModuleEmitter& module);
 
+        ~IROptimizer();
+
         /// <summary> Add common optimizations to the optimizer pipeline. </summary>
         void AddStandardPasses();
 

@@ -163,13 +163,6 @@ namespace emitters
         /// <param name="argument"> The argument. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the function argument. </returns>
-        LLVMValue LoadArgument(llvm::ilist_iterator<llvm::Argument>& argument);
-
-        /// <summary> Emit an instruction to load a function argument. </summary>
-        ///
-        /// <param name="argument"> The argument. </param>
-        ///
-        /// <returns> Pointer to an llvm::Value that represents the function argument. </returns>
         LLVMValue LoadArgument(llvm::Argument& argument);
 
         /// <summary> Emit a value-preserving cast operation from one type to another. </summary>
@@ -1583,7 +1576,10 @@ namespace emitters
         /// <summary> Output the function to the given stream. </summary>
         ///
         /// <param name="os"> The output stream to write to. </param>
-        void WriteToStream(std::ostream& os);
+        void WriteToStream(std::ostream& os) const;
+
+        /// <summary> Emit LLVM IR to std::out for debugging. </summary>
+        void DebugDump() const;
 
         //
         // Metadata

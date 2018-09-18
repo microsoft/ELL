@@ -13,7 +13,7 @@ requirements:
   - numpy
   - requests
   - paramiko
-  - llvmdev >=3.9,<4.0
+  - llvmdev >=6.0,<7.0
   - swig ==3.0.12
   - opencv
   - github

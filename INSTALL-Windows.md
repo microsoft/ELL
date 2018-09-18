@@ -18,7 +18,7 @@ ELL requires a C++ compiler. On Windows, you can use *Visual Studio 2017 with C+
 
 ELL uses the [*CMake*](https://cmake.org/) build system, version 3.8 or newer. A version of CMake that satisfies this requirement is already provided with Visual Studio 2017. You may also download and install it from <https://cmake.org/download/>.
 
-### LLVM 3.9, SWIG 3.0.12, OpenBLAS 0.2.19.3, and Doxygen 1.8.13 via NuGet
+### LLVM 6.0, SWIG 3.0.12, OpenBLAS 0.2.19.3, and Doxygen 1.8.13 via NuGet
 
 The easiest way to get prebuilt 64-bit versions of these packages is to use the [*NuGet*](https://www.nuget.org/) package manager, version 3.5 or newer. The relevant NuGet packages are specified in `ELL/external/packages.config`. The NuGet command line tool called `NuGet CLI` can be downloaded from <https://docs.nuget.org/ndocs/guides/install-nuget>. After downloading and installing NuGet CLI, open a command prompt, change to the repository's root directory (`ELL`) and type
 
@@ -31,14 +31,14 @@ and you are done.
 
 Here's more information in case you need to install things manually.
 
-* [*LLVM*](http://llvm.org/) is a C++ compiler framework, ELL depends on version 3.9.  
-* [*SWIG*](http://swig.org) version 3.0.12 - a tool that generates Python interfaces to C++ libraries. Required if you intend to use ELL from Python. 
+* [*LLVM*](http://llvm.org/) is a C++ compiler framework, ELL depends on version 6.0.
+* [*SWIG*](http://swig.org) version 3.0.12 - a tool that generates Python interfaces to C++ libraries. Required if you intend to use ELL from Python.
 * [*OpenBLAS*](http://www.openblas.net/) version 0.2.19.3 - fast linear algebra. This is optional but can make models execute up to 10 times faster.
 * [*Doxygen*](www.doxygen.org/) version 1.8.13 - this is optional, it is used to generate nice code documentation for the ELL API.
 
 ## Using ELL in Python
 
-ELL can optionally be used from Python 3.6. 
+ELL can optionally be used from Python 3.6.
 An easy way to install Python and all the required modules is with [Miniconda](https://conda.io/miniconda.html).
 Download and install Miniconda from here <https://conda.io/miniconda.html>.
 
@@ -80,7 +80,7 @@ Invoke CMake as follows
 ```shell
 cmake -G "Visual Studio 15 2017 Win64" ..
 ```
-Don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, and other files, in the `build` directory. 
+Don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, and other files, in the `build` directory.
 
 After creating the Visual Studio solution, build ELL by typing
 

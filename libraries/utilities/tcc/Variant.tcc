@@ -499,7 +499,7 @@ namespace utilities
             bool success = TryConvertValue(value, _value);
             if (!success)
             {
-                throw(utilities::InputException(utilities::InputExceptionErrors::typeMismatch));
+                throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
             }
         }
 
@@ -509,7 +509,7 @@ namespace utilities
             bool success = TryConvertValue(value, _value);
             if (!success)
             {
-                throw(utilities::InputException(utilities::InputExceptionErrors::typeMismatch));
+                throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
             }
         }
 
@@ -518,7 +518,7 @@ namespace utilities
         {
             if (!TryParseInto(s))
             {
-                throw(utilities::InputException(utilities::InputExceptionErrors::typeMismatch));
+                throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
             }
         }
 

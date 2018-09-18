@@ -23,7 +23,7 @@
 // llvm
 #include <llvm/ADT/Triple.h>
 #include <llvm/AsmParser/Parser.h>
-#include <llvm/Bitcode/ReaderWriter.h>
+#include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/TypeBuilder.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/FileSystem.h>
@@ -134,7 +134,7 @@ namespace emitters
                 }
 
                 const OutputRelocationModel relocModel = OutputRelocationModel::Static;
-                const llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
+                const llvm::CodeModel::Model codeModel = llvm::CodeModel::Small; // If this code gets executed during JIT, this might have to be medium/large
                 const llvm::TargetOptions options;
                 std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(parameters.targetDevice.triple,
                                                                                                parameters.targetDevice.cpu,
@@ -831,7 +831,7 @@ namespace emitters
     {
         auto openFlags = (ModuleOutputFormat::bitcode == format || ModuleOutputFormat::objectCode == format) ? llvm::sys::fs::F_None : llvm::sys::fs::F_Text;
         std::error_code error;
-        llvm::tool_output_file out(filePath, error, openFlags);
+        llvm::ToolOutputFile out(filePath, error, openFlags);
         if (error)
         {
             throw LLVMException(error);
@@ -981,12 +981,12 @@ namespace emitters
         return llvm::verifyModule(*_pModule, &out);
     }
 
-    void IRModuleEmitter::DebugDump()
+    void IRModuleEmitter::DebugDump() const
     {
         auto module = GetLLVMModule();
         if (module)
         {
-            module->dump();
+            emitters::DebugDump(module);
         }
         else
         {
@@ -1011,7 +1011,7 @@ namespace emitters
 
         auto relocModel = parameters.targetDevice.IsWindows() ? OutputRelocationModel::Static : OutputRelocationModel::PIC_;
         const llvm::TargetOptions options;
-        const llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
+        const llvm::CodeModel::Model codeModel = llvm::CodeModel::Small;
         return target->createTargetMachine(parameters.targetDevice.triple,
                                            parameters.targetDevice.cpu,
                                            parameters.targetDevice.features,

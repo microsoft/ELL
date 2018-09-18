@@ -141,14 +141,14 @@ if %PROCESSOR_ARCHITECTURE% == AMD64 (
 goto AddNugetPath
 
 :AddNugetPath
-set PATH=%PATH%;%ext_path%\Doxygen.1.8.13\tools;%ext_path%\vswhere.2.1.3\tools;%ext_path%\swigwintools.3.0.12\tools\swigwin-3.0.12;%ext_path%\LLVMNativeWindowsLibs.x64.3.9.1.2\build\native\tools
-setx PATH "%ext_path%\Doxygen.1.8.13\tools;%ext_path%\vswhere.2.1.3\tools;%ext_path%\swigwintools.3.0.12\tools\swigwin-3.0.12;%ext_path%\LLVMNativeWindowsLibs.x64.3.9.1.2\build\native\tools;%PATH%" /M
+set PATH=%PATH%;%ext_path%\Doxygen.1.8.13\tools;%ext_path%\vswhere.2.1.3\tools;%ext_path%\swigwintools.3.0.12\tools\swigwin-3.0.12;%ext_path%\LLVMNativeWindowsLibs.x64.6.0.1\llvm-6.0\bin
+setx PATH "%ext_path%\Doxygen.1.8.13\tools;%ext_path%\vswhere.2.1.3\tools;%ext_path%\swigwintools.3.0.12\tools\swigwin-3.0.12;%ext_path%\LLVMNativeWindowsLibs.x64.6.0.1\llvm-6.0\bin;%PATH%" /M
 setlocal EnableDelayedExpansion
 goto NugetAvailable
 
 :CheckConda
 for /f "tokens=3 delims= " %%G in ('powershell "conda --version | select -First 1"') do set conda_ver=%%G
-for /f "tokens=1,2 delims=." %%G in ('echo %conda_ver%') do ( 
+for /f "tokens=1,2 delims=." %%G in ('echo %conda_ver%') do (
     if %%G lss 4 (
         goto InstallConda
     ) else if %%G equ 4 (

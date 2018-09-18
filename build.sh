@@ -26,8 +26,8 @@ if printf '%s\n%s\n' "$(gcc --version | head -n1 | cut -d" " -f4 | awk '{print $
     exit 1
 fi
 
-if [[ ! -f "/usr/bin/llvm-config-3.9" ]]; then
-    echo "LLVM version 3.9 needs to be installed"
+if [[ ! -f "/usr/bin/llvm-config-6.0" ]]; then
+    echo "LLVM version 6.0 needs to be installed"
     echo "See INSTALL-Ubuntu.md for information on how to install llvm"
     exit 1
 fi
@@ -102,6 +102,6 @@ fi
 
 pushd $build_dir > /dev/null
 cmake "-DGIT_REPO=https://github.com/Microsoft/ell-test-models" ${cmakeargs}
-make -j $nproc 
+make -j $nproc
 make -j $nproc _ELL_python
 popd > /dev/null

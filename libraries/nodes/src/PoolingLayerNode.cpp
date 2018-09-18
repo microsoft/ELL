@@ -484,7 +484,7 @@ namespace nodes
                 if (maxOutputRow > minOutputRow && maxOutputCol > minOutputCol)
                 {
                     // BUG: explicit by-ref captures of `usesPadding` and `negWindowExtent` are here to work around a GCC bug
-                    function.For(minOutputRow, maxOutputRow, 1, [=, &usesPadding, &negWindowExtent, &poolingFunction](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex1) {
+                    function.For(minOutputRow, maxOutputRow, 1, [=, &outputIncrement, &usesPadding, &negWindowExtent, &poolingFunction](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex1) {
                         auto outputRow = function.LocalScalar(loopIndex1);
                         auto inputRow = outputRow * function.LocalScalar<int>(stride);
                         if (!usesPadding)
@@ -492,7 +492,7 @@ namespace nodes
                             inputRow = inputRow + function.LocalScalar<int>(-negWindowExtent);
                         }
 
-                        function.For(minOutputCol, maxOutputCol, 1, [=, &poolingFunction, &inputRow](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex2) {
+                        function.For(minOutputCol, maxOutputCol, 1, [=, &outputIncrement, &poolingFunction, &inputRow](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex2) {
                             auto outputColumn = function.LocalScalar(loopIndex2);
                             auto inputColumn = outputColumn * function.LocalScalar<int>(stride);
                             if (!usesPadding)
@@ -500,7 +500,7 @@ namespace nodes
                                 inputColumn = inputColumn + function.LocalScalar<int>(-negWindowExtent);
                             }
 
-                            function.For(outputDepth, [=, &poolingFunction, &inputRow, &inputColumn](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex3) {
+                            function.For(outputDepth, [=, &outputIncrement, &poolingFunction, &inputRow, &inputColumn](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex3) {
                                 auto channel = function.LocalScalar(loopIndex3);
                                 // Get the pooled value
                                 auto pooledValue = GetPoolingWindowValue(function, rowRegionBounds.windowBounds.begin, rowRegionBounds.windowBounds.end, columnRegionBounds.windowBounds.begin, columnRegionBounds.windowBounds.end, inputRow, inputColumn, channel, inputBuffer, inputIncrement, poolingFunction);

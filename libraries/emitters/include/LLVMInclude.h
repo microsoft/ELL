@@ -9,8 +9,6 @@
 
 #include <llvm/AsmParser/Parser.h>
 
-#include <llvm/Bitcode/ReaderWriter.h>
-
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/MCJIT.h>
 

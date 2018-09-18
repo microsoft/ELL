@@ -45,14 +45,14 @@ namespace emitters
         void WriteArrayType(std::ostream& os, llvm::ArrayType* t)
         {
             auto size = t->getNumElements();
-            auto elemType = t->getTypeAtIndex(0u);
+            auto elemType = t->getElementType();
             WriteLLVMType(os, elemType);
             os << "[" << size << "]";
         }
 
         void WritePointerType(std::ostream& os, llvm::PointerType* t)
         {
-            auto elemType = t->getTypeAtIndex(0u);
+            auto elemType = t->getElementType();
             WriteLLVMType(os, elemType);
             os << "*";
         }

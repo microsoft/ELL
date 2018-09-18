@@ -50,15 +50,15 @@ To install all of the above, type
 sudo apt-get install -y gcc-6 g++-6 cmake libedit-dev zlibc zlib1g zlib1g-dev
 sudo apt-get install -y libopenblas-dev doxygen
 ```
-### LLVM 3.9
+### LLVM 6.0
 
-ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 3.9-dev. To install it use this command
+ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 6.0-dev. To install it use this command
 
 ```shell
-sudo apt-get install -y llvm-3.9-dev
+sudo apt-get install -y llvm-6.0-dev
 ```
 
-This works on Ubuntu 16.04 Xenial.  If you have some other Linux version and llvm-3.9-dev is not available then
+This works on Ubuntu 16.04 Xenial.  If you have some other Linux version and `llvm-6.0-dev` is not available then
 [*LLVM*](http://llvm.org/) has more instructions on how to install it manually.
 
 ### curl

@@ -970,6 +970,18 @@ namespace emitters
         LLVMValue _pZeroLiteral = nullptr;
         std::unordered_map<std::string, llvm::StructType*> _structs;
     };
+
+    // Helper function to dump the LLVM module to stderr for debugging
+    void DebugDump(llvm::Module* module);
+
+    // Helper function to dump the LLVM type to stderr for debugging
+    void DebugDump(llvm::Type* type);
+
+    // Helper function to dump the LLVM value to stderr for debugging
+    void DebugDump(llvm::Value* value);
+
+    // Helper function to dump the LLVM function to stderr for debugging
+    void DebugDump(llvm::Function* function);
 }
 }
 

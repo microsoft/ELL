@@ -268,7 +268,7 @@ namespace utilities
             start = pos + path_separator.size();
             pos = path.find_first_of(path_separator, start);
         }
-        if (start < path.length()) 
+        if (start < path.length())
         {
             auto part = path.substr(start, path.length() - start);
             result.push_back(part);
@@ -302,7 +302,7 @@ namespace utilities
 #endif
             if (rc != 0)
             {
-                ell::utilities::Exception(ell::utilities::FormatString("mkdir failed with error code %d", errno));
+                throw ell::utilities::Exception(ell::utilities::FormatString("mkdir failed with error code %d", errno));
             }
         }
     }
@@ -335,7 +335,7 @@ namespace utilities
 #endif
         if (rc != 0)
         {
-            ell::utilities::Exception(ell::utilities::FormatString("error getting current working directory: %d", rc));
+            throw ell::utilities::Exception(ell::utilities::FormatString("error getting current working directory: %d", rc));
         }
         return utf8wd;
     }

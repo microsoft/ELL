@@ -21,7 +21,7 @@ fi
 # Update packages
 sudo apt-get update && \
 sudo apt-get dist-upgrade && \
-sudo apt-get install -y gcc-6 g++-6 cmake libedit-dev zlibc zlib1g zlib1g-dev libopenblas-dev doxygen llvm-3.9-dev curl
+sudo apt-get install -y gcc-6 g++-6 cmake libedit-dev zlibc zlib1g zlib1g-dev libopenblas-dev doxygen llvm-6.0-dev curl
 
 # Check for cmake version
 cmake_ver=$(cmake --version 2>&1 | head -n1 | cut -d ' ' -f3 | awk '{print $NF}')

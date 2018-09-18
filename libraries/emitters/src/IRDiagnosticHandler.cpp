@@ -25,7 +25,9 @@ namespace emitters
     IRDiagnosticHandler::IRDiagnosticHandler(llvm::LLVMContext& context, bool verbose)
         : _verbose(verbose)
     {
-        context.setDiagnosticHandler(&HandleMessage, this);
+        auto diagnosticHandler = std::make_unique<llvm::DiagnosticHandler>(this);
+        diagnosticHandler->DiagHandlerCallback = &HandleMessage;
+        context.setDiagnosticHandler(std::move(diagnosticHandler));
     }
 
     void IRDiagnosticHandler::SetVerbosity(bool isVerbose)

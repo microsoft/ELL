@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Windows-only:
-#if (MSVC)
+#ifdef WIN32
 #pragma warning(disable : 4146 4996)
 #endif
 
@@ -21,7 +21,7 @@
 #include <llvm/ADT/Triple.h>
 #include <llvm/Analysis/TargetLibraryInfo.h>
 
-#include <llvm/Bitcode/ReaderWriter.h>
+#include <llvm/Bitcode/BitcodeWriter.h>
 
 #include <llvm/CodeGen/MachineModuleInfo.h>
 #include <llvm/CodeGen/TargetPassConfig.h>
@@ -57,34 +57,20 @@ namespace emitters
 {
     namespace
     {
-        // Append attributes to a function
-        void AddAttributes(llvm::Function& function, const llvm::AttributeSet& attributes)
-        {
-            auto& context = function.getContext();
-            llvm::AttributeSet currentAttributes = function.getAttributes();
-            function.setAttributes(currentAttributes.addAttributes(context, llvm::AttributeSet::FunctionIndex, attributes));
-        }
-
         void SetFunctionAttributes(const std::string& cpu, const std::string& features, llvm::Module& module)
         {
             // Loop over the functions in the module, settings the cpu and features attributes
             for (auto& function : module)
             {
-                auto& context = function.getContext(); // Is it really possible the functions don't all have the same context?
-
-                // Attributes are non-mutable, so we have to replace newAttributes with the modified attributes
-                llvm::AttributeSet newAttributes;
                 if (!cpu.empty())
                 {
-                    newAttributes = newAttributes.addAttribute(context, llvm::AttributeSet::FunctionIndex, "target-cpu", cpu);
+                    function.addFnAttr("target-cpu", cpu);
                 }
 
                 if (!features.empty())
                 {
-                    newAttributes = newAttributes.addAttribute(context, llvm::AttributeSet::FunctionIndex, "target-features", features);
+                    function.addFnAttr("target-features", features);
                 }
-
-                AddAttributes(function, newAttributes);
             }
         }
 
@@ -145,7 +131,7 @@ namespace emitters
         targetOptions.FloatABIType = ellOptions.floatABI;
 
         OutputRelocationModel relocModel = ellOptions.relocModel;
-        llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
+        llvm::CodeModel::Model codeModel = llvm::CodeModel::Small; // If this code gets run during JIT, we may have to change to medium/large
 
         std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(module.getTargetTriple(),
                                                                                        ellOptions.targetDevice.cpu,
@@ -198,7 +184,7 @@ namespace emitters
                 throw EmitterException(EmitterError::notSupported);
             }
 
-            if (targetMachine->addPassesToEmitFile(passManager, bufferedStream, fileType, ellOptions.verifyModule, nullptr, nullptr, nullptr, nullptr))
+            if (targetMachine->addPassesToEmitFile(passManager, bufferedStream, fileType, ellOptions.verifyModule))
             {
                 throw EmitterException(EmitterError::unexpected, "target does not support generation of this file type!");
             }

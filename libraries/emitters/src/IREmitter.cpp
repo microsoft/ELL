@@ -1235,5 +1235,29 @@ namespace emitters
         }
         return _pZeroLiteral;
     }
+
+    void DebugDump(llvm::Module* module)
+    {
+        module->print(llvm::errs(), nullptr, /*ShouldPreserveUseListOrder*/ false, /*IsForDebug*/ true);
+        llvm::errs() << '\n';
+    }
+
+    void DebugDump(llvm::Type* type)
+    {
+        type->print(llvm::errs(), /*IsForDebug*/ true);
+        llvm::errs() << '\n';
+    }
+
+    void DebugDump(llvm::Value* value)
+    {
+        value->print(llvm::errs(), /*IsForDebug*/ true);
+        llvm::errs() << '\n';
+    }
+
+    void DebugDump(llvm::Function* function)
+    {
+        function->print(llvm::errs(), nullptr, false, /*IsForDebug*/ true);
+        llvm::errs() << '\n';
+    }
 }
 }

@@ -1,5 +1,5 @@
 @echo off
-Setlocal EnableDelayedExpansion 
+Setlocal EnableDelayedExpansion
 
 pushd %~dp0
 if not exist build goto :build
@@ -10,8 +10,8 @@ set retry=10
 set /A retry=!retry!-1
 if "!retry!"=="0" goto :nodelete
 if not exist build goto :build
-rd /s /q build 
-if exist build external\sleep 2 
+rd /s /q build
+powershell -nologo -noprofile -command "start-sleep 2"
 goto :retry
 
 

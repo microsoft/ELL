@@ -576,7 +576,7 @@ namespace emitters
         bool CheckForErrors(std::ostream& stream);
 
         /// <summary> Emit LLVM IR to std::out for debugging. </summary>
-        void DebugDump();
+        void DebugDump() const;
 
         //
         // low-level LLVM-related functionality

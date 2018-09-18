@@ -30,7 +30,7 @@
 
 using namespace ell::utilities;
 
-class PyHandle 
+class PyHandle
 {
     PyObject* _obj;
 public:
@@ -38,19 +38,19 @@ public:
     {
         _obj = o;
     }
-    ~PyHandle() 
+    ~PyHandle()
     {
         // exception safe cleanup of python objects
-        if (_obj != nullptr) 
+        if (_obj != nullptr)
         {
             Py_DECREF(_obj);
         }
     }
-    PyObject* operator*() 
+    PyObject* operator*()
     {
         return _obj;
     }
-    PyObject* steal() 
+    PyObject* steal()
     {
         PyObject* result = _obj;
         _obj = nullptr;
@@ -58,10 +58,10 @@ public:
     }
 };
 
-class PythonRuntime 
+class PythonRuntime
 {
 public:
-    PythonRuntime() 
+    PythonRuntime()
     {
         std::string pythonExe = "python";
 #ifdef WIN32
@@ -94,7 +94,7 @@ std::vector<double> ExecutePythonScript(const std::string& filePath, const std::
 {
     std::vector<PyObject*> methodArgs;
     std::vector<double> result;
-    
+
     PythonRuntime runtime;
 
     PyHandle argv = PyList_New(0);
@@ -122,7 +122,7 @@ std::vector<double> ExecutePythonScript(const std::string& filePath, const std::
     PyHandle module = PyImport_Import(*moduleName);
     if (*module == nullptr)
     {
-        ell::utilities::Exception("Error importing Python module '" + name + "' using '" + runtime.path + "'");
+        throw ell::utilities::Exception("Error importing Python module '" + name + "' using '" + runtime.path + "'");
     }
 
     // args must be in a tuple
@@ -133,23 +133,23 @@ std::vector<double> ExecutePythonScript(const std::string& filePath, const std::
     PyHandle mainFunction = PyObject_GetAttrString(*module, (char*)"main");
     if (*mainFunction == nullptr)
     {
-        ell::utilities::Exception("Error missing 'main' function in Python module '" + name + "'");
+        throw ell::utilities::Exception("Error missing 'main' function in Python module '" + name + "'");
     }
 
     // call main with the args
     PyHandle myResult = PyObject_CallObject(*mainFunction, *py_args_tuple);
     if (*myResult == nullptr)
     {
-        ell::utilities::Exception("Return value from 'main' function in Python module '" + name + "' is null, it should be a list of floating point numbers");
+        throw ell::utilities::Exception("Return value from 'main' function in Python module '" + name + "' is null, it should be a list of floating point numbers");
     }
 
     // make sure returned object is a list.
     if (!PyList_Check(*myResult))
     {
-        ell::utilities::Exception("Return value from 'main' function in Python module '" + name + "' is not a list");
+        throw ell::utilities::Exception("Return value from 'main' function in Python module '" + name + "' is not a list");
     }
 
-    // should get back a list of floats.    
+    // should get back a list of floats.
     for (size_t i = 0, n = PyList_Size(*myResult); i < n; i++)
     {
         PyObject* item = PyList_GetItem(*myResult, i); // borrowed reference

@@ -64,7 +64,7 @@ namespace neural
         }
         else
         {
-            throw new utilities::DataFormatException(utilities::DataFormatErrors::badFormat, std::string("Unknown activation type: ") + type);
+            throw utilities::DataFormatException(utilities::DataFormatErrors::badFormat, std::string("Unknown activation type: ") + type);
         }
     }
 

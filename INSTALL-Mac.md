@@ -32,20 +32,20 @@ brew update
 
 ### LLVM and Clang
 
-ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 3.9.  `Clang` is a C++ compiler built on top of LLVM, and it is the best choice for building ELL. To download and install LLVM and Clang, type
+ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 6.0.  `Clang` is a C++ compiler built on top of LLVM, and it is the best choice for building ELL. To download and install LLVM and Clang, type
 
 ```shell
-brew install llvm@3.9
+brew install llvm@6
 ```
 
 Alternatively, if you have already have *Xcode* installed and prefer to use the version of *Clang* included with it, you must still install LLVM and make sure that the command-line version of the *Xcode* tools are available.
 
 ```shell
-brew install llvm@3.9
+brew install llvm@6
 xcode-select --install
 ```
 
-If you already have LLVM installed, ensure that you have version 3.9. Note that CMake assumes that the LLVM binary files are located in the standard Homebrew location, which is `/usr/local/opt`.
+If you already have LLVM installed, ensure that you have version 6.0. Note that CMake assumes that the LLVM binary files are located in the standard Homebrew location, which is `/usr/local/opt`.
 
 ### CMake 3.8, SWIG 3.0.12, OpenBLAS, and Doxygen via Homebrew
 
@@ -68,7 +68,7 @@ brew install doxygen
 
 ## Using ELL in Python
 
-ELL can optionally be used from Python 3.6. 
+ELL can optionally be used from Python 3.6.
 An easy way to install Python and all the required modules is with [Miniconda](https://conda.io/miniconda.html).
 Download and install Miniconda from here <https://conda.io/miniconda.html>.
 
@@ -130,10 +130,9 @@ The generated executables will appear in `ELL/build/bin`.
 Try telling CMake where to find LLVM as follows:
 
 ```shell
-cmake -DLLVM_DIR=/usr/local/Cellar/llvm@3.9/3.9.1_1/lib/cmake/llvm ..
+cmake -DLLVM_DIR=$(brew --prefix llvm) ..
 ```
 
 ## Advanced Installation
 
 The instructions above are enough to start using ELL. For more advanced topics, like testing and generating documentation, please see our [advanced installation instructions](INSTALL-Advanced.md).
-

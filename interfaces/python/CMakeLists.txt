@@ -22,6 +22,10 @@ generate_interface(python ell_py ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES}
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS})
 
 if (TARGET _ELL_python)
+  if(${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
+    target_compile_options(_ELL_python PRIVATE -Wno-stringop-truncation -Wno-class-memaccess)
+  endif()
+
   set(PYTHON_DIR ${CMAKE_BINARY_DIR}/interfaces/python)
   set(COMMON_DIR ${CMAKE_BINARY_DIR}/interfaces/common)
 

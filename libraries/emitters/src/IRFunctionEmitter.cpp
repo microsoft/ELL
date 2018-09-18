@@ -218,11 +218,6 @@ namespace emitters
         llvm::verifyFunction(*_pFunction);
     }
 
-    LLVMValue IRFunctionEmitter::LoadArgument(llvm::ilist_iterator<llvm::Argument>& argument)
-    {
-        return _pEmitter->Load(&(*argument));
-    }
-
     LLVMValue IRFunctionEmitter::LoadArgument(llvm::Argument& argument)
     {
         return _pEmitter->Load(&argument);
@@ -1659,10 +1654,15 @@ namespace emitters
     // Serialization
     //
 
-    void IRFunctionEmitter::WriteToStream(std::ostream& os)
+    void IRFunctionEmitter::WriteToStream(std::ostream& os) const
     {
         llvm::raw_os_ostream out(os);
         _pFunction->print(out);
+    }
+
+    void IRFunctionEmitter::DebugDump() const
+    {
+        emitters::DebugDump(_pFunction);
     }
 
     //

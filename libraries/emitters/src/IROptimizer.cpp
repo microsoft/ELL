@@ -31,6 +31,11 @@ namespace emitters
     {
     }
 
+    IROptimizer::~IROptimizer()
+    {
+        (void)_functionPasses.doFinalization();
+    }
+
     void IROptimizer::AddStandardPasses()
     {
         _functionPasses.add(llvm::createVerifierPass());
@@ -39,17 +44,17 @@ namespace emitters
         llvm::PassManagerBuilder builder;
         builder.OptLevel = 3;
         builder.SizeLevel = 0;
-        builder.Inliner = llvm::createFunctionInliningPass(builder.OptLevel, builder.SizeLevel);
+        builder.Inliner = llvm::createFunctionInliningPass(builder.OptLevel, builder.SizeLevel, false);
         builder.LoopVectorize = true;
         builder.SLPVectorize = true;
         builder.populateFunctionPassManager(_functionPasses);
         builder.populateModulePassManager(_modulePasses);
 
+        (void)_functionPasses.doInitialization();
+
         if (targetMachine)
         {
-            builder.addExtension(llvm::PassManagerBuilder::EP_EarlyAsPossible, [&](const llvm::PassManagerBuilder&, llvm::legacy::PassManagerBase& passManager) {
-                targetMachine->addEarlyAsPossiblePasses(passManager);
-            });
+            targetMachine->adjustPassManager(builder);
         }
     }
 

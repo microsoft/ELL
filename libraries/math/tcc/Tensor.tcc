@@ -534,7 +534,7 @@ namespace math
 
         for (size_t i = 0; i < NumSlices<dimension0, dimension1>(*this); ++i)
         {
-            GetSlice<dimension0, dimension1>(i).CopyFrom(GetSlice<dimension0, dimension1>(other, i));
+            this->template GetSlice<dimension0, dimension1>(i).CopyFrom(GetSlice<dimension0, dimension1>(other, i));
         }
     }
 
@@ -548,7 +548,7 @@ namespace math
 
         for (size_t i = 0; i < math::NumSlices<dimension0, otherDimension0>(*this); ++i)
         {
-            auto thisSlice = GetSlice<dimension0, otherDimension0>(i);
+            auto thisSlice = this->template GetSlice<dimension0, otherDimension0>(i);
             auto otherSlice = other.template GetSlice<dimension0, otherDimension0>(i);
             thisSlice.CopyFrom(otherSlice);
         }

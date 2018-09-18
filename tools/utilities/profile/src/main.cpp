@@ -82,7 +82,7 @@ void ReplaceSourceAndSinkNodes(model::Map& map)
     optimizer.AddPass(std::make_unique<ReplaceSourceAndSinkNodesPass>());
     map.RemoveInputs();
     map.Optimize(optimizer);
-    
+
     // now put back inputs
     auto inputNodes = map.GetModel().GetNodesByType<model::InputNodeBase>();
     int index = 1;
@@ -233,7 +233,7 @@ void WarmUpModel(model::IRCompiledMap& map, const std::vector<InputType>& input,
     {
         auto output = map.Compute<OutputType>(input);
     }
-    
+
     if(isProfiling)
     {
         ResetProfilingInfo(map);
@@ -297,7 +297,7 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
     const auto comment = profileArguments.outputComment;
 
     ReplaceSourceAndSinkNodes(map);
-    
+
     std::vector<InputType> input = GetModelInput<InputType>(map, profileArguments, converterArgs);
 
     // Initialize the pass registry
@@ -473,7 +473,7 @@ int main(int argc, char* argv[])
         }
         return 1;
     }
-    catch (utilities::LogicException exception)
+    catch (const utilities::LogicException& exception)
     {
         std::cerr << "runtime error: " << exception.GetMessage() << std::endl;
         return 1;

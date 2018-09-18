@@ -19,7 +19,7 @@ RUN apt-get update \
 # LLVM
 RUN apt-get update \
     && apt-get install -y \
-      llvm-3.9-dev \
+      llvm-6.0-dev \
     && apt-get clean all
 
 # SWIG
