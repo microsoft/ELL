@@ -32,7 +32,7 @@ namespace nodes
     }
 
     template <typename ElementType>
-    LinearPredictorNode<ElementType>::LinearPredictorNode(const model::PortElements<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor)
+    LinearPredictorNode<ElementType>::LinearPredictorNode(const model::OutputPort<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor)
         : Node({ &_input }, { &_output, &_weightedElements }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _weightedElements(this, weightedElementsPortName, input.Size()), _predictor(predictor)
     {
         if (input.Size() != predictor.Size())
@@ -62,7 +62,7 @@ namespace nodes
     template <typename ElementType>
     void LinearPredictorNode<ElementType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<LinearPredictorNode>(newPortElements, _predictor);
         transformer.MapNodeOutput(output, newNode->output);
         transformer.MapNodeOutput(weightedElements, newNode->weightedElements);
@@ -71,7 +71,7 @@ namespace nodes
     template <typename ElementType>
     bool LinearPredictorNode<ElementType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
 
         auto weightsNode = transformer.AddNode<ConstantNode<ElementType>>(_predictor.GetWeights().ToArray());
         auto dotProductNode = transformer.AddNode<DotProductNode<ElementType>>(weightsNode->output, newPortElements);

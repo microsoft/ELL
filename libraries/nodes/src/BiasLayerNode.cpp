@@ -15,7 +15,7 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    BiasLayerNode<ValueType>::BiasLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::BiasLayer<ValueType>& layer)
+    BiasLayerNode<ValueType>::BiasLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BiasLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<BiasLayerNode<ValueType>, predictors::neural::BiasLayer<ValueType>, ValueType>(input, layer)
     {
     }
@@ -23,7 +23,7 @@ namespace nodes
     template <typename ValueType>
     bool BiasLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
         auto biasValues = this->_layer.GetBias().ToArray();
         auto scaleValuesNode = transformer.AddNode<ConstantNode<ValueType>>(); // nothing
         auto biasValuesNode = transformer.AddNode<ConstantNode<ValueType>>(biasValues);
@@ -42,7 +42,7 @@ namespace nodes
     template <typename ValueType>
     void BiasLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<BiasLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }

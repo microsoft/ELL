@@ -52,7 +52,7 @@ namespace nodes
         /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
         /// <param name="predicate"> The type of predicate to apply. </param>
-        BinaryPredicateNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, emitters::BinaryPredicateType predicate);
+        BinaryPredicateNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryPredicateType predicate);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

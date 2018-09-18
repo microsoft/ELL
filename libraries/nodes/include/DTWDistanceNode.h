@@ -50,7 +50,7 @@ namespace nodes
         ///
         /// <param name="input"> The signals to compare to the prototype </param>
         /// <param name="prototype"> The prototype </param>
-        DTWDistanceNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype);
+        DTWDistanceNode(const model::OutputPort<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

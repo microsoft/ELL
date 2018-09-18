@@ -517,7 +517,7 @@ static void TestL2NormSquaredNodeRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ l2NormSquaredNode->output });
+    const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(l2NormSquaredNode->output);
     std::cout << "Original L2NormSquaredNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
     for (const auto& inputValue : data)
     {
@@ -544,7 +544,7 @@ static void TestMovingAverageNodeRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ meanNode->output });
+    const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(meanNode->output);
     std::cout << "Original MovingAverageNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
     for (const auto& inputValue : data)
     {
@@ -581,9 +581,9 @@ static void TestSimpleForestPredictorNodeRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestPredictorNode->output });
-    auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestPredictorNode->treeOutputs });
-    auto refinedEdgeIndicatorVectorElements = transformer.GetCorrespondingOutputs(model::PortElements<bool>{ simpleForestPredictorNode->edgeIndicatorVector });
+    const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(simpleForestPredictorNode->output);
+    const auto& refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(simpleForestPredictorNode->treeOutputs);
+    const auto& refinedEdgeIndicatorVectorElements = transformer.GetCorrespondingOutputs(simpleForestPredictorNode->edgeIndicatorVector);
 
     // check equivalence
     inputNode->SetInput({ 0.18, 0.5, 0.0 });
@@ -618,7 +618,7 @@ static void TestSquaredEuclideanDistanceNodeRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ sqEuclideanDistanceNode->output });
+    const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(sqEuclideanDistanceNode->output);
     std::cout << "Original SquaredEuclideanDistanceNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
 
     inputNode->SetInput(input);
@@ -650,7 +650,7 @@ static void TestLinearPredictorNodeRefine()
 
     // check for equality
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<ElementType>{ linearPredictorNode->output });
+    const auto& newOutputElements = transformer.GetCorrespondingOutputs(linearPredictorNode->output);
     inputNode->SetInput({ 1.0, 1.0, 1.0 });
     newInputNode->SetInput({ 1.0, 1.0, 1.0 });
     auto modelOutputValue = model.ComputeOutput(linearPredictorNode->output)[0];
@@ -673,7 +673,7 @@ static void TestDemultiplexerNodeRefine()
     std::cout << "Original DemultiplexerNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newSelectorNode = transformer.GetCorrespondingInputNode(selectorNode);
-    auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output);
+    const auto& newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output);
 
     std::vector<double> inputValue{ 5.0 };
     inputNode->SetInput(inputValue);
@@ -715,7 +715,7 @@ static void TestMatrixVectorProductRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ matrixVectorProductNode->output });
+    const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(matrixVectorProductNode->output);
 
     refinedInputNode->SetInput(input);
 
@@ -748,7 +748,7 @@ static void TestEuclideanDistanceNodeRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ euclideanDistanceNode->output });
+    const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(euclideanDistanceNode->output);
 
     refinedInputNode->SetInput(input);
 
@@ -824,7 +824,7 @@ static void TestProtoNNPredictorNode()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedScoreOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ protonnPredictorNode->output });
+    const auto& refinedScoreOutputElements = transformer.GetCorrespondingOutputs(protonnPredictorNode->output);
 
     refinedInputNode->SetInput(input);
 

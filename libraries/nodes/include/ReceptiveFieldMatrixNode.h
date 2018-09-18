@@ -54,7 +54,7 @@ namespace nodes
         /// <param name="dataOrder"> Indicates the order of the dimensions in the data. The first entry is the index of the slowest-incrementing dimension, and the last entry is the index of the fastest-moving dimensions. So, the canonical row, column, channel order is {0, 1, 2}. </param>
         /// <param name="outputWidth"> The output image width. </param>
         /// <param name="outputHeight"> The output image height. </param>
-        ReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input,
+        ReceptiveFieldMatrixNode(const model::OutputPort<ValueType>& input,
                                  const model::PortMemoryLayout& inputMemoryLayout,
                                  int filterWidth,
                                  int stride,

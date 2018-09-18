@@ -129,7 +129,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::PortElements<ValueType>& input, emitters::UnaryOperationType operation)
+    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPort<ValueType>& input, emitters::UnaryOperationType operation)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _operation(operation)
     {
     }
@@ -179,7 +179,7 @@ namespace nodes
     template <typename ValueType>
     void UnaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<UnaryOperationNode<ValueType>>(newPortElements, _operation);
         transformer.MapNodeOutput(output, newNode->output);
     }

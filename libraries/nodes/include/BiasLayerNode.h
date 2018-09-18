@@ -45,7 +45,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        BiasLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::BiasLayer<ValueType>& layer);
+        BiasLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BiasLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

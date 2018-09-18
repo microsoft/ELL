@@ -36,17 +36,17 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="owningNode"> The node that contains this port </param>
-        /// <param name="input"> The input group to fetch input values from </param>
+        /// <param name="input"> The port to fetch input values from </param>
         /// <param name="name"> The name of this port </param>
         template <typename ValueType>
-        InputPortBase(const Node* owningNode, const PortElements<ValueType>& input, const std::string& name);
+        InputPortBase(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name);
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="owningNode"> The node that contains this port </param>
-        /// <param name="input"> The input group to fetch input values from </param>
+        /// <param name="input"> The port to fetch input values from </param>
         /// <param name="name"> The name of this port </param>
-        InputPortBase(const Node* owningNode, PortElementsBase& input, const std::string& name);
+        InputPortBase(const Node* owningNode, const OutputPortBase& input, const std::string& name);
 
         ~InputPortBase() override = default;
 
@@ -54,11 +54,6 @@ namespace model
         ///
         /// <returns> The list nodes this input port gets values from </returns>
         std::vector<const Node*> GetParentNodes() const;
-
-        /// <summary> Returns the list of port ranges this input port gets values from </summary>
-        ///
-        /// <returns> The list nodes this input port gets values from </returns>
-        PortElementsBase GetInputElements() const;
 
         /// <summary> Returns the output port this port gets its values from </summary>
         ///
@@ -93,10 +88,7 @@ namespace model
         /// <summary> Gets the port element at the specified index </summary>
         ///
         /// <returns> The element at the specified index </returns>
-        model::PortElementBase GetInputElement(size_t index) const
-        {
-            return GetInputElements().GetElement(index);
-        }
+        PortElementBase GetInputElement(size_t index) const;
 
     protected:
         InputPortBase(Port::PortType portType);
@@ -120,7 +112,7 @@ namespace model
         ///
         /// <param name="owningNode"> The node this port belongs to </param>
         /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
-        InputPort(const Node* owningNode, const PortElements<ValueType>& input, const std::string& name);
+        InputPort(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name);
 
         /// <summary> Assignment operator </summary>
         ///

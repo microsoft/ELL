@@ -44,7 +44,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The batch normalization layer to wrap. </param>
-        BatchNormalizationLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::BatchNormalizationLayer<ValueType>& layer);
+        BatchNormalizationLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BatchNormalizationLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -119,7 +119,7 @@ namespace nodes
     } // end anonymous namespace
 
     template <typename ValueType>
-    SoftmaxLayerNode<ValueType>::SoftmaxLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::SoftmaxLayer<ValueType>& layer)
+    SoftmaxLayerNode<ValueType>::SoftmaxLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::SoftmaxLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<SoftmaxLayerNode<ValueType>, predictors::neural::SoftmaxLayer<ValueType>, ValueType>(input, layer)
     {
     }
@@ -275,7 +275,7 @@ namespace nodes
     template <typename ValueType>
     void SoftmaxLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<SoftmaxLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }

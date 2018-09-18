@@ -60,7 +60,7 @@ namespace nodes
         /// <param name="filterWeights"> The weights for the convolutional filters. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         /// <param name="stride"> The number of elements to move/jump when sliding over the input. Typically this is 1 to 3. </param>
-        WinogradConvolutionNode(const model::PortElements<ValueType>& input,
+        WinogradConvolutionNode(const model::OutputPort<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 const ConstTensorReferenceType& filterWeights,
@@ -75,7 +75,7 @@ namespace nodes
         /// <param name="stride"> The number of elements to move/jump when sliding over the input. Typically this is 1 to 3. </param>
         /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
         /// <param name="order"> The order to process filter data during convolution. </param>
-        WinogradConvolutionNode(const model::PortElements<ValueType>& input,
+        WinogradConvolutionNode(const model::OutputPort<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 const ConstTensorReferenceType& filterWeights,
@@ -88,7 +88,7 @@ namespace nodes
         ///
         /// <param name="other"> The node to copy configuration from. </param>
         /// <param name="input"> The port to get input data from. </param>
-        WinogradConvolutionNode(const WinogradConvolutionNode<ValueType>& other, const model::PortElements<ValueType>& input);
+        WinogradConvolutionNode(const WinogradConvolutionNode<ValueType>& other, const model::OutputPort<ValueType>& input);
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
@@ -179,8 +179,8 @@ namespace nodes
         /// <param name="tileSize"> The spatial size of the filters. </param>
         /// <param name="order"> The order to process filter data during convolution. </param>
         /// <param name="numFilterChannels"> The number of channels per filter. </param>
-        WinogradConvolutionComputeNode(const model::PortElements<ValueType>& input,
-                                       const model::PortElements<ValueType>& filterWeights,
+        WinogradConvolutionComputeNode(const model::OutputPort<ValueType>& input,
+                                       const model::OutputPort<ValueType>& filterWeights,
                                        const model::PortMemoryLayout& inputMemoryLayout,
                                        const model::PortMemoryLayout& outputMemoryLayout,
                                        int stride,
@@ -216,8 +216,8 @@ namespace nodes
 
         // Cloning constructor
         WinogradConvolutionComputeNode(const WinogradConvolutionComputeNode<ValueType>& other,
-                                                                              const model::PortElements<ValueType>& input,
-                                                                              const model::PortElements<ValueType>& filterWeights);
+                                                                              const model::OutputPort<ValueType>& input,
+                                                                              const model::OutputPort<ValueType>& filterWeights);
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;

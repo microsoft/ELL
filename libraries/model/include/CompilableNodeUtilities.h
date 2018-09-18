@@ -16,7 +16,6 @@
 #include "Node.h"
 #include "OutputPort.h"
 #include "Port.h"
-#include "PortElements.h"
 
 // stl
 #include <string>

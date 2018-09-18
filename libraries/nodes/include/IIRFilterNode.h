@@ -53,7 +53,7 @@ namespace nodes
         /// <param name="input"> The signal to process. </param>
         /// <param name="b"> The feedforward coefficients for the filter. </param>
         /// <param name="a"> The recursive coefficients for the filter. </param>
-        IIRFilterNode(const model::PortElements<ValueType>& input, const std::vector<ValueType>& b, const std::vector<ValueType>& a);
+        IIRFilterNode(const model::OutputPort<ValueType>& input, const std::vector<ValueType>& b, const std::vector<ValueType>& a);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

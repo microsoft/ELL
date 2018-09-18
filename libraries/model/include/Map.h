@@ -227,12 +227,6 @@ namespace model
         /// <returns> The outputs </returns>
         const std::vector<PortElementsBase>& GetOutputs() const { return _outputElements; }
 
-        /// <summary> Resets a specified output. </summary>
-        ///
-        /// <param name="index"> Output index. </param>
-        /// <param name="outputElements"> The output elements. </param>
-        void ResetOutput(size_t index, PortElementsBase outputElements);
-
         //
         // Routines for computing output (processing data)
         //
@@ -349,7 +343,7 @@ namespace model
         /// <summary> Removes the inputs from the map. </summary>
         void RemoveInputs();
 
-        /// <summary> Adds the given output node to the map. </summary>
+        /// <summary> Adds an output to the map. </summary>
         ///
         /// <param name="outputName"> Name of the output. </param>
         /// <param name="inputNode"> The output elements. </param>

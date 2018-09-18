@@ -11,7 +11,7 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    DelayNode<ValueType>::DelayNode(const model::PortElements<ValueType>& input, size_t windowSize)
+    DelayNode<ValueType>::DelayNode(const model::OutputPort<ValueType>& input, size_t windowSize)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _windowSize(windowSize)
     {
         auto dimension = input.Size();
@@ -39,7 +39,7 @@ namespace nodes
     template <typename ValueType>
     void DelayNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<DelayNode<ValueType>>(newPortElements, _windowSize);
         transformer.MapNodeOutput(output, newNode->output);
     }

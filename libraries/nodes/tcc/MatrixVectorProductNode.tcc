@@ -29,7 +29,7 @@ namespace nodes
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& w)
+    MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& w)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, w.NumRows()), _w(w)
     {
         if (input.Size() != w.NumColumns())
@@ -73,7 +73,7 @@ namespace nodes
     template <typename ValueType, math::MatrixLayout layout>
     void MatrixVectorProductNode<ValueType, layout>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<MatrixVectorProductNode<ValueType, layout>>(newPortElements, _w);
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -81,7 +81,7 @@ namespace nodes
     template <typename ValueType, math::MatrixLayout layout>
     bool MatrixVectorProductNode<ValueType, layout>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
 
         // Make sure we have a RowMatrix (because that's what MatrixVectorMultiplyNode wants)
         math::RowMatrix<ValueType> projectionMatrix(_w);

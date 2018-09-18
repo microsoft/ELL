@@ -223,6 +223,48 @@ namespace utilities
         return _size != _stride;
     }
 
+    int MemoryLayout::GetActiveSize(size_t index) const 
+    { 
+        BoundsCheckDimensionIndex(index);
+        return _size[index]; 
+    }
+
+    int MemoryLayout::GetStride(size_t index) const 
+    { 
+        BoundsCheckDimensionIndex(index);
+        return _stride[index]; 
+    }
+
+    int MemoryLayout::GetOffset(size_t index) const 
+    { 
+        BoundsCheckDimensionIndex(index);
+        return _offset[index]; 
+    }
+    
+    int MemoryLayout::GetLogicalDimensionActiveSize(size_t index) const
+    {
+        BoundsCheckDimensionIndex(index);
+        return GetLogicalDimensionActiveSize()[index]; 
+    }
+
+    int MemoryLayout::GetLogicalDimensionStride(size_t index) const
+    {
+        BoundsCheckDimensionIndex(index);
+        return GetLogicalDimensionStride()[index]; 
+    }
+
+    int MemoryLayout::GetLogicalDimensionOffset(size_t index) const
+    {
+        BoundsCheckDimensionIndex(index);
+        return GetLogicalDimensionOffset()[index]; 
+    }
+
+    size_t MemoryLayout::GetCumulativeIncrement(size_t index) const 
+    { 
+        BoundsCheckDimensionIndex(index);
+        return _increment[index]; 
+    }
+    
     size_t MemoryLayout::NumElements() const
     {
         return static_cast<size_t>(_size.NumElements());
@@ -366,6 +408,12 @@ namespace utilities
         archiver.OptionalProperty("order") >> temp;
         _dimensionOrder = { temp };
         _increment = ComputeCumulativeIncrement();
+    }
+
+    void MemoryLayout::BoundsCheckDimensionIndex(size_t index) const
+    {
+        if (static_cast<int>(index) >= NumDimensions())
+            throw InputException(InputExceptionErrors::indexOutOfRange, "Dimension index out-of-bounds.");
     }
 
     bool Equal(const DimensionVector& shape1, const DimensionVector& shape2)

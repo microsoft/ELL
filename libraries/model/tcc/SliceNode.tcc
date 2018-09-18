@@ -21,10 +21,10 @@ namespace model
         : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0) {};
 
     template <typename ValueType>
-    SliceNode<ValueType>::SliceNode(const OutputPortBase* port, int start, int count)
-        : CompilableNode({ &_input }, { &_output }), _input(this, PortElements<ValueType>{ *port }, defaultInputPortName), _output(this, defaultOutputPortName, port->GetMemoryLayout()), _largestDimensionStart(start), _largestDimensionCount(count)
+    SliceNode<ValueType>::SliceNode(const OutputPortBase& port, int start, int count)
+        : CompilableNode({ &_input }, { &_output }), _input(this, static_cast<const OutputPort<ValueType>&>(port), defaultInputPortName), _output(this, defaultOutputPortName, port.GetMemoryLayout()), _largestDimensionStart(start), _largestDimensionCount(count)
     {
-        auto layout = port->GetMemoryLayout();
+        auto layout = port.GetMemoryLayout();
         if (layout.HasPadding())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "SliceNode must not have padding on its input");
@@ -66,8 +66,8 @@ namespace model
     template <typename ValueType>
     void SliceNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<SliceNode<ValueType>>(newPortElements.GetRanges()[0].ReferencedPort(), _largestDimensionStart, _largestDimensionCount);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<SliceNode<ValueType>>(newInputs, _largestDimensionStart, _largestDimensionCount);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

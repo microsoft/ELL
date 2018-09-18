@@ -18,6 +18,7 @@
 #include "Model.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "Node.h"
+#include "PortElements.h"
 
 #include <iostream>
 
@@ -79,7 +80,7 @@ void PrintNode(const model::Node& node, std::ostream& out, bool includeNodeId)
             out << (isFirstInputPort ? "" : ", ");
             isFirstInputPort = false;
 
-            auto elements = inputPort->GetInputElements();
+            auto elements = model::PortElementsBase{ inputPort->GetReferencedPort() };
             if (elements.NumRanges() > 1)
             {
                 out << "{";

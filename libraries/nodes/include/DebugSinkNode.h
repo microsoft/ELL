@@ -56,7 +56,7 @@ namespace nodes
         /// <param name="sink"> The sink function that will receive output values </param>
         /// <param name="label"> The optional label to be passed to the DebugSinkFunction </param>
         /// <param name="sinkFunctionName"> The optional sink function name to be emitted </param>
-        DebugSinkNode(const model::PortElements<ValueType>& input, DebugSinkFunction<ValueType> sink, const std::string& label, void* userData, const std::string& sinkFunctionName);
+        DebugSinkNode(const model::OutputPort<ValueType>& input, DebugSinkFunction<ValueType> sink, const std::string& label, void* userData, const std::string& sinkFunctionName);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

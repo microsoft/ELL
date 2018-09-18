@@ -17,13 +17,13 @@ namespace nodes
     }
 
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
+    SourceNode<ValueType>::SourceNode(const model::OutputPort<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
         : SourceNode(input, model::MemoryShape{ static_cast<int>(inputVectorSize) }, sourceFunctionName, source)
     {
     }
 
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, const model::MemoryShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
+    SourceNode<ValueType>::SourceNode(const model::OutputPort<nodes::TimeTickType>& input, const model::MemoryShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
         : model::SourceNodeBase(_input, _output, sourceFunctionName),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, shape),
@@ -33,7 +33,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, const model::PortMemoryLayout& layout, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
+    SourceNode<ValueType>::SourceNode(const model::OutputPort<nodes::TimeTickType>& input, const model::PortMemoryLayout& layout, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
         : model::SourceNodeBase(_input, _output, sourceFunctionName),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, layout),
@@ -123,7 +123,7 @@ namespace nodes
     template <typename ValueType>
     void SourceNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<SourceNode<ValueType>>(newPortElements, GetShape(), GetCallbackName(), _source);
         transformer.MapNodeOutput(output, newNode->output);
     }

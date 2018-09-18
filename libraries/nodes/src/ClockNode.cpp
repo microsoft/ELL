@@ -31,7 +31,7 @@ namespace nodes
     {
     }
 
-    ClockNode::ClockNode(const model::PortElements<TimeTickType>& input, TimeTickType interval, TimeTickType lagThreshold, const std::string& functionName, LagNotificationFunction function)
+    ClockNode::ClockNode(const model::OutputPort<TimeTickType>& input, TimeTickType interval, TimeTickType lagThreshold, const std::string& functionName, LagNotificationFunction function)
         : CompilableNode({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, 2 /*sampleTime, currentTime*/),
@@ -144,7 +144,7 @@ namespace nodes
 
     void ClockNode::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<ClockNode>(newPortElements, _interval, _lagThreshold, _lagNotificationFunctionName, _lagNotificationFunction);
         transformer.MapNodeOutput(output, newNode->output);
     }

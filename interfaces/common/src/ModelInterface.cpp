@@ -481,9 +481,9 @@ NodeIterator InputPort::GetParentNodes()
     return NodeIterator(_port->GetParentNodes());
 }
 
-PortElements InputPort::GetInputElements()
+OutputPort InputPort::GetReferencedPort()
 {
-    return PortElements(_port->GetInputElements());
+    return OutputPort(&_port->GetReferencedPort());
 }
 
 //

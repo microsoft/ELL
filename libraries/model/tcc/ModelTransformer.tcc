@@ -14,30 +14,33 @@ namespace model
     // ModelTransformer
     //
     template <typename ValueType>
-    PortElements<ValueType> ModelTransformer::TransformPortElements(const PortElements<ValueType>& elements) const
+    const OutputPort<ValueType>& ModelTransformer::GetCorrespondingInputs(const InputPort<ValueType>& port) const
     {
-        return GetCorrespondingOutputs(elements);
+        return static_cast<const OutputPort<ValueType>&>(_elementsMap.GetCorrespondingPort(port.GetReferencedPort()));
     }
 
     template <typename ValueType>
-    PortElements<ValueType> ModelTransformer::GetCorrespondingOutputs(const PortElements<ValueType>& elements) const
+    const OutputPort<ValueType>& ModelTransformer::GetCorrespondingOutputs(const OutputPort<ValueType>& port) const
     {
-        auto result = _elementsMap.GetCorrespondingPortElements(PortElementsBase(elements));
-        return PortElements<ValueType>(result);
+        const auto& result = _elementsMap.GetCorrespondingPort(port);
+        return static_cast<const OutputPort<ValueType>&>(result);
     }
 
     template <typename ValueType>
-    PortElements<ValueType> ModelTransformer::GetCorrespondingOutputs(const OutputPort<ValueType>& port) const
+    const OutputPort<ValueType>& ModelTransformer::GetCorrespondingOutputs(const PortElements<ValueType>& elements) const
     {
-        PortElements<ValueType> elements(port);
-        return GetCorrespondingOutputs(elements);
+        if (!elements.IsFullPortOutput())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "ModelTransformer::GetCorrespondingOutputs(): Invalid PortElements");
+        }
+        return static_cast<const OutputPort<ValueType>&>(GetCorrespondingOutputs(*elements.GetRanges()[0].ReferencedPort()));
     }
 
     template <typename NodeType>
     NodeType* ModelTransformer::GetCorrespondingInputNodeAs(const NodeType* inputNode) const
     {
-        auto newNodeOutputs = GetCorrespondingOutputs(inputNode->GetOutputPort());
-        auto newNodeConst = newNodeOutputs.GetElement(0).ReferencedPort()->GetNode();
+        const auto& newNodeOutputs = GetCorrespondingOutputs(inputNode->GetOutputPort());
+        auto newNodeConst = newNodeOutputs.GetNode();
         auto newInputNodeConst = dynamic_cast<const NodeType*>(newNodeConst);
         assert(newInputNodeConst != nullptr);
         auto newInputNode = const_cast<NodeType*>(newInputNodeConst);
@@ -59,21 +62,22 @@ namespace model
     }
 
     template <typename ValueType>
+    void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPortBase& newPort)
+    {
+        _elementsMap.MapNodeOutput(&oldPort, newPort);
+    }
+
+    template <typename ValueType>
     void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort)
     {
-        _elementsMap.MapNodeOutput(&oldPort, PortElementsBase{newPort});
+        _elementsMap.MapNodeOutput(&oldPort, newPort);
     }
 
     template <typename ValueType>
     void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElements<ValueType>& newElements)
     {
-        _elementsMap.MapNodeOutput(&oldPort, newElements);
-    }
-
-    template <typename ValueType>
-    void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElementsBase& newElements)
-    {
-        _elementsMap.MapNodeOutput(&oldPort, newElements);
+        const auto& newPort = _model.AddRoutingNodes(newElements);
+        _elementsMap.MapNodeOutput(&oldPort, newPort);
     }
 }
 }

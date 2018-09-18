@@ -45,7 +45,7 @@ namespace model
         /// <param name="port"> The port to take input values from. </param>
         /// <param name="start"> The start index for the first (largest) physical dimension of the active area. </param>
         /// <param name="count"> The size of the first (largest) physical dimension of the output to return. </param>
-        SliceNode(const OutputPortBase* port, int start, int count);
+        SliceNode(const OutputPortBase& port, int start, int count);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -115,7 +115,8 @@ void TestConvertPortElements()
 
     testing::ProcessTest("Testing conversion of PortElements", out1->output.Size() == 1);
     testing::ProcessTest("Testing conversion of PortElements", out2->output.Size() == 5);
+
+    // TODO: delete these tests when GetPortElements() is removed from InputPort:
     testing::ProcessTest("Testing conversion of PortElements", out1->input.GetPortElements().NumRanges() == 1);
     testing::ProcessTest("Testing conversion of PortElements", out2->input.GetPortElements().NumRanges() == 1);
-
 }

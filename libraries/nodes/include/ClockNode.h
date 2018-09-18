@@ -40,7 +40,7 @@ namespace nodes
         /// <param name="lagThreshold">The time lag before lagFunction is called. </param>
         /// <param name="functionName">The lag notification name to be emitted. </param>
         /// <param name="function">The optional lag notification function used in Compute(). </param>
-        ClockNode(const model::PortElements<TimeTickType>& input, TimeTickType interval, TimeTickType lagThreshold, const std::string& functionName, LagNotificationFunction function = nullptr);
+        ClockNode(const model::OutputPort<TimeTickType>& input, TimeTickType interval, TimeTickType lagThreshold, const std::string& functionName, LagNotificationFunction function = nullptr);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

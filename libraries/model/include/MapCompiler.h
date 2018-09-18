@@ -11,7 +11,6 @@
 #include "CompilableNodeUtilities.h"
 #include "MapCompilerOptions.h"
 #include "OutputPort.h"
-#include "PortElements.h"
 
 // emitters
 #include "CompilerOptions.h"
@@ -76,9 +75,6 @@ namespace model
         /// <summary> Get the variable for output port. </summary>
         emitters::Variable* GetVariableForPort(const OutputPortBase& port);
 
-        /// <summary> Get the variable for output port element. </summary>
-        emitters::Variable* GetVariableForElement(const PortElementBase& element);
-
         /// <summary> Associate the given variable with the output port. </summary>
         void SetVariableForPort(const Port& port, emitters::Variable* pVar);
 
@@ -126,7 +122,7 @@ namespace model
         friend class CompilableNode;
 
         void CompileNodes(Model& model);
-        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const OutputPortBase* pPort, ArgType argType);
+        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const OutputPortBase& port, ArgType argType);
         emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const PortElementBase& element, ArgType argType);
 
         MapCompilerOptions _parameters;

@@ -50,7 +50,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        RecurrentLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::RecurrentLayer<ValueType>& layer);
+        RecurrentLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::RecurrentLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -101,9 +101,9 @@ namespace nodes
         /// <param name="hiddenBias"> The biases to be applied to the hidden layer. </param>
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        RecurrentNode(const model::PortElements<ValueType>& input,
-                      const model::PortElements<ValueType>& hiddenWeights,
-                      const model::PortElements<ValueType>& hiddenBias,
+        RecurrentNode(const model::OutputPort<ValueType>& input,
+                      const model::OutputPort<ValueType>& hiddenWeights,
+                      const model::OutputPort<ValueType>& hiddenBias,
                       const ActivationType& activation,
                       const model::PortMemoryLayout& inputMemoryLayout,
                       const model::PortMemoryLayout& outputMemoryLayoutn);

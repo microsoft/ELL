@@ -16,7 +16,7 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    RegionDetectionLayerNode<ValueType>::RegionDetectionLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::RegionDetectionLayer<ValueType>& layer)
+    RegionDetectionLayerNode<ValueType>::RegionDetectionLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::RegionDetectionLayer<ValueType>& layer)
         : BaseType(input, layer)
     {
     }
@@ -24,7 +24,7 @@ namespace nodes
     template <typename ValueType>
     bool RegionDetectionLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->_input);
 
         const auto& detectionParams = this->_layer.GetDetectionParameters();
 
@@ -41,7 +41,7 @@ namespace nodes
     template <typename ValueType>
     void RegionDetectionLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<RegionDetectionLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
@@ -56,7 +56,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    RegionDetectionNode<ValueType>::RegionDetectionNode(const model::PortElements<ValueType>& input,
+    RegionDetectionNode<ValueType>::RegionDetectionNode(const model::OutputPort<ValueType>& input,
                                                         predictors::neural::RegionDetectionParameters params,
                                                         const model::PortMemoryLayout& inputMemoryLayout,
                                                         const model::PortMemoryLayout& outputMemoryLayout)
@@ -67,7 +67,7 @@ namespace nodes
     template <typename ValueType>
     void RegionDetectionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<RegionDetectionNode>(newInput, _params, GetInputMemoryLayout(), GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }

@@ -105,8 +105,7 @@ namespace model
         // Allocate variables for inputs
         for (auto inputNode : map.GetInputs())
         {
-            
-            auto argVar = AllocatePortFunctionArgument(module, &(inputNode->GetOutputPort()), ArgType::input);
+            auto argVar = AllocatePortFunctionArgument(module, inputNode->GetOutputPort(), ArgType::input);
             functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
         }
 
@@ -116,28 +115,27 @@ namespace model
             assert(outputElements.NumRanges() == 1);
 
             // TODO: can we use an array type here?
-            auto argVar = AllocatePortFunctionArgument(module, outputElements.GetRanges()[0].ReferencedPort(), ArgType::output);
+            auto argVar = AllocatePortFunctionArgument(module, *outputElements.GetRanges()[0].ReferencedPort(), ArgType::output);
             functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
         }
         return functionArguments;
     }
 
-    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const OutputPortBase* pPort, ArgType argType)
+    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const OutputPortBase& port, ArgType argType)
     {
-        assert(pPort->Size() != 0);
-        emitters::VariableType varType = PortTypeToVariableType(pPort->GetType());
+        emitters::VariableType varType = PortTypeToVariableType(port.GetType());
         emitters::VariableScope scope = argType == ArgType::input ? emitters::VariableScope::input : emitters::VariableScope::output;
 
         // outputs are modelled as Vectors
-        emitters::Variable* pVar = module.Variables().AddVectorVariable(scope, varType, pPort->Size());
+        emitters::Variable* pVar = module.Variables().AddVectorVariable(scope, varType, port.Size());
         module.AllocateVariable(*pVar);
-        SetVariableForPort(*pPort, pVar);
+        SetVariableForPort(port, pVar);
         return pVar;
     }
 
     emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const PortElementBase& element, ArgType argType)
     {
-        return AllocatePortFunctionArgument(module, element.ReferencedPort(), argType);
+        return AllocatePortFunctionArgument(module, *element.ReferencedPort(), argType);
     }
 
     void MapCompiler::PushScope()
@@ -151,11 +149,6 @@ namespace model
         Log() << "Compiler popping scope" << EOL;
         assert(_portToVarMaps.size() > 0);
         _portToVarMaps.pop_back();
-    }
-
-    emitters::Variable* MapCompiler::GetVariableForElement(const PortElementBase& element)
-    {
-        return GetVariableForPort(*element.ReferencedPort());
     }
 
     emitters::Variable* MapCompiler::GetVariableForPort(const OutputPortBase& port)

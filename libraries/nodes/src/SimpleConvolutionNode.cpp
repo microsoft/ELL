@@ -173,7 +173,7 @@ namespace nodes
     }
 
     template<typename ValueType>
-    SimpleConvolutionNode<ValueType>::SimpleConvolutionNode(const model::PortElements<ValueType>& input,
+    SimpleConvolutionNode<ValueType>::SimpleConvolutionNode(const model::OutputPort<ValueType>& input,
                                                             const model::PortMemoryLayout& inputMemoryLayout,
                                                             const model::PortMemoryLayout& outputMemoryLayout,
                                                             const ConstTensorReferenceType& filterWeights,
@@ -186,7 +186,7 @@ namespace nodes
     template<typename ValueType>
     void SimpleConvolutionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<SimpleConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, GetOutputMemoryLayout(), _filterWeights, _stride);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
@@ -194,7 +194,7 @@ namespace nodes
     template<typename ValueType>
     bool SimpleConvolutionNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
 
         // (row, column), channel order:
         const auto& weightsMatrix = _filterWeights.ReferenceAsMatrix();
@@ -249,8 +249,8 @@ namespace nodes
     }
 
     template<typename ValueType>
-    SimpleConvolutionComputeNode<ValueType>::SimpleConvolutionComputeNode(const model::PortElements<ValueType>& input,
-                                                                          const model::PortElements<ValueType>& filterWeights,
+    SimpleConvolutionComputeNode<ValueType>::SimpleConvolutionComputeNode(const model::OutputPort<ValueType>& input,
+                                                                          const model::OutputPort<ValueType>& filterWeights,
                                                                           const model::PortMemoryLayout& inputMemoryLayout,
                                                                           const model::PortMemoryLayout& outputMemoryLayout,
                                                                           int filterSize,
@@ -263,8 +263,8 @@ namespace nodes
     template<typename ValueType>
     void SimpleConvolutionComputeNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newFilterWeights = transformer.TransformPortElements(_filterWeights.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
+        const auto& newFilterWeights = transformer.GetCorrespondingInputs(_filterWeights);
         auto newNode = transformer.AddNode<SimpleConvolutionComputeNode<ValueType>>(newInput, newFilterWeights, _inputMemoryLayout, GetOutputMemoryLayout(), _filterSize, _stride, _isDepthwiseSeparable);
         transformer.MapNodeOutput(this->output, newNode->output);
     }

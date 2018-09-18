@@ -218,8 +218,8 @@ namespace passes
 
             // These are the elements in the new model that correspond to our inputs -- that is, the outputs
             // of the refined version of the linear function node attached to our primaryInput
-            auto primaryInputElements = transformer.TransformPortElements(thisNode->primaryInput.GetPortElements());
-            auto prevNode = dynamic_cast<const nodes::BroadcastLinearFunctionNode<ValueType>*>(primaryInputElements.GetElement(0).ReferencedPort()->GetNode());
+            const auto& primaryInputElements = transformer.GetCorrespondingInputs(thisNode->primaryInput);
+            auto prevNode = dynamic_cast<const nodes::BroadcastLinearFunctionNode<ValueType>*>(primaryInputElements.GetNode());
             if (prevNode == nullptr)
             {
                 transformer.CopyNode(node);
@@ -227,7 +227,7 @@ namespace passes
             }
 
             auto newCoeffs = GetCombinedLinearCoeffs(*prevNode, *thisNode);
-            auto prevPrimaryInputElements = prevNode->primaryInput.GetPortElements();
+            const auto& prevPrimaryInputElements = prevNode->primaryInput.GetReferencedPort();
             auto scaleValuesNode = transformer.AddNode<nodes::ConstantNode<ValueType>>(newCoeffs.scale);
             auto biasValuesNode = transformer.AddNode<nodes::ConstantNode<ValueType>>(newCoeffs.bias);
             auto newNode = transformer.AddNode<nodes::BroadcastLinearFunctionNode<ValueType>>(prevPrimaryInputElements,

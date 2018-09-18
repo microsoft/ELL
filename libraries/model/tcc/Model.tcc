@@ -23,7 +23,7 @@ namespace model
             }
 
             template <typename T>
-            static auto ConvertPortElementsArgImpl(Model& model, T&& arg, std::true_type, std::false_type)
+            static auto& ConvertPortElementsArgImpl(Model& model, T&& arg, std::true_type, std::false_type)
             {
                 // should not use initializer list
                 return model.AddRoutingNodes(std::forward<T>(arg));
@@ -68,9 +68,10 @@ namespace model
     }
 
     template <typename ValueType>
-    PortElements<ValueType> Model::AddRoutingNodes(const PortElements<ValueType>& elements)
+    const OutputPort<ValueType>& Model::AddRoutingNodes(const PortElements<ValueType>& elements)
     {
-        return PortElements<ValueType>(AddRoutingNodes(static_cast<const PortElementsBase&>(elements)));
+        const OutputPortBase& port = AddRoutingNodes(static_cast<const PortElementsBase&>(elements));
+        return static_cast<const OutputPort<ValueType>&>(port);
     }
 
     //

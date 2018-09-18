@@ -124,7 +124,7 @@ bool RedirectModelOutputByPortElements(model::Map& map, const std::string& targe
         model::ModelTransformer transformer;
         auto model = transformer.CopyModel(map.GetModel(), context);
         auto input = transformer.GetCorrespondingInputNode(map.GetInput());
-        auto output = transformer.GetCorrespondingOutputs(originalPortElement);
+        const auto& output = transformer.GetCorrespondingOutputs(originalPortElement);
 
         map = model::Map(model, { { "input", input } }, { { "output", output } });
     }

@@ -51,7 +51,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The signal to process. </param>
-        FFTNode(const model::PortElements<ValueType>& input);
+        FFTNode(const model::OutputPort<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

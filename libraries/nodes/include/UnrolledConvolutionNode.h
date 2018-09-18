@@ -51,7 +51,7 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="filterWeights"> The weights for the convolutional filters. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        UnrolledConvolutionNode(const model::PortElements<ValueType>& input,
+        UnrolledConvolutionNode(const model::OutputPort<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 const ConstTensorReferenceType& filterWeights,
@@ -63,7 +63,7 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="filterWeights"> The weights for the convolutional filters, expressed as a matrix. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        UnrolledConvolutionNode(const model::PortElements<ValueType>& input,
+        UnrolledConvolutionNode(const model::OutputPort<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 ConstMatrixReferenceType filterWeights,

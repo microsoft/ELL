@@ -15,7 +15,7 @@ namespace nodes
         : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0){};
 
     template <typename InputValueType, typename OutputValueType>
-    TypeCastNode<InputValueType, OutputValueType>::TypeCastNode(const model::PortElements<InputValueType>& input)
+    TypeCastNode<InputValueType, OutputValueType>::TypeCastNode(const model::OutputPort<InputValueType>& input)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size()){};
 
     template <typename InputValueType, typename OutputValueType>
@@ -33,7 +33,7 @@ namespace nodes
     template <typename InputValueType, typename OutputValueType>
     void TypeCastNode<InputValueType, OutputValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<TypeCastNode<InputValueType, OutputValueType>>(newPortElements);
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -48,7 +48,7 @@ namespace nodes
         // no-op case
         if (inputType == outputType)
         {
-            emitters::Variable* elementVar = compiler.GetVariableForElement(input.GetInputElement(0));
+            emitters::Variable* elementVar = compiler.GetVariableForPort(input.GetReferencedPort());
             compiler.SetVariableForPort(output, elementVar); // The types are the same, so this is a no-op. Just set the output variable to be the same as the input variable
             return;
         }

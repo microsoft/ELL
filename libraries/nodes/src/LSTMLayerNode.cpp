@@ -26,7 +26,7 @@ namespace nodes
     }
 
     template<typename ValueType>
-    LSTMLayerNode<ValueType>::LSTMLayerNode(const model::PortElements<ValueType>& input, const model::PortElements<int>& reset, const LayerType& layer)
+    LSTMLayerNode<ValueType>::LSTMLayerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<int>& reset, const LayerType& layer)
         : BaseType(input, layer), _reset(this, reset, "reset")
     {
         this->AddInputPort(&_reset);
@@ -45,7 +45,7 @@ namespace nodes
     template<typename ValueType>
     bool LSTMLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
         ell::model::PortElements<int> newReset;
         if (this->reset.Size() == 0)
         {
@@ -56,7 +56,7 @@ namespace nodes
         }
         else
         {
-            newReset = transformer.TransformPortElements(this->reset.GetPortElements());
+            newReset = transformer.GetCorrespondingInputs(this->reset);
         }
 
         // Transform weights and bias members into constant nodes
@@ -102,7 +102,7 @@ namespace nodes
     template<typename ValueType>
     void LSTMLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         ell::model::PortElements<int> newResetElements;
         if (this->reset.Size() == 0)
         {
@@ -113,7 +113,7 @@ namespace nodes
         }
         else
         {
-            newResetElements = transformer.TransformPortElements(this->reset.GetPortElements());
+            newResetElements = transformer.GetCorrespondingInputs(this->reset);
         }
         auto newNode = transformer.AddNode<LSTMLayerNode<ValueType>>(newPortElements, newResetElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
@@ -157,16 +157,16 @@ namespace nodes
     }
 
     template<typename ValueType>
-    LSTMNode<ValueType>::LSTMNode(const model::PortElements<ValueType>& input,
-                                                                                           const model::PortElements<int>& resetTrigger,
-                                                                                           const model::PortElements<ValueType>& inputWeights,
-                                                                                           const model::PortElements<ValueType>& forgetMeWeights,
-                                                                                           const model::PortElements<ValueType>& candidateWeights,
-                                                                                           const model::PortElements<ValueType>& outputWeights,
-                                                                                           const model::PortElements<ValueType>& inputBias,
-                                                                                           const model::PortElements<ValueType>& forgetMeBias,
-                                                                                           const model::PortElements<ValueType>& candidateBias,
-                                                                                           const model::PortElements<ValueType>& outputBias,
+    LSTMNode<ValueType>::LSTMNode(const model::OutputPort<ValueType>& input,
+                                                                                           const model::OutputPort<int>& resetTrigger,
+                                                                                           const model::OutputPort<ValueType>& inputWeights,
+                                                                                           const model::OutputPort<ValueType>& forgetMeWeights,
+                                                                                           const model::OutputPort<ValueType>& candidateWeights,
+                                                                                           const model::OutputPort<ValueType>& outputWeights,
+                                                                                           const model::OutputPort<ValueType>& inputBias,
+                                                                                           const model::OutputPort<ValueType>& forgetMeBias,
+                                                                                           const model::OutputPort<ValueType>& candidateBias,
+                                                                                           const model::OutputPort<ValueType>& outputBias,
                                                                                            const ActivationType& activation,
                                                                                            const ActivationType& recurrentActivation,
                                                                                            const model::PortMemoryLayout& inputMemoryLayout,
@@ -192,16 +192,16 @@ namespace nodes
     template<typename ValueType>
     void LSTMNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newResetTrigger = transformer.TransformPortElements(_resetTrigger.GetPortElements());
-        auto newInputWeights = transformer.TransformPortElements(_inputWeights.GetPortElements());
-        auto newForgetMeWeights = transformer.TransformPortElements(_forgetMeWeights.GetPortElements());
-        auto newCandidateWeights = transformer.TransformPortElements(_candidateWeights.GetPortElements());
-        auto newOutputWeights = transformer.TransformPortElements(_outputWeights.GetPortElements());
-        auto newInputBias = transformer.TransformPortElements(_inputBias.GetPortElements());
-        auto newForgetMeBias = transformer.TransformPortElements(_forgetMeBias.GetPortElements());
-        auto newCandidateBias = transformer.TransformPortElements(_candidateBias.GetPortElements());
-        auto newOutputBias = transformer.TransformPortElements(_outputBias.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
+        const auto& newResetTrigger = transformer.GetCorrespondingInputs(_resetTrigger);
+        const auto& newInputWeights = transformer.GetCorrespondingInputs(_inputWeights);
+        const auto& newForgetMeWeights = transformer.GetCorrespondingInputs(_forgetMeWeights);
+        const auto& newCandidateWeights = transformer.GetCorrespondingInputs(_candidateWeights);
+        const auto& newOutputWeights = transformer.GetCorrespondingInputs(_outputWeights);
+        const auto& newInputBias = transformer.GetCorrespondingInputs(_inputBias);
+        const auto& newForgetMeBias = transformer.GetCorrespondingInputs(_forgetMeBias);
+        const auto& newCandidateBias = transformer.GetCorrespondingInputs(_candidateBias);
+        const auto& newOutputBias = transformer.GetCorrespondingInputs(_outputBias);
         auto newNode = transformer.AddNode<LSTMNode>(newInput, newResetTrigger, newInputWeights, newForgetMeWeights, newCandidateWeights, newOutputWeights, newInputBias, newForgetMeBias, newCandidateBias, newOutputBias, _activation, _recurrentActivation, _inputMemoryLayout, GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }

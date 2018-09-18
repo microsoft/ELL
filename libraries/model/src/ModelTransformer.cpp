@@ -20,6 +20,34 @@ namespace ell
 namespace model
 {
     //
+    // NullNode -- used for deleting nodes
+    //
+    template <typename ValueType>
+    class NullNode : public model::Node
+    {
+    public:
+        const model::OutputPort<ValueType>& output = _output;
+
+        NullNode(size_t size) : Node({}, { &_output }), _output(this, defaultOutputPortName, size) {};
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("NullNode"); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+    protected:
+        void Compute() const override {};
+        void WriteToArchive(utilities::Archiver& archiver) const override {};
+        void ReadFromArchive(utilities::Unarchiver& archiver) override {};
+
+    private:
+        void Copy(model::ModelTransformer& transformer) const override
+        {
+            auto newNode = transformer.AddNode<NullNode<ValueType>>(_output.Size());
+            transformer.MapNodeOutput(output, newNode->output);
+        }
+
+        model::OutputPort<ValueType> _output;
+    };
+
+    //
     // TransformContext implementation
     //
     TransformContext::TransformContext()
@@ -66,86 +94,51 @@ namespace model
     //
     // PortOutputsMap
     //
-    void PortOutputsMap::Clear()
+    void ModelTransformer::PortOutputsMap::Clear()
     {
         _outputPortMap.clear();
     }
 
-    bool PortOutputsMap::IsEmpty() const
+    bool ModelTransformer::PortOutputsMap::IsEmpty() const
     {
         return _outputPortMap.empty();
     }
 
-    PortElementsBase PortOutputsMap::GetCorrespondingPortElements(const PortElementsBase& queryElements) const
+    const OutputPortBase& ModelTransformer::PortOutputsMap::GetCorrespondingPort(const OutputPortBase& queryPort) const
     {
         using namespace std::string_literals;
-        PortElementsBase result;
-        auto&& queryRanges = queryElements.GetRanges();
-        for (auto&& queryRange : queryRanges)
+        auto queryPortPtr = &queryPort;
+        if (_outputPortMap.find(queryPortPtr) == _outputPortMap.end())
         {
-            auto queryRangePort = queryRange.ReferencedPort();
-            assert(queryRangePort != nullptr);
-            if (_outputPortMap.find(queryRangePort) == _outputPortMap.end())
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element "s + to_string(queryRangePort->GetNode()->GetId()) + "." + queryRangePort->GetName() + " in new model.");
-            }
-
-            PortElementsBase targetElements = _outputPortMap.at(queryRangePort);
-            auto start = static_cast<int>(queryRange.GetStartIndex());
-            auto size = static_cast<int>(queryRange.Size());
-
-            const auto& targetRanges = targetElements.GetRanges();
-            for (const auto& targetRange : targetRanges)
-            {
-                auto targetRangePort = targetRange.ReferencedPort();
-                auto targetRangeSize = static_cast<int>(targetRange.Size());
-                auto rangesIntersect = targetRangeSize > start;
-                if (rangesIntersect)
-                {
-                    int targetStart = start;
-                    if (start > 0)
-                    {
-                        start = std::max(0, targetRangeSize-start);
-                    }
-                    auto intersectionSize = std::min(targetRangeSize-targetStart, size);
-
-                    result.Append(PortRange(*targetRangePort, targetRange.GetStartIndex()+targetStart, intersectionSize));
-
-                    size -= intersectionSize;
-
-                    // If we've matched all the elements of the query range, we can break out of this loop
-                    if (size == 0)
-                        break;
-                }
-                start = std::max(0, start-targetRangeSize);
-            }
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element "s + to_string(queryPort.GetNode()->GetId()) + "." + queryPort.GetName() + " in new model.");
         }
 
-        result.Consolidate();
-        if (result.Size() != queryElements.Size())
+        auto targetPort = _outputPortMap.at(queryPortPtr);
+
+        if (targetPort->Size() != queryPort.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch,
-                utilities::FormatString("Model transformation resulted in a mismatching port size, expecting %lld, but found %lld", queryElements.Size(), result.Size()));
+                utilities::FormatString("Model transformation resulted in a mismatching port size, expecting %lld, but found %lld", queryPort.Size(), targetPort->Size()));
         }
-        return result;
+        return *targetPort;
     }
 
-    void PortOutputsMap::MapNodeOutput(const OutputPortBase* oldPort, const PortElementsBase& newElements)
+    void ModelTransformer::PortOutputsMap::MapNodeOutput(const OutputPortBase* oldPort, const OutputPortBase& newPort)
     {
-        if (oldPort->Size() != newElements.Size())
+        if (oldPort->Size() != newPort.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch,
-                utilities::FormatString("Trying to map port %s to output of different size, expecting %lld, but found %lld", oldPort->GetName().c_str(), oldPort->Size(), newElements.Size()));
+                utilities::FormatString("Trying to map port %s to output of different size, expecting %lld, but found %lld", oldPort->GetName().c_str(), oldPort->Size(), newPort.Size()));
         }
-        _outputPortMap[oldPort] = newElements;
+        _outputPortMap[oldPort] = &newPort;
     }
 
-    PortOutputsMap PortOutputsMap::ConcatenateMaps(const PortOutputsMap& prevMap, const PortOutputsMap& newMap)
+    ModelTransformer::PortOutputsMap ModelTransformer::PortOutputsMap::ConcatenateMaps(const PortOutputsMap& prevMap, const PortOutputsMap& newMap)
     {
         PortOutputsMap result;
         for (const auto& entry : prevMap._outputPortMap)
         {
-            auto newMappedValue = newMap.GetCorrespondingPortElements(entry.second);
+            const auto& newMappedValue = newMap.GetCorrespondingPort(*entry.second);
             result.MapNodeOutput(entry.first, newMappedValue);
         }
 
@@ -174,18 +167,16 @@ namespace model
         oldModel.VisitSubset(outputNodes, [this](const Node& node) {
             CopyNode(node); });
         _context = TransformContext();
+        
         // Copy all the node metadata
         oldModel.VisitSubset(outputNodes, [this](const Node& node) {
             if (node.NumOutputPorts() > 0)
             {
-                auto ranges = (_elementsMap.GetCorrespondingPortElements(*node.GetOutputPort(0))).GetRanges();
-                if (ranges.size() > 0)
+                const auto& port = _elementsMap.GetCorrespondingPort(*node.GetOutputPort(0));
+                auto newNode = const_cast<Node*>(port.GetNode());
+                if (newNode)
                 {
-                    auto newNode = const_cast<Node*>(ranges[0].ReferencedPort()->GetNode());
-                    if (newNode)
-                    {
-                        newNode->GetMetadata() = node.GetMetadata();
-                    }
+                    newNode->GetMetadata() = node.GetMetadata();
                 }
             }
         });
@@ -281,19 +272,19 @@ namespace model
         _isModelCompilable = false;
     }
 
-    PortElementsBase ModelTransformer::TransformPortElements(const PortElementsBase& elements) const
+    const OutputPortBase& ModelTransformer::GetCorrespondingInputs(const InputPortBase& port) const
     {
-        return _elementsMap.GetCorrespondingPortElements(elements);
+        return _elementsMap.GetCorrespondingPort(port.GetReferencedPort());
     }
 
-    PortElementsBase ModelTransformer::GetCorrespondingOutputs(const OutputPortBase& port) const
+    const OutputPortBase& ModelTransformer::GetCorrespondingOutputs(const OutputPortBase& port) const
     {
-        return _elementsMap.GetCorrespondingPortElements(PortElementsBase(port));
+        return _elementsMap.GetCorrespondingPort(port);
     }
 
-    PortElementsBase ModelTransformer::GetCorrespondingOutputs(const PortElementsBase& elements) const
+    const OutputPortBase& ModelTransformer::GetCorrespondingOutputs(const PortElementsBase& elements) const
     {
-        return _elementsMap.GetCorrespondingPortElements(elements);
+        return _elementsMap.GetCorrespondingPort(*elements.GetRanges()[0].ReferencedPort());
     }
 
     InputNodeBase* ModelTransformer::GetCorrespondingInputNode(const InputNodeBase* inputNode) const
@@ -313,31 +304,31 @@ namespace model
             {
             case PortType::boolean:
             {
-                auto outputNode = AddNode<OutputNode<bool>>(PortElements<bool>{}, layout);
+                auto outputNode = AddNode<NullNode<bool>>(outputPort->Size());
                 MapNodeOutput(*static_cast<const OutputPort<bool>*>(outputPort), outputNode->output);
                 break;
             }
             case PortType::integer:
             {
-                auto outputNode = AddNode<OutputNode<int>>(PortElements<int>{}, layout);
+                auto outputNode = AddNode<NullNode<int>>(outputPort->Size());
                 MapNodeOutput(*static_cast<const OutputPort<int>*>(outputPort), outputNode->output);
                 break;
             }
             case PortType::bigInt:
             {
-                auto outputNode = AddNode<OutputNode<std::int64_t>>(PortElements<std::int64_t>{}, layout);
+                auto outputNode = AddNode<NullNode<std::int64_t>>(outputPort->Size());
                 MapNodeOutput(*static_cast<const OutputPort<std::int64_t>*>(outputPort), outputNode->output);
                 break;
             }
             case PortType::smallReal:
             {
-                auto outputNode = AddNode<OutputNode<float>>(PortElements<float>{}, layout);
+                auto outputNode = AddNode<NullNode<float>>(outputPort->Size());
                 MapNodeOutput(*static_cast<const OutputPort<float>*>(outputPort), outputNode->output);
                 break;
             }
             case PortType::real:
             {
-                auto outputNode = AddNode<OutputNode<double>>(PortElements<double>{}, layout);
+                auto outputNode = AddNode<NullNode<double>>(outputPort->Size());
                 MapNodeOutput(*static_cast<const OutputPort<double>*>(outputPort), outputNode->output);
                 break;
             }

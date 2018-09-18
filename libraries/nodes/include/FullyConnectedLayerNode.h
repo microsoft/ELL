@@ -46,7 +46,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        FullyConnectedLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::FullyConnectedLayer<ValueType>& layer);
+        FullyConnectedLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::FullyConnectedLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

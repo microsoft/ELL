@@ -45,7 +45,7 @@ namespace nodes
             ///
             /// <param name="input"> The signal to predict from </param>
             /// <param name="predictor"> The projection matrix </param>
-            MatrixVectorProductNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& w);
+            MatrixVectorProductNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& w);
 
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///

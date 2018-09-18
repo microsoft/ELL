@@ -48,7 +48,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    IIRFilterNode<ValueType>::IIRFilterNode(const model::PortElements<ValueType>& input, const std::vector<ValueType>& b, const std::vector<ValueType>& a)
+    IIRFilterNode<ValueType>::IIRFilterNode(const model::OutputPort<ValueType>& input, const std::vector<ValueType>& b, const std::vector<ValueType>& a)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _filter(b, a)
     {
     }
@@ -63,7 +63,7 @@ namespace nodes
     template <typename ValueType>
     void IIRFilterNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<IIRFilterNode<ValueType>>(newPortElements, _filter.GetFeedforwardCoefficients(), _filter.GetRecursiveCoefficients());
         transformer.MapNodeOutput(output, newNode->output);
     }

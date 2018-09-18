@@ -52,7 +52,7 @@ namespace nodes
         /// <param name="input"> The input signal </param>
         /// <param name="reset"> The reset signal (will reset when this boolean transitions from 1 to 0) </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        LSTMLayerNode(const model::PortElements<ValueType>& input, const model::PortElements<int>& reset, const LayerType& layer);
+        LSTMLayerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<int>& reset, const LayerType& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -130,16 +130,16 @@ namespace nodes
         /// <param name="outputBias"> The bias to be applied to the output nodes. </param>
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        LSTMNode(const model::PortElements<ValueType>& input,
-                        const model::PortElements<int>& resetTrigger,
-                        const model::PortElements<ValueType>& inputWeights,
-                        const model::PortElements<ValueType>& forgetMeWeights,
-                        const model::PortElements<ValueType>& candidateWeights,
-                        const model::PortElements<ValueType>& outputWeights,
-                        const model::PortElements<ValueType>& inputBias,
-                        const model::PortElements<ValueType>& forgetMeBias,
-                        const model::PortElements<ValueType>& candidateBias,
-                        const model::PortElements<ValueType>& outputBias,
+        LSTMNode(const model::OutputPort<ValueType>& input,
+                        const model::OutputPort<int>& resetTrigger,
+                        const model::OutputPort<ValueType>& inputWeights,
+                        const model::OutputPort<ValueType>& forgetMeWeights,
+                        const model::OutputPort<ValueType>& candidateWeights,
+                        const model::OutputPort<ValueType>& outputWeights,
+                        const model::OutputPort<ValueType>& inputBias,
+                        const model::OutputPort<ValueType>& forgetMeBias,
+                        const model::OutputPort<ValueType>& candidateBias,
+                        const model::OutputPort<ValueType>& outputBias,
                         const ActivationType& activation,
                         const ActivationType& recurrentActivation,
                         const model::PortMemoryLayout& inputMemoryLayout,

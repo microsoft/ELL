@@ -318,7 +318,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, int filterWidth, int stride, int convolutionPadding, std::array<int, 3> dataOrder, int outputWidth, int outputHeight)
+    ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, int filterWidth, int stride, int convolutionPadding, std::array<int, 3> dataOrder, int outputWidth, int outputHeight)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, model::PortMemoryLayout(model::MemoryShape{ outputWidth * outputHeight, filterWidth * filterWidth * inputMemoryLayout.GetLogicalDimensionActiveSize(2)}, model::DimensionOrder{ dataOrder }) ), _inputMemoryLayout(inputMemoryLayout), _filterWidth(filterWidth), _stride(stride), _convolutionPadding(convolutionPadding), _dataOrder(dataOrder), _outputWidth(outputWidth), _outputHeight(outputHeight)
     {
         if (inputMemoryLayout.NumDimensions() != 3)
@@ -330,7 +330,7 @@ namespace nodes
     template <typename ValueType>
     void ReceptiveFieldMatrixNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<ReceptiveFieldMatrixNode>(newPortElements, GetInputMemoryLayout(), _filterWidth, _stride, _convolutionPadding, _dataOrder, _outputWidth, _outputHeight);
         transformer.MapNodeOutput(this->output, newNode->output);
     }

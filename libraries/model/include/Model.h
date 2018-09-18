@@ -153,19 +153,19 @@ namespace model
 
         /// <summary> Returns part of the output computed by the model </summary>
         ///
-        /// <param name="outputPort"> The output port to get the computed value form </param>
+        /// <param name="outputPort"> The output port to get the computed value from </param>
         template <typename ValueType>
         std::vector<ValueType> ComputeOutput(const OutputPort<ValueType>& outputPort) const;
 
         /// <summary> Returns part of the output computed by the model </summary>
         ///
-        /// <param name="elements"> The output port elements to get the computed value form </param>
+        /// <param name="elements"> The output port elements to get the computed value from </param>
         template <typename ValueType>
         std::vector<ValueType> ComputeOutput(const PortElements<ValueType>& elements) const;
 
         /// <summary> Returns part of the output computed by the model </summary>
         ///
-        /// <param name="elements"> The output port elements to get the computed value form </param>
+        /// <param name="elements"> The output port elements to get the computed value from </param>
         template <typename ValueType>
         std::vector<ValueType> ComputeOutput(const PortElementsBase& elements) const;
 
@@ -270,7 +270,6 @@ namespace model
         const utilities::PropertyBag& GetMetadata() const { return _data->metadata; }
             
     protected:
-        // Serialization-related methods
         utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
@@ -283,7 +282,9 @@ namespace model
         friend class detail::ModelNodeRouter;
         template <typename ValueType>
         friend class InputPort;
-
+        friend class ModelTransformer;
+        friend class Map;
+        
         struct ModelData
         {
             // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
@@ -297,8 +298,8 @@ namespace model
         Model(const Model& other) = delete;
 
         template <typename ValueType>
-        PortElements<ValueType> AddRoutingNodes(const PortElements<ValueType>& elements);
-        PortElementsBase AddRoutingNodes(const PortElementsBase& elements);
+        const OutputPort<ValueType>& AddRoutingNodes(const PortElements<ValueType>& elements);
+        const OutputPortBase& AddRoutingNodes(const PortElementsBase& elements);
         const OutputPortBase* AddPortRange(const PortRange& inputRange);
         const OutputPortBase* AddConcat(const std::vector<const OutputPortBase*>& outputPorts);
         Node* AddExistingNode(std::unique_ptr<Node> node);

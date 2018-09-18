@@ -21,7 +21,7 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    ConvolutionalLayerNode<ValueType>::ConvolutionalLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ConvolutionalLayer<ValueType>& layer)
+    ConvolutionalLayerNode<ValueType>::ConvolutionalLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ConvolutionalLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<ConvolutionalLayerNode<ValueType>, predictors::neural::ConvolutionalLayer<ValueType>, ValueType>(input, layer)
     {
     }
@@ -35,7 +35,7 @@ namespace nodes
         const auto originalOutputLayout = this->GetOutputMemoryLayout();
         const auto convParams = this->GetLayer().GetConvolutionalParameters();
 
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto* newInput = &transformer.GetCorrespondingInputs(this->input);
 
         // Terminology:
         // fw: filter width
@@ -49,8 +49,8 @@ namespace nodes
         auto convInputLayout = originalInputLayout.ReorderedCopy({ shouldReorderToChannelMajor ? utilities::ChannelMajorTensorOrder : utilities::RowMajorTensorOrder });
         auto convOutputLayout = originalOutputLayout.ReorderedCopy({ shouldReorderToChannelMajor ? utilities::ChannelMajorTensorOrder : utilities::RowMajorTensorOrder });
 
-        auto preConvReorderNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, originalInputLayout, convInputLayout);
-        newInput = preConvReorderNode->output;
+        auto preConvReorderNode = transformer.AddNode<ReorderDataNode<ValueType>>(*newInput, originalInputLayout, convInputLayout);
+        newInput = &preConvReorderNode->output;
 
         model::PortElements<ValueType> convOutput;
 
@@ -58,25 +58,25 @@ namespace nodes
         {
         case ConvolutionMethod::simple:
         {
-            auto convNode = transformer.AddNode<SimpleConvolutionNode<ValueType>>(newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
+            auto convNode = transformer.AddNode<SimpleConvolutionNode<ValueType>>(*newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
             convOutput = convNode->output;
         }
         break;
         case ConvolutionMethod::unrolled:
         {
-            auto convNode = transformer.AddNode<UnrolledConvolutionNode<ValueType>>(newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
+            auto convNode = transformer.AddNode<UnrolledConvolutionNode<ValueType>>(*newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
             convOutput = convNode->output;
         }
         break;
         case ConvolutionMethod::diagonal:
         {
-            auto convNode = transformer.AddNode<DiagonalConvolutionNode<ValueType>>(newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
+            auto convNode = transformer.AddNode<DiagonalConvolutionNode<ValueType>>(*newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
             convOutput = convNode->output;
         }
         break;
         case ConvolutionMethod::winograd:
         {
-            auto convNode = transformer.AddNode<WinogradConvolutionNode<ValueType>>(newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
+            auto convNode = transformer.AddNode<WinogradConvolutionNode<ValueType>>(*newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
             convOutput = convNode->output;
         }
         break;
@@ -93,7 +93,7 @@ namespace nodes
     template <typename ValueType>
     void ConvolutionalLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<ConvolutionalLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }

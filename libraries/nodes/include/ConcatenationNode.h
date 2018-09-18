@@ -47,12 +47,12 @@ namespace nodes
 
         /// <summary> Constructor </summary>
         /// <param name="input"> The inputs to concatenate specified as a PortElements. </param>
-        ConcatenationNode(const model::PortElements<ValueType>& input);
+        ConcatenationNode(const model::OutputPort<ValueType>& input);
 
         /// <summary> Constructor </summary>
         /// <param name="input"> The inputs to concatenate specified as a PortElements. </param>
         /// <param name="shape"> The shape of the output data. </param>
-        ConcatenationNode(const model::PortElements<ValueType>& input, const model::MemoryShape& shape);
+        ConcatenationNode(const model::OutputPort<ValueType>& input, const model::MemoryShape& shape);
 
         /// <summary> Gets the output shape. </summary>
         ///

@@ -50,7 +50,7 @@ namespace nodes
         ///
         /// <param name="input1"> One of the signals to take the dot product of </param>
         /// <param name="input2"> The other signal to take the dot product of </param>
-        DotProductNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2);
+        DotProductNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

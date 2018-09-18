@@ -55,20 +55,20 @@ namespace nodes
         ///
         /// <param name="input1"> The left-hand input of the matrix multiplication, a row-major matrix of size m x k.  </param>
         /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
-        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2);
+        MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
 
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input1"> The left-hand input of the matrix multiplication, a row-major matrix of size m x k.  </param>
         /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
         /// <param name="outputMemoryLayout"> The output memory layout to use. </param>
-        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, const model::PortMemoryLayout& outputMemoryLayout);
+        MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, const model::PortMemoryLayout& outputMemoryLayout);
 
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input1"> The left-hand input of the matrix multiplication, a row-major matrix of size m x k.  </param>
         /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
-        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, int m, int n, int k, int matrix1Stride, const model::PortElements<ValueType>& input2, int matrix2Stride, int outputMatrixStride);
+        MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, int m, int n, int k, int matrix1Stride, const model::OutputPort<ValueType>& input2, int matrix2Stride, int outputMatrixStride);
 
         /// <summary> Constructor. </summary>
         ///
@@ -76,7 +76,7 @@ namespace nodes
         /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
         /// <param name="transpose1"> If true, transpose the left-hand input matrix. </param>
         /// <param name="transpose2"> If true, transpose the right-hand input matrix. </param>
-        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::PortElements<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride);
+        MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::OutputPort<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride);
 
         /// <summary> Constructor. </summary>
         ///
@@ -85,7 +85,7 @@ namespace nodes
         /// <param name="transpose1"> If true, transpose the left-hand input matrix. </param>
         /// <param name="transpose2"> If true, transpose the right-hand input matrix. </param>
         /// <param name="transposeOutput"> If true, transpose the output matrix. </param>
-        MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::PortElements<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride, bool transposeOutput);
+        MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::OutputPort<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride, bool transposeOutput);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

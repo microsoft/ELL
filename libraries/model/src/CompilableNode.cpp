@@ -106,14 +106,6 @@ namespace model
 
     bool CompilableNode::ShouldCompileInline() const
     {
-        // Make sure all inputs have only pure ports
-        for (auto inputPort : GetInputPorts())
-        {
-            if (inputPort->GetInputElements().NumRanges() != 1)
-            {
-                return true;
-            }
-        }
         return false;
     }
 
@@ -179,15 +171,10 @@ namespace model
         emitters::NamedVariableTypeList args;
         for (auto port : GetInputPorts())
         {
-            if (port->GetInputElements().NumRanges() != 1) // if we're using an input port as a function argument, we need to preprocess model to ensure it's a full range
-            {
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Input arguments of node functions can't be complex port elements.");
-            }
-
             auto varType = PortTypeToVariableType(port->GetType());
             auto ptrType = emitters::GetPointerType(varType);
 
-            auto var = compiler.AllocatePortFunctionArgument(module, port->GetInputElement(0), MapCompiler::ArgType::input);
+            auto var = compiler.AllocatePortFunctionArgument(module, port->GetReferencedPort(), MapCompiler::ArgType::input);
             auto varName = var->EmittedName();
             args.emplace_back(varName, ptrType);
         };
@@ -204,7 +191,7 @@ namespace model
             auto varType = PortTypeToVariableType(port->GetType());
             auto ptrType = emitters::GetPointerType(varType);
 
-            auto var = compiler.AllocatePortFunctionArgument(module, port, MapCompiler::ArgType::output);
+            auto var = compiler.AllocatePortFunctionArgument(module, *port, MapCompiler::ArgType::output);
             auto varName = var->EmittedName();
             args.emplace_back(varName, ptrType);
         };
@@ -226,11 +213,6 @@ namespace model
 
         for (auto port : GetInputPorts())
         {
-            if (port->GetInputElements().NumRanges() != 1) // if we're using an input port as a function argument, we need to preprocess the model to ensure it's a full range
-            {
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: compiling node function with complex input port.");
-            }
-
             auto inputArg = compiler.EnsurePortEmitted(*port);
             assert(inputArg->getType()->isPointerTy());
             auto inputArgPtr = currentFunction.PointerOffset(inputArg, 0);

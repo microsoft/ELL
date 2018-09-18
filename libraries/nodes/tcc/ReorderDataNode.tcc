@@ -78,7 +78,7 @@ namespace nodes
     // Without reordering ("reshape" / slicing)
     //
     template <typename ValueType>
-    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
+    ReorderDataNode<ValueType>::ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _paddingValue(paddingValue)
     {
         _inputMemoryLayout = _input.GetMemoryLayout();
@@ -89,7 +89,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
+    ReorderDataNode<ValueType>::ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _paddingValue(paddingValue)
     {
         if (inputMemoryLayout.NumDimensions() != outputMemoryLayout.NumDimensions())
@@ -102,7 +102,7 @@ namespace nodes
     // With reordering ("reshape" / slicing, followed by transpose / dimension reordering)
     //
     template <typename ValueType>
-    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::DimensionOrder& order)
+    ReorderDataNode<ValueType>::ReorderDataNode(const model::OutputPort<ValueType>& input, const model::DimensionOrder& order)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.GetMemoryLayout().ReorderedCopy(order))
     {
         _inputMemoryLayout = _input.GetMemoryLayout();
@@ -113,7 +113,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue)
+    ReorderDataNode<ValueType>::ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout.ReorderedCopy(order)), _paddingValue(paddingValue)
     {
         _inputMemoryLayout = _input.GetMemoryLayout();
@@ -124,7 +124,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue)
+    ReorderDataNode<ValueType>::ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout.ReorderedCopy(order)), _inputMemoryLayout(inputMemoryLayout), _paddingValue(paddingValue)
     {
         if (inputMemoryLayout.NumDimensions() != outputMemoryLayout.NumDimensions())
@@ -159,7 +159,7 @@ namespace nodes
     template <typename ValueType>
     void ReorderDataNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<ReorderDataNode>(newPortElements, _inputMemoryLayout, _output.GetMemoryLayout(), _paddingValue);
         transformer.MapNodeOutput(this->output, newNode->output);
     }

@@ -52,7 +52,7 @@ namespace nodes
         ///
         /// <param name="input"> The predictor's input. </param>
         /// <param name="forest"> The forest predictor. </param>
-        ForestPredictorNode(const model::PortElements<double>& input, const ForestPredictor& forest);
+        ForestPredictorNode(const model::OutputPort<double>& input, const ForestPredictor& forest);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -71,7 +71,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to predict from </param>
         /// <param name="predictor"> The predictor to use when making the prediction. </param>
-        NeuralNetworkPredictorNode(const model::PortElements<ValueType>& input, const PredictorType& predictor);
+        NeuralNetworkPredictorNode(const model::OutputPort<ValueType>& input, const PredictorType& predictor);
 
         /// <summary> Returns the underlying predictor </summary>
         ///
@@ -124,7 +124,7 @@ namespace nodes
     private:
         void Copy(model::ModelTransformer& transformer) const override;
 
-        NeuralNetworkLayerNodeBase<ValueType>* AddLayerNode(model::ModelTransformer& transformer, Layer& layer, const model::PortElements<ValueType>& layerInputs, const NetworkCompileOptions& options, NetworkCompileState& state) const;
+        NeuralNetworkLayerNodeBase<ValueType>* AddLayerNode(model::ModelTransformer& transformer, Layer& layer, const model::OutputPort<ValueType>& layerInputs, const NetworkCompileOptions& options, NetworkCompileState& state) const;
 
         // Input
         model::InputPort<ValueType> _input;

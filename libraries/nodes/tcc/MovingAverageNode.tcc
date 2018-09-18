@@ -17,7 +17,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    MovingAverageNode<ValueType>::MovingAverageNode(const model::PortElements<ValueType>& input, size_t windowSize)
+    MovingAverageNode<ValueType>::MovingAverageNode(const model::OutputPort<ValueType>& input, size_t windowSize)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _windowSize(windowSize)
     {
         auto dimension = _input.Size();
@@ -48,7 +48,7 @@ namespace nodes
     template <typename ValueType>
     void MovingAverageNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<MovingAverageNode<ValueType>>(newPortElements, _windowSize);
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -56,7 +56,7 @@ namespace nodes
     template <typename ValueType>
     bool MovingAverageNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto delayNode = transformer.AddNode<DelayNode<ValueType>>(newPortElements, _windowSize);
         auto subtractNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newPortElements, delayNode->output, emitters::BinaryOperationType::subtract);
         auto accumNode = transformer.AddNode<AccumulatorNode<ValueType>>(subtractNode->output);

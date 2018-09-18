@@ -22,7 +22,7 @@ namespace nodes
     {
     }
 
-    SingleElementThresholdNode::SingleElementThresholdNode(const model::PortElements<double>& input, const SingleElementThresholdPredictor& predictor)
+    SingleElementThresholdNode::SingleElementThresholdNode(const model::OutputPort<double>& input, const SingleElementThresholdPredictor& predictor)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _predictor(predictor)
     {
         assert(input.Size() > predictor.GetElementIndex());
@@ -44,14 +44,14 @@ namespace nodes
 
     void SingleElementThresholdNode::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<SingleElementThresholdNode>(newPortElements, _predictor);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     bool SingleElementThresholdNode::Refine(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
 
         // get the element used in the split rule
         model::PortElements<double> element{ newPortElements, _predictor.GetElementIndex() };

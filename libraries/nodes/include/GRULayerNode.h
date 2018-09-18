@@ -55,7 +55,7 @@ namespace nodes
         /// <param name="input"> The input signal </param>
         /// <param name="reset"> The reset signal (will reset when this boolean transitions from 1 to 0) </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        GRULayerNode(const model::PortElements<ValueType>& input, const model::PortElements<int>& reset, const LayerType& layer);
+        GRULayerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<int>& reset, const LayerType& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -125,14 +125,14 @@ namespace nodes
         /// <param name="resetBias"> The reset bias. </param>
         /// <param name="hiddenBias"> The hidden bias. </param>
         /// <param name="resetTrigger"> Port elements for the reset trigger. </param>
-        GRUNode(const model::PortElements<ValueType>& input,
-                       const model::PortElements<int>& resetTrigger,
-                       const model::PortElements<ValueType>& updateWeights,
-                       const model::PortElements<ValueType>& resetWeights,
-                       const model::PortElements<ValueType>& hiddenWeights,
-                       const model::PortElements<ValueType>& updateBias,
-                       const model::PortElements<ValueType>& resetBias,
-                       const model::PortElements<ValueType>& hiddenBias,
+        GRUNode(const model::OutputPort<ValueType>& input,
+                       const model::OutputPort<int>& resetTrigger,
+                       const model::OutputPort<ValueType>& updateWeights,
+                       const model::OutputPort<ValueType>& resetWeights,
+                       const model::OutputPort<ValueType>& hiddenWeights,
+                       const model::OutputPort<ValueType>& updateBias,
+                       const model::OutputPort<ValueType>& resetBias,
+                       const model::OutputPort<ValueType>& hiddenBias,
                        const ActivationType& activation,
                        const ActivationType& recurrentActivation,
                        const model::PortMemoryLayout& inputMemoryLayout,

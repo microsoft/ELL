@@ -52,7 +52,7 @@ namespace nodes
         /// <param name="filterWeights"> The weights for the convolutional filters. Stored
         ///  as a 3D tensor of dimensions (nf*fw) x fw x d, where nf == # filters, fw == filter width, and d == input depth. </param>
         /// <param name="stride"> The output stride. </param>
-        SimpleConvolutionNode(const model::PortElements<ValueType>& input,
+        SimpleConvolutionNode(const model::OutputPort<ValueType>& input,
                               const model::PortMemoryLayout& inputMemoryLayout,
                               const model::PortMemoryLayout& outputMemoryLayout,
                               const ConstTensorReferenceType& filterWeights,
@@ -141,8 +141,8 @@ namespace nodes
         /// <param name="filterSize"> The filter width. </param>
         /// <param name="stride"> The output stride. </param>
         /// <param name="isDepthwiseSeparable"> Boolean value indicating whether the convolution is depthwise separable. </param>
-        SimpleConvolutionComputeNode(const model::PortElements<ValueType>& input,
-                                     const model::PortElements<ValueType>& filterWeights,
+        SimpleConvolutionComputeNode(const model::OutputPort<ValueType>& input,
+                                     const model::OutputPort<ValueType>& filterWeights,
                                      const model::PortMemoryLayout& inputMemoryLayout,
                                      const model::PortMemoryLayout& outputMemoryLayout,
                                      int filterSize,

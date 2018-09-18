@@ -20,13 +20,9 @@ namespace model
     {
     }
 
-    InputPortBase::InputPortBase(const Node* owningNode, PortElementsBase& input, const std::string& name)
-        : Port(owningNode, name, input.GetPortType()), _referencedPort(input.GetRanges()[0].ReferencedPort())
+    InputPortBase::InputPortBase(const Node* owningNode, const OutputPortBase& input, const std::string& name)
+        : Port(owningNode, name, input.GetType()), _referencedPort(&input)
     {
-        if (!input.IsFullPortOutput())
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Input port elements must be full port outputs.");
-        }
     }
 
     std::vector<const Node*> InputPortBase::GetParentNodes() const 
@@ -34,9 +30,15 @@ namespace model
         return _referencedPort == nullptr ? std::vector<const Node*>() : std::vector<const Node*>{ _referencedPort->GetNode() }; 
     }
 
-    PortElementsBase InputPortBase::GetInputElements() const
+    PortElementBase InputPortBase::GetInputElement(size_t index) const
     {
-        return _referencedPort == nullptr ? PortElementsBase() : PortElementsBase(*_referencedPort);
+        if (!IsValid())
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: empty input port.");
+        }
+
+        PortElementsBase elements(GetReferencedPort());
+        return elements.GetElement(index);
     }
 
     PortMemoryLayout InputPortBase::GetMemoryLayout() const
@@ -60,7 +62,7 @@ namespace model
         {
             return 0;
         }
-        return GetInputElements().Size(); 
+        return GetReferencedPort().Size(); 
     }
 
     bool InputPortBase::IsValid() const

@@ -25,7 +25,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    DCTNode<ValueType>::DCTNode(const model::PortElements<ValueType>& input, size_t numFilters)
+    DCTNode<ValueType>::DCTNode(const model::OutputPort<ValueType>& input, size_t numFilters)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, numFilters), _dctCoeffs(0, 0)
     {
         _dctCoeffs = dsp::GetDCTMatrix<ValueType>(numFilters, _input.Size());
@@ -42,7 +42,7 @@ namespace nodes
     template <typename ValueType>
     void DCTNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<DCTNode<ValueType>>(newPortElements, _dctCoeffs.NumRows());
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -50,7 +50,7 @@ namespace nodes
     template <typename ValueType>
     bool DCTNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<MatrixVectorProductNode<ValueType, math::MatrixLayout::rowMajor>>(newPortElements, _dctCoeffs);
         transformer.MapNodeOutput(output, newNode->output);
         return true;

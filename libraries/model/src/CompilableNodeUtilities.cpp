@@ -17,7 +17,6 @@
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputNode.h"
-#include "PortElements.h"
 
 // utiltiies
 #include "Exception.h"

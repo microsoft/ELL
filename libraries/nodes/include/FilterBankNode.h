@@ -49,7 +49,7 @@ namespace nodes
 
     protected:
         FilterBankNode(const dsp::TriangleFilterBank& filters);
-        FilterBankNode(const model::PortElements<ValueType>& input, const dsp::TriangleFilterBank& filters);
+        FilterBankNode(const model::OutputPort<ValueType>& input, const dsp::TriangleFilterBank& filters);
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
@@ -86,7 +86,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The signal to process. </param>
-        LinearFilterBankNode(const model::PortElements<ValueType>& input, const dsp::LinearFilterBank& filters);
+        LinearFilterBankNode(const model::OutputPort<ValueType>& input, const dsp::LinearFilterBank& filters);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -131,7 +131,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The signal to process. </param>
-        MelFilterBankNode(const model::PortElements<ValueType>& input, const dsp::MelFilterBank& filters);
+        MelFilterBankNode(const model::OutputPort<ValueType>& input, const dsp::MelFilterBank& filters);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

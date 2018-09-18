@@ -290,7 +290,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    FFTNode<ValueType>::FFTNode(const model::PortElements<ValueType>& input)
+    FFTNode<ValueType>::FFTNode(const model::OutputPort<ValueType>& input)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size() / 2)
     {
     }
@@ -630,7 +630,7 @@ namespace nodes
     template <typename ValueType>
     void FFTNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<FFTNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(output, newNode->output);
     }

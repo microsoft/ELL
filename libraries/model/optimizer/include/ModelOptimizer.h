@@ -57,10 +57,10 @@ namespace model
         //
 
         /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
-        PortElementsBase GetCorrespondingOutputs(const OutputPortBase& port);
+        const OutputPortBase& GetCorrespondingOutputs(const OutputPortBase& port);
 
         /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
-        PortElementsBase GetCorrespondingOutputs(const PortElementsBase& elements);
+        const OutputPortBase& GetCorrespondingOutputs(const PortElementsBase& elements);
 
         /// <summary> Returns the input node from the new model corresponding to the given input node on the input model </summary>
         InputNodeBase* GetCorrespondingInputNode(const InputNodeBase* node);

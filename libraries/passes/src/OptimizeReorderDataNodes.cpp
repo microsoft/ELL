@@ -98,14 +98,14 @@ namespace passes
                     // if the input and output layouts match, map the output of the parent node to this chain of
                     // reorder nodes to the end of this chain
                     auto parentOutput = static_cast<const OutputPort<ValueType>*>(node.input.GetInputElement(0).ReferencedPort());
-                    auto correspondingParentOutput = transformer.GetCorrespondingOutputs(*parentOutput).GetElement(0).ReferencedPort();
-                    transformer.MapNodeOutput(*finalOutputPort, *correspondingParentOutput);
+                    const auto& correspondingParentOutput = transformer.GetCorrespondingOutputs(*parentOutput);
+                    transformer.MapNodeOutput(*finalOutputPort, correspondingParentOutput);
                 }
                 else
                 {
                     // otherwise, create a new reorder node and use the input to the chain and map its output to the
                     // final output of the chain
-                    auto newInput = transformer.TransformPortElements(node.input.GetPortElements());
+                    const auto& newInput = transformer.GetCorrespondingInputs(node.input);
                     auto newNode = transformer.AddNode<nodes::ReorderDataNode<ValueType>>(newInput, inputLayout, outputLayout, node.GetPaddingValue());
                     transformer.MapNodeOutput(*finalOutputPort, newNode->output);
 

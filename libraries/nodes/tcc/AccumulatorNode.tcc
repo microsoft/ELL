@@ -17,7 +17,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    AccumulatorNode<ValueType>::AccumulatorNode(const model::PortElements<ValueType>& input)
+    AccumulatorNode<ValueType>::AccumulatorNode(const model::OutputPort<ValueType>& input)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size())
     {
         auto dimension = input.Size();
@@ -37,7 +37,7 @@ namespace nodes
     template <typename ValueType>
     void AccumulatorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(output, newNode->output);
     }

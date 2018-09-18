@@ -23,7 +23,7 @@ namespace ell
 namespace nodes
 {
     template <typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictorNode<SplitRuleType, EdgePredictorType>::ForestPredictorNode(const model::PortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest)
+    ForestPredictorNode<SplitRuleType, EdgePredictorType>::ForestPredictorNode(const model::OutputPort<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest)
         : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
     {
     }
@@ -56,7 +56,7 @@ namespace nodes
     template <typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictorNode<SplitRuleType, EdgePredictorType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<ForestPredictorNode<SplitRuleType, EdgePredictorType>>(newPortElements, _forest);
         transformer.MapNodeOutput(output, newNode->output);
         transformer.MapNodeOutput(treeOutputs, newNode->treeOutputs);
@@ -66,7 +66,7 @@ namespace nodes
     template <typename SplitRuleType, typename EdgePredictorType>
     bool ForestPredictorNode<SplitRuleType, EdgePredictorType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         const auto& interiorNodes = _forest.GetInteriorNodes();
 
         // create a place to store references to the output ports of the sub-models at each interior node
@@ -150,12 +150,12 @@ namespace nodes
             treeSubModels.Append(interiorNodeSubModels[rootIndex]);
         }
 
-        // make a copy and add the bias term
+        // Make a copy and add the bias term
         auto treesPlusBias = treeSubModels;
         auto biasNode = transformer.AddNode<ConstantNode<double>>(_forest.GetBias());
         treesPlusBias.Append(biasNode->output);
 
-        // sum all of the trees
+        // Sum all of the trees
         auto sumNode = transformer.AddNode<SumNode<double>>(treesPlusBias);
 
         // Map all the outputs from the original node to the refined model outputs

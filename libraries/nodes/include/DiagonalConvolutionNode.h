@@ -52,7 +52,7 @@ namespace nodes
         /// <param name="filterWeights"> The weights for the convolutional filters. Stored
         ///  as a 3D tensor of dimensions (nf*fw) x fw x d, where nf == # filters, fw == filter width, and d == input depth. </param>
         /// <param name="stride"> The output stride. </param>
-        DiagonalConvolutionNode(const model::PortElements<ValueType>& input,
+        DiagonalConvolutionNode(const model::OutputPort<ValueType>& input,
                                 const model::PortMemoryLayout& inputMemoryLayout,
                                 const model::PortMemoryLayout& outputMemoryLayout,
                                 const ConstTensorReferenceType& filterWeights,
@@ -139,8 +139,8 @@ namespace nodes
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         /// <param name="filterSize"> The filter width. </param>
         /// <param name="stride"> The output stride. </param>
-        DiagonalConvolutionComputeNode(const model::PortElements<ValueType>& input,
-                                       const model::PortElements<ValueType>& filterWeights,
+        DiagonalConvolutionComputeNode(const model::OutputPort<ValueType>& input,
+                                       const model::OutputPort<ValueType>& filterWeights,
                                        const model::PortMemoryLayout& inputMemoryLayout,
                                        const model::PortMemoryLayout& outputMemoryLayout,
                                        int filterSize,

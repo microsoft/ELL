@@ -39,7 +39,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to predict from </param>
         /// <param name="predictor"> The linear predictor to use when making the prediction. </param>
-        SingleElementThresholdNode(const model::PortElements<double>& input, const SingleElementThresholdPredictor& predictor);
+        SingleElementThresholdNode(const model::OutputPort<double>& input, const SingleElementThresholdPredictor& predictor);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

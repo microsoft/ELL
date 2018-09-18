@@ -15,7 +15,6 @@
 #include "Node.h"
 #include "NodeMap.h"
 #include "OutputPort.h"
-#include "PortElements.h"
 
 // emitters
 #include "LLVMUtilities.h"
@@ -97,12 +96,6 @@ namespace model
         template <typename ValueType>
         emitters::LLVMValue EnsurePortEmitted(const OutputPortBase& port, ValueType initialValue);
 
-        /// <summary> Ensure that variable for the given port element has been declared in IR </summary>
-        ///
-        /// <param name="port"> The port elements to ensure are emitted. </param>
-        /// <returns> The LLVM Value object corresponding to the elements. </returns>
-        emitters::LLVMValue EnsurePortElementEmitted(const PortElementBase& element);
-
         /// <summary>
         /// Ensure that the variable for this outport port element is loaded into a register. This will automatically
         /// dereference any pointers it needs to.
@@ -168,11 +161,8 @@ namespace model
         void EnsureValidMap(Map& map);
         virtual std::string GetPredictFunctionName() const;
         virtual void EmitModelAPIFunctions(const Map& map);
-        emitters::Variable* GetPortVariable(const InputPortBase& port);
-        emitters::Variable* GetPortElementVariable(const PortElementBase& element);
 
         emitters::IRModuleEmitter _moduleEmitter;
-        // Profiler object for model
         ModelProfiler _profiler;
         ModelOptimizer _optimizer;
 

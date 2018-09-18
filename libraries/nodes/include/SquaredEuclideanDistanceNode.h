@@ -45,7 +45,7 @@ namespace nodes
         ///
         /// <param name="input"> The input vector </param>
         /// <param name="v"> The set of vectors to compute the distance from stacked into a row matrix</param>
-        SquaredEuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& v);
+        SquaredEuclideanDistanceNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& v);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

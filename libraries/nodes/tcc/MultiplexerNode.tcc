@@ -17,7 +17,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector)
+    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<SelectorType>& selector)
         : CompilableNode({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, defaultOutputPortName, 1)
     {
         if (selector.Size() != 1)
@@ -36,8 +36,8 @@ namespace nodes
     template <typename ValueType, typename SelectorType>
     void MultiplexerNode<ValueType, SelectorType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newElements = transformer.TransformPortElements(_elements.GetPortElements());
-        auto newSelector = transformer.TransformPortElements(_selector.GetPortElements());
+        const auto& newElements = transformer.GetCorrespondingInputs(_elements);
+        const auto& newSelector = transformer.GetCorrespondingInputs(_selector);
         auto newNode = transformer.AddNode<MultiplexerNode<ValueType, SelectorType>>(newElements, newSelector);
         transformer.MapNodeOutput(output, newNode->output);
     }

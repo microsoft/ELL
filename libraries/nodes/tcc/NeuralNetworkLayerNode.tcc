@@ -22,7 +22,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    NeuralNetworkLayerNodeBase<ValueType>::NeuralNetworkLayerNodeBase(const model::PortElements<ValueType>& input, const NeuralNetworkLayerNodeParameters& parameters, size_t outputSize)
+    NeuralNetworkLayerNodeBase<ValueType>::NeuralNetworkLayerNodeBase(const model::OutputPort<ValueType>& input, const NeuralNetworkLayerNodeParameters& parameters, size_t outputSize)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputSize), _parameters(parameters)
     {
     }
@@ -51,7 +51,7 @@ namespace nodes
     }
 
     template <typename DerivedType, typename LayerType, typename ValueType>
-    NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::NeuralNetworkLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer)
+    NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::NeuralNetworkLayerNode(const model::OutputPort<ValueType>& input, const LayerType& layer)
         : NeuralNetworkLayerNodeBase<ValueType>(input, {}, layer.GetOutput().Size()), _inputTensor(layer.GetInputShape()), _layer(layer), _inputShape(layer.GetInputShape())
     {
         _layer.GetLayerParameters().input = _inputTensor;

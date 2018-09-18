@@ -56,7 +56,7 @@ namespace nodes
         /// <param name="levelThreshold"> Special case is when the energy of the frame is lower than levelThreshold, when we force the state to NO VOICE. </param>
         /// <summary>
         VoiceActivityDetectorNode(
-            const model::PortElements<ValueType>& input,
+            const model::OutputPort<ValueType>& input,
             double sampleRate,
             double frameDuration,
             double tauUp,

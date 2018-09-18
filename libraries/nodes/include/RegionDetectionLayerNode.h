@@ -33,7 +33,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        RegionDetectionLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::RegionDetectionLayer<ValueType>& layer);
+        RegionDetectionLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::RegionDetectionLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -67,7 +67,7 @@ namespace nodes
 
         RegionDetectionNode();
 
-        RegionDetectionNode(const model::PortElements<ValueType>& input,
+        RegionDetectionNode(const model::OutputPort<ValueType>& input,
                             predictors::neural::RegionDetectionParameters params,
                             const model::PortMemoryLayout& inputMemoryLayout,
                             const model::PortMemoryLayout& outputMemoryLayout);

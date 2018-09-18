@@ -169,7 +169,7 @@ namespace nodes
     // BinaryConvolutionalLayerNode
     //
     template <typename ValueType>
-    BinaryConvolutionalLayerNode<ValueType>::BinaryConvolutionalLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::BinaryConvolutionalLayer<ValueType>& layer)
+    BinaryConvolutionalLayerNode<ValueType>::BinaryConvolutionalLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BinaryConvolutionalLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<BinaryConvolutionalLayerNode<ValueType>, predictors::neural::BinaryConvolutionalLayer<ValueType>, ValueType>(input, layer)
     {
     }
@@ -226,7 +226,8 @@ namespace nodes
             numPackedBits = 64;
         }
 
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInputElements = transformer.GetCorrespondingInputs(this->input);
+        const auto& newInput = static_cast<const model::OutputPort<ValueType>&>(newInputElements);
 
         auto&& outputLayout = this->GetOutputMemoryLayout();
         const auto outputImageHeight = outputLayout.GetActiveSize(0);
@@ -256,7 +257,7 @@ namespace nodes
 
     template <typename ValueType>
     template <typename PackedBitsType>
-    model::PortElements<ValueType> BinaryConvolutionalLayerNode<ValueType>::AddRefinedNodes(model::ModelTransformer& transformer, const model::PortElements<ValueType>& input) const
+    model::PortElements<ValueType> BinaryConvolutionalLayerNode<ValueType>::AddRefinedNodes(model::ModelTransformer& transformer, const model::OutputPort<ValueType>& input) const
     {
         auto&& inputLayout = this->GetInputMemoryLayout();
         auto&& outputLayout = this->GetOutputMemoryLayout();
@@ -293,7 +294,7 @@ namespace nodes
     template <typename ValueType>
     void BinaryConvolutionalLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<BinaryConvolutionalLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
@@ -309,7 +310,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename PackedBitsType>
-    BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::BinaryReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input,
+    BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::BinaryReceptiveFieldMatrixNode(const model::OutputPort<ValueType>& input,
                                                                                               const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                                                                               const model::PortMemoryLayout& inputMemoryLayout,
                                                                                               const model::PortMemoryLayout& outputMemoryLayout)
@@ -320,7 +321,7 @@ namespace nodes
     template <typename ValueType, typename PackedBitsType>
     void BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<BinaryReceptiveFieldMatrixNode>(newPortElements, _convolutionalParameters, _inputMemoryLayout, _outputMemoryLayout);
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -467,11 +468,11 @@ namespace nodes
     }
 
     template <typename ValueType, typename PackedBitsType>
-    BinaryXnorNode<ValueType, PackedBitsType>::BinaryXnorNode(const model::PortElements<PackedBitsType>& input,
-                                                              const model::PortElements<PackedBitsType>& compressedInputPaddingMasks,
-                                                              const model::PortElements<int>& inputPaddingMaskSums,
-                                                              const model::PortElements<PackedBitsType>& compressedFilterWeights,
-                                                              const model::PortElements<ValueType>& filterMeans,
+    BinaryXnorNode<ValueType, PackedBitsType>::BinaryXnorNode(const model::OutputPort<PackedBitsType>& input,
+                                                              const model::OutputPort<PackedBitsType>& compressedInputPaddingMasks,
+                                                              const model::OutputPort<int>& inputPaddingMaskSums,
+                                                              const model::OutputPort<PackedBitsType>& compressedFilterWeights,
+                                                              const model::OutputPort<ValueType>& filterMeans,
                                                               const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                                               const predictors::neural::PaddingParameters& inputPaddingParameters,
                                                               const model::PortMemoryLayout& inputMemoryLayout,
@@ -483,11 +484,11 @@ namespace nodes
     template <typename ValueType, typename PackedBitsType>
     void BinaryXnorNode<ValueType, PackedBitsType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newInputPaddingMasks = transformer.TransformPortElements(_inputPaddingMasks.GetPortElements());
-        auto newInputPaddingMaskSums = transformer.TransformPortElements(_inputPaddingMaskSums.GetPortElements());
-        auto newFilterWeights = transformer.TransformPortElements(_filterWeights.GetPortElements());
-        auto newFilterMeans = transformer.TransformPortElements(_filterMeans.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
+        const auto& newInputPaddingMasks = transformer.GetCorrespondingInputs(_inputPaddingMasks);
+        const auto& newInputPaddingMaskSums = transformer.GetCorrespondingInputs(_inputPaddingMaskSums);
+        const auto& newFilterWeights = transformer.GetCorrespondingInputs(_filterWeights);
+        const auto& newFilterMeans = transformer.GetCorrespondingInputs(_filterMeans);
         auto newNode = transformer.AddNode<BinaryXnorNode>(newInput, newInputPaddingMasks, newInputPaddingMaskSums, newFilterWeights, newFilterMeans, _convolutionalParameters, _inputPaddingParameters, _inputMemoryLayout, GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }

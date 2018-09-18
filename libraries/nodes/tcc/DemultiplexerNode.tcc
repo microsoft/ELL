@@ -17,7 +17,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue)
+    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<SelectorType>& selector, size_t outputSize, ValueType defaultValue)
         : Node({ &_input, &_selector }, { &_output }), _input(this, input, defaultInputPortName), _selector(this, selector, selectorPortName), _output(this, defaultOutputPortName, outputSize), _defaultValue(defaultValue)
     {
         if (selector.Size() != 1)
@@ -64,21 +64,21 @@ namespace nodes
     template <typename ValueType, typename SelectorType>
     void DemultiplexerNode<ValueType, SelectorType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newSelector = transformer.TransformPortElements(_selector.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
+        const auto& newSelector = transformer.GetCorrespondingInputs(_selector);
         auto newNode = transformer.AddNode<DemultiplexerNode<ValueType, SelectorType>>(newInput, newSelector, output.Size(), _defaultValue);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
-    model::PortElements<int> CastIfNecessary(const model::PortElements<ValueType>& values, model::ModelTransformer& transformer)
+    const model::OutputPort<int>& CastIfNecessary(const model::OutputPort<ValueType>& values, model::ModelTransformer& transformer)
     {
         auto castNode = transformer.AddNode<TypeCastNode<ValueType, int>>(values);
         return castNode->output;
     }
 
     template <>
-    inline model::PortElements<int> CastIfNecessary<int>(const model::PortElements<int>& values, model::ModelTransformer& transformer)
+    inline const model::OutputPort<int>& CastIfNecessary<int>(const model::OutputPort<int>& values, model::ModelTransformer& transformer)
     {
         return values;
     }
@@ -86,9 +86,9 @@ namespace nodes
     template <typename ValueType, typename SelectorType>
     bool DemultiplexerNode<ValueType, SelectorType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newSelector = transformer.TransformPortElements(_selector.GetPortElements());
-        auto newSelectorInt = CastIfNecessary(newSelector, transformer);
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
+        const auto& newSelector = transformer.GetCorrespondingInputs(_selector);
+        const auto& newSelectorInt = CastIfNecessary(newSelector, transformer);
 
         auto defaultNode = transformer.AddNode<ConstantNode<ValueType>>(_defaultValue);
         model::PortElements<ValueType> outputElements;

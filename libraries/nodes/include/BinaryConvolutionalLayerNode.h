@@ -48,7 +48,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        BinaryConvolutionalLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::BinaryConvolutionalLayer<ValueType>& layer);
+        BinaryConvolutionalLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BinaryConvolutionalLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -80,7 +80,7 @@ namespace nodes
         std::vector<int> GetInputPaddingMaskSums() const;
 
         template <typename PackedBitsType>
-        model::PortElements<ValueType> AddRefinedNodes(model::ModelTransformer& transformer, const model::PortElements<ValueType>& input) const;
+        model::PortElements<ValueType> AddRefinedNodes(model::ModelTransformer& transformer, const model::OutputPort<ValueType>& input) const;
     };
 
     //
@@ -100,7 +100,7 @@ namespace nodes
         BinaryReceptiveFieldMatrixNode();
 
         /// <summary></summary>
-        BinaryReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input,
+        BinaryReceptiveFieldMatrixNode(const model::OutputPort<ValueType>& input,
                                        const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                        const model::PortMemoryLayout& inputMemoryLayout,
                                        const model::PortMemoryLayout& outputMemoryLayout);
@@ -201,11 +201,11 @@ namespace nodes
         /// <param name="inputPaddingParameters"> The input padding parameters. </param>
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        BinaryXnorNode(const model::PortElements<PackedBitsType>& input,
-                       const model::PortElements<PackedBitsType>& inputPaddingMasks,
-                       const model::PortElements<int>& inputPaddingMaskSums,
-                       const model::PortElements<PackedBitsType>& filterWeights,
-                       const model::PortElements<ValueType>& filterMeans,
+        BinaryXnorNode(const model::OutputPort<PackedBitsType>& input,
+                       const model::OutputPort<PackedBitsType>& inputPaddingMasks,
+                       const model::OutputPort<int>& inputPaddingMaskSums,
+                       const model::OutputPort<PackedBitsType>& filterWeights,
+                       const model::OutputPort<ValueType>& filterMeans,
                        const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                        const predictors::neural::PaddingParameters& inputPaddingParameters,
                        const model::PortMemoryLayout& inputMemoryLayout,

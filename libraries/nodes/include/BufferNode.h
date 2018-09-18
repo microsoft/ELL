@@ -46,7 +46,7 @@ namespace nodes
         ///
         /// <param name="input"> The input to buffer. </param>
         /// <param name="windowSize"> The number of samples to accumulate in the buffer. </param>
-        BufferNode(const model::PortElements<ValueType>& input, size_t windowSize);
+        BufferNode(const model::OutputPort<ValueType>& input, size_t windowSize);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -51,7 +51,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to process. </param>
         /// <param name="operation"> The function to use to process the signal. </param>
-        UnaryOperationNode(const model::PortElements<ValueType>& input, emitters::UnaryOperationType operation);
+        UnaryOperationNode(const model::OutputPort<ValueType>& input, emitters::UnaryOperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

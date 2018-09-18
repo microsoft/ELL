@@ -46,7 +46,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The layer to wrap. </param>
-        ScalingLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ScalingLayer<ValueType>& layer);
+        ScalingLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ScalingLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -221,7 +221,7 @@ namespace nodes
     //
 
     template <typename ValueType, template <typename> class PoolingFunctionType>
-    PoolingLayerNode<ValueType, PoolingFunctionType>::PoolingLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::PoolingLayer<ValueType, PoolingFunctionType>& layer)
+    PoolingLayerNode<ValueType, PoolingFunctionType>::PoolingLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::PoolingLayer<ValueType, PoolingFunctionType>& layer)
         : NeuralNetworkLayerNode<PoolingLayerNode<ValueType, PoolingFunctionType>, predictors::neural::PoolingLayer<ValueType, PoolingFunctionType>, ValueType>(input, layer)
     {
     }
@@ -521,7 +521,7 @@ namespace nodes
     template <typename ValueType, template <typename> class PoolingFunctionType>
     void PoolingLayerNode<ValueType, PoolingFunctionType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<PoolingLayerNode<ValueType, PoolingFunctionType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }

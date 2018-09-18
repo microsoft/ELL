@@ -50,7 +50,7 @@ namespace nodes
         ///
         /// <param name="input"> The input to the layer. </param>
         /// <param name="layer"> The bias layer to wrap. </param>
-        PoolingLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::PoolingLayer<ValueType, PoolingFunctionType>& layer);
+        PoolingLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::PoolingLayer<ValueType, PoolingFunctionType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

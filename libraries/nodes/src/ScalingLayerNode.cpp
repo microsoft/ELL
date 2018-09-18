@@ -15,7 +15,7 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    ScalingLayerNode<ValueType>::ScalingLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ScalingLayer<ValueType>& layer)
+    ScalingLayerNode<ValueType>::ScalingLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ScalingLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<ScalingLayerNode<ValueType>, predictors::neural::ScalingLayer<ValueType>, ValueType>(input, layer)
     {
     }
@@ -23,7 +23,7 @@ namespace nodes
     template <typename ValueType>
     bool ScalingLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
         auto scaleValues = this->_layer.GetScale().ToArray();
         auto scaleValuesNode = transformer.AddNode<ConstantNode<ValueType>>(scaleValues);
         auto biasValuesNode = transformer.AddNode<ConstantNode<ValueType>>(); // nothing
@@ -42,7 +42,7 @@ namespace nodes
     template <typename ValueType>
     void ScalingLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<ScalingLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }

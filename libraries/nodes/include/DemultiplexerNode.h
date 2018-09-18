@@ -51,7 +51,7 @@ namespace nodes
         ///
         /// <param name="input"> The input value. </param>
         /// <param name="selector"> The index of the chosen element to recieve the value </param>
-        DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue = 0);
+        DemultiplexerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<SelectorType>& selector, size_t outputSize, ValueType defaultValue = 0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -22,19 +22,19 @@ namespace nodes
 
     // Following the pattern of OutputNode, we provide a constructor override that infers the shape from the input
     template <typename ValueType>
-    SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
+    SinkNode<ValueType>::SinkNode(const model::OutputPort<ValueType>& input, const model::OutputPort<bool>& trigger, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
         : SinkNode(input, trigger, model::MemoryShape{ static_cast<int>(input.Size()) }, sinkFunctionName, sink)
     {
     }
 
     template <typename ValueType>
-    SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, size_t outputVectorSize, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
+    SinkNode<ValueType>::SinkNode(const model::OutputPort<ValueType>& input, const model::OutputPort<bool>& trigger, size_t outputVectorSize, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
         : SinkNode(input, trigger, model::MemoryShape{ static_cast<int>(outputVectorSize) }, sinkFunctionName, sink)
     {
     }
 
     template <typename ValueType>
-    SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& trigger, const model::MemoryShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
+    SinkNode<ValueType>::SinkNode(const model::OutputPort<ValueType>& input, const model::OutputPort<bool>& trigger, const model::MemoryShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
         : model::SinkNodeBase(_input, _trigger, _output, shape, sinkFunctionName),
         _input(this, input, defaultInputPortName),
         _trigger(this, trigger, triggerPortName),
@@ -95,8 +95,8 @@ namespace nodes
     template <typename ValueType>
     void SinkNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newTrigger = transformer.TransformPortElements(_trigger.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
+        const auto& newTrigger = transformer.GetCorrespondingInputs(_trigger);
         auto newNode = transformer.AddNode<SinkNode<ValueType>>(newInput, newTrigger, GetShape(), GetCallbackName(), _sink);
         transformer.MapNodeOutput(output, newNode->output);
     }

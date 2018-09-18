@@ -17,7 +17,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    HammingWindowNode<ValueType>::HammingWindowNode(const model::PortElements<ValueType>& input)
+    HammingWindowNode<ValueType>::HammingWindowNode(const model::OutputPort<ValueType>& input)
         : Node({&_input}, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size())
     {
     }
@@ -38,7 +38,7 @@ namespace nodes
     template <typename ValueType>
     void HammingWindowNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<HammingWindowNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -46,7 +46,7 @@ namespace nodes
     template <typename ValueType>
     bool HammingWindowNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto constantNode = transformer.AddNode<ConstantNode<ValueType>>(dsp::HammingWindow<ValueType>(_input.Size()));
         auto multiplyNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newPortElements, constantNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
         transformer.MapNodeOutput(output, multiplyNode->output);

@@ -309,12 +309,12 @@ namespace nodes
         BroadcastUnaryFunctionNode();
 
         /// <summary></summary>
-        BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+        BroadcastUnaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                    const model::PortMemoryLayout& outputLayout,
                                    ValueType padding = 0);
 
         /// <summary></summary>
-        BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+        BroadcastUnaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                    const model::PortMemoryLayout& outputLayout,
                                    FunctionType function,
                                    ValueType padding = 0);
@@ -388,14 +388,14 @@ namespace nodes
         BroadcastBinaryFunctionNode();
 
         /// <summary></summary>
-        BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                    const model::PortElements<ValueType>& secondaryInput, size_t secondaryInputDimension,
+        BroadcastBinaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                    const model::OutputPort<ValueType>& secondaryInput, size_t secondaryInputDimension,
                                     const model::PortMemoryLayout& outputLayout,
                                     ValueType padding = 0);
 
         /// <summary></summary>
-        BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                    const model::PortElements<ValueType>& secondaryInput, size_t secondaryInputDimension,
+        BroadcastBinaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                    const model::OutputPort<ValueType>& secondaryInput, size_t secondaryInputDimension,
                                     const model::PortMemoryLayout& outputLayout,
                                     FunctionType function,
                                     ValueType padding = 0);
@@ -471,14 +471,14 @@ namespace nodes
         BroadcastTernaryFunctionNode();
 
         /// <summary></summary>
-        BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                     const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t secondaryInputDimension,
+        BroadcastTernaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                     const model::OutputPort<ValueType>& secondaryInput1, const model::OutputPort<ValueType>& secondaryInput2, size_t secondaryInputDimension,
                                      const model::PortMemoryLayout& outputLayout,
                                      ValueType padding = 0);
 
         /// <summary></summary>
-        BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                     const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t secondaryInputDimension,
+        BroadcastTernaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                     const model::OutputPort<ValueType>& secondaryInput1, const model::OutputPort<ValueType>& secondaryInput2, size_t secondaryInputDimension,
                                      const model::PortMemoryLayout& outputLayout,
                                      FunctionType function,
                                      ValueType padding = 0);
@@ -548,8 +548,8 @@ namespace nodes
         BroadcastLinearFunctionNode();
 
         /// <summary></summary>
-        BroadcastLinearFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                    const model::PortElements<ValueType>& scaleInput, const model::PortElements<ValueType>& biasInput, size_t secondaryInputDimension,
+        BroadcastLinearFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                    const model::OutputPort<ValueType>& scaleInput, const model::OutputPort<ValueType>& biasInput, size_t secondaryInputDimension,
                                     const model::PortMemoryLayout& outputLayout,
                                     ValueType padding = 0);
 

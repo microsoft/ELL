@@ -57,7 +57,7 @@ namespace nodes
         /// <param name="operation"> The type of operation to perform. </param>
         ///
         /// Note: the output will use the same memory layout as input1
-        BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, emitters::BinaryOperationType operation);
+        BinaryOperationNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryOperationType operation);
 
         /// <summary> Constructor. </summary>
         ///
@@ -66,8 +66,8 @@ namespace nodes
         /// <param name="layout"> The memory layout for the inputs and outputs. </param>
         /// <param name="operation"> The type of operation to perform. </param>
         /// <param name="padding"> The padding value. </param>
-        BinaryOperationNode(const model::PortElements<ValueType>& input1,
-                            const model::PortElements<ValueType>& input2,
+        BinaryOperationNode(const model::OutputPort<ValueType>& input1,
+                            const model::OutputPort<ValueType>& input2,
                             const model::PortMemoryLayout& layout,
                             emitters::BinaryOperationType operation,
                             ValueType padding = 0);
@@ -81,9 +81,9 @@ namespace nodes
         /// <param name="outputLayout"> The output layout. </param>
         /// <param name="operation"> The type of operation to perform. </param>
         /// <param name="padding"> The padding value. </param>
-        BinaryOperationNode(const model::PortElements<ValueType>& input1,
+        BinaryOperationNode(const model::OutputPort<ValueType>& input1,
                             const model::PortMemoryLayout& inputLayout1,
-                            const model::PortElements<ValueType>& input2,
+                            const model::OutputPort<ValueType>& input2,
                             const model::PortMemoryLayout& inputLayout2,
                             const model::PortMemoryLayout& outputLayout,
                             emitters::BinaryOperationType operation,

@@ -40,7 +40,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode(const model::PortElements<ValueType>& input, const PredictorType& predictor)
+    NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode(const model::OutputPort<ValueType>& input, const PredictorType& predictor)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetShapeSize(predictor.GetOutputShape())), _predictor(predictor)
     {
         if (input.Size() != GetShapeSize(_predictor.GetInputShape()))
@@ -70,7 +70,7 @@ namespace nodes
     template <typename ValueType>
     void NeuralNetworkPredictorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInputElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newInputElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<NeuralNetworkPredictorNode>(newInputElements, _predictor);
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -108,7 +108,7 @@ namespace nodes
         NetworkCompileState state;
         state.isInterleavedOrder = true;
 
-        auto newInputElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto* newInputElements = &transformer.GetCorrespondingInputs(_input);
 
         const auto& inputLayer = _predictor.GetInputLayer();
         auto inputShape = inputLayer.GetInputShape();
@@ -120,15 +120,16 @@ namespace nodes
             // If the input layer wants padding on its output, add a ReorderDataNode to add padding
             model::PortMemoryLayout inputNodeLayout(model::MemoryShape{ (int)inputShape.NumRows(), (int)inputShape.NumColumns(), (int)inputShape.NumChannels() });
             model::PortMemoryLayout paddedInputNodeLayout(model::MemoryShape{ (int)inputShape.NumRows(), (int)inputShape.NumColumns(), (int)inputShape.NumChannels() }, model::MemoryShape{ (int)padding, (int)padding, 0 });
-            auto paddedInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInputElements, inputNodeLayout, paddedInputNodeLayout, predictors::neural::GetPaddingValue<ValueType>(outputPadding.paddingScheme));
-            newInputElements = paddedInputNode->output;
+            auto paddedInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(*newInputElements, inputNodeLayout, paddedInputNodeLayout, predictors::neural::GetPaddingValue<ValueType>(outputPadding.paddingScheme));
+            newInputElements = &paddedInputNode->output;
         }
 
+        auto newInput = static_cast<const model::OutputPort<ValueType>*>(newInputElements);
         size_t prevOutputSize = GetShapeSize(inputLayer.GetOutputShape()); // With padding
         UNUSED(prevOutputSize);
-        auto layerInputs = model::PortElements<ValueType>(newInputElements);
         NeuralNetworkLayerNodeBase<ValueType>* lastNode = nullptr;
 
+        auto layerInputs = newInput;
         for (const auto& layer : _predictor.GetLayers())
         {
             auto numInputs = GetShapeSize(layer->GetInputShape());
@@ -137,10 +138,10 @@ namespace nodes
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input to layer doesn't match the output size of the previous layer");
             }
-            auto layerNode = AddLayerNode(transformer, *layer, layerInputs, options, state);
+            auto layerNode = AddLayerNode(transformer, *layer, *layerInputs, options, state);
 
             prevOutputSize = GetShapeSize(layer->GetOutputShape());
-            layerInputs = model::PortElements<ValueType>{ *layerNode->GetOutputPort(0) };
+            layerInputs = static_cast<const model::OutputPort<ValueType>*>(layerNode->GetOutputPort(0));
             lastNode = layerNode;
         }
 

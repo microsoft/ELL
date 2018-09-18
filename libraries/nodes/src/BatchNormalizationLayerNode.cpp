@@ -15,7 +15,7 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    BatchNormalizationLayerNode<ValueType>::BatchNormalizationLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::BatchNormalizationLayer<ValueType>& layer)
+    BatchNormalizationLayerNode<ValueType>::BatchNormalizationLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BatchNormalizationLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<BatchNormalizationLayerNode<ValueType>, predictors::neural::BatchNormalizationLayer<ValueType>, ValueType>(input, layer)
     {
     }
@@ -23,7 +23,7 @@ namespace nodes
     template <typename ValueType>
     bool BatchNormalizationLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
         auto scaleValues = this->_layer.GetScale().ToArray();
         auto scaleValuesNode = transformer.AddNode<ConstantNode<ValueType>>(scaleValues);
         auto biasValues = this->_layer.GetBias().ToArray();
@@ -44,7 +44,7 @@ namespace nodes
     template <typename ValueType>
     void BatchNormalizationLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<BatchNormalizationLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }

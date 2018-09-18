@@ -16,7 +16,7 @@ namespace nodes
     namespace
     {
         template <typename LayerType, typename LayerNodeType, typename ValueType>
-        NeuralNetworkLayerNodeBase<ValueType>* TryAddLayerNode(model::ModelTransformer& transformer, predictors::neural::Layer<ValueType>& layer, const model::PortElements<ValueType>& layerInputs, const typename NeuralNetworkPredictorNode<ValueType>::NetworkCompileOptions& options, typename NeuralNetworkPredictorNode<ValueType>::NetworkCompileState& state)
+        NeuralNetworkLayerNodeBase<ValueType>* TryAddLayerNode(model::ModelTransformer& transformer, predictors::neural::Layer<ValueType>& layer, const model::OutputPort<ValueType>& layerInputs, const typename NeuralNetworkPredictorNode<ValueType>::NetworkCompileOptions& options, typename NeuralNetworkPredictorNode<ValueType>::NetworkCompileState& state)
         {
             auto typedLayer = dynamic_cast<LayerType*>(&layer);
             if (typedLayer != nullptr)
@@ -27,7 +27,7 @@ namespace nodes
         }
 
         template <typename LayerType, typename LayerNodeType, typename SecondValueType, typename ValueType>
-        NeuralNetworkLayerNodeBase<ValueType>* TryAddLayerNodeWithTwoInputs(model::ModelTransformer& transformer, predictors::neural::Layer<ValueType>& layer, const model::PortElements<ValueType>& layerInputs, const model::PortElements<SecondValueType>& secondInput, const typename NeuralNetworkPredictorNode<ValueType>::NetworkCompileOptions& options, typename NeuralNetworkPredictorNode<ValueType>::NetworkCompileState& state)
+        NeuralNetworkLayerNodeBase<ValueType>* TryAddLayerNodeWithTwoInputs(model::ModelTransformer& transformer, predictors::neural::Layer<ValueType>& layer, const model::OutputPort<ValueType>& layerInputs, const model::OutputPort<SecondValueType>& secondInput, const typename NeuralNetworkPredictorNode<ValueType>::NetworkCompileOptions& options, typename NeuralNetworkPredictorNode<ValueType>::NetworkCompileState& state)
         {
             auto typedLayer = dynamic_cast<LayerType*>(&layer);
             if (typedLayer != nullptr)
@@ -39,7 +39,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    NeuralNetworkLayerNodeBase<ValueType>* NeuralNetworkPredictorNode<ValueType>::AddLayerNode(model::ModelTransformer& transformer, predictors::neural::Layer<ValueType>& layer, const model::PortElements<ValueType>& layerInputs, const NetworkCompileOptions& options, NetworkCompileState& state) const
+    NeuralNetworkLayerNodeBase<ValueType>* NeuralNetworkPredictorNode<ValueType>::AddLayerNode(model::ModelTransformer& transformer, predictors::neural::Layer<ValueType>& layer, const model::OutputPort<ValueType>& layerInputs, const NetworkCompileOptions& options, NetworkCompileState& state) const
     {
         NeuralNetworkLayerNodeBase<ValueType>* node = nullptr;
 

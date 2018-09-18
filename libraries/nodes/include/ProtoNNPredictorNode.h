@@ -44,7 +44,7 @@ namespace nodes
         /// <param name="input"> The signal to predict from </param>
         /// <param name="outputSize">The size of the output vector</param>
         /// <param name="predictor"> The ProtoNN predictor to use when making the prediction. </param>
-        ProtoNNPredictorNode(const model::PortElements<double>& input, const ProtoNNPredictor& predictor);
+        ProtoNNPredictorNode(const model::OutputPort<double>& input, const ProtoNNPredictor& predictor);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

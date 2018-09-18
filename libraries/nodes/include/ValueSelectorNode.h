@@ -46,7 +46,7 @@ namespace nodes
         /// <param name="condition"> An input that returns a single boolean value that selects which input to use as output </param>
         /// <param name="input1"> The input to return if the condition is `true` </param>
         /// <param name="input2"> The input to return if the condition is `false` </param>
-        ValueSelectorNode(const model::PortElements<bool>& condition, const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2);
+        ValueSelectorNode(const model::OutputPort<bool>& condition, const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

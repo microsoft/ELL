@@ -374,7 +374,7 @@ class SplittingNode : public model::Node
 public:
     SplittingNode()
         : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
-    SplittingNode(const model::PortElements<ValueType>& input)
+    SplittingNode(const model::OutputPort<ValueType>& input)
         : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
 
     static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SplittingNode"); }
@@ -382,26 +382,27 @@ public:
 
     void Copy(model::ModelTransformer& transformer) const override
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<SplittingNode<ValueType>>(newPortElements);
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<SplittingNode<ValueType>>(newInput);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     bool Refine(model::ModelTransformer& transformer) const override
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto newInput = model::PortElements<ValueType>{transformer.GetCorrespondingInputs(_input)};
         model::PortElements<ValueType> in1;
         model::PortElements<ValueType> in2;
         auto size = _input.Size();
         auto halfSize = size / 2;
+
         // split into two nodes, one which returns the first half, and one which returns the second half
         for (size_t index = 0; index < halfSize; ++index)
         {
-            in1.Append(model::PortElements<ValueType>(newPortElements.GetElement(index)));
+            in1.Append(model::PortElements<ValueType>(newInput.GetElement(index)));
         }
         for (size_t index = halfSize; index < size; ++index)
         {
-            in2.Append(model::PortElements<ValueType>(newPortElements.GetElement(index)));
+            in2.Append(model::PortElements<ValueType>(newInput.GetElement(index)));
         }
         auto newNode1 = transformer.AddNode<model::OutputNode<ValueType>>(in1);
         auto newNode2 = transformer.AddNode<model::OutputNode<ValueType>>(in2);
@@ -450,7 +451,7 @@ void TestRefineSplitOutputs()
 
     // Now run data through the models and make sure they agree
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{ outputNode->output });
+    const auto& newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{ outputNode->output });
 
     std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
     for (const auto& inputValue : inputValues)

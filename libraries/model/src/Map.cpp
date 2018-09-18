@@ -193,16 +193,12 @@ namespace model
     
     void Map::AddOutput(const std::string& outputName, PortElementsBase outputElements)
     {
-        _outputElements.push_back(outputElements);
+        // Add concat/splice nodes to ensure output is a single port
+        const auto& newOutputPort = _model.AddRoutingNodes(outputElements);
+        PortElementsBase newOutputElements{ newOutputPort };
+        _outputElements.push_back({newOutputPort});
         _outputNames.push_back(outputName);
-        _outputElementsMap.insert({ outputName, outputElements });
-    }
-
-    void Map::ResetOutput(size_t index, PortElementsBase outputElements)
-    {
-        assert(index <= _outputElements.size() && "Error: Resetting unset output");
-        _outputElements[index] = outputElements;
-        _outputElementsMap[_outputNames[index]] = outputElements;
+        _outputElementsMap.insert({ outputName, newOutputElements });
     }
 
     void swap(Map& a, Map& b)
@@ -277,15 +273,15 @@ namespace model
 
         for (auto& outputElements : _outputElements)
         {
-            auto refinedOutput = transformer.GetCorrespondingOutputs(outputElements);
-            outputElements = refinedOutput;
+            const auto& refinedOutput = transformer.GetCorrespondingOutputs(outputElements);
+            outputElements = { refinedOutput };
         }
 
         for (auto& outputElements : _outputElementsMap)
         {
             auto output = outputElements.second;
-            auto refinedOutput = transformer.GetCorrespondingOutputs(output);
-            outputElements.second = refinedOutput;
+            const auto& refinedOutput = transformer.GetCorrespondingOutputs(output);
+            outputElements.second = { refinedOutput };
         }
     }
 
@@ -306,15 +302,15 @@ namespace model
 
         for (auto& outputElements : _outputElements)
         {
-            auto refinedOutput = context.GetCorrespondingOutputs(outputElements);
-            outputElements = refinedOutput;
+            const auto& refinedOutput = context.GetCorrespondingOutputs(outputElements);
+            outputElements = { refinedOutput };
         }
 
         for (auto& outputElements : _outputElementsMap)
         {
             auto output = outputElements.second;
-            auto refinedOutput = context.GetCorrespondingOutputs(output);
-            outputElements.second = refinedOutput;
+            const auto& refinedOutput = context.GetCorrespondingOutputs(output);
+            outputElements.second = { refinedOutput };
         }
     }
 

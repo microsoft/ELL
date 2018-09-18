@@ -11,7 +11,7 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    BufferNode<ValueType>::BufferNode(const model::PortElements<ValueType>& input, size_t windowSize)
+    BufferNode<ValueType>::BufferNode(const model::OutputPort<ValueType>& input, size_t windowSize)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, windowSize), _windowSize(windowSize)
     {
         _samples.resize(windowSize);
@@ -48,7 +48,7 @@ namespace nodes
     template <typename ValueType>
     void BufferNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<BufferNode<ValueType>>(newPortElements, _windowSize);
         transformer.MapNodeOutput(output, newNode->output);
     }

@@ -1059,13 +1059,13 @@ namespace nodes
     }
 
     template <typename ValueType>
-    WinogradConvolutionNode<ValueType>::WinogradConvolutionNode(const WinogradConvolutionNode<ValueType>& other, const model::PortElements<ValueType>& input)
+    WinogradConvolutionNode<ValueType>::WinogradConvolutionNode(const WinogradConvolutionNode<ValueType>& other, const model::OutputPort<ValueType>& input)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, other.GetOutputMemoryLayout()), _inputMemoryLayout(other._inputMemoryLayout), _filterWeights(other._filterWeights), _stride(other._stride), _tileSize(other._tileSize), _filterSize(other._filterSize), _order(other._order)
     {
     }
 
     template <typename ValueType>
-    WinogradConvolutionNode<ValueType>::WinogradConvolutionNode(const model::PortElements<ValueType>& input,
+    WinogradConvolutionNode<ValueType>::WinogradConvolutionNode(const model::OutputPort<ValueType>& input,
                                                                 const model::PortMemoryLayout& inputMemoryLayout,
                                                                 const model::PortMemoryLayout& outputMemoryLayout,
                                                                 const ConstTensorReferenceType& filterWeights,
@@ -1089,7 +1089,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    WinogradConvolutionNode<ValueType>::WinogradConvolutionNode(const model::PortElements<ValueType>& input,
+    WinogradConvolutionNode<ValueType>::WinogradConvolutionNode(const model::OutputPort<ValueType>& input,
                                                                 const model::PortMemoryLayout& inputMemoryLayout,
                                                                 const model::PortMemoryLayout& outputMemoryLayout,
                                                                 const ConstTensorReferenceType& filterWeights,
@@ -1110,7 +1110,7 @@ namespace nodes
     template <typename ValueType>
     void WinogradConvolutionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<WinogradConvolutionNode<ValueType>>(*this, newInput);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
@@ -1119,7 +1119,7 @@ namespace nodes
     bool WinogradConvolutionNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         const int windowSize = _tileSize + _filterSize - 1;
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto* newInput = &transformer.GetCorrespondingInputs(this->input);
 
         const auto& weightsMatrix = _filterWeights.ReferenceAsMatrix();
         const auto weightsValues = weightsMatrix.ToArray();
@@ -1153,11 +1153,11 @@ namespace nodes
         {
             // add a ReorderDataNode to convert to channel-major, which is more efficient in this case
             auto orderArr = utilities::ChannelMajorTensorOrder;
-            auto reorderNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, convInputLayout, convInputLayout, utilities::DimensionOrder{ orderArr });
-            newInput = reorderNode->output;
+            auto reorderNode = transformer.AddNode<ReorderDataNode<ValueType>>(*newInput, convInputLayout, convInputLayout, utilities::DimensionOrder{ orderArr });
+            newInput = &reorderNode->output;
             convInputLayout = reorderNode->GetOutputMemoryLayout();
         }
-        auto convNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(newInput, weightsNode->output, convInputLayout, GetOutputMemoryLayout(), _stride, _tileSize, _filterSize, _order, static_cast<int>(numFilterChannels));
+        auto convNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(*newInput, weightsNode->output, convInputLayout, GetOutputMemoryLayout(), _stride, _tileSize, _filterSize, _order, static_cast<int>(numFilterChannels));
         transformer.MapNodeOutput(this->output, convNode->output);
         return true;
     }
@@ -1211,8 +1211,8 @@ namespace nodes
     }
 
     template <typename ValueType>
-    WinogradConvolutionComputeNode<ValueType>::WinogradConvolutionComputeNode(const model::PortElements<ValueType>& input,
-                                                                              const model::PortElements<ValueType>& filterWeights,
+    WinogradConvolutionComputeNode<ValueType>::WinogradConvolutionComputeNode(const model::OutputPort<ValueType>& input,
+                                                                              const model::OutputPort<ValueType>& filterWeights,
                                                                               const model::PortMemoryLayout& inputMemoryLayout,
                                                                               const model::PortMemoryLayout& outputMemoryLayout,
                                                                               int stride,
@@ -1230,8 +1230,8 @@ namespace nodes
 
     template <typename ValueType>
     WinogradConvolutionComputeNode<ValueType>::WinogradConvolutionComputeNode(const WinogradConvolutionComputeNode<ValueType>& other,
-                                                                              const model::PortElements<ValueType>& input,
-                                                                              const model::PortElements<ValueType>& filterWeights)
+                                                                              const model::OutputPort<ValueType>& input,
+                                                                              const model::OutputPort<ValueType>& filterWeights)
         : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, other.GetOutputMemoryLayout()), _inputMemoryLayout(other._inputMemoryLayout), _stride(other._stride), _tileSize(other._tileSize), _filterSize(other._filterSize), _order(other._order), _numFilterChannels(other._numFilterChannels), _inputBlockSize(other._inputBlockSize), _outputBlockSize(other._outputBlockSize)
     {
     }
@@ -1239,8 +1239,8 @@ namespace nodes
     template <typename ValueType>
     void WinogradConvolutionComputeNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newFilterWeights = transformer.TransformPortElements(_filterWeights.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
+        const auto& newFilterWeights = transformer.GetCorrespondingInputs(_filterWeights);
         auto newNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(*this, newInput, newFilterWeights);
         transformer.MapNodeOutput(this->output, newNode->output);
     }

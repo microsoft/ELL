@@ -55,7 +55,7 @@ namespace nodes
         ///
         /// <param name="inputMatrix"> The left-hand input of the matrix multiplication. </param>
         /// <param name="inputVector"> The right-hand input of the matrix multiplication. </param>
-        MatrixVectorMultiplyNode(const model::PortElements<ValueType>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::PortElements<ValueType>& inputVector);
+        MatrixVectorMultiplyNode(const model::OutputPort<ValueType>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::OutputPort<ValueType>& inputVector);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

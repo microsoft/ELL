@@ -19,7 +19,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    VoiceActivityDetectorNode<ValueType>::VoiceActivityDetectorNode(const model::PortElements<ValueType>& input, 
+    VoiceActivityDetectorNode<ValueType>::VoiceActivityDetectorNode(const model::OutputPort<ValueType>& input, 
                                                                     double sampleRate,
                                                                     double frameDuration,
                                                                     double tauUp,

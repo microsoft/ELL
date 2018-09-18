@@ -52,7 +52,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The layer to wrap. </param>
-        ActivationLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ActivationLayer<ValueType>& layer);
+        ActivationLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ActivationLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -101,7 +101,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The layer to wrap. </param>
-        ParametricReLUActivationLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer);
+        ParametricReLUActivationLayerNode(const model::OutputPort<ValueType>& input, const LayerType& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

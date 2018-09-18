@@ -20,7 +20,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    L2NormSquaredNode<ValueType>::L2NormSquaredNode(const model::PortElements<ValueType>& input)
+    L2NormSquaredNode<ValueType>::L2NormSquaredNode(const model::OutputPort<ValueType>& input)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1)
     {
     }
@@ -40,7 +40,7 @@ namespace nodes
     template <typename ValueType>
     void L2NormSquaredNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<L2NormSquaredNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -48,7 +48,7 @@ namespace nodes
     template <typename ValueType>
     bool L2NormSquaredNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
 
         auto squareInputNode = transformer.AddNode<UnaryOperationNode<ValueType>>(newPortElements, emitters::UnaryOperationType::square);
         auto sumNode = transformer.AddNode<SumNode<ValueType>>(squareInputNode->output);

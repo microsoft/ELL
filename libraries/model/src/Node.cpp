@@ -209,7 +209,7 @@ namespace model
             os << (isFirstInputPort ? "" : ", ");
             isFirstInputPort = false;
 
-            auto elements = inputPort->GetInputElements();
+            auto elements = model::PortElementsBase{ inputPort->GetReferencedPort() };
             if (elements.NumRanges() > 1)
             {
                 os << "{";

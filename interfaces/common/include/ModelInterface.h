@@ -272,6 +272,7 @@ public:
 
 #ifndef SWIG
     PortElements(const ell::model::PortElementsBase& other);
+    PortElements(const ell::model::OutputPortBase& port);
     const ell::model::PortElementsBase& GetPortElements() const { return _elements; }
 #endif
 private:
@@ -293,7 +294,7 @@ public:
     PortType GetOutputType();
     std::string GetRuntimeTypeName();
     NodeIterator GetParentNodes();
-    PortElements GetInputElements();
+    OutputPort GetReferencedPort();
 #ifndef SWIG
     InputPort(const ell::model::InputPortBase* other);
     const ell::model::InputPortBase& GetPort() const { return *_port; }

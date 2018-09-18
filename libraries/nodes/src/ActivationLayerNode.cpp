@@ -25,7 +25,7 @@ namespace nodes
     // ActivationLayerNode
     //
     template <typename ValueType>
-    ActivationLayerNode<ValueType>::ActivationLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ActivationLayer<ValueType>& layer)
+    ActivationLayerNode<ValueType>::ActivationLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ActivationLayer<ValueType>& layer)
         : BaseType(input, layer)
     {
         auto&& inputLayout = this->GetInputMemoryLayout();
@@ -39,7 +39,7 @@ namespace nodes
     template <typename ValueType>
     bool ActivationLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
 
         predictors::neural::ActivationImpl<ValueType>* ptr = this->_layer.GetActivationFunction().GetImpl();
 
@@ -95,8 +95,8 @@ namespace nodes
     template <typename ValueType>
     void ActivationLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
-        auto newNode = transformer.AddNode<ActivationLayerNode<ValueType>>(newPortElements, this->_layer);
+        const auto& newInput = transformer.GetCorrespondingInputs(this->_input);
+        auto newNode = transformer.AddNode<ActivationLayerNode<ValueType>>(newInput, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
 
@@ -105,7 +105,7 @@ namespace nodes
     //
 
     template <typename ValueType>
-    ParametricReLUActivationLayerNode<ValueType>::ParametricReLUActivationLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer)
+    ParametricReLUActivationLayerNode<ValueType>::ParametricReLUActivationLayerNode(const model::OutputPort<ValueType>& input, const LayerType& layer)
         : BaseType(input, layer)
     {
         auto&& inputLayout = this->GetInputMemoryLayout();
@@ -125,7 +125,7 @@ namespace nodes
     bool ParametricReLUActivationLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         using ActivationFunction = ParametricReLUActivationFunction<ValueType>;
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
 
         auto paf = dynamic_cast<const predictors::neural::ParametricReLUActivation<ValueType>*>(this->_layer.GetActivationFunction().GetImpl());
         auto alphaValues = paf->GetAlpha().ToArray();
@@ -146,8 +146,8 @@ namespace nodes
     template <typename ValueType>
     void ParametricReLUActivationLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
-        auto newNode = transformer.AddNode<ParametricReLUActivationLayerNode<ValueType>>(newPortElements, this->_layer);
+        const auto& newInputs = transformer.GetCorrespondingInputs(this->_input);
+        auto newNode = transformer.AddNode<ParametricReLUActivationLayerNode<ValueType>>(newInputs, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
 

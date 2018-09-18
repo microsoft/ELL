@@ -50,7 +50,7 @@ namespace
         }
 
         auto shape = thisNode->GetShape();
-        auto newInput = transformer.TransformPortElements(thisNode->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(thisNode->input);
         auto newNode = transformer.AddNode<model::OutputNode<ValueType>>(newInput, shape);
 
         transformer.MapNodeOutput(thisNode->output, newNode->output);

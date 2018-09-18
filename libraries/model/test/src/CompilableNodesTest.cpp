@@ -1191,7 +1191,7 @@ public:
     const model::OutputPort<double>& output = _output;
     /// @}
 
-    BinaryFunctionIRNode(const model::PortElements<double>& in1, const model::PortElements<double>& in2, const std::string& functionName, const std::string& irCode, const emitters::NamedVariableTypeList& otherArgs)
+    BinaryFunctionIRNode(const model::OutputPort<double>& in1, const model::OutputPort<double>& in2, const std::string& functionName, const std::string& irCode, const emitters::NamedVariableTypeList& otherArgs)
         : IRNode({ &_input1, &_input2 }, { &_output }, functionName, irCode, otherArgs), _input1(this, in1, input1PortName), _input2(this, in2, input2PortName), _output(this, outputPortName, 1)
     {
     }
@@ -1207,8 +1207,8 @@ protected:
 private:
     void Copy(model::ModelTransformer& transformer) const override
     {
-        auto newInput1 = transformer.TransformPortElements(_input1.GetPortElements());
-        auto newInput2 = transformer.TransformPortElements(_input2.GetPortElements());
+        const auto& newInput1 = transformer.GetCorrespondingInputs(_input1);
+        const auto& newInput2 = transformer.GetCorrespondingInputs(_input2);
         auto newNode = transformer.AddNode<BinaryFunctionIRNode>(newInput1, newInput2, GetFunctionName(), GetIRCode(), GetExtraArgs());
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -1336,10 +1336,10 @@ void TestNeuralNetworkPredictorNode1()
 
     // Create model
     model::Model model;
+#if 1
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
-
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
@@ -1365,6 +1365,29 @@ void TestNeuralNetworkPredictorNode1()
     unarchiver >> unarchivedMap;
 
     VerifyCompiledOutput(unarchivedMap, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_1");
+#else
+        auto inputNode = model.AddNode<model::InputNode<double>>(model::MemoryShape{1, 1, 3});
+        std::vector<ElementType> singleChannelInput = { 2 };
+        std::vector<ElementType> allChannelsInput = { 2, 1, 0 };
+        auto scaleValuesNode = model.AddNode<nodes::ConstantNode<ElementType>>(allChannelsInput);
+        auto scaleValuesNode2 = model.AddNode<nodes::ConstantNode<ElementType>>(allChannelsInput);
+        auto biasValuesNode = model.AddNode<nodes::ConstantNode<ElementType>>(); // nothing
+
+        const size_t channelDimension = 2;
+        auto computeNode = model.AddNode<nodes::BroadcastLinearFunctionNode<ElementType>>(inputNode->output,
+                                                                                inputNode->output.GetMemoryLayout(),
+                                                                                scaleValuesNode->output,
+                                                                                biasValuesNode->output,
+                                                                                channelDimension,
+                                                                                inputNode->output.GetMemoryLayout());
+    // map.Refine();
+    utilities::JsonArchiver printer(std::cout);
+    printer << model;
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    throw 0;
+#endif
 }
 
 void TestNeuralNetworkPredictorNode2()

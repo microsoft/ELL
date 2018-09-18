@@ -286,7 +286,7 @@ namespace utilities
         /// <param name="index"> The dimension. </param>
         ///
         /// <returns> The size of the memory area for the given dimension. </returns>
-        int GetActiveSize(size_t index) const { return _size[index]; }
+        int GetActiveSize(size_t index) const;
 
         /// <summary>
         /// Returns the allocated size of the memory for the given dimension (including padding).
@@ -295,7 +295,7 @@ namespace utilities
         /// <param name="index"> The dimension. </param>
         ///
         /// <returns> The allocated size in each dimension </returns>
-        int GetStride(size_t index) const { return _stride[index]; }
+        int GetStride(size_t index) const;
 
         /// <summary>
         /// Returns the cumulative increments for each dimension. This is the distance in memory
@@ -312,7 +312,7 @@ namespace utilities
         /// <param name="index"> The dimension. </param>
         ///
         /// <returns> The offset to the active part of memory for the given dimension. </returns>
-        int GetOffset(size_t index) const { return _offset[index]; }
+        int GetOffset(size_t index) const;
 
         /// <summary>
         /// Returns the cumulative increment for the requested physical dimension. This is the distance in memory
@@ -322,7 +322,7 @@ namespace utilities
         /// <param name="index"> The dimension. </param>
         ///
         /// <returns> The cumulative increment for the given physical dimension. </returns>
-        size_t GetCumulativeIncrement(size_t index) const { return _increment[index]; }
+        size_t GetCumulativeIncrement(size_t index) const;
 
         /// <summary> Returns the number of active elements in this memory layout </summary>
         ///
@@ -353,7 +353,15 @@ namespace utilities
         ///
         /// <returns> A `MemoryShape` object containing the size of the memory area. </returns>
         MemoryShape GetLogicalDimensionActiveSize() const;
-        int GetLogicalDimensionActiveSize(size_t index) const { return GetLogicalDimensionActiveSize()[index]; }
+
+        /// <summary>
+        /// Returns the size of the "active" memory area (not counting any padding) for the given logical dimension.
+        /// </summary>
+        ///
+        /// <param name="index"> The dimension. </param>
+        ///
+        /// <returns> A `MemoryShape` object containing the size of the memory area. </returns>
+        int GetLogicalDimensionActiveSize(size_t index) const;
 
         /// <summary>
         /// Returns the allocated size of the memory (including padding), in the logical coordinates for this layout.
@@ -361,7 +369,15 @@ namespace utilities
         ///
         /// <returns> A `MemoryShape` object containing the allocated size in each dimension </returns>
         MemoryShape GetLogicalDimensionStride() const;
-        int GetLogicalDimensionStride(size_t index) const { return GetLogicalDimensionStride()[index]; }
+
+        /// <summary>
+        /// Returns the allocated size of the memory (including padding) for the given logical dimension.
+        /// </summary>
+        ///
+        /// <param name="index"> The dimension. </param>
+        ///
+        /// <returns> A `MemoryShape` object containing the allocated size in each dimension </returns>
+        int GetLogicalDimensionStride(size_t index) const;
 
         /// <summary>
         /// Returns the offsets to the "active" area of memory, in the logical coordinates for this layout.
@@ -369,7 +385,15 @@ namespace utilities
         ///
         /// <returns> A `MemoryShape` object containing the offset to the active part of memory for that dimension. </returns>
         MemoryShape GetLogicalDimensionOffset() const;
-        int GetLogicalDimensionOffset(size_t index) const { return GetLogicalDimensionOffset()[index]; }
+
+        /// <summary>
+        /// Returns the offsets to the "active" area of memory for the given logical dimension.
+        /// </summary>
+        ///
+        /// <param name="index"> The dimension. </param>
+        ///
+        /// <returns> A `MemoryShape` object containing the offset to the active part of memory for that dimension. </returns>
+        int GetLogicalDimensionOffset(size_t index) const;
 
         /// <summary>
         /// Returns the cumulative increment for the requested logical dimension. This is the distance in memory
@@ -439,6 +463,7 @@ namespace utilities
 
     private:
         MemoryShape ComputeCumulativeIncrement() const;
+        void BoundsCheckDimensionIndex(size_t index) const;
 
         MemoryShape _size; // The "active" area of the memory
         MemoryShape _stride; // The allocated size along each dimension

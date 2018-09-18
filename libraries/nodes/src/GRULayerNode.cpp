@@ -30,7 +30,7 @@ namespace nodes
     }
 
     template<typename ValueType>
-    GRULayerNode<ValueType>::GRULayerNode(const model::PortElements<ValueType>& input, const model::PortElements<int>& reset, const LayerType& layer)
+    GRULayerNode<ValueType>::GRULayerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<int>& reset, const LayerType& layer)
         : BaseType(input, layer), _reset(this, reset, "reset")
     {
         this->AddInputPort(&_reset);
@@ -49,7 +49,7 @@ namespace nodes
     template<typename ValueType>
     bool GRULayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
         ell::model::PortElements<int> newReset;
         if (this->reset.Size() == 0)
         {
@@ -60,7 +60,7 @@ namespace nodes
         }
         else
         {
-            newReset = transformer.TransformPortElements(this->reset.GetPortElements());
+            newReset = transformer.GetCorrespondingInputs(this->reset);
         }
 
         // Transform weights and bias members into constant nodes
@@ -99,7 +99,7 @@ namespace nodes
     template<typename ValueType>
     void GRULayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         ell::model::PortElements<int> newResetElements;
         if (this->reset.Size() == 0)
         {
@@ -110,7 +110,7 @@ namespace nodes
         }
         else
         {
-            newResetElements = transformer.TransformPortElements(this->reset.GetPortElements());
+            newResetElements = transformer.GetCorrespondingInputs(this->reset);
         }
         auto newNode = transformer.AddNode<GRULayerNode<ValueType>>(newPortElements, newResetElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
@@ -153,14 +153,14 @@ namespace nodes
     }
 
     template<typename ValueType>
-    GRUNode<ValueType>::GRUNode(const model::PortElements<ValueType>& input,
-                                                                                         const model::PortElements<int>& resetTrigger,
-                                                                                         const model::PortElements<ValueType>& updateWeights,
-                                                                                         const model::PortElements<ValueType>& resetWeights,
-                                                                                         const model::PortElements<ValueType>& hiddenWeights,
-                                                                                         const model::PortElements<ValueType>& updateBias,
-                                                                                         const model::PortElements<ValueType>& resetBias,
-                                                                                         const model::PortElements<ValueType>& hiddenBias,
+    GRUNode<ValueType>::GRUNode(const model::OutputPort<ValueType>& input,
+                                                                                         const model::OutputPort<int>& resetTrigger,
+                                                                                         const model::OutputPort<ValueType>& updateWeights,
+                                                                                         const model::OutputPort<ValueType>& resetWeights,
+                                                                                         const model::OutputPort<ValueType>& hiddenWeights,
+                                                                                         const model::OutputPort<ValueType>& updateBias,
+                                                                                         const model::OutputPort<ValueType>& resetBias,
+                                                                                         const model::OutputPort<ValueType>& hiddenBias,
                                                                                          const ActivationType& activation,
                                                                                          const ActivationType& recurrentActivation,
                                                                                          const model::PortMemoryLayout& inputMemoryLayout,
@@ -185,14 +185,14 @@ namespace nodes
     template<typename ValueType>
     void GRUNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newResetTrigger = transformer.TransformPortElements(_resetTrigger.GetPortElements());
-        auto newUpdateWeights = transformer.TransformPortElements(_updateWeights.GetPortElements());
-        auto newResetWeights = transformer.TransformPortElements(_resetWeights.GetPortElements());
-        auto newHiddenWeights = transformer.TransformPortElements(_hiddenWeights.GetPortElements());
-        auto newUpdateBias = transformer.TransformPortElements(_updateBias.GetPortElements());
-        auto newResetBias = transformer.TransformPortElements(_resetBias.GetPortElements());
-        auto newHiddenBias = transformer.TransformPortElements(_hiddenBias.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
+        const auto& newResetTrigger = transformer.GetCorrespondingInputs(_resetTrigger);
+        const auto& newUpdateWeights = transformer.GetCorrespondingInputs(_updateWeights);
+        const auto& newResetWeights = transformer.GetCorrespondingInputs(_resetWeights);
+        const auto& newHiddenWeights = transformer.GetCorrespondingInputs(_hiddenWeights);
+        const auto& newUpdateBias = transformer.GetCorrespondingInputs(_updateBias);
+        const auto& newResetBias = transformer.GetCorrespondingInputs(_resetBias);
+        const auto& newHiddenBias = transformer.GetCorrespondingInputs(_hiddenBias);
         auto newNode = transformer.AddNode<GRUNode>(newInput, newResetTrigger, newUpdateWeights, newResetWeights, newHiddenWeights, newUpdateBias, newResetBias, newHiddenBias, _activation, _recurrentActivation, _inputMemoryLayout, GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }

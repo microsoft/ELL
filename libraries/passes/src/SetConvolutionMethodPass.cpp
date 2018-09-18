@@ -70,7 +70,7 @@ namespace passes
                 return false;
             }
 
-            auto newInput = transformer.TransformPortElements(thisNode->input.GetPortElements());
+            const auto& newInput = transformer.GetCorrespondingInputs(thisNode->input);
             const auto& layer = thisNode->GetLayer();
 
             auto layerParameters = layer.GetLayerParameters();

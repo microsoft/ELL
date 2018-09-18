@@ -27,7 +27,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    FilterBankNode<ValueType>::FilterBankNode(const model::PortElements<ValueType>& input, const dsp::TriangleFilterBank& filters)
+    FilterBankNode<ValueType>::FilterBankNode(const model::OutputPort<ValueType>& input, const dsp::TriangleFilterBank& filters)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filters(filters)
     {
     }
@@ -124,7 +124,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    LinearFilterBankNode<ValueType>::LinearFilterBankNode(const model::PortElements<ValueType>& input, const dsp::LinearFilterBank& filters)
+    LinearFilterBankNode<ValueType>::LinearFilterBankNode(const model::OutputPort<ValueType>& input, const dsp::LinearFilterBank& filters)
         : FilterBankNode<ValueType>(input, _linearFilters), _linearFilters(filters)
     {
         _output.SetSize(_linearFilters.NumActiveFilters());
@@ -133,7 +133,7 @@ namespace nodes
     template <typename ValueType>
     void LinearFilterBankNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<LinearFilterBankNode<ValueType>>(newPortElements, _linearFilters);
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -163,7 +163,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    MelFilterBankNode<ValueType>::MelFilterBankNode(const model::PortElements<ValueType>& input, const dsp::MelFilterBank& filters)
+    MelFilterBankNode<ValueType>::MelFilterBankNode(const model::OutputPort<ValueType>& input, const dsp::MelFilterBank& filters)
         : FilterBankNode<ValueType>(input, _melFilters), _melFilters(filters)
     {
         _output.SetSize(_melFilters.NumActiveFilters());
@@ -172,7 +172,7 @@ namespace nodes
     template <typename ValueType>
     void MelFilterBankNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<MelFilterBankNode<ValueType>>(newPortElements, _melFilters);
         transformer.MapNodeOutput(output, newNode->output);
     }

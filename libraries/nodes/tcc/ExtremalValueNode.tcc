@@ -17,7 +17,7 @@ namespace nodes
     }
 
     template <typename ValueType, bool max>
-    ExtremalValueNode<ValueType, max>::ExtremalValueNode(const model::PortElements<ValueType>& input)
+    ExtremalValueNode<ValueType, max>::ExtremalValueNode(const model::OutputPort<ValueType>& input)
         : CompilableNode({ &_input }, { &_val, &_argVal }), _input(this, input, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
     {
     }
@@ -162,7 +162,7 @@ namespace nodes
     template <typename ValueType>
     void ArgMinNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<ArgMinNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(this->val, newNode->val);
         transformer.MapNodeOutput(this->argVal, newNode->argVal);
@@ -171,7 +171,7 @@ namespace nodes
     template <typename ValueType>
     void ArgMaxNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(this->val, newNode->val);
         transformer.MapNodeOutput(this->argVal, newNode->argVal);

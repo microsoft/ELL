@@ -46,7 +46,7 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The convolutional layer to wrap. </param>
-        ConvolutionalLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ConvolutionalLayer<ValueType>& layer);
+        ConvolutionalLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ConvolutionalLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -495,7 +495,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                                                                     const model::PortMemoryLayout& outputLayout,
                                                                                     ValueType paddingValue)
         : BroadcastUnaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout, outputLayout, FunctionType{}, paddingValue)
@@ -503,7 +503,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                                                                     const model::PortMemoryLayout& outputLayout,
                                                                                     FunctionType function,
                                                                                     ValueType paddingValue)
@@ -522,7 +522,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastUnaryFunctionNode<ValueType, FunctionType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto primaryInputElements = transformer.TransformPortElements(_primaryInput.GetPortElements());
+        const auto& primaryInputElements = transformer.GetCorrespondingInputs(_primaryInput);
         auto broadcastFunction = GetFunction();
         auto newNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, FunctionType>>(primaryInputElements,
                                                                                                 this->GetInputMemoryLayout(),
@@ -578,8 +578,8 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                                      const model::PortElements<ValueType>& secondaryInput, size_t dimension,
+    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                                                                      const model::OutputPort<ValueType>& secondaryInput, size_t dimension,
                                                                                       const model::PortMemoryLayout& outputLayout,
                                                                                       ValueType paddingValue)
         : BroadcastBinaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout,
@@ -589,8 +589,8 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                                      const model::PortElements<ValueType>& secondaryInput, size_t dimension,
+    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                                                                      const model::OutputPort<ValueType>& secondaryInput, size_t dimension,
                                                                                       const model::PortMemoryLayout& outputLayout,
                                                                                       FunctionType function, ValueType paddingValue)
         : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput }, inputLayout, dimension,
@@ -615,8 +615,8 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastBinaryFunctionNode<ValueType, FunctionType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto primaryInputElements = transformer.TransformPortElements(_primaryInput.GetPortElements());
-        auto secondaryInputElements = transformer.TransformPortElements(_secondaryInput.GetPortElements());
+        const auto& primaryInputElements = transformer.GetCorrespondingInputs(_primaryInput);
+        const auto& secondaryInputElements = transformer.GetCorrespondingInputs(_secondaryInput);
         auto newNode = transformer.AddNode<BroadcastBinaryFunctionNode<ValueType, FunctionType>>(primaryInputElements,
                                                                                                  this->GetInputMemoryLayout(),
                                                                                                  secondaryInputElements,
@@ -659,8 +659,8 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                                        const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t dimension,
+    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                                                                        const model::OutputPort<ValueType>& secondaryInput1, const model::OutputPort<ValueType>& secondaryInput2, size_t dimension,
                                                                                         const model::PortMemoryLayout& outputLayout,
                                                                                         ValueType paddingValue)
         : BroadcastTernaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout,
@@ -670,8 +670,8 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                                        const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t dimension,
+    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                                                                        const model::OutputPort<ValueType>& secondaryInput1, const model::OutputPort<ValueType>& secondaryInput2, size_t dimension,
                                                                                         const model::PortMemoryLayout& outputLayout,
                                                                                         FunctionType function,
                                                                                         ValueType paddingValue)
@@ -691,7 +691,7 @@ namespace nodes
 
         if (std::max(secondaryInput1.Size(), secondaryInput2.Size()) != static_cast<size_t>(inputLayout.GetActiveSize(dimension)))
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Broadcast vector size doesn't match input");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Broadcast vector size doesn't match input") + "_" + std::to_string(secondaryInput1.Size()) + "_" + std::to_string(secondaryInput2.Size()) + "_" + std::to_string(inputLayout.GetActiveSize(dimension)));
         }
 
         if (secondaryInput1.Size() != secondaryInput2.Size() && secondaryInput1.Size() > 0 && secondaryInput2.Size() > 0)
@@ -708,9 +708,9 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastTernaryFunctionNode<ValueType, FunctionType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto primaryInputElements = transformer.TransformPortElements(_primaryInput.GetPortElements());
-        auto secondaryInput1Elements = transformer.TransformPortElements(_secondaryInput1.GetPortElements());
-        auto secondaryInput2Elements = transformer.TransformPortElements(_secondaryInput2.GetPortElements());
+        const auto& primaryInputElements = transformer.GetCorrespondingInputs(_primaryInput);
+        const auto& secondaryInput1Elements = transformer.GetCorrespondingInputs(_secondaryInput1);
+        const auto& secondaryInput2Elements = transformer.GetCorrespondingInputs(_secondaryInput2);
         auto newNode = transformer.AddNode<BroadcastTernaryFunctionNode<ValueType, FunctionType>>(primaryInputElements,
                                                                                                   this->GetInputMemoryLayout(),
                                                                                                   secondaryInput1Elements,
@@ -764,8 +764,8 @@ namespace nodes
     }
 
     template <typename ValueType>
-    BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                        const model::PortElements<ValueType>& scaleInput, const model::PortElements<ValueType>& biasInput, size_t dimension,
+    BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                                                        const model::OutputPort<ValueType>& scaleInput, const model::OutputPort<ValueType>& biasInput, size_t dimension,
                                                                         const model::PortMemoryLayout& outputLayout,
                                                                         ValueType paddingValue)
         : BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>(primaryInput, inputLayout,
@@ -777,9 +777,9 @@ namespace nodes
     template <typename ValueType>
     void BroadcastLinearFunctionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto primaryInputElements = transformer.TransformPortElements(primaryInput.GetPortElements());
-        auto scaleInputElements = transformer.TransformPortElements(secondaryInput1.GetPortElements());
-        auto biasInputElements = transformer.TransformPortElements(secondaryInput2.GetPortElements());
+        const auto& primaryInputElements = transformer.GetCorrespondingInputs(primaryInput);
+        const auto& scaleInputElements = transformer.GetCorrespondingInputs(secondaryInput1);
+        const auto& biasInputElements = transformer.GetCorrespondingInputs(secondaryInput2);
         auto newNode = transformer.AddNode<BroadcastLinearFunctionNode<ValueType>>(primaryInputElements,
                                                                                    this->GetInputMemoryLayout(),
                                                                                    scaleInputElements,

@@ -26,7 +26,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode(const model::PortElements<ValueType>& input,
+    UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode(const model::OutputPort<ValueType>& input,
                                                                 const model::PortMemoryLayout& inputMemoryLayout,
                                                                 const model::PortMemoryLayout& outputMemoryLayout,
                                                                 const ConstTensorReferenceType& filterWeights,
@@ -38,7 +38,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode(const model::PortElements<ValueType>& input,
+    UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode(const model::OutputPort<ValueType>& input,
                                                                 const model::PortMemoryLayout& inputMemoryLayout,
                                                                 const model::PortMemoryLayout& outputMemoryLayout,
                                                                 ConstMatrixReferenceType filterWeights,
@@ -79,7 +79,7 @@ namespace nodes
     template <typename ValueType>
     void UnrolledConvolutionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<UnrolledConvolutionNode<ValueType>>(newInput, _inputMemoryLayout, GetOutputMemoryLayout(), _filterWeights, _filterSize, _stride);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
@@ -115,7 +115,7 @@ namespace nodes
         const auto numFilters = outputLayout.GetActiveSize(2);
         const auto outputRows = outputImageWidth * outputImageHeight;
         const auto filterSize = _filterSize;
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
 
         // Needs (channel, row, column) order and no data padding
         const auto m = static_cast<int>(_filterWeights.NumRows());

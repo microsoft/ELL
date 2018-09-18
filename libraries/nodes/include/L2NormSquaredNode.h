@@ -41,7 +41,7 @@ namespace nodes
 
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the squared magnitude of </param>
-        L2NormSquaredNode(const model::PortElements<ValueType>& input);
+        L2NormSquaredNode(const model::OutputPort<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

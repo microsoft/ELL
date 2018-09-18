@@ -30,14 +30,11 @@ namespace ell
 {
 namespace model
 {
-    // Forward declarations
     class InputNodeBase;
-
     template <typename ValueType> class InputNode;
-
     class MapCompiler;
 
-    /// <summary> An action to perform on a node during transformation (refinement/compilation)
+    /// <summary> An action to perform on a node during transformation (refinement/compilation) </summary>
     enum class NodeAction
     {
         abstain,
@@ -97,39 +94,6 @@ namespace model
     private:
         std::vector<NodeActionFunction> _nodeActionFunctions;
         const MapCompiler* _compiler;
-    };
-
-    /// <summary> A utility class that maps output ports in a model to elements in a transformed model. </summary>
-    class PortOutputsMap
-    {
-    public:
-        /// <summary> Clears the map </summary>
-        void Clear();
-
-        /// <summary> Checks if the map is empty </summary>
-        bool IsEmpty() const;
-
-        /// <summary> Transforms a set of output port references from the input model space to the output model space. Called by node implementors. </summary>
-        ///
-        /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
-        /// <returns> A `PortElementsBase` object representing the transformed elements in the space of the new model. </returns>
-        PortElementsBase GetCorrespondingPortElements(const PortElementsBase& elements) const;
-
-        /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
-        ///
-        /// <param name="oldPort"> The port in the old model to map to the new model. </param>
-        /// <param name="newElements"> The elements in the new model to be mapped from the old model port. </param>
-        void MapNodeOutput(const OutputPortBase* oldPort, const PortElementsBase& newElements);
-
-        /// <summary> Merges two partial port mappings. Takes a map A->B and a map B->C and creates the map A->C. </summary>
-        ///
-        /// <param name="oldMap"> The port mapping from the original model to an intermediate state. </param>
-        /// <param name="newMap"> The port mapping from the intermediate state to the new model. </param>
-        /// <returns> A new mapping from the original model outputs to the new model outputs. </returns>
-        static PortOutputsMap ConcatenateMaps(const PortOutputsMap& oldMap, const PortOutputsMap& newMap);
-
-    private:
-        std::unordered_map<const OutputPortBase*, PortElementsBase> _outputPortMap;
     };
 
     /// <summary> A class that transforms models (including refinement and copying) </summary>
@@ -199,23 +163,32 @@ namespace model
         // for debugging
         bool IsEmpty() const { return _elementsMap.IsEmpty(); }
 
-        /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
+        /// <summary> Returns the port elements from the new model corresponding to the given input port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
-        PortElements<ValueType> GetCorrespondingOutputs(const OutputPort<ValueType>& port) const;
+        const OutputPort<ValueType>& GetCorrespondingInputs(const InputPort<ValueType>& port) const;
+
+        /// <summary> Returns the port elements from the new model corresponding to the given input port on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        const OutputPortBase& GetCorrespondingInputs(const InputPortBase& port) const;
 
         /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        PortElementsBase GetCorrespondingOutputs(const OutputPortBase& port) const;
+        template <typename ValueType>
+        const OutputPort<ValueType>& GetCorrespondingOutputs(const OutputPort<ValueType>& port) const;
+
+        /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        const OutputPortBase& GetCorrespondingOutputs(const OutputPortBase& port) const;
 
         /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
-        PortElements<ValueType> GetCorrespondingOutputs(const PortElements<ValueType>& elements) const;
+        const OutputPort<ValueType>& GetCorrespondingOutputs(const PortElements<ValueType>& elements) const;
 
         /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        PortElementsBase GetCorrespondingOutputs(const PortElementsBase& elements) const;
+        const OutputPortBase& GetCorrespondingOutputs(const PortElementsBase& elements) const;
 
         /// <summary> Returns the input node from the new model corresponding to the given input node on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
@@ -252,21 +225,17 @@ namespace model
         /// <param name="oldPort"> The port in the old model to map to the new model. </param>
         /// <param name="newPort"> The port in the new model to be mapped from the old model. </param>
         template <typename ValueType>
-        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort);
+        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPortBase& newPort);
 
         /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
         ///
         /// <param name="oldPort"> The port in the old model to map to the new model. </param>
         /// <param name="newPort"> The port in the new model to be mapped from the old model. </param>
         template <typename ValueType>
-        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElements<ValueType>& newElements);
+        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort);
 
-        /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
-        ///
-        /// <param name="oldPort"> The port in the old model to map to the new model. </param>
-        /// <param name="newElements"> The elements in the new model to be mapped from the old model. </param>
         template <typename ValueType>
-        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElementsBase& newElements);
+        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElements<ValueType>& newElements);
 
         /// <summary> Get the context used by the transformer. Called by node implementors </summary>
         ///
@@ -278,25 +247,21 @@ namespace model
         /// <returns> The context in use by the transformer. </returns>
         const TransformContext& GetContext() const { return _context; }
 
-        //
-        // Deprecated functions
-        //
-
-        /// <summary> Transforms a set of output port references from the input model space to the output model space. DEPRECATED: use GetCorrespondingOutputs instead. </summary>
-        ///
-        /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
-        /// <returns> A `PortElements` object representing the transformed elements in the space of the new model. </returns>
-        template <typename ValueType>
-        PortElements<ValueType> TransformPortElements(const PortElements<ValueType>& elements) const;
-
-        /// <summary> Transforms a set of output port references from the input model space to the output model space. DEPRECATED: use GetCorrespondingOutputs instead. </summary>
-        ///
-        /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
-        /// <returns> A `PortElementsBase` object representing the transformed elements in the space of the new model. </returns>
-        PortElementsBase TransformPortElements(const PortElementsBase& elements) const;
-
     private:
         friend class Node;
+
+        class PortOutputsMap
+        {
+        public:
+            void Clear();
+            bool IsEmpty() const;
+            const OutputPortBase& GetCorrespondingPort(const OutputPortBase& port) const;
+            void MapNodeOutput(const OutputPortBase* oldPort, const OutputPortBase& newPort);
+            static PortOutputsMap ConcatenateMaps(const PortOutputsMap& oldMap, const PortOutputsMap& newMap);
+
+        private:
+            std::unordered_map<const OutputPortBase*, const OutputPortBase*> _outputPortMap;
+        };
 
         template <typename NodeType>
         NodeType* GetCorrespondingInputNodeAs(const NodeType* node) const;

@@ -42,7 +42,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    DTWDistanceNode<ValueType>::DTWDistanceNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype)
+    DTWDistanceNode<ValueType>::DTWDistanceNode(const model::OutputPort<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _prototype(prototype)
     {
         _sampleDimension = input.Size();
@@ -128,7 +128,7 @@ namespace nodes
     template <typename ValueType>
     void DTWDistanceNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newinput = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newinput = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<DTWDistanceNode<ValueType>>(newinput, _prototype);
         transformer.MapNodeOutput(output, newNode->output);
     }

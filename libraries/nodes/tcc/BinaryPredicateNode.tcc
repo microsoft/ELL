@@ -92,7 +92,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, emitters::BinaryPredicateType predicate)
+    BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryPredicateType predicate)
         : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, _input1.Size()), _predicate(predicate)
     {
         if (input1.Size() != input2.Size())
@@ -147,8 +147,8 @@ namespace nodes
     template <typename ValueType>
     void BinaryPredicateNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto portElements1 = transformer.TransformPortElements(_input1.GetPortElements());
-        auto portElements2 = transformer.TransformPortElements(_input2.GetPortElements());
+        const auto& portElements1 = transformer.GetCorrespondingInputs(_input1);
+        const auto& portElements2 = transformer.GetCorrespondingInputs(_input2);
         auto newNode = transformer.AddNode<BinaryPredicateNode<ValueType>>(portElements1, portElements2, _predicate);
         transformer.MapNodeOutput(output, newNode->output);
     }

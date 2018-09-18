@@ -49,7 +49,7 @@ namespace nodes
         ///
         /// <param name="input"> The input to delay. </param>
         /// <param name="windowSize"> The number of samples of delay to apply to the input data. </param>
-        DelayNode(const model::PortElements<ValueType>& input, size_t windowSize);
+        DelayNode(const model::OutputPort<ValueType>& input, size_t windowSize);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -43,7 +43,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        TypeCastNode(const model::PortElements<InputValueType>& input);
+        TypeCastNode(const model::OutputPort<InputValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -38,7 +38,7 @@ namespace nodes
     {
     }
 
-    ProtoNNPredictorNode::ProtoNNPredictorNode(const model::PortElements<double>& input, const predictors::ProtoNNPredictor& predictor)
+    ProtoNNPredictorNode::ProtoNNPredictorNode(const model::OutputPort<double>& input, const predictors::ProtoNNPredictor& predictor)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, predictor.GetNumLabels()), _predictor(predictor)
     {
         if (input.Size() != predictor.GetDimension())
@@ -65,14 +65,14 @@ namespace nodes
 
     void ProtoNNPredictorNode::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<ProtoNNPredictorNode>(newPortElements, _predictor);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     bool ProtoNNPredictorNode::Refine(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
 
         // Projection
         auto projectionMatrix = _predictor.GetProjectionMatrix();

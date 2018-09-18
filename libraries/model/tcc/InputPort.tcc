@@ -14,8 +14,8 @@ namespace model
     // InputPortBase
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const Node* owningNode, const PortElements<ValueType>& input, const std::string& name)
-        : Port(owningNode, name, Port::GetPortType<ValueType>()), _referencedPort(input.NumRanges() > 0 ? input.GetRanges()[0].ReferencedPort() : nullptr)
+    InputPortBase::InputPortBase(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name)
+        : Port(owningNode, name, Port::GetPortType<ValueType>()), _referencedPort(&input)
     {
     }
 
@@ -29,7 +29,7 @@ namespace model
     }
 
     template <typename ValueType>
-    InputPort<ValueType>::InputPort(const Node* owningNode, const PortElements<ValueType>& input, const std::string& name)
+    InputPort<ValueType>::InputPort(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name)
         : InputPortBase(owningNode, input, name)
     {
     }
@@ -96,7 +96,8 @@ namespace model
     void InputPort<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Port::WriteToArchive(archiver);
-        archiver["input"] << GetPortElements();
+        auto portElements = PortElements<ValueType>{ GetReferencedPort() };
+        archiver["input"] << portElements;
     }
 
     template <typename ValueType>
@@ -110,8 +111,8 @@ namespace model
             // Back-compat: if this port has a non-simple PortElements, add nodes to the model as needed to simplify.
             auto& context = archiver.GetContext();
             ModelSerializationContext& modelContext = dynamic_cast<ModelSerializationContext&>(context);
-            auto newInput = modelContext.GetModel()->AddRoutingNodes(input);
-            _referencedPort = newInput.GetRanges()[0].ReferencedPort();
+            const auto& newInput = modelContext.GetModel()->AddRoutingNodes(input);
+            _referencedPort = &newInput;
         }
         else
         {

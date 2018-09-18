@@ -50,7 +50,7 @@ namespace nodes
         ///
         /// <param name="elements"> The input aray of values. </param>
         /// <param name="selector"> The index of the chosen element </param>
-        MultiplexerNode(const model::PortElements<ValueType>& elements, const model::PortElements<SelectorType>& selector);
+        MultiplexerNode(const model::OutputPort<ValueType>& elements, const model::OutputPort<SelectorType>& selector);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

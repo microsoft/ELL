@@ -23,7 +23,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    MatrixVectorMultiplyNode<ValueType>::MatrixVectorMultiplyNode(const model::PortElements<ValueType>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::PortElements<ValueType>& inputVector)
+    MatrixVectorMultiplyNode<ValueType>::MatrixVectorMultiplyNode(const model::OutputPort<ValueType>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::OutputPort<ValueType>& inputVector)
         : CompilableNode({ &_inputMatrix, &_inputVector }, { &_output }), _inputMatrix(this, inputMatrix, inputMatrixPortName), _inputVector(this, inputVector, inputVectorPortName), _output(this, defaultOutputPortName, m), _m(m), _n(n), _lda(matrixStride), _incx(1)
     {
         if (inputMatrix.Size() != m * n)
@@ -58,8 +58,8 @@ namespace nodes
     template <typename ValueType>
     void MatrixVectorMultiplyNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto matrixElements = transformer.TransformPortElements(_inputMatrix.GetPortElements());
-        auto vectorElements = transformer.TransformPortElements(_inputVector.GetPortElements());
+        const auto& matrixElements = transformer.GetCorrespondingInputs(_inputMatrix);
+        const auto& vectorElements = transformer.GetCorrespondingInputs(_inputVector);
         auto newNode = transformer.AddNode<MatrixVectorMultiplyNode<ValueType>>(matrixElements, _m, _n, _lda, vectorElements);
         transformer.MapNodeOutput(output, newNode->output);
     }

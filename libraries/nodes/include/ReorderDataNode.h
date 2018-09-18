@@ -50,14 +50,14 @@ namespace nodes
         ///
         /// <param name="input"> The input to reorder. </param>
         /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out. </param>
-        ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue = 0);
+        ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue = 0);
 
         /// <summary> Constructor with no reordering </summary>
         ///
         /// <param name="input"> The input to reorder. </param>
         /// <param name="inputMemoryLayout"> The memory layout of the input. Only data in the "active" area will be copied. </param>
         /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out. </param>
-        ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue = 0);
+        ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue = 0);
 
         /// <summary> Constructor with reordering </summary>
         ///
@@ -65,7 +65,7 @@ namespace nodes
         /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done. 
         //    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///   set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
-        ReorderDataNode(const model::PortElements<ValueType>& input, const model::DimensionOrder& order);
+        ReorderDataNode(const model::OutputPort<ValueType>& input, const model::DimensionOrder& order);
 
         /// <summary> Constructor with reordering </summary>
         ///
@@ -75,7 +75,7 @@ namespace nodes
         ///    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///    set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
         /// <param name="paddingValue"> The value to use for output padding, if output shape is larger than input shape. </param>
-        ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue = 0);
+        ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue = 0);
 
         /// <summary> Constructor with reordering </summary>
         ///
@@ -86,7 +86,7 @@ namespace nodes
         ///   For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///   set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
         /// <param name="paddingValue"> The value to use for output padding, if output shape is larger than input shape. </param>
-        ReorderDataNode(const model::PortElements<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue = 0);
+        ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue = 0);
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }

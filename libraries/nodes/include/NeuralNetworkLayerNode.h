@@ -70,7 +70,7 @@ namespace nodes
 
     protected:
         NeuralNetworkLayerNodeBase();
-        NeuralNetworkLayerNodeBase(const model::PortElements<ValueType>& input, const NeuralNetworkLayerNodeParameters& parameters, size_t outputSize);
+        NeuralNetworkLayerNodeBase(const model::OutputPort<ValueType>& input, const NeuralNetworkLayerNodeParameters& parameters, size_t outputSize);
 
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
@@ -104,7 +104,7 @@ namespace nodes
         ///
         /// <param name="input"> The input to the layer (typically the output of the previous layer). </param>
         /// <param name="layer"> The neural network layer to wrap. </param>
-        NeuralNetworkLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer);
+        NeuralNetworkLayerNode(const model::OutputPort<ValueType>& input, const LayerType& layer);
 
         /// <summary> Gets the layer being wrapped </summary>
         const LayerType& GetLayer() const { return _layer; }

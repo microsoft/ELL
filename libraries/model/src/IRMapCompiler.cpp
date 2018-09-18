@@ -81,34 +81,6 @@ namespace model
             shape = outNodes[0]->GetShape();
             Log() << "Output nodes present. Setting shape to first output node" << EOL;
         }
-
-        if (!out.IsFullPortOutput())
-        {
-            Log() << "Map output is not a port output, creating one..." << EOL;
-            model::OutputNodeBase* outputNode = nullptr;
-            switch (out.GetPortType())
-            {
-            case model::Port::PortType::boolean:
-                outputNode = map.GetModel().AddNode<model::OutputNode<bool>>(model::PortElements<bool>(out), shape);
-                break;
-            case model::Port::PortType::integer:
-                outputNode = map.GetModel().AddNode<model::OutputNode<int>>(model::PortElements<int>(out), shape);
-                break;
-            case model::Port::PortType::bigInt:
-                outputNode = map.GetModel().AddNode<model::OutputNode<int64_t>>(model::PortElements<int64_t>(out), shape);
-                break;
-            case model::Port::PortType::smallReal:
-                outputNode = map.GetModel().AddNode<model::OutputNode<float>>(model::PortElements<float>(out), shape);
-                break;
-            case model::Port::PortType::real:
-                outputNode = map.GetModel().AddNode<model::OutputNode<double>>(model::PortElements<double>(out), shape);
-                break;
-            default:
-                throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
-            }
-
-            map.ResetOutput(0, outputNode->GetOutputPort());
-        }
     }
 
     std::string IRMapCompiler::GetNamespacePrefix() const
@@ -431,23 +403,13 @@ namespace model
 
     emitters::LLVMValue IRMapCompiler::EnsurePortEmitted(const InputPortBase& port)
     {
-        auto portElement = port.GetInputElement(0);
-        return EnsurePortElementEmitted(portElement);
+        emitters::Variable* pVar = GetVariableForPort(port.GetReferencedPort());
+        return GetModule().EnsureEmitted(*pVar);
     }
 
     emitters::LLVMValue IRMapCompiler::EnsurePortEmitted(const OutputPortBase& port)
     {
         auto pVar = GetOrAllocatePortVariable(port);
-        return GetModule().EnsureEmitted(*pVar);
-    }
-
-    emitters::LLVMValue IRMapCompiler::EnsurePortElementEmitted(const PortElementBase& element)
-    {
-        auto pVar = GetVariableForElement(element);
-        if (pVar == nullptr)
-        {
-            throw emitters::EmitterException(emitters::EmitterError::notSupported, "Variable for output port not found");
-        }
         return GetModule().EnsureEmitted(*pVar);
     }
 
@@ -637,7 +599,7 @@ namespace model
         const Node* pNode = nullptr;
         if (HasSingleDescendant(element))
         {
-            emitters::Variable* pVar = GetVariableForElement(element);
+            emitters::Variable* pVar = GetVariableForPort(*element.ReferencedPort());
             if (pVar != nullptr && !pVar->IsLiteral())
             {
                 pNode = element.ReferencedPort()->GetNode();
@@ -658,10 +620,14 @@ namespace model
     emitters::LLVMValue IRMapCompiler::LoadPortElementVariable(const PortElementBase& element)
     {
         auto& currentFunction = GetModule().GetCurrentFunction();
-        emitters::Variable* pVar = GetPortElementVariable(element);
+        emitters::Variable* pVar = GetVariableForPort(*element.ReferencedPort());
         if (pVar->IsScalar())
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: got a scalar port variable");
+            throw emitters::EmitterException(emitters::EmitterError::vectorVariableExpected, "Error: got a scalar port variable");
+        }
+        else if (element.GetIndex() >= pVar->Dimension())
+        {
+            throw emitters::EmitterException(emitters::EmitterError::indexOutOfRange);
         }
 
         emitters::LLVMValue pVal = GetModule().EnsureEmitted(*pVar);
@@ -675,30 +641,6 @@ namespace model
         {
             return pVal;
         }
-    }
-
-    emitters::Variable* IRMapCompiler::GetPortElementVariable(const PortElementBase& element)
-    {
-        emitters::Variable* pVar = GetVariableForElement(element);
-        if (pVar == nullptr)
-        {
-            throw emitters::EmitterException(emitters::EmitterError::notSupported, "Variable for output port not found");
-        }
-        else if (pVar->IsScalar() && element.GetIndex() > 0)
-        {
-            throw emitters::EmitterException(emitters::EmitterError::vectorVariableExpected);
-        }
-        else if (element.GetIndex() >= pVar->Dimension())
-        {
-            throw emitters::EmitterException(emitters::EmitterError::indexOutOfRange);
-        }
-
-        return pVar;
-    }
-
-    emitters::Variable* IRMapCompiler::GetPortVariable(const InputPortBase& port)
-    {
-        return GetPortElementVariable(port.GetInputElement(0)); // Note: Potential error: scalar vars passed by value won't work here
     }
 }
 }

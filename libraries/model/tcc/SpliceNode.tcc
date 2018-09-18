@@ -41,7 +41,7 @@ namespace model
 
             // Create a new InputPort object
             auto portName = std::string("input_") + std::to_string(index);
-            _inputPorts.emplace_back(std::make_unique<InputPort<ValueType>>(this, PortElements<ValueType>{ *inputPort }, portName));
+            _inputPorts.emplace_back(std::make_unique<InputPort<ValueType>>(this, static_cast<const OutputPort<ValueType>&>(*inputPort), portName));
             
             // And add it to this node
             auto rawPtr = _inputPorts.back().get();
@@ -111,13 +111,8 @@ namespace model
         std::vector<const OutputPortBase*> newInputs;
         for(const auto& inputPort: _inputPorts)
         {
-            auto newPortElements = transformer.TransformPortElements(inputPort->GetPortElements());
-            if(!newPortElements.IsFullPortOutput())
-            {
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Transformed SpliceNode didn't have full input port");
-            }
-
-            newInputs.emplace_back(newPortElements.GetRanges()[0].ReferencedPort());
+            const auto& newPort = transformer.GetCorrespondingInputs(*inputPort);
+            newInputs.emplace_back(&newPort);
         }
         auto newNode = transformer.AddNode<SpliceNode<ValueType>>(newInputs);
         transformer.MapNodeOutput(output, newNode->output);
@@ -149,7 +144,7 @@ namespace model
             auto portName = std::string("input_") + std::to_string(index);
             archiver[portName] >> port;
             const auto& referencedPort = port.GetReferencedPort();
-            _inputPorts.emplace_back(std::make_unique<InputPort<ValueType>>(this, PortElements<ValueType>{ referencedPort }, portName));
+            _inputPorts.emplace_back(std::make_unique<InputPort<ValueType>>(this, referencedPort, portName));
             auto rawPtr = _inputPorts.back().get();
             AddInputPort(rawPtr);
             referencedPorts.push_back(&(_inputPorts.back()->GetReferencedPort()));

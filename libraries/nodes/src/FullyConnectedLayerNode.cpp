@@ -19,7 +19,7 @@ namespace ell
 namespace nodes
 {
     template<typename ValueType>
-    FullyConnectedLayerNode<ValueType>::FullyConnectedLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::FullyConnectedLayer<ValueType>& layer)
+    FullyConnectedLayerNode<ValueType>::FullyConnectedLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::FullyConnectedLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<FullyConnectedLayerNode<ValueType>, predictors::neural::FullyConnectedLayer<ValueType>, ValueType>(input, layer)
     {
         const auto& layerParameters = layer.GetLayerParameters();
@@ -55,7 +55,7 @@ namespace nodes
         std::vector<size_t> outputStride = outputShape;
         std::vector<size_t> outputOffset = { outputPaddingSize, outputPaddingSize, 0 };
 
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
 
         // TODO: add a reorder node here that makes the input be a contiguous vector, if necessary
 
@@ -76,7 +76,7 @@ namespace nodes
     template <typename ValueType>
     void FullyConnectedLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<FullyConnectedLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }

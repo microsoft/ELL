@@ -22,7 +22,7 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    RecurrentLayerNode<ValueType>::RecurrentLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::RecurrentLayer<ValueType>& layer)
+    RecurrentLayerNode<ValueType>::RecurrentLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::RecurrentLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<RecurrentLayerNode<ValueType>, predictors::neural::RecurrentLayer<ValueType>, ValueType>(input, layer)
     {
         const auto& layerParameters = layer.GetLayerParameters();
@@ -40,7 +40,7 @@ namespace nodes
     template <typename ValueType>
     bool RecurrentLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(this->input);
 
         // Transform weights and bias members into constant nodes
         const auto& hiddenWeights = this->_layer.GetHiddenWeights();
@@ -63,7 +63,7 @@ namespace nodes
     template <typename ValueType>
     void RecurrentLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
         auto newNode = transformer.AddNode<RecurrentLayerNode<ValueType>>(newPortElements, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
@@ -78,9 +78,9 @@ namespace nodes
     }
 
     template <typename ValueType>
-    RecurrentNode<ValueType>::RecurrentNode(const model::PortElements<ValueType>& input,
-                                                                    const model::PortElements<ValueType>& hiddenWeights,
-                                                                    const model::PortElements<ValueType>& hiddenBias,
+    RecurrentNode<ValueType>::RecurrentNode(const model::OutputPort<ValueType>& input,
+                                                                    const model::OutputPort<ValueType>& hiddenWeights,
+                                                                    const model::OutputPort<ValueType>& hiddenBias,
                                                                     const ActivationType& activation,
                                                                     const model::PortMemoryLayout& inputMemoryLayout,
                                                                     const model::PortMemoryLayout& outputMemoryLayout)
@@ -92,9 +92,9 @@ namespace nodes
     template <typename ValueType>
     void RecurrentNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newHiddenWeights = transformer.TransformPortElements(_hiddenWeights.GetPortElements());
-        auto newHiddenBias = transformer.TransformPortElements(_hiddenBias.GetPortElements());
+        const auto& newInput = transformer.GetCorrespondingInputs(_input);
+        const auto& newHiddenWeights = transformer.GetCorrespondingInputs(_hiddenWeights);
+        const auto& newHiddenBias = transformer.GetCorrespondingInputs(_hiddenBias);
         auto newNode = transformer.AddNode<RecurrentNode>(newInput, newHiddenWeights, newHiddenBias, _activation, _inputMemoryLayout, GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }

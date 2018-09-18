@@ -229,12 +229,12 @@ namespace model
         return Node::NodeId(utilities::Join(substrings, "_"));
     }
     
-    PortElementsBase Model::AddRoutingNodes(const PortElementsBase& elements)
+    const OutputPortBase& Model::AddRoutingNodes(const PortElementsBase& elements)
     {
         const auto numRanges = elements.NumRanges();
         if (numRanges == 0)
         {
-            return PortElementsBase{ elements };
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Empty range.");
         }
 
         // get vector of output ports to concatenate
@@ -256,11 +256,11 @@ namespace model
         if (numRanges > 1)
         {
             auto concatNodeOutput = AddConcat(concatInputPorts);
-            return { *concatNodeOutput };
+            return *concatNodeOutput;
         }
         else
         {
-            return PortElementsBase{ *concatInputPorts[0] };
+            return *concatInputPorts[0];
         }
     }
 
@@ -283,19 +283,19 @@ namespace model
         switch (port->GetType())
         {
         case Port::PortType::boolean:
-            return &(AddNode<SliceNode<bool>>(port, start, count)->output);
+            return &(AddNode<SliceNode<bool>>(*port, start, count)->output);
             break;
         case Port::PortType::integer:
-            return &(AddNode<SliceNode<int>>(port, start, count)->output);
+            return &(AddNode<SliceNode<int>>(*port, start, count)->output);
             break;
         case Port::PortType::bigInt:
-            return &(AddNode<SliceNode<int64_t>>(port, start, count)->output);
+            return &(AddNode<SliceNode<int64_t>>(*port, start, count)->output);
             break;
         case Port::PortType::smallReal:
-            return &(AddNode<SliceNode<float>>(port, start, count)->output);
+            return &(AddNode<SliceNode<float>>(*port, start, count)->output);
             break;
         case Port::PortType::real:
-            return &(AddNode<SliceNode<double>>(port, start, count)->output);
+            return &(AddNode<SliceNode<double>>(*port, start, count)->output);
             break;
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);

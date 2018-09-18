@@ -32,7 +32,7 @@ namespace nodes
     template <typename ValueType>
     void VoiceActivityDetectorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<VoiceActivityDetectorNode<ValueType>>(newPortElements, _vad.getSampleRate(),
             _vad.getFrameDuration(), _vad.getTauUp(), _vad.getTauDown(), _vad.getLargeInput(), _vad.getGainAtt(), _vad.getThresholdUp(), _vad.getThresholdDown(), _vad.getLevelThreshold());
         transformer.MapNodeOutput(output, newNode->output);

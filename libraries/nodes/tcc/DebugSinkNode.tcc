@@ -21,7 +21,7 @@ namespace ell
         }
 
         template <typename ValueType>
-        DebugSinkNode<ValueType>::DebugSinkNode(const model::PortElements<ValueType>& input, DebugSinkFunction<ValueType> sink, const std::string& label, void* userData, const std::string& sinkFunctionName)
+        DebugSinkNode<ValueType>::DebugSinkNode(const model::OutputPort<ValueType>& input, DebugSinkFunction<ValueType> sink, const std::string& label, void* userData, const std::string& sinkFunctionName)
             : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _label(label), _userData(userData), _sinkFunctionName(sinkFunctionName), _sink(std::move(sink))
         {
         }
@@ -69,7 +69,7 @@ namespace ell
         template <typename ValueType>
         void DebugSinkNode<ValueType>::Copy(model::ModelTransformer& transformer) const
         {
-            auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+            const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
             auto newNode = transformer.AddNode<DebugSinkNode<ValueType>>(newPortElements, _sink, _label, _userData, _sinkFunctionName);
             transformer.MapNodeOutput(output, newNode->output);
         }

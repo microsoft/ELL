@@ -61,7 +61,7 @@ namespace nodes
         /// <param name="inputVectorSize"> The input vector size. </param>
         /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
         /// <param name="source"> The optional source function that will provide input values. </param>
-        SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
+        SourceNode(const model::OutputPort<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
 
         /// <summary> Constructor. </summary>
         ///
@@ -69,7 +69,7 @@ namespace nodes
         /// <param name="shape"> The input shape. </param>
         /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
         /// <param name="source"> The optional source function that will provide input values. </param>
-        SourceNode(const model::PortElements<nodes::TimeTickType>& input, const model::MemoryShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
+        SourceNode(const model::OutputPort<nodes::TimeTickType>& input, const model::MemoryShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
 
         /// <summary> Constructor. </summary>
         ///
@@ -77,7 +77,7 @@ namespace nodes
         /// <param name="layout"> The input memory layout. </param>
         /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
         /// <param name="source"> The optional source function that will provide input values. </param>
-        SourceNode(const model::PortElements<nodes::TimeTickType>& input, const model::PortMemoryLayout& layout, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
+        SourceNode(const model::OutputPort<nodes::TimeTickType>& input, const model::PortMemoryLayout& layout, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

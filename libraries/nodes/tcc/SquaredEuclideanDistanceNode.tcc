@@ -34,7 +34,7 @@ namespace nodes
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& vectorsAsMatrix)
+    SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& vectorsAsMatrix)
         : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, vectorsAsMatrix.NumRows()), _vectorsAsMatrix(vectorsAsMatrix)
     {
         if (input.Size() != vectorsAsMatrix.NumColumns())
@@ -66,7 +66,7 @@ namespace nodes
     template <typename ValueType, math::MatrixLayout layout>
     void SquaredEuclideanDistanceNode<ValueType, layout>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<SquaredEuclideanDistanceNode<ValueType, layout>>(newPortElements, _vectorsAsMatrix);
         transformer.MapNodeOutput(output, newNode->output);
     }
@@ -75,7 +75,7 @@ namespace nodes
     template <typename ValueType, math::MatrixLayout layout>
     bool SquaredEuclideanDistanceNode<ValueType, layout>::Refine(model::ModelTransformer& transformer) const
     {
-        auto inputPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        const auto& inputPortElements = transformer.GetCorrespondingInputs(_input);
 
         // P^2 => scalar value
         auto inputNorm2SquaredNode = transformer.AddNode<L2NormSquaredNode<double>>(inputPortElements);

@@ -58,12 +58,12 @@ namespace model
         return _transformer;
     }
 
-    PortElementsBase ModelOptimizerContext::GetCorrespondingOutputs(const OutputPortBase& port)
+    const OutputPortBase& ModelOptimizerContext::GetCorrespondingOutputs(const OutputPortBase& port)
     {
         return _transformer.GetCorrespondingOutputs(port);
     }
 
-    PortElementsBase ModelOptimizerContext::GetCorrespondingOutputs(const PortElementsBase& elements)
+    const OutputPortBase& ModelOptimizerContext::GetCorrespondingOutputs(const PortElementsBase& elements)
     {
         return _transformer.GetCorrespondingOutputs(elements);
     }

@@ -50,7 +50,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ExtremalValueNode(const model::PortElements<ValueType>& input);
+        ExtremalValueNode(const model::OutputPort<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -102,7 +102,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ArgMinNode(const model::PortElements<ValueType>& input)
+        ArgMinNode(const model::OutputPort<ValueType>& input)
             : ExtremalValueNode<ValueType, false>(input) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -131,7 +131,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ArgMaxNode(const model::PortElements<ValueType>& input)
+        ArgMaxNode(const model::OutputPort<ValueType>& input)
             : ExtremalValueNode<ValueType, true>(input) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>

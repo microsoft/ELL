@@ -18,14 +18,14 @@ namespace model
     }
 
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input)
+    OutputNode<ValueType>::OutputNode(const model::OutputPort<ValueType>& input)
         : OutputNodeBase(_input, _output, MemoryShape{ static_cast<int>(input.Size()) }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size())
     {
         SetShape(MemoryShape{ static_cast<int>(input.Size()) });
     }
 
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input, const MemoryShape& shape)
+    OutputNode<ValueType>::OutputNode(const model::OutputPort<ValueType>& input, const MemoryShape& shape)
         : OutputNodeBase(_input, _output, shape), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size())
     {
         SetShape(shape);
@@ -40,8 +40,8 @@ namespace model
     template <typename ValueType>
     void OutputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<OutputNode<ValueType>>(newPortElements, GetShape());
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<OutputNode<ValueType>>(newInputs, GetShape());
         transformer.MapNodeOutput(output, newNode->output);
     }
 
