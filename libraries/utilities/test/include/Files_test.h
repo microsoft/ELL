@@ -11,5 +11,7 @@ namespace ell
 {
     void TestStringf();
     void TestJoinPaths(const std::string& basePath);
+#ifdef WIN32
     void TestUnicodePaths(const std::string& basePath);
+#endif
 }

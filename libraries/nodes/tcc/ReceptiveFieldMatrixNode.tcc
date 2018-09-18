@@ -161,7 +161,7 @@ namespace nodes
 
             // const int extraPadding = (int)convPadding - (int)inputPadding; // extraPadding is the amount of extra padding we need to do, on top of what's in the input data
             const int extraPadding = convPadding;
-            const bool useContiguousReshape = (dataOrder == std::array<int, 3>({ 2, 0, 1 })) && (stride == 1); // channel, row, column order, unit stride
+            const bool useContiguousReshape = (dataOrder == std::array<int, 3>({{ 2, 0, 1 }})) && (stride == 1); // channel, row, column order, unit stride
             if (useContiguousReshape)
             {
                 // assert(inputPadding == 0 && "Input data must not be padded");
@@ -265,7 +265,7 @@ namespace nodes
                     auto fieldRow = function.LocalScalar();
 
                     // TODO: use the entries of dataOrder to compute the indices
-                    if (dataOrder == std::array<int, 3>({ 0, 1, 2 })) // row, column, channel order
+                    if (dataOrder == std::array<int, 3>({{ 0, 1, 2 }})) // row, column, channel order
                     {
                         fieldChannel = f % inputDepth;
                         auto fDivDepth = f / inputDepth;
@@ -313,7 +313,7 @@ namespace nodes
     //
     template <typename ValueType>
     ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filterWidth(0), _stride(0), _convolutionPadding(0), _dataOrder({ 0, 1, 2 }), _outputWidth(0), _outputHeight(0)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filterWidth(0), _stride(0), _convolutionPadding(0), _dataOrder({{ 0, 1, 2 }}), _outputWidth(0), _outputHeight(0)
     {
     }
 

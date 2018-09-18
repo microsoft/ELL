@@ -18,16 +18,17 @@ namespace utilities
 {
     /// <summary> A simple stl-type iterator adapter that advances an iterator by a given stride. </summary>
     template <typename IteratorType>
-    class StlStridedIterator : std::iterator<std::random_access_iterator_tag, typename std::iterator_traits<IteratorType>::value_type>
+    class StlStridedIterator
     {
     public:
-        using Base = std::iterator<std::random_access_iterator_tag, typename std::iterator_traits<IteratorType>::value_type>;
+        //using Base = std::iterator<std::random_access_iterator_tag, typename std::iterator_traits<IteratorType>::value_type>;
+        using iterator_category = typename std::iterator_traits<IteratorType>::iterator_category; 
         using value_type = typename std::iterator_traits<IteratorType>::value_type;
-        using difference_type = typename Base::difference_type;
+        using difference_type = typename std::iterator_traits<IteratorType>::difference_type;
         using size_type = size_t;
-        using reference = typename Base::reference;
+        using reference = typename std::iterator_traits<IteratorType>::reference;
         using const_reference = const reference;
-        using pointer = typename Base::pointer;
+        using pointer = typename std::iterator_traits<IteratorType>::pointer;
         using const_pointer = const pointer;
 
         /// <summary> Constructor </summary>

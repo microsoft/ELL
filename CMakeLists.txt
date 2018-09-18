@@ -2,7 +2,7 @@
 # cmake file for Embedded Learning Library subprojects
 #
 
-cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 project(ELL)
 
@@ -69,7 +69,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Set C++ version
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Apply -fPIC where applicable to the platform
@@ -87,6 +87,7 @@ endif()
 if(MSVC)
   # Set Visual Studio-specific options
   add_definitions(-DUNICODE)
+  add_compile_options(/utf-8)
   add_compile_options(/MP)
   add_compile_options(/bigobj)
   add_compile_options(/W4)

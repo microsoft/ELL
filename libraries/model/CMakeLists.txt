@@ -56,7 +56,7 @@ set(include
     include/SpliceNode.h
 )
 
-set(tcc 
+set(tcc
     tcc/InputNode.tcc
     tcc/InputPort.tcc
     tcc/IRCompiledMap.tcc
@@ -188,7 +188,12 @@ target_include_directories(${compiler_test_name} PRIVATE test/include)
 target_link_libraries(${compiler_test_name} common model nodes passes testing model_testing utilities)
 copy_shared_libraries(${compiler_test_name})
 
-set_property(TARGET ${compiler_test_name} PROPERTY FOLDER "tests")
+set_target_properties(
+    ${compiler_test_name}
+    PROPERTIES
+        FOLDER "tests"
+        ENABLE_EXPORTS ON
+)
 
 add_test(NAME ${compiler_test_name} COMMAND ${compiler_test_name})
 set_test_library_path(${compiler_test_name})

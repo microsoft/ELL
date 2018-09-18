@@ -14,14 +14,14 @@ SWIG_VERSION=$MIN_SWIG_VERSION
 sudo apt-get install software-properties-common
 
 if ! grep -q "^deb .*ubuntu-toolchain-r/test" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
-    # Channel for gcc-6 and g++-6
+    # Channel for gcc-8 and g++-8
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 fi
 
 # Update packages
 sudo apt-get update && \
 sudo apt-get dist-upgrade && \
-sudo apt-get install -y gcc-6 g++-6 cmake libedit-dev zlibc zlib1g zlib1g-dev libopenblas-dev doxygen llvm-6.0-dev curl
+sudo apt-get install -y gcc-8 g++-8 cmake libedit-dev zlibc zlib1g zlib1g-dev libopenblas-dev doxygen llvm-6.0-dev curl
 
 # Check for cmake version
 cmake_ver=$(cmake --version 2>&1 | head -n1 | cut -d ' ' -f3 | awk '{print $NF}')

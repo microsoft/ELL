@@ -20,9 +20,12 @@
 #include <algorithm>
 #include <string>
 #include <cstring>
-#include <codecvt>
-#include <locale>
 #include <iostream>
+
+#ifdef WIN32
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
 
 namespace ell
 {
@@ -31,13 +34,13 @@ namespace ell
     //
     void TestStringf()
     {
-        testing::ProcessTest("Stringf with args", ell::utilities::FormatString("test %d is %s", 10, "fun") == "test 10 is fun");
+        testing::ProcessTest("Stringf with args", utilities::FormatString("test %d is %s", 10, "fun") == "test 10 is fun");
     }
 
     void TestJoinPaths(const std::string& basePath)
     {
-        std::vector<std::string> parts = ell::utilities::SplitPath(basePath);
-        std::string result = ell::utilities::JoinPaths("", parts);
+        std::vector<std::string> parts = utilities::SplitPath(basePath);
+        std::string result = utilities::JoinPaths("", parts);
 
         // normalize path for platform differences (just for testing)
         std::string norm = basePath;
@@ -49,45 +52,52 @@ namespace ell
         testing::ProcessTest("JoinPaths", norm == result);
     }
 
-    std::string GetUnicodeTestPath(const std::string& basePath)
+    std::string GetUnicodeTestPath(const std::string& basePath, const std::string& utf8test)
     {
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::string testing = ell::utilities::JoinPaths(basePath, "Testing");
-        std::string unicode = ell::utilities::JoinPaths(testing, "Unicode");
+        std::string testing = utilities::JoinPaths(basePath, "Testing");
+        std::string unicode = utilities::JoinPaths(testing, "Unicode");
 
-        // chinese for 'test'
-        std::wstring test(L"\u6D4B\u8bd5");
-        std::string utf8test = converter.to_bytes(test);
+        std::string testdir = utilities::JoinPaths(unicode, utf8test);
 
-        std::string testdir = ell::utilities::JoinPaths(unicode, utf8test);
         return testdir;
     }
 
     void TestUnicodePaths(const std::string& basePath)
     {
-        auto testdir = GetUnicodeTestPath(basePath);
+#ifdef WIN32
+        // chinese for 'test'
+        std::wstring test(L"\u6D4B\u8bd5");
+        auto path = fs::path(test);
+        auto utf8test = path.u8string();
+#else
+        std::string utf8test{"测试"};
+#endif
+        auto testdir = GetUnicodeTestPath(basePath, utf8test);
         std::cout << "writing test output to " << testdir << std::endl;
 
         // bugbug: the rolling build for Linux is giving us EACCESSDENIED on this testdir for some reason...
-#ifdef WIN32
-        ell::utilities::EnsureDirectoryExists(testdir);
-        testing::ProcessTest("Unicode paths", ell::utilities::DirectoryExists(testdir));
+        utilities::EnsureDirectoryExists(testdir);
+        testing::ProcessTest("Unicode paths", utilities::DirectoryExists(testdir));
 
         std::string testContent = "this is a test";
         int testContentLength = static_cast<int>(testContent.size());
 
-        // chinese for 'banana.txt'
-        std::wstring banana(L"\u9999\u8549.txt");
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::string utf8banana = converter.to_bytes(banana);
+        // chinese for 'banana'
+#ifdef WIN32
+        std::wstring banana(L"\u9999\u8549");
+        std::string utf8banana = fs::path(banana).u8string();
+#else
+        std::string utf8banana{"香蕉"};
+#endif
+        utf8banana += ".txt";
 
-        std::string testfile = ell::utilities::JoinPaths(testdir, utf8banana);
+        std::string testfile = utilities::JoinPaths(testdir, utf8banana);
         {
-            auto outputStream = ell::utilities::OpenOfstream(testfile);
+            auto outputStream = utilities::OpenOfstream(testfile);
             outputStream.write(testContent.c_str(), testContentLength);
-        } 
+        }
         {
-            auto inputStream = ell::utilities::OpenIfstream(testfile);
+            auto inputStream = utilities::OpenIfstream(testfile);
             char buffer[100];
             inputStream.read(buffer, testContentLength);
             buffer[testContentLength] = '\0';
@@ -95,8 +105,6 @@ namespace ell
 
             testing::ProcessTest("Unicode file names", actual == testContent);
         }
-#endif
     }
-
 
 } // end namespace

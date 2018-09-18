@@ -6,21 +6,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Files.h"
 #include "Exception.h"
+#include "Files.h"
 #include "StringUtil.h"
 
 // stl
 #include <algorithm>
-#include <codecvt>
 #include <cstdlib>
 #include <ios>
-#include <locale>
 #include <memory>
+#ifndef WIN32
 #include <sys/stat.h>
-#ifndef _WIN32
 #include <unistd.h>
-#endif
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif // WIN32
 
 namespace ell
 {
@@ -29,57 +30,53 @@ namespace utilities
     std::ifstream OpenIfstream(const std::string& filepath)
     {
 #ifdef WIN32
-        // open file
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring widePath = converter.from_bytes(filepath);
-        auto fs = std::ifstream(widePath);
+        auto path = fs::u8path(filepath);
 #else
-        // open file
-        auto fs = std::ifstream(filepath);
-
+        const auto& path = filepath;
 #endif
+        // open file
+        auto stream = std::ifstream(path);
+
         // check that it opened
-        if (!fs.is_open())
+        if (!stream.is_open())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "error opening file " + filepath);
+            throw utilities::InputException(InputExceptionErrors::invalidArgument, "error opening file " + filepath);
         }
 
-        return fs;
+        return stream;
     }
 
     std::ofstream OpenOfstream(const std::string& filepath)
     {
 #ifdef WIN32
-        // open file
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring widePath = converter.from_bytes(filepath);
-        auto fs = std::ofstream(widePath);
+        auto path = fs::u8path(filepath);
 #else
-        // open file
-        auto fs = std::ofstream(filepath);
+        const auto& path = filepath;
 #endif
+        // open file
+        std::ofstream stream(path);
+
         // check that it opened
-        if (!fs.is_open())
+        if (!stream.is_open())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "error opening file " + filepath);
+            throw utilities::InputException(InputExceptionErrors::invalidArgument, "error opening file " + filepath);
         }
 
-        return fs;
+        return stream;
     }
 
     bool IsFileReadable(const std::string& filepath)
     {
 #ifdef WIN32
-        // open file
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring widePath = converter.from_bytes(filepath);
-        std::ifstream fs(widePath);
+        auto path = fs::u8path(filepath);
 #else
-        // open file
-        std::ifstream fs(filepath);
+        const auto& path = filepath;
 #endif
+        // open file
+        std::ifstream stream(path);
+
         // check that it opened
-        if (fs.is_open())
+        if (stream.is_open())
         {
             return true;
         }
@@ -90,16 +87,15 @@ namespace utilities
     bool IsFileWritable(const std::string& filepath)
     {
 #ifdef WIN32
-        // open file
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring widePath = converter.from_bytes(filepath);
-        std::ofstream fs(widePath);
+        auto path = fs::u8path(filepath);
 #else
-        // open file
-        std::ofstream fs(filepath);
+        const auto& path = filepath;
 #endif
+        // open file
+        std::ofstream stream(path);
+
         // check that it opened
-        if (fs.is_open())
+        if (stream.is_open())
         {
             return true;
         }
@@ -110,37 +106,34 @@ namespace utilities
     bool FileExists(const std::string& filepath)
     {
 #ifdef WIN32
-        struct _stat64i32 buf;
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring widePath = converter.from_bytes(filepath);
-        int rc = _wstat(widePath.c_str(), &buf);
+        std::error_code ec;
+        return fs::is_regular_file(fs::u8path(filepath), ec);
 #else
         struct stat buf;
         int rc = stat(filepath.c_str(), &buf);
-#endif
+
         if (rc != -1)
         {
             return (buf.st_mode & S_IFDIR) == 0;
         }
         return false;
+#endif
     }
 
     bool DirectoryExists(const std::string& path)
     {
 #ifdef WIN32
-        struct _stat64i32 buf;
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring widePath = converter.from_bytes(path);
-        int rc = _wstat(widePath.c_str(), &buf);
+        std::error_code ec;
+        return fs::is_directory(fs::u8path(path), ec);
 #else
         struct stat buf;
         int rc = stat(path.c_str(), &buf);
-#endif
         if (rc != -1)
         {
             return (buf.st_mode & S_IFDIR) == S_IFDIR;
         }
         return false;
+#endif
     }
 
     std::string GetFileExtension(const std::string& filepath, bool toLowercase)
@@ -179,7 +172,7 @@ namespace utilities
         }
     }
 
-    // PORTABILITY should be replaced by C++17 filesystem when available
+        // PORTABILITY should be replaced by C++17 filesystem when available
 #ifdef WIN32
     std::string path_separator = "\\";
 #else
@@ -216,7 +209,6 @@ namespace utilities
         return path;
     }
 
-
     std::string JoinPaths(const std::string& path1, const std::string& path2)
     {
         return JoinPaths(path1, { path2 });
@@ -228,7 +220,7 @@ namespace utilities
         return JoinPaths(path, list);
     }
 
-    inline bool ends_with(std::string const & value, std::string const & ending)
+    inline bool ends_with(std::string const& value, std::string const& ending)
     {
         if (ending.size() > value.size()) return false;
         return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
@@ -283,7 +275,7 @@ namespace utilities
         {
 
             // mkdir can only do one directory level at a time, so here we
-            // recurrsively walk up the path making sure all intermediate paths exist.
+            // recursively walk up the path making sure all intermediate paths exist.
             std::string dirName = GetFileName(path);
             std::string parentPath = GetDirectoryPath(path);
             if (parentPath != "")
@@ -291,14 +283,17 @@ namespace utilities
                 EnsureDirectoryExists(parentPath);
             }
 
+            int rc = 0;
 #ifdef WIN32
-            // Windows requires UTF-16 for unicode path support.
-            std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-            std::wstring widePath = converter.from_bytes(path);
-            int rc = _wmkdir(widePath.c_str());
+            std::error_code ec;
+            if (!fs::create_directory(fs::u8path(path), ec))
+            {
+                rc = ec.value();
+            }
 #else
             // Linux can do unicode file names in utf-8.
-            int rc = mkdir(path.c_str(), 0777); // Note: Keep the prepended zero -- 0777 is 777 in octal.
+            constexpr mode_t modeInOctal = 0777;
+            rc = mkdir(path.c_str(), modeInOctal);
 #endif
             if (rc != 0)
             {
@@ -309,23 +304,21 @@ namespace utilities
 
     std::string GetWorkingDirectory()
     {
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        const int maxPath = 8192;
         int rc = 0;
         std::string utf8wd;
 #ifdef WIN32
-        wchar_t path[maxPath];
-        if (NULL == _wgetcwd(path, maxPath))
+        std::error_code ec;
+        auto path = fs::current_path(ec);
+        if (ec)
         {
-            rc = errno;
+            rc = ec.value();
         }
         else
         {
-            // convert to utf-8
-            std::wstring cwd(path);
-            utf8wd = converter.to_bytes(cwd);
+            utf8wd = path.generic_string();
         }
 #else
+        const int maxPath = 8192;
         char path[maxPath];
         if (getcwd(path, maxPath) == nullptr)
         {
@@ -339,7 +332,6 @@ namespace utilities
         }
         return utf8wd;
     }
-
 
     std::string FindExecutable(const std::string& name)
     {
@@ -362,6 +354,5 @@ namespace utilities
         }
         throw ell::utilities::Exception("Could not find '" + name + "' in your PATH environment");
     }
-
 }
 }

@@ -88,6 +88,10 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
 
       # Fix link problems when building in Debug mode:
       add_definitions(-DSWIG_PYTHON_INTERPRETER_NO_DEBUG)
+
+      # Don't use SWIG's undefined exception handler since it uses std::set_unexpected and std::unexpected
+      # which are removed in C++17
+      add_definitions(-DSWIG_DIRECTOR_NO_UEH)
     endif()
 
     set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC} ${EXTRA_INTERFACE})
@@ -103,7 +107,7 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
     set_source_files_properties(${INTERFACE_MAIN} ${INTERFACE_FILES} PROPERTIES CPLUSPLUS ON)
 
     message(STATUS "Creating wrappers for ${LANGUAGE_NAME}")
-    
+
     # create target here
     if(${language} STREQUAL "python")
       # Python needs an underscore on the module name because when you run "import ell" the Python loader looks for "_ell.pyd" on Windows and "_ell.so" on Unix.
@@ -160,4 +164,3 @@ macro(generate_interface LANGUAGE_NAME MODULE_NAME LANGUAGE_DIR LANGUAGE_LIBRARI
 endmacro()
 
 #
-

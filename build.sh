@@ -20,8 +20,8 @@ if printf '%s\n%s\n' "$(cmake --version | head -n1 | cut -d" " -f3 | awk '{print
     exit 1
 fi
 
-if printf '%s\n%s\n' "$(gcc --version | head -n1 | cut -d" " -f4 | awk '{print $NF}')" 5.0.0 | sort -CV; then
-    echo "Your GCC compiler version is less than the required 5.0.0"
+if printf '%s\n%s\n' "$(gcc --version | head -n1 | cut -d" " -f4 | awk '{print $NF}')" 8.0.0 | sort -CV; then
+    echo "Your GCC compiler version is less than the required 8.0.0"
     echo "See INSTALL-Ubuntu.md for information on how to install GCC"
     exit 1
 fi

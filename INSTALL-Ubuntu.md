@@ -24,15 +24,15 @@ Ubunto provides the Advanced Packaging Tool `apt` for downloading and installing
 sudo apt-get -y update
 ```
 
-### GCC 6, CMake 3.8, libedit, zlib, OpenBLAS, and Doxygen via apt-get
+### GCC 8, CMake 3.8, libedit, zlib, OpenBLAS, and Doxygen via apt-get
 
 ELL requires the following tools and libraries, some of which are installed by default on Ubuntu systems:
 
-* *GCC 6* or newer - C++14 compiler
+* *GCC 8* or newer - C++17 compiler
 * [*CMake*](https://cmake.org/) version 3.8 or newer - build system
 * *libedit* and *zlib* libraries
 
-Note that *GCC 6* may not be available by default. It can be found in [*ubuntu-toolchain-r/test*](https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test) PPA.
+Note that *GCC 8* may not be available by default. It can be found in [*ubuntu-toolchain-r/test*](https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test) PPA.
 
 To add ubuntu-toolchain-r/test PPA and update sources, type
 ```shell
@@ -47,7 +47,7 @@ Optionally, ELL can take advantage of these additional tools:
 
 To install all of the above, type
 ```shell
-sudo apt-get install -y gcc-6 g++-6 cmake libedit-dev zlibc zlib1g zlib1g-dev
+sudo apt-get install -y gcc-8 g++-8 cmake libedit-dev zlibc zlib1g zlib1g-dev
 sudo apt-get install -y libopenblas-dev doxygen
 ```
 ### LLVM 6.0
