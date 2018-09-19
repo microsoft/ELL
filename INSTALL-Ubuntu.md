@@ -47,7 +47,7 @@ Optionally, ELL can take advantage of these additional tools:
 
 To install all of the above, type
 ```shell
-sudo apt-get install -y gcc-8 g++-8 cmake libedit-dev zlibc zlib1g zlib1g-dev
+sudo apt-get install -y gcc-8 g++-8 cmake libedit-dev zlibc zlib1g zlib1g-dev make
 sudo apt-get install -y libopenblas-dev doxygen
 ```
 ### LLVM 6.0
