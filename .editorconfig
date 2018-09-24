@@ -1,0 +1,13 @@
+# top-most EditorConfig file for Visual Studio
+root = true
+
+# ensure all files are encoded using utf-8 (even without a BOM).
+# this goes together with our CMakeLists.txt /utf-8 compiler flag.
+[*]
+charset = utf-8
+
+[*.{asm,bat,cfg,clang-format,cmake,cpp,css,editorconfig,gitattributes,gitignore,gyp,h,html,i,in,inc,js,json,ll,md,py,s,scss,sh,tcc,ts,txt,xslt,yaml,yml]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
