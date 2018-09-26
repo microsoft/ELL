@@ -15,19 +15,22 @@ endif()
 
 set (module_name wrap)
 set (builder_src
-    templates/__init__.py.in
-    templates/CMakeLists.cpp.txt.in
-    templates/CMakeLists.python.txt.in
     wrap.py
     README.md)
 
-add_custom_target(${module_name} DEPENDS ${builder_src} SOURCES ${builder_src})
+set (template_src 
+    templates/__init__.py.in
+    templates/CMakeLists.cpp.txt.in
+    templates/CMakeLists.python.txt.in)
+
+source_group("templates" FILES ${template_src})
+add_custom_target(${module_name} DEPENDS ${builder_src} SOURCES ${builder_src} ${template_src})
+add_dependencies(${module_name} pythonlibs)
 set_property(TARGET ${module_name} PROPERTY FOLDER "tools")
 
 # copy files
-foreach(PY_FILE ${builder_src})
-    configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
-endforeach()
+copy_newer_files(${module_name} builder_src)
+copy_newer_files(${module_name} template_src "${CMAKE_CURRENT_BINARY_DIR}/templates/")
 
 find_program(LLC_EXECUTABLE llc HINTS ${LLVM_TOOLS_BINARY_DIR})
 if(NOT LLC_EXECUTABLE)

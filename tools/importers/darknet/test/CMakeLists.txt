@@ -15,20 +15,16 @@ if(${PYTHON_ENABLED})
 
     set (test_data unittest.cfg unittest.weights)
 
-    add_custom_target(${test_name} DEPENDS ${test_src} SOURCES ${test_src})
-    add_dependencies(${test_name} _ELL_python)
+    add_custom_target(${test_name} ALL DEPENDS ${test_src} SOURCES ${test_src})
+    add_dependencies(${test_name} ${module_name})
 
     set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
     # copy files
-    foreach(PY_FILE ${test_src})
-        configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
-    endforeach()
+    copy_newer_files(${test_name} test_src)
 
     # copy data files
-    foreach(PY_FILE ${test_data})
-        configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
-    endforeach()
+    copy_newer_files(${test_name} test_data)
 
     add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} -m unittest ${test_src})
 

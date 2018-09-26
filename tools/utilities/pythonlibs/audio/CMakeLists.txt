@@ -23,13 +23,12 @@ if(${PYTHON_ENABLED})
         wav_reader.py
     )
 
-    add_custom_target(${module_name} DEPENDS SOURCES ${lib_src})
+    add_custom_target(${module_name} ALL DEPENDS SOURCES ${lib_src})
+    add_dependencies(${module_name} pythonlibs)
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/utilities/audio")
     
     # copy files
-    foreach(PY_FILE ${lib_src})
-        configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
-    endforeach()
+    copy_newer_files(${module_name} lib_src)
 
 endif()  # PYTHON_ENABLED

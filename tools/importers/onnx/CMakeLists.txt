@@ -9,12 +9,12 @@ if(${PYTHON_ENABLED})
     set(importer_src onnx_to_ell.py
         onnx_import.py)
 
-    add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
+    add_custom_target(${module_name} ALL DEPENDS SOURCES ${importer_src})
+    add_dependencies(${module_name} pythonlibs _ELL_python)
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/importers")
+    
     #copy files
-    foreach(PY_FILE ${importer_src})
-        configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
-    endforeach()
+    copy_newer_files(${module_name} importer_src)
 
 endif()  # PYTHON_ENABLED

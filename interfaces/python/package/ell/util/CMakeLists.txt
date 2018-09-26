@@ -4,29 +4,16 @@ if(${PYTHON_ENABLED})
 
     file(GLOB PYFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
 
-    add_custom_target(${module_name} DEPENDS SOURCES ${PYFILES})
-
-    foreach(FILE ${PYFILES})
-        configure_file(${FILE} ${FILE} COPYONLY)
-    endforeach()
-
-    configure_file(
-        ${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/download_helper.py
-        download_helper.py
-        COPYONLY
-    )
+    add_custom_target(${module_name} ALL DEPENDS SOURCES ${PYFILES})
     
-    configure_file(
-        ${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/logger.py
-        logger.py
-        COPYONLY
-    )
-    
-    configure_file(
-        ${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/find_ell.py
-        find_ell.py
-        COPYONLY
-    )
+    copy_newer_files(${module_name} PYFILES)
+
+    set (other_files ${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/download_helper.py
+                     ${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/logger.py
+                     ${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/find_ell.py)
+
+                     
+    copy_newer_files(${module_name} other_files)
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/package/ell/util")
 

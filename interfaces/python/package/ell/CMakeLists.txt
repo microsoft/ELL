@@ -13,11 +13,9 @@ if(${PYTHON_ENABLED})
     add_subdirectory(util)
     add_subdirectory(vision)
 
-    add_custom_target(${module_name} DEPENDS SOURCES ${src})
-
-    foreach(FILE ${src})
-        configure_file(${FILE} ${FILE} COPYONLY)
-    endforeach()
+    add_custom_target(${module_name} ALL DEPENDS SOURCES ${src})
+    
+    copy_newer_files(${module_name} src)
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/python/package/ell")
 

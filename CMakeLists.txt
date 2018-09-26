@@ -184,8 +184,9 @@ if(BUILD_DOC)
   endif()
 
   if(DOXYGEN_FOUND)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-    set (DOXYFILE_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
+    set (doxyfile Doxyfile)
+    set (DOXYFILE_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/${doxyfile}")
+    copy_newer_files(documentation doxyfile)
     add_custom_target(doc
       COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_LOCATION}
       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"

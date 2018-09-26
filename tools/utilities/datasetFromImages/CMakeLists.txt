@@ -8,13 +8,11 @@ if(${PYTHON_ENABLED})
 
     set(src datasetFromImages.py)
 
-    add_custom_target(${tool_name} DEPENDS SOURCES ${src})
+    add_custom_target(${tool_name} ALL DEPENDS SOURCES ${src})
     add_dependencies(${tool_name} pythonlibs _ELL_python)
     
     # copy files
-    foreach(FILE ${src})
-        configure_file(${FILE} ${FILE} COPYONLY)
-    endforeach()
+    copy_newer_files(${tool_name} src)
 
     # put this project in the tools/utilities folder in the IDE 
     set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")

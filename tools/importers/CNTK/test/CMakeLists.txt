@@ -17,26 +17,19 @@ if(${PYTHON_ENABLED} AND NOT APPLE)
 
     set (test_data xorModel1.dnn)
 
-    add_custom_target(${test_name} DEPENDS ${src} SOURCES ${src})
-    add_dependencies(${test_name} _ELL_python )
+    add_custom_target(${test_name} ALL DEPENDS ${src} SOURCES ${src})
+    add_dependencies(${test_name} ${module_name})
 
     set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
     # copy files
-    foreach(PYTHON_FILE ${test_src})
-        configure_file(${PYTHON_FILE} ${PYTHON_FILE} COPYONLY)
-    endforeach()
-
-    foreach(PYTHON_FILE ${test_data})
-        configure_file(${PYTHON_FILE} ${PYTHON_FILE} COPYONLY)
-    endforeach()
-
+    copy_newer_files(${test_name} src)
+    copy_newer_files(${test_name} test_data)
     
     if(GIT_REPO)
         message(STATUS "Writing: ${CMAKE_BINARY_DIR}/config.json")
         set(JSON "{ \"gitrepo\": \"${GIT_REPO}\" }")
         file(WRITE "${CMAKE_BINARY_DIR}/config.json" ${JSON})
-        configure_file("${CMAKE_BINARY_DIR}/config.json" "config.json" COPYONLY)
     endif()
 
     add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} -m unittest ${test_src})

@@ -8,13 +8,11 @@ if(${PYTHON_ENABLED})
 
     set(src remoterun.py)
 
-    add_custom_target(${module_name} DEPENDS SOURCES ${src})
+    add_custom_target(${module_name} ALL DEPENDS SOURCES ${src})
     add_dependencies(${module_name} pythonlibs)
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/utilities")
     
     # copy files
-    foreach(FILE ${src})
-        configure_file(${FILE} ${FILE} COPYONLY)
-    endforeach()
+    copy_newer_files(${module_name} src)
   
 endif()  # PYTHON_ENABLED

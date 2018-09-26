@@ -27,8 +27,6 @@ if(${PYTHON_ENABLED})
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/utilities")
     
     # copy files
-    foreach(PY_FILE ${lib_src})
-        configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
-    endforeach()
+    copy_newer_files(${module_name} lib_src)
 
 endif()  # PYTHON_ENABLED

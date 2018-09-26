@@ -10,12 +10,11 @@ if(${PYTHON_ENABLED})
         importer.py
         memory_shapes.py)
 
-    add_custom_target(${module_name} DEPENDS SOURCES ${common_src})
+    add_custom_target(${module_name} ALL DEPENDS SOURCES ${common_src})
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/importers")
+
     #copy files
-    foreach(PY_FILE ${common_src})
-        configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
-    endforeach()
+    copy_newer_files(${module_name} common_src)
 
 endif()  # PYTHON_ENABLED
