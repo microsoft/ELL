@@ -35,7 +35,7 @@ goto :parse
 :start
 pushd %ELL_SRC%
 
-call %CONDA_PATH%\Scripts\activate.bat ell
+call %CONDA_PATH%\Scripts\activate.bat py36
 
 REM this needs to be run under VSTS agent user account (NTSERVICE account)
 git lfs install
