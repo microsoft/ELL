@@ -29,6 +29,7 @@ def find_ell_build():
     head,tail = os.path.split(__this_file_directory)
     while (tail != ""):
         # find a file that is unique to the ELL build folder
+        # (this works if our search started somewhere in the build folder)
         test = os.path.join(head,"ell_build_tools.json")
         if (os.path.isfile(test)):
             return head
@@ -36,9 +37,11 @@ def find_ell_build():
         # find a file that is unique to the ELL repo root.
         test = os.path.join(head,"StyleGuide.md")
         if (os.path.isfile(test)):
+            # this happens if we are searching from outside the build folder, so in
+            # order to support different named build folders, like 'build_gcc' or 'build_clang'
+            # we match by "build" prefix.
             for d in os.listdir(head):
                 dd = os.path.join(head, d)
-                # support different named build folders, like 'build_gcc' or 'build_clang'
                 if d.startswith("build") and os.path.isdir(dd):
                     return dd
             raise Exception("ELL build folder not found in {}\nFound:{}".format(head,os.listdir(head)))

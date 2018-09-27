@@ -2,7 +2,7 @@
 # cmake file
 #
 
-if(${PYTHON_ENABLED})
+if(${PYTHON_ENABLED} AND ${CNTK})
 
     set(module_name "cntk_importer")
 

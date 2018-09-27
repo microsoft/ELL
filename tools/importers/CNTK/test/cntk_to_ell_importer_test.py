@@ -10,11 +10,9 @@
 
 import os
 script_path = os.path.dirname(os.path.abspath(__file__))
-# Try to import CNTK and ell. If either don't exist it means they have not
-# being built, so don't run the tests.
-SkipTests = False
+
 SkipFullModelTests = False
-EllModelsUrl = "https://github.com/Microsoft/ELL-models/raw/master/"
+
 import getopt
 import configparser
 import inspect
@@ -34,37 +32,29 @@ import numpy as np
 _logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-try:
+sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
+sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs/vision'))
+sys.path.append(os.path.join(script_path, '../../common/test'))
+sys.path.append(os.path.join(script_path, '../..'))
+sys.path.append(os.path.join(script_path, '..'))
+from cntk.initializer import glorot_uniform, he_normal
+from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
+from cntk import constant, param_relu, load_model
+import cntk.layers.blocks
+from cntk.ops import *
+from itertools import product
+from download_helper import *
 
-    sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
-    sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs/vision'))
-    sys.path.append(os.path.join(script_path, '../..'))
-    sys.path.append(os.path.join(script_path, '..'))
-    from cntk.initializer import glorot_uniform, he_normal
-    from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout,\
-        BatchNormalization, Dense
-    from cntk import constant, param_relu, load_model
-    import cntk.layers.blocks
-    from cntk.ops import *
-    from itertools import product
-    from download_helper import *
-
-    import find_ell
-    import ell
-    import cntk_to_ell
-    import ziptools
-    import lib.cntk_converters as cntk_converters
-    import lib.cntk_layers as cntk_layers
-    import lib.cntk_utilities as cntk_utilities
-    import cntk_import
-    from custom_functions import BinaryConvolution, CustomSign
-except ImportError:
-    errorType, value, traceback = sys.exc_info()
-    if "Could not find ell package" in str(value):
-        _logger.info("Python was not built, so skipping test")
-        SkipTests = True
-    else:
-        raise value
+import find_ell
+import ell
+import common_importer_test
+import cntk_to_ell
+import ziptools
+import lib.cntk_converters as cntk_converters
+import lib.cntk_layers as cntk_layers
+import lib.cntk_utilities as cntk_utilities
+import cntk_import
+from custom_functions import BinaryConvolution, CustomSign
 
 
 def BatchNormalizationTester(map_rank=1,
@@ -186,14 +176,7 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
             ('prediction outputs do not match! (for partial model ' +
                 modelFile + ')'))
 
-
-class CntkToEllTestBase(unittest.TestCase):
-    def setUp(self):
-        if SkipTests:
-            self.skipTest('Module not tested, CNTK or ELL module missing')
-
-
-class CntkLayersTestCase(CntkToEllTestBase):
+class CntkLayersTestCase(common_importer_test.EllImporterTestBase):
     def verify_compiled(self, predictor, input, expectedOutput, module_name,
                         method_name, precision=5):
         map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
@@ -604,9 +587,10 @@ class CntkLayersTestCase(CntkToEllTestBase):
             "prelu_activation", "test")
 
 
-class CntkXorModelTestCase(CntkToEllTestBase):
+class CntkXorModelTestCase(common_importer_test.EllImporterTestBase):
     def test_simple_xor_model(self):
-        predictor = cntk_to_ell.predictor_from_cntk_model('xorModel1.dnn')
+        path = os.path.join(find_ell.find_ell_build(), "tools/importers/CNTK/test/xorModel1.dnn")
+        predictor = cntk_to_ell.predictor_from_cntk_model(path)
         result = predictor.Predict([0, 0])
         self.assertAlmostEqual(
             result[0], 0, msg='incorrect prediction for [0, 0]')
@@ -630,24 +614,18 @@ class CntkXorModelTestCase(CntkToEllTestBase):
         ell_map.Save("xor_test_steppable.map")
 
 
-class CntkToEllFullModelTestBase(CntkToEllTestBase):
+class CntkToEllFullModelTestBase(common_importer_test.EllImporterTestBase):
     CATEGORIES_URL = 'models/ILSVRC2012/categories.txt'
     MODEL_URLS = [
         'models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.cntk.zip'
     ]
 
     def setUp(self):
-        base_model_uri = EllModelsUrl
-        CntkToEllTestBase.setUp(self)
+        super(CntkToEllFullModelTestBase, self).setUp()
+        base_model_uri = self.get_test_model_repo()
         if SkipFullModelTests:
             self.skipTest('Full model tests are being skipped')
                 
-        if os.path.isfile("config.json"):
-            with open("config.json", "r") as f:
-                config = json.load(f)
-                if "gitrepo" in config:
-                    base_model_uri = clone_repo(config["gitrepo"])
-
         filename = os.path.basename(self.CATEGORIES_URL)
         if not self.needs_updating(filename):
             self.label_file = filename
@@ -814,7 +792,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
 
 class CntkFullModelTest(CntkToEllFullModelTestBase):
     def setUp(self):
-        CntkToEllFullModelTestBase.setUp(self)
+        super(CntkFullModelTest,self).setUp()
         self.labels = self.load_labels(self.label_file)
         self.method_index = 0
 

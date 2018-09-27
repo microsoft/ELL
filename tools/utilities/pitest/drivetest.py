@@ -85,7 +85,7 @@ class DriveTest:
         self.created_dirs = []
         self.gallery_url = "https://github.com/Microsoft/ELL-models/raw/master/"
         if gitrepo:
-            self.gallery_url = clone_repo(gitrepo)
+            self.gallery_url = clone_repo(gitrepo, get_home_path())
 
         # initialize state from the args
         if not self.output_dir:

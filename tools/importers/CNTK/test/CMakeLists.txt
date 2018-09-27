@@ -26,12 +26,6 @@ if(${PYTHON_ENABLED} AND NOT APPLE)
     copy_newer_files(${test_name} src)
     copy_newer_files(${test_name} test_data)
     
-    if(GIT_REPO)
-        message(STATUS "Writing: ${CMAKE_BINARY_DIR}/config.json")
-        set(JSON "{ \"gitrepo\": \"${GIT_REPO}\" }")
-        file(WRITE "${CMAKE_BINARY_DIR}/config.json" ${JSON})
-    endif()
-
     add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} -m unittest ${test_src})
 
 endif()  # PYTHON_ENABLED

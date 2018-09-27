@@ -1,4 +1,17 @@
-"""Helper functions to download files and subsequently extract model zip files"""
+####################################################################################################
+##
+##  Project:  Embedded Learning Library (ELL)
+##  File:     download_helper.py
+##  Authors:  Chris Lovett
+##
+##  Requires: Python 3.x
+##
+####################################################################################################
+
+"""
+Helper functions to download files and subsequently extract model zip files.
+Also provides helper for cloning a git repo and finding the files there instead.
+"""
 
 import os
 import requests
@@ -9,6 +22,7 @@ from shutil import copyfile, rmtree
 
 _logger = logging.getLogger(__name__)
 script_dir = os.path.dirname(os.path.abspath(__file__))
+_cloned_repos = {}
 
 def download_file(url, local_folder=None):
     """Downloads file pointed to by `url`.
@@ -36,8 +50,7 @@ def download_file(url, local_folder=None):
 
 
 def download_and_extract_model(url, model_extension='.cntk', local_folder=None):
-    """Downloads file pointed to by `url`. Once downloaded, unzips the
-    downloaded file.
+    """Downloads file pointed to by `url`. Once downloaded, unzips the downloaded file.
     If `local_folder` is not supplied, downloads to the current folder.
     """
     def get_model_name(url):
@@ -65,8 +78,8 @@ def download_and_extract_model(url, model_extension='.cntk', local_folder=None):
     return model_name
 
 
-def run(args):
-    """ Run a command """
+def _run(args):
+    """ Run a subprocess specified by args """
     proc = subprocess.Popen(
         args,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -77,38 +90,54 @@ def run(args):
         proc.kill()
         outs, errors = proc.communicate()
 
-    print(outs)
-    print(errors)
+    _logger.info(outs)
+    if len(errors) > 0:
+        _logger.error(errors)
 
     if proc.returncode != 0:
         raise Exception("Command failed: {}".format(" ".join(args)))
 
-def clone_repo(url):
-    """ Clone the given git repo into the user's HOME directory """
+def get_home_path():
+    """ get location of the current user's home path """
     home = os.getenv("HOME")
     if os.name == 'nt':
         home = os.getenv("USERPROFILE")
         if "NetworkService" in home:
-            home = os.path.join(os.path.splitdrive(script_dir)[0] + os.path.sep,"VSTS","agent")
+            home = os.path.join(os.path.splitdrive(script_dir)[0] + os.path.sep, "git")
+            if not os.path.isdir(home):
+                os.mkdir(home)
 
     if not os.path.isdir(home):
         raise Exception("Cannot find user's HOME directory: {}".format(home))
 
+    return home
+
+def clone_repo(url, target_directory):    
+    """ Clone the given git repo into the target_directory """
+    global _cloned_repos
+    
     repo_name = os.path.basename(url)
 
     saved = os.getcwd()
-    repo = os.path.join(home, repo_name)
+    repo = os.path.join(target_directory, repo_name)
+
+    if url in _cloned_repos:
+        return _cloned_repos[url]
 
     if os.path.isdir(repo):
-        print("### Updating git repo: '{}' at '{}'".format(repo_name, home))
+        _logger.info("### Updating git repo: '{}' at '{}'".format(repo_name, target_directory))
         os.chdir(repo)
-        run(["git", "pull"])
+        _run(["git", "pull"])
     else:
-        os.chdir(home)
-        print("### Cloning git repo: '{}' into '{}'".format(repo_name, home))
-        run(["git", "lfs", "install"])
-        run(["git", "clone", url])
+        os.chdir(target_directory)
+        _logger.info("### Cloning git repo: '{}' into '{}'".format(repo_name, target_directory))
+        _run(["git", "lfs", "install"])
+        _run(["git", "clone", url])
 
     os.chdir(saved)
-    return repo + os.path.sep
+
+    result = repo + os.path.sep
+    _cloned_repos[url] = result
+
+    return result
     

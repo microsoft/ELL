@@ -1,4 +1,4 @@
-@echo off
+REM @echo off
 REM 
 REM   Project:  Embedded Learning Library (ELL)
 REM   File:     buildtask.cmd
@@ -22,6 +22,9 @@ set RPI_CLUSTER=
 set RPI_PASSWORD=
 set RPI_APIKEY=
 set GIT_REPO=
+set CNTK=OFF
+set ONNX=OFF
+set SUBSET=
 
 :parse
 if "%1"=="" goto :start
@@ -33,6 +36,9 @@ set %name:~1%=%value%
 goto :parse
 
 :start
+if not EXIST "%ELL_SRC%" goto :usage
+if not EXIST "%CONDA_PATH%" goto :usage
+
 pushd %ELL_SRC%
 
 call %CONDA_PATH%\Scripts\activate.bat py36
@@ -41,29 +47,43 @@ REM this needs to be run under VSTS agent user account (NTSERVICE account)
 git lfs install
 
 echo ===================================== BUILD ==================================
-call .\rebuild.cmd %VS_VERSION%
+call .\rebuild.cmd %VS_VERSION% /ONNX %ONNX% /CNTK %CNTK%
 if ERRORLEVEL 1 exit /B 1
 
 cd build
 call openblas.cmd
 
+if "%RPI_CLUSTER%"=="" goto :test
 echo ===================================== CMAKE with additional options ==================================
-cmake .. -DRPI_CLUSTER=%RPI_CLUSTER% -DRPI_PASSWORD=%RPI_PASSWORD% -DRPI_KEY=%RPI_APIKEY% -DGIT_REPO=%GIT_REPO%
+echo cmake .. -DRPI_CLUSTER=%RPI_CLUSTER% -DRPI_PASSWORD=%RPI_PASSWORD% -DRPI_KEY=%RPI_APIKEY% -DGIT_REPO=%GIT_REPO% -DCNTK=%CNTK% -DONNX=%ONNX% 
+cmake .. -DRPI_CLUSTER=%RPI_CLUSTER% -DRPI_PASSWORD=%RPI_PASSWORD% -DRPI_KEY=%RPI_APIKEY% -DGIT_REPO=%GIT_REPO% -DCNTK=%CNTK% -DONNX=%ONNX% 
 if ERRORLEVEL 1 exit /B 1
 
+:test
 echo ===================================== TEST ==================================
-if "%RPI_CLUSTER%"=="" goto :fulltest
+if "%SUBSET%"=="" goto :fulltest
 
-ctest . --build-config release -R pitest_test -VV
+ctest . --build-config release -R %SUBSET% -VV
 if ERRORLEVEL 1 exit /B 1
-goto :eof
 goto :done
 
 :fulltest
 ctest . --build-config release -VV
 if ERRORLEVEL 1 exit /B 1
-goto :eof
+goto :done
 
 :done
 endlocal
 popd
+goto :eof
+
+:usage
+echo "usage: buildtask.cmd ell_repo_path anaconda_env_path vs_version options..."
+echo "options: "
+echo "   /ONNX [ON|OFF]"
+echo "   /CNTK [ON|OFF]"
+echo "   /GIT_REPO  URL_of_ell_test_models"
+echo "   /RPI_CLUSTER URL_of_pi_cluster_manager"
+echo "   /RPI_PASSWORD password"
+echo "   /RPI_APIKEY api_key"
+exit /B 1

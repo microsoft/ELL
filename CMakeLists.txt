@@ -26,13 +26,22 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # To set an option:
 # cmake -DMyOption=ON|OFF buildDirectory
 # (so if we're running cmake from a 'build' directory inside the main directory, do this:
-#      cmake -DBUILD_DOCS=OFF ..  )
+#      cmake -DBUILD_DOC=OFF ..  )
 option(BUILD_DOC "Build Doxygen documentation" ON)
 option(USE_COMPILER_CACHE "Use a compiler cache (ccache) to speed up build times" $ENV{CMAKE_COMPILER_CACHE})
 option(STRICT_MODE "Build with 'warnings as errors'" OFF)
 option(PROFILING "Enable performance profiling tests" OFF)
 option(DISABLE_PYTHON "Explicitly disable building python modules" OFF)
+option(CNTK "Enable CNTK importer and related unit tests (requires CNTK python module)" OFF)
+option(ONNX "Enable ONNX importer and related unit tests (requires PyTorch and ONNX python modules)" OFF)
 
+# -DTEST_MODELS_REPO "URL to the git repo containing test models", default is "https://github.com/Microsoft/ell-test-models"
+
+if(NOT TEST_MODELS_REPO)
+  set(TEST_MODELS_REPO "https://github.com/Microsoft/ell-test-models")
+endif()
+
+message(STATUS "Configuring tests to use TEST_MODELS_REPO at: ${TEST_MODELS_REPO}")
 set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
 
 if(DISABLE_PYTHON)
@@ -160,6 +169,11 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/user")
     endif()
   endforeach()
 endif()
+
+message(STATUS "Writing: ${CMAKE_BINARY_DIR}/config.json")
+set(JSON "{ \"test_models_repo\": \"${TEST_MODELS_REPO}\" }")
+file(WRITE "${CMAKE_BINARY_DIR}/config.json" ${JSON})
+configure_file("${CMAKE_BINARY_DIR}/config.json" "config.json" COPYONLY)
 
 # Add project for solution-level documentation
 set (DOC README.md

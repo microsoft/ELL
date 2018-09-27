@@ -23,23 +23,12 @@ import numpy as np
 _logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-# Try to import ELL. If it doesn't exist it means it has not been built,
-# so don't run the tests.
-SkipTests = False
-try:
-    script_path = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.join(script_path, "..", "..", "..", "utilities", "pythonlibs"))
-    sys.path.append(os.path.join(script_path, '..'))
-    import find_ell
-    import ell
-    import darknet_to_ell
-except ImportError:
-    errorType, value, traceback = sys.exc_info()
-    if "Could not find ell package" in str(value):
-        _logger.info("Python was not built, so skipping test")
-        SkipTests = True
-    else:
-        raise value
+script_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(script_path, "..", "..", "..", "utilities", "pythonlibs"))
+sys.path.append(os.path.join(script_path, '..'))
+import find_ell
+import ell
+import darknet_to_ell
 
 
 # Load a test darknet model and verify its output.
@@ -51,8 +40,7 @@ except ImportError:
 # - softmax
 class DarknetModelTestCase(unittest.TestCase):
     def setUp(self):
-        if SkipTests:
-            self.skipTest('Module not tested, ELL module missing')
+        pass
 
     def test_darknet_model(self):
         # Create synthetic input data

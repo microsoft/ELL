@@ -17,4 +17,6 @@ if(${PYTHON_ENABLED})
     #copy files
     copy_newer_files(${module_name} common_src)
 
+    add_subdirectory(test)
+
 endif()  # PYTHON_ENABLED

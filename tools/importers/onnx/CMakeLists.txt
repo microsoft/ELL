@@ -2,7 +2,7 @@
 # cmake file
 #
 
-if(${PYTHON_ENABLED})
+if(${PYTHON_ENABLED} AND ${ONNX})
 
     set(module_name "onnx_importer")
 

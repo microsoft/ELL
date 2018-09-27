@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import time
+import unittest
 
 import numpy as np 
 import torch
@@ -328,36 +329,40 @@ class Net(nn.Module):
             x1 = self.fc1(x1)
             return x1 
 
-model = Net()
-export_to_onnx(model, (1,3,3,3))
-verify_ell_model("model.onnx")
 
+class OnnxTestCase(unittest.TestCase):
+    def setUp(self):
+        self.onnx_model = 'model.onnx'
+        self.torch_model = 'model.pth'
 
-def external_model_test(onnx_model , torch_model=None, torch_model_obj=None):
+    def generate_model_test(self):
+        model = Net()
+        export_to_onnx(model, (1,3,3,3))
+        verify_ell_model("model.onnx")
 
-    """
-    Loading tytorch model depend on how it's been saved. 
-    torch.save/torch.load "saves/loads" an object to a disk file.
+    def external_model_test(self):
+        """
+        Loading tytorch model depend on how it's been saved. 
+        torch.save/torch.load "saves/loads" an object to a disk file.
 
-    So, if you save the_model, it will save the entire model object, 
-    including its architecture definition and some other internal aspects.
-    If you save the_model.state_dict(), it will save a dictionary containing 
-    the model state (i.e. parameters and buffers) only. 
-    Saving the model can break the code in various ways, so the preferred 
-    method is to save and load only the model state
-    e.g : if we use torch.save("model.pth") it's load as torch_model = torch.load('model.pht')
-    however if we save the state_dict(), we load the model as
-    "torch_model_obj.load_state_dict(torch.load(torch_model))" notice you'll need the model definition here
-    """
+        So, if you save the_model, it will save the entire model object, 
+        including its architecture definition and some other internal aspects.
+        If you save the_model.state_dict(), it will save a dictionary containing 
+        the model state (i.e. parameters and buffers) only. 
+        Saving the model can break the code in various ways, so the preferred 
+        method is to save and load only the model state
+        e.g : if we use torch.save("model.pth") it's load as torch_model = torch.load('model.pht')
+        however if we save the state_dict(), we load the model as
+        "torch_model_obj.load_state_dict(torch.load(torch_model))" notice you'll need the model definition here
+        """
 
-    if torch_model_obj is not None:
-        torch_model = torch_model_obj.load_state_dict(torch.load(torch_model))
-    else:
-        torch_model = torch.load(torch_model)
-    # onnx_model = export_to_onnx(torch_model)
-    ell_map, onnx_nodes = onnx_converter(onnx_model)
-    verify_ell_model(onnx_nodes)
+        # if torch_model_obj is not None:
+        #     torch_model = torch_model_obj.load_state_dict(torch.load(torch_model))
+        
+        torch_model = torch.load(self.onnx_model)
+        ell_map, onnx_nodes = onnx_converter(self.onnx_model)
+        verify_ell_model(onnx_nodes)
 
 
 if __name__ == "__main__":
-    external_model_test('model.onnx', 'model.pth')
+    unittest.main()
