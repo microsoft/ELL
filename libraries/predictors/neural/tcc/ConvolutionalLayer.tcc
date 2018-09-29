@@ -199,9 +199,9 @@ namespace neural
         _convolutionalParameters.numFiltersAtATime = static_cast<size_t>(numFilters);
 
         math::TensorArchiver::Read(_weights, "weights", archiver);
-        _isDepthwiseSeparable = (_weights.NumChannels() == 1);
-        ComputeWeightsMatrix();
+        _isDepthwiseSeparable = (_weights.NumChannels() == 1) && (_layerParameters.input.NumChannels() > 1);
         CalculateConvolutionMethod();
+        ComputeWeightsMatrix();
         InitializeIOMatrices();
     }
 

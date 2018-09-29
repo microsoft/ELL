@@ -218,7 +218,10 @@ def verify_ell_nodes_in_vision_model(ell_map, cntk_model, cntk_nodes, ordered_im
     try:
         # Get input to the CNTK model
         cntk_input_tensor = np.random.random((cntk_model.arguments[0].shape)).astype(np.float32) * 255
-        ell_input_tensor = memory_shapes.get_tensor_in_ell_order(cntk_input_tensor, "channel_row_column").ravel().astype(np.float32)
+        ell_input_tensor = cntk_input_tensor
+        if len(cntk_model.arguments[0].shape) == 1:
+            ell_input_tensor = cntk_input_tensor.reshape((1,1,cntk_model.arguments[0].shape[0]))
+        ell_input_tensor = memory_shapes.get_tensor_in_ell_order(ell_input_tensor, "channel_row_column").ravel().astype(np.float32)
 
         # For convenient lookup, map from the cntk intermediate node to the
         # importer node
@@ -399,7 +402,7 @@ def map_from_cntk_model_using_new_engine(modelFile, step_interval_msec=0, lag_th
         ell_map = importer_engine.convert_nodes(importer_model)
 
     except BaseException as exception:
-        _logger.error("Error occurred attempting to convert cntk layers to ELL model using nodes")
+        _logger.error("Error occurred attempting to convert cntk layers to ELL model using nodes: " + str(exception))
         raise exception
 
     if verify_model["audio"]:

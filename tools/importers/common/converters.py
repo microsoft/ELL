@@ -33,25 +33,33 @@ class ImporterNode:
         attributes: typing.Mapping[str, typing.Any] = {},
         padding: typing.Mapping[str, typing.Any] = {},
         input_shapes: typing.Sequence[typing.Any] = [],
-        output_shapes: typing.Sequence[typing.Any] = []):
+        output_shapes: typing.Sequence[typing.Any] = [],
+        metadata: typing.Mapping[str, str] = {}):
         """
         id: unique identifier for this node
         operation_type: string name of the operation type to be imported.
             This will get mapped to an ELL operation via the operation_map.
         inputs: array of strings representing where the input comes from.
-        outputs: array of strings representing the output tensors.
+            The string is the 'id' of another ImporterNode.
+        outputs: array of strings representing the output tensors.        
+            The string is the 'id' of another ImporterNode.
         weights: dictionary of weight parameter labels to weight names e.g. a
             convolutional node may have {'weights': 'w123', 'bias': 'b832'}.
             Dictionary keys are specific to the ELL operation.
+            The value is the id of a tensor in ImporterModel.tensors.
         attributes: dictionary of attribute names and values e.g. a
             convolutional node may have {'size': 3, 'step': 1, 'pad': 0 }.
             Dictionary keys are specific to the ELL operation.
         padding: dictionary of padding size and padding scheme e.g.
                 {"size": 0, "scheme": ell.neural.PaddingScheme.zeros}
+                [chris] why isn't this just a type of attribute?
         input_shapes: array of tuples representing input shapes and ordering
                 e.g. ((3,64,64), "channel_row_column").
+            The ImporterEngine will take care of reshaping everything to 
+            match the order required by ELL.
         output_shapes: array of tuples representing output shapes and ordering
                 e.g. ((32,8,8), "channel_row_column").
+        metadata: optional additional metadata to store in the ell_nodes.
         """
         self.id = id
         self.operation_type = operation_type
@@ -63,6 +71,7 @@ class ImporterNode:
         self.output_padding = {"size": 0, "scheme": ell.neural.PaddingScheme.zeros}
         self.input_shapes = input_shapes
         self.output_shapes = output_shapes
+        self.metadata = metadata
 
     def __repr__(self):
         _print_line = ""
@@ -122,6 +131,14 @@ class LookupTable:
         if set_group_id:
             # Set the node's metadata to show where this node came from
             ell_node.SetMetadataValue("GroupId", importer_node.id)
+        
+        # concatenate any importer_node metadata provided by importer 
+        if importer_node.metadata != None:
+            for key in importer_node.metadata:
+                value = importer_node.metadata[key]
+                ell_node.SetMetadataValue(key, value)
+
+
         # Add owning id mapping
         self.ell_id_to_owning_importer_node[ell_node_id] = importer_node
 
@@ -159,6 +176,8 @@ class LookupTable:
         """
         Returns a numpy array in ELL order
         """
+        if not uid in self.tensors:
+            raise Exception("Required tensor {} not found".format(uid))
         original_tensor, order = self.tensors[uid]
 
         return memory_shapes.get_tensor_in_ell_order(original_tensor, order)
@@ -319,6 +338,7 @@ class ConvertBase:
         self.required_weights = []
         self.required_attributes = []
         self.importer_node = node
+        self.optional = False
 
     def can_convert(self) -> bool:
         """
@@ -329,9 +349,13 @@ class ConvertBase:
         """
         for w in self.required_weights:
             if w not in self.importer_node.weights:
+                if not self.optional:
+                    raise Exception("Missing required weight '{}' on node {}_{}".format(w, self.importer_node.operation_type, self.importer_node.id))
                 return False
         for attr in self.required_attributes:
             if attr not in self.importer_node.attributes:
+                if not self.optional:
+                    raise Exception("Missing required attribute {} on node {}_{}".format(attr, self.importer_node.operation_type, self.importer_node.id))
                 return False
         return True
 
@@ -352,6 +376,7 @@ class ConvertBase:
         ell_shape = self.get_ell_shape(shape_entry[0], shape_entry[1], padding)
         ell_padding_parameter = ell.neural.PaddingParameters(self.importer_node.padding["scheme"], padding)
         return (ell_shape, ell_padding_parameter)
+
     def get_output_parameters(self, last_in_block = True, output_index = 0):
         """
         Return the output shape and padding parameters as a tuple.
@@ -436,8 +461,11 @@ class ConvertActivation(ConvertBase):
         """
         layer_parameters = self.get_layer_parameters(conversion_parameters)
         activation = self.importer_node.attributes["activation"]
+        alpha = 0.01
+        if "alpha" in self.importer_node.attributes:
+            alpha = self.importer_node.attributes["alpha"]
         if (activation == ell.neural.ActivationType.leaky):
-            return ell.neural.LeakyReLUActivationLayer(layer_parameters, 0.01)
+            return ell.neural.LeakyReLUActivationLayer(layer_parameters, alpha)
         else:
             return ell.neural.ActivationLayer(layer_parameters, activation)
 
@@ -457,6 +485,14 @@ class ConvertActivation(ConvertBase):
         ell_node = builder.AddActivationLayerNode(model, input_port_elements, activation_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
+class OptionalConvertActivation(ConvertActivation):
+    """
+    Optional converter for Activation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node)
+        self.optional = True
 
 class ConvertAveragePooling(ConvertBase):
     """
@@ -576,6 +612,14 @@ class ConvertBias(ConvertBase):
         ell_node = builder.AddBiasLayerNode(model, input_port_elements, bias_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
+class OptionalConvertBias(ConvertBias):
+    """
+    Optional converter for Bias
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node)
+        self.optional = True
 
 class ConvertBinaryConvolution(ConvertBase):
     """
@@ -784,8 +828,8 @@ class ConvertGRU(ConvertBase):
     """
     def __init__(self, node: ImporterNode):
         super().__init__(node)
-        self.required_weights = ["updateWeights", "resetWeights", "hiddenWeights", "updateBias", "resetBias", "hiddenBias"]
-        self.required_attributes = ["activation", "recurrentActivation"]
+        self.required_weights = ["update_weights", "reset_weights", "hidden_weights", "update_bias", "reset_bias", "hidden_bias"]
+        self.required_attributes = ["activation", "recurrent_activation"]
 
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -793,25 +837,25 @@ class ConvertGRU(ConvertBase):
         """
         layer_parameters = self.get_layer_parameters(conversion_parameters)
 
-        updateWeights = self.get_ell_tensor(
-            self.importer_node.weights["updateWeights"][0], conversion_parameters)
-        resetWeights = self.get_ell_tensor(
-            self.importer_node.weights["resetWeights"][0], conversion_parameters)
-        hiddenWeights = self.get_ell_tensor(
-            self.importer_node.weights["hiddenWeights"][0], conversion_parameters)
-        updateBias = self.get_ell_tensor(
-            self.importer_node.weights["updateBias"][0], conversion_parameters)
-        resetBias = self.get_ell_tensor(
-            self.importer_node.weights["resetBias"][0], conversion_parameters)
-        hiddenBias = self.get_ell_tensor(
-            self.importer_node.weights["hiddenBias"][0], conversion_parameters)
+        update_weights = self.get_ell_tensor(
+            self.importer_node.weights["update_weights"][0], conversion_parameters)
+        reset_weights = self.get_ell_tensor(
+            self.importer_node.weights["reset_weights"][0], conversion_parameters)
+        hidden_weights = self.get_ell_tensor(
+            self.importer_node.weights["hidden_weights"][0], conversion_parameters)
+        update_bias = self.get_ell_tensor(
+            self.importer_node.weights["update_bias"][0], conversion_parameters)
+        reset_bias = self.get_ell_tensor(
+            self.importer_node.weights["reset_bias"][0], conversion_parameters)
+        hidden_bias = self.get_ell_tensor(
+            self.importer_node.weights["hidden_bias"][0], conversion_parameters)
 
         activation = self.importer_node.attributes["activation"]
-        recurrentActivation = self.importer_node.attributes["activation"]
+        recurrentActivation = self.importer_node.attributes["recurrent_activation"]
 
-        return ell.neural.GRULayer(layer_parameters, updateWeights,
-                                        resetWeights, hiddenWeights,
-                                        updateBias, resetBias, hiddenBias,
+        return ell.neural.GRULayer(layer_parameters, update_weights,
+                                        reset_weights, hidden_weights,
+                                        update_bias, reset_bias, hidden_bias,
                                         activation, recurrentActivation)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -872,20 +916,31 @@ class ConvertInput(ConvertBase):
         shape_entry = self.importer_node.output_shapes[0]
         ell_shape = self.get_ell_shape(shape_entry[0], shape_entry[1], 0)
 
-        input_node = builder.AddInputNode(
-            model, ell.math.TensorShape(1, 1, 1), ell.nodes.PortType.real)
-        clock_node = builder.AddClockNode(
-            model, ell.nodes.PortElements(input_node.GetOutputPort("output")),
-            float(step_interval_msec), float(lag_threshold_msec),
-            "{}LagNotification".format(function_prefix))
-        source_node = builder.AddSourceNode(
-            model, ell.nodes.PortElements(clock_node.GetOutputPort("output")),
-            ell.nodes.PortType.smallReal, ell_shape,
-            "{}InputCallback".format(function_prefix))
+        if step_interval_msec is not None:
+            # in the steppable case the input is a clock ticks
+            input_node = builder.AddInputNode(
+                model, ell.math.TensorShape(1, 1, 1), ell.nodes.PortType.smallReal)
+
+            clock_node = builder.AddClockNode(
+                model, ell.nodes.PortElements(input_node.GetOutputPort("output")),
+                float(step_interval_msec), float(lag_threshold_msec),
+                "{}LagNotification".format(function_prefix))
+            source_node = builder.AddSourceNode(
+                model, ell.nodes.PortElements(clock_node.GetOutputPort("output")),
+                ell.nodes.PortType.smallReal, ell_shape,
+                "{}InputCallback".format(function_prefix))
+            
+            input_node = source_node
+        else:
+            input_node = builder.AddInputNode(
+                model, ell_shape, ell.nodes.PortType.smallReal)
+
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, input_node)
-        lookup_table.add_imported_ell_node(self.importer_node, clock_node)
-        lookup_table.add_imported_ell_node(self.importer_node, source_node)
+        
+        if step_interval_msec is not None:
+            lookup_table.add_imported_ell_node(self.importer_node, clock_node)
+            lookup_table.add_imported_ell_node(self.importer_node, source_node)
 
         # Special case: If output requires padding e.g. Input is connected to a
         # Convolutional node that requires padding, add a ReorderData node to
@@ -894,7 +949,7 @@ class ConvertInput(ConvertBase):
         padding = self.importer_node.output_padding["size"]
         if padding > 0:
             # Create the reorder node
-            port_elements = lookup_table.get_output_port_elements_for_node(source_node)
+            port_elements = lookup_table.get_output_port_elements_for_node(input_node)
             input_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], 0)
             output_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], padding)
             reorder_node = builder.AddReorderDataNode(model, port_elements, input_memory_layout, output_memory_layout, [0, 1, 2])
@@ -924,8 +979,8 @@ class ConvertLSTM(ConvertBase):
     """
     def __init__(self, node: ImporterNode):
         super().__init__(node)
-        self.required_weights = ["inputWeights", "forgetMeWeights", "candidateWeights", "outputWeights", "inputBias", "forgetMeBias", "candidateBias", "outputBias"]
-        self.required_attributes = ["activation", "recurrentActivation"]
+        self.required_weights = ["input_weights", "forget_me_weights", "candidate_weights", "output_weights", "input_bias", "forget_me_bias", "candidate_bias", "output_bias"]
+        self.required_attributes = ["activation", "recurrent_activation"]
 
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -933,30 +988,30 @@ class ConvertLSTM(ConvertBase):
         """
         layer_parameters = self.get_layer_parameters(conversion_parameters)
 
-        inputWeights = self.get_ell_tensor(
-            self.importer_node.weights["inputWeights"][0], conversion_parameters)
-        forgetMeWeights = self.get_ell_tensor(
-            self.importer_node.weights["forgetMeWeights"][0], conversion_parameters)
-        candidateWeights = self.get_ell_tensor(
-            self.importer_node.weights["candidateWeights"][0], conversion_parameters)
-        outputWeights = self.get_ell_tensor(
-            self.importer_node.weights["outputWeights"][0], conversion_parameters)
-        inputBias = self.get_ell_tensor(
-            self.importer_node.weights["inputBias"][0], conversion_parameters)
-        forgetMeBias = self.get_ell_tensor(
-            self.importer_node.weights["forgetMeBias"][0], conversion_parameters)
-        candidateBias = self.get_ell_tensor(
-            self.importer_node.weights["candidateBias"][0], conversion_parameters)
-        outputBias = self.get_ell_tensor(
-            self.importer_node.weights["outputBias"][0], conversion_parameters)
+        input_weights = self.get_ell_tensor(
+            self.importer_node.weights["input_weights"][0], conversion_parameters)
+        forget_me_weights = self.get_ell_tensor(
+            self.importer_node.weights["forget_me_weights"][0], conversion_parameters)
+        candidate_weights = self.get_ell_tensor(
+            self.importer_node.weights["candidate_weights"][0], conversion_parameters)
+        output_weights = self.get_ell_tensor(
+            self.importer_node.weights["output_weights"][0], conversion_parameters)
+        input_bias = self.get_ell_tensor(
+            self.importer_node.weights["input_bias"][0], conversion_parameters)
+        forget_me_bias = self.get_ell_tensor(
+            self.importer_node.weights["forget_me_bias"][0], conversion_parameters)
+        candidate_bias = self.get_ell_tensor(
+            self.importer_node.weights["candidate_bias"][0], conversion_parameters)
+        output_bias = self.get_ell_tensor(
+            self.importer_node.weights["output_bias"][0], conversion_parameters)
 
         activation = self.importer_node.attributes["activation"]
-        recurrentActivation = self.importer_node.attributes["activation"]
+        recurrentActivation = self.importer_node.attributes["recurrent_activation"]
 
-        return ell.neural.LSTMLayer(layer_parameters, inputWeights,
-                                        forgetMeWeights, candidateWeights,
-                                        outputWeights, inputBias, forgetMeBias,
-                                        candidateBias, outputBias,
+        return ell.neural.LSTMLayer(layer_parameters, input_weights,
+                                        forget_me_weights, candidate_weights,
+                                        output_weights, input_bias, forget_me_bias,
+                                        candidate_bias, output_bias,
                                         activation, recurrentActivation)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -1252,7 +1307,6 @@ class ConvertRegion(ConvertBase):
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
-
 class ConvertScaling(ConvertBase):
     """
     Converter for Scaling
@@ -1289,6 +1343,14 @@ class ConvertScaling(ConvertBase):
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
+
+class OptionalConvertScaling(ConvertScaling):
+    """
+    Optional converter for Scaling
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node)
+        self.optional = True
 
 class ConvertSoftmax(ConvertBase):
     """
@@ -1428,6 +1490,43 @@ class ConvertReshape(ConvertBase):
         # to be the reshape's input node
         input_owner = lookup_table.get_owning_node_for_output(self.importer_node.inputs[0])
         lookup_table.add_imported_ell_node(self.importer_node, input_owner, set_group_id=False)
+
+class ConvertConstant(ConvertBase):
+    """
+    Converter for Constant nodes
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node)
+        self.required_weights = []
+        self.required_attributes = [ 'tensor' ]
+
+    def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Return the appropriate ELL node
+        """
+        return None
+
+    def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Derived classes override to convert the importer node to appropriate ELL node(s)
+        and insert into the model
+        """
+        model = conversion_parameters["model"]
+        builder = conversion_parameters["builder"]
+        lookup_table = conversion_parameters["lookup_table"]
+        tensor = self.importer_node.attributes["tensor"]
+        port_type = ell.nodes.PortType.real
+        if tensor.dtype == np.float32:
+            port_type = ell.nodes.PortType.smallReal
+        elif tensor.dtype == np.int:
+            port_type = ell.nodes.PortType.integer
+        elif tensor.dtype == np.int64:
+            port_type = ell.nodes.PortType.bigInt
+        elif tensor.dtype == np.bool:
+            port_type = ell.nodes.PortType.boolean
+
+        ell_node = builder.AddConstantNode(model, tensor.ravel().astype(np.float64), port_type)
+        lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
 
 class ConvertVAD(ConvertBase):

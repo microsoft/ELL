@@ -69,9 +69,8 @@ using namespace ell::utilities;
 template <typename OutputType, typename InputType>
 std::vector<OutputType> CastVector(const std::vector<InputType>& vector)
 {
-    std::vector<OutputType> result;
-    result.reserve(vector.size());
-    std::transform(vector.begin(), vector.end(), std::back_inserter(result), [](InputType x) { return static_cast<OutputType>(x); });
+    std::vector<OutputType> result(vector.size());
+    std::transform(vector.begin(), vector.end(), result.begin(), [](InputType x) { return static_cast<OutputType>(x); });
     return result;
 }
 
@@ -84,9 +83,8 @@ namespace
         result.reserve(vector.size());
         for (const auto& row : vector)
         {
-            std::vector<OutputType> outRow;
-            outRow.reserve(row.size());
-            std::transform(row.begin(), row.end(), std::back_inserter(outRow), [](InputType x) { return static_cast<OutputType>(x); });
+            std::vector<OutputType> outRow(row.size());
+            std::transform(row.begin(), row.end(), outRow.begin(), [](InputType x) { return static_cast<OutputType>(x); });
             result.push_back(outRow);
         }
         return result;
@@ -457,6 +455,9 @@ Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, Port
     case PortType::smallReal:
         newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<float>>(CastVector<float>(values));
         break;
+    case PortType::bigInt:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<int64_t>>(CastVector<int64_t>(values));
+        break;
     default:
         throw std::invalid_argument("Error: could not create ConstantNode of the requested type");
     }
@@ -480,6 +481,9 @@ Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, cons
         break;
     case PortType::smallReal:
         newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<float>>(CastVector<float>(values), shape);
+        break;
+    case PortType::bigInt:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<int64_t>>(CastVector<int64_t>(values));
         break;
     default:
         throw std::invalid_argument("Error: could not create ConstantNode of the requested type");
@@ -760,7 +764,7 @@ typename ell::predictors::neural::Layer<ElementType>::LayerParameters GetLayerPa
 
 Node ModelBuilder::AddActivationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ActivationLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -841,7 +845,7 @@ Node ModelBuilder::AddActivationLayerNode(Model model, PortElements input, const
 
 Node ModelBuilder::AddBatchNormalizationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BatchNormalizationLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -878,7 +882,7 @@ Node ModelBuilder::AddBatchNormalizationLayerNode(Model model, PortElements inpu
 
 Node ModelBuilder::AddBiasLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BiasLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -911,7 +915,7 @@ Node ModelBuilder::AddBiasLayerNode(Model model, PortElements input, const ell::
 
 Node ModelBuilder::AddBinaryConvolutionalLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BinaryConvolutionalLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -947,7 +951,7 @@ Node ModelBuilder::AddBinaryConvolutionalLayerNode(Model model, PortElements inp
 
 Node ModelBuilder::AddConvolutionalLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ConvolutionalLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -983,7 +987,7 @@ Node ModelBuilder::AddConvolutionalLayerNode(Model model, PortElements input, co
 
 Node ModelBuilder::AddFullyConnectedLayerNode(Model model, PortElements input, const ell::api::predictors::neural::FullyConnectedLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -1018,7 +1022,7 @@ Node ModelBuilder::AddFullyConnectedLayerNode(Model model, PortElements input, c
 
 Node ModelBuilder::AddRegionDetectionLayerNode(Model model, PortElements input, const ell::api::predictors::neural::RegionDetectionLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -1049,7 +1053,7 @@ Node ModelBuilder::AddRegionDetectionLayerNode(Model model, PortElements input, 
 
 Node ModelBuilder::AddPoolingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::PoolingLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -1091,7 +1095,7 @@ Node ModelBuilder::AddPoolingLayerNode(Model model, PortElements input, const el
 
 Node ModelBuilder::AddScalingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ScalingLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -1124,7 +1128,7 @@ Node ModelBuilder::AddScalingLayerNode(Model model, PortElements input, const el
 
 Node ModelBuilder::AddSoftmaxLayerNode(Model model, PortElements input, const ell::api::predictors::neural::SoftmaxLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -1157,7 +1161,7 @@ Node ModelBuilder::AddSoftmaxLayerNode(Model model, PortElements input, const el
 
 Node ModelBuilder::AddGRULayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::GRULayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -1190,13 +1194,21 @@ Node ModelBuilder::AddGRULayerNode(Model model, PortElements input, PortElements
     // Now we can construct the underlying Layer rather than python api version of GRULayer.
     size_t m = layer.updateWeights.shape.rows;
     size_t n = layer.updateWeights.shape.columns;
+
+    auto updateWeights = CastVector<ElementType>(layer.updateWeights.data);
+    auto resetWeights = CastVector<ElementType>(layer.resetWeights.data);
+    auto hiddenWeights = CastVector<ElementType>(layer.hiddenWeights.data);
+    auto updateBias = CastVector<ElementType>(layer.updateBias.data);
+    auto resetBias = CastVector<ElementType>(layer.resetBias.data);
+    auto hiddenBias = CastVector<ElementType>(layer.hiddenBias.data);
+
     ell::predictors::neural::GRUParameters<ElementType> gruParameters = {
-        { CastVector<ElementType>(layer.updateWeights.data).data(), m, n }, 
-        { CastVector<ElementType>(layer.resetWeights.data).data(), m, n }, 
-        { CastVector<ElementType>(layer.hiddenWeights.data).data(), m, n }, 
-        { CastVector<ElementType>(layer.updateBias.data).data(), layer.updateBias.data.size() }, 
-        { CastVector<ElementType>(layer.resetBias.data).data(), layer.resetBias.data.size() }, 
-        { CastVector<ElementType>(layer.hiddenBias.data).data(), layer.hiddenBias.data.size() } };
+        { updateWeights.data(), m, n },
+        { resetWeights.data(), m, n }, 
+        { hiddenWeights.data(), m, n }, 
+        { updateBias.data(), updateBias.size() },
+        { resetBias.data(), resetBias.size() },
+        { hiddenBias.data(), hiddenBias.size() } };
     ell::predictors::neural::GRULayer<ElementType> gruLayer(parameters, gruParameters, ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(layer.activation),
         ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(layer.recurrentActivation));
 
@@ -1206,7 +1218,7 @@ Node ModelBuilder::AddGRULayerNode(Model model, PortElements input, PortElements
 
 Node ModelBuilder::AddLSTMLayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::LSTMLayer& layer)
 {
-    auto type = input.GetType();
+    auto type = layer.parameters.dataType;
     switch (type)
     {
     case PortType::real:
@@ -1236,19 +1248,28 @@ Node ModelBuilder::AddLSTMLayerNode(Model model, PortElements input, PortElement
     // layer node's constructor.
     UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode<ElementType>(layer);
 
+    auto inputWeights = CastVector<ElementType>(layer.inputWeights.data);
+    auto forgetMeWeights = CastVector<ElementType>(layer.forgetMeWeights.data);
+    auto candidateWeights = CastVector<ElementType>(layer.candidateWeights.data);
+    auto outputWeights = CastVector<ElementType>(layer.outputWeights.data);
+    auto inputBias = CastVector<ElementType>(layer.inputBias.data);
+    auto forgetMeBias = CastVector<ElementType>(layer.forgetMeBias.data);
+    auto candidateBias = CastVector<ElementType>(layer.candidateBias.data);
+    auto outputBias = CastVector<ElementType>(layer.outputBias.data);
+
     // Now we can construct the underlying Layer rather than python api version of GRULayer.
     size_t m = layer.inputWeights.shape.rows;
     size_t n = layer.inputWeights.shape.columns;
     size_t s = layer.inputBias.data.size();
     ell::predictors::neural::LSTMParameters<ElementType> lstmParameters = {
-        { CastVector<ElementType>(layer.inputWeights.data).data(), m, n }, 
-        { CastVector<ElementType>(layer.forgetMeWeights.data).data(), m, n }, 
-        { CastVector<ElementType>(layer.candidateWeights.data).data(), m, n }, 
-        { CastVector<ElementType>(layer.outputWeights.data).data(), m, n }, 
-        { CastVector<ElementType>(layer.inputBias.data).data(), s }, 
-        { CastVector<ElementType>(layer.forgetMeBias.data).data(), s }, 
-        { CastVector<ElementType>(layer.candidateBias.data).data(), s }, 
-        { CastVector<ElementType>(layer.outputBias.data).data(), s } };
+        { inputWeights.data(), m, n }, 
+        { forgetMeWeights.data(), m, n },
+        { candidateWeights.data(), m, n },
+        { outputWeights.data(), m, n },
+        { inputBias.data(), s },
+        { forgetMeBias.data(), s },
+        { candidateBias.data(), s },
+        { outputBias.data(), s } };
 
     ell::predictors::neural::LSTMLayer<ElementType> lstmLayer(parameters, lstmParameters, ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(layer.activation),
         ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(layer.recurrentActivation));

@@ -274,14 +274,17 @@ namespace nodes
         function.MemoryCopy<ValueType>(hiddenState, 0, inputPlusHidden, inputSize, outputSize);
         // Now, inputPlusHidden = [Xt, Ht-1]
 
+        auto alpha = static_cast<ValueType>(1.0); // GEMV scaling of the matrix multipication
+        auto beta = static_cast<ValueType>(1.0); // GEMV scaling of the bias addition
+
         // Zt = recurrentFunction(Wu * [Xt, Ht-1] + Bu)    (where recurrentFunction is usually sigmoid)
         function.MemoryCopy<ValueType>(updateBias, updateGateActivation, outputSize); // Copy bias values into output so GEMM call accumulates them
-        function.CallGEMV(outputSize, inputSize + outputSize, static_cast<ValueType>(1.0), updateWeights, inputSize + outputSize, inputPlusHidden, 1, static_cast<ValueType>(1.0), updateGateActivation, 1);
+        function.CallGEMV(outputSize, inputSize + outputSize, alpha, updateWeights, inputSize + outputSize, inputPlusHidden, 1, beta, updateGateActivation, 1);
         ApplyActivation(function, _recurrentActivation, updateGateActivation, outputSize);
 
         // Rt = recurrentFunction(Wr * [Xt, Ht-1] + Br)   (where recurrentFunction is usually sigmoid)
         function.MemoryCopy<ValueType>(resetBias, resetGateActivation, outputSize); // Copy bias values into output so GEMM call accumulates them
-        function.CallGEMV(outputSize, inputSize + outputSize, static_cast<ValueType>(1.0), resetWeights, inputSize + outputSize, inputPlusHidden, 1, static_cast<ValueType>(1.0), resetGateActivation, 1);
+        function.CallGEMV(outputSize, inputSize + outputSize, alpha, resetWeights, inputSize + outputSize, inputPlusHidden, 1, beta, resetGateActivation, 1);
         ApplyActivation(function, _recurrentActivation, resetGateActivation, outputSize);
 
         // Ht~ = activationFunction(Wh * [Xt, (Rt .* Ht-1)] + Bh)   (where activationFunction is typically tanh)
@@ -295,15 +298,17 @@ namespace nodes
         // Now, inputPlusHidden == Rt . * [Xt, Ht-1]
         // newHiddenState = Ht~ = activationFunction(Wh * inputPlusHidden + b_h)  (where activationFunction is usually tanh)
         function.MemoryCopy<ValueType>(hiddenBias, newHiddenState, outputSize); // Copy bias values into output so GEMM call accumulates them
-        function.CallGEMV(outputSize, inputSize + outputSize, static_cast<ValueType>(1.0), hiddenWeights, inputSize + outputSize, inputPlusHidden, 1, static_cast<ValueType>(1.0), newHiddenState, 1);
+        function.CallGEMV(outputSize, inputSize + outputSize, alpha, hiddenWeights, inputSize + outputSize, inputPlusHidden, 1, beta, newHiddenState, 1);
         ApplyActivation(function, _activation, newHiddenState, outputSize);
 
         // Compute Ht = (1-Zt) .* Ht~ + Zt * Ht-1,
+        //            = Ht~ - Zt .* Ht~  + Zt * Ht-1
+        //            = Ht~ + Zt .* (Ht-1 - Ht~) 
         function.For(outputSize, [=](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar index) {
             auto z_i = updateGateActivation[index];
-
-            // Note: Keep the static cast here -- using 1.0 directly results in NaN
-            auto newValue = ((static_cast<ValueType>(1.0) - z_i) * newHiddenState[index]) + (z_i * prevHiddenState[index]);
+            auto n_i = newHiddenState[index];
+            auto h_i = prevHiddenState[index];
+            auto newValue = n_i + z_i * (h_i - n_i);
             output[index] = newValue;
         });
 

@@ -12,6 +12,7 @@ host/
 *.7z
 *.rar
 *.gz
-*.onnx
 *.ell
+*.onnx
+*.pth
 

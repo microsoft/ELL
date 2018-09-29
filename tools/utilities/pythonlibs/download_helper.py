@@ -75,7 +75,7 @@ def download_and_extract_model(url, model_extension='.cntk', local_folder=None):
     else:
         _logger.info("Non-zipped model: " + filename)
 
-    return model_name
+    return model_filename
 
 
 def _run(args):

@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "StringUtil.h"
+
 namespace ell
 {
 namespace predictors
@@ -21,9 +23,11 @@ namespace neural
         _outputVector(GetOutputMinusPadding().Size())
     {
         _weights = weights;
-        if (_weights.NumRows() != (GetOutputMinusPadding().Size()))
+        if (_weights.NumRows() != GetOutputMinusPadding().Size())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "weights dimension for a fully connected layer should be the same as number of output nodes times inputs per node");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
+                ell::utilities::FormatString("FullyConnectedLayer weights has %d row, but expecting %d based on output size minus padding",
+                    _weights.NumRows(), GetOutputMinusPadding().Size()));
         }
     }
 
@@ -34,6 +38,12 @@ namespace neural
         _shapedInput(layerParameters.input.Size()),
         _outputVector(GetOutputMinusPadding().Size())
     {
+        if (weights.Size() != GetOutputMinusPadding().Size() * layerParameters.input.Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
+                ell::utilities::FormatString("FullyConnectedLayer weights size %d does not match output size (minus padding) of %d times input size %d",
+                    _weights.NumRows(), GetOutputMinusPadding().Size(), layerParameters.input.Size()));
+        }
     }    
 
     template <typename ElementType>

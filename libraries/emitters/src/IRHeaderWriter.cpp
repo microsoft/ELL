@@ -386,9 +386,9 @@ namespace emitters
 
         // Eventually we'd support multiple sources and sinks.
         // For now, assert that we're only going to look at the first ones of each.
-        DEBUG_THROW(sources.size() != 1, EmitterException(EmitterError::badFunctionDefinition, "Only one source callback function will be generated"));
-        DEBUG_THROW(sinks.size() != 1, EmitterException(EmitterError::badFunctionDefinition, "Only one sink callback function will be generated"));
-        DEBUG_THROW(lagNotifications.size() != 1, EmitterException(EmitterError::badFunctionDefinition, "Only one lag callback function will be generated"));
+        DEBUG_THROW(sources.size() > 1, EmitterException(EmitterError::badFunctionDefinition, "Only one source callback function will be generated"));
+        DEBUG_THROW(sinks.size() > 1, EmitterException(EmitterError::badFunctionDefinition, "Only one sink callback function will be generated"));
+        DEBUG_THROW(lagNotifications.size() > 1, EmitterException(EmitterError::badFunctionDefinition, "Only one lag callback function will be generated"));
     }
 
     ModuleCallbackDefinitions::CallbackSignature::CallbackSignature(llvm::Function& function) :

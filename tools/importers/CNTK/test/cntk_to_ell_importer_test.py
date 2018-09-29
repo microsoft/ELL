@@ -627,10 +627,7 @@ class CntkToEllFullModelTestBase(common_importer_test.EllImporterTestBase):
             self.skipTest('Full model tests are being skipped')
                 
         filename = os.path.basename(self.CATEGORIES_URL)
-        if not self.needs_updating(filename):
-            self.label_file = filename
-        else:
-            self.label_file = download_file(base_model_uri + self.CATEGORIES_URL)
+        self.label_file = download_file(base_model_uri + self.CATEGORIES_URL)
 
         with open(self.label_file) as categories_file:
             self.categories = categories_file.read().splitlines()
@@ -640,17 +637,8 @@ class CntkToEllFullModelTestBase(common_importer_test.EllImporterTestBase):
             url = base_model_uri + m
             zip_name = os.path.basename(url)
             filename = os.path.splitext(zip_name)[0]
-            if self.needs_updating(filename):
-                self.model_names += [ download_and_extract_model(url) ]
-            else:
-                self.model_names += [ os.path.splitext(filename)[0] ]
-
-    def needs_updating(self, filename):
-        if os.path.isfile(filename):
-            diff = time.time() - os.stat(filename).st_mtime
-            return diff > 60*60*24 # more than 1 day old, then download a new version.
-        else:
-            return True
+            filename = download_and_extract_model(url, model_extension=".cntk")
+            self.model_names += [ os.path.splitext(filename)[0] ]
 
 
 class CntkModelsTestCase(CntkToEllFullModelTestBase):
@@ -806,13 +794,20 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
         self.layer_index = 1
 
     def print_top_result(self):
+        prompt = ""
+        flat = None 
         if self.data is not None:
-            _logger.info("cntk picks: %s" % (self.get_label(np.argmax(self.data))))
+            prompt = "cntk picks: "
+            flat = self.data.ravel()            
         if self.ell_data is not None:
-            _logger.info("ell picks: %s" % (self.get_label(np.argmax(self.ell_data))))
+            prompt = "ell picks:"
+            flat = self.ell_data.ravel()
         if self.compiled_data is not None:
-            _logger.info("ell compiled picks: %s" %
-                  (self.get_label(np.argmax(self.compiled_data))))
+            prompt = "ell compiled picks:"
+            flat = self.compiled_data.ravel()
+
+        if flat is not None and len(flat) == len(self.labels):
+            _logger.info("%s %s" % (prompt, self.get_label(np.argmax(flat))))
 
     def test_models(self):
         """Takes random input and passes it through a full CNTK model and
@@ -929,10 +924,8 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
             return f.read().splitlines()
 
     def get_label(self, i):
-        try:
+        if self.labels is not None and i >= 0 and i < len(self.labels):
             return self.labels[i]
-        except IndexError:
-            return ""
 
 
 if __name__ == '__main__':

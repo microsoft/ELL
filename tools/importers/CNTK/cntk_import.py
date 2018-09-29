@@ -68,8 +68,8 @@ def main(argv):
         logging.basicConfig(level=logging.INFO, format="%(message)s")
 
     model_options = args.get('model_options', {})
-    step_interval = model_options.get('step_interval', 0)
-    lag_threshold = model_options.get('lag_threshold', 0)
+    step_interval = model_options.get('step_interval', None)
+    lag_threshold = model_options.get('lag_threshold', None)
     plot_model = args["plot_model"]
     verify_model = { "vision": args["verify_vision_model"],
                      "audio": args["verify_audio_model"]}

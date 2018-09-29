@@ -9,6 +9,7 @@
 ####################################################################################################
 import sys
 import logging
+import math
 import os
 
 import cntk
@@ -105,6 +106,8 @@ class FullModelTest:
     def prepare_image_for_predictor(self, image):
         """Crops, resizes image to outputshape. Returns image as numpy array in in BGR order."""
         input_size = (self.input_shape[1], self.input_shape[2]) # remember cntk shapes are (channel,rows,columns)
+        if self.input_shape[0] == 1:
+            image = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
         resized = self.resize_image(image, input_size)
         resized = resized.astype(np.float).ravel()
         return resized
@@ -177,7 +180,7 @@ class FullModelTest:
             output = np.zeros(self.cntk_model.arguments[1].shape).astype(np.float32)
             predictions = self.cntk_model.eval({self.cntk_model.arguments[0]:[self.data],self.cntk_model .arguments[1]:output})
         else:
-            predictions = self.cntk_model.eval({self.cntk_model.arguments[0]:[self.data]})
+            predictions = self.cntk_model.eval({self.cntk_model.arguments[0]:[self.data.ravel()]})
 
         size = 0
         output = None
@@ -217,6 +220,11 @@ class FullModelTest:
                 if node_input.is_input and isinstance(node_input, cntk.variables.Variable):
                     # great, this tells us the input size.
                     self.input_shape = node_input.shape
+                    if len(self.input_shape) == 1:
+                        # hmmm, strange 1D input, let's assume it is a square image...
+                        size = self.input_shape[0]
+                        w = int(math.sqrt(size))
+                        self.input_shape = (1,int(size/w),w) # channels,rows,cols
                     break
 
         self.data = self.get_input_data()
@@ -267,7 +275,7 @@ class FullModelTest:
         map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
 
         # Note: for testing purposes, callback functions assume the "model" namespace
-        compiler_options = model.MapCompilerOptions()
+        compiler_options = ell.model.MapCompilerOptions()
         compiler_options.useBlas = False
         compiled = map.Compile("host", "model", "test" + str(self.method_index), compilerOptions=compiler_options, dtype=np.float32)
 
@@ -301,7 +309,7 @@ def main(argv):
     arg_parser.add_argument("label_file", help="path to a labels file")
     arg_parser.add_argument("model_file", help="path to a CNTK model file, or a zip archive of a CNTK model file")
     arg_parser.add_argument("--image", help="path to a image file to use as input (default is random data)")
-    arg_parser.add_argument("--layers", type=bool, help="turns on layer-by-layer testing", default=False)
+    arg_parser.add_argument("--layers", help="turns on layer-by-layer testing", action="store_true")
     args = arg_parser.parse_args(argv)
     test = FullModelTest(args)
     test.run()

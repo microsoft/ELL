@@ -29,6 +29,10 @@ def get_ell_shape(shape: tuple, order: str, padding: int = 0):
         channels = shape[0]
         rows = 1 + 2*padding
         columns = 1 + 2*padding
+    elif order == "row_column":        
+        channels = 1
+        rows = shape[0] + 2*padding
+        columns = shape[1] + 2*padding
     else:
         raise NotImplementedError(
             "Unsupported input shape order: {}".format(order))
@@ -65,13 +69,18 @@ def get_tensor_in_ell_order(tensor: np.array, order: str):
         ordered_weights = ordered_weights.ravel().astype(np.float).reshape(
             original_shape[0] * original_shape[2], original_shape[3], original_shape[1])
     elif order == "channel_row_column":
-        ordered_weights = np.moveaxis(original_tensor, 0, -1)
+        ordered_weights = np.moveaxis(original_tensor, 0, -1) 
         ordered_weights = ordered_weights.ravel().astype(np.float).reshape(
             original_shape[1], original_shape[2], original_shape[0])
-    elif order == "row_column":
-        ordered_weights = np.moveaxis(original_tensor, 0, -1)
+    elif order == "column_row":
+        ordered_weights = original_tensor.T
+        # make it 3D tensor by adding 1 channel
         ordered_weights = ordered_weights.ravel().astype(
-            np.float).reshape(original_shape[1], 1, original_shape[0])
+            np.float).reshape(original_shape[0], original_shape[1], 1)
+    elif order == "row_column":
+        # make it 3D tensor by adding 1 channel
+        ordered_weights = original_tensor.ravel().astype(
+            np.float).reshape(original_shape[0], original_shape[1], 1)
     elif order == "channel":
         ordered_weights = original_tensor.ravel().astype(
             np.float).reshape(1, 1, original_tensor.size)

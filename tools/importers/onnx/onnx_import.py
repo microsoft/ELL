@@ -3,7 +3,7 @@
 #
 # Project:  Embedded Learning Library (ELL)
 # File:     onnx_importer.py (importers)
-# Authors:  Iliass Tiendrebeogo
+# Authors:  Iliass Tiendrebeogo, Chris Lovett
 #
 # Requires: Python 3.x, onnx-v1.22
 #
@@ -29,7 +29,7 @@ import ziptools
 
 _logger = logging.getLogger(__name__)
 
-def convert(model, output=None, zip_ell_model=None):
+def convert(model, output=None, zip_ell_model=None, step_interval=None, lag_threshold=None):
     model_directory, filename = os.path.split(model)
     if output:
         output_directory = output
@@ -40,9 +40,9 @@ def convert(model, output=None, zip_ell_model=None):
     model_file_name = filename_base + '.ell'
     model_file_path = os.path.join(output_directory, model_file_name)
 
-    ell_map, _ = onnx_to_ell.convert_onnx_to_ell(model) 
+    ell_map, _ = onnx_to_ell.convert_onnx_to_ell(model, step_interval_msec=step_interval, lag_threshold_msec=lag_threshold) 
  
-    _logger.info("Saving model file: '" + model_file_name + "'")
+    _logger.info("Saving model file: '" + model_file_path + "'")
     ell_map.Save(model_file_path)
 
     if zip_ell_model:
@@ -71,11 +71,11 @@ def main(argv):
     model_options = parser.add_argument_group('model_options')
     model_options.add_argument("--step_interval",
         help="produce a steppable ELL model for a millisecond interval",
-        default=0)
+        default=None)
     model_options.add_argument("--lag_threshold",
         help="number of step intervals to fall behind before notifying the caller.\n"
              "used when step_interval is set\n",
-        default=0)
+        default=None)
     args = parser.parse_args()
 
     if args.verbose:
@@ -83,7 +83,7 @@ def main(argv):
     else:
         logging.basicConfig(level=logging.INFO, format="%(message)s")
     
-    convert(args.input, args.output_directory, args.zip_ell_model)
+    convert(args.input, args.output_directory, args.zip_ell_model, args.step_interval, args.lag_threshold)
 
 if __name__ == "__main__":
     main(sys.argv[1:]) # skip the first argument(program name)

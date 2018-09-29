@@ -137,15 +137,19 @@ namespace utilities
 
     void JsonArchiver::WriteObjectType(const IArchivable& value)
     {
+        FinishPreviousLine();
         auto indent = GetCurrentIndent();
-        _out << indent << "  \"_type\": \"" << GetArchivedTypeName(value) << "\",\n";
+        _out << indent << "  \"_type\": \"" << GetArchivedTypeName(value) << "\"";
+        SetEndOfLine(",\n");
     }
 
     void JsonArchiver::WriteObjectVersion(const IArchivable& value)
     {
+        FinishPreviousLine();
         auto indent = GetCurrentIndent();
         auto version = GetArchiveVersion(value);
-        _out << indent << "  \"_version\": \"" << version.versionNumber << "\",\n";
+        _out << indent << "  \"_version\": \"" << version.versionNumber << "\"";
+        SetEndOfLine(",\n");
     }
 
     void JsonArchiver::Indent()

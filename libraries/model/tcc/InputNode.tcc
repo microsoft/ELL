@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ModelTransformer.h"
+#include "StringUtil.h"
 
 namespace ell
 {
@@ -49,7 +50,11 @@ namespace model
     template <typename ValueType>
     void InputNode<ValueType>::SetInput(std::vector<ValueType> inputValues)
     {
-        assert(_output.Size() == inputValues.size());
+        if (_output.Size() != inputValues.size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, 
+                ell::utilities::FormatString("InputNode output size %zu doesn't match input size %zu", _output.Size(), inputValues.size()));
+        }
         _inputValues = inputValues;
     }
 

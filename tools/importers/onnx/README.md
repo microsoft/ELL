@@ -8,7 +8,11 @@ You should have both [ONNX]("https://onnx.ai/") and [ELL]("https://microsoft.git
 
 ### Import onnx model 
 
-To convert an onnx model to the ELL format use the following:
+To install [ONNX]("https://onnx.ai/") and other required libraries, the best option is to use [Anaconda]("https://anaconda.org/") 
+
+### Convert a model 
+
+To convert an ONNX model to the ELL format use the following:
 
 ```
 python onnx_import.py <path_to_onnx_model>

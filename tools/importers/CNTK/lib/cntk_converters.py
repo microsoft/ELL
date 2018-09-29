@@ -476,7 +476,8 @@ class CntkDenseConverter(CntkStandardConverter):
         if len(weights_shape) == 4:
             order = "channel_row_column_filter"
         elif len(weights_shape) == 2:
-            order = "row_column"
+            # for some reason CNTK 2D tensors need to be transposed, which we can do with "column_row" order.
+            order = "column_row"
         super().__init__(cntk_node, {"weights": (0, order), "bias": (1, "channel")}, "FullyConnected")
 
     def get_attributes(self):

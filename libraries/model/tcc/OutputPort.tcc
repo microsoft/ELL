@@ -34,7 +34,7 @@ namespace model
     template <typename ValueType>
     std::vector<double> OutputPort<ValueType>::GetDoubleOutput() const
     {
-        std::vector<double> result;
+        std::vector<double> result(_cachedOutput.size());
         std::copy(_cachedOutput.begin(), _cachedOutput.end(), result.begin());
         return result;
     }

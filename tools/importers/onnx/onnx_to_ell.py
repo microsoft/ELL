@@ -2,7 +2,7 @@
 #
 # Project:  Embedded Learning Library (ELL)
 # File:     onnx_to_ell.py (importers)
-# Authors:  Iliass Tiendrebeogo
+# Authors:  Iliass Tiendrebeogo, Chris Lovett
 #
 # Requires: Python 3.x, onnx-v1.22
 #
@@ -13,8 +13,9 @@ import os
 import logging
 import sys
 
+import typing
 from typing import Text
-
+import numpy as np
 import onnx
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
@@ -25,57 +26,25 @@ import find_ell
 import ell
 import common.importer
 import common.converters
-import onnx_utilities as utils 
-from _graph_parser import Graph
-import _onnx_converters as convert
-
+import onnx_converters as convert
 
 _logger = logging.getLogger(__name__)
 
-
-def get_onnx_nodes(path):
-    """ Return a list of ONNX nodes """
-
-    onnx_nodes = utils.ONNX()._parse_onnx_model(path)
-    return onnx_nodes
-
-def make_importer_model(onnx_nodes):
+def convert_onnx_to_ell(path, step_interval_msec=None, lag_threshold_msec=None):
     """
-    Make an Importer Model for ELL from onnx_nodes.
-    Tranform onnx nodes to ImporterNode which will be converted to ELL
-    """
-    if not isinstance(onnx_nodes, list):
-        onnx_nodes = list(onnx_nodes.values())
-        
-    Importer_model = common.importer.ImporterModel()
-
-    for node in onnx_nodes:
-        uid = node.name      
-        weights = node.weights       
-        if node:
-            node = convert.OnnxConverter(node).convert()
-            Importer_model.add_node(uid, node)
-            if weights is not None:
-                for w in weights:
-                    weight = node.weights[w]
-                    if len(weight) > 2:
-                        Importer_model.add_tensor(weight[0], weight[1], weight[2])
-
-    return Importer_model
-
-def convert_onnx_to_ell(path):
-    """
-    convert the importer model into a ELL model
+    convert the importer model into a ELL model, optionally a steppable model if step_interval_msec
+    and lag_threshold_msec are provided.
     """
     _logger.info("Pre-processing... ")
-    onnx_nodes = get_onnx_nodes(path)
-    importer_model = make_importer_model(onnx_nodes)
+    converter = convert.OnnxConverter()
+    importer_model = converter.load_model(path)
     _logger.info("\n Done pre-processing.")
     try:
-        importer_engine = common.importer.ImporterEngine(step_interval_msec=0, lag_threshold_msec=0)     
-        ell_map = importer_engine.convert_nodes(importer_model, apply_ordering=False)
-    except :
-        _logger.error("Error occurred while attempting to convert the model")
+        importer_engine = common.importer.ImporterEngine(step_interval_msec=step_interval_msec, lag_threshold_msec=lag_threshold_msec)     
+        ell_map = importer_engine.convert_nodes(importer_model)
+        ordered_importer_nodes, node_mapping = importer_engine.get_importer_node_to_ell_mapping()
+    except Exception as e:
+        _logger.error("Error occurred while attempting to convert the model: " + str(e))
         raise 
 
-    return ell_map, onnx_nodes
+    return ell_map, ordered_importer_nodes

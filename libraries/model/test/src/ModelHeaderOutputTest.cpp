@@ -265,7 +265,7 @@ void TestSwigNoCallbackInterfaces()
     // Sanity tests
     testing::ProcessTest("Testing generated python code 1", testing::IsTrue(std::string::npos != result.find("def predict(inputData: 'numpy.ndarray') -> \"numpy.ndarray\":")));
     testing::ProcessTest("Testing generated python code 2", testing::IsTrue(std::string::npos != result.find(std::string("results = " + vectorTypeString + "(get_default_output_shape().Size())"))));
-    testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("TestModule_predict(None, inputData, results)")));
+    testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("TestModule_predict(None, input, results)")));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));
 

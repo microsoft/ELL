@@ -8,6 +8,7 @@
 #
 ####################################################################################################
 
+import itertools
 import os
 import sys
 import logging
@@ -44,12 +45,13 @@ _logger = logging.getLogger(__name__)
 operation_map = {
     "Activation": ConvertActivation,
     "AveragePooling": ConvertAveragePooling,
-    "BatchNormalization": [ConvertBatchNormalization, ConvertScaling, ConvertBias],
+    "BatchNormalization": [ConvertBatchNormalization, OptionalConvertScaling, OptionalConvertBias],
     "Bias": ConvertBias,
-    "BinaryConvolution": [ConvertBinaryConvolution, ConvertBias, ConvertActivation],
-    "Convolution": [ConvertConvolution, ConvertBias, ConvertActivation],
+    "BinaryConvolution": [ConvertBinaryConvolution, OptionalConvertBias, OptionalConvertActivation],
+    "Convolution": [ConvertConvolution, OptionalConvertBias, OptionalConvertActivation],
+    "Constant": ConvertConstant,
     "ElementTimes": ConvertScaling,
-    "FullyConnected": [ConvertFullyConnected, ConvertBias, ConvertActivation],
+    "FullyConnected": [ConvertFullyConnected, OptionalConvertBias, OptionalConvertActivation],
     "GRU": ConvertGRU,
     "Input": ConvertInput,
     "LeakyReLU": ConvertLeakyReLU,
@@ -79,7 +81,9 @@ class ImporterModel:
         self.tensors = {}
 
     def add_tensor(self, name: str, value: typing.Any, order: str) -> None:
-        self.tensors[name] = (value, order)
+        t = (value, order)
+        self.tensors[name] = t
+        return t
 
     def add_node(self, name: str, node: ImporterNode) -> None:
         self.nodes[name] = node
@@ -90,7 +94,7 @@ class ImporterEngine:
     an ImporterModel to ELL nodes or (currently, layers).
     """
     def __init__(self, operation_map: typing.Mapping[str, typing.Sequence[typing.Any]] = operation_map,
-        step_interval_msec=0, lag_threshold_msec=0):
+        step_interval_msec=None, lag_threshold_msec=None):
         """
         Initializes the engine with an appropriate operation to converter mapping.
         See `operation_map` comments for more information.
@@ -193,6 +197,9 @@ class ImporterEngine:
 
         self.ordered_importer_nodes = ordered_nodes
 
+        if len(ordered_nodes) == 0:
+            raise Exception("Cannot convert model because it is empty!")
+
         _logger.info("Processing the following importer nodes in order:")
         for ordered_node in ordered_nodes:
             _logger.info(ordered_node)
@@ -210,14 +217,15 @@ class ImporterEngine:
 
         last_ell_node = self.lookup_table.get_ell_node_from_importer_node_id(last_importer_node.id)
 
-        # Add the sink node
-        sink_node = self.ell_model_builder.AddSinkNode(
-            self.ell_model, ell.nodes.PortElements(last_ell_node.GetOutputPort("output")),
-            ell_output_shape,
-            "{}OutputCallback".format(function_prefix))
+        if self.step_interval_msec is not None:
+            # Add the sink node
+            last_ell_node = self.ell_model_builder.AddSinkNode(
+                self.ell_model, ell.nodes.PortElements(last_ell_node.GetOutputPort("output")),
+                ell_output_shape,
+                "{}OutputCallback".format(function_prefix))
 
         output_node = self.ell_model_builder.AddOutputNode(
-            self.ell_model, ell_output_shape, ell.nodes.PortElements(sink_node.GetOutputPort("output")))
+            self.ell_model, ell_output_shape, ell.nodes.PortElements(last_ell_node.GetOutputPort("output")))
         self.lookup_table.add_ell_output(output_node)
 
         # Create the map
@@ -226,11 +234,22 @@ class ImporterEngine:
 
         # Print out the nodes and where they came from
         self.final_mapping = self.get_node_group_mapping(self.final_ell_map.GetModel())
-        _logger.info("\nFinal mapping of imported nodes:")
+        _logger.info("\nFinal mapping of imported nodes to ell nodes:")
+        source_names = {}
+        max_len = 0
         for group_id in self.final_mapping.keys():
-            _logger.info("Imported {} -> ell nodes {}".format(group_id,
-            [ell_node.GetId() for ell_node in self.final_mapping[group_id]]))
-
+            importer_node = model.nodes[group_id]
+            text = "{}({})".format(importer_node.operation_type, group_id)
+            if len(text) > max_len:
+                max_len = len(text)
+            source_names[group_id] = text
+        
+        for group_id in self.final_mapping.keys():
+            source_name = source_names[group_id]
+            indent = "    " + (" " * (max_len - len(source_name)))
+            ell_nodes = ["{}({})".format(ell_node.GetRuntimeTypeName(), ell_node.GetId()) for ell_node in self.final_mapping[group_id]]
+            _logger.info("{}{} -> {}".format(indent, source_name, ", ".join(ell_nodes)))
+        _logger.info("")
         return self.final_ell_map
 
     def convert_importer_node_to_ell_layers(self, node_to_import: ImporterNode):
@@ -281,15 +300,15 @@ class ImporterEngine:
         _logger.debug("Importing node {}".format(node_to_import.id))
 
         # Convert a block.
-        for i in range(len(converters)):
+        for i in range(len(converters)):                
             conversion_parameters = {"lookup_table": self.lookup_table,
-                                     "first_in_block": i == 0,
-                                     "last_in_block": i == (len(converters) - 1),
-                                     "builder": self.ell_model_builder,
-                                     "model": self.ell_model,
-                                     "step_interval_msec": self.step_interval_msec,
-                                     "lag_threshold_msec": self.lag_threshold_msec,
-                                     }
+                                    "first_in_block": i == 0,
+                                    "last_in_block": i == (len(converters) - 1),
+                                    "builder": self.ell_model_builder,
+                                    "model": self.ell_model,
+                                    "step_interval_msec": self.step_interval_msec,
+                                    "lag_threshold_msec": self.lag_threshold_msec,
+                                    }
             converters[i].convert_node(conversion_parameters)
 
         return
@@ -301,20 +320,26 @@ class ImporterEngine:
         """
         pending_nodes = list(nodes.values())
         ordered_nodes = []
-
         node_processed = len(pending_nodes) > 0
+        outputs_available = {}
         while node_processed:
             node_processed = False
             for current_node in pending_nodes:
-                # Find a node which already has all of its input nodes in the
-                # ordered list.
+                # Find a node which already has all of its input nodes in the ordered list.
                 if current_node.operation_type != "Skip":
-                    if all(any(node_id in processed_node.outputs for processed_node in ordered_nodes) for node_id in current_node.inputs):
+                    if all((input_id in outputs_available) for input_id in current_node.inputs):
                         pending_nodes.remove(current_node)
                         ordered_nodes.append(current_node)
                         node_processed = True
+                        for o in current_node.outputs:
+                            outputs_available[o] = True
 
-        # Remove unreferenced inputs.
+        pending_nodes = [n for n in pending_nodes if n.operation_type != "Skip"]
+        if len(pending_nodes) > 0:
+            _logger.info("### ignoring the following nodes because their inputs are not satisfiable:")
+            for node in pending_nodes:
+                _logger.info("    {}({})".format(node.operation_type, node.id))
+
         result = []
         for current_node in ordered_nodes:
             if current_node.operation_type != "Input" or any(current_node.outputs[0] in node.inputs for node in ordered_nodes):

@@ -42,7 +42,9 @@ namespace nodes
 
         if (inputLayout.GetActiveSize() != outputLayout.GetActiveSize())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active areas must match");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
+                ell::utilities::FormatString("Input 1 active area size %d doesn't match input 2 active area size %d on BinaryFunctionNode %s", 
+                    inputLayout.GetActiveSize().NumElements(), outputLayout.GetActiveSize().NumElements(), GetId().ToString().c_str()));
         }
     }
 

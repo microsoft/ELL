@@ -106,7 +106,7 @@ class ModelTester:
             for name in testlist:
                 # e.g. bed/28497c5b_nohash_0.wav
                 expected = name.split('/')[0]
-                wav_file = os.path.join(wav_dir, "audio", name)
+                wav_file = os.path.join(wav_dir, name)
                 # open the wav file.
                 reader = wav_reader.WavReader(sample_rate)
                 reader.open(wav_file, transform.input_size, None)

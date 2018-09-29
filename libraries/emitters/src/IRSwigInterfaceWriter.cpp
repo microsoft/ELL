@@ -197,12 +197,20 @@ namespace emitters
 
                 ReplaceDelimiter(predictorCode, "PREDICTOR_CLASS", _className);
 
-                ReplaceDelimiter(predictorCode, "LAG_CALLBACK", _callbacks.lagNotifications[0].functionName);
-                ReplaceDelimiter(predictorCode, "SINK_CALLBACK", _callbacks.sinks[0].functionName);
-                ReplaceDelimiter(predictorCode, "SOURCE_CALLBACK", _callbacks.sources[0].functionName);
-
-                ReplaceDelimiter(predictorCode, "SINK_TYPE", _callbacks.sinks[0].inputType);
-                ReplaceDelimiter(predictorCode, "SOURCE_TYPE", _callbacks.sources[0].inputType);
+                if (!_callbacks.lagNotifications.empty())
+                {
+                    ReplaceDelimiter(predictorCode, "LAG_CALLBACK", _callbacks.lagNotifications[0].functionName);
+                }
+                if (!_callbacks.sinks.empty())
+                {
+                    ReplaceDelimiter(predictorCode, "SINK_CALLBACK", _callbacks.sinks[0].functionName);
+                    ReplaceDelimiter(predictorCode, "SINK_TYPE", _callbacks.sinks[0].inputType);
+                }
+                if (!_callbacks.sources.empty())
+                {
+                    ReplaceDelimiter(predictorCode, "SOURCE_CALLBACK", _callbacks.sources[0].functionName);
+                    ReplaceDelimiter(predictorCode, "SOURCE_TYPE", _callbacks.sources[0].inputType);
+                }
                 ReplaceDelimiter(predictorCode, "TIMETICK_TYPE", "double");
 
                 os << predictorCode << "\n";
@@ -212,6 +220,11 @@ namespace emitters
             void WriteCallbackSwigCode(std::ostream& os) const
             {
                 os << "WRAP_CALLABLES_AS_CALLBACKS(" << _className << ", ";
+
+                if (_callbacks.sources.empty() || _callbacks.sinks.empty() || _callbacks.lagNotifications.empty())
+                {
+                    throw EmitterException(EmitterError::notSupported, "All three types of callbacks must exist in the model: Source, Sink and LagNotification");
+                }
                 WriteCommaSeparatedList(os,
                                         { _callbacks.sources[0].className,
                                           _callbacks.sources[0].inputType,

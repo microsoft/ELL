@@ -26,8 +26,7 @@ The easiest way to get prebuilt 64-bit versions of these packages is to use the 
 nuget.exe restore external/packages.config -PackagesDirectory external
 ```
 
-NuGet will download the prerequisites into the `ELL/external` directory
-and you are done.
+NuGet will download the prerequisites into the `ELL/external` directory and you are done.
 
 Here's more information in case you need to install things manually.
 

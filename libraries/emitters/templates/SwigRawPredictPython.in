@@ -3,7 +3,8 @@ def predict(inputData: 'numpy.ndarray') -> "numpy.ndarray":
     """Convenience function for calling the model with NumPy arrays"""
     import numpy as np
     results = @@OUTPUT_VECTOR_TYPE@@(get_default_output_shape().Size())
-    @@PREDICT_FUNCTION@@(None, inputData, results)
+    input = @@OUTPUT_VECTOR_TYPE@@(inputData)
+    @@PREDICT_FUNCTION@@(None, input, results)
     return np.asarray(results)
 
 def reset():
