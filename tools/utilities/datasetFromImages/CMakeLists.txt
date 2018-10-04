@@ -9,7 +9,7 @@ if(${PYTHON_ENABLED})
     set(src datasetFromImages.py)
 
     add_custom_target(${tool_name} ALL DEPENDS SOURCES ${src})
-    add_dependencies(${tool_name} pythonlibs _ELL_python)
+    add_dependencies(${tool_name} pythonlibs)
     
     # copy files
     copy_newer_files(${tool_name} src)

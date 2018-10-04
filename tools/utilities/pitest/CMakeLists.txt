@@ -11,7 +11,7 @@ if(${PYTHON_ENABLED})
     set(src ${test_src} drivetest.py runtest.sh.in coffeemug.jpg buildtask.cmd)
 
     add_custom_target(${module_name} ALL DEPENDS SOURCES ${src})
-    add_dependencies(${module_name} pythonlibs _ELL_python)
+    add_dependencies(${module_name} pythonlibs)
     
     set_property(TARGET ${module_name} PROPERTY FOLDER "tests")
     

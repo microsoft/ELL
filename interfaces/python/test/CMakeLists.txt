@@ -8,7 +8,7 @@ if(${PYTHON_ENABLED})
   file(GLOB test_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
 
   add_custom_target(${test_name} ALL DEPENDS ${test_src} SOURCES ${test_src})
-  add_dependencies(${test_name} pythonlibs _ELL_python)
+  add_dependencies(${test_name} pythonlibs)
   set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
   # copy the contents of the test directory to build/interfaces/python
