@@ -30,53 +30,9 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> A node that wraps a neural net GRULayer. </summary>
+    /// <summary> A node that implements a simple recurrent neural net (RNN). </summary>
     template <typename ValueType>
-    class RecurrentLayerNode : public NeuralNetworkLayerNode<RecurrentLayerNode<ValueType>, predictors::neural::RecurrentLayer<ValueType>, ValueType>
-    {
-    public:
-        using LayerType = predictors::neural::RecurrentLayer<ValueType>;
-        using BaseType = NeuralNetworkLayerNode<RecurrentLayerNode<ValueType>, predictors::neural::RecurrentLayer<ValueType>, ValueType>;
-
-        /// @name Input and Output Ports
-        /// @{
-        using BaseType::input;
-        using BaseType::output;
-        /// @}
-
-        RecurrentLayerNode() = default;
-
-        /// <summary> Constructor from a layer. </summary>
-        ///
-        /// <param name="input"> </param>
-        /// <param name="layer"> The bias layer to wrap. </param>
-        RecurrentLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::RecurrentLayer<ValueType>& layer);
-
-        /// <summary> Gets the name of this type (for serialization). </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("RecurrentLayerNode"); }
-
-        /// <summary> Gets the name of this type (for serialization). </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-        /// <summary> Indicates if this node is able to compile itself to code. </summary>
-        bool IsCompilable(const model::MapCompiler* compiler) const override { return false; }
-
-    protected:
-        bool Refine(model::ModelTransformer& transformer) const override;
-
-    private:
-        void Copy(model::ModelTransformer& transformer) const override;
-    };
-
-    //
-    // Implementation: RecurrentNode
-    //
-    template <typename ValueType>
-    class RecurrentNode : public model::CompilableNode
+    class RNNNode : public model::CompilableNode
     {
     public:
         using ActivationType = predictors::neural::Activation<ValueType>;
@@ -92,7 +48,7 @@ namespace nodes
         /// @}
 
         /// <summary> Default contructor. </summary>
-        RecurrentNode();
+        RNNNode();
 
         /// <summary> Constructor. </summary>
         ///
@@ -101,7 +57,7 @@ namespace nodes
         /// <param name="hiddenBias"> The biases to be applied to the hidden layer. </param>
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
-        RecurrentNode(const model::OutputPort<ValueType>& input,
+        RNNNode(const model::OutputPort<ValueType>& input,
                       const model::OutputPort<ValueType>& hiddenWeights,
                       const model::OutputPort<ValueType>& hiddenBias,
                       const ActivationType& activation,

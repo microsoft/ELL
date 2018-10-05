@@ -150,6 +150,12 @@ namespace model
         /// <param name="nodeIndex"> the index of the node type. </param>
         PerformanceCounters* GetNodeTypePerformanceCounters(int nodeIndex);
 
+        /// <summary> Get a pointer to the named global array. </summary>
+        ///
+        /// <param name="name"> name of the global. </param>
+        template<typename ElementType>
+        ElementType* GetGlobalValuePointer(const std::string& name);
+
         /// <summary> Print a summary of the performance for the node types. </summary>
         void PrintNodeTypeProfilingInfo();
 

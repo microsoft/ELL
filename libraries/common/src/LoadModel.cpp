@@ -33,12 +33,14 @@
 #include "DTWDistanceNode.h"
 #include "ExtremalValueNode.h"
 #include "FFTNode.h"
+#include "FilterBankNode.h"
 #include "ForestPredictorNode.h"
+#include "GRUNode.h"
 #include "HammingWindowNode.h"
 #include "IIRFilterNode.h"
 #include "L2NormSquaredNode.h"
 #include "LinearPredictorNode.h"
-#include "FilterBankNode.h"
+#include "LSTMNode.h"
 #include "MatrixMatrixMultiplyNode.h"
 #include "MatrixVectorProductNode.h"
 #include "MovingAverageNode.h"
@@ -48,6 +50,7 @@
 #include "ProtoNNPredictorNode.h"
 #include "ReceptiveFieldMatrixNode.h"
 #include "ReorderDataNode.h"
+#include "RNNNode.h"
 #include "SimpleConvolutionNode.h"
 #include "SinkNode.h"
 #include "SourceNode.h"
@@ -111,11 +114,13 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DTWDistanceNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::GRUNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::HammingWindowNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormSquaredNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::IIRFilterNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearFilterBankNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LSTMNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MelFilterBankNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::rowMajor>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::columnMajor>>();
@@ -125,6 +130,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ReceptiveFieldMatrixNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::RNNNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<ElementType>>();
@@ -146,8 +152,6 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryConvolutionalLayerNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConvolutionalLayerNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::FullyConnectedLayerNode<ElementType>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ParametricReLUActivationLayerNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<ElementType, MeanPoolingFunction>>();
         context.GetTypeFactory().AddType<model::Node, nodes::PoolingLayerNode<ElementType, MaxPoolingFunction>>();
@@ -170,14 +174,6 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",LeakyReLUActivation>");
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation>");
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",ParametricReLUActivation>");
-
-        // Note: we don't need any of the other combinations because we never actually serialized those out till now.
-        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType>>("GRULayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,SigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType>>("LSTMLayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,SigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType>>("GRULayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,HardSigmoidActivation<" + TypeName<ElementType>::GetName() + ">>");
-        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType>>("LSTMLayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,HardSigmoidActivation<" + TypeName<ElementType>::GetName() + ">>");
-        context.GetTypeFactory().AddType<model::Node, nodes::GRULayerNode<ElementType>>("GRULayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,HardSigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::LSTMLayerNode<ElementType>>("LSTMLayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation,HardSigmoidActivation>");
     }
 
     void RegisterNodeTypes(utilities::SerializationContext& context)

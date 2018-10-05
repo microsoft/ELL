@@ -78,12 +78,12 @@ for /F "tokens=* USEBACKQ" %%i in (
 )
 echo Building with !procs! processes
 
-cmake --build . --config Release -- /m:!procs!
+cmake --build . --config Release -- /m:!procs! /verbosity:minimal
 if ERRORLEVEL 1 goto :builderror
 
 if NOT "!NOPYTHON!" == "" goto :eof
 
-cmake --build . --target _ELL_python --config Release -- /m:!procs!
+cmake --build . --target _ELL_python --config Release -- /m:!procs! /verbosity:minimal
 if ERRORLEVEL 1 goto :builderror
 
 goto :eof

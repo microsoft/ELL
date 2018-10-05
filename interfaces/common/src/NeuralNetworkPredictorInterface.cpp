@@ -85,10 +85,6 @@ public:
     // Specific layer factory functions
     static std::unique_ptr<UnderlyingLayer> CreateActivationLayer(ell::api::predictors::neural::ActivationLayer& layer, const UnderlyingLayerParameters& parameters);
 
-    static std::unique_ptr<UnderlyingLayer> CreateGRULayer(ell::api::predictors::neural::GRULayer& layer, const UnderlyingLayerParameters& parameters);
-
-    static std::unique_ptr<UnderlyingLayer> CreateLSTMLayer(ell::api::predictors::neural::LSTMLayer& layer, const UnderlyingLayerParameters& parameters);
-
     UnderlyingPredictor& GetUnderlyingPredictor() { return _predictor; }
 private:
 
@@ -232,54 +228,6 @@ std::unique_ptr<underlying::Layer<ElementType>> TypedNeuralNetworkPredictorImpl<
     return std::make_unique<underlying::ActivationLayer<ElementType>>(parameters, activation);
 }
 
-//
-// CreateGRULayer
-//
-
-template <typename ElementType>
-std::unique_ptr<underlying::Layer<ElementType>> TypedNeuralNetworkPredictorImpl<ElementType>::CreateGRULayer(neural::GRULayer& layer, const UnderlyingLayerParameters& parameters)
-{
-    size_t m = layer.updateWeights.shape.rows;
-    size_t n = layer.updateWeights.shape.columns;
-    size_t s = layer.updateBias.shape.rows * layer.updateBias.shape.columns * layer.updateBias.shape.channels;
-    underlying::GRUParameters<ElementType> gruParameters = {
-        { CastVector<ElementType>(layer.updateWeights.data).data(), m, n },
-        { CastVector<ElementType>(layer.resetWeights.data).data(), m, n },
-        { CastVector<ElementType>(layer.hiddenWeights.data).data(), m, n },
-        { CastVector<ElementType>(layer.updateBias.data).data(), s },
-        { CastVector<ElementType>(layer.resetBias.data).data(), s },
-        { CastVector<ElementType>(layer.hiddenBias.data).data(), s }
-    };
-
-    return std::make_unique<underlying::GRULayer<ElementType>>(parameters, gruParameters,
-        neural::ActivationLayer::CreateActivation<ElementType>(layer.activation), neural::ActivationLayer::CreateActivation<ElementType>(layer.recurrentActivation));
-}
-
-//
-// CreateLSTMLayer
-//
-
-template <typename ElementType>
-std::unique_ptr<underlying::Layer<ElementType>> TypedNeuralNetworkPredictorImpl<ElementType>::CreateLSTMLayer(neural::LSTMLayer& layer, const UnderlyingLayerParameters& parameters)
-{
-    size_t m = layer.inputWeights.shape.rows;
-    size_t n = layer.inputWeights.shape.columns;
-    underlying::LSTMParameters<ElementType> lstmParameters = {
-        { CastVector<ElementType>(layer.inputWeights.data).data(), m, n },
-        { CastVector<ElementType>(layer.forgetMeWeights.data).data(), m, n },
-        { CastVector<ElementType>(layer.candidateWeights.data).data(), m, n },
-        { CastVector<ElementType>(layer.outputWeights.data).data(), m, n },
-        { CastVector<ElementType>(layer.inputBias.data).data(), m },
-        { CastVector<ElementType>(layer.forgetMeBias.data).data(), m },
-        { CastVector<ElementType>(layer.candidateBias.data).data(), m },
-        { CastVector<ElementType>(layer.outputBias.data).data(), m }
-    };
-
-    return std::make_unique<underlying::LSTMLayer<ElementType>>(parameters, lstmParameters,
-        neural::ActivationLayer::CreateActivation<ElementType>(layer.activation), neural::ActivationLayer::CreateActivation<ElementType>(layer.recurrentActivation));
-}
-
-
 template <typename ElementType>
 std::vector<double> TypedNeuralNetworkPredictorImpl<ElementType>::PredictDouble(const std::vector<double>& input)
 {
@@ -410,18 +358,6 @@ void TypedNeuralNetworkPredictorImpl<ElementType>::AddLayer(Layer* layer, const 
 
             TensorType weights(apiLayer.weights.shape.rows, apiLayer.weights.shape.columns, apiLayer.weights.shape.channels, CastVector<ElementType>(apiLayer.weights.data));
             underlyingLayers.push_back(std::make_unique<underlying::FullyConnectedLayer<ElementType>>(parameters, weights));
-        }
-        break;
-        case (underlying::LayerType::lstm):
-        {
-            auto& apiLayer = LayerAs<neural::LSTMLayer>(layer);
-            underlyingLayers.push_back(CreateLSTMLayer(apiLayer, parameters));
-        }
-        break;
-        case (underlying::LayerType::gru):
-        {
-            auto& apiLayer = LayerAs<neural::GRULayer>(layer);
-            underlyingLayers.push_back(CreateGRULayer(apiLayer, parameters));
         }
         break;
         case (underlying::LayerType::pooling):

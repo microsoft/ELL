@@ -1,5 +1,5 @@
 #
-# cmake file for python utilities
+# cmake file for python audio utilities
 #
 
 if(${PYTHON_ENABLED})
@@ -10,7 +10,6 @@ if(${PYTHON_ENABLED})
         classifier.py
         compiled_ell_model.py
         compute_ell_model.py
-        eval_test.py
         featurizer.py
         microphone.py
         play_audio.py
@@ -30,5 +29,7 @@ if(${PYTHON_ENABLED})
     
     # copy files
     copy_newer_files(${module_name} lib_src)
+
+    add_subdirectory(training)
 
 endif()  # PYTHON_ENABLED

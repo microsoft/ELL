@@ -20,6 +20,7 @@
 // model
 #include "InputNode.h"
 #include "OutputNode.h"
+#include "ModelEditor.h"
 
 // nodes
 #include "BinaryOperationNode.h"
@@ -30,10 +31,11 @@
 #include "DTWDistanceNode.h"
 #include "FFTNode.h"
 #include "FilterBankNode.h"
-#include "GRULayerNode.h"
+#include "GRUNode.h"
 #include "HammingWindowNode.h"
 #include "IIRFilterNode.h"
 #include "InputNodeBase.h"
+#include "LSTMNode.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "ReorderDataNode.h"
 #include "Tensor.h"
@@ -48,9 +50,7 @@
 #include "BinaryConvolutionalLayer.h"
 #include "ConvolutionalLayer.h"
 #include "FullyConnectedLayer.h"
-#include "GRULayer.h"
 #include "InputLayer.h"
-#include "LSTMLayer.h"
 #include "PoolingLayer.h"
 #include "RegionDetectionLayer.h"
 #include "ScalingLayer.h"
@@ -1159,121 +1159,122 @@ Node ModelBuilder::AddSoftmaxLayerNode(Model model, PortElements input, const el
     return Node(newNode);
 }
 
-Node ModelBuilder::AddGRULayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::GRULayer& layer)
+Node ModelBuilder::AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits,
+    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+    ell::api::predictors::neural::ActivationType activation)
 {
-    auto type = layer.parameters.dataType;
+    auto type = input.GetType();
     switch (type)
     {
     case PortType::real:
-        return AddGRULayerNode<double>(model, input, reset, layer);
+        return AddRNNNode<double>(model, input, reset, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation);
         break;
     case PortType::smallReal:
-        return AddGRULayerNode<float>(model, input, reset, layer);
+        return AddRNNNode<float>(model, input, reset, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation);
         break;
     default:
-        throw std::invalid_argument("Error: could not create GRULayerNode of the requested type");
+        throw std::invalid_argument("Error: could not create RNNNode of the requested type");
     }
 }
 
 template <typename ElementType>
-Node ModelBuilder::AddGRULayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::GRULayer& layer)
+Node ModelBuilder::AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits,
+    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+    ell::api::predictors::neural::ActivationType activation)
 {
     using namespace ell::predictors::neural;
     using namespace ell::nodes;
 
-    auto elements = input.GetPortElements();
-    auto resetElements = reset.GetPortElements();
-    ell::model::Node* newNode = nullptr;
-
-    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<ElementType>::LayerParameters;
-
-    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
-    // layer node's constructor.
-    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode<ElementType>(layer);
-
-    // Now we can construct the underlying Layer rather than python api version of GRULayer.
-    size_t m = layer.updateWeights.shape.rows;
-    size_t n = layer.updateWeights.shape.columns;
-
-    auto updateWeights = CastVector<ElementType>(layer.updateWeights.data);
-    auto resetWeights = CastVector<ElementType>(layer.resetWeights.data);
-    auto hiddenWeights = CastVector<ElementType>(layer.hiddenWeights.data);
-    auto updateBias = CastVector<ElementType>(layer.updateBias.data);
-    auto resetBias = CastVector<ElementType>(layer.resetBias.data);
-    auto hiddenBias = CastVector<ElementType>(layer.hiddenBias.data);
-
-    ell::predictors::neural::GRUParameters<ElementType> gruParameters = {
-        { updateWeights.data(), m, n },
-        { resetWeights.data(), m, n }, 
-        { hiddenWeights.data(), m, n }, 
-        { updateBias.data(), updateBias.size() },
-        { resetBias.data(), resetBias.size() },
-        { hiddenBias.data(), hiddenBias.size() } };
-    ell::predictors::neural::GRULayer<ElementType> gruLayer(parameters, gruParameters, ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(layer.activation),
-        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(layer.recurrentActivation));
-
-    newNode = model.GetModel().AddNode<ell::nodes::GRULayerNode<ElementType>>(ell::model::PortElements<ElementType>(elements), ell::model::PortElements<int>(resetElements), gruLayer);
+    ell::model::Node* newNode = model.GetModel().AddNode<ell::nodes::RNNNode<ElementType>>(
+        ell::model::PortElements<ElementType>(input.GetPortElements()),
+        ell::model::PortElements<int>(reset.GetPortElements()),
+        hiddenUnits,
+        ell::model::PortElements<ElementType>(inputWeights.GetPortElements()),
+        ell::model::PortElements<ElementType>(hiddenWeights.GetPortElements()),
+        ell::model::PortElements<ElementType>(inputBias.GetPortElements()),
+        ell::model::PortElements<ElementType>(hiddenBias.GetPortElements()),
+        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(activation)
+        );
     return Node(newNode);
 }
 
-Node ModelBuilder::AddLSTMLayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::LSTMLayer& layer)
+Node ModelBuilder::AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, 
+    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+    ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
 {
-    auto type = layer.parameters.dataType;
+    auto type = input.GetType();
     switch (type)
     {
     case PortType::real:
-        return AddLSTMLayerNode<double>(model, input, reset, layer);
+        return AddGRUNode<double>(model, input, reset, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation, recurrentActivation);
         break;
     case PortType::smallReal:
-        return AddLSTMLayerNode<float>(model, input, reset, layer);
+        return AddGRUNode<float>(model, input, reset, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation, recurrentActivation);
         break;
     default:
-        throw std::invalid_argument("Error: could not create LSTMLayerNode of the requested type");
+        throw std::invalid_argument("Error: could not create GRUNode of the requested type");
     }
 }
 
 template <typename ElementType>
-Node ModelBuilder::AddLSTMLayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::LSTMLayer& layer)
+Node ModelBuilder::AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, 
+    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+    ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
 {
     using namespace ell::predictors::neural;
     using namespace ell::nodes;
 
-    auto elements = input.GetPortElements();
-    auto resetElements = reset.GetPortElements();
-    ell::model::Node* newNode = nullptr;
+    ell::model::Node* newNode = model.GetModel().AddNode<ell::nodes::GRUNode<ElementType>>(
+        ell::model::PortElements<ElementType>(input.GetPortElements()), 
+        ell::model::PortElements<int>(reset.GetPortElements()),
+        hiddenUnits,
+        ell::model::PortElements<ElementType>(inputWeights.GetPortElements()),
+        ell::model::PortElements<ElementType>(hiddenWeights.GetPortElements()),
+        ell::model::PortElements<ElementType>(inputBias.GetPortElements()),
+        ell::model::PortElements<ElementType>(hiddenBias.GetPortElements()),
+        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(activation),
+        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(recurrentActivation)
+    );
+    return Node(newNode);
+}
 
-    using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<ElementType>::LayerParameters;
+Node ModelBuilder::AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, 
+    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+    ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
+{
+    auto type = input.GetType();
+    switch (type)
+    {
+    case PortType::real:
+        return AddLSTMNode<double>(model, input, reset, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation, recurrentActivation);
+        break;
+    case PortType::smallReal:
+        return AddLSTMNode<float>(model, input, reset, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation, recurrentActivation);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create LSTMNode of the requested type");
+    }
+}
 
-    // Set the layer parameters. Note the the input tensor reference will be immediately replaced inside the
-    // layer node's constructor.
-    UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode<ElementType>(layer);
+template <typename ElementType>
+Node ModelBuilder::AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits,
+    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+    ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
+{
+    using namespace ell::predictors::neural;
+    using namespace ell::nodes;
 
-    auto inputWeights = CastVector<ElementType>(layer.inputWeights.data);
-    auto forgetMeWeights = CastVector<ElementType>(layer.forgetMeWeights.data);
-    auto candidateWeights = CastVector<ElementType>(layer.candidateWeights.data);
-    auto outputWeights = CastVector<ElementType>(layer.outputWeights.data);
-    auto inputBias = CastVector<ElementType>(layer.inputBias.data);
-    auto forgetMeBias = CastVector<ElementType>(layer.forgetMeBias.data);
-    auto candidateBias = CastVector<ElementType>(layer.candidateBias.data);
-    auto outputBias = CastVector<ElementType>(layer.outputBias.data);
-
-    // Now we can construct the underlying Layer rather than python api version of GRULayer.
-    size_t m = layer.inputWeights.shape.rows;
-    size_t n = layer.inputWeights.shape.columns;
-    size_t s = layer.inputBias.data.size();
-    ell::predictors::neural::LSTMParameters<ElementType> lstmParameters = {
-        { inputWeights.data(), m, n }, 
-        { forgetMeWeights.data(), m, n },
-        { candidateWeights.data(), m, n },
-        { outputWeights.data(), m, n },
-        { inputBias.data(), s },
-        { forgetMeBias.data(), s },
-        { candidateBias.data(), s },
-        { outputBias.data(), s } };
-
-    ell::predictors::neural::LSTMLayer<ElementType> lstmLayer(parameters, lstmParameters, ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(layer.activation),
-        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(layer.recurrentActivation));
-    newNode = model.GetModel().AddNode<ell::nodes::LSTMLayerNode<ElementType>>(ell::model::PortElements<ElementType>(elements), ell::model::PortElements<int>(resetElements), lstmLayer);
+    ell::model::Node* newNode = model.GetModel().AddNode<ell::nodes::LSTMNode<ElementType>>(
+        ell::model::PortElements<ElementType>(input.GetPortElements()),
+        ell::model::PortElements<int>(reset.GetPortElements()),
+        hiddenUnits,
+        ell::model::PortElements<ElementType>(inputWeights.GetPortElements()),
+        ell::model::PortElements<ElementType>(hiddenWeights.GetPortElements()),
+        ell::model::PortElements<ElementType>(inputBias.GetPortElements()),
+        ell::model::PortElements<ElementType>(hiddenBias.GetPortElements()),
+        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(activation),
+        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(recurrentActivation)
+        );
     return Node(newNode);
 }
 
@@ -1294,6 +1295,51 @@ Node ModelBuilder::AddDTWNode(Model model, std::vector<std::vector<double>> prot
         throw std::invalid_argument("Error: could not create DCTNode of the requested type");
     }
     return Node(newNode);
+}
+
+
+void ModelBuilder::ResetInput(Node node, PortElements input, std::string input_port_name)
+{
+    auto type = input.GetType();
+    switch (type)
+    {
+    case PortType::real:
+        InternalResetInput<double>(node, input, input_port_name);
+        break;
+    case PortType::smallReal:
+        InternalResetInput<float>(node, input, input_port_name);
+        break;
+    case PortType::integer:
+        InternalResetInput<int>(node, input, input_port_name);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not ResetInput of the requested type");
+    }
+}
+
+template <typename ElementType>
+void ModelBuilder::InternalResetInput(Node node, PortElements input, std::string input_port_name)
+{
+    using namespace ell::predictors::neural;
+    using namespace ell::nodes;
+    auto elements = input.GetPortElements();
+    const ell::model::Node* innerNode = node.GetNode();
+
+    ell::model::PortElements<ElementType> innerElements(elements);
+    if (!innerElements.IsFullPortOutput())
+    {
+        throw std::invalid_argument("Error: new input must be have a single range");
+    }
+
+    auto inputPort = innerNode->GetInputPort(input_port_name);
+    if (!inputPort)
+    {
+        throw std::invalid_argument("Error: input port named '" + input_port_name + "' was not found on this node");
+    }
+
+    ell::model::ModelEditor::ResetInputPort(
+        innerNode->GetInputPort(input_port_name),
+        *innerElements.GetElement(0).ReferencedPort());
 }
 
 // explicit instantiations

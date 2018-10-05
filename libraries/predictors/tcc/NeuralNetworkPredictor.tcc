@@ -171,11 +171,8 @@ namespace predictors
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::BinaryConvolutionalLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ConvolutionalLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::FullyConnectedLayer<ElementType>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::PoolingLayer<ElementType, MaxPoolingFunction>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::PoolingLayer<ElementType, MeanPoolingFunction>>();
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::RecurrentLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::RegionDetectionLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ScalingLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::SoftmaxLayer<ElementType>>();
@@ -195,16 +192,6 @@ namespace predictors
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,LeakyReLUActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,TanhActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,ParametricReLUActivation>");
-
-        // Note: we don't need any of the other combinations because we never actually serialized those out till now.
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<float>>("GRULayer<float,TanhActivation,SigmoidActivation>");
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<float>>("LSTMLayer<float,TanhActivation,SigmoidActivation>");
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<float>>("GRULayer<float,TanhActivation,HardSigmoidActivation<float>>");
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<float>>("LSTMLayer<float,TanhActivation,HardSigmoidActivation<float>>");
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<double>>("GRULayer<double,TanhActivation,SigmoidActivation>");
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<double>>("LSTMLayer<double,TanhActivation,SigmoidActivation>");
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<double>>("GRULayer<double,TanhActivation,HardSigmoidActivation<double>>");
-        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<double>>("LSTMLayer<double,TanhActivation,HardSigmoidActivation<double>>");
 
     }
 

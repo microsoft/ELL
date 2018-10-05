@@ -100,7 +100,17 @@ public:
     Node AddVoiceActivityDetectorNode(Model model, PortElements input, double sampleRate, double frameDuration,
         double tauUp,  double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown,
         double levelThreshold);
+    Node AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits,
+        PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+        ell::api::predictors::neural::ActivationType activation);
+    Node AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, 
+        PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+        ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
+    Node AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, 
+        PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+        ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
 
+    // Layer nodes (going away...)
     Node AddActivationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ActivationLayer& layer);
     Node AddBatchNormalizationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BatchNormalizationLayer& layer);
     Node AddBiasLayerNode(Model model, PortElements input, const ell::api::predictors::neural::BiasLayer& layer);
@@ -111,9 +121,8 @@ public:
     Node AddPoolingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::PoolingLayer& layer);
     Node AddScalingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ScalingLayer& layer);
     Node AddSoftmaxLayerNode(Model model, PortElements input, const ell::api::predictors::neural::SoftmaxLayer& layer);
-    Node AddGRULayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::GRULayer& layer);
-    Node AddLSTMLayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::LSTMLayer& layer);
 
+    void ResetInput(Node node, PortElements input, std::string input_port_name = "input");
 private:
 #ifndef SWIG
     template <typename ElementType>
@@ -150,10 +159,19 @@ private:
     Node AddSoftmaxLayerNode(Model model, PortElements input, const ell::api::predictors::neural::SoftmaxLayer& layer);
 
     template <typename ElementType>
-    Node AddLSTMLayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::LSTMLayer& layer);
+    Node AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+        ell::api::predictors::neural::ActivationType activation);
 
     template <typename ElementType>
-    Node AddGRULayerNode(Model model, PortElements input, PortElements reset, const ell::api::predictors::neural::GRULayer& layer);
+    Node AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+        ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
+
+    template <typename ElementType>
+    Node AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
+        ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
+
+    template <typename ElementType>
+    void InternalResetInput(Node node, PortElements input, std::string input_port_name);
 #endif
 
     ell::model::ModelBuilder _modelBuilder;

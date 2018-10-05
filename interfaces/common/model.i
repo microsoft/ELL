@@ -50,7 +50,12 @@ WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(FloatCallbackBase, FloatCallbackBase, f
 %template(StepDouble) ELL_API::Map::Step<double>;
 %template(StepFloat) ELL_API::Map::Step<float>;
 
+#ifndef SWIGXML
+%include "std_vector.i"
+
 %template(PortElementsList) std::vector<ELL_API::PortElements*>;
+
+#endif
 
 #ifdef SWIGPYTHON
     %include "model_python_post.i"

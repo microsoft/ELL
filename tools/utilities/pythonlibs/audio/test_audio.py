@@ -45,11 +45,11 @@ transform = featurizer.AudioTransform(args.featurizer, predictor.input_size)
 if transform.using_map != predictor.using_map:
     raise Exception("cannot mix .ell and compiled models")
 
-# setup inputs and outputs
+# set up inputs and outputs
 if args.wav_file:
     output_speaker = None
     if args.speaker:
-        output_speaker = speaker.Speaker() # output wav file to speakers at the same time
+        output_speaker = speaker.Speaker()
     reader = wav_reader.WavReader(args.sample_rate, CHANNELS)
     reader.open(args.wav_file, transform.input_size, output_speaker)
 else:

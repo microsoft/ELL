@@ -12,7 +12,7 @@ if(${PYTHON_ENABLED} AND ${ONNX})
         
     source_group("lib" FILES ${importer_lib})
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src} ${importer_lib})
-    add_dependencies(${module_name} pythonlibs _ELL_python)
+    add_dependencies(${module_name} pythonlibs)
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/importers")
     

@@ -21,9 +21,7 @@ ConvolutionalLayer,\
 ConvolutionalParameters,\
 EpsilonSummand,\
 FullyConnectedLayer,\
-GRULayer,\
 HasPadding,\
-LSTMLayer,\
 Layer,\
 LayerNames,\
 LayerParameters,\

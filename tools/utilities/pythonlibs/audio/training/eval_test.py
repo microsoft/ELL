@@ -17,6 +17,8 @@ import time
 
 import numpy as np
 
+import find_ell_root
+import ell
 import classifier
 import featurizer
 import wav_reader
@@ -25,21 +27,31 @@ THRESHOLD = 0.01
 SMOOTHING = 0 # no smoothing window on classifier output
 
 class FeatureReader:
+    """ FeatureReader takes in the full set of features and returns classifier_input_size chunks of data """
+
     def __init__(self, features, classifier_input_size):
+        """ Initialize the FeatureReader with the full set of features, and the classifier input size """
         width = int(len(features) / classifier_input_size)
         self.features = np.reshape(features, (width, classifier_input_size))
         self.pos = 0
     
     def read(self):
+        """ Return the next classifier input of size (feature_width, classifier_input_size) """
         if self.pos < len(self.features):
             self.pos += 1
             return self.features[self.pos - 1]
         return None
 
 
-class ModelTester:
+class AudioModelTester:
+    """
+    The ModelTester helper class provides the ability to test an ELL model against a given dataset
+    or list file input where the inputs are featurized already or they are raw wav files that need
+    to be featurized.
+    """
+
     def __init__(self, verbose, reset):
-        
+        """ Initialize the AudioModelTester with optional verbose and reset flags """        
         self.passed = 0
         self.failed = 0
         self.rate = 0
@@ -47,10 +59,19 @@ class ModelTester:
         self.reset = reset
 
     def get_prediction(self, name, transform, predictor):        
+        """
+        Get the best prediction from the the given transform using the given predictor. 
+        The transform represents a single test row or test file so we know already it represents
+        a single word. The 'best' prediction across all the features in that word is the one
+        with highest confidence no matter where it was in that word.  
+         """
         eof = False
         best_prediction = None
         best_probability = 0
         label = None
+        if self.reset:
+            predictor.reset()
+            
         while not eof :
             feature_data = transform.read()
             if feature_data is None:
@@ -61,28 +82,35 @@ class ModelTester:
                     best_probability = probability
                     best_prediction = label
 
-        if self.reset:
-            predictor.reset()
         return (best_prediction, best_probability, label)
 
     def process_prediction(self, name, prediction, expected, confidence):
+        """
+        Print result of a given prediction and whether the test passed or failed given the expected result
+        """
         if prediction == expected:
             self.passed += 1
             self.rate = self.passed / (self.passed + self.failed)
             if self.verbose:
-                print("PASSED {:.2f}%: {} on test file {} with confidence {:.2f}%".format(self.rate * 100, expected, name, confidence*100)) 
+                print("PASSED {:.2f}%: {} in {} with confidence {:.2f}%".format(self.rate * 100, expected, name, confidence*100)) 
             else:
-                print("PASSED {}".format(expected)) 
+                print("PASSED {:.2f}%: {}".format(self.rate * 100, expected)) 
         else:
             self.failed += 1
             self.rate = self.passed / (self.passed + self.failed)
             if self.verbose:
-                print("FAILED {:.2f}%: expected {}, got {} on test file {}".format(self.rate * 100, expected, prediction, name))
+                print("FAILED {:.2f}%: expected {}, got {} in {}".format(self.rate * 100, expected, prediction, name))
             else:
-                print("FAILED: expected {}, got {}".format(expected, prediction))
+                print("FAILED: {}, expecting {}, path={}".format(prediction, expected, name))
 
-    def RunTest(self, featurizer_model, classifier_model, list_file, max_tests, dataset, categories, sample_rate):
-
+    def run_test(self, featurizer_model, classifier_model, list_file, max_tests, dataset, categories, sample_rate):
+        """
+        Run the test using the given input models (featurizer and classifier) which may or may not be compiled.
+        The test set is defined by a list_file or a dataset.  The list file lists .wav files which we will featurize
+        using the given featurizer.  The dataset contains pre-featurized data as created by make_dataset.py.
+        The categories define the names of the keywords detected by the classifier and the sample_rate defines the 
+        audio sample rate in Hertz -- all input audio is resampled at this rate before featurization.
+        """
         predictor = classifier.AudioClassifier(classifier_model, categories, THRESHOLD, SMOOTHING)
         transform = featurizer.AudioTransform(featurizer_model, predictor.input_size)
 
@@ -130,9 +158,10 @@ class ModelTester:
 
             for f in features:
                 expected = labels[index]
-                reader = FeatureReader(f, predictor.input_size)
-                prediction = self.get_prediction(reader, predictor)
-                self.process_prediction(prediction, expected)
+                reader = FeatureReader(f, predictor.input_size)         
+                name = "row " + str(index)
+                prediction, confidence, label = self.get_prediction(name, reader, predictor)
+                self.process_prediction(name, prediction, expected, confidence)
                 index += 1
         else:
             raise Exception("Missing list_file and dataset arguments")
@@ -144,9 +173,13 @@ class ModelTester:
         print("{} passed, {} failed, pass rate of {:.2f} %".format(self.passed, self.failed, self.rate * 100))
         return self.rate
 
+def verify_file_exists(name, path):
+    if not os.path.isfile(path):
+        print("Could not find {} at: {}".format(name, path))
+        sys.exit(1)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("test the given featurizer and classifier against test input set")
+    parser = argparse.ArgumentParser("Test the given featurizer and classifier against test input set")
     parser.add_argument("--featurizer", "-f", help="specify path to featurizer model (*.ell or compiled_folder/model_name)", required=True)
     parser.add_argument("--classifier", "-c", help="specify path to classifier model (*.ell or compiled_folder/model_name)", required=True)
     parser.add_argument("--list_file", "-l", help="specify path to testing_list.txt")
@@ -155,22 +188,18 @@ if __name__ == "__main__":
     parser.add_argument("--sample_rate", "-s", help="specify audio sample rate (default 16000)", default=16000, type=int)  
     parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
     parser.add_argument("--reset", "-r", help="do a GRU reset between each test file", action="store_true")
-    parser.add_argument("--max_tests", type=int, help="maimum number of words chosen at random from each word list", default=None)
+    parser.add_argument("--max_tests", type=int, help="maximum number of words chosen at random from each word list", default=None)
 
     args = parser.parse_args()
     sample_rate = args.sample_rate
 
     if args.list_file:
-        if not os.path.isfile(args.list_file):
-            print("Could not find list file at: " + args.list_file)
-            sys.exit(1)
+        verify_file_exists("list_file", args.list_file)
     elif args.dataset:
-        if not os.path.isfile(args.dataset):
-            print("Could not find dataset file at: " + args.dataset)
-            sys.exit(1)
+        verify_file_exists("dataset", args.dataset)
     else:
         print("Expecting one of --list_file or --dataset")
         sys.exit(1)
 
-    test = ModelTester(args.verbose, args.reset)
-    test.RunTest(args.featurizer, args.classifier, args.list_file, args.max_tests, args.dataset, args.categories, sample_rate)
+    test = AudioModelTester(args.verbose, args.reset)
+    test.run_test(args.featurizer, args.classifier, args.list_file, args.max_tests, args.dataset, args.categories, sample_rate)

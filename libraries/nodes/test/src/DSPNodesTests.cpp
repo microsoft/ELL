@@ -23,6 +23,7 @@
 #include "MathConstants.h"
 #include "Tensor.h"
 #include "TensorOperations.h"
+#include "Vector.h"
 
 // model
 #include "InputNode.h"
@@ -37,10 +38,10 @@
 #include "DiagonalConvolutionNode.h"
 #include "FFTNode.h"
 #include "FilterBankNode.h"
-#include "GRULayerNode.h"
+#include "GRUNode.h"
 #include "IIRFilterNode.h"
-#include "LSTMLayerNode.h"
-#include "RecurrentLayerNode.h"
+#include "LSTMNode.h"
+#include "RNNNode.h"
 #include "SimpleConvolutionNode.h"
 #include "UnrolledConvolutionNode.h"
 #include "VoiceActivityDetectorNode.h"
@@ -631,243 +632,237 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
     }
 }
 
+
+void TestWithSerialization(model::Map& map, std::string name, std::function<void(model::Map& map, int)> body)
+{
+    // 3 iterations is important, because it finds bugs in reserialization of the deserialized model.
+    for (int iteration = 0; iteration < 3; iteration++)
+    {
+        body(map, iteration);
+
+        auto filename = name + ".json";
+
+        // archive the model
+        common::SaveMap(map, filename);
+
+        // unarchive the model
+        map = common::LoadMap(filename);
+    }
+}
+
 //
 // Recurrent layer nodes (Recurrent, GRU, LSTM)
 //
-
-// clang-format off
-const float wData[] = { 0.0381341f, 0.55826f, -0.467607f, 0.264272f, -0.733331f, 0.464226f, 0.496708f,
-0.0581872f, -0.514144f, 0.702823f, -1.50401f, 0.373703f, 0.885559f, -0.27592f,
--0.116469f, 0.320376f, -0.534044f, 1.92602f, -0.567954f, -0.0167191f, -0.822891f };
-// clang-format on
-
-void TestRecurrentNode()
+void TestRNNNode()
 {
     using ElementType = double;
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
-    using LayerParameters = typename Layer<ElementType>::LayerParameters;
-    using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
+    using ConstVectorReference = math::ConstColumnVectorReference<ElementType>;
 
-    VectorType biases = VectorType({ -0.0773237, 0.909263, -0.297635 });
+    size_t hiddenSize = 3;
 
-    MatrixType weights(3, 7);
+    // Precomputed weights created by GenerateGRUTest.py
+    const double x_t[] = { 0.11864984035491943, -1.497725486755371, 0.3899663984775543, -0.742249608039856, 0.38884925842285156, -0.8346691131591797, 0.9489753246307373, 1.0470960140228271, -1.3924566507339478, -0.6278074979782104 };
+    const double w_i[] = { -0.3215062916278839, -0.8250587582588196, -0.07175730913877487, 0.7295218110084534, 0.29332873225212097, 0.8628071546554565, 0.7429170608520508, 1.1023180484771729, -0.8306611776351929, 0.29230356216430664, 1.1557507514953613, -0.6685269474983215, 0.5184255242347717, -0.45642054080963135, -0.7934108376502991, -0.9269002676010132, 1.1365916728973389, -1.291425108909607, -0.24487516283988953, -0.07714151591062546, 1.0650510787963867, -1.2603979110717773, 0.5447753071784973, 0.6149663925170898, 1.0477608442306519, -1.3045274019241333, -2.4990055561065674, 0.04219631850719452, -0.3878266215324402, 0.047706957906484604 };
+    const double w_h[] = { 0.8688994646072388, -1.0314407348632812, 0.8147369623184204, 1.8119542598724365, -0.3671615421772003, -0.05160994082689285, -0.6416834592819214, -1.1712406873703003, 0.510130763053894 };
+    const double b_i[] = { 0.18072627484798431, 0.028830422088503838, 1.657913088798523 };
+    const double b_h[] = { 0.607840895652771, 0.32387951016426086, 0.3496452271938324 };
+    // Expected output
+    const double h_1[] = { 0.998630702495575, 0.9893065094947815, 0.9980131387710571 };
+    const double h_2[] = { 0.999634325504303, 0.9993395209312439, 0.9740726351737976 };
+    const double h_3[] = { 0.9996125102043152, 0.999338686466217, 0.9727824926376343 };
+    const double* h_t[] = { h_1, h_2, h_3 };
 
-    int columnIndex = 0;
-
-    // transform our weights into 3 x 7 matrices (21 values)
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 7; ++j)
-        {
-            weights(i, j) = wData[columnIndex];
-
-            columnIndex++;
-        }
-    }
-
-    TensorType input(1, 1, 4);
-
-    // should output ~ 1,1,0
-    input(0, 0, 0) = 5.1;
-    input(0, 0, 1) = 3.5;
-    input(0, 0, 2) = 1.4;
-    input(0, 0, 3) = 0.2;
-
-    Shape outputShape = { 1, 1, 3 };
-    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
-    RecurrentLayer<ElementType> recurrent(parameters, weights, biases, new TanhActivation<ElementType>());
-    recurrent.Compute();
-    TensorType output = recurrent.GetOutput();
-
-    recurrent.Reset();
+    ConstVectorReference input(x_t, sizeof(x_t) / sizeof(double));
+    size_t inputSize = input.Size();
+    ConstVectorReference inputWeights(w_i, sizeof(w_i) / sizeof(double));
+    ConstVectorReference hiddenWeights(w_h, sizeof(w_h) / sizeof(double));
+    ConstVectorReference inputBias(b_i, sizeof(b_i) / sizeof(double));
+    ConstVectorReference hiddenBias(b_h, sizeof(b_h) / sizeof(double));
 
     // Create model
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
-    auto computeNode = model.AddNode<nodes::RecurrentLayerNode<ElementType>>(inputNode->output, recurrent);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    auto resetTriggerNode = model.AddNode<nodes::ConstantNode<int>>(0);
+    auto inputWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputWeights.ToArray());
+    auto hiddenWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenWeights.ToArray());
+    auto inputBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputBias.ToArray());
+    auto hiddenBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenBias.ToArray());
+    auto activation = ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>());
 
-    // Compile model
-    model::MapCompilerOptions settings;
-    settings.compilerSettings.useBlas = true;
-    model::IRMapCompiler compiler(settings);
-    auto compiledMap = compiler.Compile(map);
+    auto rnnNode = model.AddNode<nodes::RNNNode<ElementType>>(inputNode->output, resetTriggerNode->output, hiddenSize,
+        inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output,
+        activation);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", rnnNode->output } });
 
-    // compare computed vs. compiled output
-    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
-    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
+    TestWithSerialization(map, "TestRNNNode", [&](model::Map& map, int iteration) {
+
+        // Compile model
+        model::MapCompilerOptions settings;
+        settings.compilerSettings.useBlas = true;
+        model::IRMapCompiler compiler(settings);
+        auto compiledMap = compiler.Compile(map);
+        auto name = rnnNode->GetRuntimeTypeName();
+
+        // test statefulness of the GRU node
+        for (size_t i = 0; i < 3; i++)
+        {
+            ConstVectorReference expectedOutput(h_t[i], sizeof(h_1) / sizeof(double));
+
+            // compare computed vs. compiled output
+            std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+            std::vector<ElementType> computedResult = VerifyCompiledOutput<ElementType, ElementType>(map, compiledMap, signal, name);
+
+            // verify compute output 
+            double epsilon = 1e-5;
+            auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
+            testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %d", name.c_str(), iteration, i), ok);
+        }
+    });
 }
-
-// clang-format off
-const float uData[] = { -0.306974f, -0.314942f, -0.307079f, -0.0778356f, -0.0929513f, 0.0426045f, -0.0200071f,
-0.508866f, 0.525531f, 0.345996f, -0.633406f, -0.519455f, 0.617442f, -0.0790342f,
-2.13148f, 2.61342f, -2.99549f, -6.15958f, 0.224837f, 0.0745432f, 0.154865f };
-const float rData[] = { -0.438305f, -0.438798f, -0.509791f, 0.385411f, -0.210201f, -0.302488f, 0.0717234f,
-0.259852f, 0.532692f, 0.675258f, 0.0314993f, -0.609884f, -0.419196f, 0.407534f,
-0.221932f, 0.51503f, -0.278936f, 0.673416f, 0.307534f, -0.176314f, 0.440408f };
-const float hData[] = { 0.0364258f, 0.557955f, -0.467648f, 0.265914f, 0.343273f, -0.0306102f, -0.265686f,
-0.241587f, 0.283854f, 0.232303f, -0.397746f, -0.191887f, -0.0618932f, -0.551409f,
-0.847701f, 0.234382f, -0.107097f, -0.38192f, 0.074817f, 0.555262f, 0.479104f };
-// clang-format on
-
 void TestGRUNode()
 {
     using ElementType = double;
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
-    using LayerParameters = typename Layer<ElementType>::LayerParameters;
-    using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
+    
+    using ConstVectorReference = math::ConstColumnVectorReference<ElementType>;
 
-    VectorType updateBias = VectorType({ 0.0, 0.0, 3.95111 });
-    VectorType resetBias = VectorType({ 0.0, 0.0, 0.0 });
-    VectorType hiddenBias = VectorType({ -0.0686757, 0.0, 0.281977 });
+    // Precomputed weights created by GenerateGRUTest.py
+    const double x_t[] = { -1.866538166999817, 2.6257550716400146, 0.06279680877923965, 0.42149317264556885 };
+    const double w_i[] = { -1.6192892789840698, 0.36051392555236816, 2.053159475326538, -1.6098523139953613, 0.4089716374874115, -2.4427011013031006, 0.3615369200706482, 0.35893726348876953, 0.6950929164886475, -0.15558069944381714, -0.6605814099311829, -0.17566926777362823, -0.5587524771690369, 1.0622758865356445, -0.7328291535377502, -0.46356719732284546, -0.3172260820865631, 1.1607599258422852, -1.774704933166504, 2.080854654312134, 1.4166220426559448, 0.08074117451906204, 0.6439551711082458, 0.6682876348495483, 0.0031769759953022003, -1.2152390480041504, 0.15362346172332764, 0.22646228969097137, -0.2625025808811188, -0.020441772416234016, -1.1608366966247559, -0.9417181611061096, 0.3165226876735687, 0.36076638102531433, 0.17325237393379211, 1.2059754133224487 };
+    const double w_h[] = { -0.6580407619476318, 1.8833234310150146, -1.8858188390731812, -0.21750696003437042, -0.7450492978096008, -0.8853184580802917, -0.3482202887535095, 0.07999972254037857, -1.643333077430725, -0.7072165012359619, -1.0991154909133911, 0.6662507653236389, -0.05446276068687439, -0.6393508911132812, -0.8782468438148499, -0.1724170297384262, -0.8084756135940552, 0.07150451093912125, 1.2091819047927856, 0.04685645550489426, 0.7719306349754333, 0.35313302278518677, 0.23132576048374176, 0.27549979090690613, 1.466962218284607, 1.2321659326553345, -3.2861289978027344 };
+    const double b_i[] = { 1.8049829006195068, -0.045422252267599106, 0.13240598142147064, 1.2670079469680786, 1.5549393892288208, -0.5999399423599243, -0.13771949708461761, -1.3751298189163208, -1.840890884399414 };
+    const double b_h[] = { 0.7539071440696716, -0.3806458115577698, -0.14616608619689941, -0.42660772800445557, -0.7125017046928406, -0.8799905180931091, 2.8359553813934326, 1.2625319957733154, 0.4183560013771057 };
+    // Expected output
+    const double h_1[] = { -0.001017451286315918, -0.15146352350711823, -0.6395260691642761 };
+    const double h_2[] = { -0.001752614974975586, -0.34548428654670715, -0.6916687488555908 };
+    const double h_3[] = { -0.0027370452880859375, -0.3964291512966156, -0.7047065496444702 };
+    const double* h_t[] = { h_1, h_2, h_3 };
 
-    MatrixType updateWeights(3, 7);
-    MatrixType resetWeights(3, 7);
-    MatrixType hiddenWeights(3, 7);
+    size_t hiddenSize = 3;
 
-    int columnIndex = 0;
-
-    // transform our weights into 3 x 7 matrices (21 values)
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 7; ++j)
-        {
-            updateWeights(i, j) = uData[columnIndex];
-            resetWeights(i, j) = rData[columnIndex];
-            hiddenWeights(i, j) = hData[columnIndex];
-
-            columnIndex++;
-        }
-    }
-
-    TensorType input(1, 1, 4);
-
-    // should output ~1,0,0
-    input(0, 0, 0) = 5.1;
-    input(0, 0, 1) = 3.5;
-    input(0, 0, 2) = 1.4;
-    input(0, 0, 3) = 0.2;
-
-    Shape outputShape = { 1, 1, 3 };
-    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
-    GRUParameters<ElementType> gruParams{ updateWeights, resetWeights, hiddenWeights, updateBias, resetBias, hiddenBias };
-    GRULayer<ElementType> gru(parameters, gruParams, new TanhActivation<ElementType>(), new SigmoidActivation<ElementType>());
-    gru.Compute();
-    auto output = gru.GetOutput();
-    UNUSED(output);
-    gru.Reset();
-
+    ConstVectorReference input(x_t, sizeof(x_t) / sizeof(double));
+    size_t inputSize = input.Size();
+    ConstVectorReference inputWeights(w_i, sizeof(w_i) / sizeof(double));
+    ConstVectorReference hiddenWeights(w_h, sizeof(w_h) / sizeof(double));
+    ConstVectorReference inputBias(b_i, sizeof(b_i) / sizeof(double));
+    ConstVectorReference hiddenBias(b_h, sizeof(b_h) / sizeof(double));
+    
     // Create model
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
     auto resetTriggerNode = model.AddNode<nodes::ConstantNode<int>>(0);
-    auto computeNode = model.AddNode<nodes::GRULayerNode<ElementType>>(inputNode->output, resetTriggerNode->output, gru);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto inputWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputWeights.ToArray());
+    auto hiddenWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenWeights.ToArray());
+    auto inputBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputBias.ToArray());
+    auto hiddenBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenBias.ToArray());
+    auto activation = ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>());
+    auto recurrentActivation = ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::SigmoidActivation<ElementType>());
 
-    // Compile model
-    model::MapCompilerOptions settings;
-    settings.compilerSettings.useBlas = true;
-    model::IRMapCompiler compiler(settings);
-    auto compiledMap = compiler.Compile(map);
+    auto gruNode = model.AddNode<nodes::GRUNode<ElementType>>(inputNode->output, resetTriggerNode->output, hiddenSize, 
+        inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output,
+        activation, recurrentActivation);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", gruNode->output } });
+    
+    TestWithSerialization(map, "TestGRUNode", [&](model::Map& map, int iteration) {
 
-    // compare computed vs. compiled output
-    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
-    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
+        // Compile model
+        model::MapCompilerOptions settings;
+        settings.compilerSettings.useBlas = true;
+        model::IRMapCompiler compiler(settings);
+        auto compiledMap = compiler.Compile(map);
+        auto name = gruNode->GetRuntimeTypeName();
+
+        // test statefulness of the GRU node
+        for (size_t i = 0; i < 3; i++)
+        {
+            ConstVectorReference expectedOutput(h_t[i], sizeof(h_1) / sizeof(double));
+
+            // compare computed vs. compiled output
+            std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+            std::vector<ElementType> computedResult = VerifyCompiledOutput<ElementType, ElementType>(map, compiledMap, signal, name);
+
+            // verify compute output 
+            double epsilon = 1e-5;
+            auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
+            testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %d", name.c_str(), iteration, i), ok);
+
+        }
+    });
 }
 
-// clang-format off
-const float iData[] = { 0.739646f, 0.8501f, -2.15136f, -2.44612f, 0.0639512f, -0.0492275f, 0.167204f,
--0.49359f, 0.253341f, -0.239276f, 0.114082f, -0.360225f, 0.434314f, -0.28489f,
--0.573704f, -0.0273829f, 0.0242156f, -0.600619f, -0.258574f, -0.312928f, -0.0446059f };
-const float fData[] = { 0.0628231f, 0.145727f, -0.258802f, -0.57547f, -0.511279f, -0.470488f, 0.231888f,
-0.42041f, -0.440816f, -0.343813f, 0.463799f, -0.456978f, 0.081054f, 0.532126f,
-0.51855f, -0.123881f, 0.509249f, 0.324012f, 0.318677f, -0.411882f, 0.082f };
-const float cData[] = { 0.187203f, 0.863434f, 0.490011f, -0.216801f, -0.290302f, 0.338456f, -0.216217f,
--0.000121037f, 0.0000392739f, 0.00000052499f, 0.0000676336f, 0.196989f, 0.312441f, 0.355654f,
-0.468885f, -0.236218f, 0.415782f, 0.302927f, -0.0503453f, -0.183221f, -0.500112f };
-const float oData[] = { 0.517059f, 0.470772f, -0.919974f, -0.319515f, 0.224966f, 0.195129f, 0.306053f,
-0.261489f, 0.499691f, 0.132338f, 0.47862f, 0.21803f, 0.00246173f, -0.0274337f,
--0.385968f, 0.120127f, -0.360038f, -0.21129f, 0.0611264f, -0.17212f, -0.165724f };
-// clang-format on
 void TestLSTMNode()
 {
     using ElementType = double;
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
-    using LayerParameters = typename Layer<ElementType>::LayerParameters;
-    using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
+    
+    using ConstVectorReference = math::ConstColumnVectorReference<ElementType>;
 
-    VectorType inputBias = VectorType({ 0.747351, -0.112848, 0.0 });
-    VectorType forgetMeBias = VectorType({ 1.0, 1.0, 1.0 });
-    VectorType candidateBias = VectorType({ 0.733668, 0.000431956, 0.0 });
-    VectorType outputBias = VectorType({ 0.385433, 0.0, 0.0 });
+    // Precomputed weights created by GenerateLSGMTest.py
+    const double x_t[] = { -0.43309685587882996, -1.130162000656128, -0.0909687802195549, -0.4426236152648926, -0.11253798007965088, 1.380946159362793, 0.8205883502960205, -0.05229336395859718, -2.0741474628448486, 0.3278883993625641 };
+    const double w_i[] = { 0.6511253118515015, 2.0175061225891113, 0.19230778515338898, 0.1317894458770752, 0.1585828810930252, -0.07296566665172577, -1.2601498365402222, 0.2603142559528351, -1.2849689722061157, -0.1481228917837143, -0.45136135816574097, 1.3159385919570923, 0.8316872119903564, -0.1754256933927536, 1.6749238967895508, 0.3764311969280243, -0.4301822781562805, -0.4683826267719269, -1.028944730758667, 1.1821211576461792, -0.86643385887146, 0.27833691239356995, 1.5544127225875854, -0.14951558411121368, -0.5922301411628723, -1.1712491512298584, 0.8437608480453491, -2.096470355987549, -2.362649917602539, 1.0517401695251465, 0.9789304137229919, 1.1866481304168701, 2.19455885887146, -1.5573855638504028, -1.4857137203216553, -0.7441024780273438, 1.209663987159729, -0.6159052848815918, -0.7103704810142517, -1.1879568099975586, -0.10851240158081055, 0.02951694466173649, -1.0808030366897583, 0.47296342253685, 0.8303858637809753, 1.3805022239685059, 0.8054493069648743, 0.0033771514426916838, 0.24905401468276978, 1.06377112865448, 0.6644095182418823, -0.3728560507297516, 1.8050099611282349, -1.4735825061798096, -0.37865114212036133, 0.7331714034080505, -0.5518970489501953, 0.7309926748275757, 1.2089462280273438, 0.7720244526863098, -0.5284073948860168, -0.060446847230196, -0.7342194318771362, -0.8396680355072021, -0.8295539021492004, 0.46687257289886475, 1.3178989887237549, -0.4714529514312744, -0.36685019731521606, -0.3204497694969177, 0.5232697129249573, 1.0299279689788818, 0.1968117356300354, -0.6680045127868652, -0.6849696636199951, 0.25415563583374023, 1.4508898258209229, -1.0641292333602905, 0.02521374635398388, -0.828795850276947, -0.1840386986732483, -0.0035157897509634495, -0.5138935446739197, 1.7330914735794067, 0.563833475112915, -0.3131422698497772, -1.2656675577163696, 0.3594684898853302, 0.46927720308303833, 0.4585743844509125, 1.3152965307235718, -0.5655897259712219, 0.32646334171295166, -0.8774658441543579, -0.9450925588607788, -0.9361690282821655, 0.31880906224250793, -0.08327312022447586, -0.71200031042099, 0.41611140966415405, 0.5446979999542236, 1.659063458442688, -0.8110974431037903, 0.4108612537384033, 0.6116517186164856, 2.3877499103546143, -0.646440863609314, 0.7542923092842102, -1.3344032764434814, -0.6392279267311096, -2.4335315227508545, 1.1413220167160034, 0.26730069518089294, -1.2412208318710327, 0.6426215767860413, 1.486965537071228, 0.8783390522003174, -1.8383007049560547, -0.8426035642623901, 0.8142386078834534, 0.14272619783878326, 0.814831554889679, -1.1428523063659668, 0.381057471036911, 0.9837798476219177, -0.580453097820282, 0.6704853177070618, 0.4560665190219879, 0.7043464183807373, 0.02900850772857666, -0.7768147587776184, 0.723414421081543, 0.6402895450592041, -1.935476541519165, 0.5388496518135071, 0.8460615873336792, -0.3884362578392029, -0.28912603855133057, -1.328397512435913, -0.00650961697101593, -1.1806731224060059, -1.1872210502624512, -0.11407879739999771, -1.6614559888839722, -0.13863477110862732, 0.15498283505439758, -3.231074810028076, -2.042465925216675, -1.1988264322280884, 0.5179974436759949, 1.838789701461792, -0.4401094317436218, 0.8016218543052673, -0.9823786020278931, -0.14128735661506653, 0.9628021121025085, 0.5577496290206909, -0.41265949606895447, -0.21254649758338928, -0.6768006682395935 };
+    const double w_h[] = { -1.554459571838379, -1.1459623575210571, -0.4674321413040161, -1.57246994972229, 1.5664836168289185, 0.07712340354919434, -0.9089983701705933, 0.49248918890953064, 0.022358577698469162, -0.6295645236968994, 0.21086902916431427, -0.3291659355163574, 0.3653954863548279, 1.7737113237380981, -0.8169741630554199, -0.3816412389278412, -0.041717443615198135, 1.1712921857833862, -0.802385151386261, 0.7553011178970337, 1.6707643270492554, 1.0745068788528442, -0.4649391770362854, 0.5538312792778015, -0.6652563810348511, 0.003600509138777852, 0.17086449265480042, -0.9902800917625427, -0.2772578299045563, -0.009141645394265652, 0.5040040016174316, -1.7911834716796875, -1.5239406824111938, 1.4718868732452393, 0.45045509934425354, 0.06189517304301262, -1.6212736368179321, -0.536480724811554, -1.7301037311553955, -1.7541351318359375, 0.36702921986579895, -0.1488613337278366, 0.4395482838153839, -0.32868295907974243, 2.0901262760162354, 0.8486853837966919, 0.698390543460846, -1.2518192529678345, -1.113065242767334, -0.9914770722389221, -0.1959114521741867, -0.2975504398345947, 1.6278289556503296, 0.18092399835586548, -0.8431065678596497, 1.0035691261291504, 0.822422981262207, -1.7101740837097168, 1.2035664319992065, 0.9784857034683228, -0.7354406118392944, 1.3279316425323486, 0.0412302128970623, 0.028288977220654488 };
+    const double b_i[] = { -0.3474038541316986, -2.0073912143707275, -1.3713533878326416, -0.7574060559272766, -1.8490254878997803, -0.20404112339019775, 0.44390836358070374, -0.4153674244880676, 0.8775933980941772, 0.3997775614261627, -0.2047869712114334, 0.22270329296588898, -0.2717428207397461, 1.1116859912872314, -0.12611441314220428, -0.05235645920038223 };
+    const double b_h[] = { -0.6316860318183899, 0.771199107170105, 0.30606597661972046, 0.597480058670044, -0.7204434275627136, -0.5604809522628784, 0.9371622800827026, -0.1999434381723404, 2.272083044052124, 0.6642170548439026, -0.780116856098175, 0.8419560194015503, -0.9387738108634949, -0.7556354403495789, 0.05611182004213333, 1.7009730339050293 };
+    // Expected output
+    const double h_1[] = { 0.00022874458227306604, 0.445499062538147, 0.6932798027992249, 0.41498056054115295 };
+    const double h_2[] = { 0.00022241008991841227, 0.09827625751495361, 0.9197579026222229, 0.5392394661903381 };
+    const double h_3[] = { 0.00028709517209790647, -0.12299935519695282, 0.9793951511383057, 0.4173615574836731 };
+    const double* h_t[] = { h_1, h_2, h_3 };
 
-    MatrixType inputWeights(3, 7);
-    MatrixType forgetMeWeights(3, 7);
-    MatrixType candidateWeights(3, 7);
-    MatrixType outputWeights(3, 7);
+    size_t hiddenSize = 4;
 
-    int columnIndex = 0;
-
-    // transform our weights into 3 x 7 matrices (21 values)
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 7; ++j)
-        {
-            inputWeights(i, j) = iData[columnIndex];
-            forgetMeWeights(i, j) = fData[columnIndex];
-            candidateWeights(i, j) = cData[columnIndex];
-            outputWeights(i, j) = oData[columnIndex];
-
-            columnIndex++;
-        }
-    }
-
-    TensorType input(1, 1, 4);
-
-    // should output 1,0,0
-    input(0, 0, 0) = 5.1;
-    input(0, 0, 1) = 3.5;
-    input(0, 0, 2) = 1.4;
-    input(0, 0, 3) = 0.2;
-
-    Shape outputShape = { 1, 1, 3 };
-    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
-
-    LSTMParameters<ElementType> lstmParams{ inputWeights, forgetMeWeights, candidateWeights, outputWeights, inputBias, forgetMeBias, candidateBias, outputBias };
-    LSTMLayer<ElementType> lstm(parameters, lstmParams, new TanhActivation<ElementType>(), new SigmoidActivation<ElementType>());
-    lstm.Compute();
-    auto output = lstm.GetOutput();
-    UNUSED(output);
-    lstm.Reset();
+    ConstVectorReference input(x_t, sizeof(x_t) / sizeof(double));
+    size_t inputSize = input.Size();
+    ConstVectorReference inputWeights(w_i, sizeof(w_i) / sizeof(double));
+    ConstVectorReference hiddenWeights(w_h, sizeof(w_h) / sizeof(double));
+    ConstVectorReference inputBias(b_i, sizeof(b_i) / sizeof(double));
+    ConstVectorReference hiddenBias(b_h, sizeof(b_h) / sizeof(double));
 
     // Create model
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
     auto resetTriggerNode = model.AddNode<nodes::ConstantNode<int>>(0);
-    auto computeNode = model.AddNode<nodes::LSTMLayerNode<ElementType>>(inputNode->output, resetTriggerNode->output, lstm);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    auto inputWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputWeights.ToArray());
+    auto hiddenWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenWeights.ToArray());
+    auto inputBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputBias.ToArray());
+    auto hiddenBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenBias.ToArray());
+    auto lstmNode = model.AddNode<nodes::LSTMNode<ElementType>>(inputNode->output, resetTriggerNode->output, hiddenSize,
+        inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output,
+        ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>()),
+        ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::SigmoidActivation<ElementType>()));
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", lstmNode->output } });
 
-    // Compile model
-    model::MapCompilerOptions settings;
-    settings.compilerSettings.useBlas = true;
-    model::IRMapCompiler compiler(settings);
-    auto compiledMap = compiler.Compile(map);
-    
-    // compare computed vs. compiled output
-    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
-    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
+    TestWithSerialization(map, "TestLSTMNode", [&](model::Map& map, int iteration) {
+
+        // Compile model
+        model::MapCompilerOptions settings;
+        settings.compilerSettings.useBlas = true;
+        model::IRMapCompiler compiler(settings);
+        auto compiledMap = compiler.Compile(map);
+        auto name = lstmNode->GetRuntimeTypeName();
+
+        // test statefulness of the LSTM node
+        for (size_t i = 0; i < 3; i++)
+        {
+            ConstVectorReference expectedOutput(h_t[i], sizeof(h_1) / sizeof(double));
+
+            // compare computed vs. compiled output
+            std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+            std::vector<ElementType> computedResult = VerifyCompiledOutput<ElementType,ElementType>(map, compiledMap, signal, name);
+            //map.SetInputValue(0, input.ToArray());
+            //auto computedResult = map.ComputeOutput<ElementType>(0);
+
+            // compute output
+            double epsilon = 1e-5;
+            auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
+            testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %d", name.c_str(), iteration, i), ok);
+        }
+
+    });
 }
 
 template< typename ElementType>
@@ -892,24 +887,6 @@ static Dataset<Example<DenseDataVector<ElementType>, WeightLabel>> LoadVadData(c
         exampleIterator.Next();
     }
     return dataset;
-}
-
-void TestWithSerialization(model::Map& map, std::string name, std::function<void(model::Map& map, int)> body)
-{
-    // 2 iterations is important, because it finds bugs in reserialization of the deserialized model.
-    int iteration = 0;
-    while (iteration++ < 3)
-    {
-        body(map, iteration);
-
-        auto filename = name + ".json";
-
-        // archive the model
-        common::SaveMap(map, filename);
-
-        // unarchive the model
-        map = common::LoadMap(filename);
-    }
 }
 
 const int FrameSize = 40;
@@ -992,11 +969,7 @@ void TestGRUNodeWithVADReset(const std::string& path)
     using namespace ell::predictors::neural;
 
     using ElementType = double;
-    using LayerParameters = typename Layer<ElementType>::LayerParameters;
-    using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
     using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
 
     auto dataset = LoadVadData<ElementType>(path, FrameSize);
 
@@ -1006,29 +979,30 @@ void TestGRUNodeWithVADReset(const std::string& path)
 
     size_t inputSize = FrameSize;
     size_t hiddenUnits = 10;
+    size_t stackSize = 3; // GRU stacks the 3 weights for input, reset, hidden into one matrix.
+    size_t numRows = hiddenUnits * stackSize;
+    size_t numCols = inputSize;
+    VectorType inputWeights(std::vector<ElementType>(numRows * numCols, static_cast<ElementType>(0.01)));
+    numCols = hiddenUnits;
+    VectorType hiddenWeights(std::vector<ElementType>(numRows * numCols, static_cast<ElementType>(0.02)));
 
-    VectorType updateBias(std::vector<ElementType>(hiddenUnits, static_cast<ElementType>(0.01)));
-    VectorType resetBias(std::vector<ElementType>(hiddenUnits, static_cast<ElementType>(0.02)));
-    VectorType hiddenBias(std::vector<ElementType>(hiddenUnits, static_cast<ElementType>(0.01)));
+    VectorType inputBias(std::vector<ElementType>(numRows, static_cast<ElementType>(0.01)));
+    VectorType hiddenBias(std::vector<ElementType>(numRows, static_cast<ElementType>(0.02)));
 
-    size_t matrixSize = hiddenUnits * (hiddenUnits + inputSize);
-    MatrixType updateWeights(hiddenUnits, hiddenUnits + inputSize, std::vector<ElementType>(matrixSize, static_cast<ElementType>(0.01)));
-    MatrixType resetWeights(hiddenUnits, hiddenUnits + inputSize, std::vector<ElementType>(matrixSize, static_cast<ElementType>(0.01)));
-    MatrixType hiddenWeights(hiddenUnits, hiddenUnits + inputSize, std::vector<ElementType>(matrixSize, static_cast<ElementType>(0.01)));
+    auto inputWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputWeights.ToArray());
+    auto hiddenWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenWeights.ToArray());
+    auto inputBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputBias.ToArray());
+    auto hiddenBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenBias.ToArray());
 
-    TensorType input(1, 1, FrameSize);
-    Shape outputShape = { 1, 1, hiddenUnits };
-    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
+    auto gruNode = model.AddNode<nodes::GRUNode<ElementType>>(inputNode->output, vadNode->output, hiddenUnits,
+        inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output,
+        ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>()),
+        ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::SigmoidActivation<ElementType>()));
 
-    GRUParameters<ElementType> gruParams{ updateWeights, resetWeights, hiddenWeights, updateBias, resetBias, hiddenBias };
-    GRULayer<ElementType> gru(parameters, gruParams, new TanhActivation<ElementType>(), new SigmoidActivation<ElementType>());
-
-    auto gruNode = model.AddNode<nodes::GRULayerNode<ElementType>>(inputNode->output, vadNode->output, gru);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", gruNode->output } });
 
-    int iteration = 0;
-    while (iteration++ < 3)
-    {
+    TestWithSerialization(map, "TestGRUNodeWithVADReset", [&dataset, hiddenUnits](model::Map& map, int iteration) {
+
         // now test compiling it.
         model::MapCompilerOptions settings;
         settings.verifyJittedModule = true;
@@ -1038,9 +1012,12 @@ void TestGRUNodeWithVADReset(const std::string& path)
         auto compiledMap = compiler.Compile(map);
         int errors = 0;
 
+        // Now since the model is compiled, in order to observe the hidden state being reset we
+        // need to access the global variable for that, which in this case will be called "g_1".
+        model::IRCompiledMap* icmap = dynamic_cast<model::IRCompiledMap*>(&compiledMap);
+
         size_t numFrames = dataset.NumExamples();
         int lastSignal = 0;
-        bool wasReset = false;
         for (size_t frame = 0; frame < numFrames; frame++)
         {
             auto e = dataset.GetExample(frame);
@@ -1053,37 +1030,34 @@ void TestGRUNodeWithVADReset(const std::string& path)
 
             compiledMap.SetInputValue(0, buffer);
             auto outputVec = compiledMap.ComputeOutput<ElementType>(0);
-            ElementType sum = 0;
-            for (auto x : outputVec)
+
+            // compute the sum of the hidden state.
+            ElementType* g_1 = icmap->GetGlobalValuePointer<ElementType>("g_1");
+            ElementType hiddenSum = 0;
+            for (size_t i = 0; i < hiddenUnits; i++)
             {
-                sum += x;
+                ElementType v = g_1[i];
+                hiddenSum += v;
             }
-            if (wasReset && sum > static_cast<ElementType>(0.1))
-            {
-                errors++;
-            }
+
+            // Now when the VAD signal transitions from 1 to zero, the GRU node should be reset
             if (lastSignal == 1 && expectedSignal == 0)
             {
-                // reset should have happened which means the next sum must be close to zero.
-                wasReset = true;
-            }
-            else
-            {
-                wasReset = false;
+                // reset should have happened which means the GRU hidden state should be zero.
+                if (hiddenSum != 0)
+                {
+                    // hidden state was not reset!
+                    errors++;
+                }
             }
 
+            // this is handy for debugging, graph this output to see the result of the GRU reset.
+            // std::cout << expectedSignal << "," << hiddenSum << ", ";
             lastSignal = expectedSignal;
         }
-        hiddenUnits = 0;
-
+        std::cout << "\n";
         testing::ProcessTest(utilities::FormatString("Testing TestGRUNodeWithVADReset iteration %d, %d errors", iteration, errors), errors == 0);
-
-        // archive the model
-        common::SaveMap(map, "TestGRUNodeWithVADReset.json");
-
-        // unarchive the model
-        map = common::LoadMap("TestGRUNodeWithVADReset.json");
-    }
+    });
 }
 
 //
@@ -1091,6 +1065,10 @@ void TestGRUNodeWithVADReset(const std::string& path)
 //
 void TestDSPNodes(const std::string& path)
 {
+    TestRNNNode();
+    TestGRUNode();
+    TestLSTMNode();
+
     TestVoiceActivityDetectorNode(path);
     TestGRUNodeWithVADReset(path);
 
@@ -1113,10 +1091,6 @@ void TestDSPNodes(const std::string& path)
     TestMelFilterBankNode<double>();
 
     TestBufferNode<float>();
-
-    TestRecurrentNode();
-    TestGRUNode();
-    TestLSTMNode();
 
     TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::simple);
     // TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::diagonal); // ERROR: diagonal test currently broken

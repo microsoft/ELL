@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="LeftToRight" Layout="Sugiyama" Offset="-267.432007324219,-428.252000457764" ZoomLevel="1.8" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id=".wavFiles" Bounds="0,5.6843418860808E-14,67.3533333333334,25.96" Label=".wav files" />
+    <Node Id="Classifier" Bounds="403.393333333333,4.2632564145606E-14,66.65,25.96" Label="Classifier" />
+    <Node Id="CompileWithELL" Category="Category4" Bounds="500.043333333334,0,57.3166666666666,25.96" Label="Testing" />
+    <Node Id="Dataset.npz" Bounds="199.41,3.19744231092045E-14,82,25.96" Label="Dataset.npz" />
+    <Node Id="Featurizer" Category="Category4" Bounds="97.3533333333334,4.2632564145606E-14,67.8833333333333,25.96" Label="Featurize" />
+    <Node Id="Training" Category="Category4" Bounds="311.41,3.19744231092045E-14,61.9833333333333,25.96" Label="Training" />
+  </Nodes>
+  <Links>
+    <Link Source=".wavFiles" Target="Featurizer" Bounds="67.3533329264323,12.9799997001571,21.000000406901,9.84757395627867E-08" />
+    <Link Source="Classifier" Target="CompileWithELL" Bounds="470.043334960938,12.9799995422363,21,0" />
+    <Link Source="Dataset.npz" Target="Training" Bounds="281.410003662109,12.9799995422363,21,0" />
+    <Link Source="Featurizer" Target="Dataset.npz" Bounds="165.236666666667,12.9799997519984,25.1733369954427,1.05608206624197E-07" />
+    <Link Source="Training" Target="Classifier" Bounds="373.393341064453,12.9799995422363,21,0" />
+  </Links>
+  <Categories>
+    <Category Id="Category4" Label="Category4" Background="#FF7F92FF" IsTag="True" />
+  </Categories>
+  <Properties>
+    <Property Id="Background" Label="Background" Description="The background color" DataType="System.Windows.Media.Brush" />
+    <Property Id="Bounds" DataType="System.Windows.Rect" />
+    <Property Id="Expression" DataType="System.String" />
+    <Property Id="GraphDirection" DataType="Microsoft.VisualStudio.Diagrams.Layout.LayoutOrientation" />
+    <Property Id="GroupLabel" DataType="System.String" />
+    <Property Id="IsEnabled" DataType="System.Boolean" />
+    <Property Id="IsTag" DataType="System.Boolean" />
+    <Property Id="Label" Label="Label" Description="Displayable label of an Annotatable object" DataType="System.String" />
+    <Property Id="Layout" DataType="System.String" />
+    <Property Id="Offset" DataType="System.String" />
+    <Property Id="TargetType" DataType="System.Type" />
+    <Property Id="Value" DataType="System.String" />
+    <Property Id="ValueLabel" DataType="System.String" />
+    <Property Id="ZoomLevel" DataType="System.String" />
+  </Properties>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Category4" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category4')" />
+      <Setter Property="Background" Value="#FF46AF3C" />
+    </Style>
+  </Styles>
+</DirectedGraph>

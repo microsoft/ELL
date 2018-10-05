@@ -78,5 +78,14 @@ namespace model
             std::get<ComputeFunction<InputType>>(_computeInputFunction) = computeFunction;
         }
     }
+
+    template<typename ElementType>
+    ElementType* IRCompiledMap::GetGlobalValuePointer(const std::string& name)
+    {
+        auto& jitter = GetJitter();
+        auto address = jitter.GetGlobalValueAddress(name);
+        return reinterpret_cast<ElementType*>(address);
+    }
+
 }
 }

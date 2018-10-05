@@ -9,7 +9,7 @@ if(${PYTHON_ENABLED} AND ${ONNX})
     set(importer_src torch_verifier.py)
         
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
-    add_dependencies(${module_name} onnx_importer pythonlibs _ELL_python)
+    add_dependencies(${module_name} onnx_importer pythonlibs)
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/importers")
     

@@ -101,8 +101,8 @@ namespace neural
         Layer<ElementType>::ReadFromArchive(archiver);
 
         math::MatrixArchiver::Read(_weights, "weights", archiver);
-        _shapedInput = VectorType(_layerParameters.input.Size());
-        _outputVector = VectorType(GetOutputMinusPadding().Size());
+        _shapedInput.Resize(_layerParameters.input.Size());
+        _outputVector.Resize(GetOutputMinusPadding().Size());
     }
 
 }

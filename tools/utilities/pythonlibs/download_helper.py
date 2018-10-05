@@ -124,6 +124,9 @@ def clone_repo(url, target_directory):
     if url in _cloned_repos:
         return _cloned_repos[url]
 
+    if url in _cloned_repos:
+        return _cloned_repos[url]
+
     if os.path.isdir(repo):
         _logger.info("### Updating git repo: '{}' at '{}'".format(repo_name, target_directory))
         os.chdir(repo)

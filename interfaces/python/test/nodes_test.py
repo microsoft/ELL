@@ -20,13 +20,13 @@ def load_vad_data():
 def test_voice_activity_node(testing):
     sample_rate = 8000  # this is the same rate used to generate VadData.txt
     frame_duration = 0.032    
-    tau_up = 1.54;
-    tau_down = 0.074326;
-    large_input = 2.400160;
-    gain_att = 0.002885;
-    threshold_up = 3.552713;
-    threshold_down = 0.931252;
-    level_threshold = 0.007885;
+    tau_up = 1.54
+    tau_down = 0.074326
+    large_input = 2.400160
+    gain_att = 0.002885
+    threshold_up = 3.552713
+    threshold_down = 0.931252
+    level_threshold = 0.007885
 
     builder = ell.model.ModelBuilder()
     ell_model = ell.model.Model()
@@ -78,13 +78,13 @@ def create_tensor(value, size, rows, columns, channels):
 def test_gru_node_with_vad_reset(testing):
     sample_rate = 8000  # this is the same rate used to generate VadData.txt
     frame_duration = 0.032    
-    tau_up = 1.54;
-    tau_down = 0.074326;
-    large_input = 2.400160;
-    gain_att = 0.002885;
-    threshold_up = 3.552713;
-    threshold_down = 0.931252;
-    level_threshold = 0.007885;
+    tau_up = 1.54
+    tau_down = 0.074326
+    large_input = 2.400160
+    gain_att = 0.002885
+    threshold_up = 3.552713
+    threshold_down = 0.931252
+    level_threshold = 0.007885
     
     hidden_units = 10    
     errors = 0
@@ -93,9 +93,9 @@ def test_gru_node_with_vad_reset(testing):
     ell_model = ell.model.Model()
 
     dataset = load_vad_data()
-    size = dataset.NumFeatures()
+    input_size = dataset.NumFeatures()
     
-    input_shape = ell.math.TensorShape(1, 1, size)
+    input_shape = ell.math.TensorShape(1, 1, input_size)
     output_shape = ell.math.TensorShape(1, 1, hidden_units)
     dataType = ell.nodes.PortType.smallReal
 
@@ -104,34 +104,38 @@ def test_gru_node_with_vad_reset(testing):
         ell.nodes.PortElements(input_node.GetOutputPort("output")), sample_rate, frame_duration,
         tau_up, tau_down, large_input, gain_att, threshold_up, threshold_down, level_threshold)
 
-    update_bias = create_tensor(0.01, hidden_units, hidden_units, 1, 1)
-    reset_bias = create_tensor(0.02, hidden_units, hidden_units, 1, 1)
-    hidden_bias = create_tensor(0.01, hidden_units, hidden_units, 1, 1)
+    numRows = hidden_units * 3
+    numCols = input_size
+    input_weights = np.ones(numRows * numCols) * 0.01
+    numCols = hidden_units
+    hidden_weights = np.ones(numRows * numCols) * 0.02
+    input_bias = np.ones(numRows) * 0.01
+    hidden_bias = np.ones(numRows) * 0.02
     
-    matrix_size = hidden_units * (size + hidden_units)
-    update_weights = create_tensor(0.01, matrix_size, hidden_units, size + hidden_units, 1)
-    reset_weights = create_tensor(0.01, matrix_size, hidden_units, size + hidden_units, 1)
-    hidden_weights = create_tensor(0.01, matrix_size, hidden_units, size + hidden_units, 1)
-
-    input_padding_parameters = ell.neural.PaddingParameters(ell.neural.PaddingScheme.zeros, 0)
-    output_padding_parameters = ell.neural.PaddingParameters(ell.neural.PaddingScheme.zeros, 0)
-    layer_parameters = ell.neural.LayerParameters(input_shape, input_padding_parameters, output_shape, output_padding_parameters, dataType)
-
-    gru_layer = ell.neural.GRULayer(layer_parameters, update_weights, reset_weights, hidden_weights, update_bias,
-        reset_bias, hidden_bias, ell.neural.ActivationType.tanh, ell.neural.ActivationType.sigmoid)
+    input_weights_node = builder.AddConstantNode(ell_model, input_weights, ell.nodes.PortType.smallReal)
+    hidden_weights_node = builder.AddConstantNode(ell_model, hidden_weights, ell.nodes.PortType.smallReal)
+    input_bias_node = builder.AddConstantNode(ell_model, input_bias, ell.nodes.PortType.smallReal)
+    hidden_bias_node = builder.AddConstantNode(ell_model, hidden_bias, ell.nodes.PortType.smallReal)
     
     # now create a gru_node that takes the same input as the vad_node, and also takes
     # the output of the vad_node as a reset signal.
-    gru_node = builder.AddGRULayerNode(ell_model, 
+    gru_node = builder.AddGRUNode(ell_model, 
         ell.nodes.PortElements(input_node.GetOutputPort("output")), 
-        ell.nodes.PortElements(vad_node.GetOutputPort("output")), gru_layer)
+        ell.nodes.PortElements(vad_node.GetOutputPort("output")), 
+        hidden_units,
+        ell.nodes.PortElements(input_weights_node.GetOutputPort("output")), 
+        ell.nodes.PortElements(hidden_weights_node.GetOutputPort("output")), 
+        ell.nodes.PortElements(input_bias_node.GetOutputPort("output")), 
+        ell.nodes.PortElements(hidden_bias_node.GetOutputPort("output")), 
+        ell.neural.ActivationType.tanh, 
+        ell.neural.ActivationType.sigmoid)
     
     output_node = builder.AddOutputNode(ell_model, output_shape, 
         ell.nodes.PortElements(gru_node.GetOutputPort("output")))
 
     # test we can access GetMemoryLayout information on the ports.
     output_size = list(gru_node.GetOutputPort("output").GetMemoryLayout().size)
-    expected_size = [1, 1, hidden_units]
+    expected_size = [hidden_units]
     if output_size != expected_size:
         print("The output port on the gru_node has size {}, we are expecting {}".format(output_size, expected_size))
         errors += 1
@@ -150,8 +154,8 @@ def test_gru_node_with_vad_reset(testing):
         expected = row.GetLabel()
         data = row.GetData().ToArray()        
         # watch out for AutoDataVector compression
-        if len(data) < size:
-            data.resize(size)            
+        if len(data) < input_size:
+            data.resize(input_size)            
         value = compiled_map.Compute(list(data), dtype=np.float32)
         total = np.sum(value)
 

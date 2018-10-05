@@ -579,34 +579,22 @@ class OnnxGRUConverter(OnnxNodeConverter):
         stacked_input_weights = tensors[0][1]
         # stacked set of update, reset, hidden weights to be applied to the hidden state
         stacked_hidden_weights = tensors[1][1]
-        # stacked set of update, reset, hidden biases
-        stacked_bias = tensors[2][1]
+        # the stacked bias comes in as one tensor which we have to then split
+        bias_weights = tensors[2][1].reshape((2, units*3))
+        # stacked set of update, reset, hidden input biases
+        stacked_input_bias = bias_weights[0]
+        # stacked set of update, reset, hidden hidden biases
+        stacked_hidden_bias = bias_weights[1]
 
         # ONNX order is update, reset, hidden
-
-        # now slice and concatentate what we need for ELL 
-        update_weights = np.concatenate([stacked_input_weights[:,0:units,],stacked_hidden_weights[:,0:units,]], 2)
-        reset_weights = np.concatenate([stacked_input_weights[:,units:2*units,],stacked_hidden_weights[:,units:2*units,]], 2)
-        hidden_weights = np.concatenate([stacked_input_weights[:,2*units:3*units,],stacked_hidden_weights[:,2*units:3*units,]], 2)
-
-        udpate_bias = stacked_bias[:,0:units]
-        reset_bias = stacked_bias[:,units:2*units]
-        hidden_bias = stacked_bias[:,2*units:3*units]
-                
-        # bugbug: why is stacked_bias_dim double what we need, seems pytorch is giving us an input bias and a hidden bias
-        udpate_bias2 = stacked_bias[:,3*units:4*units]
-        reset_bias2 = stacked_bias[:,4*units:5*units]
-        hidden_bias2 = stacked_bias[:,5*units:6*units]
 
         # we have to invent new unique id's for the tensors since we created more than we had in input_tensors.
         unique_id = "{}_{}_".format(node.operation_type, node.id)
         tensors = {
-            'update_weights': update_weights,
-            'reset_weights': reset_weights,
-            'hidden_weights': hidden_weights,
-            'update_bias': udpate_bias,
-            'reset_bias': reset_bias,
-            'hidden_bias': hidden_bias
+            'input_weights': stacked_input_weights,
+            'hidden_weights': stacked_hidden_weights,
+            'input_bias': stacked_input_bias,
+            'hidden_bias': stacked_hidden_bias
         }
 
         # register these as global tensors so the importer can find them.
@@ -687,6 +675,7 @@ class OnnxConcatConverter(OnnxNodeConverter):
 
         if not same_shapes:
             # then ignore this node, it is not really a Concat.
+            _logger.info("### ignoring strange concatenation of shapes: {}".format([s[0] for s in input_shapes]))
             self.node.operation_type = "Skip"
             return max_dim
 
@@ -823,6 +812,10 @@ class OnnxFullyConnectedConverter(OnnxNodeConverter):
                         tensor = tensor.reshape(tensor_shape) # ok, now back to the row-col shape.
                     # and since we are modifying this tensor, we need to update the version in the master list
                     self.add_tensor(weights[0], tensor)
+                if tensor_shape[0] == np.product(self.node.input_shapes[0][0]):
+                    # then the weights need to be transposed.
+                    tensor = tensor.T
+                    self.add_tensor(weights[0], tensor) # re-register the transformed version.
                 weights = (weights[0], tensor, self.get_order(tensor.shape))
                 
 
@@ -833,9 +826,9 @@ class OnnxFullyConnectedConverter(OnnxNodeConverter):
             result['bias'] = tensor_inputs[1]
         
         return result
-            
 
-class ReceptiveFieldConverter (OnnxNodeConverter):   
+            
+class ReceptiveFieldConverter(OnnxNodeConverter):   
     def __init__(self, converter):
         super().init(converter, "ReceptiveField")
         self.kernel_shape = None
@@ -907,25 +900,24 @@ class ReceptiveFieldConverter (OnnxNodeConverter):
 
     def get_number_of_output_channels(self):
         """
-        Subclasses can override this if they generate a different number of channels
-        on the output.
-        """
+        Return the number of output channels
+        """        
         return None
     
 
-class OnnxMaxPoolingConverter(ReceptiveFieldConverter ):
+class OnnxMaxPoolingConverter(ReceptiveFieldConverter):
     def __init__(self, converter):
         super(OnnxMaxPoolingConverter, self).__init__(converter)    
         self.op_type = "MaxPooling"
 
 
-class OnnxAveragePoolingConverter(ReceptiveFieldConverter ):
+class OnnxAveragePoolingConverter(ReceptiveFieldConverter):
     def __init__(self, converter):
         super(OnnxAveragePoolingConverter, self).__init__(converter)    
         self.op_type = "AveragePooling"
 
 
-class OnnxConvolutionConverter(ReceptiveFieldConverter ):
+class OnnxConvolutionConverter(ReceptiveFieldConverter):
     def __init__(self, converter):
         super(OnnxConvolutionConverter, self).__init__(converter)   
         self.op_type = "Convolution"
@@ -946,11 +938,10 @@ class OnnxConvolutionConverter(ReceptiveFieldConverter ):
             result['bias'] = tensor_inputs[1]
         
         return result
-        
+
     def get_number_of_output_channels(self):
         """
-        Return the number of filter used for this node operation
-        this is needed for the spatial output_shape
+        Return the number of output channels
         """
         shapes = self.node.input_shapes
         if len(shapes) > 1:

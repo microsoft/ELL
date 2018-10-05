@@ -79,6 +79,12 @@ namespace emitters
         return _pEngine->getFunctionAddress(name);
     }
 
+    uint64_t IRExecutionEngine::GetGlobalValueAddress(const std::string& name)
+    {
+        EnsureEngine();
+        return _pEngine->getGlobalValueAddress(name);
+    }
+
     uint64_t IRExecutionEngine::ResolveFunctionAddress(const std::string& name)
     {
         auto functionAddress = GetFunctionAddress(name);

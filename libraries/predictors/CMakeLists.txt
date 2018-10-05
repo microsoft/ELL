@@ -38,10 +38,8 @@ set(neural_include
     neural/include/BinaryConvolutionalLayer.h
     neural/include/ConvolutionalLayer.h
     neural/include/FullyConnectedLayer.h
-    neural/include/GRULayer.h
     neural/include/HardSigmoidActivation.h
     neural/include/InputLayer.h
-    neural/include/LSTMLayer.h
     neural/include/Layer.h
     neural/include/LeakyReLUActivation.h
     neural/include/MaxPoolingFunction.h
@@ -49,7 +47,6 @@ set(neural_include
     neural/include/ParametricReLUActivation.h
     neural/include/PoolingLayer.h
     neural/include/ReLUActivation.h
-    neural/include/RecurrentLayer.h
     neural/include/RegionDetectionLayer.h
     neural/include/ScalingLayer.h
     neural/include/SigmoidActivation.h
@@ -68,10 +65,8 @@ set(neural_tcc
     neural/tcc/BinaryConvolutionalLayer.tcc
     neural/tcc/ConvolutionalLayer.tcc
     neural/tcc/FullyConnectedLayer.tcc
-    neural/tcc/GRULayer.tcc
     neural/tcc/HardSigmoidActivation.tcc
     neural/tcc/InputLayer.tcc
-    neural/tcc/LSTMLayer.tcc
     neural/tcc/Layer.tcc
     neural/tcc/LeakyReLUActivation.tcc
     neural/tcc/MaxPoolingFunction.tcc
@@ -79,7 +74,6 @@ set(neural_tcc
     neural/tcc/ParametricReLUActivation.tcc
     neural/tcc/PoolingLayer.tcc
     neural/tcc/ReLUActivation.tcc
-    neural/tcc/RecurrentLayer.tcc
     neural/tcc/RegionDetectionLayer.tcc
     neural/tcc/ScalingLayer.tcc
     neural/tcc/SigmoidActivation.tcc

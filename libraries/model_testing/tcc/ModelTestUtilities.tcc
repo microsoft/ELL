@@ -136,14 +136,15 @@ void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>&
 }
 
 template<typename InputType, typename OutputType>
-void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
+std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
 {
     bool ok = true;
+    std::vector<OutputType> computedResult;
     // compare output
     for (const auto& input : signal)
     {
         map.SetInputValue(0, input);
-        auto computedResult = map.ComputeOutput<OutputType>(0);
+        computedResult = map.ComputeOutput<OutputType>(0);
 
         compiledMap.SetInputValue(0, input);
         auto compiledResult = compiledMap.ComputeOutput<OutputType>(0);
@@ -160,6 +161,7 @@ void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& com
         }
     }
     testing::ProcessTest(std::string("Testing compiled " + name + " compute"), ok);
+    return computedResult;
 }
 
 template<typename InputType>

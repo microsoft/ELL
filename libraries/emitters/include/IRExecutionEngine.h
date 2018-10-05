@@ -57,6 +57,15 @@ namespace emitters
         /// <returns> The function address. </returns>
         uint64_t GetFunctionAddress(const std::string& name);
 
+        /// <summary>
+        /// Return the address of a global variable, JITTing code as needed. Returns 0 if not found.
+        /// </summary>
+        ///
+        /// <param name="name"> Name of the requested global variable. </param>
+        ///
+        /// <returns> The variable address. </returns>
+        uint64_t GetGlobalValueAddress(const std::string& name);
+
         /// <summary> Return the address of a named function. Throws if not found. </summary>
         ///
         /// <param name="name"> Name of the requested function. </param>

@@ -126,6 +126,8 @@ class ModuleBuilder:
         self.output_dir = args.outdir
         if self.output_dir is None:
             self.output_dir = self.target
+        if os.path.isfile(self.output_dir + ".py"):
+            raise Exception("You have a python module named '{}', which will conflict with the --outdir of '{}'. Please specify a different outdir.".format(self.output_dir + ".py", self.output_dir))
         self.profile = args.profile
         self.verbose = args.verbose
         self.llvm_format = args.llvm_format

@@ -828,35 +828,15 @@ class ConvertGRU(ConvertBase):
     """
     def __init__(self, node: ImporterNode):
         super().__init__(node)
-        self.required_weights = ["update_weights", "reset_weights", "hidden_weights", "update_bias", "reset_bias", "hidden_bias"]
-        self.required_attributes = ["activation", "recurrent_activation"]
+        self.required_weights = ["input_weights", "hidden_weights", "input_bias", "hidden_bias" ]
+        self.required_attributes = ["hidden_size", "activation", "recurrent_activation"]
 
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL layer
         """
-        layer_parameters = self.get_layer_parameters(conversion_parameters)
-
-        update_weights = self.get_ell_tensor(
-            self.importer_node.weights["update_weights"][0], conversion_parameters)
-        reset_weights = self.get_ell_tensor(
-            self.importer_node.weights["reset_weights"][0], conversion_parameters)
-        hidden_weights = self.get_ell_tensor(
-            self.importer_node.weights["hidden_weights"][0], conversion_parameters)
-        update_bias = self.get_ell_tensor(
-            self.importer_node.weights["update_bias"][0], conversion_parameters)
-        reset_bias = self.get_ell_tensor(
-            self.importer_node.weights["reset_bias"][0], conversion_parameters)
-        hidden_bias = self.get_ell_tensor(
-            self.importer_node.weights["hidden_bias"][0], conversion_parameters)
-
-        activation = self.importer_node.attributes["activation"]
-        recurrentActivation = self.importer_node.attributes["recurrent_activation"]
-
-        return ell.neural.GRULayer(layer_parameters, update_weights,
-                                        reset_weights, hidden_weights,
-                                        update_bias, reset_bias, hidden_bias,
-                                        activation, recurrentActivation)
+        raise Exception("No corresponding ELL layer for GRU. Use node instead.")
+        
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -866,10 +846,30 @@ class ConvertGRU(ConvertBase):
         model = conversion_parameters["model"]
         builder = conversion_parameters["builder"]
         lookup_table = conversion_parameters["lookup_table"]
-        # Create the GRU layer
-        gru_layer = self.convert(conversion_parameters)
+
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
+        layer_parameters = self.get_layer_parameters(conversion_parameters)
+
+        # create constant nodes for the weights
+        input_weights = self.get_ell_tensor(
+            self.importer_node.weights["input_weights"][0], conversion_parameters)
+        hidden_weights = self.get_ell_tensor(
+            self.importer_node.weights["hidden_weights"][0], conversion_parameters)
+        input_bias = self.get_ell_tensor(
+            self.importer_node.weights["input_bias"][0], conversion_parameters)
+        hidden_bias = self.get_ell_tensor(
+            self.importer_node.weights["hidden_bias"][0], conversion_parameters)
+
+        input_weights_node = builder.AddConstantNode(model, input_weights.data, ell.nodes.PortType.smallReal)
+        hidden_weights_node = builder.AddConstantNode(model, hidden_weights.data, ell.nodes.PortType.smallReal)
+        input_bias_node = builder.AddConstantNode(model, input_bias.data, ell.nodes.PortType.smallReal)
+        hidden_bias = builder.AddConstantNode(model, hidden_bias.data, ell.nodes.PortType.smallReal)
+
+        hidden_size = self.importer_node.attributes["hidden_size"]
+        activation = self.importer_node.attributes["activation"]
+        recurrentActivation = self.importer_node.attributes["recurrent_activation"]
+
         # Get the port elements for the reset trigger
         if len(self.importer_node.inputs) > 1:
             reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(self.importer_node, 1)
@@ -879,8 +879,14 @@ class ConvertGRU(ConvertBase):
             reset_node = builder.AddConstantNode(model, [0], ell.nodes.PortType.integer)
             reset_port_elements = ell.nodes.PortElements(reset_node.GetOutputPort("output"))
 
-        # Add the GRULayerNode to the model
-        ell_node = builder.AddGRULayerNode(model, input_port_elements, reset_port_elements, gru_layer)
+        # Add the GRUNode to the model
+        ell_node = builder.AddGRUNode(model, input_port_elements, reset_port_elements, hidden_size,
+            ell.nodes.PortElements(input_weights_node.GetOutputPort("output")), 
+            ell.nodes.PortElements(hidden_weights_node.GetOutputPort("output")), 
+            ell.nodes.PortElements(input_bias_node.GetOutputPort("output")), 
+            ell.nodes.PortElements(hidden_bias.GetOutputPort("output")), 
+            activation, recurrentActivation)
+
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
@@ -979,40 +985,15 @@ class ConvertLSTM(ConvertBase):
     """
     def __init__(self, node: ImporterNode):
         super().__init__(node)
-        self.required_weights = ["input_weights", "forget_me_weights", "candidate_weights", "output_weights", "input_bias", "forget_me_bias", "candidate_bias", "output_bias"]
-        self.required_attributes = ["activation", "recurrent_activation"]
+        self.required_weights = ["input_weights", "hidden_weights", "input_bias", "reset_bias" ]
+        self.required_attributes = ["hidden_size", "activation", "recurrent_activation"]
 
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
         Return the appropriate ELL layer
         """
-        layer_parameters = self.get_layer_parameters(conversion_parameters)
-
-        input_weights = self.get_ell_tensor(
-            self.importer_node.weights["input_weights"][0], conversion_parameters)
-        forget_me_weights = self.get_ell_tensor(
-            self.importer_node.weights["forget_me_weights"][0], conversion_parameters)
-        candidate_weights = self.get_ell_tensor(
-            self.importer_node.weights["candidate_weights"][0], conversion_parameters)
-        output_weights = self.get_ell_tensor(
-            self.importer_node.weights["output_weights"][0], conversion_parameters)
-        input_bias = self.get_ell_tensor(
-            self.importer_node.weights["input_bias"][0], conversion_parameters)
-        forget_me_bias = self.get_ell_tensor(
-            self.importer_node.weights["forget_me_bias"][0], conversion_parameters)
-        candidate_bias = self.get_ell_tensor(
-            self.importer_node.weights["candidate_bias"][0], conversion_parameters)
-        output_bias = self.get_ell_tensor(
-            self.importer_node.weights["output_bias"][0], conversion_parameters)
-
-        activation = self.importer_node.attributes["activation"]
-        recurrentActivation = self.importer_node.attributes["recurrent_activation"]
-
-        return ell.neural.LSTMLayer(layer_parameters, input_weights,
-                                        forget_me_weights, candidate_weights,
-                                        output_weights, input_bias, forget_me_bias,
-                                        candidate_bias, output_bias,
-                                        activation, recurrentActivation)
+        raise Exception("No corresponding ELL layer for GRU. Use node instead.")
+        
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1022,10 +1003,30 @@ class ConvertLSTM(ConvertBase):
         model = conversion_parameters["model"]
         builder = conversion_parameters["builder"]
         lookup_table = conversion_parameters["lookup_table"]
-        # Create the LSTM layer
-        lstm_layer = self.convert(conversion_parameters)
+
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
+        layer_parameters = self.get_layer_parameters(conversion_parameters)
+
+        # create constant nodes for the weights
+        input_weights = self.get_ell_tensor(
+            self.importer_node.weights["input_weights"][0], conversion_parameters)
+        hidden_weights = self.get_ell_tensor(
+            self.importer_node.weights["hidden_weights"][0], conversion_parameters)
+        input_bias = self.get_ell_tensor(
+            self.importer_node.weights["input_bias"][0], conversion_parameters)
+        hidden_bias = self.get_ell_tensor(
+            self.importer_node.weights["hidden_bias"][0], conversion_parameters)
+
+        input_weights_node = builder.AddConstantNode(model, input_weights.data, ell.nodes.PortType.smallReal)
+        hidden_weights_node = builder.AddConstantNode(model, hidden_weights.data, ell.nodes.PortType.smallReal)
+        input_bias_node = builder.AddConstantNode(model, input_bias.data, ell.nodes.PortType.smallReal)
+        hidden_bias = builder.AddConstantNode(model, hidden_bias.data, ell.nodes.PortType.smallReal)
+
+        hidden_size = self.importer_node.attributes["hidden_size"]
+        activation = self.importer_node.attributes["activation"]
+        recurrentActivation = self.importer_node.attributes["recurrent_activation"]
+
         # Get the port elements for the reset trigger
         if len(self.importer_node.inputs) > 1:
             reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(self.importer_node, 1)
@@ -1035,8 +1036,14 @@ class ConvertLSTM(ConvertBase):
             reset_node = builder.AddConstantNode(model, [0], ell.nodes.PortType.integer)
             reset_port_elements = ell.nodes.PortElements(reset_node.GetOutputPort("output"))
 
-        # Add the LSTMLayerNode to the model
-        ell_node = builder.AddLSTMLayerNode(model, input_port_elements, reset_port_elements, lstm_layer)
+        # Add the GRUNode to the model
+        ell_node = builder.AddLSTMNode(model, input_port_elements, reset_port_elements, hidden_size,
+            ell.nodes.PortElements(input_weights_node.GetOutputPort("output")), 
+            ell.nodes.PortElements(hidden_weights_node.GetOutputPort("output")), 
+            ell.nodes.PortElements(input_bias_node.GetOutputPort("output")), 
+            ell.nodes.PortElements(hidden_bias.GetOutputPort("output")), 
+            activation, recurrentActivation)
+
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 

@@ -40,10 +40,7 @@ int main()
     BinaryConvolutionalLayerGemmTest<float>();
     SoftmaxLayerTest<float>();
     NeuralNetworkPredictorTest<float>();
-    RecurrentLayerTest<float>();
-    LSTMLayerTest<float>();
-    GRULayerTest<float>();
-
+    
     ActivationTest<double>();
     LayerBaseTest<double>();
     ActivationLayerTest<double>();
@@ -58,9 +55,6 @@ int main()
     BinaryConvolutionalLayerGemmTest<double>();
     SoftmaxLayerTest<double>();
     NeuralNetworkPredictorTest<double>();
-    RecurrentLayerTest<double>();
-    LSTMLayerTest<double>();
-    GRULayerTest<double>();
     
     ConvolutionalArchiveTest<float>();
     BinaryConvolutionalArchiveTest<float>();

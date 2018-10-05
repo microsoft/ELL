@@ -20,8 +20,6 @@
 #include "BinaryConvolutionalLayerNode.h"
 #include "ConvolutionalLayerNode.h"
 #include "FullyConnectedLayerNode.h"
-#include "GRULayerNode.h"
-#include "LSTMLayerNode.h"
 #include "PoolingLayerNode.h"
 #include "RegionDetectionLayerNode.h"
 #include "ScalingLayerNode.h"

@@ -18,16 +18,16 @@ set(src
     src/FFTNode.cpp
     src/FilterBankNode.cpp
     src/FullyConnectedLayerNode.cpp
-    src/GRULayerNode.cpp
+    src/GRUNode.cpp
     src/IIRFilterNode.cpp
     src/IRNode.cpp
-    src/LSTMLayerNode.cpp
+    src/LSTMNode.cpp
     src/MatrixMatrixMultiplyNode.cpp
     src/MatrixVectorMultiplyNode.cpp
     src/NeuralNetworkPredictorNode.cpp
     src/PoolingLayerNode.cpp
     src/ProtoNNPredictorNode.cpp
-    src/RecurrentLayerNode.cpp
+    src/RNNNode.cpp
     src/RegionDetectionLayerNode.cpp
     src/ScalingLayerNode.cpp
     src/SimpleConvolutionNode.cpp
@@ -66,12 +66,12 @@ set(include
     include/FilterBankNode.h
     include/ForestPredictorNode.h
     include/FullyConnectedLayerNode.h
-    include/GRULayerNode.h
+    include/GRUNode.h
     include/HammingWindowNode.h
     include/IIRFilterNode.h
     include/IRNode.h
     include/L2NormSquaredNode.h
-    include/LSTMLayerNode.h
+    include/LSTMNode.h
     include/LinearPredictorNode.h
     include/MatrixMatrixMultiplyNode.h
     include/MatrixVectorMultiplyNode.h
@@ -84,7 +84,7 @@ set(include
     include/PoolingLayerNode.h
     include/ProtoNNPredictorNode.h
     include/ReceptiveFieldMatrixNode.h
-    include/RecurrentLayerNode.h
+    include/RNNNode.h
     include/RegionDetectionLayerNode.h
     include/ReorderDataNode.h
     include/ScalingLayerNode.h
@@ -353,4 +353,3 @@ target_link_libraries(${timing_name}
 copy_shared_libraries(${timing_name})
 
 set_property(TARGET ${timing_name} PROPERTY FOLDER "tests")
-

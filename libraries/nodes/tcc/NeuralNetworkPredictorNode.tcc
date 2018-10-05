@@ -72,16 +72,6 @@ namespace nodes
         node = TryAddLayerNode<predictors::neural::FullyConnectedLayer<ValueType>, FullyConnectedLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
         if (node != nullptr) return node;
 
-        // todo: figure out how to pass a resetTrigger as second input to the GRULayer (e.g. could be output of VoiceActivityDetectorNode).
-        // for now the user can skip Layers and use GRULayerNode directly and that way they can provide the reset input.
-        auto resetTriggerNode = transformer.AddNode<ConstantNode<int>>(0);
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::GRULayer<ValueType>, GRULayerNode<ValueType>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;
-
-        node = TryAddLayerNodeWithTwoInputs<predictors::neural::LSTMLayer<ValueType>, LSTMLayerNode<ValueType>, int>(transformer, layer, layerInputs, resetTriggerNode->output, options, state);
-        if (node != nullptr) return node;        
-
         //
         // Pooling layer
         //

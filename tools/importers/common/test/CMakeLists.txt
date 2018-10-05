@@ -9,7 +9,6 @@ if(${PYTHON_ENABLED})
     set (test_src common_importer_test.py)
 
     add_custom_target(${test_name} DEPENDS ${test_src} SOURCES ${test_src})
-    add_dependencies(${test_name} _ELL_python)
 
     set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
