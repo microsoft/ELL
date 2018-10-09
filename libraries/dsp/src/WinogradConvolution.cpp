@@ -717,14 +717,14 @@ namespace dsp
         const int m = numTileRows * numTileColumns;
         const int n = numFilters;
         const int k = numChannels;
-        const int lda = numChannels;
-        const int ldb = numChannels;
-        const int ldc = numFilters;
-
         for (int windowPosition = 0; windowPosition < windowSize * windowSize; ++windowPosition)
         {
-            // multiply directly into transformedOutput
-            math::Blas::Gemm(math::MatrixLayout::rowMajor, math::MatrixTranspose::noTranspose, math::MatrixTranspose::transpose, m, n, k, 1.0, A, lda, B, ldb, 0.0, C, ldc);
+            // Multiply directly into transformedOutput
+            math::ConstRowMatrixReference<ValueType> matrixA(A, m, k);
+            math::ConstColumnMatrixReference<ValueType> matrixB(B, k, n);
+            math::RowMatrixReference<ValueType> matrixC(C, m, n);
+            math::MultiplyScaleAddUpdate(static_cast<ValueType>(1.0), matrixA, matrixB, static_cast<ValueType>(0.0), matrixC);
+
             A += signalWindowStride;
             B += filterWindowStride;
             C += outputWindowStride;
