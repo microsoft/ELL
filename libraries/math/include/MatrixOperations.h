@@ -44,6 +44,22 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     std::ostream& operator<<(std::ostream& stream, ConstMatrixReference<ElementType, layout> M);
 
+    /// <summary> Returns the matrix transpose. </summary>
+    ///
+    /// <param name="matrix"> The const matrix reference to transpose. </param>
+    ///
+    /// <returns> The transpose. </returns>
+    template <typename ElementType, MatrixLayout layout>
+    auto Transpose(ConstMatrixReference<ElementType, layout> matrix) { return matrix.Transpose(); }
+
+    /// <summary> Returns the matrix transpose. </summary>
+    ///
+    /// <param name="matrix"> The const matrix reference to transpose. </param>
+    ///
+    /// <returns> The transpose. </returns>
+    template <typename ElementType, MatrixLayout layout>
+    auto Transpose(MatrixReference<ElementType, layout> matrix) { return matrix.Transpose(); }
+
     /// <summary> Adds a scalar to a matrix, matrix += scalar. </summary>
     ///
     /// <typeparam name="MatrixElementType"> Matrix element type. </typeparam>
@@ -253,6 +269,16 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     void ColumnwiseSum(ConstMatrixReference<ElementType, layout> matrix, RowVectorReference<ElementType> vector);
 
+    /// <summary> Performs a rank-one update of the form matrix = matrix + scalar * vectorA * vectorB. </summary>
+    ///
+    /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
+    /// <typeparam name="layout"> Matrix layout. </typeparam>
+    /// <param name="vectorA"> The column vector. </param>
+    /// <param name="vectorB"> The row vector. </param>
+    /// <param name="matrix"> The matrix begin updates. </param>
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, MatrixLayout layout>
+    void RankOneUpdate(ElementType scalar, ConstColumnVectorReference<ElementType> vectorA, ConstRowVectorReference<ElementType> vectorB, MatrixReference<ElementType, layout> matrix);
+
     /// <summary> Generalized matrix vector multiplication, vectorB = scalarA * matrix * vectorA + scalarB * vectorB. </summary>
     ///
     /// <typeparam name="implementation"> The implementation. </typeparam>
@@ -349,6 +375,9 @@ namespace math
             static std::string GetImplementationName() { return "Native"; }
 
             template <typename ElementType, MatrixLayout layout>
+            static void RankOneUpdate(ElementType scalar, ConstColumnVectorReference<ElementType> vectorA, ConstRowVectorReference<ElementType> vectorB, MatrixReference<ElementType, layout> matrix);
+
+            template <typename ElementType, MatrixLayout layout>
             static void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layout> matrix, ConstColumnVectorReference<ElementType> vectorA, ElementType scalarB, ColumnVectorReference<ElementType> vectorB);
 
             template <typename ElementType, MatrixLayout layout>
@@ -363,6 +392,9 @@ namespace math
         struct MatrixOperations<ImplementationType::openBlas>
         {
             static std::string GetImplementationName() { return "OpenBLAS"; }
+
+            template <typename ElementType, MatrixLayout layout>
+            static void RankOneUpdate(ElementType scalar, ConstColumnVectorReference<ElementType> vectorA, ConstRowVectorReference<ElementType> vectorB, MatrixReference<ElementType, layout> matrix);
 
             template <typename ElementType, MatrixLayout layout>
             static void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layout> matrix, ConstColumnVectorReference<ElementType> vectorA, ElementType scalarB, ColumnVectorReference<ElementType> vectorB);

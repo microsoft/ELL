@@ -58,7 +58,8 @@ namespace utilities
     enum class LogicExceptionErrors
     {
         illegalState,
-        notImplemented
+        notImplemented,
+        notInitialized
     };
 
     /// <summary> Error codes for exceptions that are the system's fault (missing files, serial ports, TCP ports, etc). </summary>
@@ -84,6 +85,7 @@ namespace utilities
         badData,
         indexOutOfRange,
         invalidArgument,
+        invalidSize,
         nullReference,
         sizeMismatch,
         typeMismatch,

@@ -62,6 +62,8 @@ namespace math
         /// <param name="increment"> The vector increment. </param>
         UnorientedConstVectorBase(const ElementType* pData, size_t size, size_t increment=1);
 
+        UnorientedConstVectorBase(const UnorientedConstVectorBase&) = default;
+
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
@@ -271,7 +273,8 @@ namespace math
         /// <summary> Copies values from another vector into this vector. </summary>
         ///
         /// <param name="other"> The other vector. </param>
-        void CopyFrom(ConstVectorReference<ElementType, orientation> other);
+        template<typename OtherElementType>
+        void CopyFrom(ConstVectorReference<OtherElementType, orientation> other);
 
         /// <summary> Sets all vector elements to zero. </summary>
         void Reset();

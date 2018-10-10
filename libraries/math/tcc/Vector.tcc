@@ -178,7 +178,8 @@ namespace math
     }
 
     template <typename ElementType, VectorOrientation orientation>
-    void VectorReference<ElementType, orientation>::CopyFrom(ConstVectorReference<ElementType, orientation> other)
+    template<typename OtherElementType>
+    void VectorReference<ElementType, orientation>::CopyFrom(ConstVectorReference<OtherElementType, orientation> other)
     {
         if (this->Size() != other.Size())
         {
@@ -186,15 +187,15 @@ namespace math
         }
 
         ElementType* pData = GetDataPointer();
-        const ElementType* pOtherData = other.GetConstDataPointer();
+        const OtherElementType* pOtherData = other.GetConstDataPointer();
         const size_t otherIncrement = other.GetIncrement();
-        const ElementType* pOtherEnd = pOtherData + otherIncrement * other.Size();
+        const OtherElementType* pOtherEnd = pOtherData + otherIncrement * other.Size();
 
         if (this->GetIncrement() == 1 && otherIncrement == 1)
         {
             while (pOtherData < pOtherEnd)
             {
-                (*pData) = (*pOtherData);
+                (*pData) = static_cast<ElementType>(*pOtherData);
                 ++pData;
                 ++pOtherData;
             }
@@ -203,7 +204,7 @@ namespace math
         {
             while (pOtherData < pOtherEnd)
             {
-                (*pData) = (*pOtherData);
+                (*pData) = static_cast<ElementType>(*pOtherData);
                 pData += this->GetIncrement();
                 pOtherData += otherIncrement;
             }

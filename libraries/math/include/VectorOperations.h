@@ -45,6 +45,14 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     std::ostream& operator<<(std::ostream& stream, ConstVectorReference<ElementType, orientation> vector);
 
+    /// <summary> Returns the transpose vector. </summary>
+    ///
+    /// <param name="vector"> The const vector reference to transpose. </param>
+    ///
+    /// <returns> The transpose. </returns>
+    template <typename ElementType, VectorOrientation orientation>
+    auto Transpose(ConstVectorReference<ElementType, orientation> vector) { return vector.Transpose(); }
+
     /// <summary> A class that represents a transformed constant vector. </summary>
     ///
     /// <typeparam name="ElementType"> Vector element type. </typeparam>
@@ -137,6 +145,14 @@ namespace math
     /// <returns> The TransformedConstVectorReference that results from the operation. </returns>
     template <typename ElementType, VectorOrientation orientation>
     auto operator*(double scalar, ConstVectorReference<ElementType, orientation> vector)->TransformedConstVectorReference<ElementType, orientation, ScaleFunction<ElementType>>;
+
+    /// <summary> Returns the transpose vector. </summary>
+    ///
+    /// <param name="vector"> The vector reference to transpose. </param>
+    ///
+    /// <returns> The transpose. </returns>
+    template <typename ElementType, VectorOrientation orientation>
+    auto Transpose(VectorReference<ElementType, orientation> vector) { return vector.Transpose(); }
 
     /// <summary> Adds a scalar to a vector. </summary>
     ///

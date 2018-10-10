@@ -563,6 +563,13 @@ namespace math
     }
 
     template <ImplementationType implementation, typename ElementType, MatrixLayout layout>
+    void RankOneUpdate(ElementType scalar, ConstColumnVectorReference<ElementType> vectorA, ConstRowVectorReference<ElementType> vectorB, MatrixReference<ElementType, layout> matrix)
+    {
+        DEBUG_CHECK_SIZES(vectorA.Size() != matrix.NumRows() || vectorB.Size() != matrix.NumColumns(), "Incompatible matrix vector sizes.");
+        Internal::MatrixOperations<implementation>::RankOneUpdate(scalar, vectorA, vectorB, matrix);
+    }
+
+    template <ImplementationType implementation, typename ElementType, MatrixLayout layout>
     void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layout> matrix, ConstColumnVectorReference<ElementType> vectorA, ElementType scalarB, ColumnVectorReference<ElementType> vectorB)
     {
         DEBUG_CHECK_SIZES(matrix.NumColumns() != vectorA.Size() || matrix.NumRows() != vectorB.Size() , "Incompatible matrix vector sizes.");
@@ -638,6 +645,18 @@ namespace math
     namespace Internal
     {
         template <typename ElementType, MatrixLayout layout>
+        void MatrixOperations<ImplementationType::native>::RankOneUpdate(ElementType scalar, ConstColumnVectorReference<ElementType> vectorA, ConstRowVectorReference<ElementType> vectorB, MatrixReference<ElementType, layout> matrix)
+        {
+            for (size_t i = 0; i < matrix.NumRows(); ++i)
+            {
+                for (size_t j = 0; j < matrix.NumColumns(); ++j)
+                {
+                    matrix(i, j) += scalar * vectorA[i] * vectorB[j];
+                }
+            }
+        }
+
+        template <typename ElementType, MatrixLayout layout>
         void MatrixOperations<ImplementationType::native>::MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layout> matrix, ConstColumnVectorReference<ElementType> vectorA, ElementType scalarB, ColumnVectorReference<ElementType> vectorB)
         {
             for (size_t i = 0; i < matrix.NumRows(); ++i)
@@ -671,6 +690,13 @@ namespace math
         //
         // OpenBLAS implementations of operations
         //
+
+        template <typename ElementType, MatrixLayout layout>
+        void MatrixOperations<ImplementationType::openBlas>::RankOneUpdate(ElementType scalar, ConstColumnVectorReference<ElementType> vectorA, ConstRowVectorReference<ElementType> vectorB, MatrixReference<ElementType, layout> matrix)
+        {
+            Blas::Ger(matrix.GetLayout(), static_cast<int>(matrix.NumRows()), static_cast<int>(matrix.NumColumns()), scalar, vectorA.GetConstDataPointer(), static_cast<int>(vectorA.GetIncrement()), vectorB.GetConstDataPointer(), static_cast<int>(vectorB.GetIncrement()), matrix.GetDataPointer(), static_cast<int>(matrix.GetIncrement()));
+        }
+
         template <typename ElementType, MatrixLayout layout>
         void MatrixOperations<ImplementationType::openBlas>::MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layout> matrix, ConstColumnVectorReference<ElementType> vectorA, ElementType scalarB, ColumnVectorReference<ElementType> vectorB)
         {

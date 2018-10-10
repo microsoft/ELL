@@ -432,6 +432,14 @@ namespace math
     }
 
     template <typename ElementType>
+    ElementType operator*(ConstRowVectorReference<ElementType> vectorA, ConstColumnVectorReference<ElementType> vectorB)
+    {
+        ElementType result;
+        InnerProduct(vectorA, vectorB, result);
+        return result;
+    }
+
+    template <typename ElementType>
     ElementType Dot(UnorientedConstVectorBase<ElementType> vectorA, UnorientedConstVectorBase<ElementType> vectorB)
     {
         ConstRowVectorReference<ElementType> rowVector(vectorA.GetConstDataPointer(), vectorA.Size(), vectorA.GetIncrement());
@@ -710,6 +718,7 @@ namespace math
         template <typename ElementType, MatrixLayout layout>
         void VectorOperations<ImplementationType::openBlas>::OuterProduct(ConstColumnVectorReference<ElementType> vectorA, ConstRowVectorReference<ElementType> vectorB, MatrixReference<ElementType, layout> matrix)
         {
+            matrix.Reset();
             Blas::Ger(matrix.GetLayout(), static_cast<int>(matrix.NumRows()), static_cast<int>(matrix.NumColumns()), static_cast<ElementType>(1.0), vectorA.GetConstDataPointer(), static_cast<int>(vectorA.GetIncrement()), vectorB.GetConstDataPointer(), static_cast<int>(vectorB.GetIncrement()), matrix.GetDataPointer(), static_cast<int>(matrix.GetIncrement()));
         }
 

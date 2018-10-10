@@ -2,6 +2,8 @@
 # cmake file
 #
 
+add_subdirectory(optimization)
+
 set (library_name trainers)
 
 set (src src/ForestTrainer.cpp
@@ -43,7 +45,6 @@ set (tcc tcc/EvaluatingTrainer.tcc
          tcc/SGDTrainer.tcc
          tcc/ThresholdFinder.tcc)
 
-
 set (doc doc/README.md)
 
 source_group("src" FILES ${src})
@@ -75,10 +76,11 @@ source_group("src" FILES ${test_src})
 
 add_executable(${test_name} ${test_src} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} functions testing trainers)
+target_link_libraries(${test_name} functions testing ${library_name})
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${test_name} COMMAND ${test_name})
 set_test_library_path(${test_name})
+
