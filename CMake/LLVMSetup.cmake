@@ -49,7 +49,12 @@ message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
 include_directories(${LLVM_INCLUDE_DIRS})
-add_definitions(${LLVM_DEFINITIONS})
+
+# CMake seems to have a problem with adding a list of definitions when generating VS2017 projects.
+# It ends up creating a define that is comprised of multiple preprocessor defines.
+foreach(DEFINITION ${LLVM_DEFINITIONS})
+    add_definitions(${DEFINITION})
+endforeach()
 
 set(LLVM_LIBS ${LLVM_AVAILABLE_LIBS})
 list(FILTER LLVM_LIBS INCLUDE REGEX "LLVM.+")

@@ -117,7 +117,6 @@ add_library(${library_name} ${src} ${include} ${tcc} ${templates})
 target_include_directories(${library_name} PUBLIC include templates)
 target_include_directories(${library_name} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_link_libraries(${library_name} math utilities ${LLVM_LIBS})
-target_compile_definitions(${library_name} PUBLIC ${LLVM_DEFINITIONS})
 target_compile_options(${library_name} PUBLIC ${LLVM_COMPILE_OPTIONS})
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
