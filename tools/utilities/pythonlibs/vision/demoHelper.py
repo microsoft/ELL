@@ -352,7 +352,7 @@ class DemoHelper:
     def get_predictor_map(self, predictor, intervalMs=0):
         ell = self.load_ell()
         """Creates an ELL map from an ELL predictor"""
-        return ell.neural.utilities.ell_map_from_float_predictor(predictor)
+        return ell.neural.utilities.ell_map_from_predictor(predictor)
 
     def compile(self, predictor, platform, path):
         path += '/model'

@@ -54,11 +54,11 @@ def main(argv):
     model_options = arg_parser.add_argument_group('model_options')
     model_options.add_argument("--step_interval",
         help="produce a steppable ELL model for a millisecond interval",
-        default=0)
+        type=float)
     model_options.add_argument("--lag_threshold",
         help="millisecond time lag before notifying the caller.\n"
              "used when step_interval is set\n",
-        default=5)
+        type=float)
 
     args = vars(arg_parser.parse_args(argv))
 
@@ -67,9 +67,10 @@ def main(argv):
     else:
         logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-    model_options = args.get('model_options', {})
-    step_interval = model_options.get('step_interval', None)
-    lag_threshold = model_options.get('lag_threshold', None)
+    step_interval = args['step_interval']
+    lag_threshold = args['lag_threshold']
+    if step_interval is not None and lag_threshold is None:
+        lag_threshold = step_interval * 2
     plot_model = args["plot_model"]
     verify_model = { "vision": args["verify_vision_model"],
                      "audio": args["verify_audio_model"]}
@@ -89,7 +90,7 @@ def main(argv):
     else:
         _logger.info("-- Using legacy importer --")
         predictor = cntk_to_ell.predictor_from_cntk_model(filename)
-        ell_map = ell.neural.utilities.ell_map_from_float_predictor(predictor,
+        ell_map = ell.neural.utilities.ell_map_from_predictor(predictor,
             step_interval, lag_threshold)
 
     model_file_name = os.path.splitext(filename)[0] + ".ell"

@@ -921,11 +921,11 @@ class ConvertInput(ConvertBase):
         # Add the InputNode to the model
         shape_entry = self.importer_node.output_shapes[0]
         ell_shape = self.get_ell_shape(shape_entry[0], shape_entry[1], 0)
-
+        original_input_node = None
         if step_interval_msec is not None:
-            # in the steppable case the input is a clock ticks
+            # in the steppable case the input is a clock ticks (which is a double)
             input_node = builder.AddInputNode(
-                model, ell.math.TensorShape(1, 1, 1), ell.nodes.PortType.smallReal)
+                model, ell.math.TensorShape(1, 1, 1), ell.nodes.PortType.real)
 
             clock_node = builder.AddClockNode(
                 model, ell.nodes.PortElements(input_node.GetOutputPort("output")),
@@ -936,10 +936,12 @@ class ConvertInput(ConvertBase):
                 ell.nodes.PortType.smallReal, ell_shape,
                 "{}InputCallback".format(function_prefix))
             
+            original_input_node = input_node
             input_node = source_node
         else:
             input_node = builder.AddInputNode(
                 model, ell_shape, ell.nodes.PortType.smallReal)
+            original_input_node = input_node
 
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, input_node)
@@ -962,7 +964,7 @@ class ConvertInput(ConvertBase):
             # Register the mapping
             lookup_table.add_imported_ell_node(self.importer_node, reorder_node)
 
-        lookup_table.add_ell_input(input_node)
+        lookup_table.add_ell_input(original_input_node)
 
 
 class ConvertLeakyReLU(ConvertActivation):

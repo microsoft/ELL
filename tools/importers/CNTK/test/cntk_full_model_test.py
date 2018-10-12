@@ -272,7 +272,7 @@ class FullModelTest:
         self.verify_compiled(predictor, ellTestInput, ellArray, op_name)
 
     def verify_compiled(self, predictor, input, expectedOutput, module_name, precision=1e-4):
-        map = ell.neural.utilities.ell_map_from_float_predictor(predictor)
+        map = ell.neural.utilities.ell_map_from_predictor(predictor)
 
         # Note: for testing purposes, callback functions assume the "model" namespace
         compiler_options = ell.model.MapCompilerOptions()

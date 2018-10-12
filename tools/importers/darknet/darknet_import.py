@@ -29,9 +29,11 @@ class DarknetImporter:
         self.config_file = args['config_file']
         self.output_directory = args['output_directory']
 
-        model_options = args.get('model_options', {})
-        self.step_interval = model_options.get('step_interval', 0)
-        self.lag_threshold = model_options.get('lag_threshold', 0)
+        self.step_interval = args['step_interval']
+        self.lag_threshold = args['lag_threshold']
+        if self.step_interval is not None and self.lag_threshold is None:
+            self.lag_threshold = self.step_interval * 2
+
         self.logger = logger.get()
 
     def run(self):
@@ -47,7 +49,7 @@ class DarknetImporter:
         filename_base = os.path.splitext(weights_filename)[0]
         model_file_name = filename_base + '.ell'
         model_file_path = os.path.join(output_directory, model_file_name)
-        ell_map = ell.neural.utilities.ell_map_from_float_predictor(predictor,
+        ell_map = ell.neural.utilities.ell_map_from_predictor(predictor,
             self.step_interval, self.lag_threshold)
         self.logger.info("Saving model file: '" + model_file_name + "'")
         ell_map.Save(model_file_path)
@@ -71,11 +73,11 @@ if __name__ == "__main__":
     model_options = parser.add_argument_group('model_options')
     model_options.add_argument("--step_interval",
         help="produce a steppable ELL model for a millisecond interval",
-        default=0)
+        type=float)
     model_options.add_argument("--lag_threshold",
         help="number of step intervals to fall behind before notifying the caller.\n"
              "used when step_interval is set\n",
-        default=5)
+        type=float)
 
     parser_args = vars(parser.parse_args())
 
