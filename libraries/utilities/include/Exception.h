@@ -28,6 +28,12 @@ namespace utilities
         ///
         /// <returns> A message string; </returns>
         virtual const std::string& GetMessage() const { return _message; }
+
+        /// <summary> Gets the message (for std::exception compatibility). </summary>
+        ///
+        /// <returns> A message string; </returns>
+        const char* what() const noexcept override { return GetMessage().c_str(); }
+
     private:
         std::string _message;
     };

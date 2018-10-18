@@ -32,6 +32,9 @@
 // testing
 #include "testing.h"
 
+// utilities
+#include "Unused.h"
+
 // stl
 #include <iomanip>
 #include <iostream>
@@ -39,6 +42,12 @@
 #include <unordered_set>
 
 using namespace ell;
+
+// Prototypes
+void TestNodeIterator_Full();
+void TestNodeIterator_Prefix();
+void TestNodeIterator_Suffix();
+void TestNodeIterator_Middle();
 
 //
 // Utility code
@@ -66,10 +75,10 @@ private:
     std::unordered_set<model::Node::NodeId> _ids;
 };
 
-int CountIterableNodes(model::NodeIterator& iterator)
+int CountNodes(model::NodeIterator& iterator)
 {
     int count = 0;
-    while(iterator.IsValid())
+    while (iterator.IsValid())
     {
         ++count;
         iterator.Next();
@@ -77,7 +86,10 @@ int CountIterableNodes(model::NodeIterator& iterator)
     return count;
 }
 
-model::Model GetCompoundModel()
+// "two-output model":
+// in -> argmin -> moving_avg
+//   \-> argax -> moving_avg
+model::Model GetTwoOutputModel()
 {
     model::Model g;
     auto in = g.AddNode<model::InputNode<double>>(3);
@@ -103,11 +115,11 @@ void TestStaticModel()
     auto indexSelector = g.AddNode<nodes::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
     auto iter = g.GetNodeIterator();
-    testing::ProcessTest("Testing full model size", testing::IsEqual(CountIterableNodes(iter), 6));
-    iter = g.GetNodeIterator(valSelector);
-    testing::ProcessTest("Testing partial model size 1", testing::IsEqual(CountIterableNodes(iter), 5));
-    iter = g.GetNodeIterator(indexSelector);
-    testing::ProcessTest("Testing partial model size 2", testing::IsEqual(CountIterableNodes(iter), 5));
+    testing::ProcessTest("Testing full model size", testing::IsEqual(CountNodes(iter), 6));
+    iter = g.GetNodeIterator(&valSelector->output);
+    testing::ProcessTest("Testing partial model size 1", testing::IsEqual(CountNodes(iter), 5));
+    iter = g.GetNodeIterator(&indexSelector->output);
+    testing::ProcessTest("Testing partial model size 2", testing::IsEqual(CountNodes(iter), 5));
 
     //
     // Compute outputs of various nodes
@@ -135,39 +147,147 @@ void TestStaticModel()
 
 void TestNodeIterator()
 {
-    auto model = GetCompoundModel();
+    TestNodeIterator_Full();
+    TestNodeIterator_Prefix();
+    TestNodeIterator_Suffix();
+    TestNodeIterator_Middle();
+}
+
+void TestNodeIterator_Full()
+{
+    auto model = GetTwoOutputModel();
     auto iter = model.GetNodeIterator();
     NodeIdSet visitedNodeIds;
     while (iter.IsValid())
     {
         auto node = iter.Get();
-        for(auto parent: node->GetParentNodes())
+        for (auto parent : node->GetParentNodes())
         {
             testing::ProcessTest("Testing node's inputs already visited", visitedNodeIds.Contains(parent->GetId()));
         }
-        for(auto dependent: node->GetDependentNodes())
+        for (auto dependent : node->GetDependentNodes())
         {
             testing::ProcessTest("Testing node's outputs not already visited", !visitedNodeIds.Contains(dependent->GetId()));
         }
         iter.Next();
         visitedNodeIds.Add(node->GetId());
     }
-    testing::ProcessTest("Testing Size() and iterator count", model.Size() == visitedNodeIds.Size());
+    testing::ProcessTest("Testing NodeIterator count over full model", model.Size() == visitedNodeIds.Size());
+}
+
+void TestNodeIterator_Prefix()
+{
+    // model: in -> d1 -> d2 -> d3 -> d4 -> d5
+    auto model = GetLinearDebugNodeModel(5);
+    NodeIdSet visitedNodeIds;
+    auto lastNode = FindDebugNode(model, 3);
+    testing::ProcessQuietTest("Found last node", lastNode != nullptr);
+    size_t expectedPrefixSize = 4;
+    auto iter = model.GetNodeIterator(&lastNode->output);
+    while (iter.IsValid())
+    {
+        auto node = iter.Get();
+        for (auto parent : node->GetParentNodes())
+        {
+            testing::ProcessTest("Testing node's inputs already visited", visitedNodeIds.Contains(parent->GetId()));
+        }
+        for (auto dependent : node->GetDependentNodes())
+        {
+            testing::ProcessTest("Testing node's outputs not already visited", !visitedNodeIds.Contains(dependent->GetId()));
+        }
+        iter.Next();
+        visitedNodeIds.Add(node->GetId());
+    }
+    testing::ProcessTest("Testing NodeIterator count over model prefix", visitedNodeIds.Size() == expectedPrefixSize);
+}
+
+void TestNodeIterator_Suffix()
+{
+    // model: in -> d1 -> d2 -> d3 -> d4 -> d5
+    auto model = GetLinearDebugNodeModel(5);
+    NodeIdSet visitedNodeIds;
+    auto firstNode = FindDebugNode(model, 3);
+    testing::ProcessQuietTest("Found first node", firstNode != nullptr);
+    const auto& firstInput = firstNode->input;
+    size_t expectedSuffixSize = 3;
+    auto iter = model.GetNodeIterator({ &firstInput }, {});
+    while (iter.IsValid())
+    {
+        auto node = iter.Get();
+        bool shouldHaveVisitedParent = (node != firstNode);
+        for (auto parent : node->GetParentNodes())
+        {
+            testing::ProcessTest("Testing node's inputs already visited", visitedNodeIds.Contains(parent->GetId()) == shouldHaveVisitedParent);
+        }
+        for (auto dependent : node->GetDependentNodes())
+        {
+            testing::ProcessTest("Testing node's outputs not already visited", !visitedNodeIds.Contains(dependent->GetId()));
+        }
+        iter.Next();
+        visitedNodeIds.Add(node->GetId());
+        std::cout << node->GetRuntimeTypeName();
+        auto debugNode = dynamic_cast<const DebugNode<double, int>*>(node);
+        if (debugNode)
+        {
+            std::cout << " tag: " << debugNode->GetDebugInfo();
+        }
+        std::cout << std::endl;
+    }
+
+    auto success = testing::ProcessTest("Testing NodeIterator count over model suffix", visitedNodeIds.Size() == expectedSuffixSize);
+    if (!success)
+        std::cout << "Expected size: " << expectedSuffixSize << ", got: " << visitedNodeIds.Size() << std::endl;
+}
+
+void TestNodeIterator_Middle()
+{
+    // model: in -> d1 -> d2 -> d3 -> d4 -> d5
+    auto model = GetLinearDebugNodeModel(5);
+    NodeIdSet visitedNodeIds;
+    auto firstNode = FindDebugNode(model, 2);
+    testing::ProcessQuietTest("Found first node", firstNode != nullptr);
+    const auto& firstInput = firstNode->input;
+    auto lastNode = FindDebugNode(model, 4);
+    testing::ProcessQuietTest("Found last node", lastNode != nullptr);
+    const auto& lastOutput = lastNode->output;
+
+    size_t expectedSubgraphSize = 3;
+    auto iter = model.GetNodeIterator({ &firstInput }, { &lastOutput });
+    while (iter.IsValid())
+    {
+        auto node = iter.Get();
+        bool shouldHaveVisitedParent = (node != firstNode);
+        for (auto parent : node->GetParentNodes())
+        {
+            testing::ProcessTest("Testing node's inputs already visited", visitedNodeIds.Contains(parent->GetId()) == shouldHaveVisitedParent);
+        }
+
+        for (auto dependent : node->GetDependentNodes())
+        {
+            testing::ProcessTest("Testing node's outputs not already visited", !visitedNodeIds.Contains(dependent->GetId()));
+        }
+        iter.Next();
+        visitedNodeIds.Add(node->GetId());
+    }
+
+    auto success = testing::ProcessTest("Testing NodeIterator count over model subgraph", visitedNodeIds.Size() == expectedSubgraphSize);
+    if (!success)
+        std::cout << "Expected size: " << expectedSubgraphSize << ", got: " << visitedNodeIds.Size() << std::endl;
 }
 
 void TestReverseNodeIterator()
 {
-    auto model = GetCompoundModel();
+    auto model = GetTwoOutputModel();
     auto iter = model.GetReverseNodeIterator();
     NodeIdSet visitedNodeIds;
     while (iter.IsValid())
     {
         const model::Node* node = iter.Get();
-        for(const model::Node* parent: node->GetParentNodes())
+        for (const model::Node* parent : node->GetParentNodes())
         {
             testing::ProcessTest("Testing node's inputs not already visited", !visitedNodeIds.Contains(parent->GetId()));
         }
-        for(const model::Node* dependent: node->GetDependentNodes())
+        for (const model::Node* dependent : node->GetDependentNodes())
         {
             testing::ProcessTest("Testing node's outputs already visited", visitedNodeIds.Contains(dependent->GetId()));
         }
@@ -179,7 +299,7 @@ void TestReverseNodeIterator()
 
 void TestModelSerialization()
 {
-    auto model1 = GetCompoundModel();
+    auto model1 = GetTwoOutputModel();
     std::stringstream buffer;
     utilities::JsonArchiver archiver(buffer);
     archiver << model1;
@@ -196,7 +316,7 @@ void TestModelSerialization()
 
 void TestModelMetadata()
 {
-    auto model = GetCompoundModel();
+    auto model = GetTwoOutputModel();
     auto iter = model.GetNodeIterator();
     while (iter.IsValid())
     {
@@ -311,7 +431,7 @@ void TestDenseCopyModel()
     // Check that both iterators ran out at the same time
     testing::ProcessTest("testing model copy", !copiedModelIterator.IsValid());
 
-    for (auto originalIter: originalNodeCounts)
+    for (auto originalIter : originalNodeCounts)
     {
         testing::ProcessTest("testing model copy", originalIter.second == copiedNodeCounts[originalIter.first]);
     }
@@ -320,7 +440,7 @@ void TestDenseCopyModel()
     model.AddNode<model::OutputNode<double>>(minAndArgMin->val);
 
     // make sure second one is different
-    testing::ProcessTest("testing model copy", model.Size() == copiedModel.Size()+1);
+    testing::ProcessTest("testing model copy", model.Size() == copiedModel.Size() + 1);
 }
 
 void TestShallowCopyModel()
@@ -355,7 +475,7 @@ void TestShallowCopyModel()
     // Check that both iterators ran out at the same time
     testing::ProcessTest("testing model copy", !copiedModelIterator.IsValid());
 
-    for (auto originalIter: originalNodeCounts)
+    for (auto originalIter : originalNodeCounts)
     {
         testing::ProcessTest("testing model copy", originalIter.second == copiedNodeCounts[originalIter.first]);
     }
@@ -389,7 +509,7 @@ public:
 
     bool Refine(model::ModelTransformer& transformer) const override
     {
-        auto newInput = model::PortElements<ValueType>{transformer.GetCorrespondingInputs(_input)};
+        auto newInput = model::PortElements<ValueType>{ transformer.GetCorrespondingInputs(_input) };
         model::PortElements<ValueType> in1;
         model::PortElements<ValueType> in2;
         auto size = _input.Size();

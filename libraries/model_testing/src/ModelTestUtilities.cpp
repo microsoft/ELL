@@ -58,7 +58,7 @@ void PrintModel(const model::Model& model)
     model.Print(std::cout);
 }
 
-void PrintModel(const model::Model& model, const model::Node* output)
+void PrintModel(const model::Model& model, const model::OutputPortBase* output)
 {
     model.PrintSubset(std::cout, output);
 }
@@ -87,6 +87,34 @@ model::Model GetComplexModel()
     g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
     g.AddNode<model::OutputNode<bool>>(model::PortElements<bool>({ in2->output }));
     return g;
+}
+
+model::Model GetLinearDebugNodeModel(int numDebugNodes)
+{
+    // in -> node1 -> node2 -> ... -> nodeN
+    using DebugNode = DebugNode<double, int>;
+    model::Model g;
+    auto in = g.AddNode<model::InputNode<double>>(3);
+    const model::OutputPort<double>* lastOutput = &(in->output);
+    for (int i = 0; i < numDebugNodes; ++i)
+    {
+        auto node = g.AddNode<DebugNode>(*lastOutput, i + 1);
+        lastOutput = &(node->output);
+    }
+    return g;
+}
+
+const DebugNode<double, int>* FindDebugNode(const model::Model& model, int tag)
+{
+    const DebugNode<double, int>* result = nullptr;
+    model.Visit([&result, tag](const model::Node& node) {
+        auto debugNode = dynamic_cast<const DebugNode<double, int>*>(&node);
+        if (debugNode != nullptr && debugNode->GetDebugInfo() == tag)
+        {
+            result = debugNode;
+        }
+    });
+    return result;
 }
 
 void PrintHeader(emitters::IRModuleEmitter& module)

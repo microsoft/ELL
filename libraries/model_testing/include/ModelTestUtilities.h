@@ -14,6 +14,7 @@
 #include "IRCompiledMap.h"
 #include "IRDiagnosticHandler.h"
 #include "Map.h"
+#include "Node.h"
 #include "Port.h"
 
 // testing
@@ -37,6 +38,41 @@ private:
     bool _oldVerbose;
 };
 
+// Helpful node for use in debugging model transformations
+
+template <typename ValueType, typename InfoType>
+class DebugNode : public model::Node
+{
+public:
+    const model::InputPort<ValueType>& input = _input;
+    const model::OutputPort<ValueType>& output = _output;
+
+    DebugNode();
+    DebugNode(const model::OutputPort<ValueType>& input, InfoType debugInfo);
+    InfoType GetDebugInfo() const { return _info; }
+    void Compute() const override;
+
+protected:
+    void WriteToArchive(utilities::Archiver& archiver) const override;
+    void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
+private:
+    void Copy(model::ModelTransformer& transformer) const override;
+
+    model::InputPort<ValueType> _input;
+    model::OutputPort<ValueType> _output;
+    InfoType _info;
+};
+
+model::Model GetSimpleModel();
+model::Model GetComplexModel();
+
+// Creates a model with an input node followed by the specified number of DebugNode<double, int>,
+// with the "info" field of the first debug node set to 1, the second to 2, and so on
+model::Model GetLinearDebugNodeModel(int numDebugNodes); //  in -> node1 -> node2 -> ... -> nodeN
+
+const DebugNode<double, int>* FindDebugNode(const model::Model& model, int tag);
+
 void SetVerbose(bool verbose);
 bool IsVerbose();
 
@@ -46,16 +82,13 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& v);
 void PrintMap(const model::Map& map);
 
 void PrintModel(const model::Model& model);
-void PrintModel(const model::Model& model, const model::Node* output);
+void PrintModel(const model::Model& model, const model::OutputPortBase* output);
 
 void PrintHeader(emitters::IRModuleEmitter& module);
 void PrintHeader(model::IRCompiledMap& compiledMap);
 
 void PrintIR(emitters::IRModuleEmitter& module);
 void PrintIR(model::IRCompiledMap& compiledMap);
-
-model::Model GetSimpleModel();
-model::Model GetComplexModel();
 
 template <typename InputType, typename OutputType>
 void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name);

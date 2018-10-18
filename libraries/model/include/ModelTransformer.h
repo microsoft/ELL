@@ -31,7 +31,8 @@ namespace ell
 namespace model
 {
     class InputNodeBase;
-    template <typename ValueType> class InputNode;
+    template <typename ValueType>
+    class InputNode;
     class MapCompiler;
 
     /// <summary> An action to perform on a node during transformation (refinement/compilation) </summary>
@@ -43,7 +44,7 @@ namespace model
     };
 
     /// <summary> A function that determines how to process a node </summary>
-    typedef std::function<NodeAction(const Node&)> NodeActionFunction;
+    using NodeActionFunction = std::function<NodeAction(const Node&)>;
 
     /// <summary> A context object that carries information about the compiler or other process driving the transformation. </summary>
     class TransformContext
@@ -100,12 +101,21 @@ namespace model
     class ModelTransformer
     {
     public:
+        using NodeTransformFunction = std::function<void(const Node&, ModelTransformer&)>;
+
+        /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
+        ///
+        /// <param name="model"> The model. </param>
+        ///
+        /// <returns> A copy of the input model. </returns>
+        Model CopyModel(const Model& model);
+
         /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
         ///
         /// <param name="model"> The model. </param>
         /// <param name="context"> The context. </param>
         ///
-        /// <returns> The copied Model. </returns>
+        /// <returns> A copy of the input model. </returns>
         Model CopyModel(const Model& model, const TransformContext& context);
 
         /// <summary>
@@ -114,12 +124,12 @@ namespace model
         /// </summary>
         ///
         /// <param name="model"> The model. </param>
-        /// <param name="outputNode"> The output node we are interested in </param>
+        /// <param name="output"> The output that must be computable in the result model </param>
         /// <param name="context"> The context. </param>
-        /// <param name="outputNode"> The output that must be computable in the result model </param>
         ///
-        /// <returns> The copied model. </returns>
-        Model CopyModel(const Model& model, const Node* outputNode, const TransformContext& context);
+        /// <returns> A copy of the requested portion of the model. </returns>
+        Model CopySubmodel(const Model& model, const OutputPortBase* output,
+                           const TransformContext& context);
 
         /// <summary>
         /// Returns a copy of a subset of the input model, by calling Copy() on each of the model's nodes. The
@@ -127,23 +137,104 @@ namespace model
         /// </summary>
         ///
         /// <param name="model"> The model. </param>
-        /// <param name="outputNodes"> The output nodes we are interested in </param>
+        /// <param name="outputs"> The outputs that must be computable in the result model </param>
         /// <param name="context"> The context. </param>
-        /// <param name="outputNodes"> The outputs that must be computable in the result model </param>
         ///
-        /// <returns> The copied Model. </returns>
-        Model CopyModel(const Model& model, const std::vector<const Node*>& outputNodes, const TransformContext& context);
+        /// <returns> A copy of the requested portion of the model. </returns>
+        Model CopySubmodel(const Model& model, const std::vector<const OutputPortBase*>& outputs,
+                           const TransformContext& context);
+
+        /// <summary>
+        /// Copies part of a source model onto a specified place in a destination model. If the source
+        /// and destination models are the same model, then the copy is done in-place: nodes are copied
+        /// in-place within the model.
+        /// </summary>
+        ///
+        /// A submodel is specified by the outputs it computes and the inputs that will be grafted onto
+        /// new locations in the destination model. For a given output (or set of outputs), the choice of
+        /// inputs determines the size of the suffix to copy. For instance, the simple linear model
+        /// `A -> B -> C -> D`, includes the following submodels:
+        ///
+        /// A
+        /// A->B
+        /// A->B->C
+        /// A->B->C->D
+        /// B
+        /// B->C
+        /// B->C->D
+        /// C
+        /// C->D
+        /// D
+        ///
+        /// If D is specified as the output of the submodel, any of A, B, C, or D would be reasonable inputs.
+        ///
+        /// When performing an in-place copy, trivial node copies are elided: if a node is to be copied to
+        /// its existing location (that is, the new copy will havethe same inputs as the original node),
+        /// then no copy is performed. For instance, `ConstantNode`s will always have their copies elided.
+        ///
+        /// Consider the the following model:
+        ///
+        /// ```
+        ///         X--v
+        ///  I -> B -> + -> C -> out1
+        ///   \-> B' -> out2
+        /// ```
+        ///
+        /// If we wanted to copy the submodel representing the output of `B` up to the output of `C` onto the output of B',
+        /// we would create a new copy of the `+` and `C` nodes, but would use the same constant data (the `X` node).
+        ///
+        /// <param name="sourceModel"> The model to copy nodes from. </param>
+        /// <param name="sourceInputs"> The input ports defining the inputs to the submodel to copy. Any nodes in the model that are descendants
+        ///     of the given inputs, and not otherwise descendants of nodes in the submodel will not be copied. </param>
+        /// <param name="sourceOutputs"> The output ports defining the output surface that must be computable in the result model. </param>
+        /// <param name="destModel"> The model to copy nodes into. It is legal for the source model and dest model to be the same. </param>
+        /// <param name="destInputs"> The output ports of the destination model to connect the (transformed) source inputs to. </param>
+        /// <param name="context"> The context. </param>
+        ///
+        /// <returns> The outputs from the copied submodel corresponding to `sourceOutputs`. </returns>
+        std::vector<const OutputPortBase*> CopySubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const std::vector<const OutputPortBase*>& sourceOutputs,
+                                                            Model& destModel, const std::vector<const OutputPortBase*>& destInputs,
+                                                            const TransformContext& context);
+
+        /// <summary> Copies part of an input model onto a specified part of an output model. The input and output models can be the same model. </summary>
+        ///
+        /// <param name="sourceMode"> The model. </param>
+        /// <param name="sourceInputs"> The inputs for the result model. </param>
+        /// <param name="sourceOutput"> The output that must be computable in the result model. </param>
+        /// <param name="destModel"> The model to append copied nodes into. </param>
+        /// <param name="destInputs"> The output ports of the destination model to connect the (transformed) source inputs to. </param>
+        /// <param name="context"> The context. </param>
+        ///
+        /// <returns> The output from the copied submodel corresponding to `sourceOutput`. </returns>
+        const OutputPortBase& CopySubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const OutputPortBase& sourceOutputs,
+                                               Model& destModel, const std::vector<const OutputPortBase*>& destInputs,
+                                               const TransformContext& context);
+
+        /// <summary> Copies part of an input model onto a specified part of an output model. The input and output models can be the same model. </summary>
+        ///
+        /// <param name="sourceMode"> The model. </param>
+        /// <param name="sourceInputs"> The inputs for the result model. </param>
+        /// <param name="sourceOutput"> The output that must be computable in the result model. </param>
+        /// <param name="destModel"> The model to append copied nodes into. </param>
+        /// <param name="destInputs"> The output ports of the destination model to connect the (transformed) source inputs to. </param>
+        /// <param name="context"> The context. </param>
+        ///
+        /// <returns> The output from the copied submodel corresponding to `sourceOutput`. </returns>
+        template <typename ValueType>
+        const OutputPort<ValueType>& CopySubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const OutputPort<ValueType>& sourceOutput,
+                                                      Model& destModel, const std::vector<const OutputPortBase*>& destInputs,
+                                                      const TransformContext& context);
 
         /// <summary>
         /// Performs one or more refinement iterations on a given model and returns the result.
-        /// If context.IsNodeCompilable is not set, this call performs one refinement iteration. If
-        /// context.IsNodeCompilable is set, this call refines the model until all its nodes are
+        /// If `context.IsNodeCompilable()` is false, this call performs one refinement iteration. If
+        /// `context.IsNodeCompilable()` is true, this call refines the model until all its nodes are
         /// compilable or until none of the nodes refine themselves.
         /// </summary>
         ///
         /// <param name="model"> The model. </param>
         /// <param name="context"> The context. </param>
-        /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
+        /// <param name="maxIterations"> The maximum number of refinement iterations to perform. </param>
         ///
         /// <returns> The refined Model. </returns>
         Model RefineModel(const Model& model, const TransformContext& context, int maxIterations = 10);
@@ -155,7 +246,83 @@ namespace model
         /// <param name="transformFunction"> The function to apply on each node </param>
         ///
         /// <returns> The transformed Model. </returns>
-        Model TransformModel(const Model& model, const TransformContext& context, const std::function<void(const Node&, ModelTransformer&)>& transformFunction);
+        Model TransformModel(const Model& model,
+                             const TransformContext& context,
+                             const NodeTransformFunction& transformFunction);
+
+        /// <summary> Transforms the model by applying a transformation function to each node </summary>
+        ///
+        /// <param name="model"> The model to transform. </param>
+        /// <param name="outputs"> The output that must be computable in the result model </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
+        /// <param name="transformFunction"> The function to apply on each node </param>
+        ///
+        /// <returns> The transformed Model. </returns>
+        Model TransformSubmodel(const Model& model, const std::vector<const OutputPortBase*>& outputs,
+                                const TransformContext& context,
+                                const NodeTransformFunction& transformFunction);
+
+        /// <summary> Transforms the model by applying a transformation function to each node. New nodes are appended to the existing model. </summary>
+        ///
+        /// <param name="model"> The model to transform. </param>
+        /// <param name="outputs"> The outputs that must be computable in the result model </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
+        /// <param name="transformFunction"> The function to apply on each node </param>
+        std::vector<const OutputPortBase*> TransformSubmodelInPlace(Model& model, const std::vector<const OutputPortBase*>& outputs,
+                                                                    const TransformContext& context,
+                                                                    const NodeTransformFunction& transformFunction);
+
+        /// <summary> Transforms part of a model by applying a transformation function to each node, putting the result into a given place in (potentially the same) model </summary>
+        /// This is the fundamental `ModelTransformer` function, from which all the other tranformation functions can be derived.
+        ///
+        /// <param name="sourceModel"> The model to transform. </param>
+        /// <param name="sourceInputs"> The input ports defining the beginning of the portion of the source model to transform </param>
+        /// <param name="sourceOutputs"> The output ports in the source model that must be computable in the result </param>
+        /// <param name="destModel"> The model to append transformed nodes into. </param>
+        /// <param name="destInputs"> The output ports of the destination model to connect to the (transformed) source inputs </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
+        /// <param name="transformFunction"> The function to apply to each node </param>
+        ///
+        /// <returns> The outputs from the copied submodel corresponding to `sourceOutputs`. </returns>
+        std::vector<const OutputPortBase*> TransformSubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const std::vector<const OutputPortBase*>& sourceOutputs,
+                                                                 Model& destModel, const std::vector<const OutputPortBase*>& destInputs,
+                                                                 const TransformContext& context,
+                                                                 const NodeTransformFunction& transformFunction);
+
+        /// <summary> Transforms part of a model by applying a transformation function to each node, putting the result into a given place in (potentially the same) model </summary>
+        /// This is the fundamental `ModelTransformer` function, from which all the other tranformation functions can be derived.
+        ///
+        /// <param name="sourceModel"> The model to transform. </param>
+        /// <param name="sourceInputs"> The input ports defining the beginning of the portion of the source model to transform </param>
+        /// <param name="sourceOutput"> The output port in the source model that must be computable in the result </param>
+        /// <param name="destModel"> The model to append transformed nodes into. </param>
+        /// <param name="destInputs"> The output ports of the destination model to connect to the (transformed) source inputs </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
+        /// <param name="transformFunction"> The function to apply to each node </param>
+        ///
+        /// <returns> The outputs from the copied submodel corresponding to `sourceOutputs`. </returns>
+        const OutputPortBase& TransformSubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const OutputPortBase& sourceOutput,
+                                                    Model& destModel, const std::vector<const OutputPortBase*>& destInputs,
+                                                    const TransformContext& context,
+                                                    const NodeTransformFunction& transformFunction);
+
+        /// <summary> Transforms part of a model by applying a transformation function to each node, putting the result into a given place in (potentially the same) model </summary>
+        /// This is the fundamental `ModelTransformer` function, from which all the other tranformation functions can be derived.
+        ///
+        /// <param name="sourceModel"> The model to transform. </param>
+        /// <param name="sourceInputs"> The input ports defining the beginning of the portion of the source model to transform </param>
+        /// <param name="sourceOutput"> The output port in the source model that must be computable in the result </param>
+        /// <param name="destModel"> The model to append transformed nodes into. </param>
+        /// <param name="destInputs"> The output ports of the destination model to connect to the (transformed) source inputs </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
+        /// <param name="transformFunction"> The function to apply to each node </param>
+        ///
+        /// <returns> The outputs from the copied submodel corresponding to `sourceOutputs`. </returns>
+        template <typename ValueType>
+        const OutputPort<ValueType>& TransformSubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const OutputPort<ValueType>& sourceOutput,
+                                                           Model& destModel, const std::vector<const OutputPortBase*>& destInputs,
+                                                           const TransformContext& context,
+                                                           const NodeTransformFunction& transformFunction);
 
         /// <summary> Resets the internal state of the transformer </summary>
         void Reset();
@@ -163,30 +330,34 @@ namespace model
         // for debugging
         bool IsEmpty() const { return _elementsMap.IsEmpty(); }
 
-        /// <summary> Returns the port elements from the new model corresponding to the given input port on the input model </summary>
+        /// <summary> Returns the ports from the new model corresponding to the given input port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         const OutputPort<ValueType>& GetCorrespondingInputs(const InputPort<ValueType>& port) const;
 
-        /// <summary> Returns the port elements from the new model corresponding to the given input port on the input model </summary>
+        /// <summary> Returns the ports from the new model corresponding to the given input port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         const OutputPortBase& GetCorrespondingInputs(const InputPortBase& port) const;
 
-        /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
+        /// <summary> Returns the ports from the new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         const OutputPort<ValueType>& GetCorrespondingOutputs(const OutputPort<ValueType>& port) const;
 
-        /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
+        /// <summary> Returns the ports from the new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         const OutputPortBase& GetCorrespondingOutputs(const OutputPortBase& port) const;
 
-        /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
+        /// <summary> Returns the ports from the new model corresponding to the given ports on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        std::vector<const OutputPortBase*> GetCorrespondingOutputs(const std::vector<const OutputPortBase*>& ports) const;
+
+        /// <summary> Returns the ports from the new model corresponding to the given elements on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         const OutputPort<ValueType>& GetCorrespondingOutputs(const PortElements<ValueType>& elements) const;
 
-        /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
+        /// <summary> Returns the ports from the new model corresponding to the given elements on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         const OutputPortBase& GetCorrespondingOutputs(const PortElementsBase& elements) const;
 
@@ -255,24 +426,35 @@ namespace model
         public:
             void Clear();
             bool IsEmpty() const;
+            bool IsOutputMapped(const OutputPortBase& queryPort) const;
             const OutputPortBase& GetCorrespondingPort(const OutputPortBase& port) const;
-            void MapNodeOutput(const OutputPortBase* oldPort, const OutputPortBase& newPort);
+            void MapNodeOutput(const OutputPortBase* oldPort, const OutputPortBase* newPort);
             static PortOutputsMap ConcatenateMaps(const PortOutputsMap& oldMap, const PortOutputsMap& newMap);
 
         private:
             std::unordered_map<const OutputPortBase*, const OutputPortBase*> _outputPortMap;
         };
 
+        void MapNodeOutput(const OutputPortBase& oldPort, const OutputPortBase& newPort);
+        bool ShouldCopyNode(const Node& node) const;
+        bool IsInputMapped(const InputPortBase& input) const;
+        bool IsOutputMapped(const OutputPortBase& output) const;
+        bool IsInputNode(const Node& node) const;
+        static bool Compatible(const InputPortBase* source, const OutputPortBase* dest);
+        void MapCorrespondingInputs(const std::vector<const InputPortBase*>& sourceInputs, const std::vector<const OutputPortBase*>& destInputs);
+        bool IsInPlace() const;
+
         template <typename NodeType>
         NodeType* GetCorrespondingInputNodeAs(const NodeType* node) const;
 
-        // Collect nodes that are't compilable
+        void ResetContext();
         std::vector<const Node*> FindUncompilableNodes(const Model& model, const TransformContext& context) const;
 
         Model _model;
         TransformContext _context;
         PortOutputsMap _elementsMap;
         bool _isModelCompilable = false;
+        bool _isInPlace = false;
     };
 }
 }

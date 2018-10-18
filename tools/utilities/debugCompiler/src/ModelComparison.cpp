@@ -352,21 +352,21 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     _runningCompiled = false;
     _outputReference = GetMapOutput(_referenceMap, input);
 
-    // Gather the reference model DebugNodeSinks
-    std::vector<const ell::model::Node*> referenceNodes;
+    // Gather the reference model DebugSinkNode outputs
+    std::vector<const ell::model::OutputPortBase*> referenceOutputs;
     for (size_t i = 0, length = _layerOutputData.size(); i < length; i++)
     {
         LayerCaptureData& layerData = _layerOutputData[i];
-        if (layerData.referenceDebugNode != nullptr)
+        if (layerData.referenceDebugSinkNode != nullptr)
         {
-            referenceNodes.push_back(layerData.referenceDebugNode);
+            referenceOutputs.push_back(layerData.referenceDebugSinkNode->GetOutputPort(0));
         }
     }
 
-    // Now the normal reference.Compute will skip my DebugSinkNodes, so now I have to do another VisitSubset to gather that output.
+    // Now the normal reference.Compute will skip my DebugSinkNodes, so now I have to do another VisitSubmodel to gather that output.
     // This will cause the DebugSinkNode Sink function to fire which will call AddLayer below.
     auto compute = [](const model::Node& node) { node.Compute(); };
-    _referenceMap.GetModel().VisitSubset(referenceNodes, compute);
+    _referenceMap.GetModel().VisitSubmodel(referenceOutputs, compute);
 
     // Compute compiled output
     _runningCompiled = true;
@@ -528,7 +528,7 @@ void ModelComparison::WriteNodeRow(std::ostream& outputStream, std::string id, s
     }
 
     outputStream << "````" << std::endl;
-    const ell::model::Node* node = layerData.referenceDebugNode;
+    const ell::model::Node* node = layerData.referenceDebugSinkNode;
     if (node != nullptr)
     {
         WriteNodeDetail(outputStream, node);
@@ -788,8 +788,8 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
     if (_addingReference)
     {
         LayerCaptureData layerData;
-        layerData.compiledDebugNode = nullptr;
-        layerData.referenceDebugNode = sinkNode;
+        layerData.compiledDebugSinkNode = nullptr;
+        layerData.referenceDebugSinkNode = sinkNode;
         layerData.referenceNodeLabel = label;
         _layerOutputData.emplace_back(std::move(layerData));
         _nextIndex = 0;
@@ -800,14 +800,14 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
         if (i < _layerOutputData.size())
         {
             LayerCaptureData& layerData = _layerOutputData[i];
-            layerData.compiledDebugNode = sinkNode;
+            layerData.compiledDebugSinkNode = sinkNode;
             auto memLayout = layerNode->GetOutputMemoryLayout();
             layerData.size = memLayout.GetActiveSize().ToVector();
             layerData.stride = memLayout.GetStride().ToVector();
             layerData.offset = memLayout.GetOffset().ToVector();
             layerData.compiledNodeId = to_string(layerNode->GetId());
             layerData.compiledNodeLabel = label;
-            auto referenceLabel = GetSinkNodeLabel(layerData.referenceDebugNode);
+            auto referenceLabel = GetSinkNodeLabel(layerData.referenceDebugSinkNode);
             _nodeMap[referenceLabel] = label;
         }
     }

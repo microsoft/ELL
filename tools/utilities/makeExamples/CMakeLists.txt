@@ -7,8 +7,8 @@ set(tool_name makeExamples)
 
 set(src
     src/main.cpp
-    src/ModelGenerateArguments.cpp
     src/GenerateModels.cpp
+    src/ModelGenerateArguments.cpp
 )
 
 set(include

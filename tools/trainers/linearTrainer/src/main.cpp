@@ -100,9 +100,26 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
+        if (dataLoadArguments.inputDataFilename.empty())
+        {
+            throw utilities::CommandLineParserPrintHelpException(commandLineParser.GetHelpString());
+        }
+
         // load map
         mapLoadArguments.defaultInputSize = dataLoadArguments.parsedDataDimension;
-        auto map = common::LoadMap(mapLoadArguments);
+        model::Map map;
+        
+        if (mapLoadArguments.HasInputFilename())
+        {
+            map = common::LoadMap(mapLoadArguments);
+        }
+        else
+        {
+            model::Model model;
+            auto input = model.AddNode<model::InputNode<float>>(dataLoadArguments.parsedDataDimension);
+            auto output = model.AddNode<model::OutputNode<float>>(input->output);
+            map = model::Map(model, {{"input", input}}, {{"output", output->output}});
+        }
 
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;

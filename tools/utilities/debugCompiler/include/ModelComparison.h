@@ -23,6 +23,9 @@
 #include "NeuralNetworkLayerNode.h"
 #include "OutputNode.h"
 
+// nodes
+#include "DebugSinkNode.h"
+
 // stl
 #include <map>
 #include <ostream>
@@ -87,8 +90,8 @@ public:
 private:
     struct LayerCaptureData
     {
-        const ell::model::Node* referenceDebugNode; // sink node
-        const ell::model::Node* compiledDebugNode; // sink node
+        const ell::model::Node* referenceDebugSinkNode;
+        const ell::model::Node* compiledDebugSinkNode; 
         std::string referenceNodeLabel;
         std::string compiledNodeId;
         std::string compiledNodeLabel;

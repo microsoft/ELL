@@ -35,12 +35,7 @@ option(DISABLE_PYTHON "Explicitly disable building python modules" OFF)
 option(CNTK "Enable CNTK importer and related unit tests (requires CNTK python module)" OFF)
 option(ONNX "Enable ONNX importer and related unit tests (requires PyTorch and ONNX python modules)" OFF)
 
-# -DTEST_MODELS_REPO "URL to the git repo containing test models", default is "https://github.com/Microsoft/ell-test-models"
-
-if(NOT TEST_MODELS_REPO)
-  set(TEST_MODELS_REPO "https://github.com/Microsoft/ell-test-models")
-endif()
-
+set(TEST_MODELS_REPO "https://github.com/Microsoft/ell-test-models" CACHE DOCUMENTATION "URL to the git repo containing test models" )
 message(STATUS "Configuring tests to use TEST_MODELS_REPO at: ${TEST_MODELS_REPO}")
 set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
 

@@ -8,10 +8,51 @@
 
 using namespace ell;
 
-#include <random>
 #include "RandomEngines.h"
+#include <random>
 
-template<typename ValueType>
+template <typename ValueType, typename InfoType>
+DebugNode<ValueType, InfoType>::DebugNode()
+    : model::Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+{
+}
+
+template <typename ValueType, typename InfoType>
+DebugNode<ValueType, InfoType>::DebugNode(const model::OutputPort<ValueType>& input, InfoType debugInfo)
+    : model::Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _info(debugInfo)
+{
+}
+
+template <typename ValueType, typename InfoType>
+void DebugNode<ValueType, InfoType>::Copy(model::ModelTransformer& transformer) const
+{
+    const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
+    auto newNode = transformer.AddNode<DebugNode<ValueType, InfoType>>(newPortElements, _info);
+    transformer.MapNodeOutput(output, newNode->output);
+}
+
+template <typename ValueType, typename InfoType>
+void DebugNode<ValueType, InfoType>::Compute() const
+{
+    _output.SetOutput(_input.GetValue());
+}
+
+template <typename ValueType, typename InfoType>
+void DebugNode<ValueType, InfoType>::WriteToArchive(utilities::Archiver& archiver) const
+{
+    // nothing
+}
+
+template <typename ValueType, typename InfoType>
+void DebugNode<ValueType, InfoType>::ReadFromArchive(utilities::Unarchiver& archiver)
+{
+    // nothing
+}
+
+//
+//
+//
+template <typename ValueType>
 ValueType LargestDifference(const std::vector<ValueType>& a, const std::vector<ValueType>& b)
 {
     ValueType largestDifference = 0;
@@ -27,37 +68,37 @@ ValueType LargestDifference(const std::vector<ValueType>& a, const std::vector<V
     return largestDifference;
 }
 
-template<typename ValueType>
+template <typename ValueType>
 bool IsEqual(const ValueType& a, const ValueType& b, double epsilon = 1e-6)
 {
     return testing::IsEqual(a, b);
 }
 
-template<>
+template <>
 inline bool IsEqual(const float& a, const float& b, double epsilon)
 {
     return testing::IsEqual(a, b, static_cast<float>(epsilon));
 }
 
-template<>
+template <>
 inline bool IsEqual(const double& a, const double& b, double epsilon)
 {
     return testing::IsEqual(a, b, epsilon);
 }
 
-template<>
+template <>
 inline bool IsEqual(const std::vector<float>& a, const std::vector<float>& b, double epsilon)
 {
     return testing::IsEqual(a, b, static_cast<float>(epsilon));
 }
 
-template<>
+template <>
 inline bool IsEqual(const std::vector<double>& a, const std::vector<double>& b, double epsilon)
 {
     return testing::IsEqual(a, b, epsilon);
 }
 
-template<typename T>
+template <typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T>& v)
 {
     out << "[";
@@ -71,7 +112,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& v)
     return out;
 }
 
-template<typename InputType, typename OutputType>
+template <typename InputType, typename OutputType>
 void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
     if (!IsVerbose())
@@ -88,32 +129,32 @@ void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& comp
     }
 }
 
-template<typename InputType>
+template <typename InputType>
 void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
     switch (map.GetOutput(0).GetPortType())
     {
-        case model::Port::PortType::boolean:
-            PrintCompiledOutput<InputType, bool>(map, compiledMap, signal, name);
-            break;
-        case model::Port::PortType::integer:
-            PrintCompiledOutput<InputType, int>(map, compiledMap, signal, name);
-            break;
-        case model::Port::PortType::bigInt:
-            PrintCompiledOutput<InputType, int64_t>(map, compiledMap, signal, name);
-            break;
-        case model::Port::PortType::smallReal:
-            PrintCompiledOutput<InputType, float>(map, compiledMap, signal, name);
-            break;
-        case model::Port::PortType::real:
-            PrintCompiledOutput<InputType, double>(map, compiledMap, signal, name);
-            break;
-        default:
-            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+    case model::Port::PortType::boolean:
+        PrintCompiledOutput<InputType, bool>(map, compiledMap, signal, name);
+        break;
+    case model::Port::PortType::integer:
+        PrintCompiledOutput<InputType, int>(map, compiledMap, signal, name);
+        break;
+    case model::Port::PortType::bigInt:
+        PrintCompiledOutput<InputType, int64_t>(map, compiledMap, signal, name);
+        break;
+    case model::Port::PortType::smallReal:
+        PrintCompiledOutput<InputType, float>(map, compiledMap, signal, name);
+        break;
+    case model::Port::PortType::real:
+        PrintCompiledOutput<InputType, double>(map, compiledMap, signal, name);
+        break;
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
     }
 }
 
-template<typename InputType, typename OutputType>
+template <typename InputType, typename OutputType>
 void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name)
 {
     bool ok = true;
@@ -164,28 +205,28 @@ std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model:
     return computedResult;
 }
 
-template<typename InputType>
+template <typename InputType>
 void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
 {
     switch (map.GetOutput(0).GetPortType())
     {
-        case model::Port::PortType::boolean:
-            VerifyCompiledOutput<InputType, bool>(map, compiledMap, signal, name, epsilon);
-            break;
-        case model::Port::PortType::integer:
-            VerifyCompiledOutput<InputType, int>(map, compiledMap, signal, name, epsilon);
-            break;
-        case model::Port::PortType::bigInt:
-            VerifyCompiledOutput<InputType, int64_t>(map, compiledMap, signal, name, epsilon);
-            break;
-        case model::Port::PortType::smallReal:
-            VerifyCompiledOutput<InputType, float>(map, compiledMap, signal, name, epsilon);
-            break;
-        case model::Port::PortType::real:
-            VerifyCompiledOutput<InputType, double>(map, compiledMap, signal, name, epsilon);
-            break;
-        default:
-            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+    case model::Port::PortType::boolean:
+        VerifyCompiledOutput<InputType, bool>(map, compiledMap, signal, name, epsilon);
+        break;
+    case model::Port::PortType::integer:
+        VerifyCompiledOutput<InputType, int>(map, compiledMap, signal, name, epsilon);
+        break;
+    case model::Port::PortType::bigInt:
+        VerifyCompiledOutput<InputType, int64_t>(map, compiledMap, signal, name, epsilon);
+        break;
+    case model::Port::PortType::smallReal:
+        VerifyCompiledOutput<InputType, float>(map, compiledMap, signal, name, epsilon);
+        break;
+    case model::Port::PortType::real:
+        VerifyCompiledOutput<InputType, double>(map, compiledMap, signal, name, epsilon);
+        break;
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
     }
 }
 

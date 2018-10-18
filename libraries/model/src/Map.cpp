@@ -14,8 +14,8 @@
 
 // stl
 #include <algorithm>
-#include <unordered_set>
 #include <iomanip>
+#include <unordered_set>
 
 namespace ell
 {
@@ -51,7 +51,8 @@ namespace model
         Prune();
     }
 
-    Map::Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs) : _model(std::move(model))
+    Map::Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs)
+        : _model(std::move(model))
     {
         for (const auto& input : inputs)
         {
@@ -190,13 +191,13 @@ namespace model
         _inputNames.clear();
         _inputNodeMap.clear();
     }
-    
+
     void Map::AddOutput(const std::string& outputName, PortElementsBase outputElements)
     {
         // Add concat/splice nodes to ensure output is a single port
         const auto& newOutputPort = _model.AddRoutingNodes(outputElements);
         PortElementsBase newOutputElements{ newOutputPort };
-        _outputElements.push_back({newOutputPort});
+        _outputElements.push_back({ newOutputPort });
         _outputNames.push_back(outputName);
         _outputElementsMap.insert({ outputName, newOutputElements });
     }
@@ -319,10 +320,19 @@ namespace model
         TransformContext context;
         ModelTransformer transformer;
 
-        auto outputNodeVec = GetAllOutputNodes();
+        auto outputNodes = GetAllOutputNodes();
         auto sinkNodes = GetDebugSinkNodes();
-        outputNodeVec.insert(outputNodeVec.end(), sinkNodes.begin(), sinkNodes.end());
-        auto minimalModel = transformer.CopyModel(_model, outputNodeVec, context);
+        outputNodes.insert(outputNodes.end(), sinkNodes.begin(), sinkNodes.end());
+
+        std::vector<const OutputPortBase*> outputPorts;
+        for (auto node : outputNodes)
+        {
+            for (auto port : node->GetOutputPorts())
+            {
+                outputPorts.push_back(port);
+            }
+        }
+        auto minimalModel = transformer.CopySubmodel(_model, outputPorts, context);
         FixTransformedIO(transformer);
         _model = std::move(minimalModel);
     }
@@ -395,7 +405,7 @@ namespace model
         {
             return sourceNodes[0]->GetOutputType();
         }
-        
+
         return GetInput()->GetOutputType();
     }
 
@@ -433,7 +443,7 @@ namespace model
         _model = std::move(optimizedModel);
         Prune();
     }
-    
+
     void Map::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
     {
         ModelTransformer transformer;

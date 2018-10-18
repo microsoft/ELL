@@ -81,23 +81,24 @@ namespace model
     std::vector<ValueType> Model::ComputeOutput(const OutputPort<ValueType>& outputPort) const
     {
         auto compute = [](const Node& node) { node.Compute(); };
-        VisitSubset({ outputPort.GetNode() }, compute);
+        VisitSubmodel({ &outputPort }, compute);
         return outputPort.GetOutput();
     }
 
     template <typename ValueType>
     std::vector<ValueType> Model::ComputeOutput(const PortElements<ValueType>& elements) const
     {
-        // get set of nodes to make sure we visit
-        std::unordered_set<const Node*> usedNodes;
+        // get set of ports to make sure we visit
+        std::unordered_set<const OutputPortBase*> usedPorts;
         for (const auto& range : elements.GetRanges())
         {
-            usedNodes.insert(range.ReferencedPort()->GetNode());
+            usedPorts.insert(range.ReferencedPort());
         }
 
-        auto compute = [](const Node& node) { node.Compute(); };
-        auto nodes = std::vector<const Node*>(usedNodes.begin(), usedNodes.end());
-        VisitSubset(nodes, compute);
+        auto ports = std::vector<const OutputPortBase*>(usedPorts.begin(), usedPorts.end());
+        VisitSubmodel(ports, [](const Node& node) {
+            node.Compute(); 
+        });
 
         // Now construct the output
         auto numElements = elements.Size();
@@ -160,22 +161,36 @@ namespace model
     template <typename Visitor>
     void Model::Visit(Visitor&& visitor) const
     {
-        std::vector<const Node*> emptyVec;
-        VisitSubset(emptyVec, visitor);
+        std::vector<const OutputPortBase*> emptyVec;
+        VisitSubmodel(emptyVec, visitor);
     }
 
     // Visits just the parts necessary to compute output node
     template <typename Visitor>
-    void Model::VisitSubset(const Node* outputNode, Visitor&& visitor) const
+    void Model::VisitSubmodel(const OutputPortBase* output, Visitor&& visitor) const
     {
-        VisitSubset(std::vector<const Node*>{ outputNode }, visitor);
+        auto iter = GetNodeIterator(output);
+        VisitIteratedNodes(iter, visitor);
     }
 
-    // Real implementation function for `VisitSubset()`
     template <typename Visitor>
-    void Model::VisitSubset(const std::vector<const Node*>& outputNodes, Visitor&& visitor) const
+    void Model::VisitSubmodel(const std::vector<const OutputPortBase*>& outputs, Visitor&& visitor) const
     {
-        auto iter = GetNodeIterator(outputNodes);
+        auto iter = GetNodeIterator(outputs);
+        VisitIteratedNodes(iter, visitor);
+    }
+
+    template <typename Visitor>
+    void Model::VisitSubmodel(const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs, Visitor&& visitor) const
+    {
+        auto iter = GetNodeIterator(inputs, outputs);
+        VisitIteratedNodes(iter, visitor);
+    }
+
+    // Base implementation for "Visit" methods
+    template <typename Visitor>
+    void Model::VisitIteratedNodes(NodeIterator& iter, Visitor&& visitor) const
+    {
         while (iter.IsValid())
         {
             visitor(*iter.Get());

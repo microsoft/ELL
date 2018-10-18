@@ -124,14 +124,18 @@ set(test_src
     test/src/main.cpp
     test/src/Map_test.cpp
     test/src/ModelBuilder_test.cpp
+    test/src/ModelTransformerTest.cpp
     test/src/Model_test.cpp
+    test/src/ModelTransformerTest.cpp
     test/src/PortElements_test.cpp
 )
 
 set(test_include
     test/include/Map_test.h
     test/include/ModelBuilder_test.h
+    test/include/ModelTransformerTest.h
     test/include/Model_test.h
+    test/include/ModelTransformerTest.h
     test/include/PortElements_test.h
 )
 
@@ -143,7 +147,7 @@ source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} common model nodes testing model_testing utilities)
+target_link_libraries(${test_name} common model nodes testing utilities model_testing)
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")

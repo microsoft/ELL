@@ -53,10 +53,21 @@ namespace model
         friend class Model;
         NodeIterator() = default;
         NodeIterator(const Model* model);
+        void SetNodeVisited(const Node* node);
+        void SetSubmodelInputs(const std::vector<const InputPortBase*>& inputs);
+        void AddSubmodelInputParents(const Node* node);
+        void AddRemainingValidOutputs();
+        bool ShouldAddAllValidOutputs() const;
+        bool ShouldAddNodeToValidOutputs(const Node* node) const;
+        bool ShouldVisitInput(const InputPortBase* input) const;
+        void SetOutputNodesToVisit(const std::vector<const Node*>& outputs);
+        void SetOutputPortsToVisit(const std::vector<const OutputPortBase*>& outputs);
 
         const Model* _model = nullptr;
         std::unordered_set<const Node*> _visitedNodes;
-        std::vector<const Node*> _stack;
+        std::unordered_set<const InputPortBase*> _submodelInputs;
+        std::unordered_set<const Node*> _submodelInputParents;
+        std::vector<const Node*> _nodesToVisit;
 
         const Node* _currentNode = nullptr;
     };
@@ -77,7 +88,8 @@ namespace model
 
     private:
         friend class Model;
-        ForwardNodeIterator(const Model* model, const std::vector<const Node*>& outputNodes);
+        ForwardNodeIterator(const Model* model, const std::vector<const OutputPortBase*>& outputs);
+        ForwardNodeIterator(const Model* model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs);
     };
 
     /// <summary>
@@ -186,20 +198,31 @@ namespace model
         /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
+        /// <param name="output"> The output to use for deciding which nodes to visit </param>
         /// <param name="visitor"> The visitor functor to use. The type signature should be of the form `void visitor(const Node&)`. </param>
-        /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
         template <typename Visitor>
-        void VisitSubset(const Node* outputNode, Visitor&& visitor) const;
+        void VisitSubmodel(const OutputPortBase* output, Visitor&& visitor) const;
 
         /// <summary>
         /// Visits the nodes in the model necessary to compute the outputs of the given nodes. Visits the nodes
         /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
+        /// <param name="outputs"> The outputs to use for deciding which nodes to visit </param>
         /// <param name="visitor"> The visitor functor to use. The type signature should be of the form `void visitor(const Node&)`. </param>
-        /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
         template <typename Visitor>
-        void VisitSubset(const std::vector<const Node*>& outputNodes, Visitor&& visitor) const;
+        void VisitSubmodel(const std::vector<const OutputPortBase*>& outputs, Visitor&& visitor) const;
+
+        /// <summary>
+        /// Visits the nodes in the model necessary to compute the outputs of the given nodes. Visits the nodes
+        /// in dependency order. No nodes will be visited until all its inputs have first been visited.
+        /// </summary>
+        ///
+        /// <param name="inputs"> The inputs to use for deciding which nodes to visit </param>
+        /// <param name="outputs"> The outputs to use for deciding which nodes to visit </param>
+        /// <param name="visitor"> The visitor functor to use. The type signature should be of the form `void visitor(const Node&)`. </param>
+        template <typename Visitor>
+        void VisitSubmodel(const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs, Visitor&& visitor) const;
 
         /// <summary>
         /// Visits all the nodes in the model in reverse dependency order. No nodes will be visited until all
@@ -214,23 +237,32 @@ namespace model
         /// Gets an iterator over all the nodes in the model in dependency order. No nodes will be visited until all
         /// its inputs have first been visited.
         /// </summary>
-        ForwardNodeIterator GetNodeIterator() const { return GetNodeIterator(std::vector<const Node*>{}); }
+        ForwardNodeIterator GetNodeIterator() const;
 
         /// <summary>
-        /// Gets an iterator over the nodes in the model necessary to compute the output of a given node. Visits the nodes
+        /// Gets an iterator over the nodes in the model necessary to compute the given output. Visits the nodes
         /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
-        /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
-        ForwardNodeIterator GetNodeIterator(const Node* outputNode) const { return GetNodeIterator(std::vector<const Node*>{ outputNode }); }
+        /// <param name="output"> The output to use for deciding which nodes to visit </param>
+        ForwardNodeIterator GetNodeIterator(const OutputPortBase* output) const;
+
+        /// <summary>
+        /// Gets an iterator over the nodes in the model necessary to compute the given outputs. Visits the nodes
+        /// in dependency order. No nodes will be visited until all its inputs have first been visited.
+        /// </summary>
+        ///
+        /// <param name="outputs"> The outputs to use for deciding which nodes to visit </param>
+        ForwardNodeIterator GetNodeIterator(const std::vector<const OutputPortBase*>& outputs) const;
 
         /// <summary>
         /// Gets an iterator over the nodes in the model necessary to compute the outputs of the given nodes. Visits the nodes
         /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
-        /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
-        ForwardNodeIterator GetNodeIterator(const std::vector<const Node*>& outputNodes) const;
+        /// <param name="inputs"> The ports to use for deciding which nodes to visit --- nodes that are strictly inputs to these ports won't be visited.</param>
+        /// <param name="outputs"> The outputs to use for deciding which nodes to visit </param>
+        ForwardNodeIterator GetNodeIterator(const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs) const;
 
         /// <summary>
         /// Gets an iterator over all the nodes in the model in reverse dependency order. No nodes will be visited until all
@@ -257,7 +289,7 @@ namespace model
         ///
         /// <param name="os"> The stream to write data to. </param>
         /// <param name="outputNode"> The node to be computed. </param>
-        void PrintSubset(std::ostream& os, const Node* outputNode) const;
+        void PrintSubset(std::ostream& os, const OutputPortBase* outputNode) const;
 
         /// <summary> Get this object's metadata object. </summary>
         ///
@@ -268,6 +300,20 @@ namespace model
         ///
         /// <returns> A const reference to the PropertyBag containing the metadata for this object. </returns>
         const utilities::PropertyBag& GetMetadata() const { return _data->metadata; }
+
+        /// <summary> Equality operator </summary>
+        ///
+        /// <param name="other"> Model to compare to </param>
+        ///
+        /// <returns> `true` if this model is idential to the other model (they are the same object or are shallow copies of one another), otherwise `false` </returns>
+        bool operator==(const Model& other) const;
+            
+        /// <summary> Inequality operator </summary>
+        ///
+        /// <param name="other"> Model to compare to </param>
+        ///
+        /// <returns> `false` if this model is idential to the other model (they are the same object or are shallow copies of one another), otherwise `true` </returns>
+        bool operator!=(const Model& other) const;
             
     protected:
         utilities::ArchiveVersion GetArchiveVersion() const override;
@@ -285,12 +331,13 @@ namespace model
         friend class ModelTransformer;
         friend class Map;
         
+        using IDToNodeMap = std::map<Node::NodeId, std::shared_ptr<Node>, std::less<Node::NodeId>>;
         struct ModelData
         {
             // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
             // to look nodes up by id.
             // We keep it sorted by id to make visiting all nodes deterministically ordered
-            std::map<Node::NodeId, std::shared_ptr<Node>, std::less<Node::NodeId>> idToNodeMap;
+            IDToNodeMap idToNodeMap;
             utilities::PropertyBag metadata;
         };
 
@@ -300,12 +347,16 @@ namespace model
         template <typename ValueType>
         const OutputPort<ValueType>& AddRoutingNodes(const PortElements<ValueType>& elements);
         const OutputPortBase& AddRoutingNodes(const PortElementsBase& elements);
-        const OutputPortBase* AddPortRange(const PortRange& inputRange);
-        const OutputPortBase* AddConcat(const std::vector<const OutputPortBase*>& outputPorts);
+        const OutputPortBase& AddSliceNode(const PortRange& inputRange);
+        const OutputPortBase& AddSpliceNode(const std::vector<const OutputPortBase*>& outputPorts);
         Node* AddExistingNode(std::unique_ptr<Node> node);
         void EnsureNodeHasUniqueId(Node& node);
         Node::NodeId GetUniqueId(const Node::NodeId& desiredId);
         static Node::NodeId GetNextId(Node::NodeId id);
+        const IDToNodeMap& GetNodeMap() const;
+
+        template <typename Visitor>
+        void VisitIteratedNodes(NodeIterator& iter, Visitor&& visitor) const;
 
         std::shared_ptr<ModelData> _data;
     };

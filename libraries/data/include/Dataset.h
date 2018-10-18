@@ -193,7 +193,7 @@ namespace data
         /// <returns> The dataset. </returns>
         AnyDataset GetAnyDataset(size_t fromIndex = 0, size_t size = 0) const { return AnyDataset(this, fromIndex, size); }
 
-        /// <summary> Returns an DataSet whose examples have been converted from this dataset. </summary>
+        /// <summary> Returns a dataset whose examples have been converted from this dataset. </summary>
         ///
         /// <typeparam name="otherExampleType"> Example type returned by the transformation function. </typeparam>
         /// <param name="transformationFunction"> The function that is called on each example, returning the transformed example. </param>

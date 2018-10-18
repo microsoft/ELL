@@ -9,6 +9,7 @@
 #pragma once
 
 // stl
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -17,6 +18,16 @@ namespace ell
 /// <summary> testing namespace </summary>
 namespace testing
 {
+    /// <summary> Exception due to test failure. </summary>
+    class TestFailureException : public std::runtime_error
+    {
+    public:
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="testDescription"> A description of the test failure that caused the exception. </param>
+        TestFailureException(const std::string& testDescription);
+    };
+
     /// <summary> Checks if a value is true </summary>
     ///
     /// <param name="a"> The value to check </param>
@@ -127,14 +138,62 @@ namespace testing
     ///
     /// <param name="testDescription"> Information describing the test. </param>
     /// <param name="success"> true if the test was a success, false if it failed. </param>
-    /// <returns> The success value, for convenience </returns>
+    /// <returns> The success value, for convenience. </returns>
     bool ProcessTest(const std::string& testDescription, bool success);
+
+    /// <summary> Process a test, quietly. </summary>
+    /// Identical to `ProcessTest`, except that it doesn't emit anything on success.
+    ///
+    /// <param name="testDescription"> Information describing the test. </param>
+    /// <param name="success"> true if the test was a success, false if it failed. </param>
+    /// <returns> The success value, for convenience. </returns>
+    bool ProcessQuietTest(const std::string& testDescription, bool success);
+
+    /// <summary> Process a test, throwing an exception on failure. </summary>
+    ///
+    /// <param name="testDescription"> Information describing the test. </param>
+    /// <param name="success"> true if the test was a success, false if it failed. </param>
+    void ProcessCriticalTest(const std::string& testDescription, bool success);
+
+    /// <summary> Note a test failure. </summary>
+    ///
+    /// <param name="message"> A message to print. </param>
+    void TestFailed(const std::string& message);
+
+    /// <summary> Note a test success. </summary>
+    ///
+    /// <param name="message"> A message to print. </param>
+    void TestSucceeded(const std::string& message);
 
     /// <summary> Checks if one of the tests failed. </summary>
     ///
     /// <returns> true if one of the tests failed. </returns>
     bool DidTestFail();
 
+    /// <summary> Call a function, registering a test failure if an exception is thrown, and continue execution. </summary>
+    /// 
+    /// <param name="function"> The test function to call. </param>
+    /// <param name="args"> Aguments to pass to the test function. </param>
+    template <typename FunctionType, typename... Args>
+    bool FailOnException(FunctionType&& function, Args&& ...args)
+    {
+        using namespace std::literals::string_literals;
+        try
+        {
+            function(std::forward<Args>(args)...);
+            return true;
+        }
+        catch (const std::exception& exception)
+        {
+            TestFailed("Got exception in test: "s + exception.what());
+        }
+        catch (...)
+        {
+            TestFailed("Got unknown exception type in test");
+        }
+        return false;
+    }
+    
     /// <summary> RAII helper to turn on logging for a sepcific test/scope
     ///
     /// Example:

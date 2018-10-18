@@ -18,12 +18,12 @@ if(${PYTHON_ENABLED})
     # copy files
     copy_newer_files(${module_name} src)
 
-    if(RPI_CLUSTER AND RPI_PASSWORD AND RPI_KEY AND GIT_REPO)
+    if(RPI_CLUSTER AND RPI_PASSWORD AND RPI_KEY AND TEST_MODELS_REPO)
         add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${test_src} 
                                             --cluster ${RPI_CLUSTER} 
                                             --password ${RPI_PASSWORD}
                                             --key ${RPI_KEY}
-                                            --gitrepo ${GIT_REPO})
+                                            --gitrepo ${TEST_MODELS_REPO})
     endif()
 
 endif()  # PYTHON_ENABLED

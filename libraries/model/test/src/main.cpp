@@ -12,7 +12,9 @@
 
 #include "Map_test.h"
 #include "ModelBuilder_test.h"
+#include "ModelTransformerTest.h"
 #include "Model_test.h"
+#include "ModelTransformerTest.h"
 #include "PortElements_test.h"
 
 // testing
@@ -59,9 +61,7 @@ int main()
 
         TestCustomRefine();
 
-        //
         // ModelBuilder tests
-        //
 
         // Test passthrough to Model::AddNode
         TestTemplateAddNode();
@@ -83,6 +83,11 @@ int main()
 
         // Test ModelBuilder::AddNode(string, vector<string>)
         TestVariantAddInputNodesParsedArgs();
+
+        // ModelTransformer tests
+        TestCopySubmodel();
+        TestTransformSubmodelOnto();
+        TestTransformSubmodelInPlace();
     }
     catch (const utilities::Exception& exception)
     {

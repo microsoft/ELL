@@ -19,8 +19,8 @@ set NOPYTHON=
 set STRICT=
 set ONNX=OFF
 set CNTK=OFF
-set TEST_MODEL_REPO=%GIT_REPO%
-if "%TEST_MODEL_REPO%"=="" set TEST_MODEL_REPO=https://github.com/Microsoft/ell-test-models
+set TEST_MODELS_REPO=%GIT_REPO%
+if "%TEST_MODELS_REPO%"=="" set TEST_MODELS_REPO=https://github.com/Microsoft/ell-test-models
 :parse
 if "%1" == "" goto :step2
 if "%1" == "/debug" set DEBUG=1
@@ -66,8 +66,8 @@ if ERRORLEVEL 1 goto :nodelete
 
 if "!DEBUG!"=="1" dir "%VCToolsInstallDir%\bin\Hostx86\x86\"
 cd build
-echo cmake -G "!CMakeGenerator!" !STRICT! !NOPYTHON! -DCNTK=%CNTK% -DONNX=%ONNX% "-DGIT_REPO=!TEST_MODEL_REPO!" ..
-cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" -DCNTK=%CNTK% -DONNX=%ONNX% "-DGIT_REPO=!TEST_MODEL_REPO!" ..
+echo cmake -G "!CMakeGenerator!" !STRICT! !NOPYTHON! -DCNTK=%CNTK% -DONNX=%ONNX% "-DTEST_MODELS_REPO=!TEST_MODELS_REPO!" ..
+cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" -DCNTK=%CNTK% -DONNX=%ONNX% "-DTEST_MODELS_REPO=!TEST_MODELS_REPO!" ..
 goto :buildit
 
 :buildit

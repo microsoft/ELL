@@ -20,6 +20,11 @@ namespace ell
 {
 namespace testing
 {
+    TestFailureException::TestFailureException(const std::string& testDescription)
+        : std::runtime_error(std::string("TestFailureException: ") + testDescription)
+    {
+    }
+
     //
     // vectors
     //
@@ -147,15 +152,43 @@ namespace testing
     {
         if (!success)
         {
-            std::cout << testDescription << " ... Failed\n";
-            testFailedFlag = true;
+            TestFailed(testDescription + " ... Failed");
         }
         else
         {
-            std::cout << testDescription << " ... Success\n";
+            TestSucceeded(testDescription + " ... Success");
         }
 
         return success;
+    }
+
+    bool ProcessQuietTest(const std::string& testDescription, bool success)
+    {
+        if (!success)
+        {
+            TestFailed(testDescription + " ... Failed");
+        }
+
+        return success;
+    }
+
+    void ProcessCriticalTest(const std::string& testDescription, bool success)
+    {
+        if (!ProcessTest(testDescription, success))
+        {
+            throw TestFailureException(testDescription);
+        }
+    }
+
+    void TestFailed(const std::string& message)
+    {
+        std::cout << message << std::endl;
+        testFailedFlag = true;
+    }
+
+    void TestSucceeded(const std::string& message)
+    {
+        std::cout << message << std::endl;
     }
 
     bool DidTestFail()

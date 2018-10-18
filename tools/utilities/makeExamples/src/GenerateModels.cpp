@@ -6,12 +6,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "GenerateModels.h"
+
 // model
 #include "InputNode.h"
 #include "Model.h"
 #include "OutputNode.h"
 
 // nodes
+#include "ActivationLayerNode.h"
+#include "BiasLayerNode.h"
 #include "BinaryOperationNode.h"
 #include "BroadcastFunctionNode.h"
 #include "ConstantNode.h"
@@ -19,6 +23,7 @@
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
 #include "ForestPredictorNode.h"
+#include "FullyConnectedLayerNode.h"
 #include "L2NormSquaredNode.h"
 #include "LinearPredictorNode.h"
 #include "MovingAverageNode.h"
@@ -27,14 +32,25 @@
 // predictors
 #include "ForestPredictor.h"
 #include "LinearPredictor.h"
+#include "NeuralNetworkPredictor.h"
 #include "SingleElementThresholdPredictor.h"
+
+// predictors/neural
+#include "BiasLayer.h"
+#include "FullyConnectedLayer.h"
+#include "Layer.h"
+#include "ReLUActivation.h"
 
 // stl
 #include <sstream>
 #include <string>
 
-namespace ell
-{
+using namespace ell;
+using namespace model;
+using namespace nodes;
+using namespace predictors;
+using namespace predictors::neural;
+
 model::Model GenerateIdentityModel(size_t dimension)
 {
     model::Model model;
@@ -201,12 +217,8 @@ model::Model GenerateRefinedTreeModel(size_t numSplits)
 }
 
 // explicit instantiations
-template 
-model::Model GenerateBroadcastTimesTwoModel<int>(size_t dimension);
+template model::Model GenerateBroadcastTimesTwoModel<int>(size_t dimension);
 
-template 
-model::Model GenerateBroadcastTimesTwoModel<float>(size_t dimension);
+template model::Model GenerateBroadcastTimesTwoModel<float>(size_t dimension);
 
-template 
-model::Model GenerateBroadcastTimesTwoModel<double>(size_t dimension);
-}
+template model::Model GenerateBroadcastTimesTwoModel<double>(size_t dimension);
