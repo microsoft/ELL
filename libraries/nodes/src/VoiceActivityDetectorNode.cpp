@@ -30,6 +30,12 @@ namespace nodes
     };
 
     template <typename ValueType>
+    void VoiceActivityDetectorNode<ValueType>::Reset()
+    {
+        _vad.reset();
+    }
+
+    template <typename ValueType>
     void VoiceActivityDetectorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
@@ -210,6 +216,18 @@ namespace nodes
 
         // Set the output
         function.Store(pOutput, function.Load(signal));
+
+
+        // Add the internal reset function
+        std::string resetFunctionName = compiler.GetGlobalName(*this, "VADNodeReset");
+        emitters::IRFunctionEmitter& resetFunction = module.BeginResetFunction(resetFunctionName);
+        resetFunction.Store(lastTime, function.Literal(static_cast<ValueType>(0.0)));
+        resetFunction.Store(lastLevel, function.Literal(static_cast<ValueType>(0.0)));
+        resetFunction.Store(signal, function.Literal(0));
+
+        //resetFunction.Print("### GRU Node was reset\n"); // this is a handy way to debug whether the VAD node is working or not.
+        module.EndResetFunction();
+
     }
 
     template <typename ValueType>

@@ -987,7 +987,7 @@ class ConvertLSTM(ConvertBase):
     """
     def __init__(self, node: ImporterNode):
         super().__init__(node)
-        self.required_weights = ["input_weights", "hidden_weights", "input_bias", "reset_bias" ]
+        self.required_weights = ["input_weights", "hidden_weights", "input_bias", "hidden_bias" ]
         self.required_attributes = ["hidden_size", "activation", "recurrent_activation"]
 
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):

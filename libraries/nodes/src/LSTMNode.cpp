@@ -43,7 +43,7 @@ namespace nodes
     {
         if (validateWeights)
         {
-            size_t stackHeight = 4; // LSTM has 4 stacked weights for (input, forget, candidate, output).
+            size_t stackHeight = 4; // LSTM has 4 stacked weights for (input, forget, cell, output).
             size_t numRows = stackHeight * hiddenUnits;
             size_t numColumns = input.Size();
             if (inputWeights.Size() != numRows * numColumns)
@@ -100,7 +100,7 @@ namespace nodes
         ht = ot * tanh(ct)
         */
         size_t hiddenUnits = this->_hiddenUnits;
-        size_t stackHeight = 4; // LSTM has 4 stacked weights for (input, forget, candidate, output).
+        size_t stackHeight = 4; // LSTM has 4 stacked weights for (input, forget, cell, output).
         VectorType inputVector(this->_input.GetValue());
         size_t numRows = stackHeight * hiddenUnits;
         size_t numColumns = inputVector.Size();
@@ -123,7 +123,7 @@ namespace nodes
         VectorType hstack(hiddenBias); // add hidden bias
         math::MultiplyScaleAddUpdate(alpha, hiddenWeights, this->_hiddenState, beta, hstack);
 
-        // 4 slices of the vector representing the LSTM input, forget, candidate, output layers.
+        // 4 slices of the vector representing the LSTM input, forget, cell, output layers.
         auto slice1 = 0;
         auto slice2 = hiddenUnits;
         auto slice3 = 2 * hiddenUnits;
@@ -141,11 +141,11 @@ namespace nodes
         forgetGate += hstack.GetSubVector(slice2, hiddenUnits);
         this->_recurrentActivation.Apply(forgetGate);
 
-        // candidateGate = tanh(W_{ig} x + b_{ig} + W_{hg} h + b_{hg})
-        VectorType candidateGate(hiddenUnits);
-        candidateGate.CopyFrom(istack.GetSubVector(slice3, hiddenUnits));
-        candidateGate += hstack.GetSubVector(slice3, hiddenUnits);
-        this->_activation.Apply(candidateGate);
+        // cellGate = tanh(W_{ig} x + b_{ig} + W_{hg} h + b_{hg})
+        VectorType cellGate(hiddenUnits);
+        cellGate.CopyFrom(istack.GetSubVector(slice3, hiddenUnits));
+        cellGate += hstack.GetSubVector(slice3, hiddenUnits);
+        this->_activation.Apply(cellGate);
 
         // outputGate = sigma(W_{io} x + b_{io} + W_{ho} h + b_{ho})
         VectorType outputGate(hiddenUnits);
@@ -159,7 +159,7 @@ namespace nodes
             auto ft = forgetGate[i];
             auto ct = this->_cellState[i];
             auto it = inputGate[i];
-            auto gt = candidateGate[i];
+            auto gt = cellGate[i];
             auto newValue = ft * ct + it * gt;
             this->_cellState[i] = newValue;
         }
@@ -199,7 +199,7 @@ namespace nodes
         */
         const int hiddenUnits = static_cast<int>(this->_hiddenUnits);
         const int inputSize = static_cast<int>(this->input.Size());
-        size_t stackHeight = 4; // LSTM has 4 stacked weights for (input, forget, candidate, output).
+        size_t stackHeight = 4; // LSTM has 4 stacked weights for (input, forget, cell, output).
 
         // Get LLVM references for all node inputs
         auto input = compiler.EnsurePortEmitted(this->input);
@@ -233,13 +233,13 @@ namespace nodes
         auto hstack = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), stackSize));
         auto inputGate = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), hiddenUnits));
         auto forgetGate = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), hiddenUnits));
-        auto candidateGate = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), hiddenUnits));
+        auto cellGate = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), hiddenUnits));
         auto outputGate = function.LocalArray(function.Variable(emitters::GetVariableType<ValueType>(), hiddenUnits));
 
         auto alpha = static_cast<ValueType>(1.0); // GEMV scaling of the matrix multipication
         auto beta = static_cast<ValueType>(1.0); // GEMV scaling of the bias addition
 
-        // W_i * x + b_i, one matrix multiplication for all 4 gates (input, forget, candidate, output)
+        // W_i * x + b_i, one matrix multiplication for all 4 gates (input, forget, cell, output)
         function.MemoryCopy<ValueType>(inputBias, istack, stackSize); // Copy bias values into output so GEMM call accumulates them
         function.CallGEMV(stackSize, inputSize, alpha, inputWeights, inputSize, input, 1, beta, istack, 1);
 
@@ -247,46 +247,47 @@ namespace nodes
         function.MemoryCopy<ValueType>(hiddenBias, hstack, stackSize); // Copy bias values into output so GEMM call accumulates them
         function.CallGEMV(stackSize, hiddenUnits, alpha, hiddenWeights, hiddenUnits, prevHiddenState, 1, beta, hstack, 1);
 
-        // the weights are stacked in 3 slices for (input, reset, hidden).
-        auto slice1 = function.LocalScalar(0);
-        auto slice2 = function.LocalScalar(hiddenUnits);
-        auto slice3 = function.LocalScalar(hiddenUnits * 2);
-        auto slice4 = function.LocalScalar(hiddenUnits * 3);
+        // the weights are stacked in 4 slices for (input, forget, cell, output).
+        auto istack_slice0 = istack;
+        auto istack_slice1 = function.LocalArray(function.PointerOffset(istack, function.LocalScalar(hiddenUnits)));
+        auto istack_slice2 = function.LocalArray(function.PointerOffset(istack, function.LocalScalar(hiddenUnits * 2)));
+        auto istack_slice3 = function.LocalArray(function.PointerOffset(istack, function.LocalScalar(hiddenUnits * 3)));
+
+        auto hstack_slice0 = hstack;
+        auto hstack_slice1 = function.LocalArray(function.PointerOffset(hstack, function.LocalScalar(hiddenUnits)));
+        auto hstack_slice2 = function.LocalArray(function.PointerOffset(hstack, function.LocalScalar(hiddenUnits * 2)));
+        auto hstack_slice3 = function.LocalArray(function.PointerOffset(hstack, function.LocalScalar(hiddenUnits * 3)));
 
         // input_gate = sigma(W_{ iz } x + b_{ iz } + W_{ hz } h + b_{ hz })
         function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {
-            auto j = i + slice1;
-            inputGate[i] = istack[j] + hstack[j];
+            inputGate[i] = istack_slice0[i] + hstack_slice0[i];
         });
         this->ApplyActivation(function, this->_recurrentActivation, inputGate, hiddenUnits);
 
         // forget_gate = sigma(W_{if} x + b_{if} + W_{hf} h + b_{hf})
         function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {
-            auto j = i + slice2;
-            forgetGate[i] = istack[j] + hstack[j];
+            forgetGate[i] = istack_slice1[i] + hstack_slice1[i];
         });
         this->ApplyActivation(function, this->_recurrentActivation, forgetGate, hiddenUnits);
 
-        // candidate_gate = tanh(W_{ig} x + b_{ig} + W_{hg} h + b_{hg})
+        // cell_gate = tanh(W_{ig} x + b_{ig} + W_{hg} h + b_{hg})
         function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {
-            auto j = i + slice3;
-            candidateGate[i] = istack[j] + hstack[j];
+            cellGate[i] = istack_slice2[i] + hstack_slice2[i];
         });
-        this->ApplyActivation(function, this->_activation, candidateGate, hiddenUnits);
+        this->ApplyActivation(function, this->_activation, cellGate, hiddenUnits);
 
         // output_gate = sigma(W_{io} x + b_{io} + W_{ho} h + b_{ho})
         function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {
-            auto j = i + slice4;
-            outputGate[i] = istack[j] + hstack[j];
+            outputGate[i] = istack_slice3[i] + hstack_slice3[i];
         });
         this->ApplyActivation(function, this->_recurrentActivation, outputGate, hiddenUnits);
 
-        // cellState = forget_gate * cellState + input_gate * candidate_gate
+        // cellState = forget_gate * cellState + input_gate * cell_gate
         function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {
             auto ft = forgetGate[i];
             auto ct = prevCellState[i];
             auto it = inputGate[i];
-            auto gt = candidateGate[i];
+            auto gt = cellGate[i];
             auto newValue = ft * ct + it * gt;
             cellState[i] = newValue;
         });

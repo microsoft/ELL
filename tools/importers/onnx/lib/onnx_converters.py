@@ -547,6 +547,70 @@ class OnnxSliceConverter(OnnxNodeConverter):
         return attributes
 
 
+class OnnxLSTMConverter(OnnxNodeConverter):
+    def __init__(self, converter):
+        super().init(converter, "LSTM")
+
+    def get_attributes(self, attrs: Attributes):
+        attributes = {
+            "hidden_size": attrs["hidden_size"],
+            # pytorch has fixed activation types
+            "activation": ell.neural.ActivationType.tanh,
+            "recurrent_activation":  ell.neural.ActivationType.sigmoid
+        }
+        return attributes
+        
+    def get_output_shapes(self):
+        hidden_size = self.node.attributes['hidden_size']
+        shape = (hidden_size,)
+        return [(shape, "channel")]
+
+    def reform_weights(self, weights, axis):
+        # onnx layer order is: input, output, forget, cell.
+        # but ELL wants:       input, forget, cell, output.
+        parts = np.split(weights, 4, axis)
+        return np.concatenate((parts[0], parts[2], parts[3], parts[1]), axis)
+
+    def get_weights(self):
+        node = self.node
+        units = int(node.attributes['hidden_size'])
+        
+        tensors = self.get_input_tensors()
+        result = {}
+
+        if len(tensors) != 3:
+            raise Exception("Expecting 2 weight tensors and a bias tensor on LSTM node but found {}".format(len(tensors)))
+
+        # stacked set of (input, forget, cell, output) weights to be applied to the input
+        stacked_input_weights = self.reform_weights(tensors[0][1], axis=1)
+        # stacked set of (input, forget, cell, output) weights to be applied to the hidden state
+        stacked_hidden_weights = self.reform_weights(tensors[1][1], axis=1)
+        # the stacked bias comes in as one tensor which we have to then split
+        bias_weights = tensors[2][1].reshape((2, units*4))
+        # stacked set of (input, forget, cell, output) input biases
+        stacked_input_bias = self.reform_weights(bias_weights[0], axis=0)
+        # stacked set of (input, forget, cell, output) hidden biases
+        stacked_hidden_bias = self.reform_weights(bias_weights[1], axis=0)
+
+        # we have to invent new unique id's for the tensors since we created more than we had in input_tensors.
+        unique_id = "{}_{}_".format(node.operation_type, node.id)
+        tensors = {
+            'input_weights': stacked_input_weights,
+            'hidden_weights': stacked_hidden_weights,
+            'input_bias': stacked_input_bias,
+            'hidden_bias': stacked_hidden_bias
+        }
+
+        # register these as global tensors so the importer can find them.
+        for key in tensors:
+            t = tensors[key]
+            id = unique_id + key
+            self.add_tensor(id, t)
+            result[key] = (id, t, self.get_order(t))
+
+        return result
+
+
 class OnnxGRUConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "GRU")
@@ -960,6 +1024,7 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP  = {
     "Conv"                    : OnnxConvolutionConverter,
     "Convolution"             : OnnxConvolutionConverter,
     "GRU"                     : OnnxGRUConverter, # "GRU",
+    "LSTM"                    : OnnxLSTMConverter, # "LSTM",
     "Mul"                     : OnnxElementTimesConverter, # "ElementTimes",
     "MatMul"                  : OnnxFullyConnectedConverter, # "FullyConnected",
     "Bias"                    : OnnxBiasConverter, # "Bias",

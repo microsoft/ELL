@@ -30,6 +30,4 @@ if(${PYTHON_ENABLED})
     # copy files
     copy_newer_files(${module_name} lib_src)
 
-    add_subdirectory(training)
-
 endif()  # PYTHON_ENABLED

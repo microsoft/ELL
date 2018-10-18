@@ -787,7 +787,14 @@ void TestGRUNode()
             // verify compute output 
             double epsilon = 1e-5;
             auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
-            testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %d", name.c_str(), iteration, i), ok);
+
+            if (!ok)
+            {
+                std::cout << "  Test " << name.c_str() << " compute versus expected output mismatch on iteration " << iteration << " and row " << i << "\n";
+                std::cout << "  " << computedResult << "\n";
+                std::cout << "  " << expectedOutput.ToArray() << "\n";
+            }
+            testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %zu", name.c_str(), iteration, i), ok);
 
         }
     });
@@ -859,7 +866,13 @@ void TestLSTMNode()
             // compute output
             double epsilon = 1e-5;
             auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
-            testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %d", name.c_str(), iteration, i), ok);
+            if (!ok) 
+            {
+                std::cout << "  Test " << name.c_str()  << " compute versus expected output mismatch on iteration " << iteration << " and row " << i << "\n";
+                std::cout << "  " << computedResult << "\n";
+                std::cout << "  " << expectedOutput.ToArray() << "\n";
+            }
+            testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %zu", name.c_str(), iteration, i), ok);
         }
 
     });

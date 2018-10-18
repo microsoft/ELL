@@ -90,12 +90,12 @@ namespace nodes
     {
         using ConstMatrixReferenceType = math::ConstRowMatrixReference<ValueType>;
         /*
-     h = previous hidden state
-     rt = sigma(W_{ ir } x + b_{ ir } + W_{ hr } h + b_{ hr }) 
-     zt = sigma(W_{ iz } x + b_{ iz } + W_{ hz } h + b_{ hz }) 
-     nt = tanh(W_{ in } x + b_{ in } + rt * (W_{ hn } h + b_{ hn })) 
-     ht = (1 - zt) * nt + zt * h
-    */
+        h = previous hidden state
+        rt = sigma(W_{ ir } x + b_{ ir } + W_{ hr } h + b_{ hr }) 
+        zt = sigma(W_{ iz } x + b_{ iz } + W_{ hz } h + b_{ hz }) 
+        nt = tanh(W_{ in } x + b_{ in } + rt * (W_{ hn } h + b_{ hn })) 
+        ht = (1 - zt) * nt + zt * h
+        */
         size_t hiddenUnits = this->_hiddenUnits;
         size_t stackHeight = 3; // GRU has 3 stacked weights for (input, reset, hidden)
         VectorType inputVector = this->_input.GetValue();
@@ -216,26 +216,28 @@ namespace nodes
         function.CallGEMV(stackSize, hiddenUnits, alpha, hiddenWeights, hiddenUnits, hiddenState, 1, beta, hstack, 1);
 
         // the weights are stacked in 3 slices for (input, reset, hidden).
-        auto slice1 = function.LocalScalar(hiddenUnits);
-        auto slice2 = function.LocalScalar(hiddenUnits * 2);
-
+        auto istack_slice0 = istack;
+        auto istack_slice1 = function.LocalArray(function.PointerOffset(istack, function.LocalScalar(hiddenUnits)));
+        auto istack_slice2 = function.LocalArray(function.PointerOffset(istack, function.LocalScalar(hiddenUnits * 2)));
+        auto hstack_slice0 = hstack;
+        auto hstack_slice1 = function.LocalArray(function.PointerOffset(hstack, function.LocalScalar(hiddenUnits)));
+        auto hstack_slice2 = function.LocalArray(function.PointerOffset(hstack, function.LocalScalar(hiddenUnits * 2)));
+        
         // input_gate = sigma(W_{ iz } x + b_{ iz } + W_{ hz } h + b_{ hz })
         function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {
-            inputGate[i] = istack[i] + hstack[i];
+            inputGate[i] = istack_slice0[i] + hstack_slice0[i];
         });
         this->ApplyActivation(function, this->_recurrentActivation, inputGate, hiddenUnits);
 
         // reset_gate = sigma(W_{ ir } x + b_{ ir } + W_{ hr } h + b_{ hr })
         function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {
-            auto j = i + slice1;
-            resetGate[i] = istack[j] + hstack[j];
+            resetGate[i] = istack_slice1[i] + hstack_slice1[i];
         });
         this->ApplyActivation(function, this->_recurrentActivation, resetGate, hiddenUnits);
 
         // hidden_gate = tanh(W_{ in } x + b_{ in } + reset_gate * (W_{ hn } h + b_{ hn }))
-        function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {
-            auto j = i + slice2;
-            hiddenGate[i] = istack[j] + resetGate[i] * hstack[j];
+        function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {            
+            hiddenGate[i] = istack_slice2[i] + resetGate[i] * hstack_slice2[i];
         });
         this->ApplyActivation(function, this->_activation, hiddenGate, hiddenUnits);
 

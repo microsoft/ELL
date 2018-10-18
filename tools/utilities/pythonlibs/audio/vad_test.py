@@ -38,11 +38,12 @@ import vad
 class VadTest(Frame):
     """ A demo application class that provides simple GUI for testing voice activity detection on microphone or wav file input. """
 
-    def __init__(self, featurizer_path, input_device, wav_file):
+    def __init__(self, featurizer_path, input_device, wav_file, sample_rate):
         """ Initialize the VadTest object
         featurizer_path - path to the ELL featurizer to use
         input_device - id of the microphone to use
         wav_file - optional wav_file to use when you click play
+        sample_rate - the sample rate to resample the incoming audio
         """
         super().__init__()
         
@@ -84,7 +85,7 @@ class VadTest(Frame):
             self.settings[self.FEATURIZER_PATH_KEY] = featurizer_path
         elif self.FEATURIZER_PATH_KEY in self.settings:
             self.featurizer_path = self.settings[self.FEATURIZER_PATH_KEY]   
-        self.get_sample_rate()
+        self.sample_rate = sample_rate
 
         self.input_device = input_device
         self.wav_filename = None
@@ -106,11 +107,6 @@ class VadTest(Frame):
             self.show_output("Please specify and load a feature model")
 
         self.update_ui()
-
-    def get_sample_rate(self):
-        self.sample_rate = 16000
-        if self.featurizer_path and "8000" in self.featurizer_path:
-            self.sample_rate = 8000
 
     def init_ui(self):
         self.master.title("VAD Test")  
@@ -541,11 +537,11 @@ class VadTest(Frame):
         self.reading_input = False
     
 
-def main(featurizer, input_device, wav_file):
+def main(featurizer, input_device, wav_file, sample_rate):
     """ Main function to create root UI and AudioDemo object, then run the main UI loop """
     root = tk.Tk()
     root.geometry("800x800")
-    app = VadTest(featurizer, input_device, wav_file)
+    app = VadTest(featurizer, input_device, wav_file, sample_rate)
     root.bind("+", app.on_plus_key)
     root.bind("-", app.on_minus_key)
     while True:
@@ -563,8 +559,9 @@ if __name__ == "__main__":
     arg_parser.add_argument("--input_device", "-d", help="Index of input device (see --list_devices)", default=1, type=int)
     arg_parser.add_argument("--list_devices", help="List available input devices", action="store_true")
     arg_parser.add_argument("--wav_file", help="Provide an input wav file to test", default=None)
+    arg_parser.add_argument("--sample_rate", type=int, help="The sample rate that featurizer is setup to use", default=16000)
     args = arg_parser.parse_args()
     if args.list_devices:
         microphone.list_devices()
     else:
-        main(args.featurizer, args.input_device, args.wav_file)
+        main(args.featurizer, args.input_device, args.wav_file, args.sample_rate)

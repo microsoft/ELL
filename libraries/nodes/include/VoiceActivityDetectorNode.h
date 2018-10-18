@@ -77,6 +77,9 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Resets any state on the node, if any </summary>
+        void Reset() override;
+
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
