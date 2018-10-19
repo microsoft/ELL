@@ -217,6 +217,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<int64_t>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ClockNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<int>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<int>>();

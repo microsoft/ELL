@@ -60,8 +60,8 @@ if(${PYTHONLIBS_FOUND})
         @ELL_model@.@OBJECT_EXTENSION@
         @ELL_model@PYTHON_wrap.cxx
         @ELL_model@PYTHON_wrap.h
-        include/CallbackInterface.h
-        tcc/CallbackInterface.tcc)
+        @ELL_model@.i
+        @ELL_model@.i.h)
 
     if(WIN32)
         set_property(TARGET ${target_name} PROPERTY SUFFIX ".pyd")

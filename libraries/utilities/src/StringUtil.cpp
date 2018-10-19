@@ -25,6 +25,14 @@ namespace utilities
         return lower;
     }
 
+    std::string ToUppercase(const std::string& s)
+    {
+        std::string lower = s;
+        std::transform(lower.begin(), lower.end(), lower.begin(),
+            [](int c) { return static_cast<char>(::toupper(c)); });
+        return lower;
+    }
+
     void ReplaceAll(std::string& str, const std::string& from, const std::string& to)
     {
         if (from.empty())

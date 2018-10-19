@@ -223,7 +223,7 @@ namespace emitters
         os << "//\n";
         os << "// ELL header for module " << moduleName << "\n";
         os << "//\n\n";
-        os << "#pragma once\n\n";
+        os << "#pragma once\n\n";      
         os << "#include <stdint.h>\n\n";
 
         {
@@ -236,31 +236,34 @@ namespace emitters
                 DeclareIfDefDefine define(os, def.first, def.second);
             }
 
-            // First write out type definitions
-            os << "//\n// Types\n//\n\n";
-
-            // Look for the module-level "declare in header" tag
-            if (moduleEmitter.HasMetadata(c_declareTypeInHeaderTagName))
             {
-                auto typeNames = GetSingletonModuleTagValues(moduleEmitter, c_declareTypeInHeaderTagName);
+                DeclareIfDefGuard swig(os, "SWIG", DeclareIfDefGuard::Type::Negative);  
+                // First write out type definitions
+                os << "//\n// Types\n//\n\n";
 
-                auto structTypes = pModule->getIdentifiedStructTypes();
-                for (const auto& t : structTypes)
+                // Look for the module-level "declare in header" tag
+                if (moduleEmitter.HasMetadata(c_declareTypeInHeaderTagName))
                 {
-                    if (t->hasName() && (typeNames.cend() != typeNames.find(t->getName())))
+                    auto typeNames = GetSingletonModuleTagValues(moduleEmitter, c_declareTypeInHeaderTagName);
+
+                    auto structTypes = pModule->getIdentifiedStructTypes();
+                    for (const auto& t : structTypes)
                     {
-                        // Get struct field names
-                        auto tagName = GetStructFieldsTagName(t);
-                        std::vector<std::string> fieldNames;
-                        if (moduleEmitter.HasMetadata(tagName))
+                        if (t->hasName() && (typeNames.cend() != typeNames.find(t->getName())))
                         {
-                            auto fieldNameMetadata = moduleEmitter.GetMetadata(tagName);
-                            if (!fieldNameMetadata.empty())
+                            // Get struct field names
+                            auto tagName = GetStructFieldsTagName(t);
+                            std::vector<std::string> fieldNames;
+                            if (moduleEmitter.HasMetadata(tagName))
                             {
-                                fieldNames = fieldNameMetadata[0];
+                                auto fieldNameMetadata = moduleEmitter.GetMetadata(tagName);
+                                if (!fieldNameMetadata.empty())
+                                {
+                                    fieldNames = fieldNameMetadata[0];
+                                }
                             }
+                            WriteStructDefinition(os, t, fieldNames);
                         }
-                        WriteStructDefinition(os, t, fieldNames);
                     }
                 }
             }
@@ -276,49 +279,343 @@ namespace emitters
         }
     }
 
+    std::string TrimPrefix(std::string s, std::string prefix)
+    {
+        if (s.find(prefix) == 0)
+        {
+            return s.substr(prefix.size());
+        }
+        return s;
+    }
+
+    std::string SwiggifyType(std::string type)
+    {
+        if (type == "int32_t") 
+        {
+            // SWIG has a bug if we use int32_t then IntVector doesn't work properly.
+            return "int";
+        }
+        return type;
+    }
+
+    struct CppWrapperInfo
+    {
+        std::string moduleName;
+        std::string className;
+        std::string predictFunctionName;
+        std::string predictMethodName;
+        std::string predictReturnType;
+        std::string predictReturnMember;
+        std::vector<std::string> predictMethodArgs;
+        std::vector<std::string> predictCallArgs;
+        std::stringstream constructorInit;
+        std::stringstream predictPreBody;
+        std::stringstream predictPostBody;
+        std::stringstream memberDecls;
+        std::stringstream cdecls;
+        std::stringstream helperMethods;
+    };
+
+    static void WriteSourceNodeCallbacks(ModuleCallbackDefinitions& moduleCallbacks, CppWrapperInfo& info)
+    {
+        int sourceIndex = 0;
+        for (auto cb : moduleCallbacks.sources)
+        {
+            std::string inputType = SwiggifyType(cb.inputType);
+            std::string callbackFunction = cb.functionName;
+            std::string callbackMethod = TrimPrefix(callbackFunction, info.moduleName + "_");
+            std::string argName = utilities::FormatString("input%d", sourceIndex);
+
+            // setup an internal method for the callback in our Wrapper class and delegate to 
+            // a virtual method that can be implemented in another language (via SWIG)
+            info.helperMethods << "    void Internal_" << callbackMethod << "(" << inputType << "* buffer)\n";
+            info.helperMethods << "    {\n";
+            info.helperMethods << "        " << callbackMethod << "(_" << argName << ");\n"; // fill the input buffer
+            info.helperMethods << "        int32_t size = GetInputSize(" << sourceIndex << ");\n";
+            info.helperMethods << "        ::memcpy(buffer, _" << argName << ".data(), size * sizeof(" << inputType << "));\n";
+            info.helperMethods << "    }\n\n";
+            info.helperMethods << "    virtual void " << callbackMethod << "(std::vector<" << inputType << ">& " << argName << ")\n";
+            info.helperMethods << "    {\n";
+            info.helperMethods << "        // todo: override this method to fill the request input data.\n";
+            info.helperMethods << "    }\n\n";
+
+            info.constructorInit << "        _" << argName << ".resize(GetInputSize(" << sourceIndex << "));\n";
+
+            info.memberDecls << "    std::vector<" << inputType << "> _" << argName << ";\n";
+
+            // Delegate the "C" callback function to the above virtual method on the Wrapper class.
+            info.cdecls << "    void " << callbackFunction << "(void* context, " << inputType << "* " << argName << ")\n";
+            info.cdecls << "    {\n";
+            info.cdecls << "        if (context != nullptr)\n";
+            info.cdecls << "        {\n";
+            info.cdecls << "            auto predictor = reinterpret_cast<" << info.className << "*>(context);\n";
+            info.cdecls << "            predictor->Internal_" << callbackMethod << "(" << argName << ");\n";
+            info.cdecls << "        }\n";
+            info.cdecls << "    }\n";
+            ++sourceIndex;
+        }
+    }
+
+    static void WriteLagNotificationCallbacks(ModuleCallbackDefinitions& moduleCallbacks, CppWrapperInfo& info)
+    {
+        for (auto cb : moduleCallbacks.lagNotifications)
+        {
+            std::string callbackFunction = cb.functionName;
+            std::string callbackMethod = TrimPrefix(callbackFunction, info.moduleName + "_");
+
+            // setup a virtual method for the callback in our Wrapper class
+            info.helperMethods << "    virtual void " << callbackMethod << "(double lag)\n";
+            info.helperMethods << "    {\n";
+            info.helperMethods << "        // todo: add your implementation to this method if you care about lag notifications\n";
+            info.helperMethods << "        // or override this method and implement it that way\n";
+            info.helperMethods << "    }\n\n";
+            info.helperMethods << "    double GetStepInterval() const\n";
+            info.helperMethods << "    {\n";
+            info.helperMethods << "        return " << info.moduleName << "_GetStepInterval();\n";
+            info.helperMethods << "    }\n\n";
+            info.helperMethods << "    double GetLagThreshold() const\n";
+            info.helperMethods << "    {\n";
+            info.helperMethods << "        return " << info.moduleName << "_GetLagThreshold();\n";
+            info.helperMethods << "    }\n\n";
+            info.helperMethods << "    double GetTicksUntilNextInterval(double currentTime) const\n";
+            info.helperMethods << "    {\n";
+            info.helperMethods << "        return " << info.moduleName << "_GetTicksUntilNextInterval(currentTime);\n";
+            info.helperMethods << "    }\n\n";
+
+            // Delegate the "C" callback function to the above virtual method on the Wrapper class.
+            info.cdecls << "    void " << callbackFunction << "(void* context, double lag)\n";
+            info.cdecls << "    {\n";
+            info.cdecls << "        if (context != nullptr)\n";
+            info.cdecls << "        {\n";
+            info.cdecls << "            auto predictor = reinterpret_cast<" << info.className << "*>(context);\n";
+            info.cdecls << "            predictor->" << callbackMethod << "(lag);\n";
+            info.cdecls << "        }\n";
+            info.cdecls << "    }\n";
+        }
+    }
+
+    void WriteSinkNotificationCallbacks(ModuleCallbackDefinitions& moduleCallbacks, CppWrapperInfo& info)
+    {
+        bool hasSourceNodes = !moduleCallbacks.sources.empty();        
+
+        if (!moduleCallbacks.sinks.empty())
+        {
+            // add the GetSinkShape helper methods
+            info.helperMethods << "    TensorShape GetSinkShape(int index = 0) const\n";
+            info.helperMethods << "    {\n";
+            info.helperMethods << "        TensorShape inputShape;\n";
+            info.helperMethods << "        " << info.moduleName << "_GetSinkOutputShape(index, &inputShape);\n";
+            info.helperMethods << "        return inputShape;\n";
+            info.helperMethods << "    }\n\n";
+            info.helperMethods << "    int GetSinkOutputSize(int index = 0) const\n";
+            info.helperMethods << "    {\n";
+            info.helperMethods << "        return " << info.moduleName << "_GetSinkOutputSize(index);\n";
+            info.helperMethods << "    }\n\n";
+
+            int sinkIndex = 0;
+            for (auto cb : moduleCallbacks.sinks)
+            {
+                std::string outputType = SwiggifyType(cb.inputType);
+                std::string callbackFunction = cb.functionName;
+                std::string callbackMethod = TrimPrefix(callbackFunction, info.moduleName + "_");
+                std::string argName = utilities::FormatString("sinkOutput%d", sinkIndex);
+
+                // setup an internal method for the callback in our Wrapper class and delegate to 
+                // a virtual method that can be implemented in another language (via SWIG)
+                info.helperMethods << "    void Internal_" << callbackMethod << "(" << outputType << "* buffer)\n";
+                info.helperMethods << "    {\n";
+                info.helperMethods << "        int32_t size = GetSinkOutputSize(" << sinkIndex << ");\n";
+                info.helperMethods << "        _" << argName << ".assign(buffer, buffer + size);\n";
+                info.helperMethods << "        " << callbackMethod << "(_" << argName << ");\n"; // pass it to virtual method
+                info.helperMethods << "    }\n\n";
+                info.helperMethods << "    virtual void " << callbackMethod << "(std::vector<" << outputType << ">& " << argName << ")\n";
+                info.helperMethods << "    {\n";
+                info.helperMethods << "        // override this method to get the sink callback data as a vector\n";
+                info.helperMethods << "    }\n\n";
+
+                if (hasSourceNodes && sinkIndex == 0)
+                {
+                    // in the SourceNode case any OutputNodes have to be returned via SinkNode, but we
+                    // can expose the first Sink the return value of our Predict method just for convenience,
+                    // We just return the value of the _argname member that the Internal sink callback saved, see above.
+                    info.predictReturnType = "std::vector<" + outputType + ">&";
+                    info.predictReturnMember = "_" + argName;
+                }
+                info.memberDecls << "    std::vector<" << outputType << "> _" << argName << ";\n";
+
+                // Delegate the "C" callback function to the above virtual method on the Wrapper class.
+                info.cdecls << "    void " << callbackFunction << "(void* context, " << outputType << "* " << argName << ")\n";
+                info.cdecls << "    {\n";
+                info.cdecls << "        if (context != nullptr)\n";
+                info.cdecls << "        {\n";
+                info.cdecls << "            auto predictor = reinterpret_cast<" << info.className << "*>(context);\n";
+                info.cdecls << "            predictor->Internal_" << callbackMethod << "(" << argName << ");\n";
+                info.cdecls << "        }\n";
+                info.cdecls << "    }\n";
+                ++sinkIndex;
+            }
+        }
+    }
+
+    void WriteSimplePredictMethod(LLVMFunction predictFunction, CppWrapperInfo& info)
+    {
+
+        int outputCount = 0;
+        // then there are no SourceNodes, so we have a regular predict function with direct inputs.
+        for (auto arg = predictFunction->arg_begin(), end = predictFunction->arg_end(); arg != end; ++arg)
+        {
+            std::string argName = arg->getName();
+            if (argName == "context")
+            {
+                // we really want void* on these puppies, but LLVM won't let us...(which is why the argType is int8_t*,
+                // and for our wrapper class, the context will be 'this' so the "C" callbacks can find this object.
+                info.predictCallArgs.push_back("this");
+            }
+            else
+            {
+                std::stringstream ss;
+                WriteLLVMType(ss, arg->getType()->getPointerElementType());
+                std::string argType = SwiggifyType(ss.str());
+                bool passArgument = false;
+                if (argName.find("output") != std::string::npos)
+                {
+                    if (outputCount == 0)
+                    {
+                        // first argument is special, it is a member and is the return value for this function.
+                        // This argument comes from our member variable
+                        info.predictCallArgs.push_back("_" + argName + ".data()");
+                        info.predictReturnType = "std::vector<" + argType + ">&";
+                        info.predictReturnMember = "_" + argName;
+                    }
+                    else
+                    {
+                        // this output is passed as an argument.
+                        info.predictCallArgs.push_back(argName + ".data()"); // convert vector to raw buffer.
+                        passArgument = true;
+                    }
+                    // the predict output arg is a cached member vector so we only have to allocate it once.
+                    info.constructorInit << "        _" << argName << ".resize(GetOutputSize(" << outputCount++ << "));\n";
+                    info.memberDecls << "    std::vector<" << argType << "> _" << argName << ";\n";
+                }
+                else
+                {
+                    // inputs are always passed in and passed through to C predict function                            
+                    info.predictCallArgs.push_back(argName + ".data()"); // convert vector to raw buffer.
+                    passArgument = true;
+                }
+                if (passArgument)
+                {
+                    info.predictMethodArgs.push_back("std::vector<" + argType + ">& " + argName);
+                }
+            }
+        }
+    }
+
+    void WritePredictMethod(ModuleCallbackDefinitions& moduleCallbacks, CppWrapperInfo& info)
+    {
+        bool hasSourceNodes = !moduleCallbacks.sources.empty();
+        // Predict helper method has two different forms dependsing on whether we have SourceNodes or not.
+        if (hasSourceNodes)
+        {
+            // This version of predict takes context, time, and output, but output is null because we assume
+            // we will also have a SinkNode in this case.
+            info.helperMethods << "    " << info.predictReturnType << " " << info.predictMethodName << "(" << utilities::Join(info.predictMethodArgs, ", ") << ")\n";
+            info.helperMethods << "    {\n";
+            info.helperMethods << info.predictPreBody.str();
+            info.helperMethods << "        double time = GetMilliseconds();\n";
+            info.helperMethods << "        " << info.predictFunctionName << "(this, &time, nullptr);\n";
+            info.helperMethods << info.predictPostBody.str();
+            if (info.predictReturnType != "void")
+            {
+                info.helperMethods << "        return " << info.predictReturnMember << ";\n";
+            }
+            info.helperMethods << "    }\n\n";
+        }
+        else
+        {
+            // This is the easy version to use where inputs are passed in directly, and first output is returned as a
+            // return value.  The second and subsequent outputs are 'out' arguments after all the inputs.
+            info.helperMethods << "    " << info.predictReturnType << " " << info.predictMethodName << "(" << utilities::Join(info.predictMethodArgs, ", ") << ")\n";
+            info.helperMethods << "    {\n";
+            info.helperMethods << "        " << info.predictFunctionName << "(" << utilities::Join(info.predictCallArgs, ", ") << ");\n";
+            if (info.predictReturnType != "void")
+            {
+                info.helperMethods << "        return " << info.predictReturnMember << ";\n";
+            }
+            info.helperMethods << "    }\n\n";
+        }
+
+    }
+
     void WriteModuleCppWrapper(std::ostream& os, IRModuleEmitter& moduleEmitter)
     {
         auto callbacks = GetFunctionsWithTag(moduleEmitter, c_callbackFunctionTagName);
-        if (!callbacks.empty())
+
+        auto predictFunctions = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
+        if (predictFunctions.empty())
         {
-            // If callbacks are part of the module, write the callback-based predict wrapper
-
-            // (Note: newlines are part of the syntax for #include)
-            // clang-format off
-            std::string predictWrapperCode(
-                #include "CppPredictWrapper.in"
-            );
-            // clang-format on
-
-            ReplaceDelimiter(predictWrapperCode, "MODULE", moduleEmitter.GetLLVMModule()->getName());
-
-            auto predictFunctions = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
-            ReplaceDelimiter(predictWrapperCode, "FUNCTION", predictFunctions[0].function->getName());
-
-            ModuleCallbackDefinitions moduleCallbacks(callbacks);
-            if (moduleCallbacks.sources.size() > 0)
-            {
-                ReplaceDelimiter(predictWrapperCode, "SOURCE_TYPE", moduleCallbacks.sources[0].inputType);
-                ReplaceDelimiter(predictWrapperCode, "SOURCE_CALLBACK", moduleCallbacks.sources[0].functionName);
-            }
-            else
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                                                "SourceNode callback is missing");
-            }
-
-            if (moduleCallbacks.sinks.size() > 0)
-            {
-                ReplaceDelimiter(predictWrapperCode, "SINK_TYPE", moduleCallbacks.sinks[0].inputType);
-                ReplaceDelimiter(predictWrapperCode, "SINK_CALLBACK", moduleCallbacks.sinks[0].functionName);
-            }
-            else
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                                                "SinkNode callback is missing");
-            }
-            os << predictWrapperCode << "\n";
+            return;
         }
+
+        std::string moduleName = moduleEmitter.GetLLVMModule()->getName();
+        std::string className = moduleName + "Wrapper";
+        className[0] = ::toupper(className[0]); // pascal case
+
+        LLVMFunction predictFunction = predictFunctions[0].function;
+
+        // the CppPredictWrapper.in is just the first part, now do the optional call backs functions
+        // which is variable sized.
+        ModuleCallbackDefinitions moduleCallbacks(callbacks);
+
+        // Build up some variable sized content for the ModelWrapperr C++ helper class.  It is variable sized
+        // because we have optional call backs and variable number of callbacks, and variable number of
+        // parameters for predict methods.
+        CppWrapperInfo info;
+        info.moduleName = moduleName;
+        info.className = className;
+        info.predictReturnType = "void";
+        info.predictFunctionName = predictFunction->getName();
+        info.predictMethodName = TrimPrefix(info.predictFunctionName, moduleName + "_");
+        info.predictMethodName[0] = ::toupper(info.predictMethodName[0]); // pascal case
+
+        bool hasSourceNodes = !moduleCallbacks.sources.empty();
+
+        if (!hasSourceNodes)
+        {
+            WriteSimplePredictMethod(predictFunction, info);
+        }
+        else
+        {
+            WriteSourceNodeCallbacks(moduleCallbacks, info);
+            WriteLagNotificationCallbacks(moduleCallbacks, info);
+        }
+
+        WriteSinkNotificationCallbacks(moduleCallbacks, info);
+
+        WritePredictMethod(moduleCallbacks, info);
+
+        // now write out the final completed code.
+
+        // (Note: newlines are part of the syntax for #include)
+        // clang-format off
+        std::string predictWrapperCode(
+            #include "CppPredictWrapper.in"
+        );
+        // clang-format on
+
+        // fill in the tempate parameters
+        ReplaceDelimiter(predictWrapperCode, "MODULE", moduleName);
+        ReplaceDelimiter(predictWrapperCode, "CLASSNAME", className);
+        ReplaceDelimiter(predictWrapperCode, "CONSTRUCTOR_IMPL", info.constructorInit.str());
+        ReplaceDelimiter(predictWrapperCode, "CLASS_GUARD", utilities::ToUppercase(moduleName) + "_WRAPPER_DEFINED");
+        ReplaceDelimiter(predictWrapperCode, "MEMBER_DECLS", info.memberDecls.str());
+        ReplaceDelimiter(predictWrapperCode, "HELPER_METHODS", info.helperMethods.str());
+        ReplaceDelimiter(predictWrapperCode, "CDECLS_GUARD", utilities::ToUppercase(className) + "_CDECLS");
+        ReplaceDelimiter(predictWrapperCode, "CDECLS_IMPL", info.cdecls.str());
+        ReplaceDelimiter(predictWrapperCode, "STEPPABLE", hasSourceNodes ? "true" : "false" );
+            
+
+        os << predictWrapperCode;
     }
 
     void ReplaceDelimiter(std::string& text, const std::string& delimiter, const std::string& replacement)

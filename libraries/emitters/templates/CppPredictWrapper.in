@@ -1,76 +1,92 @@
-u8R"(#include <string.h>
+u8R"(
+#if !defined(@@CLASS_GUARD@@)
+#define @@CLASS_GUARD@@
+
+#if defined(__cplusplus)
+
+#include <string.h>
 #include <vector>
+#include <chrono>
 
-#define @@MODULE@@_WRAPPER_CLASS
-
-class @@MODULE@@_PredictWrapper
+// This class wraps the "C" interface and provides handy virtual methods you can override to
+// intercept any callbacks.  It also wraps the low level float buffers with std::vectors.
+// This class can then be wrapped by SWIG which will give you an interface to work with from
+// other languages (like Python) where you can easily override those virtual methods.
+class @@CLASSNAME@@
 {
 public:
-    @@MODULE@@_PredictWrapper() = default;
+    @@CLASSNAME@@() : _started(false)
+    {
+@@CONSTRUCTOR_IMPL@@
+    }
 
-    TensorShape GetInputShape() const
+    virtual ~@@CLASSNAME@@() = default;
+
+    TensorShape GetInputShape(int index = 0) const
     {    
         TensorShape inputShape;
-        @@MODULE@@_GetInputShape(0, &inputShape);
+        @@MODULE@@_GetInputShape(index, &inputShape);
         return inputShape;
     }
 
-    int32_t GetInputSize() const
+    int GetInputSize(int index = 0) const
     {
-        return @@MODULE@@_GetInputSize();
+        return @@MODULE@@_GetInputSize(index);
     }
     
-    TensorShape GetOutputShape() const
+    TensorShape GetOutputShape(int index = 0) const
     {
         TensorShape outputShape;
-        @@MODULE@@_GetOutputShape(0, &outputShape);
+        @@MODULE@@_GetOutputShape(index, &outputShape);
         return outputShape;
     }
 
-    int32_t GetOutputSize() const
+    int GetOutputSize(int index = 0) const
     {
-        return @@MODULE@@_GetOutputSize();
+        return @@MODULE@@_GetOutputSize(index);
     }
     
-    int8_t @@SOURCE_CALLBACK@@(@@SOURCE_TYPE@@* buffer)
+    void Reset()
     {
-        ::memcpy(buffer, _input, @@MODULE@@_GetInputSize() * sizeof(@@SOURCE_TYPE@@));
-        return 1;
-    }
-    void @@SINK_CALLBACK@@(@@SINK_TYPE@@* buffer)
-    {
-        ::memcpy(_output, buffer, @@MODULE@@_GetOutputSize() * sizeof(@@SINK_TYPE@@));
+        @@MODULE@@_Reset();
+        _started = false;
     }
 
-    void Predict(const std::vector<@@SOURCE_TYPE@@>& input, std::vector<@@SINK_TYPE@@>& output)
+    bool IsSteppable() const 
     {
-        _input = input.data();
-        _output = output.data();
-        double time = 0.0;
-        @@FUNCTION@@(this, &time, nullptr);
+        return @@STEPPABLE@@;
     }
 
+@@HELPER_METHODS@@
 private:
-    const @@SOURCE_TYPE@@* _input;
-    @@SINK_TYPE@@* _output;
+@@MEMBER_DECLS@@
+    
+    std::chrono::high_resolution_clock::time_point _start;
+    bool _started;
+
+    double GetMilliseconds() 
+    {    
+        if (!_started)
+        {
+            _start = std::chrono::high_resolution_clock::now();
+            _started = true;
+        }
+        auto now = std::chrono::high_resolution_clock::now();
+        auto us = std::chrono::duration_cast<std::chrono::microseconds>(now - _start);
+        return static_cast<double>(us.count()) / 1000.0;
+    }
 };
 
 
-#ifdef @@MODULE@@_MAIN
+#if !defined(@@CDECLS_GUARD@@)
+#define @@CDECLS_GUARD@@
+
 extern "C"
 {
-    int8_t @@MODULE@@_InputCallback(void* context, @@SOURCE_TYPE@@* input)
-    {
-        auto predictor = reinterpret_cast<@@MODULE@@_PredictWrapper*>(context);
-        return predictor->@@SOURCE_CALLBACK@@(input);
-    }
+@@CDECLS_IMPL@@
+}
 
-    void @@MODULE@@_OutputCallback(void* context, @@SINK_TYPE@@* output)
-    {
-        auto predictor = reinterpret_cast<@@MODULE@@_PredictWrapper*>(context);
-        predictor->@@SINK_CALLBACK@@(output);
-    }
-} // extern "C"
-#endif
-
+#endif // !defined(@@CDECLS_GUARD@@)
+#endif // defined(__cplusplus)
+#endif // !defined(@@CLASS_GUARD@@)
 )"

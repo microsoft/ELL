@@ -134,7 +134,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
     if (compileArguments.outputHeader)
     {
         TimingOutputCollector timer(timingOutput, "Time to save header file", compileArguments.verbose);
-        compiledMap.WriteCodeHeader(baseFilename + ".h");
+        compiledMap.WriteCodeHeader(baseFilename + ".h", emitters::ModuleOutputFormat::cHeader);
     }
     if (compileArguments.outputIr)
     {
@@ -162,6 +162,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
     if (compileArguments.outputSwigInterface)
     {
         TimingOutputCollector timer(timingOutput, "Time to save SWIG interface", compileArguments.verbose);
+        compiledMap.WriteCodeHeader(baseFilename + ".i.h", emitters::ModuleOutputFormat::cHeader);
         compiledMap.WriteCode(baseFilename + ".i", emitters::ModuleOutputFormat::swigInterface);
     }
 

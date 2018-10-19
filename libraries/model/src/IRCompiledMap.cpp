@@ -239,10 +239,10 @@ namespace model
         _module->WriteToFile(filePath, format, options);
     }
 
-    void IRCompiledMap::WriteCodeHeader(const std::string& filePath) const
+    void IRCompiledMap::WriteCodeHeader(const std::string& filePath, emitters::ModuleOutputFormat format) const
     {
         auto stream = utilities::OpenOfstream(filePath);
-        WriteCodeHeader(stream);
+        WriteCodeHeader(stream, format);
     }
 
     void IRCompiledMap::WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format) const
@@ -255,15 +255,15 @@ namespace model
         _module->WriteToStream(stream, format, options);
     }
 
-    void IRCompiledMap::WriteCodeHeader(std::ostream& stream) const
+    void IRCompiledMap::WriteCodeHeader(std::ostream& stream, emitters::ModuleOutputFormat format) const
     {
-        _module->WriteToStream(stream, emitters::ModuleOutputFormat::cHeader);
+        _module->WriteToStream(stream, format);
     }
 
     std::string IRCompiledMap::GetCodeHeaderString() const
     {
         std::stringstream s;
-        WriteCodeHeader(s);
+        WriteCodeHeader(s, emitters::ModuleOutputFormat::cHeader);
         return s.str();
     }
 

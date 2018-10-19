@@ -154,8 +154,6 @@ class ModuleBuilder:
             if not os.path.isfile(self.module_init_template):
                 raise Exception("Could not find __init__.py template: %s" % (self.module_init_template))
         self.files.append(os.path.join(self.ell_root, "CMake/OpenBLASSetup.cmake"))
-        self.includes.append(os.path.join(self.ell_root, "interfaces/common/include/CallbackInterface.h"))
-        self.tcc.append(os.path.join(self.ell_root, "interfaces/common/tcc/CallbackInterface.tcc"))
 
     def copy_files(self, filelist, folder):
         if not folder:

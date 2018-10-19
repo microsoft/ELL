@@ -51,6 +51,12 @@ namespace emitters
     /// <param name="replacement"> The replacement text. </param>
     void ReplaceDelimiter(std::string& text, const std::string& delimiter, const std::string& replacement);
 
+    /// <summary> Trims a matching prefix off the front of the given string. </summary>
+    ///
+    /// <param name="text"> The prefix substring to match. </param>
+    /// <returns> The trimmed string </returns>
+    std::string TrimPrefix(std::string s, std::string prefix);
+
     //
     // Utility classes
     //
@@ -124,6 +130,7 @@ namespace emitters
             std::string functionName;
             std::string className;
             std::string inputType;
+            std::string inputElementType;
             std::string returnType;
             bool inputIsScalar;
         };

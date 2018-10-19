@@ -102,45 +102,74 @@ namespace model
         /// <summary> Reset the state of the model </summary>
         void Reset();
 
-        /// <summary> Returns the size of the map's input </summary>
+        /// <summary> Returns the number of inputs to the map </summary>
         ///
-        /// <returns> The dimensionality of the map's input port </returns>
-        size_t GetInputSize() const;
+        /// <returns> The number of inputs to the map </returns>
+        size_t GetNumInputs() const;
 
-        /// <summary> Returns the size of the map's output </summary>
+        /// <summary> Returns the size of the given map's input </summary>
         ///
-        /// <returns> The dimensionality of the map's output port </returns>
-        size_t GetOutputSize() const;
+        /// <param name="index"> The index of the input node (in case there is more than one)</param>
+        /// <returns> The dimensionality of the map's input port </returns>
+        size_t GetInputSize(size_t index = 0) const;
 
         /// <summary> Returns the shape of the map's input </summary>
         ///
-        /// <returns> The dimensionality of the map's input </returns>
-        MemoryShape GetInputShape() const;
-
-        /// <summary> Returns the shape of the map's output </summary>
-        ///
-        /// <returns> The dimensionality of the map's output port </returns>
-        MemoryShape GetOutputShape() const;
+        /// <param name="index"> The index of the input node (in case there is more than one)</param>
+        /// <returns> The shape of the map's input </returns>
+        MemoryShape GetInputShape(size_t index = 0) const;
 
         /// <summary> Returns the type of the map's input </summary>
         ///
+        /// <param name="index"> The index of the input node (in case there is more than one)</param>
         /// <reutrns> The type of the map's input </summary>
-        Port::PortType GetInputType() const;
+        Port::PortType GetInputType(size_t index = 0) const;
+
+        /// <summary> Returns the number of outputs from the map </summary>
+        ///
+        /// <returns> The number of outputs from the map </returns>
+        size_t GetNumOutputs() const;
+
+        /// <summary> Returns the size of the given map's output </summary>
+        ///
+        /// <param name="index"> The index of the output node (in case there is more than one)</param>
+        /// <returns> The dimensionality of the map's output port </returns>
+        size_t GetOutputSize(size_t index = 0) const;
+
+        /// <summary> Returns the shape of the map's output </summary>
+        ///
+        /// <param name="index"> The index of the output node (in case there is more than one)</param>
+        /// <returns> The dimensionality of the map's output port </returns>
+        MemoryShape GetOutputShape(size_t index = 0) const;
 
         /// <summary> Returns the type of the map's output </summary>
         ///
+        /// <param name="index"> The index of the output node (in case there is more than one)</param>
         /// <reutrns> The type of the map's output </summary>
-        Port::PortType GetOutputType() const;
+        Port::PortType GetOutputType(size_t index = 0) const;
 
-        /// <summary> Returns the map's input node </summary>
+        /// <summary> Returns the number of sink nodes in the map </summary>
         ///
-        /// <returns> The input node </returns>
-        InputNodeBase* GetInput() const { return GetInput(0); }
+        /// <returns> The number of sink nodes in the map </returns>
+        size_t GetNumSinkNodes() const;
 
-        /// <summary> Returns the map's output PortElementsBase </summary>
+        /// <summary> Returns the size of the given map's sink output </summary>
         ///
-        /// <returns> The output </returns>
-        PortElementsBase GetOutput() const { return GetOutput(0); }
+        /// <param name="index"> The index of the sink node (in case there is more than one)</param>
+        /// <returns> The dimensionality of the map's sink node port </returns>
+        size_t GetSinkOutputSize(size_t index = 0) const;
+
+        /// <summary> Returns the shape of the map's sink output </summary>
+        ///
+        /// <param name="index"> The index of the sink node (in case there is more than one)</param>
+        /// <returns> The dimensionality of the map's sink node port </returns>
+        MemoryShape GetSinkOutputShape(size_t index = 0) const;
+
+        /// <summary> Returns the type of the map's sink node output </summary>
+        ///
+        /// <param name="index"> The index of the sink node  (in case there is more than one)</param>
+        /// <reutrns> The type of the map's sink node output </summary>
+        Port::PortType GetSinkOutputType(size_t index = 0) const;
 
         /// <summary> Refines the model wrapped by this map. </summary>
         ///
@@ -182,7 +211,7 @@ namespace model
         ///
         /// <param name="index"> The index of the input </param>
         /// <returns> The input node </returns>
-        InputNodeBase* GetInput(size_t index) const;
+        InputNodeBase* GetInput(size_t index = 0) const;
 
         /// <summary> Returns an input node </summary>
         ///
@@ -200,10 +229,20 @@ namespace model
         /// <returns> The input nodes </returns>
         std::vector<const InputNodeBase*> GetInputNodes() const;
 
+        /// <summary> Returns the source nodes </summary>
+        ///
+        /// <returns> The source nodes </returns>
+        std::vector<const SourceNodeBase*> GetSourceNodes() const;
+
         /// <summary> Returns the output nodes </summary>
         ///
         /// <returns> The output nodes </returns>
         std::vector<const OutputNodeBase*> GetOutputNodes() const;
+
+        /// <summary> Returns the sink nodes </summary>
+        ///
+        /// <returns> The sink nodes </returns>
+        std::vector<const Node*> GetSinkNodes() const;
 
         /// <summary> Get the number of outputs </summary>
         ///
@@ -214,13 +253,19 @@ namespace model
         ///
         /// <param name="index"> The index of the output </param>
         /// <returns> The output </returns>
-        PortElementsBase GetOutput(size_t index) const;
+        PortElementsBase GetOutput(size_t index = 0) const;
 
         /// <summary> Returns an outputs </summary>
         ///
         /// <param name="outputName"> The name of the output </param>
         /// <returns> The output </returns>
         PortElementsBase GetOutput(const std::string& outputName) const;
+
+        /// <summary> Returns an sink node </summary>
+        ///
+        /// <param name="index"> The index of the sink node </param>
+        /// <returns> The output </returns>
+        const Node* GetSinkNode(size_t index = 0) const;
 
         /// <summary> Returns the outputs </summary>
         ///
@@ -396,6 +441,7 @@ namespace model
 
         std::vector<const Node*> GetAllOutputNodes() const;
         std::vector<const Node*> GetDebugSinkNodes() const;
+        std::vector<const Node*> GetMatchingNodesByType(const std::string name) const;
         void FixTransformedIO(ModelTransformer& transformer);
         void FixTransformedIO(ModelOptimizerContext& context);
     };

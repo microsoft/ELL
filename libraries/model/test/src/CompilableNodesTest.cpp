@@ -1,4 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     CompilableNodesTest.cpp (compile_test)
@@ -60,6 +61,7 @@
 #include "SinkNode.h"
 #include "SoftmaxLayerNode.h"
 #include "SourceNode.h"
+#include "SpliceNode.h"
 #include "SumNode.h"
 #include "TypeCastNode.h"
 #include "UnaryOperationNode.h"
@@ -288,7 +290,9 @@ model::Map GenerateMulticlassDTWClassifier(const std::vector<LabeledPrototype>& 
     auto labelsNode = model.AddNode<ell::nodes::ConstantNode<double>>(labels);
     auto argMinNode = model.AddNode<ell::nodes::ArgMinNode<double>>(dtwOutputs); // val, argVal
     auto selectNode = model.AddNode<ell::nodes::MultiplexerNode<double, int>>(labelsNode->output, argMinNode->argVal);
-    model::Map result(model, { { "input", inputNode } }, { { "output", ell::model::PortElements<double>{ selectNode->output, argMinNode->val } } });
+    auto combinedNode = model.AddNode<ell::model::SpliceNode<double>>(std::vector<const ell::model::OutputPortBase*>{ &selectNode->output, &argMinNode->val });
+
+    model::Map result(model, { { "input", inputNode } }, { { "output", ell::model::PortElements<double>{ combinedNode->output } } });
     return result;
 }
 
@@ -830,30 +834,32 @@ void TestCompilableSourceNode()
     testing::ProcessTest("Testing callback values", testing::IsEqual(g_callbackCount, signal.size()));
 }
 
+struct CallbackContext
+{
+    size_t inputSize;
+    bool called;
+    std::vector<double> outputValues;
+};
+
 // C callback (called by emitted code)
 extern "C" {
-size_t g_sinkOutputSize = 0;
-std::vector<double> outputValues;
-void Test_CompiledSinkNode_OutputCallback_Scalar(void* context, double* output)
+void Test_CompiledSinkNode_OutputCallback(void* context, double* output)
 {
-    Log() << "Sink Output Callback (Scalar) " << *output << EOL;
-    assert(g_sinkOutputSize == 1);
-    outputValues.push_back(*output);
+    CallbackContext* cc = static_cast<CallbackContext*>(context);
+    cc->called = true;
+    Log() << "Sink Output Callback (size=" << cc->inputSize << ") " << *output << EOL;
+    cc->outputValues.assign(output, output + cc->inputSize); // assign reallocates as needed
 }
-TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Scalar, void, void*, double*);
-
-void Test_CompiledSinkNode_OutputCallback_Vector(void* context, double* output)
-{
-    Log() << "Sink Output Callback (Vector) " << *output << EOL;
-    assert(g_sinkOutputSize > 1);
-    outputValues.assign(output, output + g_sinkOutputSize); // assign reallocates as needed
-}
-TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Vector, void, void*, double*);
+TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback, void, void*, double*);
 }
 
-void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionName, bool triggerValue)
+void TestCompilableSinkNode(size_t inputSize, bool triggerValue)
 {
-    g_sinkOutputSize = inputSize;
+    std::string sinkFunctionName = "CompiledSinkNode_OutputCallback";
+
+    CallbackContext context;
+    context.inputSize = inputSize;
+    context.called = false;
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputSize);
@@ -867,6 +873,7 @@ void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionNam
 
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
+    compiledMap.SetContext(&context);
 
     // compare output
     std::vector<std::vector<double>> signal = { {} };
@@ -874,29 +881,28 @@ void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionNam
     {
         signal[0].push_back(i * 10);
     }
-    outputValues.clear();
     VerifyCompiledOutput(map, compiledMap, signal, "SinkNode");
 
     if (triggerValue)
     {
         // Verify that sink callbacks are actually called
-        testing::ProcessTest("Testing callback values", outputValues.size() == signal[0].size() && testing::IsEqual(outputValues, signal[0]));
-        for (auto x: outputValues) Log() << x << "  ";
+        testing::ProcessTest("Testing callback values", context.outputValues.size() == signal[0].size() && testing::IsEqual(context.outputValues, signal[0]));
+        for (auto x: context.outputValues) Log() << x << "  ";
         Log() << EOL;
     }
     else
     {
         // Verify that sink callbacks are never called
-        testing::ProcessTest("Testing callback values", testing::IsTrue(outputValues.empty()));
+        testing::ProcessTest("Testing callback was never called", testing::IsFalse(context.called));
     }
 }
 
 void TestCompilableSinkNode()
 {
-    TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar", true); // fails
-    TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar", false);
-    TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector", true); // fails
-    TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector", false);
+    TestCompilableSinkNode(1, true); // fails
+    TestCompilableSinkNode(1, false);
+    TestCompilableSinkNode(100, true); // fails
+    TestCompilableSinkNode(100, false);
 }
 
 void TestFloatNode()

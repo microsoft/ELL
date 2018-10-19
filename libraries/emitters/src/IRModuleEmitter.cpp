@@ -816,10 +816,6 @@ namespace emitters
             auto headerFilePath = filePath + ".h";
             auto os = utilities::OpenOfstream(filePath);
             WriteModuleSwigInterface(os, *this, utilities::GetFileName(headerFilePath));
-
-            // Write the swig header file
-            auto osHeader = utilities::OpenOfstream(headerFilePath);
-            WriteModuleSwigHeader(osHeader, *this);
             break;
         }
         default:
@@ -872,7 +868,7 @@ namespace emitters
         }
         else if (ModuleOutputFormat::swigInterface == format)
         {
-            throw EmitterException(EmitterError::notSupported, "swig only supports WriteToFile");
+            WriteHeader(os);
         }
         else
         {

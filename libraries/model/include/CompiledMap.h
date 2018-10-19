@@ -58,12 +58,14 @@ namespace model
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
         /// <param name="filePath"> The path to the file to write </param>
-        virtual void WriteCodeHeader(const std::string& filePath) const = 0;
+        /// <param name="format"> The format to write out (cHeader or Swig interface) </param>
+        virtual void WriteCodeHeader(const std::string& filePath, emitters::ModuleOutputFormat format) const = 0;
 
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
         /// <param name="streawm"> The stream to write the prototype to </param>
-        virtual void WriteCodeHeader(std::ostream& stream) const = 0;
+        /// <param name="format"> The format to write out (cHeader or Swig interface) </param>
+        virtual void WriteCodeHeader(std::ostream& stream, emitters::ModuleOutputFormat format) const = 0;
 
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///

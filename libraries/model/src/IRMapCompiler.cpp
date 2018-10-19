@@ -23,6 +23,7 @@
 
 // utils
 #include "Logger.h"
+#include "StringUtil.h"
 
 // stl
 #include <tuple>
@@ -197,10 +198,12 @@ namespace model
     {
         EmitGetInputSizeFunction(map);
         EmitGetOutputSizeFunction(map);
+        EmitGetSinkOutputSizeFunction(map);
         EmitGetNumNodesFunction(map);
         EmitShapeEnum();
         EmitGetInputShapeFunction(map);
         EmitGetOutputShapeFunction(map);
+        EmitGetSinkOutputShapeFunction(map);
     }
 
     void IRMapCompiler::EmitGetInputSizeFunction(const Map& map)
@@ -208,9 +211,16 @@ namespace model
         auto& context = _moduleEmitter.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputSize", int32Type);
+        const emitters::NamedLLVMTypeList parameters = { { "index", int32Type } };
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputSize", int32Type, parameters);
         function.IncludeInHeader();
-        function.Return(function.Literal(static_cast<int>(map.GetInputSize())));
+
+        std::vector<int> sizes;
+        for(size_t i = 0 , n = map.GetNumInputs(); i < n; ++i)
+        {            
+            sizes.push_back(map.GetInputSize(i));
+        }
+        EmitSizeConditionals(function, sizes);
         _moduleEmitter.EndFunction();
     }
 
@@ -219,10 +229,107 @@ namespace model
         auto& context = _moduleEmitter.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputSize", int32Type);
+        const emitters::NamedLLVMTypeList parameters = { { "index", int32Type } };
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputSize", int32Type, parameters);
         function.IncludeInHeader();
-        function.Return(function.Literal(static_cast<int>(map.GetOutputSize())));
+
+        std::vector<int> sizes;
+        for (size_t i = 0, n = map.GetNumOutputs(); i < n; ++i)
+        {
+            sizes.push_back(map.GetOutputSize(i));
+        }
+        EmitSizeConditionals(function, sizes);
         _moduleEmitter.EndFunction();
+    }
+
+    void IRMapCompiler::EmitGetSinkOutputSizeFunction(const Map& map)
+    {
+        auto nodes = map.GetSinkNodes();
+        if (nodes.size() > 0)
+        {
+            auto& context = _moduleEmitter.GetLLVMContext();
+            auto int32Type = llvm::Type::getInt32Ty(context);
+
+            const emitters::NamedLLVMTypeList parameters = { { "index", int32Type } };
+            auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetSinkOutputSize", int32Type, parameters);
+            function.IncludeInHeader();
+
+            std::vector<int> sizes;
+            for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)
+            {
+                const ell::model::Node* node = *ptr;
+                sizes.push_back(node->GetOutputPort(0)->GetMemoryLayout().GetActiveSize().NumElements());
+            }
+            EmitSizeConditionals(function, sizes);
+            _moduleEmitter.EndFunction();
+        }
+    }
+
+    void IRMapCompiler::EmitSizeConditionals(emitters::IRFunctionEmitter& fn, std::vector<int> sizes)
+    {
+        // This is the type of code we are trying to generate for the GetInputSize and GetOutputSize functions:
+        //
+        // int model_GetInputSize(int index)
+        // {
+        //     if (index == 0) {
+        //         return 224;
+        //     }
+        //     if (index == 1) {
+        //         return 10;
+        //     }
+        //     return 0;
+        // }
+        //
+        auto arguments = fn.Arguments().begin();
+        auto indexArgument = &(*arguments++);
+        auto pMainBlock = fn.GetCurrentBlock();
+
+        std::vector<llvm::BasicBlock*> blocks;
+        blocks.push_back(pMainBlock);
+        // create the final block in the case the index is out of range or there are no shapes and reutrn empty TensorShape.
+        auto pDoneBlock = fn.BeginBlock("NoMatchBlock");
+        {
+            fn.Return(fn.Literal(0));
+        }
+
+        if (!sizes.empty())
+        {
+            int index = 0;
+            for (auto ptr = sizes.begin(), end = sizes.end(); ptr != end; ptr++, index++)
+            {
+                int size = *ptr;
+                std::string labelSuffix = std::to_string(index);
+
+                auto followBlock = fn.BeginBlock("FollowBlock" + labelSuffix);
+                auto thenBlock = fn.BeginBlock("ThenBlock" + labelSuffix);
+                {
+                    fn.Return(fn.Literal(size));
+                }
+                auto elseBlock = fn.BeginBlock("ElseBlock" + labelSuffix);
+                {
+                    fn.Branch(followBlock);
+                }
+                auto conditionBlock = fn.BeginBlock("IfBlock" + labelSuffix);
+                {
+                    auto compare = new llvm::ICmpInst(*conditionBlock, llvm::ICmpInst::ICMP_EQ, indexArgument, fn.Literal(index));
+                    llvm::BranchInst::Create(thenBlock, elseBlock, compare, conditionBlock);
+                }
+                blocks.push_back(conditionBlock);
+                blocks.push_back(followBlock);
+            }
+            fn.SetCurrentBlock(blocks[blocks.size() - 1]);
+            fn.Branch(pDoneBlock);
+        }
+
+        fn.SetCurrentBlock(pMainBlock);
+        if (blocks.size() > 1)
+        {
+            fn.Branch(blocks[1]); // jump to first statement.
+        }
+
+        blocks.push_back(pDoneBlock);
+        // ensure all blocks are properly chained with branch instructions and inserted into the function BasicBlockList.
+        fn.ConcatenateBlocks(blocks);
     }
 
     const char* TensorShapeName = "TensorShape";
@@ -322,9 +429,9 @@ namespace model
     //         return;
     //     }
     //     if (index == 1) {
-    //         s->rows = 224;
-    //         s->columns = 224;
-    //         s->channels = 3;
+    //         s->rows = 10;
+    //         s->columns = 10;
+    //         s->channels = 20;
     //         return;
     //     }
     //     s->rows = 0;
@@ -348,13 +455,12 @@ namespace model
         auto fn = _moduleEmitter.BeginFunction(functionName, voidType, parameters);
         fn.IncludeInHeader();
 
-        auto nodes = map.GetInputNodes();
         std::vector<MemoryShape> shapes;
-        for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)
+        for (size_t i = 0, n = map.GetNumInputs(); i < n; ++i)
         {
-            const ell::model::InputNodeBase* node = *ptr;
-            shapes.push_back(node->GetShape());
+            shapes.push_back(map.GetInputShape(i));
         }
+
         EmitShapeConditionals(fn, shapes);
         _moduleEmitter.EndFunction();
     }
@@ -374,15 +480,43 @@ namespace model
         auto fn = _moduleEmitter.BeginFunction(functionName, voidType, parameters);
         fn.IncludeInHeader();
 
-        auto nodes = map.GetOutputNodes();
         std::vector<MemoryShape> shapes;
-        for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)
+        for (size_t i = 0, n = map.GetNumOutputs(); i < n; ++i)
         {
-            const ell::model::OutputNodeBase* node = *ptr;
-            shapes.push_back(node->GetShape());
+            shapes.push_back(map.GetOutputShape(i));
         }
+
         EmitShapeConditionals(fn, shapes);
         _moduleEmitter.EndFunction();
+    }
+
+    void IRMapCompiler::EmitGetSinkOutputShapeFunction(const Map& map)
+    {
+        auto nodes = map.GetSinkNodes();
+        if (nodes.size() > 0)
+        {
+            // We have to create this interface because LLVM cannot reliably return structures on the stack.
+            // void darknet_GetOutputShape(int index, struct TensorShape* shape)
+            auto shapeType = _moduleEmitter.GetStruct(TensorShapeName);
+            auto& context = _moduleEmitter.GetLLVMContext();
+            auto voidType = llvm::Type::getVoidTy(context);
+            auto int32Type = llvm::Type::getInt32Ty(context);
+
+            const emitters::NamedLLVMTypeList parameters = { { "index", int32Type }, { "shape", shapeType->getPointerTo() } };
+            const std::string functionName = GetNamespacePrefix() + "_GetSinkOutputShape";
+
+            auto fn = _moduleEmitter.BeginFunction(functionName, voidType, parameters);
+            fn.IncludeInHeader();
+
+            std::vector<MemoryShape> shapes;
+            for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)
+            {
+                const ell::model::Node* node = *ptr;
+                shapes.push_back(node->GetOutputPort(0)->GetMemoryLayout().GetActiveSize());
+            }
+            EmitShapeConditionals(fn, shapes);
+            _moduleEmitter.EndFunction();
+        }
     }
 
     void IRMapCompiler::EmitGetNumNodesFunction(const Map& map)
@@ -404,6 +538,14 @@ namespace model
     emitters::LLVMValue IRMapCompiler::EnsurePortEmitted(const InputPortBase& port)
     {
         emitters::Variable* pVar = GetVariableForPort(port.GetReferencedPort());
+        if (pVar == nullptr)
+        {
+            const Node* node = port.GetNode();
+            throw emitters::EmitterException(emitters::EmitterError::unexpected, 
+                utilities::FormatString("Error: missing port variable for '%s' port on node %s(%s)", port.GetName().c_str(), 
+                    node->GetRuntimeTypeName().c_str(),
+                    node->GetId().ToString().c_str()));
+        }
         return GetModule().EnsureEmitted(*pVar);
     }
 

@@ -52,34 +52,6 @@
 // Macros for wrapping language-specific callables so that they can act like callbacks
 #if defined(SWIGPYTHON)
 
-// Macro for emitted code
-%define WRAP_CALLABLES_AS_CALLBACKS(ForwarderClass, InputCallbackClass, InputType, OutputCallbackClass, OutputType, LagCallbackClass)
-    %pythoncode %{
-    class InputCallableWrapper(InputCallbackClass):
-        def __init__(self, f):
-            super(InputCallableWrapper, self).__init__()
-            self.f_ = f
-        def Run(self, data):
-            return self.f_(data)
-
-    class OutputCallableWrapper(OutputCallbackClass):
-        def __init__(self, f):
-            super(OutputCallableWrapper, self).__init__()
-            self.f_ = f
-        def Run(self, data):
-            self.f_(data)
-            return True
-
-    class LagCallableWrapper(LagCallbackClass):
-        def __init__(self, f):
-            super(LagCallableWrapper, self).__init__()
-            self.f_ = f
-        def Run(self, data):
-            self.f_(data)
-            return True
-    %}
-%enddef
-
 // Macros for Map
 %define WRAP_CALLABLE_AS_MAP_INPUT_CALLBACK(CallbackClass, ElementType)
     %pythonprepend ELL_API::Map::SetSourceCallback<ElementType>(ell::api::CallbackBase<ElementType>&, size_t) %{
@@ -142,12 +114,6 @@
 
 #else
 
-%define WRAP_CALLABLES_AS_CALLBACKS(ForwarderClass, Method, InputCallbackClass, InputType, OutputCallbackClass, OutputType, LagCallbackClass)
-%enddef
-%define WRAP_CALLABLE_AS_MAP_INPUT_CALLBACK(CallbackClass, ElementType)
-%enddef
-%define WRAP_CALLABLE_AS_MAP_OUTPUT_CALLBACK(CallbackClass, ElementType)
-%enddef
 %define WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(InputCallbackClass, OutputCallbackClass, ElementType)
 %enddef
 

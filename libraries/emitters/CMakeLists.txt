@@ -101,10 +101,7 @@ set (tcc
 set (templates
     templates/CppPredictWrapper.in
     templates/SwigModule.in
-    templates/SwigPredictFunction.in
-    templates/SwigPredictorClass.in
-    templates/SwigPredictorPython.in
-    templates/SwigRawPredictPython.in
+    templates/SwigPredictPython.in
     templates/SwigShapeWrappers.in
 )
 

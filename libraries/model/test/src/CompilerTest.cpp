@@ -243,11 +243,12 @@ void TestProtoNNPredictorMap()
     }
 }
 
-void TestMultiOutputMap()
+void TestCombineOutputMap()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
+    // combine inputNode and accumNode as a bigger vector of size 6 and output that.
     auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ inputNode->output, accumNode->output });
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
@@ -255,30 +256,38 @@ void TestMultiOutputMap()
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
-    testing::ProcessTest("Testing IsValid of original map", testing::IsEqual(compiledMap.IsValid(), true));
+    testing::ProcessTest("Testing TestCombineOutputMap IsValid", testing::IsEqual(compiledMap.IsValid(), true));
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-    VerifyCompiledOutput(map, compiledMap, signal, " map");
+    auto result = VerifyCompiledOutput<double, double>(map, compiledMap, signal, "TestCombineOutputMap");
+
+    testing::ProcessTest("Testing TestCombineOutputMap accumulated result", testing::IsEqual(result, { 5, 2, 1, 42, 48, 49 }));
+
 }
 
-// Map with 2 scalar values concatenated
-void TestMultiOutputMap2()
+void TestMultiOutputMap()
 {
+    // Map with 2 OutputNodes
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto sumNode = model.AddNode<nodes::SumNode<double>>(inputNode->output);
     auto dotNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, inputNode->output);
-    auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ sumNode->output, dotNode->output });
+    auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ sumNode->output });
+    auto outputNode2 = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ dotNode->output });
 
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
-    model::IRMapCompiler compiler;
-    auto compiledMap = compiler.Compile(map);
-    PrintIR(compiledMap);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output }, { "output2", outputNode2->output } });
 
-    // compare output
-    std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-    VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNodeAsFunction");
+    // can't compile multiple maps with outputs yet...
+    //model::IRMapCompiler compiler;
+    //auto compiledMap = compiler.Compile(map);
+    //PrintIR(compiledMap);
+
+    //// compare output
+    //std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+    //auto result = VerifyCompiledOutput<double, double>(map, compiledMap, signal, "TestMultiOutputMap");
+
+    testing::ProcessTest("Testing TestMultiOutputMap clone and prune", map.GetModel().Size() == 5);
 }
 
 void TestCompiledMapMove()

@@ -30,8 +30,6 @@ First it copies some common files that are needed to build the C++ project, thes
 
 ```
 d:\git\ELL\CMake\OpenBLASSetup.cmake
-d:\git\ELL\interfaces\common\include\CallbackInterface.h" 
-d:\git\ELL\interfaces\common\tcc\CallbackInterface.
 ```
 
 ### Templated CMakeLists.txt for Python

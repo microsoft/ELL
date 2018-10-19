@@ -1,7 +1,7 @@
 u8R"(%module(directors="1") @@MODULE@@
 %feature("autodoc", "3");
 
-%include "callback.i"
+%include "vector.i"
 
 // Propagate python callback exceptions
 %feature("director:except") {
@@ -19,4 +19,7 @@ u8R"(%module(directors="1") @@MODULE@@
 %{
 #include "@@HEADER@@"
 %}
+
+%feature("director") @@CLASSNAME@@;
+
 )"

@@ -24,6 +24,12 @@ using namespace ell::predictors::neural;
 
 void TestIRCompiler()
 {
+    TestMultiOutputMap();
+    TestCombineOutputMap();
+
+    // Header file generation
+    TestModelHeaderOutput();
+
     TestFloatNode();
     // TestMultipleOutputNodes(); // Multiple output nodes aren't currently supported
     TestShapeFunctionGeneration();
@@ -231,8 +237,6 @@ void TestIRCompiler()
 
     TestMatrixVectorProductNodeCompile();
 
-    // Header file generation
-    TestModelHeaderOutput();
 }
 
 int main(int argc, char* argv[])

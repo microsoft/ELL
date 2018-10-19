@@ -39,8 +39,8 @@ void TestForestMap();
 void TestSimpleMap(bool optimize);
 void TestSqEuclideanDistanceMap();
 void TestProtoNNPredictorMap();
+void TestCombineOutputMap();
 void TestMultiOutputMap();
-void TestMultiOutputMap2();
 void TestMultiSourceSinkMap();
 void TestCompiledMapMove();
 

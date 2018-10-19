@@ -16,12 +16,6 @@ namespace ell
 {
 namespace emitters
 {
-    /// <summary> Write a C++ SWIG header file for the given module. </summary>
-    ///
-    /// <param name="os"> The output stream to write to. </param>
-    /// <param name="moduleEmitter"> The `IRModuleEmitter` containing the module to write </param>
-    void WriteModuleSwigHeader(std::ostream& os, IRModuleEmitter& moduleEmitter);
-
     /// <summary> Write a C++ SWIG interface file for the given module. </summary>
     ///
     /// <param name="os"> The output stream to write to. </param>

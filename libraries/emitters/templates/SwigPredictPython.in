@@ -1,0 +1,21 @@
+u8R"(
+
+_model_wrapper = None
+
+def predict(inputData: 'numpy.ndarray') -> "numpy.ndarray":
+    """Convenience function for calling the model directly without callbacks"""
+    global _model_wrapper
+    if _model_wrapper is None:
+        _model_wrapper = @@WRAPPER_CLASS@@()
+
+    if _model_wrapper.IsSteppable():
+        raise Exception("You need to use the @@WRAPPER_CLASS@@ directly because this model is steppable, which means the input is provided by a callback method")
+        
+    inputVector = @@INPUT_VECTOR_TYPE@@(inputData)
+    output = _model_wrapper.@@PREDICT_METHOD@@(inputVector)
+    return np.array(output)
+
+def reset():
+    @@RESET_FUNCTION@@()
+
+)"

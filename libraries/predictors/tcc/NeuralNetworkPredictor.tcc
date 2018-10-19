@@ -164,6 +164,7 @@ namespace predictors
     void NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(utilities::SerializationContext& context)
     {
         using namespace ell::predictors::neural;
+
         context.GetTypeFactory().AddType<neural::InputLayer<ElementType>, neural::InputLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::BatchNormalizationLayer<ElementType>>();

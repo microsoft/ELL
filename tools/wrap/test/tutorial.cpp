@@ -33,25 +33,51 @@ std::string str(T begin, T end)
     return ss.str();
 }
 
+class TutorialWrapper : public ModelWrapper
+{
+public:
+    void SourceCallback(std::vector<double>& input0) override
+    {
+        size_t size = GetInputSize(0);
+        input0.resize(size);
+        for (size_t i = 0; i < size; i++)
+        {
+            input0[i] = 1.0;
+        }
+    }
+
+};
+
 int main(int argc, char** argv)
 {
-    model_PredictWrapper wrapper;
-
     // Create a vector to hold the input to the model
-    std::vector<double> input(wrapper.GetInputSize());
-
-    // Create a vector to hold the model's output predictions
-    std::vector<double> predictions(wrapper.GetOutputSize());
+    TutorialWrapper wrapper;
 
     // Send the image to the compiled model and fill the predictions vector with scores and measure how long it takes
     auto start = std::chrono::steady_clock::now();
-    wrapper.Predict(input, predictions);
+    auto predictions = wrapper.Predict();
     auto end = std::chrono::steady_clock::now();
 
     std::cout << "Prediction=" << str(predictions.begin(), predictions.end()) << std::endl;
 
     auto duration = std::chrono::duration<double>(end - start).count();
     std::cout << "Prediction time: " << duration << " s" << std::endl;
+
+    //if result != "1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0":
+    bool failed = false;
+    for (size_t i = 0, n = predictions.size(); i < n; i++)
+    {
+        if (predictions[i] != i + 1)
+        {
+            failed = true;
+            break;
+        }
+    }
+    if (failed) 
+    {
+        std::cout << "### FAILED tutorial.cpp got unexpected output from Predict function\n";
+        return 1;
+    }
 
     return 0;
 }

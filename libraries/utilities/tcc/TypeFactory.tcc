@@ -117,8 +117,6 @@ namespace utilities
         auto baseTypeName = std::string{ BaseType::GetTypeName() };
         auto key = baseTypeName + "__" + typeName;
 
-        DEBUG_THROW(_typeConstructorMap.find(key) != _typeConstructorMap.end(), std::logic_error(key + " has already been added to the type factory"));
-
         auto derivedCreator = TypeConstructorDerived<BaseType>::template NewTypeConstructor<RuntimeType>().release();
         _typeConstructorMap[key] = std::shared_ptr<TypeConstructorBase>(derivedCreator);
     }

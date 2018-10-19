@@ -21,6 +21,12 @@ namespace utilities
     /// <returns> Copy of std::string with all lowercase characters </returns>
     std::string ToLowercase(const std::string& s);
 
+    /// <summary> Returns copy of std::string with all uppercase characters </summary>
+    ///
+    /// <param name=s> The string to convert to uppercase </param>
+    /// <returns> Copy of std::string with all uppercase characters </returns>
+    std::string ToUppercase(const std::string& s);
+
     /// <summary> A printf-style format string function </summary>
     ///
     /// <param name=format> A printf-style format string </param>

@@ -173,11 +173,14 @@ namespace model
 
         void EmitGetInputSizeFunction(const Map& map);
         void EmitGetOutputSizeFunction(const Map& map);
+        void EmitGetSinkOutputSizeFunction(const Map& map);
         void EmitGetNumNodesFunction(const Map& map);
+        void EmitSizeConditionals(emitters::IRFunctionEmitter& fn, std::vector<int> sizes);
 
         void EmitShapeEnum();
         void EmitGetInputShapeFunction(const Map& map);
         void EmitGetOutputShapeFunction(const Map& map);
+        void EmitGetSinkOutputShapeFunction(const Map& map);
         void EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<MemoryShape> shapes);
 
         // stack of node regions

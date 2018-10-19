@@ -38,16 +38,22 @@ namespace model
 
         for (const auto& input : inputs)
         {
-            AddInput(input.first, input.second);
+            auto newInput = transformer.GetCorrespondingInputNode(input.second);
+            AddInput(input.first, newInput);
         }
 
         for (const auto& output : outputs)
         {
-            AddOutput(output.first, output.second);
+            if (!output.second.IsFullPortOutput()) 
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Map constructor requires full output ports (IsFullPortOutput()==true)");
+            }
+            PortElementsBase newOutputs = transformer.GetCorrespondingOutputs(output.second);
+            AddOutput(output.first, newOutputs);
         }
-
-        // Important: we don't need to call FixTransformedIO here because we do it in the call to Prune
-        // FixTransformedIO(transformer);
+        
+        // Important: we don't need to call FixTransformedIO here we already mapped the inputs and 
+        // outputs correctly in the code above.  
         Prune();
     }
 
@@ -231,30 +237,41 @@ namespace model
 
     std::vector<const Node*> Map::GetDebugSinkNodes() const
     {
-        // gather SinkNodes
+        // gather DebugSinkNode
         std::unordered_set<const Node*> sinkNodes;
-        _model.Visit([&](const Node& node) {
-            if (node.GetRuntimeTypeName().find("DebugSinkNode") != std::string::npos)
+        for (const Node* node: GetMatchingNodesByType("DebugSinkNode")) {
+            auto parents = node->GetParentNodes();
+            for (auto ptr = parents.begin(), end = parents.end(); ptr != end; ptr++)
             {
-                auto parents = node.GetParentNodes();
-                for (auto ptr = parents.begin(), end = parents.end(); ptr != end; ptr++)
+                const Node* parent = *ptr;
+                auto dependents = parent->GetDependentNodes();
+                for (auto ptr2 = dependents.begin(), end2 = dependents.end(); ptr2 != end2; ptr2++)
                 {
-                    const Node* parent = *ptr;
-                    auto dependents = parent->GetDependentNodes();
-                    for (auto ptr2 = dependents.begin(), end2 = dependents.end(); ptr2 != end2; ptr2++)
+                    const Node* dep = *ptr2;
+                    if (dep != node)
                     {
-                        const Node* dep = *ptr2;
-                        if (dep != &node)
-                        {
-                            // then we want to keep this DebugSinkNode, it should not get pruned.
-                            sinkNodes.insert(&node);
-                            break;
-                        }
+                        // then we want to keep this DebugSinkNode, it should not get pruned.
+                        sinkNodes.insert(node);
+                        break;
                     }
                 }
             }
-        });
+        };
         return { sinkNodes.begin(), sinkNodes.end() };
+    }
+
+    std::vector<const Node*> Map::GetMatchingNodesByType(const std::string name) const
+    {
+        // gather nodes whose runtime type name contains the given sub string.
+        std::unordered_set<const Node*> result;
+        _model.Visit([&](const Node& node) {
+            if (node.GetRuntimeTypeName().find(name) != std::string::npos)
+            {
+                // then we want to keep this node it should not get pruned.
+                result.insert(&node);
+            }
+        });
+        return { result.begin(), result.end() };
     }
 
     void Map::FixTransformedIO(ModelTransformer& transformer)
@@ -321,8 +338,19 @@ namespace model
         ModelTransformer transformer;
 
         auto outputNodes = GetAllOutputNodes();
-        auto sinkNodes = GetDebugSinkNodes();
-        outputNodes.insert(outputNodes.end(), sinkNodes.begin(), sinkNodes.end());
+        auto debugSinkNodes = GetDebugSinkNodes();
+        outputNodes.insert(outputNodes.end(), debugSinkNodes.begin(), debugSinkNodes.end());
+
+        // add any additional sink nodes not mentioned in the "outputs" list.
+        auto sinkNodes = GetSinkNodes();
+        std::unordered_set<const Node*> existing(outputNodes.begin(), outputNodes.end());
+        for (auto node : sinkNodes)
+        {
+            if (existing.find(node) == existing.end())
+            {
+                outputNodes.push_back(node);
+            }
+        }
 
         std::vector<const OutputPortBase*> outputPorts;
         for (auto node : outputNodes)
@@ -334,41 +362,67 @@ namespace model
         }
         auto minimalModel = transformer.CopySubmodel(_model, outputPorts, context);
         FixTransformedIO(transformer);
-        _model = std::move(minimalModel);
+        _model = std::move(minimalModel);        
     }
 
-    size_t Map::GetInputSize() const
+    size_t Map::GetNumInputs() const
     {
-        return GetInputShape().NumElements();
+        return _inputNodes.size();
     }
 
-    size_t Map::GetOutputSize() const
+    size_t Map::GetInputSize(size_t index) const
     {
-        return GetOutput(0).Size();
-    }
-
-    MemoryShape Map::GetInputShape() const
-    {
+        // If we have SourceNodes then these override the InputNodes in terms of our compiled API.
         auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
-        if (!sourceNodes.empty())
+        if (index < sourceNodes.size())
         {
-            return sourceNodes[0]->GetShape();
+            return sourceNodes[index]->GetShape().NumElements();
         }
+        return GetInputShape(index).NumElements();
+    }
 
+    MemoryShape Map::GetInputShape(size_t index) const
+    {
+        // If we have SourceNodes then these override the InputNodes in terms of our compiled API.
+        auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
+        if (index < sourceNodes.size())
+        {
+            return sourceNodes[index]->GetShape();
+        }
         // no source nodes, fallback to first input node's shape
-        return GetInput(0)->GetShape();
+        return GetInput(index)->GetShape();
     }
 
     std::vector<const InputNodeBase*> Map::GetInputNodes() const
     {
-        auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
-        if (!sourceNodes.empty())
-        {
-            return std::vector<const InputNodeBase*>(sourceNodes.begin(), sourceNodes.end());
-        }
-
         // no source nodes, fallback to regular input nodes
         return std::vector<const InputNodeBase*>(_inputNodes.begin(), _inputNodes.end());
+    }
+
+    std::vector<const SourceNodeBase*> Map::GetSourceNodes() const
+    {
+        return _model.GetNodesByType<SourceNodeBase>();
+    }
+
+    size_t Map::GetNumOutputs() const
+    {
+        return _outputElements.size();
+    }
+
+    size_t Map::GetOutputSize(size_t index) const
+    {
+        return GetOutputShape(index).NumElements();
+    }
+
+    size_t Map::GetNumSinkNodes() const
+    {
+        auto nodes = GetSinkNodes();
+        return nodes.size();
+    }
+
+    size_t Map::GetSinkOutputSize(size_t index) const
+    {
+        return GetSinkOutputShape(index).NumElements();
     }
 
     std::vector<const OutputNodeBase*> Map::GetOutputNodes() const
@@ -387,31 +441,54 @@ namespace model
         return result;
     }
 
-    MemoryShape Map::GetOutputShape() const
+    std::vector<const Node*> Map::GetSinkNodes() const
     {
-        auto outputNodeVec = GetOutputNodes();
-        if (!outputNodeVec.empty())
-        {
-            const OutputNodeBase* node = dynamic_cast<const OutputNodeBase*>(outputNodeVec[0]);
-            return node->GetShape();
-        }
-        return MemoryShape({ 0 });
+        return GetMatchingNodesByType("SinkNode");
     }
 
-    Port::PortType Map::GetInputType() const
+    MemoryShape Map::GetOutputShape(size_t index) const
     {
+        return GetOutput(index).GetMemoryLayout().GetActiveSize();
+    }
+
+    MemoryShape Map::GetSinkOutputShape(size_t index) const
+    {
+        const Node* node = GetSinkNode(index);
+        return node->GetOutputPort(0)->GetMemoryLayout().GetActiveSize();
+    }
+
+    const Node* Map::GetSinkNode(size_t index) const
+    {
+        auto nodes = GetSinkNodes();
+
+        if (index >= nodes.size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
+        }
+
+        return nodes[index];
+    }
+
+    Port::PortType Map::GetInputType(size_t index) const
+    {
+        // If we have SourceNodes then these override the InputNodes in terms of our compiled API.
         auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
         if (!sourceNodes.empty())
         {
-            return sourceNodes[0]->GetOutputType();
+            return sourceNodes[index]->GetOutputType();
         }
-
-        return GetInput()->GetOutputType();
+        
+        return GetInput(index)->GetOutputType();
     }
 
-    Port::PortType Map::GetOutputType() const
+    Port::PortType Map::GetOutputType(size_t index) const
     {
-        return GetOutput().GetPortType();
+        return GetOutput(index).GetPortType();
+    }
+
+    Port::PortType Map::GetSinkOutputType(size_t index) const
+    {
+        return GetSinkNode(index)->GetOutputPort(0)->GetType();
     }
 
     void Map::Refine(int maxIterations)

@@ -12,6 +12,8 @@ import gc
 import os
 import sys
 from shutil import copyfile, rmtree
+import time
+
 import numpy as np
 
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -59,28 +61,34 @@ def make_project(target_dir):
     os.chdir(current_path)
 
 
-def create_model():
+def create_model(callbacks = True):
     
     model = ell.model.Model()
     mb = ell.model.ModelBuilder()
     
+    # we want an input vectors of size 10
     shape = ell.math.TensorShape(1,1,10)
 
-    # add node representing input (input nodes have no input, they are the input)
-    # the OutputPort of the InputNode is the input data they pass along to the next node
-    inputNode = mb.AddInputNode(model, ell.math.TensorShape(1, 1, 1), ell.nodes.PortType.real)
-    inputLink = inputNode.GetOutputPort("output")
+    if callbacks:
+        # add node representing input (input nodes have no input, they are the input)
+        # the OutputPort of the InputNode is the input data they pass along to the next node
+        inputNode = mb.AddInputNode(model, ell.math.TensorShape(1, 1, 1), ell.nodes.PortType.real)
+        inputLink = inputNode.GetOutputPort("output")
 
-    # clock node is required to setup the timing of the callbacks.
-    clockNode = mb.AddClockNode(model, ell.nodes.PortElements(inputLink), float(0), float(10),
-        "LagNotification")
-    clockLink = clockNode.GetOutputPort("output")
+        # clock node is required to setup the timing of the callbacks.
+        clockNode = mb.AddClockNode(model, ell.nodes.PortElements(inputLink), float(30), float(60),
+            "LagNotification")
+        clockLink = clockNode.GetOutputPort("output")
 
-    # add a SourceNode that gets input from the application
-    sourceNode = mb.AddSourceNode(
-        model, ell.nodes.PortElements(clockLink),
-        ell.nodes.PortType.real, shape, "InputCallback")
-    sourceLink = sourceNode.GetOutputPort("output")
+        # add a SourceNode that gets input from the application
+        sourceNode = mb.AddSourceNode(
+            model, ell.nodes.PortElements(clockLink),
+            ell.nodes.PortType.real, shape, "SourceCallback")
+        sourceLink = sourceNode.GetOutputPort("output")
+    else:
+        inputNode = mb.AddInputNode(model, shape, ell.nodes.PortType.real)
+        sourceNode = inputNode
+        sourceLink = sourceNode.GetOutputPort("output")
         
     # add a constant vector to the input provided in the InputCallback
     constNode = mb.AddConstantNode(model, [ 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 ], shape,
@@ -90,18 +98,20 @@ def create_model():
     print("sourceLink size: {}".format(sourceLink.GetMemoryLayout().size.size()))
     print("constLink size: {}".format(constLink.GetMemoryLayout().size.size()))
 
-
     addNode = mb.AddBinaryOperationNode(model, 
                     ell.nodes.PortElements(sourceLink), 
                     ell.nodes.PortElements(constLink), 
                     ell.nodes.BinaryOperationType.add)    
     addLink = addNode.GetOutputPort("output")
 
-    # add a SinkNode to send this output to the application via OutputCallback
-    # (setup a condition for the sink node that is always true).
-    sinkNode = mb.AddSinkNode(model, ell.nodes.PortElements(addLink),                              
-        shape, "OutputCallback")
-    sinkLink = sinkNode.GetOutputPort("output")
+    if callbacks:
+        # add a SinkNode to send this output to the application via OutputCallback
+        # (setup a condition for the sink node that is always true).
+        sinkNode = mb.AddSinkNode(model, ell.nodes.PortElements(addLink),                              
+            shape, "SinkCallback")
+        sinkLink = sinkNode.GetOutputPort("output")
+    else:
+        sinkLink = addLink
         
     # add a node representing output from the model.
     outputNode = mb.AddOutputNode(model, shape, ell.nodes.PortElements(sinkLink))
@@ -112,8 +122,8 @@ def create_model():
     return map
 
 
-def test_python(model_path):    
-    target_dir = os.path.join(os.path.dirname(model_path), "tutorial_python")
+def test_python(model_path, target_dir):    
+    target_dir = os.path.join(os.path.dirname(model_path), target_dir)
     
     if os.path.isdir(target_dir):
         rmtree(target_dir)
@@ -142,25 +152,55 @@ def test_python(model_path):
 
     from model import model
 
+    
+    class MyWrapper(model.ModelWrapper):
+        def __init__(self, input):
+            super(MyWrapper, self).__init__()
+            self.input = input
+            self.lag = None
+
+        def SourceCallback(self, buffer):
+            print("requesting input...")
+            buffer.copy_from(self.input.astype(np.float))
+    
+        def LagNotification(self, lag):
+            print("Predict is lagging by {}".format(lag))
+            self.lag = lag
+
+        def SinkCallback(self, buffer):
+            print("output callback happening...")
+
+
     print("Input size={}".format(model.get_default_input_shape().Size()))
 
-    input = np.zeros((model.get_default_input_shape().Size()))
-    output = model.predict(input)
-    result = ", ".join([str(x) for x in list(output)])
+    input = np.ones((model.get_default_input_shape().Size()))
+    
+    wrapper = MyWrapper(input)
+    output = wrapper.Predict()
+    time.sleep(1) # this should cause the lag notification.
+    output = wrapper.Predict()
 
-    if result != "0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0":
+    result = ", ".join([str(x) for x in list(output)])
+    print("Prediction={}".format(result))
+
+    if result != "1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0":
         print("### FAILED wrap_test python module did not return the expected results, got: {}".format(result))
         return 1
     else:
         print("### PASSED wrap_test: test_python")
-        
+
+    # make sure lag notification was called.
+    if wrapper.lag is None:
+        print("### FAILED lag notification callback never happened")
+        return 1
+
     # make sure we don't leak.
     before = 0
     after = 0
     output = None
     gc.collect()
     before = len(gc.get_objects())
-    output = model.predict(input)
+    output = wrapper.Predict()
     output = None
     gc.collect()
     after = len(gc.get_objects())
@@ -172,8 +212,8 @@ def test_python(model_path):
     return 0
     
 
-def test_cpp(model_path):    
-    target_dir = os.path.join(os.path.dirname(model_path), "tutorial_cpp")
+def test_cpp(model_path, target_path):    
+    target_dir = os.path.join(os.path.dirname(model_path), target_path)
     
     if os.path.isdir(target_dir):
         rmtree(target_dir)
@@ -204,7 +244,7 @@ def test_cpp(model_path):
     # execute the compiled tutorial.exe binary and check the output
     cmd = buildtools.EllBuildTools(find_ell.get_ell_root(), verbose=True)
     output = cmd.run([binary], print_output=True)
-    if not "Prediction=0, 1, 2, 3, 4, 5, 6, 7, 8, 9" in output:
+    if not "Prediction=1, 2, 3, 4, 5, 6, 7, 8, 9, 10" in output:
         print("### FAILED: wrap_test cpp binary did not print the expected results, got the following:\n{}".format(output))
         return 1
     else:
@@ -214,15 +254,15 @@ def test_cpp(model_path):
 
 def test():
     
-    map = create_model()
+    map = create_model(True)
     
     # save this model.
     model_path = os.path.join(script_path, "model.ell")  
     map.Save(model_path)
 
-    rc = test_python(model_path)
+    rc = test_python(model_path, "tutorial_python")
 
-    rc += test_cpp(model_path)
+    rc += test_cpp(model_path, "tutorial_cpp")
 
     return rc
     

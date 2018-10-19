@@ -48,8 +48,8 @@ void RunModel(const ProfileArguments& profileArguments)
     ELL_GetInputShape(0, &inputShape);
     ELL_GetOutputShape(0, &outputShape);
 
-    auto inputSize = ELL_GetInputSize();
-    auto outputSize = ELL_GetOutputSize();
+    auto inputSize = ELL_GetInputSize(0);
+    auto outputSize = ELL_GetOutputSize(0);
 
     std::vector<InputType> input(inputSize);
     std::vector<OutputType> output(outputSize);
