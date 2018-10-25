@@ -49,10 +49,10 @@ class DriveTest:
             model=None, labels=None, target="pi3", target_dir="/home/pi/pi3", 
             username="pi", password="raspberry", iterations=1, expected=None, 
             blas=True, compile=COMPILE_INCREMENTAL, test=True, verbose=True, timeout=None, apikey=None,
-            gitrepo = None):
+            gitrepo = None, wrap_options=None):
         self.ipaddress = ipaddress
         self.build_root = find_ell.find_ell_build()
-        self.ell_root = os.path.dirname(self.build_root)   
+        self.ell_root = os.path.dirname(self.build_root)
         self.output_dir = outdir
         self.target_dir = target_dir
         self.labels_file = labels
@@ -65,6 +65,7 @@ class DriveTest:
         self.blas = blas
         self.expected = expected
         self.profile = profile
+        self.profile_log = None
         self.compile = compile
         self.test = test
         self.verbose = verbose
@@ -86,6 +87,7 @@ class DriveTest:
         self.gallery_url = "https://github.com/Microsoft/ELL-models/raw/master/"
         if gitrepo:
             self.gallery_url = clone_repo(gitrepo, get_home_path())
+        self.wrap_options = wrap_options
 
         # initialize state from the args
         if not self.output_dir:
@@ -95,6 +97,7 @@ class DriveTest:
         if os.path.isdir(self.test_dir):
             if self.compile == COMPILE_FULL:
                 rmtree(self.test_dir)
+                os.makedirs(self.test_dir)
         else:
             if self.compile == COMPILE_NONE:
                 raise Exception("Test only usage requires outdir '{}' to exist already".format(self.output_dir))
@@ -102,10 +105,10 @@ class DriveTest:
 
         if self.compile:
             self.extract_model_info(self.ell_model, self.labels_file)
-            
+
         self.output_dir = os.path.join(self.test_dir, self.target)
 
-        if self.test:
+        if self.test and self.target != "host":
             self.resolve_address(self.ipaddress, self.cluster)
 
     def __enter__(self):
@@ -272,7 +275,7 @@ class DriveTest:
 
     def wrap_project(self):
         """Creates a project for the model and target"""
-        if os.path.isdir(self.output_dir):            
+        if os.path.isdir(self.output_dir):
             if self.compile == COMPILE_INCREMENTAL:
                 try:
                     base_name = os.path.basename(self.ell_model)
@@ -283,15 +286,18 @@ class DriveTest:
                 except:
                     pass # model needs to be re-compiled then.
             rmtree(self.output_dir)
-        sys.path.append(os.path.join(current_path, "../../wrap"))
+        sys.path.append(os.path.join(current_path, "..", "..", "wrap"))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
-        builder_args = [self.ell_model, "-target", self.target, "-outdir", 
-            self.output_dir, "--blas", str(self.blas)]
-        if self.verbose:
-            builder_args.append("-v")
-        if self.profile:
-            builder_args.append("-profile")
+        if self.wrap_options is not None and len(self.wrap_options) > 0:
+            builder_args = self.wrap_options
+        else:
+            builder_args = ["--model_file", self.ell_model, "--target", self.target, "--outdir", 
+                self.output_dir, "--blas", str(self.blas)]
+            if self.verbose:
+                builder_args.append("--verbose")
+            if self.profile:
+                builder_args.append("--profile")
         builder.parse_command_line(builder_args)
         builder.run()
 
@@ -299,6 +305,7 @@ class DriveTest:
         """Verifies the remote test results and prints a pass or fail"""
         self.logger.info("==========================================================")
         found = False
+        profile_log = False
         prediction_time = 0
         prompt = "Average prediction time:"
         previous = None
@@ -308,8 +315,13 @@ class DriveTest:
                 prediction_time = float(line[len(prompt):])
                 self.prediction_time = prediction_time
                 prediction = previous
-            if "socket.timeout" in line:
+            elif "socket.timeout" in line:
                 raise Exception("### Test failed due to timeout")
+            elif "==== Profile ====" in line:
+                self.profile_log = []
+                profile_log = True
+            elif profile_log:
+                self.profile_log.append(line)
             previous = line
 
         if self.expected:
@@ -336,28 +348,51 @@ class DriveTest:
             if self.compile:
                 self.get_model() 
                 self.wrap_project()
-                self.get_bash_files()
+                if self.target != "host":
+                    self.get_bash_files()
                 self.remove_bitcode()
 
             if self.test:
                 start_time = time.time()
-                print("source={}".format(self.output_dir))
-                # do not pass cluster to remote runner because we've already locked the machine.
-                runner = RemoteRunner(cluster=None,
-                                    ipaddress=self.ipaddress,
-                                    username=self.username,
-                                    password=self.password,
-                                    source_dir=self.output_dir,
-                                    target_dir=self.target_dir,
-                                    command="runtest.sh",
-                                    verbose=self.verbose,
-                                    start_clean=not self.test,
-                                    timeout=self.timeout,
-                                    cleanup=False)
-                output = runner.run_command()
-                self.verify_remote_test(output)
+
+                if self.target != "host":
+                    # do not pass cluster to remote runner because we've already locked the machine.
+                    runner = RemoteRunner(cluster=None,
+                                        ipaddress=self.ipaddress,
+                                        username=self.username,
+                                        password=self.password,
+                                        source_dir=self.output_dir,
+                                        target_dir=self.target_dir,
+                                        command="runtest.sh",
+                                        verbose=self.verbose,
+                                        start_clean=not self.test,
+                                        timeout=self.timeout,
+                                        cleanup=False)
+                    output = runner.run_command()
+                else:
+                    sys.path.append(os.path.join(current_path, "..", "..", "wrap", "test"))
+                    mpp = __import__("wrap_test")
+                    mpp.make_project(self.output_dir)
+
+                    cmd = [ "python",
+                            os.path.join(current_path, "..", "pythonlibs", "vision", "demo.py"),
+                            self.labels_file,
+                            "--compiled_model", self.output_dir,
+                            "--model_name", self.model_name,
+                            "--image", os.path.join(current_path, "coffeemug.jpg"),
+                            "--nogui"]
+                    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                    output = []
+                    while True:
+                        line = proc.stdout.readline()
+                        if line != b"":
+                            output.append(line.decode("utf-8").rstrip())
+                        else:
+                            break
+
                 end_time = time.time()
                 total_time = end_time - start_time
+                self.verify_remote_test(output)
                 self.logger.info("Remote test time: %f seconds" % (end_time - start_time))
                 return total_time
 
@@ -385,19 +420,19 @@ if __name__ == "__main__":
     arg_parser.add_argument("--outdir", default=".", help="where to store local working files as a staging area (default '.')")
     arg_parser.add_argument("--profile", help="enable profiling functions in the ELL module", action="store_true")
 
-    model_group = arg_parser.add_argument_group("phase", "options for two separate phases")
-    arg_parser.add_argument("--compile", default="true", help="enable compile step preparing model for --test phase (default 'True')")
-    arg_parser.add_argument("--test", default="true", help="enable test phase, assume the outdir has already been built (default 'True')")
+    phase_group = arg_parser.add_argument_group("phase", "options for two separate phases")
+    phase_group.add_argument("--compile", default="true", help="enable compile step preparing model for --test phase (default 'True')")
+    phase_group.add_argument("--test", default="true", help="enable test phase, assume the outdir has already been built (default 'True')")
 
     model_group = arg_parser.add_argument_group("model", "options for loading a non-default model. All 3 must be specified for a non-default model to be used.")
     model_group.add_argument("--model", help="path to an ELL model file, the filename (without extension) will be used as the model name")
     model_group.add_argument("--labels", help="path to the labels file for evaluating the model")
 
     arg_parser.add_argument("--target", help="the target platform.\n"
-        "Choices are pi3 (Raspberry Pi 3) and aarch64 (Dragonboard)", choices=["pi0", "pi3", "pi3_64", "aarch64"], default="pi3")
+        "Choices are pi3 (Raspberry Pi 3) and aarch64 (Dragonboard)", choices=["pi0", "pi3", "pi3_64", "aarch64", "host"], default="pi3")
     arg_parser.add_argument("--target_dir", help="the directory on the target device for running the test", default="/home/pi/pi3")
-    arg_parser.add_argument("--username", help="the username for the target device", default="pi")
-    arg_parser.add_argument("--password", help="the password for the target device", default="raspberry")
+    arg_parser.add_argument("--username", help="the username for the target device", default=os.getenv("RPI_USERNAME", "pi"))
+    arg_parser.add_argument("--password", help="the password for the target device", default=os.getenv("RPI_PASSWORD", "raspberry"))
     arg_parser.add_argument("--iterations", "-i", type=int, help="the number of iterations for each predict (default 1)", default=1)
     arg_parser.add_argument("--expected", "-e", help="the string to search for to verify test passed (default '')", default=None)
     arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
@@ -412,8 +447,8 @@ if __name__ == "__main__":
         """Converts a string to a bool"""
         return v.lower() in ("yes", "true", "t", "1")
 
-    with DriveTest(args.ipaddress,  args.cluster, args.outdir, args.profile, 
-        args.model, args.labels, args.target, args.target_dir, args.username, 
-        args.password, args.iterations, args.expected, str2bool(args.blas), 
+    with DriveTest(args.ipaddress,  args.cluster, args.outdir, args.profile,
+        args.model, args.labels, args.target, args.target_dir, args.username,
+        args.password, args.iterations, args.expected, str2bool(args.blas),
         str2bool(args.compile), str2bool(args.test), str2bool(args.verbose), args.timeout) as tester:
         tester.run_test()

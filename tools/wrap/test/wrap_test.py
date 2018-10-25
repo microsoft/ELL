@@ -30,7 +30,7 @@ import buildtools
 
 def wrap_model(model, target_dir, language):
     builder = wrap.ModuleBuilder()
-    args = [ model, 
+    args = ["--model_file", model, 
             "--outdir", os.path.join(target_dir, "model"), 
             "--language", language, 
             "--target", "host", 

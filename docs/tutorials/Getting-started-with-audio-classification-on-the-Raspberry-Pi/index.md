@@ -102,8 +102,8 @@ Second, you'll call **CMake** to build the Python library.
 Run **wrap** as follows, replacing `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py featurizer_16k.ell --target host --outdir featurizer_16k --module_name mfcc
-python <ELL-root>/tools/wrap/wrap.py classifier_16k.ell --target host --outdir classifier_16k --module_name model
+python <ELL-root>/tools/wrap/wrap.py --model_file featurizer_16k.ell --target host --outdir featurizer_16k --module_name mfcc
+python <ELL-root>/tools/wrap/wrap.py --model_file classifier_16k.ell --target host --outdir classifier_16k --module_name model
 ```
 
 Here, you used the command line option of `--target host`, which tells **wrap** to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi device.
@@ -284,8 +284,8 @@ rm -rf classifier_16k
 Then run this:
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py featurizer_16k.ell --target pi3 --outdir featurizer_16k --module_name mfcc
-python <ELL-root>/tools/wrap/wrap.py classifier_16k.ell --target pi3 --outdir classifier_16k --module_name model
+python <ELL-root>/tools/wrap/wrap.py --model_file featurizer_16k.ell --target pi3 --outdir featurizer_16k --module_name mfcc
+python <ELL-root>/tools/wrap/wrap.py --model_file classifier_16k.ell --target pi3 --outdir classifier_16k --module_name model
 ```
 
 You are ready to move to the Raspberry Pi.

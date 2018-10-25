@@ -45,6 +45,23 @@ class _PassArgsParser(argparse.ArgumentParser):
         return help.replace(usage, self.format_usage()) + dashdash_help
 
 class ModuleBuilder:
+    arguments = { "model_file"          : {"required":True,     "help": "path to the ELL model file"},
+                  "module_name"         : {"default":None,      "help": "the name of the output module (defaults to the model filename)"},
+                  "target"              : {"default":"host",    "help": "the target platform", "choices":["pi3", "pi0", "orangepi0", "pi3_64", "aarch64", "host"]},
+                  "language"            : {"default":"python",  "help": "the language for the ELL module", "choices":["python", "cpp"]},
+                  "llvm_format"         : {"default":"bc",      "help": "the format of the emitted code (default 'bc')", "choices":["ir", "bc", "asm", "obj"]},
+                  "outdir"              : {"default":None,      "help": "the output directory"},
+                  "verbose"             : {"default":False,     "help": "print verbose output"},
+                  "profile"             : {"default":False,     "help": "enable profiling functions in the ELL module"},
+                  "blas"                : {"default":"true",    "help": "enable or disable the use of Blas on the target device (default 'true')"},
+                  "no_fuse_linear_ops"  : {"default":False,     "help": "disable the fusing of sequences of linear operations"},
+                  "no_opt_tool"         : {"default":False,     "help": "disable the use of LLVM's opt tool"},
+                  "no_llc_tool"         : {"default":False,     "help": "disable the use of LLVM's llc tool"},
+                  "no_optimize"         : {"default":False,     "help": "disable ELL's compiler from optimizing emitted code"},
+                  "optimization_level"  : {"default":"3",       "help": "the optimization level used by LLVM's opt and llc tools. If '0' or 'g', opt is not run (default '3')", "choices":["0", "1", "2", "3", "g"]},
+                  "debug"               : {"default":False,     "help": "emit debug code"},
+                }
+
     def __init__(self):
         self.config = None
         self.files = []
@@ -87,25 +104,15 @@ class ModuleBuilder:
             "    aarch64   arm64 Linux, works on Qualcomm DragonBoards\n"
             "    host      (default) your host computer architecture\n")
 
-        # required arguments
-        arg_parser.add_argument("model_file", help="path to the ELL model file")
-
-        # optional arguments
-        arg_parser.add_argument("--language", "-lang", help="the language for the ELL module", choices=["python", "cpp"], default=self.language)
-        arg_parser.add_argument("--target", "-target", help="the target platform", choices=["pi3", "pi0", "orangepi0", "pi3_64", "aarch64", "host"], default=self.target)
-        arg_parser.add_argument("--module_name", "-module_name", help="the name of the output module (defaults to the model filename)", default=None)
-        arg_parser.add_argument("--outdir", "-outdir", help="the output directory")
-        arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
-        arg_parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
-        arg_parser.add_argument("--llvm-format", help="the format of the emitted code (default 'bc')", choices=["ir", "bc", "asm", "obj"], default="bc")
-        arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
-        arg_parser.add_argument("--no-fuse-linear-ops", help="disable the fusing of sequences of linear operations", action="store_true")
-        arg_parser.add_argument("--no-opt-tool", help="disable the use of LLVM's opt tool", action="store_true")
-        arg_parser.add_argument("--no-llc-tool", help="disable the use of LLVM's llc tool", action="store_true")
-        arg_parser.add_argument("--no-optimize", help="disable ELL's compiler from optimizing emitted code", action="store_true")
-        arg_parser.add_argument("--optimization-level", help=("the optimization level used by LLVM's opt and llc tools. If '0' or 'g', opt "
-            "is not run (default '3')"), choices=["0", "1", "2", "3", "g"], default="3")
-        arg_parser.add_argument("--debug", help="emit debug code", action="store_true")
+        for arg in self.arguments.keys():
+            if "required" in self.arguments[arg].keys():
+                arg_parser.add_argument("--" + arg, help=self.arguments[arg]["help"], required=True)
+            elif "choices" in self.arguments[arg].keys():
+                arg_parser.add_argument("--" + arg, help=self.arguments[arg]["help"], default=self.arguments[arg]["default"], choices=self.arguments[arg]["choices"])
+            elif self.arguments[arg]["default"] == False:
+                arg_parser.add_argument("--" + arg, help=self.arguments[arg]["help"], action="store_true", default=False)
+            else:
+                arg_parser.add_argument("--" + arg, help=self.arguments[arg]["help"], default=self.arguments[arg]["default"])
 
         compile_args = []
         if '--' in args:

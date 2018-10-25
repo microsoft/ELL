@@ -39,30 +39,41 @@ class EllModel:
 
 class CompiledModel(EllModel):
     """ this class encapsulates a compiled ELL model """
-    def __init__(self, path):
+    def __init__(self, path, model_name=None):
         super(CompiledModel, self).__init__()
         self.compiled_module_path = path
         self.compiled_model = None
         self.compiled_module = None
         self.compiled_func = None
         self.func_name = 'predict'
-        self.model_name = os.path.split(path)[1]
+        if model_name is not None:
+            self.model_name = model_name
+            self.model_name_override = True
+        else:
+            self.model_name = os.path.split(path)[1]
+            self.model_name_override = False
 
     def load(self):
-        module_directory = os.path.dirname(self.compiled_module_path)
-        if not module_directory:
-            module_directory = "."
+        if not self.model_name_override:
+            module_directory = os.path.dirname(self.compiled_module_path)
+            if not module_directory:
+                module_directory = "."
 
-        model_path, module_directory = os.path.split(module_directory)            
-        if os.path.isdir(model_path):
-            sys.path.append(model_path)
+            model_path, module_directory = os.path.split(module_directory)
+            if os.path.isdir(model_path):
+                sys.path.append(model_path)
 
-        if not os.path.isdir(os.path.join(module_directory, 'build')):
-            raise Exception("you don't have a 'build' directory in '" + module_directory + "', have you compiled this project yet?")
+            if not os.path.isdir(os.path.join(module_directory, 'build')):
+                raise Exception("you don't have a 'build' directory in '" + module_directory + "', have you compiled this project yet?")
 
         try:
             import importlib
-            if module_directory == ".":
+            if self.model_name_override:
+                sys.path += [ self.compiled_module_path ]
+                sys.path += [ os.path.join(self.compiled_module_path, "build") ]
+                sys.path += [ os.path.join(self.compiled_module_path, "build", "release") ]
+                self.compiled_module = importlib.import_module(self.model_name)
+            elif module_directory == ".":
                 # we are inside the directory that contains __init__.py, which means we can't execute __init__.py.
                 sys.path += [ os.path.join(os.getcwd(), "build") ]
                 sys.path += [ os.path.join(os.getcwd(), "build", "release") ]
@@ -70,7 +81,7 @@ class CompiledModel(EllModel):
             else:
                 sys.path += [ os.getcwd() ]
                 self.compiled_module = getattr(importlib.import_module(module_directory), self.model_name)
-            
+
             inputShapeGetter = getattr(self.compiled_module, "get_default_input_shape")
             outputShapeGetter = getattr(self.compiled_module, "get_default_output_shape")
             self.input_shape = inputShapeGetter()
@@ -91,15 +102,17 @@ class CompiledModel(EllModel):
     def predict(self, data):
         return self.compiled_func(data)
 
-    def print_profile_info(self, node_level):        
+    def print_profile_info(self, node_level):
         # if the model is compiled with profiling enabled, report the additional info
+        print("==== Profile ====")
+        sys.stdout.flush()
+
         if hasattr(self.compiled_module, self.model_name + "_PrintModelProfilingInfo"):
             getattr(self.compiled_module, self.model_name + "_PrintModelProfilingInfo")()
 
         if node_level:
             if hasattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo"):
                 getattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo")()
-
 
 class ReferenceModel(EllModel):
     """ this class encapsulates a reference ELL model """
@@ -229,6 +242,7 @@ class DemoHelper:
         self.save_images = None
         self.image_index = 0
         self.model = None
+        self.model_name = None
         self.labels_file = None
         self.iterations = None  # limit number of iterations through the loop.
         self.current = None
@@ -273,7 +287,7 @@ class DemoHelper:
         if model_file:
             self.model = ReferenceModel(model_file)
         else:
-            self.model = CompiledModel(compiled_model)
+            self.model = CompiledModel(compiled_model, self.model_name)
 
         # now load the model
         self.model.load()

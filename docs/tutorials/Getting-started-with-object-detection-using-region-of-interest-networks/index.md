@@ -91,7 +91,7 @@ Compile the imported ELL model by running `wrap.py` for the Raspberry Pi device
 target.
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py model.ell --lang python --target pi3
+python <ELL-root>/tools/wrap/wrap.py --model_file model.ell --language python --target pi3
 ```
 
 Copy the resulting CMake project to the Raspberry Pi device, and build it

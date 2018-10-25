@@ -11,7 +11,7 @@ REM Usage: make_profiler.cmd model_file <compile options>
 pushd .
 
 if "%1"=="" (
-    goto :usage
+    goto usage
 )
 
 set model_file=%1
@@ -20,11 +20,13 @@ shift
 
 set profiler_directory="%model_name%_profiler"
 
-set next_opt=%1
-if NOT "%next_opt:~0,1%"=="-" (
-    set profiler_directory=%1
+if NOT "%1"=="" (
+    set next_opt=%1
+    if NOT "%next_opt:~0,1%"=="-" (
+        set profiler_directory=%1
+    )
+    shift
 )
-shift
 
 REM Platform-specific options
 REM pi3_llc_opts="-relocation-model=pic -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53"
@@ -51,3 +53,8 @@ copy ..\tools\utilities\profile\build_and_run.cmd .
 
 copy ..\tools\utilities\profile\CMakeLists-device-parallel.txt.in .\CMakeLists.txt
 popd
+
+exit /b
+
+:usage
+echo Usage: make_profiler.cmd model_file ^<compile options^>

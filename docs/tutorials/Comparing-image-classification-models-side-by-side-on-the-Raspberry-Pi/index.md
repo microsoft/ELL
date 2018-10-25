@@ -77,8 +77,8 @@ At this point, the files **model1.ell**, **model2.ell**, and **categories.txt** 
 Use the **wrap.py** tool to compile the models and create Python wrappers. Use the `--outdir` option to put the models into different directories. Make sure to replace `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py model1.ell -lang python -target pi3 -outdir model1
-python <ELL-root>/tools/wrap/wrap.py model2.ell -lang python -target pi3 -outdir model2
+python <ELL-root>/tools/wrap/wrap.py --model_file model1.ell --language python --target pi3 --outdir model1
+python <ELL-root>/tools/wrap/wrap.py --model_file model2.ell --language python --target pi3 --outdir model2
 ```
 
 The output will be similar to the following:

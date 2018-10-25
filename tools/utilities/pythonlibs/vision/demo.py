@@ -36,6 +36,7 @@ def main():
     arg_parser.add_argument("labels", help="path to the labels file for evaluating the model, or comma separated list if using more than one model")
 
     # options
+    arg_parser.add_argument("--model_name", help="name of the compiled model's Python module", default=None)
     arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
     arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=helper.threshold)
     arg_parser.add_argument("--bgr", help="specify True if input data should be in BGR format (default False)", default = helper.bgr)
@@ -72,6 +73,7 @@ def main():
         helper.print_labels = True
     helper.bgr = args.bgr
     helper.nogui = args.nogui
+    helper.model_name = args.model_name
 
     # initialize the labels and the model (either reference or compiled)
     helper.load_model(args.labels, args.model, args.compiled_model)

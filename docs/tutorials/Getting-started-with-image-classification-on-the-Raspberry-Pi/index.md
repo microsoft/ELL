@@ -79,7 +79,7 @@ Before deploying the model to the Raspberry Pi device, practice deploying it to 
 Run **wrap** as follows, replacing `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py model.ell --language python --target host
+python <ELL-root>/tools/wrap/wrap.py --model_file model.ell --language python --target host
 ```
 
 Here **wrap** uses the command line option of `--target host`, which tells it to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi device. This results in the following output.
@@ -199,7 +199,7 @@ You are ready to cross-compile the model for deployment on the Raspberry Pi devi
 As before, run the **wrap** tool on your laptop or desktop computer, but this time specify the target platform as `pi3`. This tells the ELL compiler to generate machine code for the Raspberry Pi's ARM Cortex A53 processor. This step needs to be performed in the directory to be copied to the Raspberry Pi.
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py model.ell --language python --target pi3
+python <ELL-root>/tools/wrap/wrap.py --model_file model.ell --language python --target pi3
 ```
 
 The **wrap** tool creates a new directory named **pi3**, which contains a CMake project that can be used to build the desired Python module. Don't build this project yet - this time, you need to build this project on the Raspberry Pi.

@@ -72,7 +72,7 @@ The **model.ell** file and a **categories.txt** file are now in your directory.
 Deploying an ELL model to the Raspberry Pi using C++ requires two steps. First, the ELL compiler compiles `model.ell` into machine code. Next, you create a special CMake project that contains all of the configurations and settings needed to compile and link the ELL model into an application. Both of these steps are performed by the **wrap** tool. Run **wrap** as follows, replacing `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py model.ell --language cpp --target pi3 --outdir model
+python <ELL-root>/tools/wrap/wrap.py --model_file model.ell --language cpp --target pi3 --outdir model
 ```
 
 The command line option **--target pi3** tells **wrap** to generate machine code for execution on the Raspberry Pi device. The **--outdir model** option tells **wrap** to put the output files in a directory named **model**. After running **wrap**, you'll see the following output.
