@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "Matrix.h"
-
 // stl
 #include <cstddef> // size_t
 
@@ -17,6 +15,9 @@ namespace ell
 {
 namespace math
 {
+    enum class MatrixLayout;
+    enum class MatrixTranspose;
+
     namespace Blas
     {
         /// <summary> Map the given enum value to OpenBLAS's definition of CBLAS_ORDER.</summary>

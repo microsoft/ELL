@@ -8,6 +8,8 @@
 
 
 #include "BlasWrapper.h"
+#include "Matrix.h"
+
 #if USE_BLAS
 #include "cblas.h"
 #endif
