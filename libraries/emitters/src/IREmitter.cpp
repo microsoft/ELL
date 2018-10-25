@@ -92,10 +92,10 @@ namespace emitters
             return GetVariableType(type);
         case VariableType::BytePointer:
             return GetVariableType(VariableType::Byte)->getPointerTo();
-        case VariableType::Short:
+        case VariableType::Int16:
             return GetVariableType(type);
-        case VariableType::ShortPointer:
-            return GetVariableType(VariableType::Short)->getPointerTo();
+        case VariableType::Int16Pointer:
+            return GetVariableType(VariableType::Int16)->getPointerTo();
         case VariableType::Int32:
             return GetVariableType(type);
         case VariableType::Int32Pointer:
@@ -175,7 +175,7 @@ namespace emitters
 
     llvm::Constant* IREmitter::Literal(const short value)
     {
-        return Integer(VariableType::Short, value);
+        return Integer(VariableType::Int16, value);
     }
 
     llvm::Constant* IREmitter::Literal(const int value)
@@ -251,7 +251,7 @@ namespace emitters
         switch (type)
         {
         case VariableType::Byte:
-        case VariableType::Short:
+        case VariableType::Int16:
         case VariableType::Int32:
         case VariableType::Int64:
             return Integer(type, 0);
@@ -1146,7 +1146,7 @@ namespace emitters
             return _irBuilder.getVoidTy();
         case VariableType::Byte:
             return _irBuilder.getInt8Ty();
-        case VariableType::Short:
+        case VariableType::Int16:
             return _irBuilder.getInt16Ty();
         case VariableType::Int32:
             return _irBuilder.getInt32Ty();
@@ -1170,7 +1170,7 @@ namespace emitters
         // Are these correct for the int types??
         case VariableType::Byte:
             return 8;
-        case VariableType::Short:
+        case VariableType::Int16:
             return 16;
         case VariableType::Int32:
             return 32;

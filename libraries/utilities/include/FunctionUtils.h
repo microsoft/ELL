@@ -68,7 +68,7 @@ namespace utilities
     /// <param name="args"> The rest of the arguments to apply the function to </param>
     template <typename FunctionType, typename Arg, typename... Args>
     void ApplyToEach(FunctionType&& function, Arg&& arg, Args&&... args);
-    
+
     //
     // FunctionTraits
     //
@@ -122,6 +122,10 @@ namespace utilities
     /// <summary> Calls the given function with the given arguments </summary>
     template <typename FunctionType, typename... Args>
     auto ApplyFunction(const FunctionType& function, std::tuple<Args...>&& args) -> FunctionReturnType<FunctionType>;
+
+    /// <summary> Converts a vector to a specified tuple of Args... types </summary>
+    template <typename... Args, typename T>
+    std::tuple<Args...> VectorToTuple(std::vector<T>);
 }
 }
 

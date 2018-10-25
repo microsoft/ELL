@@ -1,0 +1,26 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     Value_test.h (value)
+//  Authors:  Kern Handa
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+#include "EmitterContext.h"
+
+// stl
+#include <memory>
+#include <vector>
+
+namespace ell
+{
+
+void Value_test1();
+void Scalar_test1();
+void Vector_test1();
+
+std::vector<std::unique_ptr<value::EmitterContext>> GetContexts();
+
+} // ell

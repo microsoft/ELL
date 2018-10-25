@@ -204,13 +204,13 @@ namespace emitters
     template <>
     VariableType GetVariableType<short>()
     {
-        return VariableType::Short;
+        return VariableType::Int16;
     }
 
     template <>
     VariableType GetVariableType<short*>()
     {
-        return VariableType::ShortPointer;
+        return VariableType::Int16Pointer;
     }
 
     template <>
@@ -293,8 +293,8 @@ namespace emitters
             return VariableType::VoidPointer;
         case VariableType::Byte:
             return VariableType::BytePointer;
-        case VariableType::Short:
-            return VariableType::ShortPointer;
+        case VariableType::Int16:
+            return VariableType::Int16Pointer;
         case VariableType::Int32:
             return VariableType::Int32Pointer;
         case VariableType::Int64:
@@ -441,7 +441,7 @@ namespace emitters
     {
         switch (type)
         {
-        case VariableType::Short:
+        case VariableType::Int16:
         case VariableType::Int32:
         case VariableType::Int64:
         case VariableType::Float:

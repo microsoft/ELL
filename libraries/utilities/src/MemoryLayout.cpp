@@ -223,48 +223,48 @@ namespace utilities
         return _size != _stride;
     }
 
-    int MemoryLayout::GetActiveSize(size_t index) const 
-    { 
+    int MemoryLayout::GetActiveSize(size_t index) const
+    {
         BoundsCheckDimensionIndex(index);
-        return _size[index]; 
+        return _size[index];
     }
 
-    int MemoryLayout::GetStride(size_t index) const 
-    { 
+    int MemoryLayout::GetStride(size_t index) const
+    {
         BoundsCheckDimensionIndex(index);
-        return _stride[index]; 
+        return _stride[index];
     }
 
-    int MemoryLayout::GetOffset(size_t index) const 
-    { 
+    int MemoryLayout::GetOffset(size_t index) const
+    {
         BoundsCheckDimensionIndex(index);
-        return _offset[index]; 
+        return _offset[index];
     }
-    
+
     int MemoryLayout::GetLogicalDimensionActiveSize(size_t index) const
     {
         BoundsCheckDimensionIndex(index);
-        return GetLogicalDimensionActiveSize()[index]; 
+        return GetLogicalDimensionActiveSize()[index];
     }
 
     int MemoryLayout::GetLogicalDimensionStride(size_t index) const
     {
         BoundsCheckDimensionIndex(index);
-        return GetLogicalDimensionStride()[index]; 
+        return GetLogicalDimensionStride()[index];
     }
 
     int MemoryLayout::GetLogicalDimensionOffset(size_t index) const
     {
         BoundsCheckDimensionIndex(index);
-        return GetLogicalDimensionOffset()[index]; 
+        return GetLogicalDimensionOffset()[index];
     }
 
-    size_t MemoryLayout::GetCumulativeIncrement(size_t index) const 
-    { 
+    size_t MemoryLayout::GetCumulativeIncrement(size_t index) const
+    {
         BoundsCheckDimensionIndex(index);
-        return _increment[index]; 
+        return _increment[index];
     }
-    
+
     size_t MemoryLayout::NumElements() const
     {
         return static_cast<size_t>(_size.NumElements());
@@ -341,6 +341,11 @@ namespace utilities
     size_t MemoryLayout::GetLogicalDimensionIncrement(size_t index) const
     {
         return ReversePermute(_increment, _dimensionOrder)[index];
+    }
+
+    size_t MemoryLayout::GetLogicalEntryOffset(const MemoryCoordinates& logicalCoordinates) const
+    {
+        return GetEntryOffset(GetPhysicalCoordinates(logicalCoordinates));
     }
 
     MemoryCoordinates MemoryLayout::GetPhysicalCoordinates(const MemoryCoordinates& logicalCoordinates) const

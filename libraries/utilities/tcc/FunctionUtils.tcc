@@ -59,5 +59,21 @@ namespace utilities
     {
         return ApplyFunctionHelper(function, args, std::make_index_sequence<sizeof...(Args)>());
     }
+
+    namespace detail
+    {
+        template <typename... Args, typename T, size_t... I>
+        std::tuple<Args...> VectorToTuple(std::vector<T> t, std::index_sequence<I...>)
+        {
+            return { t[I]... };
+        }
+    }
+
+    template <typename... Args, typename T>
+    std::tuple<Args...> VectorToTuple(std::vector<T> t)
+    {
+        return detail::VectorToTuple<Args...>(t, std::make_index_sequence<sizeof...(Args)>());
+    }
+
 }
 }

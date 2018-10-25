@@ -32,6 +32,8 @@ namespace ell
 {
 namespace model
 {
+    using utilities::Boolean;
+
     IRCompiledMap::IRCompiledMap(IRCompiledMap&& other)
         : CompiledMap(std::move(other), other._functionName, other._compilerOptions), _moduleName(std::move(other._moduleName)), _module(std::move(other._module)), _executionEngine(std::move(other._executionEngine)), _verifyJittedModule(other._verifyJittedModule), _computeFunctionDefined(false)
     {
@@ -107,7 +109,7 @@ namespace model
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
-        utilities::ConformingVector<bool> temp(inputValues.size());
+        Vector<bool> temp(inputValues.size());
         for (size_t index = 0; index < temp.size(); ++index)
         {
             temp[index] = static_cast<bool>(inputValues[index]);
@@ -159,7 +161,7 @@ namespace model
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
-        if (inputValues.empty()) 
+        if (inputValues.empty())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::nullReference);
         }
@@ -177,7 +179,8 @@ namespace model
         }
 
         // Terrible hack to create a std::vector<bool>
-        return std::vector<bool>((bool*)(std::get<utilities::ConformingVector<bool>>(_cachedOutput).data()), (bool*)(std::get<utilities::ConformingVector<bool>>(_cachedOutput).data() + std::get<utilities::ConformingVector<bool>>(_cachedOutput).size()));
+        auto& vector = std::get<Vector<bool>>(_cachedOutput);
+        return { vector.begin(), vector.end() };
     }
 
     std::vector<int> IRCompiledMap::ComputeIntOutput(const model::PortElementsBase& outputs) const
@@ -188,7 +191,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        return std::get<utilities::ConformingVector<int>>(_cachedOutput);
+        return std::get<Vector<int>>(_cachedOutput);
     }
 
     std::vector<int64_t> IRCompiledMap::ComputeInt64Output(const model::PortElementsBase& outputs) const
@@ -199,7 +202,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        return std::get<utilities::ConformingVector<int64_t>>(_cachedOutput);
+        return std::get<Vector<int64_t>>(_cachedOutput);
     }
 
     std::vector<float> IRCompiledMap::ComputeFloatOutput(const model::PortElementsBase& outputs) const
@@ -210,7 +213,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        return std::get<utilities::ConformingVector<float>>(_cachedOutput);
+        return std::get<Vector<float>>(_cachedOutput);
     }
 
     std::vector<double> IRCompiledMap::ComputeDoubleOutput(const model::PortElementsBase& outputs) const
@@ -221,7 +224,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        return std::get<utilities::ConformingVector<double>>(_cachedOutput);
+        return std::get<Vector<double>>(_cachedOutput);
     }
 
     void IRCompiledMap::WriteCode(const std::string& filePath) const

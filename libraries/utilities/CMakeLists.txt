@@ -7,9 +7,9 @@ set(library_name utilities)
 set(src
   src/Archiver.cpp
   src/ArchiveVersion.cpp
+  src/Boolean.cpp
   src/CommandLineParser.cpp
   src/CompressedIntegerList.cpp
-  src/ConformingVector.cpp
   src/CStringParser.cpp
   src/Files.cpp
   src/Format.cpp
@@ -40,9 +40,9 @@ set(include
   include/AnyIterator.h
   include/Archiver.h
   include/ArchiveVersion.h
+  include/Boolean.h
   include/CommandLineParser.h
   include/CompressedIntegerList.h
-  include/ConformingVector.h
   include/CStringParser.h
   include/Debug.h
   include/Graph.h
@@ -106,7 +106,6 @@ set(tcc
   tcc/TransformIterator.tcc
   tcc/TypeFactory.tcc
   tcc/TypeName.tcc
-  tcc/TypeTraits.tcc
   tcc/Variant.tcc
   tcc/XmlArchiver.tcc
 )

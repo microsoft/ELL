@@ -22,7 +22,7 @@
 #include "ModuleEmitter.h"
 
 // utilities
-#include "ConformingVector.h"
+#include "Boolean.h"
 #include "TypeName.h"
 
 // stl
@@ -40,6 +40,7 @@ namespace model
     /// <summary> A map that can be compiled </summary>
     class IRCompiledMap : public CompiledMap
     {
+        using Boolean = utilities::Boolean;
     public:
         /// <summary> Move Constructor. </summary>
         ///
@@ -228,10 +229,13 @@ namespace model
         bool _verifyJittedModule = false;
         void* _context = nullptr;
 
+        template <typename T>
+        using Vector = std::vector<std::conditional_t<std::is_same_v<bool, T>, Boolean, T>>;
+
         // Only one of the entries in each of these tuples is active, depending on the input and output types of the map
         mutable bool _computeFunctionDefined;
         mutable std::tuple<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<int64_t>, ComputeFunction<float>, ComputeFunction<double>> _computeInputFunction;
-        mutable std::tuple<utilities::ConformingVector<bool>, utilities::ConformingVector<int>, utilities::ConformingVector<int64_t>, utilities::ConformingVector<float>, utilities::ConformingVector<double>> _cachedOutput;
+        mutable std::tuple<Vector<bool>, Vector<int>, Vector<int64_t>, Vector<float>, Vector<double>> _cachedOutput;
     };
 }
 }

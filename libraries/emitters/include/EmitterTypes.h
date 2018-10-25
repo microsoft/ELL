@@ -28,7 +28,7 @@ namespace emitters
         ///<summary> 8 bit unsigned integer </summary>
         Byte,
         ///<summary> 16 bit signed integer </summary>
-        Short,
+        Int16,
         ///<summary> 32 bit signed integer </summary>
         Int32,
         ///<summary> 64 bit signed integer </summary>
@@ -46,8 +46,8 @@ namespace emitters
         Char8Pointer,
         ///<summary> Pointer to a byte </summary>
         BytePointer,
-        ///<summary> Pointer to a short </summary>
-        ShortPointer,
+        ///<summary> Pointer to a Int16 </summary>
+        Int16Pointer,
         ///<summary> Pointer to an Int32 </summary>
         Int32Pointer,
         ///<summary> Pointer to an Int64 </summary>
