@@ -10,6 +10,7 @@
 #include "FunctionUtils_test.h"
 #include "Archiver_test.h"
 #include "Iterator_test.h"
+#include "MemoryLayout_test.h"
 #include "ObjectArchive_test.h"
 #include "PropertyBag_test.h"
 #include "TypeFactory_test.h"
@@ -51,6 +52,9 @@ int main(int argc, char* argv[])
         TestTransformIterator();
         TestParallelTransformIterator();
         TestStlStridedIterator();
+
+        // MemoryLayout tests
+        TestDimensionOrder();
 
         // TypeFactory tests
         TypeFactoryTest();

@@ -358,6 +358,33 @@ namespace utilities
         return Permute(logicalCoordinates, _dimensionOrder);
     }
 
+    int MemoryLayout::GetPhysicalDimension(int logicalDimension) const
+    {
+        if (logicalDimension < 0 || logicalDimension >= _dimensionOrder.NumDimensions())
+        {
+            throw InputException(InputExceptionErrors::indexOutOfRange);
+        }
+
+        if (auto it = std::find(_dimensionOrder.begin(), _dimensionOrder.end(), logicalDimension); it != _dimensionOrder.end())
+        {
+            return static_cast<int>(std::distance(_dimensionOrder.begin(), it));
+        }
+        else
+        {
+            throw InputException(InputExceptionErrors::indexOutOfRange);
+        }
+    }
+
+    int MemoryLayout::GetLogicalDimension(int physicalDimension) const
+    {
+        if (physicalDimension < 0 || physicalDimension >= _dimensionOrder.NumDimensions())
+        {
+            throw InputException(InputExceptionErrors::indexOutOfRange);
+        }
+
+        return _dimensionOrder[physicalDimension];
+    }
+
     bool MemoryLayout::IsOutOfBounds(const MemoryCoordinates& physicalCoordinates) const
     {
         const int numDimensions = NumDimensions();
@@ -501,5 +528,6 @@ namespace utilities
         out << " memory size (physical): " << layout.GetStride();
         return out;
     }
+
 }
 }

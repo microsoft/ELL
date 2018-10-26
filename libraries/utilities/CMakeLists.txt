@@ -135,6 +135,7 @@ set(test_src
   test/src/FunctionUtils_test.cpp
   test/src/Archiver_test.cpp
   test/src/Iterator_test.cpp
+  test/src/MemoryLayout_test.cpp
   test/src/ObjectArchive_test.cpp
   test/src/PropertyBag_test.cpp
   test/src/TypeFactory_test.cpp
@@ -148,6 +149,7 @@ set(test_include
   test/include/FunctionUtils_test.h
   test/include/Archiver_test.h
   test/include/Iterator_test.h
+  test/include/MemoryLayout_test.h
   test/include/ObjectArchive_test.h
   test/include/PropertyBag_test.h
   test/include/TypeFactory_test.h

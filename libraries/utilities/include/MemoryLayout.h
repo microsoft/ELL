@@ -48,6 +48,14 @@ namespace utilities
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "DimensionVector"; }
 
+        /// <summary> std::begin customization point </summary>
+        auto begin() { return _data.begin(); }
+        auto begin() const { return _data.cbegin(); }
+
+        /// <summary> std::end customization point </summary>
+        auto end() { return _data.end(); }
+        auto end() const { return _data.cend(); }
+
     protected:
         DimensionVector() = default;
         DimensionVector(const std::vector<int>& elements)
@@ -520,7 +528,7 @@ namespace utilities
 
     /// <summary> Writes a `MemoryShape`'s dimensions to an output stream </summary>
     std::ostream& operator<<(std::ostream& out, const utilities::MemoryShape& shape);
-    
+
     /// <summary> Writes a `MemoryLayout` to an output stream </summary>
     std::ostream& operator<<(std::ostream& out, const utilities::MemoryLayout& layout);
 }
