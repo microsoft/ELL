@@ -36,6 +36,9 @@ class VoiceActivityDetector:
         self.count = 0
         self.intervals = []
         self.start = None
+
+    def configure(self, tau_up, tau_down, threshold_up, threshold_down, large_input, gain_att, level_threshold):
+        self.tr.configure(tau_up, tau_down, threshold_up, threshold_down, large_input, gain_att, level_threshold)
   
     def process(self, data):        
         """ process incoming audio stream, this data should already be floating point in the range [0-1].
@@ -78,7 +81,16 @@ class _ActivityTracker:
         self.level_threshold = DEFAULT_LEVEL_THRESHOLD
         self.time = 0.0
         self.signal = 0
-        
+
+    def configure(self, tau_up, tau_down, threshold_up, threshold_down, large_input, gain_att, level_threshold):
+        self.tau_up = tau_up
+        self.tau_down = tau_down
+        self.threshold_up = threshold_up
+        self.threshold_down = threshold_down
+        self.large_input = large_input
+        self.gain_att = gain_att
+        self.level_threshold = level_threshold
+
     def _next_level(self, time, level):
         self.last_level = level
         if level < self.level:

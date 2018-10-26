@@ -263,6 +263,10 @@ class VadTest(Frame):
             e.delete(0,END)
             e.insert(0, s)
 
+    def get_entry(self, e):
+        v = e.get()
+        return float(v)
+
     def update_ui(self):
         self.set_entry(self.wav_filename_entry, self.wav_filename)
         self.set_entry(self.features_entry, self.featurizer_path)
@@ -273,6 +277,17 @@ class VadTest(Frame):
         self.set_entry(self.large_input, vad.DEFAULT_LARGE_INPUT)
         self.set_entry(self.gain_att, vad.DEFAULT_GAIN_ATT)
         self.set_entry(self.level_threshold, vad.DEFAULT_LEVEL_THRESHOLD)
+
+    def read_ui_settings(self):
+        self.vad.configure(
+            self.get_entry(self.tau_up),
+            self.get_entry(self.tau_down),
+            self.get_entry(self.threshold_up),
+            self.get_entry(self.threshold_down),
+            self.get_entry(self.large_input),
+            self.get_entry(self.gain_att),
+            self.get_entry(self.level_threshold)
+        )
 
     def init_data(self):
         """ initialize the spectrogram_image_data based on the newly loaded model info """
@@ -450,10 +465,12 @@ class VadTest(Frame):
         """ Play a wav file, and classify the audio. Note we use a background thread to read the
         wav file and we setup a UI animation function to draw the sliding spectrogram image, this way
         the UI update doesn't interfere with the smoothness of the audio playback """
-        if self.speaker is None:
-            self.speaker = speaker.Speaker()
+        #if self.speaker is None:
+        #    self.speaker = speaker.Speaker()
     
         self.stop()
+        
+        self.read_ui_settings()
         self.reading_input = False
         self.wav_file = wav_reader.WavReader(self.sample_rate, self.channels)
         self.wav_file.open(filename, self.featurizer.input_size, self.speaker)
@@ -485,8 +502,9 @@ class VadTest(Frame):
         the UI update doesn't interfere with the smoothness of the microphone readings """ 
         if self.microphone is None:
             self.microphone = microphone.Microphone(False)
-    
+            
         self.stop()
+        self.read_ui_settings()
         num_channels = 1
         self.microphone.open(self.featurizer.input_size, self.sample_rate, num_channels, self.input_device)        
         
