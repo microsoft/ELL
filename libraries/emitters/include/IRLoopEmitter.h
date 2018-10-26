@@ -118,6 +118,13 @@ namespace emitters
         /// <returns> Pointer to the llvm::BasicBlock that represents the body of the loop. </returns>
         llvm::BasicBlock* Begin(LLVMValue pTestValuePointer);
 
+        /// <summary> Emits the beginning of a while loop that uses a lambda to compute a test value. </summary>
+        ///
+        /// </param name="condition"> A function the emits code returning a single-bit boolean test value </param>
+        ///
+        /// <returns> Pointer to the llvm::BasicBlock that represents the body of the loop. </returns>
+        llvm::BasicBlock* Begin(std::function<LLVMValue(IRFunctionEmitter&)> condition);
+
         /// <summary> Emit the end of this loop. </summary>
         void End();
 
@@ -129,6 +136,7 @@ namespace emitters
         void CreateBlocks();
         void EmitInitialization();
         void EmitCondition(LLVMValue pTestValuePointer);
+        void EmitCondition(std::function<LLVMValue(IRFunctionEmitter&)> condition);
         llvm::BasicBlock* PrepareBody();
 
         IRFunctionEmitter& _functionEmitter; // Loop written into this function

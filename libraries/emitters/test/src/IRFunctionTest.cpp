@@ -62,7 +62,6 @@ void TestIRAddFunction()
 {
     CompilerOptions options;
     IRModuleEmitter module("CompilableIRAddFunction", options);
-    module.DeclarePrintf();
 
     IRAddFunction<double> func;
 
@@ -78,8 +77,6 @@ void TestIRAddFunction()
     auto result = func.Compile(function, xArg, yArg);
     function.Return(result);
     module.EndFunction();
-
-    module.DebugDump();
 
     IRExecutionEngine executionEngine(std::move(module));
     auto compiledFunction = (BinaryScalarDoubleFunction)executionEngine.ResolveFunctionAddress(functionName);
@@ -97,11 +94,10 @@ void TestIRAddFunction()
     testing::ProcessTest("Testing compilable add function", testing::IsEqual(computedResult, compiledResult));
 }
 
-void TestIRFunction()
+void TestCompilableIRFunction()
 {
     CompilerOptions options;
     IRModuleEmitter module("CompilableIRFunction", options);
-    module.DeclarePrintf();
 
     CompilablePlusFiveFunction func;
 
@@ -115,8 +111,6 @@ void TestIRFunction()
     auto result = func.Compile(function, arg);
     function.Return(result);
     module.EndFunction();
-
-    module.DebugDump();
 
     IRExecutionEngine executionEngine(std::move(module));
     UnaryScalarDoubleFunction compiledFunction = (UnaryScalarDoubleFunction)executionEngine.ResolveFunctionAddress(functionName);

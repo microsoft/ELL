@@ -9,9 +9,16 @@
 
 #include "LLVMUtilities.h"
 
+// utilities
+#include "Exception.h"
+
 // llvm
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/IR/Module.h>
+
+// stl
+#include <functional>
+#include <type_traits>
 
 namespace ell
 {
@@ -56,6 +63,25 @@ namespace emitters
         ///
         /// <returns> The function address. </returns>
         uint64_t GetFunctionAddress(const std::string& name);
+
+        /// <summary>
+        /// Return a std::function to invoke a named function, JITTing code as needed. Throws an exception if not found.
+        /// </summary>
+        ///
+        /// <param name="name"> Name of the requested function. </param>
+        ///
+        /// <returns> The function object. </returns>
+        template <typename FunctionType>
+        std::function<FunctionType> GetFunction(const std::string& name)
+        {
+            auto addr = GetFunctionAddress(name);
+            if (!addr)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Function not found");
+            }
+
+            return reinterpret_cast<std::add_pointer_t<FunctionType>>(addr);
+        } // STYLE discrepancy
 
         /// <summary>
         /// Return the address of a global variable, JITTing code as needed. Returns 0 if not found.

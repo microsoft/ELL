@@ -1156,33 +1156,32 @@ namespace emitters
         loop.End();
     }
 
+    void IRFunctionEmitter::While(std::function<LLVMValue(IRFunctionEmitter&)> condition, WhileLoopBodyFunction body)
+    {
+        auto loop = IRWhileLoopEmitter(*this);
+        loop.Begin(condition);
+        body(*this);
+        loop.End();
+    }
+
     IRIfEmitter IRFunctionEmitter::If(LLVMValue pTestValuePointer, std::function<void(IRFunctionEmitter&)> body)
     {
-        auto ifEmitter = IRIfEmitter(*this, true);
-        ifEmitter.If(pTestValuePointer);
-        {
-            body(*this);
-        }
+        auto ifEmitter = IRIfEmitter(*this);
+        ifEmitter.If(pTestValuePointer, body);
         return ifEmitter;
     }
 
     IRIfEmitter IRFunctionEmitter::If(std::function<LLVMValue()> comparison, IfElseBodyFunction body)
     {
-        auto ifEmitter = IRIfEmitter(*this, true);
-        ifEmitter.If(comparison);
-        {
-            body(*this);
-        }
+        auto ifEmitter = IRIfEmitter(*this);
+        ifEmitter.If(comparison(), body);
         return ifEmitter;
     }
 
     IRIfEmitter IRFunctionEmitter::If(TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue, IfElseBodyFunction body)
     {
-        auto ifEmitter = IRIfEmitter(*this, true);
-        ifEmitter.If(comparison, pValue, pTestValue);
-        {
-            body(*this);
-        }
+        auto ifEmitter = IRIfEmitter(*this);
+        ifEmitter.If(comparison, pValue, pTestValue, body);
         return ifEmitter;
     }
 

@@ -70,9 +70,6 @@ void TestPthreadSelf()
     func.Return(selfVal);
     module.EndFunction();
 
-    // print the generated code
-    // module.DebugDump();
-
     IRExecutionEngine executionEngine(std::move(module));
     VoidReturningIntFunction compiledFunction = (VoidReturningIntFunction)executionEngine.ResolveFunctionAddress(functionName);
 
@@ -138,10 +135,11 @@ void TestPthreadCreate()
     module.EndFunction();
 
     // print the generated code
-    module.DebugDump();
+    // module.DebugDump();
 
     IRExecutionEngine executionEngine(std::move(module));
-    VoidReturningIntFunction compiledFunction = (VoidReturningIntFunction)executionEngine.ResolveFunctionAddress(mainFunctionName);
+    // VoidReturningIntFunction compiledFunction = (VoidReturningIntFunction)executionEngine.ResolveFunctionAddress(mainFunctionName);
+    auto compiledFunction = executionEngine.GetFunction<int()>(mainFunctionName);
 
     auto self = compiledFunction();
     UNUSED(self);

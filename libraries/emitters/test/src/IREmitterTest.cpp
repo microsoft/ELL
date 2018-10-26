@@ -27,6 +27,7 @@
 #include <llvm/IR/TypeBuilder.h>
 
 // stl
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <ostream>
@@ -37,6 +38,7 @@
 using namespace ell;
 using namespace ell::emitters;
 
+// Utility code
 std::string g_outputBasePath = "";
 void SetOutputPathBase(std::string path)
 {
@@ -54,8 +56,6 @@ std::vector<llvm::Instruction*> RemoveTerminators(LLVMFunction pfn)
     auto& blocks = pfn->getBasicBlockList();
     for (auto pBlock = blocks.begin(); pBlock != blocks.end(); ++pBlock)
     {
-        std::cout << "##BLOCK## ";
-        std::cout << std::string(pBlock->getName()) << std::endl;
         auto& instructions = pBlock->getInstList();
         for (auto pInst = instructions.begin(); pInst != instructions.end(); ++pInst)
         {
@@ -78,13 +78,64 @@ void InsertTerminators(LLVMFunction pfn, std::vector<llvm::Instruction*>& terms)
     auto& blocks = pfn->getBasicBlockList();
     for (auto pBlock = blocks.begin(); pBlock != blocks.end(); ++pBlock)
     {
-        std::cout << "##BLOCK## ";
-        std::cout << std::string(pBlock->getName()) << std::endl;
         auto& instructions = pBlock->getInstList();
         instructions.push_back(terms[i++]);
     }
 }
 
+static std::stringstream g_debugOutput;
+
+extern "C" {
+void DebugPrint(char* message)
+{
+    g_debugOutput << message;
+}
+}
+
+LLVMFunction DeclareDebugPrint(IRModuleEmitter& module)
+{
+    llvm::FunctionType* type = llvm::TypeBuilder<int(char*), false>::get(module.GetIREmitter().GetContext());
+    return module.DeclareFunction("DebugPrint", type);
+}
+
+void CallDebugPrint(IRFunctionEmitter& function, LLVMFunction printFunction, std::string message)
+{
+    function.Call(printFunction, { function.Literal(message.c_str()) });
+}
+
+void DefineDebugPrint(LLVMFunction debugPrintFunction, IRExecutionEngine& jitter)
+{
+    g_debugOutput.clear();
+    jitter.DefineFunction(debugPrintFunction, reinterpret_cast<uintptr_t>(&DebugPrint));
+}
+
+std::string GetCapturedDebugOutput()
+{
+    return g_debugOutput.str();
+}
+
+std::string EmitStruct(const char* moduleName)
+{
+    auto module = MakeHostModuleEmitter(moduleName);
+    const char* TensorShapeName = "TensorShape";
+    auto int32Type = emitters::VariableType::Int32;
+    emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
+    auto shapeType = module.GetOrCreateStruct(TensorShapeName, namedFields);
+    module.IncludeTypeInHeader(shapeType->getName());
+
+    const emitters::NamedVariableTypeList parameters = { { "index", emitters::GetVariableType<int>() } };
+    auto function = module.BeginFunction("Dummy", shapeType, parameters);
+    function.IncludeInHeader();
+    module.EndFunction();
+
+    std::ostringstream out;
+    emitters::WriteModuleHeader(out, module);
+    return out.str();
+}
+
+// Tests
+
+// Just test that IREmitter doesn't crash
 void TestIREmitter()
 {
     llvm::LLVMContext context;
@@ -97,41 +148,9 @@ void TestIREmitter()
     // Create another module
     auto module2 = emitter.CreateModule("Module1");
     emitter.DeclareFunction(module2.get(), "foobar");
-
-    DebugDump(module1.get());
-    DebugDump(module2.get());
 }
 
-void TestLLVMShiftRegister()
-{
-    auto module = MakeHostModuleEmitter("Shifter");
-
-    std::vector<double> data({ 1.1, 2.1, 3.1, 4.1, 5.1 });
-    std::vector<double> newData1({ 1.2, 2.2 });
-    std::vector<double> newData2({ 3.2, 4.2 });
-
-    auto shiftFunction = module.BeginMainFunction();
-    llvm::GlobalVariable* pRegister = module.GlobalArray("g_shiftRegister", data);
-    LLVMValue c1 = module.ConstantArray("c_1", newData1);
-    LLVMValue c2 = module.ConstantArray("c_2", newData2);
-
-    shiftFunction.Print("Begin\n");
-    shiftFunction.PrintForEach("%f\n", pRegister, data.size());
-    shiftFunction.Print("Shift 1\n");
-    shiftFunction.ShiftAndUpdate<double>(pRegister, data.size(), newData1.size(), c1);
-    shiftFunction.PrintForEach("%f\n", pRegister, data.size());
-    shiftFunction.Print("Shift 2\n");
-    shiftFunction.ShiftAndUpdate<double>(pRegister, data.size(), newData2.size(), c2);
-    shiftFunction.PrintForEach("%f\n", pRegister, data.size());
-    shiftFunction.Return();
-    module.EndFunction();
-
-    module.DebugDump();
-    module.WriteToFile("shift.bc");
-    module.WriteToFile("shift.ll");
-    module.WriteToFile("shift.asm");
-}
-
+// Just another test that IREmitter doesn't crash
 void TestEmitLLVM()
 {
     auto module = MakeHostModuleEmitter("Looper");
@@ -164,10 +183,10 @@ void TestEmitLLVM()
         });
 
         fnMain.If(TypedComparison::equalsFloat, item, fnMain.Literal(6.6), [](IRFunctionEmitter& fnMain) {
-            fnMain.Print("Second If!\n");
-        }).Else([](IRFunctionEmitter& fnMain) {
-            fnMain.Print("Else\n");
-        });
+                  fnMain.Print("Second If!\n");
+              }).Else([](IRFunctionEmitter& fnMain) {
+                fnMain.Print("Else\n");
+              });
 
         fnMain.Printf({ fnMain.Literal("%d, %f\n"), i, item });
     });
@@ -192,221 +211,279 @@ void TestEmitLLVM()
 
     fnMain.Return();
     module.EndFunction();
-
-    module.DebugDump();
-
-    module.WriteToFile("loop.bc");
 }
 
-static std::stringstream g_debugOutput;
+void TestLLVMShiftRegister()
+{
+    auto module = MakeHostModuleEmitter("ShiftRegister");
 
-extern "C" {
-    void DebugPrint(char* message)
+    std::vector<double> data({ 1.1, 2.1, 3.1, 4.1, 5.1 });
+    std::vector<double> newData1({ 1.2, 2.2 });
+    std::vector<double> newData2({ 3.3, 4.3 });
+
+    auto fn = module.BeginFunction("ShiftRegisterTest", emitters::VariableType::Void, { emitters::VariableType::DoublePointer });
     {
-        g_debugOutput << message;
+        auto arguments = fn.Arguments().begin();
+        auto output = &(*arguments++);
+
+        llvm::GlobalVariable* pRegister = module.GlobalArray("g_shiftRegister", data);
+        LLVMValue c1 = module.ConstantArray("c_1", newData1);
+        LLVMValue c2 = module.ConstantArray("c_2", newData2);
+
+        fn.ShiftAndUpdate<double>(pRegister, data.size(), newData1.size(), c1);
+        fn.ShiftAndUpdate<double>(pRegister, data.size(), newData2.size(), c2);
+
+        fn.MemoryCopy<double>(pRegister, output, data.size());
+        fn.Return();
     }
+    module.EndFunction();
+    fn.Verify();
+
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<void(double*)>("ShiftRegisterTest");
+    const double sentinel = -17.0;
+    std::vector<double> result(6, sentinel);
+    std::vector<double> expected = { 5.1, 1.2, 2.2, 3.3, 4.3, sentinel };
+    testFn(result.data());
+    testing::ProcessTest("Testing shift register", testing::IsEqual(result, expected));
 }
 
-std::string TestCaptureStdout(emitters::IRModuleEmitter& emitter, std::function<void()> body)
+void TestHighLevelNestedIf()
 {
-    llvm::FunctionType* type = llvm::TypeBuilder<int(char*), false>::get(emitter.GetIREmitter().GetContext());
-    auto debugPrintFunction = emitter.DeclareFunction("DebugPrint", type);
-    g_debugOutput.clear();
-
-    body();
-
-    IRExecutionEngine iee(std::move(emitter));
-    iee.DefineFunction(debugPrintFunction, reinterpret_cast<uintptr_t>(&DebugPrint));
-    iee.RunMain();
-
-    return g_debugOutput.str();
-}
-
-void CallDebugPrint(IRFunctionEmitter& helper, std::string message)
-{
-    helper.Call("DebugPrint", { helper.Literal(message.c_str()) });
-}
-
-void TestIfHelpers(bool runJit)
-{
-    auto module = MakeHostModuleEmitter("IfHelpers");
-
-    auto result = TestCaptureStdout(module, [&]() {
-
-        NamedVariableTypeList argTypes = { { "x", VariableType::Double },
-        { "y", VariableType::Double },
-        { "z", VariableType::Double } };
-        auto helper = module.BeginFunction("IfTest", emitters::VariableType::Void, argTypes);
-
-        auto arguments = helper.Arguments().begin();
+    auto module = MakeHostModuleEmitter("HighLevelNestedIf");
+    NamedVariableTypeList argTypes = { { "x", VariableType::Double },
+                                       { "y", VariableType::Double },
+                                       { "z", VariableType::Double } };
+    auto fn = module.BeginFunction("HighLevelNestedIfTest", emitters::VariableType::Int32, argTypes);
+    {
+        auto arguments = fn.Arguments().begin();
         auto x = &(*arguments++);
         auto y = &(*arguments++);
         auto z = &(*arguments++);
-        CallDebugPrint(helper, "Begin IfThen\n");
+        auto result = fn.Variable(emitters::VariableType::Int32);
         {
-            IRIfEmitter ifEmitter = helper.If(helper.Comparison(emitters::TypedComparison::greaterThanFloat, x, y), [x, z](IRFunctionEmitter& fn) {
-                CallDebugPrint(fn, " If Block\n");
-                fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [](IRFunctionEmitter& fn) {
-                    CallDebugPrint(fn, "  Inner If block 1\n");
-                });
-            });
-            ifEmitter.ElseIf(helper.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [x, y](IRFunctionEmitter& fn) {
-                CallDebugPrint(fn, " ElseIf block\n");
-                fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, y), [](IRFunctionEmitter& fn) {
-                    CallDebugPrint(fn, "  Inner If block 2\n");
-                });
-            });
-            ifEmitter.Else([y, z](IRFunctionEmitter& fn) {
-                CallDebugPrint(fn, " Else block\n");
-                fn.If(fn.Comparison(emitters::TypedComparison::greaterThanFloat, y, z), [](IRFunctionEmitter& fn) {
-                    CallDebugPrint(fn, "  Inner If block 3\n");
-                });
-            });
+            fn.If(fn.Comparison(emitters::TypedComparison::greaterThanFloat, x, y), [&result, x, z](IRFunctionEmitter& fn) {
+                  fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result](IRFunctionEmitter& fn) {
+                      fn.Store(result, fn.Literal<int>(1));
+                  });
+              }).ElseIf(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result, x, y](IRFunctionEmitter& fn) {
+                    fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, y), [&result](IRFunctionEmitter& fn) {
+                        fn.Store(result, fn.Literal<int>(2));
+                    });
+              }).Else([&result, y, z](IRFunctionEmitter& fn) {
+                    fn.If(fn.Comparison(emitters::TypedComparison::greaterThanFloat, y, z), [&result](IRFunctionEmitter& fn) {
+                        fn.Store(result, fn.Literal<int>(3));
+                  });
+              });
         }
-        CallDebugPrint(helper, "End IfThen\n");
-        helper.Return();
-        module.EndFunction();
-
-        auto fn = module.BeginMainFunction();
-
-        // test all 3 branches of the if-then-else block.
-        fn.Call("IfTest", { fn.Literal(10.0), fn.Literal(5.0), fn.Literal(20.0) });
-        fn.Call("IfTest", { fn.Literal(10.0), fn.Literal(15.0), fn.Literal(20.0) });
-        fn.Call("IfTest", { fn.Literal(10.0), fn.Literal(15.0), fn.Literal(5.0) });
-
-        fn.Return();
-        module.EndFunction();
-
-        if (!runJit)
-        {
-            module.DebugDump();
-            module.WriteToFile("ifhelpers.bc");
-        }
-    });
-
-    std::string actual = g_debugOutput.str();
-    std::string expected = "Begin IfThen\n"
-        " If Block\n"
-        "  Inner If block 1\n"
-        "End IfThen\n"
-        "Begin IfThen\n"
-        " ElseIf block\n"
-        "  Inner If block 2\n"
-        "End IfThen\n"
-        "Begin IfThen\n"
-        " Else block\n"
-        "  Inner If block 3\n"
-        "End IfThen\n";
-    testing::ProcessTest("TestIfHelpers", actual == expected);
-}
-
-void TestLogical()
-{
-    auto module = MakeHostModuleEmitter("Logical");
-
-    auto fn = module.BeginFunction("TestLogical", VariableType::Void, { VariableType::Int32, VariableType::Int32, VariableType::Int32 });
-    auto args = fn.Arguments().begin();
-    llvm::Argument& val1 = *args++;
-    llvm::Argument& val2 = *args++;
-    llvm::Argument& val3 = *args++;
-
-    auto pResult = fn.LogicalAnd(fn.Comparison(TypedComparison::equals, &val1, &val1), fn.Comparison(TypedComparison::equals, &val2, &val2));
-    fn.Printf("And TRUE: %d\n", { pResult });
-
-    pResult = fn.LogicalAnd(fn.Comparison(TypedComparison::equals, &val1, &val1), fn.Comparison(TypedComparison::equals, &val2, &val3));
-    fn.Printf("And FALSE %d\n", { pResult });
-
-    pResult = fn.LogicalAnd(fn.Comparison(TypedComparison::equals, &val1, &val3), fn.Comparison(TypedComparison::equals, &val2, &val3));
-    fn.Printf("And FALSE %d\n", { pResult });
-
-    pResult = fn.LogicalOr(fn.Comparison(TypedComparison::equals, &val1, &val1), fn.Comparison(TypedComparison::equals, &val2, &val3));
-    fn.Printf("OR True %d\n", { pResult });
-
-    pResult = fn.LogicalOr(fn.Comparison(TypedComparison::equals, &val2, &val3), fn.Comparison(TypedComparison::equals, &val1, &val1));
-    fn.Printf("OR True %d\n", { pResult });
-
-    pResult = fn.LogicalOr(fn.Comparison(TypedComparison::equals, &val2, &val3), fn.Comparison(TypedComparison::equals, &val1, &val2));
-    fn.Printf("OR False %d\n", { pResult });
-
-    pResult = fn.LogicalNot(fn.Comparison(TypedComparison::equals, &val1, &val1));
-    fn.Printf("NOT True %d\n", { pResult });
-
-    pResult = fn.LogicalNot(fn.Comparison(TypedComparison::equals, &val1, &val2));
-    fn.Printf("NOT False %d\n", { pResult });
-
-    fn.Return();
+        fn.Return(fn.Load(result));
+    }
     module.EndFunction();
 
     fn.Verify();
 
-    auto fnMain = module.BeginMainFunction();
-    // We do this to prevent LLVM from doing constant folding.. so we can debug/see what is happening.
-    fnMain.Call("TestLogical", { fnMain.Literal(5), fnMain.Literal(10), fnMain.Literal(15) });
-    fnMain.Return();
-    module.DebugDump();
-
     IRExecutionEngine jit(std::move(module));
-    try
-    {
-        jit.RunMain();
-    }
-    catch (...)
-    {
-    }
+    auto testFn = jit.GetFunction<int32_t(double, double, double)>("HighLevelNestedIfTest");
+
+    // test all 3 branches of the if-then-else block.
+    int result;
+    result = testFn(10.0, 5.0, 20.0);
+    testing::ProcessTest("Testing nested if/else", result == 1);
+    result = testFn(10.0, 15.0, 20.0);
+    testing::ProcessTest("Testing nested if/else", result == 2);
+    result = testFn(10.0, 15.0, 5.0);
+    testing::ProcessTest("Testing nested if/else", result == 3);
 }
 
-void TestForLoop(bool runJit)
+void TestMixedLevelNestedIf()
+{
+    auto module = MakeHostModuleEmitter("MixedLevelNestedIf");
+    NamedVariableTypeList argTypes = { { "x", VariableType::Double },
+                                       { "y", VariableType::Double },
+                                       { "z", VariableType::Double } };
+    auto fn = module.BeginFunction("MixedLevelNestedIfTest", emitters::VariableType::Int32, argTypes);
+    {
+        auto arguments = fn.Arguments().begin();
+        auto x = &(*arguments++);
+        auto y = &(*arguments++);
+        auto z = &(*arguments++);
+        auto result = fn.Variable(emitters::VariableType::Int32);
+        {
+            IRIfEmitter ifEmitter = fn.If(fn.Comparison(emitters::TypedComparison::greaterThanFloat, x, y), [&result, x, z](IRFunctionEmitter& fn) {
+                fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result](IRFunctionEmitter& fn) {
+                    fn.Store(result, fn.Literal<int>(1));
+                });
+            });
+            ifEmitter.ElseIf(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result, x, y](IRFunctionEmitter& fn) {
+                fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, y), [&result](IRFunctionEmitter& fn) {
+                    fn.Store(result, fn.Literal<int>(2));
+                });
+            });
+            ifEmitter.Else([&result, y, z](IRFunctionEmitter& fn) {
+                fn.If(fn.Comparison(emitters::TypedComparison::greaterThanFloat, y, z), [&result](IRFunctionEmitter& fn) {
+                    fn.Store(result, fn.Literal<int>(3));
+                });
+            });
+            ifEmitter.End();
+        }
+        fn.Return(fn.Load(result));
+    }
+    module.EndFunction();
+
+    fn.Verify();
+
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<int32_t(double, double, double)>("MixedLevelNestedIfTest");
+
+    // test all 3 branches of the if-then-else block.
+    int result;
+    result = testFn(10.0, 5.0, 20.0);
+    testing::ProcessTest("Testing nested if/else", result == 1);
+    result = testFn(10.0, 15.0, 20.0);
+    testing::ProcessTest("Testing nested if/else", result == 2);
+    result = testFn(10.0, 15.0, 5.0);
+    testing::ProcessTest("Testing nested if/else", result == 3);
+}
+
+void TestLogicalAnd()
+{
+    auto module = MakeHostModuleEmitter("LogicalAnd");
+
+    auto fn = module.BeginFunction("LogicalAndTest", VariableType::Int32, { VariableType::Int32, VariableType::Int32, VariableType::Int32 });
+    {
+        auto args = fn.Arguments().begin();
+        llvm::Argument& val1 = *args++;
+        llvm::Argument& val2 = *args++;
+        llvm::Argument& val3 = *args++;
+
+        auto result = fn.LogicalAnd(fn.Comparison(TypedComparison::equals, &val1, &val2), fn.Comparison(TypedComparison::equals, &val2, &val3));
+        fn.Return(fn.CastValue<bool, int32_t>(result));
+    }
+    module.EndFunction();
+
+    fn.Verify();
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<int32_t(int32_t, int32_t, int32_t)>("LogicalAndTest");
+    auto referenceFn = [](int x1, int x2, int x3) {
+        return (x1 == x2) && (x2 == x3);
+    };
+
+    bool success = true;
+    for (auto args : std::vector<std::vector<int32_t>>{ { 1, 1, 1 }, { 1, 2, 2 }, { 1, 2, 3 }, { 1, 1, 2 } })
+    {
+        auto result = testFn(args[0], args[1], args[2]);
+        auto expected = referenceFn(args[0], args[1], args[2]);
+        success = success && (result == expected);
+    }
+    testing::ProcessTest("Testing logical AND", success);
+}
+
+void TestLogicalOr()
+{
+    auto module = MakeHostModuleEmitter("LogicalOr");
+
+    auto fn = module.BeginFunction("LogicalOrTest", VariableType::Int32, { VariableType::Int32, VariableType::Int32, VariableType::Int32 });
+    {
+        auto args = fn.Arguments().begin();
+        llvm::Argument& val1 = *args++;
+        llvm::Argument& val2 = *args++;
+        llvm::Argument& val3 = *args++;
+
+        auto result = fn.LogicalOr(fn.Comparison(TypedComparison::equals, &val1, &val2), fn.Comparison(TypedComparison::equals, &val2, &val3));
+        fn.Return(fn.CastValue<bool, int32_t>(result));
+    }
+    module.EndFunction();
+
+    fn.Verify();
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<int32_t(int32_t, int32_t, int32_t)>("LogicalOrTest");
+    auto referenceFn = [](int x1, int x2, int x3) {
+        return (x1 == x2) || (x2 == x3);
+    };
+
+    bool success = true;
+    for (auto args : std::vector<std::vector<int32_t>>{ { 1, 1, 1 }, { 1, 2, 2 }, { 1, 2, 3 }, { 1, 1, 2 } })
+    {
+        auto result = testFn(args[0], args[1], args[2]);
+        auto expected = referenceFn(args[0], args[1], args[2]);
+        success = success && (result == expected);
+    }
+    testing::ProcessTest("Testing logical OR", success);
+}
+
+void TestLogicalNot()
+{
+    auto module = MakeHostModuleEmitter("LogicalNot");
+
+    auto fn = module.BeginFunction("LogicalNotTest", VariableType::Int32, { VariableType::Int32, VariableType::Int32 });
+    {
+        auto args = fn.Arguments().begin();
+        llvm::Argument& val1 = *args++;
+        llvm::Argument& val2 = *args++;
+
+        auto result = fn.LogicalNot(fn.Comparison(TypedComparison::equals, &val1, &val2));
+        fn.Return(fn.CastValue<bool, int32_t>(result));
+    }
+    module.EndFunction();
+
+    fn.Verify();
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<int32_t(int32_t, int32_t)>("LogicalNotTest");
+    auto referenceFn = [](int x1, int x2) {
+        return !(x1 == x2);
+    };
+
+    bool success = true;
+    for (auto args : std::vector<std::vector<int32_t>>{ { 0, 1 }, { 0, 0 }, { 1, 1 }, { -1, 1 } })
+    {
+        auto result = testFn(args[0], args[1]);
+        auto expected = referenceFn(args[0], args[1]);
+        success = success && (result == expected);
+    }
+    testing::ProcessTest("Testing logical NOT", success);
+}
+
+void TestForLoop()
 {
     auto module = MakeHostModuleEmitter("ForLoop");
-
-    auto add = GetOperator<double>(BinaryOperationType::add);
-    auto varType = GetVariableType<double>();
-    auto fn = module.BeginFunction("TestForLoop", VariableType::Void, VariableTypeList{});
-
-    auto sum = fn.Variable(varType);
-
-    fn.Print("Begin ForLoop\n");
     const int numIter = 10;
+
+    auto add = GetOperator<int32_t>(BinaryOperationType::add);
+    auto varType = VariableType::Int32;
+
+    auto fn = module.BeginFunction("TestForLoop", varType, VariableTypeList{});
+    auto sum = fn.Variable(varType);
+    fn.Store(sum, fn.Literal<int32_t>(0));
     fn.For(numIter, [sum, add](IRFunctionEmitter& fn, LLVMValue i) {
-        fn.Printf({ fn.Literal("i: %f\n"), i });
         fn.Store(sum, fn.Operator(add, fn.Load(sum), i));
     });
 
-    fn.Return();
+    fn.Return(fn.Load(sum));
     module.EndFunction();
 
-    auto fnMain = module.BeginMainFunction();
-    fnMain.Call("TestForLoop");
-    fnMain.Return();
-
-    if (runJit)
+    IRExecutionEngine jit(std::move(module));
+    auto jittedFunction = jit.GetFunction<int32_t()>("TestForLoop");
+    auto result = jittedFunction();
+    int32_t expectedResult = 0;
+    for (int i = 0; i < numIter; ++i)
     {
-        IRExecutionEngine jit(std::move(module));
-        jit.RunMain();
+        expectedResult += i;
     }
-    else
-    {
-        module.DebugDump();
-    }
+    testing::ProcessTest("Testing for loop", result == expectedResult);
 }
 
-void TestWhileLoop()
+void TestWhileLoopWithVariableCondition()
 {
     auto module = MakeHostModuleEmitter("WhileLoop");
-
     auto int8Type = GetVariableType<char>();
     auto int32Type = GetVariableType<int32_t>();
-
-    auto fn = module.BeginMainFunction();
+    auto fn = module.BeginFunction("TestWhileLoop", int32Type);
     {
         auto conditionVar = fn.Variable(int8Type, "cond");
-        fn.Print("Begin while loop\n");
         auto i = fn.Variable(int32Type);
         fn.Store(i, fn.Literal<int>(5));
         fn.Store(conditionVar, fn.TrueBit());
         fn.While(conditionVar, [conditionVar, i](IRFunctionEmitter& fn) {
-            fn.Printf("i: %d\n", { fn.Load(i) });
-
             // i++
             fn.OperationAndUpdate(i, TypedOperator::add, fn.Literal<int>(1)); // i++
 
@@ -414,12 +491,42 @@ void TestWhileLoop()
             fn.Store(conditionVar, fn.Comparison(TypedComparison::notEquals, fn.Load(i), fn.Literal<int>(10)));
         });
 
-        fn.Printf("Done with while loop: i = %d\n", { fn.Load(i) });
-        fn.Return();
+        fn.Return(fn.Load(i));
     }
+    module.EndFunction();
 
     IRExecutionEngine jit(std::move(module));
-    jit.RunMain();
+    auto jittedFunction = jit.GetFunction<int32_t()>("TestWhileLoop");
+    auto result = jittedFunction();
+    const int expectedResult = 10;
+    testing::ProcessTest("Testing while loop with stored variable exit condition", result == expectedResult);
+}
+
+void TestWhileLoopWithFunctionCondition()
+{
+    auto module = MakeHostModuleEmitter("WhileLoop");
+    auto int32Type = GetVariableType<int32_t>();
+    auto fn = module.BeginFunction("TestWhileLoop", int32Type);
+    {
+        auto i = fn.Variable(int32Type);
+        fn.Store(i, fn.Literal<int>(5));
+        auto condition = [i](IRFunctionEmitter& fn) { 
+            return fn.LocalScalar(fn.Load(i)) != 10;
+            };
+
+        fn.While(condition, [i](IRFunctionEmitter& fn) {
+            fn.OperationAndUpdate(i, TypedOperator::add, fn.Literal<int>(1)); // i++
+        });
+
+        fn.Return(fn.Load(i));
+    }
+    module.EndFunction();
+
+    IRExecutionEngine jit(std::move(module));
+    auto jittedFunction = jit.GetFunction<int32_t()>("TestWhileLoop");
+    auto result = jittedFunction();
+    const int expectedResult = 10;
+    testing::ProcessTest("Testing while loop with function exit condition", result == expectedResult);
 }
 
 void TestMetadata()
@@ -442,7 +549,6 @@ void TestMetadata()
     auto fnMain = module.BeginMainFunction();
     fnMain.Call("TestMetadata");
     fnMain.Return();
-    module.DebugDump();
 
     // Missing metadata
     testing::ProcessTest("Testing missing module metadata check", testing::IsEqual(module.HasMetadata("does.not.exist"), false));
@@ -489,7 +595,7 @@ void TestHeader()
 {
     auto module = MakeHostModuleEmitter("Predictor");
 
-    auto int32Type = ell::emitters::VariableType::Int32;
+    auto int32Type = emitters::VariableType::Int32;
     emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
     auto shapeType = module.GetOrCreateStruct("Shape", namedFields);
     // test that this casues the type to show up in the module header.
@@ -512,40 +618,18 @@ void TestHeader()
     module.EndFunction();
 
     std::ostringstream out;
-    ell::emitters::WriteModuleHeader(out, module);
+    emitters::WriteModuleHeader(out, module);
 
     std::string result = out.str();
     auto structPos = result.find("typedef struct Shape");
     auto funcPos = result.find("Shape Test_GetInputShape(int32_t");
-    testing::ProcessTest("Testing header generation",
-                         structPos != std::string::npos && funcPos != std::string::npos);
-}
-
-std::string EmitStruct(const char* moduleName)
-{
-    auto module = MakeHostModuleEmitter(moduleName);
-    const char* TensorShapeName = "TensorShape";
-    auto int32Type = ell::emitters::VariableType::Int32;
-    emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
-    auto shapeType = module.GetOrCreateStruct(TensorShapeName, namedFields);
-    module.IncludeTypeInHeader(shapeType->getName());
-
-    const emitters::NamedVariableTypeList parameters = { { "index", emitters::GetVariableType<int>() } };
-    auto function = module.BeginFunction("Dummy", shapeType, parameters);
-    function.IncludeInHeader();
-    module.EndFunction();
-
-    std::ostringstream out;
-    ell::emitters::WriteModuleHeader(out, module);
-    return out.str();
+    testing::ProcessTest("Testing header generation", structPos != std::string::npos && funcPos != std::string::npos);
 }
 
 void TestTwoEmitsInOneSession()
 {
     auto emit1 = EmitStruct("Mod1");
     auto emit2 = EmitStruct("Mod2");
-    std::cout << emit1 << std::endl;
-    std::cout << emit2 << std::endl;
     auto badpos1 = emit1.find("TensorShape.");
     auto badpos2 = emit2.find("TensorShape.");
     testing::ProcessTest("Testing two uses of module emitter",
@@ -609,56 +693,189 @@ void TestScopedIf()
 {
     auto module = MakeHostModuleEmitter("If");
 
-    auto fn = module.BeginMainFunction();
-    auto cmp = fn.Comparison(TypedComparison::lessThanFloat, fn.Literal(10.0), fn.Literal(15.0));
-    fn.If(cmp, [](IRFunctionEmitter& fn) {
-        fn.Print("TrueBlock\n");
-    });
-    fn.Return();
+    // returns `1` if arg is < 10.0, otherwise returns `2`
+    auto fn = module.BeginFunction("ScopedIfTest", emitters::VariableType::Int32, { emitters::VariableType::Double });
+    {
+        auto arguments = fn.Arguments().begin();
+        auto x = &(*arguments++);
+        auto result = fn.Variable(emitters::VariableType::Int32);
+        fn.Store(result, fn.Literal<int>(1));
+        auto cmp = fn.Comparison(TypedComparison::lessThanFloat, x, fn.Literal(10.0));
+        fn.If(cmp, [&result](IRFunctionEmitter& fn) {
+            fn.Store(result, fn.Literal<int>(2));
+        });
+        fn.Return(fn.Load(result));
+    }
     module.EndFunction();
-    IRExecutionEngine iee(std::move(module));
-    iee.RunMain();
+
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<int32_t(double)>("ScopedIfTest");
+    auto referenceFn = [](double x) {
+        int result = 1;
+        if (x < 10.0)
+        {
+            result = 2;
+        }
+        return result;
+    };
+
+    bool success = true;
+    for (int i = 0; i < 20; ++i)
+    {
+        auto result = testFn(static_cast<double>(i));
+        auto expected = referenceFn(static_cast<double>(i));
+        success = success && (result == expected);
+    }
+    testing::ProcessTest("Testing scoped If", success);
 }
 
 void TestScopedIfElse()
 {
     auto module = MakeHostModuleEmitter("IfElse");
 
-    auto fn = module.BeginMainFunction();
-    fn.For(10, [](IRFunctionEmitter& fn, auto index) {
-        fn.Printf("index: ", { index });
-        auto cmp = fn.Comparison(TypedComparison::lessThan, index, fn.Literal<int>(3));
-        fn.If(cmp, [](IRFunctionEmitter& fn) {
-            fn.Print("< 3\n");
-        }).Else([](IRFunctionEmitter& fn) {
-            fn.Print("not < 3\n");
-        });
-    });
-    fn.Return();
+    auto fn = module.BeginFunction("ScopedIfElseTest", emitters::VariableType::Int32, { emitters::VariableType::Int32 });
+    {
+        auto arguments = fn.Arguments().begin();
+        auto x = &(*arguments++);
+        auto result = fn.Variable(emitters::VariableType::Int32);
+        fn.Store(result, fn.Literal<int>(0));
+
+        auto cmp = fn.Comparison(TypedComparison::lessThan, x, fn.Literal<int>(10));
+
+        fn.If(cmp, [&result](IRFunctionEmitter& fn) {
+              fn.Store(result, fn.Literal<int>(1));
+          }).Else([&result](IRFunctionEmitter& fn) {
+                fn.Store(result, fn.Literal<int>(2));
+            });
+        fn.Return(fn.Load(result));
+    }
     module.EndFunction();
-    IRExecutionEngine iee(std::move(module));
-    iee.RunMain();
+
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<int32_t(int32_t)>("ScopedIfElseTest");
+    auto referenceFn = [](int x) {
+        int result = 0;
+        if (x < 10)
+        {
+            result = 1;
+        }
+        else
+        {
+            result = 2;
+        }
+        return result;
+    };
+
+    bool success = true;
+    for (int32_t i = 0; i < 20; ++i)
+    {
+        auto result = testFn(i);
+        auto expected = referenceFn(i);
+        success = success && (result == expected);
+    }
+    testing::ProcessTest("Testing scoped IfElse", success);
 }
 
 void TestScopedIfElse2()
 {
     auto module = MakeHostModuleEmitter("IfElse2");
 
-    auto fn = module.BeginMainFunction();
-    fn.For(10, [](IRFunctionEmitter& fn, auto index) {
-        fn.Printf("Index: ", { index });
-        auto cmp1 = fn.Comparison(TypedComparison::lessThan, index, fn.Literal<int>(3));
-        auto cmp2 = fn.Comparison(TypedComparison::greaterThan, index, fn.Literal<int>(6));
-        fn.If(cmp1, [](IRFunctionEmitter& fn) {
-            fn.Print("< 3\n");
-        }).ElseIf(cmp2, [](IRFunctionEmitter& fn) {
-            fn.Print("> 6\n");
-        }).Else([](IRFunctionEmitter& fn) {
-            fn.Print("neither < 3 or > 6\n");
-        });
-    });
-    fn.Return();
+    auto fn = module.BeginFunction("ScopedIfElse2Test", emitters::VariableType::Int32, { emitters::VariableType::Int32 });
+    {
+        auto arguments = fn.Arguments().begin();
+        auto x = &(*arguments++);
+        auto result = fn.Variable(emitters::VariableType::Int32);
+        fn.Store(result, fn.Literal<int>(0));
+
+        auto cmp1 = fn.Comparison(TypedComparison::lessThan, x, fn.Literal<int>(3));
+        auto cmp2 = fn.Comparison(TypedComparison::greaterThan, x, fn.Literal<int>(6));
+        fn.If(cmp1, [&result](IRFunctionEmitter& fn) {
+              fn.Store(result, fn.Literal<int>(1));
+          }).ElseIf(cmp2, [&result](IRFunctionEmitter& fn) {
+                fn.Store(result, fn.Literal<int>(3));
+          }).Else([&result](IRFunctionEmitter& fn) {
+                fn.Store(result, fn.Literal<int>(2));
+          });
+        fn.Return(fn.Load(result));
+    }
     module.EndFunction();
-    IRExecutionEngine iee(std::move(module));
-    iee.RunMain();
+
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<int32_t(int32_t)>("ScopedIfElse2Test");
+    auto referenceFn = [](int x) {
+        int result = 0;
+        if (x < 3)
+        {
+            result = 1;
+        }
+        else if (x > 6)
+        {
+            result = 3;
+        }
+        else
+        {
+            result = 2;
+        }
+        return result;
+    };
+
+    bool success = true;
+    for (int32_t i = 0; i < 20; ++i)
+    {
+        auto result = testFn(i);
+        auto expected = referenceFn(i);
+        success = success && (result == expected);
+    }
+    testing::ProcessTest("Testing scoped IfElse2", success);
+}
+
+void TestElseIfWithComputedCondition()
+{
+    auto module = MakeHostModuleEmitter("ElseIfComputedCondition");
+
+    const auto returnType = emitters::GetVariableType<int>();
+    const emitters::NamedVariableTypeList parameters = { { "a", emitters::VariableType::Int32 }, { "b", emitters::VariableType::Int32 } };
+
+    auto fn = module.BeginFunction("ElseIfComputedConditionTest", returnType, parameters);
+    {
+        auto arguments = fn.Arguments().begin();
+        auto a = fn.LocalScalar(&(*arguments++)); // char* array
+        auto b = fn.LocalScalar(&(*arguments++)); // char* array
+
+        auto result = fn.Variable(returnType, "result");
+        fn.Store(result, fn.Literal(0));
+
+        fn.If(a == 1 && b == 1, [result](emitters::IRFunctionEmitter& fn) {
+              fn.Store(result, fn.Literal(1));
+          }).ElseIf(a == 2 || b == 2, [result](emitters::IRFunctionEmitter& fn) {
+              fn.Store(result, fn.Literal(2));
+          });
+
+        fn.Return(fn.Load(result));
+    }
+    module.EndFunction();
+
+    fn.Verify();
+
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<int32_t(int32_t, int32_t)>("ElseIfComputedConditionTest");
+    auto referenceFn = [](int a, int b) {
+        if (a == 1 && b == 1)
+            return 1;
+        else if(a == 2 || b == 2)
+            return 2;
+        else
+            return 0;
+    };
+
+    bool success = true;
+    auto trials = std::vector<std::vector<int32_t>>{ {1, 1}, {1, 2}, {2, 2}, {3, 3} };
+    for (auto args : trials)
+    {
+        auto result = testFn(args[0], args[1]);
+        auto expected = referenceFn(args[0], args[1]);
+        success = success && (result == expected);
+    }
+
+    testing::ProcessTest("Testing elseif with inline condition", success);
 }

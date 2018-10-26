@@ -65,7 +65,10 @@ namespace emitters
 
     llvm::BasicBlock* IRForLoopEmitter::Begin(LLVMValue pRepeatCount)
     {
-        assert(pRepeatCount != nullptr);
+        if (pRepeatCount == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Repeat count must not be null");
+        }
 
         CreateBlocks();
         EmitIterationVariable(VariableType::Int32, _functionEmitter.Literal(0));
@@ -115,7 +118,10 @@ namespace emitters
 
     void IRForLoopEmitter::End()
     {
-        assert(_pIncrementBlock != nullptr);
+        if (_pIncrementBlock == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Got null increment block --- End() was probably called without first calling Begin()");
+        }
 
         // Caller is done generating the body. Add a branch from the Body block to the increment block
         _functionEmitter.Branch(_pIncrementBlock);
@@ -146,11 +152,22 @@ namespace emitters
 
     llvm::BasicBlock* IRWhileLoopEmitter::Begin(LLVMValue pTestValuePointer)
     {
-        assert(pTestValuePointer != nullptr);
+        if (pTestValuePointer == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Test value must not be null");
+        }
 
         CreateBlocks();
         EmitInitialization();
         EmitCondition(pTestValuePointer);
+        return PrepareBody();
+    }
+
+    llvm::BasicBlock* IRWhileLoopEmitter::Begin(std::function<LLVMValue(IRFunctionEmitter&)> condition)
+    {
+        CreateBlocks();
+        EmitInitialization();
+        EmitCondition(condition);
         return PrepareBody();
     }
 
@@ -172,6 +189,16 @@ namespace emitters
                                     _pBodyBlock,
                                     _pAfterBlock);
         }
+    }
+
+    void IRWhileLoopEmitter::EmitCondition(std::function<LLVMValue(IRFunctionEmitter&)> condition)
+    {
+        _functionEmitter.Branch(_pConditionBlock);
+        _functionEmitter.SetCurrentBlock(_pConditionBlock);
+        auto conditionValue = condition(_functionEmitter);
+        _functionEmitter.Branch(conditionValue,
+                                _pBodyBlock,
+                                _pAfterBlock);
     }
 
     llvm::BasicBlock* IRWhileLoopEmitter::PrepareBody()

@@ -8,4 +8,4 @@
 #pragma once
 
 void TestIRAddFunction();
-void TestIRFunction();
+void TestCompilableIRFunction();

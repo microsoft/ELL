@@ -1086,6 +1086,13 @@ namespace emitters
         /// <param name="body"> A function that emits the body of the loop. </param>
         void While(LLVMValue pTestValuePointer, WhileLoopBodyFunction body);
 
+        /// <summary> Emits a while loop. </summary>
+        ///
+        /// </param name="condition"> A function the emits code returning a single-bit boolean test value </param>
+        ///
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void While(std::function<LLVMValue(IRFunctionEmitter&)> condition, WhileLoopBodyFunction body);
+
         /// <summary> Emits an if statement. </summary>
         ///
         /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
@@ -1099,7 +1106,7 @@ namespace emitters
 
         /// <summary> Emits an if statement. </summary>
         ///
-        /// <param name="comparison"> A comparison function. </param>
+        /// <param name="comparison"> A function that returns a boolean (LLVM) value. </param>
         /// <param name="body"> A function that emits the body of the "if true" block. </param>
         ///
         /// <returns>

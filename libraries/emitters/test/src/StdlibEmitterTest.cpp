@@ -58,8 +58,6 @@ void TestIRMallocFunction()
         module.EndFunction();
     }
 
-    module.DebugDump();
-
     IRExecutionEngine executionEngine(std::move(module));
     Int64CharPointerFunction compiledMallocFunction = (Int64CharPointerFunction)executionEngine.ResolveFunctionAddress(functionTestMalloc);
     block = compiledMallocFunction(800);

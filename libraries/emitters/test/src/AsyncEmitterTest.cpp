@@ -52,7 +52,6 @@ void TestIRAsyncTask(bool parallel)
     options.parallelize = parallel;
     options.targetDevice.deviceName = "host";
     IRModuleEmitter module("IRAsyncTaskTest", options);
-    module.DeclarePrintf();
 
     // Common stuff for both functions
     NamedVariableTypeList args;
@@ -109,7 +108,6 @@ void TestIRAsyncTask(bool parallel)
         computedResult.push_back(x + 5.0);
         syncCompiledResult.push_back(syncCompiledFunction(x));
         asyncCompiledResult.push_back(asyncCompiledFunction(x));
-        std::cout << (x + 5.0) << ", " << syncCompiledFunction(x) << ", " << asyncCompiledFunction(x) << std::endl;
     }
     testing::ProcessTest("Testing compilable syncFunction", testing::IsEqual(computedResult, syncCompiledResult));
     testing::ProcessTest("Testing compilable asyncFunction", testing::IsEqual(computedResult, asyncCompiledResult));
@@ -127,7 +125,6 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
     options.parallelize = parallel;
     options.useThreadPool = useThreadPool;
     IRModuleEmitter module("ThreadPoolTest", options);
-    module.DeclarePrintf();
 
     // Types
     auto& context = module.GetLLVMContext();
@@ -150,14 +147,6 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
         auto arr = taskFunction.LocalArray(&(*arguments++));
         auto begin = &(*arguments++);
         auto end = &(*arguments++);
-        if (options.targetDevice.IsWindows())
-        {
-            taskFunction.Printf("Task\tbegin: %d\tend: %d\n", { begin, end });
-        }
-        else
-        {
-            taskFunction.Printf("[%x Task]\tbegin: %d\tend: %d\n", { taskFunction.PthreadSelf(), begin, end });
-        }
 
         taskFunction.For(begin, end, [arr](emitters::IRFunctionEmitter& taskFunction, auto i) {
             arr[i] = i;
@@ -185,28 +174,20 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
             taskArrayArgs.push_back({ data, testThreadPoolFunction.Literal<int>(begin), testThreadPoolFunction.Literal<int>(end) });
         }
         auto tasks = testThreadPoolFunction.StartTasks(taskFunction, taskArrayArgs);
-        testThreadPoolFunction.Print("[Main]    \tDone submitting tasks\n");
-
         tasks.WaitAll(testThreadPoolFunction);
-        testThreadPoolFunction.Print("[Main]    \tDone waiting for tasks\n");
 
-        testThreadPoolFunction.For(arraySize, [data](IRFunctionEmitter& testThreadPoolFunction, LLVMValue i) {
-            testThreadPoolFunction.Printf("[Main]    \tdata[%d] = %d\n", {i, testThreadPoolFunction.ValueAt(data, i)});
-        });
-
-        LLVMValue sum = nullptr;
+        auto sum = testThreadPoolFunction.LocalScalar();
         for (size_t i = 0; i < numTasks; ++i)
         {
             auto task = tasks.GetTask(testThreadPoolFunction, i);
             auto returnValue = task.GetReturnValue(testThreadPoolFunction);
-            testThreadPoolFunction.Printf("Task %d return value: %d\n", { testThreadPoolFunction.Literal<int>(i), returnValue });
-            if (sum == nullptr)
+            if (sum.IsValid())
             {
-                sum = returnValue;
+                sum = sum + returnValue;
             }
             else
             {
-                sum = testThreadPoolFunction.Operator(emitters::GetAddForValueType<int>(), sum, returnValue);
+                sum = testThreadPoolFunction.LocalScalar(returnValue);
             }
         }
 
@@ -221,7 +202,6 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
         // Call the function
         auto threadPoolFunction = (IntFunction)executionEngine.ResolveFunctionAddress(testThreadPoolFunctionName);
         auto result = threadPoolFunction();
-        std::cout << "Called parallel tasks, result: " << result << std::endl;
         testing::ProcessTest("Testing compilable async function", testing::IsEqual(result, desiredResult));
     }
     catch (utilities::Exception& exception)
@@ -237,7 +217,6 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
 //
 void TestParallelFor(int begin, int end, int increment, bool parallel)
 {
-    std::cout << "Testing parallel for loop" << std::endl;
     CompilerOptions options;
     options.optimize = false;
     options.targetDevice.deviceName = "host";

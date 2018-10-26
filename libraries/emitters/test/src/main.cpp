@@ -25,13 +25,16 @@ void TestIR()
 {
     // From IREmitterTest.h
     TestIREmitter();
-
     TestEmitLLVM();
     TestLLVMShiftRegister();
-    TestIfHelpers(true);
-    TestLogical();
+    TestHighLevelNestedIf();
+    TestMixedLevelNestedIf();
+    TestLogicalAnd();
+    TestLogicalOr();
+    TestLogicalNot();
     TestForLoop();
-    TestWhileLoop();
+    TestWhileLoopWithVariableCondition();
+    TestWhileLoopWithFunctionCondition();
     TestMetadata();
     TestHeader();
     TestTwoEmitsInOneSession();
@@ -42,22 +45,25 @@ void TestIR()
     TestScopedIf();
     TestScopedIfElse();
     TestScopedIfElse2();
+    TestElseIfWithComputedCondition();
+}
 
-    // From IRFunctionTest.h
+void TestIRFunction()
+{
     TestIRAddFunction();
-    TestIRFunction();
+    TestCompilableIRFunction();
 }
 
 void TestAsyncEmitter()
 {
     TestIRAsyncTask(false); // don't use threads
-    TestIRAsyncTask(true);  // do use threads (if available)
+    TestIRAsyncTask(true); // do use threads (if available)
 
     TestParallelTasks(false, false); // deferred mode (no threads)
-    TestParallelTasks(true, false);  // async mode (always spin up a new thread)
+    TestParallelTasks(true, false); // async mode (always spin up a new thread)
     // TestParallelTasks(true, true);   // threadpool mode -- threadpool sometimes crashes or hangs when run in the JIT
 
-    // 
+    //
     TestParallelFor(0, 100, 1, false);
     TestParallelFor(0, 100, 2, false);
     TestParallelFor(10, 90, 1, false);
@@ -91,6 +97,7 @@ void TestStdlibEmitter()
 int main()
 {
     TestIR();
+    TestIRFunction();
     TestAsyncEmitter();
     TestPosixEmitter();
     TestProfiler();
