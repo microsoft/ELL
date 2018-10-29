@@ -53,6 +53,8 @@ target_include_directories(${model_tool_name} PRIVATE include)
 target_link_libraries(${model_tool_name} common dsp model nodes utilities)
 copy_shared_libraries(${model_tool_name})
 
+set_property(TARGET ${model_tool_name} PROPERTY FOLDER "tools/utilities")
+
 #
 # A script that generates compiled profilers
 #
@@ -109,7 +111,6 @@ if(WIN32)
         GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
         
     add_custom_target(make_profiler DEPENDS compile CMakeLists-device.txt.in CMakeLists-device-parallel.txt.in src/CompiledProfile_main.cpp src/CompiledExerciseModel_main.cpp make_profiler.cmd.in)
-    
     set(make_profiler_test_script "${GLOBAL_BIN_DIR}/make_profiler.cmd")
 else()
 
@@ -133,6 +134,8 @@ else()
     set(make_profiler_test_script "${GLOBAL_BIN_DIR}/make_profiler.sh")
 endif()
 
+set_property(TARGET make_profiler PROPERTY FOLDER "tools/utilities")
+    
 #
 # Tests
 #

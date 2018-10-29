@@ -34,7 +34,8 @@ macro(copy_newer_files target_name file_list)
     if (${num_extra_args} GREATER 0)
         list(GET extra_macro_args 0 out_dir)
         add_custom_target(${target_name}_make_directory ALL 
-            COMMAND ${CMAKE_COMMAND} -E make_directory ${out_dir})
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${out_dir})           
+        set_property(TARGET ${target_name}_make_directory PROPERTY FOLDER "cmake_macros")
     endif()
 
     foreach(file_name ${${file_list}})
