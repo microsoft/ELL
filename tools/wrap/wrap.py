@@ -45,21 +45,21 @@ class _PassArgsParser(argparse.ArgumentParser):
         return help.replace(usage, self.format_usage()) + dashdash_help
 
 class ModuleBuilder:
-    arguments = { "model_file"          : {"required":True,     "help": "path to the ELL model file"},
-                  "module_name"         : {"default":None,      "help": "the name of the output module (defaults to the model filename)"},
-                  "target"              : {"default":"host",    "help": "the target platform", "choices":["pi3", "pi0", "orangepi0", "pi3_64", "aarch64", "host"]},
-                  "language"            : {"default":"python",  "help": "the language for the ELL module", "choices":["python", "cpp"]},
-                  "llvm_format"         : {"default":"bc",      "help": "the format of the emitted code (default 'bc')", "choices":["ir", "bc", "asm", "obj"]},
-                  "outdir"              : {"default":None,      "help": "the output directory"},
-                  "verbose"             : {"default":False,     "help": "print verbose output"},
-                  "profile"             : {"default":False,     "help": "enable profiling functions in the ELL module"},
-                  "blas"                : {"default":"true",    "help": "enable or disable the use of Blas on the target device (default 'true')"},
-                  "no_fuse_linear_ops"  : {"default":False,     "help": "disable the fusing of sequences of linear operations"},
-                  "no_opt_tool"         : {"default":False,     "help": "disable the use of LLVM's opt tool"},
-                  "no_llc_tool"         : {"default":False,     "help": "disable the use of LLVM's llc tool"},
-                  "no_optimize"         : {"default":False,     "help": "disable ELL's compiler from optimizing emitted code"},
-                  "optimization_level"  : {"default":"3",       "help": "the optimization level used by LLVM's opt and llc tools. If '0' or 'g', opt is not run (default '3')", "choices":["0", "1", "2", "3", "g"]},
-                  "debug"               : {"default":False,     "help": "emit debug code"},
+    arguments = { "model_file"          : {"short": "f",                    "required":True,     "help": "path to the ELL model file"},
+                  "module_name"         : {"short": "n",                    "default":None,      "help": "the name of the output module (defaults to the model filename)"},
+                  "target"              : {"short": "t",                    "default":"host",    "help": "the target platform", "choices":["pi3", "pi0", "orangepi0", "pi3_64", "aarch64", "host"]},
+                  "language"            : {"short": "l",                    "default":"python",  "help": "the language for the ELL module", "choices":["python", "cpp"]},
+                  "llvm_format"         : {"short": "if",                   "default":"bc",      "help": "the format of the emitted code (default 'bc')", "choices":["ir", "bc", "asm", "obj"]},
+                  "outdir"              : {"short": "od",                   "default":None,      "help": "the output directory"},
+                  "verbose"             : {"short": "v",                    "default":False,     "help": "print verbose output"},
+                  "profile"             : {"short": "p",                    "default":False,     "help": "enable profiling functions in the ELL module"},
+                  "blas"                : {"short": "b",                    "default":"true",    "help": "enable or disable the use of Blas on the target device (default 'true')"},
+                  "no_fuse_linear_ops"  : {"short": "no_fuse_linear_ops",   "default":False,     "help": "disable the fusing of sequences of linear operations"},
+                  "no_opt_tool"         : {"short": "no_opt_tool",          "default":False,     "help": "disable the use of LLVM's opt tool"},
+                  "no_llc_tool"         : {"short": "no_llc_tool",          "default":False,     "help": "disable the use of LLVM's llc tool"},
+                  "no_optimize"         : {"short": "no_opt",               "default":False,     "help": "disable ELL's compiler from optimizing emitted code"},
+                  "optimization_level"  : {"short": "ol",                   "default":"3",       "help": "the optimization level used by LLVM's opt and llc tools. If '0' or 'g', opt is not run (default '3')", "choices":["0", "1", "2", "3", "g"]},
+                  "debug"               : {"short": "dbg",                  "default":False,     "help": "emit debug code"},
                 }
 
     def __init__(self):
@@ -106,13 +106,13 @@ class ModuleBuilder:
 
         for arg in self.arguments.keys():
             if "required" in self.arguments[arg].keys():
-                arg_parser.add_argument("--" + arg, help=self.arguments[arg]["help"], required=True)
+                arg_parser.add_argument("--" + arg, "-" + self.arguments[arg]["short"], help=self.arguments[arg]["help"], required=True)
             elif "choices" in self.arguments[arg].keys():
-                arg_parser.add_argument("--" + arg, help=self.arguments[arg]["help"], default=self.arguments[arg]["default"], choices=self.arguments[arg]["choices"])
+                arg_parser.add_argument("--" + arg, "-" + self.arguments[arg]["short"], help=self.arguments[arg]["help"], default=self.arguments[arg]["default"], choices=self.arguments[arg]["choices"])
             elif self.arguments[arg]["default"] == False:
-                arg_parser.add_argument("--" + arg, help=self.arguments[arg]["help"], action="store_true", default=False)
+                arg_parser.add_argument("--" + arg, "-" + self.arguments[arg]["short"], help=self.arguments[arg]["help"], action="store_true", default=False)
             else:
-                arg_parser.add_argument("--" + arg, help=self.arguments[arg]["help"], default=self.arguments[arg]["default"])
+                arg_parser.add_argument("--" + arg, "-" + self.arguments[arg]["short"], help=self.arguments[arg]["help"], default=self.arguments[arg]["default"])
 
         compile_args = []
         if '--' in args:

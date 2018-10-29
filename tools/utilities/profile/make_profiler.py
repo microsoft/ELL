@@ -193,6 +193,7 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description="ELL python script for generate and view profiler.\n" +
                     "Options for profiling may be read from option files or pass in as arguments.\n" +
+                    "Full argument are required when passing profile options in as arguments.\n" + 
                     "Use --profile_options to review available options.\n")
 
     verbosity = parser.add_mutually_exclusive_group()
@@ -233,6 +234,7 @@ if __name__ == '__main__':
 
     if args.profile_options:
         # just display wrap options
+        print("!!! NOTE: Profile options must use full arguments to avoid argument collision !!!")
         builder = ModuleBuilder()
         builder_args = ["-h"]
         builder.parse_command_line(builder_args)
