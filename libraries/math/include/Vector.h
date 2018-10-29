@@ -119,6 +119,11 @@ namespace math
         /// <returns> The squared norm. </returns>
         ElementType Norm2Squared() const;
 
+        /// <summary> Computes the infinity-norm of the vector </summary>
+        ///
+        /// <returns> The squared norm. </returns>
+        ElementType NormInfinity() const;
+
         /// @}
 
         /// \name Utility Functions

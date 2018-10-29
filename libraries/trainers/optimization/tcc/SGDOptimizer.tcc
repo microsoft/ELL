@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // utilities
-#include "Exception.h"
+#include "Common.h"
 
 // stl
 #include <algorithm>
@@ -28,9 +28,20 @@ namespace optimization
         _lossFunction(std::move(lossFunction)), 
         _lambda(parameters.regularization)
     {
-        if (examples.get() == nullptr || examples->Size() == 0)
+        if (!examples || examples->Size() == 0)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidSize, "Empty dataset");
+            throw OptimizationException("Empty dataset");
+        }
+
+        // check that all the outputs are compatible with the loss
+        for (size_t i = 0; i < examples->Size(); ++i)
+        {
+            auto example = examples->Get(i);
+
+            if (!_lossFunction.VerifyOutput(example.output))
+            {
+                throw OptimizationException("Discovered an output that is incompatible with the chosen loss function");
+            }
         }
 
         // setup random engine
@@ -47,7 +58,7 @@ namespace optimization
     {
         if (_examples == nullptr)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notInitialized, "Call SetExamples before calling Epoch");
+            throw OptimizationException("Call SetExamples before calling Epoch");
         }
 
         std::vector<size_t> permutation(_examples->Size());

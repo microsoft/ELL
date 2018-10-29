@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     SquareLoss.h (optimization)
+//  File:     HingeLoss.h (optimization)
 //  Authors:  Lin Xiao, Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,16 +17,16 @@ namespace trainers
 {
 namespace optimization
 {
-    /// <summary> Implements the Square Loss Function: loss(prediction, output) = 0.5 * (prediction-output)^2. </summary>
-    class SquareLoss
+    /// <summary> Implements the Hinge Loss function: loss(prediction, output) = max(0, 1-prediction*output). </summary>
+    class HingeLoss
     {
     public:
         /// <summary> Checks if an output is compatible with this loss. </summary>
         template <typename OutputType>
-        constexpr static bool VerifyOutput(OutputType) { return true; }
+        static bool VerifyOutput(OutputType output);
 
         /// <summary> Returns the smoothness of this loss, which is the Lipschitz coefficient of the loss gradient. </summary>
-        constexpr static double Smoothness() { return 1.0; }
+        constexpr static double Smoothness() { return std::numeric_limits<double>::infinity(); }
 
         /// <summary> Returns the loss of a scalar prediction, given the true scalar output. </summary>
         ///
@@ -67,4 +67,4 @@ namespace optimization
 }
 }
 
-#include "../tcc/SquareLoss.tcc"
+#include "../tcc/HingeLoss.tcc"

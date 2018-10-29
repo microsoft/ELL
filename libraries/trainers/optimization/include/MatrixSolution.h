@@ -22,7 +22,7 @@ namespace trainers
 {
 namespace optimization
 {
-    /// <summary> An unbiased matrix solution that applies to vector inputs and vector outputs. </summary>
+    /// <summary> A matrix solution that applies to vector inputs and vector outputs. </summary>
     template <typename IOElementType, bool isBiased = false>
     class MatrixSolution : public Scalable
     {
@@ -39,6 +39,15 @@ namespace optimization
         /// <summary> Returns the matrix. </summary>
         math::ConstColumnMatrixReference<double> GetMatrix() const { return _weights; }
 
+        /// <summary> Returns the matrix. </summary>
+        math::ColumnMatrixReference<double> GetMatrix() { return _weights; }
+
+        /// <summary> Returns a vector reference to the matrix. </summary>
+        math::ConstColumnVectorReference<double> GetVector() const { return _weights.ReferenceAsVector(); }
+
+        /// <summary> Returns a vector reference to the matrix. </summary>
+        math::ColumnVectorReference<double> GetVector() { return _weights.ReferenceAsVector(); }
+
         /// <summary> Returns the bias. </summary>
         template <bool B = isBiased, typename Concept = std::enable_if_t<B>>
         const math::RowVector<double>& GetBias() const { return _bias; }
@@ -51,6 +60,9 @@ namespace optimization
 
         /// <summary> Adds a scaled column vector to a scaled version of this solution. </summary>
         void operator=(SumExpression<ScaledExpression<MatrixSolution<IOElementType, isBiased>>, OuterProductExpression<IOElementType>> expression);
+
+        /// <summary> Subtracts another solution from this one. </summary>
+        void operator-=(const MatrixSolution<IOElementType, isBiased>& other);
 
         /// <summary> Adds a scaled column vector to this solution. </summary>
         void operator+=(OuterProductExpression<IOElementType> expression);
@@ -76,10 +88,6 @@ namespace optimization
         static constexpr bool isDouble = std::is_same_v<IOElementType, double>;
         mutable std::conditional_t<isDouble, Nothing, math::RowVector<double>> _doubleInput;
     };
-
-    /// <summary> Returns the 1-norm of a MatrixSolutionBase. </summary>
-    template <typename IOElementType, bool isBiased>
-    double Norm1(const MatrixSolution<IOElementType, isBiased>& solution);
 
     /// <summary> Returns the squared 2-norm of a MatrixSolutionBase. </summary>
     template <typename IOElementType, bool isBiased>

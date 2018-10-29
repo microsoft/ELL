@@ -7,6 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "Common.h"
+
 namespace ell
 {
 namespace trainers
@@ -20,7 +22,7 @@ namespace optimization
     {
         if (_input.NumRows() != _output.NumRows())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidSize, "Number of inputs and outputs don't match");
+            throw OptimizationException("Number of inputs and outputs don't match");
         }
     }
 

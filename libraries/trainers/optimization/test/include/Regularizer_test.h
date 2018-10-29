@@ -1,0 +1,14 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     Regularizer_test.h (optimization_test)
+//  Authors:  Ofer Dekel
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+/// <summary> Tests that regularizers are equivalent, given the right parameters. </summary>
+void TestRegularizerEquivalence(double regularizationParameter);
+
+

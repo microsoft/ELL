@@ -8,7 +8,7 @@
 #pragma once
 
 // utilities
-#include "Exception.h"
+#include "Common.h"
 
 // math
 #include "VectorOperations.h"
@@ -49,7 +49,7 @@ namespace optimization
 
         if (&(thisTerm.lhs.get()) != this)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "First term should be a scaled version of this solution");
+            throw OptimizationException("First term should be a scaled version of this solution");
         }
 
         double thisScale = thisTerm.rhs;
@@ -71,7 +71,7 @@ namespace optimization
 
         if (&(thisTerm.lhs.get()) != this)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "One of the terms should be a scaled version of this solution");
+            throw OptimizationException("One of the terms should be a scaled version of this solution");
         }
 
         double thisScale = thisTerm.rhs;
@@ -92,6 +92,16 @@ namespace optimization
         if constexpr (isBiased)
         {
             _bias = thisScale * _bias + updateScale;
+        }
+    }
+
+    template <typename IOElementType, bool isBiased>
+    void VectorSolution<IOElementType, isBiased>::operator-=(const VectorSolution<IOElementType, isBiased>& other)
+    {
+        _weights -= other._weights;
+        if constexpr (isBiased)
+        {
+            _bias -= other._bias;
         }
     }
 
@@ -155,28 +165,15 @@ namespace optimization
     }
 
     template <typename IOElementType, bool isBiased>
-    double Norm1(const VectorSolution<IOElementType, isBiased>& solution)
-    {
-        double result = solution.GetVector().Norm1();
-        
-        if constexpr (isBiased)
-        {
-            result += std::abs(solution.GetBias());
-        }
-        
-        return result;
-    }
-
-    template <typename IOElementType, bool isBiased>
     double Norm2Squared(const VectorSolution<IOElementType, isBiased>& solution)
     {
         double result = solution.GetVector().Norm2Squared();
-        
+
         if constexpr (isBiased)
         {
             result += solution.GetBias() * solution.GetBias();
         }
-        
+
         return result;
     }
 

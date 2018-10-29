@@ -65,6 +65,28 @@ namespace math
     }
 
     template <typename ElementType>
+    ElementType UnorientedConstVectorBase<ElementType>::NormInfinity() const
+    {
+        if (_size == 0)
+        {
+            return 0;
+        }
+
+        const ElementType* pData = GetConstDataPointer();
+        const ElementType* pEnd = pData + _size * _increment;
+        ElementType result = *pData;
+        pData += _increment;
+        
+        while (pData < pEnd)
+        {
+            result = std::max(result, std::abs(*pData));
+            pData += _increment;
+        }
+
+        return result;
+    }
+
+    template <typename ElementType>
     template <typename MapperType>
     ElementType UnorientedConstVectorBase<ElementType>::Aggregate(MapperType mapper) const
     {

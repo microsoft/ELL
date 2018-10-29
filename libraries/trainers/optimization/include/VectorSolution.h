@@ -35,11 +35,21 @@ namespace optimization
         using ExampleType = Example<InputType, OutputType>;
         using ExampleSetType = IndexedContainer<ExampleType>;
 
+        VectorSolution() = default;
+        VectorSolution(size_t size) : _weights(size) {}
+
         /// <summary> Resize the solution to match the sizes of an input and an output. </summary>
         void Resize(const InputType& inputExample, OutputType);
 
-        /// <summary> Returns the vector. </summary>
+        /// <summary> Returns a reference to the vector. </summary>
+        math::ColumnVectorReference<double> GetVector() { return _weights; }
+
+        /// <summary> Returns a const reference to the vector. </summary>
         math::ConstColumnVectorReference<double> GetVector() const { return _weights; }
+
+        /// <summary> Returns the bias. </summary>
+        template <bool B = isBiased, typename Concept = std::enable_if_t<B>>
+        double& GetBias() { return _bias; }
 
         /// <summary> Returns the bias. </summary>
         template <bool B = isBiased, typename Concept = std::enable_if_t<B>>
@@ -53,6 +63,9 @@ namespace optimization
 
         /// <summary> Adds a scaled column vector to a scaled version of this solution. </summary>
         void operator=(SumExpression<ScaledExpression<VectorSolution<IOElementType, isBiased>>, ScaledColumnVectorExpression<IOElementType>> expression);
+
+        /// <summary> Subtracts another solution from this one. </summary>
+        void operator-=(const VectorSolution<IOElementType, isBiased>& other);
 
         /// <summary> Adds a scaled column vector to this solution. </summary>
         void operator+=(ScaledColumnVectorExpression<IOElementType> expression);
@@ -78,10 +91,6 @@ namespace optimization
         static constexpr bool isDouble = std::is_same_v<IOElementType, double>;
         mutable std::conditional_t<isDouble, Nothing, math::RowVector<double>> _doubleInput;
     };
-
-    /// <summary> Returns the 1-norm of a VectorSolutionBase. </summary>
-    template <typename IOElementType, bool isBiased>
-    double Norm1(const VectorSolution<IOElementType, isBiased>& solution);
 
     /// <summary> Returns the squared 2-norm of a VectorSolutionBase. </summary>
     template <typename IOElementType, bool isBiased>

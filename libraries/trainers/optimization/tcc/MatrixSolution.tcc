@@ -8,7 +8,7 @@
 #pragma once
 
 // utilities
-#include "Exception.h"
+#include "Common.h"
 
 // math
 #include "VectorOperations.h"
@@ -56,7 +56,7 @@ namespace optimization
 
         if (&(thisTerm.lhs.get()) != this)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "First term should be a scaled version of this solution");
+            throw OptimizationException("First term should be a scaled version of this solution");
         }
 
         double thisScale = thisTerm.rhs;
@@ -78,7 +78,7 @@ namespace optimization
 
         if (&(thisTerm.lhs.get()) != this)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "The first term should be a scaled version of this solution");
+            throw OptimizationException("The first term should be a scaled version of this solution");
         }
 
         double thisScale = thisTerm.rhs;
@@ -100,6 +100,16 @@ namespace optimization
         if constexpr (isBiased)
         {
             math::ScaleAddUpdate(1.0, rowVectorReference, thisScale, _bias);
+        }
+    }
+
+    template <typename IOElementType, bool isBiased>
+    void MatrixSolution<IOElementType, isBiased>::operator-=(const MatrixSolution<IOElementType, isBiased>& other)
+    {
+        _weights -= other._weights;
+        if constexpr (isBiased)
+        {
+            _bias -= other._bias;
         }
     }
 
@@ -166,19 +176,6 @@ namespace optimization
     void MatrixSolution<IOElementType, isBiased>::InitializeAuxiliaryVariable(AuxiliaryDoubleType& aux) 
     { 
         aux.Resize(_weights.NumColumns()); aux.Reset(); 
-    }
-
-    template <typename IOElementType, bool isBiased>
-    double Norm1(const MatrixSolution<IOElementType, isBiased>& solution)
-    {
-        double result = solution.GetMatrix().ReferenceAsVector().Norm1();
-
-        if constexpr (isBiased)
-        {
-            result += solution.GetBias().Norm1();
-        }
-
-        return result;
     }
 
     template <typename IOElementType, bool isBiased>

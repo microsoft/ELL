@@ -6,8 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "Exception.h"
+#include "Common.h"
+#include "Expression.h"
 
 // stl
 #include <algorithm>
@@ -27,9 +27,9 @@ namespace optimization
         _lossFunction(lossFunction), 
         _regularizer(regularizer)
     {
-        if (examples.get() == nullptr || examples->Size() == 0)
+        if (!examples || examples->Size() == 0)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidSize, "Empty dataset");
+            throw OptimizationException("Empty dataset");
         }
         
         // set parameters
@@ -50,18 +50,19 @@ namespace optimization
         _v.Resize(firstExample.input, firstExample.output);
         _exampleInfo.resize(numExamples);
 
-        // initialize the per-example info and compute primal objective
+        // initialize the per-example info, check that outputs are compatible with the loss, and compute primal objective
         double primalSum = 0;
         for (size_t i = 0; i < numExamples; ++i)
         {
             auto example = examples->Get(i);
 
+            if (!_lossFunction.VerifyOutput(example.output))
+            {
+                throw OptimizationException("Discovered an output that is incompatible with the chosen loss function");
+            }
+
             // cache the norm of the example
             double norm2Squared = _w.GetNorm2SquaredOf(example.input); 
-            if (norm2Squared == 0)
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::badData, "input cannot have zero norm");
-            }
             _exampleInfo[i].norm2Squared = norm2Squared;
 
             // initialize the dual 
@@ -78,11 +79,6 @@ namespace optimization
     template <typename SolutionType, typename LossFunctionType, typename RegularizerType>
     void SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType>::PerformEpochs(size_t count)
     {
-        if (_examples == nullptr)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notInitialized, "Call SetExamples before calling Epoch");
-        }
-
         std::vector<size_t> permutation(_examples->Size());
         std::iota(permutation.begin(), permutation.end(), 0);
 
@@ -115,8 +111,16 @@ namespace optimization
     template <typename SolutionType, typename LossFunctionType, typename RegularizerType>
     void SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType>::Step(ExampleType example, ExampleInfo& exampleInfo)
     {
+        const double tolerance = 1.0e-8;
+
         auto& dual = exampleInfo.dual;
+
         auto lipschitz = exampleInfo.norm2Squared * _normalizedInverseLambda;
+        if (lipschitz < tolerance)
+        {
+            return;
+        }
+
         auto prediction = example.input * _w;
         prediction /= lipschitz;
         prediction += dual;

@@ -26,21 +26,16 @@ namespace optimization
     }
 
     template <typename OutputType>
-    double SquareLoss::Conjugate(double dual, OutputType output)
+    double SquareLoss::Conjugate(double v, OutputType output)
     {
-        return (0.5 * dual + output) * dual;
+        return (0.5 * v + output) * v;
     }
 
     template <typename OutputType>
-    double SquareLoss::ConjugateProx(double sigma, double dual, OutputType output)
+    double SquareLoss::ConjugateProx(double theta, double z, OutputType output)
     {
-        return (dual - sigma * output) / (1 + sigma);
+        return (z - theta * output) / (1 + theta);
     }
-
-
-
-
-
 }
 }
 }

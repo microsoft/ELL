@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     MultivariateLossAdapter.h (optimization)
+//  File:     MultivariateLoss.h (optimization)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,10 +19,15 @@ namespace optimization
 {
     /// <summary> Adapter that extends a scalar loss class to vector inputs. </summary>
     template <typename LossType>
-    class MultivariateLossAdapter : public LossType
+    class MultivariateLoss
     {
     public:
-        using LossType::LossType;
+        /// <summary> Constructor. </summary>
+        MultivariateLoss(LossType univariateLoss = {});
+
+        /// <summary> Checks if an output is compatible with this loss. </summary>
+        template <typename OutputElementType>
+        bool VerifyOutput(math::ConstRowVectorReference<OutputElementType> output) const;
 
         /// <summary> Returns the loss of a vector prediction, given the true vector output. </summary>
         ///
@@ -52,8 +57,11 @@ namespace optimization
         double Conjugate(math::ConstRowVectorReference<double> dual, math::ConstRowVectorReference<OutputElementType> output) const;
 
         /// <summary>
-        /// Returns the value of the conjugate prox function at a given vector point, which is argmin_b
-        /// {sigma*(f*)(b) + (1/2)*(b - a)_2^2}.
+        /// Returns the value of the proximal operator of the conjugate of the loss, which is 
+        ///
+        ///     argmin_b {theta*g(b) + (1/2)*||b - a||_2^2}
+        ///
+        /// where ||x||_2 is the 2-norm and g() is the convex conjugate of f()
         /// </summary>
         ///
         /// <param name="sigma"> The sigma parameter. </param>
@@ -63,9 +71,13 @@ namespace optimization
         /// <returns> Value of the loss conjugate prox. </returns>
         template <typename OutputElementType>
         math::RowVector<double> ConjugateProx(double sigma, math::ConstRowVectorReference<double> prediction, math::ConstRowVectorReference<OutputElementType> output) const;
+
+    private:
+        LossType _univariateLoss;
+
     };
 }
 }
 }
 
-#include "../tcc/MultivariateLossAdapter.tcc"
+#include "../tcc/MultivariateLoss.tcc"
