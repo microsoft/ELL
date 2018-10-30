@@ -162,18 +162,42 @@ namespace emitters
         }
     }
 
+    void WriteLLVMType(std::ostream& os, LLVMType t, VariableType vt)
+    {
+        switch (vt)
+        {
+        case VariableType::Void:
+            os << "void";
+            break;
+        case VariableType::VoidPointer:
+            os << "void*";
+            break;
+        case VariableType::Char8:
+            os << "char";
+            break;
+        case VariableType::Char8Pointer:
+            os << "char*";
+            break;
+        default:
+            WriteLLVMType(os, t);
+        }
+    }
+
     void WriteFunctionDeclaration(std::ostream& os, IRModuleEmitter& moduleEmitter, llvm::Function& function)
     {
         auto hasName = function.hasName();
         if (hasName)
         {
+
             std::string name = function.getName();
 
+            auto functionDeclaration = moduleEmitter.GetFunctionDeclaration(name);
+
             // Check if we've added comments for this function
-            if (moduleEmitter.HasFunctionComments(name))
+            if (functionDeclaration.HasComments())
             {
-                auto comments = moduleEmitter.GetFunctionComments(name);
-                for (auto comment : comments)
+                const auto& comments = functionDeclaration.GetComments();
+                for (const auto& comment : comments)
                 {
                     os << "// " << comment << "\n";
                 }
@@ -181,9 +205,12 @@ namespace emitters
 
             // Now write the function signature
             auto returnType = function.getReturnType();
-            WriteLLVMType(os, returnType);
+            WriteLLVMType(os, returnType, functionDeclaration.GetReturnType());
             os << " " << name << "(";
             bool first = true;
+            size_t i = 0;
+
+            auto argTypes = functionDeclaration.GetArguments();
 
             for (const auto& arg : function.args())
             {
@@ -194,20 +221,18 @@ namespace emitters
                 first = false;
 
                 std::string argName = arg.getName();
-                // HACK: work around LLVM problem with void*
-                if (argName == "context")
+                VariableType argType = VariableType::Custom;
+                if (i < argTypes.size())
                 {
-                    os << "void*";
+                    argType = argTypes[i].second;
                 }
-                else
-                {
-                    WriteLLVMType(os, arg.getType());
-                }
+                WriteLLVMType(os, arg.getType(), argType);
 
                 if (!argName.empty())
                 {
                     os << " " << argName;
                 }
+                i++;
             }
 
             os << ");";
@@ -314,6 +339,7 @@ namespace emitters
         std::stringstream memberDecls;
         std::stringstream cdecls;
         std::stringstream helperMethods;
+        std::stringstream resetMethodBody;
     };
 
     static void WriteSourceNodeCallbacks(ModuleCallbackDefinitions& moduleCallbacks, CppWrapperInfo& info)
@@ -522,7 +548,7 @@ namespace emitters
             info.helperMethods << "    " << info.predictReturnType << " " << info.predictMethodName << "(" << utilities::Join(info.predictMethodArgs, ", ") << ")\n";
             info.helperMethods << "    {\n";
             info.helperMethods << info.predictPreBody.str();
-            info.helperMethods << "        double time = GetMilliseconds();\n";
+            info.helperMethods << "        double time = _timer.GetMilliseconds();\n";
             info.helperMethods << "        " << info.predictFunctionName << "(this, &time, nullptr);\n";
             info.helperMethods << info.predictPostBody.str();
             if (info.predictReturnType != "void")
@@ -530,6 +556,9 @@ namespace emitters
                 info.helperMethods << "        return " << info.predictReturnMember << ";\n";
             }
             info.helperMethods << "    }\n\n";
+
+            info.memberDecls << "    HighResolutionTimer _timer;\n";
+            info.resetMethodBody << "        _timer.Reset();\n";
         }
         else
         {
@@ -613,8 +642,8 @@ namespace emitters
         ReplaceDelimiter(predictWrapperCode, "CDECLS_GUARD", utilities::ToUppercase(className) + "_CDECLS");
         ReplaceDelimiter(predictWrapperCode, "CDECLS_IMPL", info.cdecls.str());
         ReplaceDelimiter(predictWrapperCode, "STEPPABLE", hasSourceNodes ? "true" : "false" );
+        ReplaceDelimiter(predictWrapperCode, "RESET_BODY", info.resetMethodBody.str());
             
-
         os << predictWrapperCode;
     }
 

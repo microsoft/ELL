@@ -4,9 +4,42 @@ u8R"(
 
 #if defined(__cplusplus)
 
-#include <string.h>
+#include <cstring> // memcpy
 #include <vector>
+
+#ifndef HIGH_RESOLUTION_TIMER
+#define HIGH_RESOLUTION_TIMER
+// This is a default implementation of HighResolutionTimer using C++ <chrono> library.  The
+// GetMilliseconds function is used in the steppable version of the Predict method.  
+// If your platform requires a different implementation then define HIGH_RESOLUTION_TIMER 
+// before including this header.
 #include <chrono>
+
+class HighResolutionTimer
+{
+public:
+    void Reset()
+    {
+        _started = false;
+    }
+
+    /// <summary> Return high precision number of seconds since first call to Predict. </summary>
+    double GetMilliseconds() 
+    {    
+        if (!_started)
+        {
+            _start = std::chrono::high_resolution_clock::now();
+            _started = true;
+        }
+        auto now = std::chrono::high_resolution_clock::now();
+        auto us = std::chrono::duration_cast<std::chrono::microseconds>(now - _start);
+        return static_cast<double>(us.count()) / 1000.0;
+    }
+private:
+    std::chrono::high_resolution_clock::time_point _start;
+    bool _started = false;
+};
+#endif
 
 // This class wraps the "C" interface and provides handy virtual methods you can override to
 // intercept any callbacks.  It also wraps the low level float buffers with std::vectors.
@@ -15,7 +48,7 @@ u8R"(
 class @@CLASSNAME@@
 {
 public:
-    @@CLASSNAME@@() : _started(false)
+    @@CLASSNAME@@()
     {
 @@CONSTRUCTOR_IMPL@@
     }
@@ -49,7 +82,7 @@ public:
     void Reset()
     {
         @@MODULE@@_Reset();
-        _started = false;
+@@RESET_BODY@@
     }
 
     bool IsSteppable() const 
@@ -57,24 +90,14 @@ public:
         return @@STEPPABLE@@;
     }
 
+    const char* GetMetadata(const char* name) const
+    {
+        return @@MODULE@@_GetMetadata((char*)name);
+    }
+
 @@HELPER_METHODS@@
 private:
-@@MEMBER_DECLS@@
-    
-    std::chrono::high_resolution_clock::time_point _start;
-    bool _started;
-
-    double GetMilliseconds() 
-    {    
-        if (!_started)
-        {
-            _start = std::chrono::high_resolution_clock::now();
-            _started = true;
-        }
-        auto now = std::chrono::high_resolution_clock::now();
-        auto us = std::chrono::duration_cast<std::chrono::microseconds>(now - _start);
-        return static_cast<double>(us.count()) / 1000.0;
-    }
+@@MEMBER_DECLS@@      
 };
 
 

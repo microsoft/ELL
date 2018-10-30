@@ -94,6 +94,20 @@ namespace utilities
             _metadata[pair.key] = pair.value;
         }
     }
+
+    std::vector<std::string> PropertyBag::Keys() const
+    {
+        std::vector<std::string> result;
+        for (const auto& keyValue : _metadata)
+        {
+            if (!keyValue.second.IsEmpty())
+            {
+                result.push_back(keyValue.first);
+            }
+        }
+        return result;
+    }
+
 }
 }
 

@@ -14,6 +14,7 @@
 // stl
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace ell
 {
@@ -24,6 +25,7 @@ namespace utilities
     class PropertyBag : public IArchivable
     {
     public:
+
         /// <summary> Adds a metadata entry for the given key. </summary>
         ///
         /// <param name="key"> The key to use for the metadata. </param>
@@ -39,11 +41,11 @@ namespace utilities
         template <typename ValueType>
         const ValueType& GetEntry(const std::string& key) const;
 
-        /// <summary> Get the metadata for a given key. </summary>
+        /// <summary> Find the given key and return it's value (and add the key if it is not defined). </summary>
         ///
-        /// <param name="key"> The key for the metadata. </param>
+        /// <param name="key"> The key to add to the metadata. </param>
         ///
-        /// <returns> A Variant containing the value for the given key. </returns>
+        /// <returns> A Variant reference you can update. </returns>
         Variant& operator[](const std::string& key);
 
         /// <summary> Removes metadata for the given key. </summary>
@@ -70,6 +72,11 @@ namespace utilities
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "PropertyBag"; }
+
+        /// <summary> Gets the list of keys. </summary>
+        ///
+        /// <returns> The list of keys. </returns>
+        std::vector<std::string> Keys() const;
 
     protected:
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }

@@ -49,6 +49,7 @@ set (include
     include/CompilerOptions.h
     include/EmitterException.h
     include/EmitterTypes.h
+    include/FunctionDeclaration.h
     include/IRAssemblyWriter.h
     include/IRAsyncTask.h
     include/IRBlockRegion.h

@@ -134,6 +134,9 @@ namespace emitters
         /// <summary> Get the OpenBLAS function for setting the number of threads </summary>
         LLVMFunction GetOpenBLASSetNumThreadsFunction();
 
+        /// <summary> Get the string compare function </summary>
+        LLVMFunction GetStringCompareFunction();
+
         //
         // Posix functions
         //
@@ -170,9 +173,10 @@ namespace emitters
         // Special runtimes for different environments or libraries
         IRPosixRuntime _posixRuntime;
 
-        LLVMFunction _pDotProductFunctionFloat = nullptr;
-        LLVMFunction _pDotProductFunction = nullptr;
-        LLVMFunction _pGetCurrentTimeFunction = nullptr;
+        LLVMFunction _dotProductFunctionFloat = nullptr;
+        LLVMFunction _dotProductFunction = nullptr;
+        LLVMFunction _getCurrentTimeFunction = nullptr;
+        LLVMFunction _stringCompareFunction = nullptr;
     };
 }
 }

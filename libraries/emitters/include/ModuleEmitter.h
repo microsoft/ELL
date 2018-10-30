@@ -12,6 +12,7 @@
 #include "EmitterTypes.h"
 #include "TargetDevice.h"
 #include "Variable.h"
+#include "FunctionDeclaration.h"
 
 // stl
 #include <string>
@@ -52,25 +53,10 @@ namespace emitters
         /// <summary> End the function </summary>
         virtual void EndMapPredictFunction() = 0;
 
-        /// <summary> Indicates if the given function has any associated comments </summary>
+        /// <summary> Find a declaration. </summary>
         ///
-        /// <param name="functionName"> The name of the function </param>
-        ///
-        /// <returns> `true` if the function has any comments associated with it </returns>
-        virtual bool HasFunctionComments(const std::string& functionName) = 0;
-
-        /// <summary> Get the comments associated with the given function. </summary>
-        ///
-        /// <param name="functionName"> The name of the function. </param>
-        ///
-        /// <returns> The comments for the function, as a vector of strings </returns>
-        virtual std::vector<std::string> GetFunctionComments(const std::string& functionName) = 0;
-
-        /// <summary> Associates some comment text with the given function. </summary>
-        ///
-        /// <param name="functionName"> The name of the function. </param>
-        /// <param name="comments"> The comments for the function. </param>
-        virtual void SetFunctionComments(const std::string& functionName, const std::vector<std::string>& comments) = 0;
+        /// <param name="name"> The function name. </param>
+        virtual FunctionDeclaration& GetFunctionDeclaration(const std::string& name) = 0;
 
         /// <summary> Indicates if the module has the associated metadata. </summary>
         ///

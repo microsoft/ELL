@@ -281,6 +281,7 @@ namespace emitters
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType)
     {
+        _functions[functionName] = FunctionDeclaration(functionName, returnType);
         return BeginFunction(functionName, _emitter.Type(returnType));
     }
 
@@ -291,16 +292,27 @@ namespace emitters
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType, const VariableTypeList& args)
     {
+        NamedVariableTypeList fake;
+        for (auto t : args)
+        {
+            fake.push_back({ "", t });
+        }
+        _functions[functionName] = FunctionDeclaration(functionName, returnType, fake);
         return BeginFunction(functionName, _emitter.Type(returnType), _emitter.GetLLVMTypes(args));
     }
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType, const NamedVariableTypeList& args)
     {
+        _functions[functionName] = FunctionDeclaration(functionName, returnType, args);
         return BeginFunction(functionName, _emitter.Type(returnType), args);
     }
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, LLVMType returnType, const NamedVariableTypeList& args)
     {
+        if (_functions.find(functionName) == _functions.end())
+        {
+            _functions[functionName] = FunctionDeclaration(functionName, VariableType::Custom, args);
+        }
         Log() << "Begin emitting IR for function " << functionName << EOL;
         auto currentPos = _emitter.GetCurrentInsertPoint();
         IRFunctionEmitter newFunction = Function(functionName, returnType, args, false);
@@ -383,19 +395,9 @@ namespace emitters
         return _functionStack.top().first;
     }
 
-    bool IRModuleEmitter::HasFunctionComments(const std::string& functionName)
+    FunctionDeclaration& IRModuleEmitter::GetFunctionDeclaration(const std::string& name)
     {
-        return _functionComments.find(functionName) != _functionComments.end();
-    }
-
-    std::vector<std::string> IRModuleEmitter::GetFunctionComments(const std::string& functionName)
-    {
-        return _functionComments[functionName];
-    }
-
-    void IRModuleEmitter::SetFunctionComments(const std::string& functionName, const std::vector<std::string>& comments)
-    {
-        _functionComments[functionName] = comments;
+        return _functions[name];
     }
 
     // Module metadata

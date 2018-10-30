@@ -183,6 +183,9 @@ namespace model
         void EmitGetSinkOutputShapeFunction(const Map& map);
         void EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<MemoryShape> shapes);
 
+        void EmitGetMetadataFunction(const Map& map);
+        void EmitStringConditionals(emitters::IRFunctionEmitter& fn, std::vector<std::pair<std::string, std::string>> keyValuePairs);
+
         // stack of node regions
         std::vector<NodeMap<emitters::IRBlockRegion*>> _nodeRegions;
     };

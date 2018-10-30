@@ -9,3 +9,4 @@
 
 void TestIRAddFunction();
 void TestCompilableIRFunction();
+void TestStringCompareFunction();

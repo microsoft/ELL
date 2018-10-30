@@ -35,6 +35,7 @@ template <typename ElementType>
 void TestLinearPredictor();
 void TestForest();
 void TestForestMap();
+void TestNodeMetadata();
 
 void TestSimpleMap(bool optimize);
 void TestSqEuclideanDistanceMap();

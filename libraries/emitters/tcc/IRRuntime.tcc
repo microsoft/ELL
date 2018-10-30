@@ -57,19 +57,19 @@ namespace emitters
     {
         if (std::is_integral<std::decay_t<ValueType>>::value)
         {
-            if (_pDotProductFunction == nullptr)
+            if (_dotProductFunction == nullptr)
             {
-                _pDotProductFunction = GetDotProductIntFunction();
+                _dotProductFunction = GetDotProductIntFunction();
             }
-            return _pDotProductFunction;
+            return _dotProductFunction;
         }
         else if (std::is_floating_point<std::decay_t<ValueType>>::value)
         {
-            if (_pDotProductFunctionFloat == nullptr)
+            if (_dotProductFunctionFloat == nullptr)
             {
-                _pDotProductFunctionFloat = GetDotProductFloatFunction();
+                _dotProductFunctionFloat = GetDotProductFloatFunction();
             }
-            return _pDotProductFunctionFloat;
+            return _dotProductFunctionFloat;
         }
         else
         {

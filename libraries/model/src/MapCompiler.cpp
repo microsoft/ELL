@@ -39,8 +39,10 @@ namespace model
         Log() << "Creating 'predict' function" << EOL;
         auto inputSize = map.GetInput(0)->Size();
         auto outputSize = map.GetOutput(0).Size();
-        std::vector<std::string> comments = { std::string("Input size: ") + std::to_string(inputSize), std::string("Output size: ") + std::to_string(outputSize) };
-        pModuleEmitter->SetFunctionComments(functionName, comments);
+        pModuleEmitter->GetFunctionDeclaration(functionName).GetComments() = {
+            std::string("Input size: ") + std::to_string(inputSize),
+            std::string("Output size: ") + std::to_string(outputSize)
+        };
 
         OnBeginCompileModel(map.GetModel());
         CompileNodes(map.GetModel());
@@ -100,7 +102,7 @@ namespace model
         emitters::NamedVariableTypeList functionArguments;
 
         // context parameter
-        functionArguments.push_back({ "context", emitters::VariableType::BytePointer });
+        functionArguments.push_back({ "context", emitters::VariableType::VoidPointer });
 
         // Allocate variables for inputs
         for (auto inputNode : map.GetInputs())

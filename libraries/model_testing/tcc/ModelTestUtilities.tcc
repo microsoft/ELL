@@ -191,14 +191,12 @@ std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model:
         auto compiledResult = compiledMap.ComputeOutput<OutputType>(0);
         ok = ok && IsEqual(computedResult, compiledResult, static_cast<OutputType>(epsilon));
 
-        if (IsVerbose())
+        if (IsVerbose() || !ok)
         {
             std::cout << "input: " << input << std::endl;
-            std::cout << "computed: " << computedResult << " \n\ncompiled: " << compiledResult << std::endl;
-            if (!ok)
-            {
-                std::cout << "Largest difference: " << LargestDifference(computedResult, compiledResult) << ", epsilon: " << epsilon << std::endl;
-            }
+            std::cout << "computed: " << computedResult << std::endl;
+            std::cout << "compiled: " << compiledResult << std::endl;
+            std::cout << "Largest difference: " << LargestDifference(computedResult, compiledResult) << ", epsilon: " << epsilon << std::endl;            
         }
     }
     testing::ProcessTest(std::string("Testing compiled " + name + " compute"), ok);

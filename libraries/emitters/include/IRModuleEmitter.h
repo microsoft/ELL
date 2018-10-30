@@ -404,29 +404,16 @@ namespace emitters
         /// <returns> Pointer to a llvm::StructType that represents the declared struct. </returns>
         llvm::StructType* GetStruct(const std::string& name);
 
+        /// <summary> Find a FunctionDeclaration by name.  Use this to add comments.</summary>
+        ///
+        /// <param name="name"> The function name. </param>
+        ///
+        /// <returns> Pointer to FunctionDeclaration. </returns>
+        FunctionDeclaration& GetFunctionDeclaration(const std::string& name) override;
+
         //
         // Code annotation
         //
-
-        /// <summary> Indicates if the given function has any associated comments. </summary>
-        ///
-        /// <param name="functionName"> The name of the function. </param>
-        ///
-        /// <returns> `true` if the function has any comments associated with it. </returns>
-        bool HasFunctionComments(const std::string& functionName) override;
-
-        /// <summary> Get the comments associated with the given function. </summary>
-        ///
-        /// <param name="functionName"> The name of the function. </param>
-        ///
-        /// <returns> The comments for the function, as a vector of strings. </returns>
-        std::vector<std::string> GetFunctionComments(const std::string& functionName) override;
-
-        /// <summary> Associates some comment text with the given function. </summary>
-        ///
-        /// <param name="functionName"> The name of the function. </param>
-        /// <param name="comments"> The comments for the function. </param>
-        void SetFunctionComments(const std::string& functionName, const std::vector<std::string>& comments) override;
 
         /// <summary> Gets any preprocessor definitions set for the module. </summary>
         ///
@@ -765,9 +752,9 @@ namespace emitters
         std::unique_ptr<llvm::Module> _pModule; // The LLVM Module being emitted
 
         // Info to modify how code is written out
-        std::map<std::string, std::vector<std::string>> _functionComments;
         std::vector<std::pair<std::string, std::string>> _preprocessorDefinitions;
         std::vector<std::string> _resetFunctions;
+        std::map<std::string, FunctionDeclaration> _functions;
     };
 
     //

@@ -927,6 +927,9 @@ class ConvertInput(ConvertBase):
             input_node = builder.AddInputNode(
                 model, ell.math.TensorShape(1, 1, 1), ell.nodes.PortType.real)
 
+            if lag_threshold_msec is None:
+                lag_threshold_msec = 2 * step_interval_msec
+
             clock_node = builder.AddClockNode(
                 model, ell.nodes.PortElements(input_node.GetOutputPort("output")),
                 float(step_interval_msec), float(lag_threshold_msec),

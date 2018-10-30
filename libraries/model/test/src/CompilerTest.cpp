@@ -117,6 +117,23 @@ model::Map MakeForestMap()
 //
 // Tests
 //
+void TestNodeMetadata()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(10);
+    inputNode->GetMetadata().SetEntry("window_size", std::string("80"));
+    auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::MapCompilerOptions settings;
+    settings.moduleName = "Model";
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    auto compiledFunction = compiledMap.GetJitter().GetFunction<char*(const char*)>("Model_GetMetadata");
+    char* result = compiledFunction("window_size");
+
+    testing::ProcessTest("Test compiled node metadata", testing::IsEqual(std::string(result), std::string("80")));
+}
 
 void TestSimpleMap(bool optimize)
 {

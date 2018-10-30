@@ -24,6 +24,7 @@ using namespace ell::predictors::neural;
 
 void TestIRCompiler()
 {
+    TestNodeMetadata();
     TestMultiOutputMap();
     TestCombineOutputMap();
 

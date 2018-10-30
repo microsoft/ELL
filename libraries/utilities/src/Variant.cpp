@@ -112,8 +112,15 @@ namespace utilities
 
     void Variant::WriteToArchive(utilities::Archiver& archiver) const
     {
-        archiver["type"] << GetStoredTypeName();
-        archiver["value"] << *_value;
+        if (IsEmpty())
+        {
+            archiver["type"] << std::string("void");
+        }
+        else
+        {
+            archiver["type"] << GetStoredTypeName();
+            archiver["value"] << *_value;
+        }
     }
 
     void Variant::ReadFromArchive(utilities::Unarchiver& archiver)
@@ -127,12 +134,20 @@ namespace utilities
 
         std::string type;
         archiver["type"] >> type;
-        registry.SetVariantType(*this, type);
-        archiver["value"] >> *_value;
-
-        if (_value.get() == nullptr)
+        if (type == "void")
         {
-            throw utilities::DataFormatException(DataFormatErrors::badFormat, "Archive format is invalid, expecting a non empty value");
+            _type = std::type_index(typeid(void));
+            _value = nullptr;
+        }
+        else
+        {
+            registry.SetVariantType(*this, type);
+            archiver["value"] >> *_value;
+
+            if (_value.get() == nullptr)
+            {
+                throw utilities::DataFormatException(DataFormatErrors::badFormat, "Archive format is invalid, expecting a non empty value");
+            }
         }
     }
 

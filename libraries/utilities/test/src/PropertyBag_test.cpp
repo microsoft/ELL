@@ -65,6 +65,9 @@ void TestPropertyBag()
     metadata["d"] = std::vector<int>{ 5, 6, 7, 8 };
     metadata["e"] = 5.0;
 
+    // this has a side effect of adding "f" with void value, make sure the property bag can still serialize after this...
+    testing::ProcessTest("PropertyBag property access has side effect", metadata["f"].IsEmpty());
+
     std::stringstream strstream;
     {
         JsonArchiver archiver(strstream);
@@ -79,11 +82,11 @@ void TestPropertyBag()
     PropertyBag metadata2;
     unarchiver >> metadata2;
 
-    testing::ProcessTest("Deserialize PropertyBag", testing::IsEqual(metadata2.GetEntry<std::string>("a"), "foo"));
-    testing::ProcessTest("Deserialize PropertyBag", testing::IsEqual(metadata2.GetEntry<std::vector<std::string>>("b"), { "hello", "world" }));
-    testing::ProcessTest("Deserialize PropertyBag", testing::IsEqual(metadata2.GetEntry<int>("c"), 4));
-    testing::ProcessTest("Deserialize PropertyBag", testing::IsEqual(metadata2.GetEntry<std::vector<int>>("d"), { 5, 6, 7, 8 }));
-    testing::ProcessTest("Deserialize PropertyBag", testing::IsEqual(metadata2.GetEntry<double>("e"), 5.0));
+    testing::ProcessTest("Deserialize PropertyBag string", testing::IsEqual(metadata2.GetEntry<std::string>("a"), "foo"));
+    testing::ProcessTest("Deserialize PropertyBag vector<string>", testing::IsEqual(metadata2.GetEntry<std::vector<std::string>>("b"), { "hello", "world" }));
+    testing::ProcessTest("Deserialize PropertyBag int", testing::IsEqual(metadata2.GetEntry<int>("c"), 4));
+    testing::ProcessTest("Deserialize PropertyBag vector<int>", testing::IsEqual(metadata2.GetEntry<std::vector<int>>("d"), { 5, 6, 7, 8 }));
+    testing::ProcessTest("Deserialize PropertyBag double", testing::IsEqual(metadata2.GetEntry<double>("e"), 5.0));
 
     SerializationContext context2;
     std::cout << strstream.str() << std::endl;

@@ -67,6 +67,8 @@ namespace emitters
             std::swap(this->_pAfterBlock, other._pAfterBlock);
             std::swap(this->_isContinuation, other._isContinuation);
             std::swap(this->_finished, other._finished);
+            // Turn off the 'other' object destructor auto block termination, since we are handing that responsibility off to this new copy.
+            other._finished = true; 
         }
 
         return *this;

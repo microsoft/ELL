@@ -24,7 +24,7 @@ namespace emitters
         // Native implementations of matrix operation functions (as opposed to calling out to BLAS)
         //
         template <typename ValueType>
-        LLVMFunction EmitGEMVFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
+        LLVMFunction EmitGEMVFunction(IRModuleEmitter& module, const std::string& functionName, const NamedVariableTypeList& argTypes)
         {
             auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);
             auto arguments = function.Arguments().begin();
@@ -47,7 +47,7 @@ namespace emitters
             function.For(m, [A, x, y, incx, incy, lda, n, accum](IRFunctionEmitter& function, auto rowIndex) {
                 function.StoreZero(accum);
                 function.For(n, [rowIndex, A, x, incx, lda, accum](IRFunctionEmitter& function, auto columnIndex) {
-                    auto aIndex = (rowIndex*lda) + columnIndex;
+                    auto aIndex = (rowIndex * lda) + columnIndex;
                     auto xIndex = columnIndex * incx;
                     auto aVal = A[aIndex];
                     auto xVal = x[xIndex];
@@ -65,7 +65,7 @@ namespace emitters
         }
 
         template <typename ValueType>
-        LLVMFunction EmitGEMMFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
+        LLVMFunction EmitGEMMFunction(IRModuleEmitter& module, const std::string& functionName, const NamedVariableTypeList& argTypes)
         {
             const auto CblasNoTrans = 111;
             const auto CblasTrans = 112;
@@ -315,7 +315,7 @@ namespace emitters
 
     LLVMFunction IRRuntime::GetCurrentTimeFunction()
     {
-        if (_pGetCurrentTimeFunction == nullptr)
+        if (_getCurrentTimeFunction == nullptr)
         {
             auto& emitter = _module.GetIREmitter();
             auto& context = _module.GetLLVMContext();
@@ -353,14 +353,14 @@ namespace emitters
                 auto totalSecondsDoubleVal = function.Operator(TypedOperator::addFloat, secondsDoubleVal, function.Operator(TypedOperator::divideFloat, nanosecondsDoubleVal, divisor));
                 function.Return(function.Operator(TypedOperator::multiplyFloat, totalSecondsDoubleVal, function.Literal(1000.0)));
                 _module.EndFunction();
-                _pGetCurrentTimeFunction = function.GetFunction();
+                _getCurrentTimeFunction = function.GetFunction();
             }
             else
             {
                 throw EmitterException(EmitterError::functionNotFound);
             }
         }
-        return _pGetCurrentTimeFunction;
+        return _getCurrentTimeFunction;
     }
 
     LLVMFunction IRRuntime::GetSqrtFunction(VariableType argType)
@@ -443,30 +443,84 @@ namespace emitters
         return _module.GetIntrinsic(llvm::Intrinsic::cos, { argType });
     }
 
+    LLVMFunction IRRuntime::GetStringCompareFunction()
+    {
+        if (_stringCompareFunction == nullptr)
+        {
+            const emitters::NamedVariableTypeList parameters = { { "a", emitters::VariableType::BytePointer }, { "b", emitters::VariableType::BytePointer } };
+            const auto returnType = emitters::GetVariableType<int>();
+            auto function = _module.BeginFunction(GetNamespacePrefix() + "_StringCompare", returnType, parameters);
+
+            auto arguments = function.Arguments().begin();
+            auto a = function.LocalArray(&(*arguments++)); // char* array
+            auto b = function.LocalArray(&(*arguments++)); // char* array
+
+            auto result = function.Variable(returnType, "result");
+            function.Store(result, function.Literal(0));
+            auto index = function.Variable(emitters::VariableType::Int32, "index");
+            function.Store(index, function.Literal(0));
+            auto continuing = function.Variable(emitters::VariableType::Boolean, "continue");
+            function.Store(continuing, function.TrueBit());
+
+            function.While(continuing,
+                           [&a, &b, index, result, continuing](emitters::IRFunctionEmitter& fn) {
+                               auto indexValue = fn.LocalScalar(fn.Load(index));
+                               auto achar = a[indexValue];
+                               auto bchar = b[indexValue];
+                               auto zero = fn.Literal<uint8_t>(0);
+                               fn.If(achar == zero && bchar == zero, [result, continuing](emitters::IRFunctionEmitter& fn) {
+                                     // got to the end of both strings, so they are equal, return 1.
+                                     fn.Store(result, fn.Literal(1));
+                                     fn.Store(continuing, fn.FalseBit());
+                                 })
+                                   .ElseIf(achar == zero || bchar == zero || achar != bchar, [continuing](emitters::IRFunctionEmitter& fn) {
+                                       // terminate loop with 0 result
+                                       fn.Store(continuing, fn.FalseBit());
+                                   });
+                               fn.Store(index, indexValue + 1);
+                           });
+
+            function.Return(function.Load(result));
+            _module.EndFunction();
+            _stringCompareFunction = function.GetFunction();
+        }
+        return _stringCompareFunction;
+    }
+
+    LLVMTypeList GetLLVMTypes(IREmitter& emitter, const NamedVariableTypeList& argTypes)
+    {
+        LLVMTypeList llvmTypes;
+        for (auto t : argTypes)
+        {
+            llvmTypes.push_back(emitter.Type(t.second));
+        }
+        return llvmTypes;
+    }
+
     //
     // BLAS
     //
     LLVMFunction IRRuntime::GetSGEMVFunction(bool useBlas)
     {
-        VariableTypeList argTypes = {
-            VariableType::Int32, // order
-            VariableType::Int32, // transpose
-            VariableType::Int32, // m
-            VariableType::Int32, // n
-            VariableType::Float, // alpha
-            VariableType::FloatPointer, // A
-            VariableType::Int32, // lda
-            VariableType::FloatPointer, // x
-            VariableType::Int32, // incx
-            VariableType::Float, // beta
-            VariableType::FloatPointer, // y
-            VariableType::Int32 // incy
+        NamedVariableTypeList argTypes = {
+            { "order", VariableType::Int32 },
+            { "transpose", VariableType::Int32 },
+            { "m", VariableType::Int32 },
+            { "n", VariableType::Int32 },
+            { "alpha", VariableType::Float },
+            { "A", VariableType::FloatPointer },
+            { "lda", VariableType::Int32 },
+            { "x", VariableType::FloatPointer },
+            { "incx", VariableType::Int32 },
+            { "beta", VariableType::Float },
+            { "y", VariableType::FloatPointer },
+            { "incy", VariableType::Int32 }
         };
 
         auto pModule = _module.GetLLVMModule();
         if (useBlas)
         {
-            auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
+            auto types = GetLLVMTypes(_module.GetIREmitter(), argTypes);
             auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
             return static_cast<LLVMFunction>(pModule->getOrInsertFunction("cblas_sgemv", functionType));
         }
@@ -483,25 +537,25 @@ namespace emitters
 
     LLVMFunction IRRuntime::GetDGEMVFunction(bool useBlas)
     {
-        VariableTypeList argTypes = {
-            VariableType::Int32, // order
-            VariableType::Int32, // transpose
-            VariableType::Int32, // m
-            VariableType::Int32, // n
-            VariableType::Double, // alpha
-            VariableType::DoublePointer, // M
-            VariableType::Int32, // lda
-            VariableType::DoublePointer, // x
-            VariableType::Int32, // incx
-            VariableType::Double, // beta
-            VariableType::DoublePointer, // y
-            VariableType::Int32 // incy
+        NamedVariableTypeList argTypes = {
+            { "order", VariableType::Int32 },
+            { "transpose", VariableType::Int32 },
+            { "m", VariableType::Int32 },
+            { "n", VariableType::Int32 },
+            { "alpha", VariableType::Double },
+            { "M", VariableType::DoublePointer },
+            { "lda", VariableType::Int32 },
+            { "x", VariableType::DoublePointer },
+            { "incx", VariableType::Int32 },
+            { "beta", VariableType::Double },
+            { "y", VariableType::DoublePointer },
+            { "incy", VariableType::Int32 }
         };
 
         auto pModule = _module.GetLLVMModule();
         if (useBlas)
         {
-            auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
+            auto types = GetLLVMTypes(_module.GetIREmitter(), argTypes);
             auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
             return static_cast<LLVMFunction>(pModule->getOrInsertFunction("cblas_dgemv", functionType));
         }
@@ -518,27 +572,27 @@ namespace emitters
 
     LLVMFunction IRRuntime::GetSGEMMFunction(bool useBlas)
     {
-        VariableTypeList argTypes = {
-            VariableType::Int32, // order
-            VariableType::Int32, // transposeA
-            VariableType::Int32, // transposeB
-            VariableType::Int32, // m
-            VariableType::Int32, // n
-            VariableType::Int32, // k
-            VariableType::Float, // alpha
-            VariableType::FloatPointer, // A
-            VariableType::Int32, // lda
-            VariableType::FloatPointer, // B
-            VariableType::Int32, // ldb
-            VariableType::Float, // beta
-            VariableType::FloatPointer, // C
-            VariableType::Int32 // ldc
+        NamedVariableTypeList argTypes = {
+            { "order", VariableType::Int32 }, // order
+            { "transposeA", VariableType::Int32 }, // transposeA
+            { "transposeB", VariableType::Int32 }, // transposeB
+            { "m", VariableType::Int32 }, // m
+            { "n", VariableType::Int32 }, // n
+            { "k", VariableType::Int32 }, // k
+            { "alpha", VariableType::Float }, // alpha
+            { "A", VariableType::FloatPointer }, // A
+            { "lda", VariableType::Int32 }, // lda
+            { "B", VariableType::FloatPointer }, // B
+            { "ldb", VariableType::Int32 }, // ldb
+            { "beat", VariableType::Float }, // beta
+            { "C", VariableType::FloatPointer }, // C
+            { "ldc", VariableType::Int32 } // ldc
         };
 
         auto pModule = _module.GetLLVMModule();
         if (useBlas)
         {
-            auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
+            auto types = GetLLVMTypes(_module.GetIREmitter(), argTypes);
             auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
             return static_cast<LLVMFunction>(pModule->getOrInsertFunction("cblas_sgemm", functionType));
         }
@@ -555,27 +609,27 @@ namespace emitters
 
     LLVMFunction IRRuntime::GetDGEMMFunction(bool useBlas)
     {
-        VariableTypeList argTypes = {
-            VariableType::Int32, // order
-            VariableType::Int32, // transposeA
-            VariableType::Int32, // transposeB
-            VariableType::Int32, // m
-            VariableType::Int32, // n
-            VariableType::Int32, // k
-            VariableType::Double, // alpha
-            VariableType::DoublePointer, // A
-            VariableType::Int32, // lda
-            VariableType::DoublePointer, // B
-            VariableType::Int32, // ldb
-            VariableType::Double, // beta
-            VariableType::DoublePointer, // C
-            VariableType::Int32 // ldc
+        NamedVariableTypeList argTypes = {
+            { "order", VariableType::Int32 }, // order
+            { "transposeA", VariableType::Int32 }, // transposeA
+            { "transposeB", VariableType::Int32 }, // transposeB
+            { "m", VariableType::Int32 }, // m
+            { "n", VariableType::Int32 }, // n
+            { "k", VariableType::Int32 }, // k
+            { "alpha", VariableType::Double }, // alpha
+            { "A", VariableType::DoublePointer }, // A
+            { "lda", VariableType::Int32 }, // lda
+            { "B", VariableType::DoublePointer }, // B
+            { "ldb", VariableType::Int32 }, // ldb
+            { "beta", VariableType::Double }, // beta
+            { "C", VariableType::DoublePointer }, // C
+            { "ldc", VariableType::Int32 } // ldc
         };
 
         auto pModule = _module.GetLLVMModule();
         if (useBlas)
         {
-            auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
+            auto types = GetLLVMTypes(_module.GetIREmitter(), argTypes);
             auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
             return static_cast<LLVMFunction>(pModule->getOrInsertFunction("cblas_dgemm", functionType));
         }

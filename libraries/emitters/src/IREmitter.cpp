@@ -88,6 +88,8 @@ namespace emitters
             return GetVariableType(type);
         case VariableType::VoidPointer:
             return GetVariableType(VariableType::Void)->getPointerTo();
+        case VariableType::Boolean:
+            return GetVariableType(type);
         case VariableType::Byte:
             return GetVariableType(type);
         case VariableType::BytePointer:
@@ -1144,6 +1146,8 @@ namespace emitters
         {
         case VariableType::Void:
             return _irBuilder.getVoidTy();
+        case VariableType::Boolean:
+            return _irBuilder.getInt1Ty();
         case VariableType::Byte:
             return _irBuilder.getInt8Ty();
         case VariableType::Int16:
@@ -1197,6 +1201,11 @@ namespace emitters
         LLVMTypeList llvmTypes;
         for (auto t : types)
         {
+            if (t == VariableType::VoidPointer)
+            {
+                // LLVM doesn't support VoidPointer
+                t = VariableType::BytePointer;
+            }
             llvmTypes.push_back(Type(t));
         }
 
@@ -1205,8 +1214,17 @@ namespace emitters
 
     std::vector<LLVMType> IREmitter::BindArgumentTypes(const NamedVariableTypeList& arguments)
     {
-        std::vector<LLVMType> types(arguments.size());
-        std::transform(arguments.begin(), arguments.end(), types.begin(), [this](NamedVariableType argument) { return Type(argument.second); });
+        std::vector<LLVMType> types;
+        for (auto pair : arguments)
+        {
+            VariableType t = pair.second;
+            if (t == VariableType::VoidPointer)
+            {
+                // LLVM doesn't support VoidPointer
+                t = VariableType::BytePointer;
+            }
+            types.push_back(Type(t));
+        }
         return types;
     }
 

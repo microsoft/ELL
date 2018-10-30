@@ -30,8 +30,8 @@ namespace nodes
                 ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, square);
                 ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, log);
 
-                default:
-                    throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
             }
         }
 
@@ -189,37 +189,37 @@ namespace nodes
     {
         switch (this->GetOperation())
         {
-            case emitters::UnaryOperationType::sqrt:
-                return function.GetModule().GetRuntime().GetSqrtFunction<ValueType>();
-            case emitters::UnaryOperationType::exp:
-                return function.GetModule().GetRuntime().GetExpFunction<ValueType>();
-            case emitters::UnaryOperationType::log:
-                return function.GetModule().GetRuntime().GetLogFunction<ValueType>();
-            case emitters::UnaryOperationType::logicalNot:
-            {
-                auto& module = function.GetModule();
-                auto& f = module.BeginFunction("logicalNot", emitters::GetVariableType<bool>(), {emitters::GetVariableType<ValueType>()});
-                auto args = f.Arguments().begin();
-                llvm::Argument& val = *args;
-                f.Return(f.LogicalNot(&val));
-                module.EndFunction();
-                return f.GetFunction();
-            }
-            case emitters::UnaryOperationType::square:
-            {
-                auto& module = function.GetModule();
-                auto& f = module.BeginFunction("square", emitters::GetVariableType<ValueType>(), { emitters::GetVariableType<ValueType>() });
-                auto args = f.Arguments().begin();
-                llvm::Argument& val = *args;
-                f.Return(f.Operator(emitters::GetMultiplyForValueType<ValueType>(), &val, &val));
-                module.EndFunction();
-                return f.GetFunction();
-            }
-            case emitters::UnaryOperationType::tanh:
-                return function.GetModule().GetRuntime().GetTanhFunction<ValueType>();
-            case emitters::UnaryOperationType::none:
-            default:
-                throw emitters::EmitterException(emitters::EmitterError::unaryOperationNotSupported);
+        case emitters::UnaryOperationType::sqrt:
+            return function.GetModule().GetRuntime().GetSqrtFunction<ValueType>();
+        case emitters::UnaryOperationType::exp:
+            return function.GetModule().GetRuntime().GetExpFunction<ValueType>();
+        case emitters::UnaryOperationType::log:
+            return function.GetModule().GetRuntime().GetLogFunction<ValueType>();
+        case emitters::UnaryOperationType::logicalNot:
+        {
+            auto& module = function.GetModule();
+            auto& f = module.BeginFunction("logicalNot", emitters::GetVariableType<bool>(), { { "value", emitters::GetVariableType<ValueType>() } });
+            auto args = f.Arguments().begin();
+            llvm::Argument& val = *args;
+            f.Return(f.LogicalNot(&val));
+            module.EndFunction();
+            return f.GetFunction();
+        }
+        case emitters::UnaryOperationType::square:
+        {
+            auto& module = function.GetModule();
+            auto& f = module.BeginFunction("square", emitters::GetVariableType<ValueType>(), { { "value", emitters::GetVariableType<ValueType>() } });
+            auto args = f.Arguments().begin();
+            llvm::Argument& val = *args;
+            f.Return(f.Operator(emitters::GetMultiplyForValueType<ValueType>(), &val, &val));
+            module.EndFunction();
+            return f.GetFunction();
+        }
+        case emitters::UnaryOperationType::tanh:
+            return function.GetModule().GetRuntime().GetTanhFunction<ValueType>();
+        case emitters::UnaryOperationType::none:
+        default:
+            throw emitters::EmitterException(emitters::EmitterError::unaryOperationNotSupported);
         }
     }
 

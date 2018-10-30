@@ -55,11 +55,12 @@ namespace emitters
         ///<summary> Pointer to a Float </summary>
         FloatPointer,
         ///<summary> Pointer to a Double </summary>
-        DoublePointer
+        DoublePointer,
 
         //
-        // Arrays
+        // Custom Structs
         //
+        Custom
     };
 
     /// <summary> Untyped unary operations. </summary>

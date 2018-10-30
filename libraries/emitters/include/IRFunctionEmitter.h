@@ -1653,7 +1653,7 @@ namespace emitters
         IRBlockRegion* _pCurRegion = nullptr;
         LLVMFunction _pFunction = nullptr;
         llvm::BasicBlock* _entryBlock = nullptr;
-
+        
         std::string _name;
     };
 

@@ -124,3 +124,25 @@ void TestCompilableIRFunction()
     }
     testing::ProcessTest("Testing compilable function", testing::IsEqual(computedResult, compiledResult));
 }
+
+void TestStringCompareFunction()
+{
+    CompilerOptions options;
+    IRModuleEmitter module("StringCompareModule", options);
+
+    auto strcompare = module.GetRuntime().GetStringCompareFunction();
+    std::string name = strcompare->getName();
+    
+    IRExecutionEngine executionEngine(std::move(module));
+    auto compiledFunction = executionEngine.GetFunction<int(const char*, const char*)>(name);
+
+    int u = compiledFunction("eleph",    "elephant");
+    int v = compiledFunction("elephant", "eleph");
+    int x = compiledFunction("elephant", "");
+    int y = compiledFunction("elephant", "orange");
+    int z = compiledFunction("elephant", "elephant");
+
+    testing::ProcessTest("Testing string comparison function", 
+        testing::IsEqual(u, 0) && testing::IsEqual(v, 0) && testing::IsEqual(x, 0) && testing::IsEqual(y, 0) &&
+        testing::IsEqual(z, 1) );
+}

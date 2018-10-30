@@ -204,6 +204,7 @@ namespace model
         EmitGetInputShapeFunction(map);
         EmitGetOutputShapeFunction(map);
         EmitGetSinkOutputShapeFunction(map);
+        EmitGetMetadataFunction(map);
     }
 
     void IRMapCompiler::EmitGetInputSizeFunction(const Map& map)
@@ -216,8 +217,8 @@ namespace model
         function.IncludeInHeader();
 
         std::vector<int> sizes;
-        for(size_t i = 0 , n = map.GetNumInputs(); i < n; ++i)
-        {            
+        for (size_t i = 0, n = map.GetNumInputs(); i < n; ++i)
+        {
             sizes.push_back(map.GetInputSize(i));
         }
         EmitSizeConditionals(function, sizes);
@@ -521,14 +522,108 @@ namespace model
 
     void IRMapCompiler::EmitGetNumNodesFunction(const Map& map)
     {
-        auto& context = _moduleEmitter.GetLLVMContext();
-        auto int32Type = llvm::Type::getInt32Ty(context);
         int numNodes = map.GetModel().Size();
 
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetNumNodes", int32Type);
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetNumNodes", emitters::VariableType::Int32);
         function.IncludeInHeader();
         function.Return(function.Literal(numNodes));
         _moduleEmitter.EndFunction();
+    }
+
+    void IRMapCompiler::EmitGetMetadataFunction(const Map& map)
+    {
+        const emitters::NamedVariableTypeList parameters = { { "key", emitters::VariableType::Char8Pointer } };
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetMetadata", emitters::VariableType::Char8Pointer, parameters);
+        function.IncludeInHeader();
+
+        std::vector<std::pair<std::string, std::string>> keyValuePairs;
+        auto iter = map.GetModel().GetNodeIterator();
+        while (iter.IsValid())
+        {
+            auto node = iter.Get();
+            auto bag = node->GetMetadata();
+            for (auto key : bag.Keys())
+            {
+                auto value = bag[key];
+                auto strValue = value.ToString();
+                keyValuePairs.emplace_back(key, strValue);
+            }
+            iter.Next();
+        }
+        EmitStringConditionals(function, keyValuePairs);
+        _moduleEmitter.EndFunction();
+    }
+
+    void IRMapCompiler::EmitStringConditionals(emitters::IRFunctionEmitter& fn, std::vector<std::pair<std::string, std::string>> keyValuePairs)
+    {
+        // This is the type of code we are trying to generate for the GetInputSize and GetOutputSize functions:
+        //
+        // int model_GetInputSize(int index)
+        // {
+        //     if (name == "window_size") {
+        //         return "80";
+        //     }
+        //     if (name == "filterbank_size") {
+        //         return "40";
+        //     }
+        //     ...
+        //     return "";
+        // }
+        //
+        auto arguments = fn.Arguments().begin();
+        auto nameArgument = &(*arguments++);
+        auto pMainBlock = fn.GetCurrentBlock();
+
+        auto strCompare = _moduleEmitter.GetRuntime().GetStringCompareFunction();
+
+        std::vector<llvm::BasicBlock*> blocks;
+        blocks.push_back(pMainBlock);
+        // create the final block in the case the index is out of range or there are no shapes and reutrn empty TensorShape.
+        auto pDoneBlock = fn.BeginBlock("NoMatchBlock");
+        {
+            fn.Return(fn.Literal(""));
+        }
+
+        if (!keyValuePairs.empty())
+        {
+            int index = 0;
+            for (auto pair : keyValuePairs)
+            {
+                std::string key = pair.first;
+                std::string value = pair.second;
+
+                std::string labelSuffix = std::to_string(index);
+                auto followBlock = fn.BeginBlock("FollowBlock" + labelSuffix);
+                auto thenBlock = fn.BeginBlock("ThenBlock" + labelSuffix);
+                {
+                    fn.Return(fn.Literal(value));
+                }
+                auto elseBlock = fn.BeginBlock("ElseBlock" + labelSuffix);
+                {
+                    fn.Branch(followBlock);
+                }
+                auto conditionBlock = fn.BeginBlock("IfBlock" + labelSuffix);
+                {
+                    auto compare = fn.Call(strCompare, { nameArgument, fn.Literal(key) });
+                    auto isEqual = fn.LocalScalar(compare) == 1;
+                    llvm::BranchInst::Create(thenBlock, elseBlock, isEqual, conditionBlock);
+                }
+                blocks.push_back(conditionBlock);
+                blocks.push_back(followBlock);
+            }
+            fn.SetCurrentBlock(blocks[blocks.size() - 1]);
+            fn.Branch(pDoneBlock);
+        }
+
+        fn.SetCurrentBlock(pMainBlock);
+        if (blocks.size() > 1)
+        {
+            fn.Branch(blocks[1]); // jump to first statement.
+        }
+
+        blocks.push_back(pDoneBlock);
+        // ensure all blocks are properly chained with branch instructions and inserted into the function BasicBlockList.
+        fn.ConcatenateBlocks(blocks);
     }
 
     //
@@ -541,10 +636,8 @@ namespace model
         if (pVar == nullptr)
         {
             const Node* node = port.GetNode();
-            throw emitters::EmitterException(emitters::EmitterError::unexpected, 
-                utilities::FormatString("Error: missing port variable for '%s' port on node %s(%s)", port.GetName().c_str(), 
-                    node->GetRuntimeTypeName().c_str(),
-                    node->GetId().ToString().c_str()));
+            throw emitters::EmitterException(emitters::EmitterError::unexpected,
+                                             utilities::FormatString("Error: missing port variable for '%s' port on node %s(%s)", port.GetName().c_str(), node->GetRuntimeTypeName().c_str(), node->GetId().ToString().c_str()));
         }
         return GetModule().EnsureEmitted(*pVar);
     }

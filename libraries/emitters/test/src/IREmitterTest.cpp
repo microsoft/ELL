@@ -118,7 +118,7 @@ std::string EmitStruct(const char* moduleName)
 {
     auto module = MakeHostModuleEmitter(moduleName);
     const char* TensorShapeName = "TensorShape";
-    auto int32Type = emitters::VariableType::Int32;
+    auto int32Type = VariableType::Int32;
     emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
     auto shapeType = module.GetOrCreateStruct(TensorShapeName, namedFields);
     module.IncludeTypeInHeader(shapeType->getName());
@@ -184,9 +184,10 @@ void TestEmitLLVM()
 
         fnMain.If(TypedComparison::equalsFloat, item, fnMain.Literal(6.6), [](IRFunctionEmitter& fnMain) {
                   fnMain.Print("Second If!\n");
-              }).Else([](IRFunctionEmitter& fnMain) {
+              })
+            .Else([](IRFunctionEmitter& fnMain) {
                 fnMain.Print("Else\n");
-              });
+            });
 
         fnMain.Printf({ fnMain.Literal("%d, %f\n"), i, item });
     });
@@ -221,7 +222,7 @@ void TestLLVMShiftRegister()
     std::vector<double> newData1({ 1.2, 2.2 });
     std::vector<double> newData2({ 3.3, 4.3 });
 
-    auto fn = module.BeginFunction("ShiftRegisterTest", emitters::VariableType::Void, { emitters::VariableType::DoublePointer });
+    auto fn = module.BeginFunction("ShiftRegisterTest", VariableType::Void, { { "values", VariableType::DoublePointer } });
     {
         auto arguments = fn.Arguments().begin();
         auto output = &(*arguments++);
@@ -254,27 +255,29 @@ void TestHighLevelNestedIf()
     NamedVariableTypeList argTypes = { { "x", VariableType::Double },
                                        { "y", VariableType::Double },
                                        { "z", VariableType::Double } };
-    auto fn = module.BeginFunction("HighLevelNestedIfTest", emitters::VariableType::Int32, argTypes);
+    auto fn = module.BeginFunction("HighLevelNestedIfTest", VariableType::Int32, argTypes);
     {
         auto arguments = fn.Arguments().begin();
         auto x = &(*arguments++);
         auto y = &(*arguments++);
         auto z = &(*arguments++);
-        auto result = fn.Variable(emitters::VariableType::Int32);
+        auto result = fn.Variable(VariableType::Int32);
         {
             fn.If(fn.Comparison(emitters::TypedComparison::greaterThanFloat, x, y), [&result, x, z](IRFunctionEmitter& fn) {
                   fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result](IRFunctionEmitter& fn) {
                       fn.Store(result, fn.Literal<int>(1));
                   });
-              }).ElseIf(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result, x, y](IRFunctionEmitter& fn) {
+              })
+                .ElseIf(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result, x, y](IRFunctionEmitter& fn) {
                     fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, y), [&result](IRFunctionEmitter& fn) {
                         fn.Store(result, fn.Literal<int>(2));
                     });
-              }).Else([&result, y, z](IRFunctionEmitter& fn) {
+                })
+                .Else([&result, y, z](IRFunctionEmitter& fn) {
                     fn.If(fn.Comparison(emitters::TypedComparison::greaterThanFloat, y, z), [&result](IRFunctionEmitter& fn) {
                         fn.Store(result, fn.Literal<int>(3));
-                  });
-              });
+                    });
+                });
         }
         fn.Return(fn.Load(result));
     }
@@ -301,13 +304,13 @@ void TestMixedLevelNestedIf()
     NamedVariableTypeList argTypes = { { "x", VariableType::Double },
                                        { "y", VariableType::Double },
                                        { "z", VariableType::Double } };
-    auto fn = module.BeginFunction("MixedLevelNestedIfTest", emitters::VariableType::Int32, argTypes);
+    auto fn = module.BeginFunction("MixedLevelNestedIfTest", VariableType::Int32, argTypes);
     {
         auto arguments = fn.Arguments().begin();
         auto x = &(*arguments++);
         auto y = &(*arguments++);
         auto z = &(*arguments++);
-        auto result = fn.Variable(emitters::VariableType::Int32);
+        auto result = fn.Variable(VariableType::Int32);
         {
             IRIfEmitter ifEmitter = fn.If(fn.Comparison(emitters::TypedComparison::greaterThanFloat, x, y), [&result, x, z](IRFunctionEmitter& fn) {
                 fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result](IRFunctionEmitter& fn) {
@@ -349,7 +352,7 @@ void TestLogicalAnd()
 {
     auto module = MakeHostModuleEmitter("LogicalAnd");
 
-    auto fn = module.BeginFunction("LogicalAndTest", VariableType::Int32, { VariableType::Int32, VariableType::Int32, VariableType::Int32 });
+    auto fn = module.BeginFunction("LogicalAndTest", VariableType::Int32, { { "x1", VariableType::Int32 }, { "x2", VariableType::Int32 }, { "x3", VariableType::Int32 } });
     {
         auto args = fn.Arguments().begin();
         llvm::Argument& val1 = *args++;
@@ -382,7 +385,7 @@ void TestLogicalOr()
 {
     auto module = MakeHostModuleEmitter("LogicalOr");
 
-    auto fn = module.BeginFunction("LogicalOrTest", VariableType::Int32, { VariableType::Int32, VariableType::Int32, VariableType::Int32 });
+    auto fn = module.BeginFunction("LogicalOrTest", VariableType::Int32, { { "x1", VariableType::Int32 }, { "x2", VariableType::Int32 }, { "x3", VariableType::Int32 } });
     {
         auto args = fn.Arguments().begin();
         llvm::Argument& val1 = *args++;
@@ -415,7 +418,7 @@ void TestLogicalNot()
 {
     auto module = MakeHostModuleEmitter("LogicalNot");
 
-    auto fn = module.BeginFunction("LogicalNotTest", VariableType::Int32, { VariableType::Int32, VariableType::Int32 });
+    auto fn = module.BeginFunction("LogicalNotTest", VariableType::Int32, { { "x1", VariableType::Int32 }, { "x2", VariableType::Int32 } });
     {
         auto args = fn.Arguments().begin();
         llvm::Argument& val1 = *args++;
@@ -451,7 +454,7 @@ void TestForLoop()
     auto add = GetOperator<int32_t>(BinaryOperationType::add);
     auto varType = VariableType::Int32;
 
-    auto fn = module.BeginFunction("TestForLoop", varType, VariableTypeList{});
+    auto fn = module.BeginFunction("TestForLoop", varType, NamedVariableTypeList{});
     auto sum = fn.Variable(varType);
     fn.Store(sum, fn.Literal<int32_t>(0));
     fn.For(numIter, [sum, add](IRFunctionEmitter& fn, LLVMValue i) {
@@ -510,9 +513,9 @@ void TestWhileLoopWithFunctionCondition()
     {
         auto i = fn.Variable(int32Type);
         fn.Store(i, fn.Literal<int>(5));
-        auto condition = [i](IRFunctionEmitter& fn) { 
+        auto condition = [i](IRFunctionEmitter& fn) {
             return fn.LocalScalar(fn.Load(i)) != 10;
-            };
+        };
 
         fn.While(condition, [i](IRFunctionEmitter& fn) {
             fn.OperationAndUpdate(i, TypedOperator::add, fn.Literal<int>(1)); // i++
@@ -591,18 +594,18 @@ void TestMetadata()
     jit.RunMain();
 }
 
-void TestHeader()
+void TestHeaderStruct()
 {
     auto module = MakeHostModuleEmitter("Predictor");
 
-    auto int32Type = emitters::VariableType::Int32;
+    auto int32Type = VariableType::Int32;
     emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
     auto shapeType = module.GetOrCreateStruct("Shape", namedFields);
     // test that this casues the type to show up in the module header.
     module.IncludeTypeInHeader(shapeType->getName());
-
+    std::string functionName = "Test_GetInputShape";
     const emitters::NamedVariableTypeList parameters = { { "index", emitters::GetVariableType<int>() } };
-    auto function = module.BeginFunction("Test_GetInputShape", shapeType, parameters);
+    auto function = module.BeginFunction(functionName, shapeType, parameters);
     // test that this causes the function to show up in the module header
     function.IncludeInHeader();
     auto& emitter = module.GetIREmitter();
@@ -617,13 +620,44 @@ void TestHeader()
     function.Return(function.ValueAt(shapeVar));
     module.EndFunction();
 
+    // add some function comments
+    module.GetFunctionDeclaration(functionName).GetComments().push_back("This is a really fun function");
+
     std::ostringstream out;
     emitters::WriteModuleHeader(out, module);
 
     std::string result = out.str();
     auto structPos = result.find("typedef struct Shape");
     auto funcPos = result.find("Shape Test_GetInputShape(int32_t");
-    testing::ProcessTest("Testing header generation", structPos != std::string::npos && funcPos != std::string::npos);
+    auto commentPos = result.find("This is a really fun function");
+    testing::ProcessTest("Testing header generation with structs", structPos != std::string::npos && funcPos != std::string::npos && commentPos != std::string::npos);
+}
+
+void TestHeaderVoidChar()
+{
+    auto module = MakeHostModuleEmitter("Predictor");
+
+    emitters::NamedVariableTypeList parameters = { { "context", VariableType::VoidPointer }, { "name", VariableType::Char8Pointer } };
+    
+    auto function = module.BeginFunction("Test_GetMetadata", VariableType::Char8Pointer, parameters);
+
+    // test that this causes the function to show up in the module header with correct types for void and char*.
+    function.IncludeInHeader();
+    function.Return(function.Literal("test"));
+    module.EndFunction();
+
+    std::ostringstream out;
+    emitters::WriteModuleHeader(out, module);
+
+    std::string result = out.str();
+    auto funcPos = result.find("char* Test_GetMetadata(void* context, char* name");
+    testing::ProcessTest("Testing special header for void and char", funcPos != std::string::npos);
+}
+
+void TestHeader()
+{
+    TestHeaderStruct();
+    TestHeaderVoidChar();
 }
 
 void TestTwoEmitsInOneSession()
@@ -694,11 +728,11 @@ void TestScopedIf()
     auto module = MakeHostModuleEmitter("If");
 
     // returns `1` if arg is < 10.0, otherwise returns `2`
-    auto fn = module.BeginFunction("ScopedIfTest", emitters::VariableType::Int32, { emitters::VariableType::Double });
+    auto fn = module.BeginFunction("ScopedIfTest", VariableType::Int32, { { "x", VariableType::Double } });
     {
         auto arguments = fn.Arguments().begin();
         auto x = &(*arguments++);
-        auto result = fn.Variable(emitters::VariableType::Int32);
+        auto result = fn.Variable(VariableType::Int32);
         fn.Store(result, fn.Literal<int>(1));
         auto cmp = fn.Comparison(TypedComparison::lessThanFloat, x, fn.Literal(10.0));
         fn.If(cmp, [&result](IRFunctionEmitter& fn) {
@@ -733,18 +767,19 @@ void TestScopedIfElse()
 {
     auto module = MakeHostModuleEmitter("IfElse");
 
-    auto fn = module.BeginFunction("ScopedIfElseTest", emitters::VariableType::Int32, { emitters::VariableType::Int32 });
+    auto fn = module.BeginFunction("ScopedIfElseTest", VariableType::Int32, { { "x", VariableType::Int32 } });
     {
         auto arguments = fn.Arguments().begin();
         auto x = &(*arguments++);
-        auto result = fn.Variable(emitters::VariableType::Int32);
+        auto result = fn.Variable(VariableType::Int32);
         fn.Store(result, fn.Literal<int>(0));
 
         auto cmp = fn.Comparison(TypedComparison::lessThan, x, fn.Literal<int>(10));
 
         fn.If(cmp, [&result](IRFunctionEmitter& fn) {
               fn.Store(result, fn.Literal<int>(1));
-          }).Else([&result](IRFunctionEmitter& fn) {
+          })
+            .Else([&result](IRFunctionEmitter& fn) {
                 fn.Store(result, fn.Literal<int>(2));
             });
         fn.Return(fn.Load(result));
@@ -780,22 +815,24 @@ void TestScopedIfElse2()
 {
     auto module = MakeHostModuleEmitter("IfElse2");
 
-    auto fn = module.BeginFunction("ScopedIfElse2Test", emitters::VariableType::Int32, { emitters::VariableType::Int32 });
+    auto fn = module.BeginFunction("ScopedIfElse2Test", VariableType::Int32, { { "x", VariableType::Int32 } });
     {
         auto arguments = fn.Arguments().begin();
         auto x = &(*arguments++);
-        auto result = fn.Variable(emitters::VariableType::Int32);
+        auto result = fn.Variable(VariableType::Int32);
         fn.Store(result, fn.Literal<int>(0));
 
         auto cmp1 = fn.Comparison(TypedComparison::lessThan, x, fn.Literal<int>(3));
         auto cmp2 = fn.Comparison(TypedComparison::greaterThan, x, fn.Literal<int>(6));
         fn.If(cmp1, [&result](IRFunctionEmitter& fn) {
               fn.Store(result, fn.Literal<int>(1));
-          }).ElseIf(cmp2, [&result](IRFunctionEmitter& fn) {
+          })
+            .ElseIf(cmp2, [&result](IRFunctionEmitter& fn) {
                 fn.Store(result, fn.Literal<int>(3));
-          }).Else([&result](IRFunctionEmitter& fn) {
+            })
+            .Else([&result](IRFunctionEmitter& fn) {
                 fn.Store(result, fn.Literal<int>(2));
-          });
+            });
         fn.Return(fn.Load(result));
     }
     module.EndFunction();
@@ -834,7 +871,7 @@ void TestElseIfWithComputedCondition()
     auto module = MakeHostModuleEmitter("ElseIfComputedCondition");
 
     const auto returnType = emitters::GetVariableType<int>();
-    const emitters::NamedVariableTypeList parameters = { { "a", emitters::VariableType::Int32 }, { "b", emitters::VariableType::Int32 } };
+    const emitters::NamedVariableTypeList parameters = { { "a", VariableType::Int32 }, { "b", VariableType::Int32 } };
 
     auto fn = module.BeginFunction("ElseIfComputedConditionTest", returnType, parameters);
     {
@@ -847,9 +884,10 @@ void TestElseIfWithComputedCondition()
 
         fn.If(a == 1 && b == 1, [result](emitters::IRFunctionEmitter& fn) {
               fn.Store(result, fn.Literal(1));
-          }).ElseIf(a == 2 || b == 2, [result](emitters::IRFunctionEmitter& fn) {
-              fn.Store(result, fn.Literal(2));
-          });
+          })
+            .ElseIf(a == 2 || b == 2, [result](emitters::IRFunctionEmitter& fn) {
+                fn.Store(result, fn.Literal(2));
+            });
 
         fn.Return(fn.Load(result));
     }
@@ -862,14 +900,14 @@ void TestElseIfWithComputedCondition()
     auto referenceFn = [](int a, int b) {
         if (a == 1 && b == 1)
             return 1;
-        else if(a == 2 || b == 2)
+        else if (a == 2 || b == 2)
             return 2;
         else
             return 0;
     };
 
     bool success = true;
-    auto trials = std::vector<std::vector<int32_t>>{ {1, 1}, {1, 2}, {2, 2}, {3, 3} };
+    auto trials = std::vector<std::vector<int32_t>>{ { 1, 1 }, { 1, 2 }, { 2, 2 }, { 3, 3 } };
     for (auto args : trials)
     {
         auto result = testFn(args[0], args[1]);

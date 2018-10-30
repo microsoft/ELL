@@ -77,6 +77,7 @@ set(tcc
 
 set(doc
     doc/CompileAsFunction.md
+    doc/Metadata.md
     doc/README.md
 )
 

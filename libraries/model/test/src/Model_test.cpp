@@ -336,6 +336,28 @@ void TestModelMetadata()
         node->GetMetadata().SetEntry("isInput", std::string("true"));
     }
 
+    // Test copy of metadata
+    auto inputNode = inputNodes[0];
+    auto newNode = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 8);
+    newNode->GetMetadata() = inputNode->GetMetadata();
+    testing::ProcessTest("Testing metadata copy", !newNode->GetMetadata().IsEmpty());
+
+    // Test metadata survives a model copy via ModelTransformer
+    ell::model::ModelTransformer t;
+    auto copy = t.CopyModel(model);
+    auto iter2 = copy.GetNodeIterator();
+    while (iter2.IsValid())
+    {
+        auto node = const_cast<model::Node*>(iter2.Get());
+        auto name = node->GetRuntimeTypeName();
+        testing::ProcessTest("Testing metadata copy " + name + "::HasEntry('visited')", node->GetMetadata().HasEntry("visited"));
+        testing::ProcessTest("Testing metadata copy " + name + "::GetEntry('visited') == 'true'", node->GetMetadata().GetEntry<std::string>("visited") == "true");
+        testing::ProcessTest("Testing metadata copy " + name + "::HasEntry('foo')", node->GetMetadata().HasEntry("foo"));
+        testing::ProcessTest("Testing metadata copy " + name + "::GetEntry('foo') == 'baz'", node->GetMetadata().GetEntry<std::string>("foo") == "baz");
+        iter2.Next();
+    }
+
+
     // Print archive of model:
 #if 0
     std::cout << "Model with metadata:" << std::endl;

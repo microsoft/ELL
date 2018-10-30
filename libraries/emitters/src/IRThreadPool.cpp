@@ -50,12 +50,11 @@ namespace emitters
     {
         // Create individual threads (in a global_ctors function)
         auto& context = _module.GetLLVMContext();
-        auto voidType = llvm::Type::getVoidTy(context);
         auto boolType = llvm::Type::getInt1Ty(context);
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
         auto isInitedVar = _module.Global(boolType, "isInitialized"); // initialized to false
 
-        auto initThreadPoolFunction = _module.BeginFunction("initThreadPool", voidType);
+        auto initThreadPoolFunction = _module.BeginFunction("initThreadPool", VariableType::Void);
         {
             // Check if task not initialized
             auto notInited = initThreadPoolFunction.LogicalNot(initThreadPoolFunction.Load(isInitedVar));
@@ -77,11 +76,8 @@ namespace emitters
 
     void IRThreadPool::AddGlobalFinalizer()
     {
-        auto& context = _module.GetLLVMContext();
-        auto voidType = llvm::Type::getVoidTy(context);
-
         // Create individual threads (in a global_ctors function)
-        auto shutDownThreadPoolFunction = _module.BeginFunction("shutDownThreadPool", voidType);
+        auto shutDownThreadPoolFunction = _module.BeginFunction("shutDownThreadPool", VariableType::Void);
         {
             ShutDown(shutDownThreadPoolFunction);
         }

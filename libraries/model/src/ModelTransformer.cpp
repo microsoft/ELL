@@ -181,16 +181,6 @@ namespace model
             {
                 transformer.CopyNode(node);
             }
-
-            if (transformer.IsOutputMapped(*node.GetOutputPort(0)))
-            {
-                const auto& port = transformer.GetCorrespondingOutputs(*node.GetOutputPort(0));
-                auto newNode = const_cast<Node*>(port.GetNode());
-                if (newNode && newNode != (&node))
-                {
-                    newNode->GetMetadata() = node.GetMetadata();
-                }
-            }
         });
 
         ResetContext();
@@ -218,16 +208,6 @@ namespace model
             if (transformer.ShouldCopyNode(node))
             {
                 transformer.CopyNode(node);
-            }
-
-            if (transformer.IsOutputMapped(*node.GetOutputPort(0)))
-            {
-                const auto& port = transformer.GetCorrespondingOutputs(*node.GetOutputPort(0));
-                auto newNode = const_cast<Node*>(port.GetNode());
-                if (newNode && newNode != (&node))
-                {
-                    newNode->GetMetadata() = node.GetMetadata();
-                }
             }
         });
 
@@ -528,6 +508,17 @@ namespace model
         if (ShouldCopyNode(node))
         {
             node.Copy(*this);
+
+            if (IsOutputMapped(*node.GetOutputPort(0)))
+            {
+                const auto& port = GetCorrespondingOutputs(*node.GetOutputPort(0));
+                auto newNode = const_cast<Node*>(port.GetNode());
+                if (newNode && newNode != (&node))
+                {
+                    // copy metadata
+                    newNode->GetMetadata() = node.GetMetadata();
+                }
+            }
         }
     }
 

@@ -52,7 +52,7 @@ void TestPthreadSelf()
     // pthread_t pthread_self(void);
 
     auto module = MakeHostModuleEmitter("PthreadTest");
-    if(!CanUsePosixLibrary(module))
+    if (!CanUsePosixLibrary(module))
     {
         std::cout << "Unable to test Posix library on this platform" << std::endl;
         return;
@@ -83,7 +83,7 @@ void TestPthreadCreate()
     // int pthread_create(pthread_t * thread, const pthread_attr_t * attr, void * (*start_routine)(void *), void * arg);
 
     auto module = MakeHostModuleEmitter("PthreadTest");
-    if(!CanUsePosixLibrary(module))
+    if (!CanUsePosixLibrary(module))
     {
         std::cout << "Unable to test Posix library on this platform" << std::endl;
         return;
@@ -98,7 +98,7 @@ void TestPthreadCreate()
 
     // Thread task function
     std::string taskFunctionName = "Task";
-    auto taskFunction = module.BeginFunction(taskFunctionName, VariableType::BytePointer, { VariableType::BytePointer });
+    auto taskFunction = module.BeginFunction(taskFunctionName, VariableType::BytePointer, { { "context", VariableType::BytePointer } });
     auto taskSelfVal = taskFunction.PthreadSelf();
     taskFunction.Printf("Task self = %x\n", { taskSelfVal });
     module.EndFunction();

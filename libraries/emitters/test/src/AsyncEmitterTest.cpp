@@ -159,12 +159,12 @@ void TestParallelTasks(bool parallel, bool useThreadPool)
     // Function to submit tasks to thread pool
     int desiredResult = 0;
     std::string testThreadPoolFunctionName = "TestThreadPool";
-    auto testThreadPoolFunction = module.BeginFunction(testThreadPoolFunctionName, int32Type);
+    auto testThreadPoolFunction = module.BeginFunction(testThreadPoolFunctionName, VariableType::Int32);
     {
         const int arraySize = 100;
         const int numTasks = 5;
         const int taskSize = (arraySize - 1) / numTasks + 1;
-        auto data = testThreadPoolFunction.Variable(int32Type, arraySize);
+        auto data = testThreadPoolFunction.Variable(VariableType::Int32, arraySize);
         std::vector<std::vector<LLVMValue>> taskArrayArgs;
         for (int index = 0; index < numTasks; ++index)
         {
@@ -224,16 +224,12 @@ void TestParallelFor(int begin, int end, int increment, bool parallel)
     options.useThreadPool = true;
     IRModuleEmitter module("ParallelForTest", options);
 
-    // Types
-    auto& context = module.GetLLVMContext();
-    LLVMType int32Type = llvm::Type::getInt32Ty(context);
-
     // Function to run test
     std::string functionName = "TestParallelFor";
-    auto testParallelForFunction = module.BeginFunction(functionName, int32Type);
+    auto testParallelForFunction = module.BeginFunction(functionName, VariableType::Int32);
     {
         const int arraySize = end;
-        auto data = testParallelForFunction.GetModule().GlobalArray("data", int32Type, arraySize);
+        auto data = testParallelForFunction.GetModule().GlobalArray(VariableType::Int32, "data", arraySize);
 
         // initialize the array to -1
         testParallelForFunction.For(arraySize, [data](IRFunctionEmitter& function, LLVMValue i) {
@@ -245,7 +241,7 @@ void TestParallelFor(int begin, int end, int increment, bool parallel)
             function.SetValueAt(data, i, i);
         });
 
-        auto result = testParallelForFunction.Variable(int32Type, "result");
+        auto result = testParallelForFunction.Variable(VariableType::Int32, "result");
         testParallelForFunction.Store(result, testParallelForFunction.Literal<int>(0));
         testParallelForFunction.For(arraySize, [begin, end, increment, data, result](IRFunctionEmitter& function, LLVMValue i) {
             auto index = function.LocalScalar(i);

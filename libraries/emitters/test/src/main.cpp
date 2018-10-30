@@ -25,6 +25,8 @@ void TestIR()
 {
     // From IREmitterTest.h
     TestIREmitter();
+    TestStringCompareFunction();
+
     TestEmitLLVM();
     TestLLVMShiftRegister();
     TestHighLevelNestedIf();
