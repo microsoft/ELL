@@ -27,7 +27,7 @@ namespace detail
 {
 
 std::function<void()> CreateFunction(std::string fnName, std::function<void()> fn)
-{
+    {
     auto createdFn = GetContext().CreateFunction(fnName, [fn = std::move(fn)]() -> void
     {
         fn();

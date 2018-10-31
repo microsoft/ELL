@@ -354,8 +354,8 @@ void LLVMContext::CopyDataImpl(const Value& source, Value& destination)
                 {
                     fn.SetValueAt(
                         destValue,
-                        fn.Literal(static_cast<ptrdiff_t>(layout.GetEntryOffset(coordinate))),
-                        fn.ValueAt(srcValue, fn.Literal(static_cast<ptrdiff_t>(layout.GetEntryOffset(coordinate))))
+                        fn.Literal(static_cast<int>(layout.GetEntryOffset(coordinate))),
+                        fn.ValueAt(srcValue, fn.Literal(static_cast<int>(layout.GetEntryOffset(coordinate))))
                     );
                 }
                 while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
@@ -504,8 +504,8 @@ Value LLVMContext::BinaryOperationImpl(ValueBinaryOperation op, Value destinatio
                     if constexpr (std::is_same_v<Emittable, SourceDataType>)
                     {
                         opResult = opFn(
-                            fn.ValueAt(destValue, fn.Literal(static_cast<ptrdiff_t>(layout.GetEntryOffset(coordinate)))),
-                            fn.ValueAt(srcValue, fn.Literal(static_cast<ptrdiff_t>(layout.GetEntryOffset(coordinate))))
+                            fn.ValueAt(destValue, fn.Literal(static_cast<int>(layout.GetEntryOffset(coordinate)))),
+                            fn.ValueAt(srcValue, fn.Literal(static_cast<int>(layout.GetEntryOffset(coordinate))))
                         );
 
 
@@ -513,14 +513,14 @@ Value LLVMContext::BinaryOperationImpl(ValueBinaryOperation op, Value destinatio
                     else
                     {
                         opResult = opFn(
-                            fn.ValueAt(destValue, fn.Literal(static_cast<ptrdiff_t>(layout.GetEntryOffset(coordinate)))),
+                            fn.ValueAt(destValue, fn.Literal(static_cast<int>(layout.GetEntryOffset(coordinate)))),
                             fn.Literal(*(srcValue + layout.GetEntryOffset(coordinate)))
                         );
                     }
 
                     fn.SetValueAt(
                         destValue,
-                        fn.Literal(static_cast<ptrdiff_t>(layout.GetEntryOffset(coordinate))),
+                        fn.Literal(static_cast<int>(layout.GetEntryOffset(coordinate))),
                         opResult
                     );
                 }
