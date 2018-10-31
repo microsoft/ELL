@@ -13,6 +13,7 @@
 #include "Unused.h"
 
 // stl
+#include <cassert>
 #include <numeric>
 
 namespace ell
@@ -25,7 +26,7 @@ namespace utilities
         {
             const int numDimensions = shape.NumDimensions();
             std::vector<int> result(numDimensions);
-            for(int index = 0; index < numDimensions; ++index)
+            for (int index = 0; index < numDimensions; ++index)
             {
                 result[index] = shape[order[index]];
             }
@@ -36,7 +37,7 @@ namespace utilities
         {
             const int numDimensions = coordinates.NumDimensions();
             std::vector<int> result(numDimensions);
-            for(int index = 0; index < numDimensions; ++index)
+            for (int index = 0; index < numDimensions; ++index)
             {
                 result[index] = coordinates[order[index]];
             }
@@ -47,7 +48,7 @@ namespace utilities
         {
             const int numDimensions = shape.NumDimensions();
             std::vector<int> result(numDimensions);
-            for(int index = 0; index < numDimensions; ++index)
+            for (int index = 0; index < numDimensions; ++index)
             {
                 result[order[index]] = shape[index];
             }
@@ -58,13 +59,39 @@ namespace utilities
         {
             const int numDimensions = coordinates.NumDimensions();
             std::vector<int> result(numDimensions);
-            for(int index = 0; index < numDimensions; ++index)
+            for (int index = 0; index < numDimensions; ++index)
             {
                 result[order[index]] = coordinates[index];
             }
             return { result };
         }
-    }
+
+        MemoryShape ContiguousCumulativeIncrement(const MemoryShape& extent)
+        {
+            const auto numDimensions = extent.NumDimensions();
+            std::vector<int> result(numDimensions);
+            int prevScale = 1;
+            for (int index = numDimensions - 1; index >= 0; --index)
+            {
+                result[index] = prevScale;
+                prevScale = prevScale * extent[index];
+            }
+            return { result };
+        }
+
+        MemoryShape CreateExtent(const MemoryShape& physicalSize, const MemoryShape& physicalPadding)
+        {
+            assert(physicalSize.NumDimensions() == physicalPadding.NumDimensions());
+            std::vector<int> extent(physicalSize.NumDimensions());
+            std::transform(physicalSize.begin(),
+                           physicalSize.end(),
+                           physicalPadding.begin(),
+                           extent.begin(),
+                           [](int size, int padding) { return size + (2 * padding); });
+
+            return extent;
+        }
+    } // namespace
 
     //
     // DimensionVector
@@ -89,7 +116,8 @@ namespace utilities
         std::iota(test.begin(), test.end(), 0);
         if (!std::is_permutation(order.begin(), order.end(), test.begin()))
         {
-            throw InputException(InputExceptionErrors::invalidArgument, "Dimension order must be a valid permutation vector.");
+            throw InputException(InputExceptionErrors::invalidArgument,
+                                 "Dimension order must be a valid permutation vector.");
         }
     }
 
@@ -99,18 +127,16 @@ namespace utilities
         std::iota(test.begin(), test.end(), 0);
         if (!std::is_permutation(order.begin(), order.end(), test.begin()))
         {
-            throw InputException(InputExceptionErrors::invalidArgument, "Dimension order must be a valid permutation vector.");
+            throw InputException(InputExceptionErrors::invalidArgument,
+                                 "Dimension order must be a valid permutation vector.");
         }
     }
 
-    int DimensionOrder::operator[](int index) const
-    {
-        return DimensionVector::operator[](index);
-    }
+    int DimensionOrder::operator[](int index) const { return DimensionVector::operator[](index); }
 
     bool DimensionOrder::IsCanonicalOrder() const
     {
-        for(int index = 0; index < NumDimensions(); ++index)
+        for (int index = 0; index < NumDimensions(); ++index)
         {
             if (index != (*this)[index])
             {
@@ -146,13 +172,14 @@ namespace utilities
     //
     // MemoryLayout
     //
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize)
-        : MemoryLayout(physicalDimensionSize, physicalDimensionSize, MemoryShape(std::vector<int>(physicalDimensionSize.NumDimensions(), 0)))
-    {
-    }
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize) :
+        MemoryLayout(physicalDimensionSize, physicalDimensionSize,
+                     MemoryShape(std::vector<int>(physicalDimensionSize.NumDimensions(), 0)))
+    {}
 
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionPadding)
-        : _size(physicalDimensionSize), _stride(physicalDimensionSize), _offset(physicalDimensionPadding), _increment({}), _dimensionOrder(physicalDimensionSize.NumDimensions())
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionPadding) :
+        MemoryLayout(physicalDimensionSize, CreateExtent(physicalDimensionSize, physicalDimensionPadding),
+                     physicalDimensionPadding)
     {
         for (int index = 0; index < _size.NumDimensions(); ++index)
         {
@@ -160,35 +187,31 @@ namespace utilities
             {
                 throw InputException(InputExceptionErrors::invalidArgument, "Padding must be positive or zero.");
             }
-            _stride[index] = _size[index] + (2 * physicalDimensionPadding[index]);
-            if (_size[index] + _offset[index] > _stride[index])
-            {
-                throw InputException(InputExceptionErrors::invalidArgument, "Stride must be larger or equal to the size plus offset.");
-            }
         }
-        _increment = ComputeCumulativeIncrement();
     }
 
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionStride, const MemoryShape& physicalDimensionOffset)
-        : _size(physicalDimensionSize), _stride(physicalDimensionStride), _offset(physicalDimensionOffset), _increment({}), _dimensionOrder(physicalDimensionSize.NumDimensions())
-    {
-        for (int index = 0; index < _size.NumDimensions(); ++index)
-        {
-            if (_size[index] + _offset[index] > _stride[index])
-            {
-                throw InputException(InputExceptionErrors::invalidArgument, "Stride must be larger or equal to the size plus offset.");
-            }
-        }
-        _increment = ComputeCumulativeIncrement();
-    }
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
+                               const MemoryShape& physicalDimensionOffset) :
+        MemoryLayout(physicalDimensionSize, physicalDimensionExtent, physicalDimensionOffset,
+                     ContiguousCumulativeIncrement(physicalDimensionExtent))
+    {}
 
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const DimensionOrder& order)
-        : MemoryLayout(physicalDimensionSize, physicalDimensionSize, MemoryShape(std::vector<int>(physicalDimensionSize.NumDimensions(), 0)), order)
-    {
-    }
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
+                               const MemoryShape& physicalDimensionOffset,
+                               const MemoryShape& physicalDimensionIncrement) :
+        MemoryLayout(physicalDimensionSize, physicalDimensionExtent, physicalDimensionOffset,
+                     physicalDimensionIncrement, physicalDimensionSize.NumDimensions())
+    {}
 
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionPadding, const DimensionOrder& order)
-        : _size(physicalDimensionSize), _stride(physicalDimensionSize), _offset(physicalDimensionPadding), _increment({}), _dimensionOrder(order)
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const DimensionOrder& order) :
+        MemoryLayout(physicalDimensionSize, physicalDimensionSize,
+                     MemoryShape(std::vector<int>(physicalDimensionSize.NumDimensions(), 0)), order)
+    {}
+
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionPadding,
+                               const DimensionOrder& order) :
+        MemoryLayout(physicalDimensionSize, CreateExtent(physicalDimensionSize, physicalDimensionPadding),
+                     physicalDimensionPadding, order)
     {
         for (int index = 0; index < _size.NumDimensions(); ++index)
         {
@@ -196,32 +219,35 @@ namespace utilities
             {
                 throw InputException(InputExceptionErrors::invalidArgument, "Padding must be positive or zero.");
             }
-            _stride[index] = _size[index] + (2 * physicalDimensionPadding[index]);
-            if (_size[index] + _offset[index] > _stride[index])
-            {
-                throw InputException(InputExceptionErrors::invalidArgument, "Stride must be larger or equal to the size plus offset.");
-            }
         }
-        _increment = ComputeCumulativeIncrement();
     }
 
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionStride, const MemoryShape& physicalDimensionOffset, const DimensionOrder& order)
-        : _size(physicalDimensionSize), _stride(physicalDimensionStride), _offset(physicalDimensionOffset), _increment({}), _dimensionOrder(order)
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
+                               const MemoryShape& physicalDimensionOffset, const DimensionOrder& order) :
+        MemoryLayout(physicalDimensionSize, physicalDimensionExtent, physicalDimensionOffset,
+                     ContiguousCumulativeIncrement(physicalDimensionExtent), order)
+    {}
+
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
+                               const MemoryShape& physicalDimensionOffset,
+                               const MemoryShape& physicalDimensionIncrement, const DimensionOrder& order) :
+        _size(physicalDimensionSize),
+        _extent(physicalDimensionExtent),
+        _offset(physicalDimensionOffset),
+        _increment(physicalDimensionIncrement),
+        _dimensionOrder(order)
     {
         for (int index = 0; index < _size.NumDimensions(); ++index)
         {
-            if (_size[index] + _offset[index] > _stride[index])
+            if (_size[index] + _offset[index] > _extent[index])
             {
-                throw InputException(InputExceptionErrors::invalidArgument, "Stride must be larger or equal to the size plus offset.");
+                throw InputException(InputExceptionErrors::invalidArgument,
+                                     "Extent must be larger or equal to the size plus offset.");
             }
         }
-        _increment = ComputeCumulativeIncrement();
     }
 
-    bool MemoryLayout::HasPadding() const
-    {
-        return _size != _stride;
-    }
+    bool MemoryLayout::HasPadding() const { return _size != _extent; }
 
     int MemoryLayout::GetActiveSize(size_t index) const
     {
@@ -229,10 +255,10 @@ namespace utilities
         return _size[index];
     }
 
-    int MemoryLayout::GetStride(size_t index) const
+    int MemoryLayout::GetExtent(size_t index) const
     {
         BoundsCheckDimensionIndex(index);
-        return _stride[index];
+        return _extent[index];
     }
 
     int MemoryLayout::GetOffset(size_t index) const
@@ -247,10 +273,10 @@ namespace utilities
         return GetLogicalDimensionActiveSize()[index];
     }
 
-    int MemoryLayout::GetLogicalDimensionStride(size_t index) const
+    int MemoryLayout::GetLogicalDimensionExtent(size_t index) const
     {
         BoundsCheckDimensionIndex(index);
-        return GetLogicalDimensionStride()[index];
+        return GetLogicalDimensionExtent()[index];
     }
 
     int MemoryLayout::GetLogicalDimensionOffset(size_t index) const
@@ -265,28 +291,9 @@ namespace utilities
         return _increment[index];
     }
 
-    size_t MemoryLayout::NumElements() const
-    {
-        return static_cast<size_t>(_size.NumElements());
-    }
+    size_t MemoryLayout::NumElements() const { return static_cast<size_t>(_size.NumElements()); }
 
-    size_t MemoryLayout::GetMemorySize() const
-    {
-        return static_cast<size_t>(_stride.NumElements());
-    }
-
-    MemoryShape MemoryLayout::ComputeCumulativeIncrement() const
-    {
-        const auto numDimensions = NumDimensions();
-        std::vector<int> result(numDimensions);
-        int prevScale = 1;
-        for (int index = numDimensions - 1; index >= 0; --index)
-        {
-            result[index] = prevScale;
-            prevScale = prevScale * _stride[index];
-        }
-        return { result };
-    }
+    size_t MemoryLayout::GetMemorySize() const { return static_cast<size_t>(_extent.NumElements()); }
 
     size_t MemoryLayout::GetDataOffset() const
     {
@@ -323,20 +330,11 @@ namespace utilities
         return ReversePermute(physicalCoordinates, _dimensionOrder);
     }
 
-    MemoryShape MemoryLayout::GetLogicalDimensionActiveSize() const
-    {
-        return ReversePermute(_size, _dimensionOrder);
-    }
+    MemoryShape MemoryLayout::GetLogicalDimensionActiveSize() const { return ReversePermute(_size, _dimensionOrder); }
 
-    MemoryShape MemoryLayout::GetLogicalDimensionStride() const
-    {
-        return ReversePermute(_stride, _dimensionOrder);
-    }
+    MemoryShape MemoryLayout::GetLogicalDimensionExtent() const { return ReversePermute(_extent, _dimensionOrder); }
 
-    MemoryShape MemoryLayout::GetLogicalDimensionOffset() const
-    {
-        return ReversePermute(_offset, _dimensionOrder);
-    }
+    MemoryShape MemoryLayout::GetLogicalDimensionOffset() const { return ReversePermute(_offset, _dimensionOrder); }
 
     size_t MemoryLayout::GetLogicalDimensionIncrement(size_t index) const
     {
@@ -365,7 +363,8 @@ namespace utilities
             throw InputException(InputExceptionErrors::indexOutOfRange);
         }
 
-        if (auto it = std::find(_dimensionOrder.begin(), _dimensionOrder.end(), logicalDimension); it != _dimensionOrder.end())
+        if (auto it = std::find(_dimensionOrder.begin(), _dimensionOrder.end(), logicalDimension);
+            it != _dimensionOrder.end())
         {
             return static_cast<int>(std::distance(_dimensionOrder.begin(), it));
         }
@@ -390,7 +389,8 @@ namespace utilities
         const int numDimensions = NumDimensions();
         for (int index = 0; index < numDimensions; ++index)
         {
-            if (physicalCoordinates[index] + _offset[index] < 0 || physicalCoordinates[index] - _offset[index] >= _stride[index])
+            if (physicalCoordinates[index] + _offset[index] < 0 ||
+                physicalCoordinates[index] - _offset[index] >= _extent[index])
             {
                 return true;
             }
@@ -398,15 +398,9 @@ namespace utilities
         return false;
     }
 
-    bool MemoryLayout::IsContiguous() const
-    {
-        return _size == _stride && IsCanonicalOrder();
-    }
+    bool MemoryLayout::IsContiguous() const { return _size == _extent && IsCanonicalOrder(); }
 
-    bool MemoryLayout::IsCanonicalOrder() const
-    {
-        return _dimensionOrder.IsCanonicalOrder();
-    }
+    bool MemoryLayout::IsCanonicalOrder() const { return _dimensionOrder.IsCanonicalOrder(); }
 
     MemoryLayout MemoryLayout::ReorderedCopy(const DimensionOrder& newOrder) const
     {
@@ -414,38 +408,114 @@ namespace utilities
         {
             throw LogicException(LogicExceptionErrors::notImplemented, "Not implemented... yet.");
         }
-        MemoryLayout result{ Permute(GetActiveSize(), newOrder), Permute(GetStride(), newOrder), Permute(GetOffset(), newOrder), newOrder };
+        MemoryLayout result{ Permute(GetActiveSize(), newOrder),
+                             Permute(GetExtent(), newOrder),
+                             Permute(GetOffset(), newOrder),
+                             newOrder };
         return result;
+    }
+
+    MemoryLayout MemoryLayout::GetSliceLayout(int physicalDimension) const
+    {
+        if (physicalDimension >= NumDimensions())
+        {
+            throw InputException(InputExceptionErrors::indexOutOfRange,
+                                 "Can't slice along a dimension greater than the number of dimensions");
+        }
+
+        auto size = _size.ToVector();
+        auto extent = _extent.ToVector();
+        auto offset = _offset.ToVector();
+        auto increment = _increment.ToVector();
+        auto order = _dimensionOrder.ToVector();
+
+        if (physicalDimension > 0)
+        {
+            extent[physicalDimension - 1] *= extent[physicalDimension];
+        }
+
+        for (auto v : { &size, &extent, &offset, &increment, &order })
+        {
+            v->erase(v->begin() + physicalDimension);
+        }
+
+        // If the chosen physical dimension maps to a logical dimension that's anything
+        // other than the innermost (logical) dimension, decrease the remaining dimensions by 1
+        // There is expected to be, at the most, one dimension that ends up at 0. Either a dimension
+        // 1 that gets decreased to 0, or a dimension 0 that goes to -1 and then gets clamped to 0.
+        auto dimensionRemoved = _dimensionOrder[physicalDimension];
+        for (auto& i : order)
+        {
+            if (i > dimensionRemoved)
+            {
+                --i;
+            }
+        }
+
+        return { MemoryShape{ size },
+                 MemoryShape{ extent },
+                 MemoryShape{ offset },
+                 MemoryShape{ increment },
+                 DimensionOrder{ order } };
     }
 
     void MemoryLayout::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["size"] << _size.ToVector();
-        archiver["stride"] << _stride.ToVector();
+        archiver["extent"] << _extent.ToVector();
         archiver["offset"] << _offset.ToVector();
         archiver["order"] << _dimensionOrder.ToVector();
+        archiver["increment"] << _increment.ToVector();
     }
 
     void MemoryLayout::ReadFromArchive(utilities::Unarchiver& archiver)
     {
+        auto clearVector = [](auto& v) { std::fill(v.begin(), v.end(), -1); };
+        auto isSet = [](auto& v) -> bool { return std::any_of(v.begin(), v.end(), [](auto i) { return i != -1; }); };
+
         std::vector<int> temp;
         archiver["size"] >> temp;
         _size = { temp };
-        archiver["stride"] >> temp;
-        _stride = { temp };
+
+        // Try to read the extent field. If successful, check and make sure the old stride field doesn't exist.
+        // If the extent field doesn't exist, then the stride field does need to exist.
+        temp.resize(_size.NumDimensions());
+        clearVector(temp);
+        archiver.OptionalProperty("extent") >> temp;
+        if (isSet(temp))
+        {
+            _extent = { temp };
+            clearVector(temp);
+            archiver.OptionalProperty("stride") >> temp;
+            if (isSet(temp))
+            {
+                throw InputException(InputExceptionErrors::badData, "Corrupt data -- found incompatible fields");
+            }
+        }
+        else
+        {
+            archiver["stride"] >> temp;
+            _extent = { temp };
+        }
+
         archiver["offset"] >> temp;
         _offset = { temp };
-        temp.resize(_size.NumDimensions());
+
         std::iota(temp.begin(), temp.end(), 0);
         archiver.OptionalProperty("order") >> temp;
         _dimensionOrder = { temp };
-        _increment = ComputeCumulativeIncrement();
+
+        clearVector(temp);
+        archiver.OptionalProperty("increment", ContiguousCumulativeIncrement(_extent).ToVector()) >> temp;
+        _increment = { temp };
     }
 
     void MemoryLayout::BoundsCheckDimensionIndex(size_t index) const
     {
         if (static_cast<int>(index) >= NumDimensions())
+        {
             throw InputException(InputExceptionErrors::indexOutOfRange, "Dimension index out-of-bounds.");
+        }
     }
 
     bool Equal(const DimensionVector& shape1, const DimensionVector& shape2)
@@ -466,39 +536,22 @@ namespace utilities
         return true;
     }
 
-    bool operator==(const DimensionOrder& order1, const DimensionOrder& order2)
-    {
-        return Equal(order1, order2);
-    }
+    bool operator==(const DimensionOrder& order1, const DimensionOrder& order2) { return Equal(order1, order2); }
 
-    bool operator!=(const DimensionOrder& order1, const DimensionOrder& order2)
-    {
-        return !Equal(order1, order2);
-    }
+    bool operator!=(const DimensionOrder& order1, const DimensionOrder& order2) { return !Equal(order1, order2); }
 
-    bool operator==(const MemoryShape& shape1, const MemoryShape& shape2)
-    {
-        return Equal(shape1, shape2);
-    }
+    bool operator==(const MemoryShape& shape1, const MemoryShape& shape2) { return Equal(shape1, shape2); }
 
-    bool operator!=(const MemoryShape& shape1, const MemoryShape& shape2)
-    {
-        return !Equal(shape1, shape2);
-    }
+    bool operator!=(const MemoryShape& shape1, const MemoryShape& shape2) { return !Equal(shape1, shape2); }
 
-    bool operator==(const MemoryCoordinates& shape1, const MemoryCoordinates& shape2)
-    {
-        return Equal(shape1, shape2);
-    }
+    bool operator==(const MemoryCoordinates& shape1, const MemoryCoordinates& shape2) { return Equal(shape1, shape2); }
 
-    bool operator!=(const MemoryCoordinates& shape1, const MemoryCoordinates& shape2)
-    {
-        return !Equal(shape1, shape2);
-    }
+    bool operator!=(const MemoryCoordinates& shape1, const MemoryCoordinates& shape2) { return !Equal(shape1, shape2); }
 
     bool MemoryLayoutsEqual(const MemoryLayout& layout1, const MemoryLayout& layout2)
     {
-        return (layout1.GetStride() == layout2.GetStride()) && (layout1.GetActiveSize() == layout2.GetActiveSize()) && (layout1.GetOffset() == layout2.GetOffset());
+        return (layout1.GetExtent() == layout2.GetExtent()) && (layout1.GetActiveSize() == layout2.GetActiveSize()) &&
+               (layout1.GetOffset() == layout2.GetOffset());
     }
 
     bool operator==(const MemoryLayout& layout1, const MemoryLayout& layout2)
@@ -515,7 +568,7 @@ namespace utilities
     {
         out << shape[0];
         auto numDimensions = shape.NumDimensions();
-        for(int index = 1; index < numDimensions; ++index)
+        for (int index = 1; index < numDimensions; ++index)
         {
             out << " x " << shape[index];
         }
@@ -525,9 +578,9 @@ namespace utilities
     std::ostream& operator<<(std::ostream& out, const utilities::MemoryLayout& layout)
     {
         out << "active size (physical): " << layout.GetActiveSize();
-        out << " memory size (physical): " << layout.GetStride();
+        out << " memory size (physical): " << layout.GetExtent();
+        out << " memory strides (physical): " << layout.GetCumulativeIncrement();
         return out;
     }
-
-}
-}
+} // namespace utilities
+} // namespace ell

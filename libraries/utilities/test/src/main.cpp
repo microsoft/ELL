@@ -55,6 +55,8 @@ int main(int argc, char* argv[])
 
         // MemoryLayout tests
         TestDimensionOrder();
+        TestMemoryLayoutCtors();
+        TestMemoryLayoutSlice();
 
         // TypeFactory tests
         TypeFactoryTest();

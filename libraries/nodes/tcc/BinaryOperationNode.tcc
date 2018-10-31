@@ -204,7 +204,7 @@ namespace nodes
     std::vector<ValueType> BinaryOperationNode<ValueType>::ComputeOutput(Operation&& function) const
     {
         auto outputLayout = _output.GetMemoryLayout();
-        auto outputSize = outputLayout.GetStride().NumElements();
+        auto outputSize = outputLayout.GetExtent().NumElements();
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInput1Offset = 0;
@@ -346,13 +346,13 @@ namespace nodes
     {
         auto outputLayout = _output.GetMemoryLayout();
         const auto numDimensions = _inputLayout1.NumDimensions();
-        auto&& inputStride1 = _inputLayout1.GetStride();
+        auto&& inputStride1 = _inputLayout1.GetExtent();
         auto&& inputOffset1 = _inputLayout1.GetOffset();
-        auto&& inputStride2 = _inputLayout2.GetStride();
+        auto&& inputStride2 = _inputLayout2.GetExtent();
         auto&& inputOffset2 = _inputLayout2.GetOffset();
         auto&& inputSize = _inputLayout1.GetActiveSize();
         auto&& outputOffset = outputLayout.GetOffset();
-        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputStride = outputLayout.GetExtent();
 
         for (int loopIndex = 0; loopIndex < inputSize[dimension]; ++loopIndex)
         {
@@ -400,12 +400,12 @@ namespace nodes
     {
         auto outputLayout = _output.GetMemoryLayout();
         const auto numDimensions = _inputLayout1.NumDimensions();
-        auto&& inputStride1 = _inputLayout1.GetStride();
+        auto&& inputStride1 = _inputLayout1.GetExtent();
         auto&& inputOffset1 = _inputLayout1.GetOffset();
-        auto&& inputStride2 = _inputLayout2.GetStride();
+        auto&& inputStride2 = _inputLayout2.GetExtent();
         auto&& inputOffset2 = _inputLayout2.GetOffset();
         auto&& inputSize = _inputLayout1.GetActiveSize();
-        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputStride = outputLayout.GetExtent();
         auto&& outputOffset = outputLayout.GetOffset();
 
         function.For(inputSize[dimension], [input1, input2, output, inputOffset1, inputOffset2, inputStride1, inputStride2, outputStride, outputOffset, prevInput1DimensionOffset, prevInput2DimensionOffset, prevOutputDimensionOffset, dimension, numDimensions, &compiler, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex) {

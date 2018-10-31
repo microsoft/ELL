@@ -44,7 +44,7 @@ Vector Vector::SubVector(Scalar offset, int size) const
     auto newShape = layout.GetActiveSize();
     newShape[0] = size;
     indexedValue.SetLayout(
-        MemoryLayout(newShape, layout.GetStride(), layout.GetOffset(), layout.GetLogicalDimensionOrder())
+        MemoryLayout(newShape, layout.GetExtent(), layout.GetOffset(), layout.GetLogicalDimensionOrder())
     );
 
     return indexedValue;

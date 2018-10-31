@@ -27,6 +27,7 @@ namespace utilities
         v7_binary_operation_active_regions = 7,
         v8_port_memory_layout = 8,
         v9_activation_objects = 9, // move activation from template parameters to member objects.
+        v10_memory_layout_update = 10,
         nextVersion
     };
 

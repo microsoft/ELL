@@ -43,7 +43,7 @@ namespace model
             auto test1 = (physicalCoordinates[index] + layout.GetOffset(index)) < 0;
             result = result || test1;
 
-            auto test2 = (physicalCoordinates[index] - layout.GetOffset(index)) < layout.GetStride(index);
+            auto test2 = (physicalCoordinates[index] - layout.GetOffset(index)) < layout.GetExtent(index);
             result = result || test2;
         }
         return result;

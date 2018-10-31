@@ -163,11 +163,11 @@ namespace nodes
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
         //       Or, instead of unrolling, vectorizing --- if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
         const auto numDimensions = this->NumInputDimensions();
-        auto&& inputStride = inputLayout.GetStride();
+        auto&& inputStride = inputLayout.GetExtent();
         auto&& inputOffset = inputLayout.GetOffset();
         auto&& inputSize = inputLayout.GetActiveSize();
 
-        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputStride = outputLayout.GetExtent();
         auto&& outputOffset = outputLayout.GetOffset();
 
         function.For(inputSize[dimension], [dimension, numDimensions, inputStride, inputOffset, inputLayout, outputStride, outputOffset, outputLayout, pInput, pOutput, prevInputDimensionOffset, prevOutputDimensionOffset, &f, &compiler, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
@@ -228,7 +228,7 @@ namespace nodes
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
         //       Or, instead of unrolling, vectorizing --- if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
         const auto numDimensions = this->NumInputDimensions();
-        auto&& inputStride = inputLayout.GetStride();
+        auto&& inputStride = inputLayout.GetExtent();
         auto&& inputOffset = inputLayout.GetOffset();
         auto&& inputSize = inputLayout.GetActiveSize();
 

@@ -217,11 +217,11 @@ namespace nodes
         const auto inputPadding = inputLayout.GetOffset(0);
         assert((inputPadding == filterSize / 2) && "Input padding must be filterSize/2");
 
-        const auto outputTensor = function.LocalTensor(pOutput, outputLayout.GetStride().ToVector(), emitters::RowMajorTensorLayout);
+        const auto outputTensor = function.LocalTensor(pOutput, outputLayout.GetExtent().ToVector(), emitters::RowMajorTensorLayout);
 
         // input data parameters
-        const int paddedWidth = inputLayout.GetStride(1);
-        const int paddedHeight = inputLayout.GetStride(0);
+        const int paddedWidth = inputLayout.GetExtent(1);
+        const int paddedHeight = inputLayout.GetExtent(0);
 
         // output data parameters
         const int numFilters = outputLayout.GetActiveSize(2);

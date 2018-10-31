@@ -122,9 +122,9 @@ namespace nodes
         _m = input1Layout.GetLogicalDimensionActiveSize(0);
         _k = input1Layout.GetLogicalDimensionActiveSize(1);
         _n = input2Layout.GetLogicalDimensionActiveSize(1);
-        _lda = input1Layout.GetStride(1);
-        _ldb = input2Layout.GetStride(1);
-        _ldc = outputLayout.GetStride(1);
+        _lda = input1Layout.GetExtent(1);
+        _ldb = input2Layout.GetExtent(1);
+        _ldc = outputLayout.GetExtent(1);
         _transpose1 = !input1Layout.IsCanonicalOrder();
         _transpose2 = !input2Layout.IsCanonicalOrder();
         _transposeOutput = !outputLayout.IsCanonicalOrder();

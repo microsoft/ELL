@@ -17,13 +17,14 @@ AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
 AlignTrailingComments: false
 AllowShortBlocksOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Inline
+AllowShortFunctionsOnASingleLine: InlineOnly
 AllowShortIfStatementsOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 BinPackArguments: false
 BinPackParameters: true
 BreakBeforeBraces: Custom
+BreakConstructorInitializers: AfterColon
 BraceWrapping:
   AfterClass:      true
   AfterControlStatement: true
@@ -36,11 +37,15 @@ BraceWrapping:
   BeforeCatch:     true
   BeforeElse:      true
   IndentBraces:    false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
 ContinuationIndentWidth: 4
 ConstructorInitializerIndentWidth: 4
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ColumnLimit: 0
+ColumnLimit: 120
 Cpp11BracedListStyle: false
+FixNamespaceComments: true
+IncludeBlocks: Preserve
 IndentWidth: 4
 IndentCaseLabels: false
 # KeepEmptyLinesAtTheStartOfBlocks: false
@@ -51,6 +56,6 @@ PenaltyBreakBeforeFirstCallParameter: 100000
 PenaltyBreakComment: 100000
 SortIncludes: true
 SpaceAfterTemplateKeyword: true
-# Standard: Cpp11 # Broken
+Standard: Cpp11
 UseTab: Never
 ...

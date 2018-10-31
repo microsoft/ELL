@@ -36,9 +36,9 @@ namespace nodes
                                         std::array<int, 3> dataOrder,
                                         emitters::IRLocalScalar valueRow, emitters::IRLocalScalar valueColumn, emitters::IRLocalScalar valueChannel)
         {
-            const auto rowStride = inputLayout.GetStride(0);
-            const auto columnStride = inputLayout.GetStride(1);
-            const auto channelStride = inputLayout.GetStride(2);
+            const auto rowStride = inputLayout.GetExtent(0);
+            const auto columnStride = inputLayout.GetExtent(1);
+            const auto channelStride = inputLayout.GetExtent(2);
 
             auto index = function.LocalScalar();
             if (dataOrder == std::array<int, 3>({ 0, 1, 2 }))

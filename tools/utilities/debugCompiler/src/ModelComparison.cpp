@@ -560,20 +560,20 @@ void ModelComparison::WriteLayerNodeDetail(std::ostream& outputStream, const ell
     auto layerType = layerNode->GetRuntimeTypeName();
     auto inputLayout = layerNode->GetInputMemoryLayout();
     auto inputLayoutSize = inputLayout.GetActiveSize();
-    auto inputLayoutStride = inputLayout.GetStride();
+    auto inputLayoutExtent = inputLayout.GetExtent();
     auto inputLayoutOffset = inputLayout.GetOffset();
 
     auto outputLayout = layerNode->GetOutputMemoryLayout();
     auto outputLayoutSize = outputLayout.GetActiveSize();
-    auto outputLayoutStride = outputLayout.GetStride();
+    auto outputLayoutExtent = outputLayout.GetExtent();
     auto outputLayoutOffset = outputLayout.GetOffset();
 
     outputStream << "Input size:  " << inputLayoutSize[0] << " x " << inputLayoutSize[1] << " x " << inputLayoutSize[2] << ", ";
-    outputStream << "stride: " << inputLayoutStride[0] << " x " << inputLayoutStride[1] << " x " << inputLayoutStride[2] << ", ";
+    outputStream << "stride: " << inputLayoutExtent[0] << " x " << inputLayoutExtent[1] << " x " << inputLayoutExtent[2] << ", ";
     outputStream << "offset: " << inputLayoutOffset[0] << ",  " << inputLayoutOffset[1] << ",  " << inputLayoutOffset[2] << "  \n";
 
     outputStream << "Output size: " << outputLayoutSize[0] << " x " << outputLayoutSize[1] << " x " << outputLayoutSize[2] << ", ";
-    outputStream << "stride: " << outputLayoutStride[0] << " x " << outputLayoutStride[1] << " x " << outputLayoutStride[2] << ", ";
+    outputStream << "stride: " << outputLayoutExtent[0] << " x " << outputLayoutExtent[1] << " x " << outputLayoutExtent[2] << ", ";
     outputStream << "offset: " << outputLayoutOffset[0] << ",  " << outputLayoutOffset[1] << ",  " << outputLayoutOffset[2] << "  \n";
 }
 
@@ -803,7 +803,7 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
             layerData.compiledDebugSinkNode = sinkNode;
             auto memLayout = layerNode->GetOutputMemoryLayout();
             layerData.size = memLayout.GetActiveSize().ToVector();
-            layerData.stride = memLayout.GetStride().ToVector();
+            layerData.stride = memLayout.GetExtent().ToVector();
             layerData.offset = memLayout.GetOffset().ToVector();
             layerData.compiledNodeId = to_string(layerNode->GetId());
             layerData.compiledNodeLabel = label;

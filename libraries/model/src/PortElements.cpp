@@ -41,7 +41,7 @@ namespace model
             {
                 return layout2;
             }
-            
+
             if (layout2.NumDimensions() == 0)
             {
                 return layout1;
@@ -58,8 +58,8 @@ namespace model
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't concatenate layouts of different suffix sizes");
             }
 
-            auto layout1Stride = layout1.GetStride();
-            auto layout2Stride = layout2.GetStride();
+            auto layout1Stride = layout1.GetExtent();
+            auto layout2Stride = layout2.GetExtent();
             if (GetShapeSuffix(layout1Stride) != GetShapeSuffix(layout2Stride))
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't concatenate layouts of different suffix strides");
@@ -305,7 +305,7 @@ namespace model
         }
 
         // return a layout that represents the slice along the major axis for this range
-        auto stride = portLayout.GetStride();
+        auto stride = portLayout.GetExtent();
         auto activeSize = portLayout.GetActiveSize();
         auto offset = portLayout.GetOffset();
         activeSize[0] = Size();

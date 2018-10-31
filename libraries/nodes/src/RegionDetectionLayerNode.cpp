@@ -79,18 +79,18 @@ namespace nodes
         // the stride of each cell (numBoxesPerCell * boxStride)
 
         std::vector<int> expectedStride{ _params.width, _params.height, _params.numBoxesPerCell * (_params.numAnchors + 1 + _params.numClasses) };
-        if (GetInputMemoryLayout().GetStride() != expectedStride)
+        if (GetInputMemoryLayout().GetExtent() != expectedStride)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input to region detection layer has incorrect shape");
         }
 
-        if (GetOutputMemoryLayout().GetStride() != expectedStride)
+        if (GetOutputMemoryLayout().GetExtent() != expectedStride)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Output of region detection layer has incorrect shape");
         }
 
-        auto input = function.LocalTensor(compiler.EnsurePortEmitted(this->input), GetInputMemoryLayout().GetStride().ToVector(), emitters::RowMajorTensorLayout);
-        auto output = function.LocalTensor(compiler.EnsurePortEmitted(this->output), GetOutputMemoryLayout().GetStride().ToVector(), emitters::RowMajorTensorLayout);
+        auto input = function.LocalTensor(compiler.EnsurePortEmitted(this->input), GetInputMemoryLayout().GetExtent().ToVector(), emitters::RowMajorTensorLayout);
+        auto output = function.LocalTensor(compiler.EnsurePortEmitted(this->output), GetOutputMemoryLayout().GetExtent().ToVector(), emitters::RowMajorTensorLayout);
 
         function.For(_params.width, [ input, output, params = _params ](auto& fn, auto i) {
             fn.For(params.height, [input, output, params, i](auto& fn, auto j) {

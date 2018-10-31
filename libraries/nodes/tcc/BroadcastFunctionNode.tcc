@@ -144,11 +144,11 @@ namespace nodes
         //       If broadcastDimension = outermost dimension (0), we may want to parallelize over that dimension
         const auto numDimensions = NumPrimaryInputDimensions();
         auto&& inputLayout = GetInputMemoryLayout();
-        auto&& inputStride = inputLayout.GetStride();
+        auto&& inputStride = inputLayout.GetExtent();
         auto&& inputOffset = inputLayout.GetOffset();
         auto&& inputSize = inputLayout.GetActiveSize();
         auto&& outputLayout = GetOutputMemoryLayout();
-        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputStride = outputLayout.GetExtent();
         auto&& outputOffset = outputLayout.GetOffset();
         auto&& primaryInput = GetPrimaryInput();
         const auto broadcastDimension = GetBroadcastDimension();
@@ -278,11 +278,11 @@ namespace nodes
         //       If broadcastDimension = outermost dimension (0), we may want to parallelize over that dimension
         const auto numDimensions = NumPrimaryInputDimensions();
         auto&& inputLayout = GetInputMemoryLayout();
-        auto&& inputStride = inputLayout.GetStride();
+        auto&& inputStride = inputLayout.GetExtent();
         auto&& inputOffset = inputLayout.GetOffset();
         auto&& inputSize = inputLayout.GetActiveSize();
         auto&& outputLayout = GetOutputMemoryLayout();
-        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputStride = outputLayout.GetExtent();
         auto&& outputOffset = outputLayout.GetOffset();
         const auto broadcastDimension = GetBroadcastDimension();
         const auto numSecondaryInputs = NumSecondaryInputs();
@@ -353,7 +353,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastFunctionNode<ValueType, FunctionType>::Compute() const
     {
-        auto outputSize = GetOutputMemoryLayout().GetStride().NumElements();
+        auto outputSize = GetOutputMemoryLayout().GetExtent().NumElements();
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInputOffset = 0;

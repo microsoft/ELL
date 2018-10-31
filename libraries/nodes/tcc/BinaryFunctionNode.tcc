@@ -43,7 +43,7 @@ namespace nodes
         if (inputLayout.GetActiveSize() != outputLayout.GetActiveSize())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                ell::utilities::FormatString("Input 1 active area size %d doesn't match input 2 active area size %d on BinaryFunctionNode %s", 
+                ell::utilities::FormatString("Input 1 active area size %d doesn't match input 2 active area size %d on BinaryFunctionNode %s",
                     inputLayout.GetActiveSize().NumElements(), outputLayout.GetActiveSize().NumElements(), GetId().ToString().c_str()));
         }
     }
@@ -52,7 +52,7 @@ namespace nodes
     void BinaryFunctionNode<ValueType, FunctionType>::Compute() const
     {
         auto outputLayout = _output.GetMemoryLayout();
-        auto outputSize = outputLayout.GetStride().NumElements();
+        auto outputSize = outputLayout.GetExtent().NumElements();
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInputOffset = 0;
@@ -91,11 +91,11 @@ namespace nodes
     {
         auto outputLayout = _output.GetMemoryLayout();
         const auto numDimensions = _inputLayout.NumDimensions();
-        auto&& inputStride = _inputLayout.GetStride();
+        auto&& inputStride = _inputLayout.GetExtent();
         auto&& inputOffset = _inputLayout.GetOffset();
         auto&& inputSize = _inputLayout.GetActiveSize();
         auto&& outputOffset = outputLayout.GetOffset();
-        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputStride = outputLayout.GetExtent();
 
         for (int loopIndex = 0; loopIndex < inputSize[dimension]; ++loopIndex)
         {
@@ -153,10 +153,10 @@ namespace nodes
     {
         auto outputLayout = _output.GetMemoryLayout();
         const auto numDimensions = _inputLayout.NumDimensions();
-        auto&& inputStride = _inputLayout.GetStride();
+        auto&& inputStride = _inputLayout.GetExtent();
         auto&& inputOffset = _inputLayout.GetOffset();
         auto&& inputSize = _inputLayout.GetActiveSize();
-        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputStride = outputLayout.GetExtent();
         auto&& outputOffset = outputLayout.GetOffset();
 
         function.For(inputSize[dimension], [dimension, numDimensions, inputOffset, inputStride, outputOffset, outputStride, prevInputDimensionOffset, prevOutputDimensionOffset, input1, input2, output, &compiler, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue loopIndex) {

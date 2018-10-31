@@ -80,7 +80,7 @@ namespace nodes
             auto inputColStart = outputImageCol * stride;
 
             // The input is a filterSize x filterSize x numChannels image in in row x column x channel order
-            auto input = function.LocalTensor(inputVolume, inputLayout.GetStride().ToVector(), emitters::RowMajorTensorLayout);
+            auto input = function.LocalTensor(inputVolume, inputLayout.GetExtent().ToVector(), emitters::RowMajorTensorLayout);
             auto output = function.LocalTensor(realValueRow, { filterSize, filterSize, numChannels }, emitters::RowMajorTensorLayout);
 
             // For row, column, channel order:

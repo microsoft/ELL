@@ -51,7 +51,7 @@ namespace nodes
                 auto input = capturedValues[0];
                 auto filterWeights = capturedValues[1];
                 auto result = capturedValues[2];
-                auto outputTensor = function.LocalTensor(result, outputLayout.GetStride().ToVector(), RowMajorTensorLayout);
+                auto outputTensor = function.LocalTensor(result, outputLayout.GetExtent().ToVector(), RowMajorTensorLayout);
 
                 // For each output row
                 const auto outputRows = outputLayout.GetActiveSize(0);
@@ -63,7 +63,7 @@ namespace nodes
                     function.For(outputColumns, [outputRow, filterIndex, input, filterWeights, inputLayout, inputMemoryIncrements, outputTensor, filterSize, stride](IRFunctionEmitter& function, LLVMValue loopIndex3) {
                         auto outputColumn = function.LocalScalar(loopIndex3);
 
-                        const bool canCombineColumns = (inputLayout.GetActiveSize(1) == inputLayout.GetStride(1)) && (stride == 1);
+                        const bool canCombineColumns = (inputLayout.GetActiveSize(1) == inputLayout.GetExtent(1)) && (stride == 1);
                         const auto inputDepth = inputLayout.GetActiveSize(2);
 
                         // The filters are typically small, so we unroll the loops here
@@ -127,9 +127,9 @@ namespace nodes
                 auto filterWeights = capturedValues[1];
                 auto result = capturedValues[2];
 
-                auto inputTensor = function.LocalTensor(input, inputLayout.GetStride().ToVector(), RowMajorTensorLayout);
-                auto outputTensor = function.LocalTensor(result, outputLayout.GetStride().ToVector(), RowMajorTensorLayout);
-                auto filter = function.LocalMultidimArray(filterWeights, { inputLayout.GetStride(2), filterSize, filterSize});
+                auto inputTensor = function.LocalTensor(input, inputLayout.GetExtent().ToVector(), RowMajorTensorLayout);
+                auto outputTensor = function.LocalTensor(result, outputLayout.GetExtent().ToVector(), RowMajorTensorLayout);
+                auto filter = function.LocalMultidimArray(filterWeights, { inputLayout.GetExtent(2), filterSize, filterSize});
 
                 // For each output column
                 const auto outputColumns = outputLayout.GetActiveSize(1);

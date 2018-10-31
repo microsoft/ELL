@@ -464,7 +464,7 @@ namespace model
         const auto& outputPorts = node.GetOutputPorts();
         for (auto outputPort : outputPorts)
         {
-            auto layout = outputPort->GetMemoryLayout().GetStride();
+            auto layout = outputPort->GetMemoryLayout().GetExtent();
             switch (outputPort->GetType())
             {
             case PortType::boolean:

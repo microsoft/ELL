@@ -12,5 +12,7 @@ namespace ell
 {
 
 void TestDimensionOrder();
+void TestMemoryLayoutCtors();
+void TestMemoryLayoutSlice();
 
 }
