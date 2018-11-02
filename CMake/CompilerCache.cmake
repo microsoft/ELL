@@ -1,18 +1,23 @@
 #
-# CompilerCache 
+# CompilerCache
 #
 
-function(use_compiler_cache)
+if(NOT DEFINED ENV{CMAKE_COMPILER_CACHE})
+  set(CMAKE_COMPILER_CACHE ON)
+else()
+  set(CMAKE_COMPILER_CACHE $ENV{CMAKE_COMPILER_CACHE})
+endif()
+option(USE_COMPILER_CACHE "Use a compiler cache (ccache) to speed up build times" ${CMAKE_COMPILER_CACHE})
 
-  find_program(ccache_executable ccache)
-  if(ccache_executable)
-    message(STATUS "Found cccache at ${ccache_executable}")
+if(USE_COMPILER_CACHE)
+  find_program(CCACHE_EXECUTABLE ccache)
+  if(CCACHE_EXECUTABLE)
+    message(STATUS "Found cccache at ${CCACHE_EXECUTABLE}")
 
     # Support Unix Makefiles and Ninja
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${ccache_executable}")
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK  "${ccache_executable}")
-  else()
-    message(STATUS "Could not find ccache")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_EXECUTABLE}")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK  "${CCACHE_EXECUTABLE}")
   endif()
-
-endfunction()
+else()
+  message(STATUS "Not using ccache")
+endif()

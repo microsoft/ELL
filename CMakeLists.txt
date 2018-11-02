@@ -4,6 +4,10 @@
 
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
+# Include modules in the CMake directory.
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+include(CompilerCache)
+
 project(ELL)
 
 # Define custom configuration types for Visual Studio
@@ -28,7 +32,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # (so if we're running cmake from a 'build' directory inside the main directory, do this:
 #      cmake -DBUILD_DOC=OFF ..  )
 option(BUILD_DOC "Build Doxygen documentation" ON)
-option(USE_COMPILER_CACHE "Use a compiler cache (ccache) to speed up build times" $ENV{CMAKE_COMPILER_CACHE})
 option(STRICT_MODE "Build with 'warnings as errors'" OFF)
 option(PROFILING "Enable performance profiling tests" OFF)
 option(DISABLE_PYTHON "Explicitly disable building python modules" OFF)
@@ -71,9 +74,6 @@ else()
     message(STATUS "### Python 3.6 or later not found, so python features will be disabled")
   endif()
 endif()
-
-# Include modules in the CMake directory.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
 
 # Turn on ability to create folders to organize projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -136,11 +136,6 @@ include(LLVMSetup)
 include(SWIGSetup)
 include(CopySharedLibraries)
 include(AddPrecompiledHeader)
-include(CompilerCache)
-
-if(USE_COMPILER_CACHE)
-  use_compiler_cache()
-endif()
 
 # Print helpful message if LLVM not found on Windows
 if(NOT LLVM_FOUND AND WIN32)
