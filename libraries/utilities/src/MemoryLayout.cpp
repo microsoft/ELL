@@ -336,6 +336,11 @@ namespace utilities
 
     MemoryShape MemoryLayout::GetLogicalDimensionOffset() const { return ReversePermute(_offset, _dimensionOrder); }
 
+    MemoryShape MemoryLayout::GetLogicalDimensionIncrement() const
+    {
+        return ReversePermute(_increment, _dimensionOrder);
+    }
+
     size_t MemoryLayout::GetLogicalDimensionIncrement(size_t index) const
     {
         return ReversePermute(_increment, _dimensionOrder)[index];
@@ -582,5 +587,8 @@ namespace utilities
         out << " memory strides (physical): " << layout.GetCumulativeIncrement();
         return out;
     }
+
+    /*extern*/ MemoryLayout ScalarLayout{};
+
 } // namespace utilities
 } // namespace ell

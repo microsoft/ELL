@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ScalarOperations.h (value)
+//  File:     ValueScalarOperations.h (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,13 +13,13 @@ namespace ell
 namespace value
 {
 
-class Scalar;
+    class Scalar;
 
-/// <summary> Arithmetic operators </summary>
-Scalar operator+(Scalar, Scalar);
-Scalar operator*(Scalar, Scalar);
-Scalar operator-(Scalar, Scalar);
-Scalar operator/(Scalar, Scalar);
+    /// <summary> Arithmetic operators </summary>
+    Scalar operator+(Scalar, Scalar);
+    Scalar operator*(Scalar, Scalar);
+    Scalar operator-(Scalar, Scalar);
+    Scalar operator/(Scalar, Scalar);
 
-}
-}
+} // namespace value
+} // namespace ell

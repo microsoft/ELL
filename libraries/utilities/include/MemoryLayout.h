@@ -427,6 +427,14 @@ namespace utilities
         int GetLogicalDimensionOffset(size_t index) const;
 
         /// <summary>
+        /// Returns the cumulative increments in the logical coordinates for this layout. This is the distance in memory
+        /// between two entries that are adjacent in that dimension.
+        /// </summary>
+        ///
+        /// <returns> A `MemoryShape` object containing the increments for each dimension. </returns>
+        MemoryShape GetLogicalDimensionIncrement() const;
+
+        /// <summary>
         /// Returns the cumulative increment for the requested logical dimension. This is the distance in memory
         /// between two entries that are adjacent in that dimension.
         /// </summary>
@@ -518,6 +526,9 @@ namespace utilities
         // would map to physical element (d, r, c)
         DimensionOrder _dimensionOrder;
     };
+
+    /// <summary> Helper value to denote a scalar (degree 0) memory layout </summary>
+    extern MemoryLayout ScalarLayout;
 
     /// <summary> Checks if two dimension-order vectors are equal. </summary>
     ///

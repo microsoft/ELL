@@ -63,7 +63,7 @@ namespace value
         {
             auto createdFn = GetContext().CreateFunction(fnName, returnValue, [fn = std::move(fn)]() -> Value {
                 ReturnT r = fn();
-                return static_cast<Value>(r);
+                return r.GetValue();
             });
 
             return [createdFn = std::move(createdFn)]() -> ReturnT { return ReturnT(createdFn()); };
@@ -89,7 +89,7 @@ namespace value
                 constexpr auto argSize = sizeof...(Args);
                 std::vector<Value> argValues;
                 argValues.reserve(argSize);
-                (argValues.push_back(static_cast<Value>(args)), ...);
+                (argValues.push_back(args.GetValue()), ...);
 
                 createdFn(argValues);
             };
@@ -112,14 +112,14 @@ namespace value
                                                              std::tuple<Args...> tupleArgs =
                                                                  utilities::VectorToTuple<Args...>(args);
                                                              ReturnT r = std::apply(fn, tupleArgs);
-                                                             return static_cast<Value>(r);
+                                                             return r.GetValue();
                                                          });
 
             return [createdFn = std::move(createdFn)](Args&&... args) -> ReturnT {
                 constexpr auto argSize = sizeof...(Args);
                 std::vector<Value> argValues;
                 argValues.reserve(argSize);
-                (argValues.push_back(static_cast<Value>(args)), ...);
+                (argValues.push_back(args.GetValue()), ...);
 
                 return ReturnT(createdFn(argValues));
             };

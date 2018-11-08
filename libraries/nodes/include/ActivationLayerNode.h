@@ -32,9 +32,9 @@ namespace nodes
 
     /// <summary> A node that wraps a neural net ActivationLayer. </summary>
     template <typename ValueType>
-    class ActivationLayerNode : public NeuralNetworkLayerNode<ActivationLayerNode<ValueType>,
-                                                              predictors::neural::ActivationLayer<ValueType>,
-                                                              ValueType>
+    class ActivationLayerNode
+        : public NeuralNetworkLayerNode<ActivationLayerNode<ValueType>, predictors::neural::ActivationLayer<ValueType>,
+                                        ValueType>
     {
     public:
         using LayerType = predictors::neural::ActivationLayer<ValueType>;
@@ -52,7 +52,8 @@ namespace nodes
         ///
         /// <param name="input"> </param>
         /// <param name="layer"> The layer to wrap. </param>
-        ActivationLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ActivationLayer<ValueType>& layer);
+        ActivationLayerNode(const model::OutputPort<ValueType>& input,
+                            const predictors::neural::ActivationLayer<ValueType>& layer);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -80,10 +81,9 @@ namespace nodes
 
     /// <summary> A node that wraps a neural net parametric ReLU ActivationLayer. </summary>
     template <typename ValueType>
-    class ParametricReLUActivationLayerNode : public NeuralNetworkLayerNode<
-                                                  ParametricReLUActivationLayerNode<ValueType>,
-                                                  predictors::neural::ActivationLayer<ValueType>,
-                                                  ValueType>
+    class ParametricReLUActivationLayerNode
+        : public NeuralNetworkLayerNode<ParametricReLUActivationLayerNode<ValueType>,
+                                        predictors::neural::ActivationLayer<ValueType>, ValueType>
     {
     public:
         using LayerType = predictors::neural::ActivationLayer<ValueType>;
@@ -106,7 +106,10 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ParametricReLUActivationLayerNode"); }
+        static std::string GetTypeName()
+        {
+            return utilities::GetCompositeTypeName<ValueType>("ParametricReLUActivationLayerNode");
+        }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -122,5 +125,5 @@ namespace nodes
     private:
         void Copy(model::ModelTransformer& transformer) const override;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

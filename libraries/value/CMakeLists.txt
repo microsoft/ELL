@@ -9,12 +9,16 @@ set(src
     src/Emittable.cpp
     src/EmitterContext.cpp
     src/LLVMContext.cpp
-    src/Scalar.cpp
-    src/ScalarOperations.cpp
+    src/ValueMatrix.cpp
+    src/ValueMatrixOperations.cpp
+    src/ValueScalar.cpp
+    src/ValueScalarOperations.cpp
+    src/ValueTensor.cpp
+    src/ValueTensorOperations.cpp
     src/Value.cpp
     src/ValueOperations.cpp
-    src/Vector.cpp
-    src/VectorOperations.cpp
+    src/ValueVector.cpp
+    src/ValueVectorOperations.cpp
 )
 
 set(include
@@ -22,24 +26,34 @@ set(include
     include/Emittable.h
     include/EmitterContext.h
     include/LLVMContext.h
-    include/Scalar.h
-    include/ScalarOperations.h
+    include/ValueMatrix.h
+    include/ValueMatrixOperations.h
+    include/ValueScalar.h
+    include/ValueScalarOperations.h
+    include/ValueTensor.h
+    include/ValueTensorOperations.h
     include/Value.h
     include/ValueOperations.h
     include/ValueType.h
-    include/Vector.h
-    include/VectorOperations.h
+    include/ValueVector.h
+    include/ValueVectorOperations.h
 )
 
 set(tcc
     tcc/EmitterContext.tcc
+    tcc/ValueMatrix.tcc
+    tcc/ValueTensor.tcc
 )
+
+set(doc
+    doc/README.md)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
+source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include} ${tcc} ${doc})
 target_include_directories(${library_name} PUBLIC include)
 target_include_directories(${library_name} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_link_libraries(${library_name} ${LLVM_LIBS} emitters utilities)
@@ -71,7 +85,7 @@ source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} testing ${library_name})
+target_link_libraries(${test_name} testing ${library_name} math)
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")

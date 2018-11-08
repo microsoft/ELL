@@ -1,12 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueOperations.h (value)
+//  File:     ValueTensorOperations.h (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+#include "ValueScalar.h"
 
 // utilities
 #include "MemoryLayout.h"
@@ -18,13 +20,18 @@ namespace ell
 {
 namespace value
 {
-    class Value;
-    class Scalar;
 
-    /// <summary> Creates a for loop over the given layout </summary>
-    /// <param name="layout"> The layout used to describe the iteration characteristics. Only active elements are iterated over. </param>
+    class Tensor;
+
+    enum class Slice
+    {
+        All
+    };
+
+    /// <summary> Creates a for loop over the tensor </summary>
+    /// <param name="tensor"> The instance of Tensor that references the data over which to iterate </param>
     /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
-    void For(utilities::MemoryLayout layout, std::function<void(Scalar)> fn);
+    void For(Tensor tensor, std::function<void(Scalar, Scalar, Scalar)> fn);
 
 } // namespace value
 } // namespace ell
