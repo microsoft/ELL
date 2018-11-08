@@ -33,18 +33,14 @@ macro(copy_newer_files target_name file_list)
     list(LENGTH extra_macro_args num_extra_args)
     if (${num_extra_args} GREATER 0)
         list(GET extra_macro_args 0 out_dir)
-        add_custom_target(${target_name}_make_directory ALL 
-            COMMAND ${CMAKE_COMMAND} -E make_directory ${out_dir})           
-        set_property(TARGET ${target_name}_make_directory PROPERTY FOLDER "cmake_macros")
     endif()
 
-    foreach(file_name ${${file_list}})
-        # note: this works better than configure_file.  configure_file causes cmake regeneration
-        # any time you touch any file used by configure_file, which makes incremental build of 
-        # such projects slow and painful.
-        add_custom_command(TARGET ${target_name} 
-            POST_BUILD
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${file_name} ${out_dir})
-    endforeach()
+    # note: this works better than configure_file.  configure_file causes cmake regeneration
+    # any time you touch any file used by configure_file, which makes incremental build of
+    # such projects slow and painful.
+    add_custom_command(TARGET ${target_name}
+        POST_BUILD
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${out_dir}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${${file_list}} ${out_dir})
 endmacro()
