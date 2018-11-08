@@ -11,7 +11,7 @@ PYTHON_VERSION=$MIN_PYTHON_VERSION
 CMAKE_VERSION=3.12.0
 SWIG_VERSION=$MIN_SWIG_VERSION
 
-TMPDIR=mktemp -d
+TMPDIR=`mktemp -d`
 
 sudo apt-get install software-properties-common
 
@@ -31,7 +31,7 @@ if [ ! $cmake_ver = $MIN_CMAKE_VERSION ] && [ $(printf '%s\n%s\n' $cmake_ver $MI
     echo "Downloading and installing CMake"
     cmake_short_version=$(echo ${CMAKE_VERSION} | cut -d '.' -f1-2 | awk '{print $NF}')
     cmake_installer_file="cmake-${CMAKE_VERSION}-Linux-x86_64.sh"
-    curl -o "TMPDIR/${cmake_installer_file}" --location "https://cmake.org/files/v${cmake_short_version}/${cmake_installer_file}"
+    curl -o "${TMPDIR}/${cmake_installer_file}" --location "https://cmake.org/files/v${cmake_short_version}/${cmake_installer_file}"
     pushd "${TMPDIR}"
     sudo sh "./${cmake_installer_file}" --skip-license --prefix=/usr --exclude-subdir
     popd
