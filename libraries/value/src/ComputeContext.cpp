@@ -8,6 +8,7 @@
 
 #include "ComputeContext.h"
 #include "Value.h"
+#include "ValueScalar.h"
 
 // utilities
 #include "TypeTraits.h"
@@ -479,6 +480,85 @@ namespace value
         return destination;
     }
 
+    Value ComputeContext::LogicalOperationImpl(ValueLogicalOperation op, Value source1, Value source2)
+    {
+        if (source1.GetLayout() != source2.GetLayout())
+        {
+            throw InputException(InputExceptionErrors::sizeMismatch);
+        }
+
+        Value returnValue =
+            std::visit(VariantVisitor{ [](Undefined) -> Boolean {
+                                          throw LogicException(LogicExceptionErrors::illegalState);
+                                      },
+                                       [](Emittable) -> Boolean {
+                                           throw LogicException(LogicExceptionErrors::illegalState);
+                                       },
+                                       [op,
+                                        &source2Data = source2.GetUnderlyingData(),
+                                        &source1Layout = source1.GetLayout(),
+                                        &source2Layout = source2.GetLayout()](auto&& source1) -> Boolean {
+                                           using Type = std::remove_pointer_t<std::decay_t<decltype(source1)>>;
+
+                                           std::function<bool(Type, Type)> opFn;
+                                           switch (op)
+                                           {
+                                           case ValueLogicalOperation::equality:
+                                               opFn = std::equal_to<Type>{};
+                                               break;
+                                           case ValueLogicalOperation::inequality:
+                                               opFn = std::not_equal_to<Type>{};
+                                               break;
+                                           default:
+                                               if constexpr (std::is_same_v<Boolean, Type>)
+                                               {
+                                                   throw LogicException(LogicExceptionErrors::illegalState);
+                                               }
+                                               else
+                                               {
+                                                   switch (op)
+                                                   {
+                                                   case ValueLogicalOperation::greaterthan:
+                                                       opFn = std::greater<Type>{};
+                                                       break;
+                                                   case ValueLogicalOperation::greaterthanorequal:
+                                                       opFn = std::greater_equal<Type>{};
+                                                       break;
+                                                   case ValueLogicalOperation::lessthan:
+                                                       opFn = std::less<Type>{};
+                                                       break;
+                                                   case ValueLogicalOperation::lessthanorequal:
+                                                       opFn = std::less_equal<Type>{};
+                                                       break;
+                                                   default:
+                                                       throw LogicException(LogicExceptionErrors::illegalState);
+                                                   }
+                                               }
+                                           }
+
+                                           auto maxCoordinate = source1Layout.GetActiveSize().ToVector();
+                                           decltype(maxCoordinate) coordinate(maxCoordinate.size());
+
+                                           bool b = true;
+                                           auto source2 = std::get<Type*>(source2Data);
+                                           do
+                                           {
+                                               auto logicalCoordinates =
+                                                   source1Layout.GetLogicalCoordinates(coordinate);
+                                               auto source1Offset =
+                                                   source1Layout.GetLogicalEntryOffset(logicalCoordinates);
+                                               auto source2Offset =
+                                                   source2Layout.GetLogicalEntryOffset(logicalCoordinates);
+                                               b &= opFn(source1[source1Offset], source2[source2Offset]);
+                                           } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+
+                                           return b;
+                                       } },
+                       source1.GetUnderlyingData());
+
+        return returnValue;
+    }
+
     Value ComputeContext::CastImpl(Value value, ValueType destType)
     {
         if (!ValidateValue(value))
@@ -494,41 +574,89 @@ namespace value
                                        auto ptrBegin = data;
                                        auto ptrEnd = data + value.GetLayout().GetMemorySize();
 
-                                       switch (destType)
-                                       {
-                                       case ValueType::Boolean:
+                                                   switch (destType)
+                                                   {
+                                                   case ValueType::Boolean:
                                            castedData = std::vector<Boolean>(ptrBegin, ptrEnd);
                                            break;
-                                       case ValueType::Char8:
+                                                   case ValueType::Char8:
                                            castedData = std::vector<char>(ptrBegin, ptrEnd);
                                            break;
-                                       case ValueType::Byte:
+                                                   case ValueType::Byte:
                                            castedData = std::vector<uint8_t>(ptrBegin, ptrEnd);
                                            break;
-                                       case ValueType::Int16:
+                                                   case ValueType::Int16:
                                            castedData = std::vector<int16_t>(ptrBegin, ptrEnd);
                                            break;
-                                       case ValueType::Int32:
+                                                   case ValueType::Int32:
                                            castedData = std::vector<int32_t>(ptrBegin, ptrEnd);
                                            break;
-                                       case ValueType::Int64:
+                                                   case ValueType::Int64:
                                            castedData = std::vector<int64_t>(ptrBegin, ptrEnd);
                                            break;
-                                       case ValueType::Float:
+                                                   case ValueType::Float:
                                            castedData = std::vector<float>(ptrBegin, ptrEnd);
                                            break;
-                                       case ValueType::Double:
+                                                   case ValueType::Double:
                                            castedData = std::vector<double>(ptrBegin, ptrEnd);
                                            break;
-                                       default:
-                                           throw LogicException(LogicExceptionErrors::notImplemented);
-                                       }
+                                                   default:
+                                                       throw LogicException(LogicExceptionErrors::notImplemented);
+                                                   }
                                    } },
                    value.GetUnderlyingData());
 
         Value castedValue = StoreConstantData(std::move(castedData));
         castedValue.SetLayout(value.GetLayout());
         return castedValue;
+    }
+
+    class ComputeContext::IfContextImpl : public EmitterContext::IfContextImpl
+    {
+    public:
+        IfContextImpl(bool state) : _state(state) {}
+
+        void ElseIf(Scalar test, std::function<void()> fn) override
+        {
+            if (!test.GetValue().IsConstant())
+            {
+                throw LogicException(LogicExceptionErrors::illegalState);
+            }
+
+            if (!_state && test.Get<Boolean>())
+            {
+                fn();
+                _state = !_state;
+            }
+        }
+
+        void Else(std::function<void()> fn) override
+        {
+            if (!_state)
+            {
+                fn();
+                _state = !_state;
+            }
+        }
+
+    private:
+        bool _state;
+    };
+
+    EmitterContext::IfContext ComputeContext::IfImpl(Scalar test, std::function<void()> fn)
+    {
+        if (!test.GetValue().IsConstant())
+        {
+            throw LogicException(LogicExceptionErrors::illegalState);
+        }
+
+        bool state = test.Get<Boolean>();
+        if (state)
+        {
+            fn();
+        }
+
+        return { std::make_unique<ComputeContext::IfContextImpl>(state) };
     }
 
     bool ComputeContext::ValidateValue(Value value)

@@ -60,9 +60,14 @@ namespace value
         Value OffsetImpl(Value begin, Value index) override;
 
         Value UnaryOperationImpl(ValueUnaryOperation op, Value destination) override;
+
         Value BinaryOperationImpl(ValueBinaryOperation op, Value destination, Value source) override;
 
+        Value LogicalOperationImpl(ValueLogicalOperation op, Value source1, Value source2) override;
+
         Value CastImpl(Value value, ValueType type) override;
+
+        IfContext IfImpl(Scalar test, std::function<void()> fn) override;
 
         bool ValidateValue(Value value);
         bool TypeCompatible(Value value1, Value value2);
@@ -73,6 +78,7 @@ namespace value
         std::string GetGlobalScopedName(std::string name) const;
         std::string GetCurrentFunctionScopedName(std::string name) const;
 
+        class IfContextImpl;
         struct FunctionScope;
 
         using ConstantDataList = std::forward_list<ConstantData>;

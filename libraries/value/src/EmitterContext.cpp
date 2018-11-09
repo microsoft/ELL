@@ -50,6 +50,25 @@ namespace value
 
     } // namespace detail
 
+    EmitterContext::IfContextImpl::~IfContextImpl() = default;
+
+    EmitterContext::IfContext::IfContext(std::unique_ptr<EmitterContext::IfContextImpl> impl) : _impl(std::move(impl))
+    {}
+
+    EmitterContext::IfContext& EmitterContext::IfContext::ElseIf(Scalar test, std::function<void()> fn)
+    {
+        if (test.GetType() != ValueType::Boolean)
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        _impl->ElseIf(test, fn);
+
+        return *this;
+    }
+
+    void EmitterContext::IfContext::Else(std::function<void()> fn) { _impl->Else(fn); }
+
     EmitterContext::~EmitterContext() = default;
 
     Value EmitterContext::Allocate(ValueType type, size_t size) { return Allocate(type, MemoryLayout({ (int)size })); }
@@ -79,7 +98,7 @@ namespace value
         {
             Value value = globalValue.value();
             if (layout.GetMemorySize() > value.GetLayout().GetMemorySize())
-            {
+        {
                 throw InputException(InputExceptionErrors::invalidSize);
             }
             value.SetLayout(layout);
@@ -149,6 +168,21 @@ namespace value
         return BinaryOperationImpl(op, destination, source);
     }
 
+    Value EmitterContext::LogicalOperation(ValueLogicalOperation op, Value source1, Value source2)
+    {
+        if (!source1.IsDefined() || !source2.IsDefined())
+        {
+            throw InputException(InputExceptionErrors::invalidArgument);
+        }
+
+        if (source1.GetBaseType() != source2.GetBaseType())
+        {
+            throw InputException(InputExceptionErrors::invalidArgument);
+        }
+
+        return LogicalOperationImpl(op, source1, source2);
+    }
+
     Value EmitterContext::Cast(Value value, ValueType type)
     {
         if (!value.IsConstrained())
@@ -157,6 +191,16 @@ namespace value
         }
 
         return CastImpl(value, type);
+    }
+
+    EmitterContext::IfContext EmitterContext::If(Scalar test, std::function<void()> fn)
+    {
+        if (test.GetType() != ValueType::Boolean)
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        return IfImpl(test, fn);
     }
 
     namespace
@@ -214,6 +258,8 @@ namespace value
     {
         return GetContext().GlobalAllocate(name, type, layout);
     }
+
+    EmitterContext::IfContext If(Scalar test, std::function<void()> fn) { return GetContext().If(test, fn); }
 
 } // namespace value
 } // namespace ell

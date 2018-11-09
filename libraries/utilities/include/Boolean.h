@@ -34,5 +34,10 @@ static_assert(std::is_default_constructible_v<Boolean> &&
             std::is_nothrow_move_assignable_v<Boolean> &&
             std::is_nothrow_move_constructible_v<Boolean> &&
             std::is_swappable_v<Boolean>);
+
+bool operator==(Boolean b1, Boolean b2);
+
+bool operator!=(Boolean b1, Boolean b2);
+
 }
 }

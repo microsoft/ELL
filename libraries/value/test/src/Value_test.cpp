@@ -470,4 +470,26 @@ void Casting_test1()
     });
 }
 
+void If_test1()
+{
+    InvokeForContext<ComputeContext>([](auto&) {
+        CreateFunction("If_test1", []() -> void {
+            Scalar s1 = 1;
+            If(s1 == 1, [&s1]() { s1 = 0; });
+
+            testing::ProcessTest("Testing basic If expression ", testing::IsEqual(s1.Get<int>(), 0));
+
+            s1 = 1;
+            If(s1 == 0, [&s1]() { s1 = 3; }).Else([&s1]() { s1 = 0; });
+
+            testing::ProcessTest("Testing basic If/Else expression ", testing::IsEqual(s1.Get<int>(), 0));
+
+            s1 = 1;
+            If(s1 == 3, [&s1]() { s1 = 2; }).ElseIf(s1 == 1, [&s1]() { s1 = 0; }).Else([&s1]() { s1 = 3; });
+
+            testing::ProcessTest("Testing basic If/ElseIf/Else expression ", testing::IsEqual(s1.Get<int>(), 0));
+        })(); // invoke function
+    });
+}
+
 } // namespace ell

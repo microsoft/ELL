@@ -62,7 +62,17 @@ namespace value
         /// <summary> Division operation </summary>
         divide,
         /// <summary> Remainder operation </summary>
-        modulus
+        modulus,
+    };
+
+    enum class ValueLogicalOperation
+    {
+        equality,
+        inequality,
+        lessthan,
+        lessthanorequal,
+        greaterthan,
+        greaterthanorequal
     };
 
     /// <summary> Helper template function that does a mapping from C++ type to ValueType </summary>

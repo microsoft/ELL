@@ -44,6 +44,14 @@ namespace value
         using MemoryLayout = utilities::MemoryLayout;
         using MemoryCoordinates = utilities::MemoryCoordinates;
 
+        class IfContextImpl
+        {
+        public:
+            virtual ~IfContextImpl();
+            virtual void ElseIf(Scalar, std::function<void()>) = 0;
+            virtual void Else(std::function<void()>) = 0;
+        };
+
         enum class GlobalAllocationScope
         {
             Global,
@@ -51,6 +59,18 @@ namespace value
         };
 
     public:
+        class IfContext
+        {
+        public:
+            IfContext(std::unique_ptr<IfContextImpl> impl);
+
+            IfContext& ElseIf(Scalar, std::function<void()>);
+            void Else(std::function<void()>);
+
+        private:
+            std::unique_ptr<IfContextImpl> _impl;
+        };
+
         /// <summary> Describes the type that can be used to represent constant C++ data </summary>
         using ConstantData = detail::ConstantData;
 
@@ -222,7 +242,11 @@ namespace value
         /// <returns> An instance of Value pointing to the same memory as destination </returns>
         Value BinaryOperation(ValueBinaryOperation op, Value destination, Value source);
 
+        Value LogicalOperation(ValueLogicalOperation op, Value source1, Value source2);
+
         Value Cast(Value value, ValueType type);
+
+        IfContext If(Scalar test, std::function<void()> fn);
 
     private:
         virtual Value AllocateImpl(ValueType, MemoryLayout) = 0;
@@ -257,7 +281,11 @@ namespace value
         virtual Value UnaryOperationImpl(ValueUnaryOperation op, Value destination) = 0;
         virtual Value BinaryOperationImpl(ValueBinaryOperation op, Value destination, Value source) = 0;
 
+        virtual Value LogicalOperationImpl(ValueLogicalOperation op, Value source1, Value source2) = 0;
+
         virtual Value CastImpl(Value value, ValueType type) = 0;
+
+        virtual IfContext IfImpl(Scalar test, std::function<void()> fn) = 0;
     };
 
     /// <summary> Returns the global instance of EmitterContext </summary>
@@ -413,6 +441,8 @@ namespace value
                               std::vector<std::conditional_t<std::is_same_v<T, bool>, utilities::Boolean, T>>{ t },
                               utilities::ScalarLayout);
     }
+
+    EmitterContext::IfContext If(Scalar test, std::function<void()> fn);
 
 } // namespace value
 } // namespace ell

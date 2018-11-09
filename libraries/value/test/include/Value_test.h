@@ -16,7 +16,7 @@
 
 namespace ell
 {
-
+void If_test1();
 void Value_test1();
 void Scalar_test1();
 void Vector_test1();

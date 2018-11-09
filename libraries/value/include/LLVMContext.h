@@ -71,7 +71,11 @@ namespace value
         Value UnaryOperationImpl(ValueUnaryOperation op, Value destination) override;
         Value BinaryOperationImpl(ValueBinaryOperation op, Value destination, Value source) override;
 
+        Value LogicalOperationImpl(ValueLogicalOperation op, Value source1, Value source2) override;
+
         Value CastImpl(Value value, ValueType type) override;
+
+        IfContext IfImpl(Scalar test, std::function<void()> fn) override;
 
         bool TypeCompatible(Value value1, Value value2);
 
@@ -79,6 +83,9 @@ namespace value
         std::string GetGlobalScopedName(std::string name) const;
         std::string GetCurrentFunctionScopedName(std::string name) const;
 
+        emitters::IRFunctionEmitter& GetFnEmitter() const;
+
+        class IfContextImpl;
         struct FunctionScope;
 
         emitters::IRModuleEmitter& _emitter;

@@ -28,6 +28,7 @@ int main()
             value::ContextGuard guard(*context);
 
             // Value tests
+            If_test1();
             Value_test1();
             Scalar_test1();
             Vector_test1();

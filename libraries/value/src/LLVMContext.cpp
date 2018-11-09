@@ -8,6 +8,7 @@
 
 #include "LLVMContext.h"
 #include "Value.h"
+#include "ValueScalar.h"
 
 // emitters
 #include "IRModuleEmitter.h"
@@ -150,9 +151,7 @@ namespace value
 
     Value LLVMContext::AllocateImpl(ValueType type, MemoryLayout layout)
     {
-        return { Emittable{
-                     _functionStack.top().get().Variable(ValueTypeToVariableType(type), layout.GetMemorySize()) },
-                 layout };
+        return { Emittable{ GetFnEmitter().Variable(ValueTypeToVariableType(type), layout.GetMemorySize()) }, layout };
     }
 
     std::optional<Value> LLVMContext::GetGlobalValue(GlobalAllocationScope scope, std::string name)
@@ -248,7 +247,7 @@ namespace value
             FunctionScope scope(*this, fnName, ValueTypeToVariableType(returnValue.GetBaseType()));
             returnValue = fn();
 
-            _functionStack.top().get().Return(returnValue.Get<Emittable>().GetDataAs<LLVMValue>());
+            GetFnEmitter().Return(returnValue.Get<Emittable>().GetDataAs<LLVMValue>());
         }
 
         return [fnName, this] { return Emittable{ _emitter.GetCurrentFunction().Call(fnName) }; };
@@ -265,7 +264,7 @@ namespace value
 
         {
             FunctionScope scope(*this, fnName, VariableType::Void, variableArgTypes);
-            auto functionArgs = _functionStack.top().get().Arguments();
+            auto functionArgs = GetFnEmitter().Arguments();
 
             for (std::pair idx{ 0u, functionArgs.begin() }; idx.first < argValues.size(); ++idx.first, ++idx.second)
             {
@@ -307,7 +306,7 @@ namespace value
 
         {
             FunctionScope scope(*this, fnName, ValueTypeToVariableType(returnValue.GetBaseType()), variableArgTypes);
-            auto functionArgs = _functionStack.top().get().Arguments();
+            auto functionArgs = GetFnEmitter().Arguments();
 
             for (std::pair idx{ 0u, functionArgs.begin() }; idx.first < argValues.size(); ++idx.first, ++idx.second)
             {
@@ -315,7 +314,7 @@ namespace value
             }
 
             returnValue = fn(argValues);
-            _functionStack.top().get().Return(returnValue.Get<Emittable>().GetDataAs<LLVMValue>());
+            GetFnEmitter().Return(returnValue.Get<Emittable>().GetDataAs<LLVMValue>());
         }
 
         return [fnName, this, argValues = std::move(argValues)](std::vector<Value> args) {
@@ -342,16 +341,16 @@ namespace value
     Value LLVMContext::StoreConstantDataImpl(ConstantData data) { return _computeContext.StoreConstantData(data); }
 
     void LLVMContext::ForImpl(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn)
-    {
-        auto maxCoordinate = layout.GetActiveSize().ToVector();
-        decltype(maxCoordinate) coordinate(maxCoordinate.size());
-
-        do
         {
+            auto maxCoordinate = layout.GetActiveSize().ToVector();
+            decltype(maxCoordinate) coordinate(maxCoordinate.size());
+
+            do
+            {
             auto logicalCoordinates = layout.GetLogicalCoordinates(coordinate).ToVector();
             fn(std::vector<Scalar>(logicalCoordinates.begin(), logicalCoordinates.end()));
-        } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
-    }
+            } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+        }
 
     void LLVMContext::MoveDataImpl(Value& source, Value& destination)
     {
@@ -377,12 +376,12 @@ namespace value
         }
         else
         {
-            //if (!TypeCompatible(destination, source))
-            //{
-            //    throw InputException(InputExceptionErrors::typeMismatch);
-            //}
+            // if (!TypeCompatible(destination, source))
+            // {
+            //     throw InputException(InputExceptionErrors::typeMismatch);
+            // }
 
-            auto& fn = _functionStack.top().get();
+            auto& fn = GetFnEmitter();
             auto destValue = destination.Get<Emittable>().GetDataAs<LLVMValue>();
             if (source.IsConstant())
             {
@@ -439,7 +438,7 @@ namespace value
         }
         else
         {
-            auto& fn = _functionStack.top().get();
+            auto& fn = GetFnEmitter();
 
             return std::visit(VariantVisitor{ [](Undefined) -> Value {
                                                  throw LogicException(LogicExceptionErrors::illegalState);
@@ -500,7 +499,7 @@ namespace value
             throw InputException(InputExceptionErrors::sizeMismatch);
         }
 
-        auto& fn = _functionStack.top().get();
+        auto& fn = GetFnEmitter();
         std::visit(
             [&destination, op, &fn](auto&& sourceData) {
                 using SourceDataType = std::decay_t<decltype(sourceData)>;
@@ -538,7 +537,6 @@ namespace value
                                                dst,
                                                src);
                         };
-                        break;
                     case ValueBinaryOperation::modulus:
                         if (isFp)
                         {
@@ -546,6 +544,8 @@ namespace value
                         }
                         opFn = [&fn](auto dst, auto src) { return fn.Operator(TypedOperator::moduloSigned, dst, src); };
                         break;
+                    default:
+                        throw LogicException(LogicExceptionErrors::illegalState);
                     }
 
                     auto& layout = destination.GetLayout();
@@ -594,6 +594,154 @@ namespace value
         return destination;
     }
 
+    Value LLVMContext::LogicalOperationImpl(ValueLogicalOperation op, Value source1, Value source2)
+    {
+        if (source1.GetLayout() != source2.GetLayout())
+        {
+            throw InputException(InputExceptionErrors::sizeMismatch);
+        }
+
+        if (source1.IsConstant() && source2.IsConstant())
+        {
+            return _computeContext.LogicalOperation(op, source1, source2);
+        }
+
+        auto comparisonOp = TypedComparison::none;
+        bool isFp = source1.IsFloatingPoint();
+        switch (op)
+        {
+        case ValueLogicalOperation::equality:
+            comparisonOp = isFp ? TypedComparison::equalsFloat : TypedComparison::equals;
+            break;
+        case ValueLogicalOperation::inequality:
+            comparisonOp = isFp ? TypedComparison::notEqualsFloat : TypedComparison::notEquals;
+            break;
+        case ValueLogicalOperation::greaterthan:
+            comparisonOp = isFp ? TypedComparison::greaterThanFloat : TypedComparison::greaterThan;
+            break;
+        case ValueLogicalOperation::greaterthanorequal:
+            comparisonOp = isFp ? TypedComparison::greaterThanOrEqualsFloat : TypedComparison::greaterThanOrEquals;
+            break;
+        case ValueLogicalOperation::lessthan:
+            comparisonOp = isFp ? TypedComparison::lessThanFloat : TypedComparison::lessThan;
+            break;
+        case ValueLogicalOperation::lessthanorequal:
+            comparisonOp = isFp ? TypedComparison::lessThanOrEqualsFloat : TypedComparison::lessThanOrEquals;
+            break;
+        }
+
+        Value returnValue = std::visit(
+            VariantVisitor{
+                [](Undefined) -> Value { throw LogicException(LogicExceptionErrors::illegalState); },
+                [this,
+                 comparisonOp,
+                 &source2UnderlyingData = source2.GetUnderlyingData(),
+                 &source1Layout = source1.GetLayout(),
+                 &source2Layout = source2.GetLayout()](Emittable source1Data) -> Value {
+                    // source1 is an Emittable type, so source2 can be constant or Emittable
+                    return std::
+                        visit(VariantVisitor{ [](Undefined) -> Value {
+                                                 throw LogicException(LogicExceptionErrors::illegalState);
+                                             },
+                                              [&, this](Emittable source2Data) -> Value {
+                                                  auto maxCoordinate = source1Layout.GetActiveSize().ToVector();
+                                                  decltype(maxCoordinate) coordinate(maxCoordinate.size());
+                                                  auto& fn = this->GetFnEmitter();
+                                                  auto result = fn.TrueBit();
+                                                  auto llvmOp1 = source1Data.GetDataAs<LLVMValue>();
+                                                  auto llvmOp2 = source2Data.GetDataAs<LLVMValue>();
+                                                  do
+                                                  {
+                                                      auto logicalCoordinates =
+                                                          source1Layout.GetLogicalCoordinates(coordinate);
+                                                      auto source1Offset =
+                                                          source1Layout.GetLogicalEntryOffset(logicalCoordinates);
+                                                      auto source2Offset =
+                                                          source2Layout.GetLogicalEntryOffset(logicalCoordinates);
+
+                                                      result = fn.LogicalAnd(result,
+                                                                             fn.Comparison(comparisonOp,
+                                                                                           fn.ValueAt(llvmOp1,
+                                                                                                      source1Offset),
+                                                                                           fn.ValueAt(llvmOp2,
+                                                                                                      source2Offset)));
+
+                                                  } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+
+                                                  return { Emittable{ result }, ScalarLayout };
+                                              },
+                                              [&, this](auto&& source2Data) -> Value {
+                                                  using Type =
+                                                      std::remove_pointer_t<std::decay_t<decltype(source2Data)>>;
+                                                  using CastType =
+                                                      std::conditional_t<std::is_same_v<Type, Boolean>, bool, Type>;
+                                                  auto& fn = this->GetFnEmitter();
+
+                                                  auto result = fn.TrueBit();
+                                                  auto llvmOp1 = source1Data.GetDataAs<LLVMValue>();
+                                                  auto maxCoordinate = source1Layout.GetActiveSize().ToVector();
+                                                  decltype(maxCoordinate) coordinate(maxCoordinate.size());
+                                                  do
+                                                  {
+                                                      auto logicalCoordinates =
+                                                          source1Layout.GetLogicalCoordinates(coordinate);
+                                                      auto source1Offset =
+                                                          source1Layout.GetLogicalEntryOffset(logicalCoordinates);
+                                                      auto source2Offset =
+                                                          source2Layout.GetLogicalEntryOffset(logicalCoordinates);
+
+                                                      result =
+                                                          fn.LogicalAnd(result,
+                                                                        fn.Comparison(comparisonOp,
+                                                                                      fn.ValueAt(llvmOp1,
+                                                                                                 source1Offset),
+                                                                                      fn.Literal(static_cast<CastType>(
+                                                                                          source2Data
+                                                                                              [source2Offset]))));
+
+                                                  } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+
+                                                  return { Emittable{ result }, ScalarLayout };
+                                              } },
+                              source2UnderlyingData);
+                    return {};
+                },
+                [this,
+                 comparisonOp,
+                 &source2Data = source2.GetUnderlyingData(),
+                 &source1Layout = source1.GetLayout(),
+                 &source2Layout = source2.GetLayout()](auto&& source1Data) -> Value {
+                    // source1 is constant, so source2 has to be an Emittable type
+                    using Type = std::remove_pointer_t<std::decay_t<decltype(source1Data)>>;
+                    using CastType = std::conditional_t<std::is_same_v<Type, Boolean>, bool, Type>;
+
+                    auto& fn = this->GetFnEmitter();
+                    auto result = fn.TrueBit();
+                    auto llvmOp2 = std::get<Emittable>(source2Data).GetDataAs<LLVMValue>();
+
+                    auto maxCoordinate = source1Layout.GetActiveSize().ToVector();
+                    decltype(maxCoordinate) coordinate(maxCoordinate.size());
+                    do
+                    {
+                        auto logicalCoordinates = source1Layout.GetLogicalCoordinates(coordinate);
+                        auto source1Offset = source1Layout.GetLogicalEntryOffset(logicalCoordinates);
+                        auto source2Offset = source2Layout.GetLogicalEntryOffset(logicalCoordinates);
+
+                        result =
+                            fn.LogicalAnd(result,
+                                          fn.Comparison(comparisonOp,
+                                                        fn.Literal(static_cast<CastType>(source1Data[source1Offset])),
+                                                        fn.ValueAt(llvmOp2, source2Offset)));
+
+                    } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+
+                    return { Emittable{ result }, ScalarLayout };
+                } },
+            source1.GetUnderlyingData());
+
+        return returnValue;
+    }
+
     Value LLVMContext::CastImpl(Value value, ValueType type)
     {
         if (value.IsConstant())
@@ -602,13 +750,64 @@ namespace value
         }
 
         auto data = value.Get<Emittable>().GetDataAs<LLVMValue>();
-        auto& fn = _functionStack.top().get();
+        auto& fn = GetFnEmitter();
 
         auto casted = fn.CastPointer(data, ValueTypeToVariableType(type));
 
         return { casted,
                  value.IsConstrained() ? std::optional<MemoryLayout>(value.GetLayout())
                                        : std::optional<MemoryLayout>(std::nullopt) };
+    }
+
+    class LLVMContext::IfContextImpl : public EmitterContext::IfContextImpl
+    {
+    public:
+        IfContextImpl(IRIfEmitter ifEmitter, IRFunctionEmitter& fnEmitter) :
+            _ifEmitter(std::move(ifEmitter)),
+            _fnEmitter(fnEmitter)
+        {}
+
+        void ElseIf(Scalar test, std::function<void()> fn) override
+        {
+            LLVMValue testValue = nullptr;
+            if (auto value = test.GetValue(); value.IsConstant())
+            {
+                testValue = _fnEmitter.Literal(static_cast<bool>(test.Get<Boolean>()));
+            }
+            else
+            {
+                testValue = value.Get<Emittable>().GetDataAs<LLVMValue>();
+            }
+
+            _ifEmitter.ElseIf(testValue, [fn = std::move(fn)](auto&) { fn(); });
+        }
+
+        void Else(std::function<void()> fn) override
+        {
+            _ifEmitter.Else([fn = std::move(fn)](auto&) { fn(); });
+        }
+
+    private:
+        IRIfEmitter _ifEmitter;
+        IRFunctionEmitter& _fnEmitter;
+    };
+
+    EmitterContext::IfContext LLVMContext::IfImpl(Scalar test, std::function<void()> fn)
+    {
+        auto& fnEmitter = GetFnEmitter();
+        LLVMValue testValue = nullptr;
+        if (auto value = test.GetValue(); value.IsConstant())
+        {
+            testValue = fnEmitter.Literal(static_cast<bool>(test.Get<Boolean>()));
+        }
+        else
+        {
+            testValue = value.Get<Emittable>().GetDataAs<LLVMValue>();
+        }
+
+        auto ifEmitter = fnEmitter.If(testValue, [fn = std::move(fn)](auto&) { fn(); });
+
+        return { std::make_unique<LLVMContext::IfContextImpl>(std::move(ifEmitter), fnEmitter) };
     }
 
     bool LLVMContext::TypeCompatible(Value value1, Value value2)
@@ -641,8 +840,10 @@ namespace value
             throw LogicException(LogicExceptionErrors::illegalState);
         }
 
-        return GetGlobalScopedName(_functionStack.top().get().GetFunctionName() + "_" + name);
+        return GetGlobalScopedName(GetFnEmitter().GetFunctionName() + "_" + name);
     }
+
+    IRFunctionEmitter& LLVMContext::GetFnEmitter() const { return _functionStack.top().get(); }
 
 } // namespace value
 } // namespace ell

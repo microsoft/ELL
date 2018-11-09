@@ -63,5 +63,47 @@ namespace value
         return copy;
     }
 
+    Scalar operator==(Scalar s1, Scalar s2)
+    {
+        return GetContext().LogicalOperation(ValueLogicalOperation::equality,
+                                            s1.GetValue(),
+                                            s2.GetValue());
+    }
+
+    Scalar operator!=(Scalar s1, Scalar s2)
+    {
+        return GetContext().LogicalOperation(ValueLogicalOperation::inequality,
+                                            s1.GetValue(),
+                                            s2.GetValue());
+    }
+
+    Scalar operator<=(Scalar s1, Scalar s2)
+    {
+        return GetContext().LogicalOperation(ValueLogicalOperation::lessthanorequal,
+                                            s1.GetValue(),
+                                            s2.GetValue());
+    }
+
+    Scalar operator<(Scalar s1, Scalar s2)
+    {
+        return GetContext().LogicalOperation(ValueLogicalOperation::lessthan,
+                                            s1.GetValue(),
+                                            s2.GetValue());
+    }
+
+    Scalar operator>=(Scalar s1, Scalar s2)
+    {
+        return GetContext().LogicalOperation(ValueLogicalOperation::greaterthanorequal,
+                                            s1.GetValue(),
+                                            s2.GetValue());
+    }
+
+    Scalar operator>(Scalar s1, Scalar s2)
+    {
+        return GetContext().LogicalOperation(ValueLogicalOperation::greaterthan,
+                                            s1.GetValue(),
+                                            s2.GetValue());
+    }
+
 } // namespace value
 } // namespace ell
