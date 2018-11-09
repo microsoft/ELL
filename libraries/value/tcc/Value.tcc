@@ -1,16 +1,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     FunctionUtils_test.h (utilities)
-//  Authors:  Chuck Jacobs
+//  File:     Value.tcc (value)
+//  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
 namespace ell
 {
-void TestInOrderFunctionEvaluator();
-void TestApplyToEach();
-void TestFunctionTraits();
+namespace value
+{
+
+    template <typename T>
+    Value Cast(Value value)
+    {
+        return Cast(value, GetValueType<T>());
+    }
+
+}
 }

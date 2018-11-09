@@ -455,4 +455,19 @@ void Tensor_test2()
     });
 }
 
+void Casting_test1()
+{
+    InvokeForContext<ComputeContext>([](auto&) {
+        Vector floatVector = std::vector<float>{ 1.f, 2.f, 3.f };
+        auto floatScalar = floatVector[1];
+        Scalar intScalar = Cast<int>(floatScalar);
+        Scalar globalIntScalar = GlobalAllocate("global", 3);
+        intScalar += 1;
+        floatScalar += 10.f;
+        testing::ProcessTest("Cast test",
+                             intScalar.Get<int>() == 3 && intScalar.Get<int>() == globalIntScalar.Get<int>() &&
+                                 floatScalar.Get<float>() == 12.f && floatVector[1].Get<float>() == 12.f);
+    });
+}
+
 } // namespace ell

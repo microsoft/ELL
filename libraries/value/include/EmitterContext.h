@@ -9,8 +9,9 @@
 #pragma once
 
 #include "Emittable.h"
-#include "ValueType.h"
 #include "Value.h"
+#include "ValueScalar.h"
+#include "ValueType.h"
 
 // utilities
 #include "Boolean.h"
@@ -29,9 +30,6 @@ namespace ell
 namespace value
 {
 
-    class Scalar;
-    class Value;
-
     namespace detail
     {
         Scalar CalculateOffset(const utilities::MemoryLayout& layout, std::vector<Scalar> coordinates);
@@ -45,6 +43,12 @@ namespace value
     protected:
         using MemoryLayout = utilities::MemoryLayout;
         using MemoryCoordinates = utilities::MemoryCoordinates;
+
+        enum class GlobalAllocationScope
+        {
+            Global,
+            Function
+        };
 
     public:
         /// <summary> Describes the type that can be used to represent constant C++ data </summary>
@@ -63,6 +67,76 @@ namespace value
         /// <param name="layout"> The memory layout of the allocation, in number of elements </param>
         /// <returns> An instance of Value that contains a referece to the allocated memory </returns>
         Value Allocate(ValueType type, MemoryLayout layout);
+
+        /// <summary> Allocates function static data </summary>
+        /// <param name="name"> The name of the variable </param>
+        /// <param name="type"> The type of the data </param>
+        /// <param name="layout"> The layout of the data </param>
+        Value StaticAllocate(std::string name, ValueType type, utilities::MemoryLayout layout);
+
+        /// <summary> Allocates function static data </summary>
+        /// <param name="name"> The name of the variable </param>
+        /// <param name="data"> The data </param>
+        /// <param name="layout"> The layout of the data </param>
+        template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
+        Value StaticAllocate(std::string name, const std::vector<T>& data,
+                             std::optional<utilities::MemoryLayout> layout = {})
+        {
+            if (auto globalValue = GetGlobalValue(GlobalAllocationScope::Function, name))
+            {
+                return globalValue.value();
+            }
+
+            auto optionalLayout = utilities::MemoryLayout({ static_cast<int>(data.size()) });
+            return GlobalAllocateImpl(GlobalAllocationScope::Function, name, data, layout.value_or(optionalLayout));
+        }
+
+        /// <summary> Allocates scalar function static data </summary>
+        /// <param name="name"> The name of the variable </param>
+        /// <param name="data"> The data </param>
+        template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
+        Value StaticAllocate(std::string name, T t)
+        {
+            return this
+                ->template StaticAllocate(name,
+                                          std::vector<
+                                              std::conditional_t<std::is_same_v<T, bool>, utilities::Boolean, T>>{ t });
+        }
+
+        /// <summary> Allocates global data </summary>
+        /// <param name="name"> The name of the variable </param>
+        /// <param name="type"> The type of the data </param>
+        /// <param name="layout"> The layout of the data </param>
+        Value GlobalAllocate(std::string name, ValueType type, utilities::MemoryLayout layout);
+
+        /// <summary> Allocates global data </summary>
+        /// <param name="name"> The name of the variable </param>
+        /// <param name="data"> The data </param>
+        /// <param name="layout"> The layout of the data </param>
+        template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
+        Value GlobalAllocate(std::string name, const std::vector<T>& data,
+                             std::optional<utilities::MemoryLayout> layout = {})
+        {
+            if (auto globalValue = GetGlobalValue(GlobalAllocationScope::Global, name))
+            {
+                return globalValue.value();
+            }
+
+            auto optionalLayout = utilities::MemoryLayout({ static_cast<int>(data.size()) });
+            return GlobalAllocateImpl(GlobalAllocationScope::Function, name, data, layout.value_or(optionalLayout));
+        }
+
+        /// <summary> Allocates scalar global data </summary>
+        /// <param name="name"> The name of the variable </param>
+        /// <param name="data"> The data </param>
+        template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
+        Value GlobalAllocate(std::string name, T t)
+        {
+            return this
+                ->template GlobalAllocate(name,
+                                          std::vector<
+                                              std::conditional_t<std::is_same_v<T, bool>, utilities::Boolean, T>>{ t });
+        }
 
         /// <summary> Gets the type information contained in an instance of Emittable </summary>
         /// <param name="emittable"> The instance of Emittable to be queried </param>
@@ -148,8 +222,16 @@ namespace value
         /// <returns> An instance of Value pointing to the same memory as destination </returns>
         Value BinaryOperation(ValueBinaryOperation op, Value destination, Value source);
 
+        Value Cast(Value value, ValueType type);
+
     private:
         virtual Value AllocateImpl(ValueType, MemoryLayout) = 0;
+
+        virtual std::optional<Value> GetGlobalValue(GlobalAllocationScope scope, std::string name) = 0;
+        virtual Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data,
+                                         MemoryLayout layout) = 0;
+        virtual Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type,
+                                         MemoryLayout layout) = 0;
 
         virtual std::pair<ValueType, int> GetTypeImpl(Emittable) = 0;
 
@@ -174,6 +256,8 @@ namespace value
 
         virtual Value UnaryOperationImpl(ValueUnaryOperation op, Value destination) = 0;
         virtual Value BinaryOperationImpl(ValueBinaryOperation op, Value destination, Value source) = 0;
+
+        virtual Value CastImpl(Value value, ValueType type) = 0;
     };
 
     /// <summary> Returns the global instance of EmitterContext </summary>
@@ -272,6 +356,62 @@ namespace value
     Value Allocate(utilities::MemoryLayout layout)
     {
         return Allocate(GetValueType<T>(), layout);
+    }
+
+    /// <summary> Allocates function static data </summary>
+    /// <param name="name"> The name of the variable </param>
+    /// <param name="type"> The type of the data </param>
+    /// <param name="layout"> The layout of the data </param>
+    Value StaticAllocate(std::string name, ValueType type, utilities::MemoryLayout layout);
+
+    /// <summary> Allocates function static data </summary>
+    /// <param name="name"> The name of the variable </param>
+    /// <param name="data"> The data </param>
+    /// <param name="layout"> The layout of the data </param>
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
+    Value StaticAllocate(std::string name, const std::vector<T>& data,
+                         std::optional<utilities::MemoryLayout> layout = {})
+    {
+        return GetContext().StaticAllocate(name, data, layout);
+    }
+
+    /// <summary> Allocates scalar function static data </summary>
+    /// <param name="name"> The name of the variable </param>
+    /// <param name="data"> The data </param>
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
+    Scalar StaticAllocate(std::string name, T t)
+    {
+        return StaticAllocate(name,
+                              std::vector<std::conditional_t<std::is_same_v<T, bool>, utilities::Boolean, T>>{ t },
+                              utilities::ScalarLayout);
+    }
+
+    /// <summary> Allocates global data </summary>
+    /// <param name="name"> The name of the variable </param>
+    /// <param name="type"> The type of the data </param>
+    /// <param name="layout"> The layout of the data </param>
+    Value GlobalAllocate(std::string name, ValueType type, utilities::MemoryLayout layout);
+
+    /// <summary> Allocates global data </summary>
+    /// <param name="name"> The name of the variable </param>
+    /// <param name="data"> The data </param>
+    /// <param name="layout"> The layout of the data </param>
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
+    Value GlobalAllocate(std::string name, const std::vector<T>& data,
+                         std::optional<utilities::MemoryLayout> layout = {})
+    {
+        return GetContext().GlobalAllocate(name, data, layout);
+    }
+
+    /// <summary> Allocates scalar global data </summary>
+    /// <param name="name"> The name of the variable </param>
+    /// <param name="data"> The data </param>
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
+    Scalar GlobalAllocate(std::string name, T t)
+    {
+        return GlobalAllocate(name,
+                              std::vector<std::conditional_t<std::is_same_v<T, bool>, utilities::Boolean, T>>{ t },
+                              utilities::ScalarLayout);
     }
 
 } // namespace value

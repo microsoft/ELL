@@ -45,6 +45,7 @@ namespace value
         Scalar& operator*=(Scalar);
         Scalar& operator-=(Scalar);
         Scalar& operator/=(Scalar);
+        Scalar& operator%=(Scalar);
 
         /// <summary> Retrieve the underlying value as a fundamental type </summary>
         /// <typeparam name="T"> The C++ fundamental type that is being retrieved from the instance </typeparam>

@@ -60,7 +60,9 @@ namespace value
         /// <summary> Multiplication operation </summary>
         multiply,
         /// <summary> Division operation </summary>
-        divide
+        divide,
+        /// <summary> Remainder operation </summary>
+        modulus
     };
 
     /// <summary> Helper template function that does a mapping from C++ type to ValueType </summary>

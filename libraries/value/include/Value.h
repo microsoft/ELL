@@ -148,19 +148,22 @@ namespace value
 
         /// <summary> Constructor that creates an instance which serves as a placeholder for data that matches the type and layout specified </summary>
         /// <typeparam name="T"> The C++ fundamental type to be the basis of this instance </typeparam>
-        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the eventual data to be stored. If MemoryLayout is not provided, the Value instance is considered unconstrained </param>
+        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the eventual data to be stored. If
+        /// MemoryLayout is not provided, the Value instance is considered unconstrained </param>
         template <typename T>
         Value(std::optional<MemoryLayout> layout = {}) : Value(GetValueType<T>(), layout)
         {}
 
         /// <summary> Constructor that creates an instance which serves as a placeholder for data that matches the type and layout specified </summary>
         /// <param name="type"> The type to be the basis of this instance </typeparam>
-        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the eventual data to be stored. If MemoryLayout is not provided, the Value instance is considered unconstrained </param>
+        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the eventual data to be stored. If
+        /// MemoryLayout is not provided, the Value instance is considered unconstrained </param>
         Value(ValueType type, std::optional<MemoryLayout> layout = {});
 
         /// <summary> Constructor that creates an instance that wraps an Emittable instance </summary>
         /// <param name="emittable"> Context-specific data that is to be wrapped </param>
-        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the data. If MemoryLayout is not provided, the Value instance is considered unconstrained </param>
+        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the data. If MemoryLayout is
+        /// not provided, the Value instance is considered unconstrained </param>
         Value(Emittable emittable, std::optional<MemoryLayout> layout = {});
 
         /// <summary> Constructor that creates an instance from one C++ fundamental type's value and gives it a scalar layout </summary>
@@ -173,7 +176,8 @@ namespace value
         /// <summary> Constructor that creates an instance wrapping a set of constant values </summary>
         /// <typeparam name="T"> The C++ fundamental type to be the basis of this instance </typeparam>
         /// <param name="data"> The constant data </param>>
-        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the data. If MemoryLayout is not provided, the Value instance is considered unconstrained </param>
+        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the data. If MemoryLayout is
+        /// not provided, the Value instance is considered unconstrained </param>
         template <typename T>
         Value(std::initializer_list<DataType<T>> data, std::optional<MemoryLayout> layout = {}) :
             Value(std::vector<T>(data), layout)
@@ -182,7 +186,8 @@ namespace value
         /// <summary> Constructor that creates an instance wrapping a set of constant values </summary>
         /// <typeparam name="T"> The C++ fundamental type to be the basis of this instance </typeparam>
         /// <param name="data"> The constant data </param>>
-        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the data. If MemoryLayout is not provided, the Value instance is considered unconstrained </param>
+        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the data. If MemoryLayout is
+        /// not provided, the Value instance is considered unconstrained </param>
         template <typename T>
         Value(std::vector<DataType<T>> data, std::optional<MemoryLayout> layout = {}) noexcept :
             Value(detail::StoreConstantData(std::move(data)))
@@ -196,7 +201,8 @@ namespace value
         /// <summary> Constructor that creates an instance wrapping a set of constant values </summary>
         /// <typeparam name="T"> The C++ fundamental type to be the basis of this instance </typeparam>
         /// <param name="data"> Pointer to the constant data </param>>
-        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the data. If MemoryLayout is not provided, the Value instance is considered unconstrained </param>
+        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the data. If MemoryLayout
+        /// is not provided, the Value instance is considered unconstrained </param>
         template <typename T, std::enable_if_t<IsAcceptableConstantPointerType<T>, void*> = nullptr>
         Value(T t, std::optional<MemoryLayout> layout = {}) noexcept :
             _data(reinterpret_cast<std::add_pointer_t<utilities::RemoveAllPointersT<T>>>(t)),
@@ -379,3 +385,5 @@ namespace value
 
 } // namespace value
 } // namespace ell
+
+#include "../tcc/Value.tcc"

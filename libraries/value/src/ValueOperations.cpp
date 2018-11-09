@@ -23,5 +23,7 @@ namespace value
         });
     }
 
+    Value Cast(Value value, ValueType type) { return GetContext().Cast(value, type); }
+
 } // namespace value
 } // namespace ell

@@ -76,9 +76,4 @@ void TestFunctionTraits()
     static_assert(std::is_same<std::tuple_element_t<0, utilities::FunctionArgTypes<decltype(AddToGlobalValue)>>, int>::value, "FunctionTraits");
 }
 
-void TestApplyFunction()
-{
-    bool success = utilities::ApplyFunction(ManyArgFunction, 1, 2.5f, std::string("hello"));
-    testing::ProcessTest("ApplyFunction", success);
-}
 }

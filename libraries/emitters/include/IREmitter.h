@@ -141,12 +141,19 @@ namespace emitters
         /// <returns> Pointer to an llvm::Constant that represents the boolean literal. </returns>
         llvm::Constant* Literal(const bool value);
 
-        /// <summary> Emit a byte literal. </summary>
+        /// <summary> Emit an unsigned byte literal. </summary>
         ///
         /// <param name="value"> The literal value. </param>
         ///
-        /// <returns> Pointer to an llvm::Constant that represents the byte literal. </returns>
+        /// <returns> Pointer to an llvm::Constant that represents the unsigned byte literal. </returns>
         llvm::Constant* Literal(const uint8_t value);
+
+        /// <summary> Emit a signed byte literal. </summary>
+        ///
+        /// <param name="value"> The literal value. </param>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents the signed byte literal. </returns>
+        llvm::Constant* Literal(const int8_t value);
 
         /// <summary> Emit a short literal. </summary>
         ///
@@ -205,12 +212,33 @@ namespace emitters
         /// <returns> Pointer to an llvm::Value that represents the string literal. </returns>
         LLVMValue Literal(const std::string& name, const std::string& value);
 
-        /// <summary> Emit a literal array of bytes. </summary>
+        /// <summary> Emit a literal array of unsigned bytes. </summary>
         ///
         /// <param name="value"> The literal value. </param>
         ///
-        /// <returns> Pointer to an llvm::Constant that represents an array of bytes. </returns>
+        /// <returns> Pointer to an llvm::Constant that represents an array of unsigned bytes. </returns>
         llvm::Constant* Literal(const std::vector<uint8_t>& value);
+
+        /// <summary> Emit a literal array of signed bytes. </summary>
+        ///
+        /// <param name="value"> The literal value. </param>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents an array of signed bytes. </returns>
+        llvm::Constant* Literal(const std::vector<int8_t>& value);
+
+        /// <summary> Emit a literal array of char. </summary>
+        ///
+        /// <param name="value"> The literal value. </param>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents an array of char. </returns>
+        llvm::Constant* Literal(const std::vector<char>& value);
+
+        /// <summary> Emit a literal array of Int16. </summary>
+        ///
+        /// <param name="value"> The literal value. </param>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents an array of Int16. </returns>
+        llvm::Constant* Literal(const std::vector<int16_t>& value);
 
         /// <summary> Emit a literal array of Int32. </summary>
         ///

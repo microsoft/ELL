@@ -63,5 +63,11 @@ namespace value
         return *this;
     }
 
+    Scalar& Scalar::operator%=(Scalar s)
+    {
+        _value = GetContext().BinaryOperation(ValueBinaryOperation::modulus, _value, s._value);
+        return *this;
+    }
+
 } // namespace value
 } // namespace ell

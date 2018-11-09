@@ -8,6 +8,9 @@
 
 #pragma once
 
+// stl
+#include <type_traits>
+
 namespace ell
 {
 namespace value
@@ -20,6 +23,19 @@ namespace value
     Scalar operator*(Scalar, Scalar);
     Scalar operator-(Scalar, Scalar);
     Scalar operator/(Scalar, Scalar);
+    Scalar operator%(Scalar, Scalar);
+
+    Scalar operator++(Scalar);
+    Scalar operator++(Scalar, int);
+    Scalar operator--(Scalar);
+    Scalar operator--(Scalar, int);
+
+    Scalar operator==(Scalar, Scalar);
+    Scalar operator!=(Scalar, Scalar);
+    Scalar operator<(Scalar, Scalar);
+    Scalar operator<=(Scalar, Scalar);
+    Scalar operator>(Scalar, Scalar);
+    Scalar operator>=(Scalar, Scalar);
 
 } // namespace value
 } // namespace ell

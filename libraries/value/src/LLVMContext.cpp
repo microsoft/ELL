@@ -12,6 +12,9 @@
 // emitters
 #include "IRModuleEmitter.h"
 
+// utilities
+#include "StringUtil.h"
+
 namespace ell
 {
 namespace value
@@ -49,7 +52,7 @@ namespace value
                 }
             case llvm::Type::TypeID::PointerTyID:
             {
-                auto elementType = type->getPointerElementType(); //type->getSequentialElementType();
+                auto elementType = type->getPointerElementType();
 
                 auto underlyingType = LLVMTypeToVarType(elementType);
                 underlyingType.second += 1;
@@ -57,7 +60,7 @@ namespace value
             }
             case llvm::Type::TypeID::ArrayTyID:
             {
-                auto elementType = type->getArrayElementType(); //type->getSequentialElementType();
+                auto elementType = type->getArrayElementType();
 
                 auto underlyingType = LLVMTypeToVarType(elementType);
                 underlyingType.second += 1;
@@ -71,13 +74,17 @@ namespace value
 
         VariableType ValueTypeToVariableType(ValueType type)
         {
-#define VALUE_TYPE_TO_VARIABLE_TYPE_MAPPING(x, y)                                                                      \
-    case ValueType::x:                                                                                                 \
+            // clang-format off
+
+#define VALUE_TYPE_TO_VARIABLE_TYPE_MAPPING(x, y)  \
+    case ValueType::x:                             \
         return VariableType::y
 
-#define VALUE_TYPE_TO_VARIABLE_TYPE_PTR(x)                                                                             \
-    case ValueType::x:                                                                                                 \
+#define VALUE_TYPE_TO_VARIABLE_TYPE_PTR(x)         \
+    case ValueType::x:                             \
         return VariableType::x##Pointer
+
+            // clang-format on
 
             switch (type)
             {
@@ -146,6 +153,75 @@ namespace value
         return { Emittable{
                      _functionStack.top().get().Variable(ValueTypeToVariableType(type), layout.GetMemorySize()) },
                  layout };
+    }
+
+    std::optional<Value> LLVMContext::GetGlobalValue(GlobalAllocationScope scope, std::string name)
+    {
+        std::string adjustedName = GetScopeAdjustedName(scope, name);
+        if (auto it = _globals.find(adjustedName); it != _globals.end())
+        {
+            return Value(it->second.first, it->second.second);
+        }
+
+        return std::nullopt;
+    }
+
+    Value LLVMContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data,
+                                          MemoryLayout layout)
+    {
+        std::string adjustedName = GetScopeAdjustedName(scope, name);
+
+        if (_globals.find(adjustedName) != _globals.end())
+        {
+            throw InputException(InputExceptionErrors::invalidArgument,
+                                 "Unexpected collision in global data allocation");
+        }
+
+        Emittable emittable = std::visit(
+            [this, &adjustedName](auto&& vectorData) {
+                using Type = std::decay_t<decltype(vectorData)>;
+
+                if constexpr (std::is_same_v<Type, std::vector<utilities::Boolean>>)
+                {
+                    // IREmitter stores a vector of bool values as a bitvector, which
+                    // breaks the memory model we need for our purposes.
+                    // NB: This somewhat screws up our type system because we rely
+                    // on LLVM to tell us the type, but here we set a different type
+                    // altogether, with no discernable way of retrieving the fact that
+                    // originally, this was a vector of bools. This will be rectified
+                    // in the near future. (2018-11-08)
+                    std::vector<char> transformedData(vectorData.begin(), vectorData.end());
+                    return _emitter.GlobalArray(adjustedName, transformedData);
+                }
+                else
+                {
+                    return _emitter.GlobalArray(adjustedName, vectorData);
+                }
+            },
+            data);
+        _globals[adjustedName] = { emittable, layout };
+
+        return Value(emittable, layout);
+    }
+
+    Value LLVMContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type,
+                                          MemoryLayout layout)
+    {
+        std::string adjustedName = GetScopeAdjustedName(scope, name);
+
+        if (_globals.find(adjustedName) != _globals.end())
+        {
+            throw InputException(InputExceptionErrors::invalidArgument,
+                                 FormatString("Global variable %s is already defined", adjustedName.c_str()));
+        }
+
+        Emittable emittable = _emitter.GlobalArray(adjustedName,
+                                                   _emitter.GetIREmitter().Type(ValueTypeToVariableType(type)),
+                                                   layout.GetMemorySize());
+
+        _globals[adjustedName] = { emittable, layout };
+
+        return Value(emittable, layout);
     }
 
     std::pair<ValueType, int> LLVMContext::GetTypeImpl(Emittable emittable)
@@ -301,7 +377,7 @@ namespace value
         }
         else
         {
-            //if (source.Type() != destination.Type() || source.PointerLevel() != destination.PointerLevel())
+            //if (!TypeCompatible(destination, source))
             //{
             //    throw InputException(InputExceptionErrors::typeMismatch);
             //}
@@ -414,10 +490,10 @@ namespace value
             destination = Allocate(source.GetBaseType(), source.GetLayout());
         }
 
-        /*if (!TypeCompatible(destination, source))
-    {
-        throw InputException(InputExceptionErrors::typeMismatch);
-    }*/
+        // if (!TypeCompatible(destination, source))
+        // {
+        //     throw InputException(InputExceptionErrors::typeMismatch);
+        // }
 
         if (destination.GetLayout() != source.GetLayout())
         {
@@ -462,6 +538,13 @@ namespace value
                                                dst,
                                                src);
                         };
+                        break;
+                    case ValueBinaryOperation::modulus:
+                        if (isFp)
+                        {
+                            throw InputException(InputExceptionErrors::invalidArgument);
+                        }
+                        opFn = [&fn](auto dst, auto src) { return fn.Operator(TypedOperator::moduloSigned, dst, src); };
                         break;
                     }
 
@@ -511,9 +594,54 @@ namespace value
         return destination;
     }
 
+    Value LLVMContext::CastImpl(Value value, ValueType type)
+    {
+        if (value.IsConstant())
+        {
+            return _computeContext.Cast(value, type);
+        }
+
+        auto data = value.Get<Emittable>().GetDataAs<LLVMValue>();
+        auto& fn = _functionStack.top().get();
+
+        auto casted = fn.CastPointer(data, ValueTypeToVariableType(type));
+
+        return { casted,
+                 value.IsConstrained() ? std::optional<MemoryLayout>(value.GetLayout())
+                                       : std::optional<MemoryLayout>(std::nullopt) };
+    }
+
     bool LLVMContext::TypeCompatible(Value value1, Value value2)
     {
         return value1.GetBaseType() == value2.GetBaseType() && value1.PointerLevel() == value2.PointerLevel();
+    }
+
+    std::string LLVMContext::GetScopeAdjustedName(GlobalAllocationScope scope, std::string name) const
+    {
+        switch (scope)
+        {
+        case GlobalAllocationScope::Global:
+            return GetGlobalScopedName(name);
+        case GlobalAllocationScope::Function:
+            return GetCurrentFunctionScopedName(name);
+        }
+
+        throw LogicException(LogicExceptionErrors::illegalState);
+    }
+
+    std::string LLVMContext::GetGlobalScopedName(std::string name) const
+    {
+        return _emitter.GetModuleName() + "_" + name;
+    }
+
+    std::string LLVMContext::GetCurrentFunctionScopedName(std::string name) const
+    {
+        if (_functionStack.empty())
+        {
+            throw LogicException(LogicExceptionErrors::illegalState);
+        }
+
+        return GetGlobalScopedName(_functionStack.top().get().GetFunctionName() + "_" + name);
     }
 
 } // namespace value

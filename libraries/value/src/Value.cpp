@@ -32,22 +32,22 @@ namespace value
     Shallow copies of data is done in this function. Deep copies are done by the
     global EmitterContext object.
     * if lhs is not defined
-    * and rhs is not defined: don't do anything
-    * and rhs is defined: copy everything
+      * and rhs is not defined: don't do anything
+      * and rhs is defined: copy everything
     * if lhs is defined and not constrained and empty
-    * and rhs is not defined: throw
-    * and rhs is defined: if types don't match, throw. copy everything
+      * and rhs is not defined: throw
+      * and rhs is defined: if types don't match, throw. copy everything
     * if lhs is defined and constrained and empty
-    * and rhs is not defined: throw
-    * and rhs is defined and not constrained and empty: if types don't match, throw.
-    * and rhs is defined and constrained and empty: if types or layout don't match, throw
-    * and rhs is defined and not constrained and not empty: if types don't match, throw. shallow copy of data
-    * and rhs is defined and constrained and not empty: if types or layout don't match, throw. shallow copy of data
+      * and rhs is not defined: throw
+      * and rhs is defined and not constrained and empty: if types don't match, throw.
+      * and rhs is defined and constrained and empty: if types or layout don't match, throw
+      * and rhs is defined and not constrained and not empty: if types don't match, throw. shallow copy of data
+      * and rhs is defined and constrained and not empty: if types or layout don't match, throw. shallow copy of data
     * if lhs is defined and not constrained and not empty:
-    * throw
+      * throw
     * if lhs is defined and constrained and not empty:
-    * and rhs does not match type or layout: throw
-    * and rhs matches type and layout: deep copy of data
+      * and rhs does not match type or layout: throw
+      * and rhs matches type and layout: deep copy of data
     ****************************************************************************/
     // clang-format on
     Value& Value::operator=(const Value& other)
@@ -335,9 +335,7 @@ namespace value
 
     namespace detail
     {
-
         Value StoreConstantData(ConstantData data) { return GetContext().StoreConstantData(data); }
-
     } // namespace detail
 
 } // namespace value

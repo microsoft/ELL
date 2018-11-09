@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "EmitterContext.h"
 #include "ComputeContext.h"
+#include "EmitterContext.h"
 #include "ValueScalar.h"
 
 // stl
@@ -42,6 +42,11 @@ namespace value
     private:
         Value AllocateImpl(ValueType value, MemoryLayout layout) override;
 
+        std::optional<Value> GetGlobalValue(GlobalAllocationScope scope, std::string name) override;
+
+        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout) override;
+        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout) override;
+
         std::pair<ValueType, int> GetTypeImpl(Emittable emittable) override;
 
         std::function<void()> CreateFunctionImpl(std::string fnName, std::function<void()> fn) override;
@@ -66,7 +71,13 @@ namespace value
         Value UnaryOperationImpl(ValueUnaryOperation op, Value destination) override;
         Value BinaryOperationImpl(ValueBinaryOperation op, Value destination, Value source) override;
 
+        Value CastImpl(Value value, ValueType type) override;
+
         bool TypeCompatible(Value value1, Value value2);
+
+        std::string GetScopeAdjustedName(GlobalAllocationScope scope, std::string name) const;
+        std::string GetGlobalScopedName(std::string name) const;
+        std::string GetCurrentFunctionScopedName(std::string name) const;
 
         struct FunctionScope;
 
@@ -76,6 +87,7 @@ namespace value
         ComputeContext _computeContext;
 
         std::stack<std::reference_wrapper<emitters::IRFunctionEmitter>> _functionStack;
+        std::map<std::string, std::pair<Emittable, MemoryLayout>> _globals;
     };
 
 } // namespace value

@@ -41,6 +41,7 @@ set(include
 
 set(tcc
     tcc/EmitterContext.tcc
+    tcc/Value.tcc
     tcc/ValueMatrix.tcc
     tcc/ValueTensor.tcc
 )

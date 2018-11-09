@@ -24,6 +24,7 @@ void Matrix_test1();
 void Matrix_test2();
 void Tensor_test1();
 void Tensor_test2();
+void Casting_test1();
 
 std::vector<std::unique_ptr<value::EmitterContext>> GetContexts();
 

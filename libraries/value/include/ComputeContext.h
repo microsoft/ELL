@@ -33,6 +33,11 @@ namespace value
     private:
         Value AllocateImpl(ValueType type, MemoryLayout layout) override;
 
+        std::optional<Value> GetGlobalValue(GlobalAllocationScope scope, std::string name) override;
+
+        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout) override;
+        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout) override;
+
         std::pair<ValueType, int> GetTypeImpl(Emittable emittable) override;
 
         std::function<void()> CreateFunctionImpl(std::string fnName, std::function<void()> fn) override;
@@ -57,16 +62,23 @@ namespace value
         Value UnaryOperationImpl(ValueUnaryOperation op, Value destination) override;
         Value BinaryOperationImpl(ValueBinaryOperation op, Value destination, Value source) override;
 
+        Value CastImpl(Value value, ValueType type) override;
+
         bool ValidateValue(Value value);
         bool TypeCompatible(Value value1, Value value2);
 
         ConstantData ExtractConstantData(Value value);
+
+        std::string GetScopeAdjustedName(GlobalAllocationScope scope, std::string name) const;
+        std::string GetGlobalScopedName(std::string name) const;
+        std::string GetCurrentFunctionScopedName(std::string name) const;
+
         struct FunctionScope;
 
         using ConstantDataList = std::forward_list<ConstantData>;
 
-        std::stack<ConstantDataList> _stack;
-        std::map<std::string, ConstantData> _globals;
+        std::stack<std::pair<std::string, ConstantDataList>> _stack;
+        std::map<std::string, std::pair<ConstantData, MemoryLayout>> _globals;
         std::string _moduleName;
     };
 

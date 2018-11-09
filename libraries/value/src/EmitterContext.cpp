@@ -56,6 +56,40 @@ namespace value
 
     Value EmitterContext::Allocate(ValueType type, MemoryLayout layout) { return AllocateImpl(type, layout); }
 
+    Value EmitterContext::StaticAllocate(std::string name, ValueType type, utilities::MemoryLayout layout)
+    {
+        if (auto globalValue = GetGlobalValue(GlobalAllocationScope::Function, name))
+        {
+            Value value = globalValue.value();
+            if (layout.GetMemorySize() > value.GetLayout().GetMemorySize())
+            {
+                throw InputException(InputExceptionErrors::invalidSize);
+            }
+            value.SetLayout(layout);
+
+            return value;
+        }
+
+        return GlobalAllocateImpl(GlobalAllocationScope::Function, name, type, layout);
+    }
+
+    Value EmitterContext::GlobalAllocate(std::string name, ValueType type, utilities::MemoryLayout layout)
+    {
+        if (auto globalValue = GetGlobalValue(GlobalAllocationScope::Global, name))
+        {
+            Value value = globalValue.value();
+            if (layout.GetMemorySize() > value.GetLayout().GetMemorySize())
+            {
+                throw InputException(InputExceptionErrors::invalidSize);
+            }
+            value.SetLayout(layout);
+
+            return value;
+        }
+
+        return GlobalAllocateImpl(GlobalAllocationScope::Global, name, type, layout);
+    }
+
     std::pair<ValueType, int> EmitterContext::GetType(Emittable emittable) { return GetTypeImpl(emittable); }
 
     std::function<void()> EmitterContext::CreateFunction(std::string fnName, std::function<void()> fn)
@@ -115,6 +149,16 @@ namespace value
         return BinaryOperationImpl(op, destination, source);
     }
 
+    Value EmitterContext::Cast(Value value, ValueType type)
+    {
+        if (!value.IsConstrained())
+        {
+            throw InputException(InputExceptionErrors::invalidArgument);
+        }
+
+        return CastImpl(value, type);
+    }
+
     namespace
     {
         EmitterContext* s_context = nullptr;
@@ -165,6 +209,11 @@ namespace value
     Value Allocate(ValueType type, size_t size) { return GetContext().Allocate(type, size); }
 
     Value Allocate(ValueType type, MemoryLayout layout) { return GetContext().Allocate(type, layout); }
+
+    Value GlobalAllocate(std::string name, ValueType type, utilities::MemoryLayout layout)
+    {
+        return GetContext().GlobalAllocate(name, type, layout);
+    }
 
 } // namespace value
 } // namespace ell

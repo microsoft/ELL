@@ -13,8 +13,8 @@
 #include "TypeTraits.h"
 
 // stl
-#include <string>
 #include <cassert>
+#include <string>
 
 namespace ell
 {
@@ -26,7 +26,11 @@ namespace value
 
     struct ComputeContext::FunctionScope
     {
-        FunctionScope(ComputeContext& context) : context(context) { context._stack.push({}); }
+        FunctionScope(ComputeContext& context, std::string fnName) : context(context)
+        {
+            context._stack.push({ fnName, {} });
+        }
+
         ~FunctionScope() { context._stack.pop(); }
 
         ComputeContext& context;
@@ -69,6 +73,44 @@ namespace value
                 data);
         }
 
+        template <typename T>
+        auto AllocateConstantDataImpl(size_t size)
+        {
+            return std::vector<T>(size);
+        }
+
+        ConstantData AllocateConstantData(ValueType type, size_t size)
+        {
+            switch (type)
+            {
+            case ValueType::Boolean:
+                return AllocateConstantDataImpl<Boolean>(size);
+            case ValueType::Char8:
+                return AllocateConstantDataImpl<char>(size);
+            case ValueType::Byte:
+                return AllocateConstantDataImpl<uint8_t>(size);
+            case ValueType::Int16:
+                return AllocateConstantDataImpl<int16_t>(size);
+            case ValueType::Int32:
+                return AllocateConstantDataImpl<int32_t>(size);
+            case ValueType::Int64:
+                return AllocateConstantDataImpl<int64_t>(size);
+            case ValueType::Float:
+                return AllocateConstantDataImpl<float>(size);
+            case ValueType::Double:
+                return AllocateConstantDataImpl<double>(size);
+            default:
+                throw LogicException(LogicExceptionErrors::notImplemented);
+            }
+        }
+
+        template <typename T, typename Data>
+        ConstantData CastVector(T, const Data& data)
+        {
+            using VectorType = std::vector<typename T::Type>;
+            return VectorType(data.begin(), data.end());
+        }
+
     } // namespace
 
     ComputeContext::ComputeContext(std::string moduleName) : _moduleName(std::move(moduleName))
@@ -80,44 +122,58 @@ namespace value
     Value ComputeContext::AllocateImpl(ValueType type, MemoryLayout layout)
     {
         // special case the scalar case
-        auto size = layout.NumDimensions() == 0 ? 1u : layout.GetMemorySize();
+        auto size = layout == ScalarLayout ? 1u : layout.GetMemorySize();
 
-        auto createValue = [this, size, &layout](auto type) -> Value {
-            using VectorType = std::vector<typename decltype(type)::Type>;
-            VectorType v(size);
-            Value value = StoreConstantData(std::move(v));
-            value.SetLayout(layout);
-            return value;
-        };
+        auto constantData = AllocateConstantData(type, size);
+        Value value = StoreConstantData(std::move(constantData));
+        value.SetLayout(layout);
+        return value;
+    }
 
-        switch (type)
+    std::optional<Value> ComputeContext::GetGlobalValue(GlobalAllocationScope scope, std::string name)
+    {
+        std::string adjustedName = GetScopeAdjustedName(scope, name);
+
+        if (auto it = _globals.find(adjustedName); it != _globals.end())
         {
-        case ValueType::Boolean:
-            return createValue(IdentityType<Boolean>{});
-        case ValueType::Char8:
-            return createValue(IdentityType<char>{});
-        case ValueType::Byte:
-            return createValue(IdentityType<uint8_t>{});
-        case ValueType::Int16:
-            return createValue(IdentityType<int16_t>{});
-        case ValueType::Int32:
-            return createValue(IdentityType<int32_t>{});
-        case ValueType::Int64:
-            return createValue(IdentityType<int64_t>{});
-        case ValueType::Float:
-            return createValue(IdentityType<float>{});
-        case ValueType::Double:
-            return createValue(IdentityType<double>{});
-        default:
-            throw LogicException(LogicExceptionErrors::notImplemented);
+            return ConstantDataToValue(it->second.first, it->second.second);
         }
+
+        return std::nullopt;
+    }
+
+    Value ComputeContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data,
+                                             MemoryLayout layout)
+    {
+        std::string adjustedName = GetScopeAdjustedName(scope, name);
+
+        if (_globals.find(adjustedName) != _globals.end())
+        {
+            throw InputException(InputExceptionErrors::invalidArgument,
+                                 "Unexpected collision in global data allocation");
+        }
+
+        auto& globalData = _globals[adjustedName];
+        globalData.first = std::move(data);
+        globalData.second = std::move(layout);
+
+        return ConstantDataToValue(globalData.first, globalData.second);
+    }
+
+    Value ComputeContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type,
+                                             MemoryLayout layout)
+    {
+        // special case the scalar case
+        auto size = layout == ScalarLayout ? 1u : layout.GetMemorySize();
+        auto constantData = AllocateConstantData(type, size);
+        return GlobalAllocateImpl(scope, name, constantData, layout);
     }
 
     Value ComputeContext::StoreConstantDataImpl(ConstantData data)
     {
         Value value = ConstantDataToValue(data);
 
-        _stack.top().push_front(std::move(data));
+        _stack.top().second.push_front(std::move(data));
         return value;
     }
 
@@ -173,7 +229,7 @@ namespace value
                                        using RealType = std::remove_pointer_t<Type>;
                                        using VectorType = std::vector<RealType>;
 
-                                       for (auto& constData : scope)
+                                       for (auto& constData : scope.second)
                                        {
                                            auto ptr = std::get_if<VectorType>(&constData);
                                            if (ptr != nullptr)
@@ -197,8 +253,8 @@ namespace value
 
     std::function<void()> ComputeContext::CreateFunctionImpl(std::string fnName, std::function<void()> fn)
     {
-        return [fn = std::move(fn), this] {
-            FunctionScope scope(*this);
+        return [fn = std::move(fn), fnName = std::move(fnName), this] {
+            FunctionScope scope(*this, fnName);
             fn();
         };
     }
@@ -206,35 +262,36 @@ namespace value
     std::function<Value()> ComputeContext::CreateFunctionImpl(std::string fnName, Value expectedReturn,
                                                               std::function<Value()> fn)
     {
-        return [fn = std::move(fn), this, expectedReturn]() {
+        return [fn = std::move(fn), fnName = std::move(fnName), this, expectedReturn]() {
             ConstantData movedOutOfScope;
             {
-                FunctionScope scope(*this);
+                FunctionScope scope(*this, fnName);
 
                 Value returnValue = expectedReturn;
                 returnValue = fn();
 
                 movedOutOfScope = ExtractConstantData(returnValue);
             }
-            _stack.top().push_front(std::move(movedOutOfScope));
-            return ConstantDataToValue(_stack.top().front(), expectedReturn.GetLayout());
+            _stack.top().second.push_front(std::move(movedOutOfScope));
+            return ConstantDataToValue(_stack.top().second.front(), expectedReturn.GetLayout());
         };
     }
 
     std::function<void(std::vector<Value>)> ComputeContext::CreateFunctionImpl(
         std::string fnName, std::vector<Value> expectedArgs, std::function<void(std::vector<Value>)> fn)
     {
-        return [fn = std::move(fn), this, expectedArgs = std::move(expectedArgs)](std::vector<Value> args) {
+        return [fn = std::move(fn), fnName = std::move(fnName), this, expectedArgs = std::move(expectedArgs)](
+                   std::vector<Value> args) {
             assert(expectedArgs.size() == args.size());
             ConstantData movedOutOfScope;
             {
-                FunctionScope scope(*this);
+                FunctionScope scope(*this, fnName);
                 auto fnArgs = expectedArgs;
                 std::copy(args.begin(), args.end(), fnArgs.begin());
 
                 fn(args);
             }
-            _stack.top().push_front(std::move(movedOutOfScope));
+            _stack.top().second.push_front(std::move(movedOutOfScope));
         };
     }
 
@@ -242,12 +299,15 @@ namespace value
         std::string fnName, Value expectedReturn, std::vector<Value> expectedArgs,
         std::function<Value(std::vector<Value>)> fn)
     {
-        return [fn = std::move(fn), this, expectedReturn, expectedArgs = std::move(expectedArgs)](
-                   std::vector<Value> args) {
+        return [fn = std::move(fn),
+                fnName = std::move(fnName),
+                this,
+                expectedReturn,
+                expectedArgs = std::move(expectedArgs)](std::vector<Value> args) {
             assert(expectedArgs.size() == args.size());
             ConstantData movedOutOfScope;
             {
-                FunctionScope scope(*this);
+                FunctionScope scope(*this, fnName);
                 auto fnArgs = expectedArgs;
                 std::copy(args.begin(), args.end(), fnArgs.begin());
 
@@ -256,9 +316,9 @@ namespace value
 
                 movedOutOfScope = ExtractConstantData(returnValue);
             }
-            _stack.top().push_front(std::move(movedOutOfScope));
+            _stack.top().second.push_front(std::move(movedOutOfScope));
 
-            return ConstantDataToValue(_stack.top().front(), expectedReturn.GetLayout());
+            return ConstantDataToValue(_stack.top().second.front(), expectedReturn.GetLayout());
         };
     }
 
@@ -366,6 +426,23 @@ namespace value
                                        case ValueBinaryOperation::divide:
                                            opFn = [](auto dst, auto src) { return dst / src; };
                                            break;
+
+                                       default:
+                                           if constexpr (std::is_integral_v<DestinationDataType>)
+                                           {
+                                               switch (op)
+                                               {
+                                               case ValueBinaryOperation::modulus:
+                                                   opFn = [](auto dst, auto src) { return dst % src; };
+                                                   break;
+                                               default:
+                                                   throw LogicException(LogicExceptionErrors::illegalState);
+                                               }
+                                           }
+                                           else
+                                           {
+                                               throw LogicException(LogicExceptionErrors::illegalState);
+                                           }
                                        }
 
                                        auto& sourceData = std::get<DestinationDataType*>(source.GetUnderlyingData());
@@ -402,6 +479,58 @@ namespace value
         return destination;
     }
 
+    Value ComputeContext::CastImpl(Value value, ValueType destType)
+    {
+        if (!ValidateValue(value))
+        {
+            throw InputException(InputExceptionErrors::invalidArgument);
+        }
+
+        ConstantData castedData;
+
+        std::visit(VariantVisitor{ [](Undefined) {},
+                                   [](Emittable) {},
+                                   [&castedData, destType, &value](auto&& data) {
+                                       auto ptrBegin = data;
+                                       auto ptrEnd = data + value.GetLayout().GetMemorySize();
+
+                                       switch (destType)
+                                       {
+                                       case ValueType::Boolean:
+                                           castedData = std::vector<Boolean>(ptrBegin, ptrEnd);
+                                           break;
+                                       case ValueType::Char8:
+                                           castedData = std::vector<char>(ptrBegin, ptrEnd);
+                                           break;
+                                       case ValueType::Byte:
+                                           castedData = std::vector<uint8_t>(ptrBegin, ptrEnd);
+                                           break;
+                                       case ValueType::Int16:
+                                           castedData = std::vector<int16_t>(ptrBegin, ptrEnd);
+                                           break;
+                                       case ValueType::Int32:
+                                           castedData = std::vector<int32_t>(ptrBegin, ptrEnd);
+                                           break;
+                                       case ValueType::Int64:
+                                           castedData = std::vector<int64_t>(ptrBegin, ptrEnd);
+                                           break;
+                                       case ValueType::Float:
+                                           castedData = std::vector<float>(ptrBegin, ptrEnd);
+                                           break;
+                                       case ValueType::Double:
+                                           castedData = std::vector<double>(ptrBegin, ptrEnd);
+                                           break;
+                                       default:
+                                           throw LogicException(LogicExceptionErrors::notImplemented);
+                                       }
+                                   } },
+                   value.GetUnderlyingData());
+
+        Value castedValue = StoreConstantData(std::move(castedData));
+        castedValue.SetLayout(value.GetLayout());
+        return castedValue;
+    }
+
     bool ComputeContext::ValidateValue(Value value)
     {
         return value.IsDefined() && !value.IsEmpty() && value.IsConstant();
@@ -410,6 +539,29 @@ namespace value
     bool ComputeContext::TypeCompatible(Value value1, Value value2)
     {
         return value1.GetBaseType() == value2.GetBaseType() && value1.PointerLevel() == value2.PointerLevel();
+    }
+
+    std::string ComputeContext::GetScopeAdjustedName(GlobalAllocationScope scope, std::string name) const
+    {
+        switch (scope)
+        {
+        case GlobalAllocationScope::Global:
+            return GetGlobalScopedName(name);
+        case GlobalAllocationScope::Function:
+            return GetCurrentFunctionScopedName(name);
+        }
+
+        throw LogicException(LogicExceptionErrors::illegalState);
+    }
+
+    std::string ComputeContext::GetGlobalScopedName(std::string name) const { return _moduleName + "_" + name; }
+
+    std::string ComputeContext::GetCurrentFunctionScopedName(std::string name) const
+    {
+        // Our stack always has one empty "scope" pushed to it, which we
+        // can use to create our global prefix.
+
+        return GetGlobalScopedName(_stack.top().first + "_" + name);
     }
 
 } // namespace value

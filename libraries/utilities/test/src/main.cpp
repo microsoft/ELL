@@ -97,7 +97,6 @@ int main(int argc, char* argv[])
         TestInOrderFunctionEvaluator();
         TestApplyToEach();
         TestFunctionTraits();
-        TestApplyFunction();
 
         // File system tests
         TestStringf();

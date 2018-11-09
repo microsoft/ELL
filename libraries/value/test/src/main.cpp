@@ -35,6 +35,7 @@ int main()
             Matrix_test2();
             Tensor_test1();
             Tensor_test2();
+            Casting_test1();
         }
     }
     catch (const Exception& exception)
