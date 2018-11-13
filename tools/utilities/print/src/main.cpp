@@ -53,6 +53,7 @@ bool IsNeuralNetworkPredictorNode(const ell::model::Node* node)
 
 int main(int argc, char* argv[])
 {
+    int rc = 0;
     try
     {
         // create a command line parser
@@ -124,7 +125,7 @@ int main(int argc, char* argv[])
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
         std::cout << exception.GetHelpText() << std::endl;
-        return 0;
+        rc = 0;
     }
     catch (const utilities::CommandLineParserErrorException& exception)
     {
@@ -133,29 +134,29 @@ int main(int argc, char* argv[])
         {
             std::cerr << error.GetMessage() << std::endl;
         }
-        return 1;
+        rc = 1;
     }
     catch (utilities::LogicException& exception)
     {
         std::cerr << "runtime error: " << exception.GetMessage() << std::endl;
-        return 1;
+        rc = 1;
     }
     catch (utilities::InputException& exception)
     {
         std::cerr << "input error: " << exception.GetMessage() << std::endl;
-        return 1;
+        rc = 1;
     }
     catch (std::exception& exception)
     {
         std::cerr << "unknown error: " << exception.what() << std::endl;
-        return 1;
+        rc = 1;
     }
     catch (...)
     {
         std::cerr << "unknown exception" << std::endl;
-        return 1;
+        rc = 1;
     }
 
     // the end
-    return 0;
+    return rc;
 }

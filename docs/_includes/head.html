@@ -31,15 +31,9 @@
     <![endif]-->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.0.7/vega.js"
-	    integrity="sha384-lTiihlzw56u8ddKdySsnIoGvP2wNsnPs8TJROeaYggGaXsoSsmsuwa/LrT9vIgxn"
-	    crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.0.1/vega-lite.js"
-	    integrity="sha384-dQDJ36KolVmnNdVvVW0SpWAA/3wm9z6xCJ2uWHvBsaVn2lOTeS0biBx57HJt6/jV"
-	    crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0-rc7/vega-embed.js"
-	    integrity="sha384-eu4jtlWUO/nh/2m8Km6pA4enzgLFAexBTyAX4ZqLnV6MVT1Y+zlHRuXMhusTaIxa"
-	    crossorigin="anonymous"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/vega@4.3.0/build/vega.min.js" integrity="sha256-QKcPGUBQE/JmQRSVb80hrlR/NIuvAS2ElMkLVDTCyYU=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc8/build/vega-lite.min.js" integrity="sha256-WnU1pkHhwOsespeG6pMs7qn7M3jtLSyl+magtBT0f9E=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@3.23.1/build/vega-embed.min.js" integrity="sha256-mTFA1v+GmM3q4AcPsZfGKBfAbdeabn+pKwECKrBMvG0=" crossorigin="anonymous"></script>
   </head>
   
 <body class="{{ post.title | downcase | replace:' ','-' | replace:',','' | strip_html }}{% if page.category %} category-{{ page.category }}{% endif %}{% if page.layout-class %} layout-{{ page.layout-class }}{% endif %}">

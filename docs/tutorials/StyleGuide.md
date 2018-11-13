@@ -141,6 +141,7 @@ To install OpenBLAS, type:
 Code blocks are part of the markdown spec, but syntax highlighting isn't. However, many renderers (including GitHub) support syntax highlighting.
 
 - Use `back-ticks` around inline `code`.
+- Write file names in **bold**.
 - For blocks of code, start and end the code block  with three back-ticks.
 
 Examples for JavaScript and Python:

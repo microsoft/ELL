@@ -25,4 +25,5 @@ permalink: /tutorials/
 
 ## Audio Classification Tutorials in Python
 
-* [Getting started with audio keyword classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-audio-keyword-classification-on-the-Raspberry-Pi/)
+* [Getting started with audio keyword spotting on the Raspberry Pi](/ELL/tutorials/Getting-started-with-audio-keyword-spotting-on-the-Raspberry-Pi/)
+* [Training an audio keyword spotter with PyTorch](/ELL/tutorials/Training-audio-keyword-spotter-with-pytorch/)

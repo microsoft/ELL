@@ -1,0 +1,131 @@
+###################################################################################################
+##
+##  Project:  Embedded Learning Library (ELL)
+##  File:     model_editor.py
+##  Authors:  Chris Lovett
+##
+##  Requires: Python 3.x
+##
+###################################################################################################
+
+import argparse
+import os
+import sys
+import time
+
+import numpy as np
+import find_ell_root
+import ell
+
+class ModelEditor:
+    """ Helper class that can modify an ELL model """
+    
+    def __init__(self, filename):
+        """
+        Create new ModelEditor class 
+        """
+        # load the ELL model.
+        self.map = ell.model.Map(filename)
+        self.model = self.map.GetModel()
+        self.builder = ell.model.ModelBuilder()
+        self.vad_node = None
+
+    def add_vad(self, rnn, sample_rate, window_size, tau_up, tau_down, large_input, gain_att, threshold_up, threshold_down, level_threshold):
+        """
+        Add a VoiceActivityDetectorNode as the "resetTrigger" input to the given RNN, LSTM or GRU node.
+        """
+        frame_duration = float(window_size) / float(sample_rate)
+        reset_port = rnn.GetInputPort("resetTrigger")
+        name = reset_port.GetParentNodes().Get().GetRuntimeTypeName()
+        if not "VoiceActivityDetector" in name:
+            # replace dummy trigger with VAD node
+            if not self.vad_node:
+                input_port = rnn.GetInputPort("input")
+                input_node = input_port.GetParentNodes().Get()
+                self.vad_node = self.builder.AddVoiceActivityDetectorNode(self.model,                 
+                                ell.nodes.PortElements(input_node.GetOutputPort("output")),
+                                sample_rate, frame_duration, tau_up, tau_down, 
+                                large_input, gain_att, threshold_up, 
+                                threshold_down, level_threshold)
+            # make the vad node the "resetTrigger" input of this rnn node
+            reset_output = ell.nodes.PortElements(self.vad_node.GetOutputPort("output"))
+            self.builder.ResetInput(rnn, reset_output, "resetTrigger")
+            return True
+        return False
+
+    def find_rnns(self):
+        """ Find any RNN, LSTM or GRU nodes in the model """
+        result = []
+        iter = self.model.GetNodes()
+        while iter.IsValid():
+            node = iter.Get()
+            name = node.GetRuntimeTypeName()
+            if "RNN" in name or "GRU" in name or "LSTM" in name:
+                result += [ node ]
+            iter.Next() 
+        return result
+
+    def save(self, filename):
+        self.map.Save(filename)
+
+
+    def find_sink_node(self, target):
+        iter = self.model.GetNodes()
+        changed = False
+        found = False
+        while iter.IsValid():
+            node = iter.Get()
+            if "SinkNode" in node.GetRuntimeTypeName():
+                parent = node.GetInputPort("input").GetParentNodes().Get()
+                if parent.GetId() == target.GetId():
+                    return True
+
+            iter.Next() 
+        return False
+
+    def add_sink_node(self, node, functionName):
+        """
+        Add a SinkNode so you can get a callback with the output of the given node id.
+        """
+        if self.find_sink_node(node):
+            print("node '{}' already has a SinkNode".format(node.GetRuntimeTypeName()))
+            return False
+        output_port = node.GetOutputPort("output")
+        size = list(output_port.GetMemoryLayout().size)
+        while len(size) < 3:
+            size = [1] + size
+        shape = ell.math.TensorShape(size[0], size[1], size[2])
+        sink = self.builder.AddSinkNode(self.model, ell.nodes.PortElements(output_port), shape, functionName)
+        return True
+
+    def attach_sink(self, nameExpr, functionName):
+        """
+        Process the given ELL model and insert SinkNode to monitor output of the given node
+        """
+        iter = self.model.GetNodes()
+        changed = False
+        found = False
+        while iter.IsValid():
+            node = iter.Get()
+            if nameExpr in node.GetRuntimeTypeName():
+                found = True
+                changed |= self.add_sink_node(node, functionName)
+                break
+            iter.Next() 
+        if not found:
+            print("model does not contain any nodes matching expression: {}".format(nameExpr))        
+        return changed
+
+    def get_input_node(self):
+        """ return the model input node """
+        iter = self.model.GetNodes()
+        changed = False
+        found = False
+        while iter.IsValid():
+            node = iter.Get()
+            if "InputNode" in node.GetRuntimeTypeName():
+                return node
+            iter.Next() 
+        return None
+
+    
