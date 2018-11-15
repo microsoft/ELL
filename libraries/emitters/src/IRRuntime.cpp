@@ -265,26 +265,26 @@ namespace emitters
             // QueryPerformanceFrequency(&freq);
             emitter.Call(qpfFunction, { freqVar });
 
-            auto timeDouble = emitter.CastIntToFloat(emitter.Load(timeVar), VariableType::Double, true);
-            auto freqDouble = emitter.CastIntToFloat(emitter.Load(freqVar), VariableType::Double, true);
+            auto timeDouble = emitter.CastValue(emitter.Load(timeVar), VariableType::Double);
+            auto freqDouble = emitter.CastValue(emitter.Load(freqVar), VariableType::Double);
             // double seconds = (double)time.QuadPart / (double)freq.QuadPart;
             auto seconds = emitter.Operator(TypedOperator::divideFloat, timeDouble, freqDouble);
 
             // int32_t sec = (int64_t)seconds;
-            auto intSeconds = emitter.CastFloatToInt(seconds, VariableType::Int64);
-            auto floatSeconds = emitter.CastIntToFloat(intSeconds, VariableType::Double, true);
+            auto intSeconds = emitter.CastValue(seconds, VariableType::Int64);
+            auto floatSeconds = emitter.CastValue(intSeconds, VariableType::Double);
 
             //  tp->tv_nsec = (int32_t)((seconds - sec) * 10000000);
             auto remainder = emitter.Operator(TypedOperator::subtractFloat, seconds, floatSeconds);
             auto nanoseconds = emitter.Operator(TypedOperator::multiplyFloat, remainder, hundredNanoSeconds);
 
             // STYLE matching casing style of timespec struct members
-            auto tv_nsec = emitter.CastFloatToInt(nanoseconds, tmFieldVarType);
+            auto tv_nsec = emitter.CastValue(nanoseconds, tmFieldVarType);
             emitter.Store(nanoPtr, tv_nsec);
 
             // tp->tv_sec = sec;
             // STYLE matching casing style of timespec struct members
-            auto tv_sec = emitter.CastFloatToInt(floatSeconds, tmFieldVarType);
+            auto tv_sec = emitter.CastValue(floatSeconds, tmFieldVarType);
             emitter.Store(secondsPtr, tv_sec);
 
             emitter.Return(zero);
@@ -342,13 +342,12 @@ namespace emitters
                 auto callResult = function.Call(getTimeFunction, { function.Literal(CLOCK_REALTIME), timeStruct });
                 UNUSED(callResult);
 
-                // LLVMValue timeStructBase = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, function.Literal(0));
                 auto secondsPtr = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, { function.Literal(0), function.Literal(0) });
                 auto nanosecondsPtr = irBuilder.CreateInBoundsGEP(timespecType, timeStruct, { function.Literal(0), function.Literal(1) });
                 auto secondsIntVal = function.Load(secondsPtr);
                 auto nanosecondsIntVal = function.Load(nanosecondsPtr);
-                auto secondsDoubleVal = emitter.CastIntToFloat(secondsIntVal, VariableType::Double, true);
-                auto nanosecondsDoubleVal = emitter.CastIntToFloat(nanosecondsIntVal, VariableType::Double, false);
+                auto secondsDoubleVal = emitter.CastValue(secondsIntVal, VariableType::Double);
+                auto nanosecondsDoubleVal = emitter.CastUnsignedValue(nanosecondsIntVal, VariableType::Double);
                 auto divisor = function.Literal(1000000000.0);
                 auto totalSecondsDoubleVal = function.Operator(TypedOperator::addFloat, secondsDoubleVal, function.Operator(TypedOperator::divideFloat, nanosecondsDoubleVal, divisor));
                 function.Return(function.Operator(TypedOperator::multiplyFloat, totalSecondsDoubleVal, function.Literal(1000.0)));

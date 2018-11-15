@@ -92,12 +92,12 @@ namespace emitters
         }
     }
 
-    void IRForLoopEmitter::EmitCondition(TypedComparison type, LLVMValue pTestValue)
+    void IRForLoopEmitter::EmitCondition(TypedComparison comparison, LLVMValue pTestValue)
     {
         _functionEmitter.Branch(_pConditionBlock);
         _functionEmitter.SetCurrentBlock(_pConditionBlock);
         {
-            _functionEmitter.Branch(type, _functionEmitter.Load(_pIterationVariable), pTestValue, _pBodyBlock, _pAfterBlock); // TODO: add loop metadata to the branch instruction
+            _functionEmitter.Branch(comparison, _functionEmitter.Load(_pIterationVariable), pTestValue, _pBodyBlock, _pAfterBlock); // TODO: add loop metadata to the branch instruction
         }
     }
 

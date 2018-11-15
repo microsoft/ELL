@@ -165,15 +165,55 @@ namespace emitters
         /// <returns> Pointer to an llvm::Value that represents the function argument. </returns>
         LLVMValue LoadArgument(llvm::Argument& argument);
 
-        /// <summary> Emit a value-preserving cast operation from one type to another. </summary>
+        /// <summary> Emit a value-preserving cast operation to another type. </summary>
         ///
-        /// <typeparam name="InputType"> The input type. </typeparam>
         /// <typeparam name="OuputType"> The output type. </typeparam>
         /// <param name="pValue"> Pointer to the input value. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
-        template <typename InputType, typename OutputType>
+        template <typename OutputType>
         LLVMValue CastValue(LLVMValue pValue);
+
+        /// <summary> Emit a value-preserving cast operation from one type to another. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="destinationType"> Output type. </param>
+        ///
+        /// <returns> Pointer to the output value. </returns>
+        LLVMValue CastValue(LLVMValue pValue, VariableType destinationType);
+
+        /// <summary> Emit a value-preserving cast operation from an unsigned integral type to another type. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="destinationType"> Output type. </param>
+        ///
+        /// <returns> Pointer to the output value. </returns>
+        LLVMValue CastValue(LLVMValue pValue, LLVMType destinationType);
+
+        /// <summary> Emit a value-preserving cast operation from an unsigned integral type to another type. </summary>
+        ///
+        /// <typeparam name="OuputType"> The output type. </typeparam>
+        /// <param name="pValue"> Pointer to the input value. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        template <typename OutputType>
+        LLVMValue CastUnsignedValue(LLVMValue pValue);
+
+        /// <summary> Emit a value-preserving cast operation from an unsigned integral type to another type. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="destinationType"> Output type. </param>
+        ///
+        /// <returns> Pointer to the output value. </returns>
+        LLVMValue CastUnsignedValue(LLVMValue pValue, VariableType destinationType);
+
+        /// <summary> Emit a value-preserving cast operation from one type to another. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="destinationType"> Output type. </param>
+        ///
+        /// <returns> Pointer to the output value. </returns>
+        LLVMValue CastUnsignedValue(LLVMValue pValue, LLVMType destinationType);
 
         /// <summary> Emit cast to a given type. </summary>
         ///
@@ -197,7 +237,7 @@ namespace emitters
         /// <param name="valueType"> The type to cast to. Must be a pointer type. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
-        LLVMValue CastPointer(LLVMValue pValue, LLVMType valueType);
+        LLVMValue CastPointer(LLVMValue pValue, VariableType valueType);
 
         /// <summary> Emit pointer cast to a given pointer type. </summary>
         ///
@@ -205,7 +245,15 @@ namespace emitters
         /// <param name="valueType"> The type to cast to. Must be a pointer type. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
-        LLVMValue CastPointer(LLVMValue pValue, VariableType valueType);
+        LLVMValue CastPointer(LLVMValue pValue, LLVMType valueType);
+
+        /// <summary> Emit a cast from an integer type to a pointer. </summary>
+        ///
+        /// <param name="pValue"> Input value. </param>
+        /// <param name="destinationType"> Output pointer type. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        LLVMValue CastIntToPointer(LLVMValue pValue, VariableType destinationType);
 
         /// <summary> Emit a cast from an integer type to a pointer. </summary>
         ///
@@ -221,24 +269,15 @@ namespace emitters
         /// <param name="destinationType"> Output pointer type. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        LLVMValue CastPointerToInt(LLVMValue pValue, VariableType destinationType);
+
+        /// <summary> Emit a cast from a pointer to an integer type. </summary>
+        ///
+        /// <param name="pValue"> Input value. </param>
+        /// <param name="destinationType"> Output pointer type. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         LLVMValue CastPointerToInt(LLVMValue pValue, LLVMType destinationType);
-
-        /// <summary> Emit a cast from int to float. </summary>
-        ///
-        /// <param name="pValue"> Pointer to the input value. </param>
-        /// <param name="destinationType"> Output type (float or double). </param>
-        /// <param name="isSigned"> true if the value is signed. </param>
-        ///
-        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
-        LLVMValue CastIntToFloat(LLVMValue pValue, VariableType destinationType, bool isSigned);
-
-        /// <summary> Emit a cast from float to int. </summary>
-        ///
-        /// <param name="pValue"> Pointer to the input value. </param>
-        /// <param name="destinationType"> Output type (int32 or int64). </param>
-        ///
-        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
-        LLVMValue CastFloatToInt(LLVMValue pValue, VariableType destinationType = VariableType::Int32);
 
         /// <summary> Emit a cast from bool to byte. </summary>
         ///
@@ -247,12 +286,12 @@ namespace emitters
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         LLVMValue CastBoolToByte(LLVMValue pValue);
 
-        /// <summary> Emit a cast from bool to int. </summary>
+        /// <summary> Emit a cast from an arbitrary value to a 1-bit boolean. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
-        LLVMValue CastBoolToInt(LLVMValue pValue);
+        LLVMValue CastToConditionalBool(LLVMValue pValue);
 
         /// <summary> Emit a call to a function with a single optional argument. </summary>
         ///
@@ -424,7 +463,7 @@ namespace emitters
 
         /// <summary> Emit a conditional branch. </summary>
         ///
-        /// <param name="pConditionValue"> Pointer to the condition value. </param>
+        /// <param name="pConditionValue"> Pointer to the condition value. A nonzero value is interpreted as true, and zero as false. </param>
         /// <param name="pThenBlock"> Pointer to the THEN block. </param>
         /// <param name="pElseBlock"> Pointer to the ELSE block. </param>
         void Branch(LLVMValue pConditionValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);

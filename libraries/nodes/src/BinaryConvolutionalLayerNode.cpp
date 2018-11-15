@@ -840,7 +840,7 @@ namespace nodes
             assert(xorSum != nullptr);
 
             // Output scaling
-            auto sumInt = function.CastValue<PackedBitsType, int>(xorSum);
+            auto sumInt = function.CastValue<int>(xorSum);
             auto scaledSum = (function.LocalScalar<int>(-2) * sumInt) + (numBits * packedRowSize);
 
             auto scaledSumWithPadding = scaledSum;
@@ -850,7 +850,7 @@ namespace nodes
                 emitters::LLVMValue paddingSum = function.ValueAt(pInputPaddingMaskSums, outputColumnIndex);
                 scaledSumWithPadding = scaledSum - paddingSum;
             }
-            auto sumFloat = function.CastValue<int, ValueType>(scaledSumWithPadding);
+            auto sumFloat = function.CastValue<ValueType>(scaledSumWithPadding);
 
             auto adjustedSum = function.LocalScalar(sumFloat);
             if (partialBlockSize != 0)

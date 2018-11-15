@@ -52,7 +52,7 @@ namespace nodes
                     for (int channelIndex = 0; channelIndex < channels; ++channelIndex)
                     {
                         emitters::IRLocalScalar val = blockArray({ rowIndex, columnIndex, channelIndex });
-                        function.Printf("%f ", { function.CastValue<ValueType, double>(val) });
+                        function.Printf("%f ", { function.CastValue<double>(val) });
                     }
                     function.Print("  ");
                 }

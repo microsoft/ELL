@@ -26,6 +26,7 @@ void TestLogicalNot();
 void TestForLoop();
 void TestWhileLoopWithVariableCondition();
 void TestWhileLoopWithFunctionCondition();
+void TestWhileLoopWithInt32Condition();
 void TestMetadata();
 void TestHeader();
 void TestTwoEmitsInOneSession();
@@ -36,3 +37,6 @@ void TestScopedIf();
 void TestScopedIfElse();
 void TestScopedIfElse2();
 void TestElseIfWithComputedCondition();
+
+void TestCastValue();
+void TestCastToConditionalBool();

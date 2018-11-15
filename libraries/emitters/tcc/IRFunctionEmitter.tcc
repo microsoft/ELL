@@ -28,10 +28,16 @@ namespace emitters
         return _pEmitter->Pointer(value);
     }
 
-    template <typename InputType, typename OutputType>
+    template <typename OutputType>
     LLVMValue IRFunctionEmitter::CastValue(LLVMValue pValue)
     {
-        return _pEmitter->CastValue<InputType, OutputType>(pValue);
+        return _pEmitter->CastValue<OutputType>(pValue);
+    }
+
+    template <typename OutputType>
+    LLVMValue IRFunctionEmitter::CastUnsignedValue(LLVMValue pValue)
+    {
+        return _pEmitter->CastValue<OutputType>(pValue);
     }
 
     template <typename ValueType>

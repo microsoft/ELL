@@ -72,7 +72,7 @@ namespace nodes
 
         function.For(count, [pInput, pResult](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             emitters::LLVMValue inputValue = function.ValueAt(pInput, i);
-            emitters::LLVMValue castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
+            emitters::LLVMValue castElement = function.CastValue<OutputValueType>(inputValue);
             function.SetValueAt(pResult, i, castElement);
         });
     }
@@ -85,7 +85,7 @@ namespace nodes
         for (size_t i = 0; i < input.Size(); ++i)
         {
             emitters::LLVMValue inputValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
-            emitters::LLVMValue castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
+            emitters::LLVMValue castElement = function.CastValue<OutputValueType>(inputValue);
             function.SetValueAt(pResult, function.Literal((int)i), castElement);
         }
     }

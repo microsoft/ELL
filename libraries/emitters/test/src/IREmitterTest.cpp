@@ -360,7 +360,7 @@ void TestLogicalAnd()
         llvm::Argument& val3 = *args++;
 
         auto result = fn.LogicalAnd(fn.Comparison(TypedComparison::equals, &val1, &val2), fn.Comparison(TypedComparison::equals, &val2, &val3));
-        fn.Return(fn.CastValue<bool, int32_t>(result));
+        fn.Return(fn.CastValue<int32_t>(result));
     }
     module.EndFunction();
 
@@ -393,7 +393,7 @@ void TestLogicalOr()
         llvm::Argument& val3 = *args++;
 
         auto result = fn.LogicalOr(fn.Comparison(TypedComparison::equals, &val1, &val2), fn.Comparison(TypedComparison::equals, &val2, &val3));
-        fn.Return(fn.CastValue<bool, int32_t>(result));
+        fn.Return(fn.CastValue<int32_t>(result));
     }
     module.EndFunction();
 
@@ -425,7 +425,7 @@ void TestLogicalNot()
         llvm::Argument& val2 = *args++;
 
         auto result = fn.LogicalNot(fn.Comparison(TypedComparison::equals, &val1, &val2));
-        fn.Return(fn.CastValue<bool, int32_t>(result));
+        fn.Return(fn.CastValue<int32_t>(result));
     }
     module.EndFunction();
 
@@ -530,6 +530,29 @@ void TestWhileLoopWithFunctionCondition()
     auto result = jittedFunction();
     const int expectedResult = 10;
     testing::ProcessTest("Testing while loop with function exit condition", result == expectedResult);
+}
+
+void TestWhileLoopWithInt32Condition()
+{
+    auto module = MakeHostModuleEmitter("WhileLoop");
+    auto int32Type = VariableType::Int32;
+    auto fn = module.BeginFunction("TestWhileLoop", int32Type);
+    {
+        auto i = fn.Variable(int32Type);
+        fn.Store(i, fn.Literal<int>(5));
+        fn.While(i, [i](IRFunctionEmitter& fn) {
+            fn.OperationAndUpdate(i, TypedOperator::subtract, fn.Literal<int>(1)); // --i
+        });
+
+        fn.Return(fn.Load(i));
+    }
+    module.EndFunction();
+
+    IRExecutionEngine jit(std::move(module));
+    auto jittedFunction = jit.GetFunction<int32_t()>("TestWhileLoop");
+    auto result = jittedFunction();
+    const int expectedResult = 0;
+    testing::ProcessTest("Testing while loop with int32 condition", result == expectedResult);
 }
 
 void TestMetadata()
@@ -876,8 +899,8 @@ void TestElseIfWithComputedCondition()
     auto fn = module.BeginFunction("ElseIfComputedConditionTest", returnType, parameters);
     {
         auto arguments = fn.Arguments().begin();
-        auto a = fn.LocalScalar(&(*arguments++)); // char* array
-        auto b = fn.LocalScalar(&(*arguments++)); // char* array
+        auto a = fn.LocalScalar(&(*arguments++));
+        auto b = fn.LocalScalar(&(*arguments++));
 
         auto result = fn.Variable(returnType, "result");
         fn.Store(result, fn.Literal(0));
@@ -916,4 +939,114 @@ void TestElseIfWithComputedCondition()
     }
 
     testing::ProcessTest("Testing elseif with inline condition", success);
+}
+
+template <typename InT, typename OutT>
+void TestCastValue()
+{
+    auto module = MakeHostModuleEmitter("CastValue");
+    VariableType inType = emitters::GetVariableType<InT>();
+    VariableType outType = emitters::GetVariableType<OutT>();
+    const emitters::NamedVariableTypeList parameters = { { "x", inType } };
+    auto fn = module.BeginFunction("CastValue", outType, parameters);
+    {
+        auto arguments = fn.Arguments().begin();
+        auto x = fn.LocalScalar(&(*arguments++));
+        auto result = fn.CastValue(x, outType);
+        fn.Return(result);
+    }
+    module.EndFunction();
+
+    fn.Verify();
+
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<OutT(InT)>("CastValue");
+
+    bool success = true;
+    auto trials = std::vector<InT>{ 1, 2, 35, 4216 };
+    for (auto val : trials)
+    {
+        auto result = testFn(val);
+        auto expected = static_cast<OutT>(val);
+        success = success && (result == expected);
+    }
+
+    testing::ProcessTest("Testing CastValue", success);
+}
+
+void TestCastValue()
+{
+    // short, int, int64_t, float, double
+    TestCastValue<short, short>();
+    TestCastValue<short, int>();
+    TestCastValue<short, int64_t>();
+    TestCastValue<short, float>();
+    TestCastValue<short, double>();
+
+    TestCastValue<int, short>();
+    TestCastValue<int, int>();
+    TestCastValue<int, int64_t>();
+    TestCastValue<int, float>();
+    TestCastValue<int, double>();
+
+    TestCastValue<int64_t, short>();
+    TestCastValue<int64_t, int>();
+    TestCastValue<int64_t, int64_t>();
+    TestCastValue<int64_t, float>();
+    TestCastValue<int64_t, double>();
+
+    TestCastValue<float, short>();
+    TestCastValue<float, int>();
+    TestCastValue<float, int64_t>();
+    TestCastValue<float, float>();
+    TestCastValue<float, double>();
+
+    TestCastValue<double, short>();
+    TestCastValue<double, int>();
+    TestCastValue<double, int64_t>();
+    TestCastValue<double, float>();
+    TestCastValue<double, double>();
+}
+
+template <typename InT>
+void TestCastToConditionalBool()
+{
+    auto module = MakeHostModuleEmitter("CastToConditionalBool");
+    VariableType inType = emitters::GetVariableType<InT>();
+    VariableType outType = emitters::GetVariableType<bool>();
+    const emitters::NamedVariableTypeList parameters = { { "x", inType } };
+    auto fn = module.BeginFunction("CastToConditionalBool", outType, parameters);
+    {
+        auto arguments = fn.Arguments().begin();
+        auto x = fn.LocalScalar(&(*arguments++));
+        auto result = fn.CastToConditionalBool(x);
+        fn.Return(result);
+    }
+    module.EndFunction();
+
+    fn.Verify();
+
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<bool(InT)>("CastToConditionalBool");
+
+    bool success = true;
+    auto trials = std::vector<InT>{ 1, 2, 35 };
+    for (auto val : trials)
+    {
+        auto result = testFn(val);
+        auto expected = val != 0;
+        success = success && (result == expected);
+    }
+
+    testing::ProcessTest("Testing CastToConditionalBool", success);
+}
+
+void TestCastToConditionalBool()
+{
+    TestCastToConditionalBool<char>();
+    TestCastToConditionalBool<short>();
+    TestCastToConditionalBool<int>();
+    TestCastToConditionalBool<int64_t>();
+    TestCastToConditionalBool<float>();
+    TestCastToConditionalBool<double>();
 }

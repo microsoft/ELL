@@ -454,7 +454,7 @@ namespace nodes
             auto w = function.LocalScalar(function.ValueAt(twiddleFactorsVar, k));
 #else
             // w = e^i(2*pi*k/N)
-            auto kValue = function.LocalScalar(function.CastValue<int, ValueType>(k));
+            auto kValue = function.LocalScalar(function.CastValue<ValueType>(k));
             auto w = detail::ImaginaryExp(function.LocalScalar(pi / halfN) * kValue);
 #endif
 
@@ -548,7 +548,7 @@ namespace nodes
             auto w = function.LocalScalar(function.ValueAt(twiddleFactorsVar, k));
 #else
             // w = e^i(2*pi*k/N)
-            auto kValue = function.LocalScalar(function.CastValue<int, ValueType>(k));
+            auto kValue = function.LocalScalar(function.CastValue<ValueType>(k));
             auto w = detail::ImaginaryExp(function.LocalScalar(pi / halfN) * kValue);
 #endif
 

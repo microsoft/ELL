@@ -178,7 +178,7 @@ namespace nodes
             emitters::LLVMValue inputValue1 = function.ValueAt(pInput1, i);
             emitters::LLVMValue inputValue2 = function.ValueAt(pInput2, i);
             emitters::LLVMValue pOpResult = function.Comparison(cmp, inputValue1, inputValue2);
-            // LLVM internally uses 1 bit for boolean. We use integers to store boolean results (see CompileElementSelector). That requires a typecast in LLVM
+            // LLVM internally uses 1 bit for boolean. We use integers to store boolean results. That requires a typecast in LLVM
             function.SetValueAt(pResult, i, function.CastBoolToByte(pOpResult));
         });
     }
@@ -193,17 +193,7 @@ namespace nodes
         {
             emitters::LLVMValue inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
             emitters::LLVMValue inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
-
-            if (inputValue1->getType()->isIntegerTy())
-            {
-                function.Printf("input 1: %d, input 2: %d\n", { inputValue1, inputValue2 });
-            }
-            else if (inputValue1->getType()->isFloatingPointTy())
-            {
-                function.Printf("input1 : %f, input 2: %f\n", { function.CastValue<float, double>(inputValue1), function.CastValue<float, double>(inputValue2) });
-            }
             emitters::LLVMValue pOpResult = function.Comparison(emitters::GetComparison<ValueType>(GetPredicate()), inputValue1, inputValue2);
-
             function.SetValueAt(pResult, function.Literal((int)i), function.CastBoolToByte(pOpResult));
         }
     }

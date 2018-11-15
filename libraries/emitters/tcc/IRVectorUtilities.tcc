@@ -35,7 +35,13 @@ namespace emitters
     LLVMValue HorizontalVectorSum(IRFunctionEmitter& function, LLVMValue vectorValue)
     {
         LLVMType type = vectorValue->getType();
-        assert(type->isVectorTy() && "Must have vector type");
+
+        // Allow calling HorizontalVectorSum to be a no-op on a scalar
+        if (!type->isVectorTy())
+        {
+            return vectorValue;
+        }
+        
         llvm::VectorType* vecType = llvm::cast<llvm::VectorType>(type);
         assert(vecType != nullptr);
 

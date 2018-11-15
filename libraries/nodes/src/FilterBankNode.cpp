@@ -81,7 +81,7 @@ namespace nodes
                 auto inputVal = function.LocalScalar(function.ValueAt(pInput, index));
                 auto numer = index - begin;
                 auto denom = center - begin;
-                auto val = inputVal * ((function.LocalScalar(function.CastValue<int, ValueType>(numer)) + half) / function.LocalScalar(function.CastValue<int, ValueType>(denom)));
+                auto val = inputVal * ((function.LocalScalar(function.CastValue<ValueType>(numer)) + half) / function.LocalScalar(function.CastValue<ValueType>(denom)));
                 function.Store(sum, function.LocalScalar(function.Load(sum)) + val);
             });
 
@@ -91,7 +91,7 @@ namespace nodes
                 auto inputVal = function.LocalScalar(function.ValueAt(pInput, index));
                 auto numer = end - index;
                 auto denom = end - center;
-                auto val = inputVal * ((function.LocalScalar(function.CastValue<int, ValueType>(numer)) - half) / function.LocalScalar(function.CastValue<int, ValueType>(denom)));
+                auto val = inputVal * ((function.LocalScalar(function.CastValue<ValueType>(numer)) - half) / function.LocalScalar(function.CastValue<ValueType>(denom)));
                 function.Store(sum, function.LocalScalar(function.Load(sum)) + val);
             });
 

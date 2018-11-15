@@ -223,6 +223,26 @@ namespace emitters
         return _pEmitter->Load(&argument);
     }
 
+    LLVMValue IRFunctionEmitter::CastValue(LLVMValue pValue, VariableType valueType)
+    {
+        return _pEmitter->CastValue(pValue, valueType);
+    }
+
+    LLVMValue IRFunctionEmitter::CastValue(LLVMValue pValue, LLVMType valueType)
+    {
+        return _pEmitter->CastValue(pValue, valueType);
+    }
+
+    LLVMValue IRFunctionEmitter::CastUnsignedValue(LLVMValue pValue, VariableType valueType)
+    {
+        return _pEmitter->CastUnsignedValue(pValue, valueType);
+    }
+
+    LLVMValue IRFunctionEmitter::CastUnsignedValue(LLVMValue pValue, LLVMType valueType)
+    {
+        return _pEmitter->CastUnsignedValue(pValue, valueType);
+    }
+
     LLVMValue IRFunctionEmitter::BitCast(LLVMValue pValue, VariableType valueType)
     {
         return _pEmitter->BitCast(pValue, valueType);
@@ -233,53 +253,44 @@ namespace emitters
         return _pEmitter->BitCast(pValue, valueType);
     }
 
-    LLVMValue IRFunctionEmitter::CastPointer(LLVMValue pValue, LLVMType valueType)
-    {
-        if (!valueType->isPointerTy())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Type argument must be a pointer type");
-        }
-        return _pEmitter->CastPointer(pValue, valueType);
-    }
-
     LLVMValue IRFunctionEmitter::CastPointer(LLVMValue pValue, VariableType valueType)
     {
         return _pEmitter->CastPointer(pValue, valueType);
     }
 
+    LLVMValue IRFunctionEmitter::CastPointer(LLVMValue pValue, LLVMType valueType)
+    {
+        return _pEmitter->CastPointer(pValue, valueType);
+    }
+
+    LLVMValue IRFunctionEmitter::CastIntToPointer(LLVMValue pValue, VariableType valueType)
+    {
+        return _pEmitter->CastIntToPointer(pValue, valueType);
+    }
+
     LLVMValue IRFunctionEmitter::CastIntToPointer(LLVMValue pValue, LLVMType valueType)
     {
-        assert(valueType->isPointerTy());
         return _pEmitter->CastIntToPointer(pValue, valueType);
+    }
+
+    LLVMValue IRFunctionEmitter::CastPointerToInt(LLVMValue pValue, VariableType destinationType)
+    {
+        return _pEmitter->CastPointerToInt(pValue, destinationType);
     }
 
     LLVMValue IRFunctionEmitter::CastPointerToInt(LLVMValue pValue, LLVMType destinationType)
     {
-        assert(pValue->getType()->isPointerTy());
-        assert(destinationType->isIntOrIntVectorTy());
         return _pEmitter->CastPointerToInt(pValue, destinationType);
-    }
-
-    LLVMValue IRFunctionEmitter::CastIntToFloat(LLVMValue pValue, VariableType destinationType, bool isSigned)
-    {
-        assert(pValue->getType()->isIntOrIntVectorTy());
-        return _pEmitter->CastIntToFloat(pValue, destinationType, isSigned);
-    }
-
-    LLVMValue IRFunctionEmitter::CastFloatToInt(LLVMValue pValue, VariableType destinationType)
-    {
-        assert(pValue->getType()->isFPOrFPVectorTy());
-        return _pEmitter->CastFloatToInt(pValue, destinationType);
     }
 
     LLVMValue IRFunctionEmitter::CastBoolToByte(LLVMValue pValue)
     {
-        return _pEmitter->CastInt(pValue, VariableType::Byte, false);
+        return _pEmitter->CastBoolToByte(pValue);
     }
 
-    LLVMValue IRFunctionEmitter::CastBoolToInt(LLVMValue pValue)
+    LLVMValue IRFunctionEmitter::CastToConditionalBool(LLVMValue pValue)
     {
-        return _pEmitter->CastInt(pValue, VariableType::Int32, false);
+        return _pEmitter->CastToConditionalBool(pValue);
     }
 
     LLVMValue IRFunctionEmitter::Call(const std::string& name, LLVMValue pArgument)

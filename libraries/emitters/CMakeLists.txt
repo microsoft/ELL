@@ -89,10 +89,12 @@ set (include
 set (tcc
     tcc/CompilableIRFunction.tcc
     tcc/EmitterTypes.tcc
+    tcc/IREmitter.tcc
     tcc/IRFunctionEmitter.tcc
     tcc/IRLocalScalar.tcc
     tcc/IRModuleEmitter.tcc
     tcc/IRRuntime.tcc
+    tcc/IRVectorUtilities.tcc
     tcc/ScalarVariable.tcc
     tcc/SymbolTable.tcc
     tcc/VectorVariable.tcc

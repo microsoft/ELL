@@ -83,39 +83,39 @@ namespace emitters
         switch (type)
         {
         case VariableType::Void:
-            return GetVariableType(type);
+            return GetBaseVariableType(type);
         case VariableType::VoidPointer:
-            return GetVariableType(VariableType::Void)->getPointerTo();
+            return GetBaseVariableType(VariableType::Void)->getPointerTo();
         case VariableType::Boolean:
-            return GetVariableType(type);
+            return GetBaseVariableType(type);
         case VariableType::Byte:
-            return GetVariableType(type);
+            return GetBaseVariableType(type);
         case VariableType::BytePointer:
-            return GetVariableType(VariableType::Byte)->getPointerTo();
+            return GetBaseVariableType(VariableType::Byte)->getPointerTo();
         case VariableType::Int16:
-            return GetVariableType(type);
+            return GetBaseVariableType(type);
         case VariableType::Int16Pointer:
-            return GetVariableType(VariableType::Int16)->getPointerTo();
+            return GetBaseVariableType(VariableType::Int16)->getPointerTo();
         case VariableType::Int32:
-            return GetVariableType(type);
+            return GetBaseVariableType(type);
         case VariableType::Int32Pointer:
-            return GetVariableType(VariableType::Int32)->getPointerTo();
+            return GetBaseVariableType(VariableType::Int32)->getPointerTo();
         case VariableType::Int64:
-            return GetVariableType(type);
+            return GetBaseVariableType(type);
         case VariableType::Int64Pointer:
-            return GetVariableType(VariableType::Int64)->getPointerTo();
+            return GetBaseVariableType(VariableType::Int64)->getPointerTo();
         case VariableType::Float:
-            return GetVariableType(type);
+            return GetBaseVariableType(type);
         case VariableType::FloatPointer:
-            return GetVariableType(VariableType::Float)->getPointerTo();
+            return GetBaseVariableType(VariableType::Float)->getPointerTo();
         case VariableType::Double:
-            return GetVariableType(type);
+            return GetBaseVariableType(type);
         case VariableType::DoublePointer:
-            return GetVariableType(VariableType::Double)->getPointerTo();
+            return GetBaseVariableType(VariableType::Double)->getPointerTo();
         case VariableType::Char8:
-            return GetVariableType(type);
+            return GetBaseVariableType(type);
         case VariableType::Char8Pointer:
-            return GetVariableType(VariableType::Char8)->getPointerTo();
+            return GetBaseVariableType(VariableType::Char8)->getPointerTo();
         default:
             throw EmitterException(EmitterError::valueTypeNotSupported);
         }
@@ -278,163 +278,87 @@ namespace emitters
     // Typecast
     //
 
-    // bool -> ?
-    template <>
-    LLVMValue IREmitter::CastValue<bool, bool>(LLVMValue pValue)
+    LLVMValue IREmitter::CastValue(LLVMValue pValue, VariableType destinationType)
     {
-        return CastInt(pValue, VariableType::Byte, false);
+        return CastValue(pValue, Type(destinationType));
     }
 
-    template <>
-    LLVMValue IREmitter::CastValue<bool, int>(LLVMValue pValue)
+    LLVMValue IREmitter::CastValue(LLVMValue pValue, LLVMType destinationType)
     {
-        return CastInt(pValue, VariableType::Int32, false);
+        auto inputType = pValue->getType();
+        auto bitType = llvm::Type::getInt1Ty(_llvmContext);
+
+        // Boolean
+        if (destinationType == bitType)
+        {
+            return CastToConditionalBool(pValue);
+        }
+
+        if (inputType == bitType)
+        {
+            if (destinationType->isIntegerTy())
+            {
+                return CastInt(pValue, destinationType, false);
+            }
+            else if (destinationType->isFloatingPointTy())
+            {
+                return CastIntToFloat(pValue, destinationType, false);
+            }
+        }
+        else if (inputType->isIntegerTy())
+        {
+            if (destinationType->isIntegerTy())
+            {
+                return CastInt(pValue, destinationType, true);
+            }
+            else if (destinationType->isFloatingPointTy())
+            {
+                return CastIntToFloat(pValue, destinationType, true);
+            }
+        }
+        else if (inputType->isFloatingPointTy())
+        {
+            if (destinationType->isIntegerTy())
+            {
+                return CastFloatToInt(pValue, destinationType, true);
+            }
+            else if (destinationType->isFloatingPointTy())
+            {
+                return CastFloat(pValue, destinationType);
+            }
+        }
+
+        throw EmitterException(EmitterError::castNotSupported, "Bad cast");
     }
 
-    template <>
-    LLVMValue IREmitter::CastValue<bool, int64_t>(LLVMValue pValue)
+    LLVMValue IREmitter::CastUnsignedValue(LLVMValue pValue, VariableType destinationType)
     {
-        return CastInt(pValue, VariableType::Int64, false);
+        return CastUnsignedValue(pValue, Type(destinationType));
     }
 
-    template <>
-    LLVMValue IREmitter::CastValue<bool, float>(LLVMValue pValue)
+    LLVMValue IREmitter::CastUnsignedValue(LLVMValue pValue, LLVMType destinationType)
     {
-        return CastIntToFloat(pValue, VariableType::Float, false);
-    }
 
-    template <>
-    LLVMValue IREmitter::CastValue<bool, double>(LLVMValue pValue)
-    {
-        return CastIntToFloat(pValue, VariableType::Double, false);
-    }
+        auto inputType = pValue->getType();
+        if (!inputType->isIntegerTy())
+        {
+            throw EmitterException(EmitterError::castNotSupported, "Bad cast");
+        }
 
-    // int -> ?
-    template <>
-    LLVMValue IREmitter::CastValue<int, bool>(LLVMValue pValue)
-    {
-        return CastInt(pValue, VariableType::Byte, true);
-    }
+        if (destinationType->isIntegerTy())
+        {
+            return CastInt(pValue, destinationType, false);
+        }
+        else if (destinationType->isFloatingPointTy())
+        {
+            return CastIntToFloat(pValue, destinationType, false);
+        }
 
-    template <>
-    LLVMValue IREmitter::CastValue<int, int>(LLVMValue pValue)
-    {
-        return CastInt(pValue, VariableType::Int32, true);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<int, int64_t>(LLVMValue pValue)
-    {
-        return CastInt(pValue, VariableType::Int64, true);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<int, float>(LLVMValue pValue)
-    {
-        return CastIntToFloat(pValue, VariableType::Float, true);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<int, double>(LLVMValue pValue)
-    {
-        return CastIntToFloat(pValue, VariableType::Double, true);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<int64_t, bool>(LLVMValue pValue)
-    {
-        return CastInt(pValue, VariableType::Byte, true);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<int64_t, int>(LLVMValue pValue)
-    {
-        return CastInt(pValue, VariableType::Int32, true);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<int64_t, int64_t>(LLVMValue pValue)
-    {
-        return CastInt(pValue, VariableType::Int64, true);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<int64_t, float>(LLVMValue pValue)
-    {
-        return CastIntToFloat(pValue, VariableType::Float, true);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<int64_t, double>(LLVMValue pValue)
-    {
-        return CastIntToFloat(pValue, VariableType::Double, true);
-    }
-
-    // float -> ?
-    template <>
-    LLVMValue IREmitter::CastValue<float, bool>(LLVMValue pValue)
-    {
-        return CastFloatToInt(pValue, VariableType::Byte);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<float, int>(LLVMValue pValue)
-    {
-        return CastFloatToInt(pValue, VariableType::Int32);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<float, int64_t>(LLVMValue pValue)
-    {
-        return CastFloatToInt(pValue, VariableType::Int64);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<float, float>(LLVMValue pValue)
-    {
-        return _irBuilder.CreateFPCast(pValue, Type(VariableType::Float));
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<float, double>(LLVMValue pValue)
-    {
-        return _irBuilder.CreateFPCast(pValue, Type(VariableType::Double));
-    }
-
-    // double -> ?
-    template <>
-    LLVMValue IREmitter::CastValue<double, bool>(LLVMValue pValue)
-    {
-        return CastFloatToInt(pValue, VariableType::Byte);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<double, int>(LLVMValue pValue)
-    {
-        return CastFloatToInt(pValue, VariableType::Int32);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<double, int64_t>(LLVMValue pValue)
-    {
-        return CastFloatToInt(pValue, VariableType::Int64);
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<double, float>(LLVMValue pValue)
-    {
-        return _irBuilder.CreateFPCast(pValue, Type(VariableType::Float));
-    }
-
-    template <>
-    LLVMValue IREmitter::CastValue<double, double>(LLVMValue pValue)
-    {
-        return _irBuilder.CreateFPCast(pValue, Type(VariableType::Double));
+        throw EmitterException(EmitterError::castNotSupported, "Bad cast");
     }
 
     LLVMValue IREmitter::BitCast(LLVMValue pValue, VariableType destinationType)
     {
-        assert(pValue != nullptr);
         return BitCast(pValue, Type(destinationType));
     }
 
@@ -472,72 +396,156 @@ namespace emitters
         }
     }
 
-    LLVMValue IREmitter::CastPointer(LLVMValue pValue, LLVMType destinationType)
-    {
-        assert(pValue != nullptr);
-        return _irBuilder.CreatePointerCast(pValue, destinationType);
-    }
-
     LLVMValue IREmitter::CastPointer(LLVMValue pValue, VariableType destinationType)
     {
         return CastPointer(pValue, Type(destinationType));
     }
 
+    LLVMValue IREmitter::CastPointer(LLVMValue pValue, LLVMType destinationType)
+    {
+        assert(pValue != nullptr);
+        if (!destinationType->isPointerTy())
+        {
+            throw EmitterException(EmitterError::castNotSupported, "Bad cast");
+        }
+        return _irBuilder.CreatePointerCast(pValue, destinationType);
+    }
+
+    LLVMValue IREmitter::CastIntToPointer(LLVMValue pValue, VariableType destinationType)
+    {
+        return CastIntToPointer(pValue, Type(destinationType));
+    }
+
     LLVMValue IREmitter::CastIntToPointer(LLVMValue pValue, LLVMType destinationType)
     {
         assert(pValue != nullptr);
+        if (!destinationType->isPointerTy())
+        {
+            throw EmitterException(EmitterError::castNotSupported, "Bad cast");
+        }
         return _irBuilder.CreateIntToPtr(pValue, destinationType);
+    }
+
+    LLVMValue IREmitter::CastPointerToInt(LLVMValue pValue, VariableType destinationType)
+    {
+        return CastPointerToInt(pValue, Type(destinationType));
     }
 
     LLVMValue IREmitter::CastPointerToInt(LLVMValue pValue, LLVMType destinationType)
     {
         assert(pValue != nullptr);
+        if(!pValue->getType()->isPointerTy() || !destinationType->isIntOrIntVectorTy())
+        {
+            throw EmitterException(EmitterError::castNotSupported, "Bad cast");
+        }
         return _irBuilder.CreatePtrToInt(pValue, destinationType);
     }
 
     LLVMValue IREmitter::CastIntToFloat(LLVMValue pValue, VariableType destinationType, bool isSigned)
     {
+        return CastIntToFloat(pValue, Type(destinationType), isSigned);
+    }
+
+    LLVMValue IREmitter::CastIntToFloat(LLVMValue pValue, LLVMType destinationType, bool isSigned)
+    {
         assert(pValue != nullptr);
+        if(!pValue->getType()->isIntOrIntVectorTy() || !destinationType->isFPOrFPVectorTy())
+        {
+            throw EmitterException(EmitterError::castNotSupported, "Bad cast");
+        }
         if (isSigned)
         {
-            return _irBuilder.CreateSIToFP(pValue, Type(destinationType));
+            return _irBuilder.CreateSIToFP(pValue, destinationType);
         }
         else
         {
-            return _irBuilder.CreateUIToFP(pValue, Type(destinationType));
+            return _irBuilder.CreateUIToFP(pValue, destinationType);
         }
     }
 
     LLVMValue IREmitter::CastFloatToInt(LLVMValue pValue, VariableType destinationType, bool isSigned)
     {
-        assert(pValue != nullptr);
+        return CastFloatToInt(pValue, Type(destinationType), isSigned);
+    }
 
-        auto type = Type(destinationType);
-        if (!type->isIntegerTy())
+    LLVMValue IREmitter::CastFloatToInt(LLVMValue pValue, LLVMType destinationType, bool isSigned)
+    {
+        assert(pValue != nullptr);
+        if(!pValue->getType()->isFPOrFPVectorTy() || !destinationType->isIntOrIntVectorTy())
         {
-            throw EmitterException(EmitterError::notSupported);
+            throw EmitterException(EmitterError::castNotSupported, "Bad cast");
         }
 
         if (isSigned)
         {
-            return _irBuilder.CreateFPToSI(pValue, type);
+            return _irBuilder.CreateFPToSI(pValue, destinationType);
         }
         else
         {
-            return _irBuilder.CreateFPToUI(pValue, type);
+            return _irBuilder.CreateFPToUI(pValue, destinationType);
         }
     }
 
     LLVMValue IREmitter::CastInt(LLVMValue pValue, VariableType destinationType, bool isSigned)
     {
-        assert(pValue != nullptr);
-        auto type = Type(destinationType);
-        return _irBuilder.CreateIntCast(pValue, type, isSigned);
+        return CastInt(pValue, Type(destinationType), isSigned);
     }
 
-    LLVMValue IREmitter::CastBool(LLVMValue pValue) { return CastInt(pValue, VariableType::Byte, false); }
+    LLVMValue IREmitter::CastInt(LLVMValue pValue, LLVMType destinationType, bool isSigned)
+    {
+        assert(pValue != nullptr);
+        if(!pValue->getType()->isIntOrIntVectorTy() || !destinationType->isIntOrIntVectorTy())
+        {
+            throw EmitterException(EmitterError::castNotSupported, "Bad cast");
+        }
+        return _irBuilder.CreateIntCast(pValue, destinationType, isSigned);
+    }
 
-    llvm::ReturnInst* IREmitter::ReturnVoid() { return _irBuilder.CreateRetVoid(); }
+    LLVMValue IREmitter::CastFloat(LLVMValue pValue, VariableType destinationType)
+    {
+        return CastFloat(pValue, Type(destinationType));
+    }
+
+    LLVMValue IREmitter::CastFloat(LLVMValue pValue, LLVMType destinationType)
+    {
+        assert(pValue != nullptr);
+        if(!pValue->getType()->isFPOrFPVectorTy() || !destinationType->isFPOrFPVectorTy())
+        {
+            throw EmitterException(EmitterError::castNotSupported, "Bad cast");
+        }
+        return _irBuilder.CreateFPCast(pValue, destinationType);
+    }
+
+    LLVMValue IREmitter::CastBoolToByte(LLVMValue pValue)
+    {
+        return CastInt(pValue, VariableType::Byte, false);
+    }
+
+    LLVMValue IREmitter::CastToConditionalBool(LLVMValue pValue)
+    {
+        auto inputType = pValue->getType();
+        auto bitType = llvm::Type::getInt1Ty(_llvmContext);
+
+        if (inputType == bitType)
+        {
+            return pValue;    
+        }
+        else if (inputType->isIntegerTy())
+        {
+            return Comparison(TypedComparison::notEquals, pValue, Zero(inputType));
+        }
+        else if (inputType->isFloatingPointTy())
+        {
+            return Comparison(TypedComparison::notEqualsFloat, pValue, Zero(inputType));
+        }
+
+        throw EmitterException(EmitterError::castNotSupported, "Bad cast");
+    }
+
+    llvm::ReturnInst* IREmitter::ReturnVoid()
+    {
+        return _irBuilder.CreateRetVoid();
+    }
 
     //
     // Return
@@ -647,14 +655,18 @@ namespace emitters
     {
         assert(pValue != nullptr);
 
-        LLVMValue pTestValue = pValue;
-        auto pValueType = pValue->getType();
-        if (pValueType->isIntegerTy())
-        {
-            // We use bytes as booleans
-            pTestValue = CastInt(pValue, VariableType::Byte, false);
-        }
-        return Comparison(TypedComparison::equals, pTestValue, testValue ? True() : False());
+        auto boolValue = CastToConditionalBool(pValue);
+        return Comparison(TypedComparison::equals, boolValue, testValue ? TrueBit() : FalseBit());
+    }
+
+    LLVMValue IREmitter::IsTrue(LLVMValue pValue) 
+    { 
+        return Comparison(pValue, true); 
+    }
+
+    LLVMValue IREmitter::IsFalse(LLVMValue pValue) 
+    { 
+        return Comparison(pValue, false); 
     }
 
     //
@@ -665,8 +677,9 @@ namespace emitters
         assert(pCmp != nullptr);
         assert(pTrueValue != nullptr);
         assert(pFalseValue != nullptr);
+        auto boolValue = CastToConditionalBool(pCmp);
 
-        return _irBuilder.CreateSelect(pCmp, pTrueValue, pFalseValue);
+        return _irBuilder.CreateSelect(boolValue, pTrueValue, pFalseValue);
     }
 
     //
@@ -1044,8 +1057,8 @@ namespace emitters
         assert(pConditionValue != nullptr);
         assert(pThenBlock != nullptr);
         assert(pElseBlock != nullptr);
-
-        return _irBuilder.CreateCondBr(pConditionValue, pThenBlock, pElseBlock);
+        auto boolValue = CastToConditionalBool(pConditionValue);
+        return _irBuilder.CreateCondBr(boolValue, pThenBlock, pElseBlock);
     }
 
     llvm::BranchInst* IREmitter::Branch(llvm::BasicBlock* pDestination)
@@ -1102,7 +1115,7 @@ namespace emitters
 
     llvm::StructType* IREmitter::GetStruct(const std::string& name) { return _structs[name]; }
 
-    LLVMType IREmitter::GetVariableType(VariableType type)
+    LLVMType IREmitter::GetBaseVariableType(VariableType type)
     {
         switch (type)
         {

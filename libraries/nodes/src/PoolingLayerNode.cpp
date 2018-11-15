@@ -181,7 +181,7 @@ namespace nodes
             }
             else
             {
-                return function.Operator(emitters::TypedOperator::divideFloat, function.Load(_accumValueVar), function.CastValue<int, ValueType>(function.Load(_countVar)));
+                return function.Operator(emitters::TypedOperator::divideFloat, function.Load(_accumValueVar), function.CastValue<ValueType>(function.Load(_countVar)));
             }
         }
 

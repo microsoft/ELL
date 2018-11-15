@@ -121,7 +121,7 @@ namespace nodes
 
         // double time = _impl->_time++ * _impl->_frameDuration;
         LLVMValue time = function.Variable(elementType, "time");
-        function.Store(time, function.CastValue<TickType, ValueType>(function.Load(ticks)));
+        function.Store(time, function.CastValue<ValueType>(function.Load(ticks)));
         function.OperationAndUpdate(time, multiply, frameDurationLiteral);
         function.OperationAndUpdate(ticks, addTick, function.template Literal<TickType>(1)); // _time++
 

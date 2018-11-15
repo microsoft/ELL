@@ -37,6 +37,7 @@ void TestIR()
     TestForLoop();
     TestWhileLoopWithVariableCondition();
     TestWhileLoopWithFunctionCondition();
+    TestWhileLoopWithInt32Condition();
     TestMetadata();
     TestHeader();
     TestTwoEmitsInOneSession();
@@ -48,6 +49,9 @@ void TestIR()
     TestScopedIfElse();
     TestScopedIfElse2();
     TestElseIfWithComputedCondition();
+
+    TestCastValue();    
+    TestCastToConditionalBool();
 }
 
 void TestIRFunction()
