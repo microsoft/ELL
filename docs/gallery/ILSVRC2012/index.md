@@ -115,7 +115,7 @@ from which the model can be downloaded. </p>
             accuracy5 = item['accuracy']["top5"];
             speed = item['msecs_per_frame'];
             name = item['friendly_name'];
-            url = "/ELL/gallery/ILSVRC2012/" + name + "/html";
+            url = "/ELL/gallery/ILSVRC2012/" + name + ".html";
             trHTML += '<tr><td>' + image_size + '</td><td>' + accuracy1 + '</td><td>' + accuracy5 + '</td><td>' + speed + '</td><td><a href=' + url + '>' + name + '</a></td></tr>';
         });        
         $('#tabledata').append(trHTML);
