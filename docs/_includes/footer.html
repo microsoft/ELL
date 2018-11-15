@@ -31,43 +31,5 @@
 	    integrity="sha384-7PXRkl4YJnEpP8uU4ev9652TTZSxrqC8uOpcV1ftVEC7LVyLZqqDUAaq+Y+lGgr9"
 	    crossorigin="anonymous"></script>
 
-    <script>
-        // this function needs to be updated when the image_size string format changes
-        $(document).ready(function() {
-            $('.datatable').DataTable({
-                paging: false,
-                columnDefs: [ 
-                    {
-                        "targets": 0,
-                        "render": function ( data, type, full, meta ) {
-                            // If this is a display render request ...
-                            if(type === 'display') {
-                                // don't modify it.
-                                return data;
-                            }
-                            // Either convert it to a number if it is a numeric value or set it to 0
-                            // This will return a numeric value for sorting and filtering.
-                            return (isNaN(data.replace("x",""))) ? 0 : +data.replace("x","");
-                        }
-                    },
-                    // displays milliseconds instead of seconds
-                    {
-                        "targets": 3,
-                        "render": function ( data, type, full, meta ) {
-                            // If this is a display render request ...
-                            if(type === 'display') {
-                                return parseFloat(data) * 1000;
-                            }
-                            return data;
-                        }
-                    }
-                ],
-                aaSorting: [[0, 'asc'], [1, 'desc'], [3, 'asc']],
-                autoWidth: true,
-                searching: false,
-                info: false
-            });
-        });
-    </script>
     </body>
 </html>

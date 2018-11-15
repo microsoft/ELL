@@ -2,7 +2,6 @@
 layout: default
 title: ELL Gallery
 permalink: /gallery/
-datatable: true
 ---
 
 # The ELL Gallery
