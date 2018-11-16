@@ -295,6 +295,7 @@ namespace model
                 if (action == NodeAction::refine || action == NodeAction::abstain)
                 {
                     didRefineNode = node.InvokeRefine(*this);
+                    AssignNodeAncestor(node);
                 }
                 else
                 {
@@ -395,6 +396,7 @@ namespace model
         MapCorrespondingInputs(sourceInputs, destInputs);
         sourceModel.VisitSubmodel(sourceInputs, sourceOutputs, [this, transformFunction](const Node& node) {
             transformFunction(node, *this);
+            AssignNodeAncestor(node);
         });
 
         if (!previousElementMap.IsEmpty())
@@ -538,5 +540,31 @@ namespace model
         }
         return uncompilableNodes;
     }
+
+    void ModelTransformer::AssignNodeAncestor(const Node& ancestorNode)
+    {
+        auto iter = _model.GetReverseNodeIterator();
+        while (iter.IsValid())
+        {
+            auto node = const_cast<Node*>(iter.Get());
+            if (node->GetMetadata().HasEntry("ancestor"))
+            {
+                break;
+            }
+            else
+            {
+                if (ancestorNode.GetMetadata().HasEntry("ancestor"))
+                {
+                    node->GetMetadata().SetEntry("ancestor", ancestorNode.GetMetadata().GetEntry<std::string>("ancestor"));
+                }
+                else
+                {
+                    node->GetMetadata().SetEntry("ancestor", ancestorNode.GetId().ToString());
+                }
+            }
+            iter.Next();
+        }
+    }
+
 }
 }

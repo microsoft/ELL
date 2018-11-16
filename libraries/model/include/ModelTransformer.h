@@ -450,6 +450,15 @@ namespace model
         void ResetContext();
         std::vector<const Node*> FindUncompilableNodes(const Model& model, const TransformContext& context) const;
 
+        /// <summary>
+        /// Assign ancestor to newly transformed or refined nodes. This maps relationship between nodes of original
+        /// model and nodes of new model. Note that, this assumes new nodes are always appended at the end of existing
+        /// nodes. Thus, it assigns ancestor from the node at the end of model to the last node without ancestor.
+        /// </summary>
+        ///
+        /// <param name="ancestorNode"> The ancestor node or the immediate parent node that contains ancestor information. </param>
+        void AssignNodeAncestor(const Node& ancestorNode);
+
         Model _model;
         TransformContext _context;
         PortOutputsMap _elementsMap;
