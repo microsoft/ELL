@@ -7,6 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+// testing
+#include "testing.h"
+
+// math
 #include "Matrix.h"
 
 using namespace ell;
@@ -14,7 +18,7 @@ using namespace ell;
 // stl
 #include <string>
 
-template<typename ElementType>
+template <typename ElementType>
 void ProfileVectorScaleAdd(size_t size, size_t repetitions, std::string seed = "123ABC");
 
 template <typename ElementType>

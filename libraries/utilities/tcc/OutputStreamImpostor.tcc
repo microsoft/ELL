@@ -16,5 +16,5 @@ namespace utilities
         _outputStream.get() << value;
         return _outputStream;
     }
-}
-}
+} // namespace utilities
+} // namespace ell

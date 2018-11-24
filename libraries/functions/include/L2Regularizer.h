@@ -25,16 +25,16 @@ namespace functions
         /// <param name="b"> (Optional) The bias term for which the regularizer is computed. </param>
         ///
         /// <returns> Value of the regularizer. </returns>
-        double operator()(math::ConstColumnVectorReference<double> w, double b=0) const;
+        double operator()(math::ConstColumnVectorReference<double> w, double b = 0) const;
 
         /// <summary> Computes the value of the convex conjugate of the regularizer. </summary>
         ///
         /// <param name="v"> The point at which the conjugate is computed. </param>
         /// <param name="d"> (Optional) The bias term for which the conjugate is computed. </param>
         /// <returns> Value of the conjugate. </returns>
-        double Conjugate(math::ConstColumnVectorReference<double> v, double d=0) const;
+        double Conjugate(math::ConstColumnVectorReference<double> v, double d = 0) const;
 
-        /// <summary> Computes the conjugate gradient function. Namely, Given vector v, 
+        /// <summary> Computes the conjugate gradient function. Namely, Given vector v,
         /// compute w = argmax_u {v'*u - f(u)} = argmin_u {-v'*u + f(u)} </summary>
         ///
         /// <param name="v"> The point at which the conjugate gradient is computed. </param>
@@ -51,5 +51,5 @@ namespace functions
         /// <param name="b"> [in,out] The output bias term. </param>
         void ConjugateGradient(math::ConstColumnVectorReference<double> v, double d, math::ColumnVectorReference<double> w, double& b) const;
     };
-}
-}
+} // namespace functions
+} // namespace ell

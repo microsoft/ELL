@@ -11,14 +11,20 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType, typename SelectorType>
-    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode()
-        : CompilableNode({ &_elements, &_selector }, { &_output }), _elements(this, {}, elementsPortName), _selector(this, {}, selectorPortName), _output(this, defaultOutputPortName, 1)
+    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode() :
+        CompilableNode({ &_elements, &_selector }, { &_output }),
+        _elements(this, {}, elementsPortName),
+        _selector(this, {}, selectorPortName),
+        _output(this, defaultOutputPortName, 1)
     {
     }
 
     template <typename ValueType, typename SelectorType>
-    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<SelectorType>& selector)
-        : CompilableNode({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, defaultOutputPortName, 1)
+    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<SelectorType>& selector) :
+        CompilableNode({ &_elements, &_selector }, { &_output }),
+        _elements(this, input, elementsPortName),
+        _selector(this, selector, selectorPortName),
+        _output(this, defaultOutputPortName, 1)
     {
         if (selector.Size() != 1)
         {
@@ -74,18 +80,19 @@ namespace nodes
         auto pRMergeableSrc = compiler.GetMergeableNodeRegion(rVal);
 
         function.If(emitters::TypedComparison::equals, pSelectorVal, function.Literal<SelectorType>(0), [pLMergeableSrc, pResult, &compiler, this](emitters::IRFunctionEmitter& function) {
-            if (pLMergeableSrc != nullptr)
-            {
-                function.MergeRegion(pLMergeableSrc);
-            }
-            function.Store(pResult, compiler.LoadPortElementVariable(elements.GetInputElement(0)));
-        }).Else([pRMergeableSrc, pResult, &compiler, this](emitters::IRFunctionEmitter& function) {
-            if (pRMergeableSrc != nullptr)
-            {
-                function.MergeRegion(pRMergeableSrc);
-            }
-            function.Store(pResult, compiler.LoadPortElementVariable(elements.GetInputElement(1)));
-        });
+                    if (pLMergeableSrc != nullptr)
+                    {
+                        function.MergeRegion(pLMergeableSrc);
+                    }
+                    function.Store(pResult, compiler.LoadPortElementVariable(elements.GetInputElement(0)));
+                })
+            .Else([pRMergeableSrc, pResult, &compiler, this](emitters::IRFunctionEmitter& function) {
+                if (pRMergeableSrc != nullptr)
+                {
+                    function.MergeRegion(pRMergeableSrc);
+                }
+                function.Store(pResult, compiler.LoadPortElementVariable(elements.GetInputElement(1)));
+            });
 
         auto pSelectorNode = selector.GetParentNodes()[0];
         if (HasSingleDescendant(*pSelectorNode))
@@ -128,5 +135,5 @@ namespace nodes
         archiver["elements"] >> _elements;
         archiver["selector"] >> _selector;
     }
-}
-}
+} // namespace nodes
+} // namespace ell

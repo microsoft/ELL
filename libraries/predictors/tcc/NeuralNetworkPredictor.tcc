@@ -13,7 +13,7 @@ namespace ell
 {
 namespace predictors
 {
-    constexpr utilities::ArchiveVersion c_currentNeuralNetworkPredictorArchiveVersion = {utilities::ArchiveVersionNumbers::v1};
+    constexpr utilities::ArchiveVersion c_currentNeuralNetworkPredictorArchiveVersion = { utilities::ArchiveVersionNumbers::v1 };
 
     template <typename ElementType>
     NeuralNetworkPredictor<ElementType>::NeuralNetworkPredictor(InputLayerReference&& inputLayer, Layers&& layers) :
@@ -44,7 +44,7 @@ namespace predictors
         {
             return _inputLayer->GetInputShape();
         }
-        return {0, 0, 0};
+        return { 0, 0, 0 };
     }
 
     template <typename ElementType>
@@ -54,7 +54,7 @@ namespace predictors
         {
             return _layers.back()->GetOutputShape();
         }
-        return {0, 0, 0};
+        return { 0, 0, 0 };
     }
 
     template <typename ElementType>
@@ -186,14 +186,13 @@ namespace predictors
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,LeakyReLUActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,TanhActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,ParametricReLUActivation>");
-                                                                     
+
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,SigmoidActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,HardSigmoidActivation<double>>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,ReLUActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,LeakyReLUActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,TanhActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,ParametricReLUActivation>");
-
     }
 
     template <typename ElementType>
@@ -207,5 +206,5 @@ namespace predictors
     {
         return GetCurrentArchiveVersion();
     }
-}
-}
+} // namespace predictors
+} // namespace ell

@@ -197,7 +197,7 @@ namespace model
         // declaring them as abstract so that subclasses need to implement this themselves.
         void WriteToArchive(utilities::Archiver& archiver) const override = 0;
         void ReadFromArchive(utilities::Unarchiver& archiver) override = 0;
-        
+
     private:
         friend class Model;
         friend class ModelEditor;
@@ -217,5 +217,5 @@ namespace model
         mutable std::vector<const Node*> _dependentNodes;
         utilities::PropertyBag _metadata;
     };
-}
-}
+} // namespace model
+} // namespace ell

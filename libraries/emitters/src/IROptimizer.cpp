@@ -26,8 +26,9 @@ namespace emitters
 {
     using namespace llvm;
 
-    IROptimizer::IROptimizer(IRModuleEmitter& module)
-        : _module(module), _functionPasses(module.GetLLVMModule())
+    IROptimizer::IROptimizer(IRModuleEmitter& module) :
+        _module(module),
+        _functionPasses(module.GetLLVMModule())
     {
     }
 
@@ -68,5 +69,5 @@ namespace emitters
     {
         _modulePasses.run(*pModule);
     }
-}
-}
+} // namespace emitters
+} // namespace ell

@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Dataset_test.h"
-#include "Dataset.h"
 #include "DataLoaders.h"
+#include "Dataset.h"
 #include "Files.h"
 #include "StringUtil.h"
 
@@ -106,7 +106,7 @@ void DatasetSerializationTests()
         {
             auto e1 = dataset1.GetExample(i);
             auto e2 = dataset2.GetExample(i);
-            
+
             auto sameVector = testing::IsEqual(e1.GetDataVector().ToArray(), e2.GetDataVector().ToArray());
             auto sameLabel = e1.GetMetadata().label == e2.GetMetadata().label;
             auto sameWeight = e1.GetMetadata().weight == e2.GetMetadata().weight;
@@ -118,4 +118,4 @@ void DatasetSerializationTests()
     }
     testing::ProcessTest(utilities::FormatString("DatasetSerializationTest data %d errors", errors), errors == 0);
 }
-}
+} // namespace ell

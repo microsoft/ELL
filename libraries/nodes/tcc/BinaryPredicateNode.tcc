@@ -29,8 +29,8 @@ namespace nodes
                 ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, notEqual);
                 ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, lessOrEqual);
                 ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, greaterOrEqual);
-                default:
-                    throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary predicate");
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary predicate");
             }
         }
 
@@ -83,17 +83,25 @@ namespace nodes
         {
             return a >= b;
         }
-    }
+    } // namespace BinaryPredicates
 
     template <typename ValueType>
-    BinaryPredicateNode<ValueType>::BinaryPredicateNode()
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, defaultInput1PortName), _input2(this, {}, defaultInput2PortName), _output(this, defaultOutputPortName, 0), _predicate(emitters::BinaryPredicateType::none)
+    BinaryPredicateNode<ValueType>::BinaryPredicateNode() :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, {}, defaultInput1PortName),
+        _input2(this, {}, defaultInput2PortName),
+        _output(this, defaultOutputPortName, 0),
+        _predicate(emitters::BinaryPredicateType::none)
     {
     }
 
     template <typename ValueType>
-    BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryPredicateType predicate)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, _input1.Size()), _predicate(predicate)
+    BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryPredicateType predicate) :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, input1, defaultInput1PortName),
+        _input2(this, input2, defaultInput2PortName),
+        _output(this, defaultOutputPortName, _input1.Size()),
+        _predicate(predicate)
     {
         if (input1.Size() != input2.Size())
         {
@@ -120,26 +128,26 @@ namespace nodes
         std::vector<bool> output;
         switch (_predicate)
         {
-            case emitters::BinaryPredicateType::equal:
-                output = ComputeOutput(BinaryPredicates::Equal<ValueType>);
-                break;
-            case emitters::BinaryPredicateType::less:
-                output = ComputeOutput(BinaryPredicates::Less<ValueType>);
-                break;
-            case emitters::BinaryPredicateType::greater:
-                output = ComputeOutput(BinaryPredicates::Greater<ValueType>);
-                break;
-            case emitters::BinaryPredicateType::notEqual:
-                output = ComputeOutput(BinaryPredicates::NotEqual<ValueType>);
-                break;
-            case emitters::BinaryPredicateType::lessOrEqual:
-                output = ComputeOutput(BinaryPredicates::LessOrEqual<ValueType>);
-                break;
-            case emitters::BinaryPredicateType::greaterOrEqual:
-                output = ComputeOutput(BinaryPredicates::GreaterOrEqual<ValueType>);
-                break;
-            default:
-                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown predicate type");
+        case emitters::BinaryPredicateType::equal:
+            output = ComputeOutput(BinaryPredicates::Equal<ValueType>);
+            break;
+        case emitters::BinaryPredicateType::less:
+            output = ComputeOutput(BinaryPredicates::Less<ValueType>);
+            break;
+        case emitters::BinaryPredicateType::greater:
+            output = ComputeOutput(BinaryPredicates::Greater<ValueType>);
+            break;
+        case emitters::BinaryPredicateType::notEqual:
+            output = ComputeOutput(BinaryPredicates::NotEqual<ValueType>);
+            break;
+        case emitters::BinaryPredicateType::lessOrEqual:
+            output = ComputeOutput(BinaryPredicates::LessOrEqual<ValueType>);
+            break;
+        case emitters::BinaryPredicateType::greaterOrEqual:
+            output = ComputeOutput(BinaryPredicates::GreaterOrEqual<ValueType>);
+            break;
+        default:
+            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown predicate type");
         }
         _output.SetOutput(output);
     };
@@ -174,7 +182,7 @@ namespace nodes
         emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
         emitters::TypedComparison cmp = emitters::GetComparison<ValueType>(GetPredicate());
 
-        function.For(input1.Size(), [pInput1, pInput2, pResult, cmp ](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
+        function.For(input1.Size(), [pInput1, pInput2, pResult, cmp](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             emitters::LLVMValue inputValue1 = function.ValueAt(pInput1, i);
             emitters::LLVMValue inputValue2 = function.ValueAt(pInput2, i);
             emitters::LLVMValue pOpResult = function.Comparison(cmp, inputValue1, inputValue2);
@@ -218,5 +226,5 @@ namespace nodes
         _predicate = BinaryPredicates::from_string(predicate);
         _output.SetSize(_input1.Size());
     }
-}
-}
+} // namespace nodes
+} // namespace ell

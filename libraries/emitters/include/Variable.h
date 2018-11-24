@@ -79,7 +79,7 @@ namespace emitters
         };
 
         virtual ~Variable();
-        
+
         /// <summary> Variable data type </summary>
         VariableType Type() const { return _type; }
 
@@ -108,7 +108,7 @@ namespace emitters
         bool IsLiteral() const { return _scope == VariableScope::literal; }
 
         bool IsInputArgument() const { return _scope == VariableScope::input; }
-        
+
         /// <summary> Is this a global variable? </summary>
         bool IsGlobal() const { return _scope == VariableScope::global; }
 
@@ -192,7 +192,7 @@ namespace emitters
     private:
         std::vector<std::shared_ptr<Variable>> _variables;
     };
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/Variable.tcc"

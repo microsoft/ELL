@@ -15,7 +15,8 @@ namespace ell
 {
 namespace data
 {
-    GeneralizedSparseParsingIterator::GeneralizedSparseParsingIterator(TextLine& textLine) : _textLine(textLine)
+    GeneralizedSparseParsingIterator::GeneralizedSparseParsingIterator(TextLine& textLine) :
+        _textLine(textLine)
     {
         _textLine.TrimLeadingWhitespace();
         if (_textLine.IsEndOfContent())
@@ -71,7 +72,7 @@ namespace data
         // case 2: the parsed integer is an index, followed by ':<value>'
         if (nextChar == ':')
         {
-            _textLine.AdvancePosition(stepSize+1);
+            _textLine.AdvancePosition(stepSize + 1);
 
             // relative index or absolute index
             if (firstCharacterIsPlus)
@@ -108,5 +109,5 @@ namespace data
             _textLine.ParseAdvance(_currentIndexValue.value);
         }
     }
-}
-}
+} // namespace data
+} // namespace ell

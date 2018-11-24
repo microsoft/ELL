@@ -56,5 +56,5 @@ namespace emitters
         std::vector<std::string> _messagePrefixes;
         std::vector<std::string> _messages;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

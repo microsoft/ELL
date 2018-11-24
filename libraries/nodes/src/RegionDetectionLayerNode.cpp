@@ -16,8 +16,8 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    RegionDetectionLayerNode<ValueType>::RegionDetectionLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::RegionDetectionLayer<ValueType>& layer)
-        : BaseType(input, layer)
+    RegionDetectionLayerNode<ValueType>::RegionDetectionLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::RegionDetectionLayer<ValueType>& layer) :
+        BaseType(input, layer)
     {
     }
 
@@ -50,8 +50,8 @@ namespace nodes
     // RegionDetectionNode
     //
     template <typename ValueType>
-    RegionDetectionNode<ValueType>::RegionDetectionNode()
-        : RegionDetectionNode({}, {}, {}, {})
+    RegionDetectionNode<ValueType>::RegionDetectionNode() :
+        RegionDetectionNode({}, {}, {}, {})
     {
     }
 
@@ -59,8 +59,12 @@ namespace nodes
     RegionDetectionNode<ValueType>::RegionDetectionNode(const model::OutputPort<ValueType>& input,
                                                         predictors::neural::RegionDetectionParameters params,
                                                         const model::PortMemoryLayout& inputMemoryLayout,
-                                                        const model::PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _params(std::move(params)), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout)
+                                                        const model::PortMemoryLayout& outputMemoryLayout) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _params(std::move(params)),
+        _output(this, defaultOutputPortName, outputMemoryLayout),
+        _inputMemoryLayout(inputMemoryLayout)
     {
     }
 
@@ -92,7 +96,7 @@ namespace nodes
         auto input = function.LocalTensor(compiler.EnsurePortEmitted(this->input), GetInputMemoryLayout().GetExtent().ToVector(), emitters::RowMajorTensorLayout);
         auto output = function.LocalTensor(compiler.EnsurePortEmitted(this->output), GetOutputMemoryLayout().GetExtent().ToVector(), emitters::RowMajorTensorLayout);
 
-        function.For(_params.width, [ input, output, params = _params ](auto& fn, auto i) {
+        function.For(_params.width, [input, output, params = _params](auto& fn, auto i) {
             fn.For(params.height, [input, output, params, i](auto& fn, auto j) {
                 fn.For(params.numBoxesPerCell, [input, output, params, i, j](auto& fn, auto k) {
                     auto numClasses = params.numClasses;
@@ -154,5 +158,5 @@ namespace nodes
     template class RegionDetectionLayerNode<double>;
     template class RegionDetectionNode<float>;
     template class RegionDetectionNode<double>;
-}
-}
+} // namespace nodes
+} // namespace ell

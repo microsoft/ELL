@@ -24,7 +24,7 @@ namespace utilities
         size_t width;
         size_t height;
         size_t numChannels;
-        std::vector<ValueType> data;        
+        std::vector<ValueType> data;
     };
 
     template <typename ValueType>
@@ -32,5 +32,5 @@ namespace utilities
 
     template <typename ValueType>
     Image<ValueType> ParsePPMFile(const std::string& filename);
-}
-}
+} // namespace utilities
+} // namespace ell

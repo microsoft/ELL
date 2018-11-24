@@ -77,7 +77,7 @@ namespace utilities
         template <typename ReturnType, typename FunctorType>
         static ReturnType Invoke(const FunctorType& functor, const BaseType* basePointer);
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/AbstractInvoker.tcc"

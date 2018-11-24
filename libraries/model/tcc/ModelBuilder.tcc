@@ -47,7 +47,7 @@ namespace model
             using ArgTypes = utilities::FunctionArgTypes<FunctionType>;
             return CallAddNodeFunctionHelper(function, model, args, std::make_index_sequence<std::tuple_size<ArgTypes>::value - 1>());
         }
-    }
+    } // namespace ModelBuilderDetail
 
     // AddNode<NodeType>(Args...)
     template <typename NodeType, typename... Args>
@@ -83,5 +83,5 @@ namespace model
         _addNodeFunctions[key] = addNodeFunction;
         _getNodeArgsFunctions[key] = [addFunction]() { return ModelBuilderDetail::GetAddFunctionArgTypes(addFunction); };
     }
-}
-}
+} // namespace model
+} // namespace ell

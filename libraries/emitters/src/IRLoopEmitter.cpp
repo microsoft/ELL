@@ -28,8 +28,8 @@ namespace emitters
     // _pAfterBlock -- branch to this block when done
     //
 
-    IRForLoopEmitter::IRForLoopEmitter(IRFunctionEmitter& functionEmitter)
-        : _functionEmitter(functionEmitter) {}
+    IRForLoopEmitter::IRForLoopEmitter(IRFunctionEmitter& functionEmitter) :
+        _functionEmitter(functionEmitter) {}
 
     void IRForLoopEmitter::CreateBlocks()
     {
@@ -139,8 +139,8 @@ namespace emitters
     //
     // IRWhileLoopEmitter
     //
-    IRWhileLoopEmitter::IRWhileLoopEmitter(IRFunctionEmitter& functionEmitter)
-        : _functionEmitter(functionEmitter) {}
+    IRWhileLoopEmitter::IRWhileLoopEmitter(IRFunctionEmitter& functionEmitter) :
+        _functionEmitter(functionEmitter) {}
 
     void IRWhileLoopEmitter::CreateBlocks()
     {
@@ -213,5 +213,5 @@ namespace emitters
         _functionEmitter.Branch(_pConditionBlock);
         _functionEmitter.SetCurrentBlock(_pAfterBlock);
     }
-}
-}
+} // namespace emitters
+} // namespace ell

@@ -14,4 +14,4 @@ void TestGetTypeDescription();
 void TestGetObjectArchive();
 void TestSerializeIArchivable();
 void TestObjectArchiver();
-}
+} // namespace ell

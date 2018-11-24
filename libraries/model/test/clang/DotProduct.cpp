@@ -8,14 +8,13 @@
 
 // compile with clang -S -emit-llvm -o DotProduct.ll DotProduct.cpp
 
-extern "C"
-{
+extern "C" {
 void _Node__DotProduct(double* input1, double* input2, int size, double* output)
 {
     double result = 0;
-    for(int index = 0; index < size; ++index)
+    for (int index = 0; index < size; ++index)
     {
-        result += input1[index]*input2[index];
+        result += input1[index] * input2[index];
     }
     output[0] = result;
 }

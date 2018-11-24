@@ -9,7 +9,7 @@
 #include "WeightLabel.h"
 
 // utilities
-#include  "Exception.h"
+#include "Exception.h"
 
 // stl
 #include <iostream>
@@ -87,5 +87,5 @@ namespace data
 
         return WeightLabel{ weight, label };
     }
-}
-}
+} // namespace data
+} // namespace ell

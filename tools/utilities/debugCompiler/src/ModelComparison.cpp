@@ -179,7 +179,6 @@ bool IsNeuralNetworkLayerNode(const ell::model::Node* node)
     return dynamic_cast<const ell::nodes::NeuralNetworkLayerNodeBase<double>*>(node) != nullptr;
 }
 
-
 //
 // Getting map output
 //
@@ -196,20 +195,20 @@ std::vector<float> GetMapOutput(const model::Map& map, const std::vector<float>&
 {
     switch (map.GetOutputType())
     {
-        case model::Port::PortType::smallReal:
-            return GetMapOutput<InputType, float>(map, input);
-            break;
-        case model::Port::PortType::real:
-            return GetMapOutput<InputType, double>(map, input);
-            break;
-        case model::Port::PortType::integer:
-            return GetMapOutput<InputType, int>(map, input);
-            break;
-        case model::Port::PortType::bigInt:
-            return GetMapOutput<InputType, int64_t>(map, input);
-            break;
-        default:
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported output type");
+    case model::Port::PortType::smallReal:
+        return GetMapOutput<InputType, float>(map, input);
+        break;
+    case model::Port::PortType::real:
+        return GetMapOutput<InputType, double>(map, input);
+        break;
+    case model::Port::PortType::integer:
+        return GetMapOutput<InputType, int>(map, input);
+        break;
+    case model::Port::PortType::bigInt:
+        return GetMapOutput<InputType, int64_t>(map, input);
+        break;
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported output type");
     }
 }
 
@@ -217,20 +216,20 @@ std::vector<float> GetMapOutput(const model::Map& map, const std::vector<float>&
 {
     switch (map.GetInputType())
     {
-        case model::Port::PortType::smallReal:
-            return GetMapOutput<float>(map, input);
-            break;
-        case model::Port::PortType::real:
-            return GetMapOutput<double>(map, input);
-            break;
-        case model::Port::PortType::integer:
-            return GetMapOutput<int>(map, input);
-            break;
-        case model::Port::PortType::bigInt:
-            return GetMapOutput<int64_t>(map, input);
-            break;
-        default:
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported input type");
+    case model::Port::PortType::smallReal:
+        return GetMapOutput<float>(map, input);
+        break;
+    case model::Port::PortType::real:
+        return GetMapOutput<double>(map, input);
+        break;
+    case model::Port::PortType::integer:
+        return GetMapOutput<int>(map, input);
+        break;
+    case model::Port::PortType::bigInt:
+        return GetMapOutput<int64_t>(map, input);
+        break;
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported input type");
     }
 }
 
@@ -812,4 +811,4 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
         }
     }
 }
-}
+} // namespace ell

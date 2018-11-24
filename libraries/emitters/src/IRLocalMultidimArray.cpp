@@ -20,13 +20,15 @@ namespace ell
 {
 namespace emitters
 {
-    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, LLVMValue data, std::vector<int> extents)
-        : IRLocalMultidimArray(function, data, extents, extents)
+    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, LLVMValue data, std::vector<int> extents) :
+        IRLocalMultidimArray(function, data, extents, extents)
     {
     }
 
-    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, LLVMValue data, std::vector<int> extents, std::vector<int> memorySize)
-        : function(function), data(data), extents(extents)
+    IRLocalMultidimArray::IRLocalMultidimArray(emitters::IRFunctionEmitter& function, LLVMValue data, std::vector<int> extents, std::vector<int> memorySize) :
+        function(function),
+        data(data),
+        extents(extents)
     {
         strides.reserve(extents.size());
         std::copy(extents.begin() + 1, extents.end(), std::back_inserter(strides));
@@ -92,8 +94,10 @@ namespace emitters
         return function.LocalPointer(function.PointerOffset(data, offset));
     }
 
-    IRLocalMultidimArray::IRLocalArrayElement::IRLocalArrayElement(emitters::IRFunctionEmitter& function, LLVMValue data, LLVMValue offset)
-        : _function(function), _data(data), _offset(offset) {}
+    IRLocalMultidimArray::IRLocalArrayElement::IRLocalArrayElement(emitters::IRFunctionEmitter& function, LLVMValue data, LLVMValue offset) :
+        _function(function),
+        _data(data),
+        _offset(offset) {}
 
     IRLocalMultidimArray::IRLocalArrayElement& IRLocalMultidimArray::IRLocalArrayElement::operator=(const IRLocalArrayElement& value)
     {
@@ -114,5 +118,5 @@ namespace emitters
 
         return *this;
     }
-}
-}
+} // namespace emitters
+} // namespace ell

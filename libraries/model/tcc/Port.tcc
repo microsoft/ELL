@@ -49,5 +49,5 @@ namespace model
     {
         typedef bool value_type;
     };
-}
-}
+} // namespace model
+} // namespace ell

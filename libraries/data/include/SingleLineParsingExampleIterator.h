@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include "AutoDataVector.h"
 #include "Example.h"
 #include "ExampleIterator.h"
-#include "AutoDataVector.h"
 
 // stl
 #include <memory>
@@ -79,7 +79,7 @@ namespace data
     /// <returns> The single-line parsing example iterator. </returns>
     template <typename TextLineIteratorType, typename MetadataParserType, typename DataVectorParserType>
     auto MakeSingleLineParsingExampleIterator(TextLineIteratorType textLineIterator, MetadataParserType metadataParser, DataVectorParserType dataVectorParser);
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/SingleLineParsingExampleIterator.tcc"

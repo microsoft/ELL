@@ -58,5 +58,5 @@ namespace emitters
 
     /// <summary> Compile the given module to the given stream </summary>
     void GenerateMachineCode(llvm::raw_ostream& os, IRModuleEmitter& module, ModuleOutputFormat format, const MachineCodeOutputOptions& options);
-}
-}
+} // namespace emitters
+} // namespace ell

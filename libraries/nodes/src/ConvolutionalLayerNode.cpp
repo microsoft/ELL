@@ -21,8 +21,8 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    ConvolutionalLayerNode<ValueType>::ConvolutionalLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ConvolutionalLayer<ValueType>& layer)
-        : NeuralNetworkLayerNode<ConvolutionalLayerNode<ValueType>, predictors::neural::ConvolutionalLayer<ValueType>, ValueType>(input, layer)
+    ConvolutionalLayerNode<ValueType>::ConvolutionalLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ConvolutionalLayer<ValueType>& layer) :
+        NeuralNetworkLayerNode<ConvolutionalLayerNode<ValueType>, predictors::neural::ConvolutionalLayer<ValueType>, ValueType>(input, layer)
     {
     }
 
@@ -101,5 +101,5 @@ namespace nodes
     // Explicit specializations
     template class ConvolutionalLayerNode<float>;
     template class ConvolutionalLayerNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

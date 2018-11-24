@@ -152,4 +152,4 @@ ell::math::ChannelColumnRowTensor<typename TensorType::TensorElementType> Abs(co
     result.Transform([](auto x) { return std::abs(x); });
     return result;
 }
-}
+} // namespace ell

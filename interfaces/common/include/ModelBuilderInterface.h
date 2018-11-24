@@ -97,18 +97,10 @@ public:
     Node AddSourceNode(Model model, PortElements input, PortType outputType, const ell::api::math::TensorShape& shape, const std::string& sourceFunctionName);
     Node AddUnaryOperationNode(Model model, PortElements input, UnaryOperationType operation);
     Node AddDTWNode(Model model, std::vector<std::vector<double>> prototype, PortElements input);
-    Node AddVoiceActivityDetectorNode(Model model, PortElements input, double sampleRate, double frameDuration,
-        double tauUp,  double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown,
-        double levelThreshold);
-    Node AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits,
-        PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-        ell::api::predictors::neural::ActivationType activation);
-    Node AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, 
-        PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-        ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
-    Node AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, 
-        PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-        ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
+    Node AddVoiceActivityDetectorNode(Model model, PortElements input, double sampleRate, double frameDuration, double tauUp, double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown, double levelThreshold);
+    Node AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation);
+    Node AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
+    Node AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
 
     // Layer nodes (going away...)
     Node AddActivationLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ActivationLayer& layer);
@@ -123,6 +115,7 @@ public:
     Node AddSoftmaxLayerNode(Model model, PortElements input, const ell::api::predictors::neural::SoftmaxLayer& layer);
 
     void ResetInput(Node node, PortElements input, std::string input_port_name = "input");
+
 private:
 #ifndef SWIG
     template <typename ElementType>
@@ -159,16 +152,13 @@ private:
     Node AddSoftmaxLayerNode(Model model, PortElements input, const ell::api::predictors::neural::SoftmaxLayer& layer);
 
     template <typename ElementType>
-    Node AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-        ell::api::predictors::neural::ActivationType activation);
+    Node AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation);
 
     template <typename ElementType>
-    Node AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-        ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
+    Node AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
 
     template <typename ElementType>
-    Node AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-        ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
+    Node AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
 
     template <typename ElementType>
     void InternalResetInput(Node node, PortElements input, std::string input_port_name);
@@ -177,11 +167,9 @@ private:
     ell::model::ModelBuilder _modelBuilder;
 };
 
-
 #ifndef SWIG
 template <typename OutputType, typename InputType>
 std::vector<OutputType> CastVector(const std::vector<InputType>& vector);
 #endif
 
-} // end namespace
-
+} // namespace ELL_API

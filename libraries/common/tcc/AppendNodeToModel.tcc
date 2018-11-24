@@ -20,5 +20,5 @@ namespace common
         model.AddNode<PredictorNodeType>(mapOutput, predictor);
         return model;
     }
-}
-}
+} // namespace common
+} // namespace ell

@@ -13,15 +13,15 @@
 
 namespace ell
 {
-    struct LinearTrainerArguments
+struct LinearTrainerArguments
+{
+    enum class Algorithm
     {
-        enum class Algorithm
-        {
-            SGD,
-            SparseDataSGD,
-            SparseDataCenteredSGD,
-            SDCA
-        };
+        SGD,
+        SparseDataSGD,
+        SparseDataCenteredSGD,
+        SDCA
+    };
 
     Algorithm algorithm = Algorithm::SGD;
     bool normalize;
@@ -33,11 +33,12 @@ namespace ell
 };
 
 /// <summary> Parsed version of LinearTrainerArguments. </summary>
-struct ParsedLinearTrainerArguments : public LinearTrainerArguments, public utilities::ParsedArgSet
+struct ParsedLinearTrainerArguments : public LinearTrainerArguments
+    , public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments to the command line parser. </summary>
     ///
     /// <param name="parser"> [in,out] The command line parser. </param>
     void AddArgs(utilities::CommandLineParser& parser) override;
 };
-}
+} // namespace ell

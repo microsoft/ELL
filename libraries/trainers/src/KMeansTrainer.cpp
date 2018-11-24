@@ -18,11 +18,17 @@ namespace ell
 {
 namespace trainers
 {
-    KMeansTrainer::KMeansTrainer(size_t dim, size_t numClusters, size_t iterations)
-        : _means(dim, numClusters), _isInitialized(false), _iterations(iterations), _numClusters(numClusters)  {}
+    KMeansTrainer::KMeansTrainer(size_t dim, size_t numClusters, size_t iterations) :
+        _means(dim, numClusters),
+        _isInitialized(false),
+        _iterations(iterations),
+        _numClusters(numClusters) {}
 
-    KMeansTrainer::KMeansTrainer(size_t numClusters, size_t iters, math::ColumnMatrix<double> means)
-        : _means(means), _isInitialized(true), _iterations(iters), _numClusters(numClusters) {}
+    KMeansTrainer::KMeansTrainer(size_t numClusters, size_t iters, math::ColumnMatrix<double> means) :
+        _means(means),
+        _isInitialized(true),
+        _iterations(iters),
+        _numClusters(numClusters) {}
 
     void KMeansTrainer::RunKMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X)
     {
@@ -172,5 +178,5 @@ namespace trainers
 
         return choice;
     }
-}
-}
+} // namespace trainers
+} // namespace ell

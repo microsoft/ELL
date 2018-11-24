@@ -139,5 +139,5 @@ namespace emitters
         std::vector<CallbackSignature> sinks;
         std::vector<CallbackSignature> lagNotifications;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

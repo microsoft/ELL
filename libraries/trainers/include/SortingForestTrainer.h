@@ -74,7 +74,7 @@ namespace trainers
     /// <returns> A unique_ptr to a simple forest trainer. </returns>
     template <typename LossFunctionType, typename BoosterType>
     std::unique_ptr<ITrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const SortingForestTrainerParameters& parameters);
-}
-}
+} // namespace trainers
+} // namespace ell
 
 #include "../tcc/SortingForestTrainer.tcc"

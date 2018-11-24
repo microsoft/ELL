@@ -11,13 +11,16 @@ namespace ell
 namespace data
 {
     template <typename IteratorType>
-    StlIndexValueIterator<IterationPolicy::skipZeros, IteratorType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end, size_t size)
-        : _current(begin), _end(end), _size(size), _index(0)
+    StlIndexValueIterator<IterationPolicy::skipZeros, IteratorType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end, size_t size) :
+        _current(begin),
+        _end(end),
+        _size(size),
+        _index(0)
     {
         SkipZeros();
     }
 
-    template<typename IteratorType>
+    template <typename IteratorType>
     void StlIndexValueIterator<IterationPolicy::skipZeros, IteratorType>::Next()
     {
         ++_current;
@@ -36,12 +39,14 @@ namespace data
     }
 
     template <typename IteratorType>
-    StlIndexValueIterator<IterationPolicy::all, IteratorType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end, size_t size)
-        : _current(begin), _end(end), _size(size)
+    StlIndexValueIterator<IterationPolicy::all, IteratorType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end, size_t size) :
+        _current(begin),
+        _end(end),
+        _size(size)
     {
     }
 
-    template<typename IteratorType>
+    template <typename IteratorType>
     void StlIndexValueIterator<IterationPolicy::all, IteratorType>::Next()
     {
         ++_index;
@@ -51,10 +56,10 @@ namespace data
         }
     }
 
-    template<typename IteratorType>
+    template <typename IteratorType>
     IndexValue StlIndexValueIterator<IterationPolicy::all, IteratorType>::Get() const
-    { 
-        return _current < _end ? IndexValue{ _index, (double)*_current } : IndexValue{ _index, 0.0 }; 
+    {
+        return _current < _end ? IndexValue{ _index, (double)*_current } : IndexValue{ _index, 0.0 };
     }
 
     //
@@ -72,5 +77,5 @@ namespace data
     {
         return VectorIndexValueIterator<policy, ElementType>(vector.cbegin(), vector.cend(), size);
     }
-}
-}
+} // namespace data
+} // namespace ell

@@ -205,5 +205,5 @@ namespace data
     {
         return AutoDataVector(IndexValueParsingIterator(textLine));
     }
-}
-}
+} // namespace data
+} // namespace ell

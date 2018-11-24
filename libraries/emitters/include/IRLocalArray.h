@@ -13,7 +13,7 @@
 
 namespace llvm
 {
-    class Value;
+class Value;
 }
 
 namespace ell
@@ -59,5 +59,5 @@ namespace emitters
         /// <return> An instance of IRLocalArray::IRLocalArrayValue to represent the value at the offset within the array </returns>
         IRLocalArrayValue operator[](int offset) const;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

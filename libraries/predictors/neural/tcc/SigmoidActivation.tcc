@@ -37,6 +37,6 @@ namespace predictors
         {
             return std::make_unique<SigmoidActivation<ElementType>>();
         }
-    }
-}
-}
+    } // namespace neural
+} // namespace predictors
+} // namespace ell

@@ -21,43 +21,42 @@ namespace data
         auto type = GetType();
         switch (type)
         {
-            case Type::DoubleDataVector:
-                return lambda(static_cast<const DoubleDataVector*>(this));
+        case Type::DoubleDataVector:
+            return lambda(static_cast<const DoubleDataVector*>(this));
 
-            case Type::FloatDataVector:
-                return lambda(static_cast<const FloatDataVector*>(this));
+        case Type::FloatDataVector:
+            return lambda(static_cast<const FloatDataVector*>(this));
 
-            case Type::ShortDataVector:
-                return lambda(static_cast<const ShortDataVector*>(this));
+        case Type::ShortDataVector:
+            return lambda(static_cast<const ShortDataVector*>(this));
 
-            case Type::ByteDataVector:
-                return lambda(static_cast<const ByteDataVector*>(this));
+        case Type::ByteDataVector:
+            return lambda(static_cast<const ByteDataVector*>(this));
 
-            case Type::SparseDoubleDataVector:
-                return lambda(static_cast<const SparseDoubleDataVector*>(this));
+        case Type::SparseDoubleDataVector:
+            return lambda(static_cast<const SparseDoubleDataVector*>(this));
 
-            case Type::SparseFloatDataVector:
-                return lambda(static_cast<const SparseFloatDataVector*>(this));
+        case Type::SparseFloatDataVector:
+            return lambda(static_cast<const SparseFloatDataVector*>(this));
 
-            case Type::SparseShortDataVector:
-                return lambda(static_cast<const SparseShortDataVector*>(this));
+        case Type::SparseShortDataVector:
+            return lambda(static_cast<const SparseShortDataVector*>(this));
 
-            case Type::SparseByteDataVector:
-                return lambda(static_cast<const SparseByteDataVector*>(this));
+        case Type::SparseByteDataVector:
+            return lambda(static_cast<const SparseByteDataVector*>(this));
 
-            case Type::SparseBinaryDataVector:
-                return lambda(static_cast<const SparseBinaryDataVector*>(this));
+        case Type::SparseBinaryDataVector:
+            return lambda(static_cast<const SparseBinaryDataVector*>(this));
 
-            default:
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
+        default:
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
         }
     }
 
     template <IterationPolicy policy, typename TransformationType>
     void IDataVector::AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const
     {
-        InvokeWithThis<void>([vector, transformation](const auto* pThis)
-        {
+        InvokeWithThis<void>([vector, transformation](const auto* pThis) {
             pThis->template AddTransformedTo<policy>(vector, transformation);
         });
     }
@@ -65,8 +64,7 @@ namespace data
     template <typename ReturnType>
     ReturnType IDataVector::CopyAs() const
     {
-        return InvokeWithThis<ReturnType>([](const auto* pThis)
-        {
+        return InvokeWithThis<ReturnType>([](const auto* pThis) {
             return ReturnType(pThis->template GetIterator<IterationPolicy::skipZeros>());
         });
     }
@@ -74,8 +72,7 @@ namespace data
     template <IterationPolicy policy, typename ReturnType, typename TransformationType>
     ReturnType IDataVector::TransformAs(TransformationType transformation, size_t size) const
     {
-        return InvokeWithThis<ReturnType>([transformation, size](const auto* pThis)
-        {
+        return InvokeWithThis<ReturnType>([transformation, size](const auto* pThis) {
             return ReturnType(MakeTransformingIndexValueIterator(pThis->template GetIterator<policy>(size), transformation));
         });
     }
@@ -83,8 +80,7 @@ namespace data
     template <IterationPolicy policy, typename ReturnType, typename TransformationType>
     ReturnType IDataVector::TransformAs(TransformationType transformation) const
     {
-        return InvokeWithThis<ReturnType>([transformation](const auto* pThis)
-        {
+        return InvokeWithThis<ReturnType>([transformation](const auto* pThis) {
             return ReturnType(MakeTransformingIndexValueIterator(pThis->template GetIterator<policy>(), transformation));
         });
     }
@@ -367,5 +363,5 @@ namespace data
     {
         return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation);
     }
-}
-}
+} // namespace data
+} // namespace ell

@@ -17,6 +17,6 @@ struct NameValue
     std::string name;
     std::string value;
 };
-}
+} // namespace ell
 
 #include "../tcc/LayerInspector.tcc"

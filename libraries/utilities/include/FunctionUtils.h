@@ -11,8 +11,8 @@
 #include "Unused.h"
 
 // stl
-#include <tuple>
 #include <functional>
+#include <tuple>
 
 namespace ell
 {
@@ -126,7 +126,7 @@ namespace utilities
     /// <summary> Converts a vector to a specified tuple of Args... types </summary>
     template <typename... Args, typename T>
     std::tuple<Args...> VectorToTuple(std::vector<T>);
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/FunctionUtils.tcc"

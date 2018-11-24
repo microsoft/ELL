@@ -20,8 +20,8 @@
 #include "IArchivable.h"
 #include "PropertyBag.h"
 #include "StlIndexValueIterator.h"
-#include "TypeTraits.h"
 #include "TypeName.h"
+#include "TypeTraits.h"
 
 // stl
 #include <algorithm>
@@ -455,7 +455,7 @@ namespace model
         /// <param name="previousContext"> The `SerializationContext` to wrap </param>
         MapSerializationContext(utilities::SerializationContext& previousContext);
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/Map.tcc"

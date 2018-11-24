@@ -49,5 +49,5 @@ namespace emitters
         error.print(nullptr, ostream, false, true);
         return buffer.str();
     }
-}
-}
+} // namespace emitters
+} // namespace ell

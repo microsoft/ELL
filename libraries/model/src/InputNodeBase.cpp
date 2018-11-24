@@ -17,16 +17,18 @@ namespace model
         //
         // Relevant archive format versions
         //
-        constexpr utilities::ArchiveVersion currentArchiveVersion = {utilities::ArchiveVersionNumbers::v2};
-    }
+        constexpr utilities::ArchiveVersion currentArchiveVersion = { utilities::ArchiveVersionNumbers::v2 };
+    } // namespace
 
-    InputNodeBase::InputNodeBase(OutputPortBase& output)
-        : CompilableNode({}, { &output }), _outputBase(output)
+    InputNodeBase::InputNodeBase(OutputPortBase& output) :
+        CompilableNode({}, { &output }),
+        _outputBase(output)
     {
     }
 
-    InputNodeBase::InputNodeBase(InputPortBase& input, OutputPortBase& output)
-        : CompilableNode({ &input }, { &output }), _outputBase(output)
+    InputNodeBase::InputNodeBase(InputPortBase& input, OutputPortBase& output) :
+        CompilableNode({ &input }, { &output }),
+        _outputBase(output)
     {
     }
 
@@ -37,7 +39,7 @@ namespace model
 
     void InputNodeBase::SetShape(const MemoryShape& shape)
     {
-        _outputBase.SetMemoryLayout({shape});
+        _outputBase.SetMemoryLayout({ shape });
     }
 
     PortMemoryLayout InputNodeBase::GetMemoryLayout() const
@@ -49,7 +51,7 @@ namespace model
     {
         _outputBase.SetMemoryLayout(layout);
     }
-    
+
     ell::utilities::ArchiveVersion InputNodeBase::GetArchiveVersion() const
     {
         return std::max(currentArchiveVersion, CompilableNode::GetArchiveVersion());
@@ -59,5 +61,5 @@ namespace model
     {
         return version >= currentArchiveVersion && CompilableNode::CanReadArchiveVersion(version);
     }
-}
-}
+} // namespace model
+} // namespace ell

@@ -15,10 +15,10 @@
 #include "Dataset.h"
 #include "SequentialLineIterator.h"
 
-#include "SingleLineParsingExampleIterator.h"
 #include "AutoDataVector.h"
-#include "WeightLabel.h"
 #include "GeneralizedSparseParsingIterator.h"
+#include "SingleLineParsingExampleIterator.h"
+#include "WeightLabel.h"
 
 // stl
 #include <memory>
@@ -48,5 +48,5 @@ namespace common
     {
         return data::MakeDataset(GetExampleIterator<data::SequentialLineIterator, data::ClassIndexParser, data::AutoDataVectorParser<data::GeneralizedSparseParsingIterator>>(stream));
     }
-}
-}
+} // namespace common
+} // namespace ell

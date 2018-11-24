@@ -78,4 +78,4 @@ namespace dsp
     }
 
 } // end namespace dsp
-}
+} // namespace ell

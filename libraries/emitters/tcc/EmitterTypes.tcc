@@ -34,5 +34,5 @@ namespace emitters
         std::vector<bool> result(src.begin(), src.end());
         return result;
     }
-}
-}
+} // namespace emitters
+} // namespace ell

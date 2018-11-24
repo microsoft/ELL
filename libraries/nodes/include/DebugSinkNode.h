@@ -34,10 +34,10 @@ namespace nodes
     /// Note: the userData argument in the compiled code is char* instead of void* because LLVM doesn't consider pointer-to-void to be a valid type
     ///   (for some versions of LLVM, at least)
     /// ```
-    template<typename ValueType>
+    template <typename ValueType>
     using DebugSinkFunction = std::function<void(const std::string&, const std::vector<ValueType>&, void* userData)>;
 
-    template<typename ValueType>
+    template <typename ValueType>
     class DebugSinkNode : public model::CompilableNode
     {
     public:
@@ -102,7 +102,7 @@ namespace nodes
         std::string _sinkFunctionName;
         DebugSinkFunction<ValueType> _sink;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/DebugSinkNode.tcc"

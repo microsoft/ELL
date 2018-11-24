@@ -277,5 +277,5 @@ namespace utilities
 
         _tokenizer.MatchTokens({ "<", "/", "Array", ">" });
     }
-}
-}
+} // namespace utilities
+} // namespace ell

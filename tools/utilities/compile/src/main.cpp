@@ -22,9 +22,9 @@
 #include "MapLoadArguments.h"
 
 // model
-#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
+#include "Map.h"
 #include "OutputNode.h"
 
 // passes
@@ -43,8 +43,11 @@ typedef std::function<void(const double*, double*)> FnInputOutput;
 class TimingOutputCollector
 {
 public:
-    TimingOutputCollector(std::ostream& stream, const std::string& message, bool enabled)
-        : _valid(true), _enabled(enabled), _stream(stream), _message(message) {}
+    TimingOutputCollector(std::ostream& stream, const std::string& message, bool enabled) :
+        _valid(true),
+        _enabled(enabled),
+        _stream(stream),
+        _message(message) {}
 
     ~TimingOutputCollector()
     {

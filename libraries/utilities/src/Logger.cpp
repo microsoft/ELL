@@ -10,53 +10,53 @@
 #include "Logger.h"
 
 // stl
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 namespace ell
 {
 namespace utilities
 {
-namespace logging
-{
-
-bool& ShouldFlush()
-{
-    static bool shouldFlush = false;
-    return shouldFlush;
-}
-
-bool& ShouldLog()
-{
-    static bool shouldLog = false;
-    return shouldLog;
-}
-
-std::ostream& EOL(std::ostream& stream)
-{
-    stream << "\n";
-    if (ShouldFlush())
+    namespace logging
     {
-        stream << std::flush;
-    }
 
-    return stream;
-}
+        bool& ShouldFlush()
+        {
+            static bool shouldFlush = false;
+            return shouldFlush;
+        }
 
-OutputStreamImpostor& Log()
-{
-    static OutputStreamImpostor nullHandle;
-    static OutputStreamImpostor logHandle{ std::cout };
-    if (ShouldLog())
-    {
-        return logHandle;
-    }
-    else
-    {
-        return nullHandle;
-    }
-}
+        bool& ShouldLog()
+        {
+            static bool shouldLog = false;
+            return shouldLog;
+        }
 
-}
-}
-}
+        std::ostream& EOL(std::ostream& stream)
+        {
+            stream << "\n";
+            if (ShouldFlush())
+            {
+                stream << std::flush;
+            }
+
+            return stream;
+        }
+
+        OutputStreamImpostor& Log()
+        {
+            static OutputStreamImpostor nullHandle;
+            static OutputStreamImpostor logHandle{ std::cout };
+            if (ShouldLog())
+            {
+                return logHandle;
+            }
+            else
+            {
+                return nullHandle;
+            }
+        }
+
+    } // namespace logging
+} // namespace utilities
+} // namespace ell

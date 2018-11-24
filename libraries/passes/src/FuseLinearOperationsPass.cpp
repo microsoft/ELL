@@ -211,7 +211,7 @@ namespace passes
                 return false;
             }
 
-            if(!CanCombineWithPrimaryInput(*thisNode))
+            if (!CanCombineWithPrimaryInput(*thisNode))
             {
                 return false;
             }
@@ -252,7 +252,7 @@ namespace passes
             }
             transformer.CopyNode(node);
         }
-    }
+    } // namespace
 
     //
     // FuseLinearOperationsPass methods
@@ -271,5 +271,5 @@ namespace passes
         };
         model::OptimizationPassRegistry::AddPass(info);
     }
-}
-}
+} // namespace passes
+} // namespace ell

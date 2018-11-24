@@ -34,14 +34,22 @@ namespace model
 {
     using utilities::Boolean;
 
-    IRCompiledMap::IRCompiledMap(IRCompiledMap&& other)
-        : CompiledMap(std::move(other), other._functionName, other._compilerOptions), _moduleName(std::move(other._moduleName)), _module(std::move(other._module)), _executionEngine(std::move(other._executionEngine)), _verifyJittedModule(other._verifyJittedModule), _computeFunctionDefined(false)
+    IRCompiledMap::IRCompiledMap(IRCompiledMap&& other) :
+        CompiledMap(std::move(other), other._functionName, other._compilerOptions),
+        _moduleName(std::move(other._moduleName)),
+        _module(std::move(other._module)),
+        _executionEngine(std::move(other._executionEngine)),
+        _verifyJittedModule(other._verifyJittedModule),
+        _computeFunctionDefined(false)
     {
     }
 
     // private constructor:
-    IRCompiledMap::IRCompiledMap(Map map, const std::string& functionName, const MapCompilerOptions& options, std::unique_ptr<emitters::IRModuleEmitter> module, bool verifyJittedModule)
-        : CompiledMap(std::move(map), functionName, options), _module(std::move(module)), _verifyJittedModule(verifyJittedModule), _computeFunctionDefined(false)
+    IRCompiledMap::IRCompiledMap(Map map, const std::string& functionName, const MapCompilerOptions& options, std::unique_ptr<emitters::IRModuleEmitter> module, bool verifyJittedModule) :
+        CompiledMap(std::move(map), functionName, options),
+        _module(std::move(module)),
+        _verifyJittedModule(verifyJittedModule),
+        _computeFunctionDefined(false)
     {
         _moduleName = _module->GetModuleName();
     }
@@ -388,5 +396,5 @@ namespace model
         auto fn = reinterpret_cast<void (*)()>(jitter.GetFunctionAddress(_moduleName + "_ResetRegionProfilingInfo"));
         fn();
     }
-}
-}
+} // namespace model
+} // namespace ell

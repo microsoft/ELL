@@ -7,26 +7,27 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <vector>
-#include <memory>
-#include "ModelInterface.h"
 #include "DatasetInterface.h"
+#include "ModelInterface.h"
+#include <memory>
+#include <vector>
 
 namespace ELL_API
 {
 
 /// <summary> The loss function to use durng ProtoNN training. </summary>
-// Note: we are using this weird struct because SWIG doesn't import class enum properly.  
+// Note: we are using this weird struct because SWIG doesn't import class enum properly.
 // It generates ell.ProtoNNLossFunction_L2 and ell.ProtoNNLossFunction_L4, whereas we
 // want ell.ProtoNNLossFunction.L2 and ell.ProtoNNLossFunction.L2.
 struct ProtoNNLossFunction
 {
 public:
-    enum { 
+    enum
+    {
         ///<summary>The diff squared</summary>
         L2,
         ///<summary>The diff to the power of 4</summary>
-        L4 
+        L4
     };
 };
 
@@ -85,6 +86,7 @@ public:
 
     ///<summary> Create an ELL model containing the ProtoNN predictor </summary>
     Map GetMap() const;
+
 private:
     class ProtoNNPredictorImpl;
     std::shared_ptr<ProtoNNPredictorImpl> _impl;
@@ -102,7 +104,7 @@ public:
     /// <param name="dataset"> The training data where each row is numFeatures wide, as defined in the parameters. </param>
     void SetDataset(const AutoSupervisedDataset& dataset);
 
-    /// <summary> Trains a ProtoNN predictor for the dataset provided in SetDataset. 
+    /// <summary> Trains a ProtoNN predictor for the dataset provided in SetDataset.
     /// Currently you should only call Update once.</summary>
     void Update();
 
@@ -115,4 +117,4 @@ private:
     std::shared_ptr<ProtoNNTrainerImpl> _impl;
 };
 
-} // end namespace
+} // namespace ELL_API

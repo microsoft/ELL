@@ -52,7 +52,8 @@ namespace value
 
     EmitterContext::IfContextImpl::~IfContextImpl() = default;
 
-    EmitterContext::IfContext::IfContext(std::unique_ptr<EmitterContext::IfContextImpl> impl) : _impl(std::move(impl))
+    EmitterContext::IfContext::IfContext(std::unique_ptr<EmitterContext::IfContextImpl> impl) :
+        _impl(std::move(impl))
     {}
 
     EmitterContext::IfContext& EmitterContext::IfContext::ElseIf(Scalar test, std::function<void()> fn)
@@ -98,7 +99,7 @@ namespace value
         {
             Value value = globalValue.value();
             if (layout.GetMemorySize() > value.GetLayout().GetMemorySize())
-        {
+            {
                 throw InputException(InputExceptionErrors::invalidSize);
             }
             value.SetLayout(layout);
@@ -116,8 +117,7 @@ namespace value
         return CreateFunctionImpl(fnName, fn);
     }
 
-    std::function<Value()> EmitterContext::CreateFunction(std::string fnName, Value returnValue,
-                                                          std::function<Value()> fn)
+    std::function<Value()> EmitterContext::CreateFunction(std::string fnName, Value returnValue, std::function<Value()> fn)
     {
         if (!returnValue.IsEmpty())
         {
@@ -127,9 +127,7 @@ namespace value
         return CreateFunctionImpl(fnName, returnValue, fn);
     }
 
-    std::function<Value(std::vector<Value>)> EmitterContext::CreateFunction(std::string fnName, Value returnValue,
-                                                                            std::vector<Value> argTypes,
-                                                                            std::function<Value(std::vector<Value>)> fn)
+    std::function<Value(std::vector<Value>)> EmitterContext::CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argTypes, std::function<Value(std::vector<Value>)> fn)
     {
         if (std::any_of(argTypes.begin(), argTypes.end(), [](auto value) { return !value.IsEmpty(); }) ||
             !returnValue.IsEmpty())
@@ -236,16 +234,12 @@ namespace value
         return GetContext().CreateFunction(fnName, returnValue, fn);
     }
 
-    std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue,
-                                                            std::vector<Value> argTypes,
-                                                            std::function<Value(std::vector<Value>)> fn)
+    std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argTypes, std::function<Value(std::vector<Value>)> fn)
     {
         return GetContext().CreateFunction(fnName, returnValue, argTypes, fn);
     }
 
-    std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue,
-                                                            std::initializer_list<Value> argTypes,
-                                                            std::function<Value(std::vector<Value>)> fn)
+    std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue, std::initializer_list<Value> argTypes, std::function<Value(std::vector<Value>)> fn)
     {
         return CreateFunction(fnName, returnValue, std::vector<Value>(argTypes), fn);
     }

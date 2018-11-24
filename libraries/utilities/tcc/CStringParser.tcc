@@ -255,7 +255,7 @@ namespace utilities
 
     // parse a single char from the input string.
     inline ParseResult cParse(const char* pStr, char*& pEnd, char& value)
-    { 
+    {
         value = *pStr;
         pEnd = const_cast<char*>(++pStr);
         return ParseResult::success;
@@ -332,5 +332,5 @@ namespace utilities
 
         return parseResult;
     }
-}
-}
+} // namespace utilities
+} // namespace ell

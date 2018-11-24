@@ -56,5 +56,5 @@ namespace common
                          "Use the sorting trainer instead of the histogram trainer",
                          false);
     }
-}
-}
+} // namespace common
+} // namespace ell

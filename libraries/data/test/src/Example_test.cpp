@@ -76,4 +76,4 @@ void ExampleCopyAsTests()
     ExampleCopyAsTestDispatch<data::SparseByteDataVector>();
     ExampleCopyAsTestDispatch<data::SparseBinaryDataVector>();
 }
-}
+} // namespace ell

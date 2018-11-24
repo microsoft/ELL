@@ -18,9 +18,9 @@ namespace ell
 {
 namespace nodes
 {
-    template<typename ValueType>
-    FullyConnectedLayerNode<ValueType>::FullyConnectedLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::FullyConnectedLayer<ValueType>& layer)
-        : NeuralNetworkLayerNode<FullyConnectedLayerNode<ValueType>, predictors::neural::FullyConnectedLayer<ValueType>, ValueType>(input, layer)
+    template <typename ValueType>
+    FullyConnectedLayerNode<ValueType>::FullyConnectedLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::FullyConnectedLayer<ValueType>& layer) :
+        NeuralNetworkLayerNode<FullyConnectedLayerNode<ValueType>, predictors::neural::FullyConnectedLayer<ValueType>, ValueType>(input, layer)
     {
         const auto& layerParameters = layer.GetLayerParameters();
         if (HasPadding(layerParameters.inputPaddingParameters))
@@ -34,7 +34,7 @@ namespace nodes
         }
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     bool FullyConnectedLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         const auto& layerParameters = this->GetLayer().GetLayerParameters();
@@ -84,5 +84,5 @@ namespace nodes
     // Explicit specialization
     template class FullyConnectedLayerNode<float>;
     template class FullyConnectedLayerNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

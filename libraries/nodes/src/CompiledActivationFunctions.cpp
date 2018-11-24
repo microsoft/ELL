@@ -42,12 +42,13 @@ namespace nodes
         if (tanh) return std::make_unique<TanhActivationFunction<ValueType>>();
 
         auto prelu = dynamic_cast<const predictors::neural::ParametricReLUActivation<ValueType>*>(ptr);
-        if (prelu) {
+        if (prelu)
+        {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "GetNodeActivationFunction cannot be used on ParametricReLUActivations");
         }
 
         throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-            std::string("GetNodeActivationFunction given a new Activation type it doesn't recognize: ") + typeid(*f.GetImpl()).name());
+                                        std::string("GetNodeActivationFunction given a new Activation type it doesn't recognize: ") + typeid(*f.GetImpl()).name());
     }
 
     //
@@ -71,15 +72,14 @@ namespace nodes
         // y = clip (scale*x + bias) to [0,1]
         //   = scale * (clip x to [a, b]) + bias, where scale*a+bias = 0, scale*b+bias = 1; so, a = -bias/scale, b = (1-bias)/scale
         auto x = function.LocalScalar(xValue);
-        const auto zero = function.Literal(ValueType{0});
+        const auto zero = function.Literal(ValueType{ 0 });
         const auto one = function.Literal(static_cast<ValueType>(1));
         constexpr auto scale = static_cast<ValueType>(0.2);
         constexpr auto bias = static_cast<ValueType>(0.5);
         constexpr auto lowBound = -bias / scale;
         constexpr auto highBound = (1 - bias) / scale;
 
-        auto result = function.Select(x <= lowBound, zero,
-                        function.Select(x >= highBound, one, (scale * x) + bias));
+        auto result = function.Select(x <= lowBound, zero, function.Select(x >= highBound, one, (scale * x) + bias));
 
         return result;
     }
@@ -195,5 +195,5 @@ namespace nodes
     template std::unique_ptr<ActivationFunction<float>> GetNodeActivationFunction<float>(const predictors::neural::Activation<float>& f);
     template std::unique_ptr<ActivationFunction<double>> GetNodeActivationFunction<double>(const predictors::neural::Activation<double>& f);
 
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

@@ -42,7 +42,8 @@ namespace predictors
     /// <typeparam name="SplitRuleType"> Type of split rule to use in interior nodes. </typeparam>
     /// <typeparam name="EdgePredictorType"> Type of predictor to associate with each edge. </typeparam>
     template <typename SplitRuleType, typename EdgePredictorType>
-    class ForestPredictor : public IPredictor<double>, public utilities::IArchivable
+    class ForestPredictor : public IPredictor<double>
+        , public utilities::IArchivable
     {
     public:
         /// <summary> A struct that identifies a splittable node in the forest. The splittable node can be
@@ -58,8 +59,8 @@ namespace predictors
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
-            SplittableNodeId()
-                : _isRoot(true) {}
+            SplittableNodeId() :
+                _isRoot(true) {}
             SplittableNodeId(size_t parentNodeIndex, size_t childPosition);
 
             bool _isRoot;
@@ -355,7 +356,7 @@ namespace predictors
 
     /// <summary> A simple binary tree with single-input threshold rules and constant predictors in its edges. </summary>
     typedef ForestPredictor<SingleElementThresholdPredictor, ConstantPredictor> SimpleForestPredictor;
-}
-}
+} // namespace predictors
+} // namespace ell
 
 #include "../tcc/ForestPredictor.tcc"

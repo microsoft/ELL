@@ -14,7 +14,7 @@ namespace functions
 {
     double L2Regularizer::operator()(math::ConstColumnVectorReference<double> w, double b) const
     {
-        return 0.5 * (w.Norm2Squared() + b*b);
+        return 0.5 * (w.Norm2Squared() + b * b);
     }
 
     double L2Regularizer::Conjugate(math::ConstColumnVectorReference<double> v, double d) const
@@ -32,5 +32,5 @@ namespace functions
         w.CopyFrom(v);
         b = d;
     }
-}
-}
+} // namespace functions
+} // namespace ell

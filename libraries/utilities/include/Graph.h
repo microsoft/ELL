@@ -8,8 +8,8 @@
 #pragma once
 
 // stl
-#include <ostream>
 #include <map>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -238,5 +238,5 @@ namespace utilities
         std::string _description;
         std::string _dataType;
     };
-}
-}
+} // namespace utilities
+} // namespace ell

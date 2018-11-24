@@ -6,11 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "IRFunctionEmitter.h"
 #include "EmitterException.h"
 #include "IRAsyncTask.h"
 #include "IRBlockRegion.h"
 #include "IREmitter.h"
-#include "IRFunctionEmitter.h"
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 #include "IRParallelLoopEmitter.h"
@@ -48,7 +48,7 @@ namespace emitters
             else
             {
                 auto range = ranges.front();
-                std::vector<IRFunctionEmitter::ConstLoopRange> suffix(ranges.begin()+1, ranges.end());
+                std::vector<IRFunctionEmitter::ConstLoopRange> suffix(ranges.begin() + 1, ranges.end());
                 function.For(range.begin, range.end, [suffix, prevIndices, body](IRFunctionEmitter& function, auto index) {
                     std::vector<IRLocalScalar> prefix(prevIndices.begin(), prevIndices.end());
                     prefix.push_back(index);
@@ -67,7 +67,7 @@ namespace emitters
             else
             {
                 auto range = ranges.front();
-                std::vector<IRFunctionEmitter::LoopRange> suffix(ranges.begin()+1, ranges.end());
+                std::vector<IRFunctionEmitter::LoopRange> suffix(ranges.begin() + 1, ranges.end());
                 function.For(range.begin, range.end, [suffix, prevIndices, body](IRFunctionEmitter& function, auto index) {
                     std::vector<IRLocalScalar> prefix(prevIndices.begin(), prevIndices.end());
                     prefix.push_back(index);
@@ -86,7 +86,7 @@ namespace emitters
             else
             {
                 auto range = ranges.front();
-                std::vector<IRFunctionEmitter::ConstTiledLoopRange> suffix(ranges.begin()+1, ranges.end());
+                std::vector<IRFunctionEmitter::ConstTiledLoopRange> suffix(ranges.begin() + 1, ranges.end());
                 function.For(range, [suffix, prevIntervals, body](IRFunctionEmitter& function, auto interval) {
                     std::vector<IRFunctionEmitter::BlockInterval> prefix(prevIntervals.begin(), prevIntervals.end());
                     prefix.push_back(interval);
@@ -105,7 +105,7 @@ namespace emitters
             else
             {
                 auto range = ranges.front();
-                std::vector<IRFunctionEmitter::TiledLoopRange> suffix(ranges.begin()+1, ranges.end());
+                std::vector<IRFunctionEmitter::TiledLoopRange> suffix(ranges.begin() + 1, ranges.end());
                 function.For(range, [suffix, prevIntervals, body](IRFunctionEmitter& function, auto interval) {
                     std::vector<IRFunctionEmitter::BlockInterval> prefix(prevIntervals.begin(), prevIntervals.end());
                     prefix.push_back(interval);
@@ -113,14 +113,17 @@ namespace emitters
                 });
             }
         }
-    }
+    } // namespace
 
     //
     // IRFunctionEmitter methods
     //
 
-    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, LLVMFunction pFunction, const std::string& name)
-        : _pModuleEmitter(pModuleEmitter), _pEmitter(pEmitter), _pFunction(pFunction), _name(name)
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, LLVMFunction pFunction, const std::string& name) :
+        _pModuleEmitter(pModuleEmitter),
+        _pEmitter(pEmitter),
+        _pFunction(pFunction),
+        _name(name)
     {
         assert(_pModuleEmitter != nullptr);
         assert(_pEmitter != nullptr);
@@ -128,15 +131,15 @@ namespace emitters
         SetUpFunction();
     }
 
-    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, LLVMFunction pFunction, const NamedVariableTypeList& arguments, const std::string& name)
-        : IRFunctionEmitter(pModuleEmitter, pEmitter, pFunction, name)
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, LLVMFunction pFunction, const NamedVariableTypeList& arguments, const std::string& name) :
+        IRFunctionEmitter(pModuleEmitter, pEmitter, pFunction, name)
     {
         // Note: already called other constructor
         RegisterFunctionArgs(arguments);
     }
 
-    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, LLVMFunction pFunction, const NamedLLVMTypeList& arguments, const std::string& name)
-        : IRFunctionEmitter(pModuleEmitter, pEmitter, pFunction, name)
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, LLVMFunction pFunction, const NamedLLVMTypeList& arguments, const std::string& name) :
+        IRFunctionEmitter(pModuleEmitter, pEmitter, pFunction, name)
     {
         // Note: already called other constructor
         RegisterFunctionArgs(arguments);
@@ -649,8 +652,8 @@ namespace emitters
         ConcatRegions(_regions);
     }
 
-    IRFunctionEmitter::EntryBlockScope::EntryBlockScope(IRFunctionEmitter& function)
-        : _function(function)
+    IRFunctionEmitter::EntryBlockScope::EntryBlockScope(IRFunctionEmitter& function) :
+        _function(function)
     {
         // Save current position
         _oldPos = function.GetCurrentInsertPoint();
@@ -764,7 +767,7 @@ namespace emitters
     LLVMValue IRFunctionEmitter::StoreZero(LLVMValue pPointer, int numElements /* = 1 */)
     {
         assert(numElements >= 1);
-        if(llvm::dyn_cast<llvm::GlobalVariable>(pPointer) != nullptr)
+        if (llvm::dyn_cast<llvm::GlobalVariable>(pPointer) != nullptr)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "StoreZero can't handle llvm::GlobalVariables");
         }
@@ -1053,7 +1056,7 @@ namespace emitters
     void IRFunctionEmitter::For(ConstTiledLoopRange range, TiledForLoopBodyFunction body)
     {
         auto stepSize = range.blockSize;
-        auto numFullBlocks = (range.end-range.begin) / stepSize;
+        auto numFullBlocks = (range.end - range.begin) / stepSize;
         auto fullBlocksEnd = range.begin + (numFullBlocks * stepSize);
 
         // full blocks
@@ -1069,7 +1072,7 @@ namespace emitters
         // epilogue -- with non-overlapping blocks, there can be at most one epilogue block
         if (fullBlocksEnd != range.end)
         {
-            body(*this, { LocalScalar(fullBlocksEnd), LocalScalar(range.end), LocalScalar(range.end-fullBlocksEnd), LocalScalar(numFullBlocks) });
+            body(*this, { LocalScalar(fullBlocksEnd), LocalScalar(range.end), LocalScalar(range.end - fullBlocksEnd), LocalScalar(numFullBlocks) });
         }
     }
 
@@ -1081,7 +1084,7 @@ namespace emitters
         }
 
         auto stepSize = range.blockSize.GetIntValue<int>();
-        auto numFullBlocks = (range.end-range.begin) / stepSize;
+        auto numFullBlocks = (range.end - range.begin) / stepSize;
         auto fullBlocksEnd = range.begin + (numFullBlocks * stepSize);
 
         // full blocks
@@ -1094,7 +1097,7 @@ namespace emitters
 
         // epilogue -- with non-overlapping blocks, there can be at most one epilogue block
         If(fullBlocksEnd != range.end, [numFullBlocks, fullBlocksEnd, range, body](auto& function) {
-            body(function, {fullBlocksEnd, range.end, range.end-fullBlocksEnd, numFullBlocks});
+            body(function, { fullBlocksEnd, range.end, range.end - fullBlocksEnd, numFullBlocks });
         });
     }
 
@@ -1718,8 +1721,8 @@ namespace emitters
     //
     // IRFunctionCallArguments
     //
-    IRFunctionCallArguments::IRFunctionCallArguments(IRFunctionEmitter& caller)
-        : _functionEmitter(caller)
+    IRFunctionCallArguments::IRFunctionCallArguments(IRFunctionEmitter& caller) :
+        _functionEmitter(caller)
     {
     }
 
@@ -1766,5 +1769,5 @@ namespace emitters
     template void IRFunctionEmitter::CallGEMM<double>(int m, int n, int k, LLVMValue A, int lda, LLVMValue B, int ldb, LLVMValue C, int ldc);
 
     template void IRFunctionEmitter::CallGEMM<double>(bool transposeA, bool transposeB, int m, int n, int k, LLVMValue A, int lda, LLVMValue B, int ldb, LLVMValue C, int ldc);
-}
-}
+} // namespace emitters
+} // namespace ell

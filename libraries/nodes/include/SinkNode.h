@@ -10,9 +10,9 @@
 
 // model
 #include "CompilableNode.h"
-#include "OutputNodeBase.h"
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
+#include "OutputNodeBase.h"
 
 // emitters
 #include "IRMetadata.h"
@@ -113,7 +113,7 @@ namespace nodes
 
         SinkFunction<ValueType> _sink;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/SinkNode.tcc"

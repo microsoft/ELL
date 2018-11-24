@@ -44,7 +44,7 @@ namespace trainers
         /// <summary></summary>
         static void HardThresholding(math::MatrixReference<double, math::MatrixLayout::columnMajor> M, double sparsity);
     };
-}
-}
+} // namespace trainers
+} // namespace ell
 
 #include "../tcc/ProtoNNTrainerUtils.tcc"

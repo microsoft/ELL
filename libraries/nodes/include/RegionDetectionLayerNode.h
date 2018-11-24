@@ -120,5 +120,5 @@ namespace nodes
 
         model::PortMemoryLayout _inputMemoryLayout;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

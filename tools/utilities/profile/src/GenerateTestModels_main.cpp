@@ -29,7 +29,7 @@ void SaveModels()
     common::SaveMap(GenerateBinaryConvolutionPlusDenseModel(160, 160, 3, 8, 10), "binary_conv_160x160x3x8-dense_10.ell");
     common::SaveMap(GenerateBinaryDarknetLikeModel(), "binary_darknet_160x160x3.ell");
     common::SaveMap(GenerateBinaryDarknetLikeModel(true), "binary_darknet_160x160x3_real.ell");
-    
+
     common::SaveMap(GenerateConvolutionModel(64, 64, 4, 4, 3, 1, dsp::ConvolutionMethodOption::simple), "simple_64x64x4x8.ell");
     common::SaveMap(GenerateConvolutionModel(64, 64, 4, 4, 3, 1, dsp::ConvolutionMethodOption::unrolled), "unrolled_64x64x4x8.ell");
     common::SaveMap(GenerateConvolutionModel(64, 64, 4, 4, 3, 1, dsp::ConvolutionMethodOption::winograd), "winograd_64x64x4x8.ell");
@@ -45,12 +45,12 @@ int main(int argc, char* argv[])
     {
         SaveModels();
     }
-    catch(utilities::Exception& e)
+    catch (utilities::Exception& e)
     {
         std::cout << "Exception: " << e.GetMessage() << std::endl;
         throw;
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
         std::cout << "Exception: " << e.what() << std::endl;
         throw;

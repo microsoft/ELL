@@ -45,7 +45,6 @@ namespace utilities
     /// <returns> true if the file exists and is readable. </returns>
     bool IsFileWritable(const std::string& filepath);
 
-
     /// <summary> Use this method to check if file exists. This might be necessary instead of
     /// IsFileReadable in cases where you know file is a locked executable and you just want
     /// to know if it exists and you don't intend to open it.
@@ -121,7 +120,6 @@ namespace utilities
     /// <returns> The combined filename. </returns>
     std::string JoinPaths(const std::string& path, std::vector<std::string> toAdd);
 
-
     /// <summary> Split a file path into it's parts using OS specific path separator. </summary>
     ///
     /// <param name="paths"> The path. </param>
@@ -139,5 +137,5 @@ namespace utilities
     /// <param name="name"> The name of the executable to find. </param>
     /// <returns> The full path to the executable if found or empty string. </returns>
     std::string FindExecutable(const std::string& name);
-}
-}
+} // namespace utilities
+} // namespace ell

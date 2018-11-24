@@ -240,5 +240,5 @@ namespace common
 
         return settings;
     }
-}
-}
+} // namespace common
+} // namespace ell

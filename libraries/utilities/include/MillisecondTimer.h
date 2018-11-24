@@ -20,8 +20,9 @@ namespace utilities
     {
     public:
         /// <summary></summary>
-        MillisecondTimer()
-            : _start(std::chrono::system_clock::now()), _running(true) {}
+        MillisecondTimer() :
+            _start(std::chrono::system_clock::now()),
+            _running(true) {}
 
         /// <summary></summary>
         void Start()
@@ -64,5 +65,5 @@ namespace utilities
         std::chrono::system_clock::time_point _end;
         bool _running;
     };
-}
-}
+} // namespace utilities
+} // namespace ell

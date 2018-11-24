@@ -11,13 +11,13 @@
 
 namespace llvm
 {
-    class Function;
-    class FunctionType;
-    class GlobalVariable;
-    class StructType;
-    class Type;
-    class Value;
-}
+class Function;
+class FunctionType;
+class GlobalVariable;
+class StructType;
+class Type;
+class Value;
+} // namespace llvm
 
 namespace ell
 {
@@ -67,5 +67,5 @@ namespace emitters
     ///
     /// <returns> The TypedComparison for comparing values of the given type. </returns>
     emitters::TypedComparison GetComparison(LLVMType type, BinaryPredicateType operation);
-}
-}
+} // namespace emitters
+} // namespace ell

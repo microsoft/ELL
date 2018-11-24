@@ -17,5 +17,5 @@ namespace value
         return Cast(value, GetValueType<T>());
     }
 
-}
-}
+} // namespace value
+} // namespace ell

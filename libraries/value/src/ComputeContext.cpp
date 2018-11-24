@@ -27,7 +27,8 @@ namespace value
 
     struct ComputeContext::FunctionScope
     {
-        FunctionScope(ComputeContext& context, std::string fnName) : context(context)
+        FunctionScope(ComputeContext& context, std::string fnName) :
+            context(context)
         {
             context._stack.push({ fnName, {} });
         }
@@ -41,8 +42,7 @@ namespace value
     {
 
         // TODO: Make this the basis of an iterator for MemoryLayout
-        bool IncrementMemoryCoordinateImpl(int dimension, std::vector<int>& coordinate,
-                                           const std::vector<int>& maxCoordinate)
+        bool IncrementMemoryCoordinateImpl(int dimension, std::vector<int>& coordinate, const std::vector<int>& maxCoordinate)
         {
             // base case
             if (dimension < 0)
@@ -114,7 +114,8 @@ namespace value
 
     } // namespace
 
-    ComputeContext::ComputeContext(std::string moduleName) : _moduleName(std::move(moduleName))
+    ComputeContext::ComputeContext(std::string moduleName) :
+        _moduleName(std::move(moduleName))
     {
         // we always have at least one stack space, in case the top level function needs to return something
         _stack.push({});
@@ -143,8 +144,7 @@ namespace value
         return std::nullopt;
     }
 
-    Value ComputeContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data,
-                                             MemoryLayout layout)
+    Value ComputeContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout)
     {
         std::string adjustedName = GetScopeAdjustedName(scope, name);
 
@@ -161,8 +161,7 @@ namespace value
         return ConstantDataToValue(globalData.first, globalData.second);
     }
 
-    Value ComputeContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type,
-                                             MemoryLayout layout)
+    Value ComputeContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout)
     {
         // special case the scalar case
         auto size = layout == ScalarLayout ? 1u : layout.GetMemorySize();
@@ -260,8 +259,7 @@ namespace value
         };
     }
 
-    std::function<Value()> ComputeContext::CreateFunctionImpl(std::string fnName, Value expectedReturn,
-                                                              std::function<Value()> fn)
+    std::function<Value()> ComputeContext::CreateFunctionImpl(std::string fnName, Value expectedReturn, std::function<Value()> fn)
     {
         return [fn = std::move(fn), fnName = std::move(fnName), this, expectedReturn]() {
             ConstantData movedOutOfScope;
@@ -279,7 +277,9 @@ namespace value
     }
 
     std::function<void(std::vector<Value>)> ComputeContext::CreateFunctionImpl(
-        std::string fnName, std::vector<Value> expectedArgs, std::function<void(std::vector<Value>)> fn)
+        std::string fnName,
+        std::vector<Value> expectedArgs,
+        std::function<void(std::vector<Value>)> fn)
     {
         return [fn = std::move(fn), fnName = std::move(fnName), this, expectedArgs = std::move(expectedArgs)](
                    std::vector<Value> args) {
@@ -297,7 +297,9 @@ namespace value
     }
 
     std::function<Value(std::vector<Value>)> ComputeContext::CreateFunctionImpl(
-        std::string fnName, Value expectedReturn, std::vector<Value> expectedArgs,
+        std::string fnName,
+        Value expectedReturn,
+        std::vector<Value> expectedArgs,
         std::function<Value(std::vector<Value>)> fn)
     {
         return [fn = std::move(fn),
@@ -574,35 +576,35 @@ namespace value
                                        auto ptrBegin = data;
                                        auto ptrEnd = data + value.GetLayout().GetMemorySize();
 
-                                                   switch (destType)
-                                                   {
-                                                   case ValueType::Boolean:
+                                       switch (destType)
+                                       {
+                                       case ValueType::Boolean:
                                            castedData = std::vector<Boolean>(ptrBegin, ptrEnd);
                                            break;
-                                                   case ValueType::Char8:
+                                       case ValueType::Char8:
                                            castedData = std::vector<char>(ptrBegin, ptrEnd);
                                            break;
-                                                   case ValueType::Byte:
+                                       case ValueType::Byte:
                                            castedData = std::vector<uint8_t>(ptrBegin, ptrEnd);
                                            break;
-                                                   case ValueType::Int16:
+                                       case ValueType::Int16:
                                            castedData = std::vector<int16_t>(ptrBegin, ptrEnd);
                                            break;
-                                                   case ValueType::Int32:
+                                       case ValueType::Int32:
                                            castedData = std::vector<int32_t>(ptrBegin, ptrEnd);
                                            break;
-                                                   case ValueType::Int64:
+                                       case ValueType::Int64:
                                            castedData = std::vector<int64_t>(ptrBegin, ptrEnd);
                                            break;
-                                                   case ValueType::Float:
+                                       case ValueType::Float:
                                            castedData = std::vector<float>(ptrBegin, ptrEnd);
                                            break;
-                                                   case ValueType::Double:
+                                       case ValueType::Double:
                                            castedData = std::vector<double>(ptrBegin, ptrEnd);
                                            break;
-                                                   default:
-                                                       throw LogicException(LogicExceptionErrors::notImplemented);
-                                                   }
+                                       default:
+                                           throw LogicException(LogicExceptionErrors::notImplemented);
+                                       }
                                    } },
                    value.GetUnderlyingData());
 
@@ -614,7 +616,8 @@ namespace value
     class ComputeContext::IfContextImpl : public EmitterContext::IfContextImpl
     {
     public:
-        IfContextImpl(bool state) : _state(state) {}
+        IfContextImpl(bool state) :
+            _state(state) {}
 
         void ElseIf(Scalar test, std::function<void()> fn) override
         {

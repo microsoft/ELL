@@ -49,7 +49,7 @@ namespace trainers
     ///
     /// <typeparam name="LossFunctionType"> Loss function type. </typeparam>
     /// <typeparam name="RegularizerType"> Regularizer type. </typeparam>
-    template<typename LossFunctionType, typename RegularizerType>
+    template <typename LossFunctionType, typename RegularizerType>
     class SDCATrainer : public ITrainer<predictors::LinearPredictor<double>>
     {
     public:
@@ -86,7 +86,7 @@ namespace trainers
             // weight and label
             data::WeightLabel weightLabel;
 
-            // precomputed squared 2 norm of the data vector 
+            // precomputed squared 2 norm of the data vector
             double norm2Squared = 0;
 
             // dual variable
@@ -129,7 +129,7 @@ namespace trainers
     /// <returns> A linear trainer </returns>
     template <typename LossFunctionType, typename RegularizerType>
     std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSDCATrainer(const LossFunctionType& lossFunction, const RegularizerType& regularizer, const SDCATrainerParameters& parameters);
-}
-}
+} // namespace trainers
+} // namespace ell
 
 #include "../tcc/SDCATrainer.tcc"

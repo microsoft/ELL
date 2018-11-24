@@ -34,7 +34,7 @@ namespace predictors
         /// <param name="input"> The input DataVector. </param>
         ///
         /// <returns> The output DataVector. </returns>
-        template<typename OutputDataVectorType, typename InputDataVectorType>
+        template <typename OutputDataVectorType, typename InputDataVectorType>
         OutputDataVectorType Compute(const InputDataVectorType& input) const;
 
     private:
@@ -43,7 +43,7 @@ namespace predictors
 
     template <data::IterationPolicy policy, typename TransformationType>
     Normalizer<policy, TransformationType> MakeTransformationNormalizer(TransformationType transformation);
-}
-}
+} // namespace predictors
+} // namespace ell
 
 #include "../tcc/Normalizer.tcc"

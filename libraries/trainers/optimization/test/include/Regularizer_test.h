@@ -10,5 +10,3 @@
 
 /// <summary> Tests that regularizers are equivalent, given the right parameters. </summary>
 void TestRegularizerEquivalence(double regularizationParameter);
-
-

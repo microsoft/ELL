@@ -81,5 +81,5 @@ namespace functions
         }
         return b * label;
     }
-}
-}
+} // namespace functions
+} // namespace ell

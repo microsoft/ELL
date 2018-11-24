@@ -88,8 +88,8 @@ namespace predictors
             ElementType _epsilon; // To ensure non-zero division, this is added to denominator
             EpsilonSummand _epsilonSummand;
         };
-    }
-}
-}
+    } // namespace neural
+} // namespace predictors
+} // namespace ell
 
 #include "../tcc/BatchNormalizationLayer.tcc"

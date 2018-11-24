@@ -257,7 +257,7 @@ namespace utilities
         void RegisterArchivableVariantType(VariantTypeRegistry& registry);
         template <typename ValueType>
         void RegisterArchivableVariantVectorType(VariantTypeRegistry& registry);
-    
+
         VariantDetail::VariantBase* GetBasePointer() { return _value.get(); }
         const VariantDetail::VariantBase* GetBasePointer() const { return _value.get(); }
 
@@ -299,7 +299,7 @@ namespace utilities
     /// <summary> Call a function with a vector of Variants </summary>
     template <typename FunctionType>
     FunctionReturnType<FunctionType> CallFunctionWithVariants(FunctionType& function, const std::vector<utilities::Variant>& args);
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/Variant.tcc"

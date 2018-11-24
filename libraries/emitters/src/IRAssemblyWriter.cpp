@@ -81,7 +81,7 @@ namespace emitters
             options.MCOptions.PreserveAsmComments = true; // Note: not the default
             return options;
         }
-    }
+    } // namespace
 
     //
     // Exported functions
@@ -218,5 +218,5 @@ namespace emitters
             throw EmitterException(EmitterError::unexpected, "Error compiling module");
         }
     }
-}
-}
+} // namespace emitters
+} // namespace ell

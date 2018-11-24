@@ -70,8 +70,7 @@ namespace value
         }
 
         template <typename... Args>
-        std::function<void(Args...)> CreateFunction(std::string fnName, std::vector<Value> argValues,
-                                                    std::function<void(Args...)> fn)
+        std::function<void(Args...)> CreateFunction(std::string fnName, std::vector<Value> argValues, std::function<void(Args...)> fn)
         {
             constexpr auto argSize = sizeof...(Args);
             if (argValues.size() != argSize)
@@ -96,8 +95,7 @@ namespace value
         }
 
         template <typename ReturnT, typename... Args>
-        std::function<ReturnT(Args...)> CreateFunction(std::string fnName, Value returnValue,
-                                                       std::vector<Value> argValues, std::function<ReturnT(Args...)> fn)
+        std::function<ReturnT(Args...)> CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argValues, std::function<ReturnT(Args...)> fn)
         {
             constexpr auto argSize = sizeof...(Args);
             if (argValues.size() != argSize)

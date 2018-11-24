@@ -37,5 +37,5 @@ namespace model
 
         static void AddPass(const OptimizationPassInfo& passInfo);
     };
-}
-}
+} // namespace model
+} // namespace ell

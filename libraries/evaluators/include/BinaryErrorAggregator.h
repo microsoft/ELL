@@ -46,5 +46,5 @@ namespace evaluators
         double _sumFalsePositives = 0.0;
         double _sumFalseNegatives = 0.0;
     };
-}
-}
+} // namespace evaluators
+} // namespace ell

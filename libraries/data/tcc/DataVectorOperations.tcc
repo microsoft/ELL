@@ -13,7 +13,7 @@ namespace data
     template <typename DataVectorType, IsDataVector<DataVectorType> Concept>
     auto operator*(double scalar, const DataVectorType& vector)
     {
-        return MakeTransformedDataVector<IterationPolicy::skipZeros>(vector, [scalar](IndexValue x) { return scalar*x.value; });
+        return MakeTransformedDataVector<IterationPolicy::skipZeros>(vector, [scalar](IndexValue x) { return scalar * x.value; });
     }
 
     template <typename DataVectorType, IsDataVector<DataVectorType> Concept>
@@ -31,7 +31,7 @@ namespace data
     template <typename DataVectorType>
     auto Square(const DataVectorType& vector)
     {
-        return MakeTransformedDataVector<IterationPolicy::skipZeros>(vector, [](IndexValue x) { return x.value*x.value; });
+        return MakeTransformedDataVector<IterationPolicy::skipZeros>(vector, [](IndexValue x) { return x.value * x.value; });
     }
 
     template <typename DataVectorType>
@@ -51,5 +51,5 @@ namespace data
     {
         return MakeTransformedDataVector<IterationPolicy::all>(vector, [](IndexValue x) { return x.value == 0.0 ? 1.0 : 0.0; });
     }
-}
-}
+} // namespace data
+} // namespace ell

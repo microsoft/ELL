@@ -75,7 +75,7 @@ MemoryShape GetMemoryShape(const math::IntegerTriplet& shape)
 {
     return { static_cast<int>(shape[0]), static_cast<int>(shape[1]), static_cast<int>(shape[2]) };
 }
-}
+} // namespace
 
 //
 // Neural network predictor node
@@ -97,12 +97,12 @@ ell::predictors::NeuralNetworkPredictor<ElementType> CreateNeuralNetworkPredicto
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
     // Bias layer
-    LayerParameters layerParameters = LayerParameters { inputLayer->GetOutput(), NoPadding(), inputShape, NoPadding() };
+    LayerParameters layerParameters = LayerParameters{ inputLayer->GetOutput(), NoPadding(), inputShape, NoPadding() };
     VectorType bias({ -0.43837756f, -0.90868396f, -0.0323102f });
     layers.push_back(std::make_unique<BiasLayer<ElementType>>(layerParameters, bias));
 
     // Scaling layer
-    layerParameters = LayerParameters { layers.back()->GetOutput(), NoPadding(), inputShape, NoPadding() };
+    layerParameters = LayerParameters{ layers.back()->GetOutput(), NoPadding(), inputShape, NoPadding() };
     VectorType scale({ 1.0f, 5.0f, 10.0f });
     layers.push_back(std::make_unique<ScalingLayer<ElementType>>(layerParameters, scale));
 
@@ -249,7 +249,7 @@ static void TestActivationLayerNode()
     input(1, 1, 1) = -4.0;
     Shape activationOutputShape = { 4, 4, 2 };
     LayerParameters activationParameters{ input, NoPadding(), activationOutputShape, ZeroPadding(1) };
-    
+
     ActivationLayer<ElementType> activationLayer(activationParameters, new ReLUActivation<ElementType>());
     activationLayer.Compute();
     auto output = activationLayer.GetOutput();

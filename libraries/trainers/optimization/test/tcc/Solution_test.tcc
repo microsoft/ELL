@@ -55,7 +55,7 @@ void TestSolutionEquivalenceSGD(double regularizationParameter)
 
     randomEngine.seed(seed);
     auto examples1 = GetRandomExampleSet<RealType, VectorScalarExampleType<RealType>, VectorRefScalarExampleType<RealType>>(numExamples, exampleSize, randomEngine, 1);
-    
+
     randomEngine.seed(seed);
     auto examples2 = GetRandomExampleSet<RealType, VectorScalarExampleType<RealType>, VectorRefScalarExampleType<RealType>>(numExamples, exampleSize, randomEngine, 0);
 
@@ -90,7 +90,7 @@ void TestSolutionEquivalenceSGD(double regularizationParameter)
 
     std::string realName = typeid(RealType).name();
     std::string lossName = typeid(LossFunctionType).name();
-    lossName = lossName.substr(lossName.find_last_of(":")+1);
+    lossName = lossName.substr(lossName.find_last_of(":") + 1);
 
     // test if the two solutions are identical
     testing::ProcessTest("TestSolutionEquivalenceSGD (v1 == v2) <" + realName + ", " + lossName + ">", vector1.GetSubVector(0, exampleSize).IsEqual(vector2, comparisonTolerance));
@@ -148,7 +148,7 @@ void TestSolutionEquivalenceSDCA(double regularizationParameter)
 
     std::string realName = typeid(RealType).name();
     std::string lossName = typeid(LossFunctionType).name();
-    lossName = lossName.substr(lossName.find_last_of(":")+1);
+    lossName = lossName.substr(lossName.find_last_of(":") + 1);
 
     // test if the two solutions are identical
     testing::ProcessTest("TestSolutionEquivalenceSDCA (v1 == v2) <" + realName + ", " + lossName + ">", vector1.GetSubVector(0, exampleSize).IsEqual(vector2, comparisonTolerance));
@@ -157,4 +157,3 @@ void TestSolutionEquivalenceSDCA(double regularizationParameter)
     testing::ProcessTest("TestSolutionEquivalenceSDCA (v2 == v4) <" + realName + ", " + lossName + ">", vector2.IsEqual(vector4, comparisonTolerance));
     testing::ProcessTest("TestSolutionEquivalenceSDCA (b2 == b4) <" + realName + ", " + lossName + ">", testing::IsEqual(solution4.GetBias()[0], solution2.GetBias(), comparisonTolerance));
 };
-

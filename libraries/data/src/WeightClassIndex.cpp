@@ -9,7 +9,7 @@
 #include "WeightClassIndex.h"
 
 // utilities
-#include  "Exception.h"
+#include "Exception.h"
 
 // stl
 #include <iostream>
@@ -62,5 +62,5 @@ namespace data
 
         return WeightClassIndex{ weight, classIndex };
     }
-}
-}
+} // namespace data
+} // namespace ell

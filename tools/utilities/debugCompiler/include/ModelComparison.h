@@ -91,7 +91,7 @@ private:
     struct LayerCaptureData
     {
         const ell::model::Node* referenceDebugSinkNode;
-        const ell::model::Node* compiledDebugSinkNode; 
+        const ell::model::Node* compiledDebugSinkNode;
         std::string referenceNodeLabel;
         std::string compiledNodeId;
         std::string compiledNodeLabel;
@@ -131,4 +131,4 @@ private:
     double _maxError;
     bool _hasMinMax;
 };
-}
+} // namespace ell

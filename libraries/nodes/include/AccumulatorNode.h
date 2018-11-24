@@ -82,7 +82,7 @@ namespace nodes
         // Buffer
         mutable std::vector<ValueType> _accumulator;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/AccumulatorNode.tcc"

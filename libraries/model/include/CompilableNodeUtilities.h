@@ -57,5 +57,5 @@ namespace model
 
     /// <summary> Throw an exception if a node isn't binary (has 2 input ports) </summary>
     void VerifyIsPureBinary(const Node& node);
-}
-}
+} // namespace model
+} // namespace ell

@@ -170,5 +170,5 @@ namespace emitters
             ++argumentsIterator;
         }
     }
-}
-}
+} // namespace emitters
+} // namespace ell

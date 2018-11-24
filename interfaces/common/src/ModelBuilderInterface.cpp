@@ -6,9 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "ModelBuilderInterface.h"
 #include "DatasetInterface.h"
 #include "DatasetInterfaceImpl.h"
-#include "ModelBuilderInterface.h"
 #include "NeuralLayersInterface.h"
 
 // common
@@ -19,8 +19,8 @@
 
 // model
 #include "InputNode.h"
-#include "OutputNode.h"
 #include "ModelEditor.h"
+#include "OutputNode.h"
 
 // nodes
 #include "BinaryOperationNode.h"
@@ -89,7 +89,7 @@ namespace
         }
         return result;
     }
-}
+} // namespace
 
 //
 // ModelBuilder
@@ -398,8 +398,7 @@ Node ModelBuilder::AddSinkNode(Model model, PortElements input, const ell::api::
     return Node(newNode);
 }
 
-Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outputType,
-                                 const ell::api::math::TensorShape& tensorShape, const std::string& sourceFunctionName)
+Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outputType, const ell::api::math::TensorShape& tensorShape, const std::string& sourceFunctionName)
 {
     auto inputType = input.GetType();
     if (inputType != PortType::real)
@@ -727,9 +726,7 @@ Node ModelBuilder::AddDCTNode(Model model, PortElements input, int numFilters)
     return Node(newNode);
 }
 
-Node ModelBuilder::AddVoiceActivityDetectorNode(Model model, PortElements input, double sampleRate, double frameDuration,
-                                                double tauUp, double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown,
-                                                double levelThreshold)
+Node ModelBuilder::AddVoiceActivityDetectorNode(Model model, PortElements input, double sampleRate, double frameDuration, double tauUp, double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown, double levelThreshold)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
@@ -873,8 +870,7 @@ Node ModelBuilder::AddBatchNormalizationLayerNode(Model model, PortElements inpu
     UnderlyingLayerParameters parameters = GetLayerParametersForLayerNode<ElementType>(layer);
     auto epsilonSummand = (layer.epsilonSummand == ell::api::predictors::neural::EpsilonSummand::variance) ? ell::predictors::neural::EpsilonSummand::Variance : ell::predictors::neural::EpsilonSummand::SqrtVariance;
 
-    ell::predictors::neural::BatchNormalizationLayer<ElementType> batchNormalizationLayer(parameters, CastVector<ElementType>(layer.mean), CastVector<ElementType>(layer.variance), 
-        static_cast<ElementType>(layer.epsilon), epsilonSummand);
+    ell::predictors::neural::BatchNormalizationLayer<ElementType> batchNormalizationLayer(parameters, CastVector<ElementType>(layer.mean), CastVector<ElementType>(layer.variance), static_cast<ElementType>(layer.epsilon), epsilonSummand);
 
     newNode = model.GetModel().AddNode<ell::nodes::BatchNormalizationLayerNode<ElementType>>(ell::model::PortElements<ElementType>(elements), batchNormalizationLayer);
     return Node(newNode);
@@ -1159,9 +1155,7 @@ Node ModelBuilder::AddSoftmaxLayerNode(Model model, PortElements input, const el
     return Node(newNode);
 }
 
-Node ModelBuilder::AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits,
-    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-    ell::api::predictors::neural::ActivationType activation)
+Node ModelBuilder::AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation)
 {
     auto type = input.GetType();
     switch (type)
@@ -1178,9 +1172,7 @@ Node ModelBuilder::AddRNNNode(Model model, PortElements input, PortElements rese
 }
 
 template <typename ElementType>
-Node ModelBuilder::AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits,
-    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-    ell::api::predictors::neural::ActivationType activation)
+Node ModelBuilder::AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation)
 {
     using namespace ell::predictors::neural;
     using namespace ell::nodes;
@@ -1193,14 +1185,11 @@ Node ModelBuilder::AddRNNNode(Model model, PortElements input, PortElements rese
         ell::model::PortElements<ElementType>(hiddenWeights.GetPortElements()),
         ell::model::PortElements<ElementType>(inputBias.GetPortElements()),
         ell::model::PortElements<ElementType>(hiddenBias.GetPortElements()),
-        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(activation)
-        );
+        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(activation));
     return Node(newNode);
 }
 
-Node ModelBuilder::AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, 
-    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-    ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
+Node ModelBuilder::AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
 {
     auto type = input.GetType();
     switch (type)
@@ -1217,15 +1206,13 @@ Node ModelBuilder::AddGRUNode(Model model, PortElements input, PortElements rese
 }
 
 template <typename ElementType>
-Node ModelBuilder::AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, 
-    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-    ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
+Node ModelBuilder::AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
 {
     using namespace ell::predictors::neural;
     using namespace ell::nodes;
 
     ell::model::Node* newNode = model.GetModel().AddNode<ell::nodes::GRUNode<ElementType>>(
-        ell::model::PortElements<ElementType>(input.GetPortElements()), 
+        ell::model::PortElements<ElementType>(input.GetPortElements()),
         ell::model::PortElements<int>(reset.GetPortElements()),
         hiddenUnits,
         ell::model::PortElements<ElementType>(inputWeights.GetPortElements()),
@@ -1233,14 +1220,11 @@ Node ModelBuilder::AddGRUNode(Model model, PortElements input, PortElements rese
         ell::model::PortElements<ElementType>(inputBias.GetPortElements()),
         ell::model::PortElements<ElementType>(hiddenBias.GetPortElements()),
         ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(activation),
-        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(recurrentActivation)
-    );
+        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(recurrentActivation));
     return Node(newNode);
 }
 
-Node ModelBuilder::AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, 
-    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-    ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
+Node ModelBuilder::AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
 {
     auto type = input.GetType();
     switch (type)
@@ -1257,9 +1241,7 @@ Node ModelBuilder::AddLSTMNode(Model model, PortElements input, PortElements res
 }
 
 template <typename ElementType>
-Node ModelBuilder::AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits,
-    PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias,
-    ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
+Node ModelBuilder::AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
 {
     using namespace ell::predictors::neural;
     using namespace ell::nodes;
@@ -1273,8 +1255,7 @@ Node ModelBuilder::AddLSTMNode(Model model, PortElements input, PortElements res
         ell::model::PortElements<ElementType>(inputBias.GetPortElements()),
         ell::model::PortElements<ElementType>(hiddenBias.GetPortElements()),
         ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(activation),
-        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(recurrentActivation)
-        );
+        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(recurrentActivation));
     return Node(newNode);
 }
 
@@ -1296,7 +1277,6 @@ Node ModelBuilder::AddDTWNode(Model model, std::vector<std::vector<double>> prot
     }
     return Node(newNode);
 }
-
 
 void ModelBuilder::ResetInput(Node node, PortElements input, std::string input_port_name)
 {
@@ -1349,4 +1329,4 @@ template std::vector<float> CastVector<float>(const std::vector<float>&);
 template std::vector<double> CastVector<double>(const std::vector<float>&);
 template std::vector<double> CastVector<double>(const std::vector<double>&);
 
-}
+} // namespace ELL_API

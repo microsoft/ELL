@@ -144,5 +144,5 @@ namespace utilities
             _objectDescription[name] >> array;
         }
     }
-}
-}
+} // namespace utilities
+} // namespace ell

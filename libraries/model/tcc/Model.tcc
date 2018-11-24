@@ -53,7 +53,7 @@ namespace model
                     std::integral_constant<bool, shouldUseInitList>{});
             }
         };
-    }
+    } // namespace detail
 
     //
     // Factory method for creating nodes
@@ -97,7 +97,7 @@ namespace model
 
         auto ports = std::vector<const OutputPortBase*>(usedPorts.begin(), usedPorts.end());
         VisitSubmodel(ports, [](const Node& node) {
-            node.Compute(); 
+            node.Compute();
         });
 
         // Now construct the output
@@ -209,5 +209,5 @@ namespace model
             iter.Next();
         }
     }
-}
-}
+} // namespace model
+} // namespace ell

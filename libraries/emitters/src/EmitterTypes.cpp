@@ -452,5 +452,5 @@ namespace emitters
             return false;
         }
     }
-}
-}
+} // namespace emitters
+} // namespace ell

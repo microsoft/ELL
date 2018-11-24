@@ -57,7 +57,6 @@ namespace model
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-
     protected:
         void Compute() const override;
         void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
@@ -74,7 +73,7 @@ namespace model
         int _largestDimensionStart = 0;
         int _largestDimensionCount = 0;
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/SliceNode.tcc"

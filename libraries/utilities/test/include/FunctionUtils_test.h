@@ -13,4 +13,4 @@ namespace ell
 void TestInOrderFunctionEvaluator();
 void TestApplyToEach();
 void TestFunctionTraits();
-}
+} // namespace ell

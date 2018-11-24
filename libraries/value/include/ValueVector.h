@@ -37,21 +37,24 @@ namespace value
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="t"> The data to wrap </param>
         template <typename T, typename A = std::allocator<T>>
-        Vector(std::vector<T, A> data) : _value(std::move(data))
+        Vector(std::vector<T, A> data) :
+            _value(std::move(data))
         {}
 
         /// <summary> Constructs an instance from an initializer list of fundamental types </summary>
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="t"> The data to wrap </param>
         template <typename T>
-        Vector(std::initializer_list<T> data) : _value(std::vector<T>(data))
+        Vector(std::initializer_list<T> data) :
+            _value(std::vector<T>(data))
         {}
 
         /// <summary> Constructs an allocated instance of the specified size </summary>
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="size"> The size of the allocated vector </param>
         template <typename T>
-        Vector(size_t size) : Vector(Allocate<T>(size))
+        Vector(size_t size) :
+            Vector(Allocate<T>(size))
         {}
 
         /// <summary> Returns a Scalar value that represents the data at the specified index within the vector </summary>

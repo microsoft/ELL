@@ -27,5 +27,5 @@ namespace model
         auto pVar = GetOrAllocatePortVariable(port, initialValue);
         return GetModule().EnsureEmitted(*pVar);
     }
-}
-}
+} // namespace model
+} // namespace ell

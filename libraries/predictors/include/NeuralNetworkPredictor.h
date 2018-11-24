@@ -11,14 +11,13 @@
 #include "IPredictor.h"
 
 // math
-#include "Vector.h"
 #include "Matrix.h"
+#include "Vector.h"
 
 // datasets
 #include "Dataset.h"
 
 // neural network
-#include "Layer.h"
 #include "ActivationLayer.h"
 #include "BatchNormalizationLayer.h"
 #include "BiasLayer.h"
@@ -27,13 +26,14 @@
 #include "FullyConnectedLayer.h"
 #include "HardSigmoidActivation.h"
 #include "InputLayer.h"
+#include "Layer.h"
 #include "LeakyReLUActivation.h"
 #include "MaxPoolingFunction.h"
 #include "MeanPoolingFunction.h"
 #include "ParametricReLUActivation.h"
 #include "PoolingLayer.h"
-#include "RegionDetectionLayer.h"
 #include "ReLUActivation.h"
+#include "RegionDetectionLayer.h"
 #include "ScalingLayer.h"
 #include "SigmoidActivation.h"
 #include "SoftmaxLayer.h"
@@ -46,14 +46,14 @@
 #include <cstddef>
 #include <memory>
 
-
 namespace ell
 {
 namespace predictors
 {
     /// <summary> A neural network predictor. </summary>
     template <typename ElementType>
-    class NeuralNetworkPredictor : public IPredictor<std::vector<ElementType>>, public utilities::IArchivable
+    class NeuralNetworkPredictor : public IPredictor<std::vector<ElementType>>
+        , public utilities::IArchivable
     {
     public:
         /// <summary> Type of the input vector expected by this predictor type. </summary>
@@ -161,7 +161,7 @@ namespace predictors
         Layers _layers;
         mutable std::vector<ElementType> _output;
     };
-}
-}
+} // namespace predictors
+} // namespace ell
 
 #include "../tcc/NeuralNetworkPredictor.tcc"

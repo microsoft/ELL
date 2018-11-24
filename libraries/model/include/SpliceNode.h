@@ -73,7 +73,7 @@ namespace model
         std::vector<std::unique_ptr<InputPort<ValueType>>> _inputPorts;
         OutputPort<ValueType> _output;
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/SpliceNode.tcc"

@@ -14,8 +14,13 @@ namespace ell
 namespace trainers
 {
     template <typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
-    HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ThresholdFinderType& thresholdFinder, const HistogramForestTrainerParameters& parameters)
-        : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction), _thresholdFinder(thresholdFinder), _random(utilities::GetRandomEngine(parameters.randomSeed)), _thresholdFinderSampleSize(parameters.thresholdFinderSampleSize), _candidatesPerInput(parameters.candidatesPerInput)
+    HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ThresholdFinderType& thresholdFinder, const HistogramForestTrainerParameters& parameters) :
+        ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters),
+        _lossFunction(lossFunction),
+        _thresholdFinder(thresholdFinder),
+        _random(utilities::GetRandomEngine(parameters.randomSeed)),
+        _thresholdFinderSampleSize(parameters.thresholdFinderSampleSize),
+        _candidatesPerInput(parameters.candidatesPerInput)
     {
     }
 
@@ -108,5 +113,5 @@ namespace trainers
     {
         return std::make_unique<HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>>(lossFunction, booster, thresholdFinder, parameters);
     }
-}
-}
+} // namespace trainers
+} // namespace ell

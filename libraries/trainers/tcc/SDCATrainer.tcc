@@ -15,14 +15,16 @@ namespace ell
 {
 namespace trainers
 {
-    template<typename LossFunctionType, typename RegularizerType>
-    SDCATrainer<LossFunctionType, RegularizerType>::SDCATrainer(const LossFunctionType& lossFunction, const RegularizerType& regularizer, const SDCATrainerParameters& parameters)
-    : _lossFunction(lossFunction), _regularizer(regularizer), _parameters(parameters)
+    template <typename LossFunctionType, typename RegularizerType>
+    SDCATrainer<LossFunctionType, RegularizerType>::SDCATrainer(const LossFunctionType& lossFunction, const RegularizerType& regularizer, const SDCATrainerParameters& parameters) :
+        _lossFunction(lossFunction),
+        _regularizer(regularizer),
+        _parameters(parameters)
     {
         _random = utilities::GetRandomEngine(parameters.randomSeedString);
     }
 
-    template<typename LossFunctionType, typename RegularizerType>
+    template <typename LossFunctionType, typename RegularizerType>
     void SDCATrainer<LossFunctionType, RegularizerType>::SetDataset(const data::AnyDataset& anyDataset)
     {
         DEBUG_THROW(_v.Norm0() != 0, utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "can only call SetDataset before updates"));
@@ -45,8 +47,8 @@ namespace trainers
         }
     }
 
-    template<typename LossFunctionType, typename RegularizerType>
-    void SDCATrainer<LossFunctionType, RegularizerType>::Update() 
+    template <typename LossFunctionType, typename RegularizerType>
+    void SDCATrainer<LossFunctionType, RegularizerType>::Update()
     {
         if (_parameters.permute)
         {
@@ -63,11 +65,12 @@ namespace trainers
         ComputeObjectives();
     }
 
-    template<typename LossFunctionType, typename RegularizerType>
-    SDCATrainer<LossFunctionType, RegularizerType>::TrainerMetadata::TrainerMetadata(const data::WeightLabel& original) : weightLabel(original)
+    template <typename LossFunctionType, typename RegularizerType>
+    SDCATrainer<LossFunctionType, RegularizerType>::TrainerMetadata::TrainerMetadata(const data::WeightLabel& original) :
+        weightLabel(original)
     {}
 
-    template<typename LossFunctionType, typename RegularizerType>
+    template <typename LossFunctionType, typename RegularizerType>
     void SDCATrainer<LossFunctionType, RegularizerType>::Step(TrainerExampleType& example)
     {
         const auto& dataVector = example.GetDataVector();
@@ -76,15 +79,15 @@ namespace trainers
         auto weightLabel = example.GetMetadata().weightLabel;
         auto norm2Squared = example.GetMetadata().norm2Squared + 1; // add one because of bias term
         auto lipschitz = norm2Squared * _inverseScaledRegularization;
-        auto dual = example.GetMetadata().dualVariable; 
+        auto dual = example.GetMetadata().dualVariable;
 
         if (lipschitz > 0)
         {
             auto prediction = _predictor.Predict(dataVector);
-            
+
             auto newDual = _lossFunction.ConjugateProx(1.0 / lipschitz, dual + prediction / lipschitz, weightLabel.label);
             auto dualDiff = newDual - dual;
-            
+
             if (dualDiff != 0)
             {
                 _v.Transpose() += (-dualDiff * _inverseScaledRegularization) * dataVector;
@@ -95,7 +98,7 @@ namespace trainers
         }
     }
 
-    template<typename LossFunctionType, typename RegularizerType>
+    template <typename LossFunctionType, typename RegularizerType>
     void SDCATrainer<LossFunctionType, RegularizerType>::ComputeObjectives()
     {
         double invSize = 1.0 / _dataset.NumExamples();
@@ -118,7 +121,7 @@ namespace trainers
         _predictorInfo.dualObjective -= _parameters.regularization * _regularizer.Conjugate(_v, _d);
     }
 
-    template<typename LossFunctionType, typename RegularizerType>
+    template <typename LossFunctionType, typename RegularizerType>
     void SDCATrainer<LossFunctionType, RegularizerType>::ResizeTo(const data::AutoDataVector& x)
     {
         auto xSize = x.PrefixLength();
@@ -134,5 +137,5 @@ namespace trainers
     {
         return std::make_unique<SDCATrainer<LossFunctionType, RegularizerType>>(lossFunction, regularizer, parameters);
     }
-}
-}
+} // namespace trainers
+} // namespace ell

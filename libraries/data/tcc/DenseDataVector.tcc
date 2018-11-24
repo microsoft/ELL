@@ -20,8 +20,8 @@ namespace ell
 namespace data
 {
     template <typename ElementType>
-    DenseDataVector<ElementType>::DenseDataVector()
-        : _numNonzeros(0)
+    DenseDataVector<ElementType>::DenseDataVector() :
+        _numNonzeros(0)
     {
         _data.reserve(DEFAULT_DENSE_VECTOR_CAPACITY);
     }
@@ -73,15 +73,15 @@ namespace data
         return static_cast<double>(_data[index]);
     }
 
-    template<typename ElementType>
-    template<IterationPolicy policy>
+    template <typename ElementType>
+    template <IterationPolicy policy>
     VectorIndexValueIterator<policy, ElementType> DenseDataVector<ElementType>::GetIterator(size_t size) const
-    { 
-        return MakeVectorIndexValueIterator<policy>(_data, size); 
+    {
+        return MakeVectorIndexValueIterator<policy>(_data, size);
     }
 
-    template<typename ElementType> // move this to datavectorbase?
-    template<IterationPolicy policy>
+    template <typename ElementType> // move this to datavectorbase?
+    template <IterationPolicy policy>
     VectorIndexValueIterator<policy, ElementType> DenseDataVector<ElementType>::GetIterator() const
     {
         return GetIterator<policy>(PrefixLength());
@@ -99,8 +99,8 @@ namespace data
 
         if (storedValue - value > 1.0e-5 || value - storedValue > 1.0e-5)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, 
-                utilities::FormatString("Data loss detected when storing value %f as type %s", value, utilities::GetTypeName<ElementType>().c_str()));
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
+                                            utilities::FormatString("Data loss detected when storing value %f as type %s", value, utilities::GetTypeName<ElementType>().c_str()));
         }
 
         if (index < _data.size())
@@ -112,5 +112,5 @@ namespace data
         _data[index] = storedValue;
         ++_numNonzeros;
     }
-}
-}
+} // namespace data
+} // namespace ell

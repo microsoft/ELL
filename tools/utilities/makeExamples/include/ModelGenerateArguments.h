@@ -27,11 +27,12 @@ struct ModelGenerateArguments
 };
 
 /// <summary> A version of ModelGenerateArguments that adds its members to the command line parser. </summary>
-struct ParsedModelGenerateArguments : public ModelGenerateArguments, public utilities::ParsedArgSet
+struct ParsedModelGenerateArguments : public ModelGenerateArguments
+    , public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments to the command line parser. </summary>
     ///
     /// <param name="parser"> [in,out] The parser. </param>
     void AddArgs(utilities::CommandLineParser& parser) override;
 };
-}
+} // namespace ell

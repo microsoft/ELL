@@ -18,11 +18,13 @@ namespace utilities
     namespace detail
     {
         template <typename T>
-        struct IsVectorType : std::false_type {};
+        struct IsVectorType : std::false_type
+        {};
 
         template <typename T, typename A>
-        struct IsVectorType<std::vector<T, A>> : std::true_type {};
-    }
+        struct IsVectorType<std::vector<T, A>> : std::true_type
+        {};
+    } // namespace detail
 
     /// <summary> Enabled if ValueType is a boolean. </summary>
     template <typename ValueType>
@@ -98,7 +100,7 @@ namespace utilities
             static constexpr size_t NumPointers = 0;
             using Type = T;
         };
-    }
+    } // namespace detail
 
     /// <summary> Type alias that removes all pointers and returns the final underlying type </summary>
     template <typename T>
@@ -110,10 +112,13 @@ namespace utilities
 
     /// <summary> Used to wrap a number of lambdas to create an overloaded set for std::visitor </summary>
     template <typename... T>
-    struct VariantVisitor : T... { using T::operator()...; };
+    struct VariantVisitor : T...
+    {
+        using T::operator()...;
+    };
 
     // deduction guide
     template <typename... T>
-    VariantVisitor(T...) -> VariantVisitor<T...>;
-}
-}
+    VariantVisitor(T...)->VariantVisitor<T...>;
+} // namespace utilities
+} // namespace ell

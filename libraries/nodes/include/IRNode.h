@@ -102,5 +102,5 @@ namespace nodes
         emitters::NamedVariableTypeList _inputTypes;
         emitters::NamedVariableTypeList _outputTypes;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

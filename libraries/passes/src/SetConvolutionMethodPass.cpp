@@ -29,30 +29,30 @@ namespace passes
     {
         predictors::neural::ConvolutionMethod GetConvolutionMethod(model::PreferredConvolutionMethod preferredMethod)
         {
-            switch(preferredMethod)
+            switch (preferredMethod)
             {
-                case model::PreferredConvolutionMethod::unrolled:
-                    return predictors::neural::ConvolutionMethod::unrolled;
-                case model::PreferredConvolutionMethod::simple:
-                    return predictors::neural::ConvolutionMethod::simple;
-                case model::PreferredConvolutionMethod::diagonal:
-                    return predictors::neural::ConvolutionMethod::diagonal;
-                case model::PreferredConvolutionMethod::winograd:
-                    return predictors::neural::ConvolutionMethod::winograd;
-                default:
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+            case model::PreferredConvolutionMethod::unrolled:
+                return predictors::neural::ConvolutionMethod::unrolled;
+            case model::PreferredConvolutionMethod::simple:
+                return predictors::neural::ConvolutionMethod::simple;
+            case model::PreferredConvolutionMethod::diagonal:
+                return predictors::neural::ConvolutionMethod::diagonal;
+            case model::PreferredConvolutionMethod::winograd:
+                return predictors::neural::ConvolutionMethod::winograd;
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
             }
         }
 
         bool IsMethodCompatible(predictors::neural::ConvolutionMethod method, const predictors::neural::ConvolutionalParameters& convolutionalParameters)
         {
-            if(method == predictors::neural::ConvolutionMethod::winograd)
+            if (method == predictors::neural::ConvolutionMethod::winograd)
             {
-                if(convolutionalParameters.stride != 1)
+                if (convolutionalParameters.stride != 1)
                 {
                     return false;
                 }
-                if(convolutionalParameters.receptiveField != 3)
+                if (convolutionalParameters.receptiveField != 3)
                 {
                     return false;
                 }
@@ -78,7 +78,7 @@ namespace passes
 
             auto method = GetConvolutionMethod(preferredMethod);
             convolutionalParameters.method = method;
-            if(!IsMethodCompatible(method, convolutionalParameters))
+            if (!IsMethodCompatible(method, convolutionalParameters))
             {
                 return false;
             }
@@ -106,7 +106,7 @@ namespace passes
 
             transformer.CopyNode(node);
         }
-    }
+    } // namespace
 
     //
     // SetConvolutionMethodPass methods
@@ -126,5 +126,5 @@ namespace passes
         };
         model::OptimizationPassRegistry::AddPass(info);
     }
-}
-}
+} // namespace passes
+} // namespace ell

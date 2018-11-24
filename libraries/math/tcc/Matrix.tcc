@@ -25,8 +25,11 @@ namespace math
     //
 
     template <typename ElementType>
-    CommonMatrixBase<ElementType>::CommonMatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment)
-        : _pData(pData), _numRows(numRows), _numColumns(numColumns), _increment(increment)
+    CommonMatrixBase<ElementType>::CommonMatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment) :
+        _pData(pData),
+        _numRows(numRows),
+        _numColumns(numColumns),
+        _increment(increment)
     {
     }
 
@@ -46,14 +49,14 @@ namespace math
 
     // Row-major
     template <typename ElementType>
-    MatrixBase<ElementType, MatrixLayout::rowMajor>::MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns)
-        : CommonMatrixBase<ElementType>(pData, numRows, numColumns, numColumns)
+    MatrixBase<ElementType, MatrixLayout::rowMajor>::MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns) :
+        CommonMatrixBase<ElementType>(pData, numRows, numColumns, numColumns)
     {
     }
 
     template <typename ElementType>
-    MatrixBase<ElementType, MatrixLayout::rowMajor>::MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment)
-        : CommonMatrixBase<ElementType>(pData, numRows, numColumns, increment)
+    MatrixBase<ElementType, MatrixLayout::rowMajor>::MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment) :
+        CommonMatrixBase<ElementType>(pData, numRows, numColumns, increment)
     {
     }
 
@@ -65,14 +68,14 @@ namespace math
 
     // Column-major
     template <typename ElementType>
-    MatrixBase<ElementType, MatrixLayout::columnMajor>::MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns)
-        : CommonMatrixBase<ElementType>(pData, numRows, numColumns, numRows)
+    MatrixBase<ElementType, MatrixLayout::columnMajor>::MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns) :
+        CommonMatrixBase<ElementType>(pData, numRows, numColumns, numRows)
     {
     }
 
     template <typename ElementType>
-    MatrixBase<ElementType, MatrixLayout::columnMajor>::MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment)
-        : CommonMatrixBase<ElementType>(pData, numRows, numColumns, increment)
+    MatrixBase<ElementType, MatrixLayout::columnMajor>::MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment) :
+        CommonMatrixBase<ElementType>(pData, numRows, numColumns, increment)
     {
     }
 
@@ -86,14 +89,14 @@ namespace math
     // ConstMatrixReference
     //
     template <typename ElementType, MatrixLayout layout>
-    ConstMatrixReference<ElementType, layout>::ConstMatrixReference(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment)
-        : MatrixBase<ElementType, layout>(pData, numRows, numColumns, increment)
+    ConstMatrixReference<ElementType, layout>::ConstMatrixReference(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment) :
+        MatrixBase<ElementType, layout>(pData, numRows, numColumns, increment)
     {
     }
 
     template <typename ElementType, MatrixLayout layout>
-    ConstMatrixReference<ElementType, layout>::ConstMatrixReference(const ElementType* pData, size_t numRows, size_t numColumns)
-        : MatrixBase<ElementType, layout>(pData, numRows, numColumns)
+    ConstMatrixReference<ElementType, layout>::ConstMatrixReference(const ElementType* pData, size_t numRows, size_t numColumns) :
+        MatrixBase<ElementType, layout>(pData, numRows, numColumns)
     {
     }
 
@@ -236,14 +239,14 @@ namespace math
     //
 
     template <typename ElementType, MatrixLayout layout>
-    MatrixReference<ElementType, layout>::MatrixReference(ElementType* pData, size_t numRows, size_t numColumns, size_t increment)
-        : ConstMatrixReference<ElementType, layout>(pData, numRows, numColumns, increment)
+    MatrixReference<ElementType, layout>::MatrixReference(ElementType* pData, size_t numRows, size_t numColumns, size_t increment) :
+        ConstMatrixReference<ElementType, layout>(pData, numRows, numColumns, increment)
     {
     }
 
     template <typename ElementType, MatrixLayout layout>
-    MatrixReference<ElementType, layout>::MatrixReference(ElementType* pData, size_t numRows, size_t numColumns)
-        : ConstMatrixReference<ElementType, layout>(pData, numRows, numColumns)
+    MatrixReference<ElementType, layout>::MatrixReference(ElementType* pData, size_t numRows, size_t numColumns) :
+        ConstMatrixReference<ElementType, layout>(pData, numRows, numColumns)
     {
     }
 
@@ -369,15 +372,17 @@ namespace math
     //
 
     template <typename ElementType, MatrixLayout layout>
-    Matrix<ElementType, layout>::Matrix(size_t numRows, size_t numColumns)
-        : MatrixReference<ElementType, layout>(nullptr, numRows, numColumns), _data(numRows * numColumns)
+    Matrix<ElementType, layout>::Matrix(size_t numRows, size_t numColumns) :
+        MatrixReference<ElementType, layout>(nullptr, numRows, numColumns),
+        _data(numRows * numColumns)
     {
         this->_pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout layout>
-    Matrix<ElementType, layout>::Matrix(std::initializer_list<std::initializer_list<ElementType>> list)
-        : MatrixReference<ElementType, layout>(nullptr, list.size(), list.begin()->size()), _data(list.size() * list.begin()->size())
+    Matrix<ElementType, layout>::Matrix(std::initializer_list<std::initializer_list<ElementType>> list) :
+        MatrixReference<ElementType, layout>(nullptr, list.size(), list.begin()->size()),
+        _data(list.size() * list.begin()->size())
     {
         this->_pData = _data.data();
         auto numColumns = list.begin()->size();
@@ -399,36 +404,41 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout layout>
-    Matrix<ElementType, layout>::Matrix(size_t numRows, size_t numColumns, const std::vector<ElementType>& data)
-        : MatrixReference<ElementType, layout>(nullptr, numRows, numColumns), _data(data)
+    Matrix<ElementType, layout>::Matrix(size_t numRows, size_t numColumns, const std::vector<ElementType>& data) :
+        MatrixReference<ElementType, layout>(nullptr, numRows, numColumns),
+        _data(data)
     {
         this->_pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout layout>
-    Matrix<ElementType, layout>::Matrix(size_t numRows, size_t numColumns, std::vector<ElementType>&& data)
-        : MatrixReference<ElementType, layout>(nullptr, numRows, numColumns), _data(std::move(data))
+    Matrix<ElementType, layout>::Matrix(size_t numRows, size_t numColumns, std::vector<ElementType>&& data) :
+        MatrixReference<ElementType, layout>(nullptr, numRows, numColumns),
+        _data(std::move(data))
     {
         this->_pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout layout>
-    Matrix<ElementType, layout>::Matrix(Matrix<ElementType, layout>&& other)
-        : MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()), _data(std::move(other._data))
+    Matrix<ElementType, layout>::Matrix(Matrix<ElementType, layout>&& other) :
+        MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()),
+        _data(std::move(other._data))
     {
         this->_pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout layout>
-    Matrix<ElementType, layout>::Matrix(const Matrix<ElementType, layout>& other)
-        : MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()), _data(other._data)
+    Matrix<ElementType, layout>::Matrix(const Matrix<ElementType, layout>& other) :
+        MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()),
+        _data(other._data)
     {
         this->_pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout layout>
-    Matrix<ElementType, layout>::Matrix(ConstMatrixReference<ElementType, layout>& other)
-        : MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()), _data(other.NumRows() * other.NumColumns())
+    Matrix<ElementType, layout>::Matrix(ConstMatrixReference<ElementType, layout>& other) :
+        MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()),
+        _data(other.NumRows() * other.NumColumns())
     {
         this->_pData = _data.data();
         for (size_t i = 0; i < this->NumRows(); ++i)
@@ -441,8 +451,9 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout layout>
-    Matrix<ElementType, layout>::Matrix(ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value> other)
-        : MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()), _data(other.NumRows() * other.NumColumns())
+    Matrix<ElementType, layout>::Matrix(ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value> other) :
+        MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()),
+        _data(other.NumRows() * other.NumColumns())
     {
         this->_pData = _data.data();
         for (size_t i = 0; i < this->NumRows(); ++i)
@@ -491,5 +502,5 @@ namespace math
 
         matrix = std::move(value);
     }
-}
-}
+} // namespace math
+} // namespace ell

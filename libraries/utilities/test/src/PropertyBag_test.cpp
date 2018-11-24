@@ -57,7 +57,7 @@ void TestPropertyBag()
 
     //
     // Serialization tests
-    // 
+    //
     metadata.Clear();
     metadata["a"] = std::string("foo");
     metadata["b"] = std::vector<std::string>{ "hello", "world" };
@@ -100,4 +100,4 @@ void TestPropertyBag()
     testing::ProcessTest("Deserialize PropertyBag", testing::IsEqual(metadata3.GetEntry<std::vector<int>>("d"), { 5, 6, 7, 8 }));
     testing::ProcessTest("Deserialize PropertyBag", testing::IsEqual(metadata3.GetEntry<double>("e"), 5.0));
 }
-} // end namespace
+} // namespace ell

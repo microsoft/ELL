@@ -79,7 +79,7 @@ namespace
 
         transformer.CopyNode(node);
     }
-}
+} // namespace
 
 //
 // ReplaceSourceAndSinkNodesPass methods
@@ -98,4 +98,4 @@ void ReplaceSourceAndSinkNodesPass::AddToRegistry()
     };
     model::OptimizationPassRegistry::AddPass(info);
 }
-}
+} // namespace ell

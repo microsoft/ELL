@@ -11,33 +11,33 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode()
-        : SourceNode({}, model::MemoryShape{ 0 }, "", nullptr)
+    SourceNode<ValueType>::SourceNode() :
+        SourceNode({}, model::MemoryShape{ 0 }, "", nullptr)
     {
     }
 
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::OutputPort<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
-        : SourceNode(input, model::MemoryShape{ static_cast<int>(inputVectorSize) }, sourceFunctionName, source)
+    SourceNode<ValueType>::SourceNode(const model::OutputPort<nodes::TimeTickType>& input, size_t inputVectorSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source) :
+        SourceNode(input, model::MemoryShape{ static_cast<int>(inputVectorSize) }, sourceFunctionName, source)
     {
     }
 
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::OutputPort<nodes::TimeTickType>& input, const model::MemoryShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
-        : model::SourceNodeBase(_input, _output, sourceFunctionName),
+    SourceNode<ValueType>::SourceNode(const model::OutputPort<nodes::TimeTickType>& input, const model::MemoryShape& shape, const std::string& sourceFunctionName, SourceFunction<ValueType> source) :
+        model::SourceNodeBase(_input, _output, sourceFunctionName),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, shape),
-        _source(source == nullptr ? [](auto&){ return false; } : source)
+        _source(source == nullptr ? [](auto&) { return false; } : source)
     {
         _bufferedSample.resize(shape.NumElements());
     }
 
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::OutputPort<nodes::TimeTickType>& input, const model::PortMemoryLayout& layout, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
-        : model::SourceNodeBase(_input, _output, sourceFunctionName),
+    SourceNode<ValueType>::SourceNode(const model::OutputPort<nodes::TimeTickType>& input, const model::PortMemoryLayout& layout, const std::string& sourceFunctionName, SourceFunction<ValueType> source) :
+        model::SourceNodeBase(_input, _output, sourceFunctionName),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, layout),
-        _source(source == nullptr ? [](auto&){ return false; } : source)
+        _source(source == nullptr ? [](auto&) { return false; } : source)
     {
         _bufferedSample.resize(layout.NumElements());
     }
@@ -201,5 +201,5 @@ namespace nodes
             function.SetValueAt(pOutput, function.Literal(static_cast<int>(i)), value);
         }
     }
-}
-}
+} // namespace nodes
+} // namespace ell

@@ -14,14 +14,14 @@ namespace model
     // OutputPort
     //
     template <typename ValueType>
-    OutputPort<ValueType>::OutputPort(const Node* node, std::string name, size_t size)
-        : OutputPortBase(node, name, OutputPortBase::GetPortType<ValueType>(), size)
+    OutputPort<ValueType>::OutputPort(const Node* node, std::string name, size_t size) :
+        OutputPortBase(node, name, OutputPortBase::GetPortType<ValueType>(), size)
     {
     }
 
     template <typename ValueType>
-    OutputPort<ValueType>::OutputPort(const Node* node, std::string name, const PortMemoryLayout& layout)
-        : OutputPortBase(node, name, OutputPortBase::GetPortType<ValueType>(), layout)
+    OutputPort<ValueType>::OutputPort(const Node* node, std::string name, const PortMemoryLayout& layout) :
+        OutputPortBase(node, name, OutputPortBase::GetPortType<ValueType>(), layout)
     {
     }
 
@@ -77,5 +77,5 @@ namespace model
     {
         OutputPortBase::ReadFromArchive(archiver);
     }
-}
-}
+} // namespace model
+} // namespace ell

@@ -23,7 +23,7 @@ namespace model
     class Map;
     class Model;
     class Node;
-    
+
     struct MapCompilerOptions
     {
         // map-specific compiler settings
@@ -34,13 +34,12 @@ namespace model
         std::string sourceFunctionName;
         std::string sinkFunctionName;
         bool verifyJittedModule = false;
-        
+
         // optimizations
         ModelOptimizerOptions optimizerSettings;
 
         // lower-level emitters settings
         emitters::CompilerOptions compilerSettings;
     };
-}
-}
-
+} // namespace model
+} // namespace ell

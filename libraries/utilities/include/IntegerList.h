@@ -96,5 +96,5 @@ namespace utilities
         // The list
         std::vector<size_t> _list;
     };
-}
-}
+} // namespace utilities
+} // namespace ell

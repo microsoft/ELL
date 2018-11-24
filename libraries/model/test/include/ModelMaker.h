@@ -79,7 +79,7 @@ public:
 
     void SetName(const std::string& name)
     {
-        // STYLE discrepancy 
+        // STYLE discrepancy
         _name = name;
     }
 

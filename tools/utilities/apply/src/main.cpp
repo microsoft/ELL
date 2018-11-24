@@ -24,7 +24,6 @@
 #include "Vector.h"
 #include "VectorOperations.h"
 
-
 // common
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"

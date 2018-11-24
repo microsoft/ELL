@@ -51,7 +51,7 @@ namespace dsp
     /// <remarks> The output of a real-valued FFT is symmetric, so only the first (N/2)+1 entries of the signal input are necessary </remarks>
     template <typename ValueType>
     void FFT(std::vector<ValueType>& signal, bool inverse = false);
-}
-}
+} // namespace dsp
+} // namespace ell
 
 #include "../tcc/FFT.tcc"

@@ -11,14 +11,20 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    DotProductNode<ValueType>::DotProductNode()
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, defaultInput1PortName), _input2(this, {}, defaultInput2PortName), _output(this, defaultOutputPortName, 1)
+    DotProductNode<ValueType>::DotProductNode() :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, {}, defaultInput1PortName),
+        _input2(this, {}, defaultInput2PortName),
+        _output(this, defaultOutputPortName, 1)
     {
     }
 
     template <typename ValueType>
-    DotProductNode<ValueType>::DotProductNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, 1)
+    DotProductNode<ValueType>::DotProductNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2) :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, input1, defaultInput1PortName),
+        _input2(this, input2, defaultInput2PortName),
+        _output(this, defaultOutputPortName, 1)
     {
     }
 
@@ -116,5 +122,5 @@ namespace nodes
         archiver[defaultInput1PortName] >> _input1;
         archiver[defaultInput2PortName] >> _input2;
     }
-}
-}
+} // namespace nodes
+} // namespace ell

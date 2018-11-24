@@ -44,7 +44,7 @@ void TimeConvolutionImplementations(ImageExtent outputSize, FiltersExtent filter
     const size_t filterSize = static_cast<size_t>(filterParams.rows);
     const size_t numChannels = static_cast<size_t>(filterParams.numChannels);
     const size_t numFilters = static_cast<size_t>(filterParams.numFilters);
-    const size_t totalInputPadding = ((filterSize-1)/2) * 2;
+    const size_t totalInputPadding = ((filterSize - 1) / 2) * 2;
     const size_t inputRows = static_cast<size_t>(outputSize.rows) + totalInputPadding;
     const size_t inputColumns = static_cast<size_t>(outputSize.columns) + totalInputPadding;
     TimeConv2D<float>(inputRows, inputColumns, numChannels, filterSize, numFilters, numIterations, ell::dsp::ConvolutionMethodOption::simple);
@@ -76,17 +76,16 @@ int main()
     TimeConv2D<float>(120, 80, 8, 3, 16, 1, ell::dsp::ConvolutionMethodOption::unrolled);
     TimeConv2D<float>(120, 80, 8, 3, 16, 1, ell::dsp::ConvolutionMethodOption::winograd);
     std::cout << "\n";
-    
+
     TimeConv2D<float>(120, 80, 64, 3, 128, 1, ell::dsp::ConvolutionMethodOption::simple);
     TimeConv2D<float>(120, 80, 64, 3, 128, 1, ell::dsp::ConvolutionMethodOption::unrolled);
     TimeConv2D<float>(120, 80, 64, 3, 128, 1, ell::dsp::ConvolutionMethodOption::winograd);
     std::cout << "\n";
-    
+
     TimeConv2D<float>(60, 40, 256, 3, 512, 1, ell::dsp::ConvolutionMethodOption::simple);
     TimeConv2D<float>(60, 40, 256, 3, 512, 1, ell::dsp::ConvolutionMethodOption::unrolled);
     TimeConv2D<float>(60, 40, 256, 3, 512, 1, ell::dsp::ConvolutionMethodOption::winograd);
     std::cout << "\n";
-
 
     int numIterations = 100;
     TimeConvolutionImplementations({ 16, 16 }, { 8, 3, 3, 8 }, { 1, 1 }, { 2, 2 }, numIterations);
@@ -101,7 +100,7 @@ int main()
     std::cout << "\n";
     TimeConvolutionImplementations({ 16, 16 }, { 256, 3, 3, 256 }, { 1, 1 }, { 2, 2 }, numIterations);
     std::cout << "\n\n";
-    
+
     numIterations = 100;
     TimeConvolutionImplementations({ 31, 31 }, { 8, 3, 3, 8 }, { 1, 1 }, { 2, 2 }, numIterations);
     std::cout << "\n";
@@ -115,7 +114,7 @@ int main()
     std::cout << "\n";
     TimeConvolutionImplementations({ 31, 31 }, { 256, 3, 3, 256 }, { 1, 1 }, { 2, 2 }, numIterations);
     std::cout << "\n\n";
- 
+
     numIterations = 10;
     TimeConvolutionImplementations({ 64, 64 }, { 8, 3, 3, 8 }, { 1, 1 }, { 2, 2 }, numIterations);
     std::cout << "\n";
@@ -129,7 +128,7 @@ int main()
     std::cout << "\n";
     TimeConvolutionImplementations({ 64, 64 }, { 256, 3, 3, 256 }, { 1, 1 }, { 2, 2 }, numIterations);
     std::cout << "\n\n";
- 
+
     numIterations = 1;
     TimeConvolutionImplementations({ 127, 127 }, { 8, 3, 3, 8 }, { 1, 1 }, { 2, 2 }, numIterations);
     std::cout << "\n";

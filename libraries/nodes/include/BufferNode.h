@@ -83,7 +83,7 @@ namespace nodes
         mutable std::vector<ValueType> _samples;
         size_t _windowSize;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/BufferNode.tcc"

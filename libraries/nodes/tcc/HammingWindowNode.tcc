@@ -11,14 +11,18 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    HammingWindowNode<ValueType>::HammingWindowNode()
-        : Node({&_input}, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+    HammingWindowNode<ValueType>::HammingWindowNode() :
+        Node({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType>
-    HammingWindowNode<ValueType>::HammingWindowNode(const model::OutputPort<ValueType>& input)
-        : Node({&_input}, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size())
+    HammingWindowNode<ValueType>::HammingWindowNode(const model::OutputPort<ValueType>& input) :
+        Node({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, input.Size())
     {
     }
 
@@ -67,5 +71,5 @@ namespace nodes
         archiver[defaultInputPortName] >> _input;
         _output.SetSize(_input.Size());
     }
-}
-}
+} // namespace nodes
+} // namespace ell

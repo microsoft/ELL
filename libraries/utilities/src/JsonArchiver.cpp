@@ -23,19 +23,19 @@ namespace utilities
     //
     // Serialization
     //
-    JsonArchiver::JsonArchiver()
-        : _out(std::cout)
+    JsonArchiver::JsonArchiver() :
+        _out(std::cout)
     {
     }
 
-    JsonArchiver::JsonArchiver(std::ostream& outputStream)
-        : _out(outputStream)
+    JsonArchiver::JsonArchiver(std::ostream& outputStream) :
+        _out(outputStream)
     {
     }
 
-    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, t);
+#define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, t);
     ARCHIVABLE_TYPES_LIST
-    #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
     // strings
     void JsonArchiver::ArchiveValue(const char* name, const std::string& value)
@@ -95,12 +95,12 @@ namespace utilities
         FinishPreviousLine();
     }
 
-    //
-    // Arrays
-    //
-    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, t);
+//
+// Arrays
+//
+#define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, t);
     ARCHIVABLE_TYPES_LIST
-    #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
     void JsonArchiver::ArchiveArray(const char* name, const std::vector<std::string>& array)
     {
@@ -171,19 +171,21 @@ namespace utilities
     //
     // Deserialization
     //
-    JsonUnarchiver::JsonUnarchiver(SerializationContext context)
-        : Unarchiver(std::move(context)), _tokenizer(std::cin, ",:{}[]'\"")
+    JsonUnarchiver::JsonUnarchiver(SerializationContext context) :
+        Unarchiver(std::move(context)),
+        _tokenizer(std::cin, ",:{}[]'\"")
     {
     }
 
-    JsonUnarchiver::JsonUnarchiver(std::istream& inputStream, SerializationContext context)
-        : Unarchiver(std::move(context)), _tokenizer(inputStream, ",:{}[]'\"")
+    JsonUnarchiver::JsonUnarchiver(std::istream& inputStream, SerializationContext context) :
+        Unarchiver(std::move(context)),
+        _tokenizer(inputStream, ",:{}[]'\"")
     {
     }
 
-    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, t);
+#define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, t);
     ARCHIVABLE_TYPES_LIST
-    #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
     // strings
     void JsonUnarchiver::UnarchiveValue(const char* name, std::string& value)
@@ -191,14 +193,14 @@ namespace utilities
         ReadScalar(name, value);
     }
 
-    bool JsonUnarchiver::UnarchiveNull(const char* name) 
+    bool JsonUnarchiver::UnarchiveNull(const char* name)
     {
         bool result = false;
         PeekStack stack(_tokenizer);
         if (stack.Peek() == "\"" && stack.Peek() == name && stack.Peek() == "\"" && stack.Peek() == ":")
         {
             result = stack.Peek() == "null";
-            if (result) 
+            if (result)
             {
                 stack.Consume();
             }
@@ -320,12 +322,12 @@ namespace utilities
         }
     }
 
-    //
-    // Arrays
-    //
-    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, t);
+//
+// Arrays
+//
+#define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, t);
     ARCHIVABLE_TYPES_LIST
-    #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
     void JsonUnarchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
     {
@@ -508,5 +510,5 @@ namespace utilities
     {
         return str;
     }
-}
-}
+} // namespace utilities
+} // namespace ell

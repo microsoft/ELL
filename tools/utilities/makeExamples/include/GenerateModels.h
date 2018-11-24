@@ -13,7 +13,8 @@
 
 ell::model::Model GenerateIdentityModel(size_t dimension);
 ell::model::Model GenerateTimesTwoModel(size_t dimension);
-template <typename ElementType> ell::model::Model GenerateBroadcastTimesTwoModel(size_t dimension);
+template <typename ElementType>
+ell::model::Model GenerateBroadcastTimesTwoModel(size_t dimension);
 ell::model::Model GenerateIsEqualModel();
 ell::model::Model GenerateArgMaxModel(size_t dimension);
 ell::model::Model GenerateMultiOutModel(size_t dimension);

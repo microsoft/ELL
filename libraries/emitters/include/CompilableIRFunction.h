@@ -75,7 +75,7 @@ namespace emitters
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
     };
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/CompilableIRFunction.tcc"

@@ -6,18 +6,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "TrainerInterface.h"
 #include "AutoDataVector.h"
-#include "Exception.h"
 #include "Dataset.h"
 #include "DatasetInterfaceImpl.h"
-#include "Map.h"
+#include "Exception.h"
 #include "LoadModel.h"
 #include "MakeTrainer.h"
+#include "Map.h"
 #include "MapLoadArguments.h"
 #include "ModelInterface.h"
-#include "ProtoNNTrainer.h"
 #include "ProtoNNPredictorNode.h"
-#include "TrainerInterface.h"
+#include "ProtoNNTrainer.h"
 
 // stl
 #include <vector>
@@ -34,8 +34,8 @@ public:
     trainers::ProtoNNTrainerParameters _parameters;
 };
 
-ProtoNNPredictor::ProtoNNPredictor()
-    : _impl(std::make_shared<ProtoNNPredictorImpl>())
+ProtoNNPredictor::ProtoNNPredictor() :
+    _impl(std::make_shared<ProtoNNPredictorImpl>())
 {
 }
 
@@ -75,10 +75,9 @@ Map ProtoNNPredictor::GetMap() const
     // name the inputs and outputs to the map.
     innerMap->AddInput("input", inputNode);
     innerMap->AddOutput("output", outputElements);
-    
+
     return map;
 }
-
 
 class ProtoNNTrainer::ProtoNNTrainerImpl
 {
@@ -110,9 +109,8 @@ ProtoNNTrainer::ProtoNNTrainer(const ProtoNNTrainerParameters& parameters) :
     if (parameters.numLabels == 0)
     {
         throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-            "parameters.numLabels must not be zero");
+                                        "parameters.numLabels must not be zero");
     }
-
 }
 
 void ProtoNNTrainer::SetDataset(const AutoSupervisedDataset& dataset)
@@ -134,17 +132,17 @@ void ProtoNNTrainer::Update()
 
     if (numFeatures == 0)
     {
-         numFeatures = innerDataset.NumFeatures();
-         _impl->_params.numFeatures = numFeatures;
+        numFeatures = innerDataset.NumFeatures();
+        _impl->_params.numFeatures = numFeatures;
     }
-    if (_impl->_trainer == nullptr) 
+    if (_impl->_trainer == nullptr)
     {
         // lazily create protonn trainer (can't create it until we see the dataset
         // because of the -dd auto feature).
         _impl->_trainer = std::make_shared<trainers::ProtoNNTrainer>(_impl->_params);
         _impl->_trainer->SetDataset(innerDataset.GetAnyDataset(0, numExamples));
     }
-    
+
     // Train the predictor
     if (parameters.verbose) std::cout << "Training ..." << std::endl;
 
@@ -159,4 +157,4 @@ ProtoNNPredictor ProtoNNTrainer::GetPredictor() const
     return result;
 }
 
-}
+} // namespace ELL_API

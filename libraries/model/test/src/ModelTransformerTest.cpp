@@ -54,7 +54,7 @@ namespace
 {
 const std::vector<const InputPortBase*> noInput;
 const std::vector<const OutputPortBase*> noOutput;
-}
+} // namespace
 
 // Transform functions
 void CopyNode(const Node& node, ModelTransformer& transformer)
@@ -154,7 +154,7 @@ void TestCopySubmodel_DoublePrefix(const Model& model)
     TransformContext context;
     ModelTransformer transformer;
 
-    std::vector<const OutputPortBase*> outputs = { &FindDebugNode(model, 3)->output, &FindDebugNode(model, 5)->output };  // in -> n1 -> n2 -> n3 -> n4 -> n5:out
+    std::vector<const OutputPortBase*> outputs = { &FindDebugNode(model, 3)->output, &FindDebugNode(model, 5)->output }; // in -> n1 -> n2 -> n3 -> n4 -> n5:out
     auto newModel = transformer.CopySubmodel(model, outputs, context);
     ProcessTest("TestCopySubmodel_DoublePrefix", newModel.Size() == 6);
 }

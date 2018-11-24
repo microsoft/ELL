@@ -59,7 +59,7 @@ template <typename ValueType>
 void FillInputTensor(ell::math::ChannelColumnRowTensorReference<ValueType> input);
 
 //
-// Get some "interesting" filter weights. 
+// Get some "interesting" filter weights.
 //
 template <typename ValueType>
 void FillFilterVector(ell::math::RowVectorReference<ValueType> filter);

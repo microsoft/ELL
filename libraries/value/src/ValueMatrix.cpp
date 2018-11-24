@@ -25,7 +25,8 @@ namespace value
 
     Matrix::Matrix() = default;
 
-    Matrix::Matrix(Value value) : _value(value)
+    Matrix::Matrix(Value value) :
+        _value(value)
     {
         if (!_value.IsDefined() || !_value.IsConstrained() || _value.GetLayout().NumDimensions() != 2)
         {

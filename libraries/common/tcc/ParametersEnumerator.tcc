@@ -45,5 +45,5 @@ namespace common
     {
         return ParametersType{ std::get<Sequence>(valueTuple)... };
     }
-}
-}
+} // namespace common
+} // namespace ell

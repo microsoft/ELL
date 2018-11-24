@@ -289,7 +289,7 @@ namespace data
     /// <returns> A Dataset. </returns>
     template <typename ExampleType>
     Dataset<ExampleType> MakeDataset(ExampleIterator<ExampleType> exampleIterator);
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/Dataset.tcc"

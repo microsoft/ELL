@@ -37,5 +37,5 @@ namespace utilities
     {
         return std::isdigit(c) != 0;
     }
-}
-}
+} // namespace utilities
+} // namespace ell

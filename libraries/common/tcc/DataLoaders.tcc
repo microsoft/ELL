@@ -20,7 +20,7 @@ namespace ell
 {
 namespace common
 {
-    template<typename TextLineIteratorType, typename MetadataParserType, typename DataVectorParserType>
+    template <typename TextLineIteratorType, typename MetadataParserType, typename DataVectorParserType>
     auto GetExampleIterator(std::istream& stream)
     {
         TextLineIteratorType textLineIterator(stream);
@@ -32,7 +32,7 @@ namespace common
         return data::MakeSingleLineParsingExampleIterator(std::move(textLineIterator), std::move(metadataParser), std::move(dataVectorParser));
     }
 
-    template<typename ExampleType, typename MapType>
+    template <typename ExampleType, typename MapType>
     auto TransformDataset(data::Dataset<ExampleType>& input, const MapType& map)
     {
         return input.template Transform<ExampleType>([map](const ExampleType& example) {
@@ -48,7 +48,7 @@ namespace common
         {
             std::vector<double> inputValues;
         };
-    }
+    } // namespace detail
 
     // C functions called by compiled maps
     extern "C" {
@@ -72,7 +72,7 @@ namespace common
         // Sets up the function address that the LLVM jit will call for the source function callback
         // Note that this only supports a single source node, but can be extended in the future
         // to support multiple source nodes (e.g. by switching the function on node id).
-        template<typename MapType>
+        template <typename MapType>
         void ResolveInputCallback(const MapType& map, llvm::Module* module, ell::emitters::IRExecutionEngine& jitter)
         {
             const std::string defaultCallbackName("ELL_InputCallback");
@@ -97,9 +97,9 @@ namespace common
 
             jitter.DefineFunction(callback, callbackAddress);
         }
-    }
+    } // namespace detail
 
-    template<typename ExampleType, typename MapType>
+    template <typename ExampleType, typename MapType>
     auto TransformDatasetWithCompiledMap(data::Dataset<ExampleType>& input, const MapType& map, bool useBlas)
     {
         ell::model::MapCompilerOptions settings;
@@ -123,5 +123,5 @@ namespace common
             return ExampleType(std::move(transformedDataVector), example.GetMetadata());
         });
     }
-}
-}
+} // namespace common
+} // namespace ell

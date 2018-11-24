@@ -127,7 +127,7 @@ namespace utilities
     private:
         std::unordered_map<std::string, std::shared_ptr<TypeConstructorBase>> _typeConstructorMap;
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/TypeFactory.tcc"

@@ -26,12 +26,14 @@ namespace model
         //
         // Relevant archive format versions
         //
-        constexpr utilities::ArchiveVersion noMetadataArchiveVersion = {utilities::ArchiveVersionNumbers::v0_initial};
-        constexpr utilities::ArchiveVersion metadataArchiveVersion = {utilities::ArchiveVersionNumbers::v3_model_metadata};
-    }
+        constexpr utilities::ArchiveVersion noMetadataArchiveVersion = { utilities::ArchiveVersionNumbers::v0_initial };
+        constexpr utilities::ArchiveVersion metadataArchiveVersion = { utilities::ArchiveVersionNumbers::v3_model_metadata };
+    } // namespace
 
-    Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs)
-        : _id(NodeId()), _inputs(inputs), _outputs(outputs){};
+    Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) :
+        _id(NodeId()),
+        _inputs(inputs),
+        _outputs(outputs){};
 
     void Node::AddInputPort(InputPortBase* input)
     {
@@ -79,12 +81,10 @@ namespace model
 
     bool Node::CanAcceptInputLayout(const utilities::DimensionOrder& order) const
     {
-        return 
-            _inputs.empty() || 
-            std::all_of(_inputs.begin(), _inputs.end(), [&order](const auto port)
-            {
-                return port->GetMemoryLayout().GetLogicalDimensionOrder() == order; 
-            });
+        return _inputs.empty() ||
+               std::all_of(_inputs.begin(), _inputs.end(), [&order](const auto port) {
+                   return port->GetMemoryLayout().GetLogicalDimensionOrder() == order;
+               });
     }
 
     OutputPortBase* Node::GetOutputPort(const std::string& portName)
@@ -241,7 +241,7 @@ namespace model
 
     utilities::ArchiveVersion Node::GetArchiveVersion() const
     {
-        if(_metadata.IsEmpty())
+        if (_metadata.IsEmpty())
         {
             return noMetadataArchiveVersion;
         }
@@ -259,7 +259,7 @@ namespace model
     void Node::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["id"] << _id;
-        if(!_metadata.IsEmpty())
+        if (!_metadata.IsEmpty())
         {
             archiver["metadata"] << _metadata;
         }
@@ -281,5 +281,5 @@ namespace model
     {
         _id = id;
     }
-}
-}
+} // namespace model
+} // namespace ell

@@ -9,9 +9,9 @@
 #pragma once
 
 // stl
+#include <functional>
 #include <memory>
 #include <ostream>
-#include <functional>
 
 namespace ell
 {
@@ -72,14 +72,13 @@ namespace utilities
         std::ostream& operator<<(T&& value);
 
     private:
-
         std::shared_ptr<std::ofstream> _fileStream;
 
         // std::reference_wrapper<T> provides convenient value semantics
         // while retaining a reference to the underlyng `std::ostream` object
         std::reference_wrapper<std::ostream> _outputStream;
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/OutputStreamImpostor.tcc"

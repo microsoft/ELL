@@ -27,4 +27,4 @@ void ParsedModelGenerateArguments::AddArgs(utilities::CommandLineParser& parser)
         "The output path",
         "");
 }
-}
+} // namespace ell

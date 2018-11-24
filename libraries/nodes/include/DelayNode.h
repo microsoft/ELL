@@ -84,7 +84,7 @@ namespace nodes
         mutable std::vector<std::vector<ValueType>> _samples;
         size_t _windowSize;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/DelayNode.tcc"

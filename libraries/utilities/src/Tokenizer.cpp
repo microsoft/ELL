@@ -18,7 +18,7 @@
 #include <sstream>
 
 // Note: BUFFER_SIZE must be larger than the largest readable token
-#define BUFFER_SIZE 1024*1024
+#define BUFFER_SIZE 1024 * 1024
 
 namespace ell
 {
@@ -27,8 +27,9 @@ namespace utilities
     //
     // Tokenizer
     //
-    Tokenizer::Tokenizer(std::istream& inputStream, const std::string tokenStartChars)
-        : _in(inputStream), _tokenStartChars(tokenStartChars)
+    Tokenizer::Tokenizer(std::istream& inputStream, const std::string tokenStartChars) :
+        _in(inputStream),
+        _tokenStartChars(tokenStartChars)
     {
         // Initially, start with an empty buffer
         _currentPosition = _textBuffer.begin();
@@ -254,5 +255,5 @@ namespace utilities
         _tokenStart = _textBuffer.begin();
         _currentPosition = _tokenStart + oldOffset;
     }
-}
-}
+} // namespace utilities
+} // namespace ell

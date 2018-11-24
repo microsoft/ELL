@@ -12,8 +12,8 @@
 
 // model
 #include "CompilableNode.h"
-#include "Map.h"
 #include "IRCompiledMap.h"
+#include "Map.h"
 #include "Model.h"
 
 // nodes
@@ -192,27 +192,27 @@ void TestProtoNNPredictorMap()
 
     // projectedDim * dim
     auto W = protonnPredictor.GetProjectionMatrix() =
-    {
-        #include "TestProtoNNPredictorMap_Projection.inc"
-    };
+        {
+#include "TestProtoNNPredictorMap_Projection.inc"
+        };
 
     // projectedDim * numPrototypes
     auto B = protonnPredictor.GetPrototypes() =
-    {
-        #include "TestProtoNNPredictorMap_Prototypes.inc"
-    };
+        {
+#include "TestProtoNNPredictorMap_Prototypes.inc"
+        };
 
     // numLabels * numPrototypes
     auto Z = protonnPredictor.GetLabelEmbeddings() =
-    {
-        #include "TestProtoNNPredictorMap_LabelEmbeddings.inc"
-    };
+        {
+#include "TestProtoNNPredictorMap_LabelEmbeddings.inc"
+        };
 
     // MNIST training data features
     std::vector<std::vector<double>> features =
-    {
-        #include "TestProtoNNPredictorMap_features.inc"
-    };
+        {
+#include "TestProtoNNPredictorMap_features.inc"
+        };
 
     std::vector<std::vector<int>> labels{ { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 } };
 
@@ -280,7 +280,6 @@ void TestCombineOutputMap()
     auto result = VerifyCompiledOutput<double, double>(map, compiledMap, signal, "TestCombineOutputMap");
 
     testing::ProcessTest("Testing TestCombineOutputMap accumulated result", testing::IsEqual(result, { 5, 2, 1, 42, 48, 49 }));
-
 }
 
 void TestMultiOutputMap()
@@ -677,8 +676,7 @@ void TestForest()
     compiledMap.GetModule().WriteToFile(OutputPath("forest_map.ll"));
 }
 
-extern "C"
-{
+extern "C" {
 // Callbacks used by compiled map
 bool TestMulti_DataCallback1(void* context, double* input)
 {
@@ -726,21 +724,18 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1 /*currentTime*/);
-    auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold,
-        "LagNotificationCallback");
-    auto sourceNode1 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 7,
-        "DataCallback1", [] (auto& v) { return TestMulti_DataCallback1(nullptr, &v[0]); });
-    auto sourceNode2 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 1,
-        "DataCallback2", [] (auto& v) { return TestMulti_DataCallback2(nullptr, &v[0]); });
+    auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold, "LagNotificationCallback");
+    auto sourceNode1 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 7, "DataCallback1", [](auto& v) { return TestMulti_DataCallback1(nullptr, &v[0]); });
+    auto sourceNode2 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 1, "DataCallback2", [](auto& v) { return TestMulti_DataCallback2(nullptr, &v[0]); });
     auto sumNode = model.AddNode<nodes::SumNode<double>>(sourceNode1->output);
     auto minusNode = model.AddNode<nodes::BinaryOperationNode<double>>(sumNode->output,
-        sourceNode2->output, emitters::BinaryOperationType::subtract);
+                                                                       sourceNode2->output,
+                                                                       emitters::BinaryOperationType::subtract);
     auto conditionNode = model.AddNode<nodes::ConstantNode<bool>>(true);
-    auto sinkNode1 = model.AddNode<nodes::SinkNode<double>>(sumNode->output, conditionNode->output,
-        "ResultsCallback_Scalar");
+    auto sinkNode1 = model.AddNode<nodes::SinkNode<double>>(sumNode->output, conditionNode->output, "ResultsCallback_Scalar");
     auto sinkNode2 = model.AddNode<nodes::SinkNode<double>>(model::PortElements<double>{ minusNode->output, sumNode->output },
-        conditionNode->output,
-        "ResultsCallback_Vector");
+                                                            conditionNode->output,
+                                                            "ResultsCallback_Vector");
 
     // compiled maps require a single output, so we concatenate the ports for the sink nodes
     auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ sinkNode1->output, sinkNode2->output });
@@ -757,14 +752,14 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
 
     // Compare output
     std::vector<std::vector<nodes::TimeTickType>> signal =
-    {
-        { 0 },
-        { interval*1 + lagThreshold/2 }, // within threshold
-        { interval*2 }, // on time
-        { interval*3 + lagThreshold }, // late
-        { interval*4 + lagThreshold*20 }, // really late
-        { interval*5 } // on time
-    };
+        {
+            { 0 },
+            { interval * 1 + lagThreshold / 2 }, // within threshold
+            { interval * 2 }, // on time
+            { interval * 3 + lagThreshold }, // late
+            { interval * 4 + lagThreshold * 20 }, // really late
+            { interval * 5 } // on time
+        };
 
     VerifyCompiledOutput(map, compiledMap, signal, " multi-sink and source map");
 }

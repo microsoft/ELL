@@ -13,9 +13,9 @@
 
 // nodes
 #include "BroadcastFunctionNode.h"
+#include "DiagonalConvolutionNode.h"
 #include "ForestPredictorNode.h"
 #include "NeuralNetworkPredictorNode.h"
-#include "DiagonalConvolutionNode.h"
 #include "SimpleConvolutionNode.h"
 #include "UnrolledConvolutionNode.h"
 #include "WinogradConvolutionNode.h"
@@ -35,9 +35,9 @@
 #include "Layer.h"
 #include "MaxPoolingFunction.h"
 #include "PoolingLayer.h"
+#include "ReLUActivation.h"
 #include "ScalingLayer.h"
 #include "SoftmaxLayer.h"
-#include "ReLUActivation.h"
 
 // utilities
 #include "RandomEngines.h"
@@ -65,8 +65,11 @@ template <typename ValueType>
 class Uniform
 {
 public:
-    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
-        : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal - minVal) {}
+    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123") :
+        _rng(utilities::GetRandomEngine(seed)),
+        _range(static_cast<double>(_rng.max() - _rng.min())),
+        _minOutput(minVal),
+        _outputRange(maxVal - minVal) {}
 
     ValueType operator()()
     {
@@ -315,226 +318,226 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     ConvolutionalParameters realConvParams{ 3, 1, ConvolutionMethod::unrolled, 1 };
 
     // Input layer:  160x160x3
-    InputParameters inputParams = { {160, 160, 3}, NoPadding(), {160, 160, 3}, NoPadding(), 1 };
+    InputParameters inputParams = { { 160, 160, 3 }, NoPadding(), { 160, 160, 3 }, NoPadding(), 1 };
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
     // BiasLayer<float>(shape=[160,160,3]->[162,162,3], outputPadding=zeros,1)
     bias = GetRandomVector<VectorType>(3);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, inputLayer, NoPadding(), {162, 162, 3}, ZeroPadding(1), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, inputLayer, NoPadding(), { 162, 162, 3 }, ZeroPadding(1), bias);
 
     // BinaryConvolutionalLayer<float>(shape=[162,162,3]->[160,160,16], inputPadding=zeros,1, stride=1, method=unrolled, receptiveField=3, numFilters=16)
     auto convWeights = GetRandomTensor<TensorType>(3 * 16, 3, 3); // k * f, k, ch
-    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {160, 160, 16}, NoPadding(), convParams, convWeights);
+    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), { 160, 160, 16 }, NoPadding(), convParams, convWeights);
 
     // BiasLayer<float>(shape=[160,160,16]->[160,160,16])
     bias = GetRandomVector<VectorType>(16);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 160, 160, 16 }, NoPadding(), bias);
 
     // ActivationLayer<float,ReLUActivation>(shape=[160,160,16]->[160,160,16])
-    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), new ReLUActivation<ElementType>());
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), { 160, 160, 16 }, NoPadding(), new ReLUActivation<ElementType>());
 
     // BatchNormalizationLayer<float>(shape=[160,160,16]->[160,160,16])
     bnMean = GetRandomVector<VectorType>(16);
     bnVar = GetRandomVector<VectorType>(16);
-    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), bnMean, bnVar, eps, epsVar);
+    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), { 160, 160, 16 }, NoPadding(), bnMean, bnVar, eps, epsVar);
 
     // ScalingLayer<float>(shape=[160,160,16]->[160,160,16])
     scale = GetRandomVector<VectorType>(16);
-    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), scale);
+    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), { 160, 160, 16 }, NoPadding(), scale);
 
     // BiasLayer<float>(shape=[160,160,16]->[160,160,16])
     bias = GetRandomVector<VectorType>(16);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {160, 160, 16}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 160, 160, 16 }, NoPadding(), bias);
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[160,160,16]->[82,82,16], outputPadding=zeros,1, function=maxpooling, stride=2, size=2)
-    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, NoPadding(), {82, 82, 16}, ZeroPadding(1), PoolingParameters{2, 2});
+    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, NoPadding(), { 82, 82, 16 }, ZeroPadding(1), PoolingParameters{ 2, 2 });
 
     // BinaryConvolutionalLayer<float>(shape=[82,82,16]->[80,80,64], inputPadding=zeros,1, stride=1, method=unrolled, receptiveField=3, numFilters=64)
     convWeights = GetRandomTensor<TensorType>(3 * 64, 3, 16); // k * f, k, ch
-    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {80, 80, 64}, NoPadding(), convParams, convWeights);
+    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), { 80, 80, 64 }, NoPadding(), convParams, convWeights);
 
     // BiasLayer<float>(shape=[80,80,64]->[80,80,64])
     bias = GetRandomVector<VectorType>(64);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {80, 80, 64}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 80, 80, 64 }, NoPadding(), bias);
 
     // ActivationLayer<float,ReLUActivation>(shape=[80,80,64]->[80,80,64])
-    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {80, 80, 64}, NoPadding(), new ReLUActivation<ElementType>());
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), { 80, 80, 64 }, NoPadding(), new ReLUActivation<ElementType>());
 
     // BatchNormalizationLayer<float>(shape=[80,80,64]->[80,80,64])
     bnMean = GetRandomVector<VectorType>(64);
     bnVar = GetRandomVector<VectorType>(64);
-    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), {80, 80, 64}, NoPadding(), bnMean, bnVar, eps, epsVar);
+    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), { 80, 80, 64 }, NoPadding(), bnMean, bnVar, eps, epsVar);
 
     // ScalingLayer<float>(shape=[80,80,64]->[80,80,64])
     scale = GetRandomVector<VectorType>(64);
-    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {80, 80, 64}, NoPadding(), scale);
+    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), { 80, 80, 64 }, NoPadding(), scale);
 
     // BiasLayer<float>(shape=[80,80,64]->[80,80,64])
     bias = GetRandomVector<VectorType>(64);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {80, 80, 64}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 80, 80, 64 }, NoPadding(), bias);
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[80,80,64]->[42,42,64], outputPadding=zeros,1, function=maxpooling, stride=2, size=2)
-    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, NoPadding(), {42, 42, 64}, ZeroPadding(1), PoolingParameters{2, 2});
+    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, NoPadding(), { 42, 42, 64 }, ZeroPadding(1), PoolingParameters{ 2, 2 });
 
     // BinaryConvolutionalLayer<float>(shape=[42,42,64]->[40,40,64], inputPadding=zeros,1, stride=1, method=bitwise, receptiveField=3, weightsScale=none)
     convWeights = GetRandomTensor<TensorType>(3 * 64, 3, 64); // k * f, k, ch
-    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {40, 40, 64}, NoPadding(), convParams, convWeights);
+    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), { 40, 40, 64 }, NoPadding(), convParams, convWeights);
 
     // BiasLayer<float>(shape=[40,40,64]->[40,40,64])
     bias = GetRandomVector<VectorType>(64);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {40, 40, 64}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 40, 40, 64 }, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[40,40,64]->[42,42,64], outputPadding=min,1)
-    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {42, 42, 64}, ZeroPadding(1), new ReLUActivation<ElementType>());
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), { 42, 42, 64 }, ZeroPadding(1), new ReLUActivation<ElementType>());
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[42,42,64]->[20,20,64], inputPadding=min,1, function=maxpooling, stride=2, size=3)
-    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {20, 20, 64}, NoPadding(), PoolingParameters{3, 2});
+    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), { 20, 20, 64 }, NoPadding(), PoolingParameters{ 3, 2 });
 
     // BatchNormalizationLayer<float>(shape=[20,20,64]->[20,20,64])
     bnMean = GetRandomVector<VectorType>(64);
     bnVar = GetRandomVector<VectorType>(64);
-    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), {20, 20, 64}, NoPadding(), bnMean, bnVar, eps, epsVar);
+    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), { 20, 20, 64 }, NoPadding(), bnMean, bnVar, eps, epsVar);
 
     // ScalingLayer<float>(shape=[20,20,64]->[20,20,64])
     scale = GetRandomVector<VectorType>(64);
-    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {20, 20, 64}, NoPadding(), scale);
+    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), { 20, 20, 64 }, NoPadding(), scale);
 
     // BiasLayer<float>(shape=[20,20,64]->[22,22,64], outputPadding=zeros,1)
     bias = GetRandomVector<VectorType>(64);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {22, 22, 64}, ZeroPadding(1), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 22, 22, 64 }, ZeroPadding(1), bias);
 
     // BinaryConvolutionalLayer<float>(shape=[22,22,64]->[20,20,128], inputPadding=zeros,1, stride=1, method=bitwise, receptiveField=3, weightsScale=none)
     convWeights = GetRandomTensor<TensorType>(3 * 128, 3, 64); // k * f, k, ch
-    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {20, 20, 128}, NoPadding(), convParams, convWeights);
+    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), { 20, 20, 128 }, NoPadding(), convParams, convWeights);
 
     // BiasLayer<float>(shape=[20,20,128]->[20,20,128])
     bias = GetRandomVector<VectorType>(128);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {20, 20, 128}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 20, 20, 128 }, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[20,20,128]->[22,22,128], outputPadding=min,1)
-    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {22, 22, 128}, ZeroPadding(1), new ReLUActivation<ElementType>());
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), { 22, 22, 128 }, ZeroPadding(1), new ReLUActivation<ElementType>());
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[22,22,128]->[10,10,128], inputPadding=min,1, function=maxpooling, stride=2, size=3)
-    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {10, 10, 128}, NoPadding(), PoolingParameters{3, 2});
+    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), { 10, 10, 128 }, NoPadding(), PoolingParameters{ 3, 2 });
 
     // BatchNormalizationLayer<float>(shape=[10,10,128]->[10,10,128])
     bnMean = GetRandomVector<VectorType>(128);
     bnVar = GetRandomVector<VectorType>(128);
-    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), {10, 10, 128}, NoPadding(), bnMean, bnVar, eps, epsVar);
+    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), { 10, 10, 128 }, NoPadding(), bnMean, bnVar, eps, epsVar);
 
     // ScalingLayer<float>(shape=[10,10,128]->[10,10,128])
     scale = GetRandomVector<VectorType>(128);
-    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {10, 10, 128}, NoPadding(), scale);
+    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), { 10, 10, 128 }, NoPadding(), scale);
 
     // BiasLayer<float>(shape=[10,10,128]->[12,12,128], outputPadding=zeros,1)
     bias = GetRandomVector<VectorType>(128);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {12, 12, 128}, ZeroPadding(1), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 12, 12, 128 }, ZeroPadding(1), bias);
 
     // BinaryConvolutionalLayer<float>(shape=[12,12,128]->[10,10,256], inputPadding=zeros,1, stride=1, method=bitwise, receptiveField=3, weightsScale=none)
     convWeights = GetRandomTensor<TensorType>(3 * 256, 3, 128); // k * f, k, ch
-    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {10, 10, 256}, NoPadding(), convParams, convWeights);
+    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), { 10, 10, 256 }, NoPadding(), convParams, convWeights);
 
     // BiasLayer<float>(shape=[10,10,256]->[10,10,256])
     bias = GetRandomVector<VectorType>(256);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {10, 10, 256}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 10, 10, 256 }, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[10,10,256]->[12,12,256], outputPadding=min,1)
-    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {12, 12, 256}, ZeroPadding(1), new ReLUActivation<ElementType>());
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), { 12, 12, 256 }, ZeroPadding(1), new ReLUActivation<ElementType>());
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[12,12,256]->[5,5,256], inputPadding=min,1, function=maxpooling, stride=2, size=3)
-    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {5, 5, 256}, NoPadding(), PoolingParameters{3, 2});
+    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), { 5, 5, 256 }, NoPadding(), PoolingParameters{ 3, 2 });
 
     // BatchNormalizationLayer<float>(shape=[5,5,256]->[5,5,256])
     bnMean = GetRandomVector<VectorType>(256);
     bnVar = GetRandomVector<VectorType>(256);
-    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), {5, 5, 256}, NoPadding(), bnMean, bnVar, eps, epsVar);
+    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), { 5, 5, 256 }, NoPadding(), bnMean, bnVar, eps, epsVar);
 
     // ScalingLayer<float>(shape=[5,5,256]->[5,5,256])
     scale = GetRandomVector<VectorType>(256);
-    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {5, 5, 256}, NoPadding(), scale);
+    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), { 5, 5, 256 }, NoPadding(), scale);
 
     // BiasLayer<float>(shape=[5,5,256]->[7,7,256], outputPadding=zeros,1)
     bias = GetRandomVector<VectorType>(256);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {7, 7, 256}, ZeroPadding(1), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 7, 7, 256 }, ZeroPadding(1), bias);
 
     // BinaryConvolutionalLayer<float>(shape=[7,7,256]->[5,5,512], inputPadding=zeros,1, stride=1, method=bitwise, receptiveField=3, weightsScale=none)
     convWeights = GetRandomTensor<TensorType>(3 * 512, 3, 256); // k * f, k, ch
-    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {5, 5, 512}, NoPadding(), convParams, convWeights);
+    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), { 5, 5, 512 }, NoPadding(), convParams, convWeights);
 
     // BiasLayer<float>(shape=[5,5,512]->[5,5,512])
     bias = GetRandomVector<VectorType>(512);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {5, 5, 512}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 5, 5, 512 }, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[5,5,512]->[7,7,512], outputPadding=min,1)
-    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {7, 7, 512}, ZeroPadding(1), new ReLUActivation<ElementType>());
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), { 7, 7, 512 }, ZeroPadding(1), new ReLUActivation<ElementType>());
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[7,7,512]->[3,3,512], inputPadding=min,1, function=maxpooling, stride=2, size=3)
-    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {3, 3, 512}, NoPadding(), PoolingParameters{3, 2});
+    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), { 3, 3, 512 }, NoPadding(), PoolingParameters{ 3, 2 });
 
     // BatchNormalizationLayer<float>(shape=[3,3,512]->[3,3,512])
     bnMean = GetRandomVector<VectorType>(512);
     bnVar = GetRandomVector<VectorType>(512);
-    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), {3, 3, 512}, NoPadding(), bnMean, bnVar, eps, epsVar);
+    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), { 3, 3, 512 }, NoPadding(), bnMean, bnVar, eps, epsVar);
 
     // ScalingLayer<float>(shape=[3,3,512]->[3,3,512])
     scale = GetRandomVector<VectorType>(512);
-    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {3, 3, 512}, NoPadding(), scale);
+    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), { 3, 3, 512 }, NoPadding(), scale);
 
     // BiasLayer<float>(shape=[3,3,512]->[5,5,512], outputPadding=zeros,1)
     bias = GetRandomVector<VectorType>(512);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {5, 5, 512}, ZeroPadding(1), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 5, 5, 512 }, ZeroPadding(1), bias);
 
     // BinaryConvolutionalLayer<float>(shape=[5,5,512]->[3,3,1024], inputPadding=zeros,1, stride=1, method=bitwise, receptiveField=3, weightsScale=none)
     convWeights = GetRandomTensor<TensorType>(3 * 1024, 3, 512); // k * f, k, ch
-    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), {3, 3, 1024}, NoPadding(), convParams, convWeights);
+    AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, ZeroPadding(1), { 3, 3, 1024 }, NoPadding(), convParams, convWeights);
 
     // BiasLayer<float>(shape=[3,3,1024]->[3,3,1024])
     bias = GetRandomVector<VectorType>(1024);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {3, 3, 1024}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 3, 3, 1024 }, NoPadding(), bias);
 
     // ActivationLayer<float,ParametricReLUActivation>(shape=[3,3,1024]->[5,5,1024], outputPadding=min,1)
-    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), {5, 5, 1024}, ZeroPadding(1), new ReLUActivation<ElementType>());
+    AddLayer<ActivationLayer<ElementType>, ElementType>(layers, NoPadding(), { 5, 5, 1024 }, ZeroPadding(1), new ReLUActivation<ElementType>());
 
     // PoolingLayer<float,MaxPoolingFunction>(shape=[5,5,1024]->[2,2,1024], inputPadding=min,1, function=maxpooling, stride=2, size=3)
-    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), {2, 2, 1024}, NoPadding(), PoolingParameters{3, 2});
+    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, ZeroPadding(1), { 2, 2, 1024 }, NoPadding(), PoolingParameters{ 3, 2 });
 
     // BatchNormalizationLayer<float>(shape=[2,2,1024]->[2,2,1024])
     bnMean = GetRandomVector<VectorType>(1024);
     bnVar = GetRandomVector<VectorType>(1024);
-    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1024}, NoPadding(), bnMean, bnVar, eps, epsVar);
+    AddLayer<BatchNormalizationLayer<ElementType>, ElementType>(layers, NoPadding(), { 2, 2, 1024 }, NoPadding(), bnMean, bnVar, eps, epsVar);
 
     // ScalingLayer<float>(shape=[2,2,1024]->[2,2,1024])
     scale = GetRandomVector<VectorType>(1024);
-    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1024}, NoPadding(), scale);
+    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), { 2, 2, 1024 }, NoPadding(), scale);
 
     // BiasLayer<float>(shape=[2,2,1024]->[2,2,1024])
     bias = GetRandomVector<VectorType>(1024);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1024}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 2, 2, 1024 }, NoPadding(), bias);
 
     // ConvolutionalLayer<float>(shape=[2,2,1024]->[2,2,1000], stride=1, method=unrolled, receptiveField=1, numFilters=1000)
     convWeights = GetRandomTensor<TensorType>(3 * 1000, 3, 1024); // k * f, k, ch
-    if(lastLayerReal)
+    if (lastLayerReal)
     {
-        AddLayer<ConvolutionalLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1000}, NoPadding(), realConvParams, convWeights);
+        AddLayer<ConvolutionalLayer<ElementType>, ElementType>(layers, NoPadding(), { 2, 2, 1000 }, NoPadding(), realConvParams, convWeights);
     }
     else
     {
-        AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1000}, NoPadding(), convParams, convWeights);
+        AddLayer<BinaryConvolutionalLayer<ElementType>, ElementType>(layers, NoPadding(), { 2, 2, 1000 }, NoPadding(), convParams, convWeights);
     }
 
     // BiasLayer<float>(shape=[2,2,1000]->[2,2,1000])
     bias = GetRandomVector<VectorType>(1000);
-    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), {2, 2, 1000}, NoPadding(), bias);
+    AddLayer<BiasLayer<ElementType>, ElementType>(layers, NoPadding(), { 2, 2, 1000 }, NoPadding(), bias);
 
     // PoolingLayer<float,MeanPoolingFunction>(shape=[2,2,1000]->[1,1,1000], function=meanpooling, stride=1, size=2)
-    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, NoPadding(), {1, 1, 1000}, NoPadding(), PoolingParameters{2, 1});
+    AddLayer<PoolingLayer<ElementType, MaxPoolingFunction>, ElementType>(layers, NoPadding(), { 1, 1, 1000 }, NoPadding(), PoolingParameters{ 2, 1 });
 
     // ScalingLayer<float>(shape=[1,1,1000]->[1,1,1000])
     scale = GetRandomVector<VectorType>(1000);
-    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), {1, 1, 1000}, NoPadding(), scale);
+    AddLayer<ScalingLayer<ElementType>, ElementType>(layers, NoPadding(), { 1, 1, 1000 }, NoPadding(), scale);
 
     // SoftmaxLayer<float>(shape=[1,1,1000]->[1,1,1000])
-    AddLayer<SoftmaxLayer<ElementType>, ElementType>(layers, NoPadding(), {1, 1, 1000}, NoPadding());
+    AddLayer<SoftmaxLayer<ElementType>, ElementType>(layers, NoPadding(), { 1, 1, 1000 }, NoPadding());
 
     //
     // Create predictor
@@ -601,4 +604,4 @@ model::Map GenerateConvolutionModel(int inputRows, int inputColumns, int numChan
     return map;
 }
 
-}
+} // namespace ell

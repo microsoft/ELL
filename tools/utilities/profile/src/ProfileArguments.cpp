@@ -79,4 +79,4 @@ void ParsedProfileArguments::AddArgs(utilities::CommandLineParser& parser)
         "Print timing summary only",
         false);
 }
-}
+} // namespace ell

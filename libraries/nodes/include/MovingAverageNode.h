@@ -83,7 +83,7 @@ namespace nodes
         mutable std::vector<ValueType> _runningSum;
         size_t _windowSize;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/MovingAverageNode.tcc"

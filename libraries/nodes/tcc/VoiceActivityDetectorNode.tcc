@@ -13,13 +13,15 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    VoiceActivityDetectorNode<ValueType>::VoiceActivityDetectorNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1)
+    VoiceActivityDetectorNode<ValueType>::VoiceActivityDetectorNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1)
     {
     }
 
     template <typename ValueType>
-    VoiceActivityDetectorNode<ValueType>::VoiceActivityDetectorNode(const model::OutputPort<ValueType>& input, 
+    VoiceActivityDetectorNode<ValueType>::VoiceActivityDetectorNode(const model::OutputPort<ValueType>& input,
                                                                     double sampleRate,
                                                                     double frameDuration,
                                                                     double tauUp,
@@ -28,9 +30,12 @@ namespace nodes
                                                                     double gainAtt,
                                                                     double thresholdUp,
                                                                     double thresholdDown,
-                                                                    double levelThreshold)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _vad(sampleRate, input.Size(), frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold)
+                                                                    double levelThreshold) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1),
+        _vad(sampleRate, input.Size(), frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold)
     {
     }
-}
-}
+} // namespace nodes
+} // namespace ell

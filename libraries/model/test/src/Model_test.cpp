@@ -357,7 +357,6 @@ void TestModelMetadata()
         iter2.Next();
     }
 
-
     // Print archive of model:
 #if 0
     std::cout << "Model with metadata:" << std::endl;
@@ -514,10 +513,14 @@ template <typename ValueType>
 class SplittingNode : public model::Node
 {
 public:
-    SplittingNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
-    SplittingNode(const model::OutputPort<ValueType>& input)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
+    SplittingNode() :
+        Node({ &_input }, { &_output }),
+        _input(this, {}, inputPortName),
+        _output(this, outputPortName, 0){};
+    SplittingNode(const model::OutputPort<ValueType>& input) :
+        Node({ &_input }, { &_output }),
+        _input(this, input, inputPortName),
+        _output(this, outputPortName, input.Size()){};
 
     static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SplittingNode"); }
     std::string GetRuntimeTypeName() const override { return GetTypeName(); }

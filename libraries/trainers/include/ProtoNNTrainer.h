@@ -141,7 +141,7 @@ namespace trainers
         ProtoNNModelParameter(size_t dimension1, size_t dimension2);
 
         virtual ~ProtoNNModelParameter();
-        
+
         /// <summary> Get the underlying data matrix. </summary>
         ///
         /// <returns> The underlying data matrix. </returns>
@@ -209,5 +209,5 @@ namespace trainers
     ///
     /// <returns> A ProtoNN trainer </returns>
     std::unique_ptr<trainers::ProtoNNTrainer> MakeProtoNNTrainer(const trainers::ProtoNNTrainerParameters& parameters);
-}
-}
+} // namespace trainers
+} // namespace ell

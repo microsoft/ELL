@@ -50,7 +50,7 @@ namespace dsp
     /// <returns> A vector containing the values of the generalized cosine window window. </returns>
     template <typename ValueType>
     std::vector<ValueType> GeneralizedCosineWindow(size_t size, const std::vector<double>& coefficients, WindowSymmetry symmetry = WindowSymmetry::symmetric);
-}
-}
+} // namespace dsp
+} // namespace ell
 
 #include "../tcc/WindowFunctions.tcc"

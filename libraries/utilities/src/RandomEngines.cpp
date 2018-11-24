@@ -43,5 +43,5 @@ namespace utilities
     {
         return GetRandomEngines(1, seed_string)[0];
     }
-}
-}
+} // namespace utilities
+} // namespace ell

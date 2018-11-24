@@ -31,5 +31,5 @@ namespace utilities
     ///
     /// <returns> The random engine. </returns>
     std::default_random_engine GetRandomEngine(std::string seed_string = "");
-}
-}
+} // namespace utilities
+} // namespace ell

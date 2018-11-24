@@ -29,8 +29,8 @@ namespace common
         /// <summary> Constructs an instance of ParametersEnumerator. </summary>
         ///
         /// <param name="parameterValues"> Variable number of parameter value vectors. The number and order of these types should match the constructor of ParametersType. </param>
-        ParametersEnumerator(std::vector<ValueTypes>... parameterValues)
-            : _valueVectorTuple(std::make_tuple(parameterValues...))
+        ParametersEnumerator(std::vector<ValueTypes>... parameterValues) :
+            _valueVectorTuple(std::make_tuple(parameterValues...))
         {
         }
 
@@ -89,10 +89,10 @@ namespace common
     template <typename ParametersType, typename... ValueTypes>
     ParametersEnumerator<ParametersType, ValueTypes...> MakeParametersEnumerator(std::vector<ValueTypes>... parameterValues)
     {
-        // STYLE discrepancy 
+        // STYLE discrepancy
         return ParametersEnumerator<ParametersType, ValueTypes...>(parameterValues...);
     }
-}
-}
+} // namespace common
+} // namespace ell
 
 #include "../tcc/ParametersEnumerator.tcc"

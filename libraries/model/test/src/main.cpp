@@ -14,7 +14,6 @@
 #include "ModelBuilder_test.h"
 #include "ModelTransformerTest.h"
 #include "Model_test.h"
-#include "ModelTransformerTest.h"
 #include "PortElements_test.h"
 
 // testing

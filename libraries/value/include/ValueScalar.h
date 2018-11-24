@@ -30,7 +30,8 @@ namespace value
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="t"> The value to wrap </param>
         template <typename T>
-        Scalar(T t) : Scalar(Value(t))
+        Scalar(T t) :
+            Scalar(Value(t))
         {}
 
         /// <summary> Gets the underlying wrapped Value instance </summary>

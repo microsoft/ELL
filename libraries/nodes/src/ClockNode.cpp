@@ -26,19 +26,19 @@ namespace nodes
     const auto greaterThanTime = emitters::GetComparison<TimeTickType>(emitters::BinaryPredicateType::greater);
     const auto greaterThanOrEqualTime = emitters::GetComparison<TimeTickType>(emitters::BinaryPredicateType::greaterOrEqual);
 
-    ClockNode::ClockNode()
-        : ClockNode({}, 0, 0, "", nullptr)
+    ClockNode::ClockNode() :
+        ClockNode({}, 0, 0, "", nullptr)
     {
     }
 
-    ClockNode::ClockNode(const model::OutputPort<TimeTickType>& input, TimeTickType interval, TimeTickType lagThreshold, const std::string& functionName, LagNotificationFunction function)
-        : CompilableNode({ &_input }, { &_output }),
+    ClockNode::ClockNode(const model::OutputPort<TimeTickType>& input, TimeTickType interval, TimeTickType lagThreshold, const std::string& functionName, LagNotificationFunction function) :
+        CompilableNode({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, 2 /*sampleTime, currentTime*/),
         _interval(interval),
         _lastIntervalTime(UninitializedIntervalTime),
         _lagThreshold(lagThreshold),
-        _lagNotificationFunction(function == nullptr ? [](auto){} : function),
+        _lagNotificationFunction(function == nullptr ? [](auto) {} : function),
         _lagNotificationFunctionName(functionName)
     {
         if (interval < 0)
@@ -91,7 +91,7 @@ namespace nodes
         auto thresholdTime = function.template Literal<TimeTickType>(_lagThreshold);
 
         // Callback
-        const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer }, 
+        const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer },
                                                              { "currentTime", emitters::GetVariableType<TimeTickType>() } };
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + _lagNotificationFunctionName);
         module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
@@ -112,10 +112,11 @@ namespace nodes
         function.Store(newLastInterval, lastIntervalTime);
 
         function.If(noLag, [newLastInterval, now](emitters::IRFunctionEmitter& function) {
-            function.Store(newLastInterval, now);
-        }).Else([newLastInterval, lastIntervalTime, interval](emitters::IRFunctionEmitter& function) {
-            function.Store(newLastInterval, function.Operator(plusTime, lastIntervalTime, interval));
-        });
+                    function.Store(newLastInterval, now);
+                })
+            .Else([newLastInterval, lastIntervalTime, interval](emitters::IRFunctionEmitter& function) {
+                function.Store(newLastInterval, function.Operator(plusTime, lastIntervalTime, interval));
+            });
 
         function.If(greaterThanTime, interval, zeroInterval, [now, newLastInterval, thresholdTime, prefixedName, &module, &compiler](emitters::IRFunctionEmitter& function) {
             // Notify if the time lag reaches the threshold
@@ -210,10 +211,11 @@ namespace nodes
             function.Comparison(equalTime, interval, zeroInterval));
 
         function.If(noLag, [result, zeroInterval](emitters::IRFunctionEmitter& function) {
-            function.Store(result, zeroInterval);
-        }).Else([result, lastIntervalTime, interval, now](emitters::IRFunctionEmitter& function) {
-            function.Store(result, function.Operator(minusTime, function.Operator(plusTime, lastIntervalTime, interval), now));
-        });
+                    function.Store(result, zeroInterval);
+                })
+            .Else([result, lastIntervalTime, interval, now](emitters::IRFunctionEmitter& function) {
+                function.Store(result, function.Operator(minusTime, function.Operator(plusTime, lastIntervalTime, interval), now));
+            });
 
         function.Return(function.Load(result));
         moduleEmitter.EndFunction();
@@ -244,5 +246,5 @@ namespace nodes
         function.Return(function.template Literal<TimeTickType>(_interval));
         moduleEmitter.EndFunction();
     }
-}
-}
+} // namespace nodes
+} // namespace ell

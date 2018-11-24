@@ -73,5 +73,5 @@ namespace emitters
     };
 
     using EmitterException = utilities::ErrorCodeException<EmitterError>;
-}
-}
+} // namespace emitters
+} // namespace ell

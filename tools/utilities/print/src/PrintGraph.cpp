@@ -93,4 +93,4 @@ void PrintGraph(const model::Model& model, const std::string& outputFormat, std:
         graph.SaveDot(out);
     }
 }
-}
+} // namespace ell

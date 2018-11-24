@@ -39,5 +39,5 @@ namespace data
             return 0;
         }
     }
-}
-}
+} // namespace data
+} // namespace ell

@@ -71,12 +71,13 @@ namespace common
     };
 
     /// <summary> A version of DataLoadArguments that adds its members to the command line parser. </summary>
-    struct ParsedMapCompilerArguments : public MapCompilerArguments, public utilities::ParsedArgSet
+    struct ParsedMapCompilerArguments : public MapCompilerArguments
+        , public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
         /// <param name="parser"> [in,out] The parser. </param>
         void AddArgs(utilities::CommandLineParser& parser) override;
     };
-}
-}
+} // namespace common
+} // namespace ell

@@ -129,8 +129,10 @@ void WriteNodeStatistics(std::vector<std::pair<ELL_NodeInfo, ELL_PerformanceCoun
         for (const auto& info : nodeInfo)
         {
             out << "  {\n";
-            out << "    \"name\": " << "\"" << EncodeJSONString((const char*)(info.first.nodeName)) << "\",\n";
-            out << "    \"type\": " << "\"" << EncodeJSONString((const char*)(info.first.nodeType)) << "\",\n";
+            out << "    \"name\": "
+                << "\"" << EncodeJSONString((const char*)(info.first.nodeName)) << "\",\n";
+            out << "    \"type\": "
+                << "\"" << EncodeJSONString((const char*)(info.first.nodeType)) << "\",\n";
             out << "    \"total_time\": " << info.second.totalTime << ",\n";
             out << "    \"average_time\": " << info.second.totalTime / info.second.count << ",\n";
             out << "    \"count\": " << info.second.count << "\n";
@@ -149,7 +151,8 @@ void WriteNodeStatistics(std::vector<std::pair<ELL_NodeInfo, ELL_PerformanceCoun
         for (const auto& info : nodeTypeInfo)
         {
             out << "  {\n";
-            out << "    \"type\": " << "\"" << EncodeJSONString((const char*)(info.first.nodeType)) << "\",\n";
+            out << "    \"type\": "
+                << "\"" << EncodeJSONString((const char*)(info.first.nodeType)) << "\",\n";
             out << "    \"total_time\": " << info.second.totalTime << ",\n";
             out << "    \"average_time\": " << info.second.totalTime / info.second.count << ",\n";
             out << "    \"count\": " << info.second.count << "\n";
@@ -171,18 +174,18 @@ void WriteRegionStatistics(std::vector<ELL_ProfileRegionInfo>& regions, ProfileO
     auto numRegions = regions.size();
     if (format == ProfileOutputFormat::text)
     {
-        if(numRegions > 0)
+        if (numRegions > 0)
         {
             std::ios::fmtflags savedFlags(out.flags());
             out << std::fixed;
             out.precision(5);
 
             size_t maxNameLength = 0;
-            for(const auto& info: regions)
+            for (const auto& info : regions)
             {
                 maxNameLength = std::max(maxNameLength, std::strlen((const char*)(info.name)));
             }
-            
+
             out << "\nRegion statistics" << std::endl;
             for (const auto& info : regions)
             {
@@ -199,7 +202,8 @@ void WriteRegionStatistics(std::vector<ELL_ProfileRegionInfo>& regions, ProfileO
         for (const auto& info : regions)
         {
             out << "  {\n";
-            out << "    \"name\": " << "\"" << EncodeJSONString((const char*)(info.name)) << "\",\n";
+            out << "    \"name\": "
+                << "\"" << EncodeJSONString((const char*)(info.name)) << "\",\n";
             out << "    \"total_time\": " << info.totalTime << ",\n";
             out << "    \"average_time\": " << info.totalTime / info.count << ",\n";
             out << "    \"count\": " << info.count << "\n";
@@ -214,7 +218,6 @@ void WriteRegionStatistics(std::vector<ELL_ProfileRegionInfo>& regions, ProfileO
         out << "]";
     }
 }
-
 
 void fun()
 {

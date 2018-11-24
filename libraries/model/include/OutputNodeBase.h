@@ -10,10 +10,12 @@
 
 #include "CompilableNode.h"
 #include "Node.h"
+#include "OutputPort.h"
 
 // utilities
-#include "IArchivable.h"
 #include "ArchiveVersion.h"
+#include "IArchivable.h"
+#include "MemoryLayout.h"
 
 // stl
 #include <string>
@@ -22,6 +24,8 @@ namespace ell
 {
 namespace model
 {
+    using MemoryShape = utilities::MemoryShape;
+
     class IRMapCompiler;
 
     /// <summary> A node that represents an output from the system. </summary>
@@ -64,6 +68,7 @@ namespace model
         ell::utilities::ArchiveVersion GetArchiveVersion() const override;
 
         void SetShape(const MemoryShape& shape);
+
     private:
         InputPortBase& _inputBase;
         OutputPortBase& _outputBase;
@@ -84,14 +89,14 @@ namespace model
         void SetCallbackName(const std::string& name) { _callbackName = name; };
 
     protected:
-        SinkNodeBase(InputPortBase& input, InputPortBase& trigger, OutputPortBase& output, const MemoryShape& shape, const std::string& callbackName)
-            : OutputNodeBase({ &input, &trigger }, output, shape), _callbackName(callbackName)
+        SinkNodeBase(InputPortBase& input, InputPortBase& trigger, OutputPortBase& output, const MemoryShape& shape, const std::string& callbackName) :
+            OutputNodeBase({ &input, &trigger }, output, shape),
+            _callbackName(callbackName)
         {
         }
 
     private:
         std::string _callbackName;
     };
-}
-}
-
+} // namespace model
+} // namespace ell

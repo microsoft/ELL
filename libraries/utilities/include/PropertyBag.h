@@ -25,7 +25,6 @@ namespace utilities
     class PropertyBag : public IArchivable
     {
     public:
-
         /// <summary> Adds a metadata entry for the given key. </summary>
         ///
         /// <param name="key"> The key to use for the metadata. </param>
@@ -100,7 +99,7 @@ namespace utilities
     private:
         std::unordered_map<std::string, Variant> _metadata;
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/PropertyBag.tcc"

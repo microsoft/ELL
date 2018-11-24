@@ -39,5 +39,5 @@ namespace common
 
         return parseErrorMessages;
     }
-}
-}
+} // namespace common
+} // namespace ell

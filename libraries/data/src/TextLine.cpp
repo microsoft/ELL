@@ -15,13 +15,15 @@ namespace ell
 {
 namespace data
 {
-    TextLine::TextLine(std::string string) : _string(std::make_shared<const std::string>(std::move(string))), _currentChar(_string->c_str())
+    TextLine::TextLine(std::string string) :
+        _string(std::make_shared<const std::string>(std::move(string))),
+        _currentChar(_string->c_str())
     {
     }
 
-    char TextLine::Peek(size_t increment) const 
-    { 
-        return *(_currentChar + increment); 
+    char TextLine::Peek(size_t increment) const
+    {
+        return *(_currentChar + increment);
     }
 
     bool TextLine::IsEndOfContent() const
@@ -46,5 +48,5 @@ namespace data
         _currentChar += increment;
     }
 
-}
-}
+} // namespace data
+} // namespace ell

@@ -1116,7 +1116,7 @@ namespace emitters
 
     // Helper function to dump the LLVM function to stderr for debugging
     void DebugDump(llvm::Function* function);
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/IREmitter.tcc"

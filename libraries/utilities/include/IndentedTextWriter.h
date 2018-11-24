@@ -108,5 +108,5 @@ namespace utilities
         size_t _indentLevel = 0;
         bool _needsIndent = true;
     };
-}
-}
+} // namespace utilities
+} // namespace ell

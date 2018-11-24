@@ -49,7 +49,8 @@ namespace evaluators
     };
 
     template <typename BasePredictorType, typename... AggregatorTypes>
-    class IncrementalEvaluator : public Evaluator<BasePredictorType, AggregatorTypes...>, public IIncrementalEvaluator<BasePredictorType>
+    class IncrementalEvaluator : public Evaluator<BasePredictorType, AggregatorTypes...>
+        , public IIncrementalEvaluator<BasePredictorType>
     {
     public:
         using BaseClassType = Evaluator<BasePredictorType, AggregatorTypes...>;
@@ -95,7 +96,7 @@ namespace evaluators
     /// <returns> A unique_ptr to an IEvaluator. </returns>
     template <typename BasePredictorType, typename... AggregatorTypes>
     std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
-}
-}
+} // namespace evaluators
+} // namespace ell
 
 #include "../tcc/IncrementalEvaluator.tcc"

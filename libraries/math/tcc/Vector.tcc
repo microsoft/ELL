@@ -19,8 +19,10 @@ namespace math
     //
 
     template <typename ElementType>
-    UnorientedConstVectorBase<ElementType>::UnorientedConstVectorBase(const ElementType* pData, size_t size, size_t increment)
-        : _pData(pData), _size(size), _increment(increment)
+    UnorientedConstVectorBase<ElementType>::UnorientedConstVectorBase(const ElementType* pData, size_t size, size_t increment) :
+        _pData(pData),
+        _size(size),
+        _increment(increment)
     {
     }
 
@@ -76,7 +78,7 @@ namespace math
         const ElementType* pEnd = pData + _size * _increment;
         ElementType result = *pData;
         pData += _increment;
-        
+
         while (pData < pEnd)
         {
             result = std::max(result, std::abs(*pData));
@@ -118,8 +120,8 @@ namespace math
     //
 
     template <typename ElementType, VectorOrientation orientation>
-    ConstVectorReference<ElementType, orientation>::ConstVectorReference(const ElementType* pData, size_t size, size_t increment)
-        : UnorientedConstVectorBase<ElementType>(pData, size, increment)
+    ConstVectorReference<ElementType, orientation>::ConstVectorReference(const ElementType* pData, size_t size, size_t increment) :
+        UnorientedConstVectorBase<ElementType>(pData, size, increment)
     {
     }
 
@@ -180,8 +182,8 @@ namespace math
     //
 
     template <typename ElementType, VectorOrientation orientation>
-    VectorReference<ElementType, orientation>::VectorReference(const ElementType* pData, size_t size, size_t increment)
-        : ConstVectorReference<ElementType, orientation>(pData, size, increment)
+    VectorReference<ElementType, orientation>::VectorReference(const ElementType* pData, size_t size, size_t increment) :
+        ConstVectorReference<ElementType, orientation>(pData, size, increment)
     {
     }
 
@@ -200,7 +202,7 @@ namespace math
     }
 
     template <typename ElementType, VectorOrientation orientation>
-    template<typename OtherElementType>
+    template <typename OtherElementType>
     void VectorReference<ElementType, orientation>::CopyFrom(ConstVectorReference<OtherElementType, orientation> other)
     {
         if (this->Size() != other.Size())
@@ -305,52 +307,59 @@ namespace math
     //
 
     template <typename ElementType, VectorOrientation orientation>
-    Vector<ElementType, orientation>::Vector(size_t size)
-        : VectorReference<ElementType, orientation>(nullptr, size, 1), _data(size)
+    Vector<ElementType, orientation>::Vector(size_t size) :
+        VectorReference<ElementType, orientation>(nullptr, size, 1),
+        _data(size)
     {
         this->_pData = _data.data();
     }
 
     template <typename ElementType, VectorOrientation orientation>
-    Vector<ElementType, orientation>::Vector(std::vector<ElementType> data)
-        : VectorReference<ElementType, orientation>(nullptr, data.size(), 1), _data(std::move(data))
+    Vector<ElementType, orientation>::Vector(std::vector<ElementType> data) :
+        VectorReference<ElementType, orientation>(nullptr, data.size(), 1),
+        _data(std::move(data))
     {
         this->_pData = _data.data();
     }
 
     template <typename ElementType, VectorOrientation orientation>
-    Vector<ElementType, orientation>::Vector(std::initializer_list<ElementType> list)
-        : VectorReference<ElementType, orientation>(nullptr, list.size(), 1), _data(list.begin(), list.end())
+    Vector<ElementType, orientation>::Vector(std::initializer_list<ElementType> list) :
+        VectorReference<ElementType, orientation>(nullptr, list.size(), 1),
+        _data(list.begin(), list.end())
     {
         this->_pData = _data.data();
     }
 
     template <typename ElementType, VectorOrientation orientation>
-    Vector<ElementType, orientation>::Vector(Vector<ElementType, orientation>&& other)
-        : VectorReference<ElementType, orientation>(nullptr, other.Size(), other.GetIncrement()), _data(std::move(other._data))
+    Vector<ElementType, orientation>::Vector(Vector<ElementType, orientation>&& other) :
+        VectorReference<ElementType, orientation>(nullptr, other.Size(), other.GetIncrement()),
+        _data(std::move(other._data))
     {
         this->_pData = _data.data();
     }
 
     template <typename ElementType, VectorOrientation orientation>
-    Vector<ElementType, orientation>::Vector(const Vector<ElementType, orientation>& other)
-        : VectorReference<ElementType, orientation>(nullptr, other.Size(), 1), _data(other.Size())
+    Vector<ElementType, orientation>::Vector(const Vector<ElementType, orientation>& other) :
+        VectorReference<ElementType, orientation>(nullptr, other.Size(), 1),
+        _data(other.Size())
     {
         _pData = _data.data();
         this->CopyFrom(other);
     }
 
     template <typename ElementType, VectorOrientation orientation>
-    Vector<ElementType, orientation>::Vector(ConstVectorReference<ElementType, orientation>& other)
-        : VectorReference<ElementType, orientation>(nullptr, other.Size(), 1), _data(other.Size())
+    Vector<ElementType, orientation>::Vector(ConstVectorReference<ElementType, orientation>& other) :
+        VectorReference<ElementType, orientation>(nullptr, other.Size(), 1),
+        _data(other.Size())
     {
         _pData = _data.data();
         this->CopyFrom(other);
     }
 
     template <typename ElementType, VectorOrientation orientation>
-    Vector<ElementType, orientation>::Vector(ConstVectorReference<ElementType, TransposeVectorOrientation<orientation>::value>& other)
-        : VectorReference<ElementType, orientation>(nullptr, other.Size(), 1), _data(other.Size())
+    Vector<ElementType, orientation>::Vector(ConstVectorReference<ElementType, TransposeVectorOrientation<orientation>::value>& other) :
+        VectorReference<ElementType, orientation>(nullptr, other.Size(), 1),
+        _data(other.Size())
     {
         _pData = _data.data();
         this->CopyFrom(other);
@@ -422,5 +431,5 @@ namespace math
 
         vector.Swap(value);
     }
-}
-}
+} // namespace math
+} // namespace ell

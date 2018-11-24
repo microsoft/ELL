@@ -39,8 +39,9 @@ namespace model
         class ReverseRange
         {
         public:
-            ReverseRange(const ContainerType& container)
-                : _begin(container.crbegin()), _end(container.crend()) {}
+            ReverseRange(const ContainerType& container) :
+                _begin(container.crbegin()),
+                _end(container.crend()) {}
 
             auto begin() const { return _begin; }
 
@@ -81,19 +82,19 @@ namespace model
                 }
             });
         }
-    }
+    } // namespace
 
     //
     // Model
     //
 
-    Model::Model()
-        : _data(std::make_shared<Model::ModelData>())
+    Model::Model() :
+        _data(std::make_shared<Model::ModelData>())
     {
     }
 
-    Model::Model(const std::shared_ptr<Model::ModelData>& data)
-        : _data(data)
+    Model::Model(const std::shared_ptr<Model::ModelData>& data) :
+        _data(data)
     {
     }
 
@@ -392,8 +393,8 @@ namespace model
     //
 
     // Base class
-    NodeIterator::NodeIterator(const Model* model)
-        : _model(model)
+    NodeIterator::NodeIterator(const Model* model) :
+        _model(model)
     {
     }
 
@@ -469,8 +470,8 @@ namespace model
     }
 
     // ForwardNodeIterator
-    ForwardNodeIterator::ForwardNodeIterator(const Model* model, const std::vector<const OutputPortBase*>& outputs)
-        : NodeIterator(model)
+    ForwardNodeIterator::ForwardNodeIterator(const Model* model, const std::vector<const OutputPortBase*>& outputs) :
+        NodeIterator(model)
     {
         if (_model->Size() == 0)
         {
@@ -482,8 +483,8 @@ namespace model
         Next();
     }
 
-    ForwardNodeIterator::ForwardNodeIterator(const Model* model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs)
-        : NodeIterator(model)
+    ForwardNodeIterator::ForwardNodeIterator(const Model* model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs) :
+        NodeIterator(model)
     {
         if (_model->Size() == 0)
         {
@@ -546,8 +547,8 @@ namespace model
     }
 
     // ReverseNodeIterator
-    ReverseNodeIterator::ReverseNodeIterator(const Model* model)
-        : NodeIterator(model)
+    ReverseNodeIterator::ReverseNodeIterator(const Model* model) :
+        NodeIterator(model)
     {
         // Just push everything on the stack
         for (auto node : _model->_data->idToNodeMap)
@@ -601,8 +602,9 @@ namespace model
     //
     // ModelSerializationContext
     //
-    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& previousContext, Model* model)
-        : utilities::SerializationContext(previousContext, {}), _model(model)
+    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& previousContext, Model* model) :
+        utilities::SerializationContext(previousContext, {}),
+        _model(model)
     {
         auto mapContext = dynamic_cast<ModelSerializationContext*>(&previousContext);
         if (mapContext != nullptr)
@@ -632,5 +634,5 @@ namespace model
             mapContext->MapNode(id, node);
         }
     }
-}
-}
+} // namespace model
+} // namespace ell

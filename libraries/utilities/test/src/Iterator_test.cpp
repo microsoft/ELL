@@ -64,8 +64,9 @@ std::chrono::milliseconds::rep timeIt(FuncType fn)
 class MillisecondTimer
 {
 public:
-    MillisecondTimer()
-        : _start(std::chrono::system_clock::now()), _running(true) {}
+    MillisecondTimer() :
+        _start(std::chrono::system_clock::now()),
+        _running(true) {}
     void Start()
     {
         _start = std::chrono::system_clock::now();
@@ -152,4 +153,4 @@ void TestStlStridedIterator()
         testing::ProcessTest("utilities::StlStridedIterator element access", *it == vec[2 * index]);
     }
 }
-}
+} // namespace ell

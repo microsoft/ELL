@@ -33,8 +33,7 @@ namespace nodes
     /// <summary> A node that wraps a neural net ActivationLayer. </summary>
     template <typename ValueType>
     class ActivationLayerNode
-        : public NeuralNetworkLayerNode<ActivationLayerNode<ValueType>, predictors::neural::ActivationLayer<ValueType>,
-                                        ValueType>
+        : public NeuralNetworkLayerNode<ActivationLayerNode<ValueType>, predictors::neural::ActivationLayer<ValueType>, ValueType>
     {
     public:
         using LayerType = predictors::neural::ActivationLayer<ValueType>;
@@ -83,7 +82,8 @@ namespace nodes
     template <typename ValueType>
     class ParametricReLUActivationLayerNode
         : public NeuralNetworkLayerNode<ParametricReLUActivationLayerNode<ValueType>,
-                                        predictors::neural::ActivationLayer<ValueType>, ValueType>
+                                        predictors::neural::ActivationLayer<ValueType>,
+                                        ValueType>
     {
     public:
         using LayerType = predictors::neural::ActivationLayer<ValueType>;

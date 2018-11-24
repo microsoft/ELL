@@ -43,7 +43,7 @@ namespace utilities
         {
             return { t[I]... };
         }
-    }
+    } // namespace detail
 
     template <typename... Args, typename T>
     std::tuple<Args...> VectorToTuple(std::vector<T> t)
@@ -51,5 +51,5 @@ namespace utilities
         return detail::VectorToTuple<Args...>(t, std::make_index_sequence<sizeof...(Args)>());
     }
 
-}
-}
+} // namespace utilities
+} // namespace ell

@@ -41,6 +41,7 @@ namespace model
     class IRCompiledMap : public CompiledMap
     {
         using Boolean = utilities::Boolean;
+
     public:
         /// <summary> Move Constructor. </summary>
         ///
@@ -156,7 +157,7 @@ namespace model
         /// <summary> Get a pointer to the named global array. </summary>
         ///
         /// <param name="name"> name of the global. </param>
-        template<typename ElementType>
+        template <typename ElementType>
         ElementType* GetGlobalValuePointer(const std::string& name);
 
         /// <summary> Print a summary of the performance for the node types. </summary>
@@ -237,7 +238,7 @@ namespace model
         mutable std::tuple<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<int64_t>, ComputeFunction<float>, ComputeFunction<double>> _computeInputFunction;
         mutable std::tuple<Vector<bool>, Vector<int>, Vector<int64_t>, Vector<float>, Vector<double>> _cachedOutput;
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/IRCompiledMap.tcc"

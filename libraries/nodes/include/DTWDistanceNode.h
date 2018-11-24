@@ -93,7 +93,7 @@ namespace nodes
         mutable std::vector<int> _s;
         mutable int _currentTime;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/DTWDistanceNode.tcc"

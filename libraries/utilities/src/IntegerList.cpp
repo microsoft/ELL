@@ -16,8 +16,9 @@ namespace ell
 {
 namespace utilities
 {
-    IntegerList::Iterator::Iterator(const vector_iterator& begin, const vector_iterator& end)
-        : _begin(begin), _end(end)
+    IntegerList::Iterator::Iterator(const vector_iterator& begin, const vector_iterator& end) :
+        _begin(begin),
+        _end(end)
     {
     }
 
@@ -45,5 +46,5 @@ namespace utilities
     {
         return Iterator(_list.cbegin(), _list.cend());
     }
-}
-}
+} // namespace utilities
+} // namespace ell

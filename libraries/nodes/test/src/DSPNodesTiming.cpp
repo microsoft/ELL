@@ -122,7 +122,7 @@ model::PortMemoryLayout CalculateMemoryLayout(int numRows, int numColumns, int n
 
     return { size, stride, offset };
 }
-}
+} // namespace
 
 //
 // Timing functions
@@ -135,7 +135,7 @@ auto TimeReferenceConvolution(const math::ChannelColumnRowTensor<ValueType>& sig
 
     // Perform the convolution
     utilities::MillisecondTimer timer;
-    if(algorithm == dsp::ConvolutionMethodOption::winograd)
+    if (algorithm == dsp::ConvolutionMethodOption::winograd)
     {
         const auto order = dsp::WinogradFilterOrder::tilesFirst;
         const int tileSize = 2;
@@ -178,7 +178,7 @@ static void TimeConvolutionNode(ImageShape inputShape, FiltersShape filterShape,
     const int inputPadding = (filterSize - 1) / 2;
     const int outputPadding = 0;
     const int stride = 1;
-        
+
     auto inputSize = (inputRows + 2 * inputPadding) * (inputColumns + 2 * inputPadding) * numChannels;
     auto data = std::vector<ValueType>(inputSize);
 
@@ -236,7 +236,6 @@ static void TimeConvolutionNode(ImageShape inputShape, FiltersShape filterShape,
     auto compilationTime = timer.Elapsed();
     std::cout << "Time to compile model: " << compilationTime << " ms\n";
 
-
     timer.Reset();
     for (int index = 0; index < numIterations; ++index)
     {
@@ -249,7 +248,8 @@ static void TimeConvolutionNode(ImageShape inputShape, FiltersShape filterShape,
     auto referenceTime = TimeReferenceConvolution(paddedDataTensor, filterWeights, numFilters, numIterations, convolutionMethod);
 
     auto algName = GetConvAlgName(convolutionMethod);
-    std::cout << "Total time for " << numIterations << " iterations of " << inputRows << " x " << inputColumns << " x " << numChannels << " -> " << numFilters << " " << algName << " convolutions: " << compiledTime << " ms\t" << "(reference: " << referenceTime << " ms)\n";
+    std::cout << "Total time for " << numIterations << " iterations of " << inputRows << " x " << inputColumns << " x " << numChannels << " -> " << numFilters << " " << algName << " convolutions: " << compiledTime << " ms\t"
+              << "(reference: " << referenceTime << " ms)\n";
 }
 
 //
@@ -258,88 +258,87 @@ static void TimeConvolutionNode(ImageShape inputShape, FiltersShape filterShape,
 void TimeDSPNodes()
 {
     //
-    // Timings on jitted models 
+    // Timings on jitted models
     //
-    TimeConvolutionNode<float>({240, 240, 3}, {16, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::simple);
-    TimeConvolutionNode<float>({240, 240, 3}, {16, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::unrolled);
-    TimeConvolutionNode<float>({240, 240, 3}, {16, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 240, 240, 3 }, { 16, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>({ 240, 240, 3 }, { 16, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>({ 240, 240, 3 }, { 16, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
     std::cout << std::endl;
 
-    TimeConvolutionNode<float>({100, 100, 16}, {32, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::simple); 
-    TimeConvolutionNode<float>({100, 100, 16}, {32, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::unrolled);
-    TimeConvolutionNode<float>({100, 100, 16}, {32, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 100, 100, 16 }, { 32, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>({ 100, 100, 16 }, { 32, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>({ 100, 100, 16 }, { 32, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
     std::cout << std::endl;
 
-    TimeConvolutionNode<float>({32, 48, 64}, {256, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::simple);
-    TimeConvolutionNode<float>({32, 48, 64}, {256, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::unrolled);
-    TimeConvolutionNode<float>({32, 48, 64}, {256, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 32, 48, 64 }, { 256, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>({ 32, 48, 64 }, { 256, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>({ 32, 48, 64 }, { 256, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
     std::cout << std::endl;
 
-    TimeConvolutionNode<float>({64, 64, 16}, {16, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::simple);
-    TimeConvolutionNode<float>({64, 64, 16}, {16, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::unrolled);
-    TimeConvolutionNode<float>({64, 64, 16}, {16, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    std::cout << std::endl;
-    
-    TimeConvolutionNode<float>({64, 64, 32}, {32, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::simple);
-    TimeConvolutionNode<float>({64, 64, 32}, {32, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::unrolled);
-    TimeConvolutionNode<float>({64, 64, 32}, {32, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    std::cout << std::endl;
-    
-    TimeConvolutionNode<float>({64, 64, 64}, {64, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::simple);
-    TimeConvolutionNode<float>({64, 64, 64}, {64, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::unrolled);
-    TimeConvolutionNode<float>({64, 64, 64}, {64, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    std::cout << std::endl;
-    
-    TimeConvolutionNode<float>({64, 64, 128}, {128, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::simple);
-    TimeConvolutionNode<float>({64, 64, 128}, {128, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::unrolled);
-    TimeConvolutionNode<float>({64, 64, 128}, {128, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 64, 64, 16 }, { 16, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>({ 64, 64, 16 }, { 16, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>({ 64, 64, 16 }, { 16, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
     std::cout << std::endl;
 
+    TimeConvolutionNode<float>({ 64, 64, 32 }, { 32, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>({ 64, 64, 32 }, { 32, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>({ 64, 64, 32 }, { 32, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    std::cout << std::endl;
+
+    TimeConvolutionNode<float>({ 64, 64, 64 }, { 64, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>({ 64, 64, 64 }, { 64, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>({ 64, 64, 64 }, { 64, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    std::cout << std::endl;
+
+    TimeConvolutionNode<float>({ 64, 64, 128 }, { 128, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::simple);
+    TimeConvolutionNode<float>({ 64, 64, 128 }, { 128, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::unrolled);
+    TimeConvolutionNode<float>({ 64, 64, 128 }, { 128, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    std::cout << std::endl;
 
     // Winograd-specific stuff
-    TimeConvolutionNode<float>({127, 127, 8}, {8, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    TimeConvolutionNode<float>({127, 127, 16}, {16, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    TimeConvolutionNode<float>({127, 127, 32}, {32, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    TimeConvolutionNode<float>({127, 127, 64}, {64, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 127, 127, 8 }, { 8, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 127, 127, 16 }, { 16, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 127, 127, 32 }, { 32, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 127, 127, 64 }, { 64, 3, 3, 0 }, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
     // TimeConvolutionNode<float>({127, 127, 128}, {128, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
     // TimeConvolutionNode<float>({127, 127, 256}, {256, 3, 3, 0}, 10, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    
-    // Winograd-specific 
+
+    // Winograd-specific
     std::cout << "Regular (3D)\n";
     std::cout << "Tiles-first\n";
-    TimeConvolutionNode<float>({64, 64, 1}, {1, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    TimeConvolutionNode<float>({64, 64, 2}, {2, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    TimeConvolutionNode<float>({64, 64, 4}, {4, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    TimeConvolutionNode<float>({64, 64, 8}, {8, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    TimeConvolutionNode<float>({127, 127, 1}, {1, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    TimeConvolutionNode<float>({127, 127, 2}, {2, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    TimeConvolutionNode<float>({127, 127, 4}, {4, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
-    TimeConvolutionNode<float>({127, 127, 8}, {8, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 64, 64, 1 }, { 1, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 64, 64, 2 }, { 2, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 64, 64, 4 }, { 4, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 64, 64, 8 }, { 8, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 127, 127, 1 }, { 1, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 127, 127, 2 }, { 2, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 127, 127, 4 }, { 4, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
+    TimeConvolutionNode<float>({ 127, 127, 8 }, { 8, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::tilesFirst });
 
     std::cout << "\n";
     std::cout << "Filters-first\n";
-    TimeConvolutionNode<float>({64, 64, 1}, {1, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({64, 64, 2}, {2, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({64, 64, 4}, {4, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({64, 64, 8}, {8, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({127, 127, 1}, {1, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({127, 127, 2}, {2, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({127, 127, 4}, {4, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({127, 127, 8}, {8, 3, 3, 0}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 64, 64, 1 }, { 1, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 64, 64, 2 }, { 2, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 64, 64, 4 }, { 4, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 64, 64, 8 }, { 8, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 127, 127, 1 }, { 1, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 127, 127, 2 }, { 2, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 127, 127, 4 }, { 4, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 127, 127, 8 }, { 8, 3, 3, 0 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
 
     std::cout << "\n";
     std::cout << "Depthwise-separable\n";
     std::cout << "Filters-first\n";
-    TimeConvolutionNode<float>({64, 64, 1}, {1, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({64, 64, 2}, {2, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({64, 64, 4}, {4, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({64, 64, 8}, {8, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({64, 64, 16}, {16, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({64, 64, 32}, {32, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({127, 127, 1}, {1, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({127, 127, 2}, {2, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({127, 127, 4}, {4, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({127, 127, 8}, {8, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({127, 127, 16}, {16, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    TimeConvolutionNode<float>({127, 127, 32}, {32, 3, 3, 1}, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 64, 64, 1 }, { 1, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 64, 64, 2 }, { 2, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 64, 64, 4 }, { 4, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 64, 64, 8 }, { 8, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 64, 64, 16 }, { 16, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 64, 64, 32 }, { 32, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 127, 127, 1 }, { 1, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 127, 127, 2 }, { 2, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 127, 127, 4 }, { 4, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 127, 127, 8 }, { 8, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 127, 127, 16 }, { 16, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
+    TimeConvolutionNode<float>({ 127, 127, 32 }, { 32, 3, 3, 1 }, 100, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
 }

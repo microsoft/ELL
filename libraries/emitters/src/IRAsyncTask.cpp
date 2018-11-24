@@ -18,8 +18,9 @@ namespace ell
 {
 namespace emitters
 {
-    IRAsyncTask::IRAsyncTask(IRFunctionEmitter& owningFunction, LLVMFunction taskFunction, const std::vector<LLVMValue>& arguments)
-        : _taskFunction(taskFunction), _arguments(arguments)
+    IRAsyncTask::IRAsyncTask(IRFunctionEmitter& owningFunction, LLVMFunction taskFunction, const std::vector<LLVMValue>& arguments) :
+        _taskFunction(taskFunction),
+        _arguments(arguments)
     {
         const auto& compilerParameters = owningFunction.GetModule().GetCompilerOptions();
         _usePthreads = compilerParameters.parallelize && !compilerParameters.targetDevice.IsWindows();
@@ -29,8 +30,8 @@ namespace emitters
         }
     }
 
-    IRAsyncTask::IRAsyncTask(IRFunctionEmitter& owningFunction, IRFunctionEmitter& taskFunction, const std::vector<LLVMValue>& arguments)
-        : IRAsyncTask(owningFunction, taskFunction.GetFunction(), arguments)
+    IRAsyncTask::IRAsyncTask(IRFunctionEmitter& owningFunction, IRFunctionEmitter& taskFunction, const std::vector<LLVMValue>& arguments) :
+        IRAsyncTask(owningFunction, taskFunction.GetFunction(), arguments)
     {
     }
 
@@ -108,5 +109,5 @@ namespace emitters
             task.Wait(function);
         }
     }
-}
-}
+} // namespace emitters
+} // namespace ell

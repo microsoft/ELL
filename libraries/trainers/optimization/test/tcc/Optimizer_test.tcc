@@ -64,7 +64,7 @@ void TestSDCARegressionConvergence(LossFunctionType lossFunction, RegularizerTyp
     //std::cout << optimizer.GetSolution().GetBias() << "; " << optimizer.GetSolution().GetVector() << "\t" << optimizer.GetSolutionInfo().primalObjective << std::endl;
 }
 
-#include<iostream>
+#include <iostream>
 
 // assert that the duality gap tends to zero
 template <typename LossFunctionType, typename RegularizerType>
@@ -83,7 +83,7 @@ void TestSDCAClassificationConvergence(LossFunctionType lossFunction, Regularize
     std::normal_distribution<double> biasDistribution(0, biasVariance);
     solution.GetBias() = biasDistribution(randomEngine);
 
-    std::uniform_int_distribution<int> vectorDistribution(-1,1);
+    std::uniform_int_distribution<int> vectorDistribution(-1, 1);
     solution.GetVector().Generate([&]() { return vectorDistribution(randomEngine); });
 
     // create random dataset
@@ -105,4 +105,3 @@ void TestSDCAClassificationConvergence(LossFunctionType lossFunction, Regularize
     //std::cout << solution.GetBias() << "; " << solution.GetVector() << std::endl;
     //std::cout << optimizer.GetSolution().GetBias() << "; " << optimizer.GetSolution().GetVector() << "\t" << optimizer.GetSolutionInfo().primalObjective << std::endl;
 }
-

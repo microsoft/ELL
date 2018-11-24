@@ -14,29 +14,33 @@ namespace ell
 namespace model
 {
     template <typename ValueType>
-    InputNode<ValueType>::InputNode()
-        : InputNodeBase(_output), _output(this, defaultOutputPortName, 0)
+    InputNode<ValueType>::InputNode() :
+        InputNodeBase(_output),
+        _output(this, defaultOutputPortName, 0)
     {
         SetShape(MemoryShape{ 0 });
     }
 
     template <typename ValueType>
-    InputNode<ValueType>::InputNode(size_t size)
-        : InputNodeBase(_output), _output(this, defaultOutputPortName, size)
+    InputNode<ValueType>::InputNode(size_t size) :
+        InputNodeBase(_output),
+        _output(this, defaultOutputPortName, size)
     {
         SetShape(MemoryShape{ static_cast<int>(size) });
     }
 
     template <typename ValueType>
-    InputNode<ValueType>::InputNode(MemoryShape shape)
-        : InputNodeBase(_output), _output(this, defaultOutputPortName, PortMemoryLayout{ shape })
+    InputNode<ValueType>::InputNode(MemoryShape shape) :
+        InputNodeBase(_output),
+        _output(this, defaultOutputPortName, PortMemoryLayout{ shape })
     {
         SetShape(shape);
     }
 
     template <typename ValueType>
-    InputNode<ValueType>::InputNode(const PortMemoryLayout& layout)
-        : InputNodeBase(_output), _output(this, defaultOutputPortName, layout)
+    InputNode<ValueType>::InputNode(const PortMemoryLayout& layout) :
+        InputNodeBase(_output),
+        _output(this, defaultOutputPortName, layout)
     {
         SetMemoryLayout(layout);
     }
@@ -52,8 +56,8 @@ namespace model
     {
         if (_output.Size() != inputValues.size())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, 
-                ell::utilities::FormatString("InputNode output size %zu doesn't match input size %zu", _output.Size(), inputValues.size()));
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
+                                            ell::utilities::FormatString("InputNode output size %zu doesn't match input size %zu", _output.Size(), inputValues.size()));
         }
         _inputValues = inputValues;
     }
@@ -92,7 +96,7 @@ namespace model
         int size;
         archiver.OptionalProperty("size", 0) >> size;
         std::vector<int> shapeVector;
-        archiver.OptionalProperty("shape", std::vector<int>{size}) >> shapeVector;
+        archiver.OptionalProperty("shape", std::vector<int>{ size }) >> shapeVector;
         if (archiver.HasNextPropertyName("layout"))
         {
             PortMemoryLayout layout;
@@ -101,8 +105,8 @@ namespace model
         }
         else
         {
-            SetShape({shapeVector});
+            SetShape({ shapeVector });
         }
     }
-}
-}
+} // namespace model
+} // namespace ell

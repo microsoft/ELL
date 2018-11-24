@@ -11,8 +11,9 @@ namespace ell
 namespace utilities
 {
     template <typename IteratorType>
-    StlContainerIteratorBase<IteratorType>::StlContainerIteratorBase(IteratorType begin, IteratorType end)
-        : _current(begin), _end(end)
+    StlContainerIteratorBase<IteratorType>::StlContainerIteratorBase(IteratorType begin, IteratorType end) :
+        _current(begin),
+        _end(end)
     {
     }
 
@@ -48,5 +49,5 @@ namespace utilities
     {
         return StlContainerReferenceIterator<typename ContainerType::iterator, typename ContainerType::value_type>(container.begin(), container.end());
     }
-}
-}
+} // namespace utilities
+} // namespace ell

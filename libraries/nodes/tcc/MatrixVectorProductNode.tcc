@@ -23,14 +23,20 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType, math::MatrixLayout layout>
-    MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1), _w(0, 0)
+    MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode() :
+        Node({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1),
+        _w(0, 0)
     {
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& w)
-        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, w.NumRows()), _w(w)
+    MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& w) :
+        Node({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, w.NumRows()),
+        _w(w)
     {
         if (input.Size() != w.NumColumns())
         {
@@ -90,7 +96,7 @@ namespace nodes
         auto m = projectionMatrix.NumRows();
         auto n = projectionMatrix.NumColumns();
         auto matrixStride = projectionMatrix.GetIncrement();
-        if(matrixStride == 0 || matrixStride < m)
+        if (matrixStride == 0 || matrixStride < m)
         {
             utilities::InputException(utilities::InputExceptionErrors::badData, "Matrix has an invalid stride");
         }
@@ -121,5 +127,5 @@ namespace nodes
     {
         return transformer.AddNode<MatrixVectorProductNode>(input, w);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

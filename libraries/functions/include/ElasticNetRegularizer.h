@@ -19,7 +19,6 @@ namespace functions
     class ElasticNetRegularizer
     {
     public:
-
         /// <summary> Constructs an instance of ElasticNetRegularizer. </summary>
         ///
         /// <param name="ratioL1L2"> (Optional) The ratio between the L1 regularization parameter and the L2 regularization parameter. </param>
@@ -31,7 +30,7 @@ namespace functions
         /// <param name="b"> (Optional) The bias term for which the regularizer is computed. </param>
         ///
         /// <returns> Value of the regularizer. </returns>
-        double operator()(math::ConstColumnVectorReference<double> w, double b=0) const;
+        double operator()(math::ConstColumnVectorReference<double> w, double b = 0) const;
 
         /// <summary> Computes the value of the convex conjugate of the regularizer. </summary>
         ///
@@ -39,7 +38,7 @@ namespace functions
         /// <param name="d"> (Optional) The bias term for which the regularizer is computed. </param>
         ///
         /// <returns> Value of the conjugate. </returns>
-        double Conjugate(math::ConstColumnVectorReference<double> v, double d=0) const;
+        double Conjugate(math::ConstColumnVectorReference<double> v, double d = 0) const;
 
         /// <summary> Computes the conjugate gradient function. Namely, given vector v, compute g = argmax_w {v'*w - f(w)} = argmin_w {-v'*w + f(w)} </summary>
         ///
@@ -60,5 +59,5 @@ namespace functions
     private:
         double _ratioL1L2;
     };
-}
-}
+} // namespace functions
+} // namespace ell

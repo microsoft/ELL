@@ -47,14 +47,14 @@ namespace utilities
     /// <typeparam name="Type"> The type (e.g., 'double') </typeparam>
     template <typename Type>
     std::string GetTypeName();
-    
+
     /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
     ///
     /// <param name="baseType"> The base type (e.g., 'Vector') </param>
     /// <typeparam name="Types"> The templated type (e.g., 'double') </typeparam>
     template <typename... Types>
     std::string GetCompositeTypeName(std::string baseType);
-    
+
     /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
     ///
     /// <param name="baseType"> The base type (e.g., 'Vector') </param>
@@ -354,7 +354,7 @@ namespace utilities
         /// <returns> The serialization name. </returns>
         static std::string GetName() { return "IArchivable"; }
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/TypeName.tcc"

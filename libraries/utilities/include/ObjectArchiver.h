@@ -24,7 +24,8 @@ namespace ell
 namespace utilities
 {
     /// <summary> An archiver that encodes data in an ObjectArchive </summary>
-    class ObjectArchiver : public Archiver, public Unarchiver
+    class ObjectArchiver : public Archiver
+        , public Unarchiver
     {
     public:
         /// <summary> Constructor for writing </summary>
@@ -50,34 +51,34 @@ namespace utilities
         bool HasNextPropertyName(const std::string& name) override;
 
     protected:
-        // Serialization
-        #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_VALUE_OVERRIDE(t);
+// Serialization
+#define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_VALUE_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void ArchiveValue(const char* name, const std::string& value) override;
         void ArchiveNull(const char* name) override;
 
-        #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_ARRAY_OVERRIDE(t);
+#define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_ARRAY_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void ArchiveArray(const char* name, const std::vector<std::string>& array) override;
         void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) override;
 
         void ArchiveObject(const char* name, const IArchivable& value) override;
 
-        // Deserialization
-        #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_VALUE_OVERRIDE(t);
+// Deserialization
+#define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_VALUE_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void UnarchiveValue(const char* name, std::string& value) override;
         bool UnarchiveNull(const char* name) override;
 
-        #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_OVERRIDE(t);
+#define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void UnarchiveArray(const char* name, std::vector<std::string>& array) override;
 
@@ -113,7 +114,7 @@ namespace utilities
         // The object description
         ObjectArchive _objectDescription;
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/ObjectArchiver.tcc"

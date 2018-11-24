@@ -6,14 +6,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "math_profile.h"
-#include "Vector_test.h"
 #include "Matrix_test.h"
 #include "Tensor_test.h"
+#include "Vector_test.h"
+#include "math_profile.h"
 
 using namespace ell;
 
-template<typename ElementType>
+template <typename ElementType>
 void RunProfile()
 {
     const size_t repetitions = 10;

@@ -21,9 +21,9 @@
 // trainers
 #include "HistogramForestTrainer.h"
 #include "LogitBooster.h"
+#include "ProtoNNTrainer.h"
 #include "SortingForestTrainer.h"
 #include "ThresholdFinder.h"
-#include "ProtoNNTrainer.h"
 
 namespace ell
 {
@@ -35,20 +35,20 @@ namespace common
 
         switch (lossFunctionArguments.lossFunction)
         {
-            case LossFunctionEnum::squared:
-                return trainers::MakeSGDTrainer(functions::SquaredLoss(), trainerParameters);
+        case LossFunctionEnum::squared:
+            return trainers::MakeSGDTrainer(functions::SquaredLoss(), trainerParameters);
 
-            case LossFunctionEnum::log:
-                return trainers::MakeSGDTrainer(functions::LogLoss(), trainerParameters);
+        case LossFunctionEnum::log:
+            return trainers::MakeSGDTrainer(functions::LogLoss(), trainerParameters);
 
-            case LossFunctionEnum::hinge:
-                return trainers::MakeSGDTrainer(functions::HingeLoss(), trainerParameters);
+        case LossFunctionEnum::hinge:
+            return trainers::MakeSGDTrainer(functions::HingeLoss(), trainerParameters);
 
-            case LossFunctionEnum::smoothHinge:
-                return trainers::MakeSGDTrainer(functions::SmoothHingeLoss(), trainerParameters);
+        case LossFunctionEnum::smoothHinge:
+            return trainers::MakeSGDTrainer(functions::SmoothHingeLoss(), trainerParameters);
 
-            default:
-                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+        default:
+            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 
@@ -58,20 +58,20 @@ namespace common
 
         switch (lossFunctionArguments.lossFunction)
         {
-            case LossFunctionEnum::squared:
-                return trainers::MakeSparseDataSGDTrainer(functions::SquaredLoss(), trainerParameters);
+        case LossFunctionEnum::squared:
+            return trainers::MakeSparseDataSGDTrainer(functions::SquaredLoss(), trainerParameters);
 
-            case LossFunctionEnum::log:
-                return trainers::MakeSparseDataSGDTrainer(functions::LogLoss(), trainerParameters);
+        case LossFunctionEnum::log:
+            return trainers::MakeSparseDataSGDTrainer(functions::LogLoss(), trainerParameters);
 
-            case LossFunctionEnum::hinge:
-                return trainers::MakeSparseDataSGDTrainer(functions::HingeLoss(), trainerParameters);
+        case LossFunctionEnum::hinge:
+            return trainers::MakeSparseDataSGDTrainer(functions::HingeLoss(), trainerParameters);
 
-            case LossFunctionEnum::smoothHinge:
-                return trainers::MakeSparseDataSGDTrainer(functions::SmoothHingeLoss(), trainerParameters);
+        case LossFunctionEnum::smoothHinge:
+            return trainers::MakeSparseDataSGDTrainer(functions::SmoothHingeLoss(), trainerParameters);
 
-            default:
-                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+        default:
+            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 
@@ -124,19 +124,19 @@ namespace common
 
         switch (lossFunctionArguments.lossFunction)
         {
-            case LossFunctionEnum::squared:
+        case LossFunctionEnum::squared:
 
-                if (trainerArguments.sortingTrainer)
-                {
-                    return trainers::MakeSortingForestTrainer(functions::SquaredLoss(), trainers::LogitBooster(), trainerArguments);
-                }
-                else
-                {
-                    return trainers::MakeHistogramForestTrainer(functions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), trainerArguments);
-                }
+            if (trainerArguments.sortingTrainer)
+            {
+                return trainers::MakeSortingForestTrainer(functions::SquaredLoss(), trainers::LogitBooster(), trainerArguments);
+            }
+            else
+            {
+                return trainers::MakeHistogramForestTrainer(functions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), trainerArguments);
+            }
 
-            default:
-                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+        default:
+            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 
@@ -144,5 +144,5 @@ namespace common
     {
         return trainers::MakeProtoNNTrainer(parameters);
     }
-}
-}
+} // namespace common
+} // namespace ell

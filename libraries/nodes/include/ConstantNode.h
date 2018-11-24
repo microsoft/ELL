@@ -113,7 +113,7 @@ namespace nodes
     ///
     /// <returns> The node added to the model. </returns>
     ConstantNode<double>* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::ConstantPredictor& predictor, model::ModelTransformer& transformer);
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/ConstantNode.tcc"

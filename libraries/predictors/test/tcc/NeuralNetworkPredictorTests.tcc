@@ -59,8 +59,7 @@ void ActivationTest()
             }
         }
     }
-    testing::ProcessTest("Testing HardSigmoidActivation", Equals(T1(0, 0, 0), 0.7) && Equals(T1(0, 1, 0), 0.1) && T1(1, 0, 1) == 1 && T1(1, 1, 1) == 0 &&
-                                                          T1(0, 0, 1) == 0.5 && T1(0, 1, 1) == 0.5 && T1(1, 0, 0) == 0.5 && T1(1, 1, 0) == 0.5);
+    testing::ProcessTest("Testing HardSigmoidActivation", Equals(T1(0, 0, 0), 0.7) && Equals(T1(0, 1, 0), 0.1) && T1(1, 0, 1) == 1 && T1(1, 1, 1) == 0 && T1(0, 0, 1) == 0.5 && T1(0, 1, 1) == 0.5 && T1(1, 0, 0) == 0.5 && T1(1, 1, 0) == 0.5);
 
     auto relu = ReLUActivation<ElementType>();
     for (size_t i = 0; i < T0.NumRows(); ++i)
@@ -338,12 +337,12 @@ void PoolingLayerTest()
     // Verify PoolingLayer with padding
     TensorType input2 // This input must include the padding
         {
-          { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
-          { { 0, -1 }, { 5, 6 }, { 0, 0 }, { 20, 21 }, { 0, 0 }, { 0, 0 } },
-          { { 0, 0 }, { -1, 0 }, { 10, 11 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
-          { { 0, 0 }, { 30, 31 }, { 0, 0 }, { 0, 0 }, { -1, 0 }, { 0, 0 } },
-          { { 0, 0 }, { 0, 0 }, { 0, -5 }, { 0, 0 }, { 40, 41 }, { 0, 0 } },
-          { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, -1 }, { 0, 0 }, { 0, 0 } },
+            { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
+            { { 0, -1 }, { 5, 6 }, { 0, 0 }, { 20, 21 }, { 0, 0 }, { 0, 0 } },
+            { { 0, 0 }, { -1, 0 }, { 10, 11 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
+            { { 0, 0 }, { 30, 31 }, { 0, 0 }, { 0, 0 }, { -1, 0 }, { 0, 0 } },
+            { { 0, 0 }, { 0, 0 }, { 0, -5 }, { 0, 0 }, { 40, 41 }, { 0, 0 } },
+            { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, -1 }, { 0, 0 }, { 0, 0 } },
         };
     TensorType expected2{
         { { 5, 6 }, { 20, 21 }, { 0, 0 } },
@@ -371,7 +370,7 @@ void ConvolutionalLayerTest()
     using Shape = typename Layer<ElementType>::Shape;
 
     // Verify ConvolutionalLayer with diagonal method
-    TensorType input(3, 4, 2); // Input includes padding --- 1 x 2 x 2 with 1 pixel of padding 
+    TensorType input(3, 4, 2); // Input includes padding --- 1 x 2 x 2 with 1 pixel of padding
     input.Fill(0);
     input(1, 1, 0) = 2;
     input(1, 2, 0) = 1;
@@ -380,7 +379,7 @@ void ConvolutionalLayerTest()
     Shape outputShape = { 1, 2, 2 }; // Output has no padding: 1 x 2 x 2
     LayerParameters parameters{ input, ZeroPadding(1), outputShape, NoPadding() };
     ConvolutionalParameters convolutionalParams{ 3, 1, ConvolutionMethod::diagonal, 2 };
-    
+
     // Filter weights in `weightsVector` are in numFilters x numChannels x filterSize x filterSize order
     // clang-format off
     std::vector<ElementType> weightsVector {
@@ -429,7 +428,6 @@ void ConvolutionalLayerTest()
     convolutionalLayerDiagonal.Compute();
     auto outputDiagonal = convolutionalLayerDiagonal.GetOutput();
     testing::ProcessTest("Testing ConvolutionalLayer (diagonal), values", Equals(outputDiagonal(0, 0, 0), 10) && Equals(outputDiagonal(0, 0, 1), 15) && Equals(outputDiagonal(0, 1, 0), 18) && Equals(outputDiagonal(0, 1, 1), 18));
-
 }
 
 template <typename ElementType>

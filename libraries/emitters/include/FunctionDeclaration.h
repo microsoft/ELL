@@ -16,18 +16,21 @@ namespace emitters
     {
     public:
         /// <summary> Default constructor </summary>
-        FunctionDeclaration()
-            : _returnType(VariableType::Custom) {}
+        FunctionDeclaration() :
+            _returnType(VariableType::Custom) {}
 
         /// <summary> Construct a new Function wrapper </summary>
-        FunctionDeclaration(const std::string& name, VariableType returnType)
-            : _name(name), _returnType(returnType)
+        FunctionDeclaration(const std::string& name, VariableType returnType) :
+            _name(name),
+            _returnType(returnType)
         {
         }
 
         /// <summary> Construct a new Function wrapper </summary>
-        FunctionDeclaration(const std::string& name, VariableType returnType, const NamedVariableTypeList& args)
-            : _name(name), _returnType(returnType), _args(args)
+        FunctionDeclaration(const std::string& name, VariableType returnType, const NamedVariableTypeList& args) :
+            _name(name),
+            _returnType(returnType),
+            _args(args)
         {
         }
 
@@ -57,5 +60,5 @@ namespace emitters
         VariableType _returnType;
         NamedVariableTypeList _args;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

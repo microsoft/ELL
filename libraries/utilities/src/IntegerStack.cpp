@@ -49,5 +49,5 @@ namespace utilities
 
         assert(value < _smallestUnpopped);
     }
-}
-}
+} // namespace utilities
+} // namespace ell

@@ -137,5 +137,5 @@ namespace emitters
         bool _isContinuation = false;
         bool _finished = false;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

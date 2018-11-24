@@ -58,5 +58,5 @@ namespace emitters
 
         throw EmitterException(EmitterError::valueTypeNotSupported);
     }
-}
-}
+} // namespace emitters
+} // namespace ell

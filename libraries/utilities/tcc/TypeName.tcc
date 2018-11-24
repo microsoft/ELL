@@ -58,5 +58,5 @@ namespace utilities
         auto typeStrings = std::vector<std::string>{ TypeName<Types>::GetName()... };
         return GetCompositeTypeName(baseType, typeStrings);
     }
-}
-}
+} // namespace utilities
+} // namespace ell

@@ -32,4 +32,4 @@ utilities::CommandLineParseResult ParsedApplyArguments::PostProcess(const utilit
     std::vector<std::string> errors;
     return errors;
 }
-}
+} // namespace ell

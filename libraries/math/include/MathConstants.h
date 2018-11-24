@@ -18,5 +18,5 @@ namespace math
     {
         constexpr static const ValueType pi = static_cast<ValueType>(3.14159265358979323846);
     };
-}
-}
+} // namespace math
+} // namespace ell

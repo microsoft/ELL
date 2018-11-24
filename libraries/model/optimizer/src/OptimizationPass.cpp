@@ -28,7 +28,7 @@ namespace model
     // OptimizationPass
     //
     OptimizationPass::~OptimizationPass() = default;
-    
+
     void OptimizationPass::Initialize(const Model& model, const MapCompilerOptions& settings, ModelOptimizerContext& context) const
     {
         UNUSED(model, settings, context);
@@ -46,12 +46,11 @@ namespace model
     {
         model::TransformContext transformContext;
         return optimizerContext.GetTransformer().TransformModel(model, transformContext, [this, &settings, &optimizerContext](const model::Node& node, model::ModelTransformer& transformer) {
-
             // The transformer that gets passed in to the lambda had better be the same one that's in the context.
             // This will get fixed in a future redesign
             assert(&transformer == &(optimizerContext.GetTransformer()));
             this->OptimizeNode(node, settings, optimizerContext);
         });
     }
-}
-}
+} // namespace model
+} // namespace ell

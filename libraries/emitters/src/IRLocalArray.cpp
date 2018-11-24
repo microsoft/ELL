@@ -27,8 +27,12 @@ namespace emitters
     }
 
     IRLocalArray::IRLocalArrayValue::IRLocalArrayValue(
-        emitters::IRFunctionEmitter& function, LLVMValue value, LLVMValue pOffset)
-        : _function(function), _pPointer(value), _pOffset(pOffset) {}
+        emitters::IRFunctionEmitter& function,
+        LLVMValue value,
+        LLVMValue pOffset) :
+        _function(function),
+        _pPointer(value),
+        _pOffset(pOffset) {}
 
     IRLocalArray::IRLocalArrayValue& IRLocalArray::IRLocalArrayValue::operator=(const IRLocalArrayValue& value)
     {
@@ -49,5 +53,5 @@ namespace emitters
 
         return *this;
     }
-}
-}
+} // namespace emitters
+} // namespace ell

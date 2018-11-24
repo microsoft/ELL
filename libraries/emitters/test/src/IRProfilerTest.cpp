@@ -16,8 +16,8 @@
 #include "IRExecutionEngine.h"
 #include "IRFunctionEmitter.h"
 #include "IRModuleEmitter.h"
-#include "Variable.h"
 #include "IRProfiler.h"
+#include "Variable.h"
 
 // testing
 #include "testing.h"
@@ -57,7 +57,7 @@ void TestProfileRegion()
     {
         // function.Print("Test function begin\n");
         auto x = function.LocalScalar(function.GetFunctionArgument("x"));
-        
+
         IRProfileRegion region1(function, "TestRegion1");
         testing::ProcessTest("Testing IRProfileRegion time not set", !region1.IsStartTimeValid());
         region1.Enter();
@@ -68,12 +68,12 @@ void TestProfileRegion()
         testing::ProcessTest("Testing IRProfileRegion time not set", !region1.IsStartTimeValid());
         region1.Enter();
         auto result2 = 5.0 * x + result1;
-        
+
         // Do something time-consuming:
         int vecSize = 10000;
         int numIter = 100;
         auto vec = function.Variable(VariableType::Double, vecSize);
-        function.For(numIter, [vec, vecSize](IRFunctionEmitter& function, auto){
+        function.For(numIter, [vec, vecSize](IRFunctionEmitter& function, auto) {
             auto dotSum = function.DotProduct(vecSize, vec, vec);
             UNUSED(dotSum);
         });
@@ -100,7 +100,7 @@ void TestProfileRegion()
     auto resetRegionsFunctionName = module.GetProfiler().GetResetRegionProfilingInfoFunctionName();
 
     IRExecutionEngine executionEngine(std::move(module));
-    
+
     using UnaryScalarDoubleFunctionType = double (*)(double);
     auto compiledFunction = (UnaryScalarDoubleFunctionType)executionEngine.ResolveFunctionAddress(functionName);
 
@@ -135,11 +135,11 @@ void TestProfileRegion()
     auto printProfileResultsFunction = (VoidFunctionType)executionEngine.ResolveFunctionAddress(printRegionsFunctionName);
     printProfileResultsFunction();
 #endif
-    
+
     // Check the regions have been executed the number of times we expect
     auto r0 = getRegionInfoFunction(0);
     auto r1 = getRegionInfoFunction(1);
-    
+
     testing::ProcessTest("Testing profile regions", testing::IsEqual(r0->count, 10));
     testing::ProcessTest("Testing profile regions", testing::IsEqual(r1->count, 5));
     testing::ProcessTest("Testing profile regions", r0->totalTime > r1->totalTime);

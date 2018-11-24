@@ -19,5 +19,5 @@ namespace nodes
     {
         return transformer.AddNode<ConstantNode<double>>(predictor.GetValue());
     }
-}
-}
+} // namespace nodes
+} // namespace ell

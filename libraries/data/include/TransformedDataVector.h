@@ -61,7 +61,7 @@ namespace data
     /// <param name="transformedDataVector"> The TransformedDataVector being added to vector. </param>
     template <IterationPolicy policy, typename DataVectorType, typename TransformationType>
     void operator+=(math::RowVectorReference<double> vector, const TransformedDataVector<policy, DataVectorType, TransformationType>& transformedDataVector);
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/TransformedDataVector.tcc"

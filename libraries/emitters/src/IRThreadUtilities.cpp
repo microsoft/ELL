@@ -74,5 +74,5 @@ namespace emitters
     {
         return GetTaskWrapperFunction(module, taskFunction.GetFunction());
     }
-}
-}
+} // namespace emitters
+} // namespace ell

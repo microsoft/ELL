@@ -94,7 +94,7 @@ namespace nodes
         // Operation
         emitters::UnaryOperationType _operation;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/UnaryOperationNode.tcc"

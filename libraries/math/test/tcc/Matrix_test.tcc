@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Matrix.h"
-
 template <typename ElementType, math::MatrixLayout layout>
 void TestMatrixNumRows()
 {
@@ -171,7 +169,7 @@ void TestMatrixGetDataPointer()
 
     auto S = M.GetSubMatrix(1, 1, 2, 2);
 
-    testing::ProcessTest("Matrix::GetDataPointer", M.GetDataPointer() == &(M(0,0)) && S.GetDataPointer() == &(M(1,1)) && M.GetConstDataPointer() == &(M(0, 0)) && S.GetConstDataPointer() == &(M(1, 1)));
+    testing::ProcessTest("Matrix::GetDataPointer", M.GetDataPointer() == &(M(0, 0)) && S.GetDataPointer() == &(M(1, 1)) && M.GetConstDataPointer() == &(M(0, 0)) && S.GetConstDataPointer() == &(M(1, 1)));
 }
 
 template <typename ElementType, math::MatrixLayout layout>
@@ -195,9 +193,9 @@ void TestMatrixIsContiguous()
         { 1, 0, 4, 0 },
         { 0, 0, 0, 7 }
     };
-    
+
     auto S = M.GetSubMatrix(1, 1, 1, 2);
-    
+
     testing::ProcessTest("Matrix::IsContiguous", M.IsContiguous() == true && S.IsContiguous() == false);
 }
 
@@ -217,10 +215,10 @@ void TestMatrixToArray()
     auto Sm = M.GetSubMatrix(0, 1, 2, 2);
     auto Sn = N.GetSubMatrix(0, 1, 2, 2);
 
-    std::vector<ElementType> v{ 1,0,0,0,4,0,0,7 };
-    std::vector<ElementType> u{ 0,0,4,0 };
-    std::vector<ElementType> x{ 1,0,4,0,0,0,0,7 };
-    std::vector<ElementType> y{ 0,4,0,0 };
+    std::vector<ElementType> v{ 1, 0, 0, 0, 4, 0, 0, 7 };
+    std::vector<ElementType> u{ 0, 0, 4, 0 };
+    std::vector<ElementType> x{ 1, 0, 4, 0, 0, 0, 0, 7 };
+    std::vector<ElementType> y{ 0, 4, 0, 0 };
 
     testing::ProcessTest("Matrix::ToArray", M.ToArray() == v && Sm.ToArray() == u && N.ToArray() == x && Sn.ToArray() == y);
 }
@@ -395,7 +393,7 @@ void TestMatrixGetColumn()
         { 0, 8, 5, 6 }
     };
 
-    math::ColumnVector<ElementType> w{ 4,5 };
+    math::ColumnVector<ElementType> w{ 4, 5 };
 
     testing::ProcessTest("Matrix::GetColumn", M == R && v == w);
 }
@@ -423,7 +421,7 @@ void TestMatrixGetRow()
         { 0, 3, 5, 6 }
     };
 
-    math::RowVector<ElementType> w{ 3,5,6 };
+    math::RowVector<ElementType> w{ 3, 5, 6 };
 
     testing::ProcessTest("Matrix::GetRow", M == R && w == v);
 }
@@ -448,7 +446,7 @@ void TestMatrixGetDiagonal()
         { 0, 8, 9, 6 }
     };
 
-    math::ColumnVector<ElementType> u{ 9,9 };
+    math::ColumnVector<ElementType> u{ 9, 9 };
 
     testing::ProcessTest("Matrix::GetDiagonal", M == R && u == v);
 }
@@ -526,10 +524,10 @@ void TestMatrixCopyFrom()
     };
 
     M.CopyFrom(N);
-    M.GetSubMatrix(0,2,2,2).CopyFrom(S);
+    M.GetSubMatrix(0, 2, 2, 2).CopyFrom(S);
 
     math::RowMatrix<ElementType> R{
-        { 1, 0, 2, 6},
+        { 1, 0, 2, 6 },
         { 0, 0, 3, 9 }
     };
 
@@ -604,8 +602,8 @@ void TestMatrixGenerate()
         { 0, 0, 0, 7 }
     };
 
-    M.Generate([]()->ElementType {return -2; });
-    N.GetSubMatrix(0, 1, 2, 2).Generate([]()->ElementType {return -2; });
+    M.Generate([]() -> ElementType { return -2; });
+    N.GetSubMatrix(0, 1, 2, 2).Generate([]() -> ElementType { return -2; });
 
     math::RowMatrix<ElementType> R{
         { -2, -2, -2, -2 },
@@ -633,8 +631,8 @@ void TestMatrixTransform()
         { 0, 0, 0, 7 }
     };
 
-    M.Transform([](ElementType x) {return 2 * x; });
-    N.GetSubMatrix(0, 1, 2, 2).Transform([](ElementType x) {return 2 * x; });
+    M.Transform([](ElementType x) { return 2 * x; });
+    N.GetSubMatrix(0, 1, 2, 2).Transform([](ElementType x) { return 2 * x; });
 
     math::RowMatrix<ElementType> R{
         { 2, 0, 8, 0 },
@@ -677,7 +675,7 @@ void TestMatrixPrint()
     auto x = stream1.str();
 
     std::stringstream stream2;
-    math::Print(M.GetSubMatrix(0,1,2,2), stream2);
+    math::Print(M.GetSubMatrix(0, 1, 2, 2), stream2);
     auto y = stream2.str();
 
     testing::ProcessTest("Print(Matrix)", x == "{ { 1, 2, 0 },\n  { 0, 3, 7 } }\n" && y == "{ { 2, 0 },\n  { 3, 7 } }\n");
@@ -883,7 +881,7 @@ void TestMatrixAddSetScalar()
         { 1, 2, 0 },
         { 0, 3, 7 }
     };
-    math::Matrix<ElementType, layoutB>N(2, 3);
+    math::Matrix<ElementType, layoutB> N(2, 3);
 
     math::AddSet<implementation>(static_cast<ElementType>(-2), M, N);
     math::AddSet<implementation>(static_cast<ElementType>(1), M.GetSubMatrix(0, 1, 2, 2), N.GetSubMatrix(0, 1, 2, 2));
@@ -905,7 +903,7 @@ void TestMatrixAddSetZero()
         { 1, 2, 0 },
         { 0, 3, 7 }
     };
-    math::Matrix<ElementType, layoutB>N(2, 3);
+    math::Matrix<ElementType, layoutB> N(2, 3);
 
     math::AddSet<implementation>(static_cast<ElementType>(0), M, N);
     math::AddSet<implementation>(static_cast<ElementType>(0), M.GetSubMatrix(0, 1, 2, 2), N.GetSubMatrix(0, 1, 2, 2));
@@ -1003,7 +1001,7 @@ void TestMatrixScaleAddUpdateScalarMatrixOne()
 
     math::ScaleAddUpdate<implementation>(static_cast<ElementType>(0), M, math::One(), N);
     math::ScaleAddUpdate<implementation>(static_cast<ElementType>(1), M, math::One(), N);
-    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(-2), M.GetSubMatrix(0,1,2,2), math::One(), N.GetSubMatrix(0,1,2,2));
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(-2), M.GetSubMatrix(0, 1, 2, 2), math::One(), N.GetSubMatrix(0, 1, 2, 2));
 
     math::RowMatrix<ElementType> R{
         { 0, 2, 1 },
@@ -1093,19 +1091,19 @@ template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout l
 void TestMatrixScaleAddSetScalarMatrixOne()
 {
     auto implementationName = math::Internal::MatrixOperations<implementation>::GetImplementationName();
-    
+
     math::Matrix<ElementType, layoutA> M{
         { 1, 2, 0 },
         { 0, 3, 7 }
     };
-    
+
     math::Matrix<ElementType, layoutB> N{
         { -1, 1, 3 },
         { 1, 1, 2 }
     };
-    
+
     math::Matrix<ElementType, outputLayout> O(2, 3);
-    
+
     math::ScaleAddSet<implementation>(static_cast<ElementType>(-1), M, math::One(), N, O);
 
     math::RowMatrix<ElementType> R{
@@ -1214,7 +1212,7 @@ void TestMatrixVectorMultiplyScaleAddUpdate()
     };
 
     math::Matrix<ElementType, layout> N{
-        { 1, 0 ,3, 1 },
+        { 1, 0, 3, 1 },
         { 0, 1, 0, -1 },
         { 2, 0, 1, 3 },
         { 2, 2, 2, 3 }
@@ -1228,7 +1226,7 @@ void TestMatrixVectorMultiplyScaleAddUpdate()
     ElementType t = 3;
 
     math::MultiplyScaleAddUpdate<implementation>(s, M, v, t, u);
-    math::MultiplyScaleAddUpdate<implementation>(s, N.GetSubMatrix(1,1,3,2), v, t, w);
+    math::MultiplyScaleAddUpdate<implementation>(s, N.GetSubMatrix(1, 1, 3, 2), v, t, w);
 
     math::ColumnVector<ElementType> r{ 9, 11, 28 };
 
@@ -1247,7 +1245,7 @@ void TestVectorMatrixMultiplyScaleAddUpdate()
     };
 
     math::Matrix<ElementType, layout> N{
-        { 1, 0 ,3, 1 },
+        { 1, 0, 3, 1 },
         { 0, 1, 0, -1 },
         { 2, 0, 1, 3 },
         { 2, 2, 2, 3 }
@@ -1261,8 +1259,8 @@ void TestVectorMatrixMultiplyScaleAddUpdate()
     ElementType t = 3;
 
     math::MultiplyScaleAddUpdate<implementation>(s, u, M, t, v);
-    math::MultiplyScaleAddUpdate<implementation>(s, u, N.GetSubMatrix(1,1,3,2), t, w);
-    
+    math::MultiplyScaleAddUpdate<implementation>(s, u, N.GetSubMatrix(1, 1, 3, 2), t, w);
+
     math::RowVector<ElementType> r{ 11, 14 };
 
     testing::ProcessTest(implementationName + "::MultiplyScaleAddUpdate(scalar, Vector, Matrix, scalar, Vector)", v == r && w == r);
@@ -1281,15 +1279,15 @@ void TestMatrixMatrixMultiplyScaleAddUpdate()
 
     // a padded version of A
     math::Matrix<ElementType, layout1> AA{
-        { 1, 1, 1, 1},
-        { 1, 1, 2, 1},
-        { 1, 3, 1, 1},
-        { 1, 2, 0, 1},
-        { 1, 1, 1, 1}
+        { 1, 1, 1, 1 },
+        { 1, 1, 2, 1 },
+        { 1, 3, 1, 1 },
+        { 1, 2, 0, 1 },
+        { 1, 1, 1, 1 }
     };
 
     math::Matrix<ElementType, layout2> B{
-        { 3, 4,  5,  6 },
+        { 3, 4, 5, 6 },
         { 8, 9, 10, 11 }
     };
 
@@ -1305,10 +1303,10 @@ void TestMatrixMatrixMultiplyScaleAddUpdate()
     C.Fill(1);
     math::MultiplyScaleAddUpdate<implementation>(static_cast<ElementType>(1), A, B, static_cast<ElementType>(-1), C);
 
-    math::Matrix<ElementType, layout3> CC(A.NumRows()+2, B.NumColumns()+2);
+    math::Matrix<ElementType, layout3> CC(A.NumRows() + 2, B.NumColumns() + 2);
     CC.Fill(1);
     auto CCC = CC.GetSubMatrix(1, 1, 3, 4);
-    math::MultiplyScaleAddUpdate<implementation>(static_cast<ElementType>(1), AA.GetSubMatrix(1,1,3,2), BB.GetSubMatrix(1,1,2,4), static_cast<ElementType>(-1), CCC);
+    math::MultiplyScaleAddUpdate<implementation>(static_cast<ElementType>(1), AA.GetSubMatrix(1, 1, 3, 2), BB.GetSubMatrix(1, 1, 2, 4), static_cast<ElementType>(-1), CCC);
 
     math::Matrix<ElementType, layout3> R{
         { 18, 21, 24, 27 },
@@ -1436,5 +1434,3 @@ void TestMatrixArchiver()
 
     testing::ProcessTest("MatrixArchiver", Ma == M);
 }
-
-

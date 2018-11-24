@@ -61,5 +61,5 @@ namespace trainers
         std::seed_seq seed(randomSeedString.begin(), randomSeedString.end());
         _random = std::default_random_engine(seed);
     }
-}
-}
+} // namespace trainers
+} // namespace ell

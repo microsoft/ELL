@@ -36,7 +36,7 @@ namespace nodes
             }
             return nullptr;
         }
-    }
+    } // namespace
 
     template <typename ValueType>
     NeuralNetworkLayerNodeBase<ValueType>* NeuralNetworkPredictorNode<ValueType>::AddLayerNode(model::ModelTransformer& transformer, predictors::neural::Layer<ValueType>& layer, const model::OutputPort<ValueType>& layerInputs, const NetworkCompileOptions& options, NetworkCompileState& state) const
@@ -47,7 +47,7 @@ namespace nodes
         {
             auto& activationLayer = layer.template As<predictors::neural::ActivationLayer<ValueType>>();
             auto paf = dynamic_cast<const predictors::neural::ParametricReLUActivation<ValueType>*>(activationLayer.GetActivationFunction().GetImpl());
-            if (paf) 
+            if (paf)
             {
                 // Ah, then this one is special, we have to use ParametricReLUActivationLayerNode in this case.
                 return TryAddLayerNode<predictors::neural::ActivationLayer<ValueType>, ParametricReLUActivationLayerNode<ValueType>>(transformer, layer, layerInputs, options, state);
@@ -94,5 +94,5 @@ namespace nodes
         auto name = layer.GetRuntimeTypeName();
         throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unknown layer type in refine: " + name);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

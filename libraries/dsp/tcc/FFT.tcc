@@ -117,7 +117,7 @@ namespace dsp
                 complexOdds[k] = e - wo; // odd
             }
         }
-    }
+    } // namespace detail
 
     template <typename ValueType>
     void FFT(std::vector<std::complex<ValueType>>& input, bool inverse)
@@ -152,5 +152,5 @@ namespace dsp
             input[index] = std::abs(output[index]);
         }
     }
-}
-}
+} // namespace dsp
+} // namespace ell

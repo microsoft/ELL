@@ -76,6 +76,5 @@ namespace utilities
         _value = Variant();
     }
 
-
-}
-}
+} // namespace utilities
+} // namespace ell

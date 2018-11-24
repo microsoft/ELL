@@ -35,8 +35,10 @@ struct TestStruct : public utilities::IArchivable
     float b = 0.0f;
     double c = 0.0;
     TestStruct() = default;
-    TestStruct(int a, float b, double c)
-        : a(a), b(b), c(c) {}
+    TestStruct(int a, float b, double c) :
+        a(a),
+        b(b),
+        c(c) {}
     static std::string GetTypeName() { return "TestStruct"; }
     std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
@@ -69,10 +71,12 @@ struct OptionalValueStruct : public utilities::IArchivable
     std::unique_ptr<int> _x;
 
     OptionalValueStruct() = default;
-    OptionalValueStruct(int a)
-        : _a(a), _hasB(false) {}
-    OptionalValueStruct(int a, int b, int* x = nullptr)
-        : _a(a), _b(b)
+    OptionalValueStruct(int a) :
+        _a(a),
+        _hasB(false) {}
+    OptionalValueStruct(int a, int b, int* x = nullptr) :
+        _a(a),
+        _b(b)
     {
         if (x) _x = std::make_unique<int>(*x);
     }
@@ -104,8 +108,8 @@ struct OptionalValueStruct : public utilities::IArchivable
 
 void TestArchivedObjectInfo()
 {
-    using utilities::ArchiveVersionNumbers;
     using utilities::ArchivedObjectInfo;
+    using utilities::ArchiveVersionNumbers;
 
     ArchivedObjectInfo objInfoA1{ "typeA", ArchiveVersionNumbers::v1 };
     ArchivedObjectInfo objInfoB1{ "typeB", ArchiveVersionNumbers::v1 };
@@ -369,4 +373,4 @@ void TestXmlUnarchiver()
 {
     TestUnarchiver<utilities::XmlArchiver, utilities::XmlUnarchiver>();
 }
-}
+} // namespace ell

@@ -133,7 +133,7 @@ namespace nodes
         // Pointer to the predictor
         PredictorType _predictor;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/NeuralNetworkPredictorNode.tcc"

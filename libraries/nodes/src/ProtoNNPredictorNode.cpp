@@ -12,11 +12,11 @@
 #include "BinaryOperationNode.h"
 #include "ConstantNode.h"
 #include "DotProductNode.h"
+#include "ExtremalValueNode.h"
 #include "L2NormSquaredNode.h"
-#include "UnaryOperationNode.h"
 #include "MatrixVectorProductNode.h"
 #include "SquaredEuclideanDistanceNode.h"
-#include "ExtremalValueNode.h"
+#include "UnaryOperationNode.h"
 
 // utilities
 #include "Exception.h"
@@ -33,13 +33,18 @@ namespace ell
 {
 namespace nodes
 {
-    ProtoNNPredictorNode::ProtoNNPredictorNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+    ProtoNNPredictorNode::ProtoNNPredictorNode() :
+        Node({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
-    ProtoNNPredictorNode::ProtoNNPredictorNode(const model::OutputPort<double>& input, const predictors::ProtoNNPredictor& predictor)
-        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, predictor.GetNumLabels()), _predictor(predictor)
+    ProtoNNPredictorNode::ProtoNNPredictorNode(const model::OutputPort<double>& input, const predictors::ProtoNNPredictor& predictor) :
+        Node({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, predictor.GetNumLabels()),
+        _predictor(predictor)
     {
         if (input.Size() != predictor.GetDimension())
         {
@@ -115,5 +120,5 @@ namespace nodes
     {
         return transformer.AddNode<ProtoNNPredictorNode>(input, predictor);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

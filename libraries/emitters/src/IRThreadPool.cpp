@@ -29,8 +29,8 @@ namespace emitters
     // IRThreadPool
     //
 
-    IRThreadPool::IRThreadPool(IRModuleEmitter& module)
-        : _module(module)
+    IRThreadPool::IRThreadPool(IRModuleEmitter& module) :
+        _module(module)
     {
     }
 
@@ -126,10 +126,10 @@ namespace emitters
                 auto task = _taskQueue.PopNextTask(workerThreadFunction);
                 // check for a poison "null" task, indicating we should break out of the loop and terminate the thread
                 workerThreadFunction.If(
-                        workerThreadFunction.Operator(TypedOperator::logicalOr, task.IsNull(workerThreadFunction), _taskQueue.GetShutdownFlag(workerThreadFunction)),
-                        [notDoneVar](auto& workerThreadFunction) {
-                        workerThreadFunction.Store(notDoneVar, workerThreadFunction.FalseBit());
-                    })
+                                        workerThreadFunction.Operator(TypedOperator::logicalOr, task.IsNull(workerThreadFunction), _taskQueue.GetShutdownFlag(workerThreadFunction)),
+                                        [notDoneVar](auto& workerThreadFunction) {
+                                            workerThreadFunction.Store(notDoneVar, workerThreadFunction.FalseBit());
+                                        })
                     .Else([this, &task](IRFunctionEmitter& workerThreadFunction) {
                         task.Run(workerThreadFunction);
 
@@ -160,8 +160,8 @@ namespace emitters
     // IRThreadPoolTaskQueue
     //
 
-    IRThreadPoolTaskQueue::IRThreadPoolTaskQueue()
-        : _tasks(*this)
+    IRThreadPoolTaskQueue::IRThreadPoolTaskQueue() :
+        _tasks(*this)
     {
         // Note: we can't initialize ourselves here, for ordering reasons.
     }
@@ -406,8 +406,11 @@ namespace emitters
     //
     // IRThreadPoolTask
     //
-    IRThreadPoolTask::IRThreadPoolTask(LLVMValue wrappedTaskFunctionPtr, LLVMValue argsStructPtr, LLVMValue returnValuePtr, IRThreadPoolTaskArray* taskArray)
-        : _taskFunctionPtr(wrappedTaskFunctionPtr), _argsStruct(argsStructPtr), _returnValuePtr(returnValuePtr), _taskArray(taskArray)
+    IRThreadPoolTask::IRThreadPoolTask(LLVMValue wrappedTaskFunctionPtr, LLVMValue argsStructPtr, LLVMValue returnValuePtr, IRThreadPoolTaskArray* taskArray) :
+        _taskFunctionPtr(wrappedTaskFunctionPtr),
+        _argsStruct(argsStructPtr),
+        _returnValuePtr(returnValuePtr),
+        _taskArray(taskArray)
     {
         if (_taskFunctionPtr == nullptr)
         {
@@ -451,8 +454,8 @@ namespace emitters
     // IRThreadPoolTaskArray
     //
 
-    IRThreadPoolTaskArray::IRThreadPoolTaskArray(IRThreadPoolTaskQueue& taskQueue)
-        : _taskQueue(taskQueue)
+    IRThreadPoolTaskArray::IRThreadPoolTaskArray(IRThreadPoolTaskQueue& taskQueue) :
+        _taskQueue(taskQueue)
     {
     }
 
@@ -587,30 +590,31 @@ namespace emitters
 
         auto isNotNegative = function.Comparison(TypedComparison::greaterThanOrEquals, taskIndex, function.Literal<int>(0));
         function.If(isNotNegative, [=](auto& function) {
-            // Get pointers into struct fields
-            auto returnValuesStoragePtr = this->GetReturnValuesStoragePointer(function); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
-            auto taskArgStoragePtr = this->GetTaskArgsStoragePointer(function); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
+                    // Get pointers into struct fields
+                    auto returnValuesStoragePtr = this->GetReturnValuesStoragePointer(function); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
+                    auto taskArgStoragePtr = this->GetTaskArgsStoragePointer(function); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
 
-            auto taskFunctionPtr = function.CastPointer(this->GetTaskFunctionPointer(function), taskFunctionType->getPointerTo()->getPointerTo()); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
-            auto taskFunction = function.Load(taskFunctionPtr);
-            auto taskArgStructSize = this->GetTaskArgsStructSize(function); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
-            auto taskReturnValuesStorage = function.Load(returnValuesStoragePtr);
-            auto taskArgStorage = function.Load(taskArgStoragePtr);
+                    auto taskFunctionPtr = function.CastPointer(this->GetTaskFunctionPointer(function), taskFunctionType->getPointerTo()->getPointerTo()); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
+                    auto taskFunction = function.Load(taskFunctionPtr);
+                    auto taskArgStructSize = this->GetTaskArgsStructSize(function); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
+                    auto taskReturnValuesStorage = function.Load(returnValuesStoragePtr);
+                    auto taskArgStorage = function.Load(taskArgStoragePtr);
 
-            // Doing some pointer arithmetic here to account for not knowing the size of the argument struct
-            auto taskData = function.PointerOffset(taskArgStorage, function.Operator(TypedOperator::multiply, taskIndex, taskArgStructSize));
-            auto taskReturnValue = function.PointerOffset(taskReturnValuesStorage, taskIndex);
+                    // Doing some pointer arithmetic here to account for not knowing the size of the argument struct
+                    auto taskData = function.PointerOffset(taskArgStorage, function.Operator(TypedOperator::multiply, taskIndex, taskArgStructSize));
+                    auto taskReturnValue = function.PointerOffset(taskReturnValuesStorage, taskIndex);
 
-            function.Store(taskFunctionVar, function.CastPointer(taskFunction, int8PtrType));
-            function.Store(taskDataVar, taskData);
-            function.Store(taskReturnValueVar, taskReturnValue);
-        }).Else([=](auto& function) {  // index < 0 -- return null task
-            function.Store(taskFunctionVar, function.NullPointer(int8PtrType));
-            function.Store(taskDataVar, function.NullPointer(int8PtrType));
-            function.Store(taskReturnValueVar, function.NullPointer(int8PtrPtrType));
-        });
+                    function.Store(taskFunctionVar, function.CastPointer(taskFunction, int8PtrType));
+                    function.Store(taskDataVar, taskData);
+                    function.Store(taskReturnValueVar, taskReturnValue);
+                })
+            .Else([=](auto& function) { // index < 0 -- return null task
+                function.Store(taskFunctionVar, function.NullPointer(int8PtrType));
+                function.Store(taskDataVar, function.NullPointer(int8PtrType));
+                function.Store(taskReturnValueVar, function.NullPointer(int8PtrPtrType));
+            });
 
         return { function.Load(taskFunctionVar), function.Load(taskDataVar), function.Load(taskReturnValueVar), this };
     }
-}
-}
+} // namespace emitters
+} // namespace ell

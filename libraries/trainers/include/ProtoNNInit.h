@@ -59,5 +59,5 @@ namespace trainers
         // Returns the underlying projection matrix.
         math::ColumnMatrix<double> _Z;
     };
-}
-}
+} // namespace trainers
+} // namespace ell

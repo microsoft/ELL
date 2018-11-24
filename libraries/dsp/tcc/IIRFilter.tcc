@@ -11,8 +11,11 @@ namespace ell
 namespace dsp
 {
     template <typename ValueType>
-    IIRFilter<ValueType>::IIRFilter(std::vector<ValueType> b, std::vector<ValueType> a)
-        : _previousInput(b.size()), _previousOutput(a.size()), _b(b), _a(a)
+    IIRFilter<ValueType>::IIRFilter(std::vector<ValueType> b, std::vector<ValueType> a) :
+        _previousInput(b.size()),
+        _previousOutput(a.size()),
+        _b(b),
+        _a(a)
     {
         Reset();
     }
@@ -70,5 +73,5 @@ namespace dsp
         _previousInput.Resize(_b.size());
         _previousOutput.Resize(_a.size());
     }
-}
-}
+} // namespace dsp
+} // namespace ell

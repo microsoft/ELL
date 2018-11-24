@@ -22,8 +22,8 @@ namespace ell
 {
 namespace emitters
 {
-    IRDiagnosticHandler::IRDiagnosticHandler(llvm::LLVMContext& context, bool verbose)
-        : _verbose(verbose)
+    IRDiagnosticHandler::IRDiagnosticHandler(llvm::LLVMContext& context, bool verbose) :
+        _verbose(verbose)
     {
         auto diagnosticHandler = std::make_unique<llvm::DiagnosticHandler>(this);
         diagnosticHandler->DiagHandlerCallback = &HandleMessage;
@@ -84,5 +84,5 @@ namespace emitters
             std::cerr << message;
         }
     }
-}
-}
+} // namespace emitters
+} // namespace ell

@@ -51,7 +51,7 @@ namespace dsp
     /// <returns> The DCT of the input signal. </returns>
     template <typename ValueType>
     math::ColumnVector<ValueType> DCT(math::ConstColumnVectorReference<ValueType> signal, bool normalize = false);
-}
-}
+} // namespace dsp
+} // namespace ell
 
 #include "../tcc/DCT.tcc"

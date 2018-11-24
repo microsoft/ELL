@@ -30,7 +30,7 @@ namespace functions
         }
         else
         {
-            return l*l / (2 * _inverseSmoothness);
+            return l * l / (2 * _inverseSmoothness);
         }
     }
 
@@ -55,8 +55,8 @@ namespace functions
     double SmoothHingeLoss::Conjugate(double dual, double label) const
     {
         double x = dual * label;
-        DEBUG_THROW(x < -1 || x > 0 , utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "dual times label must be in [-1,0]"));
-        return x + (_inverseSmoothness / 2) * (x*x);
+        DEBUG_THROW(x < -1 || x > 0, utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "dual times label must be in [-1,0]"));
+        return x + (_inverseSmoothness / 2) * (x * x);
     }
 
     double SmoothHingeLoss::ConjugateProx(double sigma, double dual, double label) const
@@ -75,5 +75,5 @@ namespace functions
             return b * label;
         }
     }
-}
-}
+} // namespace functions
+} // namespace ell

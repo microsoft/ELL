@@ -48,5 +48,5 @@ namespace model
         }
         return result;
     }
-}
-}
+} // namespace model
+} // namespace ell

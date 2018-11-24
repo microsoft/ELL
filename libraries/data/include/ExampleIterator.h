@@ -62,7 +62,7 @@ namespace data
 
     using AutoSupervisedExampleIterator = ExampleIterator<AutoSupervisedExample>;
     using AutoSupervisedMultiClassExampleIterator = ExampleIterator<AutoSupervisedMultiClassExample>;
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/ExampleIterator.tcc"

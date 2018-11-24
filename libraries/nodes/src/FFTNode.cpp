@@ -281,25 +281,28 @@ namespace nodes
             return function;
         }
 
-    }
+    } // namespace detail
 
     template <typename ValueType>
-    FFTNode<ValueType>::FFTNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+    FFTNode<ValueType>::FFTNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType>
-    FFTNode<ValueType>::FFTNode(const model::OutputPort<ValueType>& input)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size() / 2)
+    FFTNode<ValueType>::FFTNode(const model::OutputPort<ValueType>& input) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, _input.Size() / 2)
     {
     }
 
     inline void Deinterleave(emitters::IRFunctionEmitter& function, emitters::LLVMValue array, emitters::LLVMValue halfLength, emitters::LLVMValue scratch)
     {
         auto halfN = function.LocalScalar(halfLength);
-        function.For(halfN, [&scratch, &array](emitters::IRFunctionEmitter& function, auto index)
-        {
+        function.For(halfN, [&scratch, &array](emitters::IRFunctionEmitter& function, auto index) {
             auto evenIndex = index * 2;
             auto oddIndex = evenIndex + 1;
             function.SetValueAt(scratch, index, function.ValueAt(array, oddIndex));
@@ -698,5 +701,5 @@ namespace nodes
     // Explicit instantiations
     template class FFTNode<float>;
     template class FFTNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

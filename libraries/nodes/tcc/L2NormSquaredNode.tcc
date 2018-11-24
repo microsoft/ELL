@@ -6,22 +6,26 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "UnaryOperationNode.h"
 #include "SumNode.h"
+#include "UnaryOperationNode.h"
 
 namespace ell
 {
 namespace nodes
 {
     template <typename ValueType>
-    L2NormSquaredNode<ValueType>::L2NormSquaredNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1)
+    L2NormSquaredNode<ValueType>::L2NormSquaredNode() :
+        Node({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1)
     {
     }
 
     template <typename ValueType>
-    L2NormSquaredNode<ValueType>::L2NormSquaredNode(const model::OutputPort<ValueType>& input)
-        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1)
+    L2NormSquaredNode<ValueType>::L2NormSquaredNode(const model::OutputPort<ValueType>& input) :
+        Node({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1)
     {
     }
 
@@ -70,5 +74,5 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
     }
-}
-}
+} // namespace nodes
+} // namespace ell

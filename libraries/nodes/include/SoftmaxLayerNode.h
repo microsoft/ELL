@@ -96,5 +96,5 @@ namespace nodes
                                       emitters::LLVMValue prevInputDimensionOffset,
                                       FunctionType& f) const;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

@@ -37,7 +37,8 @@ namespace value
         /// <param name="rows"> The number of rows of the allocated matrix </param>
         /// <param name="columns"> The number of columns of the allocated matrix </param>
         template <typename T>
-        Matrix(int rows, int columns) : Matrix(Allocate<T>(utilities::MemoryLayout({ rows, columns })))
+        Matrix(int rows, int columns) :
+            Matrix(Allocate<T>(utilities::MemoryLayout({ rows, columns })))
         {}
 
         /// <summary> Constructs an instance from a std::vector based representation of the matrix </summary>

@@ -27,17 +27,17 @@ namespace common
 
         switch (lossFunctionArguments.lossFunction)
         {
-            case LossFunctionEnum::squared:
-                return evaluators::MakeEvaluator<PredictorType>(anyDataset, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::SquaredLoss()));
+        case LossFunctionEnum::squared:
+            return evaluators::MakeEvaluator<PredictorType>(anyDataset, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::SquaredLoss()));
 
-            case LossFunctionEnum::log:
-                return evaluators::MakeEvaluator<PredictorType>(anyDataset, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::LogLoss()));
+        case LossFunctionEnum::log:
+            return evaluators::MakeEvaluator<PredictorType>(anyDataset, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::LogLoss()));
 
-            case LossFunctionEnum::hinge:
-                return evaluators::MakeEvaluator<PredictorType>(anyDataset, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::HingeLoss()));
+        case LossFunctionEnum::hinge:
+            return evaluators::MakeEvaluator<PredictorType>(anyDataset, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::HingeLoss()));
 
-            default:
-                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this evaluator");
+        default:
+            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this evaluator");
         }
     }
 
@@ -48,18 +48,18 @@ namespace common
 
         switch (lossFunctionArguments.lossFunction)
         {
-            case LossFunctionEnum::squared:
-                return evaluators::MakeIncrementalEvaluator<BasePredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::SquaredLoss()));
+        case LossFunctionEnum::squared:
+            return evaluators::MakeIncrementalEvaluator<BasePredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::SquaredLoss()));
 
-            case LossFunctionEnum::log:
-                return evaluators::MakeIncrementalEvaluator<BasePredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::LogLoss()));
+        case LossFunctionEnum::log:
+            return evaluators::MakeIncrementalEvaluator<BasePredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::LogLoss()));
 
-            case LossFunctionEnum::hinge:
-                return evaluators::MakeIncrementalEvaluator<BasePredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::HingeLoss()));
+        case LossFunctionEnum::hinge:
+            return evaluators::MakeIncrementalEvaluator<BasePredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(functions::HingeLoss()));
 
-            default:
-                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this evaluator");
+        default:
+            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this evaluator");
         }
     }
-}
-}
+} // namespace common
+} // namespace ell

@@ -115,5 +115,5 @@ namespace dsp
 
     extern template math::ChannelColumnRowTensor<float> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride, ConvolutionMethodOption method);
     extern template math::ChannelColumnRowTensor<double> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride, ConvolutionMethodOption method);
-}
-}
+} // namespace dsp
+} // namespace ell

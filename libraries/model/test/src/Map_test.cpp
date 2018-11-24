@@ -13,8 +13,8 @@
 #include "DenseDataVector.h"
 
 // model
-#include "Map.h"
 #include "InputNode.h"
+#include "Map.h"
 #include "Model.h"
 #include "OutputNode.h"
 #include "PortElements.h"
@@ -179,44 +179,37 @@ void TestMapClockNode()
 
     model::Model model;
     auto in = model.AddNode<model::InputNode<nodes::TimeTickType>>(1);
-    auto clock = model.AddNode<nodes::ClockNode>(in->output, interval, lagThreshold,
-        "LagNotificationCallback",
-        [&lagValues](auto timeLag)
-        {
-            std::cout << "LagNotificationCallback: " << timeLag << "\n";
-            lagValues.push_back(timeLag);
-        });
-    auto source = model.AddNode<nodes::SourceNode<double>>(clock->output, 3,
-        "SourceCallback",
-        [&inputValues](auto& input)
-        {
-            std::cout << "SourceCallback\n";
-            input.assign(3, 42.0);
-            inputValues.push_back(input);
-            return true;
-        });
+    auto clock = model.AddNode<nodes::ClockNode>(in->output, interval, lagThreshold, "LagNotificationCallback", [&lagValues](auto timeLag) {
+        std::cout << "LagNotificationCallback: " << timeLag << "\n";
+        lagValues.push_back(timeLag);
+    });
+    auto source = model.AddNode<nodes::SourceNode<double>>(clock->output, 3, "SourceCallback", [&inputValues](auto& input) {
+        std::cout << "SourceCallback\n";
+        input.assign(3, 42.0);
+        inputValues.push_back(input);
+        return true;
+    });
     auto condition = model.AddNode<nodes::ConstantNode<bool>>(true);
     auto sink = model.AddNode<nodes::SinkNode<double>>(source->output,
-        condition->output,
-        "SinkCallback",
-        [&outputValues] (const auto& values)
-        {
-            std::cout << "SinkCallback\n";
-            outputValues.push_back(values);
-        });
+                                                       condition->output,
+                                                       "SinkCallback",
+                                                       [&outputValues](const auto& values) {
+                                                           std::cout << "SinkCallback\n";
+                                                           outputValues.push_back(values);
+                                                       });
 
     auto map = model::Map(model, { { "clockInput", in } }, { { "sinkOutput", sink->output } });
     TestMapSerialization(map);
 
     std::vector<std::vector<nodes::TimeTickType>> clockValues =
-    {
-        { 0 },
-        { interval*1 + lagThreshold/2 }, // within threshold
-        { interval*2 }, // on time
-        { interval*3 + lagThreshold }, // late
-        { interval*4 + lagThreshold*20 }, // really late
-        { interval*5 } // on time
-    };
+        {
+            { 0 },
+            { interval * 1 + lagThreshold / 2 }, // within threshold
+            { interval * 2 }, // on time
+            { interval * 3 + lagThreshold }, // late
+            { interval * 4 + lagThreshold * 20 }, // really late
+            { interval * 5 } // on time
+        };
 
     for (const auto& input : clockValues)
     {
@@ -226,6 +219,6 @@ void TestMapClockNode()
 
     testing::ProcessTest("Testing source and sink callbacks", testing::IsEqual(inputValues, outputValues));
 
-    std::vector<nodes::TimeTickType> expectedLagValues = { lagThreshold, lagThreshold*20 };
+    std::vector<nodes::TimeTickType> expectedLagValues = { lagThreshold, lagThreshold * 20 };
     testing::ProcessTest("Testing lag callbacks", testing::IsEqual(lagValues, expectedLagValues));
 }

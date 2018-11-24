@@ -14,8 +14,9 @@ namespace utilities
     // RingBuffer class
     //
     template <typename T>
-    RingBuffer<T>::RingBuffer(size_t size)
-        : _buffer(size), _currentPos(0)
+    RingBuffer<T>::RingBuffer(size_t size) :
+        _buffer(size),
+        _currentPos(0)
     {
     }
 
@@ -64,5 +65,5 @@ namespace utilities
     {
         std::fill(_buffer.begin(), _buffer.end(), val);
     }
-}
-}
+} // namespace utilities
+} // namespace ell

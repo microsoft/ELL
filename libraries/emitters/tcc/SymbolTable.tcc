@@ -11,8 +11,8 @@ namespace ell
 namespace emitters
 {
     template <typename ValueType, ValueType DefaultValue>
-    SymbolTable<ValueType, DefaultValue>::SymbolTable(std::initializer_list<SymbolValue> values)
-        : _map(values)
+    SymbolTable<ValueType, DefaultValue>::SymbolTable(std::initializer_list<SymbolValue> values) :
+        _map(values)
     {
     }
 
@@ -43,10 +43,10 @@ namespace emitters
     {
         // return namePrefix;
         int index = 0;
-        while(true)
+        while (true)
         {
             auto name = namePrefix + "_" + std::to_string(index);
-            if(!Contains(name))
+            if (!Contains(name))
             {
                 return name;
             }
@@ -59,7 +59,6 @@ namespace emitters
     {
         return (Get(name) != DefaultValue);
     }
-
 
     template <typename ValueType, ValueType DefaultValue>
     void SymbolTable<ValueType, DefaultValue>::Remove(const std::string& name)
@@ -76,5 +75,5 @@ namespace emitters
     {
         _map.clear();
     }
-}
-}
+} // namespace emitters
+} // namespace ell

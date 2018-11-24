@@ -16,9 +16,8 @@
 #include "LLVMUtilities.h"
 
 // utilities
-#include "UniqueId.h"
 #include "Logger.h"
-
+#include "UniqueId.h"
 
 // stl
 #include <algorithm>
@@ -254,5 +253,5 @@ namespace model
         currentFunction.Call(function, args);
         Log() << "Emitting call to node function " << functionName << EOL;
     }
-}
-}
+} // namespace model
+} // namespace ell

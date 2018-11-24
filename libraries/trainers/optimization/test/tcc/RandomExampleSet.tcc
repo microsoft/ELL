@@ -17,7 +17,7 @@ ExampleType GetRandomExample(size_t randomVectorSize, std::default_random_engine
     auto vectorView = vector.GetSubVector(0, randomVectorSize);
 
     // generate random values
-    std::normal_distribution<double> normal(0,200);
+    std::normal_distribution<double> normal(0, 200);
     vectorView.Generate([&]() { return static_cast<ElementType>(normal(randomEngine)); });
 
     ElementType output = randomEngine() % 2 == 0 ? static_cast<ElementType>(-1) : static_cast<ElementType>(1);

@@ -44,7 +44,7 @@ namespace math
                 Print(M.GetRow(i), stream, indent + 2, maxElementsPerRow);
             }
             stream << "," << EOL
-                << std::string(indent + 2, ' ') << "...," << EOL;
+                   << std::string(indent + 2, ' ') << "...," << EOL;
             Print(M.GetRow(M.NumRows() - 1), stream, indent + 2, maxElementsPerRow);
         }
         stream << " }" << EOL;
@@ -117,7 +117,7 @@ namespace math
 
     namespace Internal
     {
-        template<ImplementationType implementation, typename ElementType, MatrixLayout layout>
+        template <ImplementationType implementation, typename ElementType, MatrixLayout layout>
         void AddUpdateAsVectors(ConstMatrixReference<ElementType, layout> matrixA, MatrixReference<ElementType, layout> matrixB)
         {
             if (matrixA.IsContiguous() && matrixB.IsContiguous())
@@ -141,9 +141,9 @@ namespace math
                 Internal::VectorOperations<implementation>::AddUpdate(matrixA.GetRow(i), matrixB.GetRow(i));
             }
         }
-    }
+    } // namespace Internal
 
-    template<ImplementationType implementation, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
+    template <ImplementationType implementation, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
     void AddUpdate(ConstMatrixReference<ElementType, layoutA> matrixA, MatrixReference<ElementType, layoutB> matrixB)
     {
         DEBUG_CHECK_SIZES(matrixA.NumRows() != matrixB.NumRows() || matrixA.NumColumns() != matrixB.NumColumns(), "Incompatible matrix sizes.");
@@ -211,7 +211,7 @@ namespace math
                 Internal::VectorOperations<implementation>::AddSet(matrixA.GetRow(i), matrixB.GetRow(i), output.GetRow(i));
             }
         }
-    }
+    } // namespace Internal
 
     template <ImplementationType implementation, typename ElementType, MatrixLayout layout, MatrixLayout outputLayout>
     void AddSet(ElementType scalar, ConstMatrixReference<ElementType, layout> matrix, MatrixReference<ElementType, outputLayout> output)
@@ -231,7 +231,7 @@ namespace math
     template <ImplementationType implementation, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB, MatrixLayout outputLayout>
     void AddSet(ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, MatrixReference<ElementType, outputLayout> output)
     {
-        DEBUG_CHECK_SIZES(matrixA.NumRows() != matrixB.NumRows() || matrixA.NumColumns() != matrixB.NumColumns()|| matrixA.NumRows() != output.NumRows() || matrixA.NumColumns() != output.NumColumns(), "Incompatible matrix sizes.");
+        DEBUG_CHECK_SIZES(matrixA.NumRows() != matrixB.NumRows() || matrixA.NumColumns() != matrixB.NumColumns() || matrixA.NumRows() != output.NumRows() || matrixA.NumColumns() != output.NumColumns(), "Incompatible matrix sizes.");
 
         Internal::AddSetAsVectors<implementation>(matrixA, matrixB, output);
     }
@@ -287,7 +287,7 @@ namespace math
                 Internal::VectorOperations<implementation>::ScaleSet(scalar, matrix.GetRow(i), output.GetRow(i));
             }
         }
-    }
+    } // namespace Internal
 
     template <ImplementationType implementation, typename ElementType, MatrixLayout matrixLayout, MatrixLayout outputLayout>
     void ScaleSet(ElementType scalar, ConstMatrixReference<ElementType, matrixLayout> matrix, MatrixReference<ElementType, outputLayout> output)
@@ -302,7 +302,7 @@ namespace math
         {
             output.CopyFrom(matrix);
         }
-        else 
+        else
         {
             Internal::ScaleSetAsVectors<implementation>(scalar, matrix, output);
         }
@@ -335,7 +335,7 @@ namespace math
                 Internal::VectorOperations<implementation>::ScaleAddUpdate(scalarA, matrixA.GetRow(i), scalarB, matrixB.GetRow(i));
             }
         }
-    }
+    } // namespace Internal
 
     // matrixB += scalarA * matrixA
     template <ImplementationType implementation, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
@@ -373,7 +373,7 @@ namespace math
         {
             AddUpdate<implementation>(scalarA, matrixB);
         }
-        else if(matrixB.IsContiguous())
+        else if (matrixB.IsContiguous())
         {
             Internal::VectorOperations<implementation>::ScaleAddUpdate(scalarA, OnesVector(), scalarB, matrixB.ReferenceAsVector());
         }
@@ -400,7 +400,7 @@ namespace math
         {
             AddUpdate<implementation>(matrixA, matrixB);
         }
-        else 
+        else
         {
             Internal::ScaleAddUpdateAsVectors<implementation>(One(), matrixA, scalarB, matrixB);
         }
@@ -470,7 +470,7 @@ namespace math
                 Internal::VectorOperations<implementation>::ScaleAddSet(scalarA, matrixA.GetRow(i), scalarB, matrixB.GetRow(i), output.GetRow(i));
             }
         }
-    }
+    } // namespace Internal
 
     // output = scalarA * matrixA + matrixB
     template <ImplementationType implementation, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB, MatrixLayout outputLayout>
@@ -572,7 +572,7 @@ namespace math
     template <ImplementationType implementation, typename ElementType, MatrixLayout layout>
     void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layout> matrix, ConstColumnVectorReference<ElementType> vectorA, ElementType scalarB, ColumnVectorReference<ElementType> vectorB)
     {
-        DEBUG_CHECK_SIZES(matrix.NumColumns() != vectorA.Size() || matrix.NumRows() != vectorB.Size() , "Incompatible matrix vector sizes.");
+        DEBUG_CHECK_SIZES(matrix.NumColumns() != vectorA.Size() || matrix.NumRows() != vectorB.Size(), "Incompatible matrix vector sizes.");
 
         Internal::MatrixOperations<implementation>::MultiplyScaleAddUpdate(scalarA, matrix, vectorA, scalarB, vectorB);
     }
@@ -588,7 +588,7 @@ namespace math
     template <ImplementationType implementation, typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB, MatrixLayout layoutC>
     void MultiplyScaleAddUpdate(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, ElementType scalarC, MatrixReference<ElementType, layoutC> matrixC)
     {
-        DEBUG_CHECK_SIZES(matrixA.NumColumns() != matrixB.NumRows() || matrixA.NumRows() != matrixC.NumRows() || matrixB.NumColumns() != matrixC.NumColumns(), "Incompatible matrix sizes."); 
+        DEBUG_CHECK_SIZES(matrixA.NumColumns() != matrixB.NumRows() || matrixA.NumRows() != matrixC.NumRows() || matrixB.NumColumns() != matrixC.NumColumns(), "Incompatible matrix sizes.");
 
         Internal::MatrixOperations<implementation>::MultiplyScaleAddUpdate(scalarA, matrixA, matrixB, scalarC, matrixC);
     }
@@ -603,7 +603,7 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout layout>
-    void RowwiseCumulativeSumUpdate(MatrixReference<ElementType, layout> matrix) 
+    void RowwiseCumulativeSumUpdate(MatrixReference<ElementType, layout> matrix)
     {
         for (size_t i = 0; i < matrix.NumRows(); ++i)
         {
@@ -612,7 +612,7 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout layout>
-    void ColumnwiseCumulativeSumUpdate(MatrixReference<ElementType, layout> matrix) 
+    void ColumnwiseCumulativeSumUpdate(MatrixReference<ElementType, layout> matrix)
     {
         for (size_t i = 0; i < matrix.NumColumns(); ++i)
         {
@@ -621,7 +621,7 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout layout>
-    void RowwiseConsecutiveDifferenceUpdate(MatrixReference<ElementType, layout> matrix) 
+    void RowwiseConsecutiveDifferenceUpdate(MatrixReference<ElementType, layout> matrix)
     {
         for (size_t i = 0; i < matrix.NumRows(); ++i)
         {
@@ -630,7 +630,7 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout layout>
-    void ColumnwiseConsecutiveDifferenceUpdate(MatrixReference<ElementType, layout> matrix) 
+    void ColumnwiseConsecutiveDifferenceUpdate(MatrixReference<ElementType, layout> matrix)
     {
         for (size_t i = 0; i < matrix.NumColumns(); ++i)
         {
@@ -716,11 +716,9 @@ namespace math
             MatrixTranspose transposeA = matrixA.GetLayout() == order ? MatrixTranspose::noTranspose : MatrixTranspose::transpose;
             MatrixTranspose transposeB = matrixB.GetLayout() == order ? MatrixTranspose::noTranspose : MatrixTranspose::transpose;
 
-            Blas::Gemm(order, transposeA, transposeB, static_cast<int>(matrixA.NumRows()), static_cast<int>(matrixB.NumColumns()), static_cast<int>(matrixA.NumColumns()), scalarA,
-                matrixA.GetConstDataPointer(), static_cast<int>(matrixA.GetIncrement()), matrixB.GetConstDataPointer(), static_cast<int>(matrixB.GetIncrement()), scalarB,
-                matrixC.GetDataPointer(), static_cast<int>(matrixC.GetIncrement()));
+            Blas::Gemm(order, transposeA, transposeB, static_cast<int>(matrixA.NumRows()), static_cast<int>(matrixB.NumColumns()), static_cast<int>(matrixA.NumColumns()), scalarA, matrixA.GetConstDataPointer(), static_cast<int>(matrixA.GetIncrement()), matrixB.GetConstDataPointer(), static_cast<int>(matrixB.GetIncrement()), scalarB, matrixC.GetDataPointer(), static_cast<int>(matrixC.GetIncrement()));
         }
 #endif
-    }
-}
-}
+    } // namespace Internal
+} // namespace math
+} // namespace ell

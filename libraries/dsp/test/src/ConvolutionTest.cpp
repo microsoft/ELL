@@ -61,7 +61,7 @@ math::ChannelColumnRowTensor<ValueType>& operator-=(math::ChannelColumnRowTensor
 }
 
 const double epsilon = 1e-6;
-}
+} // namespace
 
 //
 // Tests
@@ -276,21 +276,21 @@ void TestConv2DSeparableVsSimple(int numRows, int numColumns, int numChannels, i
     auto fullResult = Convolve2DDepthwiseSeparable(signal, filters, numFilters, stride, algorithm);
 
     // Separately convolve each image / filter pair and compare with that channel of result
-    for(int channelIndex = 0; channelIndex < numChannels; ++channelIndex)
+    for (int channelIndex = 0; channelIndex < numChannels; ++channelIndex)
     {
         auto signalSlice = signal.GetSubTensor(0, 0, channelIndex, numRows, numColumns, 1);
-        auto filterSlice = filters.GetSubTensor(channelIndex*filterRows, 0, 0, filterRows, filterColumns, 1);
+        auto filterSlice = filters.GetSubTensor(channelIndex * filterRows, 0, 0, filterRows, filterColumns, 1);
         auto reference = Convolve2D(signalSlice, filterSlice, 1, stride, dsp::ConvolutionMethodOption::simple);
         auto result = fullResult.GetSubTensor(0, 0, channelIndex, fullResult.NumRows(), fullResult.NumColumns(), 1);
-        
+
         // Compare results
         bool ok = testing::ProcessTest("Testing convolution result", reference.IsEqual(result, static_cast<ValueType>(epsilon)));
         if (!ok)
         {
             std::cout << "Incorrect result for channel " << channelIndex << " of 2D separable tensor "
-                    << " " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << " x " << signal.NumChannels() << std::endl;
+                      << " " << GetConvAlgName(algorithm) << " convolution on input of size " << signal.NumRows() << " x " << signal.NumColumns() << " x " << signal.NumChannels() << std::endl;
 
-    #if 0
+#if 0
             // Useful for pinpointing errors during debugging:
             std::cout << "Input:\n" << signal << std::endl;
             std::cout << std::endl;
@@ -300,7 +300,7 @@ void TestConv2DSeparableVsSimple(int numRows, int numColumns, int numChannels, i
             std::cout << std::endl;
             std::cout << "Computed:\n" << result << std::endl;
             std::cout << std::endl;
-    #endif
+#endif
             auto referenceArray = reference.ToArray();
             auto resultArray = result.ToArray();
             auto size = referenceArray.size();
@@ -310,10 +310,10 @@ void TestConv2DSeparableVsSimple(int numRows, int numColumns, int numChannels, i
                 diffArray[index] = referenceArray[index] - resultArray[index];
             }
 
-    #if 0
+#if 0
             // Useful for pinpointing errors during debugging:
             std::cout << "Difference:  " << diffArray << std::endl;
-    #endif
+#endif
             std::cout << "Max difference:  " << *std::max_element(diffArray.begin(), diffArray.end()) << std::endl;
         }
     }

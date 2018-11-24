@@ -10,51 +10,50 @@ namespace ell
 {
 namespace predictors
 {
-namespace neural
-{
-
-    template <typename ElementType>
-    BiasLayer<ElementType>::BiasLayer(const LayerParameters& layerParameters, const VectorType& bias) :
-        Layer<ElementType>(layerParameters),
-        _bias(bias)
+    namespace neural
     {
-        if (this->GetInputShape() != this->GetOutputShapeMinusPadding())
+
+        template <typename ElementType>
+        BiasLayer<ElementType>::BiasLayer(const LayerParameters& layerParameters, const VectorType& bias) :
+            Layer<ElementType>(layerParameters),
+            _bias(bias)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, GetRuntimeTypeName() + ": Expected size of input and output tensor (minus padding) to match");
+            if (this->GetInputShape() != this->GetOutputShapeMinusPadding())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, GetRuntimeTypeName() + ": Expected size of input and output tensor (minus padding) to match");
+            }
+            if (_bias.Size() != NumOutputChannels())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, GetRuntimeTypeName() + ": Number of 'bias' values must equal number of channels in output");
+            }
         }
-        if (_bias.Size() != NumOutputChannels())
+
+        template <typename ElementType>
+        void BiasLayer<ElementType>::Compute()
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, GetRuntimeTypeName() + ": Number of 'bias' values must equal number of channels in output");
+            auto output = GetOutputMinusPadding();
+            auto input = _layerParameters.input;
+
+            AssignValues(input, output);
+            math::AddUpdate<math::Dimension::channel>(_bias, output);
         }
-    }
 
-    template <typename ElementType>
-    void BiasLayer<ElementType>::Compute()
-    {
-        auto output = GetOutputMinusPadding();
-        auto input = _layerParameters.input;
+        template <typename ElementType>
+        void BiasLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
+        {
+            Layer<ElementType>::WriteToArchive(archiver);
 
-        AssignValues(input, output);
-        math::AddUpdate<math::Dimension::channel>(_bias, output);
-    }
+            math::VectorArchiver::Write(_bias, "bias", archiver);
+        }
 
-    template <typename ElementType>
-    void BiasLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
-    {
-        Layer<ElementType>::WriteToArchive(archiver);
+        template <typename ElementType>
+        void BiasLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
+        {
+            Layer<ElementType>::ReadFromArchive(archiver);
 
-        math::VectorArchiver::Write(_bias, "bias", archiver);
-    }
+            math::VectorArchiver::Read(_bias, "bias", archiver);
+        }
 
-    template <typename ElementType>
-    void BiasLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
-    {
-        Layer<ElementType>::ReadFromArchive(archiver);
-
-        math::VectorArchiver::Read(_bias, "bias", archiver);
-    }
-
-}
-}
-}
-
+    } // namespace neural
+} // namespace predictors
+} // namespace ell

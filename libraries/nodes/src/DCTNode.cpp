@@ -19,14 +19,20 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    DCTNode<ValueType>::DCTNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _dctCoeffs(0, 0)
+    DCTNode<ValueType>::DCTNode() :
+        Node({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0),
+        _dctCoeffs(0, 0)
     {
     }
 
     template <typename ValueType>
-    DCTNode<ValueType>::DCTNode(const model::OutputPort<ValueType>& input, size_t numFilters)
-        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, numFilters), _dctCoeffs(0, 0)
+    DCTNode<ValueType>::DCTNode(const model::OutputPort<ValueType>& input, size_t numFilters) :
+        Node({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, numFilters),
+        _dctCoeffs(0, 0)
     {
         _dctCoeffs = dsp::GetDCTMatrix<ValueType>(numFilters, _input.Size());
     }
@@ -78,5 +84,5 @@ namespace nodes
     // Explicit instantiations
     template class DCTNode<float>;
     template class DCTNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

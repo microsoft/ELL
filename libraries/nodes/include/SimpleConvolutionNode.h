@@ -58,7 +58,7 @@ namespace nodes
                               const ConstTensorReferenceType& filterWeights,
                               size_t stride);
 
-       /// <summary> Gets information about the input memory layout </summary>
+        /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the input memory layout </summary>
@@ -205,5 +205,5 @@ namespace nodes
 
         bool _isDepthwiseSeparable = false;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

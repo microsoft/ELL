@@ -46,5 +46,5 @@ namespace emitters
 
         TargetDevice targetDevice;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

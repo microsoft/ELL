@@ -14,26 +14,35 @@ namespace nodes
 
     // Default constructor
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode()
-        : CompilableNode({}, { &_output }), _output(this, defaultOutputPortName, 0){};
+    ConstantNode<ValueType>::ConstantNode() :
+        CompilableNode({}, { &_output }),
+        _output(this, defaultOutputPortName, 0){};
 
     // Constructor for a scalar constant
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode(ValueType value)
-        : CompilableNode({}, { &_output }), _output(this, defaultOutputPortName, 1), _values({ value }){};
+    ConstantNode<ValueType>::ConstantNode(ValueType value) :
+        CompilableNode({}, { &_output }),
+        _output(this, defaultOutputPortName, 1),
+        _values({ value }){};
 
     // Constructor for a vector constant
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values)
-        : CompilableNode({}, { &_output }), _output(this, defaultOutputPortName, values.size()), _values(values){};
+    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values) :
+        CompilableNode({}, { &_output }),
+        _output(this, defaultOutputPortName, values.size()),
+        _values(values){};
 
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values, const model::MemoryShape& shape)
-        : CompilableNode({}, { &_output }), _output(this, defaultOutputPortName, shape), _values(values){};
+    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values, const model::MemoryShape& shape) :
+        CompilableNode({}, { &_output }),
+        _output(this, defaultOutputPortName, shape),
+        _values(values){};
 
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values, const model::PortMemoryLayout& layout)
-        : CompilableNode({}, { &_output }), _output(this, defaultOutputPortName, layout), _values(values){};
+    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values, const model::PortMemoryLayout& layout) :
+        CompilableNode({}, { &_output }),
+        _output(this, defaultOutputPortName, layout),
+        _values(values){};
 
     template <typename ValueType>
     void ConstantNode<ValueType>::Compute() const
@@ -93,5 +102,5 @@ namespace nodes
             _output.SetSize(_values.size());
         }
     }
-}
-}
+} // namespace nodes
+} // namespace ell

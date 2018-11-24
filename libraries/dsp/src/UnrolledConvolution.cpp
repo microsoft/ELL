@@ -77,7 +77,7 @@ namespace dsp
             }
             return weightsMatrix;
         }
-    }
+    } // namespace
 
     //
     // Unrolled convolution
@@ -138,5 +138,5 @@ namespace dsp
 
     template math::ChannelColumnRowTensor<float> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride);
     template math::ChannelColumnRowTensor<double> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride);
-}
-}
+} // namespace dsp
+} // namespace ell

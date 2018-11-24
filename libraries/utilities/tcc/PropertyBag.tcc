@@ -23,5 +23,5 @@ namespace utilities
         const auto& variant = _metadata.at(key);
         return variant.GetValue<ValueType>();
     }
-}
-}
+} // namespace utilities
+} // namespace ell

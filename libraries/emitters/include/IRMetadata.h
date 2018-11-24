@@ -89,5 +89,5 @@ namespace emitters
     ///
     /// <returns> An unordered_set of values for the given metadata tag. </returns>
     std::unordered_set<std::string> GetSingletonModuleTagValues(IRModuleEmitter& moduleEmitter, const std::string& tag);
-}
-}
+} // namespace emitters
+} // namespace ell

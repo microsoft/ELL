@@ -35,6 +35,5 @@ namespace passes
         /// <summary> Add this pass type to the global pass registry. </summary>
         static void AddToRegistry();
     };
-}
-}
-
+} // namespace passes
+} // namespace ell

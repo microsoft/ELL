@@ -5,7 +5,7 @@
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-# pragma once
+#pragma once
 
 #include "DataVector.h"
 #include "TransformedDataVector.h"
@@ -86,7 +86,7 @@ namespace data
     /// <returns> The TransformedDataVector generated from the vector and the elementwise zero indicator. </returns>
     template <typename DataVectorType>
     auto ZeroIndicator(const DataVectorType& vector);
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/DataVectorOperations.tcc"

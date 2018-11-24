@@ -33,5 +33,5 @@ namespace functions
         /// <returns> The loss derivative. </returns>
         double GetDerivative(double prediction, double label) const;
     };
-}
-}
+} // namespace functions
+} // namespace ell

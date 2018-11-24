@@ -289,5 +289,5 @@ namespace nodes
         predictors::neural::PaddingParameters _inputPaddingParameters;
         model::PortMemoryLayout _inputMemoryLayout;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

@@ -11,12 +11,12 @@
 
 // model
 #include "CompiledMap.h"
-#include "Map.h"
 #include "EmitterException.h"
 #include "EmitterTypes.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
 #include "InputNode.h"
+#include "Map.h"
 #include "Model.h"
 #include "OutputNode.h"
 

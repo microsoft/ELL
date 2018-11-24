@@ -36,25 +36,25 @@ namespace utilities
     //
     // CommandLineParseResult class
     //
-    CommandLineParseResult::CommandLineParseResult(bool ok)
-        : _isOK(ok)
+    CommandLineParseResult::CommandLineParseResult(bool ok) :
+        _isOK(ok)
     {
     }
 
-    CommandLineParseResult::CommandLineParseResult(const char* message)
-        : _isOK(false)
-    {
-        _messages.emplace_back(message);
-    }
-
-    CommandLineParseResult::CommandLineParseResult(const std::string& message)
-        : _isOK(false)
+    CommandLineParseResult::CommandLineParseResult(const char* message) :
+        _isOK(false)
     {
         _messages.emplace_back(message);
     }
 
-    CommandLineParseResult::CommandLineParseResult(const std::vector<std::string>& messages)
-        : _messages(messages)
+    CommandLineParseResult::CommandLineParseResult(const std::string& message) :
+        _isOK(false)
+    {
+        _messages.emplace_back(message);
+    }
+
+    CommandLineParseResult::CommandLineParseResult(const std::vector<std::string>& messages) :
+        _messages(messages)
     {
         _isOK = _messages.size() == 0;
     }
@@ -62,16 +62,21 @@ namespace utilities
     //
     // ParseError class
     //
-    ParseError::ParseError(const std::string& message)
-        : _message(message)
+    ParseError::ParseError(const std::string& message) :
+        _message(message)
     {
     }
 
     //
     // OptionInfo internal class
     //
-    CommandLineParser::OptionInfo::OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::string emptyValueString, std::function<bool(std::string)> set_value_callback)
-        : name(name), shortName(shortName), description(description), defaultValueString(defaultValue), emptyValueString(emptyValueString), set_value_callbacks({ set_value_callback })
+    CommandLineParser::OptionInfo::OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::string emptyValueString, std::function<bool(std::string)> set_value_callback) :
+        name(name),
+        shortName(shortName),
+        description(description),
+        defaultValueString(defaultValue),
+        emptyValueString(emptyValueString),
+        set_value_callbacks({ set_value_callback })
     {
     }
 
@@ -611,5 +616,5 @@ namespace utilities
             return "";
         }
     }
-}
-}
+} // namespace utilities
+} // namespace ell

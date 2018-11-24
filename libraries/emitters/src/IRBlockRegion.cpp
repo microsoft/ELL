@@ -15,8 +15,9 @@ namespace ell
 {
 namespace emitters
 {
-    IRBlockRegion::IRBlockRegion(llvm::BasicBlock* pStart)
-        : _pStart(pStart), _pEnd(pStart)
+    IRBlockRegion::IRBlockRegion(llvm::BasicBlock* pStart) :
+        _pStart(pStart),
+        _pEnd(pStart)
     {
         assert(pStart != nullptr);
     }
@@ -74,5 +75,5 @@ namespace emitters
     {
         _regions.clear();
     }
-}
-}
+} // namespace emitters
+} // namespace ell

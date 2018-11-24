@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DatasetInterface.h"
-#include "DatasetInterfaceImpl.h"
 #include "DataLoaders.h"
+#include "DatasetInterfaceImpl.h"
 #include "Exception.h"
 #include "Files.h"
 
@@ -20,13 +20,13 @@ using namespace ell;
 namespace ELL_API
 {
 
-AutoDataVector::AutoDataVector()
-    : _impl(std::make_shared<AutoDataVectorImpl>())
+AutoDataVector::AutoDataVector() :
+    _impl(std::make_shared<AutoDataVectorImpl>())
 {
 }
 
-AutoDataVector::AutoDataVector(const std::vector<double>& data)
-    : _impl(std::make_shared<AutoDataVectorImpl>())
+AutoDataVector::AutoDataVector(const std::vector<double>& data) :
+    _impl(std::make_shared<AutoDataVectorImpl>())
 {
     _impl->_vector = std::make_shared<ell::data::AutoDataVector>(data);
 }
@@ -36,7 +36,7 @@ std::vector<double> AutoDataVector::ToArray() const
     return _impl->_vector->ToArray();
 }
 
-template<typename ElementType>
+template <typename ElementType>
 void InternalCopyTo(std::vector<double>& data, std::vector<ElementType>& buffer)
 {
     if (buffer.size() < data.size())
@@ -68,17 +68,18 @@ class AutoSupervisedExample::AutoSupervisedExampleImpl
 {
 public:
     AutoSupervisedExampleImpl() = default;
-    AutoSupervisedExampleImpl(const ell::data::AutoSupervisedExample& e) : _example(e) {}
-    ell::data::AutoSupervisedExample _example; 
+    AutoSupervisedExampleImpl(const ell::data::AutoSupervisedExample& e) :
+        _example(e) {}
+    ell::data::AutoSupervisedExample _example;
 };
 
-AutoSupervisedExample::AutoSupervisedExample()
-    : _impl(std::make_shared<AutoSupervisedExampleImpl>())
+AutoSupervisedExample::AutoSupervisedExample() :
+    _impl(std::make_shared<AutoSupervisedExampleImpl>())
 {
 }
 
-AutoSupervisedExample::AutoSupervisedExample(AutoDataVector vector, double label)
-    : _impl(std::make_shared<AutoSupervisedExampleImpl>(ell::data::AutoSupervisedExample(vector.ToArray(), { 1.0, label })))
+AutoSupervisedExample::AutoSupervisedExample(AutoDataVector vector, double label) :
+    _impl(std::make_shared<AutoSupervisedExampleImpl>(ell::data::AutoSupervisedExample(vector.ToArray(), { 1.0, label })))
 {
 }
 
@@ -94,8 +95,8 @@ AutoDataVector AutoSupervisedExample::GetData() const
     return result;
 }
 
-AutoSupervisedDataset::AutoSupervisedDataset()
-    : _impl(std::make_shared<AutoSupervisedDatasetImpl>())
+AutoSupervisedDataset::AutoSupervisedDataset() :
+    _impl(std::make_shared<AutoSupervisedDatasetImpl>())
 {
 }
 
@@ -112,7 +113,7 @@ size_t AutoSupervisedDataset::NumFeatures() const
 AutoSupervisedExample AutoSupervisedDataset::GetExample(size_t index)
 {
     AutoSupervisedExample result;
-    result._impl->_example = _impl->_dataset.GetExample(index).CopyAs<ell::data::AutoSupervisedExample >();
+    result._impl->_example = _impl->_dataset.GetExample(index).CopyAs<ell::data::AutoSupervisedExample>();
     return result;
 }
 
@@ -143,4 +144,4 @@ void AutoSupervisedDataset::Save(std::string filename)
     _impl->_dataset.Print(stream);
 }
 
-}
+} // namespace ELL_API

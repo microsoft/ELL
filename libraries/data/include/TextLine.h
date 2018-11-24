@@ -7,15 +7,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 // utilities
 #include "CStringParser.h"
 
 namespace ell
 {
-namespace data 
+namespace data
 {
     /// <summary> Represents a constant line of text with a cursor that enables incremental parsing. </summary>
     class TextLine
@@ -85,10 +85,10 @@ namespace data
         size_t Size() const { return _string->length(); }
 
     private:
-        std::shared_ptr<const std::string> _string = nullptr; 
+        std::shared_ptr<const std::string> _string = nullptr;
         const char* _currentChar = nullptr;
     };
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/TextLine.tcc"

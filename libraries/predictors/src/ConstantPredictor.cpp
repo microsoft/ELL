@@ -15,8 +15,8 @@ namespace ell
 {
 namespace predictors
 {
-    ConstantPredictor::ConstantPredictor(double value)
-        : _value(value)
+    ConstantPredictor::ConstantPredictor(double value) :
+        _value(value)
     {
     }
 
@@ -41,5 +41,5 @@ namespace predictors
         Print(os);
         os << "\n";
     }
-}
-}
+} // namespace predictors
+} // namespace ell

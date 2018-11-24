@@ -63,5 +63,5 @@ namespace evaluators
     {
         return { "ErrorRate", "Precision", "Recall", "F1-Score" };
     }
-}
-}
+} // namespace evaluators
+} // namespace ell

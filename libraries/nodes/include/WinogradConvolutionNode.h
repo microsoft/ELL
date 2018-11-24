@@ -83,7 +83,6 @@ namespace nodes
                                 int tileSize,
                                 FilterOrder order);
 
-
         /// <summary> Cloning constructor </summary>
         ///
         /// <param name="other"> The node to copy configuration from. </param>
@@ -216,8 +215,9 @@ namespace nodes
 
         // Cloning constructor
         WinogradConvolutionComputeNode(const WinogradConvolutionComputeNode<ValueType>& other,
-                                                                              const model::OutputPort<ValueType>& input,
-                                                                              const model::OutputPort<ValueType>& filterWeights);
+                                       const model::OutputPort<ValueType>& input,
+                                       const model::OutputPort<ValueType>& filterWeights);
+
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
@@ -259,5 +259,5 @@ namespace nodes
         int _inputBlockSize = 1;
         int _outputBlockSize = 1;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

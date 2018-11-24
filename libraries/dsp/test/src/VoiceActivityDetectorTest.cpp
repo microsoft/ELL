@@ -20,8 +20,8 @@
 #include "StringUtil.h"
 
 // data
-#include "Dataset.h"
 #include "DataLoaders.h"
+#include "Dataset.h"
 
 // stl
 #include <algorithm>
@@ -53,7 +53,8 @@ void TestVoiceActivityDetectorInternal(const std::string& filename, VoiceActivit
         std::vector<double> data = example.GetDataVector().ToArray();
         std::vector<ValueType> buffer;
         std::transform(data.begin(), data.end(), std::back_inserter(buffer), [](double x) { return static_cast<ValueType>(x); });
-        if (buffer.size() < static_cast<size_t>(frameSize)) {
+        if (buffer.size() < static_cast<size_t>(frameSize))
+        {
             buffer.resize(frameSize); // fix AutoDataVector possible compression
         }
 
@@ -86,7 +87,7 @@ void TestVoiceActivityDetector(const std::string& path)
     VoiceActivityDetector vad(8000, FrameSize, 0.032, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
 
     std::string filename = utilities::JoinPaths(path, { "..", "VadData.txt" });
-    if (!utilities::FileExists(filename)) 
+    if (!utilities::FileExists(filename))
     {
         filename = utilities::JoinPaths(path, { "VadData.txt" });
     }

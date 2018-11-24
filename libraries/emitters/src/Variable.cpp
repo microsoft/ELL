@@ -44,8 +44,10 @@ namespace emitters
     //
     // Variable
     //
-    Variable::Variable(const VariableType type, const VariableScope scope, int flags)
-        : _type(type), _scope(scope), _flags(flags)
+    Variable::Variable(const VariableType type, const VariableScope scope, int flags) :
+        _type(type),
+        _scope(scope),
+        _flags(flags)
     {
     }
 
@@ -82,18 +84,18 @@ namespace emitters
     {
         switch (type)
         {
-            case VariableType::Double:
-                return AddVariable<ScalarVariable<double>>(scope);
-            case VariableType::Float:
-                return AddVariable<ScalarVariable<float>>(scope);
-            case VariableType::Int32:
-                return AddVariable<ScalarVariable<int>>(scope);
-            case VariableType::Int64:
-                return AddVariable<ScalarVariable<int64_t>>(scope);
-            case VariableType::Byte:
-                return AddVariable<ScalarVariable<uint8_t>>(scope);
-            default:
-                throw EmitterException(EmitterError::valueTypeNotSupported);
+        case VariableType::Double:
+            return AddVariable<ScalarVariable<double>>(scope);
+        case VariableType::Float:
+            return AddVariable<ScalarVariable<float>>(scope);
+        case VariableType::Int32:
+            return AddVariable<ScalarVariable<int>>(scope);
+        case VariableType::Int64:
+            return AddVariable<ScalarVariable<int64_t>>(scope);
+        case VariableType::Byte:
+            return AddVariable<ScalarVariable<uint8_t>>(scope);
+        default:
+            throw EmitterException(EmitterError::valueTypeNotSupported);
         }
     }
 
@@ -101,18 +103,18 @@ namespace emitters
     {
         switch (type)
         {
-            case VariableType::Double:
-                return AddVariable<VectorVariable<double>>(scope, size);
-            case VariableType::Float:
-                return AddVariable<VectorVariable<float>>(scope, size);
-            case VariableType::Int32:
-                return AddVariable<VectorVariable<int>>(scope, size);
-            case VariableType::Int64:
-                return AddVariable<VectorVariable<int64_t>>(scope, size);
-            case VariableType::Byte:
-                return AddVariable<VectorVariable<uint8_t>>(scope, size);
-            default:
-                throw EmitterException(EmitterError::valueTypeNotSupported);
+        case VariableType::Double:
+            return AddVariable<VectorVariable<double>>(scope, size);
+        case VariableType::Float:
+            return AddVariable<VectorVariable<float>>(scope, size);
+        case VariableType::Int32:
+            return AddVariable<VectorVariable<int>>(scope, size);
+        case VariableType::Int64:
+            return AddVariable<VectorVariable<int64_t>>(scope, size);
+        case VariableType::Byte:
+            return AddVariable<VectorVariable<uint8_t>>(scope, size);
+        default:
+            throw EmitterException(EmitterError::valueTypeNotSupported);
         }
     }
 
@@ -120,19 +122,19 @@ namespace emitters
     {
         switch (type)
         {
-            case VariableType::Double:
-                return AddVariable<VectorElementVariable<double>>(src, offset);
-            case VariableType::Float:
-                return AddVariable<VectorElementVariable<float>>(src, offset);
-            case VariableType::Int32:
-                return AddVariable<VectorElementVariable<int>>(src, offset);
-            case VariableType::Int64:
-                return AddVariable<VectorElementVariable<int64_t>>(src, offset);
-            case VariableType::Byte:
-                return AddVariable<VectorElementVariable<uint8_t>>(src, offset);
-            default:
-                throw EmitterException(EmitterError::valueTypeNotSupported);
+        case VariableType::Double:
+            return AddVariable<VectorElementVariable<double>>(src, offset);
+        case VariableType::Float:
+            return AddVariable<VectorElementVariable<float>>(src, offset);
+        case VariableType::Int32:
+            return AddVariable<VectorElementVariable<int>>(src, offset);
+        case VariableType::Int64:
+            return AddVariable<VectorElementVariable<int64_t>>(src, offset);
+        case VariableType::Byte:
+            return AddVariable<VectorElementVariable<uint8_t>>(src, offset);
+        default:
+            throw EmitterException(EmitterError::valueTypeNotSupported);
         }
     }
-}
-}
+} // namespace emitters
+} // namespace ell

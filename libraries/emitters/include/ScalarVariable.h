@@ -73,7 +73,7 @@ namespace emitters
         Variable& _src;
         int _offset;
     };
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/ScalarVariable.tcc"

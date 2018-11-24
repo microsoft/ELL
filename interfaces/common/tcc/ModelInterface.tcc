@@ -30,8 +30,7 @@ void Map::SetSourceCallback(ell::api::CallbackBase<ElementType>& callback, size_
         std::string name = typeid(ElementType).name();
         throw std::invalid_argument("Cannot set SourceCallback because model has no SourceNode of type '" + name + "'");
     }
-    nodes.at(index)->SetSourceFunction([&callback](auto& input)
-    {
+    nodes.at(index)->SetSourceFunction([&callback](auto& input) {
         return callback.Run(input);
     });
 }
@@ -47,8 +46,7 @@ void Map::SetSinkCallback(ell::api::CallbackBase<ElementType>& callback, size_t 
         throw std::invalid_argument("Cannot set SinkCallback because model has no SinkNode of type '" + name + "'");
     }
 
-    nodes.at(index)->SetSinkFunction([&callback](const std::vector<ElementType>& output)
-    {
+    nodes.at(index)->SetSinkFunction([&callback](const std::vector<ElementType>& output) {
         // Reason for the const_cast:
         // SWIG warns that the const overload gets shadowed, so CallbackBase only
         // provides a non-const vector overload for Run.
@@ -102,6 +100,6 @@ void CompiledMap::InvokeSinkCallback(ElementType* output)
     GetCallbackForwarder<ElementType>().InvokeOutput(output);
 }
 
-} // end namespace
+} // namespace ELL_API
 
 #endif // SWIG

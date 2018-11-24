@@ -124,7 +124,7 @@ namespace model
         ///
         /// <returns> The PortElements containing the referenced locations to get values from </returns>
         PortElements<ValueType> GetPortElements() const;
-        
+
         /// <summary> Returns the port this port gets its values from </summary>
         ///
         /// <returns> The OutputPort to get values from </returns>
@@ -161,7 +161,7 @@ namespace model
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/InputPort.tcc"

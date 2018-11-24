@@ -89,5 +89,5 @@ namespace nodes
         size_t _m, _n;
         size_t _lda, _incx;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

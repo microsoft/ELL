@@ -39,15 +39,15 @@ namespace utilities
         JsonArchiver(std::ostream& outputStream);
 
     protected:
-        #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_VALUE_OVERRIDE(t);
+#define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_VALUE_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void ArchiveValue(const char* name, const std::string& value) override;
 
-        #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_ARRAY_OVERRIDE(t);
+#define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_ARRAY_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void ArchiveNull(const char* name) override;
 
@@ -65,7 +65,7 @@ namespace utilities
         void WriteScalar(const char* name, const ValueType& value);
 
         void WriteScalar(const char* name, const char* value);
-        void WriteScalar(const char* name, const std::string& value);               
+        void WriteScalar(const char* name, const std::string& value);
 
         template <typename ValueType>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
@@ -108,17 +108,17 @@ namespace utilities
         bool HasNextPropertyName(const std::string& name) override;
 
     protected:
-        #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_VALUE_OVERRIDE(t);
+#define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_VALUE_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void UnarchiveValue(const char* name, std::string& value) override;
 
         bool UnarchiveNull(const char* name) override;
 
-        #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_OVERRIDE(t);
+#define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void UnarchiveArray(const char* name, std::vector<std::string>& array) override;
 
@@ -168,7 +168,7 @@ namespace utilities
         /// <summary></summary>
         static std::string DecodeTypeName(const std::string& str);
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/JsonArchiver.tcc"

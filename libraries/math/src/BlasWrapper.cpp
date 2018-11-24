@@ -6,7 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #include "BlasWrapper.h"
 #include "Matrix.h"
 
@@ -24,7 +23,8 @@ namespace math
     {
         int GetCBlasMatrixOrder(MatrixLayout order)
         {
-            switch (order) {
+            switch (order)
+            {
             case MatrixLayout::rowMajor:
 #if USE_BLAS
                 return CBLAS_ORDER::CblasRowMajor;
@@ -45,7 +45,8 @@ namespace math
 
         int GetCBlasMatrixTranspose(MatrixTranspose transpose)
         {
-            switch (transpose) {
+            switch (transpose)
+            {
             case MatrixTranspose::transpose:
 #if USE_BLAS
                 return CBLAS_TRANSPOSE::CblasTrans;
@@ -164,6 +165,6 @@ namespace math
             cblas_dgemm(static_cast<CBLAS_ORDER>(GetCBlasMatrixOrder(order)), static_cast<CBLAS_TRANSPOSE>(GetCBlasMatrixTranspose(transposeA)), static_cast<CBLAS_TRANSPOSE>(GetCBlasMatrixTranspose(transposeB)), m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
         }
 #endif
-    }
-}
-}
+    } // namespace Blas
+} // namespace math
+} // namespace ell

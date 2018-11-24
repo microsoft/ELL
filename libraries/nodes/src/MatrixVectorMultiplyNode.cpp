@@ -17,14 +17,28 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    MatrixVectorMultiplyNode<ValueType>::MatrixVectorMultiplyNode()
-        : CompilableNode({ &_inputMatrix, &_inputVector }, { &_output }), _inputMatrix(this, {}, inputMatrixPortName), _inputVector(this, {}, inputVectorPortName), _output(this, defaultOutputPortName, 0), _m(0), _n(0), _lda(0), _incx(0)
+    MatrixVectorMultiplyNode<ValueType>::MatrixVectorMultiplyNode() :
+        CompilableNode({ &_inputMatrix, &_inputVector }, { &_output }),
+        _inputMatrix(this, {}, inputMatrixPortName),
+        _inputVector(this, {}, inputVectorPortName),
+        _output(this, defaultOutputPortName, 0),
+        _m(0),
+        _n(0),
+        _lda(0),
+        _incx(0)
     {
     }
 
     template <typename ValueType>
-    MatrixVectorMultiplyNode<ValueType>::MatrixVectorMultiplyNode(const model::OutputPort<ValueType>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::OutputPort<ValueType>& inputVector)
-        : CompilableNode({ &_inputMatrix, &_inputVector }, { &_output }), _inputMatrix(this, inputMatrix, inputMatrixPortName), _inputVector(this, inputVector, inputVectorPortName), _output(this, defaultOutputPortName, m), _m(m), _n(n), _lda(matrixStride), _incx(1)
+    MatrixVectorMultiplyNode<ValueType>::MatrixVectorMultiplyNode(const model::OutputPort<ValueType>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::OutputPort<ValueType>& inputVector) :
+        CompilableNode({ &_inputMatrix, &_inputVector }, { &_output }),
+        _inputMatrix(this, inputMatrix, inputMatrixPortName),
+        _inputVector(this, inputVector, inputVectorPortName),
+        _output(this, defaultOutputPortName, m),
+        _m(m),
+        _n(n),
+        _lda(matrixStride),
+        _incx(1)
     {
         if (inputMatrix.Size() != m * n)
         {
@@ -103,5 +117,5 @@ namespace nodes
     // Explicitly instantiate versions
     template class MatrixVectorMultiplyNode<float>;
     template class MatrixVectorMultiplyNode<double>;
-}
-}
+} // namespace nodes
+} // namespace ell

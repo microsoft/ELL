@@ -69,8 +69,8 @@ namespace utilities
     {
         return id._id;
     }
-}
-}
+} // namespace utilities
+} // namespace ell
 
 std::hash<ell::utilities::UniqueId>::result_type std::hash<ell::utilities::UniqueId>::operator()(const argument_type& id) const
 {

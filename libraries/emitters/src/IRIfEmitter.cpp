@@ -28,23 +28,24 @@ namespace emitters
 
             return true;
         }
-    }
+    } // namespace
     const std::string IfCondBlockName = "if.cond";
     const std::string IfThenBlockName = "if.then";
     const std::string IfElseBlockName = "if.else";
     const std::string IfEndBlockName = "if.end";
     const std::string IfAfterBlockName = "if.after";
 
-    IRIfEmitter::IRIfEmitter(IRFunctionEmitter& functionEmitter, llvm::BasicBlock* pPrevBlock)
-        : _functionEmitter(&functionEmitter), _pEndBlock(pPrevBlock)
+    IRIfEmitter::IRIfEmitter(IRFunctionEmitter& functionEmitter, llvm::BasicBlock* pPrevBlock) :
+        _functionEmitter(&functionEmitter),
+        _pEndBlock(pPrevBlock)
     {
         assert(_functionEmitter);
 
         _pAfterBlock = _functionEmitter->BlockAfter(GetParentBlock(), IfAfterBlockName);
     }
 
-    IRIfEmitter::IRIfEmitter(IRFunctionEmitter& functionEmitter, TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue)
-        : IRIfEmitter(functionEmitter)
+    IRIfEmitter::IRIfEmitter(IRFunctionEmitter& functionEmitter, TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue) :
+        IRIfEmitter(functionEmitter)
     {
         If(comparison, pValue, pTestValue);
     }
@@ -68,7 +69,7 @@ namespace emitters
             std::swap(this->_isContinuation, other._isContinuation);
             std::swap(this->_finished, other._finished);
             // Turn off the 'other' object destructor auto block termination, since we are handing that responsibility off to this new copy.
-            other._finished = true; 
+            other._finished = true;
         }
 
         return *this;
@@ -226,5 +227,5 @@ namespace emitters
     {
         return (_pEndBlock != nullptr) ? _pEndBlock : _functionEmitter->GetCurrentBlock();
     }
-}
-}
+} // namespace emitters
+} // namespace ell

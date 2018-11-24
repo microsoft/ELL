@@ -34,7 +34,7 @@ namespace api
         //
         class NeuralNetworkPredictor
         {
-        public:            
+        public:
             using LayerShape = ell::api::math::TensorShape;
             using DataType = ELL_API::PortType;
 
@@ -51,14 +51,14 @@ namespace api
             DataType GetDataType() const;
 
 #ifndef SWIG
-            template<typename ElementType>
+            template <typename ElementType>
             ell::predictors::NeuralNetworkPredictor<ElementType>& GetUnderlyingPredictor();
 
-        private:            
+        private:
             std::shared_ptr<NeuralNetworkPredictorImpl> _predictor;
             DataType _dataType;
 #endif
         };
-    }
-}
-}
+    } // namespace predictors
+} // namespace api
+} // namespace ell

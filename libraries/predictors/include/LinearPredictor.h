@@ -31,7 +31,8 @@ namespace predictors
     ///
     /// <typeparam name="ElementType"> The fundamental type used by this predictor. </typeparam>
     template <typename ElementType>
-    class LinearPredictor : public IPredictor<ElementType>, public utilities::IArchivable
+    class LinearPredictor : public IPredictor<ElementType>
+        , public utilities::IArchivable
     {
     public:
         /// <summary> Type of the data vector expected by this predictor type. </summary>
@@ -132,7 +133,7 @@ namespace predictors
         math::ColumnVector<ElementType> _w;
         ElementType _b = 0;
     };
-}
-}
+} // namespace predictors
+} // namespace ell
 
 #include "../tcc/LinearPredictor.tcc"

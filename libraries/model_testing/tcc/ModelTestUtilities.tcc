@@ -12,14 +12,19 @@ using namespace ell;
 #include <random>
 
 template <typename ValueType, typename InfoType>
-DebugNode<ValueType, InfoType>::DebugNode()
-    : model::Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+DebugNode<ValueType, InfoType>::DebugNode() :
+    model::Node({ &_input }, { &_output }),
+    _input(this, {}, defaultInputPortName),
+    _output(this, defaultOutputPortName, 0)
 {
 }
 
 template <typename ValueType, typename InfoType>
-DebugNode<ValueType, InfoType>::DebugNode(const model::OutputPort<ValueType>& input, InfoType debugInfo)
-    : model::Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _info(debugInfo)
+DebugNode<ValueType, InfoType>::DebugNode(const model::OutputPort<ValueType>& input, InfoType debugInfo) :
+    model::Node({ &_input }, { &_output }),
+    _input(this, input, defaultInputPortName),
+    _output(this, defaultOutputPortName, _input.Size()),
+    _info(debugInfo)
 {
 }
 
@@ -176,7 +181,7 @@ void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>&
     testing::ProcessTest(std::string("Testing map " + name + " compute"), ok);
 }
 
-template<typename InputType, typename OutputType>
+template <typename InputType, typename OutputType>
 std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
 {
     bool ok = true;
@@ -196,7 +201,7 @@ std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model:
             std::cout << "input: " << input << std::endl;
             std::cout << "computed: " << computedResult << std::endl;
             std::cout << "compiled: " << compiledResult << std::endl;
-            std::cout << "Largest difference: " << LargestDifference(computedResult, compiledResult) << ", epsilon: " << epsilon << std::endl;            
+            std::cout << "Largest difference: " << LargestDifference(computedResult, compiledResult) << ", epsilon: " << epsilon << std::endl;
         }
     }
     testing::ProcessTest(std::string("Testing compiled " + name + " compute"), ok);
@@ -232,8 +237,11 @@ template <typename ValueType>
 class Uniform
 {
 public:
-    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
-        : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal - minVal) {}
+    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123") :
+        _rng(utilities::GetRandomEngine(seed)),
+        _range(static_cast<double>(_rng.max() - _rng.min())),
+        _minOutput(minVal),
+        _outputRange(maxVal - minVal) {}
 
     ValueType operator()()
     {

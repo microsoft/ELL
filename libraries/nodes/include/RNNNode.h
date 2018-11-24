@@ -67,14 +67,14 @@ namespace nodes
         /// <param name="recurrentActivation"> The recurrent activation function. </param>
         /// <param name="validateWeights"> Whether to check the size of the weights. </param>
         RNNNode(const model::OutputPort<ValueType>& input,
-            const model::OutputPort<int>& resetTrigger,
-            size_t hiddenUnits,
-            const model::OutputPort<ValueType>& inputWeights,
-            const model::OutputPort<ValueType>& hiddenWeights,
-            const model::OutputPort<ValueType>& inputBias,
-            const model::OutputPort<ValueType>& hiddenBias,
-            const ActivationType& activation,
-            bool validateWeights = true);
+                const model::OutputPort<int>& resetTrigger,
+                size_t hiddenUnits,
+                const model::OutputPort<ValueType>& inputWeights,
+                const model::OutputPort<ValueType>& hiddenWeights,
+                const model::OutputPort<ValueType>& inputBias,
+                const model::OutputPort<ValueType>& hiddenBias,
+                const ActivationType& activation,
+                bool validateWeights = true);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -122,5 +122,5 @@ namespace nodes
     private:
         mutable int _lastResetValue;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

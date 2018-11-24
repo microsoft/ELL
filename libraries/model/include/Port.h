@@ -96,8 +96,10 @@ namespace model
         const utilities::PropertyBag& GetMetadata() const { return _metadata; }
 
     protected:
-        Port(const Node* node, std::string name, PortType type)
-            : _node(node), _name(name), _type(type) {}
+        Port(const Node* node, std::string name, PortType type) :
+            _node(node),
+            _name(name),
+            _type(type) {}
         ~Port() override = default;
 
         utilities::ArchiveVersion GetArchiveVersion() const override;
@@ -126,7 +128,7 @@ namespace model
 
     template <Port::PortType portType>
     using ValueType = typename PortTypeToValueType<portType>::value_type;
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/Port.tcc"

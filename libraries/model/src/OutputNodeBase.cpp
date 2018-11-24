@@ -6,37 +6,41 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InputNodeBase.h"
-#include "IRMapCompiler.h"
 #include "OutputNodeBase.h"
+#include "IRMapCompiler.h"
+#include "InputNodeBase.h"
 
 namespace ell
 {
 namespace model
 {
-    OutputNodeBase::OutputNodeBase(InputPortBase& input, OutputPortBase& output, const MemoryShape& shape)
-        : CompilableNode({ &input }, { &output }), _inputBase(input), _outputBase(output)
+    OutputNodeBase::OutputNodeBase(InputPortBase& input, OutputPortBase& output, const MemoryShape& shape) :
+        CompilableNode({ &input }, { &output }),
+        _inputBase(input),
+        _outputBase(output)
     {
     }
 
-    OutputNodeBase::OutputNodeBase(const std::vector<InputPortBase*>& inputs, OutputPortBase& output, const MemoryShape& shape)
-        : CompilableNode(inputs, { &output }), _inputBase(*inputs.at(0)), _outputBase(output)
+    OutputNodeBase::OutputNodeBase(const std::vector<InputPortBase*>& inputs, OutputPortBase& output, const MemoryShape& shape) :
+        CompilableNode(inputs, { &output }),
+        _inputBase(*inputs.at(0)),
+        _outputBase(output)
     {
     }
 
-    MemoryShape OutputNodeBase::GetShape() const 
-    { 
+    MemoryShape OutputNodeBase::GetShape() const
+    {
         return _outputBase.GetMemoryLayout().GetActiveSize();
     }
 
-    void OutputNodeBase::SetShape(const MemoryShape& shape) 
-    { 
-        _outputBase.SetMemoryLayout({shape});
-    } 
+    void OutputNodeBase::SetShape(const MemoryShape& shape)
+    {
+        _outputBase.SetMemoryLayout({ shape });
+    }
 
     ell::utilities::ArchiveVersion OutputNodeBase::GetArchiveVersion() const
     {
-        return {ell::utilities::ArchiveVersionNumbers::v2};
+        return { ell::utilities::ArchiveVersionNumbers::v2 };
     }
 
     void OutputNodeBase::Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
@@ -64,5 +68,5 @@ namespace model
             });
         });
     }
-}
-}
+} // namespace model
+} // namespace ell

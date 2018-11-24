@@ -9,16 +9,16 @@
 #pragma once
 
 #include "Common.h"
-#include "Vector.h"
 #include "Tensor.h"
+#include "Vector.h"
 
 // utilities
 #include "Debug.h"
 #include "Exception.h"
 
 // stl
-#include <string>
 #include <ostream>
+#include <string>
 
 namespace ell
 {
@@ -114,7 +114,7 @@ namespace math
     /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
     /// <param name="vector"> The vector </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
     void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
 
     /// <summary> Multiplies each slice in a Tensor with the corresponding vector element. </summary>
@@ -125,7 +125,7 @@ namespace math
     /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
     /// <param name="vector"> The vector </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension2>
     void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
 
     /// <summary> Multiplies each slice in a Tensor with the corresponding vector element. </summary>
@@ -136,7 +136,7 @@ namespace math
     /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
     /// <param name="vector"> The vector </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1>
+    template <Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1>
     void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
 
     /// <summary> Adds a scalar to a tensor, tensor += scalar. </summary>
@@ -158,7 +158,7 @@ namespace math
     /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
     /// <param name="vector"> The vector </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension2>
     void AddUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
 
     /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
@@ -169,7 +169,7 @@ namespace math
     /// <typeparam name="dimension1"> The second dimension in the Tensor layout. </typeparam>
     /// <param name="vector"> The vector </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1>
+    template <Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1>
     void AddUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
 
     /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
@@ -180,7 +180,7 @@ namespace math
     /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
     /// <param name="vector"> The vector </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
     void AddUpdate(ConstRowVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
 
     /// <summary> Adds each vector element to the corresponding Tensor slice. </summary>
@@ -191,7 +191,7 @@ namespace math
     /// <typeparam name="dimension2"> The third dimension in the Tensor layout. </typeparam>
     /// <param name="vector"> The vector </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
     void AddUpdate(ConstColumnVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
 
     /// <summary> Applies the transformation M = scale[i] * M + bias[i], where M is the i'th Tensor slice. </summary>
@@ -203,7 +203,7 @@ namespace math
     /// <param name="scale"> The vector of elements that multiply the Tensor slices </param>
     /// <param name="bias"> The vector of elements to add to the Tensor slices </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension1, Dimension dimension2>
     void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor);
 
     /// <summary> Applies the transformation M = scale[i] * M + bias[i], where M is the i'th Tensor slice. </summary>
@@ -215,7 +215,7 @@ namespace math
     /// <param name="scale"> The vector of elements that multiply the Tensor slices </param>
     /// <param name="bias"> The vector of elements to add to the Tensor slices </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension2>
     void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor);
 
     /// <summary> Applies the transformation M = scale[i] * M + bias[i], where M is the i'th Tensor slice. </summary>
@@ -227,9 +227,9 @@ namespace math
     /// <param name="scale"> The vector of elements that multiply the Tensor slices </param>
     /// <param name="bias"> The vector of elements to add to the Tensor slices </param>
     /// <param name="tensor"> The tensor. </param>
-    template<Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1>
+    template <Dimension vectorOrientation, ImplementationType implementation = ImplementationType::openBlas, typename ElementType, Dimension dimension0, Dimension dimension1>
     void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor);
-}
-}
+} // namespace math
+} // namespace ell
 
 #include "../tcc/TensorOperations.tcc"

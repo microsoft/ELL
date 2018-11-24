@@ -48,7 +48,7 @@ namespace model
     public:
         ModelOptimizerContext() = default;
         ModelOptimizerContext(const ModelOptimizerContext& other) = delete;
-        
+
         /// <summary> Gets the `ModelTransformer` being used for transforming the dataset during this invocation of the optimizer. </summary>
         ModelTransformer& GetTransformer();
 
@@ -96,5 +96,5 @@ namespace model
         OptimizationPassList _passes;
         MapCompilerOptions _settings;
     };
-}
-}
+} // namespace model
+} // namespace ell

@@ -165,7 +165,10 @@ public:
                      const std::vector<int>& order = {});
 
 #ifndef SWIG
-    const ell::model::PortMemoryLayout& Get() const { return _layout; }
+    const ell::model::PortMemoryLayout& Get() const
+    {
+        return _layout;
+    }
 
     PortMemoryLayout(const ell::model::PortMemoryLayout& layout);
 #endif
@@ -375,7 +378,7 @@ public:
     CompiledMap CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const;
     CompiledMap CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const;
 
-    // Return true if the model contains a SourceNode.  In this case you need 
+    // Return true if the model contains a SourceNode.  In this case you need
     // to register the callbacks via SetSourceCallback and SetSinkCallback.
     bool HasSourceNodes();
 
@@ -394,19 +397,20 @@ public:
     std::vector<float> ComputeFloat(const std::vector<float>& inputData);
 
 #ifndef SWIG
-    std::shared_ptr<ell::model::Map> GetInnerMap() { return _map; }
+    std::shared_ptr<ell::model::Map> GetInnerMap()
+    {
+        return _map;
+    }
 #endif
 
 private:
 #ifndef SWIG
-    CompiledMap Compile(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName,
-                        const std::string& sourceFunctionName, const std::string& sinkFunctionName,
-                        const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings,
-                        std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolverFunction) const;
+    CompiledMap Compile(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const std::string& sourceFunctionName, const std::string& sinkFunctionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings, std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolverFunction) const;
 #endif
 
     std::shared_ptr<ell::model::Map> _map;
-    enum class TriState {
+    enum class TriState
+    {
         Uninitialized,
         No,
         Yes
@@ -447,11 +451,11 @@ public:
     void InvokeSinkCallback(ElementType* output);
 #endif
 
-    // Return true if the model contains a SourceNode.  In this case you need 
+    // Return true if the model contains a SourceNode.  In this case you need
     // to register the callbacks via SetSourceCallback and SetSinkCallback.
     bool HasSourceNodes();
 
-    // Older non callback based API, only makes sense when model has single input/output nodes and no source/sink nodes.    
+    // Older non callback based API, only makes sense when model has single input/output nodes and no source/sink nodes.
     std::vector<double> ComputeDouble(const std::vector<double>& inputData);
     std::vector<float> ComputeFloat(const std::vector<float>& inputData);
 
@@ -465,7 +469,8 @@ private:
     ell::api::CallbackForwarder<double, double> forwarderDouble;
     ell::api::CallbackForwarder<float, float> forwarderFloat;
 
-    enum class TriState {
+    enum class TriState
+    {
         Uninitialized,
         No,
         Yes
@@ -490,6 +495,6 @@ struct ModelOptimizerOptions
     bool fuseLinearFunctionNodes = true;
 };
 
-} // end namespace
+} // namespace ELL_API
 
 #include "../tcc/ModelInterface.tcc"

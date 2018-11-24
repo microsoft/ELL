@@ -9,8 +9,8 @@
 #pragma once
 
 // model
-#include "CompilableNodeUtilities.h"
 #include "CompilableNode.h"
+#include "CompilableNodeUtilities.h"
 #include "IRMapCompiler.h"
 #include "InputPort.h"
 #include "MapCompiler.h"
@@ -96,14 +96,14 @@ namespace nodes
     {
     public:
         /// <summary> Default Constructor </summary>
-        ArgMinNode()
-            : ExtremalValueNode<ValueType, false>() {}
+        ArgMinNode() :
+            ExtremalValueNode<ValueType, false>() {}
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ArgMinNode(const model::OutputPort<ValueType>& input)
-            : ExtremalValueNode<ValueType, false>(input) {}
+        ArgMinNode(const model::OutputPort<ValueType>& input) :
+            ExtremalValueNode<ValueType, false>(input) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -125,14 +125,14 @@ namespace nodes
     {
     public:
         /// <summary> Default Constructor </summary>
-        ArgMaxNode()
-            : ExtremalValueNode<ValueType, true>() {}
+        ArgMaxNode() :
+            ExtremalValueNode<ValueType, true>() {}
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ArgMaxNode(const model::OutputPort<ValueType>& input)
-            : ExtremalValueNode<ValueType, true>(input) {}
+        ArgMaxNode(const model::OutputPort<ValueType>& input) :
+            ExtremalValueNode<ValueType, true>(input) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -147,7 +147,7 @@ namespace nodes
     private:
         void Copy(model::ModelTransformer& transformer) const override;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/ExtremalValueNode.tcc"

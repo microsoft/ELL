@@ -17,8 +17,8 @@ namespace predictors
     }
 
     template <typename PredictorType>
-    SignPredictor<PredictorType>::SignPredictor(PredictorType predictor)
-        : _predictor(std::move(predictor))
+    SignPredictor<PredictorType>::SignPredictor(PredictorType predictor) :
+        _predictor(std::move(predictor))
     {
     }
 
@@ -52,5 +52,5 @@ namespace predictors
     {
         archiver["predictor"] >> _predictor;
     }
-}
-}
+} // namespace predictors
+} // namespace ell

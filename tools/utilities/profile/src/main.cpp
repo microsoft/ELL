@@ -19,10 +19,10 @@
 #include "ModelLoadArguments.h"
 
 // model
-#include "Map.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
 #include "IRModelProfiler.h"
+#include "Map.h"
 #include "PortMemoryLayout.h"
 
 // passes
@@ -86,7 +86,7 @@ void ReplaceSourceAndSinkNodes(model::Map& map)
     // now put back inputs
     auto inputNodes = map.GetModel().GetNodesByType<model::InputNodeBase>();
     int index = 1;
-    for(auto node: inputNodes)
+    for (auto node : inputNodes)
     {
         map.AddInput("input_" + std::to_string(index), node);
         ++index;
@@ -234,7 +234,7 @@ void WarmUpModel(model::IRCompiledMap& map, const std::vector<InputType>& input,
         auto output = map.Compute<OutputType>(input);
     }
 
-    if(isProfiling)
+    if (isProfiling)
     {
         ResetProfilingInfo(map);
     }
@@ -389,20 +389,20 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
 {
     switch (map.GetOutputType())
     {
-        case model::Port::PortType::smallReal:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments, mapCompilerArguments, converterArgs);
-            break;
-        case model::Port::PortType::real:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::real>>(map, profileArguments, mapCompilerArguments, converterArgs);
-            break;
-        case model::Port::PortType::integer:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::integer>>(map, profileArguments, mapCompilerArguments, converterArgs);
-            break;
-        case model::Port::PortType::bigInt:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments, mapCompilerArguments, converterArgs);
-            break;
-        default:
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported output type");
+    case model::Port::PortType::smallReal:
+        ProfileModel<InputType, model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments, mapCompilerArguments, converterArgs);
+        break;
+    case model::Port::PortType::real:
+        ProfileModel<InputType, model::ValueType<model::Port::PortType::real>>(map, profileArguments, mapCompilerArguments, converterArgs);
+        break;
+    case model::Port::PortType::integer:
+        ProfileModel<InputType, model::ValueType<model::Port::PortType::integer>>(map, profileArguments, mapCompilerArguments, converterArgs);
+        break;
+    case model::Port::PortType::bigInt:
+        ProfileModel<InputType, model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments, mapCompilerArguments, converterArgs);
+        break;
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported output type");
     }
 }
 
@@ -413,20 +413,20 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
 {
     switch (map.GetInputType())
     {
-        case model::Port::PortType::smallReal:
-            ProfileModel<model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments, mapCompilerArguments, converterArgs);
-            break;
-        case model::Port::PortType::real:
-            ProfileModel<model::ValueType<model::Port::PortType::real>>(map, profileArguments, mapCompilerArguments, converterArgs);
-            break;
-        case model::Port::PortType::integer:
-            ProfileModel<model::ValueType<model::Port::PortType::integer>>(map, profileArguments, mapCompilerArguments, converterArgs);
-            break;
-        case model::Port::PortType::bigInt:
-            ProfileModel<model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments, mapCompilerArguments, converterArgs);
-            break;
-        default:
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported input type");
+    case model::Port::PortType::smallReal:
+        ProfileModel<model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments, mapCompilerArguments, converterArgs);
+        break;
+    case model::Port::PortType::real:
+        ProfileModel<model::ValueType<model::Port::PortType::real>>(map, profileArguments, mapCompilerArguments, converterArgs);
+        break;
+    case model::Port::PortType::integer:
+        ProfileModel<model::ValueType<model::Port::PortType::integer>>(map, profileArguments, mapCompilerArguments, converterArgs);
+        break;
+    case model::Port::PortType::bigInt:
+        ProfileModel<model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments, mapCompilerArguments, converterArgs);
+        break;
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported input type");
     }
 }
 

@@ -15,8 +15,8 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    BatchNormalizationLayerNode<ValueType>::BatchNormalizationLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BatchNormalizationLayer<ValueType>& layer)
-        : NeuralNetworkLayerNode<BatchNormalizationLayerNode<ValueType>, predictors::neural::BatchNormalizationLayer<ValueType>, ValueType>(input, layer)
+    BatchNormalizationLayerNode<ValueType>::BatchNormalizationLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BatchNormalizationLayer<ValueType>& layer) :
+        NeuralNetworkLayerNode<BatchNormalizationLayerNode<ValueType>, predictors::neural::BatchNormalizationLayer<ValueType>, ValueType>(input, layer)
     {
     }
 
@@ -55,5 +55,5 @@ namespace nodes
 
     template class BatchNormalizationLayerNode<float>;
     template class BatchNormalizationLayerNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

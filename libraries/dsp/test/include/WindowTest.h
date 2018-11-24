@@ -16,4 +16,3 @@ void TestHammingWindow2();
 
 template <typename ValueType>
 void TestHannWindow();
-

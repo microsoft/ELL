@@ -22,5 +22,5 @@ namespace emitters
     /// <param name="moduleEmitter"> The `IRModuleEmitter` containing the module to write </param>
     /// <param name="headerName"> The name of the SWIG header file </param>
     void WriteModuleSwigInterface(std::ostream& os, IRModuleEmitter& moduleEmitter, const std::string& headerName);
-}
-}
+} // namespace emitters
+} // namespace ell

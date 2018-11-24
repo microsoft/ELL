@@ -11,9 +11,9 @@
 #include "Vector.h"
 
 // stl
+#include <array>
 #include <cmath>
 #include <vector>
-#include <array>
 
 // utilities
 #include "Debug.h"
@@ -23,16 +23,21 @@
 // stl
 #include <array>
 #include <initializer_list>
+#include <ostream>
 #include <tuple>
 #include <vector>
-#include <ostream>
 
 namespace ell
 {
 namespace math
 {
     /// <summary> Enum that represents the dimensions of a tensor. </summary>
-    enum class Dimension { row, column, channel };
+    enum class Dimension
+    {
+        row,
+        column,
+        channel
+    };
 
     // abbreviations
     using IntegerTriplet = std::array<size_t, 3>;
@@ -54,12 +59,12 @@ namespace math
         /// <summary> Casting operator to an IntegerTriplet. </summary>
         ///
         /// <returns> The result of the cast. </returns>
-        operator IntegerTriplet() const { return {_rowValue, _columnValue, _channelValue}; }
+        operator IntegerTriplet() const { return { _rowValue, _columnValue, _channelValue }; }
 
         /// <summary> Casting operator to a vector equivalent to IntegerTriplet. </summary>
         ///
         /// <returns> The result of the cast. </returns>
-        operator std::vector<size_t>() const { return{ _rowValue, _columnValue, _channelValue }; }
+        operator std::vector<size_t>() const { return { _rowValue, _columnValue, _channelValue }; }
 
         /// <summary> Equality operator. </summary>
         ///
@@ -80,7 +85,7 @@ namespace math
         /// <typeparam name="dimension"> The dimension to get. </typeparam>
         ///
         /// <returns> The value. </returns>
-        template<Dimension dimension>
+        template <Dimension dimension>
         size_t GetValue() const;
 
         friend std::ostream& operator<<(std::ostream& stream, const TensorCoordinateBase& tensor)
@@ -159,7 +164,7 @@ namespace math
         ///
         /// <param name="values"> The vector. </param>
         TensorCoordinate(const std::vector<size_t>& values);
-        
+
         /// <summary> Gets the row index. </summary>
         ///
         /// <returns> The row index. </returns>
@@ -239,7 +244,7 @@ namespace math
         /// <typeparam name="dimensionIndex"> The dimension index. </typeparam>
         ///
         /// <returns> The size of the specified dimension. </returns>
-        template<size_t dimensionIndex>
+        template <size_t dimensionIndex>
         size_t GetSize() const;
 
         /// <summary> Gets the size of the first dimension. </summary>
@@ -286,7 +291,7 @@ namespace math
         /// matrix. </typeparam>
         ///
         /// <returns> The number of 2D slices. </returns>
-        template<Dimension rowDimension, Dimension columnDimension>
+        template <Dimension rowDimension, Dimension columnDimension>
         size_t NumSlices() const;
 
         /// <summary>
@@ -296,7 +301,7 @@ namespace math
         /// <typeparam name="dimension"> Which tensor dimension to use for the slice. </typeparam>
         ///
         /// <returns> The number of 1D slices. </returns>
-        template<Dimension dimension>
+        template <Dimension dimension>
         size_t NumSlices() const;
 
         /// <summary> Gets the number of primary slices. </summary>
@@ -351,7 +356,7 @@ namespace math
         /// <param name="tolerance"> The element comparison tolerance. </param>
         ///
         /// <returns> true if the two tensors are equivalent. </returns>
-        template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
+        template <Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
         bool IsEqual(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other, ElementType tolerance = 1.0e-8) const;
 
         /// <summary> Equality operator for tensors. </summary>
@@ -359,7 +364,7 @@ namespace math
         /// <param name="other"> The other tensor. </param>
         ///
         /// <returns> true if the two tensors are equivalent. </returns>
-        template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
+        template <Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
         bool operator==(const ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2>& other) const;
 
         /// <summary> Inequality operator for tensors. </summary>
@@ -367,7 +372,7 @@ namespace math
         /// <param name="other"> The other tensor. </param>
         ///
         /// <returns> true if the two tensors are not equivalent. </returns>
-        template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
+        template <Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
         bool operator!=(const ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2>& other) const;
 
         /// @}
@@ -413,7 +418,7 @@ namespace math
         /// <param name="index"> Slice index. </param>
         ///
         /// <returns> The resulting slice. </returns>
-        template<Dimension rowDimension, Dimension columnDimension>
+        template <Dimension rowDimension, Dimension columnDimension>
         auto GetSlice(size_t index) const -> typename TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::ConstSliceType;
 
         /// <summary>
@@ -474,7 +479,7 @@ namespace math
     /// <param name="tensor"> The tensor. </param>
     ///
     /// <returns> The number of 2D slices. </returns>
-    template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     size_t NumSlices(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
 
     /// <summary> Helper function to get the number of 1D slices along two dimensions of a tensor. </summary>
@@ -502,7 +507,7 @@ namespace math
     /// <param name="index"> Slice index </param>
     ///
     /// <returns> The requested slice. </returns>
-    template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     auto GetSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index);
 
     /// <summary> Helper function to get a const tensor slice. </summary>
@@ -530,7 +535,7 @@ namespace math
     /// (increment of 1). </typeparam>
     /// <typeparam name="dimension1"> Identity of the tensor dimension with a minor memory increment. </typeparam>
     /// <typeparam name="dimension2"> Identity of the tensor dimension with a major memory increment. </typeparam>
-    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     class TensorReference : public ConstTensorReference<ElementType, dimension0, dimension1, dimension2>
     {
     public:
@@ -611,7 +616,7 @@ namespace math
         /// <typeparam name="otherDimension1"> Dimension 1 of the other Tensor. </typeparam>
         /// <typeparam name="otherDimension2"> Dimension 2 of the other Tensor. </typeparam>
         /// <param name="other"> The other tensor. </param>
-        template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
+        template <Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
         void CopyFrom(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other);
 
         /// <summary> Sets all Tensor elements to zero. </summary>
@@ -644,11 +649,11 @@ namespace math
         /// \name View Functions
         /// @{
 
-        using ConstTensorRef::GetSubTensor;
-        using ConstTensorRef::GetSlice;
         using ConstTensorRef::GetPrimarySlice;
-        using ConstTensorRef::ReferenceAsVector;
+        using ConstTensorRef::GetSlice;
+        using ConstTensorRef::GetSubTensor;
         using ConstTensorRef::ReferenceAsMatrix;
+        using ConstTensorRef::ReferenceAsVector;
 
         /// <summary> Gets a reference to this vector. </summary>
         ///
@@ -688,7 +693,7 @@ namespace math
         /// <param name="index"> Slice index. </param>
         ///
         /// <returns> The resulting slice. </returns>
-        template<Dimension rowDimension, Dimension columnDimension>
+        template <Dimension rowDimension, Dimension columnDimension>
         auto GetSlice(size_t index) -> typename TensorMatrixSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::SliceType;
 
         /// <summary>
@@ -744,7 +749,7 @@ namespace math
     /// <param name="tensor"> The tensor. </param>
     ///
     /// <returns> The number of 2D slices. </returns>
-    template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     size_t NumSlices(TensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
 
     /// <summary> Helper function to get the number of 1D slices along two dimensions of a tensor. </summary>
@@ -772,7 +777,7 @@ namespace math
     /// <param name="index"> Slice index </param>
     ///
     /// <returns> The requested slice. </returns>
-    template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     auto GetSlice(TensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index);
 
     /// <summary> Helper function to get a tensor slice. </summary>
@@ -796,7 +801,7 @@ namespace math
     /// (increment of 1). </typeparam>
     /// <typeparam name="dimension1"> Identity of the tensor dimension with a minor memory increment. </typeparam>
     /// <typeparam name="dimension2"> Identity of the tensor dimension with a major memory increment. </typeparam>
-    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     class Tensor : public TensorReference<ElementType, dimension0, dimension1, dimension2>
     {
     public:
@@ -842,7 +847,7 @@ namespace math
         /// <summary> Copies a tensor of a different layout. </summary>
         ///
         /// <param name="other"> The other tensor. </param>
-        template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
+        template <Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
         Tensor(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other);
 
         /// <summary> Constructs a tensor from a triply nested initializer list, given in logical order (row, column, channel). </summary>
@@ -891,7 +896,7 @@ namespace math
         /// <param name="tensor"> The tensor to add to the archiver. </param>
         /// <param name="name"> The name of the tensor value to store in the archiver. </param>
         /// <param name="archiver"> The `Archiver` to add the tensor to </param>
-        template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+        template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
         static void Write(const Tensor<ElementType, dimension0, dimension1, dimension2>& tensor, const std::string& name, utilities::Archiver& archiver);
 
         /// <summary> Reads a tensor from the archive. </summary>
@@ -904,7 +909,7 @@ namespace math
         /// <param name="tensor"> The tensor that will hold the result after it has been read from the archiver. </param>
         /// <param name="name"> The name of the tensor value in the archiver. </param>
         /// <param name="archiver"> The `Archiver` to read the tensor from  </param>
-        template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+        template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
         static void Read(Tensor<ElementType, dimension0, dimension1, dimension2>& tensor, const std::string& name, utilities::Unarchiver& archiver);
 
     private:
@@ -959,6 +964,6 @@ namespace math
     /// </summary>
     template <typename ElementType>
     using ConstColumnRowChannelTensorReference = ConstTensorReference<ElementType, Dimension::column, Dimension::row, Dimension::channel>;
-}
-}
+} // namespace math
+} // namespace ell
 #include "../tcc/Tensor.tcc"

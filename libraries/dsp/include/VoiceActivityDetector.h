@@ -12,7 +12,6 @@
 #include "Archiver.h"
 #include "Exception.h"
 #include "IArchivable.h"
-#include "IArchivable.h"
 #include "TypeName.h"
 
 // stl
@@ -34,9 +33,8 @@ namespace dsp
         std::unique_ptr<VoiceActivityDetectorImpl> _impl;
 
     public:
-
-        /// <summary> 
-        /// default constructor, used only during deserialization 
+        /// <summary>
+        /// default constructor, used only during deserialization
         /// </summary>
         VoiceActivityDetector();
 
@@ -127,5 +125,5 @@ namespace dsp
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
     };
-}
-}
+} // namespace dsp
+} // namespace ell

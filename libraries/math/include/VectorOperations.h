@@ -18,8 +18,8 @@
 #include "TypeTraits.h"
 
 // stl
-#include <string>
 #include <ostream>
+#include <string>
 
 namespace ell
 {
@@ -51,7 +51,10 @@ namespace math
     ///
     /// <returns> The transpose. </returns>
     template <typename ElementType, VectorOrientation orientation>
-    auto Transpose(ConstVectorReference<ElementType, orientation> vector) { return vector.Transpose(); }
+    auto Transpose(ConstVectorReference<ElementType, orientation> vector)
+    {
+        return vector.Transpose();
+    }
 
     /// <summary> A class that represents a transformed constant vector. </summary>
     ///
@@ -144,7 +147,7 @@ namespace math
     ///
     /// <returns> The TransformedConstVectorReference that results from the operation. </returns>
     template <typename ElementType, VectorOrientation orientation>
-    auto operator*(double scalar, ConstVectorReference<ElementType, orientation> vector)->TransformedConstVectorReference<ElementType, orientation, ScaleFunction<ElementType>>;
+    auto operator*(double scalar, ConstVectorReference<ElementType, orientation> vector) -> TransformedConstVectorReference<ElementType, orientation, ScaleFunction<ElementType>>;
 
     /// <summary> Returns the transpose vector. </summary>
     ///
@@ -152,7 +155,10 @@ namespace math
     ///
     /// <returns> The transpose. </returns>
     template <typename ElementType, VectorOrientation orientation>
-    auto Transpose(VectorReference<ElementType, orientation> vector) { return vector.Transpose(); }
+    auto Transpose(VectorReference<ElementType, orientation> vector)
+    {
+        return vector.Transpose();
+    }
 
     /// <summary> Adds a scalar to a vector. </summary>
     ///
@@ -285,7 +291,8 @@ namespace math
     void ScaleSet(ElementType scalar, ConstVectorReference<ElementType, orientation> vector, VectorReference<ElementType, orientation> output);
 
     /// <summary> A stub class that represents the all-ones vector. </summary>
-    struct OnesVector {};
+    struct OnesVector
+    {};
 
     /// @{
     /// <summary>
@@ -442,7 +449,7 @@ namespace math
         struct VectorOperations
         {};
 
-        template<>
+        template <>
         struct VectorOperations<ImplementationType::native>
         {
             static std::string GetImplementationName() { return "Native"; }
@@ -511,7 +518,7 @@ namespace math
         };
 
 #ifdef USE_BLAS
-        template<>
+        template <>
         struct VectorOperations<ImplementationType::openBlas>
         {
             static std::string GetImplementationName() { return "OpenBLAS"; }
@@ -580,13 +587,13 @@ namespace math
         };
 
 #else
-        template<>
+        template <>
         struct VectorOperations<ImplementationType::openBlas> : public VectorOperations<ImplementationType::native>
         {};
 
 #endif // USE_BLAS
-    }
-}
-}
+    } // namespace Internal
+} // namespace math
+} // namespace ell
 
 #include "../tcc/VectorOperations.tcc"

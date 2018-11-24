@@ -16,5 +16,5 @@ namespace data
     {
         dataVector.AddTo(vector);
     }
-}
-}
+} // namespace data
+} // namespace ell

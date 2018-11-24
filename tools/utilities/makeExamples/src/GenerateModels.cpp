@@ -76,7 +76,7 @@ model::Model GenerateBroadcastTimesTwoModel(size_t dimension)
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(dimension);
     auto constantTwoNode = model.AddNode<nodes::ConstantNode<ElementType>>(std::vector<ElementType>(1, 2.0));
     auto nullNode = model.AddNode<nodes::ConstantNode<ElementType>>();
-    model::PortMemoryLayout layout({static_cast<int>(dimension), 1});
+    model::PortMemoryLayout layout({ static_cast<int>(dimension), 1 });
     auto timesNode = model.AddNode<nodes::BroadcastLinearFunctionNode<ElementType>>(inputNode->output, layout, constantTwoNode->output, nullNode->output, 1, layout);
     model.AddNode<model::OutputNode<ElementType>>(timesNode->output);
     return model;

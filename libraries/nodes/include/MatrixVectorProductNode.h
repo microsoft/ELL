@@ -31,52 +31,52 @@ namespace nodes
     template <typename ValueType, math::MatrixLayout layout>
     class MatrixVectorProductNode : public model::Node
     {
-        public:
-            /// @name Input and Output Ports
-            /// @{
-            const model::InputPort<ValueType>& input = _input;
-            const model::OutputPort<ValueType>& output = _output;
-            /// @}
+    public:
+        /// @name Input and Output Ports
+        /// @{
+        const model::InputPort<ValueType>& input = _input;
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
 
-            /// <summary> Default Constructor </summary>
-            MatrixVectorProductNode();
+        /// <summary> Default Constructor </summary>
+        MatrixVectorProductNode();
 
-            /// <summary> Constructor </summary>
-            ///
-            /// <param name="input"> The signal to predict from </param>
-            /// <param name="predictor"> The projection matrix </param>
-            MatrixVectorProductNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& w);
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="input"> The signal to predict from </param>
+        /// <param name="predictor"> The projection matrix </param>
+        MatrixVectorProductNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& w);
 
-            /// <summary> Gets the name of this type (for serialization). </summary>
-            ///
-            /// <returns> The name of this type. </returns>
-            static std::string GetTypeName() { return utilities::GetCompositeTypeName("MatrixVectorProductNode", { utilities::GetTypeName<ValueType>(), std::to_string(int(layout)) }); }
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName("MatrixVectorProductNode", { utilities::GetTypeName<ValueType>(), std::to_string(int(layout)) }); }
 
-            /// <summary> Gets the name of this type (for serialization). </summary>
-            ///
-            /// <returns> The name of this type. </returns>
-            std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-            /// <summary> Refines this node in the model being constructed by the transformer </summary>
-            bool Refine(model::ModelTransformer& transformer) const override;
+        /// <summary> Refines this node in the model being constructed by the transformer </summary>
+        bool Refine(model::ModelTransformer& transformer) const override;
 
-        protected:
-            void Compute() const override;
-            void WriteToArchive(utilities::Archiver& archiver) const override;
-            void ReadFromArchive(utilities::Unarchiver& archiver) override;
-            bool HasState() const override { return true; }
+    protected:
+        void Compute() const override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        bool HasState() const override { return true; }
 
-        private:
-            void Copy(model::ModelTransformer& transformer) const override;
+    private:
+        void Copy(model::ModelTransformer& transformer) const override;
 
-            // Inputs
-            model::InputPort<ValueType> _input;
+        // Inputs
+        model::InputPort<ValueType> _input;
 
-            // Output
-            model::OutputPort<ValueType> _output;
+        // Output
+        model::OutputPort<ValueType> _output;
 
-            // Projection matrix
-            math::Matrix<ValueType, layout> _w;
+        // Projection matrix
+        math::Matrix<ValueType, layout> _w;
     };
 
     /// <summary> Adds a Matrix vector product node to a model transformer. </summary>
@@ -90,7 +90,7 @@ namespace nodes
     /// <returns> The node added to the model. </returns>
     template <typename ValueType, math::MatrixLayout layout>
     MatrixVectorProductNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> w, model::ModelTransformer& transformer);
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/MatrixVectorProductNode.tcc"

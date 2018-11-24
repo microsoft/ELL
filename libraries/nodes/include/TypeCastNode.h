@@ -72,7 +72,7 @@ namespace nodes
         model::InputPort<InputValueType> _input;
         model::OutputPort<OutputValueType> _output;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/TypeCastNode.tcc"

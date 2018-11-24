@@ -99,5 +99,5 @@ namespace nodes
         LagNotificationFunction _lagNotificationFunction;
         std::string _lagNotificationFunctionName;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

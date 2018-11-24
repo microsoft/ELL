@@ -23,7 +23,7 @@ namespace emitters
             auto normalizedTriple = llvm::Triple::normalize(tripleString.empty() ? llvm::sys::getDefaultTargetTriple() : tripleString);
             return llvm::Triple(normalizedTriple);
         }
-    }
+    } // namespace
 
     bool TargetDevice::IsWindows() const
     {
@@ -42,5 +42,5 @@ namespace emitters
         auto tripleObj = GetNormalizedTriple(triple);
         return tripleObj.getOS() == llvm::Triple::MacOSX || tripleObj.getOS() == llvm::Triple::Darwin;
     }
-}
-}
+} // namespace emitters
+} // namespace ell

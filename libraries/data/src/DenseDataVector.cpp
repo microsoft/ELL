@@ -12,32 +12,32 @@ namespace ell
 {
 namespace data
 {
-// float specialization
-template<>
-IDataVector::Type DenseDataVector<float>::GetStaticType()
-{
-    return IDataVector::Type::FloatDataVector;
-}
+    // float specialization
+    template <>
+    IDataVector::Type DenseDataVector<float>::GetStaticType()
+    {
+        return IDataVector::Type::FloatDataVector;
+    }
 
-// double specialization
-template<>
-IDataVector::Type DenseDataVector<double>::GetStaticType()
-{
-    return IDataVector::Type::DoubleDataVector;
-}
+    // double specialization
+    template <>
+    IDataVector::Type DenseDataVector<double>::GetStaticType()
+    {
+        return IDataVector::Type::DoubleDataVector;
+    }
 
-// short specialization
-template<>
-IDataVector::Type DenseDataVector<short>::GetStaticType()
-{
-    return IDataVector::Type::ShortDataVector;
-}
+    // short specialization
+    template <>
+    IDataVector::Type DenseDataVector<short>::GetStaticType()
+    {
+        return IDataVector::Type::ShortDataVector;
+    }
 
-// byte specialization
-template<>
-IDataVector::Type DenseDataVector<char>::GetStaticType()
-{
-    return IDataVector::Type::ByteDataVector;
-}
-}
-}
+    // byte specialization
+    template <>
+    IDataVector::Type DenseDataVector<char>::GetStaticType()
+    {
+        return IDataVector::Type::ByteDataVector;
+    }
+} // namespace data
+} // namespace ell

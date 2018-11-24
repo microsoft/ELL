@@ -33,5 +33,5 @@ namespace utilities
     {
         throw LogicException(LogicExceptionErrors::illegalState, "base type reference could not be matched with a derived type");
     }
-}
-}
+} // namespace utilities
+} // namespace ell

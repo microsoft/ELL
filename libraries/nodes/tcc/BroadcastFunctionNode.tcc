@@ -92,19 +92,25 @@ namespace nodes
     //
 
     template <typename ValueType, typename FunctionType>
-    BroadcastFunctionNode<ValueType, FunctionType>::BroadcastFunctionNode(const std::vector<model::InputPortBase*>& inputs, const std::vector<model::OutputPortBase*>& outputs)
-        : CompilableNode(inputs, outputs), _paddingValue(0)
+    BroadcastFunctionNode<ValueType, FunctionType>::BroadcastFunctionNode(const std::vector<model::InputPortBase*>& inputs, const std::vector<model::OutputPortBase*>& outputs) :
+        CompilableNode(inputs, outputs),
+        _paddingValue(0)
     {
     }
 
     template <typename ValueType, typename FunctionType>
     BroadcastFunctionNode<ValueType, FunctionType>::BroadcastFunctionNode(const std::vector<model::InputPortBase*>& inputs,
-                                                                          const model::PortMemoryLayout& inputLayout, size_t broadcastDimension,
+                                                                          const model::PortMemoryLayout& inputLayout,
+                                                                          size_t broadcastDimension,
                                                                           const std::vector<model::OutputPortBase*>& outputs,
                                                                           const model::PortMemoryLayout& outputLayout,
                                                                           FunctionType function,
-                                                                          ValueType paddingValue)
-        : CompilableNode(inputs, outputs), _inputLayout(inputLayout), _broadcastDimension(broadcastDimension), _function(function), _paddingValue(paddingValue)
+                                                                          ValueType paddingValue) :
+        CompilableNode(inputs, outputs),
+        _inputLayout(inputLayout),
+        _broadcastDimension(broadcastDimension),
+        _function(function),
+        _paddingValue(paddingValue)
     {
     }
 
@@ -264,14 +270,7 @@ namespace nodes
 
     // Note: secondaryValues is passed by non-const reference to avoid copies. It doesn't function as an output parameter.
     template <typename ValueType, typename FunctionType>
-    void BroadcastFunctionNode<ValueType, FunctionType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function,
-                                                                                  size_t dimension,
-                                                                                  emitters::IRLocalScalar begin,
-                                                                                  emitters::IRLocalScalar end,
-                                                                                  emitters::LLVMValue primaryInput, const std::vector<emitters::LLVMValue>& secondaryInputs,
-                                                                                  emitters::LLVMValue output,
-                                                                                  emitters::IRLocalScalar prevInputDimensionOffset, emitters::IRLocalScalar prevOutputDimensionOffset,
-                                                                                  std::vector<emitters::LLVMValue>& secondaryValues) const
+    void BroadcastFunctionNode<ValueType, FunctionType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, emitters::IRLocalScalar begin, emitters::IRLocalScalar end, emitters::LLVMValue primaryInput, const std::vector<emitters::LLVMValue>& secondaryInputs, emitters::LLVMValue output, emitters::IRLocalScalar prevInputDimensionOffset, emitters::IRLocalScalar prevOutputDimensionOffset, std::vector<emitters::LLVMValue>& secondaryValues) const
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
         //       Or, instead of unrolling, vectorizing --- if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
@@ -477,7 +476,7 @@ namespace nodes
         model::PortMemoryLayout outputLayout;
         archiver["outputLayout"] >> outputLayout;
         auto outputs = GetOutputPorts();
-        for(auto p: outputs)
+        for (auto p : outputs)
         {
             p->SetMemoryLayout(outputLayout);
         }
@@ -489,27 +488,24 @@ namespace nodes
     // BroadcastUnaryFunctionNode
     //
     template <typename ValueType, typename FunctionType>
-    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode()
-        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, { &_output }), _primaryInput(this, {}, primaryInputPortName), _output(this, ell::model::Node::defaultOutputPortName, 0)
+    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode() :
+        BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, { &_output }),
+        _primaryInput(this, {}, primaryInputPortName),
+        _output(this, ell::model::Node::defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                                    const model::PortMemoryLayout& outputLayout,
-                                                                                    ValueType paddingValue)
-        : BroadcastUnaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout, outputLayout, FunctionType{}, paddingValue)
+    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, ValueType paddingValue) :
+        BroadcastUnaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout, outputLayout, FunctionType{}, paddingValue)
     {
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                                    const model::PortMemoryLayout& outputLayout,
-                                                                                    FunctionType function,
-                                                                                    ValueType paddingValue)
-        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, inputLayout, 0, { &_output }, outputLayout, function, paddingValue)
-        , _primaryInput(this, primaryInput, primaryInputPortName)
-        , _output(this, ell::model::Node::defaultOutputPortName, outputLayout)
+    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType paddingValue) :
+        BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, inputLayout, 0, { &_output }, outputLayout, function, paddingValue),
+        _primaryInput(this, primaryInput, primaryInputPortName),
+        _output(this, ell::model::Node::defaultOutputPortName, outputLayout)
     {
         // Verify sizes are compatible
         size_t totalInputSize = inputLayout.GetMemorySize();
@@ -572,32 +568,26 @@ namespace nodes
     // BroadcastBinaryFunctionNode
     //
     template <typename ValueType, typename FunctionType>
-    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode()
-        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput }, { &_output }), _primaryInput(this, {}, primaryInputPortName), _secondaryInput(this, {}, secondaryInputPortName), _output(this, ell::model::Node::defaultOutputPortName, 0)
+    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode() :
+        BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput }, { &_output }),
+        _primaryInput(this, {}, primaryInputPortName),
+        _secondaryInput(this, {}, secondaryInputPortName),
+        _output(this, ell::model::Node::defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                                      const model::OutputPort<ValueType>& secondaryInput, size_t dimension,
-                                                                                      const model::PortMemoryLayout& outputLayout,
-                                                                                      ValueType paddingValue)
-        : BroadcastBinaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout,
-                                                               secondaryInput, dimension,
-                                                               outputLayout, FunctionType{}, paddingValue)
+    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout, const model::OutputPort<ValueType>& secondaryInput, size_t dimension, const model::PortMemoryLayout& outputLayout, ValueType paddingValue) :
+        BroadcastBinaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout, secondaryInput, dimension, outputLayout, FunctionType{}, paddingValue)
     {
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                                      const model::OutputPort<ValueType>& secondaryInput, size_t dimension,
-                                                                                      const model::PortMemoryLayout& outputLayout,
-                                                                                      FunctionType function, ValueType paddingValue)
-        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput }, inputLayout, dimension,
-                                                         { &_output }, outputLayout, function, paddingValue)
-        , _primaryInput(this, primaryInput, primaryInputPortName)
-        , _secondaryInput(this, secondaryInput, secondaryInputPortName)
-        , _output(this, ell::model::Node::defaultOutputPortName, outputLayout)
+    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout, const model::OutputPort<ValueType>& secondaryInput, size_t dimension, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType paddingValue) :
+        BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput }, inputLayout, dimension, { &_output }, outputLayout, function, paddingValue),
+        _primaryInput(this, primaryInput, primaryInputPortName),
+        _secondaryInput(this, secondaryInput, secondaryInputPortName),
+        _output(this, ell::model::Node::defaultOutputPortName, outputLayout)
     {
         // Verify sizes are compatible
         size_t totalInputSize = inputLayout.GetMemorySize();
@@ -653,34 +643,28 @@ namespace nodes
     // BroadcastTernaryFunctionNode
     //
     template <typename ValueType, typename FunctionType>
-    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode()
-        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput1, &_secondaryInput2 }, { &_output }), _primaryInput(this, {}, primaryInputPortName), _secondaryInput1(this, {}, secondaryInput1PortName), _secondaryInput2(this, {}, secondaryInput2PortName), _output(this, ell::model::Node::defaultOutputPortName, 0)
+    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode() :
+        BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput1, &_secondaryInput2 }, { &_output }),
+        _primaryInput(this, {}, primaryInputPortName),
+        _secondaryInput1(this, {}, secondaryInput1PortName),
+        _secondaryInput2(this, {}, secondaryInput2PortName),
+        _output(this, ell::model::Node::defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                                        const model::OutputPort<ValueType>& secondaryInput1, const model::OutputPort<ValueType>& secondaryInput2, size_t dimension,
-                                                                                        const model::PortMemoryLayout& outputLayout,
-                                                                                        ValueType paddingValue)
-        : BroadcastTernaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout,
-                                                                secondaryInput1, secondaryInput2, dimension,
-                                                                outputLayout, FunctionType{}, paddingValue)
+    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout, const model::OutputPort<ValueType>& secondaryInput1, const model::OutputPort<ValueType>& secondaryInput2, size_t dimension, const model::PortMemoryLayout& outputLayout, ValueType paddingValue) :
+        BroadcastTernaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout, secondaryInput1, secondaryInput2, dimension, outputLayout, FunctionType{}, paddingValue)
     {
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                                        const model::OutputPort<ValueType>& secondaryInput1, const model::OutputPort<ValueType>& secondaryInput2, size_t dimension,
-                                                                                        const model::PortMemoryLayout& outputLayout,
-                                                                                        FunctionType function,
-                                                                                        ValueType paddingValue)
-        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput1, &_secondaryInput2 }, inputLayout, dimension,
-                                                         { &_output }, outputLayout, function, paddingValue)
-        , _primaryInput(this, primaryInput, primaryInputPortName)
-        , _secondaryInput1(this, secondaryInput1, secondaryInput1PortName)
-        , _secondaryInput2(this, secondaryInput2, secondaryInput2PortName)
-        , _output(this, ell::model::Node::defaultOutputPortName, outputLayout)
+    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout, const model::OutputPort<ValueType>& secondaryInput1, const model::OutputPort<ValueType>& secondaryInput2, size_t dimension, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType paddingValue) :
+        BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput1, &_secondaryInput2 }, inputLayout, dimension, { &_output }, outputLayout, function, paddingValue),
+        _primaryInput(this, primaryInput, primaryInputPortName),
+        _secondaryInput1(this, secondaryInput1, secondaryInput1PortName),
+        _secondaryInput2(this, secondaryInput2, secondaryInput2PortName),
+        _output(this, ell::model::Node::defaultOutputPortName, outputLayout)
     {
         // Verify sizes are compatible
         size_t totalInputSize = inputLayout.GetMemorySize();
@@ -758,19 +742,14 @@ namespace nodes
     // BroadcastLinearFunctionNode
     //
     template <typename ValueType>
-    BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode()
-        : BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>()
+    BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode() :
+        BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>()
     {
     }
 
     template <typename ValueType>
-    BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
-                                                                        const model::OutputPort<ValueType>& scaleInput, const model::OutputPort<ValueType>& biasInput, size_t dimension,
-                                                                        const model::PortMemoryLayout& outputLayout,
-                                                                        ValueType paddingValue)
-        : BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>(primaryInput, inputLayout,
-                                                                                      scaleInput, biasInput, dimension,
-                                                                                      outputLayout, paddingValue)
+    BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout, const model::OutputPort<ValueType>& scaleInput, const model::OutputPort<ValueType>& biasInput, size_t dimension, const model::PortMemoryLayout& outputLayout, ValueType paddingValue) :
+        BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>(primaryInput, inputLayout, scaleInput, biasInput, dimension, outputLayout, paddingValue)
     {
     }
 
@@ -789,5 +768,5 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

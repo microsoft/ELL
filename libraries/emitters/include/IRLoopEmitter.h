@@ -145,5 +145,5 @@ namespace emitters
         llvm::BasicBlock* _pBodyBlock = nullptr; // The body of the loop
         llvm::BasicBlock* _pAfterBlock = nullptr; // When the loop is done, we branch to this block
     };
-}
-}
+} // namespace emitters
+} // namespace ell

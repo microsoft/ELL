@@ -59,7 +59,7 @@ namespace utilities
     /// <returns> A ParallelTransformIterator over the input sequence using the specified transform function</returns>
     template <typename InputIteratorType, typename FuncType>
     auto MakeParallelTransformIterator(InputIteratorType& inIterator, FuncType transformFunction) -> ParallelTransformIterator<InputIteratorType, decltype(transformFunction(inIterator.Get())), FuncType>;
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/ParallelTransformIterator.tcc"

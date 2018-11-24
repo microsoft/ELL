@@ -43,5 +43,5 @@ namespace model
     /// <param name="layout"> The layout of the memory </param>
     /// <returns> A value representing `true` if the location is out of bounds </returns>
     emitters::IRLocalScalar EmitIsOutOfBounds(emitters::IRFunctionEmitter& function, const std::vector<emitters::IRLocalScalar>& physicalCoordinates, const PortMemoryLayout& layout);
-}
-}
+} // namespace model
+} // namespace ell

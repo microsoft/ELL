@@ -23,7 +23,7 @@ namespace utilities
         {
             return std::array<int, N>{ I... };
         }
-    }
+    } // namespace detail
 
     /// <summary> Returns a compile-time array of N integers, filled with values 0 .. N-1 </summary>
     ///
@@ -33,5 +33,5 @@ namespace utilities
     {
         return detail::MakeNArrayImpl<N>(std::make_index_sequence<N>{});
     }
-}
-}
+} // namespace utilities
+} // namespace ell

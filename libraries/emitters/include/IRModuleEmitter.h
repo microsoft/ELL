@@ -25,12 +25,12 @@
 #include <llvm/IR/DataLayout.h>
 #include <llvm/IR/GlobalVariable.h>
 #include <llvm/IR/Intrinsics.h>
-#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/PassManager.h>
-#include <llvm/Target/TargetMachine.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/Target/TargetMachine.h>
 
 // stl
 #include <initializer_list>
@@ -242,7 +242,7 @@ namespace emitters
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
         llvm::GlobalVariable* Global(LLVMType pType, const std::string& name);
 
-         /// <summary> Emit a named global variable of a template type. </summary>
+        /// <summary> Emit a named global variable of a template type. </summary>
         ///
         /// <typeparam name="ValueType"> The variable type. </typeparam>
         /// <param name="name"> The name of the variable. </param>
@@ -643,7 +643,6 @@ namespace emitters
     protected:
         void SetCompilerOptions(const CompilerOptions& parameters) override;
 
-
     private:
         friend class IRFunctionEmitter;
 
@@ -763,7 +762,7 @@ namespace emitters
 
     /// <summary> Convenience function for creating an `IRModuleEmitter` with the default compiler parameters, set up for the host environment </summary>
     IRModuleEmitter MakeHostModuleEmitter(const std::string moduleName);
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/IRModuleEmitter.tcc"

@@ -52,7 +52,7 @@ namespace emitters
     /// <returns> The sum of the elements in the given vector </returns>
     template <typename ValueType>
     LLVMValue HorizontalVectorSum(IRFunctionEmitter& function, LLVMValue vectorValue);
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/IRVectorUtilities.tcc"

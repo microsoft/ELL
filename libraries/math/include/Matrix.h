@@ -201,9 +201,9 @@ namespace math
         /// <param name="pData"> Pointer to the underlying memory that contains the tensor data. </param>
         /// <param name="numRows"> Number of matrix rows. </param>
         /// <param name="numColumns"> Number of matrix columns. </param>
-        /// <param name="increment"> The matrix increment. </param> 
+        /// <param name="increment"> The matrix increment. </param>
         ConstMatrixReference(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
-        
+
         /// \name Accessor Functions
         /// @{
 
@@ -648,7 +648,7 @@ namespace math
 
     template <typename ElementType>
     using ConstRowMatrixReference = ConstMatrixReference<ElementType, MatrixLayout::rowMajor>;
-}
-}
+} // namespace math
+} // namespace ell
 
 #include "../tcc/Matrix.tcc"

@@ -15,9 +15,9 @@
 
 // model
 #include "IRMapCompiler.h"
+#include "LSTMNode.h"
 #include "ModelTransformer.h"
 #include "PortElements.h"
-#include "LSTMNode.h"
 
 // stl
 #include <string>
@@ -50,15 +50,15 @@ namespace nodes
         /// <param name="recurrentActivation"> The recurrent activation function. </param>
         /// <param name="validateWeights"> Whether to check the size of the weights. </param>
         GRUNode(const model::OutputPort<ValueType>& input,
-                    const model::OutputPort<int>& resetTrigger,
-                    size_t hiddenUnits,
-                    const model::OutputPort<ValueType>& inputWeights,
-                    const model::OutputPort<ValueType>& hiddenWeights,
-                    const model::OutputPort<ValueType>& inputBias,
-                    const model::OutputPort<ValueType>& hiddenBias,
-                    const ActivationType& activation,
-                    const ActivationType& recurrentActivation,
-                    bool validateWeights = true);
+                const model::OutputPort<int>& resetTrigger,
+                size_t hiddenUnits,
+                const model::OutputPort<ValueType>& inputWeights,
+                const model::OutputPort<ValueType>& hiddenWeights,
+                const model::OutputPort<ValueType>& inputBias,
+                const model::OutputPort<ValueType>& hiddenBias,
+                const ActivationType& activation,
+                const ActivationType& recurrentActivation,
+                bool validateWeights = true);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -83,5 +83,5 @@ namespace nodes
 
         using VectorType = math::ColumnVector<ValueType>;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

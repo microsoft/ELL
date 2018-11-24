@@ -9,4 +9,3 @@
 #pragma once
 
 void TestNeuralNetworkLayerNodes();
-

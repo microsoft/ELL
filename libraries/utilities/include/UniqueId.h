@@ -77,8 +77,8 @@ namespace utilities
     };
 
     std::string to_string(const UniqueId& id);
-}
-}
+} // namespace utilities
+} // namespace ell
 
 // custom specialization of std::hash so we can keep UniqueIds in containers that require hashable types
 namespace std
@@ -95,4 +95,4 @@ struct hash<ell::utilities::UniqueId>
     /// <returns> A hash value for the given input. </returns>
     result_type operator()(const argument_type& id) const;
 };
-}
+} // namespace std

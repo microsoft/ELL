@@ -24,7 +24,7 @@ namespace model
     {
     public:
         virtual ~OptimizationPass();
-        
+
         /// <summary> Perform any pre-optimization initialization required by the pass. </summary>
         /// This method is always called before the optimization pass is started.
         ///
@@ -71,5 +71,5 @@ namespace model
         /// <param name="context"> The optimization context object for this run of the optimizer. </param>
         Model Run(const Model& model, const MapCompilerOptions& settings, ModelOptimizerContext& context) const final;
     };
-}
-}
+} // namespace model
+} // namespace ell

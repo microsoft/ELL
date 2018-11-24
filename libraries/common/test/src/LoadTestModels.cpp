@@ -187,5 +187,5 @@ namespace common
             throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound);
         }
     }
-}
-}
+} // namespace common
+} // namespace ell

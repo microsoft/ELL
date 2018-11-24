@@ -19,7 +19,7 @@ namespace functions
         /// <summary> Gets the smoothness of this loss, which is the Lipschitz coefficient of the gradient. </summary>
         ///
         /// <returns> The smoothness coefficient. </returns>
-        double GetSmoothness() const { return 1.0/_inverseSmoothness; }
+        double GetSmoothness() const { return 1.0 / _inverseSmoothness; }
 
         /// <summary> Returns the value of the loss at a given point. </summary>
         ///
@@ -58,7 +58,7 @@ namespace functions
         double ConjugateProx(double sigma, double dual, double label) const;
 
     private:
-        double _inverseSmoothness = 1.0;      // _inverseSmoothness=0 reduces to the standard hinge loss. Must be nonnegative. The bigger, the smoother.
+        double _inverseSmoothness = 1.0; // _inverseSmoothness=0 reduces to the standard hinge loss. Must be nonnegative. The bigger, the smoother.
     };
-}
-}
+} // namespace functions
+} // namespace ell

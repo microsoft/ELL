@@ -10,9 +10,9 @@
 #include "Variant_test.h"
 
 // utilities
+#include "JsonArchiver.h"
 #include "TypeName.h"
 #include "Variant.h"
-#include "JsonArchiver.h"
 
 // testing
 #include "testing.h"
@@ -201,4 +201,4 @@ void TestVariantArchive()
     // unarchiver >> variant2;
 }
 
-} // end namespace
+} // namespace ell

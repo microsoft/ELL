@@ -6,9 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "MatrixOperations.h"
 #include "Vector.h"
 #include "VectorOperations.h"
-#include "MatrixOperations.h"
 
 // stl
 #include <chrono>
@@ -18,10 +18,9 @@
 // utilities
 #include "RandomEngines.h"
 
-
 using namespace ell;
 
-template<typename Function>
+template <typename Function>
 double GetTime(Function function, size_t repetitions)
 {
     // warm up
@@ -42,10 +41,10 @@ double GetTime(Function function, size_t repetitions)
 
 void PrintLine(std::string functionName, double native, double singleBlas, double multiBlas)
 {
-    std::cout << functionName 
-        <<"\tnative:1.0\tsingleBlas:" << singleBlas / native
-        <<"\tmultiBlas:" << multiBlas / native
-        << std::endl;
+    std::cout << functionName
+              << "\tnative:1.0\tsingleBlas:" << singleBlas / native
+              << "\tmultiBlas:" << multiBlas / native
+              << std::endl;
 }
 
 template <typename ElementType, typename VectorAType, math::VectorOrientation orientation>
@@ -61,7 +60,7 @@ void ProfileVectorScaleAddWorker(ElementType scalarA, VectorAType vectorA, Eleme
     PrintLine("ScaleAddUpdate" + type + "(" + description + ", vector)", native, singleBlas, multiBlas);
 }
 
-template<typename ElementType>
+template <typename ElementType>
 void ProfileVectorScaleAdd(size_t size, size_t repetitions, std::string seed)
 {
     auto engine = utilities::GetRandomEngine(seed);
@@ -166,7 +165,7 @@ void ProfileMatrixVectorMultiplyScaleAddUpdate(size_t numRows, size_t numColumns
     std::string vector1 = "Vector" + type + "[" + std::to_string(numColumns) + "]";
     std::string vector2 = "Vector" + type + "[" + std::to_string(numRows) + "]";
     std::string matrix = "Matrix" + type + "[" + std::to_string(numRows) + ", " + std::to_string(numColumns) + "]";
-    std::string functionName = "MultiplyScaleAddUpdate(scalar, " + matrix + ", " + vector1 + ", scalar, " +vector2 + ")";
+    std::string functionName = "MultiplyScaleAddUpdate(scalar, " + matrix + ", " + vector1 + ", scalar, " + vector2 + ")";
     PrintLine(functionName, native, singleBlas, multiBlas);
 }
 

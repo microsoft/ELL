@@ -98,8 +98,8 @@ namespace model
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        PortElement(const OutputPortBase& port, size_t index)
-            : PortElementBase(port, index) {}
+        PortElement(const OutputPortBase& port, size_t index) :
+            PortElementBase(port, index) {}
 
         /// <summary> The port this element refers to </summary>
         ///
@@ -322,7 +322,7 @@ namespace model
         ///
         /// <returns> true if empty </returns>
         bool IsEmpty() const { return _ranges.empty(); }
-        
+
         /// <summary> Gets a vector of range objects </summary>
         ///
         /// <returns> A std::vector of PortRange objects </returns>
@@ -621,8 +621,8 @@ namespace model
 
     template <typename ValueType>
     PortElements<ValueType> ProxyToPortElements(const Model& model, const PortElementsProxy& proxy);
-}
-}
+} // namespace model
+} // namespace ell
 
 //
 // Custom specialization of std::hash so we can keep PortRanges in containers that require hashable types
@@ -646,7 +646,7 @@ template <>
 struct hash<ell::model::PortRange>
 {
     using argument_type = ell::model::PortRange;
-    using result_type = std::size_t ;
+    using result_type = std::size_t;
 
     /// <summary> Computes a hash of the input value. </summary>
     ///
@@ -658,13 +658,13 @@ template <>
 struct hash<ell::model::PortElementsBase>
 {
     using argument_type = ell::model::PortElementsBase;
-    using result_type = std::size_t ;
+    using result_type = std::size_t;
 
     /// <summary> Computes a hash of the input value. </summary>
     ///
     /// <returns> A hash value for the given input. </returns>
     result_type operator()(const argument_type& id) const;
 };
-}
+} // namespace std
 
 #include "../tcc/PortElements.tcc"

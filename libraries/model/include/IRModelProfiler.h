@@ -43,7 +43,7 @@ namespace emitters
 {
     class IRFunctionEmitter;
     class IRModuleEmitter;
-}
+} // namespace emitters
 
 namespace model
 {
@@ -226,5 +226,5 @@ namespace model
         // Aggregate performance counter emitters for node types
         std::map<std::string, NodePerformanceEmitter> _nodeTypePerformanceCounters;
     };
-}
-}
+} // namespace model
+} // namespace ell

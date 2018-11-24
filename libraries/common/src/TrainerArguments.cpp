@@ -33,8 +33,8 @@ namespace common
             "lossFunction",
             "lf",
             "Choice of loss function",
-            { { "squared", LossFunctionArguments::LossFunction::squared }, { "hinge", LossFunctionArguments::LossFunction::hinge }, { "log", LossFunctionArguments::LossFunction::log }, {"smoothHinge", LossFunctionArguments::LossFunction::smoothHinge} },
+            { { "squared", LossFunctionArguments::LossFunction::squared }, { "hinge", LossFunctionArguments::LossFunction::hinge }, { "log", LossFunctionArguments::LossFunction::log }, { "smoothHinge", LossFunctionArguments::LossFunction::smoothHinge } },
             "squared");
     }
-}
-}
+} // namespace common
+} // namespace ell

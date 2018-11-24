@@ -24,8 +24,10 @@ namespace nodes
     //
 
     template <typename ValueType>
-    DiagonalConvolutionNode<ValueType>::DiagonalConvolutionNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+    DiagonalConvolutionNode<ValueType>::DiagonalConvolutionNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
@@ -34,8 +36,13 @@ namespace nodes
                                                                 const model::PortMemoryLayout& inputMemoryLayout,
                                                                 const model::PortMemoryLayout& outputMemoryLayout,
                                                                 const ConstTensorReferenceType& filterWeights,
-                                                                int stride)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterWeights(filterWeights), _stride(stride)
+                                                                int stride) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, outputMemoryLayout),
+        _inputMemoryLayout(inputMemoryLayout),
+        _filterWeights(filterWeights),
+        _stride(stride)
     {
     }
 
@@ -160,8 +167,11 @@ namespace nodes
     //
 
     template <typename ValueType>
-    DiagonalConvolutionComputeNode<ValueType>::DiagonalConvolutionComputeNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _filterWeights(this, {}, filterWeightsPortName), _output(this, defaultOutputPortName, 0)
+    DiagonalConvolutionComputeNode<ValueType>::DiagonalConvolutionComputeNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _filterWeights(this, {}, filterWeightsPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
@@ -171,8 +181,14 @@ namespace nodes
                                                                               const model::PortMemoryLayout& inputMemoryLayout,
                                                                               const model::PortMemoryLayout& outputMemoryLayout,
                                                                               int filterSize,
-                                                                              int stride)
-        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterSize(filterSize), _stride(stride)
+                                                                              int stride) :
+        CompilableNode({ &_input, &_filterWeights }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _filterWeights(this, filterWeights, filterWeightsPortName),
+        _output(this, defaultOutputPortName, outputMemoryLayout),
+        _inputMemoryLayout(inputMemoryLayout),
+        _filterSize(filterSize),
+        _stride(stride)
     {
         const int numFilters = outputMemoryLayout.GetActiveSize(2);
         _batchSize = numFilters;
@@ -339,7 +355,7 @@ namespace nodes
                                     sum = sum + diagonalValue;
                             }
 
-                            outputTensor({startRow, outputColumn, filterIndex}) = sum;
+                            outputTensor({ startRow, outputColumn, filterIndex }) = sum;
                         });
                     });
                 });
@@ -350,5 +366,5 @@ namespace nodes
     // Explicit specializations
     template class DiagonalConvolutionNode<float>;
     template class DiagonalConvolutionNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

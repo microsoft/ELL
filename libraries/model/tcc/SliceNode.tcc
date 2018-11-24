@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "Model.h"
 #include "IRMapCompiler.h"
+#include "Model.h"
 #include "ModelTransformer.h"
 
 namespace ell
@@ -17,12 +17,18 @@ namespace ell
 namespace model
 {
     template <typename ValueType>
-    SliceNode<ValueType>::SliceNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0) {};
+    SliceNode<ValueType>::SliceNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0){};
 
     template <typename ValueType>
-    SliceNode<ValueType>::SliceNode(const OutputPortBase& port, int start, int count)
-        : CompilableNode({ &_input }, { &_output }), _input(this, static_cast<const OutputPort<ValueType>&>(port), defaultInputPortName), _output(this, defaultOutputPortName, port.GetMemoryLayout()), _largestDimensionStart(start), _largestDimensionCount(count)
+    SliceNode<ValueType>::SliceNode(const OutputPortBase& port, int start, int count) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, static_cast<const OutputPort<ValueType>&>(port), defaultInputPortName),
+        _output(this, defaultOutputPortName, port.GetMemoryLayout()),
+        _largestDimensionStart(start),
+        _largestDimensionCount(count)
     {
         auto layout = port.GetMemoryLayout();
         if (layout.HasPadding())
@@ -53,7 +59,7 @@ namespace model
 
         auto input = function.LocalArray(compiler.EnsurePortEmitted(_input));
         auto output = function.LocalArray(compiler.EnsurePortEmitted(_output));
-        
+
         auto layout = _input.GetReferencedPort().GetMemoryLayout();
         const auto increment = layout.GetCumulativeIncrement(0); // slowest-moving dimension
         const auto inputOffset = static_cast<int>(_largestDimensionStart * increment);
@@ -92,5 +98,5 @@ namespace model
         archiver["layout"] >> layout;
         _output.SetMemoryLayout(layout);
     }
-}
-}
+} // namespace model
+} // namespace ell

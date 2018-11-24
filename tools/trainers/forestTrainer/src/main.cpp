@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         trainer->SetDataset(mappedDataset.GetAnyDataset());
-        
+
         for (size_t epoch = 0; epoch < trainerArguments.numEpochs; ++epoch)
         {
             trainer->Update();

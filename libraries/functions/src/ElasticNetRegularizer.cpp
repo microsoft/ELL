@@ -15,13 +15,14 @@ namespace ell
 {
 namespace functions
 {
-    ElasticNetRegularizer::ElasticNetRegularizer(double ratioL1L2) : _ratioL1L2(ratioL1L2)
+    ElasticNetRegularizer::ElasticNetRegularizer(double ratioL1L2) :
+        _ratioL1L2(ratioL1L2)
     {
     }
 
     double ElasticNetRegularizer::operator()(math::ConstColumnVectorReference<double> v, double b) const
     {
-        return 0.5 * (v.Norm2Squared() + b*b) + _ratioL1L2 * (v.Norm1() + std::abs(b));
+        return 0.5 * (v.Norm2Squared() + b * b) + _ratioL1L2 * (v.Norm1() + std::abs(b));
     }
 
     double ElasticNetRegularizer::Conjugate(math::ConstColumnVectorReference<double> v, double d) const
@@ -56,7 +57,7 @@ namespace functions
             if (w > 0)
             {
                 dot += v[j] * w;
-                norm2Squared += w*w;
+                norm2Squared += w * w;
                 norm1 += w;
                 continue;
             }
@@ -65,7 +66,7 @@ namespace functions
             if (w < 0)
             {
                 dot += v[j] * w;
-                norm2Squared += w*w;
+                norm2Squared += w * w;
                 norm1 -= w;
             }
         }
@@ -107,5 +108,5 @@ namespace functions
             }
         }
     }
-}
-}
+} // namespace functions
+} // namespace ell

@@ -432,7 +432,7 @@ namespace data
     /// <returns> The transformed data vector. </returns>
     template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
     static ReturnType TransformAs(const DataVectorType& vector, TransformationType transformation);
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/DataVector.tcc"

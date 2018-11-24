@@ -75,7 +75,7 @@ namespace nodes
         mutable std::vector<ValueType> _runningSquaredSum;
         size_t _windowSize;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/MovingVarianceNode.tcc"

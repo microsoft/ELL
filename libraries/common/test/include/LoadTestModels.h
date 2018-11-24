@@ -26,5 +26,5 @@ namespace common
     /// <param name="name"> The name of built in test model. </param>
     /// <returns> The loaded test model. </returns>
     model::Model LoadTestModel(const std::string& name);
-}
-}
+} // namespace common
+} // namespace ell

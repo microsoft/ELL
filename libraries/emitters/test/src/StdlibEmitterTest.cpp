@@ -27,8 +27,8 @@
 using namespace ell;
 using namespace ell::emitters;
 
-using Int64CharPointerFunction = char*(*)(int64_t);
-using VoidCharPointerFunction = void(*)(char*);
+using Int64CharPointerFunction = char* (*)(int64_t);
+using VoidCharPointerFunction = void (*)(char*);
 //
 // Malloc
 //
@@ -70,5 +70,4 @@ void TestIRMallocFunction()
     compiledFreeFunction(block);
 
     // TBD: Note if I call 'free(block)' it crashes... not sure why
-
 }

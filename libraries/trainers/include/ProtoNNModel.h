@@ -10,8 +10,8 @@
 
 // stl
 #include <cstddef>
-#include <memory>
 #include <map>
+#include <memory>
 
 #include "Matrix.h"
 
@@ -20,7 +20,11 @@ namespace ell
 namespace trainers
 {
 #if !defined(SWIG)
-    enum class ProtoNNLossFunction { L2, L4 };
+    enum class ProtoNNLossFunction
+    {
+        L2,
+        L4
+    };
 #endif
 
     /// <summary> Parameters for the ProtoNN trainer. </summary>
@@ -67,6 +71,5 @@ namespace trainers
         bool verbose;
     };
 
-}
-}
-
+} // namespace trainers
+} // namespace ell

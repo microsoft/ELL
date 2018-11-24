@@ -21,8 +21,8 @@ namespace ell
 {
 namespace emitters
 {
-    IRPosixRuntime::IRPosixRuntime(IRModuleEmitter& module)
-        : _module(module)
+    IRPosixRuntime::IRPosixRuntime(IRModuleEmitter& module) :
+        _module(module)
     {
     }
 
@@ -138,8 +138,8 @@ namespace emitters
                 // %union.pthread_mutex_t = type { %"struct.(anonymous union)::__pthread_mutex_s" }
                 // %"struct.(anonymous union)::__pthread_mutex_s" = type { i32, i32, i32, i32, i32, i16, i16, %struct.__pthread_internal_list }
                 // %struct.__pthread_internal_list = type { %struct.__pthread_internal_list*, %struct.__pthread_internal_list* }
-                auto internalListType = _module.GetAnonymousStructType({GetPointerSizedIntType(), GetPointerSizedIntType()});
-                return _module.GetOrCreateStruct("pthread_mutex_t", {int32Type, int32Type, int32Type, int32Type, int32Type, int16Type, int16Type, internalListType});
+                auto internalListType = _module.GetAnonymousStructType({ GetPointerSizedIntType(), GetPointerSizedIntType() });
+                return _module.GetOrCreateStruct("pthread_mutex_t", { int32Type, int32Type, int32Type, int32Type, int32Type, int16Type, int16Type, internalListType });
             }
             else
             {
@@ -192,7 +192,7 @@ namespace emitters
                 // Linux 64-bit generic
                 // %union.pthread_cond_t = type { %struct.anon }
                 // % struct.anon = type { i32, i32, i64, i64, i64, i8*, i32, i32 }
-                return _module.GetOrCreateStruct("pthread_cond_t", {int32Type, int32Type, int64Type, int64Type, int64Type, int8PtrType, int32Type, int32Type});
+                return _module.GetOrCreateStruct("pthread_cond_t", { int32Type, int32Type, int64Type, int64Type, int64Type, int8PtrType, int32Type, int32Type });
             }
             else
             {
@@ -272,9 +272,9 @@ namespace emitters
         auto pthreadPtrType = GetPthreadType()->getPointerTo();
         auto threadFunctionType = llvm::FunctionType::get(int8PtrType, { int8PtrType }, false);
         std::vector<LLVMType> args = { pthreadPtrType,
-                                          int8PtrType,
-                                          static_cast<LLVMType>(threadFunctionType)->getPointerTo(),
-                                          int8PtrType };
+                                       int8PtrType,
+                                       static_cast<LLVMType>(threadFunctionType)->getPointerTo(),
+                                       int8PtrType };
         auto functionType = llvm::FunctionType::get(intType, args, false);
         return static_cast<LLVMFunction>(_module.GetLLVMModule()->getOrInsertFunction("pthread_create", functionType));
     }
@@ -500,5 +500,5 @@ namespace emitters
     }
 
     // Signature: int pthread_once(pthread_once_t * once_init, void (*init_routine)(void)));
-}
-}
+} // namespace emitters
+} // namespace ell

@@ -13,7 +13,7 @@ namespace ell
 {
 namespace trainers
 {
-    template<data::IterationPolicy policy, typename TransformationType>
+    template <data::IterationPolicy policy, typename TransformationType>
     math::RowVector<double> CalculateTransformedMean(const data::AnyDataset& anyDataset, TransformationType transformation)
     {
         // get example iterator
@@ -35,21 +35,21 @@ namespace trainers
         }
 
         double scale = 1.0 / count;
-        result.Transform([scale](double x) {return scale*x; });
+        result.Transform([scale](double x) { return scale * x; });
 
         return result;
     }
 
-    template<typename TransformationType>
+    template <typename TransformationType>
     math::RowVector<double> CalculateSparseTransformedMean(const data::AnyDataset& anyDataset, TransformationType transformation)
     {
         return CalculateTransformedMean<data::IterationPolicy::skipZeros>(anyDataset, transformation);
     }
 
-    template<typename TransformationType>
+    template <typename TransformationType>
     math::RowVector<double> CalculateDenseTransformedMean(const data::AnyDataset& anyDataset, TransformationType transformation)
     {
         return CalculateTransformedMean<data::IterationPolicy::all>(anyDataset, transformation);
     }
-}
-}
+} // namespace trainers
+} // namespace ell

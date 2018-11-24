@@ -16,7 +16,9 @@ namespace utilities
     //
     // KeyValue
     //
-    PropertyBag::KeyValue::KeyValue(const std::string& key, const Variant& value) : key(key), value(value)
+    PropertyBag::KeyValue::KeyValue(const std::string& key, const Variant& value) :
+        key(key),
+        value(value)
     {
     }
 
@@ -42,13 +44,13 @@ namespace utilities
 
     bool PropertyBag::IsEmpty() const
     {
-        if(_metadata.empty())
+        if (_metadata.empty())
         {
             return true;
         }
-        for(const auto& keyValue: _metadata)
+        for (const auto& keyValue : _metadata)
         {
-            if(!keyValue.second.IsEmpty())
+            if (!keyValue.second.IsEmpty())
             {
                 return false;
             }
@@ -60,11 +62,11 @@ namespace utilities
     {
         Variant result;
         auto keyIter = _metadata.find(key);
-        if(keyIter != _metadata.end())
+        if (keyIter != _metadata.end())
         {
             result = keyIter->second;
             _metadata.erase(keyIter);
-        }        
+        }
         return result;
     }
 
@@ -77,7 +79,7 @@ namespace utilities
     void PropertyBag::WriteToArchive(Archiver& archiver) const
     {
         std::vector<KeyValue> keyValuePairs;
-        for(const auto& pair: _metadata)
+        for (const auto& pair : _metadata)
         {
             keyValuePairs.emplace_back(pair.first, pair.second);
         }
@@ -89,7 +91,7 @@ namespace utilities
         _metadata.clear();
         std::vector<KeyValue> keyValuePairs;
         archiver["data"] >> keyValuePairs;
-        for(const auto& pair: keyValuePairs)
+        for (const auto& pair : keyValuePairs)
         {
             _metadata[pair.key] = pair.value;
         }
@@ -108,6 +110,5 @@ namespace utilities
         return result;
     }
 
-}
-}
-
+} // namespace utilities
+} // namespace ell

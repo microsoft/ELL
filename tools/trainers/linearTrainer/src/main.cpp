@@ -68,7 +68,6 @@ model::Map AppendTrainedLinearPredictorToMap(const predictors::LinearPredictor<E
     return outputMap;
 }
 
-
 int main(int argc, char* argv[])
 {
     try
@@ -108,7 +107,7 @@ int main(int argc, char* argv[])
         // load map
         mapLoadArguments.defaultInputSize = dataLoadArguments.parsedDataDimension;
         model::Map map;
-        
+
         if (mapLoadArguments.HasInputFilename())
         {
             map = common::LoadMap(mapLoadArguments);
@@ -118,7 +117,7 @@ int main(int argc, char* argv[])
             model::Model model;
             auto input = model.AddNode<model::InputNode<float>>(dataLoadArguments.parsedDataDimension);
             auto output = model.AddNode<model::OutputNode<float>>(input->output);
-            map = model::Map(model, {{"input", input}}, {{"output", output->output}});
+            map = model::Map(model, { { "input", input } }, { { "output", output->output } });
         }
 
         // load dataset
@@ -135,7 +134,7 @@ int main(int argc, char* argv[])
 
             // find inverse absolute mean
             auto scaleVector = trainers::CalculateSparseTransformedMean(mappedDataset.GetAnyDataset(), [](data::IndexValue x) { return std::abs(x.value); });
-            scaleVector.Transform([](double x) {return x > 0.0 ? 1.0 / x : 0.0; });
+            scaleVector.Transform([](double x) { return x > 0.0 ? 1.0 / x : 0.0; });
 
             // create normalizer
             auto coordinateTransformation = [&](data::IndexValue x) { return x.value * scaleVector[x.index]; };
@@ -161,16 +160,16 @@ int main(int argc, char* argv[])
             trainer = common::MakeSparseDataSGDTrainer(trainerArguments.lossFunctionArguments, { linearTrainerArguments.regularization, linearTrainerArguments.randomSeedString });
             break;
         case LinearTrainerArguments::Algorithm::SparseDataCenteredSGD:
-            {
-                auto mean = trainers::CalculateMean(mappedDataset.GetAnyDataset());
-                trainer = common::MakeSparseDataCenteredSGDTrainer(trainerArguments.lossFunctionArguments, mean, { linearTrainerArguments.regularization, linearTrainerArguments.randomSeedString });
-                break;
-            }
+        {
+            auto mean = trainers::CalculateMean(mappedDataset.GetAnyDataset());
+            trainer = common::MakeSparseDataCenteredSGDTrainer(trainerArguments.lossFunctionArguments, mean, { linearTrainerArguments.regularization, linearTrainerArguments.randomSeedString });
+            break;
+        }
         case LinearTrainerArguments::Algorithm::SDCA:
-            {
-                trainer = common::MakeSDCATrainer(trainerArguments.lossFunctionArguments, { linearTrainerArguments.regularization, linearTrainerArguments.desiredPrecision, linearTrainerArguments.maxEpochs, linearTrainerArguments.permute, linearTrainerArguments.randomSeedString });
-                break;
-            }
+        {
+            trainer = common::MakeSDCATrainer(trainerArguments.lossFunctionArguments, { linearTrainerArguments.regularization, linearTrainerArguments.desiredPrecision, linearTrainerArguments.maxEpochs, linearTrainerArguments.permute, linearTrainerArguments.randomSeedString });
+            break;
+        }
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized algorithm type");
         }
@@ -181,13 +180,13 @@ int main(int argc, char* argv[])
         // Train the predictor
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         trainer->SetDataset(mappedDataset.GetAnyDataset());
-        
+
         for (size_t epoch = 0; epoch < trainerArguments.numEpochs; ++epoch)
         {
             trainer->Update();
             evaluator->Evaluate(trainer->GetPredictor());
         }
-        
+
         // Print loss and errors
         if (trainerArguments.verbose)
         {
@@ -206,17 +205,17 @@ int main(int argc, char* argv[])
             switch (map.GetOutputType())
             {
             case model::Port::PortType::smallReal:
-                {
-                    auto outputMap = AppendTrainedLinearPredictorToMap<float>(trainer->GetPredictor(), map, mappedDatasetDimension);
-                    common::SaveMap(outputMap, modelSaveArguments.outputModelFilename);
-                }
-                break;
+            {
+                auto outputMap = AppendTrainedLinearPredictorToMap<float>(trainer->GetPredictor(), map, mappedDatasetDimension);
+                common::SaveMap(outputMap, modelSaveArguments.outputModelFilename);
+            }
+            break;
             case model::Port::PortType::real:
-                {
-                    auto outputMap = AppendTrainedLinearPredictorToMap<double>(trainer->GetPredictor(), map, mappedDatasetDimension);
-                    common::SaveMap(outputMap, modelSaveArguments.outputModelFilename);
-                }
-                break;
+            {
+                auto outputMap = AppendTrainedLinearPredictorToMap<double>(trainer->GetPredictor(), map, mappedDatasetDimension);
+                common::SaveMap(outputMap, modelSaveArguments.outputModelFilename);
+            }
+            break;
             default:
                 std::cerr << "Unexpected output type for model. Should be double or float." << std::endl;
                 break;

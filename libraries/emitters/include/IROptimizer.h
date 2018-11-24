@@ -45,5 +45,5 @@ namespace emitters
         llvm::legacy::PassManager _modulePasses;
         llvm::legacy::FunctionPassManager _functionPasses;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

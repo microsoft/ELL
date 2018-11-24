@@ -15,8 +15,8 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    BiasLayerNode<ValueType>::BiasLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BiasLayer<ValueType>& layer)
-        : NeuralNetworkLayerNode<BiasLayerNode<ValueType>, predictors::neural::BiasLayer<ValueType>, ValueType>(input, layer)
+    BiasLayerNode<ValueType>::BiasLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BiasLayer<ValueType>& layer) :
+        NeuralNetworkLayerNode<BiasLayerNode<ValueType>, predictors::neural::BiasLayer<ValueType>, ValueType>(input, layer)
     {
     }
 
@@ -50,5 +50,5 @@ namespace nodes
     // Explicit specialization
     template class BiasLayerNode<float>;
     template class BiasLayerNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

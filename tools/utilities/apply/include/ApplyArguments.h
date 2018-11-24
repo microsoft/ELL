@@ -27,7 +27,8 @@ struct ApplyArguments
 };
 
 /// <summary> Parsed command line arguments for the apply executable. </summary>
-struct ParsedApplyArguments : public ApplyArguments, public utilities::ParsedArgSet
+struct ParsedApplyArguments : public ApplyArguments
+    , public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments to the command line parser. </summary>
     ///
@@ -41,4 +42,4 @@ struct ParsedApplyArguments : public ApplyArguments, public utilities::ParsedArg
     /// <returns> An utilities::CommandLineParseResult. </returns>
     utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
 };
-}
+} // namespace ell

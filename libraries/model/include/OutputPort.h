@@ -196,7 +196,7 @@ namespace model
     private:
         mutable std::vector<ValueType> _cachedOutput;
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/OutputPort.tcc"

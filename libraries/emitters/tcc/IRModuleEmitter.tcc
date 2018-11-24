@@ -71,32 +71,32 @@ namespace emitters
         LLVMValue pVal = nullptr;
         switch (var.Scope())
         {
-            case VariableScope::literal:
-                pVal = EmitLiteral<T>(static_cast<LiteralVariable<T>&>(var));
-                _literals.Add(var.EmittedName(), pVal);
-                break;
+        case VariableScope::literal:
+            pVal = EmitLiteral<T>(static_cast<LiteralVariable<T>&>(var));
+            _literals.Add(var.EmittedName(), pVal);
+            break;
 
-            case VariableScope::local:
-                if (var.IsVectorRef())
-                {
-                    pVal = EmitRef<T>(static_cast<VectorElementVariable<T>&>(var));
-                }
-                else if (var.HasInitValue())
-                {
-                    pVal = EmitLocal<T>(static_cast<InitializedScalarVariable<T>&>(var));
-                }
-                else
-                {
-                    pVal = EmitLocal<T>(static_cast<ScalarVariable<T>&>(var));
-                }
-                break;
+        case VariableScope::local:
+            if (var.IsVectorRef())
+            {
+                pVal = EmitRef<T>(static_cast<VectorElementVariable<T>&>(var));
+            }
+            else if (var.HasInitValue())
+            {
+                pVal = EmitLocal<T>(static_cast<InitializedScalarVariable<T>&>(var));
+            }
+            else
+            {
+                pVal = EmitLocal<T>(static_cast<ScalarVariable<T>&>(var));
+            }
+            break;
 
-            case VariableScope::global:
-                pVal = EmitGlobal<T>(static_cast<InitializedScalarVariable<T>&>(var));
-                break;
+        case VariableScope::global:
+            pVal = EmitGlobal<T>(static_cast<InitializedScalarVariable<T>&>(var));
+            break;
 
-            default:
-                throw EmitterException(EmitterError::variableScopeNotSupported);
+        default:
+            throw EmitterException(EmitterError::variableScopeNotSupported);
         }
         return pVal;
     }
@@ -107,25 +107,25 @@ namespace emitters
         LLVMValue pVal = nullptr;
         switch (var.Scope())
         {
-            case VariableScope::literal:
-                pVal = EmitLiteralVector<T>(static_cast<LiteralVectorVariable<T>&>(var));
-                _literals.Add(var.EmittedName(), pVal);
-                break;
+        case VariableScope::literal:
+            pVal = EmitLiteralVector<T>(static_cast<LiteralVectorVariable<T>&>(var));
+            _literals.Add(var.EmittedName(), pVal);
+            break;
 
-            case VariableScope::global:
-                if (var.HasInitValue())
-                {
-                    pVal = EmitGlobalVector<T>(static_cast<InitializedVectorVariable<T>&>(var));
-                }
-                else
-                {
-                    pVal = EmitGlobalVector<T>(static_cast<VectorVariable<T>&>(var));
-                }
-                _globals.Add(var.EmittedName(), pVal);
-                break;
+        case VariableScope::global:
+            if (var.HasInitValue())
+            {
+                pVal = EmitGlobalVector<T>(static_cast<InitializedVectorVariable<T>&>(var));
+            }
+            else
+            {
+                pVal = EmitGlobalVector<T>(static_cast<VectorVariable<T>&>(var));
+            }
+            _globals.Add(var.EmittedName(), pVal);
+            break;
 
-            default:
-                throw EmitterException(EmitterError::variableScopeNotSupported);
+        default:
+            throw EmitterException(EmitterError::variableScopeNotSupported);
         }
         assert(pVal != nullptr);
         return pVal;
@@ -197,5 +197,5 @@ namespace emitters
         LLVMValue pSrcVar = EnsureEmitted(var.Src());
         return currentFunction.PtrOffsetA(pSrcVar, currentFunction.Literal(var.Offset()), var.EmittedName());
     }
-}
-}
+} // namespace emitters
+} // namespace ell

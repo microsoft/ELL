@@ -76,7 +76,7 @@ namespace utilities
     private:
         std::shared_ptr<IIterator<ValueType>> _iterator = nullptr;
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/AnyIterator.tcc"

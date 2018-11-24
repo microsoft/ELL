@@ -29,7 +29,8 @@ struct PrintArguments
 };
 
 /// <summary> Arguments for parsed print. </summary>
-struct ParsedPrintArguments : public PrintArguments, public utilities::ParsedArgSet
+struct ParsedPrintArguments : public PrintArguments
+    , public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments. </summary>
     ///
@@ -43,4 +44,4 @@ struct ParsedPrintArguments : public PrintArguments, public utilities::ParsedArg
     /// <returns> An utilities::CommandLineParseResult. </returns>
     utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
 };
-}
+} // namespace ell

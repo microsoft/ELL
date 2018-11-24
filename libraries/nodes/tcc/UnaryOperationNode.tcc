@@ -120,17 +120,23 @@ namespace nodes
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Error: taking log of a boolean value");
         }
-    }
+    } // namespace UnaryOperations
 
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _operation(emitters::UnaryOperationType::none)
+    UnaryOperationNode<ValueType>::UnaryOperationNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0),
+        _operation(emitters::UnaryOperationType::none)
     {
     }
 
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPort<ValueType>& input, emitters::UnaryOperationType operation)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _operation(operation)
+    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPort<ValueType>& input, emitters::UnaryOperationType operation) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, _input.Size()),
+        _operation(operation)
     {
     }
 
@@ -282,5 +288,5 @@ namespace nodes
         _operation = UnaryOperations::from_string(operation);
         _output.SetSize(_input.Size());
     }
-}
-}
+} // namespace nodes
+} // namespace ell

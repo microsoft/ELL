@@ -7,9 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "AutoDataVector.h"
 #include "Dataset.h"
 #include "DatasetInterface.h"
-#include "AutoDataVector.h"
 
 namespace ELL_API
 {
@@ -25,4 +25,4 @@ public:
     ell::data::AutoSupervisedDataset _dataset;
 };
 
-} // end namespace
+} // namespace ELL_API

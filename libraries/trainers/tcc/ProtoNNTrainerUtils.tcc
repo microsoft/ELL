@@ -22,7 +22,6 @@
 #include <fstream>
 #include <sstream>
 
-
 namespace ell
 {
 namespace trainers
@@ -83,7 +82,6 @@ namespace trainers
             {
                 norm += A(j, i) * A(j, i);
             }
-
         }
 
         norm = sqrt(norm);
@@ -117,8 +115,7 @@ namespace trainers
 
         std::vector<double> data;
         data.assign(M.GetDataPointer(), M.GetDataPointer() + (size_t)(M.NumRows() * M.NumColumns()));
-        std::sort(data.begin(), data.end(),
-            [](double i, double j) {return std::abs(i) > std::abs(j); });
+        std::sort(data.begin(), data.end(), [](double i, double j) { return std::abs(i) > std::abs(j); });
 
         size_t mat_size = M.NumRows() * M.NumColumns();
 
@@ -128,8 +125,8 @@ namespace trainers
 
         for (size_t i = 0; i < M.NumColumns(); i++)
         {
-            M.GetColumn(i).Transform([thresh](double x) { return  (std::abs(x) < thresh ? 0.0 : x); });
+            M.GetColumn(i).Transform([thresh](double x) { return (std::abs(x) < thresh ? 0.0 : x); });
         }
     }
-}
-}
+} // namespace trainers
+} // namespace ell

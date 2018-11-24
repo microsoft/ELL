@@ -12,8 +12,8 @@
 
 // common
 #include "LoadModel.h"
-#include "MapLoadArguments.h"
 #include "MapCompilerArguments.h"
+#include "MapLoadArguments.h"
 
 // model
 #include "IRMapCompiler.h"
@@ -87,17 +87,17 @@ int main(int argc, char* argv[])
         model::Model model;
         if (mapLoadArguments.HasModelFilename())
         {
-            // not all models can be turned into maps if they have no input or output nodes, 
+            // not all models can be turned into maps if they have no input or output nodes,
             // so we can't use LoadMap here.
             model = common::LoadModel(mapLoadArguments.inputModelFilename);
             if (printArguments.refine > 0)
             {
                 model::TransformContext context;
                 model::ModelTransformer transformer;
-                model = transformer.RefineModel(model, context, printArguments.refine);                
+                model = transformer.RefineModel(model, context, printArguments.refine);
             }
         }
-        else 
+        else
         {
             model::Map map = LoadMap(mapLoadArguments);
             if (printArguments.refine > 0)

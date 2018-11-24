@@ -135,8 +135,8 @@ namespace nodes
     class MeanPoolingFunction
     {
     public:
-        MeanPoolingFunction(emitters::IRFunctionEmitter& function, int staticCount, ValueType paddingValue = 0)
-            : _count(staticCount)
+        MeanPoolingFunction(emitters::IRFunctionEmitter& function, int staticCount, ValueType paddingValue = 0) :
+            _count(staticCount)
         {
             auto valueType = emitters::GetVariableType<ValueType>();
             _paddingValue = function.LocalScalar(paddingValue);
@@ -221,8 +221,8 @@ namespace nodes
     //
 
     template <typename ValueType, template <typename> class PoolingFunctionType>
-    PoolingLayerNode<ValueType, PoolingFunctionType>::PoolingLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::PoolingLayer<ValueType, PoolingFunctionType>& layer)
-        : NeuralNetworkLayerNode<PoolingLayerNode<ValueType, PoolingFunctionType>, predictors::neural::PoolingLayer<ValueType, PoolingFunctionType>, ValueType>(input, layer)
+    PoolingLayerNode<ValueType, PoolingFunctionType>::PoolingLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::PoolingLayer<ValueType, PoolingFunctionType>& layer) :
+        NeuralNetworkLayerNode<PoolingLayerNode<ValueType, PoolingFunctionType>, predictors::neural::PoolingLayer<ValueType, PoolingFunctionType>, ValueType>(input, layer)
     {
     }
 
@@ -230,16 +230,16 @@ namespace nodes
     template <typename ValueType, template <typename> class PoolingFunctionType>
     template <typename PoolingFunctionT>
     emitters::LLVMValue PoolingLayerNode<ValueType, PoolingFunctionType>::GetPoolingWindowValue(emitters::IRFunctionEmitter& function,
-                                                                                         int windowRowBegin,
-                                                                                         int windowRowEnd,
-                                                                                         int windowColumnBegin,
-                                                                                         int windowColumnEnd,
-                                                                                         emitters::LLVMValue inputRow,
-                                                                                         emitters::LLVMValue inputColumn,
-                                                                                         emitters::LLVMValue inputChannel,
-                                                                                         emitters::LLVMValue inputBuffer,
-                                                                                         const model::MemoryShape& inputIncrement,
-                                                                                         PoolingFunctionT& poolingFunction)
+                                                                                                int windowRowBegin,
+                                                                                                int windowRowEnd,
+                                                                                                int windowColumnBegin,
+                                                                                                int windowColumnEnd,
+                                                                                                emitters::LLVMValue inputRow,
+                                                                                                emitters::LLVMValue inputColumn,
+                                                                                                emitters::LLVMValue inputChannel,
+                                                                                                emitters::LLVMValue inputBuffer,
+                                                                                                const model::MemoryShape& inputIncrement,
+                                                                                                PoolingFunctionT& poolingFunction)
     {
         const auto plus = emitters::TypedOperator::add;
         const auto times = emitters::TypedOperator::multiply;
@@ -517,7 +517,6 @@ namespace nodes
         }
     } // end function
 
-
     template <typename ValueType, template <typename> class PoolingFunctionType>
     void PoolingLayerNode<ValueType, PoolingFunctionType>::Copy(model::ModelTransformer& transformer) const
     {
@@ -536,5 +535,5 @@ namespace nodes
     template class PoolingLayerNode<double, ell::predictors::neural::MeanPoolingFunction>;
     template class PoolingLayerNode<float, ell::predictors::neural::MaxPoolingFunction>;
     template class PoolingLayerNode<double, ell::predictors::neural::MaxPoolingFunction>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

@@ -6,12 +6,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "HingeLoss.h"
-#include "LogLoss.h"
-#include "SquaredLoss.h"
-#include "SmoothHingeLoss.h"
-#include "L2Regularizer.h"
 #include "ElasticNetRegularizer.h"
+#include "HingeLoss.h"
+#include "L2Regularizer.h"
+#include "LogLoss.h"
+#include "SmoothHingeLoss.h"
+#include "SquaredLoss.h"
 
 // testing
 #include "testing.h"
@@ -21,12 +21,12 @@
 #include "VectorOperations.h"
 
 // stl
-#include <cmath>
-#include <iostream>
-#include <string>
 #include <array>
-#include <random>
+#include <cmath>
 #include <functional>
+#include <iostream>
+#include <random>
+#include <string>
 
 using namespace ell;
 using Range = std::array<double, 3>;
@@ -97,7 +97,7 @@ void SmoothHingeLossTest()
     testing::ProcessTest("Testing functions::SmoothHingeLoss::GetDerivative(0,-1)", testing::IsEqual(smoothHingeLoss.GetDerivative(0, -1), 1.0));
 }
 
-template<typename LossType>
+template <typename LossType>
 void DerivativeTest(LossType loss, double prediction, double label)
 {
     double epsilon = 1.0e-4;
@@ -108,7 +108,7 @@ void DerivativeTest(LossType loss, double prediction, double label)
     testing::ProcessTest("Testing " + std::string(typeid(LossType).name()) + "::GetDerivative(" + std::to_string(prediction) + ',' + std::to_string(label) + ")", error < epsilon);
 }
 
-template<typename LossType>
+template <typename LossType>
 void DerivativeTest(LossType loss, Range predictionRange, Range labelRange)
 {
     for (double prediction = predictionRange[0]; prediction <= predictionRange[2]; prediction += predictionRange[1])
@@ -121,7 +121,7 @@ void DerivativeTest(LossType loss, Range predictionRange, Range labelRange)
 }
 
 // returns true if the function never takes a value lower than 'bound' in the range 'range'
-template<typename FunctionType>
+template <typename FunctionType>
 bool IsLowerBound(const FunctionType& function, double bound, Range range)
 {
     for (double comparator = range[0]; comparator <= range[2]; comparator += range[1])
@@ -136,16 +136,16 @@ bool IsLowerBound(const FunctionType& function, double bound, Range range)
     return true;
 }
 
-template<typename LossType>
+template <typename LossType>
 void LossConjugateTest(LossType loss, double dual, double label, Range comparatorRange)
 {
-    auto objective = [&](double x) {return -x*dual + loss(x, label); };
+    auto objective = [&](double x) { return -x * dual + loss(x, label); };
     double negativeConjugate = -loss.Conjugate(dual, label);
     bool isLowerBound = IsLowerBound(objective, negativeConjugate, comparatorRange);
     testing::ProcessTest("Testing " + std::string(typeid(LossType).name()) + "::Conjugate(" + std::to_string(dual) + ',' + std::to_string(label) + ")", isLowerBound);
 }
 
-template<typename LossType>
+template <typename LossType>
 void LossConjugateTest(LossType loss, Range dualRange, Range labelRange, Range comparatorRange)
 {
     for (double dual = dualRange[0]; dual <= dualRange[2]; dual += dualRange[1])
@@ -158,17 +158,17 @@ void LossConjugateTest(LossType loss, Range dualRange, Range labelRange, Range c
 }
 
 // Test if Fenchel-Young holds at given points
-template<typename RegularizerType>
+template <typename RegularizerType>
 void RegularizerConjugateTest(RegularizerType regularizer, math::ConstColumnVectorReference<double> p, math::ConstColumnVectorReference<double> d)
 {
     const double epsilon = 1.0e-8;
     double fenchelYoung = regularizer(p) + regularizer.Conjugate(d);
-    double dot = math::Dot(p,d);
+    double dot = math::Dot(p, d);
     testing::ProcessTest("Testing " + std::string(typeid(RegularizerType).name()) + "::Conjugate()", dot < fenchelYoung + epsilon);
 }
 
 // Test if Fenchel-Young holds at multiple random points
-template<typename RegularizerType>
+template <typename RegularizerType>
 void RegularizerConjugateTest(RegularizerType regularizer, size_t dimension, size_t repetitions)
 {
     math::ColumnVector<double> p(dimension);
@@ -177,7 +177,7 @@ void RegularizerConjugateTest(RegularizerType regularizer, size_t dimension, siz
     std::random_device rd;
     std::mt19937 generator(rd());
     std::normal_distribution<> normalDistribution(0, 1);
-    auto normalGenerator = [&]() {return normalDistribution(generator); };
+    auto normalGenerator = [&]() { return normalDistribution(generator); };
 
     for (size_t t = 0; t > repetitions; ++t)
     {
@@ -189,17 +189,17 @@ void RegularizerConjugateTest(RegularizerType regularizer, size_t dimension, siz
     }
 }
 
-template<typename LossType>
+template <typename LossType>
 void ConjugateProxTest(LossType loss, double sigma, double dual, double label, Range comparatorRange)
 {
-    auto objective = [&](double x) {return sigma * loss.Conjugate(x, label) + 0.5 * std::pow(x - dual, 2); };
+    auto objective = [&](double x) { return sigma * loss.Conjugate(x, label) + 0.5 * std::pow(x - dual, 2); };
     double conjugateProx = loss.ConjugateProx(sigma, dual, label);
     double conjugateProxObjective = objective(conjugateProx);
     bool isLowerBound = IsLowerBound(objective, conjugateProxObjective, comparatorRange);
     testing::ProcessTest("Testing " + std::string(typeid(LossType).name()) + "::ConjugateProx(" + std::to_string(sigma) + ',' + std::to_string(dual) + ',' + std::to_string(label) + ")", isLowerBound);
 }
 
-template<typename LossType>
+template <typename LossType>
 void ConjugateProxTest(LossType loss, double sigma, Range dualRange, Range labelRange, Range comparatorRange)
 {
     for (double dual = dualRange[0]; dual <= dualRange[2]; dual += dualRange[1])
@@ -234,7 +234,7 @@ int main()
     RegularizerConjugateTest(functions::L2Regularizer(), 100, 100);
     RegularizerConjugateTest(functions::ElasticNetRegularizer(), 100, 100);
 
-    ConjugateProxTest(functions::SquaredLoss(), 1.0,  { -1.0, 0.1, 1.0 }, { -1.0, 0.1, 1.0 }, { 0, 0.1, 1.0 });
+    ConjugateProxTest(functions::SquaredLoss(), 1.0, { -1.0, 0.1, 1.0 }, { -1.0, 0.1, 1.0 }, { 0, 0.1, 1.0 });
     ConjugateProxTest(functions::LogLoss(), 1.0, { -1.0, 0.1, 1.0 }, { 1.0, 0.1, 1.0 }, { -1.0, 0.1, 0 });
     ConjugateProxTest(functions::LogLoss(), 1.0, { -1.0, 0.1, 1.0 }, { -1.0, 0.1, -1.0 }, { 0, 0.1, 1.0 });
     ConjugateProxTest(functions::SmoothHingeLoss(), 1.0, { -1.0, 0.1, 1.0 }, { -1.0, 1.0, -1.0 }, { 0.0, 0.1, 1.0 });

@@ -62,5 +62,5 @@ namespace utilities
     /// <param name=separator> The separator character to insert between the strings. </param>
     /// <returns> A single string with the given strings separated by the given separator character. </returns>
     std::string Join(const std::vector<std::string>& strings, const std::string& separator);
-}
-}
+} // namespace utilities
+} // namespace ell

@@ -9,8 +9,8 @@
 #pragma once
 
 // model
-#include "CompilableNodeUtilities.h"
 #include "CompilableNode.h"
+#include "CompilableNodeUtilities.h"
 #include "IRMapCompiler.h"
 #include "Model.h"
 #include "ModelTransformer.h"
@@ -96,7 +96,7 @@ namespace nodes
         // Operation
         emitters::BinaryPredicateType _predicate;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/BinaryPredicateNode.tcc"

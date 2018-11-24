@@ -31,16 +31,18 @@ class InnerObject : public utilities::IArchivable
 {
 public:
     InnerObject() = default;
-    InnerObject(const InnerObject& other)
-        : _a(other._a), _b(other._b)
+    InnerObject(const InnerObject& other) :
+        _a(other._a),
+        _b(other._b)
     {
         if (other._x.get())
         {
             _x = std::make_unique<int>(*other._x.get());
         }
     }
-    InnerObject(int a, double b, int* x = nullptr)
-        : _a(a), _b(b)
+    InnerObject(int a, double b, int* x = nullptr) :
+        _a(a),
+        _b(b)
     {
         if (x)
         {
@@ -78,8 +80,9 @@ class DerivedObject : public InnerObject
 {
 public:
     DerivedObject() = default;
-    DerivedObject(int a, double b, std::string c)
-        : InnerObject(a, b), _c(c) {}
+    DerivedObject(int a, double b, std::string c) :
+        InnerObject(a, b),
+        _c(c) {}
     std::string GetC() { return _c; }
 
     void WriteToArchive(utilities::Archiver& archiver) const override
@@ -105,8 +108,9 @@ class OuterObject : public utilities::IArchivable
 {
 public:
     OuterObject() = default;
-    OuterObject(std::string name, int a, double b)
-        : _name(name), _inner(a, b) {}
+    OuterObject(std::string name, int a, double b) :
+        _name(name),
+        _inner(a, b) {}
     std::string GetName() { return _name; }
     InnerObject GetInner() { return _inner; }
 
@@ -300,4 +304,4 @@ void TestObjectArchiver()
     dearchiver3 >> deserializedDerived;
     testing::ProcessTest("Deserialize with ObjectArchiver check", deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");
 }
-}
+} // namespace ell

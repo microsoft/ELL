@@ -63,7 +63,7 @@ namespace trainers
         template <typename ExampleIteratorType>
         std::vector<predictors::SingleElementThresholdPredictor> GetThresholds(ExampleIteratorType exampleIterator) const;
     };
-}
-}
+} // namespace trainers
+} // namespace ell
 
 #include "../tcc/ThresholdFinder.tcc"

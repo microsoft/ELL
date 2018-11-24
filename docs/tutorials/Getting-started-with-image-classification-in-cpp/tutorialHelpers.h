@@ -6,11 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
+#include <numeric>
+#include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
-#include <numeric>
-#include <algorithm>
-#include <opencv2/opencv.hpp>
 
 class tutorialHelpers
 {
@@ -55,7 +55,7 @@ public:
 
         // Return as a vector of floats
         return { resultImage.datastart, resultImage.dataend };
-     }
+    }
 
     // Returns the top N scores that exceed a given threshold. The result is a vector of std::pair,
     // where the first element of each pair is the index and the second is the score.
@@ -66,8 +66,7 @@ public:
         std::iota(indexes.begin(), indexes.end(), 0);
 
         // sort indexes based on comparing prediction values
-        std::partial_sort(indexes.begin(), indexes.begin() + topN, indexes.end(), [&predictions](size_t index1, size_t index2)
-        {
+        std::partial_sort(indexes.begin(), indexes.begin() + topN, indexes.end(), [&predictions](size_t index1, size_t index2) {
             return predictions[index1] > predictions[index2];
         });
 
@@ -106,8 +105,7 @@ public:
 
         cv::rectangle(image, topLeft, cv::Point(image.cols, topLeft.y + height), color, CV_FILLED);
 
-        cv::putText(image, text, cv::Point(topLeft.x + height / 4, topLeft.y + (int)(height * 0.667)),
-                    cv::FONT_HERSHEY_COMPLEX_SMALL, fontScale, cv::Scalar(0, 0, 0), 1, CV_AA);
+        cv::putText(image, text, cv::Point(topLeft.x + height / 4, topLeft.y + (int)(height * 0.667)), cv::FONT_HERSHEY_COMPLEX_SMALL, fontScale, cv::Scalar(0, 0, 0), 1, CV_AA);
     }
 
     // Draw a header text block on an image

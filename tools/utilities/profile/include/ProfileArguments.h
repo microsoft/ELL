@@ -33,15 +33,15 @@ struct ProfileArguments
     bool summaryOnly = false;
 
     // TODO: something about regions
-
 };
 
 /// <summary> Arguments for parsed print. </summary>
-struct ParsedProfileArguments : public ProfileArguments, public utilities::ParsedArgSet
+struct ParsedProfileArguments : public ProfileArguments
+    , public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments. </summary>
     ///
     /// <param name="parser"> [in,out] The parser. </param>
     void AddArgs(utilities::CommandLineParser& parser) override;
 };
-}
+} // namespace ell

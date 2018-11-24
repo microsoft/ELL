@@ -76,8 +76,8 @@ namespace model
     //
     // ModelOptimizer
     //
-    ModelOptimizer::ModelOptimizer(const MapCompilerOptions& settings)
-        : _settings(settings)
+    ModelOptimizer::ModelOptimizer(const MapCompilerOptions& settings) :
+        _settings(settings)
     {
     }
 
@@ -108,5 +108,5 @@ namespace model
     {
         _passes.AddPass(std::move(pass));
     }
-}
-}
+} // namespace model
+} // namespace ell

@@ -36,8 +36,10 @@ namespace utilities
     {
         static constexpr int currentVersion = static_cast<int>(ArchiveVersionNumbers::nextVersion) - 1;
 
-        constexpr ArchiveVersion(int version) : versionNumber(version) {}
-        constexpr ArchiveVersion(ArchiveVersionNumbers version) : versionNumber(static_cast<int>(version)) {}
+        constexpr ArchiveVersion(int version) :
+            versionNumber(version) {}
+        constexpr ArchiveVersion(ArchiveVersionNumbers version) :
+            versionNumber(static_cast<int>(version)) {}
 
         /// <summary> The version number </summary>
         int versionNumber = 0;
@@ -51,5 +53,5 @@ namespace utilities
     bool operator<(const ArchiveVersion& a, const ArchiveVersion& b);
     bool operator<=(const ArchiveVersion& a, const ArchiveVersion& b);
 
-}
-}
+} // namespace utilities
+} // namespace ell

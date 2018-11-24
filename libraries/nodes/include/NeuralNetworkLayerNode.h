@@ -157,7 +157,7 @@ namespace nodes
     // helper:
     template <typename LayerType>
     typename LayerType::LayerParameters GetLayerNodeParameters(const typename LayerType::TensorType& inputTensor, const typename LayerType::LayerParameters& layerParameters);
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/NeuralNetworkLayerNode.tcc"

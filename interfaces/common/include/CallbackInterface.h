@@ -99,10 +99,10 @@ namespace api
         /// <param name="outputSize"> The output size. </param>
         /// <param name="lagCallback"> The lag callback object. </param>
         void Register(ell::api::CallbackBase<InputType>& inputCallback,
-            size_t inputSize,
-            ell::api::CallbackBase<OutputType>& outputCallback,
-            size_t outputSize,
-            ell::api::CallbackBase<TimeTickType>& lagCallback);
+                      size_t inputSize,
+                      ell::api::CallbackBase<OutputType>& outputCallback,
+                      size_t outputSize,
+                      ell::api::CallbackBase<TimeTickType>& lagCallback);
 
         /// <summary> Clears callbacks with the forwarder. </summary>
         void Clear();
@@ -116,7 +116,7 @@ namespace api
         std::vector<InputType> _inputBuffer;
         std::vector<OutputType> _outputBuffer;
     };
-}
-}
+} // namespace api
+} // namespace ell
 
 #include "../tcc/CallbackInterface.tcc"

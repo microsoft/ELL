@@ -291,5 +291,5 @@ namespace utilities
             }
         }
     }
-}
-}
+} // namespace utilities
+} // namespace ell

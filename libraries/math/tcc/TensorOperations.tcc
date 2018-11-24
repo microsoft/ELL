@@ -96,7 +96,7 @@ namespace math
         }
     }
 
-    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1>
+    template <Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1>
     void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
     {
         for (size_t i = 0; i < vector.Size(); ++i)
@@ -105,7 +105,7 @@ namespace math
         }
     }
 
-    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension2>
     void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
     {
         for (size_t i = 0; i < vector.Size(); ++i)
@@ -114,7 +114,7 @@ namespace math
         }
     }
 
-    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
     void ScaleUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
     {
         for (size_t i = 0; i < tensor.GetSize2(); ++i)
@@ -137,7 +137,7 @@ namespace math
         }
     }
 
-    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1>
+    template <Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1>
     void AddUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
     {
         DEBUG_CHECK_SIZES(vector.Size() != tensor.GetSize2(), "vector and tensor dimensions must be the same");
@@ -148,7 +148,7 @@ namespace math
         }
     }
 
-    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension2>
     void AddUpdate(UnorientedConstVectorBase<ElementType> vector, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
     {
         DEBUG_CHECK_SIZES(vector.Size() != tensor.GetSize1(), "vector and tensor dimensions must be the same");
@@ -158,13 +158,13 @@ namespace math
         }
     }
 
-    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
     void AddUpdate(ConstRowVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
     {
         AddUpdate<vectorOrientation, implementation>(vector.Transpose(), tensor);
     }
 
-    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
     void AddUpdate(ConstColumnVectorReference<ElementType> vector, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
     {
         DEBUG_CHECK_SIZES(vector.Size() != tensor.GetSize0(), "vector and tensor dimensions must be the same");
@@ -180,7 +180,7 @@ namespace math
         }
     }
 
-    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1>
+    template <Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension1>
     void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, dimension0, dimension1, vectorOrientation> tensor)
     {
         DEBUG_CHECK_SIZES(scale.Size() != tensor.GetSize2(), "vector and tensor dimensions must be the same");
@@ -190,7 +190,7 @@ namespace math
         }
     }
 
-    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension0, Dimension dimension2>
     void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, dimension0, vectorOrientation, dimension2> tensor)
     {
         DEBUG_CHECK_SIZES(scale.Size() != tensor.GetSize1(), "vector and tensor dimensions must be the same");
@@ -200,7 +200,7 @@ namespace math
         }
     }
 
-    template<Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
+    template <Dimension vectorOrientation, ImplementationType implementation, typename ElementType, Dimension dimension1, Dimension dimension2>
     void ScaleAddUpdate(UnorientedConstVectorBase<ElementType> scale, UnorientedConstVectorBase<ElementType> bias, TensorReference<ElementType, vectorOrientation, dimension1, dimension2> tensor)
     {
         DEBUG_CHECK_SIZES(scale.Size() != tensor.GetSize0() || bias.Size() != tensor.GetSize0(), "vectors and tensor dimensions must be the same");
@@ -218,5 +218,5 @@ namespace math
             }
         }
     }
-}
-}
+} // namespace math
+} // namespace ell

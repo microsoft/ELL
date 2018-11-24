@@ -122,5 +122,5 @@ namespace nodes
         int _lda = 0, _ldb = 0, _ldc = 0;
         bool _transpose1 = false, _transpose2 = false, _transposeOutput = false;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

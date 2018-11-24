@@ -11,8 +11,11 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    DelayNode<ValueType>::DelayNode(const model::OutputPort<ValueType>& input, size_t windowSize)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _windowSize(windowSize)
+    DelayNode<ValueType>::DelayNode(const model::OutputPort<ValueType>& input, size_t windowSize) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, _input.Size()),
+        _windowSize(windowSize)
     {
         auto dimension = input.Size();
         for (size_t index = 0; index < windowSize; ++index)
@@ -22,8 +25,11 @@ namespace nodes
     }
 
     template <typename ValueType>
-    DelayNode<ValueType>::DelayNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _windowSize(0)
+    DelayNode<ValueType>::DelayNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0),
+        _windowSize(0)
     {
     }
 
@@ -92,5 +98,5 @@ namespace nodes
         }
         _output.SetSize(dimension);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

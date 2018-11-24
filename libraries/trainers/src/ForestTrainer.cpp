@@ -49,8 +49,8 @@ namespace trainers
     //
     // NodeRanges
     //
-    ForestTrainerBase::NodeRanges::NodeRanges(const Range& totalRange)
-        : _firstIndex(2)
+    ForestTrainerBase::NodeRanges::NodeRanges(const Range& totalRange) :
+        _firstIndex(2)
     {
         _firstIndex[0] = totalRange.firstIndex;
         _firstIndex[1] = totalRange.firstIndex + totalRange.size;
@@ -96,8 +96,9 @@ namespace trainers
         _childSums = childSums;
     }
 
-    ForestTrainerBase::NodeStats::NodeStats(const Sums& totalSums)
-        : _totalSums(totalSums), _childSums(2)
+    ForestTrainerBase::NodeStats::NodeStats(const Sums& totalSums) :
+        _totalSums(totalSums),
+        _childSums(2)
     {
     }
 
@@ -106,8 +107,8 @@ namespace trainers
         return _childSums[position];
     }
 
-    ForestTrainerBase::TrainerMetadata::TrainerMetadata(const data::WeightLabel& metaData)
-        : strong(metaData)
+    ForestTrainerBase::TrainerMetadata::TrainerMetadata(const data::WeightLabel& metaData) :
+        strong(metaData)
     {
     }
 
@@ -135,5 +136,5 @@ namespace trainers
         _childSums[1].Print(os);
         os << "\n";
     }
-}
-}
+} // namespace trainers
+} // namespace ell

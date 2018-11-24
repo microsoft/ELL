@@ -160,8 +160,10 @@ namespace utilities
     // OptionalPropertyUnarchiver class
     //
     template <typename DefaultValueType>
-    Unarchiver::OptionalPropertyUnarchiver<DefaultValueType>::OptionalPropertyUnarchiver(Unarchiver& archiver, const std::string& name, const DefaultValueType& defaultValue)
-        : _unarchiver(archiver), _propertyName(name), _defaultValue(defaultValue){};
+    Unarchiver::OptionalPropertyUnarchiver<DefaultValueType>::OptionalPropertyUnarchiver(Unarchiver& archiver, const std::string& name, const DefaultValueType& defaultValue) :
+        _unarchiver(archiver),
+        _propertyName(name),
+        _defaultValue(defaultValue){};
 
     template <typename DefaultValueType>
     template <typename ValueType>
@@ -366,8 +368,10 @@ namespace utilities
     //
 
     template <typename ValueType>
-    EnsureMaxPrecision<ValueType>::EnsureMaxPrecision(std::ostream& out)
-        : _flags(out.flags()), _precision(out.precision()), _out(out)
+    EnsureMaxPrecision<ValueType>::EnsureMaxPrecision(std::ostream& out) :
+        _flags(out.flags()),
+        _precision(out.precision()),
+        _out(out)
     {
         _out.precision(std::numeric_limits<ValueType>::digits10 + 1);
     }
@@ -401,7 +405,7 @@ namespace utilities
         {
             return "float";
         }
-    }
+    } // namespace ArchiverImpl
 
     template <typename T>
     std::string GetArchivedTypeName()
@@ -414,5 +418,5 @@ namespace utilities
     {
         return value.GetRuntimeTypeName();
     }
-}
-}
+} // namespace utilities
+} // namespace ell

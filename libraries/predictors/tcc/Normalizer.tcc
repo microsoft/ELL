@@ -11,8 +11,8 @@ namespace ell
 namespace predictors
 {
     template <data::IterationPolicy policy, typename TransformationType>
-    inline Normalizer<policy, TransformationType>::Normalizer(TransformationType transformation)
-        : _transformation(transformation)
+    inline Normalizer<policy, TransformationType>::Normalizer(TransformationType transformation) :
+        _transformation(transformation)
     {
     }
 
@@ -28,5 +28,5 @@ namespace predictors
     {
         return Normalizer<policy, TransformationType>(transformation);
     }
-}
-}
+} // namespace predictors
+} // namespace ell

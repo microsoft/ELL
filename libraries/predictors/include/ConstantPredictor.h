@@ -21,7 +21,8 @@ namespace ell
 namespace predictors
 {
     /// <summary> A predictor that ignores its input and outputs a constant number. This class is used to define decision trees. </summary>
-    class ConstantPredictor : public IPredictor<double>, public utilities::IArchivable
+    class ConstantPredictor : public IPredictor<double>
+        , public utilities::IArchivable
     {
     public:
         ConstantPredictor() = default;
@@ -73,5 +74,5 @@ namespace predictors
     private:
         double _value = 0.0;
     };
-}
-}
+} // namespace predictors
+} // namespace ell

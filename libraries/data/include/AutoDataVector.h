@@ -202,7 +202,7 @@ namespace data
         /// <returns> An AutoDataVector. </returns>
         static AutoDataVector Parse(TextLine& textLine);
     };
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/AutoDataVector.tcc"

@@ -85,7 +85,7 @@ namespace nodes
         model::InputPort<ValueType> _input;
         model::OutputPort<ValueType> _output;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/ConcatenationNode.tcc"

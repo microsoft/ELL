@@ -89,7 +89,7 @@ namespace trainers
     /// <returns> A unique_ptr to a simple forest trainer. </returns>
     template <typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
     std::unique_ptr<ITrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ThresholdFinderType& thresholdFinder, const HistogramForestTrainerParameters& parameters);
-}
-}
+} // namespace trainers
+} // namespace ell
 
 #include "../tcc/HistogramForestTrainer.tcc"

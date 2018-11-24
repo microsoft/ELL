@@ -76,5 +76,5 @@ namespace utilities
 
         return MatchResult::success;
     }
-}
-}
+} // namespace utilities
+} // namespace ell

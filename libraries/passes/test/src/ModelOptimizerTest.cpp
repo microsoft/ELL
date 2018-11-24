@@ -9,11 +9,11 @@
 // #include "ModelTestUtilities.h"
 
 // model
+#include "ModelOptimizer.h"
 #include "IRMapCompiler.h"
 #include "InputNode.h"
 #include "Map.h"
 #include "MapCompilerOptions.h"
-#include "ModelOptimizer.h"
 #include "PortMemoryLayout.h"
 
 // nodes
@@ -77,7 +77,7 @@ model::Map GenerateTestModel(const model::PortMemoryLayout& inputLayout, const m
     model::PortElements<ValueType> prevOutput = inputNode->output;
     int scaleStart = static_cast<ValueType>(1);
     int biasStart = static_cast<ValueType>(2);
-    for (auto info: functionInfos)
+    for (auto info : functionInfos)
     {
         nodes::ConstantNode<ValueType>* scaleNode = nullptr;
         nodes::ConstantNode<ValueType>* biasNode = nullptr;
@@ -150,7 +150,7 @@ void TestFuseLinearOpsPass(std::vector<std::pair<bool, bool>> functionInfos)
 
     auto newSize = optimizedMap.GetModel().Size();
     auto numLinearNodes = functionInfos.size();
-    testing::ProcessTest("Testing linear ops count", oldSize == (3*numLinearNodes)+1 && newSize == 4);
+    testing::ProcessTest("Testing linear ops count", oldSize == (3 * numLinearNodes) + 1 && newSize == 4);
 
     // Evaluate model post-optimization
     optimizedMap.SetInputValue("input", testInput);

@@ -43,5 +43,5 @@ namespace common
         std::vector<std::string> parseErrorMessages;
         return parseErrorMessages;
     }
-}
-}
+} // namespace common
+} // namespace ell

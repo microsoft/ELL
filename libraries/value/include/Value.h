@@ -36,8 +36,7 @@ namespace value
     namespace detail
     {
         using ConstantData =
-            std::variant<std::vector<utilities::Boolean>, std::vector<char>, std::vector<uint8_t>, std::vector<int16_t>,
-                         std::vector<int32_t>, std::vector<int64_t>, std::vector<float>, std::vector<double>>;
+            std::variant<std::vector<utilities::Boolean>, std::vector<char>, std::vector<uint8_t>, std::vector<int16_t>, std::vector<int32_t>, std::vector<int64_t>, std::vector<float>, std::vector<double>>;
 
         using Undefined = std::monostate;
 
@@ -97,8 +96,7 @@ namespace value
             return { GetValueType<T>(), utilities::CountOfPointers<T> };
         }
 
-        using UnderlyingDataType = std::variant<detail::Undefined, Emittable, Boolean*, char*, uint8_t*, int16_t*,
-                                                int32_t*, int64_t*, float*, double*>;
+        using UnderlyingDataType = std::variant<detail::Undefined, Emittable, Boolean*, char*, uint8_t*, int16_t*, int32_t*, int64_t*, float*, double*>;
 
         using MemoryLayout = utilities::MemoryLayout;
 
@@ -151,7 +149,8 @@ namespace value
         /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the eventual data to be stored. If
         /// MemoryLayout is not provided, the Value instance is considered unconstrained </param>
         template <typename T>
-        Value(std::optional<MemoryLayout> layout = {}) : Value(GetValueType<T>(), layout)
+        Value(std::optional<MemoryLayout> layout = {}) :
+            Value(GetValueType<T>(), layout)
         {}
 
         /// <summary> Constructor that creates an instance which serves as a placeholder for data that matches the type and layout specified </summary>
@@ -170,7 +169,8 @@ namespace value
         /// <typeparam name="T"> The C++ fundamental type to be the basis of this instance </typeparam>
         /// <param name="t"> The value to be wrapped </param>
         template <typename T>
-        Value(DataType<T> t) : Value(std::vector<T>{ t }, utilities::ScalarLayout)
+        Value(DataType<T> t) :
+            Value(std::vector<T>{ t }, utilities::ScalarLayout)
         {}
 
         /// <summary> Constructor that creates an instance wrapping a set of constant values </summary>

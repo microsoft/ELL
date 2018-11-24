@@ -14,14 +14,15 @@ namespace utilities
 {
     static const std::string tabStringDefault = "    ";
 
-    IndentedTextWriter::IndentedTextWriter()
-        : _tabString(tabStringDefault)
+    IndentedTextWriter::IndentedTextWriter() :
+        _tabString(tabStringDefault)
     {
         SetPrecision(17);
     }
 
-    IndentedTextWriter::IndentedTextWriter(const IndentedTextWriter& other)
-        : _tabString(other._tabString), _indentLevel(other._indentLevel)
+    IndentedTextWriter::IndentedTextWriter(const IndentedTextWriter& other) :
+        _tabString(other._tabString),
+        _indentLevel(other._indentLevel)
     {
         SetPrecision(other.GetPrecision());
     }
@@ -134,5 +135,5 @@ namespace utilities
             _buffer << _tabString;
         }
     }
-}
-}
+} // namespace utilities
+} // namespace ell

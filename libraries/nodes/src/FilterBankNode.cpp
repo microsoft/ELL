@@ -21,14 +21,20 @@ namespace nodes
     // FilterBankNode
     //
     template <typename ValueType>
-    FilterBankNode<ValueType>::FilterBankNode(const dsp::TriangleFilterBank& filters)
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filters(filters)
+    FilterBankNode<ValueType>::FilterBankNode(const dsp::TriangleFilterBank& filters) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0),
+        _filters(filters)
     {
     }
 
     template <typename ValueType>
-    FilterBankNode<ValueType>::FilterBankNode(const model::OutputPort<ValueType>& input, const dsp::TriangleFilterBank& filters)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filters(filters)
+    FilterBankNode<ValueType>::FilterBankNode(const model::OutputPort<ValueType>& input, const dsp::TriangleFilterBank& filters) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0),
+        _filters(filters)
     {
     }
 
@@ -96,7 +102,6 @@ namespace nodes
             });
 
             function.SetValueAt(pOutput, filterIndex, function.Load(sum));
-
         });
     }
 
@@ -118,14 +123,15 @@ namespace nodes
     // LinearFilterBankNode
     //
     template <typename ValueType>
-    LinearFilterBankNode<ValueType>::LinearFilterBankNode()
-        : FilterBankNode<ValueType>(_linearFilters)
+    LinearFilterBankNode<ValueType>::LinearFilterBankNode() :
+        FilterBankNode<ValueType>(_linearFilters)
     {
     }
 
     template <typename ValueType>
-    LinearFilterBankNode<ValueType>::LinearFilterBankNode(const model::OutputPort<ValueType>& input, const dsp::LinearFilterBank& filters)
-        : FilterBankNode<ValueType>(input, _linearFilters), _linearFilters(filters)
+    LinearFilterBankNode<ValueType>::LinearFilterBankNode(const model::OutputPort<ValueType>& input, const dsp::LinearFilterBank& filters) :
+        FilterBankNode<ValueType>(input, _linearFilters),
+        _linearFilters(filters)
     {
         _output.SetSize(_linearFilters.NumActiveFilters());
     }
@@ -157,14 +163,15 @@ namespace nodes
     // MelFilterBankNode
     //
     template <typename ValueType>
-    MelFilterBankNode<ValueType>::MelFilterBankNode()
-        : FilterBankNode<ValueType>(_melFilters)
+    MelFilterBankNode<ValueType>::MelFilterBankNode() :
+        FilterBankNode<ValueType>(_melFilters)
     {
     }
 
     template <typename ValueType>
-    MelFilterBankNode<ValueType>::MelFilterBankNode(const model::OutputPort<ValueType>& input, const dsp::MelFilterBank& filters)
-        : FilterBankNode<ValueType>(input, _melFilters), _melFilters(filters)
+    MelFilterBankNode<ValueType>::MelFilterBankNode(const model::OutputPort<ValueType>& input, const dsp::MelFilterBank& filters) :
+        FilterBankNode<ValueType>(input, _melFilters),
+        _melFilters(filters)
     {
         _output.SetSize(_melFilters.NumActiveFilters());
     }
@@ -199,5 +206,5 @@ namespace nodes
     template class LinearFilterBankNode<double>;
     template class MelFilterBankNode<float>;
     template class MelFilterBankNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

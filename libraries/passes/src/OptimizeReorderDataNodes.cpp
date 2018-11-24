@@ -65,15 +65,13 @@ namespace passes
                         if (currentNode->GetDependentNodes().size() == 1 &&
                             (nextNode = dynamic_cast<const ReorderDataNode<ValueType>*>(currentNode->GetDependentNodes()[0])))
                         {
-                            Log() << "Removing node ReorderDataNode [id = " << currentNode->GetId().ToString() <<
-                                     "] since it is followed by another ReorderDataNode" << EOL;
+                            Log() << "Removing node ReorderDataNode [id = " << currentNode->GetId().ToString() << "] since it is followed by another ReorderDataNode" << EOL;
 
                             transformer.DeleteNode(*currentNode);
                         }
                         else
                         {
-                            Log() << "ReorderDataNode [id = " << currentNode->GetId().ToString() <<
-                                     "] is a terminal node in this chain of ReorderDataNodes" << EOL;
+                            Log() << "ReorderDataNode [id = " << currentNode->GetId().ToString() << "] is a terminal node in this chain of ReorderDataNodes" << EOL;
 
                             // this is the final reorder node that we're going to optimize in this pass
                             // get its output layout
@@ -123,8 +121,8 @@ namespace passes
         std::vector<model::Node::NodeId> nodesToIgnore;
     };
 
-    OptimizeReorderDataNodes::OptimizeReorderDataNodes()
-        : _state(new OptimizeReorderDataNodes::State)
+    OptimizeReorderDataNodes::OptimizeReorderDataNodes() :
+        _state(new OptimizeReorderDataNodes::State)
     {
     }
 
@@ -155,5 +153,5 @@ namespace passes
         };
         model::OptimizationPassRegistry::AddPass(info);
     }
-}
-}
+} // namespace passes
+} // namespace ell

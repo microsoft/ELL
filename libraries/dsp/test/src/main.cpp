@@ -22,14 +22,14 @@
 #include "WindowFunctions.h"
 
 // testing
-#include "testing.h"
 #include "Files.h"
 #include "Unused.h"
+#include "testing.h"
 
 // stl
 #include <complex>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 using namespace ell;
 using namespace dsp;
@@ -43,7 +43,6 @@ void DspTest(const std::string& path)
     // Voice Activity Detection
     TestVoiceActivityDetector<float>(path);
     TestVoiceActivityDetector<double>(path);
-
 
     // 1D Convolution
     TestConv1D<float>(ConvolutionMethodOption::simple);

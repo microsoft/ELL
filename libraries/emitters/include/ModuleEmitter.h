@@ -10,9 +10,9 @@
 
 #include "CompilerOptions.h"
 #include "EmitterTypes.h"
+#include "FunctionDeclaration.h"
 #include "TargetDevice.h"
 #include "Variable.h"
-#include "FunctionDeclaration.h"
 
 // stl
 #include <string>
@@ -152,5 +152,5 @@ namespace emitters
 
         VariableAllocator _variables; // variable object manager
     };
-}
-}
+} // namespace emitters
+} // namespace ell

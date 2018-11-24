@@ -11,9 +11,9 @@ namespace ell
 namespace data
 {
     template <typename ExampleType>
-    ExampleIterator<ExampleType>::ExampleIterator(std::unique_ptr<IExampleIterator<ExampleType>>&& iterator)
-        : _iterator(std::move(iterator))
+    ExampleIterator<ExampleType>::ExampleIterator(std::unique_ptr<IExampleIterator<ExampleType>>&& iterator) :
+        _iterator(std::move(iterator))
     {
     }
-}
-}
+} // namespace data
+} // namespace ell

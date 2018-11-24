@@ -34,5 +34,5 @@ namespace trainers
     private:
         double _scale;
     };
-}
-}
+} // namespace trainers
+} // namespace ell

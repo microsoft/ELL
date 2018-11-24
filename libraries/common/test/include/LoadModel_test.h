@@ -11,4 +11,4 @@ void TestLoadSampleModels();
 void TestLoadTreeModels();
 void TestLoadSavedModels(const std::string& examplePath);
 void TestSaveModels();
-}
+} // namespace ell

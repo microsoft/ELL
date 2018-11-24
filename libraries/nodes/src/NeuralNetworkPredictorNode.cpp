@@ -31,17 +31,22 @@ namespace nodes
         {
             return shape[0] * shape[1] * shape[2];
         }
-    }
+    } // namespace
 
     template <typename ValueType>
-    NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+    NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode() :
+        Node({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType>
-    NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode(const model::OutputPort<ValueType>& input, const PredictorType& predictor)
-        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetShapeSize(predictor.GetOutputShape())), _predictor(predictor)
+    NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode(const model::OutputPort<ValueType>& input, const PredictorType& predictor) :
+        Node({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, GetShapeSize(predictor.GetOutputShape())),
+        _predictor(predictor)
     {
         if (input.Size() != GetShapeSize(_predictor.GetInputShape()))
         {
@@ -134,7 +139,7 @@ namespace nodes
         {
             auto numInputs = GetShapeSize(layer->GetInputShape());
             DEBUG_USED(numInputs);
-            if (prevOutputSize != numInputs) 
+            if (prevOutputSize != numInputs)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input to layer doesn't match the output size of the previous layer");
             }
@@ -165,5 +170,5 @@ namespace nodes
     // explicit specialization for float, double
     template class NeuralNetworkPredictorNode<float>;
     template class NeuralNetworkPredictorNode<double>;
-}
-}
+} // namespace nodes
+} // namespace ell

@@ -77,7 +77,8 @@ namespace common
     };
 
     /// <summary> A version of MapLoadArguments that adds its members to the command line parser. </summary>
-    struct ParsedMapLoadArguments : public MapLoadArguments, public utilities::ParsedArgSet
+    struct ParsedMapLoadArguments : public MapLoadArguments
+        , public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
@@ -91,5 +92,5 @@ namespace common
         /// <returns> An utilities::CommandLineParseResult. </returns>
         utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
     };
-}
-}
+} // namespace common
+} // namespace ell

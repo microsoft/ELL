@@ -24,7 +24,7 @@ namespace model
             case model::Port::PortType::boolean:
             {
                 std::get<Vector<bool>>(_cachedOutput).resize(outputSize);
-                auto fn = reinterpret_cast<void(*)(void*, const InputType*, bool*)>(functionPointer);
+                auto fn = reinterpret_cast<void (*)(void*, const InputType*, bool*)>(functionPointer);
                 computeFunction = [this, fn](void* context, const InputType* input) {
                     fn(context, input, (bool*)std::get<Vector<bool>>(_cachedOutput).data());
                 };
@@ -34,7 +34,7 @@ namespace model
             case model::Port::PortType::integer:
             {
                 std::get<Vector<int>>(_cachedOutput).resize(outputSize);
-                auto fn = reinterpret_cast<void(*)(void*, const InputType*, int*)>(functionPointer);
+                auto fn = reinterpret_cast<void (*)(void*, const InputType*, int*)>(functionPointer);
                 computeFunction = [this, fn](void* context, const InputType* input) {
                     fn(context, input, std::get<Vector<int>>(_cachedOutput).data());
                 };
@@ -44,7 +44,7 @@ namespace model
             case model::Port::PortType::bigInt:
             {
                 std::get<Vector<int64_t>>(_cachedOutput).resize(outputSize);
-                auto fn = reinterpret_cast<void(*)(void*, const InputType*, int64_t*)>(functionPointer);
+                auto fn = reinterpret_cast<void (*)(void*, const InputType*, int64_t*)>(functionPointer);
                 computeFunction = [this, fn](void* context, const InputType* input) {
                     fn(context, input, std::get<Vector<int64_t>>(_cachedOutput).data());
                 };
@@ -54,7 +54,7 @@ namespace model
             case model::Port::PortType::smallReal:
             {
                 std::get<Vector<float>>(_cachedOutput).resize(outputSize);
-                auto fn = reinterpret_cast<void(*)(void*, const InputType*, float*)>(functionPointer);
+                auto fn = reinterpret_cast<void (*)(void*, const InputType*, float*)>(functionPointer);
                 computeFunction = [this, fn](void* context, const InputType* input) {
                     fn(context, input, std::get<Vector<float>>(_cachedOutput).data());
                 };
@@ -64,7 +64,7 @@ namespace model
             case model::Port::PortType::real:
             {
                 std::get<Vector<double>>(_cachedOutput).resize(outputSize);
-                auto fn = reinterpret_cast<void(*)(void*, const InputType*, double*)>(functionPointer);
+                auto fn = reinterpret_cast<void (*)(void*, const InputType*, double*)>(functionPointer);
                 computeFunction = [this, fn](void* context, const InputType* input) {
                     fn(context, input, std::get<Vector<double>>(_cachedOutput).data());
                 };
@@ -79,7 +79,7 @@ namespace model
         }
     }
 
-    template<typename ElementType>
+    template <typename ElementType>
     ElementType* IRCompiledMap::GetGlobalValuePointer(const std::string& name)
     {
         auto& jitter = GetJitter();
@@ -87,5 +87,5 @@ namespace model
         return reinterpret_cast<ElementType*>(address);
     }
 
-}
-}
+} // namespace model
+} // namespace ell

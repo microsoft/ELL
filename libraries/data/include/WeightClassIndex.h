@@ -58,5 +58,5 @@ namespace data
         /// <returns> A WeightClassIndex. </returns>
         static WeightClassIndex Parse(TextLine& textLine);
     };
-}
-}
+} // namespace data
+} // namespace ell

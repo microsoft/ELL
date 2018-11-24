@@ -14,8 +14,9 @@ namespace model
     // InputPortBase
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name)
-        : Port(owningNode, name, Port::GetPortType<ValueType>()), _referencedPort(&input)
+    InputPortBase::InputPortBase(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name) :
+        Port(owningNode, name, Port::GetPortType<ValueType>()),
+        _referencedPort(&input)
     {
     }
 
@@ -23,14 +24,14 @@ namespace model
     // InputPort
     //
     template <typename ValueType>
-    InputPort<ValueType>::InputPort()
-        : InputPortBase(Port::GetPortType<ValueType>())
+    InputPort<ValueType>::InputPort() :
+        InputPortBase(Port::GetPortType<ValueType>())
     {
     }
 
     template <typename ValueType>
-    InputPort<ValueType>::InputPort(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name)
-        : InputPortBase(owningNode, input, name)
+    InputPort<ValueType>::InputPort(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name) :
+        InputPortBase(owningNode, input, name)
     {
     }
 
@@ -119,5 +120,5 @@ namespace model
             _referencedPort = input.GetRanges()[0].ReferencedPort();
         }
     }
-}
-}
+} // namespace model
+} // namespace ell

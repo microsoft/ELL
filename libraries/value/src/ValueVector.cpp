@@ -17,7 +17,8 @@ namespace value
 
     Vector::Vector() = default;
 
-    Vector::Vector(Value value) : _value(value)
+    Vector::Vector(Value value) :
+        _value(value)
     {
         if (!_value.IsDefined() || !_value.IsConstrained() || _value.GetLayout().NumDimensions() != 1)
         {

@@ -11,8 +11,9 @@ namespace ell
 namespace trainers
 {
     template <typename LossFunctionType, typename BoosterType>
-    SortingForestTrainer<LossFunctionType, BoosterType>::SortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const SortingForestTrainerParameters& parameters)
-        : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction)
+    SortingForestTrainer<LossFunctionType, BoosterType>::SortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const SortingForestTrainerParameters& parameters) :
+        ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters),
+        _lossFunction(lossFunction)
     {
     }
 
@@ -99,5 +100,5 @@ namespace trainers
     {
         return std::make_unique<SortingForestTrainer<LossFunctionType, BoosterType>>(lossFunction, booster, parameters);
     }
-}
-}
+} // namespace trainers
+} // namespace ell

@@ -110,7 +110,7 @@ ell::math::ChannelColumnRowTensor<ValueType> MakeTensor(std::initializer_list<st
     for (const auto& row : list)
     {
         DEBUG_THROW(row.size() != numColumns, ell::utilities::InputException(ell::utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
-        for (const auto& column: row)
+        for (const auto& column : row)
         {
             DEBUG_THROW(column.size() != numChannels, ell::utilities::InputException(ell::utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
             std::transform(column.begin(), column.end(), std::back_inserter(data), [](ValueType2 x) { return static_cast<ValueType>(x); });
@@ -120,7 +120,7 @@ ell::math::ChannelColumnRowTensor<ValueType> MakeTensor(std::initializer_list<st
 }
 
 //
-// Fill a vector with some "interesting" input signal data. The particular values aren't that important, 
+// Fill a vector with some "interesting" input signal data. The particular values aren't that important,
 // but using something other than uniform noise is probably a good idea.
 //
 // The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
@@ -140,7 +140,7 @@ void FillInputVector(math::RowVectorReference<ValueType> input)
 }
 
 //
-// Fill a vector with some "interesting" filter weights. The particular values aren't that important, 
+// Fill a vector with some "interesting" filter weights. The particular values aren't that important,
 // but using something other than uniform noise is probably a good idea.
 //
 // The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
@@ -160,7 +160,7 @@ void FillFilterVector(math::RowVectorReference<ValueType> filter)
 }
 
 //
-// Fill a matrix with some "interesting" input signal data. The particular values aren't that important, 
+// Fill a matrix with some "interesting" input signal data. The particular values aren't that important,
 // but using something other than uniform noise is probably a good idea.
 //
 // The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
@@ -184,7 +184,7 @@ void FillInputMatrix(math::RowMatrixReference<ValueType> input)
 }
 
 //
-// Fill a matrix with some "interesting" filter weights. The particular values aren't that important, 
+// Fill a matrix with some "interesting" filter weights. The particular values aren't that important,
 // but using something other than uniform noise is probably a good idea.
 //
 // The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
@@ -208,7 +208,7 @@ void FillFilterMatrix(math::RowMatrixReference<ValueType> filter)
 }
 
 //
-// Fill a tensor with some "interesting" input signal data. The particular values aren't that important, 
+// Fill a tensor with some "interesting" input signal data. The particular values aren't that important,
 // but using something other than uniform noise is probably a good idea.
 //
 // The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
@@ -221,7 +221,7 @@ void FillInputTensor(math::ChannelColumnRowTensorReference<ValueType> input)
 }
 
 //
-// Fill a tensor with some "interesting" filter weights. The particular values aren't that important, 
+// Fill a tensor with some "interesting" filter weights. The particular values aren't that important,
 // but using something other than uniform noise is probably a good idea.
 //
 // The `std::trunc` part is there just so that the numbers have relatively few significant digits after the decimal,
@@ -281,7 +281,7 @@ template void FillInputTensor(math::ChannelColumnRowTensorReference<float> input
 template void FillInputTensor(math::ChannelColumnRowTensorReference<double> input);
 
 //
-// Get some "interesting" filter weights. 
+// Get some "interesting" filter weights.
 //
 template void FillFilterVector(math::RowVectorReference<float> filter);
 template void FillFilterVector(math::RowVectorReference<double> filter);

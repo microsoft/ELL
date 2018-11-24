@@ -17,5 +17,5 @@ namespace data
     {
         return vector * dataVector;
     }
-}
-}
+} // namespace data
+} // namespace ell

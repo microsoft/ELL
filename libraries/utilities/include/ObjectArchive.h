@@ -145,7 +145,7 @@ namespace utilities
     /// <returns> The new object </returns>
     template <typename ValueType>
     ValueType CreateObject(const ObjectArchive& archive);
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/ObjectArchive.tcc"

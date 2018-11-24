@@ -30,5 +30,5 @@ namespace passes
         FuseLinearOperationsPass::AddToRegistry();
         OptimizeReorderDataNodes::AddToRegistry();
     }
-}
-}
+} // namespace passes
+} // namespace ell

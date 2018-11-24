@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     {
         std::string basePath = ell::utilities::GetDirectoryPath(argv[0]);
         std::string examplePath = ell::utilities::JoinPaths(basePath, { "..", "..", "..", "examples" });
-        if (argc > 1) 
+        if (argc > 1)
         {
             examplePath = argv[1];
         }

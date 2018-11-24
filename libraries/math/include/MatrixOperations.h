@@ -16,8 +16,8 @@
 #endif
 
 // stl
-#include <string>
 #include <ostream>
+#include <string>
 
 namespace ell
 {
@@ -50,7 +50,10 @@ namespace math
     ///
     /// <returns> The transpose. </returns>
     template <typename ElementType, MatrixLayout layout>
-    auto Transpose(ConstMatrixReference<ElementType, layout> matrix) { return matrix.Transpose(); }
+    auto Transpose(ConstMatrixReference<ElementType, layout> matrix)
+    {
+        return matrix.Transpose();
+    }
 
     /// <summary> Returns the matrix transpose. </summary>
     ///
@@ -58,7 +61,10 @@ namespace math
     ///
     /// <returns> The transpose. </returns>
     template <typename ElementType, MatrixLayout layout>
-    auto Transpose(MatrixReference<ElementType, layout> matrix) { return matrix.Transpose(); }
+    auto Transpose(MatrixReference<ElementType, layout> matrix)
+    {
+        return matrix.Transpose();
+    }
 
     /// <summary> Adds a scalar to a matrix, matrix += scalar. </summary>
     ///
@@ -189,7 +195,8 @@ namespace math
     void ScaleSet(ElementType scalar, ConstMatrixReference<ElementType, matrixLayout> matrix, MatrixReference<ElementType, outputLayout> output);
 
     /// <summary> A stub class that represents the all-ones matrix. </summary>
-    struct OnesMatrix {};
+    struct OnesMatrix
+    {};
 
     /// @{
     /// <summary>
@@ -413,8 +420,8 @@ namespace math
         };
 
 #endif // USE_BLAS
-    }
-}
-}
+    } // namespace Internal
+} // namespace math
+} // namespace ell
 
 #include "../tcc/MatrixOperations.tcc"

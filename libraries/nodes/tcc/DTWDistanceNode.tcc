@@ -33,17 +33,25 @@ namespace nodes
             }
             return (sumSquares - ((sum * sum) / size)) / size;
         }
-    }
+    } // namespace DTWDistanceNodeImpl
 
     template <typename ValueType>
-    DTWDistanceNode<ValueType>::DTWDistanceNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1), _sampleDimension(0), _prototypeLength(0), _prototypeVariance(0)
+    DTWDistanceNode<ValueType>::DTWDistanceNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1),
+        _sampleDimension(0),
+        _prototypeLength(0),
+        _prototypeVariance(0)
     {
     }
 
     template <typename ValueType>
-    DTWDistanceNode<ValueType>::DTWDistanceNode(const model::OutputPort<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _prototype(prototype)
+    DTWDistanceNode<ValueType>::DTWDistanceNode(const model::OutputPort<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1),
+        _prototype(prototype)
     {
         _sampleDimension = input.Size();
         _prototypeLength = prototype.size();
@@ -223,7 +231,7 @@ namespace nodes
         auto numColumns = _prototype[0].size();
         std::vector<double> elements;
         elements.reserve(numRows * numColumns);
-        for (const auto& row : _prototype) 
+        for (const auto& row : _prototype)
         {
             elements.insert(elements.end(), row.begin(), row.end());
         }
@@ -253,5 +261,5 @@ namespace nodes
         _d.resize(_prototypeLength + 1);
         _s.resize(_prototypeLength + 1);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

@@ -41,14 +41,14 @@ namespace utilities
         XmlArchiver(std::ostream& outputStream);
 
     protected:
-        #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_VALUE_OVERRIDE(t);
+#define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_VALUE_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
         void ArchiveValue(const char* name, const std::string& value) override;
 
-        #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_ARRAY_OVERRIDE(t);
+#define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_ARRAY_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void ArchiveNull(const char* name) override;
 
@@ -106,17 +106,17 @@ namespace utilities
         bool HasNextPropertyName(const std::string& name) override;
 
     protected:
-        #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_VALUE_OVERRIDE(t);
+#define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_VALUE_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void UnarchiveValue(const char* name, std::string& value) override;
 
         bool UnarchiveNull(const char* name) override;
 
-        #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_OVERRIDE(t);
+#define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_ARRAY_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
-        #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
         void UnarchiveArray(const char* name, std::vector<std::string>& array) override;
         void BeginUnarchiveArray(const char* name, const std::string& typeName) override;
@@ -155,7 +155,7 @@ namespace utilities
         static std::string EncodeTypeName(const std::string& str);
         static std::string DecodeTypeName(const std::string& str);
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/XmlArchiver.tcc"

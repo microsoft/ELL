@@ -11,8 +11,9 @@ namespace ell
 namespace utilities
 {
     template <typename IteratorType>
-    StlStridedIterator<IteratorType>::StlStridedIterator(const IteratorType& iterator, difference_type stride)
-        : _iterator(iterator), _stride(stride)
+    StlStridedIterator<IteratorType>::StlStridedIterator(const IteratorType& iterator, difference_type stride) :
+        _iterator(iterator),
+        _stride(stride)
     {
     }
 
@@ -189,5 +190,5 @@ namespace utilities
     {
         return { iterator, stride };
     }
-}
-}
+} // namespace utilities
+} // namespace ell

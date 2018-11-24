@@ -23,17 +23,19 @@ namespace api
     //////////////////////////////////////////////////////////////////////////
 
     template <typename InputType, typename OutputType>
-    CallbackForwarder<InputType, OutputType>::CallbackForwarder()
-        : _inputCallback(nullptr), _outputCallback(nullptr), _lagCallback(nullptr)
+    CallbackForwarder<InputType, OutputType>::CallbackForwarder() :
+        _inputCallback(nullptr),
+        _outputCallback(nullptr),
+        _lagCallback(nullptr)
     {
     }
 
     template <typename InputType, typename OutputType>
     void CallbackForwarder<InputType, OutputType>::Register(CallbackBase<InputType>& inputCallback,
-        size_t inputSize,
-        CallbackBase<OutputType>& outputCallback,
-        size_t outputSize,
-        CallbackBase<TimeTickType>& lagCallback)
+                                                            size_t inputSize,
+                                                            CallbackBase<OutputType>& outputCallback,
+                                                            size_t outputSize,
+                                                            CallbackBase<TimeTickType>& lagCallback)
     {
         // Caller owns the lifetime of these objects
         _inputCallback = &inputCallback;
@@ -106,5 +108,5 @@ namespace api
 
         _lagCallback->Run(value);
     }
-}
-}
+} // namespace api
+} // namespace ell

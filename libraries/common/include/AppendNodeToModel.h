@@ -26,7 +26,7 @@ namespace common
     /// <returns> The new model, with the predictor node appended </returns>
     template <typename PredictorNodeType, typename PredictorType>
     model::Model AppendNodeToModel(const model::Map& map, const PredictorType& predictor);
-}
-}
+} // namespace common
+} // namespace ell
 
 #include "../tcc/AppendNodeToModel.tcc"

@@ -87,7 +87,7 @@ namespace dsp
         std::vector<ValueType> _b; // _b = {b0, b1, b2, ... }, so _b[0] = b0 = the scaling on the current input
         std::vector<ValueType> _a; // _a = {a1, a2, ... }, so _a[0] == a1 (since we never use the scaling coeff a0)
     };
-}
-}
+} // namespace dsp
+} // namespace ell
 
 #include "../tcc/IIRFilter.tcc"

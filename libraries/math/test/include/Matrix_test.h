@@ -7,7 +7,19 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+// testing
+#include "testing.h"
+
+// math
 #include "Matrix.h"
+#include "MatrixOperations.h"
+#include "Vector.h"
+
+// utilities
+#include "JsonArchiver.h"
+
+// stl
+#include <sstream>
 
 using namespace ell;
 

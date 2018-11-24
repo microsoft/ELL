@@ -33,7 +33,8 @@ namespace common
     };
 
     /// <summary> A version of DataLoadArguments that adds its members to the command line parser. </summary>
-    struct ParsedDataLoadArguments : public DataLoadArguments, public utilities::ParsedArgSet
+    struct ParsedDataLoadArguments : public DataLoadArguments
+        , public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
@@ -47,5 +48,5 @@ namespace common
         /// <returns> An utilities::CommandLineParseResult. </returns>
         utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
     };
-}
-}
+} // namespace common
+} // namespace ell

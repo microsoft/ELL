@@ -12,7 +12,7 @@ namespace ell
 {
 namespace utilities
 {
-    /// <summary> The results of the parse command: 
+    /// <summary> The results of the parse command:
     ///     success = Parsing succeeded;
     ///     badFormat = The string was not formatted correctly;
     ///     endOfString = The pointer pStr points \0 or to whitespace followed by \0;
@@ -63,7 +63,7 @@ namespace utilities
     ///
     /// <returns> True if digit, false if not. </returns>
     bool IsDigit(char c);
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/CStringParser.tcc"

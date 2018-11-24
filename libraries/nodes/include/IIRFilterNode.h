@@ -89,5 +89,5 @@ namespace nodes
     //
     extern template class IIRFilterNode<float>;
     extern template class IIRFilterNode<double>;
-}
-}
+} // namespace nodes
+} // namespace ell

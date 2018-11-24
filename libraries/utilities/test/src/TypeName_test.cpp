@@ -58,4 +58,4 @@ void TestEnumTypeNames()
     VerifyTypeName<SimpleEnum>("enum");
     VerifyTypeName<ClassEnum>("enum");
 }
-}
+} // namespace ell

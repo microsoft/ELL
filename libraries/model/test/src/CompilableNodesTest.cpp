@@ -134,7 +134,7 @@ void TestCompilableScalarOutputNode()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto outputNode = model.AddNode<model::OutputNode<double>>(ell::model::PortElements<double>{inputNode->output});
+    auto outputNode = model.AddNode<model::OutputNode<double>>(ell::model::PortElements<double>{ inputNode->output });
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -256,8 +256,9 @@ class LabeledPrototype
 public:
     LabeledPrototype() = default;
     LabeledPrototype(const LabeledPrototype&) = default;
-    LabeledPrototype(int label, const std::vector<std::vector<double>>& prototype)
-        : _label(label), _prototype(prototype){};
+    LabeledPrototype(int label, const std::vector<std::vector<double>>& prototype) :
+        _label(label),
+        _prototype(prototype){};
     int Label() const { return _label; }
     size_t Dimension() const { return _prototype[0].size(); }
     std::vector<std::vector<double>> Prototype() const { return _prototype; }
@@ -887,7 +888,8 @@ void TestCompilableSinkNode(size_t inputSize, bool triggerValue)
     {
         // Verify that sink callbacks are actually called
         testing::ProcessTest("Testing callback values", context.outputValues.size() == signal[0].size() && testing::IsEqual(context.outputValues, signal[0]));
-        for (auto x: context.outputValues) Log() << x << "  ";
+        for (auto x : context.outputValues)
+            Log() << x << "  ";
         Log() << EOL;
     }
     else
@@ -1047,7 +1049,7 @@ void TestOrderedMatrixMatrixMultiplyNode(int m, int n, int k, bool transposeA, b
     auto orderA = transposeA ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
     auto orderB = transposeB ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
     auto orderC = transposeC ? model::DimensionOrder{ 1, 0 } : model::DimensionOrder{ 0, 1 };
-    auto outputLayout = model::PortMemoryLayout( model::MemoryShape{ m, n } ).ReorderedCopy(orderC);
+    auto outputLayout = model::PortMemoryLayout(model::MemoryShape{ m, n }).ReorderedCopy(orderC);
 
     model::Model model;
     auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(model::MemoryShape{ m, k });
@@ -1197,8 +1199,11 @@ public:
     const model::OutputPort<double>& output = _output;
     /// @}
 
-    BinaryFunctionIRNode(const model::OutputPort<double>& in1, const model::OutputPort<double>& in2, const std::string& functionName, const std::string& irCode, const emitters::NamedVariableTypeList& otherArgs)
-        : IRNode({ &_input1, &_input2 }, { &_output }, functionName, irCode, otherArgs), _input1(this, in1, input1PortName), _input2(this, in2, input2PortName), _output(this, outputPortName, 1)
+    BinaryFunctionIRNode(const model::OutputPort<double>& in1, const model::OutputPort<double>& in2, const std::string& functionName, const std::string& irCode, const emitters::NamedVariableTypeList& otherArgs) :
+        IRNode({ &_input1, &_input2 }, { &_output }, functionName, irCode, otherArgs),
+        _input1(this, in1, input1PortName),
+        _input2(this, in2, input2PortName),
+        _output(this, outputPortName, 1)
     {
     }
 
@@ -1372,20 +1377,20 @@ void TestNeuralNetworkPredictorNode1()
 
     VerifyCompiledOutput(unarchivedMap, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_1");
 #else
-        auto inputNode = model.AddNode<model::InputNode<double>>(model::MemoryShape{1, 1, 3});
-        std::vector<ElementType> singleChannelInput = { 2 };
-        std::vector<ElementType> allChannelsInput = { 2, 1, 0 };
-        auto scaleValuesNode = model.AddNode<nodes::ConstantNode<ElementType>>(allChannelsInput);
-        auto scaleValuesNode2 = model.AddNode<nodes::ConstantNode<ElementType>>(allChannelsInput);
-        auto biasValuesNode = model.AddNode<nodes::ConstantNode<ElementType>>(); // nothing
+    auto inputNode = model.AddNode<model::InputNode<double>>(model::MemoryShape{ 1, 1, 3 });
+    std::vector<ElementType> singleChannelInput = { 2 };
+    std::vector<ElementType> allChannelsInput = { 2, 1, 0 };
+    auto scaleValuesNode = model.AddNode<nodes::ConstantNode<ElementType>>(allChannelsInput);
+    auto scaleValuesNode2 = model.AddNode<nodes::ConstantNode<ElementType>>(allChannelsInput);
+    auto biasValuesNode = model.AddNode<nodes::ConstantNode<ElementType>>(); // nothing
 
-        const size_t channelDimension = 2;
-        auto computeNode = model.AddNode<nodes::BroadcastLinearFunctionNode<ElementType>>(inputNode->output,
-                                                                                inputNode->output.GetMemoryLayout(),
-                                                                                scaleValuesNode->output,
-                                                                                biasValuesNode->output,
-                                                                                channelDimension,
-                                                                                inputNode->output.GetMemoryLayout());
+    const size_t channelDimension = 2;
+    auto computeNode = model.AddNode<nodes::BroadcastLinearFunctionNode<ElementType>>(inputNode->output,
+                                                                                      inputNode->output.GetMemoryLayout(),
+                                                                                      scaleValuesNode->output,
+                                                                                      biasValuesNode->output,
+                                                                                      channelDimension,
+                                                                                      inputNode->output.GetMemoryLayout());
     // map.Refine();
     utilities::JsonArchiver printer(std::cout);
     printer << model;

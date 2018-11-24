@@ -40,5 +40,5 @@ namespace functions
     {
         return value * value;
     }
-}
-}
+} // namespace functions
+} // namespace ell

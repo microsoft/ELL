@@ -26,7 +26,7 @@ struct ProfileArguments
 //
 // Test-data-related
 //
-template<typename T>
+template <typename T>
 std::vector<T> GetInputData(std::string filename, const TensorShape& inputShape, float scale)
 {
     std::default_random_engine engine(123);
@@ -40,7 +40,7 @@ std::vector<T> GetInputData(std::string filename, const TensorShape& inputShape,
     return result;
 }
 
-template<typename InputType, typename OutputType>
+template <typename InputType, typename OutputType>
 void RunModel(const ProfileArguments& profileArguments)
 {
     TensorShape inputShape;
@@ -54,9 +54,9 @@ void RunModel(const ProfileArguments& profileArguments)
     std::vector<InputType> input(inputSize);
     std::vector<OutputType> output(outputSize);
 
-    #ifdef ELL_WRAPPER_CLASS
+#ifdef ELL_WRAPPER_CLASS
     ELL_PredictWrapper wrapper;
-    #endif
+#endif
 
     // Evaluate the model in a loop
     for (int iter = 0; iter < profileArguments.numIterations; ++iter)
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     using OutputType = float;
 
     int numIterations = 20;
-    if(argc > 1)
+    if (argc > 1)
     {
         numIterations = atoi(argv[1]);
     }

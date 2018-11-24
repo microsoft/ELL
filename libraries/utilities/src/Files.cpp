@@ -6,8 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Exception.h"
 #include "Files.h"
+#include "Exception.h"
 #include "StringUtil.h"
 
 // stl
@@ -172,7 +172,7 @@ namespace utilities
         }
     }
 
-        // PORTABILITY should be replaced by C++17 filesystem when available
+    // PORTABILITY should be replaced by C++17 filesystem when available
 #ifdef WIN32
     std::string path_separator = "\\";
 #else
@@ -354,5 +354,5 @@ namespace utilities
         }
         throw ell::utilities::Exception("Could not find '" + name + "' in your PATH environment");
     }
-}
-}
+} // namespace utilities
+} // namespace ell

@@ -21,13 +21,15 @@ namespace emitters
     // IRTask
     //
 
-    IRTask::IRTask(const IRAsyncTask& asyncTask)
-        : _type(TaskType::async), _task(asyncTask)
+    IRTask::IRTask(const IRAsyncTask& asyncTask) :
+        _type(TaskType::async),
+        _task(asyncTask)
     {
     }
 
-    IRTask::IRTask(const IRThreadPoolTask& threadPoolTask)
-        : _type(TaskType::threadPool), _task(threadPoolTask)
+    IRTask::IRTask(const IRThreadPoolTask& threadPoolTask) :
+        _type(TaskType::threadPool),
+        _task(threadPoolTask)
     {
     }
 
@@ -94,13 +96,15 @@ namespace emitters
     // IRTaskArray
     //
 
-    IRTaskArray::IRTaskArray(const std::vector<IRAsyncTask>& asyncTasks)
-        : _type(IRTask::TaskType::async), _tasks(asyncTasks)
+    IRTaskArray::IRTaskArray(const std::vector<IRAsyncTask>& asyncTasks) :
+        _type(IRTask::TaskType::async),
+        _tasks(asyncTasks)
     {
     }
 
-    IRTaskArray::IRTaskArray(const IRThreadPoolTaskArray& threadPoolTasks)
-        : _type(IRTask::TaskType::threadPool), _tasks(threadPoolTasks)
+    IRTaskArray::IRTaskArray(const IRThreadPoolTaskArray& threadPoolTasks) :
+        _type(IRTask::TaskType::threadPool),
+        _tasks(threadPoolTasks)
     {
     }
 
@@ -156,5 +160,5 @@ namespace emitters
             throw std::invalid_argument("illegal value for TaskType");
         }
     }
-}
-}
+} // namespace emitters
+} // namespace ell

@@ -150,12 +150,12 @@ namespace trainers
         SGDTrainerParameters _parameters;
 
         // these variables follow the notation in https://arxiv.org/abs/1612.09147
-        math::ColumnVector<double> _v;  // gradient sum - weights
-        math::ColumnVector<double> _u;  // harmonic-weighted gradient sum - weights
-        double _t = 0;                  // step counter
-        double _a = 0;                  // gradient sum - bias
-        double _h = 0;                  // harmonic number
-        double _c = 0;                  // 1/t-weighted sum of _a
+        math::ColumnVector<double> _v; // gradient sum - weights
+        math::ColumnVector<double> _u; // harmonic-weighted gradient sum - weights
+        double _t = 0; // step counter
+        double _a = 0; // gradient sum - bias
+        double _h = 0; // harmonic number
+        double _c = 0; // 1/t-weighted sum of _a
 
         // these variables are mutable because we calculate them in a lazy manner (only when `GetPredictor() const` is called)
         mutable PredictorType _lastPredictor;
@@ -203,12 +203,12 @@ namespace trainers
         SGDTrainerParameters _parameters;
 
         // these variables follow the notation in https://arxiv.org/abs/1612.09147
-        math::ColumnVector<double> _v;  // gradient sum - weights
-        math::ColumnVector<double> _u;  // harmonic-weighted gradient sum - weights
-        double _t = 0;                  // step counter
-        double _a = 0;                  // gradient sum - bias
-        double _h = 0;                  // harmonic number
-        double _c = 0;                  // 1/t-weighted sum of _a
+        math::ColumnVector<double> _v; // gradient sum - weights
+        math::ColumnVector<double> _u; // harmonic-weighted gradient sum - weights
+        double _t = 0; // step counter
+        double _a = 0; // gradient sum - bias
+        double _h = 0; // harmonic number
+        double _c = 0; // 1/t-weighted sum of _a
 
         double _z = 0;
         double _r = 0;
@@ -258,7 +258,7 @@ namespace trainers
     /// <returns> A linear trainer </returns>
     template <typename LossFunctionType>
     std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSparseDataCenteredSGDTrainer(const LossFunctionType& lossFunction, math::RowVector<double> center, const SGDTrainerParameters& parameters);
-}
-}
+} // namespace trainers
+} // namespace ell
 
 #include "../tcc/SGDTrainer.tcc"

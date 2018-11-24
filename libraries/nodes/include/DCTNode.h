@@ -86,5 +86,5 @@ namespace nodes
         // DCT Matrix
         math::RowMatrix<ValueType> _dctCoeffs;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

@@ -26,7 +26,7 @@ namespace trainers
     /// <param name="transformation"> The transformation. </param>
     ///
     /// <returns> The calculated mean. </returns>
-    template<data::IterationPolicy policy, typename TransformationType>
+    template <data::IterationPolicy policy, typename TransformationType>
     math::RowVector<double> CalculateTransformedMean(const data::AnyDataset& anyDataset, TransformationType transformation);
 
     /// <summary> Applies a sparse transformation to each data vector in a dataset and returns the mean </summary>
@@ -36,7 +36,7 @@ namespace trainers
     /// <param name="transformation"> The transformation. </param>
     ///
     /// <returns> The calculated mean. </returns>
-    template<typename TransformationType>
+    template <typename TransformationType>
     math::RowVector<double> CalculateSparseTransformedMean(const data::AnyDataset& anyDataset, TransformationType transformation);
 
     /// <summary> Applies a dense transformation to each data vector in a dataset and returns the mean </summary>
@@ -46,7 +46,7 @@ namespace trainers
     /// <param name="transformation"> The transformation. </param>
     ///
     /// <returns> The calculated mean. </returns>
-    template<typename TransformationType>
+    template <typename TransformationType>
     math::RowVector<double> CalculateDenseTransformedMean(const data::AnyDataset& anyDataset, TransformationType transformation);
 
     /// <summary> Calcluates the mean of data vectors in a dataset </summary>
@@ -55,7 +55,7 @@ namespace trainers
     ///
     /// <returns> The calculated mean. </returns>
     math::RowVector<double> CalculateMean(const data::AnyDataset& anyDataset);
-}
-}
+} // namespace trainers
+} // namespace ell
 
 #include "../tcc/MeanCalculator.tcc"

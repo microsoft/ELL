@@ -103,8 +103,8 @@ void TestConvertPortElements()
     model::Model g;
     auto in1 = g.AddNode<model::InputNode<double>>(3);
     auto in2 = g.AddNode<model::InputNode<double>>(2);
-    auto out1 = g.AddNode<model::OutputNode<double>>(model::PortElements<double>{in1->output, 1});
-    auto out2 = g.AddNode<model::OutputNode<double>>(model::PortElements<double>{in1->output, in2->output});
+    auto out1 = g.AddNode<model::OutputNode<double>>(model::PortElements<double>{ in1->output, 1 });
+    auto out2 = g.AddNode<model::OutputNode<double>>(model::PortElements<double>{ in1->output, in2->output });
 
     model::PortElements<double> elements1 = { in1->output };
     Log() << "Output1 size: " << out1->output.Size() << EOL;

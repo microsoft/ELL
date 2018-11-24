@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "IRModuleEmitter.h"
 #include "IRFunctionEmitter.h"
+#include "IRModuleEmitter.h"
 
 // stl
 #include <string>
@@ -46,5 +46,5 @@ namespace emitters
     ///
     /// <returns> An LLVM StructType pointer for a struct that can hold the functions arguments. </returns>
     llvm::StructType* GetTaskArgStructType(IRModuleEmitter& module, LLVMFunction taskFunction);
-}
-}
+} // namespace emitters
+} // namespace ell

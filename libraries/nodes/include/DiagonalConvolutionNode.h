@@ -201,5 +201,5 @@ namespace nodes
         int _stride = 1;
         int _batchSize = 0;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

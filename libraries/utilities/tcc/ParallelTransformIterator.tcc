@@ -20,8 +20,12 @@ namespace utilities
     //
 
     template <typename InputIteratorType, typename OutType, typename FuncType, int MaxTasks>
-    ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::ParallelTransformIterator(InputIteratorType& inIter, FuncType transformFunction)
-        : _inIter(inIter), _transformFunction(transformFunction), _currentOutputValid(false), _currentIndex(0), _endIndex(-1)
+    ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::ParallelTransformIterator(InputIteratorType& inIter, FuncType transformFunction) :
+        _inIter(inIter),
+        _transformFunction(transformFunction),
+        _currentOutputValid(false),
+        _currentIndex(0),
+        _endIndex(-1)
     {
         // Fill the buffer with futures that are the result of calling std::async(transformFunction) on inIter
         int maxTasks = MaxTasks == 0 ? std::thread::hardware_concurrency() : MaxTasks;
@@ -87,5 +91,5 @@ namespace utilities
         using OutType = decltype(transformFunction(inIterator.Get()));
         return ParallelTransformIterator<InputIteratorType, OutType, FuncType>(inIterator, transformFunction);
     }
-}
-}
+} // namespace utilities
+} // namespace ell

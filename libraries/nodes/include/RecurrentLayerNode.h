@@ -58,11 +58,11 @@ namespace nodes
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         RNNNode(const model::OutputPort<ValueType>& input,
-                      const model::OutputPort<ValueType>& hiddenWeights,
-                      const model::OutputPort<ValueType>& hiddenBias,
-                      const ActivationType& activation,
-                      const model::PortMemoryLayout& inputMemoryLayout,
-                      const model::PortMemoryLayout& outputMemoryLayoutn);
+                const model::OutputPort<ValueType>& hiddenWeights,
+                const model::OutputPort<ValueType>& hiddenBias,
+                const ActivationType& activation,
+                const model::PortMemoryLayout& inputMemoryLayout,
+                const model::PortMemoryLayout& outputMemoryLayoutn);
 
         /// <summary> Gets information about the input memory layout </summary>
         ///
@@ -131,5 +131,5 @@ namespace nodes
 
         void ApplyActivation(emitters::IRFunctionEmitter& function, emitters::LLVMValue data, size_t dataLength);
     };
-}
-}
+} // namespace nodes
+} // namespace ell

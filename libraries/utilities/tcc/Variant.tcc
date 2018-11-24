@@ -143,9 +143,9 @@ namespace utilities
             void SetFloatValue(long double value) override;
 
             void operator++() override { Increment(_value); }
-            void operator++(int)override { Increment(_value); }
+            void operator++(int) override { Increment(_value); }
             void operator--() override { Decrement(_value); }
-            void operator--(int)override { Decrement(_value); }
+            void operator--(int) override { Decrement(_value); }
 
             static std::string GetTypeName() { return GetCompositeTypeName<ValueType>("VariantDerived"); }
             std::string GetRuntimeTypeName() const override { return GetTypeName(); }
@@ -403,8 +403,8 @@ namespace utilities
         //
         // VariantBase implementation
         //
-        inline VariantBase::VariantBase(std::type_index type)
-            : _type(type){};
+        inline VariantBase::VariantBase(std::type_index type) :
+            _type(type){};
 
         template <typename ValueType>
         ValueType& VariantBase::GetValue()
@@ -445,14 +445,18 @@ namespace utilities
         // VariantDerived implementation
         //
         template <typename ValueType>
-        VariantDerived<ValueType>::VariantDerived()
-            : VariantBase(typeid(ValueType)), _value(ValueType()), _typeName(TypeName<ValueType>::GetName())
+        VariantDerived<ValueType>::VariantDerived() :
+            VariantBase(typeid(ValueType)),
+            _value(ValueType()),
+            _typeName(TypeName<ValueType>::GetName())
         {
         }
 
         template <typename ValueType>
-        VariantDerived<ValueType>::VariantDerived(const ValueType& val)
-            : VariantBase(typeid(ValueType)), _value(val), _typeName(TypeName<ValueType>::GetName())
+        VariantDerived<ValueType>::VariantDerived(const ValueType& val) :
+            VariantBase(typeid(ValueType)),
+            _value(val),
+            _typeName(TypeName<ValueType>::GetName())
         {
         }
 
@@ -562,14 +566,14 @@ namespace utilities
             // archiver >> _value;
         }
 
-    } // end VariantDetail namespace
+    } // namespace VariantDetail
 
     //
     // Variant implementation
     //
     template <typename ValueType, ValueType Default>
-    Variant::Variant()
-        : _type(std::type_index(typeid(ValueType)))
+    Variant::Variant() :
+        _type(std::type_index(typeid(ValueType)))
     {
         auto derivedPtr = new VariantDetail::VariantDerived<std::decay_t<ValueType>>(Default);
         auto basePtr = static_cast<VariantDetail::VariantBase*>(derivedPtr);
@@ -577,8 +581,8 @@ namespace utilities
     }
 
     template <typename ValueType, IsNotVariant<ValueType> concept>
-    Variant::Variant(ValueType&& value)
-        : _type(std::type_index(typeid(ValueType)))
+    Variant::Variant(ValueType&& value) :
+        _type(std::type_index(typeid(ValueType)))
     {
         static_assert(!std::is_same<std::decay_t<ValueType>, Variant>(), "Can't make a Variant of a Variant");
         auto derivedPtr = new VariantDetail::VariantDerived<std::decay_t<ValueType>>(std::forward<ValueType>(value));
@@ -900,5 +904,5 @@ namespace utilities
         using ArgTypes = utilities::FunctionArgTypes<FunctionType>;
         return CallFunctionWithVariantsHelper(function, args, std::make_index_sequence<std::tuple_size<ArgTypes>::value>());
     }
-}
-}
+} // namespace utilities
+} // namespace ell

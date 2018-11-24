@@ -29,7 +29,7 @@ namespace emitters
 {
     class IRBlockRegion;
     class IRModuleEmitter;
-}
+} // namespace emitters
 
 namespace model
 {
@@ -189,7 +189,7 @@ namespace model
         // stack of node regions
         std::vector<NodeMap<emitters::IRBlockRegion*>> _nodeRegions;
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/IRMapCompiler.tcc"

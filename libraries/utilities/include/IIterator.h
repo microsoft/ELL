@@ -49,5 +49,5 @@ namespace utilities
         /// <returns> A const reference to the current item; </returns>
         virtual ValueType Get() const = 0;
     };
-}
-}
+} // namespace utilities
+} // namespace ell

@@ -43,5 +43,5 @@ namespace passes
         struct State;
         std::unique_ptr<State> _state;
     };
-}
-}
+} // namespace passes
+} // namespace ell

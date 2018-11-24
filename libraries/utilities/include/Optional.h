@@ -21,11 +21,13 @@ namespace utilities
     public:
         /// <summary> Default constructor: creates an empty value </summary>
         constexpr Optional() {}
-        
+
         /// <summary> Constructor with a (non-'auto') value </summary>
         ///
         /// <param name="value"> The value to set the object to. </param>
-        constexpr Optional(T value) : _hasValue(true), _value(value) {}
+        constexpr Optional(T value) :
+            _hasValue(true),
+            _value(value) {}
 
         /// <summary> Query if the object has a value </summary>
         ///
@@ -56,7 +58,7 @@ namespace utilities
         bool _hasValue = false;
         T _value = {};
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/Optional.tcc"

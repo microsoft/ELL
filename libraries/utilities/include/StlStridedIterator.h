@@ -22,7 +22,7 @@ namespace utilities
     {
     public:
         //using Base = std::iterator<std::random_access_iterator_tag, typename std::iterator_traits<IteratorType>::value_type>;
-        using iterator_category = typename std::iterator_traits<IteratorType>::iterator_category; 
+        using iterator_category = typename std::iterator_traits<IteratorType>::iterator_category;
         using value_type = typename std::iterator_traits<IteratorType>::value_type;
         using difference_type = typename std::iterator_traits<IteratorType>::difference_type;
         using size_type = size_t;
@@ -91,7 +91,7 @@ namespace utilities
     // utility function for creating StlStridedIterator
     template <typename IteratorType>
     StlStridedIterator<IteratorType> MakeStlStridedIterator(const IteratorType& iterator, ptrdiff_t stride);
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/StlStridedIterator.tcc"

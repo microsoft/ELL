@@ -111,7 +111,8 @@ namespace trainers
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    class ForestTrainer : public ForestTrainerBase, public ITrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>>
+    class ForestTrainer : public ForestTrainerBase
+        , public ITrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>>
     {
     public:
         using PredictorType = typename predictors::ForestPredictor<SplitRuleType, EdgePredictorType>;
@@ -207,7 +208,7 @@ namespace trainers
         // the data set
         data::Dataset<TrainerExampleType> _dataset;
     };
-}
-}
+} // namespace trainers
+} // namespace ell
 
 #include "../tcc/ForestTrainer.tcc"

@@ -13,4 +13,4 @@ namespace ell
 void TestFundamentalTypeNames();
 void TestClassTypeNames();
 void TestEnumTypeNames();
-}
+} // namespace ell

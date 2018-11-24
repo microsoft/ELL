@@ -11,14 +11,16 @@ namespace ell
 namespace data
 {
     template <typename DataVectorType, typename MetadataType>
-    Example<DataVectorType, MetadataType>::Example(DataVectorType dataVector, MetadataType metadata)
-        : _dataVector(std::make_shared<const DataVectorType>(std::move(dataVector))), _metadata(std::move(metadata))
+    Example<DataVectorType, MetadataType>::Example(DataVectorType dataVector, MetadataType metadata) :
+        _dataVector(std::make_shared<const DataVectorType>(std::move(dataVector))),
+        _metadata(std::move(metadata))
     {
     }
 
     template <typename DataVectorType, typename MetadataType>
-    Example<DataVectorType, MetadataType>::Example(const std::shared_ptr<const DataVectorType>& dataVector, const MetadataType& metadata)
-        : _dataVector(dataVector), _metadata(metadata)
+    Example<DataVectorType, MetadataType>::Example(const std::shared_ptr<const DataVectorType>& dataVector, const MetadataType& metadata) :
+        _dataVector(dataVector),
+        _metadata(metadata)
     {
     }
 
@@ -54,5 +56,5 @@ namespace data
         example.Print(ostream);
         return ostream;
     }
-}
-}
+} // namespace data
+} // namespace ell

@@ -25,7 +25,7 @@ namespace ell
 namespace model
 {
     class ModelTransformer;
-    
+
     /// <summary> A node that represents an input to the system. </summary>
     template <typename ValueType>
     class InputNode : public InputNodeBase
@@ -89,7 +89,7 @@ namespace model
         std::vector<ValueType> _inputValues;
         OutputPort<ValueType> _output;
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/InputNode.tcc"

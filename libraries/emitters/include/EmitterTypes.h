@@ -325,7 +325,7 @@ namespace emitters
         static std::vector<DestType> ToVariableVector(const std::vector<bool>& src);
         static std::vector<bool> FromVariableVector(const std::vector<DestType>& src);
     };
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/EmitterTypes.tcc"

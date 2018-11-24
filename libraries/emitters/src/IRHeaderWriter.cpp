@@ -118,7 +118,7 @@ namespace emitters
                 os << "} " << typeName << ";\n\n";
             }
         }
-    }
+    } // namespace
 
     void WriteLLVMType(std::ostream& os, LLVMType t)
     {
@@ -248,7 +248,7 @@ namespace emitters
         os << "//\n";
         os << "// ELL header for module " << moduleName << "\n";
         os << "//\n\n";
-        os << "#pragma once\n\n";      
+        os << "#pragma once\n\n";
         os << "#include <stdint.h>\n\n";
 
         {
@@ -262,7 +262,7 @@ namespace emitters
             }
 
             {
-                DeclareIfDefGuard swig(os, "SWIG", DeclareIfDefGuard::Type::Negative);  
+                DeclareIfDefGuard swig(os, "SWIG", DeclareIfDefGuard::Type::Negative);
                 // First write out type definitions
                 os << "//\n// Types\n//\n\n";
 
@@ -315,7 +315,7 @@ namespace emitters
 
     std::string SwiggifyType(std::string type)
     {
-        if (type == "int32_t") 
+        if (type == "int32_t")
         {
             // SWIG has a bug if we use int32_t then IntVector doesn't work properly.
             return "int";
@@ -352,7 +352,7 @@ namespace emitters
             std::string callbackMethod = TrimPrefix(callbackFunction, info.moduleName + "_");
             std::string argName = utilities::FormatString("input%d", sourceIndex);
 
-            // setup an internal method for the callback in our Wrapper class and delegate to 
+            // setup an internal method for the callback in our Wrapper class and delegate to
             // a virtual method that can be implemented in another language (via SWIG)
             info.helperMethods << "    void Internal_" << callbackMethod << "(" << inputType << "* buffer)\n";
             info.helperMethods << "    {\n";
@@ -422,7 +422,7 @@ namespace emitters
 
     void WriteSinkNotificationCallbacks(ModuleCallbackDefinitions& moduleCallbacks, CppWrapperInfo& info)
     {
-        bool hasSourceNodes = !moduleCallbacks.sources.empty();        
+        bool hasSourceNodes = !moduleCallbacks.sources.empty();
 
         if (!moduleCallbacks.sinks.empty())
         {
@@ -446,7 +446,7 @@ namespace emitters
                 std::string callbackMethod = TrimPrefix(callbackFunction, info.moduleName + "_");
                 std::string argName = utilities::FormatString("sinkOutput%d", sinkIndex);
 
-                // setup an internal method for the callback in our Wrapper class and delegate to 
+                // setup an internal method for the callback in our Wrapper class and delegate to
                 // a virtual method that can be implemented in another language (via SWIG)
                 info.helperMethods << "    void Internal_" << callbackMethod << "(" << outputType << "* buffer)\n";
                 info.helperMethods << "    {\n";
@@ -525,7 +525,7 @@ namespace emitters
                 }
                 else
                 {
-                    // inputs are always passed in and passed through to C predict function                            
+                    // inputs are always passed in and passed through to C predict function
                     info.predictCallArgs.push_back(argName + ".data()"); // convert vector to raw buffer.
                     passArgument = true;
                 }
@@ -573,7 +573,6 @@ namespace emitters
             }
             info.helperMethods << "    }\n\n";
         }
-
     }
 
     void WriteModuleCppWrapper(std::ostream& os, IRModuleEmitter& moduleEmitter)
@@ -641,9 +640,9 @@ namespace emitters
         ReplaceDelimiter(predictWrapperCode, "HELPER_METHODS", info.helperMethods.str());
         ReplaceDelimiter(predictWrapperCode, "CDECLS_GUARD", utilities::ToUppercase(className) + "_CDECLS");
         ReplaceDelimiter(predictWrapperCode, "CDECLS_IMPL", info.cdecls.str());
-        ReplaceDelimiter(predictWrapperCode, "STEPPABLE", hasSourceNodes ? "true" : "false" );
+        ReplaceDelimiter(predictWrapperCode, "STEPPABLE", hasSourceNodes ? "true" : "false");
         ReplaceDelimiter(predictWrapperCode, "RESET_BODY", info.resetMethodBody.str());
-            
+
         os << predictWrapperCode;
     }
 
@@ -655,8 +654,8 @@ namespace emitters
     //
     // DeclareExternC
     //
-    DeclareExternC::DeclareExternC(std::ostream& os)
-        : _os(&os)
+    DeclareExternC::DeclareExternC(std::ostream& os) :
+        _os(&os)
     {
         DeclareIfDefGuard guard(os, "__cplusplus", DeclareIfDefGuard::Type::Positive);
         *_os << "extern \"C\"\n{\n";
@@ -668,8 +667,10 @@ namespace emitters
         *_os << "} // extern \"C\"\n";
     }
 
-    DeclareIfDefGuard::DeclareIfDefGuard(std::ostream& os, std::string symbol, Type type)
-        : _os(os), _symbol(std::move(symbol)), _type(type)
+    DeclareIfDefGuard::DeclareIfDefGuard(std::ostream& os, std::string symbol, Type type) :
+        _os(os),
+        _symbol(std::move(symbol)),
+        _type(type)
     {
         _os << "#if " << (_type == Type::Negative ? "!" : "") << "defined(" << _symbol << ")\n";
     }
@@ -679,8 +680,8 @@ namespace emitters
         _os << "#endif // " << (_type == Type::Negative ? "!" : "") << "defined(" << _symbol << ")\n\n";
     }
 
-    DeclareIfDefDefine::DeclareIfDefDefine(std::ostream& os, std::string symbol, const std::string& value /* = "" */)
-        : DeclareIfDefGuard(os, std::move(symbol), Type::Negative)
+    DeclareIfDefDefine::DeclareIfDefDefine(std::ostream& os, std::string symbol, const std::string& value /* = "" */) :
+        DeclareIfDefGuard(os, std::move(symbol), Type::Negative)
     {
         _os << "#define " << _symbol << (value.empty() ? "" : " ") << value << "\n\n";
     }
@@ -752,5 +753,5 @@ namespace emitters
         className = inputType + "CallbackBase";
         className[0] = ::toupper(className[0]); // pascal case
     }
-}
-}
+} // namespace emitters
+} // namespace ell

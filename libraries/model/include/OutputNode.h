@@ -73,7 +73,7 @@ namespace model
     private:
         void Copy(ModelTransformer& transformer) const override;
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/OutputNode.tcc"

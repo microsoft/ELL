@@ -11,8 +11,9 @@ namespace ell
 namespace data
 {
     template <IterationPolicy policy, typename DataVectorType, typename TransformationType>
-    TransformedDataVector<policy, DataVectorType, TransformationType>::TransformedDataVector(const DataVectorType& dataVector, TransformationType transformation)
-        : _dataVector(dataVector), _transformation(transformation)
+    TransformedDataVector<policy, DataVectorType, TransformationType>::TransformedDataVector(const DataVectorType& dataVector, TransformationType transformation) :
+        _dataVector(dataVector),
+        _transformation(transformation)
     {
     }
 
@@ -27,5 +28,5 @@ namespace data
     {
         AddTransformedTo<DataVectorType, policy>(transformedDataVector.GetDataVector(), vector, transformedDataVector.GetTransformation());
     }
-}
-}
+} // namespace data
+} // namespace ell

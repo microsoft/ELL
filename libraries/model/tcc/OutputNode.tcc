@@ -11,22 +11,28 @@ namespace ell
 namespace model
 {
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode()
-        : OutputNodeBase(_input, _output, {}), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0) 
+    OutputNode<ValueType>::OutputNode() :
+        OutputNodeBase(_input, _output, {}),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0)
     {
         SetShape({});
     }
 
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::OutputPort<ValueType>& input)
-        : OutputNodeBase(_input, _output, MemoryShape{ static_cast<int>(input.Size()) }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size())
+    OutputNode<ValueType>::OutputNode(const model::OutputPort<ValueType>& input) :
+        OutputNodeBase(_input, _output, MemoryShape{ static_cast<int>(input.Size()) }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, input.Size())
     {
         SetShape(MemoryShape{ static_cast<int>(input.Size()) });
     }
 
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::OutputPort<ValueType>& input, const MemoryShape& shape)
-        : OutputNodeBase(_input, _output, shape), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size())
+    OutputNode<ValueType>::OutputNode(const model::OutputPort<ValueType>& input, const MemoryShape& shape) :
+        OutputNodeBase(_input, _output, shape),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, input.Size())
     {
         SetShape(shape);
     }
@@ -62,7 +68,7 @@ namespace model
         int size;
         archiver.OptionalProperty("size", 0) >> size;
         std::vector<int> shapeVector;
-        archiver.OptionalProperty("shape", std::vector<int>{size}) >> shapeVector;
+        archiver.OptionalProperty("shape", std::vector<int>{ size }) >> shapeVector;
         if (archiver.HasNextPropertyName("layout"))
         {
             PortMemoryLayout layout;
@@ -71,8 +77,8 @@ namespace model
         }
         else
         {
-            SetShape({shapeVector});
+            SetShape({ shapeVector });
         }
     }
-}
-}
+} // namespace model
+} // namespace ell

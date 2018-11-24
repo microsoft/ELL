@@ -74,5 +74,5 @@ namespace utilities
     {
         bool ArchiveAsPrimitive() const override { return true; }
     };
-}
-}
+} // namespace utilities
+} // namespace ell

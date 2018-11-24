@@ -14,8 +14,10 @@ namespace ell
 namespace trainers
 {
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters)
-        : _booster(booster), _parameters(parameters), _forest()
+    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters) :
+        _booster(booster),
+        _parameters(parameters),
+        _forest()
     {
     }
 
@@ -76,8 +78,11 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums)
-        : gain(0), nodeId(nodeId), stats(totalSums), ranges(totalRange)
+    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums) :
+        gain(0),
+        nodeId(nodeId),
+        stats(totalSums),
+        ranges(totalRange)
     {
     }
 
@@ -220,5 +225,5 @@ namespace trainers
         splitRule.PrintLine(os, tabs);
         stats.PrintLine(os, tabs);
     }
-}
-}
+} // namespace trainers
+} // namespace ell

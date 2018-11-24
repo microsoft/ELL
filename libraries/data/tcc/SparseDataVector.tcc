@@ -16,27 +16,31 @@ namespace data
 
     template <typename ElementType, typename IndexListType>
     SparseDataVectorIterator<IterationPolicy::skipZeros, ElementType, IndexListType>::SparseDataVectorIterator(
-        const IndexIteratorType& index_iterator, const ValueIteratorType& valueIterator, size_t size)
-        : _indexIterator(index_iterator), _valueIterator(valueIterator), _size(size)
+        const IndexIteratorType& index_iterator,
+        const ValueIteratorType& valueIterator,
+        size_t size) :
+        _indexIterator(index_iterator),
+        _valueIterator(valueIterator),
+        _size(size)
     {
     }
     template <typename ElementType, typename IndexListType>
-    bool SparseDataVectorIterator<IterationPolicy::skipZeros, ElementType, IndexListType>::IsValid() const 
-    { 
-        return _indexIterator.IsValid() && _indexIterator.Get() < _size; 
+    bool SparseDataVectorIterator<IterationPolicy::skipZeros, ElementType, IndexListType>::IsValid() const
+    {
+        return _indexIterator.IsValid() && _indexIterator.Get() < _size;
     }
 
     template <typename ElementType, typename IndexListType>
-    void SparseDataVectorIterator<IterationPolicy::skipZeros, ElementType, IndexListType>::Next() 
-    { 
-        _indexIterator.Next(); 
-        ++_valueIterator; 
+    void SparseDataVectorIterator<IterationPolicy::skipZeros, ElementType, IndexListType>::Next()
+    {
+        _indexIterator.Next();
+        ++_valueIterator;
     }
 
     template <typename ElementType, typename IndexListType>
-    IndexValue SparseDataVectorIterator<IterationPolicy::skipZeros, ElementType, IndexListType>::Get() const 
-    { 
-        return IndexValue{ _indexIterator.Get(), static_cast<double>(*_valueIterator) }; 
+    IndexValue SparseDataVectorIterator<IterationPolicy::skipZeros, ElementType, IndexListType>::Get() const
+    {
+        return IndexValue{ _indexIterator.Get(), static_cast<double>(*_valueIterator) };
     }
 
     template <typename ElementType, typename IndexListType>
@@ -49,8 +53,8 @@ namespace data
             if (_indexIterator.IsValid() && _indexIterator.Get() < _size)
             {
                 _iteratorIndex = _indexIterator.Get();
-            } 
-            else 
+            }
+            else
             {
                 _iteratorIndex = _size;
             }
@@ -59,8 +63,8 @@ namespace data
     }
 
     template <typename ElementType, typename IndexListType>
-    IndexValue SparseDataVectorIterator<IterationPolicy::all, ElementType, IndexListType>::Get() const 
-    { 
+    IndexValue SparseDataVectorIterator<IterationPolicy::all, ElementType, IndexListType>::Get() const
+    {
         if (_index == _iteratorIndex)
         {
             return IndexValue{ _index, static_cast<double>(*_valueIterator) };
@@ -68,9 +72,11 @@ namespace data
         return IndexValue{ _index, 0.0 };
     }
 
-    template<typename ElementType, typename IndexListType>
+    template <typename ElementType, typename IndexListType>
     SparseDataVectorIterator<IterationPolicy::all, ElementType, IndexListType>::SparseDataVectorIterator(const IndexIteratorType& indexIterator, const ValueIteratorType& valueIterator, size_t size) :
-        _indexIterator(indexIterator), _valueIterator(valueIterator), _size(size)
+        _indexIterator(indexIterator),
+        _valueIterator(valueIterator),
+        _size(size)
     {
         _iteratorIndex = _indexIterator.IsValid() ? _indexIterator.Get() : _size;
     }
@@ -82,11 +88,11 @@ namespace data
         AppendElements(std::move(SparseIterator));
     }
 
-    template<typename ElementType, typename IndexListType>
-    template<IterationPolicy policy>
-    auto SparseDataVector<ElementType, IndexListType>::GetIterator(size_t size) const -> Iterator<policy> 
-    { 
-        return Iterator<policy>(_indexList.GetIterator(), _values.cbegin(), size); 
+    template <typename ElementType, typename IndexListType>
+    template <IterationPolicy policy>
+    auto SparseDataVector<ElementType, IndexListType>::GetIterator(size_t size) const -> Iterator<policy>
+    {
+        return Iterator<policy>(_indexList.GetIterator(), _values.cbegin(), size);
     }
 
     template <typename ElementType, typename IndexListType>
@@ -148,5 +154,5 @@ namespace data
             return _indexList.Max() + 1;
         }
     }
-}
-}
+} // namespace data
+} // namespace ell

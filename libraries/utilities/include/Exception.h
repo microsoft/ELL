@@ -20,7 +20,8 @@ namespace utilities
     {
     public:
         /// <summary></summary>
-        Exception(const std::string& message) : _message(message) { }  // STYLE discrepancy 
+        Exception(const std::string& message) :
+            _message(message) {} // STYLE discrepancy
 
         ~Exception() override = default;
 
@@ -110,7 +111,7 @@ namespace utilities
     using NumericException = ErrorCodeException<NumericExceptionErrors>;
     using InputException = ErrorCodeException<InputExceptionErrors>;
     using DataFormatException = ErrorCodeException<DataFormatErrors>;
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/Exception.tcc"

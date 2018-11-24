@@ -31,7 +31,7 @@ namespace emitters
         {
             return function.GetEmitter();
         }
-    }
+    } // namespace detail
     using namespace detail;
 
     bool IRLocalScalar::IsConstantInt() const
@@ -455,5 +455,5 @@ namespace emitters
         LLVMValue result = a.function.Select(a >= b, a, b);
         return { a.function, result };
     }
-}
-}
+} // namespace emitters
+} // namespace ell

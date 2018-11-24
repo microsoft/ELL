@@ -105,9 +105,10 @@ namespace utilities
         SerializationContext* GetPreviousContext() { return _previousContext; }
 
     protected:
-        struct c_tor {}; // tag struct for calling constructor that stores a previous context
-        SerializationContext(SerializationContext& previousContext, c_tor)
-            : _previousContext(&previousContext) {}
+        struct c_tor
+        {}; // tag struct for calling constructor that stores a previous context
+        SerializationContext(SerializationContext& previousContext, c_tor) :
+            _previousContext(&previousContext) {}
 
     private:
         friend class Variant;
@@ -272,7 +273,7 @@ namespace utilities
         PropertyArchiver operator[](const std::string& name);
 
     protected:
-// These are all the virtual function that need to be implemented by archivers
+        // These are all the virtual function that need to be implemented by archivers
 
 #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_VALUE_BASE(t);
         ARCHIVABLE_TYPES_LIST
@@ -300,7 +301,6 @@ namespace utilities
         ArchiveVersion GetArchiveVersion(const IArchivable& value) const;
 
     private:
-
         // unique pointer to non-archivable object
         template <typename ValueType, IsNotArchivable<ValueType> concept = true>
         void ArchiveItem(const char* name, const std::unique_ptr<ValueType>& value);
@@ -379,7 +379,8 @@ namespace utilities
             DefaultValueType _defaultValue;
         };
 
-        struct NoDefault {}; // tag type to denote that we don't have a default value
+        struct NoDefault
+        {}; // tag type to denote that we don't have a default value
 
         /// <summary> Constructor </summary>
         ///
@@ -469,7 +470,7 @@ namespace utilities
 #define ARCHIVE_TYPE_OP(t) DECLARE_UNARCHIVE_VALUE_BASE(t);
         ARCHIVABLE_TYPES_LIST
 #undef ARCHIVE_TYPE_OP
-        
+
         virtual void UnarchiveValue(const char* name, std::string& value) = 0;
         virtual void UnarchiveValue(const char* name, IArchivable& value);
 
@@ -592,7 +593,7 @@ namespace utilities
     void base::UnarchiveValue(const char* name, type& value, IsFundamental<type>) { ReadScalar(name, value); }
 #define IMPLEMENT_UNARCHIVE_ARRAY(base, type) \
     void base::UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type>) { ReadArray(name, value); }
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/Archiver.tcc"

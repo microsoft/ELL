@@ -101,7 +101,7 @@ namespace nodes
         int _outputWidth;
         int _outputHeight;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/ReceptiveFieldMatrixNode.tcc"

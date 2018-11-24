@@ -23,7 +23,8 @@ namespace predictors
     ///
     /// <typeparam name="PredictorType"> The internal predictor type. </typeparam>
     template <typename PredictorType>
-    class SignPredictor : IPredictor<bool>, public utilities::IArchivable
+    class SignPredictor : IPredictor<bool>
+        , public utilities::IArchivable
     {
     public:
         /// <summary> Type of the data vector expected by this predictor type. </summary>
@@ -73,7 +74,7 @@ namespace predictors
     /// <returns> A SignPredictor </returns>
     template <typename PredictorType>
     SignPredictor<PredictorType> MakeSignPredictor(PredictorType predictor);
-}
-}
+} // namespace predictors
+} // namespace ell
 
 #include "../tcc/SignPredictor.tcc"

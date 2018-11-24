@@ -26,7 +26,8 @@ namespace value
 
     Tensor::Tensor() = default;
 
-    Tensor::Tensor(Value value) : _value(value)
+    Tensor::Tensor(Value value) :
+        _value(value)
     {
         if (!_value.IsDefined() || !_value.IsConstrained() || _value.GetLayout().NumDimensions() != 3)
         {
@@ -44,8 +45,7 @@ namespace value
 
     Value Tensor::GetValue() const { return _value; }
 
-    Tensor Tensor::SubTensor(Scalar row, Scalar column, Scalar channel, int numRows, int numColumns,
-                             int numChannels) const
+    Tensor Tensor::SubTensor(Scalar row, Scalar column, Scalar channel, int numRows, int numColumns, int numChannels) const
     {
         const MemoryLayout& currentLayout = _value.GetLayout();
 

@@ -41,4 +41,4 @@ void TestLoadMappedDataset(const std::string& examplePath)
     auto dataset = common::GetDataset(stream);
     dataset = common::TransformDataset(dataset, map);
 }
-}
+} // namespace ell

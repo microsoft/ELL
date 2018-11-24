@@ -37,5 +37,5 @@ namespace functions
             return 0.0;
         }
     }
-}
-}
+} // namespace functions
+} // namespace ell

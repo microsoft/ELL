@@ -11,8 +11,8 @@
 #include "AutoDataVector.h"
 #include "DataVector.h"
 #include "DenseDataVector.h"
-#include "WeightLabel.h"
 #include "WeightClassIndex.h"
+#include "WeightLabel.h"
 
 // utilities
 #include "TypeTraits.h"
@@ -150,7 +150,7 @@ namespace data
     /// <returns> The shifted ostream. </returns>
     template <typename DataVectorType, typename MetadataType>
     std::ostream& operator<<(std::ostream& ostream, const Example<DataVectorType, MetadataType>& example);
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/Example.tcc"

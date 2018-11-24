@@ -18,13 +18,21 @@ namespace ell
 {
 namespace predictors
 {
-    ProtoNNPredictor::ProtoNNPredictor()
-        : _dimension(0), _W(0, 0), _B(0, 0), _Z(0, 0), _gamma(0)
+    ProtoNNPredictor::ProtoNNPredictor() :
+        _dimension(0),
+        _W(0, 0),
+        _B(0, 0),
+        _Z(0, 0),
+        _gamma(0)
     {
     }
 
-    ProtoNNPredictor::ProtoNNPredictor(size_t dimension, size_t projectedDimension, size_t numPrototypes, size_t numLabels, double gamma)
-        : _dimension(dimension), _W(projectedDimension, dimension), _B(projectedDimension, numPrototypes), _Z(numLabels, numPrototypes), _gamma(gamma)
+    ProtoNNPredictor::ProtoNNPredictor(size_t dimension, size_t projectedDimension, size_t numPrototypes, size_t numLabels, double gamma) :
+        _dimension(dimension),
+        _W(projectedDimension, dimension),
+        _B(projectedDimension, numPrototypes),
+        _Z(numLabels, numPrototypes),
+        _gamma(gamma)
     {
     }
 
@@ -97,5 +105,5 @@ namespace predictors
         math::MatrixArchiver::Read(_B, "b", archiver);
         math::MatrixArchiver::Read(_Z, "z", archiver);
     }
-}
-}
+} // namespace predictors
+} // namespace ell

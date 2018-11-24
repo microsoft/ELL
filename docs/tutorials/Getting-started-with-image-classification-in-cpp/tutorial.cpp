@@ -6,11 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <stdio.h>
-#include <fstream>
-#include <sstream>
 #include <chrono>
+#include <fstream>
 #include <opencv2/opencv.hpp>
+#include <sstream>
+#include <stdio.h>
 
 // Include the model interface file for the compiled ELL model
 // Note: the "<modelname>_MAIN" preprocessor symbol must be defined in exactly one source file
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     std::vector<float> predictions(wrapper.GetOutputSize());
 
     // Declare a variable to hold the prediction times
-    std::vector<double>  predictionTimes;
+    std::vector<double> predictionTimes;
     double meanTimeToPredict = 0.0;
 
     while ((cv::waitKey(1) & 0xFF) == 0xFF)

@@ -16,8 +16,9 @@ namespace trainers
     template <typename PredictorType>
     EvaluatingTrainer<PredictorType>::EvaluatingTrainer(
         std::unique_ptr<InternalTrainerType>&& internalTrainer,
-        std::shared_ptr<EvaluatorType> evaluator)
-        : _internalTrainer(std::move(internalTrainer)), _evaluator(evaluator)
+        std::shared_ptr<EvaluatorType> evaluator) :
+        _internalTrainer(std::move(internalTrainer)),
+        _evaluator(evaluator)
     {
         assert(_internalTrainer != nullptr);
         assert(_evaluator != nullptr);
@@ -43,5 +44,5 @@ namespace trainers
     {
         return EvaluatingTrainer<PredictorType>(std::move(internalTrainer), evaluator);
     }
-}
-}
+} // namespace trainers
+} // namespace ell

@@ -125,5 +125,5 @@ namespace nodes
         int _stride = 1;
         bool _isDepthwiseSeparable = false;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

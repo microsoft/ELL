@@ -59,7 +59,7 @@ namespace data
     {
         return TransformingIndexValueIterator<WrappedIndexValueIteratorType, TransformationType>(std::move(wrappedIterator), std::move(transform));
     }
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/TransformingIndexValueIterator.tcc"

@@ -12,26 +12,30 @@ namespace ell
 {
 namespace model
 {
-    OutputPortBase::OutputPortBase(const Node* node, std::string name, PortType type, size_t size)
-        : Port(node, name, type), _layout({static_cast<int>(size)}), _isReferenced(false)
+    OutputPortBase::OutputPortBase(const Node* node, std::string name, PortType type, size_t size) :
+        Port(node, name, type),
+        _layout({ static_cast<int>(size) }),
+        _isReferenced(false)
     {
     }
 
-    OutputPortBase::OutputPortBase(const Node* node, std::string name, PortType type, const PortMemoryLayout& layout)
-        : Port(node, name, type), _layout(layout),_isReferenced(false)
+    OutputPortBase::OutputPortBase(const Node* node, std::string name, PortType type, const PortMemoryLayout& layout) :
+        Port(node, name, type),
+        _layout(layout),
+        _isReferenced(false)
     {
     }
 
     void OutputPortBase::SetSize(size_t size)
     {
-        _layout = PortMemoryLayout({static_cast<int>(size)});
+        _layout = PortMemoryLayout({ static_cast<int>(size) });
     }
-    
+
     void OutputPortBase::SetMemoryLayout(const PortMemoryLayout& layout)
     {
         _layout = layout;
     }
-    
+
     utilities::ArchiveVersion OutputPortBase::GetArchiveVersion() const
     {
         return utilities::ArchiveVersionNumbers::v8_port_memory_layout;
@@ -53,7 +57,7 @@ namespace model
         Port::ReadFromArchive(archiver);
         int size = 0;
         archiver.OptionalProperty("size", 0) >> size;
-        archiver.OptionalProperty("layout", PortMemoryLayout({size})) >> _layout;
+        archiver.OptionalProperty("layout", PortMemoryLayout({ size })) >> _layout;
     }
-}
-}
+} // namespace model
+} // namespace ell

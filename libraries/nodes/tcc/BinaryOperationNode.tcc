@@ -136,19 +136,25 @@ namespace nodes
         {
             return (!a) != (!b);
         }
-    }
+    } // namespace BinaryOperations
 
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode()
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, defaultInput1PortName), _input2(this, {}, defaultInput2PortName), _output(this, defaultOutputPortName, 0), _operation(emitters::BinaryOperationType::none)
+    BinaryOperationNode<ValueType>::BinaryOperationNode() :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, {}, defaultInput1PortName),
+        _input2(this, {}, defaultInput2PortName),
+        _output(this, defaultOutputPortName, 0),
+        _operation(emitters::BinaryOperationType::none)
     {
     }
 
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryOperationType operation)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }),
-        _input1(this, input1, defaultInput1PortName),  _inputLayout1(input1.GetMemoryLayout()),
-        _input2(this, input2, defaultInput2PortName),  _inputLayout2(input2.GetMemoryLayout()),
+    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryOperationType operation) :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, input1, defaultInput1PortName),
+        _inputLayout1(input1.GetMemoryLayout()),
+        _input2(this, input2, defaultInput2PortName),
+        _inputLayout2(input2.GetMemoryLayout()),
         _output(this, defaultOutputPortName, input1.GetMemoryLayout()),
         _operation(operation),
         _paddingValue(0)
@@ -164,13 +170,15 @@ namespace nodes
                                                         const model::OutputPort<ValueType>& input2,
                                                         const model::PortMemoryLayout& layout,
                                                         emitters::BinaryOperationType operation,
-                                                        ValueType padding)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }),
-          _input1(this, input1, defaultInput1PortName), _inputLayout1(layout),
-          _input2(this, input2, defaultInput2PortName), _inputLayout2(layout),
-          _output(this, defaultOutputPortName, layout),
-          _operation(operation),
-          _paddingValue(padding)
+                                                        ValueType padding) :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, input1, defaultInput1PortName),
+        _inputLayout1(layout),
+        _input2(this, input2, defaultInput2PortName),
+        _inputLayout2(layout),
+        _output(this, defaultOutputPortName, layout),
+        _operation(operation),
+        _paddingValue(padding)
     {
     }
 
@@ -181,13 +189,15 @@ namespace nodes
                                                         const model::PortMemoryLayout& inputLayout2,
                                                         const model::PortMemoryLayout& outputLayout,
                                                         emitters::BinaryOperationType operation,
-                                                        ValueType padding)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }),
-          _input1(this, input1, defaultInput1PortName), _inputLayout1(inputLayout1),
-          _input2(this, input2, defaultInput2PortName), _inputLayout2(inputLayout2),
-          _output(this, defaultOutputPortName, outputLayout),
-          _operation(operation),
-          _paddingValue(padding)
+                                                        ValueType padding) :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, input1, defaultInput1PortName),
+        _inputLayout1(inputLayout1),
+        _input2(this, input2, defaultInput2PortName),
+        _inputLayout2(inputLayout2),
+        _output(this, defaultOutputPortName, outputLayout),
+        _operation(operation),
+        _paddingValue(padding)
     {
         if (inputLayout1.GetActiveSize() != inputLayout2.GetActiveSize())
         {
@@ -502,5 +512,5 @@ namespace nodes
         _output.SetMemoryLayout(outputLayout);
         archiver["padding"] >> _paddingValue;
     }
-}
-}
+} // namespace nodes
+} // namespace ell

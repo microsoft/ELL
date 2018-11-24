@@ -13,4 +13,4 @@ void TestTransformIterator();
 void TestParallelTransformIterator();
 
 void TestStlStridedIterator();
-}
+} // namespace ell

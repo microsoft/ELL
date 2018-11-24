@@ -27,8 +27,11 @@ namespace model
     //
     // NodeInfoEmitter
     //
-    NodeInfoEmitter::NodeInfoEmitter(emitters::IRModuleEmitter& module, const Node* node, emitters::LLVMValue nodeInfoPtr, llvm::StructType* nodeInfoType)
-        : _module(&module), _node(node), _nodeInfoPtr(nodeInfoPtr), _nodeInfoType(nodeInfoType)
+    NodeInfoEmitter::NodeInfoEmitter(emitters::IRModuleEmitter& module, const Node* node, emitters::LLVMValue nodeInfoPtr, llvm::StructType* nodeInfoType) :
+        _module(&module),
+        _node(node),
+        _nodeInfoPtr(nodeInfoPtr),
+        _nodeInfoType(nodeInfoType)
     {
     }
 
@@ -54,8 +57,10 @@ namespace model
     //
     // PerformanceCountersEmitter
     //
-    PerformanceCountersEmitter::PerformanceCountersEmitter(emitters::IRModuleEmitter& module, emitters::LLVMValue performanceCountersPtr, llvm::StructType* performanceCountersType)
-        : _module(&module), _performanceCountersPtr(performanceCountersPtr), _performanceCountersType(performanceCountersType)
+    PerformanceCountersEmitter::PerformanceCountersEmitter(emitters::IRModuleEmitter& module, emitters::LLVMValue performanceCountersPtr, llvm::StructType* performanceCountersType) :
+        _module(&module),
+        _performanceCountersPtr(performanceCountersPtr),
+        _performanceCountersType(performanceCountersType)
     {
     }
 
@@ -107,8 +112,9 @@ namespace model
     //
     // NodePerformanceEmitter
     //
-    NodePerformanceEmitter::NodePerformanceEmitter(emitters::IRModuleEmitter& module, const Node* node, emitters::LLVMValue nodeInfoPtr, emitters::LLVMValue performanceCountersPtr, llvm::StructType* nodeInfoType, llvm::StructType* performanceCountersType)
-        : _nodeInfoEmitter(module, node, nodeInfoPtr, nodeInfoType), _performanceCountersEmitter(module, performanceCountersPtr, performanceCountersType)
+    NodePerformanceEmitter::NodePerformanceEmitter(emitters::IRModuleEmitter& module, const Node* node, emitters::LLVMValue nodeInfoPtr, emitters::LLVMValue performanceCountersPtr, llvm::StructType* nodeInfoType, llvm::StructType* performanceCountersType) :
+        _nodeInfoEmitter(module, node, nodeInfoPtr, nodeInfoType),
+        _performanceCountersEmitter(module, performanceCountersPtr, performanceCountersType)
     {
     }
 
@@ -136,14 +142,22 @@ namespace model
     //
     // ModelProfiler
     //
-    ModelProfiler::ModelProfiler()
-        : _module(nullptr), _model(nullptr), _profilingEnabled(false), _nodeInfoType(nullptr), _performanceCountersType(nullptr)
+    ModelProfiler::ModelProfiler() :
+        _module(nullptr),
+        _model(nullptr),
+        _profilingEnabled(false),
+        _nodeInfoType(nullptr),
+        _performanceCountersType(nullptr)
     {
         // Emit functions
     }
 
-    ModelProfiler::ModelProfiler(emitters::IRModuleEmitter& module, Model& model, bool enableProfiling)
-        : _module(&module), _model(&model), _profilingEnabled(enableProfiling), _nodeInfoType(nullptr), _performanceCountersType(nullptr)
+    ModelProfiler::ModelProfiler(emitters::IRModuleEmitter& module, Model& model, bool enableProfiling) :
+        _module(&module),
+        _model(&model),
+        _profilingEnabled(enableProfiling),
+        _nodeInfoType(nullptr),
+        _performanceCountersType(nullptr)
     {
         // Emit functions
     }
@@ -570,5 +584,5 @@ namespace model
         auto time = _module->GetRuntime().GetCurrentTime(function);
         return time;
     }
-}
-}
+} // namespace model
+} // namespace ell

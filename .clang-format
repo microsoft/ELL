@@ -22,7 +22,7 @@ AllowShortIfStatementsOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 BinPackArguments: false
-BinPackParameters: true
+BinPackParameters: false
 BreakBeforeBraces: Custom
 BreakConstructorInitializers: AfterColon
 BraceWrapping:
@@ -42,7 +42,7 @@ BraceWrapping:
 ContinuationIndentWidth: 4
 ConstructorInitializerIndentWidth: 4
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ColumnLimit: 120
+ColumnLimit: 0
 Cpp11BracedListStyle: false
 FixNamespaceComments: true
 IncludeBlocks: Preserve

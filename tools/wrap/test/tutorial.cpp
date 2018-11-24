@@ -6,10 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <stdio.h>
+#include <chrono>
 #include <iostream>
 #include <sstream>
-#include <chrono>
+#include <stdio.h>
 #include <vector>
 
 // Include the model interface file for the compiled ELL model
@@ -45,7 +45,6 @@ public:
             input0[i] = 1.0;
         }
     }
-
 };
 
 int main(int argc, char** argv)
@@ -73,7 +72,7 @@ int main(int argc, char** argv)
             break;
         }
     }
-    if (failed) 
+    if (failed)
     {
         std::cout << "### FAILED tutorial.cpp got unexpected output from Predict function\n";
         return 1;

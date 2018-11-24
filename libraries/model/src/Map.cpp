@@ -28,7 +28,7 @@ namespace model
         //
         constexpr utilities::ArchiveVersion noMetadataArchiveVersion = { utilities::ArchiveVersionNumbers::v2 };
         constexpr utilities::ArchiveVersion metadataArchiveVersion = { utilities::ArchiveVersionNumbers::v3_model_metadata };
-    }
+    } // namespace
 
     Map::Map(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs)
     {
@@ -44,21 +44,21 @@ namespace model
 
         for (const auto& output : outputs)
         {
-            if (!output.second.IsFullPortOutput()) 
+            if (!output.second.IsFullPortOutput())
             {
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Map constructor requires full output ports (IsFullPortOutput()==true)");
             }
             PortElementsBase newOutputs = transformer.GetCorrespondingOutputs(output.second);
             AddOutput(output.first, newOutputs);
         }
-        
-        // Important: we don't need to call FixTransformedIO here we already mapped the inputs and 
-        // outputs correctly in the code above.  
+
+        // Important: we don't need to call FixTransformedIO here we already mapped the inputs and
+        // outputs correctly in the code above.
         Prune();
     }
 
-    Map::Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs)
-        : _model(std::move(model))
+    Map::Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs) :
+        _model(std::move(model))
     {
         for (const auto& input : inputs)
         {
@@ -239,7 +239,8 @@ namespace model
     {
         // gather DebugSinkNode
         std::unordered_set<const Node*> sinkNodes;
-        for (const Node* node: GetMatchingNodesByType("DebugSinkNode")) {
+        for (const Node* node : GetMatchingNodesByType("DebugSinkNode"))
+        {
             auto parents = node->GetParentNodes();
             for (auto ptr = parents.begin(), end = parents.end(); ptr != end; ptr++)
             {
@@ -362,7 +363,7 @@ namespace model
         }
         auto minimalModel = transformer.CopySubmodel(_model, outputPorts, context);
         FixTransformedIO(transformer);
-        _model = std::move(minimalModel);        
+        _model = std::move(minimalModel);
     }
 
     size_t Map::GetNumInputs() const
@@ -477,7 +478,7 @@ namespace model
         {
             return sourceNodes[index]->GetOutputType();
         }
-        
+
         return GetInput(index)->GetOutputType();
     }
 
@@ -672,9 +673,9 @@ namespace model
     //
     // MapSerializationContext
     //
-    MapSerializationContext::MapSerializationContext(utilities::SerializationContext& previousContext)
-        : ModelSerializationContext(previousContext, nullptr)
+    MapSerializationContext::MapSerializationContext(utilities::SerializationContext& previousContext) :
+        ModelSerializationContext(previousContext, nullptr)
     {
     }
-}
-}
+} // namespace model
+} // namespace ell

@@ -11,8 +11,9 @@ namespace ell
 namespace data
 {
     template <typename WrappedIndexValueIteratorType, typename TransformationType>
-    TransformingIndexValueIterator<WrappedIndexValueIteratorType, TransformationType>::TransformingIndexValueIterator(WrappedIndexValueIteratorType wrappedIterator, TransformationType transform)
-        : _wrappedIterator(std::move(wrappedIterator)), _transform(std::move(transform))
+    TransformingIndexValueIterator<WrappedIndexValueIteratorType, TransformationType>::TransformingIndexValueIterator(WrappedIndexValueIteratorType wrappedIterator, TransformationType transform) :
+        _wrappedIterator(std::move(wrappedIterator)),
+        _transform(std::move(transform))
     {
     }
 
@@ -22,5 +23,5 @@ namespace data
         auto indexValue = _wrappedIterator.Get();
         return { indexValue.index, _transform(indexValue) };
     }
-}
-}
+} // namespace data
+} // namespace ell

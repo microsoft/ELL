@@ -11,13 +11,13 @@ namespace ell
 {
 namespace trainers
 {
-namespace optimization
-{
-    template <typename VectorElementType, typename IndexedContainerElementType>
-    IndexedContainerElementType VectorIndexedContainer<VectorElementType, IndexedContainerElementType>::Get(size_t index) const  
+    namespace optimization
     {
-        return IndexedContainerElementType((*this)[index]); 
-    }
-}
-}
-}
+        template <typename VectorElementType, typename IndexedContainerElementType>
+        IndexedContainerElementType VectorIndexedContainer<VectorElementType, IndexedContainerElementType>::Get(size_t index) const
+        {
+            return IndexedContainerElementType((*this)[index]);
+        }
+    } // namespace optimization
+} // namespace trainers
+} // namespace ell

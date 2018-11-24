@@ -73,5 +73,5 @@ namespace dsp
         // https://en.wikipedia.org/wiki/Window_function#Hann_window
         return GeneralizedCosineWindow<ValueType>(size, { 0.5, 0.5 }, symmetry);
     }
-}
-}
+} // namespace dsp
+} // namespace ell

@@ -58,8 +58,8 @@ namespace nodes
         class ComputeEulerAndSumFunction
         {
         public:
-            ComputeEulerAndSumFunction(emitters::IRFunctionEmitter& function, emitters::LLVMValue maxValue)
-                : _maxValue(maxValue)
+            ComputeEulerAndSumFunction(emitters::IRFunctionEmitter& function, emitters::LLVMValue maxValue) :
+                _maxValue(maxValue)
             {
                 auto valueType = emitters::GetVariableType<ValueType>();
                 _accumValueVar = function.Variable(valueType, "eulerSumAccumValue");
@@ -97,8 +97,8 @@ namespace nodes
         class NormalizeOutputFunction
         {
         public:
-            NormalizeOutputFunction(emitters::IRFunctionEmitter& function, emitters::LLVMValue sum)
-                : _sum(sum)
+            NormalizeOutputFunction(emitters::IRFunctionEmitter& function, emitters::LLVMValue sum) :
+                _sum(sum)
             {
             }
 
@@ -119,8 +119,8 @@ namespace nodes
     } // end anonymous namespace
 
     template <typename ValueType>
-    SoftmaxLayerNode<ValueType>::SoftmaxLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::SoftmaxLayer<ValueType>& layer)
-        : NeuralNetworkLayerNode<SoftmaxLayerNode<ValueType>, predictors::neural::SoftmaxLayer<ValueType>, ValueType>(input, layer)
+    SoftmaxLayerNode<ValueType>::SoftmaxLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::SoftmaxLayer<ValueType>& layer) :
+        NeuralNetworkLayerNode<SoftmaxLayerNode<ValueType>, predictors::neural::SoftmaxLayer<ValueType>, ValueType>(input, layer)
     {
     }
 
@@ -150,15 +150,7 @@ namespace nodes
 
     template <typename ValueType>
     template <typename FunctionType>
-    void SoftmaxLayerNode<ValueType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function,
-                                                               size_t dimension,
-                                                               const model::PortMemoryLayout& inputLayout,
-                                                               const model::PortMemoryLayout& outputLayout,
-                                                               emitters::LLVMValue pInput,
-                                                               emitters::LLVMValue pOutput,
-                                                               emitters::LLVMValue prevInputDimensionOffset,
-                                                               emitters::LLVMValue prevOutputDimensionOffset,
-                                                               FunctionType& f) const
+    void SoftmaxLayerNode<ValueType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, emitters::LLVMValue pInput, emitters::LLVMValue pOutput, emitters::LLVMValue prevInputDimensionOffset, emitters::LLVMValue prevOutputDimensionOffset, FunctionType& f) const
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
         //       Or, instead of unrolling, vectorizing --- if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
@@ -218,12 +210,7 @@ namespace nodes
     // In-place version
     template <typename ValueType>
     template <typename FunctionType>
-    void SoftmaxLayerNode<ValueType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function,
-                                                               size_t dimension,
-                                                               const model::PortMemoryLayout& inputLayout,
-                                                               emitters::LLVMValue pInput,
-                                                               emitters::LLVMValue prevInputDimensionOffsetValue,
-                                                               FunctionType& f) const
+    void SoftmaxLayerNode<ValueType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, const model::PortMemoryLayout& inputLayout, emitters::LLVMValue pInput, emitters::LLVMValue prevInputDimensionOffsetValue, FunctionType& f) const
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
         //       Or, instead of unrolling, vectorizing --- if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
@@ -283,5 +270,5 @@ namespace nodes
     // Explicit specialization
     template class SoftmaxLayerNode<float>;
     template class SoftmaxLayerNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

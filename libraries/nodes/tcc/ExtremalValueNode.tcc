@@ -11,14 +11,20 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType, bool max>
-    ExtremalValueNode<ValueType, max>::ExtremalValueNode()
-        : CompilableNode({ &_input }, { &_val, &_argVal }), _input(this, {}, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
+    ExtremalValueNode<ValueType, max>::ExtremalValueNode() :
+        CompilableNode({ &_input }, { &_val, &_argVal }),
+        _input(this, {}, inputPortName),
+        _val(this, valPortName, 1),
+        _argVal(this, argValPortName, 1)
     {
     }
 
     template <typename ValueType, bool max>
-    ExtremalValueNode<ValueType, max>::ExtremalValueNode(const model::OutputPort<ValueType>& input)
-        : CompilableNode({ &_input }, { &_val, &_argVal }), _input(this, input, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
+    ExtremalValueNode<ValueType, max>::ExtremalValueNode(const model::OutputPort<ValueType>& input) :
+        CompilableNode({ &_input }, { &_val, &_argVal }),
+        _input(this, input, inputPortName),
+        _val(this, valPortName, 1),
+        _argVal(this, argValPortName, 1)
     {
     }
 
@@ -98,7 +104,7 @@ namespace nodes
         function.Store(bestVal, val0);
         function.StoreZero(bestIndex);
 
-        function.For(1, numInputs, 1, [inputVal, bestVal, bestIndex, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue i){
+        function.For(1, numInputs, 1, [inputVal, bestVal, bestIndex, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             auto val = function.ValueAt(inputVal, i);
             function.If(GetComparison(), val, function.Load(bestVal), [bestVal, bestIndex, val, i](auto& function) {
                 function.Store(bestVal, val);
@@ -176,5 +182,5 @@ namespace nodes
         transformer.MapNodeOutput(this->val, newNode->val);
         transformer.MapNodeOutput(this->argVal, newNode->argVal);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

@@ -50,7 +50,7 @@ void TestIR()
     TestScopedIfElse2();
     TestElseIfWithComputedCondition();
 
-    TestCastValue();    
+    TestCastValue();
     TestCastToConditionalBool();
 }
 

@@ -40,7 +40,7 @@ namespace model
         ///
         /// <param named="args"> A vector of `Variant`s to pass to the node creator function registered with `ModelBuilder` </param>
         /// <remarks> Throws an exception on error </remarks>
-        Node* AddNode(Model& model, const std::string& nodeTypeName, const std::vector<ell::utilities::Variant > & args);
+        Node* AddNode(Model& model, const std::string& nodeTypeName, const std::vector<ell::utilities::Variant>& args);
 
         /// <summary> Creates a node and adds it to the model being built </summary>
         ///
@@ -115,7 +115,7 @@ namespace model
         std::map<std::string, std::function<Node*(Model& model, const std::vector<ell::utilities::Variant>&)>> _addNodeFunctions;
         std::map<std::string, std::function<std::vector<ell::utilities::Variant>()>> _getNodeArgsFunctions;
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/ModelBuilder.tcc"

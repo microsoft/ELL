@@ -29,7 +29,8 @@ namespace common
     };
 
     /// <summary> A version of ModelSaveArguments that adds its members to the command line parser. </summary>
-    struct ParsedModelSaveArguments : public ModelSaveArguments, public utilities::ParsedArgSet
+    struct ParsedModelSaveArguments : public ModelSaveArguments
+        , public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
@@ -43,5 +44,5 @@ namespace common
         /// <returns> An utilities::CommandLineParseResult. </returns>
         utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
     };
-}
-}
+} // namespace common
+} // namespace ell

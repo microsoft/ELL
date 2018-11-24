@@ -91,7 +91,7 @@ namespace nodes
     /// <returns> The node added to the model. </returns>
     template <typename ValueType, math::MatrixLayout layout>
     SquaredEuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> w, model::ModelTransformer& transformer);
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/SquaredEuclideanDistanceNode.tcc"

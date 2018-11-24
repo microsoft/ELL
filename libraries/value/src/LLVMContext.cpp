@@ -108,8 +108,7 @@ namespace value
         }
 
         // TODO: Make this the basis of an iterator for MemoryLayout
-        bool IncrementMemoryCoordinateImpl(int dimension, std::vector<int>& coordinate,
-                                           const std::vector<int>& maxCoordinate)
+        bool IncrementMemoryCoordinateImpl(int dimension, std::vector<int>& coordinate, const std::vector<int>& maxCoordinate)
         {
             // base case
             if (dimension < 0)
@@ -137,7 +136,8 @@ namespace value
     struct LLVMContext::FunctionScope
     {
         template <typename... Args>
-        FunctionScope(LLVMContext& context, Args&&... args) : context(context)
+        FunctionScope(LLVMContext& context, Args&&... args) :
+            context(context)
         {
             context._functionStack.push(context._emitter.BeginFunction(std::forward<Args>(args)...));
         }
@@ -147,7 +147,9 @@ namespace value
         LLVMContext& context;
     };
 
-    LLVMContext::LLVMContext(IRModuleEmitter& emitter) : _emitter(emitter), _computeContext(_emitter.GetModuleName()) {}
+    LLVMContext::LLVMContext(IRModuleEmitter& emitter) :
+        _emitter(emitter),
+        _computeContext(_emitter.GetModuleName()) {}
 
     Value LLVMContext::AllocateImpl(ValueType type, MemoryLayout layout)
     {
@@ -165,8 +167,7 @@ namespace value
         return std::nullopt;
     }
 
-    Value LLVMContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data,
-                                          MemoryLayout layout)
+    Value LLVMContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout)
     {
         std::string adjustedName = GetScopeAdjustedName(scope, name);
 
@@ -203,8 +204,7 @@ namespace value
         return Value(emittable, layout);
     }
 
-    Value LLVMContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type,
-                                          MemoryLayout layout)
+    Value LLVMContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout)
     {
         std::string adjustedName = GetScopeAdjustedName(scope, name);
 
@@ -240,8 +240,7 @@ namespace value
         return [fnName, this] { (void)_emitter.GetCurrentFunction().Call(fnName); };
     }
 
-    std::function<Value()> LLVMContext::CreateFunctionImpl(std::string fnName, Value returnValue,
-                                                           std::function<Value()> fn)
+    std::function<Value()> LLVMContext::CreateFunctionImpl(std::string fnName, Value returnValue, std::function<Value()> fn)
     {
         {
             FunctionScope scope(*this, fnName, ValueTypeToVariableType(returnValue.GetBaseType()));
@@ -296,7 +295,9 @@ namespace value
     }
 
     std::function<Value(std::vector<Value>)> LLVMContext::CreateFunctionImpl(
-        std::string fnName, Value returnValue, std::vector<Value> argValues,
+        std::string fnName,
+        Value returnValue,
+        std::vector<Value> argValues,
         std::function<Value(std::vector<Value>)> fn)
     {
         std::vector<VariableType> variableArgTypes(argValues.size());
@@ -341,16 +342,16 @@ namespace value
     Value LLVMContext::StoreConstantDataImpl(ConstantData data) { return _computeContext.StoreConstantData(data); }
 
     void LLVMContext::ForImpl(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn)
-        {
-            auto maxCoordinate = layout.GetActiveSize().ToVector();
-            decltype(maxCoordinate) coordinate(maxCoordinate.size());
+    {
+        auto maxCoordinate = layout.GetActiveSize().ToVector();
+        decltype(maxCoordinate) coordinate(maxCoordinate.size());
 
-            do
-            {
+        do
+        {
             auto logicalCoordinates = layout.GetLogicalCoordinates(coordinate).ToVector();
             fn(std::vector<Scalar>(logicalCoordinates.begin(), logicalCoordinates.end()));
-            } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
-        }
+        } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+    }
 
     void LLVMContext::MoveDataImpl(Value& source, Value& destination)
     {

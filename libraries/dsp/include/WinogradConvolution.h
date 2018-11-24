@@ -186,5 +186,5 @@ namespace dsp
     /// <param name="filterSize"> The size of the filter. </param>
     template <typename ValueType>
     math::RowMatrix<ValueType> GetRightResultTransformMatrix(int tileSize, int filterSize);
-}
-}
+} // namespace dsp
+} // namespace ell

@@ -39,8 +39,14 @@ namespace dsp
             double gainAtt,
             double thresholdUp,
             double thresholdDown,
-            double levelThreshold)
-            : _tauUp(tauUp), _tauDown(tauDown), _largeInput(largeInput), _gainAtt(gainAtt), _thresholdUp(thresholdUp), _thresholdDown(thresholdDown), _levelThreshold(levelThreshold)
+            double levelThreshold) :
+            _tauUp(tauUp),
+            _tauDown(tauDown),
+            _largeInput(largeInput),
+            _gainAtt(gainAtt),
+            _thresholdUp(thresholdUp),
+            _thresholdDown(thresholdDown),
+            _levelThreshold(levelThreshold)
         {
             reset();
         }
@@ -190,7 +196,7 @@ namespace dsp
         double _frameDuration;
         double _sampleRate;
         double _windowSize;
-        int64_t _time; 
+        int64_t _time;
 
         VoiceActivityDetectorImpl(
             double sampleRate,
@@ -202,8 +208,9 @@ namespace dsp
             double gainAtt,
             double thresholdUp,
             double thresholdDown,
-            double levelThreshold)
-            : _cmw(sampleRate, windowSize), _tracker(tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold)
+            double levelThreshold) :
+            _cmw(sampleRate, windowSize),
+            _tracker(tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold)
         {
             this->_sampleRate = sampleRate;
             this->_windowSize = windowSize;
@@ -218,7 +225,7 @@ namespace dsp
     }
 
     VoiceActivityDetector::VoiceActivityDetector(
-        double sampleRate, 
+        double sampleRate,
         double windowSize,
         double frameDuration,
         double tauUp,
@@ -227,8 +234,8 @@ namespace dsp
         double gainAtt,
         double thresholdUp,
         double thresholdDown,
-        double levelThreshold)
-        : _impl(std::make_unique<VoiceActivityDetectorImpl>(sampleRate, windowSize, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold))
+        double levelThreshold) :
+        _impl(std::make_unique<VoiceActivityDetectorImpl>(sampleRate, windowSize, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold))
     {
         reset();
     }
@@ -254,7 +261,7 @@ namespace dsp
     {
         return _impl->_windowSize;
     }
-    
+
     double VoiceActivityDetector::getFrameDuration() const
     {
         return _impl->_frameDuration;
@@ -279,7 +286,7 @@ namespace dsp
     {
         return _impl->_tracker._gainAtt;
     }
-    
+
     double VoiceActivityDetector::getThresholdUp() const
     {
         return _impl->_tracker._thresholdUp;
@@ -329,16 +336,15 @@ namespace dsp
             return false;
         }
         return _impl->_windowSize == other._impl->_windowSize &&
-            _impl->_sampleRate == other._impl->_sampleRate &&
-            _impl->_frameDuration == other._impl->_frameDuration &&
-            _impl->_tracker._tauUp == other._impl->_tracker._tauUp &&
-            _impl->_tracker._tauDown == other._impl->_tracker._tauDown &&
-            _impl->_tracker._largeInput == other._impl->_tracker._largeInput &&
-            _impl->_tracker._gainAtt == other._impl->_tracker._gainAtt &&
-            _impl->_tracker._thresholdUp == other._impl->_tracker._thresholdUp &&
-            _impl->_tracker._thresholdDown == other._impl->_tracker._thresholdDown &&
-            _impl->_tracker._levelThreshold == other._impl->_tracker._levelThreshold;
-
+               _impl->_sampleRate == other._impl->_sampleRate &&
+               _impl->_frameDuration == other._impl->_frameDuration &&
+               _impl->_tracker._tauUp == other._impl->_tracker._tauUp &&
+               _impl->_tracker._tauDown == other._impl->_tracker._tauDown &&
+               _impl->_tracker._largeInput == other._impl->_tracker._largeInput &&
+               _impl->_tracker._gainAtt == other._impl->_tracker._gainAtt &&
+               _impl->_tracker._thresholdUp == other._impl->_tracker._thresholdUp &&
+               _impl->_tracker._thresholdDown == other._impl->_tracker._thresholdDown &&
+               _impl->_tracker._levelThreshold == other._impl->_tracker._levelThreshold;
     }
 
     void VoiceActivityDetector::WriteToArchive(utilities::Archiver& archiver) const
@@ -385,5 +391,5 @@ namespace dsp
     //
     template int VoiceActivityDetector::process<float>(const std::vector<float>&);
     template int VoiceActivityDetector::process<double>(const std::vector<double>&);
-}
-}
+} // namespace dsp
+} // namespace ell

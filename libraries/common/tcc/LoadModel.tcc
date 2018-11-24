@@ -8,9 +8,9 @@
 
 // utilities
 #include "Archiver.h"
+#include "Exception.h"
 #include "Files.h"
 #include "JsonArchiver.h"
-#include "Exception.h"
 
 namespace ell
 {
@@ -35,5 +35,5 @@ namespace common
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read file: " + ex.GetMessage());
         }
     }
-}
-}
+} // namespace common
+} // namespace ell

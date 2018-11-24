@@ -89,7 +89,7 @@ namespace nodes
 
     /// <summary> Defines an alias representing a simple forest node, which holds a forest with a SingleElementThresholdPredictor as the split rule and ConstantPredictors on the edges. </summary>
     typedef ForestPredictorNode<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor> SimpleForestPredictorNode;
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/ForestPredictorNode.tcc"

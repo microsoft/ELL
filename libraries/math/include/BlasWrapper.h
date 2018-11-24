@@ -110,7 +110,7 @@ namespace math
         double Dot(int n, const double* x, int incx, const double* y, int incy);
         /// @}
 
-         /// @{
+        /// @{
         /// <summary>
         /// Wraps the BLAS GER function, which computes the outer product of two vectors.
         /// </summary>
@@ -170,6 +170,6 @@ namespace math
         void Gemm(MatrixLayout order, MatrixTranspose transposeA, MatrixTranspose transposeB, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc);
         void Gemm(MatrixLayout order, MatrixTranspose transposeA, MatrixTranspose transposeB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc);
         /// @}
-    }
-}
-}
+    } // namespace Blas
+} // namespace math
+} // namespace ell

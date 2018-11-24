@@ -23,14 +23,13 @@
 #include "BroadcastFunctionNode.h"
 #include "BufferNode.h"
 #include "ClockNode.h"
+#include "CompiledActivationFunctions.h"
 #include "ConcatenationNode.h"
 #include "DCTNode.h"
-#include "DiagonalConvolutionNode.h"
-#include "ClockNode.h"
-#include "CompiledActivationFunctions.h"
-#include "DelayNode.h"
-#include "DotProductNode.h"
 #include "DTWDistanceNode.h"
+#include "DelayNode.h"
+#include "DiagonalConvolutionNode.h"
+#include "DotProductNode.h"
 #include "ExtremalValueNode.h"
 #include "FFTNode.h"
 #include "FilterBankNode.h"
@@ -39,8 +38,8 @@
 #include "HammingWindowNode.h"
 #include "IIRFilterNode.h"
 #include "L2NormSquaredNode.h"
-#include "LinearPredictorNode.h"
 #include "LSTMNode.h"
+#include "LinearPredictorNode.h"
 #include "MatrixMatrixMultiplyNode.h"
 #include "MatrixVectorProductNode.h"
 #include "MovingAverageNode.h"
@@ -48,9 +47,9 @@
 #include "MultiplexerNode.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "ProtoNNPredictorNode.h"
+#include "RNNNode.h"
 #include "ReceptiveFieldMatrixNode.h"
 #include "ReorderDataNode.h"
-#include "RNNNode.h"
 #include "SimpleConvolutionNode.h"
 #include "SinkNode.h"
 #include "SourceNode.h"
@@ -89,7 +88,7 @@ namespace ell
 {
 namespace common
 {
-    template<typename ElementType>
+    template <typename ElementType>
     void RegisterRealNodeTypes(utilities::SerializationContext& context)
     {
         context.GetTypeFactory().AddType<model::Node, model::InputNode<ElementType>>();
@@ -417,5 +416,5 @@ namespace common
     {
         SaveArchivedObject<utilities::JsonArchiver>(map, outStream);
     }
-}
-}
+} // namespace common
+} // namespace ell

@@ -43,13 +43,13 @@ namespace utilities
         ///
         /// <param name="token"> The token to match. </param>
         bool TryMatchToken(std::string token);
-        
+
         /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
         ///
         /// <param name="token"> The token to match. </param>
         /// <param name="readToek"> The token actually read. </param>
         bool TryMatchToken(std::string token, std::string& readToken);
-        
+
         /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
         ///
         /// <param name="token"> The token to match. </param>
@@ -90,13 +90,13 @@ namespace utilities
         char _currentStringDelimiter = '\0'; // '\0' if we're not currently parsing a string
     };
 
-
     /// This helper class lets you peek random number of times and it restores all
     /// those tokens when it goes out of scope.
     class PeekStack
     {
     public:
-        PeekStack(Tokenizer& tokenizer) : _tokenizer(tokenizer)
+        PeekStack(Tokenizer& tokenizer) :
+            _tokenizer(tokenizer)
         {
         }
         std::string Peek()
@@ -109,7 +109,7 @@ namespace utilities
         {
             while (!_tokens.empty())
             {
-                _tokenizer.PutBackToken(_tokens.top());                    
+                _tokenizer.PutBackToken(_tokens.top());
                 _tokens.pop();
             }
         }
@@ -118,11 +118,11 @@ namespace utilities
         {
             _tokens = std::stack<std::string>();
         }
+
     private:
         std::stack<std::string> _tokens;
         Tokenizer& _tokenizer;
     };
 
-
-}
-}
+} // namespace utilities
+} // namespace ell

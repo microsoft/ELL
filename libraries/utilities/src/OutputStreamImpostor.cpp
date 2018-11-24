@@ -24,9 +24,11 @@ namespace utilities
 {
     static std::ofstream nullStreamBuf;
 
-    OutputStreamImpostor::OutputStreamImpostor() : _outputStream(nullStreamBuf) {}
+    OutputStreamImpostor::OutputStreamImpostor() :
+        _outputStream(nullStreamBuf) {}
 
-    OutputStreamImpostor::OutputStreamImpostor(StreamType streamType) : OutputStreamImpostor()
+    OutputStreamImpostor::OutputStreamImpostor(StreamType streamType) :
+        OutputStreamImpostor()
     {
         switch (streamType)
         {
@@ -41,11 +43,12 @@ namespace utilities
         }
     }
 
-    OutputStreamImpostor::OutputStreamImpostor(std::ostream& stream) : _outputStream(stream) {}
+    OutputStreamImpostor::OutputStreamImpostor(std::ostream& stream) :
+        _outputStream(stream) {}
 
     OutputStreamImpostor::OutputStreamImpostor(const std::string& filename) :
         _fileStream(std::make_shared<std::ofstream>(OpenOfstream(filename))),
         _outputStream(*_fileStream)
     {}
-}
-}
+} // namespace utilities
+} // namespace ell

@@ -53,7 +53,7 @@ int ReturnIntFunction()
 
 bool ManyArgFunction(int a, float b, std::string c)
 {
-    return a==1 && b==2.5 && c == "hello";
+    return a == 1 && b == 2.5 && c == "hello";
 }
 
 void TestInOrderFunctionEvaluator()
@@ -76,4 +76,4 @@ void TestFunctionTraits()
     static_assert(std::is_same<std::tuple_element_t<0, utilities::FunctionArgTypes<decltype(AddToGlobalValue)>>, int>::value, "FunctionTraits");
 }
 
-}
+} // namespace ell

@@ -29,7 +29,7 @@ namespace emitters
         void VerifyArgTypesCompatible(const IRLocalValue& a, const IRLocalValue& b);
 
         void VerifyArgTypesCompatible(const IRLocalValue& a, const IRLocalValue& b, std::function<bool(const IRLocalValue&, const IRLocalValue&)> areCompatible);
-    }
+    } // namespace detail
 
     /// <summary>
     /// Abstract base class for helper types for llvm values representing values local to a function
@@ -76,5 +76,5 @@ namespace emitters
     {
         using IRLocalValue::IRLocalValue;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

@@ -6,9 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "Archiver_test.h"
+#include "Files.h"
+#include "Files_test.h"
 #include "Format_test.h"
 #include "FunctionUtils_test.h"
-#include "Archiver_test.h"
 #include "Iterator_test.h"
 #include "MemoryLayout_test.h"
 #include "ObjectArchive_test.h"
@@ -16,8 +18,6 @@
 #include "TypeFactory_test.h"
 #include "TypeName_test.h"
 #include "Variant_test.h"
-#include "Files_test.h"
-#include "Files.h"
 
 // testing
 #include "testing.h"

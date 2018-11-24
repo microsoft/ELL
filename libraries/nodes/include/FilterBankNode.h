@@ -156,5 +156,5 @@ namespace nodes
         // FilterBank
         dsp::MelFilterBank _melFilters;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

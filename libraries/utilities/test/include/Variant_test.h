@@ -23,4 +23,4 @@ void TestParseObjVariant();
 
 void TestVariantToString();
 void TestVariantArchive();
-}
+} // namespace ell

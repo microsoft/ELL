@@ -25,14 +25,16 @@ namespace utilities
     //
     // Serialization
     //
-    XmlArchiver::XmlArchiver()
-        : _out(std::cout), _ready(true)
+    XmlArchiver::XmlArchiver() :
+        _out(std::cout),
+        _ready(true)
     {
         WriteFileHeader();
     }
 
-    XmlArchiver::XmlArchiver(std::ostream& outputStream)
-        : _out(outputStream), _ready(true)
+    XmlArchiver::XmlArchiver(std::ostream& outputStream) :
+        _out(outputStream),
+        _ready(true)
     {
         WriteFileHeader();
     }
@@ -49,16 +51,16 @@ namespace utilities
         _out << "</ell>\n";
     }
 
-    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, t);
+#define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, t);
     ARCHIVABLE_TYPES_LIST
-    #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
     // strings
     void XmlArchiver::ArchiveValue(const char* name, const std::string& value)
     {
         WriteScalar(name, value);
     }
-    
+
     void XmlArchiver::ArchiveNull(const char* name)
     {
         auto indent = GetCurrentIndent();
@@ -100,12 +102,12 @@ namespace utilities
         _out << "</" << typeName << ">" << std::endl;
     }
 
-    //
-    // Arrays
-    //
-    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, t);
+//
+// Arrays
+//
+#define ARCHIVE_TYPE_OP(t) IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, t);
     ARCHIVABLE_TYPES_LIST
-    #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
     void XmlArchiver::ArchiveArray(const char* name, const std::vector<std::string>& array)
     {
@@ -151,21 +153,23 @@ namespace utilities
     //
     // Deserialization
     //
-    XmlUnarchiver::XmlUnarchiver(SerializationContext context)
-        : Unarchiver(std::move(context)), _tokenizer(std::cin, "<>=/'\"")
+    XmlUnarchiver::XmlUnarchiver(SerializationContext context) :
+        Unarchiver(std::move(context)),
+        _tokenizer(std::cin, "<>=/'\"")
     {
         ReadFileHeader();
     }
 
-    XmlUnarchiver::XmlUnarchiver(std::istream& inputStream, SerializationContext context)
-        : Unarchiver(std::move(context)), _tokenizer(inputStream, "<>?=/'\"")
+    XmlUnarchiver::XmlUnarchiver(std::istream& inputStream, SerializationContext context) :
+        Unarchiver(std::move(context)),
+        _tokenizer(inputStream, "<>?=/'\"")
     {
         ReadFileHeader();
     }
 
-    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, t);
+#define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, t);
     ARCHIVABLE_TYPES_LIST
-    #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
     void XmlUnarchiver::ReadFileHeader()
     {
@@ -197,7 +201,7 @@ namespace utilities
 
         _tokenizer.MatchToken("<");
         auto readTypeName = XmlUtilities::DecodeTypeName(_tokenizer.ReadNextToken());
-        if (readTypeName.empty()) 
+        if (readTypeName.empty())
         {
             throw utilities::DataFormatException(DataFormatErrors::badFormat, "XML format is invalid, expecting a non empty object type name");
         }
@@ -206,7 +210,7 @@ namespace utilities
             _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
         }
         _tokenizer.MatchToken(">");
-        return {readTypeName, 0};
+        return { readTypeName, 0 };
     }
 
     void XmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
@@ -247,16 +251,16 @@ namespace utilities
                 _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
             }
             _tokenizer.MatchTokens({ "/", ">" });
-        } 
+        }
         return result;
     }
 
-    //
-    // Arrays
-    //
-    #define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, t);
+//
+// Arrays
+//
+#define ARCHIVE_TYPE_OP(t) IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, t);
     ARCHIVABLE_TYPES_LIST
-    #undef ARCHIVE_TYPE_OP
+#undef ARCHIVE_TYPE_OP
 
     void XmlUnarchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
     {
@@ -410,5 +414,5 @@ namespace utilities
         std::replace(result.begin(), result.end(), ')', '>');
         return result;
     }
-}
-}
+} // namespace utilities
+} // namespace ell

@@ -20,8 +20,11 @@ namespace ell
 {
 namespace trainers
 {
-    ProtoNNInit::ProtoNNInit(size_t dim, size_t numLabels, size_t numPrototypesPerLabel)
-        : _dim(dim), _numPrototypesPerLabel(numPrototypesPerLabel), _B(dim, numLabels * numPrototypesPerLabel), _Z(numLabels, numLabels * numPrototypesPerLabel) {}
+    ProtoNNInit::ProtoNNInit(size_t dim, size_t numLabels, size_t numPrototypesPerLabel) :
+        _dim(dim),
+        _numPrototypesPerLabel(numPrototypesPerLabel),
+        _B(dim, numLabels * numPrototypesPerLabel),
+        _Z(numLabels, numLabels * numPrototypesPerLabel) {}
 
     void ProtoNNInit::Initialize(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> WX, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> Y)
     {
@@ -70,5 +73,5 @@ namespace trainers
         auto rbfWidth = 2.5;
         return gammaInit * (rbfWidth / std::sqrt(-1.0 * std::log(median)));
     }
-}
-}
+} // namespace trainers
+} // namespace ell

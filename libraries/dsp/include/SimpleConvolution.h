@@ -79,5 +79,5 @@ namespace dsp
     /// <param name="result"> The tensor to write the result into. </param>
     template <typename ValueType>
     void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<ValueType> input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<ValueType> result);
-}
-}
+} // namespace dsp
+} // namespace ell

@@ -34,7 +34,7 @@ namespace emitters
                 throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments are local to different functions");
             }
         }
-    }
+    } // namespace
 
     namespace detail
     {
@@ -67,15 +67,16 @@ namespace emitters
                 throw EmitterException(EmitterError::badFunctionArguments, "IRLocalValue arguments have incompatible types");
             }
         }
-    }
+    } // namespace detail
 
     using namespace detail;
 
     //
     // IRLocalValue
     //
-    IRLocalValue::IRLocalValue(emitters::IRFunctionEmitter& function, LLVMValue value)
-        : function(function), value(value) {}
+    IRLocalValue::IRLocalValue(emitters::IRFunctionEmitter& function, LLVMValue value) :
+        function(function),
+        value(value) {}
 
     IRLocalValue& IRLocalValue::operator=(const IRLocalValue& other)
     {
@@ -89,5 +90,5 @@ namespace emitters
         this->value = value;
         return *this;
     }
-}
-}
+} // namespace emitters
+} // namespace ell

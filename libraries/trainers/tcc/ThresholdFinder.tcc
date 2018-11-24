@@ -70,5 +70,5 @@ namespace trainers
 
         return thresholdPredictors;
     }
-}
-}
+} // namespace trainers
+} // namespace ell

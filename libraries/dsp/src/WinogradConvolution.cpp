@@ -134,7 +134,8 @@ namespace dsp
         class Fixed2DArray
         {
         public:
-            constexpr Fixed2DArray() : _data({ 0 }) {}
+            constexpr Fixed2DArray() :
+                _data({ 0 }) {}
 
             void CopyFrom(const math::ConstChannelColumnRowTensorReference<ValueType>& data)
             {
@@ -195,7 +196,7 @@ namespace dsp
             const ValueType* GetDataPointer() const { return _data.data(); }
 
         private:
-            std::array<ValueType, rows* columns> _data;
+            std::array<ValueType, rows * columns> _data;
         };
 
         //
@@ -209,7 +210,8 @@ namespace dsp
             static constexpr int columns = N;
             static constexpr int channels = K;
 
-            constexpr Fixed3DArray() : _data({ 0 }) {}
+            constexpr Fixed3DArray() :
+                _data({ 0 }) {}
 
             ValueType operator()(int row, int column, int channel) const
             {
@@ -246,7 +248,7 @@ namespace dsp
             const ValueType* GetDataPointer() const { return _data.data(); }
 
         private:
-            std::array<ValueType, rows* columns* channels> _data;
+            std::array<ValueType, rows * columns * channels> _data;
         };
 
         template <typename ElementType, int rows, int columns>
@@ -1242,12 +1244,12 @@ namespace dsp
         // outputTile is a tr x tc matrix
         // output is a r x c x nf tensor
         static void AccumulatePartialOutputTile(const TileArray& outputTile,
-                                           int tileRowIndex,
-                                           int tileColumnIndex,
-                                           int filterIndex,
-                                           int rows,
-                                           int columns,
-                                           TensorReference& output)
+                                                int tileRowIndex,
+                                                int tileColumnIndex,
+                                                int filterIndex,
+                                                int rows,
+                                                int columns,
+                                                TensorReference& output)
         {
             // iterate over entries in the tile
             for (int rowIndex = 0; rowIndex < rows; ++rowIndex)
@@ -1722,5 +1724,5 @@ namespace dsp
     template void TransformFilters(const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int tileSize, WinogradFilterOrder order, math::ChannelColumnRowTensorReference<float>& transformedFilters);
     template math::ChannelColumnRowTensor<double> GetTransformedFilters(const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int tileSize, WinogradFilterOrder order);
     template void TransformFilters(const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int tileSize, WinogradFilterOrder order, math::ChannelColumnRowTensorReference<double>& transformedFilters);
-}
-}
+} // namespace dsp
+} // namespace ell

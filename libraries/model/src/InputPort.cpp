@@ -15,19 +15,20 @@ namespace model
     //
     // InputPortBase
     //
-    InputPortBase::InputPortBase(Port::PortType portType)
-        : Port(nullptr, "", portType)
+    InputPortBase::InputPortBase(Port::PortType portType) :
+        Port(nullptr, "", portType)
     {
     }
 
-    InputPortBase::InputPortBase(const Node* owningNode, const OutputPortBase& input, const std::string& name)
-        : Port(owningNode, name, input.GetType()), _referencedPort(&input)
+    InputPortBase::InputPortBase(const Node* owningNode, const OutputPortBase& input, const std::string& name) :
+        Port(owningNode, name, input.GetType()),
+        _referencedPort(&input)
     {
     }
 
-    std::vector<const Node*> InputPortBase::GetParentNodes() const 
-    { 
-        return _referencedPort == nullptr ? std::vector<const Node*>() : std::vector<const Node*>{ _referencedPort->GetNode() }; 
+    std::vector<const Node*> InputPortBase::GetParentNodes() const
+    {
+        return _referencedPort == nullptr ? std::vector<const Node*>() : std::vector<const Node*>{ _referencedPort->GetNode() };
     }
 
     PortElementBase InputPortBase::GetInputElement(size_t index) const
@@ -57,12 +58,12 @@ namespace model
     }
 
     size_t InputPortBase::Size() const
-    { 
+    {
         if (!IsValid())
         {
             return 0;
         }
-        return GetReferencedPort().Size(); 
+        return GetReferencedPort().Size();
     }
 
     bool InputPortBase::IsValid() const
@@ -74,5 +75,5 @@ namespace model
     {
         _referencedPort = input;
     }
-}
-}
+} // namespace model
+} // namespace ell

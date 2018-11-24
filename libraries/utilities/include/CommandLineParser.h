@@ -174,7 +174,7 @@ namespace utilities
         /// <summary> Returns any args after the "--" separator </summary>
         ///
         /// <returns> The passthrough args </returns>
-        std::vector<std::string> GetPassthroughArgs() { return _passthroughArgs;  }
+        std::vector<std::string> GetPassthroughArgs() { return _passthroughArgs; }
 
     private:
         CommandLineParser(const CommandLineParser&) = delete;
@@ -200,8 +200,9 @@ namespace utilities
             Type EntryType;
             std::string EntryString; // option name for option, docstring for std::string
 
-            DocumentationEntry(Type t, std::string str)
-                : EntryType(t), EntryString(str) {}
+            DocumentationEntry(Type t, std::string str) :
+                EntryType(t),
+                EntryString(str) {}
         };
 
         struct OptionInfo
@@ -282,8 +283,8 @@ namespace utilities
     {
     public:
         /// <summary></summary>
-        CommandLineParserException(const char* message)
-            : std::runtime_error(message){};
+        CommandLineParserException(const char* message) :
+            std::runtime_error(message){};
     };
 
     /// <summary> An object containing a parsing error message from the command-line parser. </summary>
@@ -312,12 +313,13 @@ namespace utilities
         const std::vector<ParseError>& GetParseErrors() const { return _errors; }
 
         /// <summary> Constructor. Called by command-line parser </summary>
-        CommandLineParserErrorException(const char* message)
-            : CommandLineParserException(message) {}
+        CommandLineParserErrorException(const char* message) :
+            CommandLineParserException(message) {}
 
         /// <summary></summary>
-        CommandLineParserErrorException(const char* message, std::vector<ParseError> errors)
-            : CommandLineParserException(message), _errors(errors) {}
+        CommandLineParserErrorException(const char* message, std::vector<ParseError> errors) :
+            CommandLineParserException(message),
+            _errors(errors) {}
 
     private:
         std::vector<ParseError> _errors;
@@ -333,8 +335,9 @@ namespace utilities
         std::string GetHelpText() const { return _helpText; }
 
         /// <summary> Constructor. Called by command-line parser </summary>
-        CommandLineParserPrintHelpException(std::string helpText)
-            : CommandLineParserException(""), _helpText(helpText) {}
+        CommandLineParserPrintHelpException(std::string helpText) :
+            CommandLineParserException(""),
+            _helpText(helpText) {}
 
     private:
         std::string _helpText;
@@ -345,10 +348,10 @@ namespace utilities
     {
     public:
         /// <summary></summary>
-        CommandLineParserInvalidOptionsException(const char* what)
-            : CommandLineParserException(what) {}
+        CommandLineParserInvalidOptionsException(const char* what) :
+            CommandLineParserException(what) {}
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/CommandLineParser.tcc"

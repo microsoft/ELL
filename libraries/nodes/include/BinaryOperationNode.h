@@ -152,7 +152,7 @@ namespace nodes
         // Padding
         ValueType _paddingValue;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/BinaryOperationNode.tcc"

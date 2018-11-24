@@ -80,5 +80,5 @@ namespace nodes
     ///
     /// <returns> The node added to the model. </returns>
     SingleElementThresholdNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor, model::ModelTransformer& transformer);
-}
-}
+} // namespace nodes
+} // namespace ell

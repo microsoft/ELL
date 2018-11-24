@@ -20,8 +20,8 @@ namespace nodes
     // GRUNode
     //
     template <typename ValueType>
-    GRUNode<ValueType>::GRUNode()
-        : LSTMNode<ValueType>()
+    GRUNode<ValueType>::GRUNode() :
+        LSTMNode<ValueType>()
     {
     }
 
@@ -35,8 +35,8 @@ namespace nodes
                                 const model::OutputPort<ValueType>& hiddenBias,
                                 const ActivationType& activation,
                                 const ActivationType& recurrentActivation,
-                                bool validateWeights)
-        : LSTMNode<ValueType>(input, resetTrigger, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation, recurrentActivation, false)
+                                bool validateWeights) :
+        LSTMNode<ValueType>(input, resetTrigger, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation, recurrentActivation, false)
     {
         if (validateWeights)
         {
@@ -47,28 +47,27 @@ namespace nodes
             if (inputWeights.Size() != numRows * numColumns)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The GRUNode input weights are the wrong size, found %zu but expecting %zu", inputWeights.Size(), numRows * numColumns));
+                                                ell::utilities::FormatString("The GRUNode input weights are the wrong size, found %zu but expecting %zu", inputWeights.Size(), numRows * numColumns));
             }
 
             numColumns = hiddenUnits;
             if (hiddenWeights.Size() != numRows * numColumns)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The GRUNode hidden weights are the wrong size, found %zu but expecting %zu", hiddenWeights.Size(), numRows * numColumns));
+                                                ell::utilities::FormatString("The GRUNode hidden weights are the wrong size, found %zu but expecting %zu", hiddenWeights.Size(), numRows * numColumns));
             }
 
             if (inputBias.Size() != numRows)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The GRUNode input bias vector is the wrong size, found %zu but expecting %zu", inputBias.Size(), numRows));
+                                                ell::utilities::FormatString("The GRUNode input bias vector is the wrong size, found %zu but expecting %zu", inputBias.Size(), numRows));
             }
 
             if (hiddenBias.Size() != numRows)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The GRUNode hidden bias vector is the wrong size, found %zu but expecting %zu", hiddenBias.Size(), numRows));
+                                                ell::utilities::FormatString("The GRUNode hidden bias vector is the wrong size, found %zu but expecting %zu", hiddenBias.Size(), numRows));
             }
-
         }
     }
 
@@ -222,7 +221,7 @@ namespace nodes
         auto hstack_slice0 = hstack;
         auto hstack_slice1 = function.LocalArray(function.PointerOffset(hstack, function.LocalScalar(hiddenUnits)));
         auto hstack_slice2 = function.LocalArray(function.PointerOffset(hstack, function.LocalScalar(hiddenUnits * 2)));
-        
+
         // input_gate = sigma(W_{ iz } x + b_{ iz } + W_{ hz } h + b_{ hz })
         function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {
             inputGate[i] = istack_slice0[i] + hstack_slice0[i];
@@ -236,7 +235,7 @@ namespace nodes
         this->ApplyActivation(function, this->_recurrentActivation, resetGate, hiddenUnits);
 
         // hidden_gate = tanh(W_{ in } x + b_{ in } + reset_gate * (W_{ hn } h + b_{ hn }))
-        function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {            
+        function.For(hiddenUnits, [=](emitters::IRFunctionEmitter& fn, emitters::IRLocalScalar i) {
             hiddenGate[i] = istack_slice2[i] + resetGate[i] * hstack_slice2[i];
         });
         this->ApplyActivation(function, this->_activation, hiddenGate, hiddenUnits);
@@ -279,5 +278,5 @@ namespace nodes
     template class GRUNode<float>;
     template class GRUNode<double>;
 
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

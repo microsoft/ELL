@@ -131,8 +131,9 @@ namespace emitters
     static const std::string& dotProductIntName = "DotProductInt";
     static const std::string& getTimeFunctionName = "GetTime";
 
-    IRRuntime::IRRuntime(IRModuleEmitter& module)
-        : _module(module), _posixRuntime(module)
+    IRRuntime::IRRuntime(IRModuleEmitter& module) :
+        _module(module),
+        _posixRuntime(module)
     {
     }
 
@@ -685,5 +686,5 @@ namespace emitters
         llvm::FunctionType* functionType = llvm::FunctionType::get(voidType, { GetIntType() }, false);
         return static_cast<LLVMFunction>(pModule->getOrInsertFunction("openblas_set_num_threads", functionType));
     }
-}
-}
+} // namespace emitters
+} // namespace ell

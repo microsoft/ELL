@@ -15,8 +15,9 @@ namespace ell
 {
 namespace data
 {
-    SequentialLineIterator::SequentialLineIterator(std::istream& stream, char delim)
-        : _stream(stream), _delim(delim)
+    SequentialLineIterator::SequentialLineIterator(std::istream& stream, char delim) :
+        _stream(stream),
+        _delim(delim)
     {
         Next();
     }
@@ -34,5 +35,5 @@ namespace data
 
         _currentLine = TextLine(std::move(nextLine));
     }
-}
-}
+} // namespace data
+} // namespace ell

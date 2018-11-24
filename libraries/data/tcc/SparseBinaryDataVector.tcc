@@ -14,12 +14,13 @@ namespace ell
 namespace data
 {
     template <typename IndexListType>
-    SparseBinaryDataVectorIterator<IterationPolicy::skipZeros, IndexListType>::SparseBinaryDataVectorIterator(const IndexIteratorType& listIterator, size_t size)
-        : _indexIterator(listIterator), _size(size)
+    SparseBinaryDataVectorIterator<IterationPolicy::skipZeros, IndexListType>::SparseBinaryDataVectorIterator(const IndexIteratorType& listIterator, size_t size) :
+        _indexIterator(listIterator),
+        _size(size)
     {
     }
 
-    template<typename IndexListType>
+    template <typename IndexListType>
     void SparseBinaryDataVectorIterator<IterationPolicy::all, IndexListType>::Next()
     {
         if (_index == _iteratorIndex)
@@ -30,15 +31,16 @@ namespace data
         ++_index;
     }
 
-    template<typename IndexListType>
+    template <typename IndexListType>
     IndexValue SparseBinaryDataVectorIterator<IterationPolicy::all, IndexListType>::Get() const
-    { 
-        return _index == _iteratorIndex ? IndexValue{ _index, 1.0 } : IndexValue{ _index, 0.0 }; 
+    {
+        return _index == _iteratorIndex ? IndexValue{ _index, 1.0 } : IndexValue{ _index, 0.0 };
     }
 
-    template<typename IndexListType>
-    SparseBinaryDataVectorIterator<IterationPolicy::all, IndexListType>::SparseBinaryDataVectorIterator(const IndexIteratorType & listIterator, size_t size) :
-        _indexIterator(listIterator), _size(size)
+    template <typename IndexListType>
+    SparseBinaryDataVectorIterator<IterationPolicy::all, IndexListType>::SparseBinaryDataVectorIterator(const IndexIteratorType& listIterator, size_t size) :
+        _indexIterator(listIterator),
+        _size(size)
     {
         _iteratorIndex = _indexIterator.IsValid() ? _indexIterator.Get() : _size;
     }
@@ -50,18 +52,18 @@ namespace data
         AppendElements(std::move(indexValueIterator));
     }
 
-    template<typename IndexListType>
-    template<IterationPolicy policy>
+    template <typename IndexListType>
+    template <IterationPolicy policy>
     auto SparseBinaryDataVectorBase<IndexListType>::GetIterator(size_t size) const -> Iterator<policy>
-    { 
-        return Iterator<policy>(_indexList.GetIterator(), size); 
+    {
+        return Iterator<policy>(_indexList.GetIterator(), size);
     }
 
-    template<typename IndexListType>
-    template<IterationPolicy policy>
+    template <typename IndexListType>
+    template <IterationPolicy policy>
     auto SparseBinaryDataVectorBase<IndexListType>::GetIterator() const -> Iterator<policy>
     {
-        return GetIterator<policy>(PrefixLength()); 
+        return GetIterator<policy>(PrefixLength());
     }
 
     template <typename IndexListType>
@@ -96,7 +98,7 @@ namespace data
             return;
         }
 
-        if (value != 1) 
+        if (value != 1)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input to BinaryDataVector needs to be 0 or 1");
         }
@@ -150,5 +152,5 @@ namespace data
             iter.Next();
         }
     }
-}
-}
+} // namespace data
+} // namespace ell

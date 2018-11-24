@@ -50,12 +50,12 @@ namespace value
         std::pair<ValueType, int> GetTypeImpl(Emittable emittable) override;
 
         std::function<void()> CreateFunctionImpl(std::string fnName, std::function<void()> fn) override;
-        std::function<Value()> CreateFunctionImpl(std::string fnName, Value returnValue,
-                                                  std::function<Value()> fn) override;
-        std::function<void(std::vector<Value>)> CreateFunctionImpl(std::string fnName, std::vector<Value> argValues,
-                                                                   std::function<void(std::vector<Value>)> fn) override;
+        std::function<Value()> CreateFunctionImpl(std::string fnName, Value returnValue, std::function<Value()> fn) override;
+        std::function<void(std::vector<Value>)> CreateFunctionImpl(std::string fnName, std::vector<Value> argValues, std::function<void(std::vector<Value>)> fn) override;
         std::function<Value(std::vector<Value>)> CreateFunctionImpl(
-            std::string fnName, Value returnValue, std::vector<Value> argValues,
+            std::string fnName,
+            Value returnValue,
+            std::vector<Value> argValues,
             std::function<Value(std::vector<Value>)> fn) override;
 
         Value StoreConstantDataImpl(ConstantData data) override;

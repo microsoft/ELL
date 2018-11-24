@@ -16,7 +16,7 @@ namespace emitters
     static const std::string c_structFieldsTagNamePrefix = "ell.type.fields";
     std::string GetStructFieldsTagName(llvm::StructType* structType)
     {
-        if(!structType->hasName())
+        if (!structType->hasName())
         {
             return "";
         }
@@ -56,5 +56,5 @@ namespace emitters
         }
         return tagValues;
     }
-}
-}
+} // namespace emitters
+} // namespace ell

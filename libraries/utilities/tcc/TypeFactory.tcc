@@ -120,5 +120,5 @@ namespace utilities
         auto derivedCreator = TypeConstructorDerived<BaseType>::template NewTypeConstructor<RuntimeType>().release();
         _typeConstructorMap[key] = std::shared_ptr<TypeConstructorBase>(derivedCreator);
     }
-}
-}
+} // namespace utilities
+} // namespace ell

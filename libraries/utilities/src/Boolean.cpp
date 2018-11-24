@@ -13,19 +13,20 @@ namespace ell
 namespace utilities
 {
 
-Boolean::Boolean() = default;
+    Boolean::Boolean() = default;
 
-Boolean::Boolean(bool value) : value(value) {}
+    Boolean::Boolean(bool value) :
+        value(value) {}
 
-bool operator==(Boolean b1, Boolean b2)
-{
-    return static_cast<bool>(b1) == static_cast<bool>(b2);
-}
+    bool operator==(Boolean b1, Boolean b2)
+    {
+        return static_cast<bool>(b1) == static_cast<bool>(b2);
+    }
 
-bool operator!=(Boolean b1, Boolean b2)
-{
-    return static_cast<bool>(b1) != static_cast<bool>(b2);
-}
+    bool operator!=(Boolean b1, Boolean b2)
+    {
+        return static_cast<bool>(b1) != static_cast<bool>(b2);
+    }
 
-}
-}
+} // namespace utilities
+} // namespace ell

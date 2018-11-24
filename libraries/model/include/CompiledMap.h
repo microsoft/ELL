@@ -89,9 +89,9 @@ namespace model
 
     protected:
         CompiledMap(Map map, std::string functionName, const MapCompilerOptions& options);
-      
+
         std::string _functionName;
         MapCompilerOptions _compilerOptions;
     };
-}
-}
+} // namespace model
+} // namespace ell

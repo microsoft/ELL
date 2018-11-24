@@ -14,8 +14,8 @@
 
 // stl
 #include <cmath>
-#include <vector>
 #include <limits>
+#include <vector>
 
 namespace ell
 {
@@ -60,7 +60,7 @@ namespace math
         /// <param name="pData"> Pointer to the data. </param>
         /// <param name="size"> The size of the vector. </param>
         /// <param name="increment"> The vector increment. </param>
-        UnorientedConstVectorBase(const ElementType* pData, size_t size, size_t increment=1);
+        UnorientedConstVectorBase(const ElementType* pData, size_t size, size_t increment = 1);
 
         UnorientedConstVectorBase(const UnorientedConstVectorBase&) = default;
 
@@ -164,7 +164,7 @@ namespace math
         /// <param name="pData"> Pointer to the data. </param>
         /// <param name="size"> The size of the vector. </param>
         /// <param name="increment"> The vector increment. </param>
-        ConstVectorReference(const ElementType* pData, size_t size, size_t increment=1);
+        ConstVectorReference(const ElementType* pData, size_t size, size_t increment = 1);
 
         /// <summary> Swaps the contents of this with the contents of another ConstVectorReference. </summary>
         ///
@@ -249,7 +249,7 @@ namespace math
         /// <param name="pData"> Pointer to the data. </param>
         /// <param name="size"> The size of the vector. </param>
         /// <param name="increment"> The vector increment. </param>
-        VectorReference(const ElementType* pData, size_t size, size_t increment=1);
+        VectorReference(const ElementType* pData, size_t size, size_t increment = 1);
 
         using ConstVectorReference<ElementType, orientation>::operator[];
         using ConstVectorReference<ElementType, orientation>::GetSubVector;
@@ -278,7 +278,7 @@ namespace math
         /// <summary> Copies values from another vector into this vector. </summary>
         ///
         /// <param name="other"> The other vector. </param>
-        template<typename OtherElementType>
+        template <typename OtherElementType>
         void CopyFrom(ConstVectorReference<OtherElementType, orientation> other);
 
         /// <summary> Sets all vector elements to zero. </summary>
@@ -497,7 +497,7 @@ namespace math
 
     template <typename ElementType>
     using ConstRowVectorReference = ConstVectorReference<ElementType, VectorOrientation::row>;
-}
-}
+} // namespace math
+} // namespace ell
 
 #include "../tcc/Vector.tcc"

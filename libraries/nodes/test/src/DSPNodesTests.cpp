@@ -59,9 +59,9 @@
 #include "testing.h"
 
 // data
-#include "Example.h"
-#include "Dataset.h"
 #include "DataLoaders.h"
+#include "Dataset.h"
+#include "Example.h"
 #include "WeightLabel.h"
 
 // utilities
@@ -116,7 +116,7 @@ model::PortMemoryLayout CalculateMemoryLayout(int numRows, int numColumns, int n
 
     return { size, stride, offset };
 }
-}
+} // namespace
 
 //
 // Test compute functions
@@ -605,9 +605,8 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
     auto compiledResult = compiledMap.ComputeOutput<ValueType>(0);
 
     auto ok = testing::IsEqual(reference, compiledResult, epsilon);
-    testing::ProcessTest("Testing compiled "s + GetConvAlgName(convolutionMethod) + " convolution node vs reference for  " + std::to_string(inputRows) + " x " + std::to_string(inputColumns) + " x " + std::to_string(numChannels)
-                    + " image and " + std::to_string(numFilters) + " " + std::to_string(filterSize) + " x " + std::to_string(filterSize) + " x " + std::to_string(numFilterChannels) + " filters, stride " + std::to_string(stride), ok);
-    
+    testing::ProcessTest("Testing compiled "s + GetConvAlgName(convolutionMethod) + " convolution node vs reference for  " + std::to_string(inputRows) + " x " + std::to_string(inputColumns) + " x " + std::to_string(numChannels) + " image and " + std::to_string(numFilters) + " " + std::to_string(filterSize) + " x " + std::to_string(filterSize) + " x " + std::to_string(numFilterChannels) + " filters, stride " + std::to_string(stride), ok);
+
     // Helpful debugging output
     if (!ok)
     {
@@ -631,7 +630,6 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
 #endif
     }
 }
-
 
 void TestWithSerialization(model::Map& map, std::string name, std::function<void(model::Map& map, int)> body)
 {
@@ -691,13 +689,10 @@ void TestRNNNode()
     auto hiddenBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenBias.ToArray());
     auto activation = ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>());
 
-    auto rnnNode = model.AddNode<nodes::RNNNode<ElementType>>(inputNode->output, resetTriggerNode->output, hiddenSize,
-        inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output,
-        activation);
+    auto rnnNode = model.AddNode<nodes::RNNNode<ElementType>>(inputNode->output, resetTriggerNode->output, hiddenSize, inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output, activation);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", rnnNode->output } });
 
     TestWithSerialization(map, "TestRNNNode", [&](model::Map& map, int iteration) {
-
         // Compile model
         model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = true;
@@ -714,7 +709,7 @@ void TestRNNNode()
             std::vector<std::vector<ElementType>> signal = { input.ToArray() };
             std::vector<ElementType> computedResult = VerifyCompiledOutput<ElementType, ElementType>(map, compiledMap, signal, name);
 
-            // verify compute output 
+            // verify compute output
             double epsilon = 1e-5;
             auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
             testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %d", name.c_str(), iteration, i), ok);
@@ -726,7 +721,7 @@ void TestGRUNode()
     using ElementType = double;
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
-    
+
     using ConstVectorReference = math::ConstColumnVectorReference<ElementType>;
 
     // Precomputed weights created by GenerateGRUTest.py
@@ -749,7 +744,7 @@ void TestGRUNode()
     ConstVectorReference hiddenWeights(w_h, sizeof(w_h) / sizeof(double));
     ConstVectorReference inputBias(b_i, sizeof(b_i) / sizeof(double));
     ConstVectorReference hiddenBias(b_h, sizeof(b_h) / sizeof(double));
-    
+
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
@@ -761,13 +756,10 @@ void TestGRUNode()
     auto activation = ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>());
     auto recurrentActivation = ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::SigmoidActivation<ElementType>());
 
-    auto gruNode = model.AddNode<nodes::GRUNode<ElementType>>(inputNode->output, resetTriggerNode->output, hiddenSize, 
-        inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output,
-        activation, recurrentActivation);
+    auto gruNode = model.AddNode<nodes::GRUNode<ElementType>>(inputNode->output, resetTriggerNode->output, hiddenSize, inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output, activation, recurrentActivation);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", gruNode->output } });
-    
-    TestWithSerialization(map, "TestGRUNode", [&](model::Map& map, int iteration) {
 
+    TestWithSerialization(map, "TestGRUNode", [&](model::Map& map, int iteration) {
         // Compile model
         model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = true;
@@ -784,7 +776,7 @@ void TestGRUNode()
             std::vector<std::vector<ElementType>> signal = { input.ToArray() };
             std::vector<ElementType> computedResult = VerifyCompiledOutput<ElementType, ElementType>(map, compiledMap, signal, name);
 
-            // verify compute output 
+            // verify compute output
             double epsilon = 1e-5;
             auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
 
@@ -795,7 +787,6 @@ void TestGRUNode()
                 std::cout << "  " << expectedOutput.ToArray() << "\n";
             }
             testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %zu", name.c_str(), iteration, i), ok);
-
         }
     });
 }
@@ -805,7 +796,7 @@ void TestLSTMNode()
     using ElementType = double;
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
-    
+
     using ConstVectorReference = math::ConstColumnVectorReference<ElementType>;
 
     // Precomputed weights created by GenerateLSGMTest.py
@@ -837,14 +828,10 @@ void TestLSTMNode()
     auto hiddenWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenWeights.ToArray());
     auto inputBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputBias.ToArray());
     auto hiddenBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenBias.ToArray());
-    auto lstmNode = model.AddNode<nodes::LSTMNode<ElementType>>(inputNode->output, resetTriggerNode->output, hiddenSize,
-        inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output,
-        ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>()),
-        ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::SigmoidActivation<ElementType>()));
+    auto lstmNode = model.AddNode<nodes::LSTMNode<ElementType>>(inputNode->output, resetTriggerNode->output, hiddenSize, inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output, ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>()), ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::SigmoidActivation<ElementType>()));
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", lstmNode->output } });
 
     TestWithSerialization(map, "TestLSTMNode", [&](model::Map& map, int iteration) {
-
         // Compile model
         model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = true;
@@ -859,26 +846,25 @@ void TestLSTMNode()
 
             // compare computed vs. compiled output
             std::vector<std::vector<ElementType>> signal = { input.ToArray() };
-            std::vector<ElementType> computedResult = VerifyCompiledOutput<ElementType,ElementType>(map, compiledMap, signal, name);
+            std::vector<ElementType> computedResult = VerifyCompiledOutput<ElementType, ElementType>(map, compiledMap, signal, name);
             //map.SetInputValue(0, input.ToArray());
             //auto computedResult = map.ComputeOutput<ElementType>(0);
 
             // compute output
             double epsilon = 1e-5;
             auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
-            if (!ok) 
+            if (!ok)
             {
-                std::cout << "  Test " << name.c_str()  << " compute versus expected output mismatch on iteration " << iteration << " and row " << i << "\n";
+                std::cout << "  Test " << name.c_str() << " compute versus expected output mismatch on iteration " << iteration << " and row " << i << "\n";
                 std::cout << "  " << computedResult << "\n";
                 std::cout << "  " << expectedOutput.ToArray() << "\n";
             }
             testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %zu", name.c_str(), iteration, i), ok);
         }
-
     });
 }
 
-template< typename ElementType>
+template <typename ElementType>
 static Dataset<Example<DenseDataVector<ElementType>, WeightLabel>> LoadVadData(const std::string& path, int numFeatures)
 {
     std::string filename = utilities::JoinPaths(path, { "..", "..", "dsp", "VadData.txt" });
@@ -928,8 +914,7 @@ static void TestVoiceActivityDetectorNode(const std::string& path)
     // compiledMap.GetModule().DebugDump();
     auto dataset = LoadVadData<ElementType>(path, FrameSize);
 
-    TestWithSerialization(map, "TestVoiceActivityDetectorNode", [&dataset](model::Map& map, int iteration){
-
+    TestWithSerialization(map, "TestVoiceActivityDetectorNode", [&dataset](model::Map& map, int iteration) {
         // compiling it.
         model::MapCompilerOptions settings;
         settings.verifyJittedModule = true;
@@ -967,12 +952,10 @@ static void TestVoiceActivityDetectorNode(const std::string& path)
             {
                 ++compileErrors;
             }
-
-        } 
+        }
 
         testing::ProcessTest(utilities::FormatString("Testing TestVoiceActivityDetectorNode Compute iteration %d, %d errors", iteration, refErrors), refErrors == 0);
         testing::ProcessTest(utilities::FormatString("Testing TestVoiceActivityDetectorNode Compiled iteration %d, %d errors", iteration, compileErrors), compileErrors == 0);
-
     });
 }
 
@@ -1007,15 +990,11 @@ void TestGRUNodeWithVADReset(const std::string& path)
     auto inputBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputBias.ToArray());
     auto hiddenBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenBias.ToArray());
 
-    auto gruNode = model.AddNode<nodes::GRUNode<ElementType>>(inputNode->output, vadNode->output, hiddenUnits,
-        inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output,
-        ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>()),
-        ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::SigmoidActivation<ElementType>()));
+    auto gruNode = model.AddNode<nodes::GRUNode<ElementType>>(inputNode->output, vadNode->output, hiddenUnits, inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output, ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>()), ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::SigmoidActivation<ElementType>()));
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", gruNode->output } });
 
     TestWithSerialization(map, "TestGRUNodeWithVADReset", [&dataset, hiddenUnits](model::Map& map, int iteration) {
-
         // now test compiling it.
         model::MapCompilerOptions settings;
         settings.verifyJittedModule = true;
@@ -1109,7 +1088,7 @@ void TestDSPNodes(const std::string& path)
     // TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::diagonal); // ERROR: diagonal test currently broken
     TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::unrolled);
     TestConvolutionNodeCompile<float>(dsp::ConvolutionMethodOption::winograd);
-    
+
     // Test simple convolution
     TestConvolutionNodeCompileVsReference<float>({ 2, 2, 1 }, { 1, 3, 3, 0 }, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>({ 2, 3, 1 }, { 1, 3, 3, 0 }, 1, dsp::ConvolutionMethodOption::simple);
@@ -1279,8 +1258,7 @@ void TestDSPNodes(const std::string& path)
     TestConvolutionNodeCompileVsReference<float>({ 32, 32, 8 }, { 8, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
     TestConvolutionNodeCompileVsReference<float>({ 64, 64, 8 }, { 8, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
     TestConvolutionNodeCompileVsReference<float>({ 120, 80, 8 }, { 8, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::winograd, { 2, dsp::WinogradFilterOrder::filtersFirst });
-    
-    
+
     TestConvolutionNodeCompileVsReference<float>({ 2, 2, 1 }, { 1, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::winograd, { 4, dsp::WinogradFilterOrder::filtersFirst });
     TestConvolutionNodeCompileVsReference<float>({ 2, 3, 1 }, { 1, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::winograd, { 4, dsp::WinogradFilterOrder::filtersFirst });
     TestConvolutionNodeCompileVsReference<float>({ 3, 2, 1 }, { 1, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::winograd, { 4, dsp::WinogradFilterOrder::filtersFirst });

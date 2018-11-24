@@ -13,8 +13,8 @@
 
 // model
 #include "CompilableNode.h"
-#include "InputNodeBase.h"
 #include "IRMapCompiler.h"
+#include "InputNodeBase.h"
 #include "ModelTransformer.h"
 
 // nodes
@@ -129,7 +129,7 @@ namespace nodes
         mutable std::vector<ValueType> _bufferedSample;
         mutable TimeTickType _bufferedSampleTime;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/SourceNode.tcc"

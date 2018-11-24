@@ -145,8 +145,8 @@ namespace data
 
     /// <summary> A dense data vector with byte elements. </summary>
     using ByteDataVector = DenseDataVector<char>;
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/DenseDataVector.tcc"
 

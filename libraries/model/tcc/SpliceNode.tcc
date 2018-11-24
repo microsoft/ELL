@@ -16,15 +16,18 @@ namespace ell
 namespace model
 {
     template <typename ValueType>
-    SpliceNode<ValueType>::SpliceNode()
-        : CompilableNode({ }, { &_output }), _output(this, defaultOutputPortName, 0) {}
+    SpliceNode<ValueType>::SpliceNode() :
+        CompilableNode({}, { &_output }),
+        _output(this, defaultOutputPortName, 0)
+    {}
 
     template <typename ValueType>
-    SpliceNode<ValueType>::SpliceNode(const std::vector<const OutputPortBase*>& inputs) 
-        : CompilableNode({ }, { &_output }), _output(this, defaultOutputPortName, ComputeOutputLayout(inputs))
+    SpliceNode<ValueType>::SpliceNode(const std::vector<const OutputPortBase*>& inputs) :
+        CompilableNode({}, { &_output }),
+        _output(this, defaultOutputPortName, ComputeOutputLayout(inputs))
     {
         auto layout = _output.GetMemoryLayout();
-        if(layout.HasPadding())
+        if (layout.HasPadding())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "SpliceNode must not have padding on its input");
         }
@@ -32,7 +35,7 @@ namespace model
         // Add 1 input port per port in the input list
         auto increment = layout.GetCumulativeIncrement(0);
         int index = 0;
-        for(const auto& inputPort: inputs)
+        for (const auto& inputPort : inputs)
         {
             if (inputPort->Size() % increment != 0)
             {
@@ -42,7 +45,7 @@ namespace model
             // Create a new InputPort object
             auto portName = std::string("input_") + std::to_string(index);
             _inputPorts.emplace_back(std::make_unique<InputPort<ValueType>>(this, static_cast<const OutputPort<ValueType>&>(*inputPort), portName));
-            
+
             // And add it to this node
             auto rawPtr = _inputPorts.back().get();
             AddInputPort(rawPtr);
@@ -54,7 +57,7 @@ namespace model
     PortMemoryLayout SpliceNode<ValueType>::ComputeOutputLayout(const std::vector<const OutputPortBase*>& inputPorts)
     {
         std::vector<PortRange> ranges;
-        for(auto port: inputPorts)
+        for (auto port : inputPorts)
         {
             ranges.emplace_back(*port);
         }
@@ -67,7 +70,7 @@ namespace model
     {
         std::vector<ValueType> output;
         output.reserve(_output.Size());
-        for(const auto& input: _inputPorts)
+        for (const auto& input : _inputPorts)
         {
             auto value = input->GetValue();
             std::copy(value.begin(), value.end(), std::back_inserter(output));
@@ -109,7 +112,7 @@ namespace model
     void SpliceNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         std::vector<const OutputPortBase*> newInputs;
-        for(const auto& inputPort: _inputPorts)
+        for (const auto& inputPort : _inputPorts)
         {
             const auto& newPort = transformer.GetCorrespondingInputs(*inputPort);
             newInputs.emplace_back(&newPort);
@@ -152,5 +155,5 @@ namespace model
 
         _output.SetMemoryLayout(ComputeOutputLayout(referencedPorts));
     }
-}
-}
+} // namespace model
+} // namespace ell

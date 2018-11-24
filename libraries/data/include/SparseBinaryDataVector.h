@@ -56,7 +56,6 @@ namespace data
         IndexValue Get() const;
 
     protected:
-
         using IndexIteratorType = typename IndexListType::Iterator;
 
         // private ctor that can only be called from the parent class
@@ -156,7 +155,7 @@ namespace data
         /// <param name="size"> The prefix size. </param>
         ///
         /// <returns> The iterator. </returns>
-        template<IterationPolicy policy>
+        template <IterationPolicy policy>
         Iterator<policy> GetIterator(size_t size) const;
 
         /// <summary>
@@ -167,7 +166,7 @@ namespace data
         /// <typeparam name="policy"> The iteration policy. </typeparam>
         ///
         /// <returns> The iterator. </returns>
-        template<IterationPolicy policy>
+        template <IterationPolicy policy>
         Iterator<policy> GetIterator() const;
 
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
@@ -218,8 +217,8 @@ namespace data
         /// <returns> The data vector type. </returns>
         IDataVector::Type GetType() const override { return IDataVector::Type::SparseBinaryDataVector; }
     };
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/SparseBinaryDataVector.tcc"
 

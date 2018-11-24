@@ -47,12 +47,13 @@ namespace common
     };
 
     /// <summary> A version of TrainerArguments that adds its members to the command line parser. </summary>
-    struct ParsedTrainerArguments : public TrainerArguments, public utilities::ParsedArgSet
+    struct ParsedTrainerArguments : public TrainerArguments
+        , public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
         /// <param name="parser"> [in,out] The parser. </param>
         void AddArgs(utilities::CommandLineParser& parser) override;
     };
-}
-}
+} // namespace common
+} // namespace ell

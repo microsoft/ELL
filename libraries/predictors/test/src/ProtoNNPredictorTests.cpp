@@ -55,4 +55,3 @@ void ProtoNNPredictorTest()
     testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(maxLabelIndex, R));
     testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(*maxElement, score, 1e-6));
 }
-

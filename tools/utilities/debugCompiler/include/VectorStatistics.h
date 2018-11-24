@@ -27,7 +27,7 @@ public:
     /// <summary> Create VectorStatistics from the given vector. </summary>
     template <typename ValueType>
     VectorStatistics(const std::vector<ValueType>& vec);
-    
+
     /// <summary> Create VectorStatistics from the given tensor. </summary>
     template <typename TensorType>
     VectorStatistics(const TensorType& tensor);
@@ -89,6 +89,6 @@ std::vector<ValueType> Abs(const std::vector<ValueType>& vec);
 /// <summary> Returns tensor with each element converted to the absolute value of the original.</summary>
 template <typename TensorType>
 ell::math::ChannelColumnRowTensor<typename TensorType::TensorElementType> Abs(const TensorType& tensor);
-}
+} // namespace ell
 
 #include "../tcc/VectorStatistics.tcc"

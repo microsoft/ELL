@@ -6,9 +6,9 @@
 #include "LoadMap_test.h"
 
 // common
+#include "Files.h"
 #include "LoadModel.h"
 #include "MapLoadArguments.h"
-#include "Files.h"
 
 // model
 #include "Model.h"
@@ -46,7 +46,7 @@ void TestLoadMapWithPorts(const std::string& examplePath)
 
     bool threw = false;
     std::cout << "Testing map loading, file " << args.inputModelFilename << std::endl;
-    try 
+    try
     {
         auto map = common::LoadMap(args);
     }
@@ -57,4 +57,4 @@ void TestLoadMapWithPorts(const std::string& examplePath)
     // check stuff out
     testing::ProcessTest("Testing Map constructor does not support multiple output ranges", threw);
 }
-}
+} // namespace ell

@@ -11,12 +11,16 @@ namespace ell
 namespace nodes
 {
     template <typename InputValueType, typename OutputValueType>
-    TypeCastNode<InputValueType, OutputValueType>::TypeCastNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0){};
+    TypeCastNode<InputValueType, OutputValueType>::TypeCastNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0){};
 
     template <typename InputValueType, typename OutputValueType>
-    TypeCastNode<InputValueType, OutputValueType>::TypeCastNode(const model::OutputPort<InputValueType>& input)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, input.Size()){};
+    TypeCastNode<InputValueType, OutputValueType>::TypeCastNode(const model::OutputPort<InputValueType>& input) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, input.Size()){};
 
     template <typename InputValueType, typename OutputValueType>
     void TypeCastNode<InputValueType, OutputValueType>::Compute() const
@@ -104,5 +108,5 @@ namespace nodes
         archiver[defaultInputPortName] >> _input;
         _output.SetSize(_input.Size());
     }
-}
-}
+} // namespace nodes
+} // namespace ell

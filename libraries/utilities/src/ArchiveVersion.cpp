@@ -41,5 +41,5 @@ namespace utilities
     {
         return !(a > b);
     }
-}
-}
+} // namespace utilities
+} // namespace ell

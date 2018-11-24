@@ -41,5 +41,5 @@ namespace emitters
             argument.setName(arguments[i++].first);
         }
     }
-}
-}
+} // namespace emitters
+} // namespace ell

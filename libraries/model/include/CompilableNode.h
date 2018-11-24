@@ -42,8 +42,8 @@ namespace model
         bool IsCompilable(const MapCompiler* compiler) const override { return true; }
 
     protected:
-        CompilableNode(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs)
-            : Node(inputs, outputs) {}
+        CompilableNode(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) :
+            Node(inputs, outputs) {}
         ~CompilableNode() override = default;
 
         // Compile function necessary to override in subclasses
@@ -111,7 +111,7 @@ namespace model
 
     private:
         const std::string _nodeFunctionPrefix = "_Node__";
-        const char _badIdentifierChars[3] = {'<', '>', ','};
+        const char _badIdentifierChars[3] = { '<', '>', ',' };
     };
-}
-}
+} // namespace model
+} // namespace ell

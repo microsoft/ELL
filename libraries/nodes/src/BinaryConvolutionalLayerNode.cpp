@@ -169,8 +169,8 @@ namespace nodes
     // BinaryConvolutionalLayerNode
     //
     template <typename ValueType>
-    BinaryConvolutionalLayerNode<ValueType>::BinaryConvolutionalLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BinaryConvolutionalLayer<ValueType>& layer)
-        : NeuralNetworkLayerNode<BinaryConvolutionalLayerNode<ValueType>, predictors::neural::BinaryConvolutionalLayer<ValueType>, ValueType>(input, layer)
+    BinaryConvolutionalLayerNode<ValueType>::BinaryConvolutionalLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::BinaryConvolutionalLayer<ValueType>& layer) :
+        NeuralNetworkLayerNode<BinaryConvolutionalLayerNode<ValueType>, predictors::neural::BinaryConvolutionalLayer<ValueType>, ValueType>(input, layer)
     {
     }
 
@@ -290,7 +290,6 @@ namespace nodes
         return { xnorNode->output };
     }
 
-
     template <typename ValueType>
     void BinaryConvolutionalLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
@@ -304,8 +303,10 @@ namespace nodes
     //
 
     template <typename ValueType, typename PackedBitsType>
-    BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::BinaryReceptiveFieldMatrixNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+    BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::BinaryReceptiveFieldMatrixNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
@@ -313,8 +314,13 @@ namespace nodes
     BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::BinaryReceptiveFieldMatrixNode(const model::OutputPort<ValueType>& input,
                                                                                               const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                                                                               const model::PortMemoryLayout& inputMemoryLayout,
-                                                                                              const model::PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, GetPackedFilterSize<PackedBitsType>(convolutionalParameters, inputMemoryLayout, outputMemoryLayout)), _convolutionalParameters(convolutionalParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
+                                                                                              const model::PortMemoryLayout& outputMemoryLayout) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, GetPackedFilterSize<PackedBitsType>(convolutionalParameters, inputMemoryLayout, outputMemoryLayout)),
+        _convolutionalParameters(convolutionalParameters),
+        _inputMemoryLayout(inputMemoryLayout),
+        _outputMemoryLayout(outputMemoryLayout)
     {
     }
 
@@ -462,8 +468,14 @@ namespace nodes
     // BinaryXnorNode
     //
     template <typename ValueType, typename PackedBitsType>
-    BinaryXnorNode<ValueType, PackedBitsType>::BinaryXnorNode()
-        : CompilableNode({ &_input, &_inputPaddingMasks, &_inputPaddingMaskSums, &_filterWeights, &_filterMeans }, { &_output }), _input(this, {}, defaultInputPortName), _inputPaddingMasks(this, {}, inputPaddingMasksPortName), _inputPaddingMaskSums(this, {}, inputPaddingMaskSumsPortName), _filterWeights(this, {}, filterWeightsPortName), _filterMeans(this, {}, filterMeansPortName), _output(this, defaultOutputPortName, 0)
+    BinaryXnorNode<ValueType, PackedBitsType>::BinaryXnorNode() :
+        CompilableNode({ &_input, &_inputPaddingMasks, &_inputPaddingMaskSums, &_filterWeights, &_filterMeans }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _inputPaddingMasks(this, {}, inputPaddingMasksPortName),
+        _inputPaddingMaskSums(this, {}, inputPaddingMaskSumsPortName),
+        _filterWeights(this, {}, filterWeightsPortName),
+        _filterMeans(this, {}, filterMeansPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
@@ -476,8 +488,17 @@ namespace nodes
                                                               const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                                               const predictors::neural::PaddingParameters& inputPaddingParameters,
                                                               const model::PortMemoryLayout& inputMemoryLayout,
-                                                              const model::PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input, &_inputPaddingMasks, &_inputPaddingMaskSums, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, defaultInputPortName), _inputPaddingMasks(this, compressedInputPaddingMasks, inputPaddingMasksPortName), _inputPaddingMaskSums(this, inputPaddingMaskSums, inputPaddingMaskSumsPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _inputMemoryLayout(inputMemoryLayout)
+                                                              const model::PortMemoryLayout& outputMemoryLayout) :
+        CompilableNode({ &_input, &_inputPaddingMasks, &_inputPaddingMaskSums, &_filterWeights, &_filterMeans }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _inputPaddingMasks(this, compressedInputPaddingMasks, inputPaddingMasksPortName),
+        _inputPaddingMaskSums(this, inputPaddingMaskSums, inputPaddingMaskSumsPortName),
+        _filterWeights(this, compressedFilterWeights, filterWeightsPortName),
+        _filterMeans(this, filterMeans, filterMeansPortName),
+        _output(this, defaultOutputPortName, outputMemoryLayout),
+        _convolutionalParameters(convolutionalParameters),
+        _inputPaddingParameters(inputPaddingParameters),
+        _inputMemoryLayout(inputMemoryLayout)
     {
     }
 
@@ -703,8 +724,7 @@ namespace nodes
             auto blockStartVal = &(*arguments++);
             auto blockEndVal = &(*arguments++);
 
-            taskFunction.For(blockStartVal, blockEndVal, taskFunction.Literal<int>(1), [pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums,
-                                                                                        pOutput, hasZeroPadding, outputColumns, packedRowSize, packedRowStride, useVectorInstructions, vectorSize, numVectorBlocks, &compiler, this](emitters::IRFunctionEmitter& taskFunction, emitters::LLVMValue filterIndex) {
+            taskFunction.For(blockStartVal, blockEndVal, taskFunction.Literal<int>(1), [pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums, pOutput, hasZeroPadding, outputColumns, packedRowSize, packedRowStride, useVectorInstructions, vectorSize, numVectorBlocks, &compiler, this](emitters::IRFunctionEmitter& taskFunction, emitters::LLVMValue filterIndex) {
                 ComputeFilterOutput(compiler,
                                     taskFunction,
                                     pInput,
@@ -891,5 +911,5 @@ namespace nodes
     template class BinaryConvolutionalLayerNode<float>;
     template class BinaryConvolutionalLayerNode<double>;
 
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

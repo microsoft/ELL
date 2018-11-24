@@ -44,7 +44,7 @@ bool CanUsePosixLibrary(IRModuleEmitter& module)
     return module.GetCompilerOptions().targetDevice.IsLinux() ||
            module.GetCompilerOptions().targetDevice.IsMacOS();
 }
-}
+} // namespace
 
 void TestPthreadSelf()
 {

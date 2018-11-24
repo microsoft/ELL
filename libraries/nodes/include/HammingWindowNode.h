@@ -74,7 +74,7 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/HammingWindowNode.tcc"

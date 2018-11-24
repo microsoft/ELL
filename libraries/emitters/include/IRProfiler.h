@@ -57,7 +57,7 @@ namespace emitters
 
         /// <summary> Check internal time is valid. For testing. </summary>
         bool IsStartTimeValid() const;
-        
+
     private:
         friend IRProfiler;
         IRProfileRegion(IRFunctionEmitter& function, IRProfiler& profiler, const std::string& name, IRLocalScalar index);
@@ -174,5 +174,5 @@ namespace emitters
         llvm::GlobalVariable* _profileRegionsArray = nullptr;
         int _regionCount = 0;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

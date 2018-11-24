@@ -14,7 +14,6 @@
 #include "LogLoss.h"
 #include "SquaredLoss.h"
 
-
 // trainers
 #include "MeanCalculator.h"
 #include "SDCATrainer.h"

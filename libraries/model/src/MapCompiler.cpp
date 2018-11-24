@@ -23,8 +23,8 @@ namespace model
 {
     using namespace logging;
 
-    MapCompiler::MapCompiler(const MapCompilerOptions& settings)
-        : _parameters(settings)
+    MapCompiler::MapCompiler(const MapCompilerOptions& settings) :
+        _parameters(settings)
     {
         PushScope();
     }
@@ -173,5 +173,5 @@ namespace model
     {
         SetVariableForPort(*element.ReferencedPort(), pVar);
     }
-}
-}
+} // namespace model
+} // namespace ell

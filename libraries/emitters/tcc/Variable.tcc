@@ -69,5 +69,5 @@ namespace emitters
     {
         return AddVariable<InitializedVectorVariable<ElementType>>(scope, data);
     }
-}
-}
+} // namespace emitters
+} // namespace ell

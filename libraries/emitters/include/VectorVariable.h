@@ -76,7 +76,7 @@ namespace emitters
     private:
         std::vector<ElementType> _data;
     };
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/VectorVariable.tcc"

@@ -19,7 +19,7 @@ namespace dsp
     // Functions
     //
 
-    template<typename ValueType>
+    template <typename ValueType>
     math::RowVector<ValueType> Convolve1D(const math::RowVector<ValueType>& signal, const math::RowVector<ValueType>& filter, ConvolutionMethodOption method)
     {
         switch (method)
@@ -37,13 +37,13 @@ namespace dsp
         }
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     math::ChannelColumnRowTensor<ValueType> Convolve2D(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, ConvolutionMethodOption method)
     {
         return Convolve2D(signal, filters, numFilters, 1, method);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     math::ChannelColumnRowTensor<ValueType> Convolve2D(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride, ConvolutionMethodOption method)
     {
         switch (method)
@@ -66,13 +66,13 @@ namespace dsp
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     math::ChannelColumnRowTensor<ValueType> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, ConvolutionMethodOption method)
     {
         return Convolve2DDepthwiseSeparable(signal, filters, numFilters, 1, method);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     math::ChannelColumnRowTensor<ValueType> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& signal, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride, ConvolutionMethodOption method)
     {
         switch (method)
@@ -112,5 +112,5 @@ namespace dsp
 
     template math::ChannelColumnRowTensor<float> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride, ConvolutionMethodOption method);
     template math::ChannelColumnRowTensor<double> Convolve2DDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride, ConvolutionMethodOption method);
-}
-}
+} // namespace dsp
+} // namespace ell

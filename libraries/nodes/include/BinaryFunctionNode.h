@@ -55,8 +55,7 @@ namespace nodes
         /// <param name="input2"> The right-hand input of the function. </param>
         /// <param name="function"> The function to apply coordinate-wise. </param>
         /// <param name="padding"> The padding value. </param>
-        BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2,
-                           FunctionType function, ValueType padding = 0);
+        BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, FunctionType function, ValueType padding = 0);
 
         /// <summary> Constructor. </summary>
         ///
@@ -65,8 +64,7 @@ namespace nodes
         /// <param name="layout"> The layout for both inputs and the output. </param>
         /// <param name="function"> The function to apply coordinate-wise. </param>
         /// <param name="padding"> The padding value. </param>
-        BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2,
-                           const model::PortMemoryLayout& inputLayout, FunctionType function, ValueType padding = 0);
+        BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, const model::PortMemoryLayout& inputLayout, FunctionType function, ValueType padding = 0);
 
         /// <summary> Constructor. </summary>
         ///
@@ -76,8 +74,7 @@ namespace nodes
         /// <param name="outputLayout"> The output layout. </param>
         /// <param name="function"> The function to apply coordinate-wise. </param>
         /// <param name="padding"> The padding value. </param>
-        BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2,
-                           const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding = 0);
+        BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding = 0);
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputLayout; }
@@ -142,7 +139,7 @@ namespace nodes
 
         ValueType _paddingValue;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/BinaryFunctionNode.tcc"

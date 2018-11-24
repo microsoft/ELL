@@ -11,14 +11,22 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType, typename SelectorType>
-    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode()
-        : Node({ &_input, &_selector }, { &_output }), _input(this, {}, defaultInputPortName), _selector(this, {}, selectorPortName), _output(this, defaultOutputPortName, 0), _defaultValue(0)
+    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode() :
+        Node({ &_input, &_selector }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _selector(this, {}, selectorPortName),
+        _output(this, defaultOutputPortName, 0),
+        _defaultValue(0)
     {
     }
 
     template <typename ValueType, typename SelectorType>
-    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<SelectorType>& selector, size_t outputSize, ValueType defaultValue)
-        : Node({ &_input, &_selector }, { &_output }), _input(this, input, defaultInputPortName), _selector(this, selector, selectorPortName), _output(this, defaultOutputPortName, outputSize), _defaultValue(defaultValue)
+    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode(const model::OutputPort<ValueType>& input, const model::OutputPort<SelectorType>& selector, size_t outputSize, ValueType defaultValue) :
+        Node({ &_input, &_selector }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _selector(this, selector, selectorPortName),
+        _output(this, defaultOutputPortName, outputSize),
+        _defaultValue(defaultValue)
     {
         if (selector.Size() != 1)
         {
@@ -104,5 +112,5 @@ namespace nodes
         transformer.MapNodeOutput(output, outputElements);
         return true;
     }
-}
-}
+} // namespace nodes
+} // namespace ell

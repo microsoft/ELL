@@ -15,8 +15,8 @@
 #include "testing.h"
 
 // solutions
-#include "VectorSolution.h"
 #include "MatrixSolution.h"
+#include "VectorSolution.h"
 
 // loss functions
 #include "AbsoluteLoss.h"
@@ -24,12 +24,12 @@
 #include "HuberLoss.h"
 #include "LogisticLoss.h"
 #include "SmoothedHingeLoss.h"
-#include "SquaredHingeLoss.h"
 #include "SquareLoss.h"
+#include "SquaredHingeLoss.h"
 
 // regularizers
-#include "L2Regularizer.h"
 #include "ElasticNetRegularizer.h"
+#include "L2Regularizer.h"
 #include "MaxRegularizer.h"
 
 using namespace ell;
@@ -40,39 +40,39 @@ int main()
     // Test that Derivative() is consistent with Value()
 
     TestDerivative(AbsoluteLoss{}, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 });
-    TestDerivative(HuberLoss{2.0}, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 });
-    TestDerivative(HuberLoss{1.0}, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 });
-    TestDerivative(HuberLoss{0.6}, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 });
+    TestDerivative(HuberLoss{ 2.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 });
+    TestDerivative(HuberLoss{ 1.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 });
+    TestDerivative(HuberLoss{ 0.6 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 });
     TestDerivative(SquareLoss{}, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 });
 
     TestDerivative(HingeLoss{}, { -2.05, 0.1, 2.05 }, { -1.0, 2.0, 1.0 });
     TestDerivative(LogisticLoss{}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 });
-    TestDerivative(SmoothedHingeLoss{1.0}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 });
-    TestDerivative(SmoothedHingeLoss{0.5}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 });
-    TestDerivative(SmoothedHingeLoss{0.3}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 });
+    TestDerivative(SmoothedHingeLoss{ 1.0 }, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 });
+    TestDerivative(SmoothedHingeLoss{ 0.5 }, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 });
+    TestDerivative(SmoothedHingeLoss{ 0.3 }, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 });
     TestDerivative(SquaredHingeLoss{}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 });
 
     // Test that Conjugate() is consistent with Value()
 
     TestConjugate(AbsoluteLoss{}, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -10, 10);
-    TestConjugate(HuberLoss{2.0}, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -10, 10);
-    TestConjugate(HuberLoss{1.0}, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -10, 10);
-    TestConjugate(HuberLoss{0.6}, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -10, 10);
+    TestConjugate(HuberLoss{ 2.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -10, 10);
+    TestConjugate(HuberLoss{ 1.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -10, 10);
+    TestConjugate(HuberLoss{ 0.6 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -10, 10);
     TestConjugate(SquareLoss{}, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -10, 10);
 
     TestConjugate(HingeLoss{}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 }, -10, 10);
     TestConjugate(LogisticLoss{}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 }, -30, 30);
-    TestConjugate(SmoothedHingeLoss{1.0}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 }, -10, 10);
-    TestConjugate(SmoothedHingeLoss{0.5}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 }, -10, 10);
-    TestConjugate(SmoothedHingeLoss{0.3}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 }, -10, 10);
+    TestConjugate(SmoothedHingeLoss{ 1.0 }, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 }, -10, 10);
+    TestConjugate(SmoothedHingeLoss{ 0.5 }, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 }, -10, 10);
+    TestConjugate(SmoothedHingeLoss{ 0.3 }, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 }, -10, 10);
     TestConjugate(SquaredHingeLoss{}, { -2.0, 0.1, 2.0 }, { -1.0, 2.0, 1.0 }, -10, 10);
 
     // Test ConjugateProx() is consistent with Conjugate()
 
     TestConjugateProx(AbsoluteLoss{}, { 0.1, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -1, 1);
-    TestConjugateProx(HuberLoss{2.0}, { 0.1, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -1, 1);
-    TestConjugateProx(HuberLoss{1.0}, { 0.1, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -1, 1);
-    TestConjugateProx(HuberLoss{0.6}, { 0.1, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -1, 1);
+    TestConjugateProx(HuberLoss{ 2.0 }, { 0.1, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -1, 1);
+    TestConjugateProx(HuberLoss{ 1.0 }, { 0.1, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -1, 1);
+    TestConjugateProx(HuberLoss{ 0.6 }, { 0.1, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -1, 1);
     TestConjugateProx(SquareLoss{}, { 0.1, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, { -2.0, 0.1, 2.0 }, -10, 10);
 
     TestConjugateProx(HingeLoss{}, { 0.1, 0.1, 2.0 }, { -1.0, 2.0, 1.0 }, { -1.0, 2.0, 1.0 }, -1, 1);

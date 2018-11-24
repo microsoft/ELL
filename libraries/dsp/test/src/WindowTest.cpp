@@ -50,7 +50,7 @@ void VerifyHammingWindow(const std::vector<ValueType>& computed, const std::vect
 {
     using namespace std::string_literals;
     std::vector<ValueType> cast_reference(reference.size());
-    std::transform(reference.begin(), reference.end(), cast_reference.begin(), [](ValueType2 x){ return static_cast<ValueType>(x); });
+    std::transform(reference.begin(), reference.end(), cast_reference.begin(), [](ValueType2 x) { return static_cast<ValueType>(x); });
     testing::ProcessTest("Testing "s + symmetry + " Hamming window against generated example", testing::IsEqual(computed, cast_reference, static_cast<ValueType>(epsilon)));
 }
 

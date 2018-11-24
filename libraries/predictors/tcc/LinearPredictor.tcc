@@ -6,8 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LinearPredictor.h"
 #include "DataVectorOperations.h"
+#include "LinearPredictor.h"
 
 // stl
 #include <memory>
@@ -20,21 +20,23 @@ namespace ell
 namespace predictors
 {
     template <typename ElementType>
-    LinearPredictor<ElementType>::LinearPredictor(size_t dim)
-        : _w(dim), _b(0)
+    LinearPredictor<ElementType>::LinearPredictor(size_t dim) :
+        _w(dim),
+        _b(0)
     {
     }
 
     template <typename ElementType>
-    LinearPredictor<ElementType>::LinearPredictor(const math::ColumnVector<ElementType>& weights, ElementType bias)
-        : _w(weights), _b(bias)
+    LinearPredictor<ElementType>::LinearPredictor(const math::ColumnVector<ElementType>& weights, ElementType bias) :
+        _w(weights),
+        _b(bias)
     {
     }
 
     template <typename ElementType>
     template <typename OtherElementType>
-    LinearPredictor<ElementType>::LinearPredictor(const LinearPredictor<OtherElementType>& other)
-        : _b(other.GetBias())
+    LinearPredictor<ElementType>::LinearPredictor(const LinearPredictor<OtherElementType>& other) :
+        _b(other.GetBias())
     {
         auto weights = other.GetWeights();
         _w.Resize(weights.Size());
@@ -67,13 +69,13 @@ namespace predictors
     auto LinearPredictor<ElementType>::GetWeightedElements(const DataVectorType& dataVector) const -> DataVectorType
     {
         auto transformation = [&](data::IndexValue indexValue) -> ElementType { return indexValue.value * _w[indexValue.index]; };
-        return dataVector.TransformAs<data::IterationPolicy::skipZeros,DataVectorType>(transformation);
+        return dataVector.TransformAs<data::IterationPolicy::skipZeros, DataVectorType>(transformation);
     }
 
     template <typename ElementType>
     void LinearPredictor<ElementType>::Scale(ElementType scalar)
     {
-        _w *= scalar; 
+        _w *= scalar;
         _b *= scalar;
     }
 
@@ -93,5 +95,5 @@ namespace predictors
         _w = math::ColumnVector<ElementType>(std::move(w));
         archiver["b"] >> _b;
     }
-}
-}
+} // namespace predictors
+} // namespace ell

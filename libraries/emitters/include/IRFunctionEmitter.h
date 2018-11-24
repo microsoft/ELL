@@ -13,13 +13,13 @@
 #include "IRBlockRegion.h"
 #include "IREmitter.h"
 #include "IRIfEmitter.h"
-#include "IRLocalValue.h"
-#include "IRLocalScalar.h"
 #include "IRLocalArray.h"
 #include "IRLocalMultidimArray.h"
+#include "IRLocalScalar.h"
+#include "IRLocalValue.h"
 #include "IRLoopEmitter.h"
-#include "IRParallelLoopEmitter.h"
 #include "IROptimizer.h"
+#include "IRParallelLoopEmitter.h"
 #include "IRTask.h"
 #include "LLVMUtilities.h"
 #include "Variable.h"
@@ -1692,7 +1692,7 @@ namespace emitters
         IRBlockRegion* _pCurRegion = nullptr;
         LLVMFunction _pFunction = nullptr;
         llvm::BasicBlock* _entryBlock = nullptr;
-        
+
         std::string _name;
     };
 
@@ -1746,7 +1746,7 @@ namespace emitters
         IRFunctionEmitter& _functionEmitter;
         IRValueList _arguments;
     };
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/IRFunctionEmitter.tcc"

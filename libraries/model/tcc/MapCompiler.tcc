@@ -43,5 +43,5 @@ namespace model
         assert(pVar != nullptr);
         return pVar;
     }
-}
-}
+} // namespace model
+} // namespace ell

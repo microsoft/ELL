@@ -10,8 +10,8 @@
 
 // stl
 #include <cstddef>
-#include <memory>
 #include <map>
+#include <memory>
 
 // Matrix
 #include <Matrix.h>
@@ -92,5 +92,5 @@ namespace trainers
         // Number of clusters.
         size_t _numClusters = 0;
     };
-}
-}
+} // namespace trainers
+} // namespace ell

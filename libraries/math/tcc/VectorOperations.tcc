@@ -52,8 +52,9 @@ namespace math
     }
 
     template <typename ElementType, VectorOrientation orientation, typename TransformationType>
-    TransformedConstVectorReference<ElementType, orientation, TransformationType>::TransformedConstVectorReference(ConstVectorReference<ElementType, orientation> vector, TransformationType transformation)
-        : _vector(vector), _transformation(std::move(transformation))
+    TransformedConstVectorReference<ElementType, orientation, TransformationType>::TransformedConstVectorReference(ConstVectorReference<ElementType, orientation> vector, TransformationType transformation) :
+        _vector(vector),
+        _transformation(std::move(transformation))
     {
     }
 
@@ -83,8 +84,8 @@ namespace math
 
     template <typename ElementType>
     ElementType ScaleFunction<ElementType>::operator()(ElementType x)
-    { 
-        return x * _value; 
+    {
+        return x * _value;
     }
 
     template <typename ElementType, VectorOrientation orientation>
@@ -135,7 +136,7 @@ namespace math
     {
         DEBUG_THROW(scalar == 0, utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "Divide by zero."));
 
-        ScaleUpdate(1/static_cast<VectorElementType>(scalar), vector);
+        ScaleUpdate(1 / static_cast<VectorElementType>(scalar), vector);
     }
 
     // vector += scalar
@@ -289,7 +290,7 @@ namespace math
     void ScaleAddUpdate(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, VectorReference<ElementType, orientation> vectorB)
     {
         DEBUG_CHECK_SIZES(vectorB.Size() != vectorA.Size(), "Incompatible vector sizes.");
-        
+
         if (scalarA == 0)
         {
             ScaleUpdate<implementation>(scalarB, vectorB);
@@ -313,7 +314,7 @@ namespace math
     }
 
     // output = scalarA * vectorA + vectorB
-    template<ImplementationType implementation, typename ElementType, VectorOrientation orientation>
+    template <ImplementationType implementation, typename ElementType, VectorOrientation orientation>
     void ScaleAddSet(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, One, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output)
     {
         DEBUG_CHECK_SIZES(vectorB.Size() != vectorA.Size() || vectorA.Size() != output.Size(), "Incompatible vector sizes.");
@@ -357,7 +358,7 @@ namespace math
     }
 
     // output = vectorA + scalarB * vectorB
-    template<ImplementationType implementation, typename ElementType, VectorOrientation orientation>
+    template <ImplementationType implementation, typename ElementType, VectorOrientation orientation>
     void ScaleAddSet(One, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output)
     {
         DEBUG_CHECK_SIZES(vectorB.Size() != vectorA.Size() || vectorA.Size() != output.Size(), "Incompatible vector sizes.");
@@ -491,7 +492,7 @@ namespace math
         }
     }
 
-    template<typename ElementType, VectorOrientation orientation, typename TransformationType>
+    template <typename ElementType, VectorOrientation orientation, typename TransformationType>
     void TransformUpdate(TransformationType transformation, VectorReference<ElementType, orientation> vector)
     {
         vector.Transform(transformation);
@@ -500,7 +501,7 @@ namespace math
     template <typename ElementType, VectorOrientation orientation, typename TransformationType>
     void TransformSet(TransformationType transformation, ConstVectorReference<ElementType, orientation> vector, VectorReference<ElementType, orientation> output)
     {
-        DEBUG_CHECK_SIZES (vector.Size() != output.Size(), "Incompatible vector sizes.");
+        DEBUG_CHECK_SIZES(vector.Size() != output.Size(), "Incompatible vector sizes.");
 
         ElementType* pOutputData = output.GetDataPointer();
         const ElementType* pVectorData = vector.GetConstDataPointer();
@@ -607,7 +608,7 @@ namespace math
             }
         }
 
-        template<typename ElementType, VectorOrientation orientation>
+        template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::native>::AddUpdate(ElementType scalar, VectorReference<ElementType, orientation> vector)
         {
             UnaryVectorUpdateImplementation(vector, [scalar](ElementType& v) { v += scalar; });
@@ -621,17 +622,17 @@ namespace math
         }
 
         // output = scalar + vector
-        template<typename ElementType, VectorOrientation orientation>
+        template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::native>::AddSet(ElementType scalar, ConstVectorReference<ElementType, orientation> vector, VectorReference<ElementType, orientation> output)
         {
             BinaryVectorUpdateImplementation(vector, output, [scalar](ElementType a, ElementType& o) { o = scalar + a; });
         }
 
         // output = vectorA + vectorB
-        template<typename ElementType, VectorOrientation orientation>
+        template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::native>::AddSet(ConstVectorReference<ElementType, orientation> vectorA, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output)
         {
-            TrinaryVectorUpdateImplementation(vectorA, vectorB, output, [](ElementType a, ElementType b, ElementType& o) {o = a + b; });
+            TrinaryVectorUpdateImplementation(vectorA, vectorB, output, [](ElementType a, ElementType b, ElementType& o) { o = a + b; });
         }
 
         // vector *= scalar
@@ -680,11 +681,11 @@ namespace math
         template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::native>::ScaleAddSet(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, One, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output)
         {
-            TrinaryVectorUpdateImplementation(vectorA, vectorB, output, [scalarA](ElementType a, ElementType b, ElementType& o) {o = scalarA * a + b; });
+            TrinaryVectorUpdateImplementation(vectorA, vectorB, output, [scalarA](ElementType a, ElementType b, ElementType& o) { o = scalarA * a + b; });
         }
 
         // output = scalarA * ones + scalarB * vectorB
-        template<typename ElementType, VectorOrientation orientation>
+        template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::native>::ScaleAddSet(ElementType scalarA, OnesVector, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output)
         {
             BinaryVectorUpdateImplementation(vectorB, output, [scalarA, scalarB](ElementType b, ElementType& o) { o = scalarA + scalarB * b; });
@@ -694,14 +695,14 @@ namespace math
         template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::native>::ScaleAddSet(One, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output)
         {
-            TrinaryVectorUpdateImplementation(vectorA, vectorB, output, [scalarB](ElementType a, ElementType b, ElementType& o) {o = a + scalarB * b; });
+            TrinaryVectorUpdateImplementation(vectorA, vectorB, output, [scalarB](ElementType a, ElementType b, ElementType& o) { o = a + scalarB * b; });
         }
 
         // output = scalarA * vectorA + scalarB * vectorB
-        template<typename ElementType, VectorOrientation orientation>
+        template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::native>::ScaleAddSet(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output)
         {
-            TrinaryVectorUpdateImplementation(vectorA, vectorB, output, [scalarA, scalarB](ElementType a, ElementType b, ElementType& o) {o = scalarA * a + scalarB * b; });
+            TrinaryVectorUpdateImplementation(vectorA, vectorB, output, [scalarA, scalarB](ElementType a, ElementType b, ElementType& o) { o = scalarA * a + scalarB * b; });
         }
 
 #ifdef USE_BLAS
@@ -722,21 +723,21 @@ namespace math
             Blas::Ger(matrix.GetLayout(), static_cast<int>(matrix.NumRows()), static_cast<int>(matrix.NumColumns()), static_cast<ElementType>(1.0), vectorA.GetConstDataPointer(), static_cast<int>(vectorA.GetIncrement()), vectorB.GetConstDataPointer(), static_cast<int>(vectorB.GetIncrement()), matrix.GetDataPointer(), static_cast<int>(matrix.GetIncrement()));
         }
 
-        template<typename ElementType, VectorOrientation orientation>
+        template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::openBlas>::AddSet(ElementType scalar, ConstVectorReference<ElementType, orientation> vector, VectorReference<ElementType, orientation> output)
         {
             output.Fill(scalar);
             AddUpdate(vector, output);
         }
 
-        template<typename ElementType, VectorOrientation orientation>
+        template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::openBlas>::AddSet(ConstVectorReference<ElementType, orientation> vectorA, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output)
         {
             output.CopyFrom(vectorA);
             AddUpdate(vectorB, output);
         }
 
-        template<typename ElementType, VectorOrientation orientation>
+        template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::openBlas>::AddUpdate(ElementType scalar, VectorReference<ElementType, orientation> vector)
         {
             UnaryVectorUpdateImplementation(vector, [scalar](ElementType& v) { v += scalar; });
@@ -803,7 +804,7 @@ namespace math
         }
 
         // vectorC = scalarA * ones + scalarB * vectorB
-        template<typename ElementType, VectorOrientation orientation>
+        template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::openBlas>::ScaleAddSet(ElementType scalarA, OnesVector, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output)
         {
             output.Fill(scalarA);
@@ -819,7 +820,7 @@ namespace math
         }
 
         // vectorC = scalarA * vectorA + scalarB * vectorB
-        template<typename ElementType, VectorOrientation orientation>
+        template <typename ElementType, VectorOrientation orientation>
         void VectorOperations<ImplementationType::openBlas>::ScaleAddSet(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output)
         {
             ScaleSet(scalarA, vectorA, output);
@@ -827,6 +828,6 @@ namespace math
         }
 
 #endif // USE_BLAS
-    }
-}
-}
+    } // namespace Internal
+} // namespace math
+} // namespace ell

@@ -21,7 +21,7 @@ namespace nodes
         //
         // Relevant archive format versions
         //
-        constexpr utilities::ArchiveVersion currentArchiveVersion = {utilities::ArchiveVersionNumbers::v2};
+        constexpr utilities::ArchiveVersion currentArchiveVersion = { utilities::ArchiveVersionNumbers::v2 };
 
         template <typename ValueType>
         void MatrixMatrixMultiply(bool transposeA, bool transposeB, bool transposeC, int m, int n, int k, const std::vector<ValueType>& matrixAValues, const std::vector<ValueType>& matrixBValues, std::vector<ValueType>& matrixCValues)
@@ -93,23 +93,29 @@ namespace nodes
                 }
             }
         }
+    } // namespace
+
+    template <typename ValueType>
+    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode() :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, {}, defaultInput1PortName),
+        _input2(this, {}, defaultInput2PortName),
+        _output(this, defaultOutputPortName, 0)
+    {
     }
 
     template <typename ValueType>
-    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode()
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, defaultInput1PortName), _input2(this, {}, defaultInput2PortName), _output(this, defaultOutputPortName, 0)
+    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2) :
+        MatrixMatrixMultiplyNode<ValueType>(input1, input2, model::PortMemoryLayout({ input1.GetMemoryLayout().GetActiveSize(0), input2.GetMemoryLayout().GetActiveSize(1) }))
     {
     }
 
-    template<typename ValueType>
-    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
-        : MatrixMatrixMultiplyNode<ValueType>(input1, input2, model::PortMemoryLayout({ input1.GetMemoryLayout().GetActiveSize(0), input2.GetMemoryLayout().GetActiveSize(1) }))
-    {
-    }
-
-    template<typename ValueType>
-    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, const model::PortMemoryLayout& outputLayout)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, outputLayout)
+    template <typename ValueType>
+    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, const model::PortMemoryLayout& outputLayout) :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, input1, defaultInput1PortName),
+        _input2(this, input2, defaultInput2PortName),
+        _output(this, defaultOutputPortName, outputLayout)
     {
         auto input1Layout = _input1.GetMemoryLayout();
         auto input2Layout = _input2.GetMemoryLayout();
@@ -135,9 +141,20 @@ namespace nodes
         }
     }
 
-    template<typename ValueType>
-    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, int m, int n, int k, int matrix1Stride, const model::OutputPort<ValueType>& input2, int matrix2Stride, int outputMatrixStride)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, m * n), _m(m), _n(n), _k(k), _lda(matrix1Stride), _ldb(matrix2Stride), _ldc(outputMatrixStride), _transpose1(false), _transpose2(false)
+    template <typename ValueType>
+    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, int m, int n, int k, int matrix1Stride, const model::OutputPort<ValueType>& input2, int matrix2Stride, int outputMatrixStride) :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, input1, defaultInput1PortName),
+        _input2(this, input2, defaultInput2PortName),
+        _output(this, defaultOutputPortName, m * n),
+        _m(m),
+        _n(n),
+        _k(k),
+        _lda(matrix1Stride),
+        _ldb(matrix2Stride),
+        _ldc(outputMatrixStride),
+        _transpose1(false),
+        _transpose2(false)
     {
         if (static_cast<int>(input1.Size()) != m * k)
         {
@@ -151,14 +168,26 @@ namespace nodes
     }
 
     template <typename ValueType>
-    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::OutputPort<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride)
-        : MatrixMatrixMultiplyNode<ValueType>(input1, m, n, k, matrix1Stride, transpose1, input2, matrix2Stride, transpose2, outputMatrixStride, false)
+    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::OutputPort<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride) :
+        MatrixMatrixMultiplyNode<ValueType>(input1, m, n, k, matrix1Stride, transpose1, input2, matrix2Stride, transpose2, outputMatrixStride, false)
     {
     }
 
     template <typename ValueType>
-    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::OutputPort<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride, bool transposeOutput)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, m * n), _m(m), _n(n), _k(k), _lda(matrix1Stride), _ldb(matrix2Stride), _ldc(outputMatrixStride), _transpose1(transpose1), _transpose2(transpose2), _transposeOutput(transposeOutput)
+    MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::OutputPort<ValueType>& input1, int m, int n, int k, int matrix1Stride, bool transpose1, const model::OutputPort<ValueType>& input2, int matrix2Stride, bool transpose2, int outputMatrixStride, bool transposeOutput) :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, input1, defaultInput1PortName),
+        _input2(this, input2, defaultInput2PortName),
+        _output(this, defaultOutputPortName, m * n),
+        _m(m),
+        _n(n),
+        _k(k),
+        _lda(matrix1Stride),
+        _ldb(matrix2Stride),
+        _ldc(outputMatrixStride),
+        _transpose1(transpose1),
+        _transpose2(transpose2),
+        _transposeOutput(transposeOutput)
     {
         // TODO: reset output layout (incl. transpose info)
         if (static_cast<int>(input1.Size()) != m * k)
@@ -172,7 +201,7 @@ namespace nodes
         }
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Compute() const
     {
         assert(static_cast<int>(input1.Size()) == _m * _k);
@@ -194,7 +223,7 @@ namespace nodes
         _output.SetOutput(outputMatrixValues);
     };
 
-    template<typename ValueType>
+    template <typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& PortElements1 = transformer.GetCorrespondingInputs(_input1);
@@ -203,14 +232,14 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         emitters::LLVMValue pInput1 = compiler.EnsurePortEmitted(input1);
         emitters::LLVMValue pInput2 = compiler.EnsurePortEmitted(input2);
         emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
-        if(_transposeOutput)
+        if (_transposeOutput)
         {
             function.CallGEMM<ValueType>(!_transpose2, !_transpose1, (int)_n, (int)_m, (int)_k, pInput2, (int)_ldb, pInput1, (int)_lda, pOutput, (int)_ldc);
         }
@@ -220,19 +249,19 @@ namespace nodes
         }
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     ell::utilities::ArchiveVersion MatrixMatrixMultiplyNode<ValueType>::GetArchiveVersion() const
     {
         return std::max(currentArchiveVersion, CompilableNode::GetArchiveVersion());
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     bool MatrixMatrixMultiplyNode<ValueType>::CanReadArchiveVersion(const utilities::ArchiveVersion& version) const
     {
         return CompilableNode::CanReadArchiveVersion(version);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
@@ -250,7 +279,7 @@ namespace nodes
         archiver["transposeOutput"] << _transposeOutput;
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         // TODO: check version number and read this format if in back-compat mode
@@ -272,5 +301,5 @@ namespace nodes
     // Explicitly instantiate versions
     template class MatrixMatrixMultiplyNode<float>;
     template class MatrixMatrixMultiplyNode<double>;
-}
-}
+} // namespace nodes
+} // namespace ell

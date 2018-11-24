@@ -661,7 +661,7 @@ void TestHeaderVoidChar()
     auto module = MakeHostModuleEmitter("Predictor");
 
     emitters::NamedVariableTypeList parameters = { { "context", VariableType::VoidPointer }, { "name", VariableType::Char8Pointer } };
-    
+
     auto function = module.BeginFunction("Test_GetMetadata", VariableType::Char8Pointer, parameters);
 
     // test that this causes the function to show up in the module header with correct types for void and char*.

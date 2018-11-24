@@ -114,7 +114,7 @@ namespace data
     /// <returns> An IndexValue iterator. </returns>
     template <IterationPolicy policy, typename ElementType>
     VectorIndexValueIterator<policy, ElementType> MakeVectorIndexValueIterator(const std::vector<ElementType>& container, size_t size);
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/StlIndexValueIterator.tcc"

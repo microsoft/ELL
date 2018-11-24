@@ -49,5 +49,5 @@ namespace data
         TextLine& _textLine;
         IndexValue _currentIndexValue;
     };
-}
-}
+} // namespace data
+} // namespace ell

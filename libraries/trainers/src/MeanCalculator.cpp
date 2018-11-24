@@ -14,7 +14,7 @@ namespace trainers
 {
     math::RowVector<double> CalculateMean(const data::AnyDataset& anyDataset)
     {
-        return CalculateTransformedMean<data::IterationPolicy::skipZeros>(anyDataset, [](data::IndexValue x) {return x.value; });
+        return CalculateTransformedMean<data::IterationPolicy::skipZeros>(anyDataset, [](data::IndexValue x) { return x.value; });
     }
-}
-}
+} // namespace trainers
+} // namespace ell

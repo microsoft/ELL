@@ -239,5 +239,5 @@ namespace emitters
         // task queue
         IRThreadPoolTaskQueue _taskQueue;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

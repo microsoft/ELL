@@ -98,5 +98,5 @@ namespace utilities
 
     template <typename WrappedTupleType>
     using UnwrappedTupleType = typename UnwrappedTuple<WrappedTupleType>::type;
-}
-}
+} // namespace utilities
+} // namespace ell

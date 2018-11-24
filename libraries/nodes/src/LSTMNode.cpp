@@ -21,8 +21,8 @@ namespace nodes
     // LSTMNode
     //
     template <typename ValueType>
-    LSTMNode<ValueType>::LSTMNode()
-        : RNNNode<ValueType>()
+    LSTMNode<ValueType>::LSTMNode() :
+        RNNNode<ValueType>()
     {
     }
 
@@ -36,10 +36,10 @@ namespace nodes
                                   const model::OutputPort<ValueType>& hiddenBias,
                                   const ActivationType& activation,
                                   const ActivationType& recurrentActivation,
-                                  bool validateWeights)
-        : RNNNode<ValueType>(input, resetTrigger, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation, false)
-        , _recurrentActivation(recurrentActivation)
-        , _cellState(hiddenUnits)
+                                  bool validateWeights) :
+        RNNNode<ValueType>(input, resetTrigger, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation, false),
+        _recurrentActivation(recurrentActivation),
+        _cellState(hiddenUnits)
     {
         if (validateWeights)
         {
@@ -49,26 +49,26 @@ namespace nodes
             if (inputWeights.Size() != numRows * numColumns)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The LSTMNode input weights are the wrong size, found %zu but expecting %zu", inputWeights.Size(), numRows * numColumns));
+                                                ell::utilities::FormatString("The LSTMNode input weights are the wrong size, found %zu but expecting %zu", inputWeights.Size(), numRows * numColumns));
             }
 
             numColumns = hiddenUnits;
             if (hiddenWeights.Size() != numRows * numColumns)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The LSTMNode hidden weights are the wrong size, found %zu but expecting %zu", hiddenWeights.Size(), numRows * numColumns));
+                                                ell::utilities::FormatString("The LSTMNode hidden weights are the wrong size, found %zu but expecting %zu", hiddenWeights.Size(), numRows * numColumns));
             }
-            
+
             if (inputBias.Size() != numRows)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The LSTMNode input bias vector is the wrong size, found %zu but expecting %zu", inputBias.Size(), numRows));
+                                                ell::utilities::FormatString("The LSTMNode input bias vector is the wrong size, found %zu but expecting %zu", inputBias.Size(), numRows));
             }
 
             if (hiddenBias.Size() != numRows)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The LSTMNode hidden bias vector is the wrong size, found %zu but expecting %zu", hiddenBias.Size(), numRows));
+                                                ell::utilities::FormatString("The LSTMNode hidden bias vector is the wrong size, found %zu but expecting %zu", hiddenBias.Size(), numRows));
             }
         }
     }
@@ -347,5 +347,5 @@ namespace nodes
     template class LSTMNode<float>;
     template class LSTMNode<double>;
 
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

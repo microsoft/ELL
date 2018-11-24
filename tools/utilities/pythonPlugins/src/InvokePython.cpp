@@ -6,11 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "InvokePython.h"
-#include "Files.h"
 #include "Exception.h"
+#include "Files.h"
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
 
 #if defined(PYTHON_FOUND)
 
@@ -22,17 +22,17 @@
 #include <Python.h>
 #endif
 
-#include <iostream>
 #include <fstream>
-#include <sstream>
+#include <iostream>
 #include <memory>
-
+#include <sstream>
 
 using namespace ell::utilities;
 
 class PyHandle
 {
     PyObject* _obj;
+
 public:
     PyHandle(PyObject* o)
     {
@@ -165,9 +165,9 @@ std::vector<double> ExecutePythonScript(const std::string& filePath, const std::
 
 #else // defined(PYTHON_FOUND)
 
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
 
 std::vector<double> ExecutePythonScript(const std::string& filePath, const std::vector<std::string>&)
 {

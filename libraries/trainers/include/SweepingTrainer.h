@@ -69,7 +69,7 @@ namespace trainers
     /// <returns> A unique_ptr to a sweeping trainer. </returns>
     template <typename PredictorType>
     std::unique_ptr<ITrainer<PredictorType>> MakeSweepingTrainer(std::vector<EvaluatingTrainer<PredictorType>>&& evaluatingTrainers);
-}
-}
+} // namespace trainers
+} // namespace ell
 
 #include "../tcc/SweepingTrainer.tcc"

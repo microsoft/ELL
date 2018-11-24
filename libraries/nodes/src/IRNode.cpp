@@ -18,13 +18,16 @@ namespace ell
 {
 namespace nodes
 {
-    IRNode::IRNode(const std::vector<model::InputPortBase*>& inputPorts, const std::vector<model::OutputPortBase*>& outputPorts, const std::string& functionName, const std::string& irCode)
-        : IRNode(inputPorts, outputPorts, functionName, irCode, {})
+    IRNode::IRNode(const std::vector<model::InputPortBase*>& inputPorts, const std::vector<model::OutputPortBase*>& outputPorts, const std::string& functionName, const std::string& irCode) :
+        IRNode(inputPorts, outputPorts, functionName, irCode, {})
     {
     }
 
-    IRNode::IRNode(const std::vector<model::InputPortBase*>& inputPorts, const std::vector<model::OutputPortBase*>& outputPorts, const std::string& functionName, const std::string& irCode, const emitters::NamedVariableTypeList& extraArgs)
-        : CompilableNode(inputPorts, outputPorts), _functionName(functionName), _irCode(irCode), _extraArgs(extraArgs)
+    IRNode::IRNode(const std::vector<model::InputPortBase*>& inputPorts, const std::vector<model::OutputPortBase*>& outputPorts, const std::string& functionName, const std::string& irCode, const emitters::NamedVariableTypeList& extraArgs) :
+        CompilableNode(inputPorts, outputPorts),
+        _functionName(functionName),
+        _irCode(irCode),
+        _extraArgs(extraArgs)
     {
     }
 
@@ -98,5 +101,5 @@ namespace nodes
     {
         return _irCode;
     }
-}
-}
+} // namespace nodes
+} // namespace ell

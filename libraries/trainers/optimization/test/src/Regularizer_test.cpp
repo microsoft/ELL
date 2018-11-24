@@ -12,9 +12,9 @@
 // optimization
 #include "ElasticNetRegularizer.h"
 #include "HuberLoss.h"
+#include "L2Regularizer.h"
 #include "MatrixSolution.h"
 #include "MaxRegularizer.h"
-#include "L2Regularizer.h"
 #include "OptimizationExample.h"
 #include "SDCAOptimizer.h"
 #include "VectorSolution.h"

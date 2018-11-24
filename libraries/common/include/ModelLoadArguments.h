@@ -26,7 +26,8 @@ namespace common
     };
 
     /// <summary> A version of ModelLoadArguments that adds its members to the command line parser. </summary>
-    struct ParsedModelLoadArguments : public ModelLoadArguments, public utilities::ParsedArgSet
+    struct ParsedModelLoadArguments : public ModelLoadArguments
+        , public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
@@ -40,5 +41,5 @@ namespace common
         /// <returns> An utilities::CommandLineParseResult. </returns>
         utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
     };
-}
-}
+} // namespace common
+} // namespace ell

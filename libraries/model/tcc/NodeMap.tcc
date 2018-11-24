@@ -49,5 +49,5 @@ namespace model
     {
         _map.clear();
     }
-}
-}
+} // namespace model
+} // namespace ell

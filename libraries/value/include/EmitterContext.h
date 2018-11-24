@@ -99,8 +99,7 @@ namespace value
         /// <param name="data"> The data </param>
         /// <param name="layout"> The layout of the data </param>
         template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
-        Value StaticAllocate(std::string name, const std::vector<T>& data,
-                             std::optional<utilities::MemoryLayout> layout = {})
+        Value StaticAllocate(std::string name, const std::vector<T>& data, std::optional<utilities::MemoryLayout> layout = {})
         {
             if (auto globalValue = GetGlobalValue(GlobalAllocationScope::Function, name))
             {
@@ -134,8 +133,7 @@ namespace value
         /// <param name="data"> The data </param>
         /// <param name="layout"> The layout of the data </param>
         template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
-        Value GlobalAllocate(std::string name, const std::vector<T>& data,
-                             std::optional<utilities::MemoryLayout> layout = {})
+        Value GlobalAllocate(std::string name, const std::vector<T>& data, std::optional<utilities::MemoryLayout> layout = {})
         {
             if (auto globalValue = GetGlobalValue(GlobalAllocationScope::Global, name))
             {
@@ -174,8 +172,7 @@ namespace value
         /// <param name="argValues"> A vector of Values describing the types of the arguments and their memory layout expected by the function </param>
         /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
         /// <returns> A callable function that executes the body described by fn </returns>
-        std::function<void(std::vector<Value>)> CreateFunction(std::string fnName, std::vector<Value> argValues,
-                                                               std::function<void(std::vector<Value>)> fn);
+        std::function<void(std::vector<Value>)> CreateFunction(std::string fnName, std::vector<Value> argValues, std::function<void(std::vector<Value>)> fn);
 
         /// <summary> Creates a callable function </summary>
         /// <param name="fnName"> The string identifier for this particular function </param>
@@ -190,9 +187,7 @@ namespace value
         /// <param name="argValues"> A vector of Values describing the types of the arguments and their memory layout expected by the function </param>
         /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
         /// <returns> A callable function that executes the body described by fn </returns>
-        std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue,
-                                                                std::vector<Value> argValues,
-                                                                std::function<Value(std::vector<Value>)> fn);
+        std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argValues, std::function<Value(std::vector<Value>)> fn);
 
         /// <summary> Stores data known ahead of time in the form of a std::vector of one of the fundamental types </summary>
         /// <param name="data"> The data that is to be stored by the context instance </param>
@@ -252,20 +247,21 @@ namespace value
         virtual Value AllocateImpl(ValueType, MemoryLayout) = 0;
 
         virtual std::optional<Value> GetGlobalValue(GlobalAllocationScope scope, std::string name) = 0;
-        virtual Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data,
-                                         MemoryLayout layout) = 0;
-        virtual Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type,
-                                         MemoryLayout layout) = 0;
+        virtual Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout) = 0;
+        virtual Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout) = 0;
 
         virtual std::pair<ValueType, int> GetTypeImpl(Emittable) = 0;
 
         virtual std::function<void()> CreateFunctionImpl(std::string fnName, std::function<void()> fn) = 0;
-        virtual std::function<Value()> CreateFunctionImpl(std::string fnName, Value returnValue,
-                                                          std::function<Value()> fn) = 0;
+        virtual std::function<Value()> CreateFunctionImpl(std::string fnName, Value returnValue, std::function<Value()> fn) = 0;
         virtual std::function<void(std::vector<Value>)> CreateFunctionImpl(
-            std::string fnName, std::vector<Value> argValues, std::function<void(std::vector<Value>)> fn) = 0;
+            std::string fnName,
+            std::vector<Value> argValues,
+            std::function<void(std::vector<Value>)> fn) = 0;
         virtual std::function<Value(std::vector<Value>)> CreateFunctionImpl(
-            std::string fnName, Value returnValue, std::vector<Value> argValues,
+            std::string fnName,
+            Value returnValue,
+            std::vector<Value> argValues,
             std::function<Value(std::vector<Value>)> fn) = 0;
 
         virtual Value StoreConstantDataImpl(ConstantData data) = 0;
@@ -397,8 +393,7 @@ namespace value
     /// <param name="data"> The data </param>
     /// <param name="layout"> The layout of the data </param>
     template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
-    Value StaticAllocate(std::string name, const std::vector<T>& data,
-                         std::optional<utilities::MemoryLayout> layout = {})
+    Value StaticAllocate(std::string name, const std::vector<T>& data, std::optional<utilities::MemoryLayout> layout = {})
     {
         return GetContext().StaticAllocate(name, data, layout);
     }
@@ -425,8 +420,7 @@ namespace value
     /// <param name="data"> The data </param>
     /// <param name="layout"> The layout of the data </param>
     template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
-    Value GlobalAllocate(std::string name, const std::vector<T>& data,
-                         std::optional<utilities::MemoryLayout> layout = {})
+    Value GlobalAllocate(std::string name, const std::vector<T>& data, std::optional<utilities::MemoryLayout> layout = {})
     {
         return GetContext().GlobalAllocate(name, data, layout);
     }

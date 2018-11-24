@@ -190,7 +190,9 @@ namespace value
         _layout(layout)
     {}
 
-    Value::Value(ValueType type, std::optional<MemoryLayout> layout) : _type({ type, 0 }), _layout(layout) {}
+    Value::Value(ValueType type, std::optional<MemoryLayout> layout) :
+        _type({ type, 0 }),
+        _layout(layout) {}
 
     void Value::Reset()
     {

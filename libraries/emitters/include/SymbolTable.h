@@ -69,6 +69,6 @@ namespace emitters
     private:
         std::unordered_map<std::string, ValueType> _map;
     };
-}
-}
+} // namespace emitters
+} // namespace ell
 #include "../tcc/SymbolTable.tcc"

@@ -11,14 +11,18 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    AccumulatorNode<ValueType>::AccumulatorNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+    AccumulatorNode<ValueType>::AccumulatorNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType>
-    AccumulatorNode<ValueType>::AccumulatorNode(const model::OutputPort<ValueType>& input)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size())
+    AccumulatorNode<ValueType>::AccumulatorNode(const model::OutputPort<ValueType>& input) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, _input.Size())
     {
         auto dimension = input.Size();
         _accumulator = std::vector<ValueType>(dimension);
@@ -105,5 +109,5 @@ namespace nodes
         _accumulator = std::vector<ValueType>(dimension);
         _output.SetSize(dimension);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

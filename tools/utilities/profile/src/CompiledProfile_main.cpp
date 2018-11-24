@@ -8,8 +8,8 @@
 
 // compiled model
 #define ELL_MAIN
-#include "compiled_model.h"
 #include "ProfileReport.h"
+#include "compiled_model.h"
 
 // stl
 #include <algorithm>
@@ -31,7 +31,7 @@ struct ProfileArguments
 //
 // Test-data-related
 //
-template<typename T>
+template <typename T>
 std::vector<T> GetInputData(std::string filename, const TensorShape& inputShape, float scale)
 {
     std::default_random_engine engine(123);
@@ -108,7 +108,7 @@ void ResetProfilingInfo()
     ELL_ResetRegionProfilingInfo();
 }
 
-template<typename InputType, typename OutputType>
+template <typename InputType, typename OutputType>
 void ProfileModel(const ProfileArguments& profileArguments)
 {
     auto& profileOutputStream = std::cout;
@@ -125,9 +125,9 @@ void ProfileModel(const ProfileArguments& profileArguments)
     std::vector<InputType> input(inputSize);
     std::vector<OutputType> output(outputSize);
 
-    #ifdef ELL_WRAPPER_CLASS
+#ifdef ELL_WRAPPER_CLASS
     ELL_PredictWrapper wrapper;
-    #endif
+#endif
 
     // Warm up the system by evaluating the model some number of times
     for (int iter = 0; iter < profileArguments.numWarmUpIterations; ++iter)
@@ -188,11 +188,11 @@ int main(int argc, char* argv[])
 
     int numIterations = 20;
     int numWarmUpIterations = 10;
-    if(argc > 1)
+    if (argc > 1)
     {
         numIterations = atoi(argv[1]);
     }
-    if(argc > 2)
+    if (argc > 2)
     {
         numWarmUpIterations = atoi(argv[2]);
     }

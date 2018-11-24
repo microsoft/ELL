@@ -26,8 +26,8 @@ namespace emitters
         throw emitters::EmitterException(emitters::EmitterError::unexpected, msg);
     }
 
-    IRExecutionEngine::IRExecutionEngine(IRModuleEmitter&& module, bool verify)
-        : IRExecutionEngine(module.TransferOwnership(), verify)
+    IRExecutionEngine::IRExecutionEngine(IRModuleEmitter&& module, bool verify) :
+        IRExecutionEngine(module.TransferOwnership(), verify)
     {
     }
 
@@ -132,5 +132,5 @@ namespace emitters
             PerformInitialization();
         }
     }
-}
-}
+} // namespace emitters
+} // namespace ell

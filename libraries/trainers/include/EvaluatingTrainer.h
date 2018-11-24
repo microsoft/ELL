@@ -71,7 +71,7 @@ namespace trainers
     EvaluatingTrainer<PredictorType> MakeEvaluatingTrainer(
         std::unique_ptr<ITrainer<PredictorType>>&& internalTrainer,
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator);
-}
-}
+} // namespace trainers
+} // namespace ell
 
 #include "../tcc/EvaluatingTrainer.tcc"

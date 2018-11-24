@@ -115,7 +115,7 @@ namespace dsp
     template <typename ValueType>
     math::ChannelColumnRowTensor<ValueType> Convolve2DSimpleDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride)
     {
-        if(numFilters != static_cast<int>(input.NumChannels()) || filters.NumChannels() != 1)
+        if (numFilters != static_cast<int>(input.NumChannels()) || filters.NumChannels() != 1)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Depthwise separable convolution requires numFilters to be the same as the number of input channels and the filter depth to be 1.");
         }
@@ -149,5 +149,5 @@ namespace dsp
 
     template void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<float> signal, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<float> result);
     template void Convolve2DSimple(math::ConstChannelColumnRowTensorReference<double> signal, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride, math::ChannelColumnRowTensorReference<double> result);
-}
-}
+} // namespace dsp
+} // namespace ell

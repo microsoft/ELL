@@ -57,8 +57,9 @@ namespace utilities
     //
     // PropertyArchiver class
     //
-    Archiver::PropertyArchiver::PropertyArchiver(Archiver& archiver, const std::string& name)
-        : _archiver(archiver), _propertyName(name){};
+    Archiver::PropertyArchiver::PropertyArchiver(Archiver& archiver, const std::string& name) :
+        _archiver(archiver),
+        _propertyName(name){};
 
     //
     // Archiver class
@@ -101,14 +102,15 @@ namespace utilities
     //
     // PropertyArchiver class
     //
-    Unarchiver::PropertyUnarchiver::PropertyUnarchiver(Unarchiver& archiver, const std::string& name)
-        : _unarchiver(archiver), _propertyName(name){};
+    Unarchiver::PropertyUnarchiver::PropertyUnarchiver(Unarchiver& archiver, const std::string& name) :
+        _unarchiver(archiver),
+        _propertyName(name){};
 
     //
     // Unarchiver class
     //
-    Unarchiver::Unarchiver(SerializationContext context)
-        : _baseContext(context)
+    Unarchiver::Unarchiver(SerializationContext context) :
+        _baseContext(context)
     {
         _contexts.push_back(_baseContext);
     }
@@ -177,5 +179,5 @@ namespace utilities
     {
         UNUSED(name, typeName);
     }
-}
-}
+} // namespace utilities
+} // namespace ell

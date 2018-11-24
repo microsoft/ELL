@@ -73,9 +73,9 @@ namespace model
     };
 
     /// <summary>
-    /// An iterator over the nodes in the model that visits the nodes in dependency 
-    /// order --- no nodes will be visited until all its inputs have first been visited. 
-    /// Other than fulfilling this constraint, no guarantees are made on the order the 
+    /// An iterator over the nodes in the model that visits the nodes in dependency
+    /// order --- no nodes will be visited until all its inputs have first been visited.
+    /// Other than fulfilling this constraint, no guarantees are made on the order the
     /// nodes are visited.
     /// </summary>
     class ForwardNodeIterator : public NodeIterator
@@ -93,9 +93,9 @@ namespace model
     };
 
     /// <summary>
-    /// An iterator over the nodes in the model that visits the nodes in reverse dependency 
-    /// order --- no nodes will be visited until all its outputs have first been visited. 
-    /// Other than fulfilling this constraint, no guarantees are made on the order the 
+    /// An iterator over the nodes in the model that visits the nodes in reverse dependency
+    /// order --- no nodes will be visited until all its outputs have first been visited.
+    /// Other than fulfilling this constraint, no guarantees are made on the order the
     /// nodes are visited.
     /// </summary>
     class ReverseNodeIterator : public NodeIterator
@@ -307,14 +307,14 @@ namespace model
         ///
         /// <returns> `true` if this model is idential to the other model (they are the same object or are shallow copies of one another), otherwise `false` </returns>
         bool operator==(const Model& other) const;
-            
+
         /// <summary> Inequality operator </summary>
         ///
         /// <param name="other"> Model to compare to </param>
         ///
         /// <returns> `false` if this model is idential to the other model (they are the same object or are shallow copies of one another), otherwise `true` </returns>
         bool operator!=(const Model& other) const;
-            
+
     protected:
         utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
@@ -330,7 +330,7 @@ namespace model
         friend class InputPort;
         friend class ModelTransformer;
         friend class Map;
-        
+
         using IDToNodeMap = std::map<Node::NodeId, std::shared_ptr<Node>, std::less<Node::NodeId>>;
         struct ModelData
         {
@@ -401,7 +401,7 @@ namespace model
         Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/Model.tcc"

@@ -20,16 +20,14 @@ namespace utilities
     std::string ToLowercase(const std::string& s)
     {
         std::string lower = s;
-        std::transform(lower.begin(), lower.end(), lower.begin(),
-            [](int c) { return static_cast<char>(::tolower(c)); });
+        std::transform(lower.begin(), lower.end(), lower.begin(), [](int c) { return static_cast<char>(::tolower(c)); });
         return lower;
     }
 
     std::string ToUppercase(const std::string& s)
     {
         std::string lower = s;
-        std::transform(lower.begin(), lower.end(), lower.begin(),
-            [](int c) { return static_cast<char>(::toupper(c)); });
+        std::transform(lower.begin(), lower.end(), lower.begin(), [](int c) { return static_cast<char>(::toupper(c)); });
         return lower;
     }
 
@@ -77,12 +75,12 @@ namespace utilities
     {
         std::stringstream stream;
         std::string sep = "";
-        for(const auto& s: strings)
+        for (const auto& s : strings)
         {
             stream << sep << s;
             sep = separator;
         }
         return stream.str();
     }
-}
-}
+} // namespace utilities
+} // namespace ell

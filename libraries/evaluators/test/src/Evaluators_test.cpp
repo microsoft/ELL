@@ -51,4 +51,4 @@ void TestEvaluators()
     std::cout << "Goodness: " << evaluator->GetGoodness() << std::endl;
     testing::ProcessTest("Evaluator sanity check", !testing::IsEqual(evaluator->GetGoodness(), 0.0, 1e-8));
 }
-}
+} // namespace ell

@@ -19,13 +19,13 @@ namespace ell
 {
 namespace utilities
 {
-    Match::Match(const char* pStr)
-        : _pStr(pStr)
+    Match::Match(const char* pStr) :
+        _pStr(pStr)
     {
     }
 
-    Match::Match(const std::string& str)
-        : _pStr(str.c_str())
+    Match::Match(const std::string& str) :
+        _pStr(str.c_str())
     {
     }
 
@@ -159,5 +159,5 @@ namespace utilities
         case MatchResult::success:; // nothing
         }
     }
-}
-}
+} // namespace utilities
+} // namespace ell

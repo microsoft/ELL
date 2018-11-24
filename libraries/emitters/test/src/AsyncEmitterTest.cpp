@@ -246,7 +246,7 @@ void TestParallelFor(int begin, int end, int increment, bool parallel)
         testParallelForFunction.For(arraySize, [begin, end, increment, data, result](IRFunctionEmitter& function, LLVMValue i) {
             auto index = function.LocalScalar(i);
             auto val = function.LocalScalar(function.ValueAt(data, index));
-            function.If((index >= begin) && (index < end) && (((val-begin) % increment) == 0) && (val != index), [result](IRFunctionEmitter& function) {
+            function.If((index >= begin) && (index < end) && (((val - begin) % increment) == 0) && (val != index), [result](IRFunctionEmitter& function) {
                 function.Store(result, function.Literal(1));
             });
         });

@@ -64,7 +64,7 @@ void PrintNode(const model::Node& node, std::ostream& out, bool includeNodeId)
     std::string label = nodeType;
     if (includeNodeId)
     {
-        label.insert(0, "<id:" + to_string(node.GetId())  + "> ");
+        label.insert(0, "<id:" + to_string(node.GetId()) + "> ");
     }
     bool isInputNode = nodeType.find("InputNode") == 0;
     out << label << "(";
@@ -140,4 +140,4 @@ void PrintModel(const model::Model& model, std::ostream& out, bool includeNodeId
 {
     model.Visit([&out, includeNodeId](const model::Node& node) { PrintNode(node, out, includeNodeId); });
 }
-}
+} // namespace ell

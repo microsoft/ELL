@@ -31,7 +31,7 @@ namespace emitters
         {
             return static_cast<ValueType>(intValue->getZExtValue());
         }
-    }
+    } // namespace detail
 
     template <typename ValueType, utilities::IsIntegral<ValueType> /* = true*/>
     ValueType IRLocalScalar::GetIntValue() const
@@ -47,7 +47,7 @@ namespace emitters
         {
             return GetIntValue<ValueType>();
         }
-        
+
         return defaultValue;
     }
 
@@ -222,7 +222,7 @@ namespace emitters
 
         auto expInput = Exp(a);
         constexpr auto one = static_cast<ValueType>(1);
-        auto result = emitter.Select(a > ValueType{0}, one / (Exp(-a) + one), expInput / (expInput + one));
+        auto result = emitter.Select(a > ValueType{ 0 }, one / (Exp(-a) + one), expInput / (expInput + one));
         return { fn, result };
     }
 
@@ -258,5 +258,5 @@ namespace emitters
     {
         return Max(value, a);
     }
-}
-}
+} // namespace emitters
+} // namespace ell

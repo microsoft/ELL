@@ -22,5 +22,5 @@ namespace predictors
         /// <summary> The prediction type. </summary>
         using PredictionType = T;
     };
-}
-}
+} // namespace predictors
+} // namespace ell

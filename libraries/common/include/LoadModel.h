@@ -69,7 +69,7 @@ namespace common
     /// <param name="map"> The map. </param>
     /// <param name="outStream"> The stream. </param>
     void SaveMap(const model::Map& map, std::ostream& outStream);
-}
-}
+} // namespace common
+} // namespace ell
 
 #include "../tcc/LoadModel.tcc"

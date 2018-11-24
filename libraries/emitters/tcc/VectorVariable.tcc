@@ -14,8 +14,9 @@ namespace emitters
     // VectorVariable
     //
     template <typename T>
-    VectorVariable<T>::VectorVariable(const VariableScope scope, const size_t size, int flags)
-        : Variable(GetVariableType<T>(), scope, flags), _size(size)
+    VectorVariable<T>::VectorVariable(const VariableScope scope, const size_t size, int flags) :
+        Variable(GetVariableType<T>(), scope, flags),
+        _size(size)
     {
     }
 
@@ -23,15 +24,15 @@ namespace emitters
     // InitializedVectorVariable
     //
     template <typename T>
-    InitializedVectorVariable<T>::InitializedVectorVariable(const VariableScope scope, const std::vector<T>& data, int flags)
-        : VectorVariable<T>(scope, data.size(), flags | Variable::VariableFlags::hasInitValue)
+    InitializedVectorVariable<T>::InitializedVectorVariable(const VariableScope scope, const std::vector<T>& data, int flags) :
+        VectorVariable<T>(scope, data.size(), flags | Variable::VariableFlags::hasInitValue)
     {
         _initialData = VariableValueType<T>::ToVariableVector(data);
     }
 
     template <typename T>
-    InitializedVectorVariable<T>::InitializedVectorVariable(const VariableScope scope, size_t size, int flags)
-        : VectorVariable<T>(scope, size, flags | Variable::VariableFlags::hasInitValue)
+    InitializedVectorVariable<T>::InitializedVectorVariable(const VariableScope scope, size_t size, int flags) :
+        VectorVariable<T>(scope, size, flags | Variable::VariableFlags::hasInitValue)
     {
         T defValue = GetDefaultValue<ElementType>();
         for (size_t i = 0; i < size; ++i)
@@ -44,10 +45,10 @@ namespace emitters
     // LiteralVectorVariable
     //
     template <typename T>
-    LiteralVectorVariable<T>::LiteralVectorVariable(const std::vector<T>& data)
-        : VectorVariable<T>(VariableScope::literal, data.size(), Variable::VariableFlags::none)
+    LiteralVectorVariable<T>::LiteralVectorVariable(const std::vector<T>& data) :
+        VectorVariable<T>(VariableScope::literal, data.size(), Variable::VariableFlags::none)
     {
         _data = VariableValueType<T>::ToVariableVector(data);
     }
-}
-}
+} // namespace emitters
+} // namespace ell

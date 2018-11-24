@@ -18,18 +18,18 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    RNNNode<ValueType>::RNNNode()
-        : CompilableNode(
-              { &_input, &_resetTrigger, &_inputWeights, &_hiddenWeights, &_inputBias, &_hiddenBias },
-              { &_output })
-        , _input(this, {}, defaultInputPortName)
-        , _resetTrigger(this, {}, resetTriggerPortName)
-        , _hiddenUnits(0)
-        , _inputWeights(this, {}, inputWeightsPortName)
-        , _hiddenWeights(this, {}, hiddenWeightsPortName)
-        , _inputBias(this, {}, inputBiasPortName)
-        , _hiddenBias(this, {}, hiddenBiasPortName)
-        , _output(this, defaultOutputPortName, 0)
+    RNNNode<ValueType>::RNNNode() :
+        CompilableNode(
+            { &_input, &_resetTrigger, &_inputWeights, &_hiddenWeights, &_inputBias, &_hiddenBias },
+            { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _resetTrigger(this, {}, resetTriggerPortName),
+        _hiddenUnits(0),
+        _inputWeights(this, {}, inputWeightsPortName),
+        _hiddenWeights(this, {}, hiddenWeightsPortName),
+        _inputBias(this, {}, inputBiasPortName),
+        _hiddenBias(this, {}, hiddenBiasPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
@@ -42,21 +42,21 @@ namespace nodes
                                 const model::OutputPort<ValueType>& inputBias,
                                 const model::OutputPort<ValueType>& hiddenBias,
                                 const ActivationType& activation,
-                                bool validateWeights)
-        : CompilableNode({ &_input, &_resetTrigger, &_inputWeights, &_hiddenWeights, &_inputBias, &_hiddenBias },
-                         { &_output })
-        , _input(this, input, defaultInputPortName)
-        , _resetTrigger(this, resetTrigger, resetTriggerPortName)
-        , _hiddenUnits(hiddenUnits)
-        , _inputWeights(this, inputWeights, inputWeightsPortName)
-        , _hiddenWeights(this, hiddenWeights, hiddenWeightsPortName)
-        , _inputBias(this, inputBias, inputBiasPortName)
-        , _hiddenBias(this, hiddenBias, hiddenBiasPortName)
-        , _output(this, defaultOutputPortName, hiddenUnits)
-        , _activation(activation)
-        , _hiddenState(hiddenUnits)
+                                bool validateWeights) :
+        CompilableNode({ &_input, &_resetTrigger, &_inputWeights, &_hiddenWeights, &_inputBias, &_hiddenBias },
+                       { &_output }),
+        _input(this, input, defaultInputPortName),
+        _resetTrigger(this, resetTrigger, resetTriggerPortName),
+        _hiddenUnits(hiddenUnits),
+        _inputWeights(this, inputWeights, inputWeightsPortName),
+        _hiddenWeights(this, hiddenWeights, hiddenWeightsPortName),
+        _inputBias(this, inputBias, inputBiasPortName),
+        _hiddenBias(this, hiddenBias, hiddenBiasPortName),
+        _output(this, defaultOutputPortName, hiddenUnits),
+        _activation(activation),
+        _hiddenState(hiddenUnits)
     {
-        if (validateWeights) 
+        if (validateWeights)
         {
             size_t numRows = hiddenUnits;
             size_t numColumns = input.Size();
@@ -64,26 +64,26 @@ namespace nodes
             if (inputWeights.Size() != numRows * numColumns)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The RNNNode input weights are the wrong size, found %zu but expecting %zu", inputWeights.Size(), numRows * numColumns));
+                                                ell::utilities::FormatString("The RNNNode input weights are the wrong size, found %zu but expecting %zu", inputWeights.Size(), numRows * numColumns));
             }
 
             numColumns = hiddenUnits;
             if (hiddenWeights.Size() != numRows * numColumns)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The RNNNode hidden weights are the wrong size, found %zu but expecting %zu", hiddenWeights.Size(), numRows * numColumns));
+                                                ell::utilities::FormatString("The RNNNode hidden weights are the wrong size, found %zu but expecting %zu", hiddenWeights.Size(), numRows * numColumns));
             }
 
             if (inputBias.Size() != hiddenUnits)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The RNNNode input bias vector is the wrong size, found %zu but expecting %zu", inputBias.Size(), hiddenUnits));
+                                                ell::utilities::FormatString("The RNNNode input bias vector is the wrong size, found %zu but expecting %zu", inputBias.Size(), hiddenUnits));
             }
 
             if (hiddenBias.Size() != hiddenUnits)
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                    ell::utilities::FormatString("The RNNNode hidden bias vector is the wrong size, found %zu but expecting %zu", hiddenBias.Size(), hiddenUnits));
+                                                ell::utilities::FormatString("The RNNNode hidden bias vector is the wrong size, found %zu but expecting %zu", hiddenBias.Size(), hiddenUnits));
             }
         }
     }
@@ -314,5 +314,5 @@ namespace nodes
     // Explicit instantiations
     template class RNNNode<float>;
     template class RNNNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

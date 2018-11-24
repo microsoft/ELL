@@ -44,7 +44,8 @@ struct CompileArguments
 };
 
 /// <summary> Parsed command line arguments for the compile executable. </summary>
-struct ParsedCompileArguments : public CompileArguments, public utilities::ParsedArgSet
+struct ParsedCompileArguments : public CompileArguments
+    , public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments to the command line parser. </summary>
     ///
@@ -53,4 +54,4 @@ struct ParsedCompileArguments : public CompileArguments, public utilities::Parse
 
     model::MapCompilerOptions GetMapCompilerOptions(const std::string& baseFilename);
 };
-}
+} // namespace ell

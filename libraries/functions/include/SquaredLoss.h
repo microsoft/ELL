@@ -64,5 +64,5 @@ namespace functions
         /// <returns> The output of the convex function. </returns>
         double BregmanGenerator(double value) const;
     };
-}
-}
+} // namespace functions
+} // namespace ell

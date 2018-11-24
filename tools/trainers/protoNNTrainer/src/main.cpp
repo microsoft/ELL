@@ -26,15 +26,15 @@
 #include "MapSaveArguments.h"
 #include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
-#include "TrainerArguments.h"
 #include "ProtoNNTrainerArguments.h"
+#include "TrainerArguments.h"
 
 // math
 #include "MatrixOperations.h"
 
 // model
-#include "Map.h"
 #include "InputNode.h"
+#include "Map.h"
 #include "Model.h"
 #include "OutputNode.h"
 

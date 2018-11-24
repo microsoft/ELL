@@ -127,8 +127,11 @@ template <typename ValueType>
 class Uniform
 {
 public:
-    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
-        : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal - minVal) {}
+    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123") :
+        _rng(utilities::GetRandomEngine(seed)),
+        _range(static_cast<double>(_rng.max() - _rng.min())),
+        _minOutput(minVal),
+        _outputRange(maxVal - minVal) {}
 
     ValueType operator()()
     {
@@ -149,7 +152,7 @@ void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, El
     Uniform<ElementType> rand(min, max);
     std::generate(vector.begin(), vector.end(), rand);
 }
-}
+} // namespace
 
 //
 // Test compute functions
@@ -341,11 +344,8 @@ static void TestBinaryOperationNodeCompute2()
     auto outputNode = model.AddNode<nodes::BinaryOperationNode<double>>(input1Node->output, input1Shape, constantNode->output, input2Shape, outputShape, emitters::BinaryOperationType::add, 0);
     auto map = model::Map(model, { { "input", input1Node } }, { { "output", outputNode->output } });
 
-    std::vector<double> expected { 2, 4, 6, 8, 10, 12, 14, 16 };
-    std::vector<double> input { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                0.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 0.0,
-                                0.0, 0.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0,
-                                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    std::vector<double> expected{ 2, 4, 6, 8, 10, 12, 14, 16 };
+    std::vector<double> input{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0, 0.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
     auto result = map.Compute<double>(input);
     testing::ProcessTest("TestBinaryOperationNodeCompute2", testing::IsEqual(result, expected));
@@ -852,33 +852,33 @@ static void TestClockNodeCompute()
 
     std::vector<std::vector<nodes::TimeTickType>> signal =
         {
-          { start },
-          { start + interval * 1 + lagThreshold / 2 }, // within threshold
-          { start + interval * 2 }, // on time
-          { start + interval * 3 + lagThreshold }, // late (expect notification)
-          { start + interval * 4 + lagThreshold * 20 }, // really late (expect notification)
-          { start + interval * 5 } // on time
+            { start },
+            { start + interval * 1 + lagThreshold / 2 }, // within threshold
+            { start + interval * 2 }, // on time
+            { start + interval * 3 + lagThreshold }, // late (expect notification)
+            { start + interval * 4 + lagThreshold * 20 }, // really late (expect notification)
+            { start + interval * 5 } // on time
         };
 
     std::vector<std::vector<nodes::TimeTickType>> expectedResults =
         {
-          // lastIntervalTime, currentTime
-          { start, start },
-          { start + interval * 1, start + interval * 1 + lagThreshold / 2 },
-          { start + interval * 2, start + interval * 2 },
-          { start + interval * 3, start + interval * 3 + lagThreshold },
-          { start + interval * 4, start + interval * 4 + lagThreshold * 20 },
-          { start + interval * 5, start + interval * 5 }
+            // lastIntervalTime, currentTime
+            { start, start },
+            { start + interval * 1, start + interval * 1 + lagThreshold / 2 },
+            { start + interval * 2, start + interval * 2 },
+            { start + interval * 3, start + interval * 3 + lagThreshold },
+            { start + interval * 4, start + interval * 4 + lagThreshold * 20 },
+            { start + interval * 5, start + interval * 5 }
         };
 
     std::vector<nodes::TimeTickType> expectedGetTicksResults =
         {
-          interval,
-          interval - lagThreshold / 2,
-          interval,
-          interval - lagThreshold,
-          interval - lagThreshold * 20,
-          interval
+            interval,
+            interval - lagThreshold / 2,
+            interval,
+            interval - lagThreshold,
+            interval - lagThreshold * 20,
+            interval
         };
 
     std::vector<std::vector<nodes::TimeTickType>> results;
@@ -903,7 +903,7 @@ static void TestConcatenationNodeCompute()
     auto inputNode = model.AddNode<model::InputNode<double>>(data.size());
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 6, 7, 8 });
     auto concatenationInputs = model::PortElements<double>({ inputNode->output, constantNode->output });
-    auto outputNode = model.AddNode<nodes::ConcatenationNode<double>>(concatenationInputs,  model::MemoryShape{ 1, 1, 8 });
+    auto outputNode = model.AddNode<nodes::ConcatenationNode<double>>(concatenationInputs, model::MemoryShape{ 1, 1, 8 });
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
 

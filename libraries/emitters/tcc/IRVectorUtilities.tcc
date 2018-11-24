@@ -41,7 +41,7 @@ namespace emitters
         {
             return vectorValue;
         }
-        
+
         llvm::VectorType* vecType = llvm::cast<llvm::VectorType>(type);
         assert(vecType != nullptr);
 
@@ -77,5 +77,5 @@ namespace emitters
         auto half2 = emitter.GetIRBuilder().CreateExtractElement(vectorValue, static_cast<uint64_t>(1));
         return function.Operator(emitters::GetAddForValueType<ValueType>(), half1, half2);
     }
-}
-}
+} // namespace emitters
+} // namespace ell

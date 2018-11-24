@@ -12,8 +12,9 @@ namespace ell
 {
 namespace predictors
 {
-    SingleElementThresholdPredictor::SingleElementThresholdPredictor(size_t index, double threshold)
-        : _index(index), _threshold(threshold)
+    SingleElementThresholdPredictor::SingleElementThresholdPredictor(size_t index, double threshold) :
+        _index(index),
+        _threshold(threshold)
     {
     }
 
@@ -43,5 +44,5 @@ namespace predictors
     {
         os << std::string(tabs * 4, ' ') << "index = " << _index << ", threshold = " << _threshold << "\n";
     }
-}
-}
+} // namespace predictors
+} // namespace ell

@@ -25,8 +25,8 @@ namespace emitters
     {
     public:
         /// <summary></summary>
-        IRLoader(llvm::LLVMContext& context)
-            : _llvmContext(context) {}
+        IRLoader(llvm::LLVMContext& context) :
+            _llvmContext(context) {}
 
         /// <summary> Load a module by parsing the given assembly text. </summary>
         ///
@@ -52,5 +52,5 @@ namespace emitters
     private:
         llvm::LLVMContext& _llvmContext;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

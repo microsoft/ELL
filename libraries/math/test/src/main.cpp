@@ -6,20 +6,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "math_profile.h"
-#include "Vector_test.h"
 #include "Matrix_test.h"
 #include "Tensor_test.h"
+#include "Vector_test.h"
+#include "math_profile.h"
 
 using namespace ell;
 
-template<typename ElementType, math::ImplementationType implementation>
+template <typename ElementType, math::ImplementationType implementation>
 void RunVectorImplementationTests()
 {
     TestVectorVectorInner<ElementType, implementation>();
 }
 
-template<typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
 void RunOrientedVectorImplementationTests()
 {
     TestVectorAddUpdateScalar<ElementType, orientation, implementation>();
@@ -58,7 +58,7 @@ void RunOrientedVectorImplementationTests()
     TestVectorScaleAddSetVectorOneOne<ElementType, orientation, implementation>();
 }
 
-template<typename ElementType, math::VectorOrientation orientation>
+template <typename ElementType, math::VectorOrientation orientation>
 void RunOrientedVectorTests()
 {
     TestVectorEqualityOperator<ElementType, orientation>();
@@ -91,7 +91,7 @@ void RunOrientedVectorTests()
     RunOrientedVectorImplementationTests<ElementType, orientation, math::ImplementationType::openBlas>();
 }
 
-template<typename ElementType>
+template <typename ElementType>
 void RunVectorTests()
 {
     TestVectorIndexer<ElementType>();
@@ -117,7 +117,7 @@ void RunTripleLayoutMatrixImplementationTests()
 {
     TestMatrixScaleAddSetScalarMatrixOne<ElementType, layout1, layout2, layout3, implementation>();
     TestMatrixScaleAddSetOneMatrixScalar<ElementType, layout1, layout2, layout3, implementation>();
-    TestMatrixScaleAddSetScalarMatrixScalar<ElementType, layout1, layout2, layout3,  implementation>();
+    TestMatrixScaleAddSetScalarMatrixScalar<ElementType, layout1, layout2, layout3, implementation>();
     TestMatrixMatrixMultiplyScaleAddUpdate<ElementType, layout1, layout2, layout3, implementation>();
 }
 
@@ -199,14 +199,14 @@ void RunLayoutMatrixTests()
     TestMatrixColumnwiseConsecutiveDifferenceUpdate<ElementType, layout>();
     TestMatrixArchiver<ElementType, layout>();
 
-    RunDoubleLayoutMatrixTests <ElementType, layout, layout>();
-    RunDoubleLayoutMatrixTests <ElementType, layout, math::TransposeMatrixLayout<layout>::value>();
+    RunDoubleLayoutMatrixTests<ElementType, layout, layout>();
+    RunDoubleLayoutMatrixTests<ElementType, layout, math::TransposeMatrixLayout<layout>::value>();
 
     RunLayoutMatrixImplementationTests<ElementType, layout, math::ImplementationType::native>();
     RunLayoutMatrixImplementationTests<ElementType, layout, math::ImplementationType::openBlas>();
 }
 
-template<typename ElementType>
+template <typename ElementType>
 void RunMatrixTests()
 {
     TestMatrixGetIncrement<ElementType>();

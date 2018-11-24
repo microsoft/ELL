@@ -219,8 +219,8 @@ namespace data
 
     /// <summary> A sparse data vector with byte elements. </summary>
     using SparseByteDataVector = SparseDataVector<char, utilities::CompressedIntegerList>;
-}
-}
+} // namespace data
+} // namespace ell
 
 #include "../tcc/SparseDataVector.tcc"
 

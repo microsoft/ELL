@@ -77,8 +77,8 @@ namespace nodes
         /// <summary> Constructor specifying the leaky factor. </summary>
         ///
         /// <param name="leakyFactor"> The leaky factor. </param>
-        LeakyReLUActivationFunction(ValueType leakyFactor)
-            : _leakyFactor(leakyFactor) {}
+        LeakyReLUActivationFunction(ValueType leakyFactor) :
+            _leakyFactor(leakyFactor) {}
 
         /// <summary> Computes the leaky ReLU activation (on the host machine) </summary>
         ///
@@ -247,5 +247,5 @@ namespace nodes
     template <typename ValueType>
     std::unique_ptr<ActivationFunction<ValueType>> GetNodeActivationFunction(const predictors::neural::Activation<ValueType>& f);
 
-}
-}
+} // namespace nodes
+} // namespace ell

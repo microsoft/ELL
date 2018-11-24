@@ -12,15 +12,15 @@
 #include "LLVMUtilities.h"
 
 // model
+#include "Activation.h"
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
 #include "PortElements.h"
-#include "Activation.h"
 #include "RNNNode.h"
 
 // math
-#include "Vector.h"
 #include "Matrix.h"
+#include "Vector.h"
 
 // stl
 #include <string>
@@ -31,7 +31,7 @@ namespace ell
 namespace nodes
 {
     ///<summary> LSTMnode implements a Long Short Term Memory network.  See http://colah.github.io/posts/2015-08-Understanding-LSTMs/. </summary>
-    template<typename ValueType>
+    template <typename ValueType>
     class LSTMNode : public RNNNode<ValueType>
     {
     public:
@@ -53,15 +53,15 @@ namespace nodes
         /// <param name="recurrentActivation"> The recurrent activation function. </param>
         /// <param name="validateWeights"> Whether to check the size of the weights. </param>
         LSTMNode(const model::OutputPort<ValueType>& input,
-                        const model::OutputPort<int>& resetTrigger,
-                        size_t hiddenUnits,
-                        const model::OutputPort<ValueType>& inputWeights,
-                        const model::OutputPort<ValueType>& hiddenWeights,
-                        const model::OutputPort<ValueType>& inputBias,
-                        const model::OutputPort<ValueType>& hiddenBias,
-                        const ActivationType& activation,
-                        const ActivationType& recurrentActivation,
-                        bool validateWeights = true);
+                 const model::OutputPort<int>& resetTrigger,
+                 size_t hiddenUnits,
+                 const model::OutputPort<ValueType>& inputWeights,
+                 const model::OutputPort<ValueType>& hiddenWeights,
+                 const model::OutputPort<ValueType>& inputBias,
+                 const model::OutputPort<ValueType>& hiddenBias,
+                 const ActivationType& activation,
+                 const ActivationType& recurrentActivation,
+                 bool validateWeights = true);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -77,7 +77,6 @@ namespace nodes
         void Reset() override;
 
     protected:
-
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         bool HasState() const override { return true; }
@@ -93,7 +92,6 @@ namespace nodes
 
         // Additional Hidden state for compute
         mutable VectorType _cellState;
-
     };
-}
-}
+} // namespace nodes
+} // namespace ell

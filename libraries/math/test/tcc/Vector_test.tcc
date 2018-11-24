@@ -21,10 +21,10 @@
 template <typename ElementType>
 void TestVectorIndexer()
 {
-    math::RowVector<ElementType> v{ 1,2,3,4,5,6,7 };
+    math::RowVector<ElementType> v{ 1, 2, 3, 4, 5, 6, 7 };
     auto u = v.GetSubVector(2, 2);
-    
-    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
     math::ColumnMatrix<ElementType> N(M);
     auto w = M.GetRow(1);
     auto z = N.GetRow(1);
@@ -36,7 +36,7 @@ template <typename ElementType>
 void TestVectorSize()
 {
     math::RowVector<ElementType> u{};
-    math::RowVector<ElementType> v{ 1,2,3,4,5,6,7 };
+    math::RowVector<ElementType> v{ 1, 2, 3, 4, 5, 6, 7 };
     auto w = v.GetSubVector(2, 3);
 
     testing::ProcessTest("Vector::Size", v.Size() == 7 && u.Size() == 0 && w.Size() == 3);
@@ -45,7 +45,7 @@ void TestVectorSize()
 template <typename ElementType>
 void TestVectorGetDataPointer()
 {
-    math::RowVector<ElementType> v{ 1,2,3,4,5,6,7 };
+    math::RowVector<ElementType> v{ 1, 2, 3, 4, 5, 6, 7 };
     auto u = v.GetSubVector(2, 2);
 
     testing::ProcessTest("Vector::GetDataPointer", &(v[0]) == v.GetDataPointer() && v.GetDataPointer() + 2 == u.GetDataPointer());
@@ -54,14 +54,14 @@ void TestVectorGetDataPointer()
 template <typename ElementType>
 void TestVectorGetIncrement()
 {
-    math::RowVector<ElementType> v{ 1,2,3,4,5,6,7 };
+    math::RowVector<ElementType> v{ 1, 2, 3, 4, 5, 6, 7 };
     auto u = v.GetSubVector(2, 2);
-    
-    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
     math::ColumnMatrix<ElementType> N(M);
     auto w = M.GetRow(1);
     auto z = N.GetRow(1);
-    
+
     testing::ProcessTest("Vector::GetIncrement", v.GetIncrement() == 1 && u.GetIncrement() == 1 && w.GetIncrement() == 1 && z.GetIncrement() == 3);
 }
 
@@ -128,8 +128,8 @@ void TestVectorToArray()
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorEqualityOperator()
 {
-    math::Vector<ElementType, orientation> u{ 1,2,3,4,5 };
-    math::Vector<ElementType, orientation> v{ 1,2,3,4,5 };
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
+    math::Vector<ElementType, orientation> v{ 1, 2, 3, 4, 5 };
 
     testing::ProcessTest("Vector::operator==", u == v);
 }
@@ -137,10 +137,10 @@ void TestVectorEqualityOperator()
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorInequalityOperator()
 {
-    math::Vector<ElementType, orientation> u{ 1,2,3,4,5 };
-    math::Vector<ElementType, orientation> v{ 1,2,3,4,5 };
-    math::Vector<ElementType, orientation> w{ -1,2,3,4,5 };
-    math::Vector<ElementType, orientation> z{ 1,2,3,4 };
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
+    math::Vector<ElementType, orientation> v{ 1, 2, 3, 4, 5 };
+    math::Vector<ElementType, orientation> w{ -1, 2, 3, 4, 5 };
+    math::Vector<ElementType, orientation> z{ 1, 2, 3, 4 };
 
     testing::ProcessTest("Vector::operator!=", u != w && u != v.Transpose() && u != z);
 }
@@ -148,7 +148,7 @@ void TestVectorInequalityOperator()
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorGetConstReference()
 {
-    math::Vector<ElementType, orientation> u{ 1,2,3,4,5 };
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
     auto v = u.GetConstReference();
 
     testing::ProcessTest("Vector::GetConstReference", u == v);
@@ -157,7 +157,7 @@ void TestVectorGetConstReference()
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorGetSubVector()
 {
-    math::Vector<ElementType, orientation> u{ 1,2,3,4,5 };
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
     auto v = u.GetSubVector(2, 2);
 
     math::Matrix<ElementType, math::MatrixLayout::rowMajor> A{
@@ -174,12 +174,12 @@ void TestVectorGetSubVector()
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorTranspose()
 {
-    math::Vector<ElementType, orientation> v{ 1,2,3,4,5,6,7 };
+    math::Vector<ElementType, orientation> v{ 1, 2, 3, 4, 5, 6, 7 };
     auto u = v.Transpose();
-    math::Vector<ElementType, math::TransposeVectorOrientation<orientation>::value> w{ 1,2,3,4,5,6,7 };
+    math::Vector<ElementType, math::TransposeVectorOrientation<orientation>::value> w{ 1, 2, 3, 4, 5, 6, 7 };
 
-    auto x = v.GetSubVector(2,3).Transpose();
-    math::Vector<ElementType, math::TransposeVectorOrientation<orientation>::value> z{ 3,4,5 };
+    auto x = v.GetSubVector(2, 3).Transpose();
+    math::Vector<ElementType, math::TransposeVectorOrientation<orientation>::value> z{ 3, 4, 5 };
 
     testing::ProcessTest("Vector::Transpose", u == w && x == z);
 }
@@ -187,10 +187,10 @@ void TestVectorTranspose()
 template <typename ElementType>
 void TestVectorSwap()
 {
-    math::RowVector<ElementType> v{ 1,2,3,4,5,6,7 };
-    math::RowVector<ElementType> u{ -1,-2,-3,-4,-5,-6,-7 };
-    math::RowVector<ElementType> s{ -1,-2,-3,-4,-5,-6,-7 };
-    math::RowVector<ElementType> t{ 1,2,3,4,5,6,7 };
+    math::RowVector<ElementType> v{ 1, 2, 3, 4, 5, 6, 7 };
+    math::RowVector<ElementType> u{ -1, -2, -3, -4, -5, -6, -7 };
+    math::RowVector<ElementType> s{ -1, -2, -3, -4, -5, -6, -7 };
+    math::RowVector<ElementType> t{ 1, 2, 3, 4, 5, 6, 7 };
     v.Swap(u);
 
     testing::ProcessTest("Vector::Swap", v == s && u == t);
@@ -199,14 +199,14 @@ void TestVectorSwap()
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorCopyFrom()
 {
-    math::Vector<ElementType, orientation> v{ 1,2,3,4,5,6,7 };
+    math::Vector<ElementType, orientation> v{ 1, 2, 3, 4, 5, 6, 7 };
     math::Vector<ElementType, orientation> u(7);
     u.CopyFrom(v);
 
-    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
-    math::ColumnVector<ElementType> x{ 11,12,13 };
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
+    math::ColumnVector<ElementType> x{ 11, 12, 13 };
     M.GetColumn(1).CopyFrom(x);
-    math::RowMatrix<ElementType> R{ { 1, 11, 3 },{ 4,12,6 },{ 7,13,9 } };
+    math::RowMatrix<ElementType> R{ { 1, 11, 3 }, { 4, 12, 6 }, { 7, 13, 9 } };
 
     testing::ProcessTest("Vector::CopyFrom", u == v && M == R);
 }
@@ -214,14 +214,14 @@ void TestVectorCopyFrom()
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorReset()
 {
-    math::Vector<ElementType, orientation> v{ 1,2,3,4,5,6,7 };
+    math::Vector<ElementType, orientation> v{ 1, 2, 3, 4, 5, 6, 7 };
     v.GetSubVector(1, 2).Reset();
-    math::Vector<ElementType, orientation> r{ 1,0,0,4,5,6,7 };
+    math::Vector<ElementType, orientation> r{ 1, 0, 0, 4, 5, 6, 7 };
 
-    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
     M.GetColumn(1).Reset();
     M.GetRow(1).Reset();
-    math::RowMatrix<ElementType> R{ { 1, 0, 3 },{ 0, 0, 0 },{ 7, 0, 9 } };
+    math::RowMatrix<ElementType> R{ { 1, 0, 3 }, { 0, 0, 0 }, { 7, 0, 9 } };
 
     testing::ProcessTest("Vector::Reset", v == r && M == R);
 }
@@ -233,10 +233,10 @@ void TestVectorFill()
     v.Fill(2);
     math::Vector<ElementType, orientation> r{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
 
-    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
     M.GetColumn(1).Fill(-1);
     M.GetRow(1).Fill(1);
-    math::RowMatrix<ElementType> R{ { 1, -1, 3 },{ 1, 1, 1 },{ 7, -1, 9 } };
+    math::RowMatrix<ElementType> R{ { 1, -1, 3 }, { 1, 1, 1 }, { 7, -1, 9 } };
 
     testing::ProcessTest("Vector::Fill", v == r && M == R);
 }
@@ -245,13 +245,13 @@ template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorGenerate()
 {
     math::Vector<ElementType, orientation> v{ 1, 2, 3, 4, 5, 6, 7 };
-    v.GetSubVector(1, 2).Generate([]()->ElementType {return -1; });
+    v.GetSubVector(1, 2).Generate([]() -> ElementType { return -1; });
     math::Vector<ElementType, orientation> r{ 1, -1, -1, 4, 5, 6, 7 };
 
-    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
-    M.GetColumn(1).Generate([]()->ElementType {return -1.0; });
-    M.GetRow(1).Generate([]()->ElementType {return 1.0; });
-    math::RowMatrix<ElementType> R{ { 1, -1, 3 },{ 1, 1, 1 },{ 7, -1, 9 } };
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
+    M.GetColumn(1).Generate([]() -> ElementType { return -1.0; });
+    M.GetRow(1).Generate([]() -> ElementType { return 1.0; });
+    math::RowMatrix<ElementType> R{ { 1, -1, 3 }, { 1, 1, 1 }, { 7, -1, 9 } };
 
     testing::ProcessTest("Vector::Generate", v == r && M == R);
 }
@@ -259,17 +259,17 @@ void TestVectorGenerate()
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorTransform()
 {
-    math::Vector<ElementType, orientation> v{ 1,2,3,4,5,6,7 };
-    v.Transform([](ElementType value) {return value * 2; });
-    math::Vector<ElementType, orientation> u{ 2,4,6,8,10,12,14 };
-    
-    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
-    M.GetColumn(1).Transform([](ElementType value) {return value * 2; });
-    math::ColumnVector<ElementType> w{ 4,10,16 };
+    math::Vector<ElementType, orientation> v{ 1, 2, 3, 4, 5, 6, 7 };
+    v.Transform([](ElementType value) { return value * 2; });
+    math::Vector<ElementType, orientation> u{ 2, 4, 6, 8, 10, 12, 14 };
 
-    math::Vector<ElementType, orientation> z{ 1,-2,3,-4,-5,6,-7 };
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
+    M.GetColumn(1).Transform([](ElementType value) { return value * 2; });
+    math::ColumnVector<ElementType> w{ 4, 10, 16 };
+
+    math::Vector<ElementType, orientation> z{ 1, -2, 3, -4, -5, 6, -7 };
     z.Transform(math::AbsoluteValueTransformation<ElementType>);
-    math::Vector<ElementType, orientation> y{ 1,2,3,4,5,6,7 };
+    math::Vector<ElementType, orientation> y{ 1, 2, 3, 4, 5, 6, 7 };
 
     testing::ProcessTest("Vector::Transform", v == u && M.GetColumn(1) == w && z == y);
 }
@@ -422,7 +422,7 @@ void TestVectorVectorOuter()
 
     math::OuterProduct<implementation>(u, v, A);
 
-    math::ColumnMatrix<ElementType> B{ {1, -1}, {2, -2}, {3, -3} };
+    math::ColumnMatrix<ElementType> B{ { 1, -1 }, { 2, -2 }, { 3, -3 } };
     testing::ProcessTest(implementationName + "::OuterProduct(Vector, Vector)", A == B);
 }
 

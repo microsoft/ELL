@@ -31,7 +31,7 @@ namespace model
     class Map;
     class Model;
     class Node;
-    
+
     /// <summary> Abstract base class for ELL model compilers. </summary>
     class MapCompiler
     {
@@ -91,9 +91,9 @@ namespace model
         emitters::Variable* AllocatePortVariable(const OutputPortBase& port);
         emitters::Variable* GetOrAllocatePortVariable(const OutputPortBase& port);
 
-        template<typename ValueType>
+        template <typename ValueType>
         emitters::Variable* AllocatePortVariable(const OutputPortBase& port, ValueType initialValue);
-        template<typename ValueType>
+        template <typename ValueType>
         emitters::Variable* GetOrAllocatePortVariable(const OutputPortBase& port, ValueType initialValue);
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace model
         // stored as a stack, with the top of the stack being the innermost scope
         std::vector<std::unordered_map<const Port*, emitters::Variable*>> _portToVarMaps; // Do we need separate elementToVarMaps?
     };
-}
-}
+} // namespace model
+} // namespace ell
 
 #include "../tcc/MapCompiler.tcc"

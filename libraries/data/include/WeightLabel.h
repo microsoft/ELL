@@ -15,7 +15,6 @@
 // utilities
 #include "CStringParser.h"
 
-
 namespace ell
 {
 namespace data
@@ -62,5 +61,5 @@ namespace data
         /// <returns> A WeightLabel. </returns>
         static WeightLabel Parse(TextLine& textLine);
     };
-}
-}
+} // namespace data
+} // namespace ell

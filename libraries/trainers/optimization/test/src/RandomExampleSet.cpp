@@ -31,7 +31,7 @@ std::shared_ptr<VectorIndexedContainer<VectorExampleType, ContainerExampleType>>
 
     // distribution for the example clouds
     std::normal_distribution<double> inputDistribution(0, marginVariance / size);
-    
+
     // distribution for binary labels
     std::bernoulli_distribution labelDistribution(0.5);
 

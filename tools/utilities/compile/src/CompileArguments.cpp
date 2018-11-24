@@ -99,4 +99,4 @@ void ParsedCompileArguments::AddArgs(utilities::CommandLineParser& parser)
         "Print timing information and detail about the network being compiled",
         false);
 }
-}
+} // namespace ell

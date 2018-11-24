@@ -99,7 +99,7 @@ namespace nodes
         // for compute implementation.
         mutable dsp::VoiceActivityDetector _vad;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/VoiceActivityDetectorNode.tcc"

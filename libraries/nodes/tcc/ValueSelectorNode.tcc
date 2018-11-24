@@ -11,14 +11,22 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    ValueSelectorNode<ValueType>::ValueSelectorNode()
-        : Node({ &_condition, &_input1, &_input2 }, { &_output }), _condition(this, {}, conditionPortName), _input1(this, {}, defaultInput1PortName), _input2(this, {}, defaultInput2PortName), _output(this, defaultOutputPortName, 0)
+    ValueSelectorNode<ValueType>::ValueSelectorNode() :
+        Node({ &_condition, &_input1, &_input2 }, { &_output }),
+        _condition(this, {}, conditionPortName),
+        _input1(this, {}, defaultInput1PortName),
+        _input2(this, {}, defaultInput2PortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
     template <typename ValueType>
-    ValueSelectorNode<ValueType>::ValueSelectorNode(const model::OutputPort<bool>& condition, const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
-        : Node({ &_condition, &_input1, &_input2 }, { &_output }), _condition(this, condition, conditionPortName), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _output(this, defaultOutputPortName, input1.Size())
+    ValueSelectorNode<ValueType>::ValueSelectorNode(const model::OutputPort<bool>& condition, const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2) :
+        Node({ &_condition, &_input1, &_input2 }, { &_output }),
+        _condition(this, condition, conditionPortName),
+        _input1(this, input1, defaultInput1PortName),
+        _input2(this, input2, defaultInput2PortName),
+        _output(this, defaultOutputPortName, input1.Size())
     {
         if (condition.Size() != 1)
         {
@@ -68,5 +76,5 @@ namespace nodes
 
         transformer.MapNodeOutput(output, newNode->output);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

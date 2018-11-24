@@ -97,13 +97,14 @@ namespace model
     protected:
         // Note: Source nodes still receive timestamps as input, even though data is retrieved through callbacks.
         // Therefore, they have input ports.
-        SourceNodeBase(InputPortBase& input, OutputPortBase& output, const std::string& callbackName)
-            : InputNodeBase(input, output), _callbackName(callbackName)
+        SourceNodeBase(InputPortBase& input, OutputPortBase& output, const std::string& callbackName) :
+            InputNodeBase(input, output),
+            _callbackName(callbackName)
         {
         }
 
     private:
         std::string _callbackName;
     };
-}
-}
+} // namespace model
+} // namespace ell

@@ -73,20 +73,19 @@ auto Get1DReferenceFilter()
 
 auto Get1DReferenceSignal()
 {
-    return std::vector<double>{ 0.42929697, 0.90317845, 0.84490289, 0.66174327, 0.10820399, 0.3511343,
-                                0.58248869, 0.62674724, 0.11014194, 0.00132073, 0.58431646, 0.39873614,
-                                0.40304155, 0.79139607, 0.97710827, 0.21268128 };
+    return std::vector<double>{ 0.42929697, 0.90317845, 0.84490289, 0.66174327, 0.10820399, 0.3511343, 0.58248869, 0.62674724, 0.11014194, 0.00132073, 0.58431646, 0.39873614, 0.40304155, 0.79139607, 0.97710827, 0.21268128 };
 }
 
 auto Get1DReferenceConvolutionResult()
 {
-    return std::vector<double>{ 0.77013919, 0.81368187, 0.56914835, 0.30732139, 0.34824032, 0.53571473, 0.48653128,
-                                0.21208796, 0.17427497, 0.39217245, 0.44620757, 0.49905383, 0.74073549, 0.73957347 };
+    return std::vector<double>{ 0.77013919, 0.81368187, 0.56914835, 0.30732139, 0.34824032, 0.53571473, 0.48653128, 0.21208796, 0.17427497, 0.39217245, 0.44620757, 0.49905383, 0.74073549, 0.73957347 };
 }
 
 struct TestLLVMContext : public LLVMContext
 {
-    TestLLVMContext(std::unique_ptr<IRModuleEmitter> emitter) : LLVMContext(*emitter), _emitter(std::move(emitter)) {}
+    TestLLVMContext(std::unique_ptr<IRModuleEmitter> emitter) :
+        LLVMContext(*emitter),
+        _emitter(std::move(emitter)) {}
 
     void DebugDump() { _emitter->DebugDump(); }
 

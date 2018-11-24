@@ -18,7 +18,7 @@
 using namespace ell;
 using namespace ell::trainers::optimization;
 
-template<typename LossFunctionType>
+template <typename LossFunctionType>
 double TestDerivative(LossFunctionType loss, double prediction, double output)
 {
     const double epsilon = 1.0e-6;
@@ -32,7 +32,7 @@ double TestDerivative(LossFunctionType loss, double prediction, double output)
     return error;
 }
 
-template<typename LossFunctionType>
+template <typename LossFunctionType>
 void TestDerivative(LossFunctionType loss, Range predictionRange, Range outputRange)
 {
     double errorTolerance = 1.0e-6;
@@ -52,7 +52,7 @@ void TestDerivative(LossFunctionType loss, Range predictionRange, Range outputRa
     testing::ProcessTest("TestDerivative <" + lossName + ">", maxError < errorTolerance);
 }
 
-template<typename LossFunctionType>
+template <typename LossFunctionType>
 bool TestConjugate(LossFunctionType loss, double v, double output, double lower, double upper)
 {
     const double tolerance = 1.0e-6;
@@ -63,7 +63,7 @@ bool TestConjugate(LossFunctionType loss, double v, double output, double lower,
         return true;
     }
 
-    auto objective = [&](double x) {return conjugate - x * v + loss.Value(x, output); };
+    auto objective = [&](double x) { return conjugate - x * v + loss.Value(x, output); };
     auto minimizer = GoldenSectionMinimizer(objective, lower, upper);
     minimizer.MinimizeToPrecision(tolerance);
     if (minimizer.GetMinUpperBound() < tolerance && minimizer.GetMinLowerBound() > -tolerance)
@@ -73,7 +73,7 @@ bool TestConjugate(LossFunctionType loss, double v, double output, double lower,
     return false;
 }
 
-template<typename LossFunctionType>
+template <typename LossFunctionType>
 void TestConjugate(LossFunctionType loss, Range vRange, Range outputRange, double lower, double upper)
 {
     bool success = true;
@@ -81,7 +81,7 @@ void TestConjugate(LossFunctionType loss, Range vRange, Range outputRange, doubl
     {
         for (double output = outputRange.from; output <= outputRange.to; output += outputRange.increment)
         {
-            if(!TestConjugate(loss, v, output, lower, upper))
+            if (!TestConjugate(loss, v, output, lower, upper))
             {
                 success = false;
             }
@@ -94,14 +94,14 @@ void TestConjugate(LossFunctionType loss, Range vRange, Range outputRange, doubl
     testing::ProcessTest("TestConjugate <" + lossName + ">", success);
 }
 
-template<typename LossFunctionType>
+template <typename LossFunctionType>
 bool TestConjugateProx(LossFunctionType loss, double theta, double z, double output, double lower, double upper)
 {
     const double tolerance = 1.0e-6;
 
     double conjugateProx = loss.ConjugateProx(theta, z, output);
     double conjugateProxValue = theta * loss.Conjugate(conjugateProx, output) + 0.5 * (conjugateProx - z) * (conjugateProx - z);
-    auto objective = [&](double x) {return theta * loss.Conjugate(x, output) + 0.5 * (x - z) * (x - z) - conjugateProxValue; };
+    auto objective = [&](double x) { return theta * loss.Conjugate(x, output) + 0.5 * (x - z) * (x - z) - conjugateProxValue; };
 
     auto minimizer = GoldenSectionMinimizer(objective, lower, upper);
     minimizer.MinimizeToPrecision(tolerance);
@@ -112,7 +112,7 @@ bool TestConjugateProx(LossFunctionType loss, double theta, double z, double out
     return false;
 }
 
-template<typename LossFunctionType>
+template <typename LossFunctionType>
 void TestConjugateProx(LossFunctionType loss, Range thetaRange, Range zRange, Range outputRange, double lower, double upper)
 {
     bool success = true;
@@ -122,7 +122,7 @@ void TestConjugateProx(LossFunctionType loss, Range thetaRange, Range zRange, Ra
         {
             for (double theta = thetaRange.from; theta <= thetaRange.to; theta += thetaRange.increment)
             {
-                if(!TestConjugateProx(loss, theta, z, output, lower, upper))
+                if (!TestConjugateProx(loss, theta, z, output, lower, upper))
                 {
                     success = false;
                 }

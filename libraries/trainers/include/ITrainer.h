@@ -43,5 +43,5 @@ namespace trainers
         /// <returns> A const reference to the current predictor. </returns>
         virtual const PredictorType& GetPredictor() const = 0;
     };
-}
-}
+} // namespace trainers
+} // namespace ell

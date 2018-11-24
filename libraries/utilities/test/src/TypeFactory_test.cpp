@@ -94,4 +94,4 @@ void TypeFactoryTest()
 
     testing::ProcessTest("TypeFactory", derived1->GetRuntimeTypeName() == Derived1::GetTypeName() && derived2->GetRuntimeTypeName() == Derived2::GetTypeName());
 }
-}
+} // namespace ell

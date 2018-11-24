@@ -171,11 +171,11 @@ namespace testing
     bool DidTestFail();
 
     /// <summary> Call a function, registering a test failure if an exception is thrown, and continue execution. </summary>
-    /// 
+    ///
     /// <param name="function"> The test function to call. </param>
     /// <param name="args"> Aguments to pass to the test function. </param>
     template <typename FunctionType, typename... Args>
-    bool FailOnException(FunctionType&& function, Args&& ...args)
+    bool FailOnException(FunctionType&& function, Args&&... args)
     {
         using namespace std::literals::string_literals;
         try
@@ -193,7 +193,7 @@ namespace testing
         }
         return false;
     }
-    
+
     /// <summary> RAII helper to turn on logging for a sepcific test/scope
     ///
     /// Example:
@@ -211,8 +211,8 @@ namespace testing
         EnableLoggingHelper& operator=(const EnableLoggingHelper&) = delete;
         EnableLoggingHelper& operator=(EnableLoggingHelper&&) = delete;
     };
-}
-}
+} // namespace testing
+} // namespace ell
 
 // Forces a symbol to be defined so that LLVM jit can find it
 #if defined(_WIN32)

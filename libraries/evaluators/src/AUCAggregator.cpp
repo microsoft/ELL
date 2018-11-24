@@ -72,5 +72,5 @@ namespace evaluators
     {
         return { "AUC" };
     }
-}
-}
+} // namespace evaluators
+} // namespace ell

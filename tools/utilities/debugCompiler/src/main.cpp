@@ -76,7 +76,7 @@ void ReplaceSourceAndSinkNodes(model::Map& map)
     // now put back inputs
     auto inputNodes = map.GetModel().GetNodesByType<model::InputNodeBase>();
     int index = 1;
-    for(auto node: inputNodes)
+    for (auto node : inputNodes)
     {
         map.AddInput("input_" + std::to_string(index), node);
         ++index;

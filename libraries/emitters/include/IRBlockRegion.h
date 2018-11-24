@@ -100,5 +100,5 @@ namespace emitters
     private:
         std::vector<std::shared_ptr<IRBlockRegion>> _regions;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

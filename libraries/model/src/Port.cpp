@@ -18,9 +18,9 @@ namespace model
         //
         // Relevant archive format versions
         //
-        constexpr utilities::ArchiveVersion noMetadataArchiveVersion = {utilities::ArchiveVersionNumbers::v0_initial};
-        constexpr utilities::ArchiveVersion metadataArchiveVersion = {utilities::ArchiveVersionNumbers::v3_model_metadata};
-    }
+        constexpr utilities::ArchiveVersion noMetadataArchiveVersion = { utilities::ArchiveVersionNumbers::v0_initial };
+        constexpr utilities::ArchiveVersion metadataArchiveVersion = { utilities::ArchiveVersionNumbers::v3_model_metadata };
+    } // namespace
 
     //
     // Specializations of GetPortType
@@ -57,7 +57,7 @@ namespace model
 
     utilities::ArchiveVersion Port::GetArchiveVersion() const
     {
-        if(_metadata.IsEmpty())
+        if (_metadata.IsEmpty())
         {
             return noMetadataArchiveVersion;
         }
@@ -116,5 +116,5 @@ namespace model
             return "Unknown";
         };
     }
-}
-}
+} // namespace model
+} // namespace ell

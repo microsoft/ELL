@@ -28,5 +28,5 @@ namespace common
             "Add an evaluation using the constant zero predictor",
             true);
     }
-}
-}
+} // namespace common
+} // namespace ell

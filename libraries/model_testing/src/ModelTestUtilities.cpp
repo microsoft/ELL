@@ -27,8 +27,8 @@ using namespace ell;
 
 static bool g_isVerbose = false;
 
-VerboseRegion::VerboseRegion(bool verbose)
-    : _oldVerbose(IsVerbose())
+VerboseRegion::VerboseRegion(bool verbose) :
+    _oldVerbose(IsVerbose())
 {
     SetVerbose(verbose);
 }

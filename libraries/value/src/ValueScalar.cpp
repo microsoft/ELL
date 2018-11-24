@@ -20,7 +20,8 @@ namespace value
 
     Scalar::Scalar() = default;
 
-    Scalar::Scalar(Value value) : _value(std::move(value))
+    Scalar::Scalar(Value value) :
+        _value(std::move(value))
     {
         if (!_value.IsDefined() || !_value.IsConstrained() || _value.GetLayout().NumDimensions() != 0)
         {

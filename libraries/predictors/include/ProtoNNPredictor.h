@@ -29,7 +29,8 @@ namespace predictors
 {
     /// <summary> A ProtoNN predictor. </summary>
     ///
-    class ProtoNNPredictor : public IPredictor<double>, public utilities::IArchivable
+    class ProtoNNPredictor : public IPredictor<double>
+        , public utilities::IArchivable
     {
     public:
         /// <summary> Type of the data vector expected by this predictor type. </summary>
@@ -139,7 +140,7 @@ namespace predictors
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        math::ColumnVector<double> GetLabelScores(const std::vector<double> &inputVector) const;
+        math::ColumnVector<double> GetLabelScores(const std::vector<double>& inputVector) const;
 
         // Input dimension
         size_t _dimension;
@@ -156,5 +157,5 @@ namespace predictors
         // Gamma constant
         double _gamma;
     };
-}
-}
+} // namespace predictors
+} // namespace ell

@@ -14,8 +14,8 @@ namespace ell
 {
 namespace trainers
 {
-    LogitBooster::LogitBooster(double scale)
-        : _scale(scale)
+    LogitBooster::LogitBooster(double scale) :
+        _scale(scale)
     {
     }
 
@@ -32,5 +32,5 @@ namespace trainers
             return { strongWeightLabel.weight / (1.0 + exp(scaledMargin)), strongWeightLabel.label };
         }
     }
-}
-}
+} // namespace trainers
+} // namespace ell

@@ -109,8 +109,9 @@ namespace emitters
     template <size_t N>
     struct IRLocalNDimArray : IRLocalMultidimArray
     {
-        IRLocalNDimArray(IRFunctionEmitter& function, LLVMValue data, std::array<int, N> extents, std::array<int, N> layout)
-            : IRLocalMultidimArray(function, data, ToLayoutOrder(extents, layout)), layout(layout)
+        IRLocalNDimArray(IRFunctionEmitter& function, LLVMValue data, std::array<int, N> extents, std::array<int, N> layout) :
+            IRLocalMultidimArray(function, data, ToLayoutOrder(extents, layout)),
+            layout(layout)
         {
             constexpr auto expectedLayout = utilities::MakeNArray<N>();
 
@@ -173,5 +174,5 @@ namespace emitters
 
     /// <summary> Represents channel-major layout for use with IRLocalTensor </summary>
     constexpr std::array<int, 3> ChannelMajorTensorLayout{ 2, 1, 0 };
-}
-}
+} // namespace emitters
+} // namespace ell

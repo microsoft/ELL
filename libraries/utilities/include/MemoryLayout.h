@@ -58,9 +58,11 @@ namespace utilities
 
     protected:
         DimensionVector() = default;
-        DimensionVector(const std::vector<int>& elements) : _data(elements.begin(), elements.end()) {}
+        DimensionVector(const std::vector<int>& elements) :
+            _data(elements.begin(), elements.end()) {}
 
-        DimensionVector(const std::initializer_list<int>& elements) : _data(elements.begin(), elements.end()) {}
+        DimensionVector(const std::initializer_list<int>& elements) :
+            _data(elements.begin(), elements.end()) {}
 
         DimensionVector(const std::vector<size_t>& elements);
 
@@ -95,7 +97,8 @@ namespace utilities
         /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for
         ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major). </param>
         template <size_t N>
-        DimensionOrder(const std::array<int, N>& order) : DimensionOrder({ order.begin(), order.end() })
+        DimensionOrder(const std::array<int, N>& order) :
+            DimensionOrder({ order.begin(), order.end() })
         {}
 
         /// <summary> Indicates if this object represents the canonical memory order (0, 1, 2, ...) </summary>
@@ -122,17 +125,20 @@ namespace utilities
         /// <summary> Constructor from a vector of integers </summary>
         ///
         /// <param name="shape"> The size per dimension of the shape </param>
-        MemoryShape(const std::vector<int>& shape) : DimensionVector(shape) {}
+        MemoryShape(const std::vector<int>& shape) :
+            DimensionVector(shape) {}
 
         /// <summary> Constructor from a list of integers </summary>
         ///
         /// <param name="shape"> The size per dimension of the shape </param>
-        MemoryShape(const std::initializer_list<int>& shape) : DimensionVector(shape) {}
+        MemoryShape(const std::initializer_list<int>& shape) :
+            DimensionVector(shape) {}
 
         /// <summary> Constructor from a vector of unsigned integers </summary>
         ///
         /// <param name="shape"> The size per dimension of the shape </param>
-        MemoryShape(const std::vector<size_t>& shape) : DimensionVector(shape) {}
+        MemoryShape(const std::vector<size_t>& shape) :
+            DimensionVector(shape) {}
 
         /// <summary> Get the total number of elements. </summary>
         int NumElements() const;
@@ -161,17 +167,20 @@ namespace utilities
         /// <summary> Constructor from a vector of integers </summary>
         ///
         /// <param name="coordinates"> The coordinates </param>
-        MemoryCoordinates(const std::vector<int>& coordinates) : DimensionVector(coordinates) {}
+        MemoryCoordinates(const std::vector<int>& coordinates) :
+            DimensionVector(coordinates) {}
 
         /// <summary> Constructor from a list of integers </summary>
         ///
         /// <param name="coordinates"> The coordinates </param>
-        MemoryCoordinates(const std::initializer_list<int>& coordinates) : DimensionVector(coordinates) {}
+        MemoryCoordinates(const std::initializer_list<int>& coordinates) :
+            DimensionVector(coordinates) {}
 
         /// <summary> Constructor from a vector of unsigned integers </summary>
         ///
         /// <param name="coordinates"> The coordinates </param>
-        MemoryCoordinates(const std::vector<size_t>& coordinates) : DimensionVector(coordinates) {}
+        MemoryCoordinates(const std::vector<size_t>& coordinates) :
+            DimensionVector(coordinates) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -211,8 +220,7 @@ namespace utilities
         ///   fastest-changing dimension). </param>
         /// <param name="physicalDimensionExtent"> The extent of the allocated memory of the memory region. </param>
         /// <param name="physicalDimensionOffset"> The offset into memory to the active area of the memory region. </param>
-        MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
-                     const MemoryShape& physicalDimensionOffset);
+        MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent, const MemoryShape& physicalDimensionOffset);
 
         /// <summary> General constructor. </summary>
         ///
@@ -223,8 +231,7 @@ namespace utilities
         /// <param name="physicalDimensionOffset"> The offset into memory to the active area of the memory region. </param>
         /// <param name="physicalDimensionIncrement"> The cumulative increments for each dimension. This is the
         /// distance in memory between two entries that are adjacent in that dimension. </param>
-        MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
-                     const MemoryShape& physicalDimensionOffset, const MemoryShape& physicalDimensionIncrement);
+        MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent, const MemoryShape& physicalDimensionOffset, const MemoryShape& physicalDimensionIncrement);
 
         //
         // Constructors with a user-supplied logical dimension ordering
@@ -247,8 +254,7 @@ namespace utilities
         /// <param name="physicalDimensionPadding"> The amount of padding to apply to the beginning and end of each dimension </param>
         /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for
         ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major. </param>
-        MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionPadding,
-                     const DimensionOrder& order);
+        MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionPadding, const DimensionOrder& order);
 
         /// <summary> General constructor. </summary>
         ///
@@ -259,8 +265,7 @@ namespace utilities
         /// <param name="physicalDimensionOffset"> The offset into memory to the active area of the memory region. </param>
         /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for
         ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major. </param>
-        MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
-                     const MemoryShape& physicalDimensionOffset, const DimensionOrder& order);
+        MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent, const MemoryShape& physicalDimensionOffset, const DimensionOrder& order);
 
         /// <summary> General constructor. </summary>
         ///
@@ -273,9 +278,7 @@ namespace utilities
         /// distance in memory between two entries that are adjacent in that dimension. </param>
         /// <param name="order"> The ordering of the logical dimensions in memory (e.g., [0, 1] for
         ///     the canonical row-major ordering of 2D arrays, and [1, 0] for column-major. </param>
-        MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
-                     const MemoryShape& physicalDimensionOffset, const MemoryShape& physicalDimensionIncrement,
-                     const DimensionOrder& order);
+        MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent, const MemoryShape& physicalDimensionOffset, const MemoryShape& physicalDimensionIncrement, const DimensionOrder& order);
 
         /// <summary> Returns the number of dimensions in this memory layout </summary>
         ///

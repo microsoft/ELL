@@ -30,7 +30,8 @@ namespace common
     };
 
     /// <summary> A version of DataSaveArguments that can add its members to the command line parser and post process their values. </summary>
-    struct ParsedDataSaveArguments : public DataSaveArguments, public utilities::ParsedArgSet
+    struct ParsedDataSaveArguments : public DataSaveArguments
+        , public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
@@ -44,5 +45,5 @@ namespace common
         /// <returns> An utilities::CommandLineParseResult. </returns>
         utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
     };
-}
-}
+} // namespace common
+} // namespace ell

@@ -20,8 +20,11 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filterWeights(0, 0)
+    UnrolledConvolutionNode<ValueType>::UnrolledConvolutionNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0),
+        _filterWeights(0, 0)
     {
     }
 
@@ -30,8 +33,14 @@ namespace nodes
                                                                 const model::PortMemoryLayout& inputMemoryLayout,
                                                                 const model::PortMemoryLayout& outputMemoryLayout,
                                                                 const ConstTensorReferenceType& filterWeights,
-                                                                int stride)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterWeights(0, 0), _filterSize(filterWeights.NumColumns()), _stride(stride)
+                                                                int stride) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, outputMemoryLayout),
+        _inputMemoryLayout(inputMemoryLayout),
+        _filterWeights(0, 0),
+        _filterSize(filterWeights.NumColumns()),
+        _stride(stride)
     {
         _isDepthwiseSeparable = (filterWeights.NumChannels() == 1) && (inputMemoryLayout.GetActiveSize()[2] > 1);
         _filterWeights = GetWeightsMatrix(filterWeights);
@@ -43,8 +52,14 @@ namespace nodes
                                                                 const model::PortMemoryLayout& outputMemoryLayout,
                                                                 ConstMatrixReferenceType filterWeights,
                                                                 int filterSize,
-                                                                int stride)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterWeights(filterWeights), _filterSize(filterSize), _stride(stride)
+                                                                int stride) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, outputMemoryLayout),
+        _inputMemoryLayout(inputMemoryLayout),
+        _filterWeights(filterWeights),
+        _filterSize(filterSize),
+        _stride(stride)
     {
         _isDepthwiseSeparable = (static_cast<int>(filterWeights.NumColumns()) == (filterSize * filterSize)) && (inputMemoryLayout.GetActiveSize()[2] > static_cast<int>(1));
     }
@@ -224,8 +239,7 @@ namespace nodes
 
         // Loop over all input channels.
         // The large capture parameters for the lambda are to work around a bug in gcc 5.4
-        function.For(numFilters, [this, inputBuffer, outputBuffer, reshapedInputMatrix, inputIncrement, outputIncrement, weights, fieldArea, outputRows,
-                                  outputColumns, outputElements, depth] (emitters::IRFunctionEmitter& function, emitters::LLVMValue fValue) {
+        function.For(numFilters, [this, inputBuffer, outputBuffer, reshapedInputMatrix, inputIncrement, outputIncrement, weights, fieldArea, outputRows, outputColumns, outputElements, depth](emitters::IRFunctionEmitter& function, emitters::LLVMValue fValue) {
             auto f = function.LocalScalar(fValue);
 
             emitters::LLVMValue inputPtr = function.PointerOffset(inputBuffer, f);
@@ -238,7 +252,7 @@ namespace nodes
 
             // ReceptiveFieldToRows for this channel/filter.
             // Iterate over all h * w locations in the output image
-            function.For(outputRows, [&] (emitters::IRFunctionEmitter& function, emitters::LLVMValue outputImageRowValue) {
+            function.For(outputRows, [&](emitters::IRFunctionEmitter& function, emitters::LLVMValue outputImageRowValue) {
                 auto outputImageRow = function.LocalScalar(outputImageRowValue);
                 auto inputRow = outputImageRow * _stride;
                 function.For(outputColumns, [&](emitters::IRFunctionEmitter& function, emitters::LLVMValue outputImageColumnValue) {
@@ -294,5 +308,5 @@ namespace nodes
     // Explicit specializations
     template class UnrolledConvolutionNode<float>;
     template class UnrolledConvolutionNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

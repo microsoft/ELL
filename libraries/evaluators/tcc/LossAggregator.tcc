@@ -11,8 +11,8 @@ namespace ell
 namespace evaluators
 {
     template <typename LossFunctionType>
-    LossAggregator<LossFunctionType>::LossAggregator(LossFunctionType lossFunction)
-        : _lossFunction(std::move(lossFunction))
+    LossAggregator<LossFunctionType>::LossAggregator(LossFunctionType lossFunction) :
+        _lossFunction(std::move(lossFunction))
     {
     }
 
@@ -49,5 +49,5 @@ namespace evaluators
     {
         return LossAggregator<LossFunctionType>(std::move(lossFunction));
     }
-}
-}
+} // namespace evaluators
+} // namespace ell

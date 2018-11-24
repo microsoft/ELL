@@ -28,8 +28,9 @@ namespace model
     public:
         const model::OutputPort<ValueType>& output = _output;
 
-        NullNode(size_t size)
-            : Node({}, { &_output }), _output(this, defaultOutputPortName, size){};
+        NullNode(size_t size) :
+            Node({}, { &_output }),
+            _output(this, defaultOutputPortName, size){};
         static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("NullNode"); }
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
@@ -51,19 +52,19 @@ namespace model
     //
     // TransformContext implementation
     //
-    TransformContext::TransformContext()
-        : _compiler(nullptr)
+    TransformContext::TransformContext() :
+        _compiler(nullptr)
     {
     }
 
-    TransformContext::TransformContext(const NodeActionFunction& nodeActionFunction)
-        : _compiler(nullptr)
+    TransformContext::TransformContext(const NodeActionFunction& nodeActionFunction) :
+        _compiler(nullptr)
     {
         _nodeActionFunctions.emplace_back(nodeActionFunction);
     }
 
-    TransformContext::TransformContext(const MapCompiler* compiler, const NodeActionFunction& nodeActionFunction)
-        : _compiler(compiler)
+    TransformContext::TransformContext(const MapCompiler* compiler, const NodeActionFunction& nodeActionFunction) :
+        _compiler(compiler)
     {
         _nodeActionFunctions.emplace_back(nodeActionFunction);
     }
@@ -187,9 +188,7 @@ namespace model
         return result;
     }
 
-    const OutputPortBase& ModelTransformer::CopySubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const OutputPortBase& sourceOutput,
-                                                             Model& destModel, const std::vector<const OutputPortBase*>& destInputs,
-                                                             const TransformContext& context)
+    const OutputPortBase& ModelTransformer::CopySubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const OutputPortBase& sourceOutput, Model& destModel, const std::vector<const OutputPortBase*>& destInputs, const TransformContext& context)
     {
         auto result = CopySubmodelOnto(sourceModel, sourceInputs, { &sourceOutput }, destModel, destInputs, context);
         if (result.size() != 1)
@@ -199,9 +198,7 @@ namespace model
         return *(result[0]);
     }
 
-    std::vector<const OutputPortBase*> ModelTransformer::CopySubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const std::vector<const OutputPortBase*>& sourceOutputs,
-                                                                          Model& destModel, const std::vector<const OutputPortBase*>& destInputs,
-                                                                          const TransformContext& context)
+    std::vector<const OutputPortBase*> ModelTransformer::CopySubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const std::vector<const OutputPortBase*>& sourceOutputs, Model& destModel, const std::vector<const OutputPortBase*>& destInputs, const TransformContext& context)
     {
         _elementsMap.Clear();
         auto result = TransformSubmodelOnto(sourceModel, sourceInputs, sourceOutputs, destModel, destInputs, context, [](const Node& node, ModelTransformer& transformer) {
@@ -362,17 +359,12 @@ namespace model
         return newModel;
     }
 
-    std::vector<const OutputPortBase*> ModelTransformer::TransformSubmodelInPlace(Model& model, const std::vector<const OutputPortBase*>& outputs,
-                                                                                  const TransformContext& context,
-                                                                                  const std::function<void(const Node&, ModelTransformer&)>& transformFunction)
+    std::vector<const OutputPortBase*> ModelTransformer::TransformSubmodelInPlace(Model& model, const std::vector<const OutputPortBase*>& outputs, const TransformContext& context, const std::function<void(const Node&, ModelTransformer&)>& transformFunction)
     {
         return TransformSubmodelOnto(model, {}, outputs, model, {}, context, transformFunction);
     }
 
-    const OutputPortBase& ModelTransformer::TransformSubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const OutputPortBase& sourceOutput,
-                                                                  Model& destModel, const std::vector<const OutputPortBase*>& destInputs,
-                                                                  const TransformContext& context,
-                                                                  const NodeTransformFunction& transformFunction)
+    const OutputPortBase& ModelTransformer::TransformSubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const OutputPortBase& sourceOutput, Model& destModel, const std::vector<const OutputPortBase*>& destInputs, const TransformContext& context, const NodeTransformFunction& transformFunction)
     {
         auto result = TransformSubmodelOnto(sourceModel, sourceInputs, { &sourceOutput }, destModel, destInputs, context, transformFunction);
         if (result.size() != 1)
@@ -382,10 +374,7 @@ namespace model
         return *result[0];
     }
 
-    std::vector<const OutputPortBase*> ModelTransformer::TransformSubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const std::vector<const OutputPortBase*>& sourceOutputs,
-                                                                               Model& destModel, const std::vector<const OutputPortBase*>& destInputs,
-                                                                               const TransformContext& context,
-                                                                               const NodeTransformFunction& transformFunction)
+    std::vector<const OutputPortBase*> ModelTransformer::TransformSubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const std::vector<const OutputPortBase*>& sourceOutputs, Model& destModel, const std::vector<const OutputPortBase*>& destInputs, const TransformContext& context, const NodeTransformFunction& transformFunction)
     {
         _context = context;
         _model = destModel.ShallowCopy();
@@ -566,5 +555,5 @@ namespace model
         }
     }
 
-}
-}
+} // namespace model
+} // namespace ell

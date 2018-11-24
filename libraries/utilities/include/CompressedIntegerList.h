@@ -101,5 +101,5 @@ namespace utilities
         size_t _last;
         size_t _size;
     };
-}
-}
+} // namespace utilities
+} // namespace ell

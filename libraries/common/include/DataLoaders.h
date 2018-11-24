@@ -17,10 +17,9 @@
 // model
 #include "Map.h"
 
-
 // stl
-#include <string>
 #include <istream>
+#include <string>
 
 namespace ell
 {
@@ -79,7 +78,7 @@ namespace common
     auto TransformDataset(data::Dataset<ExampleType>& input, const MapType& map);
 
     /// <summary>
-    /// The map is first compiled, then a new dataset is returned 
+    /// The map is first compiled, then a new dataset is returned
     /// by running an existing dataset through the compiled map.
     /// </summary>
     ///
@@ -92,7 +91,7 @@ namespace common
     /// <returns> The transformed dataset. </returns>
     template <typename ExampleType, typename MapType>
     auto TransformDatasetWithCompiledMap(data::Dataset<ExampleType>& input, const MapType& map, bool useBlas = true);
-}
-}
+} // namespace common
+} // namespace ell
 
 #include "../tcc/DataLoaders.tcc"

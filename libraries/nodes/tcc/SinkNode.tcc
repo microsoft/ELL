@@ -15,31 +15,31 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    SinkNode<ValueType>::SinkNode()
-        : SinkNode({}, {}, model::MemoryShape{ 0 }, "", nullptr)
+    SinkNode<ValueType>::SinkNode() :
+        SinkNode({}, {}, model::MemoryShape{ 0 }, "", nullptr)
     {
     }
 
     // Following the pattern of OutputNode, we provide a constructor override that infers the shape from the input
     template <typename ValueType>
-    SinkNode<ValueType>::SinkNode(const model::OutputPort<ValueType>& input, const model::OutputPort<bool>& trigger, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
-        : SinkNode(input, trigger, model::MemoryShape{ static_cast<int>(input.Size()) }, sinkFunctionName, sink)
+    SinkNode<ValueType>::SinkNode(const model::OutputPort<ValueType>& input, const model::OutputPort<bool>& trigger, const std::string& sinkFunctionName, SinkFunction<ValueType> sink) :
+        SinkNode(input, trigger, model::MemoryShape{ static_cast<int>(input.Size()) }, sinkFunctionName, sink)
     {
     }
 
     template <typename ValueType>
-    SinkNode<ValueType>::SinkNode(const model::OutputPort<ValueType>& input, const model::OutputPort<bool>& trigger, size_t outputVectorSize, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
-        : SinkNode(input, trigger, model::MemoryShape{ static_cast<int>(outputVectorSize) }, sinkFunctionName, sink)
+    SinkNode<ValueType>::SinkNode(const model::OutputPort<ValueType>& input, const model::OutputPort<bool>& trigger, size_t outputVectorSize, const std::string& sinkFunctionName, SinkFunction<ValueType> sink) :
+        SinkNode(input, trigger, model::MemoryShape{ static_cast<int>(outputVectorSize) }, sinkFunctionName, sink)
     {
     }
 
     template <typename ValueType>
-    SinkNode<ValueType>::SinkNode(const model::OutputPort<ValueType>& input, const model::OutputPort<bool>& trigger, const model::MemoryShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
-        : model::SinkNodeBase(_input, _trigger, _output, shape, sinkFunctionName),
+    SinkNode<ValueType>::SinkNode(const model::OutputPort<ValueType>& input, const model::OutputPort<bool>& trigger, const model::MemoryShape& shape, const std::string& sinkFunctionName, SinkFunction<ValueType> sink) :
+        model::SinkNodeBase(_input, _trigger, _output, shape, sinkFunctionName),
         _input(this, input, defaultInputPortName),
         _trigger(this, trigger, triggerPortName),
         _output(this, defaultOutputPortName, shape),
-        _sink(sink == nullptr ? [](const auto&){} : sink)
+        _sink(sink == nullptr ? [](const auto&) {} : sink)
     {
     }
 
@@ -71,7 +71,7 @@ namespace nodes
 
             // Callback signature: void SinkFunction(void* context, ValueType* array)
             const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer },
-                                                                    { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
+                                                                 { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
             module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
 
             emitters::LLVMFunction pSinkFunction = module.GetFunction(prefixedName);
@@ -180,5 +180,5 @@ namespace nodes
             function.SetValueAt(pOutput, function.Literal(static_cast<int>(i)), value);
         }
     }
-}
-}
+} // namespace nodes
+} // namespace ell

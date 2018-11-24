@@ -46,5 +46,5 @@ namespace utilities
         size_t _smallestUnpopped = 0;
         std::stack<size_t> _stack;
     };
-}
-}
+} // namespace utilities
+} // namespace ell

@@ -11,8 +11,8 @@ namespace ell
 namespace trainers
 {
     template <typename PredictorType>
-    SweepingTrainer<PredictorType>::SweepingTrainer(std::vector<EvaluatingTrainerType>&& evaluatingTrainers)
-        : _evaluatingTrainers(std::move(evaluatingTrainers))
+    SweepingTrainer<PredictorType>::SweepingTrainer(std::vector<EvaluatingTrainerType>&& evaluatingTrainers) :
+        _evaluatingTrainers(std::move(evaluatingTrainers))
     {
         assert(_evaluatingTrainers.size() > 0);
     }
@@ -55,5 +55,5 @@ namespace trainers
     {
         return std::make_unique<SweepingTrainer<PredictorType>>(std::move(evaluatingTrainers));
     }
-}
-}
+} // namespace trainers
+} // namespace ell

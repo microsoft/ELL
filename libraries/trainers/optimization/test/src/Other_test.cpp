@@ -10,8 +10,8 @@
 
 // optimization
 #include "L2Regularizer.h"
-#include "MatrixSolution.h"
 #include "MatrixExampleSet.h"
+#include "MatrixSolution.h"
 #include "MultivariateLoss.h"
 #include "NormProx.h"
 #include "SGDOptimizer.h"
@@ -34,26 +34,26 @@ using namespace ell::trainers::optimization;
 
 void TestL1Prox()
 {
-    math::ColumnVector<double> v { 1, 2 ,3, -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
     L1Prox(v, 1.0);
 
-    math::ColumnVector<double> v1{ 1, 2 ,3 , -1, -2, -3, 0.5, -0.5 };
-    math::ColumnVector<double> v2{ 1, 2 ,3 , -1, -2, -3, 0.5, -0.5 };
-    math::ColumnVector<double> v3{ 1, 2 ,3 , -1, -2, -3, 0.5, -0.5 };
-    math::ColumnVector<double> v4{ 1, 2 ,3 , -1, -2, -3, 0.5, -0.5 };
-    math::ColumnVector<double> v5{ 1, 2 ,3 , -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v1{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v2{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v3{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v4{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v5{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
 
     L1Prox(v1, 0.4);
-    math::ColumnVector<double> r1{ 0.6, 1.6 ,2.6 , -0.6, -1.6, -2.6, 0.1, -0.1 };
+    math::ColumnVector<double> r1{ 0.6, 1.6, 2.6, -0.6, -1.6, -2.6, 0.1, -0.1 };
 
     L1Prox(v2, 1.0);
-    math::ColumnVector<double> r2{ 0, 1 ,2 , 0, -1, -2, 0, 0 };
+    math::ColumnVector<double> r2{ 0, 1, 2, 0, -1, -2, 0, 0 };
 
     L1Prox(v3, 1.2);
-    math::ColumnVector<double> r3{ 0, 0.8 ,1.8 , 0, -0.8, -1.8, 0, 0 };
+    math::ColumnVector<double> r3{ 0, 0.8, 1.8, 0, -0.8, -1.8, 0, 0 };
 
     L1Prox(v4, 2.5);
-    math::ColumnVector<double> r4{ 0, 0 ,0.5 , 0, 0, -0.5, 0, 0 };
+    math::ColumnVector<double> r4{ 0, 0, 0.5, 0, 0, -0.5, 0, 0 };
 
     L1Prox(v5, 3.0);
     math::ColumnVector<double> r5(8);
@@ -73,23 +73,23 @@ void TestLInfinityProx()
 {
     std::vector<size_t> scratch;
 
-    math::ColumnVector<double> v1{ 1, 2 ,3 , -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v1{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
     LInfinityProx(v1, scratch, 1.0);
-    math::ColumnVector<double> r1{ 1, 2 ,2.5, -1, -2, -2.5, 0.5, -0.5 };
+    math::ColumnVector<double> r1{ 1, 2, 2.5, -1, -2, -2.5, 0.5, -0.5 };
 
-    math::ColumnVector<double> v2{ 1, 2 ,3 , -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v2{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
     LInfinityProx(v2, scratch, 2.0);
-    math::ColumnVector<double> r2{ 1, 2, 2 , -1, -2, -2, 0.5, -0.5 };
+    math::ColumnVector<double> r2{ 1, 2, 2, -1, -2, -2, 0.5, -0.5 };
 
-    math::ColumnVector<double> v3{ 1, 2 ,3 , -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v3{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
     LInfinityProx(v3, scratch, 3.0);
     math::ColumnVector<double> r3{ 1, 1.75, 1.75, -1, -1.75, -1.75, 0.5, -0.5 };
 
-    math::ColumnVector<double> v4{ 1, 2 ,3 , -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v4{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
     LInfinityProx(v4, scratch, v4.Norm1() - 0.1 * v4.Size());
     math::ColumnVector<double> r4{ 0.1, 0.1, 0.1, -0.1, -0.1, -0.1, 0.1, -0.1 };
 
-    math::ColumnVector<double> v5{ 1, 2 ,3 , -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v5{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
     LInfinityProx(v5, scratch, v5.Norm1());
     math::ColumnVector<double> r5(8);
 
@@ -129,8 +129,8 @@ void TestMatrixExampleSet()
     output.Generate([&]() { return normal(randomEngine); });
 
     // use the two matrices to create an example set
-    auto examples = std::make_shared<MatrixExampleSet<double>>( std::move(input), std::move(output) );
-    
+    auto examples = std::make_shared<MatrixExampleSet<double>>(std::move(input), std::move(output));
+
     // train an SGD optimizer on the example set
     auto optimizer = MakeSGDOptimizer<MatrixSolution<double>>(examples, MultivariateLoss<SquareLoss>{}, { 0.0001 });
     optimizer.PerformEpochs();

@@ -75,4 +75,4 @@ void TestMatchFormat()
     // parser error
     testMatchFormat(MatchResult::parserError, "integer X and float -33.3", "integer % and float %", int(), double());
 }
-}
+} // namespace ell

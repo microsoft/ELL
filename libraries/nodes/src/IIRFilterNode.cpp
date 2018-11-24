@@ -39,17 +39,23 @@ namespace nodes
             // std::reverse_copy(coeffs.begin()+1, coeffs.end(), std::back_inserter(result));
             return result;
         }
-    }
+    } // namespace detail
 
     template <typename ValueType>
-    IIRFilterNode<ValueType>::IIRFilterNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filter({}, {})
+    IIRFilterNode<ValueType>::IIRFilterNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0),
+        _filter({}, {})
     {
     }
 
     template <typename ValueType>
-    IIRFilterNode<ValueType>::IIRFilterNode(const model::OutputPort<ValueType>& input, const std::vector<ValueType>& b, const std::vector<ValueType>& a)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, _input.Size()), _filter(b, a)
+    IIRFilterNode<ValueType>::IIRFilterNode(const model::OutputPort<ValueType>& input, const std::vector<ValueType>& b, const std::vector<ValueType>& a) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, _input.Size()),
+        _filter(b, a)
     {
     }
 
@@ -100,8 +106,7 @@ namespace nodes
         emitters::LLVMValue yVar = function.Variable(emitters::GetVariableType<ValueType>(), "y");
 
         // Loop over input entries
-        function.For(inputSize, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue inputIndex)
-        {
+        function.For(inputSize, [=](emitters::IRFunctionEmitter& function, emitters::LLVMValue inputIndex) {
             auto* inputVal = function.ValueAt(pInput, inputIndex);
 
             // zero out accumulator
@@ -113,8 +118,7 @@ namespace nodes
 
             // compute dot product X dot B
             auto bOffset = function.LocalScalar((int)bSize - 1) - xIndex;
-            function.For(bSize, [prevInput, bCoeffs, bOffset, yVar](emitters::IRFunctionEmitter& function, emitters::LLVMValue iVar)
-            {
+            function.For(bSize, [prevInput, bCoeffs, bOffset, yVar](emitters::IRFunctionEmitter& function, emitters::LLVMValue iVar) {
                 auto i = function.LocalScalar(iVar);
                 auto xVal = function.LocalScalar(function.ValueAt(prevInput, i));
                 auto bVal = function.LocalScalar(function.ValueAt(bCoeffs, bOffset + i));
@@ -124,8 +128,7 @@ namespace nodes
             // compute dot product Y dot A
             auto yIndex = function.LocalScalar(function.Load(yIndexVar));
             auto aOffset = function.LocalScalar((int)aSize) - yIndex;
-            function.For(aSize, [prevOutput, aCoeffs, aOffset, yVar](emitters::IRFunctionEmitter& function, emitters::LLVMValue jVar)
-            {
+            function.For(aSize, [prevOutput, aCoeffs, aOffset, yVar](emitters::IRFunctionEmitter& function, emitters::LLVMValue jVar) {
                 auto j = function.LocalScalar(jVar);
                 auto yVal = function.LocalScalar(function.ValueAt(prevOutput, j));
                 auto aVal = function.LocalScalar(function.ValueAt(aCoeffs, aOffset + j));
@@ -165,5 +168,5 @@ namespace nodes
     //
     template class IIRFilterNode<float>;
     template class IIRFilterNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

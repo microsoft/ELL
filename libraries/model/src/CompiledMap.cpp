@@ -12,7 +12,9 @@ namespace ell
 {
 namespace model
 {
-    CompiledMap::CompiledMap(model::Map map, std::string functionName, const MapCompilerOptions& options)
-        : Map(std::move(map)), _functionName(functionName), _compilerOptions(options) {}
-}
-}
+    CompiledMap::CompiledMap(model::Map map, std::string functionName, const MapCompilerOptions& options) :
+        Map(std::move(map)),
+        _functionName(functionName),
+        _compilerOptions(options) {}
+} // namespace model
+} // namespace ell

@@ -11,29 +11,36 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType, typename FunctionType>
-    BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode()
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, defaultInput1PortName), _input2(this, {}, defaultInput2PortName), _output(this, defaultOutputPortName, 0), _paddingValue(0)
+    BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode() :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, {}, defaultInput1PortName),
+        _input2(this, {}, defaultInput2PortName),
+        _output(this, defaultOutputPortName, 0),
+        _paddingValue(0)
     {
     }
 
     template <typename ValueType, typename FunctionType>
-    BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2,
-        FunctionType function, ValueType padding)
-        : BinaryFunctionNode(input1, input2, input1.GetMemoryLayout(), function, padding)
+    BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, FunctionType function, ValueType padding) :
+        BinaryFunctionNode(input1, input2, input1.GetMemoryLayout(), function, padding)
     {
     }
 
     template <typename ValueType, typename FunctionType>
-    BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2,
-        const model::PortMemoryLayout& layout, FunctionType function, ValueType padding)
-        : BinaryFunctionNode(input1, input2, input1.GetMemoryLayout(), input1.GetMemoryLayout(), function, padding)
+    BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, const model::PortMemoryLayout& layout, FunctionType function, ValueType padding) :
+        BinaryFunctionNode(input1, input2, input1.GetMemoryLayout(), input1.GetMemoryLayout(), function, padding)
     {
     }
 
     template <typename ValueType, typename FunctionType>
-    BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2,
-        const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, defaultInput1PortName), _input2(this, input2, defaultInput2PortName), _inputLayout(inputLayout), _output(this, defaultOutputPortName, outputLayout), _function(std::move(function)), _paddingValue(padding)
+    BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding) :
+        CompilableNode({ &_input1, &_input2 }, { &_output }),
+        _input1(this, input1, defaultInput1PortName),
+        _input2(this, input2, defaultInput2PortName),
+        _inputLayout(inputLayout),
+        _output(this, defaultOutputPortName, outputLayout),
+        _function(std::move(function)),
+        _paddingValue(padding)
     {
         if (input1.Size() != input2.Size())
         {
@@ -43,8 +50,10 @@ namespace nodes
         if (inputLayout.GetActiveSize() != outputLayout.GetActiveSize())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                ell::utilities::FormatString("Input 1 active area size %d doesn't match input 2 active area size %d on BinaryFunctionNode %s",
-                    inputLayout.GetActiveSize().NumElements(), outputLayout.GetActiveSize().NumElements(), GetId().ToString().c_str()));
+                                            ell::utilities::FormatString("Input 1 active area size %d doesn't match input 2 active area size %d on BinaryFunctionNode %s",
+                                                                         inputLayout.GetActiveSize().NumElements(),
+                                                                         outputLayout.GetActiveSize().NumElements(),
+                                                                         GetId().ToString().c_str()));
         }
     }
 
@@ -240,5 +249,5 @@ namespace nodes
         archiver["outputLayout"] >> outputLayout;
         _output.SetMemoryLayout(outputLayout);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

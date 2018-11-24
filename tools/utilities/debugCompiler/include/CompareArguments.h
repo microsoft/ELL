@@ -34,11 +34,12 @@ struct CompareArguments
 };
 
 /// <summary> Arguments for parsed print. </summary>
-struct ParsedCompareArguments : public CompareArguments, public utilities::ParsedArgSet
+struct ParsedCompareArguments : public CompareArguments
+    , public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments. </summary>
     ///
     /// <param name="parser"> [in,out] The parser. </param>
     void AddArgs(utilities::CommandLineParser& parser) override;
 };
-}
+} // namespace ell

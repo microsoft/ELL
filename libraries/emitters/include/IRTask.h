@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "IRThreadPool.h"
 #include "IRAsyncTask.h"
+#include "IRThreadPool.h"
 #include "LLVMUtilities.h"
 
 // stl
@@ -75,13 +75,19 @@ namespace emitters
     private:
         friend class IRTaskArray;
         friend class IRFunctionEmitter;
-        enum class TaskType { async, threadPool };
+        enum class TaskType
+        {
+            async,
+            threadPool
+        };
         TaskType _type;
         union TaskUnion
         {
-            TaskUnion(const IRAsyncTask& task) : asyncTask(task) {}
-            TaskUnion(const IRThreadPoolTask& task) : threadPoolTask(task) {}
-            ~TaskUnion(){}
+            TaskUnion(const IRAsyncTask& task) :
+                asyncTask(task) {}
+            TaskUnion(const IRThreadPoolTask& task) :
+                threadPoolTask(task) {}
+            ~TaskUnion() {}
 
             IRAsyncTask asyncTask;
             IRThreadPoolTask threadPoolTask;
@@ -126,9 +132,11 @@ namespace emitters
         IRTask::TaskType _type;
         union TasksUnion
         {
-            TasksUnion(const std::vector<IRAsyncTask>& tasks) : asyncTasks(tasks) {}
-            TasksUnion(const IRThreadPoolTaskArray& tasks) : threadPoolTasks(tasks) {}
-            ~TasksUnion(){}
+            TasksUnion(const std::vector<IRAsyncTask>& tasks) :
+                asyncTasks(tasks) {}
+            TasksUnion(const IRThreadPoolTaskArray& tasks) :
+                threadPoolTasks(tasks) {}
+            ~TasksUnion() {}
 
             std::vector<IRAsyncTask> asyncTasks;
             IRThreadPoolTaskArray threadPoolTasks;
@@ -138,5 +146,5 @@ namespace emitters
         IRTaskArray(const IRThreadPoolTaskArray& threadPoolTasks);
     };
 
-}
-}
+} // namespace emitters
+} // namespace ell

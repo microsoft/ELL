@@ -16,9 +16,9 @@
 // nodes
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
+#include "BufferNode.h"
 #include "ConcatenationNode.h"
 #include "DCTNode.h"
-#include "BufferNode.h"
 #include "DelayNode.h"
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
@@ -72,7 +72,7 @@ namespace common
         builder.RegisterNodeCreator<nodes::ConcatenationNode<int>, const model::PortElements<int>&>();
         builder.RegisterNodeCreator<nodes::ConcatenationNode<float>, const model::PortElements<float>&>();
         builder.RegisterNodeCreator<nodes::ConcatenationNode<double>, const model::PortElements<double>&>();
-        
+
         builder.RegisterNodeCreator<nodes::ConcatenationNode<bool>, const model::PortElements<bool>&, const model::MemoryShape&>();
         builder.RegisterNodeCreator<nodes::ConcatenationNode<int>, const model::PortElements<int>&, const model::MemoryShape&>();
         builder.RegisterNodeCreator<nodes::ConcatenationNode<float>, const model::PortElements<float>&, const model::MemoryShape&>();
@@ -98,7 +98,7 @@ namespace common
 
         builder.RegisterNodeCreator<nodes::FFTNode<float>, const model::PortElements<float>&>();
         builder.RegisterNodeCreator<nodes::FFTNode<double>, const model::PortElements<double>&>();
-        
+
         builder.RegisterNodeCreator<nodes::HammingWindowNode<float>, const model::PortElements<float>&>();
         builder.RegisterNodeCreator<nodes::HammingWindowNode<double>, const model::PortElements<double>&>();
 
@@ -132,5 +132,5 @@ namespace common
         builder.RegisterNodeCreator<nodes::ValueSelectorNode<int>, const model::PortElements<bool>&, const model::PortElements<int>&, const model::PortElements<int>&>();
         builder.RegisterNodeCreator<nodes::ValueSelectorNode<double>, const model::PortElements<bool>&, const model::PortElements<double>&, const model::PortElements<double>&>();
     }
-}
-}
+} // namespace common
+} // namespace ell

@@ -11,8 +11,8 @@
 
 // data
 #include "DataVector.h"
-#include "Dataset.h"
 #include "DataVectorOperations.h"
+#include "Dataset.h"
 
 // math
 #include "VectorOperations.h"
@@ -28,18 +28,20 @@ namespace trainers
     //
 
     template <typename LossFunctionType>
-    SGDTrainer<LossFunctionType>::SGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters)
-        : SGDTrainerBase(parameters.randomSeedString), _lossFunction(lossFunction), _parameters(parameters)
+    SGDTrainer<LossFunctionType>::SGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters) :
+        SGDTrainerBase(parameters.randomSeedString),
+        _lossFunction(lossFunction),
+        _parameters(parameters)
     {
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     void SGDTrainer<LossFunctionType>::DoFirstStep(const data::AutoDataVector& x, double y, double weight)
     {
         DoNextStep(x, y, weight);
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     void SGDTrainer<LossFunctionType>::DoNextStep(const data::AutoDataVector& x, double y, double weight)
     {
         ResizeTo(x);
@@ -90,15 +92,17 @@ namespace trainers
 
     //
     // SparseDataSGDTrainer
-    // 
+    //
 
-    template<typename LossFunctionType>
-    SparseDataSGDTrainer<LossFunctionType>::SparseDataSGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters)
-        : SGDTrainerBase(parameters.randomSeedString), _lossFunction(lossFunction), _parameters(parameters)
+    template <typename LossFunctionType>
+    SparseDataSGDTrainer<LossFunctionType>::SparseDataSGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters) :
+        SGDTrainerBase(parameters.randomSeedString),
+        _lossFunction(lossFunction),
+        _parameters(parameters)
     {
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     void SparseDataSGDTrainer<LossFunctionType>::DoFirstStep(const data::AutoDataVector& x, double y, double weight)
     {
         ResizeTo(x);
@@ -110,7 +114,7 @@ namespace trainers
         _h = 1.0;
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     void SparseDataSGDTrainer<LossFunctionType>::DoNextStep(const data::AutoDataVector& x, double y, double weight)
     {
         ResizeTo(x);
@@ -119,11 +123,11 @@ namespace trainers
         // apply the predictor
         const double lambda = _parameters.regularization;
         double d = x * _v;
-        double p = -(d + _a) / (lambda * (_t-1.0));
+        double p = -(d + _a) / (lambda * (_t - 1.0));
 
         // get the derivative
         double g = weight * _lossFunction.GetDerivative(p, y);
-        
+
         // update
         _v.Transpose() += g * x;
         _a += g;
@@ -132,7 +136,7 @@ namespace trainers
         _h += 1.0 / _t;
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     auto SparseDataSGDTrainer<LossFunctionType>::GetLastPredictor() const -> const PredictorType&
     {
         const double lambda = _parameters.regularization;
@@ -146,7 +150,7 @@ namespace trainers
         return _lastPredictor;
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     auto SparseDataSGDTrainer<LossFunctionType>::GetAveragedPredictor() const -> const PredictorType&
     {
         const double lambda = _parameters.regularization;
@@ -157,7 +161,7 @@ namespace trainers
         w.Reset();
         w += -_h / (lambda * _t) * _v;
         w += 1 / (lambda * _t) * _u;
-        
+
         _averagedPredictor.GetBias() = -_c / (lambda * _t);
         return _averagedPredictor;
     }
@@ -175,17 +179,20 @@ namespace trainers
 
     //
     // SparseDataCenteredSGDTrainer
-    // 
+    //
 
-    template<typename LossFunctionType>
-    SparseDataCenteredSGDTrainer<LossFunctionType>::SparseDataCenteredSGDTrainer(const LossFunctionType& lossFunction, math::RowVector<double> center, const SGDTrainerParameters& parameters)
-        : SGDTrainerBase(parameters.randomSeedString), _lossFunction(lossFunction), _parameters(parameters), _center(std::move(center))
+    template <typename LossFunctionType>
+    SparseDataCenteredSGDTrainer<LossFunctionType>::SparseDataCenteredSGDTrainer(const LossFunctionType& lossFunction, math::RowVector<double> center, const SGDTrainerParameters& parameters) :
+        SGDTrainerBase(parameters.randomSeedString),
+        _lossFunction(lossFunction),
+        _parameters(parameters),
+        _center(std::move(center))
     {
         _theta = 1 + _center.Norm2Squared();
     }
 
-    template<typename LossFunctionType>
-    void SparseDataCenteredSGDTrainer<LossFunctionType>::DoFirstStep(const data::AutoDataVector& x, double y, double weight) 
+    template <typename LossFunctionType>
+    void SparseDataCenteredSGDTrainer<LossFunctionType>::DoFirstStep(const data::AutoDataVector& x, double y, double weight)
     {
         ResizeTo(x);
         _t = 1.0;
@@ -204,9 +211,9 @@ namespace trainers
         _s = _r;
     }
 
-    template<typename LossFunctionType>
-    void SparseDataCenteredSGDTrainer<LossFunctionType>::DoNextStep(const data::AutoDataVector& x, double y, double weight) 
-    { 
+    template <typename LossFunctionType>
+    void SparseDataCenteredSGDTrainer<LossFunctionType>::DoNextStep(const data::AutoDataVector& x, double y, double weight)
+    {
         ResizeTo(x);
         ++_t;
 
@@ -214,7 +221,7 @@ namespace trainers
         const double lambda = _parameters.regularization;
         double d = x * _v;
         double q = x * _center.Transpose();
-        double p = -(d + _r - _a * q) / (lambda * (_t-1.0));
+        double p = -(d + _r - _a * q) / (lambda * (_t - 1.0));
 
         // get the derivative
         double g = weight * _lossFunction.GetDerivative(p, y);
@@ -232,7 +239,7 @@ namespace trainers
         _s += _r / _t;
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     auto SparseDataCenteredSGDTrainer<LossFunctionType>::GetLastPredictor() const -> const PredictorType&
     {
         const double lambda = _parameters.regularization;
@@ -243,7 +250,7 @@ namespace trainers
         return _lastPredictor;
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     auto SparseDataCenteredSGDTrainer<LossFunctionType>::GetAveragedPredictor() const -> const PredictorType&
     {
         const double lambda = _parameters.regularization;
@@ -293,5 +300,5 @@ namespace trainers
     {
         return std::make_unique<SparseDataCenteredSGDTrainer<LossFunctionType>>(lossFunction, std::move(center), parameters);
     }
-}
-}
+} // namespace trainers
+} // namespace ell

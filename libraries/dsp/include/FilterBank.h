@@ -255,5 +255,5 @@ namespace dsp
 
     /// <summary> Convert a mel-scale frequency to Hz. </summary>
     double MelToFreq(double mel);
-}
-}
+} // namespace dsp
+} // namespace ell

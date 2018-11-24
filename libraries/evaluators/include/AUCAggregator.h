@@ -52,5 +52,5 @@ namespace evaluators
 
         mutable std::vector<Aggregate> _aggregates; // mutable because Get() const has to sort this vector
     };
-}
-}
+} // namespace evaluators
+} // namespace ell

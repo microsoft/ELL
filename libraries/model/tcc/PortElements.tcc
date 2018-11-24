@@ -15,20 +15,20 @@ namespace model
     //
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port)
-        : PortElementsBase(port)
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port) :
+        PortElementsBase(port)
     {
     }
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex)
-        : PortElementsBase(PortRange(port, startIndex))
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex) :
+        PortElementsBase(PortRange(port, startIndex))
     {
     }
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
-        : PortElementsBase(PortRange(port, startIndex, numValues))
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) :
+        PortElementsBase(PortRange(port, startIndex, numValues))
     {
     }
 
@@ -72,8 +72,8 @@ namespace model
     }
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const PortElements<ValueType>& elements, size_t index)
-        : PortElements(elements, index, 1)
+    PortElements<ValueType>::PortElements(const PortElements<ValueType>& elements, size_t index) :
+        PortElements(elements, index, 1)
     {
     }
 
@@ -183,5 +183,5 @@ namespace model
         return PortElements<ValueType>(ProxyToPortElements(model, proxy));
     }
 
-}
-}
+} // namespace model
+} // namespace ell

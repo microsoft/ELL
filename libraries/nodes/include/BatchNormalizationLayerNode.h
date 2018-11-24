@@ -65,5 +65,5 @@ namespace nodes
     private:
         void Copy(model::ModelTransformer& transformer) const override;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

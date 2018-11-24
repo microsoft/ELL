@@ -178,7 +178,7 @@ namespace emitters
         LLVMFunction _getCurrentTimeFunction = nullptr;
         LLVMFunction _stringCompareFunction = nullptr;
     };
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/IRRuntime.tcc"

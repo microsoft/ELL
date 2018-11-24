@@ -22,4 +22,4 @@ void ParsedCompareArguments::AddArgs(utilities::CommandLineParser& parser)
     parser.AddOption(writeGraph, "graph", "", "Write DGML graph", true);
     parser.AddOption(writePrediction, "pred", "", "Write prediction to report", true);
 }
-}
+} // namespace ell

@@ -18,4 +18,4 @@ void TestJsonUnarchiver();
 
 void TestXmlArchiver();
 void TestXmlUnarchiver();
-}
+} // namespace ell

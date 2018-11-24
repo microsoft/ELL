@@ -44,7 +44,7 @@ namespace data
         /// <summary> Returns a TextLine that contains the current line. </summary>
         ///
         /// <returns> A TextLine </returns>
-        TextLine GetTextLine() const { return _currentLine; } 
+        TextLine GetTextLine() const { return _currentLine; }
 
     private:
         std::istream& _stream;
@@ -52,5 +52,5 @@ namespace data
         TextLine _currentLine;
         char _delim;
     };
-}
-}
+} // namespace data
+} // namespace ell

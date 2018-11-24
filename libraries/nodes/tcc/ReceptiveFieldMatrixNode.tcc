@@ -31,10 +31,12 @@ namespace nodes
 
         // Note: this function is inline to suppress a compiler warning about it being unneeded
         inline emitters::LLVMValue GetValueFromVolume(emitters::IRFunctionEmitter& function,
-                                        emitters::LLVMValue inputVolume,
-                                        const model::PortMemoryLayout& inputLayout,
-                                        std::array<int, 3> dataOrder,
-                                        emitters::IRLocalScalar valueRow, emitters::IRLocalScalar valueColumn, emitters::IRLocalScalar valueChannel)
+                                                      emitters::LLVMValue inputVolume,
+                                                      const model::PortMemoryLayout& inputLayout,
+                                                      std::array<int, 3> dataOrder,
+                                                      emitters::IRLocalScalar valueRow,
+                                                      emitters::IRLocalScalar valueColumn,
+                                                      emitters::IRLocalScalar valueChannel)
         {
             const auto rowStride = inputLayout.GetExtent(0);
             const auto columnStride = inputLayout.GetExtent(1);
@@ -57,11 +59,13 @@ namespace nodes
 
         template <typename ValueType>
         emitters::LLVMValue GetValueFromPaddedVolume(emitters::IRFunctionEmitter& function,
-                                              emitters::LLVMValue inputVolume,
-                                              const model::PortMemoryLayout& inputLayout,
-                                              int convPadding,
-                                              std::array<int, 3> dataOrder,
-                                              emitters::IRLocalScalar inputRow, emitters::IRLocalScalar inputColumn, emitters::IRLocalScalar inputChannel)
+                                                     emitters::LLVMValue inputVolume,
+                                                     const model::PortMemoryLayout& inputLayout,
+                                                     int convPadding,
+                                                     std::array<int, 3> dataOrder,
+                                                     emitters::IRLocalScalar inputRow,
+                                                     emitters::IRLocalScalar inputColumn,
+                                                     emitters::IRLocalScalar inputChannel)
         {
             const int inputHeight = inputLayout.GetActiveSize(0);
             const int inputWidth = inputLayout.GetActiveSize(1);
@@ -161,7 +165,7 @@ namespace nodes
 
             // const int extraPadding = (int)convPadding - (int)inputPadding; // extraPadding is the amount of extra padding we need to do, on top of what's in the input data
             const int extraPadding = convPadding;
-            const bool useContiguousReshape = (dataOrder == std::array<int, 3>({{ 2, 0, 1 }})) && (stride == 1); // channel, row, column order, unit stride
+            const bool useContiguousReshape = (dataOrder == std::array<int, 3>({ { 2, 0, 1 } })) && (stride == 1); // channel, row, column order, unit stride
             if (useContiguousReshape)
             {
                 // assert(inputPadding == 0 && "Input data must not be padded");
@@ -265,7 +269,7 @@ namespace nodes
                     auto fieldRow = function.LocalScalar();
 
                     // TODO: use the entries of dataOrder to compute the indices
-                    if (dataOrder == std::array<int, 3>({{ 0, 1, 2 }})) // row, column, channel order
+                    if (dataOrder == std::array<int, 3>({ { 0, 1, 2 } })) // row, column, channel order
                     {
                         fieldChannel = f % inputDepth;
                         auto fDivDepth = f / inputDepth;
@@ -281,7 +285,7 @@ namespace nodes
                     }
 
                     // Now for each receptive field entry, iterate over all h * w locations in the output image
-                    function.For(outputHeight, [=, &fieldRow, &fieldColumn] (emitters::IRFunctionEmitter& function, emitters::LLVMValue outputImageRowValue) {
+                    function.For(outputHeight, [=, &fieldRow, &fieldColumn](emitters::IRFunctionEmitter& function, emitters::LLVMValue outputImageRowValue) {
                         auto outputImageRow = function.LocalScalar(outputImageRowValue);
                         auto inputRow = outputImageRow * stride;
                         function.For(outputWidth, [=, &fieldRow, &fieldColumn, &inputRow](emitters::IRFunctionEmitter& function, emitters::LLVMValue outputImageColumnValue) {
@@ -306,20 +310,37 @@ namespace nodes
                 });
             }
         }
-    }
+    } // namespace
 
     //
     // ReceptiveFieldMatrixNode
     //
     template <typename ValueType>
-    ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _filterWidth(0), _stride(0), _convolutionPadding(0), _dataOrder({{ 0, 1, 2 }}), _outputWidth(0), _outputHeight(0)
+    ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0),
+        _filterWidth(0),
+        _stride(0),
+        _convolutionPadding(0),
+        _dataOrder({ { 0, 1, 2 } }),
+        _outputWidth(0),
+        _outputHeight(0)
     {
     }
 
     template <typename ValueType>
-    ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, int filterWidth, int stride, int convolutionPadding, std::array<int, 3> dataOrder, int outputWidth, int outputHeight)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, model::PortMemoryLayout(model::MemoryShape{ outputWidth * outputHeight, filterWidth * filterWidth * inputMemoryLayout.GetLogicalDimensionActiveSize(2)}, model::DimensionOrder{ dataOrder }) ), _inputMemoryLayout(inputMemoryLayout), _filterWidth(filterWidth), _stride(stride), _convolutionPadding(convolutionPadding), _dataOrder(dataOrder), _outputWidth(outputWidth), _outputHeight(outputHeight)
+    ReceptiveFieldMatrixNode<ValueType>::ReceptiveFieldMatrixNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, int filterWidth, int stride, int convolutionPadding, std::array<int, 3> dataOrder, int outputWidth, int outputHeight) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, model::PortMemoryLayout(model::MemoryShape{ outputWidth * outputHeight, filterWidth * filterWidth * inputMemoryLayout.GetLogicalDimensionActiveSize(2) }, model::DimensionOrder{ dataOrder })),
+        _inputMemoryLayout(inputMemoryLayout),
+        _filterWidth(filterWidth),
+        _stride(stride),
+        _convolutionPadding(convolutionPadding),
+        _dataOrder(dataOrder),
+        _outputWidth(outputWidth),
+        _outputHeight(outputHeight)
     {
         if (inputMemoryLayout.NumDimensions() != 3)
         {
@@ -393,5 +414,5 @@ namespace nodes
         archiver["outputWidth"] >> _outputWidth;
         archiver["outputHeight"] >> _outputHeight;
     }
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

@@ -133,5 +133,5 @@ namespace utilities
     {
         return val ? "true" : "false";
     }
-}
-}
+} // namespace utilities
+} // namespace ell

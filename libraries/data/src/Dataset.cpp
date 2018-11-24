@@ -12,9 +12,11 @@ namespace ell
 {
 namespace data
 {
-    AnyDataset::AnyDataset(const DatasetBase* pDataset, size_t fromIndex, size_t size)
-        : _pDataset(pDataset), _fromIndex(fromIndex), _size(size)
+    AnyDataset::AnyDataset(const DatasetBase* pDataset, size_t fromIndex, size_t size) :
+        _pDataset(pDataset),
+        _fromIndex(fromIndex),
+        _size(size)
     {
     }
-}
-}
+} // namespace data
+} // namespace ell

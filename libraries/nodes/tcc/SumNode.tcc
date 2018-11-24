@@ -13,14 +13,18 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    SumNode<ValueType>::SumNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1)
+    SumNode<ValueType>::SumNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1)
     {
     }
 
     template <typename ValueType>
-    SumNode<ValueType>::SumNode(const model::OutputPort<ValueType>& input)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1)
+    SumNode<ValueType>::SumNode(const model::OutputPort<ValueType>& input) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1)
     {
     }
 
@@ -65,7 +69,6 @@ namespace nodes
             CompileExpanded(compiler, function);
         }
     }
-
 
     template <typename ValueType>
     void SumNode<ValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
@@ -146,7 +149,7 @@ namespace nodes
         const int epilogueSize = size - (vectorSize * numBlocks);
         if (epilogueSize > 0)
         {
-            for(int epilogueIndex = vectorSize * numBlocks; epilogueIndex < size; ++epilogueIndex)
+            for (int epilogueIndex = vectorSize * numBlocks; epilogueIndex < size; ++epilogueIndex)
             {
                 emitters::LLVMValue pValue = function.ValueAt(input, function.Literal<int>(epilogueIndex));
                 sum = function.Operator(emitters::GetAddForValueType<ValueType>(), sum, pValue);
@@ -181,5 +184,5 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
     }
-}
-}
+} // namespace nodes
+} // namespace ell

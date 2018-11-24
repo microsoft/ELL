@@ -76,5 +76,5 @@ namespace utilities
     template Image<int64_t> ParsePPMFile(const std::string& filename);
     template Image<float> ParsePPMFile(const std::string& filename);
     template Image<double> ParsePPMFile(const std::string& filename);
-}
-}
+} // namespace utilities
+} // namespace ell

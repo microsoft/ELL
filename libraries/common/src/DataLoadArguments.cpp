@@ -10,8 +10,8 @@
 #include "DataLoaders.h"
 
 // utilities
-#include "Files.h"
 #include "CStringParser.h"
+#include "Files.h"
 
 // stl
 #include <algorithm>
@@ -75,5 +75,5 @@ namespace common
 
         return parseErrorMessages;
     }
-}
-}
+} // namespace common
+} // namespace ell

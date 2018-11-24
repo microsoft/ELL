@@ -203,7 +203,7 @@ namespace emitters
     IRLocalScalar Max(ValueType a, IRLocalScalar b);
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar Max(IRLocalScalar a, ValueType b);
-}
-}
+} // namespace emitters
+} // namespace ell
 
 #include "../tcc/IRLocalScalar.tcc"

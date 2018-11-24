@@ -8,7 +8,6 @@
 
 #pragma once
 
-
 namespace ell
 {
 namespace model
@@ -18,7 +17,7 @@ namespace model
         normalize,
         // refine, // ??
         optimize
-    }; 
+    };
 
     enum class PreferredConvolutionMethod : int
     {
@@ -39,5 +38,5 @@ namespace model
         // phase
         OptimizerPhase phase = OptimizerPhase::optimize;
     };
-}
-}
+} // namespace model
+} // namespace ell

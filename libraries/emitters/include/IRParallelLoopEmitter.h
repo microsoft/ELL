@@ -24,8 +24,10 @@ namespace emitters
     /// <summary> Struct for options influencing parallel loop generation. </summary>
     struct ParallelLoopOptions
     {
-        ParallelLoopOptions() : numTasks(0) {}
-        ParallelLoopOptions(int numTasks) : numTasks(numTasks) {}
+        ParallelLoopOptions() :
+            numTasks(0) {}
+        ParallelLoopOptions(int numTasks) :
+            numTasks(numTasks) {}
 
         int numTasks = 0; // The number of tasks to break the loop into. '0' is the special 'auto' flag
     };
@@ -59,5 +61,5 @@ namespace emitters
 
         IRFunctionEmitter& _functionEmitter; // Loop written into this function
     };
-}
-}
+} // namespace emitters
+} // namespace ell

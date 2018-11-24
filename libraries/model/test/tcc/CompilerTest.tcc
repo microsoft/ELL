@@ -24,7 +24,7 @@ using namespace ell;
 template <typename ElementType>
 void TestLinearPredictor()
 {
-    std::vector<std::vector<ElementType>> signal{{ 1.0, 2.0, 1.0, -1.0, 0.5 }};
+    std::vector<std::vector<ElementType>> signal{ { 1.0, 2.0, 1.0, -1.0, 0.5 } };
 
     const int dim = 5;
     math::ColumnVector<ElementType> weights({ 1, 2, 3, 4, 5 });
@@ -49,4 +49,3 @@ void TestLinearPredictor()
     // compare output
     VerifyCompiledOutput(map, compiledMap, signal, " map");
 }
-

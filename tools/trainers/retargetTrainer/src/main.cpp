@@ -26,11 +26,11 @@
 #include "Evaluator.h"
 
 // functions
-#include "LogLoss.h"
-#include "SquaredLoss.h"
 #include "HingeLoss.h"
-#include "SmoothHingeLoss.h"
 #include "L2Regularizer.h"
+#include "LogLoss.h"
+#include "SmoothHingeLoss.h"
+#include "SquaredLoss.h"
 
 // model
 #include "InputNode.h"
@@ -117,7 +117,7 @@ bool RedirectModelOutputByPortElements(model::Map& map, const std::string& targe
         auto elementsProxy = model::ParsePortElementsProxy(targetPortElements);
         auto originalPortElement = model::ProxyToPortElements(map.GetModel(), elementsProxy);
 
-        // Create a copy of the refined model, setting the 
+        // Create a copy of the refined model, setting the
         // input to be the original input node and the output to be from the target
         // port elements.
         model::TransformContext context;
@@ -158,12 +158,14 @@ void PrintSDCAPredictorInfoValues(const trainers::SDCAPredictorInfo& info, std::
     os.precision(originalPrecision);
 }
 
-void PrintEvaluation(double dualityGap, double desiredPrecision, evaluators::IEvaluator<PredictorType>* evaluator,  std::ostream& os)
+void PrintEvaluation(double dualityGap, double desiredPrecision, evaluators::IEvaluator<PredictorType>* evaluator, std::ostream& os)
 {
     // Print evaluation of training
-    os << "Final duality Gap: " << dualityGap << std::endl << std::endl;
+    os << "Final duality Gap: " << dualityGap << std::endl
+       << std::endl;
     evaluator->Print(os);
-    os << std::endl << std::endl;
+    os << std::endl
+       << std::endl;
     if (dualityGap < desiredPrecision)
     {
         os << "Training completed successfully." << std::endl;
@@ -260,8 +262,7 @@ std::vector<data::AutoSupervisedDataset> CreateDatasetsForOneVersusRest(data::Au
         size_t negativeCount = (totalCount - classCounts[i]);
         double weightPositiveCase = 1.0 / (positiveCount ? positiveCount : 1.0);
         double weightNegativeCase = 1.0 / (negativeCount ? negativeCount : 1.0);
-        datasets[i] = multiclassDataset.Transform<data::AutoSupervisedExample>([i, weightPositiveCase, weightNegativeCase] (const auto& example)
-        {
+        datasets[i] = multiclassDataset.Transform<data::AutoSupervisedExample>([i, weightPositiveCase, weightNegativeCase](const auto& example) {
             if (example.GetMetadata().classIndex == i)
             {
                 // Positive case
@@ -316,7 +317,7 @@ model::Map GetMultiClassMapFromBinaryPredictors(std::vector<PredictorType>& bina
 
     // Apply a sigmoid function so that output can be treated as a probability or
     // confidence score.
-    auto sigmoidNode = model.AddNode<nodes::BroadcastUnaryFunctionNode<ElementType,nodes::SigmoidActivationFunction<ElementType>>>(
+    auto sigmoidNode = model.AddNode<nodes::BroadcastUnaryFunctionNode<ElementType, nodes::SigmoidActivationFunction<ElementType>>>(
         addNode->output,
         model::PortMemoryLayout({ static_cast<int>(addNode->output.Size()), 1, 1 }),
         model::PortMemoryLayout({ static_cast<int>(addNode->output.Size()), 1, 1 }));
@@ -395,7 +396,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
         if (retargetArguments.verbose) std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
 
-        _timer.Start();            
+        _timer.Start();
         // load map
         if (retargetArguments.verbose) std::cout << "Loading model from " << retargetArguments.inputModelFilename;
         auto map = common::LoadMap(retargetArguments.inputModelFilename);
@@ -439,32 +440,35 @@ int main(int argc, char* argv[])
         if (retargetArguments.multiClass)
         {
             // This is a multi-class dataset
-            _timer.Start();            
+            _timer.Start();
             auto stream = utilities::OpenIfstream(retargetArguments.inputDataFilename);
             auto multiclassDataset = common::GetMultiClassDataset(stream);
             if (retargetArguments.verbose) std::cout << "(" << _timer.Elapsed() << " ms)" << std::endl;
-            
+
             // Obtain a new training dataset for the set of Linear Predictors by running the
             // multiclassDataset through the modified model
-            if (retargetArguments.verbose) std::cout << std::endl << "Transforming dataset with compiled model...";
+            if (retargetArguments.verbose) std::cout << std::endl
+                                                     << "Transforming dataset with compiled model...";
             _timer.Start();
 
             auto dataset = common::TransformDatasetWithCompiledMap(multiclassDataset, map, retargetArguments.useBlas);
             if (retargetArguments.verbose) std::cout << "(" << _timer.Elapsed() << " ms)" << std::endl;
 
             // Create binary classification datasets for each one versus rest (OVR) case
-            if (retargetArguments.verbose) std::cout << std::endl << "Creating datasets for One vs Rest...";
-            _timer.Start();            
+            if (retargetArguments.verbose) std::cout << std::endl
+                                                     << "Creating datasets for One vs Rest...";
+            _timer.Start();
             auto datasets = CreateDatasetsForOneVersusRest(dataset);
             if (retargetArguments.verbose) std::cout << "(" << _timer.Elapsed() << " ms)" << std::endl;
 
             // Next, train a binary classifier for each case and combine into a
             // single model.
-            _timer.Start();            
+            _timer.Start();
             std::vector<PredictorType> predictors(datasets.size());
             for (size_t i = 0; i < datasets.size(); ++i)
             {
-                std::cout << std::endl << "=== Training binary classifier for class " << i << " vs Rest ===" << std::endl;
+                std::cout << std::endl
+                          << "=== Training binary classifier for class " << i << " vs Rest ===" << std::endl;
 
                 predictors[i] = RetargetModelUsingLinearPredictor(retargetArguments, datasets[i]);
             }
@@ -476,20 +480,21 @@ int main(int argc, char* argv[])
         else
         {
             // This is a binary classification dataset
-            _timer.Start();            
+            _timer.Start();
             auto stream = utilities::OpenIfstream(retargetArguments.inputDataFilename);
             auto binaryDataset = common::GetDataset(stream);
             if (retargetArguments.verbose) std::cout << "Loading dataset took :" << _timer.Elapsed() << " ms" << std::endl;
             // Obtain a new training dataset for the Linear Predictor by running the
             // binaryDataset through the modified model
-            if (retargetArguments.verbose) std::cout << std::endl << "Transforming dataset with compiled model...";
+            if (retargetArguments.verbose) std::cout << std::endl
+                                                     << "Transforming dataset with compiled model...";
             _timer.Start();
 
             auto dataset = common::TransformDatasetWithCompiledMap(binaryDataset, map);
             if (retargetArguments.verbose) std::cout << "(" << _timer.Elapsed() << " ms)" << std::endl;
 
             // Train a linear predictor whose input comes from the previous model
-            _timer.Start();            
+            _timer.Start();
             auto predictor = RetargetModelUsingLinearPredictor(retargetArguments, dataset);
             if (retargetArguments.verbose) std::cout << "Training completed... (" << _timer.Elapsed() << " ms)" << std::endl;
 
@@ -497,8 +502,10 @@ int main(int argc, char* argv[])
             result = GetRetargetedModel(predictor, map);
         }
         common::SaveMap(result, retargetArguments.outputModelFilename);
-        if (retargetArguments.verbose) std::cout << std::endl << "RetargetTrainer completed... (" << _overallTimer.Elapsed() << " ms)" << std::endl;
-        std::cout << std::endl << "New model saved as " << retargetArguments.outputModelFilename << std::endl;
+        if (retargetArguments.verbose) std::cout << std::endl
+                                                 << "RetargetTrainer completed... (" << _overallTimer.Elapsed() << " ms)" << std::endl;
+        std::cout << std::endl
+                  << "New model saved as " << retargetArguments.outputModelFilename << std::endl;
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

@@ -28,9 +28,9 @@ namespace model
 
     void OptimizationPassRegistry::AddPassesToOptimizer(ModelOptimizer& optimizer, const ModelOptimizerOptions& settings)
     {
-        for(const auto& pass: _passes)
+        for (const auto& pass : _passes)
         {
-            if(pass.isValidFunction(settings))
+            if (pass.isValidFunction(settings))
             {
                 optimizer.AddPass(pass.createFunction());
             }
@@ -41,5 +41,5 @@ namespace model
     {
         _passes.push_back(passInfo);
     }
-}
-}
+} // namespace model
+} // namespace ell

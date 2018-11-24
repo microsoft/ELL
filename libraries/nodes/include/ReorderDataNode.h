@@ -62,7 +62,7 @@ namespace nodes
         /// <summary> Constructor with reordering </summary>
         ///
         /// <param name="input"> The input to reorder. </param>
-        /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done. 
+        /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
         //    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///   set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
         ReorderDataNode(const model::OutputPort<ValueType>& input, const model::DimensionOrder& order);
@@ -146,7 +146,7 @@ namespace nodes
 
         ValueType _paddingValue;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/ReorderDataNode.tcc"

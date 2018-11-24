@@ -21,7 +21,6 @@
 #include <vector>
 namespace
 {
-
 }
 
 //
@@ -55,7 +54,6 @@ ell::math::RowVector<ValueType> Get1DReferenceConvolutionResult()
 {
     return MakeVector<ValueType>({ 0.77013919, 0.81368187, 0.56914835, 0.30732139, 0.34824032, 0.53571473, 0.48653128, 0.21208796, 0.17427497, 0.39217245, 0.44620757, 0.49905383, 0.74073549, 0.73957347 });
 }
-
 
 //
 // NOTE: The examples below were randomly-generated using
@@ -309,7 +307,6 @@ ell::math::ChannelColumnRowTensor<ValueType> GetSeparableReferenceConvolutionRes
         );
     // clang-format on
 }
-
 
 template ell::math::RowVector<float> Get1DReferenceFilter();
 template ell::math::RowVector<double> Get1DReferenceFilter();

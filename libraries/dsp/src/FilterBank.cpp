@@ -40,8 +40,11 @@ namespace dsp
     // TriangleFilter
     //
 
-    TriangleFilter::TriangleFilter(size_t lowBin, size_t centerBin, size_t highBin, size_t size)
-        : _lowBin(lowBin), _centerBin(centerBin), _highBin(highBin), _size(size) {}
+    TriangleFilter::TriangleFilter(size_t lowBin, size_t centerBin, size_t highBin, size_t size) :
+        _lowBin(lowBin),
+        _centerBin(centerBin),
+        _highBin(highBin),
+        _size(size) {}
 
     double TriangleFilter::operator[](size_t index)
     {
@@ -80,20 +83,24 @@ namespace dsp
     //
     // TriangleFilterBank
     //
-    TriangleFilterBank::TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters)
-        : TriangleFilterBank(windowSize, sampleRate, numFilters, 0, numFilters)
+    TriangleFilterBank::TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters) :
+        TriangleFilterBank(windowSize, sampleRate, numFilters, 0, numFilters)
     {
         // Note: Subclass implementations must explicitly call SetBins() in order to properly initialize the object
     }
 
-    TriangleFilterBank::TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse)
-        : TriangleFilterBank(windowSize, sampleRate, numFilters, 0, numFiltersToUse)
+    TriangleFilterBank::TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse) :
+        TriangleFilterBank(windowSize, sampleRate, numFilters, 0, numFiltersToUse)
     {
         // Note: Subclass implementations must explicitly call SetBins() in order to properly initialize the object
     }
 
-    TriangleFilterBank::TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter)
-        : _windowSize(windowSize), _sampleRate(sampleRate), _numFilters(numFilters), _beginFilter(beginFilter), _endFilter(endFilter)
+    TriangleFilterBank::TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter) :
+        _windowSize(windowSize),
+        _sampleRate(sampleRate),
+        _numFilters(numFilters),
+        _beginFilter(beginFilter),
+        _endFilter(endFilter)
     {
         // Note: Subclass implementations must explicitly call SetBins() in order to properly initialize the object
     }
@@ -190,18 +197,18 @@ namespace dsp
     // LinearFilterBank
     //
 
-    LinearFilterBank::LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters)
-        : LinearFilterBank(windowSize, sampleRate, numFilters, 0, numFilters)
+    LinearFilterBank::LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters) :
+        LinearFilterBank(windowSize, sampleRate, numFilters, 0, numFilters)
     {
     }
 
-    LinearFilterBank::LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse)
-        : LinearFilterBank(windowSize, sampleRate, numFilters, 0, numFiltersToUse)
+    LinearFilterBank::LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse) :
+        LinearFilterBank(windowSize, sampleRate, numFilters, 0, numFiltersToUse)
     {
     }
 
-    LinearFilterBank::LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter)
-        : TriangleFilterBank(windowSize, sampleRate, numFilters, beginFilter, endFilter)
+    LinearFilterBank::LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter) :
+        TriangleFilterBank(windowSize, sampleRate, numFilters, beginFilter, endFilter)
     {
         LinearFilterBank::InitializeBins();
     }
@@ -236,18 +243,18 @@ namespace dsp
     // MelFilterBank
     //
 
-    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters)
-        : MelFilterBank(windowSize, sampleRate, numFilters, 0, numFilters)
+    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters) :
+        MelFilterBank(windowSize, sampleRate, numFilters, 0, numFilters)
     {
     }
 
-    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse)
-        : MelFilterBank(windowSize, sampleRate, numFilters, 0, numFiltersToUse)
+    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse) :
+        MelFilterBank(windowSize, sampleRate, numFilters, 0, numFiltersToUse)
     {
     }
 
-    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter)
-        : TriangleFilterBank(windowSize, sampleRate, numFilters, beginFilter, endFilter)
+    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter) :
+        TriangleFilterBank(windowSize, sampleRate, numFilters, beginFilter, endFilter)
     {
         MelFilterBank::InitializeBins();
     }
@@ -290,5 +297,5 @@ namespace dsp
     template std::vector<double> TriangleFilterBank::FilterFourierCoefficients(const std::vector<std::complex<double>>& fourierCoefficients) const;
     template std::vector<float> TriangleFilterBank::FilterFourierCoefficientsFast(const std::vector<std::complex<float>>& fourierCoefficients) const;
     template std::vector<double> TriangleFilterBank::FilterFourierCoefficientsFast(const std::vector<std::complex<double>>& fourierCoefficients) const;
-}
-}
+} // namespace dsp
+} // namespace ell

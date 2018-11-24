@@ -38,17 +38,20 @@ namespace model
         {
             return (node.GetRuntimeTypeName().find("ConvolutionalLayerNode") == 0);
         }
-    }
+    } // namespace
 
     using namespace logging;
 
-    IRMapCompiler::IRMapCompiler()
-        : IRMapCompiler(MapCompilerOptions{})
+    IRMapCompiler::IRMapCompiler() :
+        IRMapCompiler(MapCompilerOptions{})
     {
     }
 
-    IRMapCompiler::IRMapCompiler(const MapCompilerOptions& settings)
-        : MapCompiler(settings), _moduleEmitter(settings.moduleName, settings.compilerSettings), _profiler(), _optimizer(settings)
+    IRMapCompiler::IRMapCompiler(const MapCompilerOptions& settings) :
+        MapCompiler(settings),
+        _moduleEmitter(settings.moduleName, settings.compilerSettings),
+        _profiler(),
+        _optimizer(settings)
     {
         Log() << "Initializing IR map compiler" << EOL;
         Log() << "Initializing optimizer" << EOL;
@@ -877,5 +880,5 @@ namespace model
             return pVal;
         }
     }
-}
-}
+} // namespace model
+} // namespace ell

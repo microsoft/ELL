@@ -9,7 +9,7 @@
 
 namespace ell
 {
-    void DataVectorParseTest();
-    void AutoDataVectorParseTest();
-    void SingleFileParseTest();
-}
+void DataVectorParseTest();
+void AutoDataVectorParseTest();
+void SingleFileParseTest();
+} // namespace ell

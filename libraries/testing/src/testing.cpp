@@ -20,8 +20,8 @@ namespace ell
 {
 namespace testing
 {
-    TestFailureException::TestFailureException(const std::string& testDescription)
-        : std::runtime_error(std::string("TestFailureException: ") + testDescription)
+    TestFailureException::TestFailureException(const std::string& testDescription) :
+        std::runtime_error(std::string("TestFailureException: ") + testDescription)
     {
     }
 
@@ -210,5 +210,5 @@ namespace testing
     template bool IsEqual(const std::vector<std::vector<float>>& a, const std::vector<std::vector<double>>& b, double tolerance);
     template bool IsEqual(const std::vector<std::vector<double>>& a, const std::vector<std::vector<float>>& b, double tolerance);
     template bool IsEqual(const std::vector<std::vector<double>>& a, const std::vector<std::vector<double>>& b, double tolerance);
-}
-}
+} // namespace testing
+} // namespace ell

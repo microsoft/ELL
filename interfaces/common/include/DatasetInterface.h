@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace ELL_API
@@ -36,6 +36,7 @@ public:
     /// <summary> Copy the data in this vector to the given float buffer, resizing the buffer if necessary. </summary>
     /// <param name="buffer"> The buffer to copy the data into. </param>
     void CopyTo(std::vector<float>& buffer);
+
 private:
     class AutoDataVectorImpl;
     friend class AutoSupervisedExample;
@@ -59,6 +60,7 @@ public:
     /// <summary> Returns the example data to be used in training or testing. </summary>
     /// <returns> The example data. </returns>
     AutoDataVector GetData() const;
+
 private:
     class AutoSupervisedExampleImpl;
     friend class AutoSupervisedDataset;
@@ -99,4 +101,4 @@ private:
     std::shared_ptr<AutoSupervisedDatasetImpl> _impl;
 };
 
-} // end namespace
+} // namespace ELL_API

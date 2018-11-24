@@ -96,7 +96,8 @@ namespace utilities
     //
     // DimensionVector
     //
-    DimensionVector::DimensionVector(const std::vector<size_t>& elements) : _data(elements.size())
+    DimensionVector::DimensionVector(const std::vector<size_t>& elements) :
+        _data(elements.size())
     {
         std::transform(elements.begin(), elements.end(), _data.begin(), [](size_t x) { return static_cast<int>(x); });
     }
@@ -105,12 +106,14 @@ namespace utilities
     // DimensionOrder
     //
 
-    DimensionOrder::DimensionOrder(int numDimensions) : DimensionVector(std::vector<int>(numDimensions))
+    DimensionOrder::DimensionOrder(int numDimensions) :
+        DimensionVector(std::vector<int>(numDimensions))
     {
         std::iota(_data.begin(), _data.end(), 0);
     }
 
-    DimensionOrder::DimensionOrder(const std::vector<int>& order) : DimensionVector(order)
+    DimensionOrder::DimensionOrder(const std::vector<int>& order) :
+        DimensionVector(order)
     {
         std::vector<int> test(order.size());
         std::iota(test.begin(), test.end(), 0);
@@ -121,7 +124,8 @@ namespace utilities
         }
     }
 
-    DimensionOrder::DimensionOrder(const std::initializer_list<int>& order) : DimensionVector(order)
+    DimensionOrder::DimensionOrder(const std::initializer_list<int>& order) :
+        DimensionVector(order)
     {
         std::vector<int> test(order.size());
         std::iota(test.begin(), test.end(), 0);
@@ -173,13 +177,11 @@ namespace utilities
     // MemoryLayout
     //
     MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize) :
-        MemoryLayout(physicalDimensionSize, physicalDimensionSize,
-                     MemoryShape(std::vector<int>(physicalDimensionSize.NumDimensions(), 0)))
+        MemoryLayout(physicalDimensionSize, physicalDimensionSize, MemoryShape(std::vector<int>(physicalDimensionSize.NumDimensions(), 0)))
     {}
 
     MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionPadding) :
-        MemoryLayout(physicalDimensionSize, CreateExtent(physicalDimensionSize, physicalDimensionPadding),
-                     physicalDimensionPadding)
+        MemoryLayout(physicalDimensionSize, CreateExtent(physicalDimensionSize, physicalDimensionPadding), physicalDimensionPadding)
     {
         for (int index = 0; index < _size.NumDimensions(); ++index)
         {
@@ -190,28 +192,20 @@ namespace utilities
         }
     }
 
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
-                               const MemoryShape& physicalDimensionOffset) :
-        MemoryLayout(physicalDimensionSize, physicalDimensionExtent, physicalDimensionOffset,
-                     ContiguousCumulativeIncrement(physicalDimensionExtent))
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent, const MemoryShape& physicalDimensionOffset) :
+        MemoryLayout(physicalDimensionSize, physicalDimensionExtent, physicalDimensionOffset, ContiguousCumulativeIncrement(physicalDimensionExtent))
     {}
 
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
-                               const MemoryShape& physicalDimensionOffset,
-                               const MemoryShape& physicalDimensionIncrement) :
-        MemoryLayout(physicalDimensionSize, physicalDimensionExtent, physicalDimensionOffset,
-                     physicalDimensionIncrement, physicalDimensionSize.NumDimensions())
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent, const MemoryShape& physicalDimensionOffset, const MemoryShape& physicalDimensionIncrement) :
+        MemoryLayout(physicalDimensionSize, physicalDimensionExtent, physicalDimensionOffset, physicalDimensionIncrement, physicalDimensionSize.NumDimensions())
     {}
 
     MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const DimensionOrder& order) :
-        MemoryLayout(physicalDimensionSize, physicalDimensionSize,
-                     MemoryShape(std::vector<int>(physicalDimensionSize.NumDimensions(), 0)), order)
+        MemoryLayout(physicalDimensionSize, physicalDimensionSize, MemoryShape(std::vector<int>(physicalDimensionSize.NumDimensions(), 0)), order)
     {}
 
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionPadding,
-                               const DimensionOrder& order) :
-        MemoryLayout(physicalDimensionSize, CreateExtent(physicalDimensionSize, physicalDimensionPadding),
-                     physicalDimensionPadding, order)
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionPadding, const DimensionOrder& order) :
+        MemoryLayout(physicalDimensionSize, CreateExtent(physicalDimensionSize, physicalDimensionPadding), physicalDimensionPadding, order)
     {
         for (int index = 0; index < _size.NumDimensions(); ++index)
         {
@@ -222,15 +216,11 @@ namespace utilities
         }
     }
 
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
-                               const MemoryShape& physicalDimensionOffset, const DimensionOrder& order) :
-        MemoryLayout(physicalDimensionSize, physicalDimensionExtent, physicalDimensionOffset,
-                     ContiguousCumulativeIncrement(physicalDimensionExtent), order)
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent, const MemoryShape& physicalDimensionOffset, const DimensionOrder& order) :
+        MemoryLayout(physicalDimensionSize, physicalDimensionExtent, physicalDimensionOffset, ContiguousCumulativeIncrement(physicalDimensionExtent), order)
     {}
 
-    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent,
-                               const MemoryShape& physicalDimensionOffset,
-                               const MemoryShape& physicalDimensionIncrement, const DimensionOrder& order) :
+    MemoryLayout::MemoryLayout(const MemoryShape& physicalDimensionSize, const MemoryShape& physicalDimensionExtent, const MemoryShape& physicalDimensionOffset, const MemoryShape& physicalDimensionIncrement, const DimensionOrder& order) :
         _size(physicalDimensionSize),
         _extent(physicalDimensionExtent),
         _offset(physicalDimensionOffset),

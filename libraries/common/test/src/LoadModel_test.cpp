@@ -6,8 +6,8 @@
 #include "LoadModel_test.h"
 
 // common
-#include "LoadTestModels.h"
 #include "Files.h"
+#include "LoadTestModels.h"
 
 // model
 #include "Model.h"
@@ -78,4 +78,4 @@ void TestSaveModels()
     auto newTree2 = common::LoadModel("tree_2." + ext);
     auto newTree3 = common::LoadModel("tree_3." + ext);
 }
-}
+} // namespace ell

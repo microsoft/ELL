@@ -40,5 +40,5 @@ namespace trainers
         }
         return current - begin + 1;
     }
-}
-}
+} // namespace trainers
+} // namespace ell

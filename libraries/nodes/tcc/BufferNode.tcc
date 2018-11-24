@@ -11,15 +11,21 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    BufferNode<ValueType>::BufferNode(const model::OutputPort<ValueType>& input, size_t windowSize)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, windowSize), _windowSize(windowSize)
+    BufferNode<ValueType>::BufferNode(const model::OutputPort<ValueType>& input, size_t windowSize) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, windowSize),
+        _windowSize(windowSize)
     {
         _samples.resize(windowSize);
     }
 
     template <typename ValueType>
-    BufferNode<ValueType>::BufferNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0), _windowSize(0)
+    BufferNode<ValueType>::BufferNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0),
+        _windowSize(0)
     {
     }
 
@@ -94,5 +100,5 @@ namespace nodes
         _samples.resize(_windowSize);
         _output.SetSize(_windowSize);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

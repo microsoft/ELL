@@ -40,8 +40,8 @@ namespace emitters
     //
     // IRProfileRegionBlock
     //
-    IRProfileRegionBlock::IRProfileRegionBlock(IRFunctionEmitter& function, const std::string& name)
-        : _region(function, name)
+    IRProfileRegionBlock::IRProfileRegionBlock(IRFunctionEmitter& function, const std::string& name) :
+        _region(function, name)
     {
         _region.Enter();
     }
@@ -54,16 +54,22 @@ namespace emitters
     //
     // IRProfileRegion
     //
-    IRProfileRegion::IRProfileRegion(IRFunctionEmitter& function, const std::string& name)
-        : _function(function), _profiler(function.GetModule().GetProfiler()), _index(function.LocalScalar()), _startTime(function.LocalScalar())
+    IRProfileRegion::IRProfileRegion(IRFunctionEmitter& function, const std::string& name) :
+        _function(function),
+        _profiler(function.GetModule().GetProfiler()),
+        _index(function.LocalScalar()),
+        _startTime(function.LocalScalar())
     {
         _index = _profiler.CreateRegion(_function);
         _profiler.InitRegion(*this, name);
     }
 
     // Private constructor for use by IRProfiler
-    IRProfileRegion::IRProfileRegion(IRFunctionEmitter& function, IRProfiler& profiler, const std::string& name, IRLocalScalar index)
-        : _function(function), _profiler(profiler), _index(index), _startTime(function.LocalScalar())
+    IRProfileRegion::IRProfileRegion(IRFunctionEmitter& function, IRProfiler& profiler, const std::string& name, IRLocalScalar index) :
+        _function(function),
+        _profiler(profiler),
+        _index(index),
+        _startTime(function.LocalScalar())
     {
     }
 
@@ -85,8 +91,9 @@ namespace emitters
     //
     // IRProfiler
     //
-    IRProfiler::IRProfiler(emitters::IRModuleEmitter& module, bool enableProfiling)
-        : _module(&module), _profilingEnabled(enableProfiling)
+    IRProfiler::IRProfiler(emitters::IRModuleEmitter& module, bool enableProfiling) :
+        _module(&module),
+        _profilingEnabled(enableProfiling)
     {
     }
 
@@ -199,7 +206,6 @@ namespace emitters
         function.StoreZero(timePtr);
     }
 
-
     std::string IRProfiler::GetUniqueRegionName(const std::string& desiredName) const
     {
         // Ensure name is unique
@@ -211,7 +217,7 @@ namespace emitters
         }
         return regionName;
     }
-    
+
     IRLocalScalar IRProfiler::CreateRegion(IRFunctionEmitter& function)
     {
         if (!_profilingEnabled)
@@ -391,5 +397,5 @@ namespace emitters
         auto regionPtr = function.PointerOffset(regions, index);
         return regionPtr;
     }
-}
-}
+} // namespace emitters
+} // namespace ell

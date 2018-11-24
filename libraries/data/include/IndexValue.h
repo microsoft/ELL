@@ -34,6 +34,10 @@ namespace data
     using IsIndexValueIterator = typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IteratorType>::value, bool>;
 
     /// <summary> Iteration policies. </summary>
-    enum class IterationPolicy { all, skipZeros };
-}
-}
+    enum class IterationPolicy
+    {
+        all,
+        skipZeros
+    };
+} // namespace data
+} // namespace ell

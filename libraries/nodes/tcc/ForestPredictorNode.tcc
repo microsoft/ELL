@@ -23,14 +23,23 @@ namespace ell
 namespace nodes
 {
     template <typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictorNode<SplitRuleType, EdgePredictorType>::ForestPredictorNode(const model::OutputPort<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest)
-        : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
+    ForestPredictorNode<SplitRuleType, EdgePredictorType>::ForestPredictorNode(const model::OutputPort<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest) :
+        Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1),
+        _treeOutputs(this, treeOutputsPortName, forest.NumTrees()),
+        _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()),
+        _forest(forest)
     {
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictorNode<SplitRuleType, EdgePredictorType>::ForestPredictorNode()
-        : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1), _treeOutputs(this, treeOutputsPortName, 0), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, 0)
+    ForestPredictorNode<SplitRuleType, EdgePredictorType>::ForestPredictorNode() :
+        Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1),
+        _treeOutputs(this, treeOutputsPortName, 0),
+        _edgeIndicatorVector(this, edgeIndicatorVectorPortName, 0)
     {
     }
 
@@ -170,7 +179,7 @@ namespace nodes
     {
         // forest output
         auto inputDataVector = typename ForestPredictor::DataVectorType(_input.GetValue());
-        _output.SetOutput({_forest.Predict(inputDataVector)});
+        _output.SetOutput({ _forest.Predict(inputDataVector) });
 
         // individual tree outputs
         std::vector<double> treeOutputs(_forest.NumTrees());
@@ -184,5 +193,5 @@ namespace nodes
         auto edgeIndicator = _forest.GetEdgeIndicatorVector(inputDataVector);
         _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
-}
-}
+} // namespace nodes
+} // namespace ell

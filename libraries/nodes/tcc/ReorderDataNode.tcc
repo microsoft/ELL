@@ -142,7 +142,8 @@ namespace nodes
     template <typename ValueType>
     ReorderDataNode<ValueType>::ReorderDataNode(const model::OutputPort<ValueType>& input,
                                                 const model::PortMemoryLayout& outputMemoryLayout,
-                                                const model::DimensionOrder& order, ValueType paddingValue) :
+                                                const model::DimensionOrder& order,
+                                                ValueType paddingValue) :
         CompilableNode({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, outputMemoryLayout.ReorderedCopy(order)),
@@ -160,7 +161,8 @@ namespace nodes
     ReorderDataNode<ValueType>::ReorderDataNode(const model::OutputPort<ValueType>& input,
                                                 const model::PortMemoryLayout& inputMemoryLayout,
                                                 const model::PortMemoryLayout& outputMemoryLayout,
-                                                const model::DimensionOrder& order, ValueType paddingValue) :
+                                                const model::DimensionOrder& order,
+                                                ValueType paddingValue) :
         CompilableNode({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, outputMemoryLayout.ReorderedCopy(order)),
@@ -217,7 +219,8 @@ namespace nodes
     template <typename ValueType>
     void ReorderDataNode<ValueType>::ComputeDimensionLoop(const model::PortMemoryLayout& inputMemoryLayout,
                                                           const model::PortMemoryLayout& outputMemoryLayout,
-                                                          int dimension, std::vector<int>& coordinates,
+                                                          int dimension,
+                                                          std::vector<int>& coordinates,
                                                           std::vector<ValueType>& output) const
     {
         if (dimension == inputMemoryLayout.NumDimensions() - 1) // last dimension

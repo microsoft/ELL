@@ -9,4 +9,4 @@ namespace ell
 {
 void TestLoadDataset(const std::string& examplePath);
 void TestLoadMappedDataset(const std::string& examplePath);
-}
+} // namespace ell

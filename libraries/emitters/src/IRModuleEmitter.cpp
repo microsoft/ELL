@@ -6,13 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "IRModuleEmitter.h"
 #include "EmitterException.h"
 #include "IRAssemblyWriter.h"
 #include "IRDiagnosticHandler.h"
 #include "IRHeaderWriter.h"
 #include "IRLoader.h"
 #include "IRMetadata.h"
-#include "IRModuleEmitter.h"
 #include "IRSwigInterfaceWriter.h"
 #include "LLVMUtilities.h"
 
@@ -42,7 +42,6 @@ namespace emitters
     using namespace utilities::logging;
     using utilities::logging::Log;
 
-
     namespace
     {
         static const size_t c_defaultNumBits = 64;
@@ -70,14 +69,18 @@ namespace emitters
         std::string c_armDataLayout = "e-m:e-p:32:32-i64:64-v128:64:128-a:0:32-n32-S64";
         std::string c_arm64DataLayout = "e-m:e-i64:64-i128:128-n32:64-S128"; // DragonBoard
         std::string c_iosDataLayout = "e-m:o-i64:64-i128:128-n32:64-S128";
-    }
+    } // namespace
 
     //
     // Constructors
     //
 
-    IRModuleEmitter::IRModuleEmitter(const std::string& moduleName, const CompilerOptions& parameters)
-        : _llvmContext(new llvm::LLVMContext()), _emitter(*_llvmContext), _runtime(*this), _threadPool(*this), _profiler(*this, parameters.profile)
+    IRModuleEmitter::IRModuleEmitter(const std::string& moduleName, const CompilerOptions& parameters) :
+        _llvmContext(new llvm::LLVMContext()),
+        _emitter(*_llvmContext),
+        _runtime(*this),
+        _threadPool(*this),
+        _profiler(*this, parameters.profile)
     {
         InitializeLLVM();
         InitializeGlobalPassRegistry();
@@ -1204,5 +1207,5 @@ namespace emitters
         parameters.targetDevice.deviceName = "host";
         return { moduleName, parameters };
     }
-}
-}
+} // namespace emitters
+} // namespace ell

@@ -67,7 +67,7 @@ namespace nodes
                         const auto inputDepth = inputLayout.GetActiveSize(2);
 
                         // The filters are typically small, so we unroll the loops here
-                        auto val = function.LocalScalar(ValueType{0});
+                        auto val = function.LocalScalar(ValueType{ 0 });
                         for (int windowRow = 0; windowRow < filterSize; ++windowRow)
                         {
                             // Note: if the memory storage from consecutive columns is contiguous, we can process them together and avoid a loop
@@ -104,7 +104,7 @@ namespace nodes
             }); // End numFilters loop
         }
 
-        template<typename ValueType>
+        template <typename ValueType>
         void EmitSimpleDepthwiseSeparableConvolutionCode(IRFunctionEmitter& function, LLVMValue input, LLVMValue filterWeights, const PortMemoryLayout& inputLayout, const PortMemoryLayout& outputLayout, int filterSize, int stride, LLVMValue result)
         {
             const auto inputDepth = inputLayout.GetActiveSize(2);
@@ -129,7 +129,7 @@ namespace nodes
 
                 auto inputTensor = function.LocalTensor(input, inputLayout.GetExtent().ToVector(), RowMajorTensorLayout);
                 auto outputTensor = function.LocalTensor(result, outputLayout.GetExtent().ToVector(), RowMajorTensorLayout);
-                auto filter = function.LocalMultidimArray(filterWeights, { inputLayout.GetExtent(2), filterSize, filterSize});
+                auto filter = function.LocalMultidimArray(filterWeights, { inputLayout.GetExtent(2), filterSize, filterSize });
 
                 // For each output column
                 const auto outputColumns = outputLayout.GetActiveSize(1);
@@ -138,7 +138,7 @@ namespace nodes
                     const auto numFilters = outputLayout.GetActiveSize(2);
                     function.For(numFilters, [outputRow, outputColumn, inputTensor, filter, outputTensor, filterSize, stride](IRFunctionEmitter& function, auto filterIndex) {
                         // The filters are typically small, so we unroll the loops here
-                        auto val = function.LocalScalar(ValueType{0});
+                        auto val = function.LocalScalar(ValueType{ 0 });
                         for (int windowRow = 0; windowRow < filterSize; ++windowRow)
                         {
                             for (int windowColumn = 0; windowColumn < filterSize; ++windowColumn)
@@ -166,24 +166,31 @@ namespace nodes
     // SimpleConvolutionNode
     //
 
-    template<typename ValueType>
-    SimpleConvolutionNode<ValueType>::SimpleConvolutionNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 0)
+    template <typename ValueType>
+    SimpleConvolutionNode<ValueType>::SimpleConvolutionNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     SimpleConvolutionNode<ValueType>::SimpleConvolutionNode(const model::OutputPort<ValueType>& input,
                                                             const model::PortMemoryLayout& inputMemoryLayout,
                                                             const model::PortMemoryLayout& outputMemoryLayout,
                                                             const ConstTensorReferenceType& filterWeights,
-                                                            size_t stride)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterWeights(filterWeights), _stride(static_cast<int>(stride))
+                                                            size_t stride) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, outputMemoryLayout),
+        _inputMemoryLayout(inputMemoryLayout),
+        _filterWeights(filterWeights),
+        _stride(static_cast<int>(stride))
     {
         _isDepthwiseSeparable = (filterWeights.NumChannels() == 1) && (inputMemoryLayout.GetActiveSize()[2] > 1);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void SimpleConvolutionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& newInput = transformer.GetCorrespondingInputs(_input);
@@ -191,7 +198,7 @@ namespace nodes
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     bool SimpleConvolutionNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         const auto& newInput = transformer.GetCorrespondingInputs(this->input);
@@ -206,13 +213,13 @@ namespace nodes
         return true;
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void SimpleConvolutionNode<ValueType>::Compute() const
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void SimpleConvolutionNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         model::CompilableNode::WriteToArchive(archiver);
@@ -223,7 +230,7 @@ namespace nodes
         math::TensorArchiver::Write(_filterWeights, "weights", archiver);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void SimpleConvolutionNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         model::CompilableNode::ReadFromArchive(archiver);
@@ -242,25 +249,35 @@ namespace nodes
     // SimpleConvolutionComputeNode
     //
 
-    template<typename ValueType>
-    SimpleConvolutionComputeNode<ValueType>::SimpleConvolutionComputeNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _filterWeights(this, {}, filterWeightsPortName), _output(this, defaultOutputPortName, 0)
+    template <typename ValueType>
+    SimpleConvolutionComputeNode<ValueType>::SimpleConvolutionComputeNode() :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _filterWeights(this, {}, filterWeightsPortName),
+        _output(this, defaultOutputPortName, 0)
     {
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     SimpleConvolutionComputeNode<ValueType>::SimpleConvolutionComputeNode(const model::OutputPort<ValueType>& input,
                                                                           const model::OutputPort<ValueType>& filterWeights,
                                                                           const model::PortMemoryLayout& inputMemoryLayout,
                                                                           const model::PortMemoryLayout& outputMemoryLayout,
                                                                           int filterSize,
                                                                           int stride,
-                                                                          bool isDepthwiseSeparable)
-        : CompilableNode({ &_input, &_filterWeights }, { &_output }), _input(this, input, defaultInputPortName), _filterWeights(this, filterWeights, filterWeightsPortName), _output(this, defaultOutputPortName, outputMemoryLayout), _inputMemoryLayout(inputMemoryLayout), _filterSize(filterSize), _stride(stride), _isDepthwiseSeparable(isDepthwiseSeparable)
+                                                                          bool isDepthwiseSeparable) :
+        CompilableNode({ &_input, &_filterWeights }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _filterWeights(this, filterWeights, filterWeightsPortName),
+        _output(this, defaultOutputPortName, outputMemoryLayout),
+        _inputMemoryLayout(inputMemoryLayout),
+        _filterSize(filterSize),
+        _stride(stride),
+        _isDepthwiseSeparable(isDepthwiseSeparable)
     {
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void SimpleConvolutionComputeNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& newInput = transformer.GetCorrespondingInputs(_input);
@@ -269,7 +286,7 @@ namespace nodes
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void SimpleConvolutionComputeNode<ValueType>::Compute() const
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
@@ -280,7 +297,7 @@ namespace nodes
     // d: # input channels
     // f: # filters (== output channels)
 
-    template<typename ValueType>
+    template <typename ValueType>
     void SimpleConvolutionComputeNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         // input is a d x (w+2p) x (h+2p) array
@@ -314,5 +331,5 @@ namespace nodes
     // Explicit specializations
     template class SimpleConvolutionNode<float>;
     template class SimpleConvolutionNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

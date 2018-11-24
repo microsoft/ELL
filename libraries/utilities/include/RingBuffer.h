@@ -57,14 +57,14 @@ namespace utilities
 
         /// <summary> Resize the ring buffer and reset the current position to zero. </summary>
         void Resize(size_t size);
-        
+
     private:
         size_t GetBufferIndex(int inputIndex) const;
 
         std::vector<T> _buffer;
         size_t _currentPos = 0;
     };
-}
-}
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/RingBuffer.tcc"

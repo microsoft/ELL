@@ -65,5 +65,5 @@ namespace functions
         static constexpr double _conjugateProxDesiredPrecision = 1.0e-6;
         static constexpr size_t _conjugateProxMaxIterations = 20;
     };
-}
-}
+} // namespace functions
+} // namespace ell

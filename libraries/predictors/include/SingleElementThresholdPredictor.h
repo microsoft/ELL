@@ -17,15 +17,16 @@
 #include "IArchivable.h"
 
 // stl
-#include <string>
 #include <ostream>
+#include <string>
 
 namespace ell
 {
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
-    class SingleElementThresholdPredictor : public IPredictor<bool>, public utilities::IArchivable
+    class SingleElementThresholdPredictor : public IPredictor<bool>
+        , public utilities::IArchivable
     {
     public:
         using DataVectorType = data::FloatDataVector;
@@ -82,5 +83,5 @@ namespace predictors
         size_t _index;
         double _threshold;
     };
-}
-}
+} // namespace predictors
+} // namespace ell

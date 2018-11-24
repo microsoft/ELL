@@ -19,5 +19,5 @@ namespace passes
 {
     /// <summary> Add standard passes to the registry </summary>
     void AddStandardPassesToRegistry();
-}
-}
+} // namespace passes
+} // namespace ell

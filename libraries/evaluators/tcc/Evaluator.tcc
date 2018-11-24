@@ -16,8 +16,10 @@ namespace ell
 namespace evaluators
 {
     template <typename PredictorType, typename... AggregatorTypes>
-    Evaluator<PredictorType, AggregatorTypes...>::Evaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
-        : _dataset(anyDataset), _evaluatorParameters(evaluatorParameters), _aggregatorTuple(std::make_tuple(aggregators...))
+    Evaluator<PredictorType, AggregatorTypes...>::Evaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators) :
+        _dataset(anyDataset),
+        _evaluatorParameters(evaluatorParameters),
+        _aggregatorTuple(std::make_tuple(aggregators...))
     {
         static_assert(sizeof...(AggregatorTypes) > 0, "Evaluator must contains at least one aggregator");
 
@@ -126,11 +128,11 @@ namespace evaluators
 
     template <typename PredictorType, typename... AggregatorTypes>
     template <typename AggregatorT>
-    Evaluator<PredictorType, AggregatorTypes...>::ElementUpdater<AggregatorT>::ElementUpdater(AggregatorT& aggregator, const ElementUpdaterParameters& params)
-            : _params(params), _aggregator(aggregator) 
-            {
-            }
-
+    Evaluator<PredictorType, AggregatorTypes...>::ElementUpdater<AggregatorT>::ElementUpdater(AggregatorT& aggregator, const ElementUpdaterParameters& params) :
+        _params(params),
+        _aggregator(aggregator)
+    {
+    }
 
     template <typename PredictorType, typename... AggregatorTypes>
     template <typename AggregatorT>
@@ -141,11 +143,10 @@ namespace evaluators
 
     template <typename PredictorType, typename... AggregatorTypes>
     template <typename AggregatorT>
-    Evaluator<PredictorType, AggregatorTypes...>::ElementResetter<AggregatorT>::ElementResetter(AggregatorT& aggregator)
-            : _aggregator(aggregator)
+    Evaluator<PredictorType, AggregatorTypes...>::ElementResetter<AggregatorT>::ElementResetter(AggregatorT& aggregator) :
+        _aggregator(aggregator)
     {
     }
-
 
     template <typename PredictorType, typename... AggregatorTypes>
     template <typename AggregatorT>
@@ -158,14 +159,14 @@ namespace evaluators
     template <std::size_t Index>
     auto Evaluator<PredictorType, AggregatorTypes...>::GetElementUpdateFunction(const ElementUpdaterParameters& params) -> ElementUpdater<AggregatorType<Index>>
     {
-        return {std::get<Index>(_aggregatorTuple), params};
+        return { std::get<Index>(_aggregatorTuple), params };
     }
 
     template <typename PredictorType, typename... AggregatorTypes>
     template <std::size_t Index>
     auto Evaluator<PredictorType, AggregatorTypes...>::GetElementResetFunction() -> ElementResetter<AggregatorType<Index>>
     {
-        return {std::get<Index>(_aggregatorTuple)};
+        return { std::get<Index>(_aggregatorTuple) };
     }
 
     template <typename PredictorType, typename... AggregatorTypes>
@@ -208,5 +209,5 @@ namespace evaluators
     {
         return std::make_unique<Evaluator<PredictorType, AggregatorTypes...>>(anyDataset, evaluatorParameters, aggregators...);
     }
-}
-}
+} // namespace evaluators
+} // namespace ell

@@ -15,8 +15,8 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    ScalingLayerNode<ValueType>::ScalingLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ScalingLayer<ValueType>& layer)
-        : NeuralNetworkLayerNode<ScalingLayerNode<ValueType>, predictors::neural::ScalingLayer<ValueType>, ValueType>(input, layer)
+    ScalingLayerNode<ValueType>::ScalingLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ScalingLayer<ValueType>& layer) :
+        NeuralNetworkLayerNode<ScalingLayerNode<ValueType>, predictors::neural::ScalingLayer<ValueType>, ValueType>(input, layer)
     {
     }
 
@@ -50,5 +50,5 @@ namespace nodes
     // Explicit specialization
     template class ScalingLayerNode<float>;
     template class ScalingLayerNode<double>;
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

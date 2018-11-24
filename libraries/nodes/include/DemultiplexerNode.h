@@ -85,7 +85,7 @@ namespace nodes
         // Default value
         ValueType _defaultValue;
     };
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/DemultiplexerNode.tcc"

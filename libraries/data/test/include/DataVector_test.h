@@ -15,4 +15,4 @@ void DataVectorCopyAsTests();
 void AutoDataVectorTest();
 void TransformedDataVectorTest();
 void IteratorTests();
-}
+} // namespace ell

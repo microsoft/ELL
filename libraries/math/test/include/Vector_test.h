@@ -7,8 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "MatrixOperations.h"
-#include "Matrix.h"
+// testing
+#include "testing.h"
+
+// math
 #include "Vector.h"
 
 using namespace ell;
@@ -229,7 +231,7 @@ void TestVectorCumulativeSumUpdate();
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorConsecutiveDifferenceUpdate();
 
-template<typename ElementType>
+template <typename ElementType>
 void TestVectorArchiver();
 
 #include "../tcc/Vector_test.tcc"

@@ -191,8 +191,10 @@ GraphNode::GraphNode(std::string id, std::string label, bool isGroup)
     _isGroup = isGroup;
 }
 
-GraphNode::GraphNode(const GraphNode& other)
-    : _id(other._id), _label(other._label), _isGroup(other._isGroup)
+GraphNode::GraphNode(const GraphNode& other) :
+    _id(other._id),
+    _label(other._label),
+    _isGroup(other._isGroup)
 {
 }
 
@@ -230,8 +232,8 @@ GraphStyleCondition::GraphStyleCondition(const GraphStyleCondition& other)
     _expression = other._expression;
 }
 
-GraphStyle::GraphStyle(std::string targetType, std::string groupLabel, std::string valueLabel, GraphStyleCondition condition)
-    : _condition(condition)
+GraphStyle::GraphStyle(std::string targetType, std::string groupLabel, std::string valueLabel, GraphStyleCondition condition) :
+    _condition(condition)
 {
     _targetType = targetType;
     _groupLabel = groupLabel;
@@ -246,13 +248,17 @@ GraphProperty::GraphProperty(std::string id, std::string label, std::string desc
     _dataType = dataType;
 }
 
-GraphLink::GraphLink(GraphNode& source, GraphNode& target, std::string category)
-    : _source(source), _target(target), _category(category)
+GraphLink::GraphLink(GraphNode& source, GraphNode& target, std::string category) :
+    _source(source),
+    _target(target),
+    _category(category)
 {
 }
 
-GraphLink::GraphLink(const GraphLink& other)
-    : _source(other._source), _target(other._target), _category(other._category)
+GraphLink::GraphLink(const GraphLink& other) :
+    _source(other._source),
+    _target(other._target),
+    _category(other._category)
 {
 }
 

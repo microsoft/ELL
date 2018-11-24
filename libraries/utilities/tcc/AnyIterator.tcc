@@ -26,14 +26,15 @@ namespace utilities
         IteratorWrapper(const IteratorWrapper<IteratorType, ValueType>& other) = default;
         IteratorWrapper(IteratorWrapper<IteratorType, ValueType>&& other) = default;
 
-        IteratorWrapper(IteratorType&& inputIterator)
-            : _iterator(inputIterator) {}
+        IteratorWrapper(IteratorType&& inputIterator) :
+            _iterator(inputIterator) {}
 
         virtual bool IsValid() const override { return _iterator.IsValid(); }
         virtual bool HasSize() const override { return _iterator.HasSize(); }
         virtual size_t NumItemsLeft() const override { return _iterator.NumItemsLeft(); }
         virtual void Next() override { _iterator.Next(); }
         virtual ValueType Get() const override { return _iterator.Get(); }
+
     private:
         IteratorType _iterator;
     };
@@ -42,8 +43,8 @@ namespace utilities
     // AnyIterator class implementation
     //
     template <typename ValueType>
-    AnyIterator<ValueType>::AnyIterator(std::shared_ptr<IIterator<ValueType>> iterator)
-        : _iterator(iterator)
+    AnyIterator<ValueType>::AnyIterator(std::shared_ptr<IIterator<ValueType>> iterator) :
+        _iterator(iterator)
     {
     }
 
@@ -108,5 +109,5 @@ namespace utilities
         auto wrapper = std::make_shared<IteratorWrapper<IteratorType, ValueType>>(std::forward<IteratorType>(iter));
         return AnyIterator<ValueType>(wrapper);
     }
-}
-}
+} // namespace utilities
+} // namespace ell

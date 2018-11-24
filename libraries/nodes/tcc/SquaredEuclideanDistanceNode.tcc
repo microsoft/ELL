@@ -6,13 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SquaredEuclideanDistanceNode.h"
-#include "UnaryOperationNode.h"
+#include "BinaryOperationNode.h"
 #include "ConstantNode.h"
 #include "DotProductNode.h"
 #include "L2NormSquaredNode.h"
-#include "BinaryOperationNode.h"
 #include "MatrixVectorProductNode.h"
+#include "SquaredEuclideanDistanceNode.h"
+#include "UnaryOperationNode.h"
 
 // math
 #include "MatrixOperations.h"
@@ -28,14 +28,20 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType, math::MatrixLayout layout>
-    SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1), _vectorsAsMatrix(0, 0)
+    SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode() :
+        Node({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1),
+        _vectorsAsMatrix(0, 0)
     {
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& vectorsAsMatrix)
-        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, vectorsAsMatrix.NumRows()), _vectorsAsMatrix(vectorsAsMatrix)
+    SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& vectorsAsMatrix) :
+        Node({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, vectorsAsMatrix.NumRows()),
+        _vectorsAsMatrix(vectorsAsMatrix)
     {
         if (input.Size() != vectorsAsMatrix.NumColumns())
         {
@@ -142,5 +148,5 @@ namespace nodes
     {
         return transformer.AddNode<SquaredEuclideanDistanceNode>(input, vectorsAsMatrix);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

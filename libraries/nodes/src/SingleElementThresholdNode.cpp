@@ -17,13 +17,18 @@ namespace ell
 {
 namespace nodes
 {
-    SingleElementThresholdNode::SingleElementThresholdNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1)
+    SingleElementThresholdNode::SingleElementThresholdNode() :
+        Node({ &_input }, { &_output }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1)
     {
     }
 
-    SingleElementThresholdNode::SingleElementThresholdNode(const model::OutputPort<double>& input, const SingleElementThresholdPredictor& predictor)
-        : Node({ &_input }, { &_output }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _predictor(predictor)
+    SingleElementThresholdNode::SingleElementThresholdNode(const model::OutputPort<double>& input, const SingleElementThresholdPredictor& predictor) :
+        Node({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1),
+        _predictor(predictor)
     {
         assert(input.Size() > predictor.GetElementIndex());
     }
@@ -76,5 +81,5 @@ namespace nodes
     {
         return transformer.AddNode<SingleElementThresholdNode>(input, predictor);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

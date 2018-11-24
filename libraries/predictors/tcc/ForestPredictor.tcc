@@ -16,20 +16,25 @@ namespace ell
 namespace predictors
 {
     template <typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictor<SplitRuleType, EdgePredictorType>::SplittableNodeId::SplittableNodeId(size_t parentNodeIndex, size_t childPosition)
-        : _isRoot(false), _parentNodeIndex(parentNodeIndex), _childPosition(childPosition)
+    ForestPredictor<SplitRuleType, EdgePredictorType>::SplittableNodeId::SplittableNodeId(size_t parentNodeIndex, size_t childPosition) :
+        _isRoot(false),
+        _parentNodeIndex(parentNodeIndex),
+        _childPosition(childPosition)
     {
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictor<SplitRuleType, EdgePredictorType>::SplitAction::SplitAction(SplittableNodeId nodeId, SplitRuleType _splitRule, std::vector<EdgePredictorType> edgePredictors)
-        : _nodeId(std::move(nodeId)), _splitRule(std::move(_splitRule)), _edgePredictors(std::move(edgePredictors))
+    ForestPredictor<SplitRuleType, EdgePredictorType>::SplitAction::SplitAction(SplittableNodeId nodeId, SplitRuleType _splitRule, std::vector<EdgePredictorType> edgePredictors) :
+        _nodeId(std::move(nodeId)),
+        _splitRule(std::move(_splitRule)),
+        _edgePredictors(std::move(edgePredictors))
     {
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::Edge(const EdgePredictorType& predictor)
-        : _predictor(predictor), _targetNodeIndex(0)
+    ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::Edge(const EdgePredictorType& predictor) :
+        _predictor(predictor),
+        _targetNodeIndex(0)
     {
     }
 
@@ -292,8 +297,9 @@ namespace predictors
     // InteriorNode
     //
     template <typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::InteriorNode(const SplitAction& splitAction, size_t _firstEdgeIndex)
-        : _splitRule(splitAction._splitRule), _firstEdgeIndex(_firstEdgeIndex)
+    ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::InteriorNode(const SplitAction& splitAction, size_t _firstEdgeIndex) :
+        _splitRule(splitAction._splitRule),
+        _firstEdgeIndex(_firstEdgeIndex)
     {
         std::copy(splitAction._edgePredictors.begin(), splitAction._edgePredictors.end(), std::back_inserter(_outgoingEdges));
     }
@@ -406,5 +412,5 @@ namespace predictors
         archiver["predictor"] >> _predictor;
         archiver["targetNodeIndex"] >> _targetNodeIndex;
     }
-}
-}
+} // namespace predictors
+} // namespace ell

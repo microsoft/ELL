@@ -89,7 +89,7 @@ namespace nodes
     /// <returns> The node added to the model. </returns>
     template <typename ElementType>
     LinearPredictorNode<ElementType>* AddNodeToModelTransformer(const model::PortElements<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor, model::ModelTransformer& transformer);
-}
-}
+} // namespace nodes
+} // namespace ell
 
 #include "../tcc/LinearPredictorNode.tcc"

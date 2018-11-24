@@ -45,8 +45,11 @@ namespace utilities
         _value += delta;
     }
 
-    CompressedIntegerList::Iterator::Iterator(const uint8_t* iter, const uint8_t* end)
-        : _iter(iter), _end(end), _value(0), _iter_increment(0)
+    CompressedIntegerList::Iterator::Iterator(const uint8_t* iter, const uint8_t* end) :
+        _iter(iter),
+        _end(end),
+        _value(0),
+        _iter_increment(0)
     {
         if (IsValid())
         {
@@ -54,8 +57,9 @@ namespace utilities
         }
     }
 
-    CompressedIntegerList::CompressedIntegerList()
-        : _last(std::numeric_limits<size_t>::max()), _size(0)
+    CompressedIntegerList::CompressedIntegerList() :
+        _last(std::numeric_limits<size_t>::max()),
+        _size(0)
     {
     }
 
@@ -138,5 +142,5 @@ namespace utilities
         _last = std::numeric_limits<size_t>::max();
         _size = 0;
     }
-}
-}
+} // namespace utilities
+} // namespace ell

@@ -70,16 +70,16 @@ namespace nodes
     protected:
         template <typename PoolingFunctionT>
         emitters::LLVMValue GetPoolingWindowValue(emitters::IRFunctionEmitter& function,
-                                           int windowRowStart,
-                                           int windowRowEnd,
-                                           int windowColumnStart,
-                                           int windowColumnEnd,
-                                           emitters::LLVMValue inputRow,
-                                           emitters::LLVMValue inputColumn,
-                                           emitters::LLVMValue inputChannel,
-                                           emitters::LLVMValue inputBuffer,
-                                           const model::MemoryShape& inputIncrement,
-                                           PoolingFunctionT& poolingFunction);
+                                                  int windowRowStart,
+                                                  int windowRowEnd,
+                                                  int windowColumnStart,
+                                                  int windowColumnEnd,
+                                                  emitters::LLVMValue inputRow,
+                                                  emitters::LLVMValue inputColumn,
+                                                  emitters::LLVMValue inputChannel,
+                                                  emitters::LLVMValue inputBuffer,
+                                                  const model::MemoryShape& inputIncrement,
+                                                  PoolingFunctionT& poolingFunction);
 
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         using BaseType::HasState;
@@ -87,5 +87,5 @@ namespace nodes
     private:
         void Copy(model::ModelTransformer& transformer) const override;
     };
-}
-}
+} // namespace nodes
+} // namespace ell

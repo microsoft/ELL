@@ -29,7 +29,7 @@ void SaveModels(const std::string& ext, const std::string& outputPath)
     common::SaveModel(GenerateTimesTwoModel(3), outputPath + "/times_two." + ext);
     common::SaveModel(GenerateIsEqualModel(), outputPath + "/is_equal." + ext);
     common::SaveModel(GenerateArgMaxModel(3), outputPath + "/arg_max." + ext);
-    
+
     common::SaveModel(GenerateModel1(), outputPath + "/model_1." + ext);
     common::SaveModel(GenerateModel2(), outputPath + "/model_2." + ext);
     common::SaveModel(GenerateModel3(), outputPath + "/model_3." + ext);

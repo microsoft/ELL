@@ -54,5 +54,5 @@ namespace utilities
     {
         return archive.GetValue<ValueType>();
     }
-}
-}
+} // namespace utilities
+} // namespace ell

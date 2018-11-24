@@ -85,5 +85,5 @@ namespace nodes
     ///
     /// <returns> The node added to the model. </returns>
     ProtoNNPredictorNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::ProtoNNPredictor& predictor, model::ModelTransformer& transformer);
-}
-}
+} // namespace nodes
+} // namespace ell

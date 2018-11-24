@@ -59,6 +59,7 @@ namespace utilities
     class StlContainerIterator : public StlContainerIteratorBase<IteratorType>
     {
         using BaseType = StlContainerIteratorBase<IteratorType>;
+
     public:
         using BaseType::BaseType;
 
@@ -82,7 +83,7 @@ namespace utilities
     ///
     /// <returns> A StlContainerIterator over the range specified by the begin and end iterators. </returns>
     template <typename IteratorType>
-    auto MakeStlContainerIterator(IteratorType begin, IteratorType end)->StlContainerIterator<IteratorType>;
+    auto MakeStlContainerIterator(IteratorType begin, IteratorType end) -> StlContainerIterator<IteratorType>;
 
     /// <summary> Convenience function for creating StlContainerIterators </summary>
     ///
@@ -90,13 +91,14 @@ namespace utilities
     ///
     /// <returns> A StlContainerIterator over the container</returns>
     template <typename ContainerType>
-    auto MakeStlContainerIterator(ContainerType& container)->StlContainerIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
+    auto MakeStlContainerIterator(ContainerType& container) -> StlContainerIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
 
     /// <summary> An adapter that transforms a begin/end pair of STL iterators into a read-only forward iterator with IsValid, Next, and Get functions</summary>
-    template<typename IteratorType, typename ValueType = typename std::iterator_traits<std::decay_t<IteratorType>>::value_type>
+    template <typename IteratorType, typename ValueType = typename std::iterator_traits<std::decay_t<IteratorType>>::value_type>
     class StlContainerReferenceIterator : public StlContainerIteratorBase<IteratorType>
     {
         using BaseType = StlContainerIteratorBase<IteratorType>;
+
     public:
         using BaseType::BaseType;
 
@@ -120,7 +122,7 @@ namespace utilities
     ///
     /// <returns> A StlContainerReferenceIterator over the range specified by the begin and end iterators. </returns>
     template <typename IteratorType>
-    auto MakeStlContainerReferenceIterator(IteratorType begin, IteratorType end)->StlContainerReferenceIterator<IteratorType>;
+    auto MakeStlContainerReferenceIterator(IteratorType begin, IteratorType end) -> StlContainerReferenceIterator<IteratorType>;
 
     /// <summary> Convenience function for creating StlContainerReferenceIterators </summary>
     ///
@@ -128,8 +130,8 @@ namespace utilities
     ///
     /// <returns> A StlContainerReferenceIterator over the container</returns>
     template <typename ContainerType>
-    auto MakeStlContainerReferenceIterator(ContainerType& container)->StlContainerReferenceIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
-}
-}
+    auto MakeStlContainerReferenceIterator(ContainerType& container) -> StlContainerReferenceIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
+} // namespace utilities
+} // namespace ell
 
 #include "../tcc/StlContainerIterator.tcc"

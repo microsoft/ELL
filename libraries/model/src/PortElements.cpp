@@ -30,7 +30,7 @@ namespace model
                 return shape;
             }
             auto result = shape.ToVector();
-            return { std::vector<int>(result.begin()+1, result.end()) };
+            return { std::vector<int>(result.begin() + 1, result.end()) };
         }
 
         // Concatenate two layouts, if they're compatible.
@@ -263,25 +263,37 @@ namespace model
         return { _index, _ranges[0].ReferencedPort()->GetDoubleOutput(_ranges[0].GetStartIndex()) };
     }
 
-    PortElementsBase::Iterator::Iterator(const std::vector<PortRange>& ranges)
-        : _ranges(ranges.begin(), ranges.end())
+    PortElementsBase::Iterator::Iterator(const std::vector<PortRange>& ranges) :
+        _ranges(ranges.begin(), ranges.end())
     {
     }
 
     //
     // PortRange
     //
-    PortRange::PortRange(const OutputPortBase& port)
-        : _referencedPort(&port), _startIndex(0), _sliceSize(port.Size()), _isFixedSize(false) {}
+    PortRange::PortRange(const OutputPortBase& port) :
+        _referencedPort(&port),
+        _startIndex(0),
+        _sliceSize(port.Size()),
+        _isFixedSize(false) {}
 
-    PortRange::PortRange(const OutputPortBase& port, size_t index)
-        : _referencedPort(&port), _startIndex(index), _sliceSize(1), _isFixedSize(true) {}
+    PortRange::PortRange(const OutputPortBase& port, size_t index) :
+        _referencedPort(&port),
+        _startIndex(index),
+        _sliceSize(1),
+        _isFixedSize(true) {}
 
-    PortRange::PortRange(const OutputPortBase& port, size_t startIndex, size_t numValues)
-        : _referencedPort(&port), _startIndex(startIndex), _sliceSize(numValues), _isFixedSize(true) {}
+    PortRange::PortRange(const OutputPortBase& port, size_t startIndex, size_t numValues) :
+        _referencedPort(&port),
+        _startIndex(startIndex),
+        _sliceSize(numValues),
+        _isFixedSize(true) {}
 
-    PortRange::PortRange(const PortElementBase& element)
-        : _referencedPort(element.ReferencedPort()), _startIndex(element.GetIndex()), _sliceSize(1), _isFixedSize(true) {}
+    PortRange::PortRange(const PortElementBase& element) :
+        _referencedPort(element.ReferencedPort()),
+        _startIndex(element.GetIndex()),
+        _sliceSize(1),
+        _isFixedSize(true) {}
 
     size_t PortRange::Size() const
     {
@@ -359,8 +371,9 @@ namespace model
     //
     // PortElementBase
     //
-    PortElementBase::PortElementBase(const OutputPortBase& port, size_t index)
-        : _referencedPort(&port), _index(index) {}
+    PortElementBase::PortElementBase(const OutputPortBase& port, size_t index) :
+        _referencedPort(&port),
+        _index(index) {}
 
     //
     // PortElementsBase
@@ -439,7 +452,7 @@ namespace model
     {
         // Concatenate layout along largest (first) dimension
         PortMemoryLayout result = {};
-        for(const auto& range: _ranges)
+        for (const auto& range : _ranges)
         {
             // for non-simple ranges, the size and strides of all but the first dimension must match
             auto rangeLayout = range.GetMemoryLayout();
@@ -564,23 +577,43 @@ namespace model
     // PortRangeProxy
     //
 
-    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName)
-        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(0), _sliceSize(0), _isFixedSize(false)
+    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName) :
+        _nodeId(nodeId),
+        _portName(portName),
+        _portType(Port::PortType::none),
+        _startIndex(0),
+        _sliceSize(0),
+        _isFixedSize(false)
     {
     }
 
-    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, size_t startIndex)
-        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(startIndex), _sliceSize(0), _isFixedSize(true)
+    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, size_t startIndex) :
+        _nodeId(nodeId),
+        _portName(portName),
+        _portType(Port::PortType::none),
+        _startIndex(startIndex),
+        _sliceSize(0),
+        _isFixedSize(true)
     {
     }
 
-    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, size_t startIndex, size_t numValues)
-        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(startIndex), _sliceSize(numValues), _isFixedSize(true)
+    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, size_t startIndex, size_t numValues) :
+        _nodeId(nodeId),
+        _portName(portName),
+        _portType(Port::PortType::none),
+        _startIndex(startIndex),
+        _sliceSize(numValues),
+        _isFixedSize(true)
     {
     }
 
-    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, Port::PortType portType, size_t startIndex, size_t numValues)
-        : _nodeId(nodeId), _portName(portName), _portType(portType), _startIndex(startIndex), _sliceSize(numValues), _isFixedSize(true)
+    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, Port::PortType portType, size_t startIndex, size_t numValues) :
+        _nodeId(nodeId),
+        _portName(portName),
+        _portType(portType),
+        _startIndex(startIndex),
+        _sliceSize(numValues),
+        _isFixedSize(true)
     {
     }
 
@@ -616,13 +649,13 @@ namespace model
     // PortElementsProxy
     //
 
-    PortElementsProxy::PortElementsProxy()
-        : _portType(Port::PortType::none)
+    PortElementsProxy::PortElementsProxy() :
+        _portType(Port::PortType::none)
     {
     }
 
-    PortElementsProxy::PortElementsProxy(Port::PortType portType)
-        : _portType(portType)
+    PortElementsProxy::PortElementsProxy(Port::PortType portType) :
+        _portType(portType)
     {
     }
 
@@ -696,7 +729,7 @@ namespace model
             const OutputPortBase* port = node->GetOutputPort(rangeProxy.GetPortName());
             if (port == nullptr)
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::nullReference, std::string("Couldn't unarchive PortRange port -- bad port name \"")  + rangeProxy.GetPortName() + "\" for port " + rangeProxy.GetNodeId().ToString());
+                throw utilities::InputException(utilities::InputExceptionErrors::nullReference, std::string("Couldn't unarchive PortRange port -- bad port name \"") + rangeProxy.GetPortName() + "\" for port " + rangeProxy.GetNodeId().ToString());
             }
 
             if (rangeProxy.GetPortType() != Port::PortType::none && port->GetType() != rangeProxy.GetPortType())
@@ -714,8 +747,8 @@ namespace model
         }
         return elements;
     }
-}
-}
+} // namespace model
+} // namespace ell
 
 //
 // hash functions for PortElementBase and PortRange
@@ -744,7 +777,7 @@ std::hash<ell::model::PortElementsBase>::result_type std::hash<ell::model::PortE
 
     auto hash = 0;
     const auto& ranges = elements.GetRanges();
-    for(const auto& range: ranges)
+    for (const auto& range : ranges)
     {
         hash = std::hash<ell::model::PortRange>()(range) ^ (hash << 1);
     }

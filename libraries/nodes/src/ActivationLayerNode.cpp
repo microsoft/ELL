@@ -25,8 +25,8 @@ namespace nodes
     // ActivationLayerNode
     //
     template <typename ValueType>
-    ActivationLayerNode<ValueType>::ActivationLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ActivationLayer<ValueType>& layer)
-        : BaseType(input, layer)
+    ActivationLayerNode<ValueType>::ActivationLayerNode(const model::OutputPort<ValueType>& input, const predictors::neural::ActivationLayer<ValueType>& layer) :
+        BaseType(input, layer)
     {
         auto&& inputLayout = this->GetInputMemoryLayout();
         auto&& outputLayout = this->GetOutputMemoryLayout();
@@ -55,31 +55,27 @@ namespace nodes
         auto outputLayout = this->GetOutputMemoryLayout();
 
         ell::model::Node* computeNode = nullptr;
-        if (hardSigmoid) {
-            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, HardSigmoidActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout, 
-                HardSigmoidActivationFunction<ValueType>{});
+        if (hardSigmoid)
+        {
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, HardSigmoidActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout, HardSigmoidActivationFunction<ValueType>{});
         }
         else if (leakyReLU)
         {
-            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, LeakyReLUActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout,
-                LeakyReLUActivationFunction<ValueType>(leakyReLU->GetLeakyFactor()));
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, LeakyReLUActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout, LeakyReLUActivationFunction<ValueType>(leakyReLU->GetLeakyFactor()));
         }
         else if (sigmoid)
         {
-            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, SigmoidActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout,
-                SigmoidActivationFunction<ValueType>{});
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, SigmoidActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout, SigmoidActivationFunction<ValueType>{});
         }
         else if (relu)
         {
-            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, ReLUActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout,
-                ReLUActivationFunction<ValueType>{});
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, ReLUActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout, ReLUActivationFunction<ValueType>{});
         }
         else if (tanh)
         {
-            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, TanhActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout,
-                TanhActivationFunction<ValueType>{});
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, TanhActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout, TanhActivationFunction<ValueType>{});
         }
-        else if (prelu) 
+        else if (prelu)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "ActivationLayerNode cannot be used on ParametricReLUActivations");
         }
@@ -87,7 +83,7 @@ namespace nodes
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "ActivationLayerNode given a new Activation type it doesn't recognize");
         }
-        
+
         transformer.MapNodeOutput(this->output, *(computeNode->GetOutputPort(0)));
         return true;
     }
@@ -105,8 +101,8 @@ namespace nodes
     //
 
     template <typename ValueType>
-    ParametricReLUActivationLayerNode<ValueType>::ParametricReLUActivationLayerNode(const model::OutputPort<ValueType>& input, const LayerType& layer)
-        : BaseType(input, layer)
+    ParametricReLUActivationLayerNode<ValueType>::ParametricReLUActivationLayerNode(const model::OutputPort<ValueType>& input, const LayerType& layer) :
+        BaseType(input, layer)
     {
         auto&& inputLayout = this->GetInputMemoryLayout();
         auto&& outputLayout = this->GetOutputMemoryLayout();
@@ -151,12 +147,11 @@ namespace nodes
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
 
-
     // Explicit specialization
     template class ActivationLayerNode<float>;
     template class ActivationLayerNode<double>;
     template class ParametricReLUActivationLayerNode<float>;
     template class ParametricReLUActivationLayerNode<double>;
 
-} // nodes
-} // ell
+} // namespace nodes
+} // namespace ell

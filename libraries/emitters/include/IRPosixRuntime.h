@@ -174,5 +174,5 @@ namespace emitters
         // Cached types
         llvm::StructType* _timespecType = nullptr;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

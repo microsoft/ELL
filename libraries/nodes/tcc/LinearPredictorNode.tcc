@@ -6,10 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LinearPredictorNode.h"
 #include "BinaryOperationNode.h"
 #include "ConstantNode.h"
 #include "DotProductNode.h"
+#include "LinearPredictorNode.h"
 
 // utilities
 #include "Exception.h"
@@ -26,14 +26,21 @@ namespace ell
 namespace nodes
 {
     template <typename ElementType>
-    LinearPredictorNode<ElementType>::LinearPredictorNode()
-        : Node({ &_input }, { &_output, &_weightedElements }), _input(this, {}, defaultInputPortName), _output(this, defaultOutputPortName, 1), _weightedElements(this, weightedElementsPortName, 0)
+    LinearPredictorNode<ElementType>::LinearPredictorNode() :
+        Node({ &_input }, { &_output, &_weightedElements }),
+        _input(this, {}, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1),
+        _weightedElements(this, weightedElementsPortName, 0)
     {
     }
 
     template <typename ElementType>
-    LinearPredictorNode<ElementType>::LinearPredictorNode(const model::OutputPort<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor)
-        : Node({ &_input }, { &_output, &_weightedElements }), _input(this, input, defaultInputPortName), _output(this, defaultOutputPortName, 1), _weightedElements(this, weightedElementsPortName, input.Size()), _predictor(predictor)
+    LinearPredictorNode<ElementType>::LinearPredictorNode(const model::OutputPort<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor) :
+        Node({ &_input }, { &_output, &_weightedElements }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, 1),
+        _weightedElements(this, weightedElementsPortName, input.Size()),
+        _predictor(predictor)
     {
         if (input.Size() != predictor.Size())
         {
@@ -98,5 +105,5 @@ namespace nodes
     {
         return transformer.AddNode<LinearPredictorNode<ElementType>>(input, predictor);
     }
-}
-}
+} // namespace nodes
+} // namespace ell

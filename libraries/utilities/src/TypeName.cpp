@@ -34,5 +34,5 @@ namespace utilities
         result += ">";
         return result;
     }
-}
-}
+} // namespace utilities
+} // namespace ell

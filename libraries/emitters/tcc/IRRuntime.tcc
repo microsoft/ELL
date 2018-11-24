@@ -76,5 +76,5 @@ namespace emitters
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
     }
-}
-}
+} // namespace emitters
+} // namespace ell

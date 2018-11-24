@@ -6,9 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "ModelInterface.h"
 #include "DatasetInterface.h"
 #include "DatasetInterfaceImpl.h"
-#include "ModelInterface.h"
 
 // common
 #include "LoadModel.h"
@@ -92,8 +92,8 @@ PortType Port::GetOutputType()
     return static_cast<PortType>(_port->GetType());
 }
 
-Port::Port(const ell::model::Port* other)
-    : _port(other)
+Port::Port(const ell::model::Port* other) :
+    _port(other)
 {
 }
 
@@ -139,8 +139,9 @@ InputPort InputPortIterator::Get()
     return InputPort(_ports[_i]);
 }
 
-InputPortIterator::InputPortIterator(std::vector<ell::model::InputPortBase*> ports)
-    : _i(0), _ports(ports)
+InputPortIterator::InputPortIterator(std::vector<ell::model::InputPortBase*> ports) :
+    _i(0),
+    _ports(ports)
 {
 }
 
@@ -166,8 +167,9 @@ OutputPort OutputPortIterator::Get()
     return OutputPort(_ports[_i]);
 }
 
-OutputPortIterator::OutputPortIterator(std::vector<ell::model::OutputPortBase*> ports)
-    : _i(0), _ports(ports)
+OutputPortIterator::OutputPortIterator(std::vector<ell::model::OutputPortBase*> ports) :
+    _i(0),
+    _ports(ports)
 {
 }
 
@@ -214,21 +216,27 @@ Node NodeIterator::Get()
     }
 }
 
-NodeIterator::NodeIterator(std::vector<const ell::model::Node*> nodes)
-    : _i(0), _isVector(true), _nodes(nodes), _iterator()
+NodeIterator::NodeIterator(std::vector<const ell::model::Node*> nodes) :
+    _i(0),
+    _isVector(true),
+    _nodes(nodes),
+    _iterator()
 {
 }
 
-NodeIterator::NodeIterator(ell::model::ForwardNodeIterator& other)
-    : _i(0), _isVector(false), _nodes(0), _iterator(other)
+NodeIterator::NodeIterator(ell::model::ForwardNodeIterator& other) :
+    _i(0),
+    _isVector(false),
+    _nodes(0),
+    _iterator(other)
 {
 }
 
 //
 // Node
 //
-Node::Node(const ell::model::Node* other)
-    : _node(other)
+Node::Node(const ell::model::Node* other) :
+    _node(other)
 {
 }
 
@@ -313,8 +321,8 @@ void Node::SetMetadataValue(const std::string& key, const std::string& value)
 //
 // InputNode
 //
-InputNode::InputNode(const InputNode& node)
-    : Node(node.GetNode())
+InputNode::InputNode(const InputNode& node) :
+    Node(node.GetNode())
 {
     if (dynamic_cast<const ell::model::InputNodeBase*>(node.GetNode()) == nullptr)
     {
@@ -322,8 +330,8 @@ InputNode::InputNode(const InputNode& node)
     }
 }
 
-InputNode::InputNode(Node node)
-    : Node(node.GetNode())
+InputNode::InputNode(Node node) :
+    Node(node.GetNode())
 {
     if (dynamic_cast<const ell::model::InputNodeBase*>(node.GetNode()) == nullptr)
     {
@@ -331,8 +339,8 @@ InputNode::InputNode(Node node)
     }
 }
 
-InputNode::InputNode(const ell::model::InputNodeBase* other)
-    : Node(other)
+InputNode::InputNode(const ell::model::InputNodeBase* other) :
+    Node(other)
 {
 }
 
@@ -344,8 +352,8 @@ const ell::model::InputNodeBase* InputNode::GetInputNode() const
 //
 // OutputNode
 //
-OutputNode::OutputNode(const OutputNode& node)
-    : Node(node.GetNode())
+OutputNode::OutputNode(const OutputNode& node) :
+    Node(node.GetNode())
 {
     if (dynamic_cast<const ell::model::OutputNodeBase*>(node.GetNode()) == nullptr)
     {
@@ -353,8 +361,8 @@ OutputNode::OutputNode(const OutputNode& node)
     }
 }
 
-OutputNode::OutputNode(Node node)
-    : Node(node.GetNode())
+OutputNode::OutputNode(Node node) :
+    Node(node.GetNode())
 {
     if (dynamic_cast<const ell::model::OutputNodeBase*>(node.GetNode()) == nullptr)
     {
@@ -362,8 +370,8 @@ OutputNode::OutputNode(Node node)
     }
 }
 
-OutputNode::OutputNode(const ell::model::OutputNodeBase* other)
-    : Node(other)
+OutputNode::OutputNode(const ell::model::OutputNodeBase* other) :
+    Node(other)
 {
 }
 
@@ -375,8 +383,8 @@ const ell::model::OutputNodeBase* OutputNode::GetOutputNode() const
 //
 // PortElement
 //
-PortElement::PortElement(const ell::model::PortElementBase& other)
-    : _port(other)
+PortElement::PortElement(const ell::model::PortElementBase& other) :
+    _port(other)
 {
 }
 
@@ -403,13 +411,13 @@ OutputPort PortElement::ReferencedPort()
 //
 // PortElements
 //
-PortElements::PortElements(const ell::model::PortElementsBase& other)
-    : _elements(other)
+PortElements::PortElements(const ell::model::PortElementsBase& other) :
+    _elements(other)
 {
 }
 
-PortElements::PortElements(const OutputPort& port)
-    : _elements(port.GetPort())
+PortElements::PortElements(const OutputPort& port) :
+    _elements(port.GetPort())
 {
 }
 
@@ -441,8 +449,8 @@ PortElement PortElements::GetElement(int index) const
 // InputPort
 //
 
-InputPort::InputPort(const ell::model::InputPortBase* other)
-    : _port(other)
+InputPort::InputPort(const ell::model::InputPortBase* other) :
+    _port(other)
 {
 }
 
@@ -489,8 +497,8 @@ OutputPort InputPort::GetReferencedPort()
 //
 // OutputPort
 //
-OutputPort::OutputPort(const ell::model::OutputPortBase* other)
-    : _port(other)
+OutputPort::OutputPort(const ell::model::OutputPortBase* other) :
+    _port(other)
 {
 }
 
@@ -542,8 +550,11 @@ void OutputPort::ReferencePort()
 //
 // PortMemoryLayout
 //
-PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<int>& p, const std::vector<int>& o, const std::vector<int>& order)
-    : size(s), padding(p), offset(o), order(order)
+PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<int>& p, const std::vector<int>& o, const std::vector<int>& order) :
+    size(s),
+    padding(p),
+    offset(o),
+    order(order)
 {
     if (padding.size() == 0 && offset.size() == 0)
     {
@@ -563,9 +574,12 @@ PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<
     }
 }
 
-PortMemoryLayout::PortMemoryLayout(const ell::model::PortMemoryLayout& layout)
-    : size(layout.GetActiveSize().ToVector()), padding(layout.GetExtent().ToVector()), offset(layout.GetOffset().ToVector()),
-    order(layout.GetLogicalDimensionOrder().ToVector()), _layout(layout)
+PortMemoryLayout::PortMemoryLayout(const ell::model::PortMemoryLayout& layout) :
+    size(layout.GetActiveSize().ToVector()),
+    padding(layout.GetExtent().ToVector()),
+    offset(layout.GetOffset().ToVector()),
+    order(layout.GetLogicalDimensionOrder().ToVector()),
+    _layout(layout)
 {
 }
 
@@ -653,8 +667,8 @@ Map::Map(Model model, InputNode inputNode, PortElements output)
     _map = std::make_shared<ell::model::Map>(model.GetModel(), inputs, outputs);
 }
 
-Map::Map(std::shared_ptr<ell::model::Map>& map)
-    : _map(map)
+Map::Map(std::shared_ptr<ell::model::Map>& map) :
+    _map(map)
 {
 }
 
@@ -801,8 +815,9 @@ CompiledMap Map::Compile(const std::string& targetDevice,
 //
 // CompiledMap
 //
-CompiledMap::CompiledMap(ell::model::IRCompiledMap map, ell::api::math::TensorShape inputShape, ell::api::math::TensorShape outputShape)
-    : _inputShape(inputShape), _outputShape(outputShape)
+CompiledMap::CompiledMap(ell::model::IRCompiledMap map, ell::api::math::TensorShape inputShape, ell::api::math::TensorShape outputShape) :
+    _inputShape(inputShape),
+    _outputShape(outputShape)
 {
     _map = std::make_shared<ell::model::IRCompiledMap>(std::move(map));
 }
@@ -889,4 +904,4 @@ ell::api::CallbackForwarder<float, float>& CompiledMap::GetCallbackForwarder()
 {
     return forwarderFloat;
 }
-}
+} // namespace ELL_API

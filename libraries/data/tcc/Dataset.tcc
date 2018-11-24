@@ -30,16 +30,17 @@ namespace data
 
         // all Dataset types for which GetAnyDataset() is called must be listed below, in the variadic template argument.
         using Invoker = utilities::AbstractInvoker<DatasetBase,
-            Dataset<data::AutoSupervisedExample>,
-            Dataset<data::DenseSupervisedExample>>;
+                                                   Dataset<data::AutoSupervisedExample>,
+                                                   Dataset<data::DenseSupervisedExample>>;
 
         return Invoker::Invoke<ExampleIterator<ExampleType>>(getExampleIterator, _pDataset);
     }
 
     template <typename DatasetExampleType>
     template <typename IteratorExampleType>
-    Dataset<DatasetExampleType>::DatasetExampleIterator<IteratorExampleType>::DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end)
-        : _current(begin), _end(end)
+    Dataset<DatasetExampleType>::DatasetExampleIterator<IteratorExampleType>::DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end) :
+        _current(begin),
+        _end(end)
     {
     }
 
@@ -54,8 +55,8 @@ namespace data
     }
 
     template <typename DatasetExampleType>
-    Dataset<DatasetExampleType>::Dataset(const AnyDataset& anyDataset)
-        : Dataset(anyDataset.GetExampleIterator<DatasetExampleType>())
+    Dataset<DatasetExampleType>::Dataset(const AnyDataset& anyDataset) :
+        Dataset(anyDataset.GetExampleIterator<DatasetExampleType>())
     {
     }
 
@@ -234,5 +235,5 @@ namespace data
     {
         return Dataset<ExampleType>(std::move(exampleIterator));
     }
-}
-}
+} // namespace data
+} // namespace ell

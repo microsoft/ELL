@@ -20,6 +20,7 @@ namespace math
     };
 
     /// <summary> A stub class that represents the scalar one. </summary>
-    struct One {};
-}
-}
+    struct One
+    {};
+} // namespace math
+} // namespace ell

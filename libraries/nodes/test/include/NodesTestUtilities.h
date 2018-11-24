@@ -48,14 +48,13 @@ struct DiagonalOptions
 union ConvolutionOptions
 {
     ConvolutionOptions() {}
-    ConvolutionOptions(int tileSize, ell::dsp::WinogradFilterOrder order)
-        : winogradOptions({ tileSize, order }) {}
-    ConvolutionOptions(int tileSize)
-        : winogradOptions({ tileSize, ell::dsp::WinogradFilterOrder::tilesFirst }) {}
+    ConvolutionOptions(int tileSize, ell::dsp::WinogradFilterOrder order) :
+        winogradOptions({ tileSize, order }) {}
+    ConvolutionOptions(int tileSize) :
+        winogradOptions({ tileSize, ell::dsp::WinogradFilterOrder::tilesFirst }) {}
 
     WinogradOptions winogradOptions;
     SimpleOptions simpleOptions;
     UnrolledOptions unrolledOptions;
     DiagonalOptions diagonalOptions;
 };
-

@@ -129,5 +129,5 @@ namespace emitters
         std::unique_ptr<llvm::EngineBuilder> _pBuilder;
         std::unique_ptr<llvm::ExecutionEngine> _pEngine;
     };
-}
-}
+} // namespace emitters
+} // namespace ell

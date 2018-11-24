@@ -56,7 +56,7 @@ namespace evaluators
 
     template <typename LossFunctionType>
     LossAggregator<LossFunctionType> MakeLossAggregator(LossFunctionType lossFunction);
-}
-}
+} // namespace evaluators
+} // namespace ell
 
 #include "../tcc/LossAggregator.tcc"

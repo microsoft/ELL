@@ -22,5 +22,5 @@ namespace emitters
         LLVMValue sum = function.Operator(emitters::GetAddForValueType<ValueType>(), x, y);
         return sum;
     }
-}
-}
+} // namespace emitters
+} // namespace ell

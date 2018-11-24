@@ -35,8 +35,8 @@ namespace emitters
         class PredictFunctionWriter
         {
         public:
-            PredictFunctionWriter(IRModuleEmitter& moduleEmitter, llvm::Function& predictFunction)
-                : _function(&predictFunction)
+            PredictFunctionWriter(IRModuleEmitter& moduleEmitter, llvm::Function& predictFunction) :
+                _function(&predictFunction)
             {
                 _moduleName = moduleEmitter.GetModuleName();
                 InitPredictFunctionInfo(moduleEmitter);
@@ -65,7 +65,6 @@ namespace emitters
                 ReplaceDelimiter(predictPythonCode, "PREDICT_METHOD", predictMethodName);
                 ReplaceDelimiter(predictPythonCode, "INPUT_VECTOR_TYPE", inputVectorType);
                 ReplaceDelimiter(predictPythonCode, "RESET_FUNCTION", resetFunctionName);
-                
 
                 os << "%pythoncode %{\n"
                    << predictPythonCode
@@ -104,7 +103,6 @@ namespace emitters
                         }
                         _inputType = os.str();
                     }
-
                 }
                 else
                 {
@@ -113,13 +111,12 @@ namespace emitters
                     // defined in the SourceNode callback
                     _inputType = moduleCallbacks.sources[0].inputType;
                 }
-
             }
 
             std::string _moduleName;
             std::string _functionName;
             std::string _inputType;
-            bool _inputIsScalar; 
+            bool _inputIsScalar;
             LLVMFunction _function;
         };
 
@@ -188,7 +185,7 @@ namespace emitters
             //
             WriteShapeWrappers(os, moduleEmitter);
         }
-    }
+    } // namespace
 
     void WriteModuleSwigInterface(std::ostream& os, IRModuleEmitter& moduleEmitter, const std::string& headerName)
     {
@@ -199,5 +196,5 @@ namespace emitters
 
         WriteModuleSwigCode(os, moduleEmitter, headerName);
     }
-}
-}
+} // namespace emitters
+} // namespace ell

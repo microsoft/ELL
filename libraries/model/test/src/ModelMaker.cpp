@@ -23,7 +23,7 @@ ModelMaker::ModelMaker(const ModelMaker& src)
     _model = transformer.CopyModel(src._model, context);
 }
 
-ModelMaker::ModelMaker(ModelMaker&& src)
-    : _model(std::move(src._model))
+ModelMaker::ModelMaker(ModelMaker&& src) :
+    _model(std::move(src._model))
 {
 }

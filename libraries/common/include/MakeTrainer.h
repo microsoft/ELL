@@ -9,8 +9,8 @@
 #pragma once
 
 #include "ForestTrainerArguments.h"
-#include "TrainerArguments.h"
 #include "ProtoNNTrainerArguments.h"
+#include "TrainerArguments.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -18,8 +18,8 @@
 
 // trainers
 #include "ITrainer.h"
-#include "SGDTrainer.h"
 #include "SDCATrainer.h"
+#include "SGDTrainer.h"
 
 // stl
 #include <memory>
@@ -75,5 +75,5 @@ namespace common
     ///
     /// <returns> A unique_ptr to a protoNN trainer. </returns>
     std::unique_ptr<trainers::ITrainer<predictors::ProtoNNPredictor>> MakeProtoNNTrainer(const trainers::ProtoNNTrainerParameters& parameters);
-}
-}
+} // namespace common
+} // namespace ell

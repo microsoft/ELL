@@ -85,5 +85,5 @@ namespace emitters
 
     /// <summary> Waits for all given tasks to finish </summary>
     void SyncAllTasks(IRFunctionEmitter& function, std::vector<IRAsyncTask>& tasks);
-}
-}
+} // namespace emitters
+} // namespace ell

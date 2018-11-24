@@ -18,8 +18,8 @@ namespace ell
 {
 namespace emitters
 {
-    IRParallelForLoopEmitter::IRParallelForLoopEmitter(IRFunctionEmitter& functionEmitter)
-        : _functionEmitter(functionEmitter) {}
+    IRParallelForLoopEmitter::IRParallelForLoopEmitter(IRFunctionEmitter& functionEmitter) :
+        _functionEmitter(functionEmitter) {}
 
     void IRParallelForLoopEmitter::EmitLoop(int begin, int end, int increment, const ParallelLoopOptions& options, const std::vector<LLVMValue>& capturedValues, BodyFunction body)
     {
@@ -76,7 +76,7 @@ namespace emitters
 
         // args = start, captured args
         auto returnType = _functionEmitter.GetModule().GetIREmitter().Type(VariableType::Void);
-        auto argTypes = _functionEmitter.GetModule().GetIREmitter().GetLLVMTypes({ VariableType::Int32, VariableType::Int32 , VariableType::Int32 });
+        auto argTypes = _functionEmitter.GetModule().GetIREmitter().GetLLVMTypes({ VariableType::Int32, VariableType::Int32, VariableType::Int32 });
         auto capturedTypes = GetLLVMTypes(capturedValues);
         std::copy(capturedTypes.begin(), capturedTypes.end(), std::back_inserter(argTypes));
         auto taskFunction = _functionEmitter.GetModule().BeginFunction(name, returnType, argTypes);
@@ -101,5 +101,5 @@ namespace emitters
         _functionEmitter.GetModule().EndFunction();
         return taskFunction;
     }
-}
-}
+} // namespace emitters
+} // namespace ell
