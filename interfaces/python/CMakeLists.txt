@@ -34,7 +34,7 @@ if (TARGET _ELL_python)
   add_custom_command(TARGET _ELL_python
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${PYTHON_DIR}/ell_py.py ${PYTHON_DIR}/package/ell/ell_py.py
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/tools/utilities/pythonlibs/buildtools.py ${PYTHON_DIR}/package/ell/util/buildtools.py
+      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/tools/utilities/pythonlibs/buildtools.py ${PYTHON_DIR}/package/ell/util/buildtools.py
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/docs/tutorials/shared/tutorial_helpers.py ${PYTHON_DIR}/package/ell/util/tutorialHelpers.py
   )
 
