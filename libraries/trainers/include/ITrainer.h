@@ -8,10 +8,8 @@
 
 #pragma once
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// stl
 #include <memory>
 
 namespace ell

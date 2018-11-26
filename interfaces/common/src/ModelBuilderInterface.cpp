@@ -11,54 +11,48 @@
 #include "DatasetInterfaceImpl.h"
 #include "NeuralLayersInterface.h"
 
-// common
-#include "RegisterNodeCreators.h"
+#include <common/include/RegisterNodeCreators.h>
 
-// math
-#include "FilterBank.h"
+#include <dsp/include/FilterBank.h>
 
-// model
-#include "InputNode.h"
-#include "ModelEditor.h"
-#include "OutputNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/InputNodeBase.h>
+#include <model/include/ModelEditor.h>
+#include <model/include/OutputNode.h>
 
-// nodes
-#include "BinaryOperationNode.h"
-#include "BufferNode.h"
-#include "ClockNode.h"
-#include "ConcatenationNode.h"
-#include "DCTNode.h"
-#include "DTWDistanceNode.h"
-#include "FFTNode.h"
-#include "FilterBankNode.h"
-#include "GRUNode.h"
-#include "HammingWindowNode.h"
-#include "IIRFilterNode.h"
-#include "InputNodeBase.h"
-#include "LSTMNode.h"
-#include "NeuralNetworkPredictorNode.h"
-#include "ReorderDataNode.h"
-#include "Tensor.h"
-#include "TypeCastNode.h"
-#include "UnaryOperationNode.h"
-#include "VoiceActivityDetectorNode.h"
+#include <math/include/Tensor.h>
 
-// layers
-#include "ActivationLayer.h"
-#include "BatchNormalizationLayer.h"
-#include "BiasLayer.h"
-#include "BinaryConvolutionalLayer.h"
-#include "ConvolutionalLayer.h"
-#include "FullyConnectedLayer.h"
-#include "InputLayer.h"
-#include "PoolingLayer.h"
-#include "RegionDetectionLayer.h"
-#include "ScalingLayer.h"
+#include <nodes/include/BinaryOperationNode.h>
+#include <nodes/include/BufferNode.h>
+#include <nodes/include/ClockNode.h>
+#include <nodes/include/ConcatenationNode.h>
+#include <nodes/include/DCTNode.h>
+#include <nodes/include/DTWDistanceNode.h>
+#include <nodes/include/FFTNode.h>
+#include <nodes/include/FilterBankNode.h>
+#include <nodes/include/GRUNode.h>
+#include <nodes/include/HammingWindowNode.h>
+#include <nodes/include/IIRFilterNode.h>
+#include <nodes/include/LSTMNode.h>
+#include <nodes/include/NeuralNetworkPredictorNode.h>
+#include <nodes/include/ReorderDataNode.h>
+#include <nodes/include/TypeCastNode.h>
+#include <nodes/include/UnaryOperationNode.h>
+#include <nodes/include/VoiceActivityDetectorNode.h>
 
-// utilities
-#include "Exception.h"
+#include <predictors/neural/include/ActivationLayer.h>
+#include <predictors/neural/include/BatchNormalizationLayer.h>
+#include <predictors/neural/include/BiasLayer.h>
+#include <predictors/neural/include/BinaryConvolutionalLayer.h>
+#include <predictors/neural/include/ConvolutionalLayer.h>
+#include <predictors/neural/include/FullyConnectedLayer.h>
+#include <predictors/neural/include/InputLayer.h>
+#include <predictors/neural/include/PoolingLayer.h>
+#include <predictors/neural/include/RegionDetectionLayer.h>
+#include <predictors/neural/include/ScalingLayer.h>
 
-// stl
+#include <utilities/include/Exception.h>
+
 #include <algorithm>
 
 namespace ELL_API

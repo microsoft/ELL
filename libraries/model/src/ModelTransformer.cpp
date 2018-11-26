@@ -11,9 +11,8 @@
 #include "Node.h"
 #include "OutputNode.h"
 
-// utilities
-#include "Exception.h"
-#include "StringUtil.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/StringUtil.h>
 
 namespace ell
 {

@@ -89,7 +89,7 @@ source_group("neural\\src" FILES ${neural_src})
 source_group("neural\\tcc" FILES ${neural_tcc})
 
 add_library(${library_name} ${src} ${include} ${tcc} ${neural_src} ${neural_include} ${neural_tcc})
-target_include_directories(${library_name} PUBLIC include neural/include)
+target_include_directories(${library_name} PRIVATE include neural/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} data dsp math utilities)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
@@ -123,7 +123,7 @@ source_group("include" FILES ${test_include})
 source_group("tcc" FILES ${test_tcc})
 
 add_executable(${test_name} ${test_src} ${test_include} ${test_tcc})
-target_include_directories(${test_name} PRIVATE test/include)
+target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 
 target_link_libraries(${test_name} common data predictors testing )
 copy_shared_libraries(${test_name})
@@ -139,4 +139,3 @@ if(MSVC)
     target_compile_options(${library_name} PRIVATE /wd4505)
     target_compile_options(${test_name} PRIVATE /wd4505)
 endif()
-

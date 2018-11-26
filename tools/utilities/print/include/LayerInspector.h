@@ -1,12 +1,17 @@
 #pragma once
 
-// model
-#include "InputPort.h"
-#include "Model.h"
-#include "NeuralNetworkPredictorNode.h"
-#include "Node.h"
+#include <model/include/InputPort.h>
+#include <model/include/Model.h>
+#include <model/include/Node.h>
 
-// stl
+#include <nodes/include/NeuralNetworkPredictorNode.h>
+
+#include <predictors/neural/include/ActivationLayer.h>
+#include <predictors/neural/include/BinaryConvolutionalLayer.h>
+#include <predictors/neural/include/ConvolutionalLayer.h>
+#include <predictors/neural/include/PoolingLayer.h>
+#include <predictors/neural/include/ScalingLayer.h>
+
 #include <memory>
 #include <vector>
 

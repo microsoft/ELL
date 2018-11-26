@@ -11,15 +11,17 @@
 #include "IRCompiledMap.h"
 #include "InputPort.h"
 #include "MapCompiler.h"
-#include "ModelOptimizer.h"
 #include "Node.h"
 #include "NodeMap.h"
 #include "OutputPort.h"
 
-// emitters
-#include "LLVMUtilities.h"
+#include <model/optimizer/include/ModelOptimizer.h>
 
-// stl
+#include <emitters/include/LLVMUtilities.h>
+#include <emitters/include/IRModuleEmitter.h>
+
+#include <utilities/include/Logger.h>
+
 #include <string>
 #include <vector>
 

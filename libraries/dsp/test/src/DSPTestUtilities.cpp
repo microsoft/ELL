@@ -8,8 +8,7 @@
 
 #include "DSPTestUtilities.h"
 
-// math
-#include "MathConstants.h"
+#include <math/include/MathConstants.h>
 
 using namespace ell;
 

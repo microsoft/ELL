@@ -22,7 +22,7 @@ source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 
 add_library(${library_name} ${src} ${include} ${tcc})
-target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} data)
 
 # MSVC emits warnings incorrectly when mixing inheritance, templates,
@@ -46,7 +46,7 @@ source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include})
-target_include_directories(${test_name} PRIVATE test/include)
+target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} data evaluators functions predictors testing)
 copy_shared_libraries(${test_name})
 
@@ -58,7 +58,7 @@ endif()
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
-add_test(NAME ${test_name} 
+add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${test_name})
 set_test_library_path(${test_name})

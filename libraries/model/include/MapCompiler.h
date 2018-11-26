@@ -12,13 +12,11 @@
 #include "MapCompilerOptions.h"
 #include "OutputPort.h"
 
-// emitters
-#include "CompilerOptions.h"
-#include "EmitterTypes.h"
-#include "ModuleEmitter.h"
-#include "Variable.h"
+#include <emitters/include/CompilerOptions.h>
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/ModuleEmitter.h>
+#include <emitters/include/Variable.h>
 
-// stl
 #include <cassert>
 #include <stack>
 #include <string>

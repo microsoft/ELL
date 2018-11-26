@@ -12,13 +12,11 @@
 #include "ValueOperations.h"
 #include "ValueType.h"
 
-// utilities
-#include "Boolean.h"
-#include "Exception.h"
-#include "MemoryLayout.h"
-#include "TypeTraits.h"
+#include <utilities/include/Boolean.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/MemoryLayout.h>
+#include <utilities/include/TypeTraits.h>
 
-// stl
 #include <initializer_list>
 #include <optional>
 #include <type_traits>

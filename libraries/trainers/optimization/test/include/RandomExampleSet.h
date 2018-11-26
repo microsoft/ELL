@@ -8,15 +8,12 @@
 
 #pragma once
 
-// optimization
-#include "IndexedContainer.h"
-#include "OptimizationExample.h"
-#include "VectorSolution.h"
+#include <trainers/optimization/include/IndexedContainer.h>
+#include <trainers/optimization/include/OptimizationExample.h>
+#include <trainers/optimization/include/VectorSolution.h>
 
-// math
-#include "Vector.h"
+#include <math/include/Vector.h>
 
-// stl
 #include <memory>
 #include <random>
 

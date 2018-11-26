@@ -10,11 +10,9 @@
 
 #include "Activation.h"
 
-// math
-#include "Tensor.h"
+#include <math/include/Tensor.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

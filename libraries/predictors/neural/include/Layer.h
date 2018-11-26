@@ -8,19 +8,15 @@
 
 #pragma once
 
-#include "IPredictor.h"
+#include <predictors/include/IPredictor.h>
 
-// math
-#include "Tensor.h"
-#include "TensorOperations.h"
+#include <math/include/Tensor.h>
+#include <math/include/TensorOperations.h>
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// utilities
-#include "IArchivable.h"
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <cstddef>
 #include <memory>
 #include <ostream>

@@ -10,8 +10,7 @@
 #include <memory>
 #include <string>
 
-// utilities
-#include "CStringParser.h"
+#include <utilities/include/CStringParser.h>
 
 namespace ell
 {

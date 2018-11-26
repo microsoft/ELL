@@ -110,7 +110,7 @@ source_group("optimizer\\tcc" FILES ${optimizer_tcc})
 source_group("optimizer\\doc" FILES ${optimizer_doc})
 
 add_library(${library_name} ${src} ${include} ${tcc} ${doc} ${optimizer_src} ${optimizer_include} ${optimizer_tcc} ${optimizer_doc})
-target_include_directories(${library_name} PUBLIC include optimizer/include)
+target_include_directories(${library_name} PRIVATE include optimizer/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} utilities data emitters)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
@@ -147,7 +147,7 @@ source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include} ${include})
-target_include_directories(${test_name} PRIVATE test/include)
+target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} common model nodes testing utilities model_testing)
 copy_shared_libraries(${test_name})
 
@@ -189,7 +189,7 @@ source_group("include" FILES ${compiler_test_include})
 source_group("tcc" FILES ${compiler_test_tcc})
 
 add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include} ${compiler_test_tcc})
-target_include_directories(${compiler_test_name} PRIVATE test/include)
+target_include_directories(${compiler_test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${compiler_test_name} common model nodes passes testing model_testing utilities)
 copy_shared_libraries(${compiler_test_name})
 

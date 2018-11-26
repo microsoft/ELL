@@ -9,7 +9,6 @@
 
 #include "LLVMUtilities.h"
 
-// stl
 #include <ostream>
 #include <string>
 

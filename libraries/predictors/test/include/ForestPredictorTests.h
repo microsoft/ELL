@@ -8,7 +8,6 @@
 
 #pragma once
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
 void ForestPredictorTest();

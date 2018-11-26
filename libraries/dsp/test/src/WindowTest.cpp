@@ -9,16 +9,12 @@
 #include "WindowTest.h"
 #include "DSPTestData.h"
 
-// dsp
-#include "WindowFunctions.h"
+#include <dsp/include/WindowFunctions.h>
 
-// math
-#include "MathConstants.h"
+#include <math/include/MathConstants.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <algorithm>
 #include <cmath>
 #include <iostream>

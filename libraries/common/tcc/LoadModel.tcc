@@ -6,11 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "Archiver.h"
-#include "Exception.h"
-#include "Files.h"
-#include "JsonArchiver.h"
+#include <utilities/include/Archiver.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/JsonArchiver.h>
 
 namespace ell
 {

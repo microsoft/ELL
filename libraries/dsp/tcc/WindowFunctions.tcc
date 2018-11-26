@@ -6,12 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "WindowFunctions.h"
+#include <math/include/MathConstants.h>
 
-// math
-#include "MathConstants.h"
-
-// stl
 #include <cmath>
 
 namespace ell

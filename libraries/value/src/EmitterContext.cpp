@@ -10,10 +10,8 @@
 #include "Value.h"
 #include "ValueScalar.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// stl
 #include <tuple>
 #include <utility>
 

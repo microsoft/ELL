@@ -11,66 +11,55 @@
 #include "NodesTestData.h"
 #include "NodesTestUtilities.h"
 
-#include "ModelTestUtilities.h"
+#include <model_testing/include/ModelTestUtilities.h>
 
-// common
-#include "LoadModel.h"
+#include <common/include/DataLoaders.h>
+#include <common/include/LoadModel.h>
 
-// dsp
-#include "Convolution.h"
+#include <dsp/include/Convolution.h>
 
-// math
-#include "MathConstants.h"
-#include "Tensor.h"
-#include "TensorOperations.h"
-#include "Vector.h"
+#include <math/include/MathConstants.h>
+#include <math/include/Tensor.h>
+#include <math/include/TensorOperations.h>
+#include <math/include/Vector.h>
 
-// model
-#include "InputNode.h"
-#include "Model.h"
-#include "Node.h"
+#include <model/include/InputNode.h>
+#include <model/include/Model.h>
+#include <model/include/Node.h>
 
-// nodes
-#include "BufferNode.h"
-#include "ConstantNode.h"
-#include "DTWDistanceNode.h"
-#include "DelayNode.h"
-#include "DiagonalConvolutionNode.h"
-#include "FFTNode.h"
-#include "FilterBankNode.h"
-#include "GRUNode.h"
-#include "IIRFilterNode.h"
-#include "LSTMNode.h"
-#include "RNNNode.h"
-#include "SimpleConvolutionNode.h"
-#include "UnrolledConvolutionNode.h"
-#include "VoiceActivityDetectorNode.h"
-#include "WinogradConvolutionNode.h"
+#include <nodes/include/BufferNode.h>
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/DTWDistanceNode.h>
+#include <nodes/include/DelayNode.h>
+#include <nodes/include/DiagonalConvolutionNode.h>
+#include <nodes/include/FFTNode.h>
+#include <nodes/include/FilterBankNode.h>
+#include <nodes/include/GRUNode.h>
+#include <nodes/include/IIRFilterNode.h>
+#include <nodes/include/LSTMNode.h>
+#include <nodes/include/RNNNode.h>
+#include <nodes/include/SimpleConvolutionNode.h>
+#include <nodes/include/UnrolledConvolutionNode.h>
+#include <nodes/include/VoiceActivityDetectorNode.h>
+#include <nodes/include/WinogradConvolutionNode.h>
 
-// predictors
-#include "NeuralNetworkPredictor.h"
-#include "SigmoidActivation.h"
-#include "TanhActivation.h"
+#include <predictors/include/NeuralNetworkPredictor.h>
 
-// predictors/neural
-#include "ConvolutionalLayer.h"
+#include <predictors/neural/include/SigmoidActivation.h>
+#include <predictors/neural/include/TanhActivation.h>
+#include <predictors/neural/include/ConvolutionalLayer.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// data
-#include "DataLoaders.h"
-#include "Dataset.h"
-#include "Example.h"
-#include "WeightLabel.h"
+#include <data/include/Dataset.h>
+#include <data/include/Example.h>
+#include <data/include/WeightLabel.h>
 
-// utilities
-#include "Exception.h"
-#include "Files.h"
-#include "RandomEngines.h"
-#include "StringUtil.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/RandomEngines.h>
+#include <utilities/include/StringUtil.h>
 
-// stl
 #include <cmath>
 #include <iostream>
 #include <memory>

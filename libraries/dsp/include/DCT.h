@@ -6,16 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// math
-#include "MathConstants.h"
-#include "Matrix.h"
-#include "MatrixOperations.h"
-#include "Vector.h"
+#include <math/include/MathConstants.h>
+#include <math/include/Matrix.h>
+#include <math/include/MatrixOperations.h>
+#include <math/include/Vector.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// stl
 #include <cmath>
 #include <vector>
 

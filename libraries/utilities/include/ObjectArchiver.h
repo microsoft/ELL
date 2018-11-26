@@ -13,7 +13,6 @@
 #include "ObjectArchive.h"
 #include "TypeName.h"
 
-// stl
 #include <cstddef>
 #include <cstdint>
 #include <string>

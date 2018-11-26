@@ -8,12 +8,10 @@
 
 #include "Example_test.h"
 
-#include "Example.h"
+#include <data/include/Example.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <sstream>
 
 namespace ell

@@ -9,8 +9,7 @@
 #include "IRTask.h"
 #include "IRFunctionEmitter.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

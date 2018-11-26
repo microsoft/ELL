@@ -8,10 +8,8 @@
 
 #include "WeightLabel.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// stl
 #include <iostream>
 
 namespace ell

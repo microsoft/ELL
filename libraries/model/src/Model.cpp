@@ -13,10 +13,8 @@
 #include "SliceNode.h"
 #include "SpliceNode.h"
 
-// utility
-#include "StringUtil.h"
+#include <utilities/include/StringUtil.h>
 
-// stl
 #include <algorithm>
 #include <unordered_map>
 

@@ -8,22 +8,18 @@
 
 #include "RandomExampleSet.h"
 
-// optimization
-#include "IndexedContainer.h"
-#include "MatrixSolution.h"
-#include "MultivariateLoss.h"
-#include "OptimizationExample.h"
-#include "SDCAOptimizer.h"
-#include "SGDOptimizer.h"
-#include "VectorSolution.h"
+#include <trainers/optimization/include/IndexedContainer.h>
+#include <trainers/optimization/include/MatrixSolution.h>
+#include <trainers/optimization/include/MultivariateLoss.h>
+#include <trainers/optimization/include/OptimizationExample.h>
+#include <trainers/optimization/include/SDCAOptimizer.h>
+#include <trainers/optimization/include/SGDOptimizer.h>
+#include <trainers/optimization/include/VectorSolution.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// math
-#include "Vector.h"
+#include <math/include/Vector.h>
 
-// stl
 #include <memory>
 #include <string>
 

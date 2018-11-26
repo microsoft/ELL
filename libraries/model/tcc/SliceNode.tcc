@@ -2,15 +2,9 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     SliceNode.tcc (model)
-//  Authors:  SliceNode
+//  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#pragma once
-
-#include "IRMapCompiler.h"
-#include "Model.h"
-#include "ModelTransformer.h"
 
 namespace ell
 {

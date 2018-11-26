@@ -13,10 +13,8 @@
 #include "IRModuleEmitter.h"
 #include "LLVMUtilities.h"
 
-// utilities
-#include "UniqueId.h"
+#include <utilities/include/UniqueId.h>
 
-// stl
 #include <algorithm>
 #include <functional>
 #include <iterator>

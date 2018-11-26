@@ -10,14 +10,11 @@
 
 #include "TrainerArguments.h"
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// utilities
-#include "Evaluator.h"
-#include "IncrementalEvaluator.h"
+#include <evaluators/include/Evaluator.h>
+#include <evaluators/include/IncrementalEvaluator.h>
 
-// stl
 #include <memory>
 
 namespace ell

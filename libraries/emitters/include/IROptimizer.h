@@ -9,7 +9,6 @@
 
 #include "LLVMUtilities.h"
 
-// llvm
 #include <llvm/IR/LegacyPassManager.h>
 
 namespace ell

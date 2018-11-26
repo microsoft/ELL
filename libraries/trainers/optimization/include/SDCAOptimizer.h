@@ -7,14 +7,18 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// math
-#include "Vector.h"
+#include "Common.h"
+#include "Expression.h"
 
-// stl
+#include <math/include/Vector.h>
+
+#include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <numeric>
 #include <random>
 #include <string>
+#include <vector>
 
 namespace ell
 {

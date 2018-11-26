@@ -8,11 +8,9 @@
 
 #include "ModelBuilder.h"
 
-// utilities
-#include "Exception.h"
-#include "JsonArchiver.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/JsonArchiver.h>
 
-// stl
 #include <sstream>
 
 namespace ell

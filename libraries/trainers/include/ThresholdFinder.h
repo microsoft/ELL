@@ -8,13 +8,10 @@
 
 #pragma once
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// predictor
-#include "SingleElementThresholdPredictor.h"
+#include <predictors/include/SingleElementThresholdPredictor.h>
 
-// stl
 #include <vector>
 
 namespace ell

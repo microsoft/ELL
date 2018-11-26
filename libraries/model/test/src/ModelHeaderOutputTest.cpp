@@ -8,30 +8,25 @@
 
 #include "ModelHeaderOutputTest.h"
 
-// model
-#include "IRCompiledMap.h"
-#include "InputNode.h"
-#include "Map.h"
-#include "Model.h"
-#include "OutputNode.h"
+#include <model/include/IRCompiledMap.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/InputNode.h>
+#include <model/include/Map.h>
+#include <model/include/Model.h>
+#include <model/include/OutputNode.h>
 
-// emitters
-#include "IRHeaderWriter.h"
-#include "IRMapCompiler.h"
-#include "IRModuleEmitter.h"
-#include "IRSwigInterfaceWriter.h"
+#include <emitters/include/IRHeaderWriter.h>
+#include <emitters/include/IRModuleEmitter.h>
+#include <emitters/include/IRSwigInterfaceWriter.h>
 
-// nodes
-#include "ClockNode.h"
-#include "ConstantNode.h"
-#include "SinkNode.h"
-#include "SourceNode.h"
-#include "SumNode.h"
+#include <nodes/include/ClockNode.h>
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/SinkNode.h>
+#include <nodes/include/SourceNode.h>
+#include <nodes/include/SumNode.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <iostream>
 #include <sstream>
 #include <string>

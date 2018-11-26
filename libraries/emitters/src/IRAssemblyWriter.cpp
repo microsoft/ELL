@@ -17,7 +17,6 @@
 #include "IRDiagnosticHandler.h"
 #include "IRModuleEmitter.h"
 
-// llvm
 #include <llvm/ADT/Triple.h>
 #include <llvm/Analysis/TargetLibraryInfo.h>
 
@@ -45,7 +44,6 @@
 
 #include <llvm/Target/TargetMachine.h>
 
-// stl
 #include <functional>
 #include <memory>
 #include <string>

@@ -8,7 +8,13 @@
 
 #pragma once
 
-// stl
+#include "CStringParser.h"
+#include "Exception.h"
+
+#include <cctype>
+#include <iomanip>
+#include <sstream>
+#include <type_traits>
 #include <ostream>
 #include <string>
 

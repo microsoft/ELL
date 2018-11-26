@@ -8,13 +8,11 @@
 
 #pragma once
 
-// stl
+#include <math/include/Matrix.h>
+
 #include <cstddef>
 #include <map>
 #include <memory>
-
-// Matrix
-#include <Matrix.h>
 
 namespace ell
 {

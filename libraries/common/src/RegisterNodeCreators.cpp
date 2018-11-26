@@ -8,31 +8,29 @@
 
 #include "RegisterNodeCreators.h"
 
-// model
-#include "InputNode.h"
-#include "ModelBuilder.h"
-#include "OutputNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/ModelBuilder.h>
+#include <model/include/OutputNode.h>
 
-// nodes
-#include "BinaryOperationNode.h"
-#include "BinaryPredicateNode.h"
-#include "BufferNode.h"
-#include "ConcatenationNode.h"
-#include "DCTNode.h"
-#include "DelayNode.h"
-#include "DotProductNode.h"
-#include "ExtremalValueNode.h"
-#include "FFTNode.h"
-#include "ForestPredictorNode.h"
-#include "HammingWindowNode.h"
-#include "IIRFilterNode.h"
-#include "L2NormSquaredNode.h"
-#include "LinearPredictorNode.h"
-#include "MovingAverageNode.h"
-#include "MovingVarianceNode.h"
-#include "MultiplexerNode.h"
-#include "UnaryOperationNode.h"
-#include "ValueSelectorNode.h"
+#include <nodes/include/BinaryOperationNode.h>
+#include <nodes/include/BinaryPredicateNode.h>
+#include <nodes/include/BufferNode.h>
+#include <nodes/include/ConcatenationNode.h>
+#include <nodes/include/DCTNode.h>
+#include <nodes/include/DelayNode.h>
+#include <nodes/include/DotProductNode.h>
+#include <nodes/include/ExtremalValueNode.h>
+#include <nodes/include/FFTNode.h>
+#include <nodes/include/ForestPredictorNode.h>
+#include <nodes/include/HammingWindowNode.h>
+#include <nodes/include/IIRFilterNode.h>
+#include <nodes/include/L2NormSquaredNode.h>
+#include <nodes/include/LinearPredictorNode.h>
+#include <nodes/include/MovingAverageNode.h>
+#include <nodes/include/MovingVarianceNode.h>
+#include <nodes/include/MultiplexerNode.h>
+#include <nodes/include/UnaryOperationNode.h>
+#include <nodes/include/ValueSelectorNode.h>
 
 namespace ell
 {

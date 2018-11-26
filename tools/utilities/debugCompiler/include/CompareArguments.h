@@ -8,11 +8,9 @@
 
 #pragma once
 
-// utilities
-#include "CommandLineParser.h"
-#include "OutputStreamImpostor.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/OutputStreamImpostor.h>
 
-// stl
 #include <ios>
 #include <locale>
 #include <string>

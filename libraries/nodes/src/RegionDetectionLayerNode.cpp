@@ -9,7 +9,8 @@
 #include "RegionDetectionLayerNode.h"
 #include "ActivationLayerNode.h"
 #include "CompiledActivationFunctions.h"
-#include "SigmoidActivation.h"
+
+#include <predictors/neural/include/SigmoidActivation.h>
 
 namespace ell
 {

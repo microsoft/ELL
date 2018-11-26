@@ -8,10 +8,8 @@
 
 #pragma once
 
-// model
-#include "Model.h"
+#include <model/include/Model.h>
 
-// stl
 #include <ostream>
 
 namespace ell

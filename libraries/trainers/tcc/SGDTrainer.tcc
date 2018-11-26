@@ -6,16 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// stl
 #include <cmath>
 
-// data
-#include "DataVector.h"
-#include "DataVectorOperations.h"
-#include "Dataset.h"
+#include <data/include/DataVector.h>
+#include <data/include/DataVectorOperations.h>
+#include <data/include/Dataset.h>
 
-// math
-#include "VectorOperations.h"
+#include <math/include/VectorOperations.h>
 
 namespace ell
 {

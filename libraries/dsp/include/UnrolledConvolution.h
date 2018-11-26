@@ -10,9 +10,8 @@
 
 #include "Convolution.h"
 
-// math
-#include "Tensor.h"
-#include "Vector.h"
+#include <math/include/Tensor.h>
+#include <math/include/Vector.h>
 
 namespace ell
 {

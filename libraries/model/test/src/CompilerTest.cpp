@@ -8,51 +8,45 @@
 
 #include "CompilerTest.h"
 #include "ModelMaker.h"
-#include "ModelTestUtilities.h"
 
-// model
-#include "CompilableNode.h"
-#include "IRCompiledMap.h"
-#include "Map.h"
-#include "Model.h"
+#include <model_testing/include/ModelTestUtilities.h>
 
-// nodes
-#include "AccumulatorNode.h"
-#include "ClockNode.h"
-#include "ConstantNode.h"
-#include "DelayNode.h"
-#include "DotProductNode.h"
-#include "ForestPredictorNode.h"
-#include "L2NormSquaredNode.h"
-#include "LinearPredictorNode.h"
-#include "MatrixVectorProductNode.h"
-#include "ProtoNNPredictorNode.h"
-#include "SinkNode.h"
-#include "SourceNode.h"
-#include "SquaredEuclideanDistanceNode.h"
-#include "SumNode.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/IRCompiledMap.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/Map.h>
+#include <model/include/Model.h>
 
-// emitters
-#include "EmitterException.h"
-#include "EmitterTypes.h"
-#include "IREmitter.h"
-#include "IRFunctionEmitter.h"
-#include "IRMapCompiler.h"
-#include "IRModuleEmitter.h"
-#include "ScalarVariable.h"
-#include "VectorVariable.h"
+#include <nodes/include/AccumulatorNode.h>
+#include <nodes/include/ClockNode.h>
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/DelayNode.h>
+#include <nodes/include/DotProductNode.h>
+#include <nodes/include/ForestPredictorNode.h>
+#include <nodes/include/L2NormSquaredNode.h>
+#include <nodes/include/LinearPredictorNode.h>
+#include <nodes/include/MatrixVectorProductNode.h>
+#include <nodes/include/ProtoNNPredictorNode.h>
+#include <nodes/include/SinkNode.h>
+#include <nodes/include/SourceNode.h>
+#include <nodes/include/SquaredEuclideanDistanceNode.h>
+#include <nodes/include/SumNode.h>
 
-// predictors
-#include "LinearPredictor.h"
-#include "ProtoNNPredictor.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/IREmitter.h>
+#include <emitters/include/IRFunctionEmitter.h>
+#include <emitters/include/IRModuleEmitter.h>
+#include <emitters/include/ScalarVariable.h>
+#include <emitters/include/VectorVariable.h>
 
-// utilities
-#include "Logger.h"
+#include <predictors/include/LinearPredictor.h>
+#include <predictors/include/ProtoNNPredictor.h>
 
-// testing
-#include "testing.h"
+#include <utilities/include/Logger.h>
 
-// stl
+#include <testing/include/testing.h>
+
 #include <iostream>
 #include <ostream>
 #include <string>

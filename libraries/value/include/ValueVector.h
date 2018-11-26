@@ -13,8 +13,7 @@
 #include "ValueScalar.h"
 #include "ValueVectorOperations.h"
 
-// utilities
-#include "MemoryLayout.h"
+#include <utilities/include/MemoryLayout.h>
 
 #include <functional>
 

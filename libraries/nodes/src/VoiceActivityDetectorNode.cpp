@@ -8,11 +8,10 @@
 
 #include "VoiceActivityDetectorNode.h"
 
-// emitters
-#include "EmitterException.h"
-#include "EmitterTypes.h"
-#include "IREmitter.h"
-#include "IRLocalValue.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/IREmitter.h>
+#include <emitters/include/IRLocalValue.h>
 
 namespace ell
 {

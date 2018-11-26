@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "IndexValue.h"
+#include <data/include/IndexValue.h>
 
 namespace ell
 {

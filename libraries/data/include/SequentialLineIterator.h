@@ -10,7 +10,6 @@
 
 #include "TextLine.h"
 
-// stl
 #include <fstream>
 #include <memory>
 #include <string>

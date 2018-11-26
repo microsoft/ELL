@@ -7,35 +7,30 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Model_test.h"
-#include "ModelTestUtilities.h"
 
-// common
-#include "LoadModel.h"
+#include <model_testing/include/ModelTestUtilities.h>
 
-// model
-#include "InputNode.h"
-#include "InputPort.h"
-#include "Model.h"
-#include "ModelEditor.h"
-#include "ModelTransformer.h"
-#include "Node.h"
-#include "OutputNode.h"
-#include "OutputPort.h"
+#include <common/include/LoadModel.h>
 
-// nodes
-#include "ConstantNode.h"
-#include "DotProductNode.h"
-#include "ExtremalValueNode.h"
-#include "MovingAverageNode.h"
-#include "ValueSelectorNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/InputPort.h>
+#include <model/include/Model.h>
+#include <model/include/ModelEditor.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+#include <model/include/OutputNode.h>
+#include <model/include/OutputPort.h>
 
-// testing
-#include "testing.h"
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/DotProductNode.h>
+#include <nodes/include/ExtremalValueNode.h>
+#include <nodes/include/MovingAverageNode.h>
+#include <nodes/include/ValueSelectorNode.h>
 
-// utilities
-#include "Unused.h"
+#include <testing/include/testing.h>
 
-// stl
+#include <utilities/include/Unused.h>
+
 #include <iomanip>
 #include <iostream>
 #include <unordered_map>

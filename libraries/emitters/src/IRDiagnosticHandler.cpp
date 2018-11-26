@@ -8,13 +8,11 @@
 
 #include "IRDiagnosticHandler.h"
 
-// llvm
 #include <llvm/IR/DiagnosticInfo.h>
 #include <llvm/IR/DiagnosticPrinter.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/Support/raw_os_ostream.h>
 
-// stl
 #include <iostream>
 #include <sstream>
 

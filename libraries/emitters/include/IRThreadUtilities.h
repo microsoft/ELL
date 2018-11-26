@@ -11,7 +11,6 @@
 #include "IRFunctionEmitter.h"
 #include "IRModuleEmitter.h"
 
-// stl
 #include <string>
 #include <vector>
 

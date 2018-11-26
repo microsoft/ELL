@@ -8,8 +8,7 @@
 
 #pragma once
 
-// model
-#include "Model.h"
+#include <model/include/Model.h>
 
 ell::model::Model GenerateIdentityModel(size_t dimension);
 ell::model::Model GenerateTimesTwoModel(size_t dimension);

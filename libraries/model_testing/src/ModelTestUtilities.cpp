@@ -8,19 +8,16 @@
 
 #include "ModelTestUtilities.h"
 
-// model
-#include "InputNode.h"
-#include "InputPort.h"
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "OutputNode.h"
-#include "OutputPort.h"
+#include <model/include/InputNode.h>
+#include <model/include/InputPort.h>
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/OutputNode.h>
+#include <model/include/OutputPort.h>
 
-// nodes
-#include "ExtremalValueNode.h"
-#include "MovingAverageNode.h"
+#include <nodes/include/ExtremalValueNode.h>
+#include <nodes/include/MovingAverageNode.h>
 
-// stl
 #include <iostream>
 
 using namespace ell;

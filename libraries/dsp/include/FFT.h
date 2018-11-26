@@ -6,14 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// math
-#include "MathConstants.h"
-#include "Vector.h"
+#include <math/include/MathConstants.h>
+#include <math/include/Vector.h>
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
-// stl
 #include <complex>
 #include <vector>
 

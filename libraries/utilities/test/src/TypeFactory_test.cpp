@@ -6,12 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "TypeFactory.h"
+#include <utilities/include/TypeFactory.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-//stl
 #include <memory>
 #include <string>
 

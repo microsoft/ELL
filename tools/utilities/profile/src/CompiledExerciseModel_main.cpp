@@ -10,7 +10,6 @@
 #define ELL_MAIN
 #include "compiled_model_noprofile.h"
 
-// stl
 #include <cstring>
 #include <iostream>
 #include <random>

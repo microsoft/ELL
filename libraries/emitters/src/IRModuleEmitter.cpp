@@ -16,11 +16,9 @@
 #include "IRSwigInterfaceWriter.h"
 #include "LLVMUtilities.h"
 
-// utilities
-#include "Files.h"
-#include "Logger.h"
+#include <utilities/include/Files.h>
+#include <utilities/include/Logger.h>
 
-// llvm
 #include <llvm/ADT/Triple.h>
 #include <llvm/AsmParser/Parser.h>
 #include <llvm/Bitcode/BitcodeWriter.h>

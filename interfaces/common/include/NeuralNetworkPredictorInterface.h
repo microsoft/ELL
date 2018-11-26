@@ -7,14 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// apis
 #include "MathInterface.h"
 #include "ModelInterface.h"
 #include "NeuralLayersInterface.h"
 
 #ifndef SWIG
-#include "NeuralNetworkPredictor.h"
-// stl
+#include <predictors/include/NeuralNetworkPredictor.h>
+
 #include <memory>
 #include <string>
 #include <vector>

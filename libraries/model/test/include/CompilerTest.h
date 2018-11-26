@@ -8,10 +8,21 @@
 
 #pragma once
 
-#include "Map.h"
+#include <model_testing/include/ModelTestUtilities.h>
 
-// stl
+#include <emitters/include/IREmitter.h>
+
+#include <model/include/CompiledMap.h>
+#include <model/include/IRCompiledMap.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/Map.h>
+#include <model/include/OutputNode.h>
+
+#include <nodes/include/LinearPredictorNode.h>
+
 #include <string>
+
+using namespace ell;
 
 void SetOutputPathBase(std::string path);
 std::string OutputPath(std::string relPath);

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Tensor.h"
+#include <math/include/Tensor.h>
 
 template <typename ValueType>
 ell::math::RowVector<ValueType> Get1DReferenceFilter();

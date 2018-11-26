@@ -8,11 +8,9 @@
 
 #pragma once
 
-// dsp
-#include "Convolution.h"
+#include <dsp/include/Convolution.h>
 
-// model
-#include "Map.h"
+#include <model/include/Map.h>
 
 namespace ell
 {

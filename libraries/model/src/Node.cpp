@@ -11,10 +11,8 @@
 #include "ModelTransformer.h"
 #include "OutputPort.h"
 
-// utilities
-#include "IArchivable.h"
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <unordered_set>
 
 namespace ell

@@ -7,15 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "Common.h"
 #include "Expression.h"
 #include "IndexedContainer.h"
 #include "OptimizationExample.h"
 
-// math
-#include "Vector.h"
-#include "VectorOperations.h"
+#include <math/include/Vector.h>
+#include <math/include/VectorOperations.h>
 
-// stl
 #include <type_traits>
 
 namespace ell

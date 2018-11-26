@@ -8,7 +8,6 @@
 
 #include "TypeName.h"
 
-// stl
 #include <string>
 #include <vector>
 

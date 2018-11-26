@@ -8,17 +8,13 @@
 
 #include "DSPTestData.h"
 
-// dsp
-#include "DCT.h"
+#include <dsp/include/DCT.h>
 
-// math
-#include "Matrix.h"
-#include "MatrixOperations.h"
+#include <math/include/Matrix.h>
+#include <math/include/MatrixOperations.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <iostream>
 #include <type_traits>
 #include <vector>

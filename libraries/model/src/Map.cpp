@@ -7,12 +7,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Map.h"
-#include "Exception.h"
 #include "ModelOptimizer.h"
 #include "ModelTransformer.h"
 #include "OutputNode.h"
 
-// stl
+#include <utilities/include/Exception.h>
+
 #include <algorithm>
 #include <iomanip>
 #include <unordered_set>

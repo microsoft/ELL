@@ -8,8 +8,7 @@
 
 #pragma once
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
 template <typename ElementType>
 void LinearPredictorTest();

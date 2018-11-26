@@ -9,7 +9,6 @@
 #include "IRLocalArray.h"
 #include "IRFunctionEmitter.h"
 
-// LLVM
 #include <llvm/IR/Value.h>
 
 namespace ell

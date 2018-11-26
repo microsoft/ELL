@@ -10,21 +10,18 @@
 
 #include "SumNode.h"
 
-// model
 #include "BinaryOperationNode.h"
-#include "CompilableNode.h"
-#include "CompilableNodeUtilities.h"
-#include "IRMapCompiler.h"
-#include "InputPort.h"
-#include "MapCompiler.h"
-#include "ModelTransformer.h"
-#include "OutputPort.h"
-#include "PortElements.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/CompilableNodeUtilities.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/InputPort.h>
+#include <model/include/MapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/OutputPort.h>
+#include <model/include/PortElements.h>
 
-// utilities
-#include "TypeName.h"
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <string>
 
 namespace ell

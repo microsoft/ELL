@@ -8,17 +8,16 @@
 
 #pragma once
 
-// model
 #include "CompilableNode.h"
+#include "IRMapCompiler.h"
 #include "InputPort.h"
+#include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
 
-// utilities
-#include "Exception.h"
-#include "TypeName.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <memory>
 #include <string>
 #include <vector>

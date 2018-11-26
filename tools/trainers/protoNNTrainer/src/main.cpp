@@ -6,48 +6,39 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "CommandLineParser.h"
-#include "Exception.h"
-#include "Files.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
 
-// data
-#include "Dataset.h"
-#include "Example.h"
+#include <data/include/Dataset.h>
+#include <data/include/Example.h>
 
-// common
-#include "DataLoadArguments.h"
-#include "DataLoaders.h"
-#include "EvaluatorArguments.h"
-#include "LoadModel.h"
-#include "MakeEvaluator.h"
-#include "MakeTrainer.h"
-#include "MapLoadArguments.h"
-#include "MapSaveArguments.h"
-#include "ModelLoadArguments.h"
-#include "ModelSaveArguments.h"
-#include "ProtoNNTrainerArguments.h"
-#include "TrainerArguments.h"
+#include <common/include/DataLoadArguments.h>
+#include <common/include/DataLoaders.h>
+#include <common/include/EvaluatorArguments.h>
+#include <common/include/LoadModel.h>
+#include <common/include/MakeEvaluator.h>
+#include <common/include/MakeTrainer.h>
+#include <common/include/MapLoadArguments.h>
+#include <common/include/MapSaveArguments.h>
+#include <common/include/ModelLoadArguments.h>
+#include <common/include/ModelSaveArguments.h>
+#include <common/include/ProtoNNTrainerArguments.h>
+#include <common/include/TrainerArguments.h>
 
-// math
-#include "MatrixOperations.h"
+#include <math/include/MatrixOperations.h>
 
-// model
-#include "InputNode.h"
-#include "Map.h"
-#include "Model.h"
-#include "OutputNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/Map.h>
+#include <model/include/Model.h>
+#include <model/include/OutputNode.h>
 
-// trainer
-#include "ProtoNNTrainer.h"
+#include <trainers/include/ProtoNNTrainer.h>
 
-// predictor
-#include "ProtoNNPredictor.h"
+#include <predictors/include/ProtoNNPredictor.h>
 
-// nodes
-#include "ProtoNNPredictorNode.h"
+#include <nodes/include/ProtoNNPredictorNode.h>
 
-// stl
 #include <iostream>
 #include <memory>
 #include <stdexcept>

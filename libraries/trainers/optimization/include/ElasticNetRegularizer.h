@@ -9,6 +9,7 @@
 #pragma once
 
 #include "MatrixSolution.h"
+#include "NormProx.h"
 #include "VectorSolution.h"
 
 namespace ell

@@ -8,14 +8,11 @@
 
 #include "NodesTests.h"
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Exception.h"
-#include "Unused.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/Unused.h>
 
-// stl
 #include <iostream>
 
 using namespace ell;

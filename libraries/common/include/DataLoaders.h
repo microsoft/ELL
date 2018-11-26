@@ -10,14 +10,11 @@
 
 #include "DataLoadArguments.h"
 
-// data
-#include "Dataset.h"
-#include "ExampleIterator.h"
+#include <data/include/Dataset.h>
+#include <data/include/ExampleIterator.h>
 
-// model
-#include "Map.h"
+#include <model/include/Map.h>
 
-// stl
 #include <istream>
 #include <string>
 

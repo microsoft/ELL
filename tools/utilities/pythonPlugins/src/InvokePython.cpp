@@ -5,9 +5,12 @@
 //  Authors:  Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "InvokePython.h"
-#include "Exception.h"
-#include "Files.h"
+
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+
 #include <stdexcept>
 #include <string>
 #include <vector>

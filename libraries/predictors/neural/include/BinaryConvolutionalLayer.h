@@ -10,8 +10,7 @@
 #include "ConvolutionalLayer.h"
 #include "Layer.h"
 
-// math
-#include "Matrix.h"
+#include <math/include/Matrix.h>
 
 namespace ell
 {

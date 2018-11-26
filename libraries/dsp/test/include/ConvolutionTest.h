@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Convolution.h"
+#include <dsp/include/Convolution.h>
 
 struct Extent2D
 {

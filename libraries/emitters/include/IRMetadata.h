@@ -9,7 +9,6 @@
 
 #include "LLVMUtilities.h"
 
-// stl
 #include <string>
 #include <unordered_set>
 #include <vector>

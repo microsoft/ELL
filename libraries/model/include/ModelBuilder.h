@@ -10,12 +10,10 @@
 #include "Model.h"
 #include "Node.h"
 
-// utilities
-#include "FunctionUtils.h"
-#include "TupleUtils.h"
-#include "Variant.h"
+#include <utilities/include/FunctionUtils.h>
+#include <utilities/include/TupleUtils.h>
+#include <utilities/include/Variant.h>
 
-// stl
 #include <map>
 #include <string>
 #include <vector>

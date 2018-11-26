@@ -9,23 +9,21 @@
 #include "IRMapCompiler.h"
 #include "CompilableNode.h"
 #include "CompilableNodeUtilities.h"
-#include "IRMetadata.h"
 #include "IRModelProfiler.h"
 #include "Model.h"
 #include "ModelOptimizer.h"
 #include "OptimizationPassRegistry.h"
 #include "OutputNode.h"
 
-// emitters
-#include "EmitterException.h"
-#include "LLVMUtilities.h"
-#include "Variable.h"
+#include <emitters/include/IRMetadata.h>
 
-// utils
-#include "Logger.h"
-#include "StringUtil.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/LLVMUtilities.h>
+#include <emitters/include/Variable.h>
 
-// stl
+#include <utilities/include/Logger.h>
+#include <utilities/include/StringUtil.h>
+
 #include <tuple>
 
 namespace ell

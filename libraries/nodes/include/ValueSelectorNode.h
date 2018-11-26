@@ -8,14 +8,12 @@
 
 #pragma once
 
-#include "InputPort.h"
-#include "Node.h"
-#include "OutputPort.h"
+#include <model/include/InputPort.h>
+#include <model/include/Node.h>
+#include <model/include/OutputPort.h>
 
-// utilities
-#include "TypeName.h"
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <exception>
 #include <vector>
 

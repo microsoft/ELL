@@ -6,22 +6,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// functions
-#include "L2Regularizer.h"
-#include "LogLoss.h"
-#include "SquaredLoss.h"
+#include <functions/include/L2Regularizer.h>
+#include <functions/include/LogLoss.h>
+#include <functions/include/SquaredLoss.h>
 
-// trainers
-#include "MeanCalculator.h"
-#include "SDCATrainer.h"
-#include "SGDTrainer.h"
-#include "SquaredLoss.h"
+#include <trainers/include/MeanCalculator.h>
+#include <trainers/include/SDCATrainer.h>
+#include <trainers/include/SGDTrainer.h>
 
-// utilities
-#include "testing.h"
+#include <testing/include/testing.h>
 
 using namespace ell;
 

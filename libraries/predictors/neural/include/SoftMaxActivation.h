@@ -8,11 +8,9 @@
 
 #pragma once
 
-// math
-#include "Tensor.h"
-#include "Vector.h"
+#include <math/include/Tensor.h>
+#include <math/include/Vector.h>
 
-// stl
 #include <memory>
 
 namespace ell

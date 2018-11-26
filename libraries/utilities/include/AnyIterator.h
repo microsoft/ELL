@@ -10,7 +10,6 @@
 
 #include "IIterator.h"
 
-// stl
 #include <functional>
 #include <memory>
 #include <utility>

@@ -8,22 +8,18 @@
 
 #include "VoiceActivityDetectorTest.h"
 
-// vad
-#include "VoiceActivityDetector.h"
+#include <dsp/include/VoiceActivityDetector.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Files.h"
-#include "JsonArchiver.h"
-#include "StringUtil.h"
+#include <utilities/include/Files.h>
+#include <utilities/include/JsonArchiver.h>
+#include <utilities/include/StringUtil.h>
 
-// data
-#include "DataLoaders.h"
-#include "Dataset.h"
+#include <common/include/DataLoaders.h>
 
-// stl
+#include <data/include/Dataset.h>
+
 #include <algorithm>
 #include <iostream>
 #include <type_traits>

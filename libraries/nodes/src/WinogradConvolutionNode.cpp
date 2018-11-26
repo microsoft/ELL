@@ -10,18 +10,14 @@
 #include "ConstantNode.h"
 #include "ReorderDataNode.h"
 
-// dsp
-#include "WinogradConvolution.h"
+#include <dsp/include/WinogradConvolution.h>
 
-// math
-#include "Matrix.h"
+#include <math/include/Matrix.h>
 
-// emitters
-#include "IRProfiler.h"
+#include <emitters/include/IRProfiler.h>
 
-// utilities
-#include "Logger.h"
-#include "Unused.h"
+#include <utilities/include/Logger.h>
+#include <utilities/include/Unused.h>
 
 // #define PROFILE_REGIONS
 

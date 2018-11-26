@@ -6,11 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// math
-#include "TensorOperations.h"
+#include <math/include/TensorOperations.h>
 
-// utilities
-#include "testing.h"
+#include <testing/include/testing.h>
 
 // stl
 #include <cstdlib> // rand

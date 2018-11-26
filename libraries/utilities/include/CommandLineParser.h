@@ -7,14 +7,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+#include "Exception.h"
 #include "StringUtil.h"
 
-// stl
 #include <cstddef>
 #include <functional>
 #include <initializer_list>
 #include <map>
 #include <set>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>

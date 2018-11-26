@@ -8,7 +8,6 @@
 
 #include "CStringParser.h"
 
-// stl
 #include <cctype>
 
 namespace ell

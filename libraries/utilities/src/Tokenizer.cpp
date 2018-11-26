@@ -10,7 +10,6 @@
 #include "Exception.h"
 #include "Files.h"
 
-// stl
 #include <cassert>
 #include <cctype>
 #include <istream>

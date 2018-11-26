@@ -7,30 +7,27 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PerformanceCountersTest.h"
-#include "ModelTestUtilities.h"
 
-// model
-#include "CompiledMap.h"
-#include "EmitterException.h"
-#include "EmitterTypes.h"
-#include "IRCompiledMap.h"
-#include "IRMapCompiler.h"
-#include "InputNode.h"
-#include "Map.h"
-#include "Model.h"
-#include "OutputNode.h"
+#include <model_testing/include/ModelTestUtilities.h>
 
-// nodes
-#include "ConstantNode.h"
-#include "MatrixMatrixMultiplyNode.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/EmitterTypes.h>
 
-// testing
-#include "testing.h"
+#include <model/include/CompiledMap.h>
+#include <model/include/IRCompiledMap.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/InputNode.h>
+#include <model/include/Map.h>
+#include <model/include/Model.h>
+#include <model/include/OutputNode.h>
 
-// utilities
-#include "RandomEngines.h"
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/MatrixMatrixMultiplyNode.h>
 
-// stl
+#include <testing/include/testing.h>
+
+#include <utilities/include/RandomEngines.h>
+
 #include <iostream>
 #include <ostream>
 #include <string>

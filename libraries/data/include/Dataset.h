@@ -13,11 +13,9 @@
 #include "Example.h"
 #include "ExampleIterator.h"
 
-// utilities
-#include "AbstractInvoker.h"
-#include "TypeTraits.h"
+#include <utilities/include/AbstractInvoker.h>
+#include <utilities/include/TypeTraits.h>
 
-// stl
 #include <functional>
 #include <ostream>
 #include <random>

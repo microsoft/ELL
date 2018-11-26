@@ -10,8 +10,7 @@
 
 #include "IPredictor.h"
 
-// utilities
-#include "IArchivable.h"
+#include <utilities/include/IArchivable.h>
 
 //stl
 #include <ostream>

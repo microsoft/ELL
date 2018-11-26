@@ -8,16 +8,13 @@
 
 #pragma once
 
-// model
-#include "CompilableNode.h"
-#include "IRMapCompiler.h"
-#include "ModelTransformer.h"
-#include "OutputNodeBase.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/OutputNodeBase.h>
 
-// emitters
-#include "IRMetadata.h"
+#include <emitters/include/IRMetadata.h>
 
-// stl
 #include <functional>
 #include <string>
 #include <vector>

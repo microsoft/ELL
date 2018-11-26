@@ -8,13 +8,10 @@
 
 #include "MemoryLayout_test.h"
 
-// utilities
-#include "MemoryLayout.h"
+#include <utilities/include/MemoryLayout.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <algorithm>
 #include <numeric>
 

@@ -8,11 +8,9 @@
 
 #pragma once
 
-// emitters
-#include "IRLocalScalar.h"
+#include <emitters/include/IRLocalScalar.h>
 
-// utilities
-#include "MemoryLayout.h"
+#include <utilities/include/MemoryLayout.h>
 
 namespace ell
 {

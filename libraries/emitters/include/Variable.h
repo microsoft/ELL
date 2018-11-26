@@ -9,10 +9,8 @@
 
 #include "EmitterTypes.h"
 
-// utilities
-#include "IntegerStack.h"
+#include <utilities/include/IntegerStack.h>
 
-// stl
 #include <memory>
 #include <string>
 #include <vector>

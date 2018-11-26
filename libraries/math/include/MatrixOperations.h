@@ -15,7 +15,6 @@
 #include "BlasWrapper.h"
 #endif
 
-// stl
 #include <ostream>
 #include <string>
 

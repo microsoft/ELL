@@ -10,10 +10,8 @@
 
 #include "IndexValue.h"
 
-// math
-#include "Vector.h"
+#include <math/include/Vector.h>
 
-// stl
 #include <cstddef>
 #include <functional>
 #include <initializer_list>

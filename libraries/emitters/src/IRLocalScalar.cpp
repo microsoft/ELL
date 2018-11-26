@@ -10,13 +10,10 @@
 #include "EmitterException.h"
 #include "IRModuleEmitter.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// LLVM
 #include <llvm/IR/Value.h>
 
-// stl
 #include <functional>
 
 namespace ell

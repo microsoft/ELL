@@ -8,9 +8,8 @@
 
 #pragma once
 
-// utilities
-#include "IIterator.h"
-#include "StlContainerIterator.h"
+#include <utilities/include/IIterator.h>
+#include <utilities/include/StlContainerIterator.h>
 
 namespace ell
 {

@@ -10,35 +10,29 @@
 #include "ProfileReport.h"
 #include "ReplaceSourceAndSinkNodesPass.h"
 
-// tools/PythonPlugin
-#include "InvokePython.h"
+#include <pythonPlugins/include/InvokePython.h>
 
-// common
-#include "LoadModel.h"
-#include "MapCompilerArguments.h"
-#include "ModelLoadArguments.h"
+#include <common/include/LoadModel.h>
+#include <common/include/MapCompilerArguments.h>
+#include <common/include/ModelLoadArguments.h>
 
-// model
-#include "IRCompiledMap.h"
-#include "IRMapCompiler.h"
-#include "IRModelProfiler.h"
-#include "Map.h"
-#include "PortMemoryLayout.h"
+#include <model/include/IRCompiledMap.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/IRModelProfiler.h>
+#include <model/include/Map.h>
+#include <model/include/PortMemoryLayout.h>
 
-// passes
-#include "StandardPasses.h"
+#include <passes/include/StandardPasses.h>
 
-// utilities
-#include "CommandLineParser.h"
-#include "Exception.h"
-#include "Files.h"
-#include "MillisecondTimer.h"
-#include "OutputStreamImpostor.h"
-#include "RandomEngines.h"
-#include "TypeName.h"
-#include "Unused.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/MillisecondTimer.h>
+#include <utilities/include/OutputStreamImpostor.h>
+#include <utilities/include/RandomEngines.h>
+#include <utilities/include/TypeName.h>
+#include <utilities/include/Unused.h>
 
-// stl
 #include <iomanip>
 #include <iostream>
 #include <random>

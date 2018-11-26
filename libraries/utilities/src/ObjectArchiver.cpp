@@ -10,7 +10,6 @@
 #include "IArchivable.h"
 #include "Unused.h"
 
-// stl
 #include <string>
 #include <vector>
 

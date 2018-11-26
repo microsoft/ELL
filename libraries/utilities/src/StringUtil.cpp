@@ -8,7 +8,6 @@
 
 #include "StringUtil.h"
 
-// stl
 #include <algorithm>
 #include <cstdio>
 #include <sstream>

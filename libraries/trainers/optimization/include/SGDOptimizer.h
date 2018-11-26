@@ -7,10 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// stl
+#include "Common.h"
+
+#include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <numeric>
 #include <random>
+#include <vector>
 
 namespace ell
 {

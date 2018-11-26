@@ -8,14 +8,12 @@
 
 #pragma once
 
-// model
-#include "MapCompilerOptions.h"
-#include "Model.h"
+#include <model/include/MapCompilerOptions.h>
+#include <model/include/Model.h>
 #include "ModelOptimizerOptions.h"
-#include "ModelTransformer.h"
+#include <model/include/ModelTransformer.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

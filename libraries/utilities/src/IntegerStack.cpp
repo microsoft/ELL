@@ -8,7 +8,6 @@
 
 #include "IntegerStack.h"
 
-// stl
 #include <cassert>
 
 namespace ell

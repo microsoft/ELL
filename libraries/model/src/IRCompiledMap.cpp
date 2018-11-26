@@ -6,26 +6,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// model
 #include "IRCompiledMap.h"
 #include "CompilableNodeUtilities.h"
-#include "EmitterException.h"
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
 #include "OutputNode.h"
 #include "Port.h"
 
-// emitters
-#include "IROptimizer.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/IROptimizer.h>
 
-// utilities
-#include "Exception.h"
-#include "Files.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
 
-// llvm
 #include <llvm/Transforms/Utils/Cloning.h>
 
-// stl
 #include <sstream>
 
 namespace ell

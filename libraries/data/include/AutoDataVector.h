@@ -8,15 +8,18 @@
 
 #pragma once
 
+#define APPROXIMATION_TOLERANCE 1.0e-9
+#define SPARSE_THRESHOLD 0.2
+
 #include "DataVector.h"
 #include "DenseDataVector.h"
+#include "SparseBinaryDataVector.h"
+#include "SparseDataVector.h"
 #include "TextLine.h"
 
-// utilities
-#include "Exception.h"
-#include "TypeTraits.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/TypeTraits.h>
 
-// stl
 #include <initializer_list>
 
 namespace ell

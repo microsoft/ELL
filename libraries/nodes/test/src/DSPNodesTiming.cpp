@@ -9,38 +9,30 @@
 #include "DSPNodesTiming.h"
 #include "NodesTestUtilities.h"
 
-// dsp
-#include "Convolution.h"
-#include "WinogradConvolution.h"
+#include <dsp/include/Convolution.h>
+#include <dsp/include/WinogradConvolution.h>
 
-// math
-#include "MathConstants.h"
-#include "Tensor.h"
-#include "TensorOperations.h"
+#include <math/include/MathConstants.h>
+#include <math/include/Tensor.h>
+#include <math/include/TensorOperations.h>
 
-// model
-#include "InputNode.h"
-#include "Model.h"
-#include "Node.h"
+#include <model/include/InputNode.h>
+#include <model/include/Model.h>
+#include <model/include/Node.h>
 
-// nodes
-#include "DiagonalConvolutionNode.h"
-#include "SimpleConvolutionNode.h"
-#include "UnrolledConvolutionNode.h"
-#include "WinogradConvolutionNode.h"
+#include <nodes/include/DiagonalConvolutionNode.h>
+#include <nodes/include/SimpleConvolutionNode.h>
+#include <nodes/include/UnrolledConvolutionNode.h>
+#include <nodes/include/WinogradConvolutionNode.h>
 
-// predictors/neural
-#include "ConvolutionalLayer.h"
+#include <predictors/neural/include/ConvolutionalLayer.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Exception.h"
-#include "MillisecondTimer.h"
-#include "RandomEngines.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/MillisecondTimer.h>
+#include <utilities/include/RandomEngines.h>
 
-// stl
 #include <cmath>
 #include <iostream>
 #include <numeric>

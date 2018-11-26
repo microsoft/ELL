@@ -9,7 +9,6 @@
 
 #include "EmitterException.h"
 
-// stl
 #include <unordered_map>
 
 namespace ell

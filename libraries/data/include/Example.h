@@ -14,8 +14,7 @@
 #include "WeightClassIndex.h"
 #include "WeightLabel.h"
 
-// utilities
-#include "TypeTraits.h"
+#include <utilities/include/TypeTraits.h>
 
 // stl
 #include <algorithm> // for std::swap

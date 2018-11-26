@@ -6,10 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DataVectorOperations.h"
+#include <data/include/DataVectorOperations.h>
 
-// utilities
-#include "RandomEngines.h"
+#include <utilities/include/RandomEngines.h>
 
 namespace ell
 {

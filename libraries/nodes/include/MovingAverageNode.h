@@ -13,17 +13,14 @@
 #include "ConstantNode.h"
 #include "DelayNode.h"
 
-// model
-#include "InputPort.h"
-#include "ModelTransformer.h"
-#include "Node.h"
-#include "OutputPort.h"
-#include "PortElements.h"
+#include <model/include/InputPort.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+#include <model/include/OutputPort.h>
+#include <model/include/PortElements.h>
 
-// utilities
-#include "TypeName.h"
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <string>
 #include <vector>
 

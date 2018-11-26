@@ -8,9 +8,11 @@
 
 #pragma once
 
-// stl
 #include <future>
+#include <thread>
 #include <vector>
+
+#define DEFAULT_MAX_TASKS 8
 
 namespace ell
 {

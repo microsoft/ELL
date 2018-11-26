@@ -8,24 +8,18 @@
 
 #include "Evaluators_test.h"
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// predictors
-#include "LinearPredictor.h"
+#include <predictors/include/LinearPredictor.h>
 
-// evaluators
-#include "AUCAggregator.h"
-#include "Evaluator.h"
-#include "LossAggregator.h"
+#include <evaluators/include/AUCAggregator.h>
+#include <evaluators/include/Evaluator.h>
+#include <evaluators/include/LossAggregator.h>
 
-// functions
-#include "SquaredLoss.h"
+#include <functions/include/SquaredLoss.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <iostream>
 
 namespace ell

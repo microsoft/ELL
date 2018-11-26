@@ -12,10 +12,8 @@
 #include "OutputNodeBase.h"
 #include "OutputPort.h"
 
-// utilities
-#include "IArchivable.h"
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <memory>
 #include <string>
 #include <vector>

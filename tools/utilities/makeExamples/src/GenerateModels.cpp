@@ -8,40 +8,35 @@
 
 #include "GenerateModels.h"
 
-// model
-#include "InputNode.h"
-#include "Model.h"
-#include "OutputNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/Model.h>
+#include <model/include/OutputNode.h>
 
-// nodes
-#include "ActivationLayerNode.h"
-#include "BiasLayerNode.h"
-#include "BinaryOperationNode.h"
-#include "BroadcastFunctionNode.h"
-#include "ConstantNode.h"
-#include "DelayNode.h"
-#include "DotProductNode.h"
-#include "ExtremalValueNode.h"
-#include "ForestPredictorNode.h"
-#include "FullyConnectedLayerNode.h"
-#include "L2NormSquaredNode.h"
-#include "LinearPredictorNode.h"
-#include "MovingAverageNode.h"
-#include "MovingVarianceNode.h"
+#include <nodes/include/ActivationLayerNode.h>
+#include <nodes/include/BiasLayerNode.h>
+#include <nodes/include/BinaryOperationNode.h>
+#include <nodes/include/BroadcastFunctionNode.h>
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/DelayNode.h>
+#include <nodes/include/DotProductNode.h>
+#include <nodes/include/ExtremalValueNode.h>
+#include <nodes/include/ForestPredictorNode.h>
+#include <nodes/include/FullyConnectedLayerNode.h>
+#include <nodes/include/L2NormSquaredNode.h>
+#include <nodes/include/LinearPredictorNode.h>
+#include <nodes/include/MovingAverageNode.h>
+#include <nodes/include/MovingVarianceNode.h>
 
-// predictors
-#include "ForestPredictor.h"
-#include "LinearPredictor.h"
-#include "NeuralNetworkPredictor.h"
-#include "SingleElementThresholdPredictor.h"
+#include <predictors/include/ForestPredictor.h>
+#include <predictors/include/LinearPredictor.h>
+#include <predictors/include/NeuralNetworkPredictor.h>
+#include <predictors/include/SingleElementThresholdPredictor.h>
 
-// predictors/neural
-#include "BiasLayer.h"
-#include "FullyConnectedLayer.h"
-#include "Layer.h"
-#include "ReLUActivation.h"
+#include <predictors/neural/include/BiasLayer.h>
+#include <predictors/neural/include/FullyConnectedLayer.h>
+#include <predictors/neural/include/Layer.h>
+#include <predictors/neural/include/ReLUActivation.h>
 
-// stl
 #include <sstream>
 #include <string>
 

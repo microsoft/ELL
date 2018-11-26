@@ -7,15 +7,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// math
-#include "Matrix.h"
+#include <math/include/Matrix.h>
 
 using namespace ell;
 
-// stl
 #include <string>
 
 template <typename ElementType>

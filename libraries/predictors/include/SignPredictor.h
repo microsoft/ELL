@@ -8,10 +8,8 @@
 
 #pragma once
 
-// utilities
-#include "IArchivable.h"
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <memory>
 
 namespace ell

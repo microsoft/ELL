@@ -12,8 +12,7 @@
 #include "ReceptiveFieldMatrixNode.h"
 #include "ReorderDataNode.h"
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
 namespace ell
 {

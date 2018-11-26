@@ -5,14 +5,14 @@
 # define project
 set (tool_name profile)
 
-set (src 
+set (src
   src/ProfileArguments.cpp
   src/ProfileReport.cpp
   src/ReplaceSourceAndSinkNodesPass.cpp
   src/main.cpp
   )
-  
-  set (include 
+
+  set (include
   include/ProfileArguments.h
   include/ProfileReport.h
   include/ReplaceSourceAndSinkNodesPass.h
@@ -22,11 +22,11 @@ source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 
-# create executable in build\bin
+# create executable in build/bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
-set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
+set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR})
 add_executable(${tool_name} ${src} ${include} ${tcc})
-target_include_directories(${tool_name} PRIVATE include)
+target_include_directories(${tool_name} PRIVATE include ${ELL_LIBRARIES_DIR} ${CMAKE_CURRENT_LIST_DIR}/..)
 target_link_libraries(${tool_name} common emitters model nodes passes utilities pythonPlugins)
 copy_shared_libraries(${tool_name})
 set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")
@@ -39,7 +39,7 @@ set (models_src
   src/GenerateTestModels_main.cpp
   src/GenerateTestModels.cpp
   )
-  
+
 set (models_include
   include/GenerateTestModels.h
   )
@@ -47,9 +47,9 @@ set (models_include
 set (model_tool_name makeProfileModels)
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
-set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
+set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR})
 add_executable(${model_tool_name} ${models_src} ${models_include})
-target_include_directories(${model_tool_name} PRIVATE include)
+target_include_directories(${model_tool_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${model_tool_name} common dsp model nodes utilities)
 copy_shared_libraries(${model_tool_name})
 
@@ -109,7 +109,7 @@ if(WIN32)
         DESTINATION ${CMAKE_BINARY_DIR}
         FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
         GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-        
+
     add_custom_target(make_profiler DEPENDS compile CMakeLists-device.txt.in CMakeLists-device-parallel.txt.in src/CompiledProfile_main.cpp src/CompiledExerciseModel_main.cpp make_profiler.cmd.in)
     set(make_profiler_test_script "${GLOBAL_BIN_DIR}/make_profiler.cmd")
 else()
@@ -128,14 +128,14 @@ else()
       DESTINATION ${CMAKE_BINARY_DIR}
       FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
       GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-      
+
     add_custom_target(make_profiler DEPENDS compile CMakeLists-device.txt.in CMakeLists-device-parallel.txt.in src/CompiledProfile_main.cpp src/CompiledExerciseModel_main.cpp make_profiler.sh.in)
-    
+
     set(make_profiler_test_script "${GLOBAL_BIN_DIR}/make_profiler.sh")
 endif()
 
 set_property(TARGET make_profiler PROPERTY FOLDER "tools/utilities")
-    
+
 #
 # Tests
 #
@@ -146,7 +146,7 @@ set(make_profiler_test_directory "${CMAKE_BINARY_DIR}/${make_profiler_test_model
 
 add_test(NAME make_profiler_test
   WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-  COMMAND ${CMAKE_COMMAND} 
+  COMMAND ${CMAKE_COMMAND}
     -D BUILD_DIR=${CMAKE_BINARY_DIR}
     -D BIN_DIR=${GLOBAL_BIN_DIR}
     -D MAKE_MODELS_EXE=$<TARGET_FILE:makeProfileModels>

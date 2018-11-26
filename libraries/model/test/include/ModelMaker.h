@@ -8,20 +8,18 @@
 
 #pragma once
 
-// model
-#include "InputNode.h"
-#include "OutputNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/OutputNode.h>
 
-// nodes
-#include "AccumulatorNode.h"
-#include "BinaryOperationNode.h"
-#include "BinaryPredicateNode.h"
-#include "ConstantNode.h"
-#include "DelayNode.h"
-#include "DotProductNode.h"
-#include "MultiplexerNode.h"
-#include "SumNode.h"
-#include "UnaryOperationNode.h"
+#include <nodes/include/AccumulatorNode.h>
+#include <nodes/include/BinaryOperationNode.h>
+#include <nodes/include/BinaryPredicateNode.h>
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/DelayNode.h>
+#include <nodes/include/DotProductNode.h>
+#include <nodes/include/MultiplexerNode.h>
+#include <nodes/include/SumNode.h>
+#include <nodes/include/UnaryOperationNode.h>
 
 using namespace ell;
 

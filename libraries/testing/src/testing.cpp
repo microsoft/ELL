@@ -6,13 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// testing
 #include "testing.h"
 
-// utilities
-#include "Logger.h"
+#include <utilities/include/Logger.h>
 
-// stl
 #include <iostream>
 #include <string>
 

@@ -8,8 +8,7 @@
 
 #pragma once
 
-// dsp
-#include "WinogradConvolution.h"
+#include <dsp/include/WinogradConvolution.h>
 
 struct ImageShape
 {

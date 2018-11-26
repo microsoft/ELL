@@ -8,7 +8,6 @@
 
 #pragma once
 
-// stl
 #include <random>
 #include <string>
 #include <vector>

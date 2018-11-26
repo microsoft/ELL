@@ -13,8 +13,7 @@
 #include "PosixEmitterTest.h"
 #include "StdlibEmitterTest.h"
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
 // set to 1 if you want to test emitted IR that is async
 #define TEST_THREAD_EMITTED_IR 0

@@ -12,11 +12,9 @@
 #include "Tensor.h"
 #include "Vector.h"
 
-// utilities
-#include "Debug.h"
-#include "Exception.h"
+#include <utilities/include/Debug.h>
+#include <utilities/include/Exception.h>
 
-// stl
 #include <ostream>
 #include <string>
 

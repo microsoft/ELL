@@ -8,24 +8,20 @@
 
 #include "PosixEmitterTest.h"
 
-// emitters
-#include "EmitterException.h"
-#include "EmitterTypes.h"
-#include "IRAsyncTask.h"
-#include "IRBlockRegion.h"
-#include "IREmitter.h"
-#include "IRExecutionEngine.h"
-#include "IRFunctionEmitter.h"
-#include "IRModuleEmitter.h"
-#include "LLVMUtilities.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/IRAsyncTask.h>
+#include <emitters/include/IRBlockRegion.h>
+#include <emitters/include/IREmitter.h>
+#include <emitters/include/IRExecutionEngine.h>
+#include <emitters/include/IRFunctionEmitter.h>
+#include <emitters/include/IRModuleEmitter.h>
+#include <emitters/include/LLVMUtilities.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
-// stl
 #include <ios>
 #include <iostream>
 #include <memory>

@@ -12,25 +12,25 @@
 #include "Regularizer_test.h"
 #include "Solution_test.h"
 
-#include "testing.h"
+#include <testing/include/testing.h>
 
 // solutions
-#include "MatrixSolution.h"
-#include "VectorSolution.h"
-
-// loss functions
-#include "AbsoluteLoss.h"
-#include "HingeLoss.h"
-#include "HuberLoss.h"
-#include "LogisticLoss.h"
-#include "SmoothedHingeLoss.h"
-#include "SquareLoss.h"
-#include "SquaredHingeLoss.h"
+#include <trainers/optimization/include/MatrixSolution.h>
+#include <trainers/optimization/include/VectorSolution.h>
 
 // regularizers
-#include "ElasticNetRegularizer.h"
-#include "L2Regularizer.h"
-#include "MaxRegularizer.h"
+#include <trainers/optimization/include/ElasticNetRegularizer.h>
+#include <trainers/optimization/include/L2Regularizer.h>
+#include <trainers/optimization/include/MaxRegularizer.h>
+
+// loss functions
+#include <trainers/optimization/include/AbsoluteLoss.h>
+#include <trainers/optimization/include/HingeLoss.h>
+#include <trainers/optimization/include/HuberLoss.h>
+#include <trainers/optimization/include/LogisticLoss.h>
+#include <trainers/optimization/include/SmoothedHingeLoss.h>
+#include <trainers/optimization/include/SquareLoss.h>
+#include <trainers/optimization/include/SquaredHingeLoss.h>
 
 using namespace ell;
 using namespace ell::trainers::optimization;

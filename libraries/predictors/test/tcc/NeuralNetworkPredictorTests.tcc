@@ -6,22 +6,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "HardSigmoidActivation.h"
-#include "LeakyReLUActivation.h"
-#include "LoadModel.h"
-#include "MaxPoolingFunction.h"
-#include "NeuralNetworkPredictor.h"
-#include "ParametricReLUActivation.h"
-#include "ReLUActivation.h"
-#include "SigmoidActivation.h"
-#include "SoftMaxActivation.h"
-#include "TanhActivation.h"
+#include <common/include/LoadModel.h>
 
-// testing
-#include "testing.h"
+#include <predictors/include/NeuralNetworkPredictor.h>
+#include <predictors/neural/include/HardSigmoidActivation.h>
+#include <predictors/neural/include/LeakyReLUActivation.h>
+#include <predictors/neural/include/MaxPoolingFunction.h>
+#include <predictors/neural/include/ParametricReLUActivation.h>
+#include <predictors/neural/include/ReLUActivation.h>
+#include <predictors/neural/include/SigmoidActivation.h>
+#include <predictors/neural/include/SoftMaxActivation.h>
+#include <predictors/neural/include/TanhActivation.h>
 
-// utilities
-#include "JsonArchiver.h"
+#include <testing/include/testing.h>
+
+#include <utilities/include/JsonArchiver.h>
 
 using namespace ell;
 using namespace ell::common;

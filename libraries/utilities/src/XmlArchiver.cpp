@@ -11,7 +11,6 @@
 #include "IArchivable.h"
 #include "Unused.h"
 
-// stl
 #include <algorithm>
 #include <cctype>
 #include <iostream>

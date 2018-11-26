@@ -8,30 +8,30 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "AccumulatorNode.h"
-#include "BinaryOperationNode.h"
-#include "ConstantNode.h"
-#include "DelayNode.h"
-#include "DotProductNode.h"
-#include "LinearPredictorNode.h"
-#include "L2NormSquaredNode.h"
-#include "MovingAverageNode.h"
-#include "SumNode.h"
-#include "UnaryOperationNode.h"
-#include "MovingVarianceNode.h"
+#include <nodes/include/AccumulatorNode.h>
+#include <nodes/include/BinaryOperationNode.h>
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/DelayNode.h>
+#include <nodes/include/DotProductNode.h>
+#include <nodes/include/LinearPredictorNode.h>
+#include <nodes/include/L2NormSquaredNode.h>
+#include <nodes/include/MovingAverageNode.h>
+#include <nodes/include/SumNode.h>
+#include <nodes/include/UnaryOperationNode.h>
+#include <nodes/include/MovingVarianceNode.h>
 %}
 
 %ignore ell::nodes::LinearPredictorSubModelOutputs;
 %ignore ell::nodes::BuildSubModel;
 
-%include "AccumulatorNode.h"
-%include "BinaryOperationNode.h"
-%include "ConstantNode.h"
-%include "DelayNode.h"
-%include "DotProductNode.h"
-%include "LinearPredictorNode.h"
-%include "L2NormSquaredNode.h"
-%include "MovingAverageNode.h"
-%include "SumNode.h"
-%include "UnaryOperationNode.h"
-%include "MovingVarianceNode.h"
+%include <nodes/include/AccumulatorNode.h>
+%include <nodes/include/BinaryOperationNode.h>
+%include <nodes/include/ConstantNode.h>
+%include <nodes/include/DelayNode.h>
+%include <nodes/include/DotProductNode.h>
+%include <nodes/include/LinearPredictorNode.h>
+%include <nodes/include/L2NormSquaredNode.h>
+%include <nodes/include/MovingAverageNode.h>
+%include <nodes/include/SumNode.h>
+%include <nodes/include/UnaryOperationNode.h>
+%include <nodes/include/MovingVarianceNode.h>

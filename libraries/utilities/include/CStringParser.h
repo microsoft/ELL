@@ -8,6 +8,11 @@
 
 #pragma once
 
+#include <cctype>
+#include <cerrno>
+#include <cstdlib>
+#include <string>
+
 namespace ell
 {
 namespace utilities

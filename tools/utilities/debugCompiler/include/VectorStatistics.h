@@ -8,10 +8,8 @@
 
 #pragma once
 
-// math
-#include "Tensor.h"
+#include <math/include/Tensor.h>
 
-// stl
 #include <cmath>
 #include <cstring> // for size_t
 #include <vector>

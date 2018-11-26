@@ -7,12 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DatasetInterface.h"
-#include "DataLoaders.h"
 #include "DatasetInterfaceImpl.h"
-#include "Exception.h"
-#include "Files.h"
 
-// stl
+#include <common/include/DataLoaders.h>
+
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+
 #include <vector>
 
 using namespace ell;

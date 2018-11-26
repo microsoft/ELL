@@ -7,30 +7,25 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ModelBuilder_test.h"
-#include "ModelTestUtilities.h"
 
-// common
-#include "RegisterNodeCreators.h"
+#include <model_testing/include/ModelTestUtilities.h>
 
-// model
-#include "InputNode.h"
-#include "Model.h"
-#include "ModelBuilder.h"
-#include "OutputNode.h"
-#include "PortElements.h"
+#include <common/include/RegisterNodeCreators.h>
 
-// nodes
-#include "ExtremalValueNode.h"
-#include "MovingAverageNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/Model.h>
+#include <model/include/ModelBuilder.h>
+#include <model/include/OutputNode.h>
+#include <model/include/PortElements.h>
 
-// testing
-#include "testing.h"
+#include <nodes/include/ExtremalValueNode.h>
+#include <nodes/include/MovingAverageNode.h>
 
-// utilities
-#include "FunctionUtils.h"
-#include "Variant.h"
+#include <testing/include/testing.h>
 
-// stl
+#include <utilities/include/FunctionUtils.h>
+#include <utilities/include/Variant.h>
+
 #include <tuple>
 
 using namespace ell;

@@ -24,7 +24,6 @@
 #include "LLVMUtilities.h"
 #include "Variable.h"
 
-// llvm
 #include <llvm/IR/Argument.h>
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Constant.h>
@@ -33,7 +32,6 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/LLVMContext.h>
 
-// stl
 #include <functional>
 #include <initializer_list>
 #include <ostream>

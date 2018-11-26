@@ -9,11 +9,9 @@
 #include "ModelOptimizer.h"
 #include "OptimizationPass.h"
 
-// model
-#include "ModelTransformer.h"
+#include <model/include/ModelTransformer.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

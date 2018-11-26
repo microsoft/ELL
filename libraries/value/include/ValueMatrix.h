@@ -12,8 +12,7 @@
 #include "ValueMatrixOperations.h"
 #include "ValueVector.h"
 
-// utilities
-#include "MemoryLayout.h"
+#include <utilities/include/MemoryLayout.h>
 
 #include <functional>
 

@@ -57,7 +57,7 @@ source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 
 add_library(${library_name} ${src} ${include} ${tcc} ${doc})
-target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} math)
 
 # MSVC emits warnings incorrectly when mixing inheritance, templates,
@@ -96,7 +96,7 @@ source_group("include" FILES ${test_include})
 source_group("tcc" FILES ${test_tcc})
 
 add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${include})
-target_include_directories(${test_name} PRIVATE test/include)
+target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} optimization testing)
 copy_shared_libraries(${test_name})
 

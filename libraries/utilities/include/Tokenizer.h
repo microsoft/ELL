@@ -8,7 +8,6 @@
 
 #pragma once
 
-// stl
 #include <initializer_list>
 #include <istream>
 #include <stack>

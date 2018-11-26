@@ -8,19 +8,16 @@
 
 #pragma once
 
-// model
-#include "CompilableNode.h"
-#include "IRMapCompiler.h"
-#include "InputPort.h"
-#include "MapCompiler.h"
-#include "Node.h"
-#include "OutputPort.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/InputPort.h>
+#include <model/include/MapCompiler.h>
+#include <model/include/Node.h>
+#include <model/include/OutputPort.h>
 
-// utilities
-#include "IArchivable.h"
-#include "TypeName.h"
+#include <utilities/include/IArchivable.h>
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <exception>
 #include <vector>
 

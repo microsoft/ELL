@@ -10,16 +10,13 @@
 
 #include "Node.h"
 
-// emitters
-#include "EmitterTypes.h"
-#include "IRFunctionEmitter.h"
-#include "IRModuleEmitter.h"
-#include "LLVMUtilities.h"
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/IRFunctionEmitter.h>
+#include <emitters/include/IRModuleEmitter.h>
+#include <emitters/include/LLVMUtilities.h>
 
-// utilities
-#include "TypeName.h"
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <string>
 #include <vector>
 

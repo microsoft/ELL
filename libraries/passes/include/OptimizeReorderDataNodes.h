@@ -8,14 +8,11 @@
 
 #pragma once
 
-// model
-#include "Model.h"
+#include <model/include/Model.h>
 
-// model/optimizer
-#include "ModelOptimizer.h"
-#include "OptimizationPass.h"
+#include <model/optimizer/include/ModelOptimizer.h>
+#include <model/optimizer/include/OptimizationPass.h>
 
-// stl
 #include <vector>
 
 namespace ell

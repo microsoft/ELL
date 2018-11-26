@@ -8,13 +8,10 @@
 
 #include "PortMemoryLayout.h"
 
-// emitters
-#include "IRFunctionEmitter.h"
+#include <emitters/include/IRFunctionEmitter.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// stl
 #include <numeric>
 
 namespace ell

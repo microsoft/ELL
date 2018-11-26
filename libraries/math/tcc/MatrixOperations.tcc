@@ -6,12 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "VectorOperations.h"
+#include "../include/VectorOperations.h"
 
-// utilities
-#include "Debug.h"
-#include "Exception.h"
-#include "Logger.h"
+#include <utilities/include/Debug.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Logger.h>
 
 namespace ell
 {

@@ -8,16 +8,13 @@
 
 #include "RandomExampleSet.h"
 
-// optimization
-#include "IndexedContainer.h"
-#include "OptimizationExample.h"
-#include "SDCAOptimizer.h"
-#include "VectorSolution.h"
+#include <trainers/optimization/include/IndexedContainer.h>
+#include <trainers/optimization/include/OptimizationExample.h>
+#include <trainers/optimization/include/SDCAOptimizer.h>
+#include <trainers/optimization/include/VectorSolution.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <memory>
 #include <string>
 

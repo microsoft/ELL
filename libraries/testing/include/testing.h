@@ -8,7 +8,6 @@
 
 #pragma once
 
-// stl
 #include <stdexcept>
 #include <string>
 #include <vector>

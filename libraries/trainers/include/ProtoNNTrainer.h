@@ -9,23 +9,17 @@
 
 #pragma once
 
-// trainer
 #include "ITrainer.h"
 
-// predictors
-#include "ProtoNNPredictor.h"
+#include <predictors/include/ProtoNNPredictor.h>
 
-// parameters
 #include "ProtoNNModel.h"
 
-// math
-#include "Matrix.h"
+#include <math/include/Matrix.h>
 
-// data
-#include "Dataset.h"
-#include "Example.h"
+#include <data/include/Dataset.h>
+#include <data/include/Example.h>
 
-// stl
 #include <cstddef>
 #include <map>
 #include <memory>

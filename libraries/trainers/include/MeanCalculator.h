@@ -8,11 +8,9 @@
 
 #pragma once
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// math
-#include "Vector.h"
+#include <math/include/Vector.h>
 
 namespace ell
 {

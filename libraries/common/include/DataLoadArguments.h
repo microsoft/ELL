@@ -8,10 +8,8 @@
 
 #pragma once
 
-// utilities
-#include "CommandLineParser.h"
+#include <utilities/include/CommandLineParser.h>
 
-// stl
 #include <string>
 
 namespace ell

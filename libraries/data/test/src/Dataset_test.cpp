@@ -7,15 +7,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Dataset_test.h"
-#include "DataLoaders.h"
-#include "Dataset.h"
-#include "Files.h"
-#include "StringUtil.h"
 
-// testing
-#include "testing.h"
+#include <common/include/DataLoaders.h>
 
-// stl
+#include <data/include/Dataset.h>
+
+#include <utilities/include/Files.h>
+#include <utilities/include/StringUtil.h>
+
+#include <testing/include/testing.h>
+
 #include <sstream>
 
 namespace ell

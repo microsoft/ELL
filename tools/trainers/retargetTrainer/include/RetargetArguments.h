@@ -8,11 +8,9 @@
 
 #pragma once
 
-// utilities
-#include "CommandLineParser.h"
+#include <utilities/include/CommandLineParser.h>
 
-// common
-#include "TrainerArguments.h"
+#include <common/include/TrainerArguments.h>
 
 namespace ell
 {

@@ -12,18 +12,15 @@
 #include "Node.h"
 #include "PortElements.h"
 
-// data
-#include "DataVector.h"
+#include <data/include/DataVector.h>
+#include <data/include/StlIndexValueIterator.h>
 
-// utilities
-#include "Exception.h"
-#include "IArchivable.h"
-#include "PropertyBag.h"
-#include "StlIndexValueIterator.h"
-#include "TypeName.h"
-#include "TypeTraits.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/IArchivable.h>
+#include <utilities/include/PropertyBag.h>
+#include <utilities/include/TypeName.h>
+#include <utilities/include/TypeTraits.h>
 
-// stl
 #include <algorithm>
 #include <string>
 #include <unordered_map>

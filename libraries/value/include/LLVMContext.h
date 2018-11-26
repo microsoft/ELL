@@ -12,7 +12,6 @@
 #include "EmitterContext.h"
 #include "ValueScalar.h"
 
-// stl
 #include <functional>
 #include <stack>
 

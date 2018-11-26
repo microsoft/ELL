@@ -8,12 +8,10 @@
 
 #ifndef SWIG
 
-// model
-#include "IRMapCompiler.h"
+#include <model/include/IRMapCompiler.h>
 
-// nodes
-#include "SinkNode.h"
-#include "SourceNode.h"
+#include <nodes/include/SinkNode.h>
+#include <nodes/include/SourceNode.h>
 
 namespace ELL_API
 {

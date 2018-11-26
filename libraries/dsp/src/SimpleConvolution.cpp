@@ -8,11 +8,9 @@
 
 #include "SimpleConvolution.h"
 
-// math
-#include "VectorOperations.h"
+#include <math/include/VectorOperations.h>
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
 namespace ell
 {

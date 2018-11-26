@@ -8,11 +8,9 @@
 
 #include "CompiledActivationFunctions.h"
 
-// activation
-#include "Activation.h"
+#include <predictors/neural/include/Activation.h>
 
-// emitters
-#include "IRLocalValue.h"
+#include <emitters/include/IRLocalValue.h>
 
 namespace ell
 {

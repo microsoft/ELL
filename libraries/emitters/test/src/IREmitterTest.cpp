@@ -7,26 +7,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "IREmitterTest.h"
 
-// emitters
-#include "EmitterException.h"
-#include "EmitterTypes.h"
-#include "IRBlockRegion.h"
-#include "IREmitter.h"
-#include "IRExecutionEngine.h"
-#include "IRFunctionEmitter.h"
-#include "IRHeaderWriter.h"
-#include "IRModuleEmitter.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/IRBlockRegion.h>
+#include <emitters/include/IREmitter.h>
+#include <emitters/include/IRExecutionEngine.h>
+#include <emitters/include/IRFunctionEmitter.h>
+#include <emitters/include/IRHeaderWriter.h>
+#include <emitters/include/IRModuleEmitter.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
-// LLVM
 #include <llvm/IR/TypeBuilder.h>
 
-// stl
 #include <functional>
 #include <iostream>
 #include <memory>

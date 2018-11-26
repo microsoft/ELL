@@ -9,7 +9,6 @@
 #include "CompressedIntegerList.h"
 #include "Exception.h"
 
-// stl
 #include <cassert>
 #include <cstring>
 #include <limits>

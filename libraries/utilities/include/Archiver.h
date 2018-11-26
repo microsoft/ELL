@@ -13,7 +13,6 @@
 #include "TypeName.h"
 #include "TypeTraits.h"
 
-// stl
 #include <cstddef>
 #include <cstdint>
 #include <functional>

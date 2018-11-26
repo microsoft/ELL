@@ -6,8 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ModelTransformer.h"
-#include "StringUtil.h"
+#include "../include/ModelTransformer.h"
+
+#include <utilities/include/StringUtil.h>
 
 namespace ell
 {

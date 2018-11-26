@@ -10,13 +10,10 @@
 
 #include "IPredictor.h"
 
-// data
-#include "DenseDataVector.h"
+#include <data/include/DenseDataVector.h>
 
-// utilities
-#include "IArchivable.h"
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <ostream>
 #include <string>
 

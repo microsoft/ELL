@@ -7,18 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// math
-#include "Matrix.h"
-#include "MatrixOperations.h"
-#include "Vector.h"
+#include <math/include/Matrix.h>
+#include <math/include/MatrixOperations.h>
+#include <math/include/Vector.h>
 
-// utilities
-#include "JsonArchiver.h"
+#include <utilities/include/JsonArchiver.h>
 
-// stl
 #include <sstream>
 
 using namespace ell;

@@ -8,12 +8,10 @@
 
 #pragma once
 
-// model
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
 
-// nodes
 #include "ActivationLayerNode.h"
 #include "BatchNormalizationLayerNode.h"
 #include "BiasLayerNode.h"
@@ -25,21 +23,18 @@
 #include "ScalingLayerNode.h"
 #include "SoftmaxLayerNode.h"
 
-// predictors
-#include "NeuralNetworkPredictor.h"
+#include <predictors/include/NeuralNetworkPredictor.h>
 
 // activation and pooling functions
-#include "LeakyReLUActivation.h"
-#include "MaxPoolingFunction.h"
-#include "MeanPoolingFunction.h"
-#include "ParametricReLUActivation.h"
-#include "ReLUActivation.h"
-#include "SigmoidActivation.h"
+#include <predictors/neural/include/LeakyReLUActivation.h>
+#include <predictors/neural/include/MaxPoolingFunction.h>
+#include <predictors/neural/include/MeanPoolingFunction.h>
+#include <predictors/neural/include/ParametricReLUActivation.h>
+#include <predictors/neural/include/ReLUActivation.h>
+#include <predictors/neural/include/SigmoidActivation.h>
 
-// utilities
-#include "TypeName.h"
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <functional>
 #include <string>
 #include <type_traits>

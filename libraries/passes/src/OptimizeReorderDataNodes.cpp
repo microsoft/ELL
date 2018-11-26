@@ -8,16 +8,14 @@
 
 #include "OptimizeReorderDataNodes.h"
 
-// model
-#include "ModelTransformer.h"
-#include "OptimizationPassRegistry.h"
+#include <model/include/ModelTransformer.h>
 
-// nodes
-#include "ReorderDataNode.h"
+#include <model/optimizer/include/OptimizationPassRegistry.h>
 
-// utilities
-#include "Exception.h"
-#include "Logger.h"
+#include <nodes/include/ReorderDataNode.h>
+
+#include <utilities/include/Exception.h>
+#include <utilities/include/Logger.h>
 
 namespace ell
 {

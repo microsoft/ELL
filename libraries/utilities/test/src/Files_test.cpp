@@ -9,14 +9,11 @@
 
 #include "Files_test.h"
 
-// utilities
-#include "Files.h"
-#include "StringUtil.h"
+#include <utilities/include/Files.h>
+#include <utilities/include/StringUtil.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <algorithm>
 #include <cstring>
 #include <iostream>

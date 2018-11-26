@@ -12,7 +12,6 @@
 #include "IRFunctionEmitter.h"
 #include "LLVMUtilities.h"
 
-// stl
 #include <string>
 
 namespace ell

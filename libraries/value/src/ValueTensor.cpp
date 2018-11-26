@@ -9,10 +9,8 @@
 #include "ValueTensor.h"
 #include "EmitterContext.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// stl
 #include <cassert>
 #include <functional>
 #include <numeric>

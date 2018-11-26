@@ -8,14 +8,11 @@
 
 #pragma once
 
-// emitters
-#include "ModuleEmitter.h"
+#include <emitters/include/ModuleEmitter.h>
 
-// model
 #include "Map.h"
 #include "MapCompilerOptions.h"
 
-// stl
 #include <ostream>
 #include <string>
 

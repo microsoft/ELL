@@ -1,20 +1,3 @@
-#pragma once
-
-// model
-#include "ActivationLayer.h"
-#include "BinaryConvolutionalLayer.h"
-#include "ConvolutionalLayer.h"
-#include "InputPort.h"
-#include "Model.h"
-#include "NeuralNetworkPredictorNode.h"
-#include "Node.h"
-#include "PoolingLayer.h"
-#include "ScalingLayer.h"
-
-// stl
-#include <memory>
-#include <vector>
-
 namespace ell
 {
 static std::string PaddingSchemeToString(ell::predictors::neural::PaddingScheme scheme)

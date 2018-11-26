@@ -11,7 +11,6 @@
 #include "ProfileReport.h"
 #include "compiled_model.h"
 
-// stl
 #include <algorithm>
 #include <cstring>
 #include <iostream>

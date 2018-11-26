@@ -6,12 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// optimization
-#include "GoldenSectionMinimizer.h"
+#include <trainers/optimization/include/GoldenSectionMinimizer.h>
 
-// stl
 #include <algorithm>
 #include <cmath>
 

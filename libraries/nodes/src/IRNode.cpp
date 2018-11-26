@@ -8,11 +8,9 @@
 
 #include "IRNode.h"
 
-// model
-#include "CompilableNodeUtilities.h"
+#include <model/include/CompilableNodeUtilities.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

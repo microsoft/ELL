@@ -9,11 +9,9 @@
 
 #include "TextLine.h"
 
-// stl
 #include <ostream>
 
-// utilities
-#include "CStringParser.h"
+#include <utilities/include/CStringParser.h>
 
 namespace ell
 {

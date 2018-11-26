@@ -41,7 +41,7 @@ source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 
 add_library(${library_name} ${src} ${include} ${tcc} ${doc})
-target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_include_directories(${library_name} SYSTEM PUBLIC ${BLAS_INCLUDE_DIRS})
 target_link_libraries(${library_name} utilities ${BLAS_LIBS})
 
@@ -74,7 +74,7 @@ source_group("include" FILES ${test_include})
 source_group("tcc" FILES ${test_tcc})
 
 add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${include})
-target_include_directories(${test_name} PRIVATE test/include)
+target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} math testing)
 copy_shared_libraries(${test_name})
 
@@ -100,7 +100,7 @@ source_group("include" FILES ${profile_include})
 source_group("tcc" FILES ${profile_tcc})
 
 add_executable(${profile_name} ${profile_src} ${profile_include} ${profile_tcc} ${include})
-target_include_directories(${profile_name} PRIVATE test/include)
+target_include_directories(${profile_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${profile_name} math testing)
 copy_shared_libraries(${profile_name})
 

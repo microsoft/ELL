@@ -15,10 +15,8 @@
 #include "Port.h"
 #include "PortElements.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// stl
 #include <cassert>
 #include <exception>
 #include <functional>

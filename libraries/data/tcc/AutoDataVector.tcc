@@ -6,13 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define APPROXIMATION_TOLERANCE 1.0e-9
-#define SPARSE_THRESHOLD 0.2
-
-#include "DenseDataVector.h"
-#include "SparseBinaryDataVector.h"
-#include "SparseDataVector.h"
-
 namespace ell
 {
 namespace data

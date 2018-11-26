@@ -10,7 +10,6 @@
 #include "Exception.h"
 #include "StringUtil.h"
 
-// stl
 #include <algorithm>
 #include <cstdlib>
 #include <ios>

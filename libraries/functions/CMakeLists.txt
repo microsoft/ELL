@@ -22,7 +22,7 @@ source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 
 add_library(${library_name} ${src} ${include})
-target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} utilities math)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
@@ -41,7 +41,7 @@ source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 copy_shared_libraries(${test_name})
-target_include_directories(${test_name} PRIVATE test/include)
+target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} functions testing utilities math)
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")

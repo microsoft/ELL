@@ -8,7 +8,6 @@
 
 #include "ElasticNetRegularizer.h"
 
-// stl
 #include <cmath>
 
 namespace ell

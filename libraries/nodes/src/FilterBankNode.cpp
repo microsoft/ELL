@@ -8,10 +8,9 @@
 
 #include "FilterBankNode.h"
 
-// emitters
-#include "EmitterException.h"
-#include "EmitterTypes.h"
-#include "IRLocalValue.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/IRLocalValue.h>
 
 namespace ell
 {

@@ -8,16 +8,13 @@
 
 #pragma once
 
-// model
-#include "IRMapCompiler.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
-#include "PortMemoryLayout.h"
+#include <model/include/IRMapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/PortElements.h>
+#include <model/include/PortMemoryLayout.h>
 
-// predictors
-#include "ConvolutionalLayer.h"
+#include <predictors/neural/include/ConvolutionalLayer.h>
 
-// stl
 #include <string>
 
 namespace ell

@@ -5,18 +5,15 @@
 
 #include "LoadMap_test.h"
 
-// common
-#include "Files.h"
-#include "LoadModel.h"
-#include "MapLoadArguments.h"
+#include <common/include/LoadModel.h>
+#include <common/include/MapLoadArguments.h>
 
-// model
-#include "Model.h"
+#include <model/include/Model.h>
 
-// testing
-#include "testing.h"
+#include <utilities/include/Files.h>
 
-// stl
+#include <testing/include/testing.h>
+
 #include <iostream>
 
 namespace ell

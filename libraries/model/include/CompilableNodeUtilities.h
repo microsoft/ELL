@@ -8,16 +8,13 @@
 
 #pragma once
 
-// emitters
-#include "EmitterTypes.h"
+#include <emitters/include/EmitterTypes.h>
 
-// model
 #include "InputPort.h"
 #include "Node.h"
 #include "OutputPort.h"
 #include "Port.h"
 
-// stl
 #include <string>
 
 namespace ell

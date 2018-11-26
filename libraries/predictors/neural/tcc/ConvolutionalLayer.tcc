@@ -6,10 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// #include "DiagonalConvolution.h"
-#include "SimpleConvolution.h"
-#include "UnrolledConvolution.h"
-#include "WinogradConvolution.h"
+// #include <dsp/include/DiagonalConvolution.h>
+#include <dsp/include/SimpleConvolution.h>
+#include <dsp/include/UnrolledConvolution.h>
+#include <dsp/include/WinogradConvolution.h>
 
 namespace ell
 {

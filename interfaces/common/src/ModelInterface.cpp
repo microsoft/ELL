@@ -10,28 +10,23 @@
 #include "DatasetInterface.h"
 #include "DatasetInterfaceImpl.h"
 
-// common
-#include "LoadModel.h"
-#include "RegisterNodeCreators.h"
+#include <common/include/LoadModel.h>
+#include <common/include/MapLoadArguments.h>
+#include <common/include/RegisterNodeCreators.h>
 
-// emitters
-#include "ModuleEmitter.h"
+#include <emitters/include/ModuleEmitter.h>
 
-// utilities
-#include "JsonArchiver.h"
-#include "StringUtil.h"
+#include <utilities/include/JsonArchiver.h>
+#include <utilities/include/StringUtil.h>
 
-// math
-#include "DenseDataVector.h"
-#include "FilterBank.h"
+#include <data/include/DenseDataVector.h>
 
-// model
-#include "InputNode.h"
-#include "Map.h"
-#include "MapLoadArguments.h"
-#include "OutputNode.h"
+#include <dsp/include/FilterBank.h>
 
-// stl
+#include <model/include/InputNode.h>
+#include <model/include/Map.h>
+#include <model/include/OutputNode.h>
+
 #include <algorithm>
 
 //

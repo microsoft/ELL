@@ -8,15 +8,12 @@
 
 #include "MapLoadArguments.h"
 
-// model
-#include "Model.h"
-#include "Node.h"
+#include <model/include/Model.h>
+#include <model/include/Node.h>
 
-// utilities
-#include "Files.h"
-#include "Tokenizer.h"
+#include <utilities/include/Files.h>
+#include <utilities/include/Tokenizer.h>
 
-// stl
 #include <sstream>
 
 namespace ell

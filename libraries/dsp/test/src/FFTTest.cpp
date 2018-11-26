@@ -9,20 +9,15 @@
 #include "FFTTest.h"
 #include "DSPTestData.h"
 
-// dsp
-#include "FFT.h"
+#include <dsp/include/FFT.h>
 
-// math
-#include "Vector.h"
-#include "VectorOperations.h"
+#include <math/include/Vector.h>
+#include <math/include/VectorOperations.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "RandomEngines.h"
+#include <utilities/include/RandomEngines.h>
 
-// stl
 #include <complex>
 #include <random>
 #include <vector>

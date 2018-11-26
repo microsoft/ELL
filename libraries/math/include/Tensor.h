@@ -10,18 +10,12 @@
 #include "Matrix.h"
 #include "Vector.h"
 
-// stl
+#include <utilities/include/Debug.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/IArchivable.h>
+
 #include <array>
 #include <cmath>
-#include <vector>
-
-// utilities
-#include "Debug.h"
-#include "Exception.h"
-#include "IArchivable.h"
-
-// stl
-#include <array>
 #include <initializer_list>
 #include <ostream>
 #include <tuple>

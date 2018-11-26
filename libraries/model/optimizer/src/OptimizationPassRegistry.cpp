@@ -8,11 +8,9 @@
 
 #include "OptimizationPassRegistry.h"
 
-// model
 #include "ModelOptimizer.h"
 #include "ModelOptimizerOptions.h"
 
-// stl
 #include <functional>
 #include <string>
 #include <vector>

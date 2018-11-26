@@ -11,8 +11,7 @@
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
 namespace ell
 {

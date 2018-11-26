@@ -7,11 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "Common.h"
 #include "IndexedContainer.h"
 #include "OptimizationExample.h"
 
-// math
-#include "Matrix.h"
+#include <math/include/Matrix.h>
 
 namespace ell
 {

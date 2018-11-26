@@ -11,7 +11,6 @@
 #include "IRLocalScalar.h"
 #include "LLVMUtilities.h"
 
-// stl
 #include <functional>
 #include <vector>
 

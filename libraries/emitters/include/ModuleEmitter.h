@@ -14,7 +14,6 @@
 #include "TargetDevice.h"
 #include "Variable.h"
 
-// stl
 #include <string>
 
 namespace ell

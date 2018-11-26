@@ -8,25 +8,19 @@
 
 #pragma once
 
-// emitters
-#include "LLVMUtilities.h"
+#include <emitters/include/LLVMUtilities.h>
 
-// dsp
-#include "WinogradConvolution.h"
+#include <dsp/include/WinogradConvolution.h>
 
-// emitters
-#include "IRLocalArray.h"
+#include <emitters/include/IRLocalArray.h>
 
-// math
-#include "Tensor.h"
+#include <math/include/Tensor.h>
 
-// model
-#include "IRMapCompiler.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
-#include "PortMemoryLayout.h"
+#include <model/include/IRMapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/PortElements.h>
+#include <model/include/PortMemoryLayout.h>
 
-// stl
 #include <string>
 
 namespace ell

@@ -8,17 +8,14 @@
 
 #pragma once
 
-// model
-#include "CompilableNode.h"
-#include "IRMapCompiler.h"
-#include "InputPort.h"
-#include "ModelTransformer.h"
-#include "OutputPort.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/InputPort.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/OutputPort.h>
 
-// dsp
-#include "VoiceActivityDetector.h"
+#include <dsp/include/VoiceActivityDetector.h>
 
-// stl
 #include <memory>
 
 namespace ell

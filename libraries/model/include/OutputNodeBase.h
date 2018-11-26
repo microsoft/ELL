@@ -12,12 +12,10 @@
 #include "Node.h"
 #include "OutputPort.h"
 
-// utilities
-#include "ArchiveVersion.h"
-#include "IArchivable.h"
-#include "MemoryLayout.h"
+#include <utilities/include/ArchiveVersion.h>
+#include <utilities/include/IArchivable.h>
+#include <utilities/include/MemoryLayout.h>
 
-// stl
 #include <string>
 
 namespace ell

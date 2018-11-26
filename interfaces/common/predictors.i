@@ -103,11 +103,11 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 %rename("%s") PoolingParameters; // Expose PoolingParameters
 %rename("%s") RegionDetectionParameters; // Expose RegionDetectionParameters
 %ignore ell::predictors::neural::Layer::LayerParameters;
-%include <Layer.h>
-%include <BinaryConvolutionalLayer.h>
-%include <ConvolutionalLayer.h>
-%include <PoolingLayer.h>
-%include <RegionDetectionLayer.h>
+%include <predictors/neural/include/Layer.h>
+%include <predictors/neural/include/BinaryConvolutionalLayer.h>
+%include <predictors/neural/include/ConvolutionalLayer.h>
+%include <predictors/neural/include/PoolingLayer.h>
+%include <predictors/neural/include/RegionDetectionLayer.h>
 
 
 // Restore environment

@@ -16,7 +16,6 @@
 #include "TypeName.h"
 #include "Unused.h"
 
-// stl
 #include <cstdint>
 #include <functional>
 #include <memory>

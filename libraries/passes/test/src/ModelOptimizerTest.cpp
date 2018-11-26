@@ -8,28 +8,24 @@
 
 // #include "ModelTestUtilities.h"
 
-// model
-#include "ModelOptimizer.h"
-#include "IRMapCompiler.h"
-#include "InputNode.h"
-#include "Map.h"
-#include "MapCompilerOptions.h"
-#include "PortMemoryLayout.h"
+#include <model/optimizer/include/ModelOptimizer.h>
 
-// nodes
-#include "BroadcastFunctionNode.h"
-#include "ConstantNode.h"
-#include "MatrixMatrixMultiplyNode.h"
-#include "ReorderDataNode.h"
+#include <model/include/IRMapCompiler.h>
+#include <model/include/InputNode.h>
+#include <model/include/Map.h>
+#include <model/include/MapCompilerOptions.h>
+#include <model/include/PortMemoryLayout.h>
 
-// passes
-#include "FuseLinearOperationsPass.h"
-#include "StandardPasses.h"
+#include <nodes/include/BroadcastFunctionNode.h>
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/MatrixMatrixMultiplyNode.h>
+#include <nodes/include/ReorderDataNode.h>
 
-// testing
-#include "testing.h"
+#include <passes/include/FuseLinearOperationsPass.h>
+#include <passes/include/StandardPasses.h>
 
-// stl
+#include <testing/include/testing.h>
+
 #include <algorithm>
 #include <iostream>
 

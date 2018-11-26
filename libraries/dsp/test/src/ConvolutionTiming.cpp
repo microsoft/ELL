@@ -10,24 +10,19 @@
 #include "ConvolutionTestData.h"
 #include "DSPTestUtilities.h"
 
-// dsp
-#include "Convolution.h"
-#include "WinogradConvolution.h"
+#include <dsp/include/Convolution.h>
+#include <dsp/include/WinogradConvolution.h>
 
-// math
-#include "MathConstants.h"
-#include "Tensor.h"
-#include "TensorOperations.h"
-#include "Vector.h"
-#include "VectorOperations.h"
+#include <math/include/MathConstants.h>
+#include <math/include/Tensor.h>
+#include <math/include/TensorOperations.h>
+#include <math/include/Vector.h>
+#include <math/include/VectorOperations.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "MillisecondTimer.h"
+#include <utilities/include/MillisecondTimer.h>
 
-// stl
 #include <cmath>
 #include <iostream>
 #include <string>

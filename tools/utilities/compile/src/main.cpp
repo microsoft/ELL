@@ -8,29 +8,23 @@
 
 #include "CompileArguments.h"
 
-// utilities
-#include "CommandLineParser.h"
-#include "Exception.h"
-#include "MillisecondTimer.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/MillisecondTimer.h>
 
-// dataset
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// common
-#include "LoadModel.h"
-#include "MapCompilerArguments.h"
-#include "MapLoadArguments.h"
+#include <common/include/LoadModel.h>
+#include <common/include/MapCompilerArguments.h>
+#include <common/include/MapLoadArguments.h>
 
-// model
-#include "IRCompiledMap.h"
-#include "IRMapCompiler.h"
-#include "Map.h"
-#include "OutputNode.h"
+#include <model/include/IRCompiledMap.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/Map.h>
+#include <model/include/OutputNode.h>
 
-// passes
-#include "StandardPasses.h"
+#include <passes/include/StandardPasses.h>
 
-// stl
 #include <iostream>
 #include <sstream>
 #include <stdexcept>

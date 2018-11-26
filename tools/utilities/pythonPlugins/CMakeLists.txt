@@ -8,7 +8,7 @@ set (library_name pythonPlugins)
 set (src  src/InvokePython.cpp src/imageConverter.py src/audioConverter.py )
 
 set (include include/InvokePython.h)
-  
+
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
@@ -19,9 +19,9 @@ endif()  # PYTHON_ENABLED
 
 include_directories(../../../libraries/utilities/include)
 
-# create executable in build\bin
+# create executable in build/bin
 add_library(${library_name} ${src} ${include})
-target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} Threads::Threads)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "tools/utilities")

@@ -10,7 +10,6 @@
 
 #include "IArchivable.h"
 
-// stl
 #include <functional>
 #include <ostream>
 #include <string>

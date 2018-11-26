@@ -6,15 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "VectorOperations.h"
+#include "../include/VectorOperations.h"
 
-// utilities
-#include "Debug.h"
-#include "Exception.h"
-#include "Unused.h"
+#include <utilities/include/Debug.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Unused.h>
 
-// stl
-#include <algorithm> // for std::generate
+#include <algorithm>
 
 namespace ell
 {

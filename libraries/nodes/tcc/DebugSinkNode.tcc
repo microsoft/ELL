@@ -6,9 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "Debug.h"
-#include "Exception.h"
+#include <utilities/include/Debug.h>
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

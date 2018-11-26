@@ -8,16 +8,13 @@
 
 #pragma once
 
-// data
-#include "Dataset.h"
-#include "Example.h"
+#include <data/include/Dataset.h>
+#include <data/include/Example.h>
 
-// stl
+#include <math/include/Matrix.h>
+
 #include <cstddef>
 #include <memory>
-
-// Matrix
-#include <Matrix.h>
 
 namespace ell
 {

@@ -6,9 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LinearPredictor.h"
-// testing
-#include "testing.h"
+#include <predictors/include/LinearPredictor.h>
+
+#include <testing/include/testing.h>
 
 using namespace ell;
 

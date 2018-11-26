@@ -8,19 +8,16 @@
 
 #include "DataLoaders.h"
 
-// utilities
-#include "Files.h"
+#include <utilities/include/Files.h>
 
-// data
-#include "Dataset.h"
-#include "SequentialLineIterator.h"
+#include <data/include/Dataset.h>
+#include <data/include/SequentialLineIterator.h>
 
-#include "AutoDataVector.h"
-#include "GeneralizedSparseParsingIterator.h"
-#include "SingleLineParsingExampleIterator.h"
-#include "WeightLabel.h"
+#include <data/include/AutoDataVector.h>
+#include <data/include/GeneralizedSparseParsingIterator.h>
+#include <data/include/SingleLineParsingExampleIterator.h>
+#include <data/include/WeightLabel.h>
 
-// stl
 #include <memory>
 #include <stdexcept>
 

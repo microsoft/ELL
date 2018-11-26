@@ -10,7 +10,6 @@
 
 #include "TypeTraits.h"
 
-// stl
 #include <cstddef>
 #include <cstdint>
 #include <memory>

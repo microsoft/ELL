@@ -11,8 +11,7 @@
 #include "Example_test.h"
 #include "Parser_test.h"
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
 using namespace ell;
 

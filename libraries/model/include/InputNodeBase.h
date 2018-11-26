@@ -13,11 +13,9 @@
 #include "OutputPort.h"
 #include "Port.h"
 
-// utilities
-#include "ArchiveVersion.h"
-#include "TypeName.h"
+#include <utilities/include/ArchiveVersion.h>
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <string>
 #include <vector>
 

@@ -9,7 +9,6 @@
 #include "LLVMUtilities.h"
 #include "EmitterException.h"
 
-// llvm
 #include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
 

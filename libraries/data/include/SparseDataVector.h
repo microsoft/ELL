@@ -12,10 +12,8 @@
 #ifndef SPARSEDATAVECTOR_H
 #define SPARSEDATAVECTOR_H
 
-// utilities
-#include "CompressedIntegerList.h"
+#include <utilities/include/CompressedIntegerList.h>
 
-// stl
 #include <cstddef>
 #include <initializer_list>
 #include <type_traits>

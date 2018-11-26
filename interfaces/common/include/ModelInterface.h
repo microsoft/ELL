@@ -9,29 +9,24 @@
 
 #ifndef SWIG
 
-// emitters
-#include "EmitterTypes.h"
-
-// math
-#include "Tensor.h"
-
-// model
-#include "IRCompiledMap.h"
-#include "InputNode.h"
-#include "InputPort.h"
-#include "Model.h"
-#include "Node.h"
-#include "OutputNode.h"
-#include "OutputPort.h"
-#include "Port.h"
-#include "PortElements.h"
-#include "PortMemoryLayout.h"
-
-// apis
 #include "CallbackInterface.h"
 #include "MathInterface.h"
 
-// stl
+#include <emitters/include/EmitterTypes.h>
+
+#include <math/include/Tensor.h>
+
+#include <model/include/IRCompiledMap.h>
+#include <model/include/InputNode.h>
+#include <model/include/InputPort.h>
+#include <model/include/Model.h>
+#include <model/include/Node.h>
+#include <model/include/OutputNode.h>
+#include <model/include/OutputPort.h>
+#include <model/include/Port.h>
+#include <model/include/PortElements.h>
+#include <model/include/PortMemoryLayout.h>
+
 #include <memory>
 #include <sstream>
 #include <string>

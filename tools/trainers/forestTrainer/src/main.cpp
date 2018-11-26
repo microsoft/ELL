@@ -6,35 +6,29 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "CommandLineParser.h"
-#include "Exception.h"
-#include "Files.h"
-#include "OutputStreamImpostor.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/OutputStreamImpostor.h>
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// common
-#include "AppendNodeToModel.h"
-#include "DataLoadArguments.h"
-#include "DataLoaders.h"
-#include "EvaluatorArguments.h"
-#include "ForestTrainerArguments.h"
-#include "LoadModel.h"
-#include "MakeEvaluator.h"
-#include "MakeTrainer.h"
-#include "MapLoadArguments.h"
-#include "ModelSaveArguments.h"
-#include "TrainerArguments.h"
+#include <common/include/AppendNodeToModel.h>
+#include <common/include/DataLoadArguments.h>
+#include <common/include/DataLoaders.h>
+#include <common/include/EvaluatorArguments.h>
+#include <common/include/ForestTrainerArguments.h>
+#include <common/include/LoadModel.h>
+#include <common/include/MakeEvaluator.h>
+#include <common/include/MakeTrainer.h>
+#include <common/include/MapLoadArguments.h>
+#include <common/include/ModelSaveArguments.h>
+#include <common/include/TrainerArguments.h>
 
-// model
-#include "Model.h"
+#include <model/include/Model.h>
 
-// nodes
-#include "ForestPredictorNode.h"
+#include <nodes/include/ForestPredictorNode.h>
 
-// stl
 #include <iostream>
 #include <stdexcept>
 

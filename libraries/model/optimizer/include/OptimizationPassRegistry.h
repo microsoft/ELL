@@ -10,7 +10,6 @@
 
 #include "OptimizationPass.h"
 
-// stl
 #include <functional>
 #include <memory>
 #include <string>

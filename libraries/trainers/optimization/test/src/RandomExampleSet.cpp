@@ -8,7 +8,6 @@
 
 #include "RandomExampleSet.h"
 
-// stl
 #include <cassert>
 
 using namespace ell;

@@ -12,7 +12,6 @@
 #include "Exception.h"
 #include "Tokenizer.h"
 
-// stl
 #include <cstddef>
 #include <cstdint>
 #include <istream>

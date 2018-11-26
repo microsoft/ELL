@@ -10,39 +10,35 @@
 
 #include "IPredictor.h"
 
-// math
-#include "Matrix.h"
-#include "Vector.h"
+#include <math/include/Matrix.h>
+#include <math/include/Vector.h>
 
-// datasets
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
 // neural network
-#include "ActivationLayer.h"
-#include "BatchNormalizationLayer.h"
-#include "BiasLayer.h"
-#include "BinaryConvolutionalLayer.h"
-#include "ConvolutionalLayer.h"
-#include "FullyConnectedLayer.h"
-#include "HardSigmoidActivation.h"
-#include "InputLayer.h"
-#include "Layer.h"
-#include "LeakyReLUActivation.h"
-#include "MaxPoolingFunction.h"
-#include "MeanPoolingFunction.h"
-#include "ParametricReLUActivation.h"
-#include "PoolingLayer.h"
-#include "ReLUActivation.h"
-#include "RegionDetectionLayer.h"
-#include "ScalingLayer.h"
-#include "SigmoidActivation.h"
-#include "SoftmaxLayer.h"
-#include "TanhActivation.h"
+#include <predictors/neural/include/ActivationLayer.h>
+#include <predictors/neural/include/BatchNormalizationLayer.h>
+#include <predictors/neural/include/BiasLayer.h>
+#include <predictors/neural/include/BinaryConvolutionalLayer.h>
+#include <predictors/neural/include/ConvolutionalLayer.h>
+#include <predictors/neural/include/FullyConnectedLayer.h>
+#include <predictors/neural/include/HardSigmoidActivation.h>
+#include <predictors/neural/include/InputLayer.h>
+#include <predictors/neural/include/Layer.h>
+#include <predictors/neural/include/LeakyReLUActivation.h>
+#include <predictors/neural/include/MaxPoolingFunction.h>
+#include <predictors/neural/include/MeanPoolingFunction.h>
+#include <predictors/neural/include/ParametricReLUActivation.h>
+#include <predictors/neural/include/PoolingLayer.h>
+#include <predictors/neural/include/ReLUActivation.h>
+#include <predictors/neural/include/RegionDetectionLayer.h>
+#include <predictors/neural/include/ScalingLayer.h>
+#include <predictors/neural/include/SigmoidActivation.h>
+#include <predictors/neural/include/SoftmaxLayer.h>
+#include <predictors/neural/include/TanhActivation.h>
 
-// utilities
-#include "IArchivable.h"
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <cstddef>
 #include <memory>
 

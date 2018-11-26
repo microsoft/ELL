@@ -8,10 +8,9 @@
 
 #pragma once
 
-// model/optimizer
-#include "ModelOptimizer.h"
-#include "ModelOptimizerOptions.h"
-#include "OptimizationPassRegistry.h"
+#include <model/optimizer/include/ModelOptimizer.h>
+#include <model/optimizer/include/ModelOptimizerOptions.h>
+#include <model/optimizer/include/OptimizationPassRegistry.h>
 
 namespace ell
 {

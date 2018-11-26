@@ -8,10 +8,9 @@
 
 #pragma once
 
-// model
-#include "Map.h"
-#include "Model.h"
-#include "ModelTransformer.h"
+#include <model/include/Map.h>
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
 
 namespace ell
 {

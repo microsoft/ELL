@@ -10,14 +10,12 @@
 #include "IRModuleEmitter.h"
 #include "LLVMInclude.h"
 
-// llvm
 #include <llvm/IR/Module.h>
 #include <llvm/Transforms/IPO.h>
 #include <llvm/Transforms/IPO/PassManagerBuilder.h>
 #include <llvm/Transforms/Scalar.h>
 #include <llvm/Transforms/Scalar/GVN.h>
 
-// stl
 #include <memory>
 
 namespace ell

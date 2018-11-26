@@ -6,14 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DataVectorOperations.h"
-#include "LinearPredictor.h"
+#include <data/include/DataVectorOperations.h>
 
-// stl
+#include <math/include/VectorOperations.h>
+
 #include <memory>
-
-// math
-#include "VectorOperations.h"
 
 namespace ell
 {

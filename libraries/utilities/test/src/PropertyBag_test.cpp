@@ -9,14 +9,11 @@
 
 #include "PropertyBag_test.h"
 
-// utilities
-#include "JsonArchiver.h"
-#include "PropertyBag.h"
+#include <utilities/include/JsonArchiver.h>
+#include <utilities/include/PropertyBag.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <iostream>
 #include <string>
 #include <vector>

@@ -9,8 +9,7 @@
 #include "ValueScalar.h"
 #include "EmitterContext.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

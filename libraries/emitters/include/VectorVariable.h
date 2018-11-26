@@ -10,7 +10,6 @@
 #include "EmitterTypes.h"
 #include "Variable.h"
 
-// stl
 #include <vector>
 
 namespace ell

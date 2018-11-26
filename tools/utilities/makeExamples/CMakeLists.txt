@@ -23,7 +23,7 @@ source_group("include" FILES ${include})
 set(GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR})
 add_executable(${tool_name} ${src} ${include})
-target_include_directories(${tool_name} PRIVATE include)
+target_include_directories(${tool_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${tool_name} utilities model nodes common)
 copy_shared_libraries(${tool_name})
 

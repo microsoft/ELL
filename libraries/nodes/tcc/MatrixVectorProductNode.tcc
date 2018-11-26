@@ -6,18 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ConstantNode.h"
-#include "MatrixVectorMultiplyNode.h"
-
-// math
-#include "MatrixOperations.h"
-
-// utilities
-#include "Exception.h"
-
-// stl
-#include <vector>
-
 namespace ell
 {
 namespace nodes

@@ -6,21 +6,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ElasticNetRegularizer.h"
-#include "HingeLoss.h"
-#include "L2Regularizer.h"
-#include "LogLoss.h"
-#include "SmoothHingeLoss.h"
-#include "SquaredLoss.h"
+#include <functions/include/ElasticNetRegularizer.h>
+#include <functions/include/HingeLoss.h>
+#include <functions/include/L2Regularizer.h>
+#include <functions/include/LogLoss.h>
+#include <functions/include/SmoothHingeLoss.h>
+#include <functions/include/SquaredLoss.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// math
-#include "Vector.h"
-#include "VectorOperations.h"
+#include <math/include/Vector.h>
+#include <math/include/VectorOperations.h>
 
-// stl
 #include <array>
 #include <cmath>
 #include <functional>

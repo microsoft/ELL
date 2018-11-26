@@ -12,12 +12,10 @@
 #include "OutputPort.h"
 #include "PortElements.h"
 
-// utilities
-#include "IArchivable.h"
-#include "IIterator.h"
-#include "PropertyBag.h"
+#include <utilities/include/IArchivable.h>
+#include <utilities/include/IIterator.h>
+#include <utilities/include/PropertyBag.h>
 
-// stl
 #include <map>
 #include <memory>
 #include <unordered_map>

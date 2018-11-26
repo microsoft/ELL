@@ -8,7 +8,6 @@
 
 #include "AUCAggregator.h"
 
-// stl
 #include <algorithm>
 
 namespace ell

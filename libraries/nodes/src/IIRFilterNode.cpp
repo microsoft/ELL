@@ -8,14 +8,13 @@
 
 #include "IIRFilterNode.h"
 
-// emitters
-#include "EmitterException.h"
-#include "EmitterTypes.h"
-#include "IRLocalValue.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/IRLocalValue.h>
 
-// math
-#include "FFT.h"
-#include "MathConstants.h"
+#include <dsp/include/FFT.h>
+
+#include <math/include/MathConstants.h>
 
 namespace ell
 {

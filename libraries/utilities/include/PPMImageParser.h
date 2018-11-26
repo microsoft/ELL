@@ -8,7 +8,6 @@
 
 #pragma once
 
-// stl
 #include <cstddef>
 #include <istream>
 #include <string>

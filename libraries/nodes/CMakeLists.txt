@@ -147,12 +147,13 @@ source_group("tcc" FILES ${tcc})
 add_library(${library_name} ${src} ${include} ${tcc})
 
 target_include_directories(${library_name}
-    PUBLIC
+    PRIVATE
         include
+        ${ELL_LIBRARIES_DIR}
 )
 
 target_link_libraries(${library_name}
-    math    
+    math
     model
     predictors
     dsp
@@ -197,6 +198,7 @@ add_executable(${test_name}
 target_include_directories(${test_name}
     PRIVATE
         test/include
+        ${ELL_LIBRARIES_DIR}
 )
 
 target_link_libraries(${test_name}
@@ -243,6 +245,7 @@ add_executable(${test_name}
 target_include_directories(${test_name}
     PRIVATE
         test/include
+        ${ELL_LIBRARIES_DIR}
 )
 
 target_link_libraries(${test_name}
@@ -290,6 +293,7 @@ add_executable(${test_name}
 target_include_directories(${test_name}
     PRIVATE
         test/include
+        ${ELL_LIBRARIES_DIR}
 )
 
 target_link_libraries(${test_name}
@@ -311,7 +315,7 @@ add_test(NAME ${test_name} COMMAND ${test_name})
 set_test_library_path(${test_name})
 
 #
-# timing project 
+# timing project
 #
 
 set(timing_name ${library_name}_timing)
@@ -338,6 +342,7 @@ add_executable(${timing_name}
 target_include_directories(${timing_name}
     PRIVATE
         test/include
+        ${ELL_LIBRARIES_DIR}
 )
 
 target_link_libraries(${timing_name}

@@ -8,11 +8,9 @@
 
 #include "DCTNode.h"
 
-// nodes
 #include "MatrixVectorProductNode.h"
 
-// dsp
-#include "DCT.h"
+#include <dsp/include/DCT.h>
 
 namespace ell
 {

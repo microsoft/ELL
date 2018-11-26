@@ -6,21 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "BinaryOperationNode.h"
-#include "ConstantNode.h"
-#include "DotProductNode.h"
-#include "LinearPredictorNode.h"
-
-// utilities
-#include "Exception.h"
-
-// data
-#include "DenseDataVector.h"
-
-// stl
-#include <string>
-#include <vector>
-
 namespace ell
 {
 namespace nodes

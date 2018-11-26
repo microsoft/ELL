@@ -8,16 +8,12 @@
 
 #include "ConvolutionTiming.h"
 
-// dsp
-#include "Convolution.h"
+#include <dsp/include/Convolution.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
-// stl
 #include <iostream>
 
 using namespace ell;

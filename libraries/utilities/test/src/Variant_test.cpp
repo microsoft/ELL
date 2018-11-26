@@ -9,15 +9,12 @@
 
 #include "Variant_test.h"
 
-// utilities
-#include "JsonArchiver.h"
-#include "TypeName.h"
-#include "Variant.h"
+#include <utilities/include/JsonArchiver.h>
+#include <utilities/include/TypeName.h>
+#include <utilities/include/Variant.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <iostream>
 #include <string>
 #include <vector>

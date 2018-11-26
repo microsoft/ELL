@@ -12,7 +12,6 @@
 #include "Unused.h"
 #include "Variant.h"
 
-// stl
 #include <functional>
 #include <string>
 #include <type_traits>

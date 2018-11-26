@@ -8,15 +8,15 @@
 
 #pragma once
 
-// model
 #include "CompilableNode.h"
+#include "IRMapCompiler.h"
+#include "Model.h"
+#include "ModelTransformer.h"
 #include "Node.h"
 
-// utilities
-#include "Exception.h"
-#include "TypeName.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <string>
 #include <vector>
 

@@ -8,47 +8,40 @@
 
 #include "NeuralNetworkLayerNodesTests.h"
 
-// nodes
-#include "ActivationLayerNode.h"
-#include "BatchNormalizationLayerNode.h"
-#include "BiasLayerNode.h"
-#include "BinaryConvolutionalLayerNode.h"
-#include "ConvolutionalLayerNode.h"
-#include "FullyConnectedLayerNode.h"
-#include "NeuralNetworkPredictorNode.h"
-#include "PoolingLayerNode.h"
-#include "ScalingLayerNode.h"
-#include "SoftmaxLayerNode.h"
+#include <nodes/include/ActivationLayerNode.h>
+#include <nodes/include/BatchNormalizationLayerNode.h>
+#include <nodes/include/BiasLayerNode.h>
+#include <nodes/include/BinaryConvolutionalLayerNode.h>
+#include <nodes/include/ConvolutionalLayerNode.h>
+#include <nodes/include/FullyConnectedLayerNode.h>
+#include <nodes/include/NeuralNetworkPredictorNode.h>
+#include <nodes/include/PoolingLayerNode.h>
+#include <nodes/include/ScalingLayerNode.h>
+#include <nodes/include/SoftmaxLayerNode.h>
 
-// model
-#include "InputNode.h"
-#include "Model.h"
-#include "Node.h"
+#include <model/include/InputNode.h>
+#include <model/include/Model.h>
+#include <model/include/Node.h>
 
-// predictors
-#include "NeuralNetworkPredictor.h"
+#include <predictors/include/NeuralNetworkPredictor.h>
 
-// predictors/neural
-#include "ActivationLayer.h"
-#include "BatchNormalizationLayer.h"
-#include "BiasLayer.h"
-#include "BinaryConvolutionalLayer.h"
-#include "ConvolutionalLayer.h"
-#include "FullyConnectedLayer.h"
-#include "InputLayer.h"
-#include "PoolingLayer.h"
-#include "ReLUActivation.h"
-#include "RegionDetectionLayer.h"
-#include "ScalingLayer.h"
-#include "SoftmaxLayer.h"
+#include <predictors/neural/include/ActivationLayer.h>
+#include <predictors/neural/include/BatchNormalizationLayer.h>
+#include <predictors/neural/include/BiasLayer.h>
+#include <predictors/neural/include/BinaryConvolutionalLayer.h>
+#include <predictors/neural/include/ConvolutionalLayer.h>
+#include <predictors/neural/include/FullyConnectedLayer.h>
+#include <predictors/neural/include/InputLayer.h>
+#include <predictors/neural/include/PoolingLayer.h>
+#include <predictors/neural/include/ReLUActivation.h>
+#include <predictors/neural/include/RegionDetectionLayer.h>
+#include <predictors/neural/include/ScalingLayer.h>
+#include <predictors/neural/include/SoftmaxLayer.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// common
-#include "LoadModel.h" // for RegisterNodeTypes
+#include <common/include/LoadModel.h> // for RegisterNodeTypes
 
-// stl
 #include <cmath>
 #include <iostream>
 #include <sstream>

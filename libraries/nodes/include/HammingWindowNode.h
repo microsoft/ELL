@@ -11,15 +11,12 @@
 #include "BinaryOperationNode.h"
 #include "ConstantNode.h"
 
-// math
-#include "WindowFunctions.h"
+#include <dsp/include/WindowFunctions.h>
 
-// model
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
 
-// stl
 #include <string>
 
 namespace ell

@@ -6,17 +6,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MatrixOperations.h"
-#include "Vector.h"
-#include "VectorOperations.h"
+#include <math/include/MatrixOperations.h>
+#include <math/include/Vector.h>
+#include <math/include/VectorOperations.h>
 
-// stl
+#include <utilities/include/RandomEngines.h>
+
 #include <chrono>
 #include <iostream>
 #include <random>
-
-// utilities
-#include "RandomEngines.h"
 
 using namespace ell;
 

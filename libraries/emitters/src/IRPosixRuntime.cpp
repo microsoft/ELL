@@ -9,7 +9,6 @@
 #include "IRPosixRuntime.h"
 #include "IRModuleEmitter.h"
 
-// llvm
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>

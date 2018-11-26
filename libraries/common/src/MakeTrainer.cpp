@@ -8,22 +8,19 @@
 
 #include "MakeTrainer.h"
 
-// functions
-#include "HingeLoss.h"
-#include "L2Regularizer.h"
-#include "LogLoss.h"
-#include "SmoothHingeLoss.h"
-#include "SquaredLoss.h"
+#include <functions/include/HingeLoss.h>
+#include <functions/include/L2Regularizer.h>
+#include <functions/include/LogLoss.h>
+#include <functions/include/SmoothHingeLoss.h>
+#include <functions/include/SquaredLoss.h>
 
-// utilities
-#include "CommandLineParser.h"
+#include <utilities/include/CommandLineParser.h>
 
-// trainers
-#include "HistogramForestTrainer.h"
-#include "LogitBooster.h"
-#include "ProtoNNTrainer.h"
-#include "SortingForestTrainer.h"
-#include "ThresholdFinder.h"
+#include <trainers/include/HistogramForestTrainer.h>
+#include <trainers/include/LogitBooster.h>
+#include <trainers/include/ProtoNNTrainer.h>
+#include <trainers/include/SortingForestTrainer.h>
+#include <trainers/include/ThresholdFinder.h>
 
 namespace ell
 {

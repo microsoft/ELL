@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "Evaluator.h"
 #include "ITrainer.h"
 
-// stl
+#include <evaluators/include/Evaluator.h>
+
 #include <memory>
 
 namespace ell

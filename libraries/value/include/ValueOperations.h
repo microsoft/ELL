@@ -10,11 +10,9 @@
 
 #include "ValueType.h"
 
-// utilities
-#include "Boolean.h"
-#include "MemoryLayout.h"
+#include <utilities/include/Boolean.h>
+#include <utilities/include/MemoryLayout.h>
 
-// stl
 #include <functional>
 
 namespace ell

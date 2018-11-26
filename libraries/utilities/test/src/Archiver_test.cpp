@@ -8,17 +8,14 @@
 
 #include "Archiver_test.h"
 
-// utilities
-#include "Archiver.h"
-#include "IArchivable.h"
-#include "JsonArchiver.h"
-#include "UniqueId.h"
-#include "XmlArchiver.h"
+#include <utilities/include/Archiver.h>
+#include <utilities/include/IArchivable.h>
+#include <utilities/include/JsonArchiver.h>
+#include <utilities/include/UniqueId.h>
+#include <utilities/include/XmlArchiver.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <iostream>
 #include <memory>
 #include <sstream>

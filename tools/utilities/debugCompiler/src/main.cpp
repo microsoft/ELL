@@ -7,29 +7,26 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompareArguments.h"
-#include "InvokePython.h"
 #include "ModelComparison.h"
 #include "ReplaceSourceAndSinkNodesPass.h"
 
-// common
-#include "LoadModel.h"
-#include "MapCompilerArguments.h"
-#include "ModelLoadArguments.h"
+#include <pythonPlugins/include/InvokePython.h>
 
-// model
-#include "Map.h"
-#include "MapCompilerOptions.h"
-#include "PortMemoryLayout.h"
+#include <common/include/LoadModel.h>
+#include <common/include/MapCompilerArguments.h>
+#include <common/include/ModelLoadArguments.h>
 
-// utilities
-#include "CommandLineParser.h"
-#include "Exception.h"
-#include "Files.h"
-#include "OutputStreamImpostor.h"
-#include "RandomEngines.h"
-#include "TypeTraits.h"
+#include <model/include/Map.h>
+#include <model/include/MapCompilerOptions.h>
+#include <model/include/PortMemoryLayout.h>
 
-// stl
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/OutputStreamImpostor.h>
+#include <utilities/include/RandomEngines.h>
+#include <utilities/include/TypeTraits.h>
+
 #include <fstream>
 #include <iostream>
 #include <string>

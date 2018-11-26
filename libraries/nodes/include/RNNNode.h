@@ -8,21 +8,18 @@
 
 #pragma once
 
-#include "Activation.h"
 #include "CompiledActivationFunctions.h"
 
-// emitters
-#include "LLVMUtilities.h"
+#include <predictors/neural/include/Activation.h>
 
-// model
-#include "IRMapCompiler.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
+#include <emitters/include/LLVMUtilities.h>
 
-// utilities
-#include "StringUtil.h"
+#include <model/include/IRMapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/PortElements.h>
 
-// stl
+#include <utilities/include/StringUtil.h>
+
 #include <string>
 
 namespace ell

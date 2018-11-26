@@ -8,8 +8,7 @@
 
 #pragma once
 
-// model
-#include "ModelBuilder.h"
+#include <model/include/ModelBuilder.h>
 
 namespace ell
 {

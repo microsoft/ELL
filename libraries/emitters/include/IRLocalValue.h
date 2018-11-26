@@ -10,7 +10,6 @@
 
 #include "LLVMUtilities.h"
 
-// stl
 #include <functional>
 
 namespace ell

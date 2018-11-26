@@ -10,17 +10,13 @@
 #include "ProtoNNInit.h"
 #include "ProtoNNTrainerUtils.h"
 
-// math
-#include "MatrixOperations.h"
-#include "Vector.h"
+#include <math/include/MatrixOperations.h>
+#include <math/include/Vector.h>
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
-// stl
 #include <cassert>
 #include <cmath>
 #include <ctime>

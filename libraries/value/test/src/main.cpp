@@ -8,13 +8,10 @@
 
 #include "Value_test.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <iostream>
 
 int main()

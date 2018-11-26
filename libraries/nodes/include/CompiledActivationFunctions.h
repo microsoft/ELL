@@ -10,20 +10,17 @@
 
 #include "BroadcastFunctionNode.h"
 
-// emitters
-#include "IRFunctionEmitter.h"
-#include "LLVMUtilities.h"
+#include <emitters/include/IRFunctionEmitter.h>
+#include <emitters/include/LLVMUtilities.h>
 
-// predictors/neural
-#include "HardSigmoidActivation.h"
-#include "LeakyReLUActivation.h"
-#include "ParametricReLUActivation.h"
-#include "ReLUActivation.h"
-#include "SigmoidActivation.h"
-#include "TanhActivation.h"
+#include <predictors/neural/include/HardSigmoidActivation.h>
+#include <predictors/neural/include/LeakyReLUActivation.h>
+#include <predictors/neural/include/ParametricReLUActivation.h>
+#include <predictors/neural/include/ReLUActivation.h>
+#include <predictors/neural/include/SigmoidActivation.h>
+#include <predictors/neural/include/TanhActivation.h>
 
-// utilities
-#include "TypeName.h"
+#include <utilities/include/TypeName.h>
 
 namespace ell
 {

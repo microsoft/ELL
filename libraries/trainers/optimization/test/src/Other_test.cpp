@@ -8,23 +8,19 @@
 
 #include "Other_test.h"
 
-// optimization
-#include "L2Regularizer.h"
-#include "MatrixExampleSet.h"
-#include "MatrixSolution.h"
-#include "MultivariateLoss.h"
-#include "NormProx.h"
-#include "SGDOptimizer.h"
-#include "SquareLoss.h"
+#include <trainers/optimization/include/L2Regularizer.h>
+#include <trainers/optimization/include/MatrixExampleSet.h>
+#include <trainers/optimization/include/MatrixSolution.h>
+#include <trainers/optimization/include/MultivariateLoss.h>
+#include <trainers/optimization/include/NormProx.h>
+#include <trainers/optimization/include/SGDOptimizer.h>
+#include <trainers/optimization/include/SquareLoss.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// math
-#include "Matrix.h"
-#include "Vector.h"
+#include <math/include/Matrix.h>
+#include <math/include/Vector.h>
 
-// stl
 #include <memory>
 #include <random>
 #include <vector>

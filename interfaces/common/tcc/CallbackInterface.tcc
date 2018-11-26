@@ -8,7 +8,6 @@
 
 #ifndef SWIG
 
-// stl
 #include <assert.h>
 #include <stdexcept>
 

@@ -10,7 +10,6 @@
 
 #include "IndexValue.h"
 
-// stl
 #include <memory>
 
 namespace ell

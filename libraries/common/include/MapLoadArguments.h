@@ -10,15 +10,12 @@
 
 #include "ModelLoadArguments.h"
 
-// model
-#include "InputNode.h"
-#include "Model.h"
-#include "PortElements.h"
+#include <model/include/InputNode.h>
+#include <model/include/Model.h>
+#include <model/include/PortElements.h>
 
-// utilities
-#include "CommandLineParser.h"
+#include <utilities/include/CommandLineParser.h>
 
-// stl
 #include <string>
 
 namespace ell

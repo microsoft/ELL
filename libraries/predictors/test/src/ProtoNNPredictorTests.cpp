@@ -6,10 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ProtoNNPredictor.h"
+#include <predictors/include/ProtoNNPredictor.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
 using namespace ell;
 

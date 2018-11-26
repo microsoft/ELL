@@ -7,11 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "KMeansTrainer.h"
 
-// math
-#include "MatrixOperations.h"
-#include "VectorOperations.h"
+#include <math/include/MatrixOperations.h>
+#include <math/include/VectorOperations.h>
 
-// stl
 #include <cmath>
 
 namespace ell

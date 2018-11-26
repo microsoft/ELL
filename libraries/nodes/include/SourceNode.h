@@ -8,23 +8,19 @@
 
 #pragma once
 
-// emitters
-#include "LLVMUtilities.h"
+#include <emitters/include/LLVMUtilities.h>
 
-// model
-#include "CompilableNode.h"
-#include "IRMapCompiler.h"
-#include "InputNodeBase.h"
-#include "ModelTransformer.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/InputNodeBase.h>
+#include <model/include/ModelTransformer.h>
 
 // nodes
 #include "ClockNode.h" // for TimeTickType
 
-// emitters
-#include "IRMetadata.h"
-#include "IRModuleEmitter.h"
+#include <emitters/include/IRMetadata.h>
+#include <emitters/include/IRModuleEmitter.h>
 
-// stl
 #include <string>
 #include <vector>
 

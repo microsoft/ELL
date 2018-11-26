@@ -8,18 +8,15 @@
 
 #include "CompilableNode.h"
 #include "CompilableNodeUtilities.h"
-#include "EmitterException.h"
 #include "IRMapCompiler.h"
 #include "MapCompiler.h"
 
-// emitters
-#include "LLVMUtilities.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/LLVMUtilities.h>
 
-// utilities
-#include "Logger.h"
-#include "UniqueId.h"
+#include <utilities/include/Logger.h>
+#include <utilities/include/UniqueId.h>
 
-// stl
 #include <algorithm>
 #include <functional>
 #include <iterator>

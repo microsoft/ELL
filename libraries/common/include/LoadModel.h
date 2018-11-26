@@ -10,9 +10,8 @@
 
 #include "MapLoadArguments.h"
 
-// model
-#include "Map.h"
-#include "Model.h"
+#include <model/include/Map.h>
+#include <model/include/Model.h>
 
 namespace ell
 {

@@ -10,7 +10,7 @@
 #include "ModelInterface.h"
 #include "ModelBuilderInterface.h"
 
-#include "Variant.h"
+#include <utilities/include/Variant.h>
 #include <vector>
 %}
 

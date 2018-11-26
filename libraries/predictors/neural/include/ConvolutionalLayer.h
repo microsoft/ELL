@@ -9,11 +9,9 @@
 #pragma once
 #include "Layer.h"
 
-// dsp
-#include "Convolution.h"
+#include <dsp/include/Convolution.h>
 
-// math
-#include "Matrix.h"
+#include <math/include/Matrix.h>
 
 namespace ell
 {

@@ -20,7 +20,6 @@
 #include "ScalarVariable.h"
 #include "VectorVariable.h"
 
-// llvm
 #include <llvm/IR/Constant.h>
 #include <llvm/IR/DataLayout.h>
 #include <llvm/IR/GlobalVariable.h>
@@ -32,7 +31,6 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Target/TargetMachine.h>
 
-// stl
 #include <initializer_list>
 #include <iosfwd>
 #include <memory>

@@ -11,7 +11,6 @@
 #include "IArchivable.h"
 #include "ObjectArchiver.h"
 
-// stl
 #include <memory>
 
 namespace ell

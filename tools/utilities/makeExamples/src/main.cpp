@@ -9,14 +9,11 @@
 #include "GenerateModels.h"
 #include "ModelGenerateArguments.h"
 
-// common
-#include "LoadModel.h"
+#include <common/include/LoadModel.h>
 
-// utilities
-#include "CommandLineParser.h"
-#include "Files.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Files.h>
 
-// stl
 #include <iostream>
 
 using namespace ell;

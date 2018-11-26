@@ -10,7 +10,6 @@
 
 #include "Evaluator.h"
 
-// stl
 #include <memory>
 #include <vector>
 

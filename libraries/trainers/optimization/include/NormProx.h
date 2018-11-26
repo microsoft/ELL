@@ -8,10 +8,8 @@
 
 #pragma once
 
-// math
-#include "Vector.h"
+#include <math/include/Vector.h>
 
-// stl
 #include <vector>
 
 namespace ell

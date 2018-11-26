@@ -9,10 +9,8 @@
 #include "IRLocalMultidimArray.h"
 #include "IRFunctionEmitter.h"
 
-// LLVM
 #include <llvm/IR/Value.h>
 
-// stl
 #include <functional>
 #include <numeric>
 

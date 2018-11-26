@@ -8,15 +8,24 @@
 
 #pragma once
 
-// model
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
+#include "BinaryOperationNode.h"
+#include "ConstantNode.h"
+#include "DotProductNode.h"
+#include "L2NormSquaredNode.h"
+#include "MatrixVectorProductNode.h"
+#include "SquaredEuclideanDistanceNode.h"
+#include "UnaryOperationNode.h"
 
-// math
-#include "Matrix.h"
+#include <utilities/include/Exception.h>
 
-// stl
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+
+#include <math/include/MatrixOperations.h>
+#include <math/include/Matrix.h>
+
+#include <vector>
 #include <string>
 
 namespace ell

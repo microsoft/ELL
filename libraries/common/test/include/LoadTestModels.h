@@ -8,13 +8,11 @@
 
 #pragma once
 
-#include "LoadModel.h"
-#include "MapLoadArguments.h"
+#include <common/include/LoadModel.h>
+#include <common/include/MapLoadArguments.h>
 
-// model
-#include "Model.h"
+#include <model/include/Model.h>
 
-// stl
 #include <string>
 
 namespace ell

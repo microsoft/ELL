@@ -11,11 +11,9 @@
 #include "EvaluatingTrainer.h"
 #include "ITrainer.h"
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// evaluators
-#include "Evaluator.h"
+#include <evaluators/include/Evaluator.h>
 
 //stl
 #include <memory>

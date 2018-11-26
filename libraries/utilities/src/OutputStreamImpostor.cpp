@@ -8,10 +8,8 @@
 
 #include "OutputStreamImpostor.h"
 
-// utilities
 #include "Files.h"
 
-// stl
 #include <fstream>
 #include <iostream>
 #include <memory>

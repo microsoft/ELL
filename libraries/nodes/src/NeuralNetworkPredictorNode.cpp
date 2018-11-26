@@ -10,13 +10,10 @@
 #include "ConstantNode.h"
 #include "ReorderDataNode.h"
 
-// data
-#include "DenseDataVector.h"
+#include <data/include/DenseDataVector.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// stl
 #include <string>
 #include <vector>
 

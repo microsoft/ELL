@@ -10,14 +10,11 @@
 #include "EmitterException.h"
 #include "LLVMUtilities.h"
 
-// utilities
-#include "Logger.h"
+#include <utilities/include/Logger.h>
 
-// llvm
 #include <llvm/IR/InstrTypes.h>
 #include <llvm/Support/raw_os_ostream.h>
 
-// stl
 #include <algorithm>
 #include <sstream>
 

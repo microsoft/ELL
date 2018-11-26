@@ -9,16 +9,13 @@
 
 #include "ObjectArchive_test.h"
 
-// utilities
-#include "Archiver.h"
-#include "IArchivable.h"
-#include "ObjectArchiver.h"
-#include "XmlArchiver.h"
+#include <utilities/include/Archiver.h>
+#include <utilities/include/IArchivable.h>
+#include <utilities/include/ObjectArchiver.h>
+#include <utilities/include/XmlArchiver.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <iostream>
 #include <sstream>
 #include <vector>

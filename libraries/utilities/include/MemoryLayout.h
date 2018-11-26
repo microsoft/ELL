@@ -8,10 +8,8 @@
 
 #pragma once
 
-// utilities
 #include "IArchivable.h"
 
-// stl
 #include <algorithm>
 #include <array>
 #include <initializer_list>

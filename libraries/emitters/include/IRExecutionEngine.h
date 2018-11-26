@@ -9,14 +9,11 @@
 
 #include "LLVMUtilities.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// llvm
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/IR/Module.h>
 
-// stl
 #include <functional>
 #include <type_traits>
 

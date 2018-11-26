@@ -8,12 +8,10 @@
 
 #pragma once
 
-#include "ModelOptimizerOptions.h"
+#include <model/optimizer/include/ModelOptimizerOptions.h>
 
-// emitters
-#include "CompilerOptions.h"
+#include <emitters/include/CompilerOptions.h>
 
-// stl
 #include <string>
 
 namespace ell

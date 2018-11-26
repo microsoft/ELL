@@ -56,7 +56,7 @@ source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 
 add_library(${library_name} ${src} ${include} ${tcc})
-target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} data utilities functions model nodes predictors evaluators trainers)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
@@ -89,7 +89,7 @@ source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include})
 add_dependencies(${test_name} exampleModels)
-target_include_directories(${test_name} PRIVATE test/include)
+target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} common data testing utilities functions predictors trainers model nodes)
 copy_shared_libraries(${test_name})
 
@@ -97,4 +97,3 @@ set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${test_name} COMMAND ${test_name} ${CMAKE_BINARY_DIR}/examples)
 set_test_library_path(${test_name})
-

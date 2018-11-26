@@ -10,7 +10,6 @@
 #include "Logger.h"
 #include "Unused.h"
 
-// stl
 #include <algorithm>
 #include <sstream>
 

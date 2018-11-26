@@ -8,12 +8,10 @@
 
 #pragma once
 
-// utilities
-#include "CommandLineParser.h"
+#include <utilities/include/CommandLineParser.h>
 
-// trainers
-#include "HistogramForestTrainer.h"
-#include "SortingForestTrainer.h"
+#include <trainers/include/HistogramForestTrainer.h>
+#include <trainers/include/SortingForestTrainer.h>
 
 namespace ell
 {

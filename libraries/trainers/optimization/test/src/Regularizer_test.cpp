@@ -9,20 +9,17 @@
 #include "Regularizer_test.h"
 #include "RandomExampleSet.h"
 
-// optimization
-#include "ElasticNetRegularizer.h"
-#include "HuberLoss.h"
-#include "L2Regularizer.h"
-#include "MatrixSolution.h"
-#include "MaxRegularizer.h"
-#include "OptimizationExample.h"
-#include "SDCAOptimizer.h"
-#include "VectorSolution.h"
+#include <trainers/optimization/include/ElasticNetRegularizer.h>
+#include <trainers/optimization/include/HuberLoss.h>
+#include <trainers/optimization/include/L2Regularizer.h>
+#include <trainers/optimization/include/MatrixSolution.h>
+#include <trainers/optimization/include/MaxRegularizer.h>
+#include <trainers/optimization/include/OptimizationExample.h>
+#include <trainers/optimization/include/SDCAOptimizer.h>
+#include <trainers/optimization/include/VectorSolution.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <random>
 
 using namespace ell::trainers::optimization;

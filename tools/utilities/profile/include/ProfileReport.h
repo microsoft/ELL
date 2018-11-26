@@ -11,14 +11,17 @@
 #ifdef COMPILED_ELL_PROFILER
 #include "compiled_model.h"
 #else
-#include "IRModelProfiler.h"
-#include "IRProfiler.h"
+
+#include <model/include/IRModelProfiler.h>
+
+#include <emitters/include/IRProfiler.h>
+
 using ELL_ProfileRegionInfo = ell::emitters::ProfileRegionInfo;
 using ELL_NodeInfo = ell::model::NodeInfo;
 using ELL_PerformanceCounters = ell::model::PerformanceCounters;
+
 #endif // COMPILED_ELL_PROFILER
 
-// stl
 #include <iomanip>
 #include <ostream>
 #include <sstream>

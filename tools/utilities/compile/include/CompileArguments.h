@@ -8,14 +8,11 @@
 
 #pragma once
 
-// model
-#include "MapCompiler.h"
+#include <model/include/MapCompiler.h>
 
-// utilities
-#include "CommandLineParser.h"
-#include "OutputStreamImpostor.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/OutputStreamImpostor.h>
 
-// stl
 #include <string>
 
 namespace ell

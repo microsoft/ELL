@@ -8,7 +8,6 @@
 
 #include "ProtoNNPredictorNode.h"
 
-// nodes
 #include "BinaryOperationNode.h"
 #include "ConstantNode.h"
 #include "DotProductNode.h"
@@ -18,13 +17,10 @@
 #include "SquaredEuclideanDistanceNode.h"
 #include "UnaryOperationNode.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// data
-#include "DenseDataVector.h"
+#include <data/include/DenseDataVector.h>
 
-// stl
 #include <functional>
 #include <string>
 #include <vector>

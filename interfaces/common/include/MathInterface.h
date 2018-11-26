@@ -8,16 +8,15 @@
 #pragma once
 
 #ifndef SWIG
-// math
-#include <Tensor.h>
 
-// model
-#include <PortMemoryLayout.h>
+#include <math/include/Tensor.h>
 
-// stl
+#include <model/include/PortMemoryLayout.h>
+
 #include <array>
 #include <stddef.h>
 #include <vector>
+
 #endif
 
 // Note: this has to be outside the above #ifndef SWIG otherwise SWIG doesn't know what std::max_element is doing

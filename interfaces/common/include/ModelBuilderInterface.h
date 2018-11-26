@@ -9,19 +9,16 @@
 
 #ifndef SWIG
 
-// emitters
-#include "EmitterTypes.h"
-
-// math
-#include "Tensor.h"
-
-// model
-#include "Model.h"
-#include "ModelBuilder.h"
 #include "ModelInterface.h"
 #include "NeuralNetworkPredictorInterface.h"
 
-// stl
+#include <emitters/include/EmitterTypes.h>
+
+#include <math/include/Tensor.h>
+
+#include <model/include/Model.h>
+#include <model/include/ModelBuilder.h>
+
 #include <memory>
 #include <sstream>
 #include <string>

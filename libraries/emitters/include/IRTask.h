@@ -12,7 +12,6 @@
 #include "IRThreadPool.h"
 #include "LLVMUtilities.h"
 
-// stl
 #include <vector>
 
 namespace ell

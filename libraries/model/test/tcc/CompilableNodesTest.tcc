@@ -6,21 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ModelTestUtilities.h"
-
-// model
-#include "CompiledMap.h"
-#include "IRCompiledMap.h"
-#include "IREmitter.h"
-#include "IRMapCompiler.h"
-#include "Map.h"
-
-// nodes
-#include "ConstantNode.h"
-#include "DotProductNode.h"
-
-using namespace ell;
-
 template <typename ElementType>
 void TestCompilableDotProductNode2(int dimension)
 {

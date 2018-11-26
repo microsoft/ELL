@@ -6,10 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ForestPredictor.h"
+#include <predictors/include/ForestPredictor.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
 using namespace ell;
 

@@ -10,10 +10,8 @@
 
 #include "ValueScalar.h"
 
-// utilities
-#include "MemoryLayout.h"
+#include <utilities/include/MemoryLayout.h>
 
-// stl
 #include <functional>
 
 namespace ell

@@ -11,12 +11,10 @@
 #include "IRLocalScalar.h"
 #include "LLVMUtilities.h"
 
-// utilities
-#include "Exception.h"
-#include "IntegerNArray.h"
-#include "MemoryLayout.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/IntegerNArray.h>
+#include <utilities/include/MemoryLayout.h>
 
-// stl
 #include <algorithm>
 #include <array>
 #include <initializer_list>

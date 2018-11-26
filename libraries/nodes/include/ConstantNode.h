@@ -8,25 +8,20 @@
 
 #pragma once
 
-// model
-#include "CompilableNode.h"
-#include "CompilableNodeUtilities.h"
-#include "IRMapCompiler.h"
-#include "MapCompiler.h"
-#include "ModelTransformer.h"
-#include "OutputPort.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/CompilableNodeUtilities.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/MapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/OutputPort.h>
 
-// emitters
-#include "IRFunctionEmitter.h"
+#include <emitters/include/IRFunctionEmitter.h>
 
-// predictors
-#include "ConstantPredictor.h"
+#include <predictors/include/ConstantPredictor.h>
 
-// utilities
-#include "IArchivable.h"
-#include "TypeName.h"
+#include <utilities/include/IArchivable.h>
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <memory>
 #include <vector>
 

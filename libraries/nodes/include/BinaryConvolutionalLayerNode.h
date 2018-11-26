@@ -8,19 +8,16 @@
 
 #pragma once
 
-// emitters
-#include "LLVMUtilities.h"
-
-// model
-#include "IRMapCompiler.h"
-#include "ModelTransformer.h"
 #include "NeuralNetworkLayerNode.h"
-#include "PortElements.h"
 
-// predictors
-#include "BinaryConvolutionalLayer.h"
+#include <emitters/include/LLVMUtilities.h>
 
-// stl
+#include <model/include/IRMapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/PortElements.h>
+
+#include <predictors/neural/include/BinaryConvolutionalLayer.h>
+
 #include <string>
 #include <type_traits>
 

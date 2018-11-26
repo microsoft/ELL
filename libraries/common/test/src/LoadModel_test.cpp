@@ -5,17 +5,14 @@
 
 #include "LoadModel_test.h"
 
-// common
-#include "Files.h"
 #include "LoadTestModels.h"
 
-// model
-#include "Model.h"
+#include <model/include/Model.h>
 
-// testing
-#include "testing.h"
+#include <utilities/include/Files.h>
 
-// stl
+#include <testing/include/testing.h>
+
 #include <iostream>
 
 namespace ell

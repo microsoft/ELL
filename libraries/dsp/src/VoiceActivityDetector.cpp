@@ -8,7 +8,6 @@
 
 #include "VoiceActivityDetector.h"
 
-// stl
 #include <algorithm>
 #include <cassert>
 #include <cstdint>

@@ -46,7 +46,7 @@ source_group("tcc" FILES ${tcc})
 source_group("py" FILES ${py})
 
 add_library(${library_name} ${src} ${include} ${tcc})
-target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} math utilities)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
@@ -57,7 +57,7 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 set(test_name ${library_name}_test)
 
-set(test_src 
+set(test_src
   test/src/main.cpp
   test/src/CepstrumTestData.cpp
   test/src/ConvolutionTest.cpp
@@ -72,7 +72,7 @@ set(test_src
   test/src/VoiceActivityDetectorTest.cpp
   test/src/WindowTest.cpp
 )
-  
+
 set(test_include
   test/include/CepstrumTestData.h
   test/include/ConvolutionTest.h
@@ -106,7 +106,7 @@ source_group("py" FILES ${test_py})
 source_group("data" FILES ${test_data})
 
 add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${test_data})
-target_include_directories(${test_name} PRIVATE test/include)
+target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} dsp testing utilities data common)
 copy_shared_libraries(${test_name})
 
@@ -129,12 +129,12 @@ add_custom_command(TARGET dspDataFiles
 
 set(timing_name ${library_name}_timing)
 
-set(timing_src 
+set(timing_src
   test/src/timing_main.cpp
   test/src/ConvolutionTiming.cpp
   test/src/DSPTestUtilities.cpp
 )
-  
+
 set(timing_include
   test/include/ConvolutionTiming.h
   test/include/DSPTestUtilities.h
@@ -152,7 +152,7 @@ source_group("tcc" FILES ${timing_tcc})
 source_group("py" FILES ${timing_py})
 
 add_executable(${timing_name} ${timing_src} ${timing_include} ${timing_tcc} ${include})
-target_include_directories(${timing_name} PRIVATE test/include)
+target_include_directories(${timing_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${timing_name} dsp testing utilities)
 copy_shared_libraries(${timing_name})
 

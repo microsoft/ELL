@@ -115,7 +115,7 @@ source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 
 add_library(${library_name} ${src} ${include} ${tcc})
-target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} Threads::Threads)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
@@ -162,7 +162,7 @@ source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include} ${include})
-target_include_directories(${test_name} PRIVATE test/include)
+target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 
 target_link_libraries(${test_name} utilities testing)
 target_link_libraries(${test_name} Threads::Threads)

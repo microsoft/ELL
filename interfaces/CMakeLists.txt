@@ -112,17 +112,7 @@ set(INTERFACE_DEPENDENCIES
 
 # Add ELL library include directories
 include_directories(common/include)
-include_directories(../libraries/common/include)
-include_directories(../libraries/data/include)
-include_directories(../libraries/evaluators/include)
-include_directories(../libraries/functions/include)
-include_directories(../libraries/model/include)
-include_directories(../libraries/nodes/include)
-include_directories(../libraries/predictors/include)
-include_directories(../libraries/predictors/neural/include)
-include_directories(../libraries/trainers/include)
-include_directories(../libraries/utilities/include)
-include_directories(../libraries/math/include)
+include_directories(../libraries/)
 
 add_subdirectory(common)
 add_subdirectory(python)

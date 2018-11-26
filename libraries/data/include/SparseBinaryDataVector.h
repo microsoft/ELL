@@ -12,11 +12,9 @@
 #ifndef SPARSEBINARYDATAVECTOR_H
 #define SPARSEBINARYDATAVECTOR_H
 
-// utilities
-#include "CompressedIntegerList.h"
-#include "IntegerList.h"
+#include <utilities/include/CompressedIntegerList.h>
+#include <utilities/include/IntegerList.h>
 
-// stl
 #include <cstddef>
 #include <initializer_list>
 #include <vector>

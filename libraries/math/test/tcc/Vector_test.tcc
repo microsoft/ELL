@@ -6,16 +6,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// math
-#include "VectorOperations.h"
+#include <math/include/VectorOperations.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "JsonArchiver.h"
+#include <utilities/include/JsonArchiver.h>
 
-// stl
 #include <sstream>
 
 template <typename ElementType>

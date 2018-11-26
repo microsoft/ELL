@@ -10,11 +10,9 @@
 #include "OptimizeReorderDataNodes.h"
 #include "SetConvolutionMethodPass.h"
 
-// model
-#include "OutputNode.h"
+#include <model/include/OutputNode.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

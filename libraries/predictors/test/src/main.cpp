@@ -11,8 +11,7 @@
 #include "NeuralNetworkPredictorTests.h"
 #include "ProtoNNPredictorTests.h"
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
 /// Runs all tests
 ///

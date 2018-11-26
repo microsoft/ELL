@@ -8,15 +8,12 @@
 
 #pragma once
 
-// dsp
-#include "Convolution.h"
+#include <dsp/include/Convolution.h>
 
-// math
-#include "Matrix.h"
-#include "Tensor.h"
-#include "Vector.h"
+#include <math/include/Matrix.h>
+#include <math/include/Tensor.h>
+#include <math/include/Vector.h>
 
-// stl
 #include <vector>
 
 template <typename ValueType>

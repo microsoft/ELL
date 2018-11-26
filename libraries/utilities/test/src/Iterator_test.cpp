@@ -9,17 +9,14 @@
 
 #include "Iterator_test.h"
 
-// utilities
-#include "IIterator.h"
-#include "ParallelTransformIterator.h"
-#include "StlContainerIterator.h"
-#include "StlStridedIterator.h"
-#include "TransformIterator.h"
+#include <utilities/include/IIterator.h>
+#include <utilities/include/ParallelTransformIterator.h>
+#include <utilities/include/StlContainerIterator.h>
+#include <utilities/include/StlStridedIterator.h>
+#include <utilities/include/TransformIterator.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <chrono>
 #include <iostream>
 #include <numeric>

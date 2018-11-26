@@ -8,7 +8,6 @@
 
 #pragma once
 
-// STL
 #include <limits>
 
 namespace ell

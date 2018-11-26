@@ -6,21 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ModelTestUtilities.h"
-
-// model
-#include "CompiledMap.h"
-#include "IRCompiledMap.h"
-#include "IREmitter.h"
-#include "IRMapCompiler.h"
-#include "Map.h"
-#include "OutputNode.h"
-
-// nodes
-#include "LinearPredictorNode.h"
-
-using namespace ell;
-
 template <typename ElementType>
 void TestLinearPredictor()
 {

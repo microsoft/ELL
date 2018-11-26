@@ -7,35 +7,29 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Map_test.h"
-#include "ModelTestUtilities.h"
 
-// data
-#include "DenseDataVector.h"
+#include <common/include/LoadModel.h> // for RegisterNodeTypes
 
-// model
-#include "InputNode.h"
-#include "Map.h"
-#include "Model.h"
-#include "OutputNode.h"
-#include "PortElements.h"
+#include <model_testing/include/ModelTestUtilities.h>
 
-// nodes
-#include "ClockNode.h"
-#include "ExtremalValueNode.h"
-#include "MovingAverageNode.h"
-#include "SinkNode.h"
-#include "SourceNode.h"
+#include <data/include/DenseDataVector.h>
 
-// common
-#include "LoadModel.h" // for RegisterNodeTypes
+#include <model/include/InputNode.h>
+#include <model/include/Map.h>
+#include <model/include/Model.h>
+#include <model/include/OutputNode.h>
+#include <model/include/PortElements.h>
 
-// utilities
-#include "JsonArchiver.h"
+#include <nodes/include/ClockNode.h>
+#include <nodes/include/ExtremalValueNode.h>
+#include <nodes/include/MovingAverageNode.h>
+#include <nodes/include/SinkNode.h>
+#include <nodes/include/SourceNode.h>
 
-// testing
-#include "testing.h"
+#include <utilities/include/JsonArchiver.h>
 
-// stl
+#include <testing/include/testing.h>
+
 #include <cassert>
 #include <iostream>
 #include <sstream>

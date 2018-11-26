@@ -10,14 +10,11 @@
 #include "LoadMap_test.h"
 #include "LoadModel_test.h"
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Exception.h"
-#include "Files.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
 
-// stl
 #include <iostream>
 
 /// Runs all tests

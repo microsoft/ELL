@@ -9,10 +9,8 @@
 #pragma once
 #include "Layer.h"
 
-// math
-#include "Matrix.h"
+#include <math/include/Matrix.h>
 
-// stl
 #include <vector>
 
 namespace ell

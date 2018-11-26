@@ -9,9 +9,8 @@
 #include "DiagonalConvolutionNode.h"
 #include "ConstantNode.h"
 
-// math
-#include "Matrix.h"
-#include "MatrixOperations.h"
+#include <math/include/Matrix.h>
+#include <math/include/MatrixOperations.h>
 
 using namespace std::string_literals;
 

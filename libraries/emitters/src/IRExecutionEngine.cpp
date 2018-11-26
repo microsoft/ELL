@@ -9,10 +9,8 @@
 #include "IRExecutionEngine.h"
 #include "IRModuleEmitter.h"
 
-// llvm
 #include <llvm/Support/TargetSelect.h>
 
-// stl
 #include <memory>
 #include <string>
 

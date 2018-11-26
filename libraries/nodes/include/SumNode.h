@@ -8,23 +8,19 @@
 
 #pragma once
 
-// model
-#include "CompilableNode.h"
-#include "CompilableNodeUtilities.h"
-#include "IRMapCompiler.h"
-#include "InputPort.h"
-#include "ModelTransformer.h"
-#include "Node.h"
-#include "OutputPort.h"
-#include "PortElements.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/CompilableNodeUtilities.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/InputPort.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+#include <model/include/OutputPort.h>
+#include <model/include/PortElements.h>
 
-// emitters
-#include "IRVectorUtilities.h"
+#include <emitters/include/IRVectorUtilities.h>
 
-// utilities
-#include "TypeName.h"
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <string>
 
 namespace ell

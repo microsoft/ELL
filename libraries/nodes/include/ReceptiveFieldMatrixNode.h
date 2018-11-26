@@ -8,15 +8,13 @@
 
 #pragma once
 
-// model
-#include "CompilableNode.h"
-#include "IRMapCompiler.h"
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
-#include "Port.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+#include <model/include/Port.h>
 
-// stl
 #include <algorithm>
 #include <array>
 #include <numeric>

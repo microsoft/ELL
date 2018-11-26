@@ -8,7 +8,6 @@
 
 #pragma once
 
-// stl
 #include <cstring>
 
 template <typename ValueType>

@@ -10,15 +10,12 @@
 #include "CepstrumTestData.h"
 #include "DSPTestData.h"
 
-// dsp
-#include "FilterBank.h"
+#include <dsp/include/FilterBank.h>
 
 #include "CepstrumTestData.h"
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <iostream>
 #include <vector>
 

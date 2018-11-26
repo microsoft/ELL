@@ -10,16 +10,12 @@
 
 #include "IPredictor.h"
 
-// math
-#include "Matrix.h"
+#include <math/include/Matrix.h>
 
-// datasets
-#include "AutoDataVector.h"
+#include <data/include/AutoDataVector.h>
 
-// utilities
-#include "IArchivable.h"
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <cstdint>
 #include <memory>
 

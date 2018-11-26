@@ -7,11 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// math
-#include "Tensor.h"
+#include <math/include/Tensor.h>
 
 using namespace ell;
 

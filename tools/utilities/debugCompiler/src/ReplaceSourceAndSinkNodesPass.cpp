@@ -8,16 +8,16 @@
 
 #include "ReplaceSourceAndSinkNodesPass.h"
 
-// model
-#include "InputNode.h"
-#include "ModelTransformer.h"
-#include "OptimizationPassRegistry.h"
-#include "OutputNode.h"
-#include "SinkNode.h"
-#include "SourceNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/OutputNode.h>
 
-// utilities
-#include "Exception.h"
+#include <model/optimizer/include/OptimizationPassRegistry.h>
+
+#include <nodes/include/SinkNode.h>
+#include <nodes/include/SourceNode.h>
+
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

@@ -6,34 +6,29 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LoadModel.h"
+#include <common/include/LoadModel.h>
 
-// model
-#include "InputNode.h"
-#include "Model.h"
-#include "OutputNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/Model.h>
+#include <model/include/OutputNode.h>
 
-// nodes
-#include "BinaryOperationNode.h"
-#include "DelayNode.h"
-#include "DotProductNode.h"
-#include "ForestPredictorNode.h"
-#include "L2NormSquaredNode.h"
-#include "LinearPredictorNode.h"
-#include "MovingAverageNode.h"
-#include "MovingVarianceNode.h"
+#include <nodes/include/BinaryOperationNode.h>
+#include <nodes/include/DelayNode.h>
+#include <nodes/include/DotProductNode.h>
+#include <nodes/include/ForestPredictorNode.h>
+#include <nodes/include/L2NormSquaredNode.h>
+#include <nodes/include/LinearPredictorNode.h>
+#include <nodes/include/MovingAverageNode.h>
+#include <nodes/include/MovingVarianceNode.h>
 
-// predictors
-#include "ForestPredictor.h"
-#include "LinearPredictor.h"
-#include "SingleElementThresholdPredictor.h"
+#include <predictors/include/ForestPredictor.h>
+#include <predictors/include/LinearPredictor.h>
+#include <predictors/include/SingleElementThresholdPredictor.h>
 
-// utilities
-#include "Archiver.h"
-#include "Files.h"
-#include "JsonArchiver.h"
+#include <utilities/include/Archiver.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/JsonArchiver.h>
 
-// stl
 #include <cstdint>
 #include <istream>
 #include <vector>

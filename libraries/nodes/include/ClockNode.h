@@ -8,9 +8,8 @@
 
 #pragma once
 
-// model
-#include "CompilableNode.h"
-#include "ModelTransformer.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/ModelTransformer.h>
 
 namespace ell
 {

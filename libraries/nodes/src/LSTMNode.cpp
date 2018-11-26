@@ -8,10 +8,9 @@
 
 #include "LSTMNode.h"
 
-#include "MatrixOperations.h"
+#include <math/include/MatrixOperations.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

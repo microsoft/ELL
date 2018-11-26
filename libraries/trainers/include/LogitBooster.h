@@ -8,8 +8,7 @@
 
 #pragma once
 
-// data
-#include "Example.h"
+#include <data/include/Example.h>
 
 namespace ell
 {

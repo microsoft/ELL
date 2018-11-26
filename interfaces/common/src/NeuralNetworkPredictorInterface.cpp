@@ -8,27 +8,25 @@
 
 // neural network predictor
 #include "NeuralNetworkPredictorInterface.h"
-#include "HardSigmoidActivation.h"
-#include "LeakyReLUActivation.h"
-#include "MaxPoolingFunction.h"
-#include "MeanPoolingFunction.h"
-#include "NeuralNetworkPredictor.h"
-#include "ParametricReLUActivation.h"
-#include "ReLUActivation.h"
-#include "SigmoidActivation.h"
-
-// apis
 #include "MathInterface.h"
 #include "ModelBuilderInterface.h"
 #include "NeuralLayersInterface.h"
 
-// utilities
-#include "Exception.h"
-#include "Files.h"
-#include "JsonArchiver.h"
-#include "StringUtil.h"
+#include <predictors/include/NeuralNetworkPredictor.h>
 
-// stl
+#include <predictors/neural/include/HardSigmoidActivation.h>
+#include <predictors/neural/include/LeakyReLUActivation.h>
+#include <predictors/neural/include/MaxPoolingFunction.h>
+#include <predictors/neural/include/MeanPoolingFunction.h>
+#include <predictors/neural/include/ParametricReLUActivation.h>
+#include <predictors/neural/include/ReLUActivation.h>
+#include <predictors/neural/include/SigmoidActivation.h>
+
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/JsonArchiver.h>
+#include <utilities/include/StringUtil.h>
+
 #include <string>
 #include <vector>
 

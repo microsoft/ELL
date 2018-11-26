@@ -8,7 +8,6 @@
 
 #include "DataSaveArguments.h"
 
-// stl
 #include <vector>
 
 namespace ell

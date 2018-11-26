@@ -6,15 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// data
-#include "SingleLineParsingExampleIterator.h"
+#include <data/include/SingleLineParsingExampleIterator.h>
 
-// model
-#include "IRCompiledMap.h"
-#include "IRMapCompiler.h"
+#include <model/include/IRCompiledMap.h>
+#include <model/include/IRMapCompiler.h>
 
 // nodes
-#include "ClockNode.h" // for nodes::TimeTickType
+#include <nodes/include/ClockNode.h> // for nodes::TimeTickType
 
 namespace ell
 {

@@ -8,8 +8,7 @@
 
 #include "ForestTrainer.h"
 
-// utilites
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

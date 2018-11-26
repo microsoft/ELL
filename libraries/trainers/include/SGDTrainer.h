@@ -10,14 +10,11 @@
 
 #include "ITrainer.h"
 
-// predictors
-#include "LinearPredictor.h"
+#include <predictors/include/LinearPredictor.h>
 
-// data
-#include "Dataset.h"
-#include "Example.h"
+#include <data/include/Dataset.h>
+#include <data/include/Example.h>
 
-// stl
 #include <cstddef>
 #include <memory>
 #include <random>

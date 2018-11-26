@@ -6,13 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Exception.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/StringUtil.h>
+#include <utilities/include/TypeName.h>
 
-// utilities
-#include "StringUtil.h"
-#include "TypeName.h"
-
-// stl
 #include <cassert>
 
 namespace ell

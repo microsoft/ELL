@@ -8,7 +8,6 @@
 
 #pragma once
 
-// stl
 #include <functional>
 #include <memory>
 #include <ostream>

@@ -8,8 +8,11 @@
 
 #pragma once
 
-// math
-#include "Vector.h"
+#include "Common.h"
+
+#include <math/include/Vector.h>
+
+#include <cmath>
 
 namespace ell
 {

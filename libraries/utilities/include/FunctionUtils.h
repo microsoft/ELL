@@ -10,7 +10,6 @@
 
 #include "Unused.h"
 
-// stl
 #include <functional>
 #include <tuple>
 

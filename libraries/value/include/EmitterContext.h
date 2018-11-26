@@ -13,12 +13,10 @@
 #include "ValueScalar.h"
 #include "ValueType.h"
 
-// utilities
-#include "Boolean.h"
-#include "FunctionUtils.h"
-#include "MemoryLayout.h"
+#include <utilities/include/Boolean.h>
+#include <utilities/include/FunctionUtils.h>
+#include <utilities/include/MemoryLayout.h>
 
-// stl
 #include <functional>
 #include <memory>
 #include <string>

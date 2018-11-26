@@ -8,8 +8,7 @@
 
 #include "ConstantNode.h"
 
-// model
-#include "Node.h"
+#include <model/include/Node.h>
 
 namespace ell
 {

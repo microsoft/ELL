@@ -8,7 +8,6 @@
 
 #include "SquaredLoss.h"
 
-// stl
 #include <cmath>
 
 namespace ell

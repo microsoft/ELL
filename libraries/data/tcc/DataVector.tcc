@@ -6,10 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DenseDataVector.h"
-#include "SparseBinaryDataVector.h"
-#include "SparseDataVector.h"
-#include "TransformingIndexValueIterator.h"
+#include "../include/DenseDataVector.h"
+#include "../include/SparseBinaryDataVector.h"
+#include "../include/SparseDataVector.h"
+#include "../include/TransformingIndexValueIterator.h"
 
 namespace ell
 {

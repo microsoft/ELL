@@ -55,7 +55,7 @@ source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 
 add_library(${library_name} ${src} ${include} ${tcc} ${doc})
-target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_include_directories(${library_name} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_link_libraries(${library_name} ${LLVM_LIBS} emitters utilities)
 target_compile_options(${library_name} PUBLIC ${LLVM_COMPILE_OPTIONS})
@@ -85,7 +85,7 @@ source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include})
-target_include_directories(${test_name} PRIVATE test/include)
+target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} testing ${library_name} math)
 copy_shared_libraries(${test_name})
 

@@ -8,24 +8,20 @@
 
 #include "IRProfilerTest.h"
 
-// emitters
-#include "CompilerOptions.h"
-#include "EmitterException.h"
-#include "EmitterTypes.h"
-#include "IREmitter.h"
-#include "IRExecutionEngine.h"
-#include "IRFunctionEmitter.h"
-#include "IRModuleEmitter.h"
-#include "IRProfiler.h"
-#include "Variable.h"
+#include <emitters/include/CompilerOptions.h>
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/IREmitter.h>
+#include <emitters/include/IRExecutionEngine.h>
+#include <emitters/include/IRFunctionEmitter.h>
+#include <emitters/include/IRModuleEmitter.h>
+#include <emitters/include/IRProfiler.h>
+#include <emitters/include/Variable.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
-// stl
 #include <string>
 #include <vector>
 

@@ -12,10 +12,9 @@
 #include "CompiledActivationFunctions.h"
 #include "ConstantNode.h"
 
-// predictors
-#include "LeakyReLUActivation.h"
-#include "ReLUActivation.h"
-#include "SigmoidActivation.h"
+#include <predictors/neural/include/LeakyReLUActivation.h>
+#include <predictors/neural/include/ReLUActivation.h>
+#include <predictors/neural/include/SigmoidActivation.h>
 
 namespace ell
 {

@@ -10,15 +10,12 @@
 
 #include "ProtoNNTrainerUtils.h"
 
-// data
-#include "Dataset.h"
-#include "Example.h"
+#include <data/include/Dataset.h>
+#include <data/include/Example.h>
 
-// stl
 #include <cstddef>
 #include <memory>
 
-// file
 #include <fstream>
 #include <sstream>
 

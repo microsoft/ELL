@@ -9,10 +9,10 @@
 #pragma once
 
 #include "Activation.h"
-#include "Unused.h"
 
-// math
-#include "Tensor.h"
+#include <utilities/include/Unused.h>
+
+#include <math/include/Tensor.h>
 
 namespace ell
 {

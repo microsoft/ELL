@@ -12,16 +12,13 @@
 #include "ProtoNNTrainerArguments.h"
 #include "TrainerArguments.h"
 
-// predictors
-#include "LinearPredictor.h"
-#include "ProtoNNPredictor.h"
+#include <predictors/include/LinearPredictor.h>
+#include <predictors/include/ProtoNNPredictor.h>
 
-// trainers
-#include "ITrainer.h"
-#include "SDCATrainer.h"
-#include "SGDTrainer.h"
+#include <trainers/include/ITrainer.h>
+#include <trainers/include/SDCATrainer.h>
+#include <trainers/include/SGDTrainer.h>
 
-// stl
 #include <memory>
 
 namespace ell

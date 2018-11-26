@@ -6,14 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "OutputPort.h"
-
-// emitters
-#include "IRModuleEmitter.h"
-
-// utilities
-#include "Logger.h"
-
 namespace ell
 {
 namespace model

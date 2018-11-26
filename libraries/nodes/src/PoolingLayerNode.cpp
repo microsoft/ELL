@@ -9,9 +9,8 @@
 #include "PoolingLayerNode.h"
 #include "ConstantNode.h"
 
-// predictors
-#include "MaxPoolingFunction.h"
-#include "MeanPoolingFunction.h"
+#include <predictors/neural/include/MaxPoolingFunction.h>
+#include <predictors/neural/include/MeanPoolingFunction.h>
 
 namespace ell
 {

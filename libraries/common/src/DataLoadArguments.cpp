@@ -9,11 +9,9 @@
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
 
-// utilities
-#include "CStringParser.h"
-#include "Files.h"
+#include <utilities/include/CStringParser.h>
+#include <utilities/include/Files.h>
 
-// stl
 #include <algorithm>
 #include <string>
 #include <vector>

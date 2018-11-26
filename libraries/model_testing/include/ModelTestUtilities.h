@@ -7,23 +7,23 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// math
-#include "Tensor.h"
+#include <math/include/Tensor.h>
 
-// model
-#include "IRCompiledMap.h"
-#include "IRDiagnosticHandler.h"
-#include "Map.h"
-#include "Node.h"
-#include "Port.h"
+#include <emitters/include/IRDiagnosticHandler.h>
 
-// testing
-#include "testing.h"
+#include <model/include/IRCompiledMap.h>
+#include <model/include/Map.h>
+#include <model/include/Node.h>
+#include <model/include/Port.h>
 
-// stl
+#include <testing/include/testing.h>
+
+#include <utilities/include/RandomEngines.h>
+
 #include <iostream>
 #include <string>
 #include <vector>
+#include <random>
 
 using namespace ell;
 

@@ -7,22 +7,17 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompilableNodeUtilities.h"
-#include "EmitterException.h"
-
-// emitters
-#include "EmitterTypes.h"
-
-// model
 #include "InputNode.h"
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputNode.h"
 
-// utiltiies
-#include "Exception.h"
-#include "Logger.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/EmitterTypes.h>
 
-// stl
+#include <utilities/include/Exception.h>
+#include <utilities/include/Logger.h>
+
 #include <sstream>
 #include <string>
 

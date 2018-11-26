@@ -8,34 +8,28 @@
 
 #include "ApplyArguments.h"
 
-// utilities
-#include "CommandLineParser.h"
-#include "Exception.h"
-#include "Files.h"
-#include "OutputStreamImpostor.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/OutputStreamImpostor.h>
 
-// data
-#include "DataVector.h"
-#include "DataVectorOperations.h"
-#include "Dataset.h"
-#include "Example.h"
+#include <data/include/DataVector.h>
+#include <data/include/DataVectorOperations.h>
+#include <data/include/Dataset.h>
+#include <data/include/Example.h>
 
-// math
-#include "Vector.h"
-#include "VectorOperations.h"
+#include <math/include/Vector.h>
+#include <math/include/VectorOperations.h>
 
-// common
-#include "DataLoadArguments.h"
-#include "DataLoaders.h"
-#include "DataSaveArguments.h"
-#include "LoadModel.h"
-#include "MapLoadArguments.h"
+#include <common/include/DataLoadArguments.h>
+#include <common/include/DataLoaders.h>
+#include <common/include/DataSaveArguments.h>
+#include <common/include/LoadModel.h>
+#include <common/include/MapLoadArguments.h>
 
-// model
-#include "Map.h"
-#include "OutputNode.h"
+#include <model/include/Map.h>
+#include <model/include/OutputNode.h>
 
-// stl
 #include <iostream>
 #include <stdexcept>
 #include <string>

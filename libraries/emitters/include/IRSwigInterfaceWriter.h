@@ -9,7 +9,6 @@
 
 #include "IRModuleEmitter.h"
 
-// stl
 #include <ostream>
 
 namespace ell

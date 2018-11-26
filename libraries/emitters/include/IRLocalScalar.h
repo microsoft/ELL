@@ -12,8 +12,7 @@
 #include "IRLocalValue.h"
 #include "LLVMUtilities.h"
 
-// utilities
-#include "TypeTraits.h"
+#include <utilities/include/TypeTraits.h>
 
 namespace ell
 {

@@ -8,15 +8,19 @@
 
 #pragma once
 
-// model
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
+#include "ConstantNode.h"
+#include "MatrixVectorMultiplyNode.h"
 
-// math
-#include "Matrix.h"
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
 
-// stl
+#include <math/include/Matrix.h>
+#include <math/include/MatrixOperations.h>
+
+#include <utilities/include/Exception.h>
+
+#include <vector>
 #include <string>
 
 namespace ell

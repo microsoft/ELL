@@ -2,6 +2,8 @@
 # cmake file for Embedded Learning Library subprojects
 #
 
+set(ELL_LIBRARIES_DIR ${CMAKE_CURRENT_LIST_DIR})
+
 add_subdirectory(common)
 add_subdirectory(data)
 add_subdirectory(dsp)

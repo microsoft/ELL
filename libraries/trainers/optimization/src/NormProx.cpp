@@ -8,7 +8,6 @@
 
 #include "NormProx.h"
 
-// stl
 #include <algorithm>
 #include <numeric>
 

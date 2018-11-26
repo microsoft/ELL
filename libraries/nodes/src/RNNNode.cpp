@@ -8,10 +8,10 @@
 
 #include "RNNNode.h"
 #include "CompiledActivationFunctions.h"
-#include "MatrixOperations.h"
 
-// utilities
-#include "Exception.h"
+#include <math/include/MatrixOperations.h>
+
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

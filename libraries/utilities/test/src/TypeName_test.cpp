@@ -6,15 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "TypeName.h"
+#include <utilities/include/TypeName.h>
+#include <utilities/include/UniqueId.h>
 
-// utilities
-#include "UniqueId.h"
+#include <testing/include/testing.h>
 
-// testing
-#include "testing.h"
-
-//stl
 #include <string>
 
 namespace ell

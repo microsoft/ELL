@@ -12,13 +12,10 @@
 #include "IPredictor.h"
 #include "SingleElementThresholdPredictor.h"
 
-// data
-#include "DenseDataVector.h"
+#include <data/include/DenseDataVector.h>
 
-// utilities
-#include "IArchivable.h"
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <algorithm>
 #include <functional>
 #include <iterator>

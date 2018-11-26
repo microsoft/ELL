@@ -8,26 +8,22 @@
 
 #include "Value_test.h"
 
-#include "ComputeContext.h"
-#include "LLVMContext.h"
-#include "Value.h"
-#include "ValueMatrix.h"
-#include "ValueTensor.h"
-#include "ValueVector.h"
+#include <value/include/ComputeContext.h>
+#include <value/include/LLVMContext.h>
+#include <value/include/Value.h>
+#include <value/include/ValueMatrix.h>
+#include <value/include/ValueTensor.h>
+#include <value/include/ValueVector.h>
 
-// emitters
-#include "IRModuleEmitter.h"
+#include <emitters/include/IRModuleEmitter.h>
 
-// math
-#include "Matrix.h"
-#include "Tensor.h"
-#include "Vector.h"
+#include <math/include/Matrix.h>
+#include <math/include/Tensor.h>
+#include <math/include/Vector.h>
 
-// utilities
-#include "FunctionUtils.h"
+#include <utilities/include/FunctionUtils.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
 #include <iostream>
 #include <memory>

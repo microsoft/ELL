@@ -6,15 +6,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// LossFunction
-#include "HingeLoss.h"
-#include "LogLoss.h"
-#include "SquaredLoss.h"
+// Loss functions
+#include <functions/include/HingeLoss.h>
+#include <functions/include/LogLoss.h>
+#include <functions/include/SquaredLoss.h>
 
-// evaluators
-#include "AUCAggregator.h"
-#include "BinaryErrorAggregator.h"
-#include "LossAggregator.h"
+#include <evaluators/include/AUCAggregator.h>
+#include <evaluators/include/BinaryErrorAggregator.h>
+#include <evaluators/include/LossAggregator.h>
 
 namespace ell
 {

@@ -6,23 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "BinaryOperationNode.h"
-#include "ConstantNode.h"
-#include "DotProductNode.h"
-#include "L2NormSquaredNode.h"
-#include "MatrixVectorProductNode.h"
-#include "SquaredEuclideanDistanceNode.h"
-#include "UnaryOperationNode.h"
-
-// math
-#include "MatrixOperations.h"
-
-// utilities
-#include "Exception.h"
-
-// stl
-#include <vector>
-
 namespace ell
 {
 namespace nodes

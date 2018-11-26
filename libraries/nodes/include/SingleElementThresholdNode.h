@@ -8,13 +8,11 @@
 
 #pragma once
 
-// model
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
 
-// predictors
-#include "SingleElementThresholdPredictor.h"
+#include <predictors/include/SingleElementThresholdPredictor.h>
 
 namespace ell
 {

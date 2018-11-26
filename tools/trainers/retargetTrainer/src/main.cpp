@@ -8,49 +8,40 @@
 
 #include "RetargetArguments.h"
 
-// utilities
-#include "CommandLineParser.h"
-#include "Exception.h"
-#include "MillisecondTimer.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/MillisecondTimer.h>
 
-// common
-#include "DataLoaders.h"
-#include "LoadModel.h"
-#include "MakeEvaluator.h"
-#include "MakeTrainer.h"
+#include <common/include/DataLoaders.h>
+#include <common/include/LoadModel.h>
+#include <common/include/MakeEvaluator.h>
+#include <common/include/MakeTrainer.h>
 
-// data
-#include "Dataset.h"
+#include <data/include/Dataset.h>
 
-// evaluators
-#include "Evaluator.h"
+#include <evaluators/include/Evaluator.h>
 
-// functions
-#include "HingeLoss.h"
-#include "L2Regularizer.h"
-#include "LogLoss.h"
-#include "SmoothHingeLoss.h"
-#include "SquaredLoss.h"
+#include <functions/include/HingeLoss.h>
+#include <functions/include/L2Regularizer.h>
+#include <functions/include/LogLoss.h>
+#include <functions/include/SmoothHingeLoss.h>
+#include <functions/include/SquaredLoss.h>
 
-// model
-#include "InputNode.h"
-#include "Map.h"
-#include "OutputNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/Map.h>
+#include <model/include/OutputNode.h>
 
-// nodes
-#include "BinaryOperationNode.h"
-#include "BroadcastFunctionNode.h"
-#include "CompiledActivationFunctions.h"
-#include "ConstantNode.h"
-#include "LinearPredictorNode.h"
-#include "MatrixVectorProductNode.h"
-#include "NeuralNetworkPredictorNode.h"
-#include "SinkNode.h"
+#include <nodes/include/BinaryOperationNode.h>
+#include <nodes/include/BroadcastFunctionNode.h>
+#include <nodes/include/CompiledActivationFunctions.h>
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/LinearPredictorNode.h>
+#include <nodes/include/MatrixVectorProductNode.h>
+#include <nodes/include/NeuralNetworkPredictorNode.h>
+#include <nodes/include/SinkNode.h>
 
-// predictors
-#include "Normalizer.h"
+#include <predictors/include/Normalizer.h>
 
-// stl
 #include <algorithm>
 #include <iostream>
 

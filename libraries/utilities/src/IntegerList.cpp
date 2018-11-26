@@ -9,7 +9,6 @@
 #include "IntegerList.h"
 #include "Exception.h"
 
-// stl
 #include <stdexcept>
 
 namespace ell

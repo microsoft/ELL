@@ -10,26 +10,22 @@
 
 #include "ConstantNode.h"
 
-// emitters
-#include "IRAsyncTask.h"
-#include "IREmitter.h"
-#include "IRVectorUtilities.h"
-#include "LLVMUtilities.h"
+#include <emitters/include/IRAsyncTask.h>
+#include <emitters/include/IREmitter.h>
+#include <emitters/include/IRVectorUtilities.h>
+#include <emitters/include/LLVMUtilities.h>
 
-// model
-#include "CompilableNode.h"
-#include "CompilableNodeUtilities.h"
-#include "IRMapCompiler.h"
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
-#include "PortMemoryLayout.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/CompilableNodeUtilities.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+#include <model/include/PortMemoryLayout.h>
 
-// utilities
-#include "Exception.h"
-#include "TypeName.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <functional>
 #include <numeric>
 #include <string>

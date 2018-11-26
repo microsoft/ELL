@@ -6,15 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "Common.h"
-
-// stl
-#include <algorithm>
-#include <numeric>
-#include <random>
-#include <vector>
-
 namespace ell
 {
 namespace trainers

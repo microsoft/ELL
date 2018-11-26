@@ -12,10 +12,8 @@
 #ifndef DENSEDATAVECTOR_H
 #define DENSEDATAVECTOR_H
 
-// utilities
-#include "StlContainerIterator.h"
+#include <utilities/include/StlContainerIterator.h>
 
-// stl
 #include <cstddef>
 #include <initializer_list>
 #include <type_traits>

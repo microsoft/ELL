@@ -8,17 +8,15 @@
 
 #pragma once
 
-// model
-#include "IRMapCompiler.h"
-#include "ModelTransformer.h"
 #include "NeuralNetworkLayerNode.h"
-#include "PortElements.h"
 
-// predictors
-#include "ActivationLayer.h"
-#include "ParametricReLUActivation.h"
+#include <model/include/IRMapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/PortElements.h>
 
-// stl
+#include <predictors/neural/include/ActivationLayer.h>
+#include <predictors/neural/include/ParametricReLUActivation.h>
+
 #include <string>
 #include <type_traits>
 

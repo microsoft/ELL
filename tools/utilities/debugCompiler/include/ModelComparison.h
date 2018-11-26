@@ -8,25 +8,23 @@
 
 #pragma once
 
-#include "Graph.h"
 #include "VectorStatistics.h"
 
-// model
-#include "DebugSinkNode.h"
-#include "IRCompiledMap.h"
-#include "IRMapCompiler.h"
-#include "InputPort.h"
-#include "LoadModel.h"
-#include "Map.h"
-#include "Model.h"
-#include "ModelLoadArguments.h"
-#include "NeuralNetworkLayerNode.h"
-#include "OutputNode.h"
+#include <utilities/include/Graph.h>
 
-// nodes
-#include "DebugSinkNode.h"
+#include <common/include/LoadModel.h>
+#include <common/include/ModelLoadArguments.h>
 
-// stl
+#include <model/include/IRCompiledMap.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/InputPort.h>
+#include <model/include/Map.h>
+#include <model/include/Model.h>
+#include <model/include/OutputNode.h>
+
+#include <nodes/include/DebugSinkNode.h>
+#include <nodes/include/NeuralNetworkLayerNode.h>
+
 #include <map>
 #include <ostream>
 #include <string>

@@ -13,9 +13,8 @@
 #include "OutputPort.h"
 #include "PortMemoryLayout.h"
 
-// utilities
-#include "IArchivable.h"
-#include "TypeName.h"
+#include <utilities/include/IArchivable.h>
+#include <utilities/include/TypeName.h>
 
 #include <string>
 #include <vector>

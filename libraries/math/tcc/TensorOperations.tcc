@@ -6,10 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MatrixOperations.h"
+#include "../include/MatrixOperations.h"
 
-// utilities
-#include "Logger.h"
+#include <utilities/include/Logger.h>
 
 namespace ell
 {

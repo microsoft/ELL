@@ -11,7 +11,6 @@
 #include "EmitterContext.h"
 #include "ValueScalar.h"
 
-// stl
 #include <forward_list>
 #include <map>
 #include <stack>

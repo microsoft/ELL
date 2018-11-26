@@ -8,11 +8,13 @@
 
 #pragma once
 
-// data
-#include "Dataset.h"
-#include "Example.h"
+#include "BinaryErrorAggregator.h"
 
-// stl
+#include <data/include/Dataset.h>
+#include <data/include/Example.h>
+
+#include <utilities/include/FunctionUtils.h>
+
 #include <functional>
 #include <memory>
 #include <tuple>

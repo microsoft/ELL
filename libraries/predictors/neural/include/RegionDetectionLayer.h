@@ -9,6 +9,10 @@
 #pragma once
 
 #include "Layer.h"
+#include "SigmoidActivation.h"
+#include "SoftMaxActivation.h"
+
+#include <cmath>
 
 namespace ell
 {

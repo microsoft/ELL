@@ -8,15 +8,13 @@
 
 #include "FuseLinearOperationsPass.h"
 
-// model
-#include "ModelTransformer.h"
-#include "OptimizationPassRegistry.h"
+#include <model/include/ModelTransformer.h>
 
-// nodes
-#include "BroadcastFunctionNode.h"
+#include <model/optimizer/include/OptimizationPassRegistry.h>
 
-// utilities
-#include "Exception.h"
+#include <nodes/include/BroadcastFunctionNode.h>
+
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

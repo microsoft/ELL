@@ -9,7 +9,6 @@
 
 #pragma once
 
-// stl
 #include <vector>
 
 std::vector<std::vector<double>> GetReferenceCepstrumCoefficients();

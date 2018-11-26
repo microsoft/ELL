@@ -11,7 +11,6 @@
 #include "IArchivable.h"
 #include "Variant.h"
 
-// stl
 #include <string>
 #include <unordered_map>
 #include <vector>

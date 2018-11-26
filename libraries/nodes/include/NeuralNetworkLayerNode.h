@@ -8,18 +8,15 @@
 
 #pragma once
 
-// model
-#include "CompilableNode.h"
-#include "IRMapCompiler.h"
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
-#include "PortMemoryLayout.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+#include <model/include/PortMemoryLayout.h>
 
-// predictors
-#include "Layer.h"
+#include <predictors/neural/include/Layer.h>
 
-// stl
 #include <string>
 #include <type_traits>
 

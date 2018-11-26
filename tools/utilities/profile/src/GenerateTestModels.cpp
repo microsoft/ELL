@@ -8,39 +8,34 @@
 
 #include "GenerateTestModels.h"
 
-// math
-#include "Tensor.h"
+#include <math/include/Tensor.h>
 
-// nodes
-#include "BroadcastFunctionNode.h"
-#include "DiagonalConvolutionNode.h"
-#include "ForestPredictorNode.h"
-#include "NeuralNetworkPredictorNode.h"
-#include "SimpleConvolutionNode.h"
-#include "UnrolledConvolutionNode.h"
-#include "WinogradConvolutionNode.h"
+#include <nodes/include/BroadcastFunctionNode.h>
+#include <nodes/include/DiagonalConvolutionNode.h>
+#include <nodes/include/ForestPredictorNode.h>
+#include <nodes/include/NeuralNetworkPredictorNode.h>
+#include <nodes/include/SimpleConvolutionNode.h>
+#include <nodes/include/UnrolledConvolutionNode.h>
+#include <nodes/include/WinogradConvolutionNode.h>
 
-// predictors
-#include "ForestPredictor.h"
-#include "LinearPredictor.h"
-#include "NeuralNetworkPredictor.h"
-#include "SingleElementThresholdPredictor.h"
+#include <predictors/include/ForestPredictor.h>
+#include <predictors/include/LinearPredictor.h>
+#include <predictors/include/NeuralNetworkPredictor.h>
+#include <predictors/include/SingleElementThresholdPredictor.h>
 
-// predictors/neural
-#include "ActivationLayer.h"
-#include "BatchNormalizationLayer.h"
-#include "BinaryConvolutionalLayer.h"
-#include "ConvolutionalLayer.h"
-#include "FullyConnectedLayer.h"
-#include "Layer.h"
-#include "MaxPoolingFunction.h"
-#include "PoolingLayer.h"
-#include "ReLUActivation.h"
-#include "ScalingLayer.h"
-#include "SoftmaxLayer.h"
+#include <predictors/neural/include/ActivationLayer.h>
+#include <predictors/neural/include/BatchNormalizationLayer.h>
+#include <predictors/neural/include/BinaryConvolutionalLayer.h>
+#include <predictors/neural/include/ConvolutionalLayer.h>
+#include <predictors/neural/include/FullyConnectedLayer.h>
+#include <predictors/neural/include/Layer.h>
+#include <predictors/neural/include/MaxPoolingFunction.h>
+#include <predictors/neural/include/PoolingLayer.h>
+#include <predictors/neural/include/ReLUActivation.h>
+#include <predictors/neural/include/ScalingLayer.h>
+#include <predictors/neural/include/SoftmaxLayer.h>
 
-// utilities
-#include "RandomEngines.h"
+#include <utilities/include/RandomEngines.h>
 
 namespace ell
 {

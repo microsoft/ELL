@@ -10,10 +10,8 @@
 
 #include "NeuralNetworkLayerNode.h"
 
-// predictors
-#include "RegionDetectionLayer.h"
+#include <predictors/neural/include/RegionDetectionLayer.h>
 
-// stl
 #include <string>
 
 namespace ell

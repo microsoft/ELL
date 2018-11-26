@@ -12,13 +12,10 @@
 
 #include "ModelOptimizerTest.h"
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// stl
 #include <iostream>
 
 using namespace ell;

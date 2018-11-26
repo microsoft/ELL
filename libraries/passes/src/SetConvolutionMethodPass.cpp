@@ -8,18 +8,15 @@
 
 #include "SetConvolutionMethodPass.h"
 
-// model
-#include "ModelTransformer.h"
-#include "OptimizationPassRegistry.h"
+#include <model/include/ModelTransformer.h>
 
-// nodes
-#include "ConvolutionalLayerNode.h"
+#include <model/optimizer/include/OptimizationPassRegistry.h>
 
-// predictors/neural
-#include "ConvolutionalLayer.h"
+#include <nodes/include/ConvolutionalLayerNode.h>
 
-// utilities
-#include "Exception.h"
+#include <predictors/neural/include/ConvolutionalLayer.h>
+
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

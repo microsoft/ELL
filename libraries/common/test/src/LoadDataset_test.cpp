@@ -5,19 +5,15 @@
 
 #include "LoadMap_test.h"
 
-// common
-#include "DataLoadArguments.h"
-#include "DataLoaders.h"
-#include "LoadModel.h"
-#include "MapLoadArguments.h"
+#include <common/include/DataLoadArguments.h>
+#include <common/include/DataLoaders.h>
+#include <common/include/LoadModel.h>
+#include <common/include/MapLoadArguments.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Files.h"
+#include <utilities/include/Files.h>
 
-// stl
 #include <iostream>
 
 namespace ell

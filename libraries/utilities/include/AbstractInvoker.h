@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "Exception.h"
+
 namespace ell
 {
 namespace utilities

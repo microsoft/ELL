@@ -9,10 +9,8 @@
 #include "ModuleEmitter.h"
 #include "EmitterException.h"
 
-// utilities
-#include "Files.h"
+#include <utilities/include/Files.h>
 
-// stl
 #include <cassert>
 
 namespace ell

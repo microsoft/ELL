@@ -10,15 +10,12 @@
 
 #include "ITrainer.h"
 
-// data
-#include "Dataset.h"
-#include "DenseDataVector.h"
+#include <data/include/Dataset.h>
+#include <data/include/DenseDataVector.h>
 
-// predictors
-#include "ForestPredictor.h"
+#include <predictors/include/ForestPredictor.h>
 
-// utilities
-#include "OutputStreamImpostor.h"
+#include <utilities/include/OutputStreamImpostor.h>
 
 // stl
 #include <iostream> // For std::cout in VERBOSE_MODE

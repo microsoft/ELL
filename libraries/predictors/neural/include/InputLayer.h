@@ -9,7 +9,6 @@
 #pragma once
 #include "Layer.h"
 
-// stl
 #include <vector>
 
 namespace ell

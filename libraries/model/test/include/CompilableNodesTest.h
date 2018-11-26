@@ -8,12 +8,24 @@
 
 #pragma once
 
-// predictors
-#include <ConvolutionalLayer.h>
-#include <Layer.h>
+#include <model_testing/include/ModelTestUtilities.h>
 
-// stl
-#include <cstring> // size_t
+#include <emitters/include/IREmitter.h>
+
+#include <model/include/CompiledMap.h>
+#include <model/include/IRCompiledMap.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/Map.h>
+
+#include <nodes/include/ConstantNode.h>
+#include <nodes/include/DotProductNode.h>
+
+#include <predictors/neural/include/ConvolutionalLayer.h>
+#include <predictors/neural/include/Layer.h>
+
+#include <cstring>
+
+using namespace ell;
 
 void TestCompileIsEqual();
 void TestCompilableScalarOutputNode();

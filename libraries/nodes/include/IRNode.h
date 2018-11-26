@@ -8,24 +8,20 @@
 
 #pragma once
 
-// emitters
-#include "LLVMUtilities.h"
+#include <emitters/include/LLVMUtilities.h>
 
-// model
-#include "CompilableNode.h"
-#include "CompilableNodeUtilities.h"
-#include "IRMapCompiler.h"
-#include "InputPort.h"
-#include "MapCompiler.h"
-#include "ModelTransformer.h"
-#include "Node.h"
-#include "OutputPort.h"
-#include "PortElements.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/CompilableNodeUtilities.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/InputPort.h>
+#include <model/include/MapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+#include <model/include/OutputPort.h>
+#include <model/include/PortElements.h>
 
-// utilities
-#include "TypeName.h"
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <initializer_list>
 #include <string>
 #include <vector>

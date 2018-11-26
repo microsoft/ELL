@@ -10,11 +10,9 @@
 
 #include "PortMemoryLayout.h"
 
-// utilities
-#include "IArchivable.h"
-#include "PropertyBag.h"
+#include <utilities/include/IArchivable.h>
+#include <utilities/include/PropertyBag.h>
 
-// stl
 #include <string>
 
 namespace ell

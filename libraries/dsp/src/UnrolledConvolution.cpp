@@ -8,11 +8,9 @@
 
 #include "UnrolledConvolution.h"
 
-// math
-#include "MatrixOperations.h"
+#include <math/include/MatrixOperations.h>
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
 namespace ell
 {

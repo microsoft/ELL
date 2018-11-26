@@ -6,11 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "Exception.h"
-#include "Logger.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/Logger.h>
 
-// stl
 #include <algorithm>
 #include <random>
 #include <stdexcept>

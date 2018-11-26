@@ -9,16 +9,15 @@
 #include "PrintModel.h"
 #include "LayerInspector.h"
 
-// utilities
-#include "Exception.h"
-#include "OutputStreamImpostor.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/OutputStreamImpostor.h>
 
-// model
-#include "InputPort.h"
-#include "Model.h"
-#include "NeuralNetworkPredictorNode.h"
-#include "Node.h"
-#include "PortElements.h"
+#include <model/include/InputPort.h>
+#include <model/include/Model.h>
+#include <model/include/Node.h>
+#include <model/include/PortElements.h>
+
+#include <nodes/include/NeuralNetworkPredictorNode.h>
 
 #include <iostream>
 

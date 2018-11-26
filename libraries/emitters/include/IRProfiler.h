@@ -12,7 +12,6 @@
 #include "IRLocalScalar.h"
 #include "LLVMUtilities.h"
 
-// stl
 #include <string>
 #include <unordered_set>
 

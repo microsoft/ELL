@@ -6,43 +6,35 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "CommandLineParser.h"
-#include "Exception.h"
-#include "Files.h"
-#include "OutputStreamImpostor.h"
-#include "RandomEngines.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/OutputStreamImpostor.h>
+#include <utilities/include/RandomEngines.h>
 
-// data
-#include "Example.h"
+#include <data/include/Example.h>
 
-// common
-#include "AppendNodeToModel.h"
-#include "DataLoadArguments.h"
-#include "DataLoaders.h"
-#include "LoadModel.h"
-#include "MakeEvaluator.h"
-#include "MakeTrainer.h"
-#include "MapLoadArguments.h"
-#include "ModelSaveArguments.h"
-#include "ParametersEnumerator.h"
-#include "TrainerArguments.h"
+#include <common/include/AppendNodeToModel.h>
+#include <common/include/DataLoadArguments.h>
+#include <common/include/DataLoaders.h>
+#include <common/include/LoadModel.h>
+#include <common/include/MakeEvaluator.h>
+#include <common/include/MakeTrainer.h>
+#include <common/include/MapLoadArguments.h>
+#include <common/include/ModelSaveArguments.h>
+#include <common/include/ParametersEnumerator.h>
+#include <common/include/TrainerArguments.h>
 
-// trainers
-#include "EvaluatingTrainer.h"
-#include "SGDTrainer.h"
-#include "SweepingTrainer.h"
+#include <trainers/include/EvaluatingTrainer.h>
+#include <trainers/include/SGDTrainer.h>
+#include <trainers/include/SweepingTrainer.h>
 
-// evaluators
-#include "Evaluator.h"
+#include <evaluators/include/Evaluator.h>
 
-// model
-#include "Model.h"
+#include <model/include/Model.h>
 
-// nodes
-#include "LinearPredictorNode.h"
+#include <nodes/include/LinearPredictorNode.h>
 
-// stl
 #include <iostream>
 #include <memory>
 #include <stdexcept>

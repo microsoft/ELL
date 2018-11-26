@@ -8,22 +8,18 @@
 
 #include "PortElements_test.h"
 
-// model
-#include "InputNode.h"
-#include "Model.h"
-#include "OutputNode.h"
-#include "PortElements.h"
-#include "SliceNode.h"
-#include "SpliceNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/Model.h>
+#include <model/include/OutputNode.h>
+#include <model/include/PortElements.h>
+#include <model/include/SliceNode.h>
+#include <model/include/SpliceNode.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "JsonArchiver.h"
-#include "Logger.h"
+#include <utilities/include/JsonArchiver.h>
+#include <utilities/include/Logger.h>
 
-// stl
 #include <iostream>
 #include <sstream>
 #include <typeinfo>

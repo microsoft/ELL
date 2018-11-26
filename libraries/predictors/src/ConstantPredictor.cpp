@@ -8,7 +8,6 @@
 
 #include "ConstantPredictor.h"
 
-// stl
 #include <string>
 
 namespace ell

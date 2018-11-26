@@ -10,9 +10,9 @@
 #include "Matrix.h"
 
 #if USE_BLAS
-#include "cblas.h"
+#include <cblas.h>
 #endif
-// stl
+
 #include <thread> // for hardware_concurrency()
 
 namespace ell

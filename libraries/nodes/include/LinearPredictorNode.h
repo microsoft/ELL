@@ -8,16 +8,23 @@
 
 #pragma once
 
-// model
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
+#include "BinaryOperationNode.h"
+#include "ConstantNode.h"
+#include "DotProductNode.h"
+#include "LinearPredictorNode.h"
 
-// predictors
-#include "LinearPredictor.h"
+#include <utilities/include/Exception.h>
 
-// stl
+#include <data/include/DenseDataVector.h>
+
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+
+#include <predictors/include/LinearPredictor.h>
+
 #include <string>
+#include <vector>
 
 namespace ell
 {

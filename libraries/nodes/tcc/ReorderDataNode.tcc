@@ -6,12 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// model
-#include "CompilableNodeUtilities.h"
-#include "IRMapCompiler.h"
-#include "OutputNode.h"
+#include <model/include/CompilableNodeUtilities.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/OutputNode.h>
 
-// stl
 #include <vector>
 
 namespace ell

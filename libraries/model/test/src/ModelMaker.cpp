@@ -8,7 +8,7 @@
 
 #include "ModelMaker.h"
 
-#include "ModelTransformer.h"
+#include <model/include/ModelTransformer.h>
 
 using namespace ell;
 

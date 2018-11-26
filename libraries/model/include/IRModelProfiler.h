@@ -11,11 +11,9 @@
 #include "Model.h"
 #include "Node.h"
 
-// emitters
-#include "EmitterTypes.h"
-#include "LLVMUtilities.h"
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/LLVMUtilities.h>
 
-// stl
 #include <map>
 #include <string>
 

@@ -8,19 +8,16 @@
 
 #include "DataVector_test.h"
 
-// data
-#include "AutoDataVector.h"
-#include "DataVector.h"
-#include "DataVectorOperations.h"
-#include "DenseDataVector.h"
-#include "SparseBinaryDataVector.h"
-#include "SparseDataVector.h"
+#include <data/include/AutoDataVector.h>
+#include <data/include/DataVector.h>
+#include <data/include/DataVectorOperations.h>
+#include <data/include/DenseDataVector.h>
+#include <data/include/SparseBinaryDataVector.h>
+#include <data/include/SparseDataVector.h>
 
-// math
-#include "Vector.h"
+#include <math/include/Vector.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
 // stl
 #include <algorithm> // for std::transform

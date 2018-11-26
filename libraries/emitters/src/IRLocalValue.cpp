@@ -9,13 +9,10 @@
 #include "IRLocalValue.h"
 #include "IRFunctionEmitter.h"
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// LLVM
 #include <llvm/IR/Value.h>
 
-// stl
 #include <cassert>
 
 namespace ell

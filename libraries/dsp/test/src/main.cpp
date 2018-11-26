@@ -15,18 +15,16 @@
 #include "VoiceActivityDetectorTest.h"
 #include "WindowTest.h"
 
-// dsp
-#include "Convolution.h"
-#include "FFT.h"
-#include "IIRFilter.h"
-#include "WindowFunctions.h"
+#include <dsp/include/Convolution.h>
+#include <dsp/include/FFT.h>
+#include <dsp/include/IIRFilter.h>
+#include <dsp/include/WindowFunctions.h>
 
-// testing
-#include "Files.h"
-#include "Unused.h"
-#include "testing.h"
+#include <utilities/include/Files.h>
+#include <utilities/include/Unused.h>
 
-// stl
+#include <testing/include/testing.h>
+
 #include <complex>
 #include <iostream>
 #include <vector>

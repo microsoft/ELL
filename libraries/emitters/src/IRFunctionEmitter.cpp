@@ -17,10 +17,8 @@
 #include "IRThreadPool.h"
 #include "LLVMUtilities.h"
 
-// utilities
-#include "Logger.h"
+#include <utilities/include/Logger.h>
 
-// llvm
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/raw_os_ostream.h>
 

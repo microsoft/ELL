@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "SDCAOptimizer.h"
+#include <trainers/optimization/include/SDCAOptimizer.h>
 
 /// <summary> Tests that the SDCA duality gap tends to zero in a regression setting after a sufficient number of epochs.</summary>
 template <typename LossFunctionType, typename RegularizerType>

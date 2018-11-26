@@ -5,14 +5,6 @@
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma once
-
-// utilities
-#include "Common.h"
-
-// math
-#include "MatrixOperations.h"
-#include "VectorOperations.h"
 
 namespace ell
 {

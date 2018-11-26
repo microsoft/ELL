@@ -7,13 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IRModelProfiler.h"
-#include "IRFunctionEmitter.h"
-#include "IRMetadata.h"
-#include "IRModuleEmitter.h"
-#include "LLVMUtilities.h"
 #include "Model.h"
 
-// stl
+#include <emitters/include/IRFunctionEmitter.h>
+#include <emitters/include/IRMetadata.h>
+#include <emitters/include/IRModuleEmitter.h>
+#include <emitters/include/LLVMUtilities.h>
+
 #include <algorithm>
 #include <functional>
 #include <iterator>

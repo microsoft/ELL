@@ -1,22 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ForestPredictorNode.cpp (nodes)
+//  File:     ForestPredictorNode.tcc (nodes)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "BinaryOperationNode.h"
-#include "ConstantNode.h"
-#include "DemultiplexerNode.h"
-#include "ForestPredictorNode.h"
-#include "MultiplexerNode.h"
-#include "SingleElementThresholdNode.h"
-#include "SumNode.h"
-
-// stl
-#include <memory>
-#include <vector>
 
 namespace ell
 {

@@ -8,15 +8,12 @@
 
 #include "DSPNodesTests.h"
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Exception.h"
-#include "Files.h"
-#include "Unused.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/Unused.h>
 
-// stl
 #include <iostream>
 #include <string>
 

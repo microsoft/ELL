@@ -8,9 +8,8 @@
 
 #include "MatrixMatrixMultiplyNode.h"
 
-// math
-#include "Matrix.h"
-#include "MatrixOperations.h"
+#include <math/include/Matrix.h>
+#include <math/include/MatrixOperations.h>
 
 namespace ell
 {

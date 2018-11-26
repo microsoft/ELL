@@ -9,13 +9,10 @@
 
 #include "FunctionUtils_test.h"
 
-// utilities
-#include "FunctionUtils.h"
+#include <utilities/include/FunctionUtils.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <type_traits>
 
 namespace ell

@@ -10,8 +10,7 @@
 #include "BinaryPredicateNode.h"
 #include "ConstantNode.h"
 
-// data
-#include "DenseDataVector.h"
+#include <data/include/DenseDataVector.h>
 
 namespace ell
 {

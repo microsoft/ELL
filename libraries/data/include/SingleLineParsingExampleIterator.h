@@ -12,7 +12,6 @@
 #include "Example.h"
 #include "ExampleIterator.h"
 
-// stl
 #include <memory>
 #include <vector>
 

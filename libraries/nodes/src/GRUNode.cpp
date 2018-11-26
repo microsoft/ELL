@@ -7,10 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GRUNode.h"
-#include "MatrixOperations.h"
 
-// utilities
-#include "Exception.h"
+#include <math/include/MatrixOperations.h>
+
+#include <utilities/include/Exception.h>
 
 namespace ell
 {
@@ -90,9 +90,9 @@ namespace nodes
         using ConstMatrixReferenceType = math::ConstRowMatrixReference<ValueType>;
         /*
         h = previous hidden state
-        rt = sigma(W_{ ir } x + b_{ ir } + W_{ hr } h + b_{ hr }) 
-        zt = sigma(W_{ iz } x + b_{ iz } + W_{ hz } h + b_{ hz }) 
-        nt = tanh(W_{ in } x + b_{ in } + rt * (W_{ hn } h + b_{ hn })) 
+        rt = sigma(W_{ ir } x + b_{ ir } + W_{ hr } h + b_{ hr })
+        zt = sigma(W_{ iz } x + b_{ iz } + W_{ hz } h + b_{ hz })
+        nt = tanh(W_{ in } x + b_{ in } + rt * (W_{ hn } h + b_{ hn }))
         ht = (1 - zt) * nt + zt * h
         */
         size_t hiddenUnits = this->_hiddenUnits;

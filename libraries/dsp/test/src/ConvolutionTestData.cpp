@@ -9,14 +9,11 @@
 #include "ConvolutionTestData.h"
 #include "DSPTestUtilities.h"
 
-// math
-#include "Tensor.h"
-#include "Vector.h"
+#include <math/include/Tensor.h>
+#include <math/include/Vector.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// stl
 #include <algorithm>
 #include <vector>
 namespace

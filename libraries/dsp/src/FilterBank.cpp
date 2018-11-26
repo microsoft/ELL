@@ -8,7 +8,6 @@
 
 #include "FilterBank.h"
 
-// stl
 #include <algorithm>
 #include <cmath>
 #include <string>

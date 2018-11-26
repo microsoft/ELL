@@ -8,7 +8,6 @@
 
 #pragma once
 
-// stl
 #include <vector>
 
 template <typename ValueType>

@@ -8,20 +8,17 @@
 
 #pragma once
 
-// model
-#include "CompilableNode.h"
-#include "IRMapCompiler.h"
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
-#include "Port.h"
-#include "PortMemoryLayout.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+#include <model/include/Port.h>
+#include <model/include/PortMemoryLayout.h>
 
-// utilities
-#include "ArchiveVersion.h"
-#include "IArchivable.h"
+#include <utilities/include/ArchiveVersion.h>
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <algorithm>
 #include <array>
 #include <numeric>

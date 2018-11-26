@@ -8,9 +8,9 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "HingeLoss.h"
-#include "LogLoss.h"
-#include "SquaredLoss.h"
+#include <functions/include/HingeLoss.h>
+#include <functions/include/LogLoss.h>
+#include <functions/include/SquaredLoss.h>
 %}
 
 %inline %{

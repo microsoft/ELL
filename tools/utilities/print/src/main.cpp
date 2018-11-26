@@ -10,32 +10,25 @@
 #include "PrintGraph.h"
 #include "PrintModel.h"
 
-// common
-#include "LoadModel.h"
-#include "MapCompilerArguments.h"
-#include "MapLoadArguments.h"
+#include <common/include/LoadModel.h>
+#include <common/include/MapCompilerArguments.h>
+#include <common/include/MapLoadArguments.h>
 
-// model
-#include "IRMapCompiler.h"
-#include "Map.h"
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
+#include <model/include/IRMapCompiler.h>
+#include <model/include/Map.h>
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
 
-// nodes
-#include "NeuralNetworkPredictorNode.h"
+#include <nodes/include/NeuralNetworkPredictorNode.h>
 
-// passes
-#include "StandardPasses.h"
+#include <passes/include/StandardPasses.h>
 
-// utilities
-#include "CommandLineParser.h"
-#include "Exception.h"
-#include "NeuralNetworkPredictorNode.h"
-#include "OutputStreamImpostor.h"
-#include "StringUtil.h"
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/OutputStreamImpostor.h>
+#include <utilities/include/StringUtil.h>
 
-// stl
 #include <iostream>
 
 using namespace ell;

@@ -10,10 +10,8 @@
 #include "Value.h"
 #include "ValueScalar.h"
 
-// utilities
-#include "TypeTraits.h"
+#include <utilities/include/TypeTraits.h>
 
-// stl
 #include <cassert>
 #include <string>
 

@@ -10,7 +10,6 @@
 #include "Exception.h"
 #include "Files.h"
 
-// stl
 #include <istream>
 
 namespace ell

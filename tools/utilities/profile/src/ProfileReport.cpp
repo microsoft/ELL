@@ -8,7 +8,6 @@
 
 #include "ProfileReport.h"
 
-// stl
 #include <algorithm>
 #include <cstring>
 #include <iomanip>

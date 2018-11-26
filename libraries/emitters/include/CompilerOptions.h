@@ -10,8 +10,7 @@
 
 #include "TargetDevice.h"
 
-// utilities
-#include "Optional.h"
+#include <utilities/include/Optional.h>
 
 namespace ell
 {

@@ -7,9 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "AutoDataVector.h"
-#include "Dataset.h"
 #include "DatasetInterface.h"
+
+#include <data/include/AutoDataVector.h>
+#include <data/include/Dataset.h>
 
 namespace ELL_API
 {

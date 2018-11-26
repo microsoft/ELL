@@ -14,10 +14,8 @@
 #include "Transformations.h"
 #include "Vector.h"
 
-// utilities
-#include "TypeTraits.h"
+#include <utilities/include/TypeTraits.h>
 
-// stl
 #include <ostream>
 #include <string>
 

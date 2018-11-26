@@ -9,21 +9,17 @@
 
 #ifndef SWIG
 
-// math
-#include "Tensor.h"
-
-// neural network
-#include "Layer.h"
 #include "MathInterface.h"
 #include "ModelInterface.h"
 
-// layer parameters
-#include "BinaryConvolutionalLayer.h"
-#include "ConvolutionalLayer.h"
-#include "PoolingLayer.h"
-#include "RegionDetectionLayer.h"
+#include <math/include/Tensor.h>
 
-// stl
+#include <predictors/neural/include/BinaryConvolutionalLayer.h>
+#include <predictors/neural/include/ConvolutionalLayer.h>
+#include <predictors/neural/include/Layer.h>
+#include <predictors/neural/include/PoolingLayer.h>
+#include <predictors/neural/include/RegionDetectionLayer.h>
+
 #include <array>
 #include <string>
 #include <vector>

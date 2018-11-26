@@ -8,18 +8,24 @@
 
 #pragma once
 
-// model
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
-
-// predictors
+#include "BinaryOperationNode.h"
 #include "ConstantNode.h"
-#include "ForestPredictor.h"
-#include "SingleElementThresholdPredictor.h"
+#include "DemultiplexerNode.h"
+#include "ForestPredictorNode.h"
+#include "MultiplexerNode.h"
+#include "SingleElementThresholdNode.h"
+#include "SumNode.h"
 
-// stl
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
+
+#include <predictors/include/ForestPredictor.h>
+#include <predictors/include/SingleElementThresholdPredictor.h>
+
 #include <string>
+#include <memory>
+#include <vector>
 
 namespace ell
 {

@@ -8,22 +8,17 @@
 
 #include "FFTNode.h"
 
-// emitters
-#include "EmitterException.h"
-#include "EmitterTypes.h"
-#include "IRLocalValue.h"
-#include "LLVMUtilities.h"
+#include <emitters/include/EmitterException.h>
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/IRLocalValue.h>
+#include <emitters/include/LLVMUtilities.h>
 
-// math
-#include "MathConstants.h"
+#include <math/include/MathConstants.h>
 
-// dsp
-#include "FFT.h"
+#include <dsp/include/FFT.h>
 
-// llvm
 #include <llvm/IR/Type.h>
 
-// stl
 #include <cmath>
 
 #define USE_STORED_TWIDDLE_FACTORS 1

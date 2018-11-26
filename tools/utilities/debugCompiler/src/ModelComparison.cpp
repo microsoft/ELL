@@ -9,21 +9,16 @@
 #include "ModelComparison.h"
 #include "VectorStatistics.h"
 
-// emitters
-#include "EmitterTypes.h"
+#include <emitters/include/EmitterTypes.h>
 
-// nodes
-#include "DebugSinkNode.h"
-#include "NeuralNetworkPredictorNode.h"
+#include <nodes/include/DebugSinkNode.h>
+#include <nodes/include/NeuralNetworkPredictorNode.h>
 
-// passes
-#include "StandardPasses.h"
+#include <passes/include/StandardPasses.h>
 
-// utilities
-#include "Files.h"
-#include "Graph.h"
+#include <utilities/include/Files.h>
+#include <utilities/include/Graph.h>
 
-// stl
 #include <sstream>
 #include <string>
 

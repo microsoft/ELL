@@ -11,10 +11,8 @@
 #include "IRHeaderWriter.h"
 #include "IRMetadata.h"
 
-// utilities
-#include "StringUtil.h"
+#include <utilities/include/StringUtil.h>
 
-// stl
 #include <regex>
 #include <sstream>
 #include <string>

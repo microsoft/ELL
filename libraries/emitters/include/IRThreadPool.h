@@ -11,10 +11,8 @@
 #include "IREmitter.h"
 #include "LLVMUtilities.h"
 
-// llvm
 #include <llvm/IR/GlobalVariable.h>
 
-// stl
 #include <string>
 #include <vector>
 

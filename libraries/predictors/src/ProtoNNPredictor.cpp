@@ -8,10 +8,8 @@
 
 #include "ProtoNNPredictor.h"
 
-// math
-#include "MatrixOperations.h"
+#include <math/include/MatrixOperations.h>
 
-// stl
 #include <memory>
 
 namespace ell

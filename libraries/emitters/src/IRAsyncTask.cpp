@@ -10,9 +10,8 @@
 #include "IRFunctionEmitter.h"
 #include "IRThreadUtilities.h"
 
-// utilities
-#include "Exception.h"
-#include "Unused.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/Unused.h>
 
 namespace ell
 {

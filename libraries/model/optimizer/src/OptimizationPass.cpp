@@ -8,16 +8,13 @@
 
 #include "OptimizationPass.h"
 
-// model
-#include "MapCompilerOptions.h"
-#include "Model.h"
+#include <model/include/MapCompilerOptions.h>
+#include <model/include/Model.h>
 #include "ModelOptimizer.h"
-#include "ModelTransformer.h"
+#include <model/include/ModelTransformer.h>
 
-// utilities
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
-// stl
 #include <cassert>
 
 namespace ell

@@ -10,11 +10,9 @@
 #include "Value.h"
 #include "ValueScalar.h"
 
-// emitters
-#include "IRModuleEmitter.h"
+#include <emitters/include/IRModuleEmitter.h>
 
-// utilities
-#include "StringUtil.h"
+#include <utilities/include/StringUtil.h>
 
 namespace ell
 {

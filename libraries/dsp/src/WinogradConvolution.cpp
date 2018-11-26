@@ -9,17 +9,14 @@
 #include "WinogradConvolution.h"
 #include "SimpleConvolution.h"
 
-// math
-#include "BlasWrapper.h"
-#include "MatrixOperations.h"
-#include "TensorOperations.h"
+#include <math/include/BlasWrapper.h>
+#include <math/include/MatrixOperations.h>
+#include <math/include/TensorOperations.h>
 
-// utilities
-#include "Debug.h"
-#include "Exception.h"
-#include "Unused.h"
+#include <utilities/include/Debug.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Unused.h>
 
-// stl
 #include <array>
 #include <cassert>
 #include <initializer_list>

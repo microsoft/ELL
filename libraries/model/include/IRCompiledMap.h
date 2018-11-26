@@ -16,16 +16,13 @@
 #include "OutputPort.h"
 #include "PortElements.h"
 
-// emitters
-#include "IRExecutionEngine.h"
-#include "IRModuleEmitter.h"
-#include "ModuleEmitter.h"
+#include <emitters/include/IRExecutionEngine.h>
+#include <emitters/include/IRModuleEmitter.h>
+#include <emitters/include/ModuleEmitter.h>
 
-// utilities
-#include "Boolean.h"
-#include "TypeName.h"
+#include <utilities/include/Boolean.h>
+#include <utilities/include/TypeName.h>
 
-// stl
 #include <functional>
 #include <memory>
 #include <ostream>

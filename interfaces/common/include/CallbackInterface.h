@@ -9,7 +9,6 @@
 
 #ifndef SWIG
 
-// stl
 #include <vector>
 
 #endif

@@ -13,14 +13,11 @@
 #include "Port.h"
 #include "PortMemoryLayout.h"
 
-// data
-#include "IndexValue.h"
+#include <data/include/IndexValue.h>
 
-// utilities
-#include "Exception.h"
-#include "IArchivable.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <algorithm>
 #include <deque>
 #include <vector>

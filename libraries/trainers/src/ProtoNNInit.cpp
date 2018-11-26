@@ -9,7 +9,6 @@
 #include "ProtoNNInit.h"
 #include "KMeansTrainer.h"
 
-// stl
 #include <cassert>
 #include <cmath>
 

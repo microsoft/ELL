@@ -10,15 +10,12 @@
 
 #include "NeuralNetworkLayerNode.h"
 
-// model
-#include "IRMapCompiler.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
+#include <model/include/IRMapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/PortElements.h>
 
-// predictors
-#include "ConvolutionalLayer.h"
+#include <predictors/neural/include/ConvolutionalLayer.h>
 
-// stl
 #include <string>
 #include <type_traits>
 

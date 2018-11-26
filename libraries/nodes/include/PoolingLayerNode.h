@@ -10,19 +10,15 @@
 
 #include "NeuralNetworkLayerNode.h"
 
-// emitters
-#include "LLVMUtilities.h"
+#include <emitters/include/LLVMUtilities.h>
 
-// model
-#include "IRMapCompiler.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
-#include "PortMemoryLayout.h"
+#include <model/include/IRMapCompiler.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/PortElements.h>
+#include <model/include/PortMemoryLayout.h>
 
-// predictors
-#include "PoolingLayer.h"
+#include <predictors/neural/include/PoolingLayer.h>
 
-// stl
 #include <string>
 #include <type_traits>
 

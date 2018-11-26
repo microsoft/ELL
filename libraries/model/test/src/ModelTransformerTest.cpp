@@ -7,22 +7,19 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ModelTransformerTest.h"
-#include "ModelTestUtilities.h"
 
-// model
-#include "InputNode.h"
-#include "Model.h"
-#include "OutputNode.h"
-#include "PortElements.h"
+#include <model_testing/include/ModelTestUtilities.h>
 
-// nodes
-#include "BinaryOperationNode.h"
-#include "UnaryOperationNode.h"
+#include <model/include/InputNode.h>
+#include <model/include/Model.h>
+#include <model/include/OutputNode.h>
+#include <model/include/PortElements.h>
 
-// testing
-#include "testing.h"
+#include <nodes/include/BinaryOperationNode.h>
+#include <nodes/include/UnaryOperationNode.h>
 
-// stl
+#include <testing/include/testing.h>
+
 #include <cassert>
 #include <iostream>
 #include <sstream>

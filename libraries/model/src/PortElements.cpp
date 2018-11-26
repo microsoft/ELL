@@ -10,11 +10,9 @@
 #include "Model.h"
 #include "Node.h"
 
-// utilities
-#include "Exception.h"
-#include "Tokenizer.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/Tokenizer.h>
 
-// stl
 #include <sstream>
 
 namespace ell

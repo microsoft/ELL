@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Archiver_test.h"
-#include "Files.h"
 #include "Files_test.h"
 #include "Format_test.h"
 #include "FunctionUtils_test.h"
@@ -19,14 +18,12 @@
 #include "TypeName_test.h"
 #include "Variant_test.h"
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// utilities
-#include "Exception.h"
-#include "Unused.h"
+#include <utilities/include/Exception.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/Unused.h>
 
-// stl
 #include <iostream>
 #include <numeric>
 #include <string>

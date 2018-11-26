@@ -8,11 +8,9 @@
 
 #pragma once
 
-// utilities
-#include "Boolean.h"
-#include "TypeTraits.h"
+#include <utilities/include/Boolean.h>
+#include <utilities/include/TypeTraits.h>
 
-// stl
 #include <cstdint>
 
 namespace ell

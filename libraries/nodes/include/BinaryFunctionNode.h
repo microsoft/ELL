@@ -8,25 +8,21 @@
 
 #pragma once
 
-// model
-#include "CompilableNode.h"
-#include "CompilableNodeUtilities.h"
-#include "IRMapCompiler.h"
-#include "MapCompiler.h"
-#include "Model.h"
-#include "ModelTransformer.h"
-#include "Node.h"
+#include <model/include/CompilableNode.h>
+#include <model/include/CompilableNodeUtilities.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/MapCompiler.h>
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
 
-// emitters
-#include "EmitterTypes.h"
-#include "LLVMUtilities.h"
+#include <emitters/include/EmitterTypes.h>
+#include <emitters/include/LLVMUtilities.h>
 
-// utilities
-#include "ArchiveVersion.h"
-#include "Exception.h"
-#include "IArchivable.h"
+#include <utilities/include/ArchiveVersion.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/IArchivable.h>
 
-// stl
 #include <string>
 #include <vector>
 

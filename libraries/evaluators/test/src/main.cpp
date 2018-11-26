@@ -11,13 +11,10 @@
 
 #include "Evaluators_test.h"
 
-// evaluators
-#include "Evaluator.h"
+#include <evaluators/include/Evaluator.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <iostream>
 
 using namespace ell;

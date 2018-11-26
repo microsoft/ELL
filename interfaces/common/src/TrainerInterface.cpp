@@ -7,19 +7,24 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "TrainerInterface.h"
-#include "AutoDataVector.h"
-#include "Dataset.h"
 #include "DatasetInterfaceImpl.h"
-#include "Exception.h"
-#include "LoadModel.h"
-#include "MakeTrainer.h"
-#include "Map.h"
-#include "MapLoadArguments.h"
 #include "ModelInterface.h"
-#include "ProtoNNPredictorNode.h"
-#include "ProtoNNTrainer.h"
 
-// stl
+#include <common/include/LoadModel.h>
+#include <common/include/MakeTrainer.h>
+#include <common/include/MapLoadArguments.h>
+
+#include <data/include/AutoDataVector.h>
+#include <data/include/Dataset.h>
+
+#include <model/include/Map.h>
+
+#include <nodes/include/ProtoNNPredictorNode.h>
+
+#include <trainers/include/ProtoNNTrainer.h>
+
+#include <utilities/include/Exception.h>
+
 #include <vector>
 
 using namespace ell;

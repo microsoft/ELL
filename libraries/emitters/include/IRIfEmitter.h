@@ -11,10 +11,8 @@
 #include "EmitterTypes.h"
 #include "LLVMUtilities.h"
 
-// llvm
 #include <llvm/IR/BasicBlock.h>
 
-// stl
 #include <functional>
 
 namespace ell

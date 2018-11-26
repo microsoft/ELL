@@ -8,8 +8,7 @@
 
 #pragma once
 
-// dsp
-#include "Convolution.h"
+#include <dsp/include/Convolution.h>
 
 // 1D convolution over a vector
 template <typename ValueType>

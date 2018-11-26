@@ -8,16 +8,12 @@
 
 #include "GenerateTestModels.h"
 
-// common
-#include "LoadModel.h"
+#include <common/include/LoadModel.h>
 
-// model
-#include "Model.h"
+#include <model/include/Model.h>
 
-// utilities
-#include "Exception.h"
+#include <utilities/include/Exception.h>
 
-// stl
 #include <iostream>
 #include <stdexcept>
 

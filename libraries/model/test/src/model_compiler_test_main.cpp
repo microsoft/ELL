@@ -9,13 +9,12 @@
 #include "CompilableNodesTest.h"
 #include "CompilerTest.h"
 #include "ModelHeaderOutputTest.h"
-#include "ModelTestUtilities.h"
 #include "PerformanceCountersTest.h"
 
-// testing
-#include "testing.h"
+#include <model_testing/include/ModelTestUtilities.h>
 
-// stl
+#include <testing/include/testing.h>
+
 #include <iostream>
 
 using namespace ell;

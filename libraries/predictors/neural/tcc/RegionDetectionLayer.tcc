@@ -6,12 +6,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "SigmoidActivation.h"
-#include "SoftMaxActivation.h"
-
-// stl
-#include <cmath>
-
 namespace ell
 {
 namespace predictors

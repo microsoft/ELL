@@ -8,17 +8,14 @@
 
 #pragma once
 
-// utilities
-#include "CommandLineParser.h"
+#include <utilities/include/CommandLineParser.h>
 
-// model
-#include "MapCompilerOptions.h"
-#include "ModelOptimizerOptions.h"
+#include <model/include/MapCompilerOptions.h>
 
-// utilities
-#include "Optional.h"
+#include <model/optimizer/include/ModelOptimizerOptions.h>
 
-// stl
+#include <utilities/include/Optional.h>
+
 #include <string>
 
 namespace ell

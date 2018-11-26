@@ -13,7 +13,6 @@
 #include "Exception.h"
 #include "TypeName.h"
 
-// stl
 #include <ostream>
 #include <string>
 

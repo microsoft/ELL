@@ -11,18 +11,15 @@
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 
-// llvm
 #include <llvm/IR/Attributes.h>
 #include <llvm/IR/IRPrintingPasses.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/raw_os_ostream.h>
 
-// utilities
-#include "Debug.h"
-#include "StringUtil.h"
+#include <utilities/include/Debug.h>
+#include <utilities/include/StringUtil.h>
 
-// stl
 #include <sstream>
 #include <string>
 #include <vector>

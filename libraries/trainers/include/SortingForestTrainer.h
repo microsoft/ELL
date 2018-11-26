@@ -11,9 +11,8 @@
 #include "ForestTrainer.h"
 #include "LogitBooster.h"
 
-// predictors
-#include "ConstantPredictor.h"
-#include "SingleElementThresholdPredictor.h"
+#include <predictors/include/ConstantPredictor.h>
+#include <predictors/include/SingleElementThresholdPredictor.h>
 
 namespace ell
 {

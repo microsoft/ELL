@@ -6,15 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "CStringParser.h"
-#include "Exception.h"
-
-// stl
-#include <cctype>
-#include <iomanip>
-#include <sstream>
-#include <type_traits>
-
 namespace ell
 {
 namespace utilities

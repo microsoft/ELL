@@ -6,9 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "CStringParser.h"
-#include "Exception.h"
+#include <utilities/include/CStringParser.h>
+#include <utilities/include/Exception.h>
 
 namespace ell
 {

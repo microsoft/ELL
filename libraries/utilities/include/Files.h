@@ -8,7 +8,6 @@
 
 #pragma once
 
-// stl
 #include <fstream>
 #include <string>
 #include <vector>

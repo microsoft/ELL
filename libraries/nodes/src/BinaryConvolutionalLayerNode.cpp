@@ -10,18 +10,16 @@
 #include "ConstantNode.h"
 #include "ReorderDataNode.h"
 
-// emitters
-#include "IRAsyncTask.h"
-#include "IREmitter.h"
-#include "IRThreadPool.h"
-#include "IRVectorUtilities.h"
-#include "LLVMUtilities.h"
+#include <emitters/include/IRAsyncTask.h>
+#include <emitters/include/IREmitter.h>
+#include <emitters/include/IRThreadPool.h>
+#include <emitters/include/IRVectorUtilities.h>
+#include <emitters/include/LLVMUtilities.h>
 
-#include "IRHeaderWriter.h"
+#include <emitters/include/IRHeaderWriter.h>
 
-#include "Unused.h"
+#include <utilities/include/Unused.h>
 
-// stl
 #include <algorithm>
 #include <numeric>
 

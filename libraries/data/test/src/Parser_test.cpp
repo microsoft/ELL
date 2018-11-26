@@ -8,19 +8,16 @@
 
 #include "Parser_test.h"
 
-// data
-#include "AutoDataVector.h"
-#include "Dataset.h"
-#include "GeneralizedSparseParsingIterator.h"
-#include "SequentialLineIterator.h"
-#include "SingleLineParsingExampleIterator.h"
-#include "TextLine.h"
-#include "WeightLabel.h"
+#include <data/include/AutoDataVector.h>
+#include <data/include/Dataset.h>
+#include <data/include/GeneralizedSparseParsingIterator.h>
+#include <data/include/SequentialLineIterator.h>
+#include <data/include/SingleLineParsingExampleIterator.h>
+#include <data/include/TextLine.h>
+#include <data/include/WeightLabel.h>
 
-// testing
-#include "testing.h"
+#include <testing/include/testing.h>
 
-// stl
 #include <memory>
 #include <sstream>
 #include <string>
