@@ -36,30 +36,14 @@ set (include include/AutoDataVector.h
              include/WeightLabel.h
              )
 
-set (tcc tcc/AutoDataVector.tcc
-         tcc/DataVector.tcc
-         tcc/DataVectorOperations.tcc
-         tcc/DenseDataVector.tcc
-         tcc/Example.tcc
-         tcc/ExampleIterator.tcc
-         tcc/Dataset.tcc
-         tcc/SingleLineParsingExampleIterator.tcc
-         tcc/SparseBinaryDataVector.tcc
-         tcc/SparseDataVector.tcc
-         tcc/StlIndexValueIterator.tcc
-         tcc/TextLine.tcc
-         tcc/TransformedDataVector.tcc
-         tcc/TransformingIndexValueIterator.tcc)
-
-set (doc doc/GeneralizedSparseFormat.md
+             set (doc doc/GeneralizedSparseFormat.md
          doc/README.md)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${doc})
+add_library(${library_name} ${src} ${include} ${doc})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} math utilities)
 

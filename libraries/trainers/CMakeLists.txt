@@ -34,25 +34,13 @@ set (include include/EvaluatingTrainer.h
              include/ThresholdFinder.h
 )
 
-set (tcc tcc/EvaluatingTrainer.tcc
-         tcc/ForestTrainer.tcc
-         tcc/HistogramForestTrainer.tcc
-         tcc/MeanCalculator.tcc
-         tcc/ProtoNNTrainerUtils.tcc
-         tcc/SortingForestTrainer.tcc
-         tcc/SweepingTrainer.tcc
-         tcc/SDCATrainer.tcc
-         tcc/SGDTrainer.tcc
-         tcc/ThresholdFinder.tcc)
-
 set (doc doc/README.md)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${doc})
+add_library(${library_name} ${src} ${include} ${doc})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} utilities evaluators predictors)
 

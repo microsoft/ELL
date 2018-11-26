@@ -29,12 +29,6 @@ set(include
   include/WinogradConvolution.h
 )
 
-set(tcc
-  tcc/FFT.tcc
-  tcc/IIRFilter.tcc
-  tcc/WindowFunctions.tcc
-)
-
 set(py
   py/symbolic.py
   py/winograd.py
@@ -42,10 +36,9 @@ set(py
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 source_group("py" FILES ${py})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} math utilities)
 
@@ -88,9 +81,6 @@ set(test_include
   test/include/WindowTest.h
 )
 
-set(test_tcc
-)
-
 set(test_py
   test/py/generate_test_data.py
 )
@@ -101,11 +91,10 @@ set(test_data
 
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
-source_group("tcc" FILES ${test_tcc})
 source_group("py" FILES ${test_py})
 source_group("data" FILES ${test_data})
 
-add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${test_data})
+add_executable(${test_name} ${test_src} ${test_include} ${test_data})
 target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} dsp testing utilities data common)
 copy_shared_libraries(${test_name})
@@ -140,18 +129,14 @@ set(timing_include
   test/include/DSPTestUtilities.h
 )
 
-set(timing_tcc
-)
-
 set(timing_py
 )
 
 source_group("src" FILES ${timing_src})
 source_group("include" FILES ${timing_include})
-source_group("tcc" FILES ${timing_tcc})
 source_group("py" FILES ${timing_py})
 
-add_executable(${timing_name} ${timing_src} ${timing_include} ${timing_tcc} ${include})
+add_executable(${timing_name} ${timing_src} ${timing_include} ${include})
 target_include_directories(${timing_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${timing_name} dsp testing utilities)
 copy_shared_libraries(${timing_name})

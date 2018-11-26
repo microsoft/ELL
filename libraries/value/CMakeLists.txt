@@ -39,22 +39,14 @@ set(include
     include/ValueVectorOperations.h
 )
 
-set(tcc
-    tcc/EmitterContext.tcc
-    tcc/Value.tcc
-    tcc/ValueMatrix.tcc
-    tcc/ValueTensor.tcc
-)
-
 set(doc
     doc/README.md)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${doc})
+add_library(${library_name} ${src} ${include} ${doc})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_include_directories(${library_name} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_link_libraries(${library_name} ${LLVM_LIBS} emitters utilities)

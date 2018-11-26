@@ -53,7 +53,6 @@ if (TARGET _ELL_python)
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/CMake/OpenBLASSetup.cmake ${DEPLOYDIR}/OpenBLASSetup.cmake
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/interfaces/common/include/CallbackInterface.h ${DEPLOYDIR}/include/CallbackInterface.h
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/interfaces/common/tcc/CallbackInterface.tcc ${DEPLOYDIR}/tcc/CallbackInterface.tcc
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/tools/wrap/templates/CMakeLists.python.txt.in ${DEPLOYDIR}/CMakeLists.python.txt.in
   )
 

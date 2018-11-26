@@ -47,4 +47,23 @@ namespace trainers
 } // namespace trainers
 } // namespace ell
 
-#include "../tcc/IndexedContainer.tcc"
+#pragma region implementation
+
+#pragma once
+
+namespace ell
+{
+namespace trainers
+{
+    namespace optimization
+    {
+        template <typename VectorElementType, typename IndexedContainerElementType>
+        IndexedContainerElementType VectorIndexedContainer<VectorElementType, IndexedContainerElementType>::Get(size_t index) const
+        {
+            return IndexedContainerElementType((*this)[index]);
+        }
+    } // namespace optimization
+} // namespace trainers
+} // namespace ell
+
+#pragma endregion implementation

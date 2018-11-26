@@ -114,4 +114,19 @@ namespace utilities
 } // namespace utilities
 } // namespace ell
 
-#include "../tcc/Exception.tcc"
+#pragma region implementation
+
+namespace ell
+{
+namespace utilities
+{
+    template <typename ErrorCodeType>
+    ErrorCodeException<ErrorCodeType>::ErrorCodeException(ErrorCodeType errorCode, const std::string& message) :
+        Exception(message),
+        _errorCode(errorCode)
+    {
+    }
+} // namespace utilities
+} // namespace ell
+
+#pragma endregion implementation

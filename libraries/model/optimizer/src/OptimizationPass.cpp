@@ -8,9 +8,9 @@
 
 #include "OptimizationPass.h"
 
+#include "ModelOptimizer.h"
 #include <model/include/MapCompilerOptions.h>
 #include <model/include/Model.h>
-#include "ModelOptimizer.h"
 #include <model/include/ModelTransformer.h>
 
 #include <utilities/include/Unused.h>

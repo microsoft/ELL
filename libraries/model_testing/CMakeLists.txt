@@ -10,14 +10,11 @@ set(src
 set(include
     include/ModelTestUtilities.h
 )
-set(tcc
-    tcc/ModelTestUtilities.tcc )
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} utilities model nodes emitters testing)
 

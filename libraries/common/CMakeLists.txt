@@ -43,19 +43,10 @@ set(include
     include/ProtoNNTrainerArguments.h
 )
 
-set(tcc
-    tcc/AppendNodeToModel.tcc
-    tcc/DataLoaders.tcc
-    tcc/LoadModel.tcc
-    tcc/MakeEvaluator.tcc
-    tcc/ParametersEnumerator.tcc
-)
-
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} data utilities functions model nodes predictors evaluators trainers)
 

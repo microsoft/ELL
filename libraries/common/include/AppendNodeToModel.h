@@ -28,4 +28,23 @@ namespace common
 } // namespace common
 } // namespace ell
 
-#include "../tcc/AppendNodeToModel.tcc"
+#pragma region implementation
+
+namespace ell
+{
+namespace common
+{
+    template <typename PredictorNodeType, typename PredictorType>
+    model::Model AppendNodeToModel(const model::Map& map, const PredictorType& predictor)
+    {
+        model::TransformContext context;
+        model::ModelTransformer transformer;
+        auto model = transformer.CopyModel(map.GetModel(), context);
+        auto mapOutput = map.GetOutputElements<double>(0);
+        model.AddNode<PredictorNodeType>(mapOutput, predictor);
+        return model;
+    }
+} // namespace common
+} // namespace ell
+
+#pragma endregion implementation

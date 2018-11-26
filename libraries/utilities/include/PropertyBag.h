@@ -101,4 +101,26 @@ namespace utilities
 } // namespace utilities
 } // namespace ell
 
-#include "../tcc/PropertyBag.tcc"
+#pragma region implementation
+
+namespace ell
+{
+namespace utilities
+{
+    template <typename ValueType>
+    void PropertyBag::SetEntry(const std::string& key, ValueType value)
+    {
+        _metadata[key] = Variant(value);
+    }
+
+    template <typename ValueType>
+    const ValueType& PropertyBag::GetEntry(const std::string& key) const
+    {
+        // This function throws an exception if there aren't any entries for the key, or if the underlying Variant doesn't contain a value of the correct type
+        const auto& variant = _metadata.at(key);
+        return variant.GetValue<ValueType>();
+    }
+} // namespace utilities
+} // namespace ell
+
+#pragma endregion implementation

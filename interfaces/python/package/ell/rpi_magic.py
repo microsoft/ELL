@@ -1,5 +1,5 @@
 """
-A Jupyter magic to allow code to be copied and deployed on the Raspberry Pi directly 
+A Jupyter magic to allow code to be copied and deployed on the Raspberry Pi directly
 from the notebook.
 """
 import tempfile
@@ -11,6 +11,7 @@ from . import platform
 from IPython import get_ipython
 from ipywidgets import Button, HBox, Label, Output, Layout
 from IPython.core.magic import Magics, magics_class, cell_magic
+
 
 @magics_class
 class RaspberryPi(Magics):
@@ -54,9 +55,8 @@ class RaspberryPi(Magics):
                 local_path = rpi_path + '/' + os.path.basename(file)
                 # I don't like this logic :(
                 if (file.find('/include/') >= 0):
-                    local_path = rpi_path + '/include/' + os.path.basename(file)
-                if (file.find('/tcc/') >= 0):
-                    local_path = rpi_path + '/tcc/' + os.path.basename(file)
+                    local_path = rpi_path + '/include/' + \
+                        os.path.basename(file)
                 sftp.put(file, local_path, callback=report_progress)
 
     def copy_model_to_rpi(self, model, rpi_path):
@@ -64,7 +64,6 @@ class RaspberryPi(Magics):
         files = model.files(platform.PI3) + [
             pkgdir + '/deploy/OpenBLASSetup.cmake',
             pkgdir + '/deploy/include/CallbackInterface.h',
-            pkgdir + '/deploy/tcc/CallbackInterface.tcc',
             pkgdir + '/util/tutorialHelpers.py',
         ]
 
@@ -81,7 +80,7 @@ class RaspberryPi(Magics):
                 return
 
         self.remote_command('rm -r -f ' + rpi_path + '; mkdir -p ' + rpi_path +
-                            '/include; mkdir -p ' + rpi_path + '/tcc')
+                            '/include')
         self.remote_copy(files, rpi_path)
         self.feedback('Building...')
         self.remote_command('cd ' + rpi_path +
@@ -96,7 +95,7 @@ class RaspberryPi(Magics):
 
     def print_output(self, line):
         line = line.strip('\n')
-        print(line)            
+        print(line)
         sys.stdout.flush()
 
     def remote_command(self, command):
@@ -126,7 +125,7 @@ class RaspberryPi(Magics):
 
     @cell_magic
     def rpi(self, line, cell):
-                
+
         from IPython.core.display import display
 
         'provide a user interface for remotely executing code on the RPi'
@@ -163,24 +162,27 @@ class RaspberryPi(Magics):
             self.status_label.value = 'Running'
             self.remote_command_async(
                 'cd ' + rpi_path + '; ' +
-                'source /home/pi/miniconda3/envs/py34/bin/activate py34 > /dev/null 2>&1; ' + 
+                'source /home/pi/miniconda3/envs/py34/bin/activate py34 > /dev/null 2>&1; ' +
                 'echo running remote python script...; ' +
-                'python3 actuation.py', 
-                lambda:self.on_job_complete(stop_button))
+                'python3 actuation.py',
+                lambda: self.on_job_complete(stop_button))
         except paramiko.AuthenticationException:
             self.feedback(
                 'Authentication failed. Wrong password? Evaluate the cell to try again.'
             )
             self.password = None
         except TimeoutError:
-            self.feedback('Timeout while trying to reach the Raspberry Pi. Wrong IP address?')
+            self.feedback(
+                'Timeout while trying to reach the Raspberry Pi. Wrong IP address?')
         except:
             errorType, value, traceback = sys.exc_info()
-            self.feedback("### Exception: " + str(errorType) + ": " + str(value))
+            self.feedback("### Exception: " +
+                          str(errorType) + ": " + str(value))
 
     def on_job_complete(self, stop_button):
         stop_button.description = "Completed"
         stop_button.disabled = True
+
 
 def init_magics():
     try:

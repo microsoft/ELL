@@ -64,4 +64,18 @@ namespace data
 } // namespace data
 } // namespace ell
 
-#include "../tcc/ExampleIterator.tcc"
+#pragma region implementation
+
+namespace ell
+{
+namespace data
+{
+    template <typename ExampleType>
+    ExampleIterator<ExampleType>::ExampleIterator(std::unique_ptr<IExampleIterator<ExampleType>>&& iterator) :
+        _iterator(std::move(iterator))
+    {
+    }
+} // namespace data
+} // namespace ell
+
+#pragma endregion implementation

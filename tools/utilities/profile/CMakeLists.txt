@@ -20,12 +20,11 @@ set (src
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 
 # create executable in build/bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR})
-add_executable(${tool_name} ${src} ${include} ${tcc})
+add_executable(${tool_name} ${src} ${include})
 target_include_directories(${tool_name} PRIVATE include ${ELL_LIBRARIES_DIR} ${CMAKE_CURRENT_LIST_DIR}/..)
 target_link_libraries(${tool_name} common emitters model nodes passes utilities pythonPlugins)
 copy_shared_libraries(${tool_name})

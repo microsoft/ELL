@@ -8,7 +8,5 @@ set (INTERFACE_SRC src/ModelBuilderInterface.cpp
                    src/NeuralNetworkPredictorInterface.cpp
                    src/TrainerInterface.cpp
                    src/DatasetInterface.cpp)
-set (INTERFACE_TCC tcc/CallbackInterface.tcc
-                   tcc/ModelInterface.tcc)
 
 generate_interface(common ell ${CMAKE_CURRENT_SOURCE_DIR} "" "" "")

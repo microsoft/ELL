@@ -384,4 +384,20 @@ namespace value
 } // namespace value
 } // namespace ell
 
-#include "../tcc/Value.tcc"
+#pragma region implementation
+
+namespace ell
+{
+namespace value
+{
+
+    template <typename T>
+    Value Cast(Value value)
+    {
+        return Cast(value, GetValueType<T>());
+    }
+
+} // namespace value
+} // namespace ell
+
+#pragma endregion implementation

@@ -49,4 +49,36 @@ namespace predictors
 } // namespace predictors
 } // namespace ell
 
-#include "../tcc/MaxPoolingFunction.tcc"
+#pragma region implementation
+
+#include <algorithm>
+#include <limits>
+
+namespace ell
+{
+namespace predictors
+{
+    namespace neural
+    {
+        template <typename ElementType>
+        MaxPoolingFunction<ElementType>::MaxPoolingFunction() :
+            _max(std::numeric_limits<ElementType>::lowest())
+        {
+        }
+
+        template <typename ElementType>
+        void MaxPoolingFunction<ElementType>::Accumulate(ElementType input)
+        {
+            _max = std::max(_max, input);
+        }
+
+        template <typename ElementType>
+        ElementType MaxPoolingFunction<ElementType>::GetValue() const
+        {
+            return _max;
+        }
+    } // namespace neural
+} // namespace predictors
+} // namespace ell
+
+#pragma endregion implementation

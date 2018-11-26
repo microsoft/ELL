@@ -66,7 +66,6 @@ class ModuleBuilder:
         self.config = None
         self.files = []
         self.includes = []
-        self.tcc = []
         self.tools = None
         self.language = "python"
         self.target = "host"
@@ -180,7 +179,7 @@ class ModuleBuilder:
     def create_template_file(self, template_filename, output_filename):
         with open(template_filename) as f:
             template = f.read()
-        
+
         template = template.replace("@ELL_outdir@", os.path.basename(self.output_dir))
         template = template.replace("@ELL_model@", self.model_file_base)
         template = template.replace("@ELL_model_name@", self.model_name)
@@ -215,21 +214,20 @@ class ModuleBuilder:
         self.find_files()
         self.copy_files(self.files, "")
         self.copy_files(self.includes, "include")
-        self.copy_files(self.tcc, "tcc")
         out_file = self.tools.compile(
-            model_file=self.model_file, 
-            func_name=self.func_name, 
-            model_name=self.model_name, 
-            target=self.target, 
-            output_dir=self.output_dir, 
-            use_blas=self.blas, 
-            fuse_linear_ops=self.fuse_linear_ops, 
+            model_file=self.model_file,
+            func_name=self.func_name,
+            model_name=self.model_name,
+            target=self.target,
+            output_dir=self.output_dir,
+            use_blas=self.blas,
+            fuse_linear_ops=self.fuse_linear_ops,
             profile=self.profile,
-            llvm_format=self.llvm_format, 
-            optimize=self.optimize, 
-            debug=self.debug, 
-            is_model_file=False, 
-            swig=self.swig, 
+            llvm_format=self.llvm_format,
+            optimize=self.optimize,
+            debug=self.debug,
+            is_model_file=False,
+            swig=self.swig,
             header=self.cpp_header,
             objext="." + self.objext,
             extra_options=self.compile_args

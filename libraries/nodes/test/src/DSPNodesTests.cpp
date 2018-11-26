@@ -45,9 +45,9 @@
 
 #include <predictors/include/NeuralNetworkPredictor.h>
 
+#include <predictors/neural/include/ConvolutionalLayer.h>
 #include <predictors/neural/include/SigmoidActivation.h>
 #include <predictors/neural/include/TanhActivation.h>
-#include <predictors/neural/include/ConvolutionalLayer.h>
 
 #include <testing/include/testing.h>
 

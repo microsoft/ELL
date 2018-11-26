@@ -34,7 +34,7 @@ namespace value
     /// <remarks> The new Value instance's data is distinct from the original </remarks>
     Value Cast(Value value, ValueType type);
 
-    // Defined in Value.tcc
+    // Defined in Value.h's implementation region
     /// <summary> Cast a value to another type, returning a new value </summary>
     /// <typeparam name="T"> The type to which the data should be casted </typeparam>
     /// <param name="value"> The data to convert </param>

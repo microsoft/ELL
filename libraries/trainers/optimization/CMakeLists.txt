@@ -30,33 +30,10 @@ set (include include/AbsoluteLoss.h
              include/VectorSolution.h
 )
 
-set (tcc tcc/AbsoluteLoss.tcc
-         tcc/ElasticNetRegularizer.tcc
-         tcc/Expression.tcc
-         tcc/GoldenSectionMinimizer.tcc
-         tcc/HingeLoss.tcc
-         tcc/HuberLoss.tcc
-         tcc/IndexedContainer.tcc
-         tcc/L2Regularizer.tcc
-         tcc/LogisticLoss.tcc
-         tcc/MatrixExampleSet.tcc
-         tcc/MatrixSolution.tcc
-         tcc/MaxRegularizer.tcc
-         tcc/MultivariateLoss.tcc
-         tcc/OptimizationExample.tcc
-         tcc/SmoothedHingeLoss.tcc
-         tcc/SquaredHingeLoss.tcc
-         tcc/SquareLoss.tcc
-         tcc/SDCAOptimizer.tcc
-         tcc/SGDOptimizer.tcc
-         tcc/VectorSolution.tcc
-)
-
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${doc})
+add_library(${library_name} ${src} ${include} ${doc})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} math)
 
@@ -86,16 +63,10 @@ set (test_include test/include/LossFunction_test.h
                   test/include/Regularizer_test.h
                   test/include/Solution_test.h)
 
-set (test_tcc test/tcc/LossFunction_test.tcc
-              test/tcc/Optimizer_test.tcc
-              test/tcc/RandomExampleSet.tcc
-              test/tcc/Solution_test.tcc)
-
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
-source_group("tcc" FILES ${test_tcc})
 
-add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${include})
+add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} optimization testing)
 copy_shared_libraries(${test_name})

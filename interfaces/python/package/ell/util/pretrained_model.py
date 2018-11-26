@@ -35,7 +35,7 @@ class PretrainedModel:
     def download(self, local_path, rename=None, cache=True):
         """Download the model from Github and unzip it"""
         import urllib.request
-        
+
         self.local_path = local_path
         os.makedirs(local_path, exist_ok=True)
         local_file = os.path.join(local_path, self.name + '.ell')
@@ -45,7 +45,7 @@ class PretrainedModel:
             urllib.request.urlretrieve(
                 'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt',
                 self.labels_path)
-            
+
         if not cache or not os.path.exists(local_file):
             print('downloading model ' + self.model_name + ' ...', flush=True)
             zip_path, _ = urllib.request.urlretrieve(
@@ -93,14 +93,14 @@ class PretrainedModel:
 
             if not os.path.exists(outpath + '.bc'):
                 raise Exception("compile failed to produce output file: " +
-                    os.path.exists(outpath + '.bc')) 
+                    os.path.exists(outpath + '.bc'))
 
             if _buildtools.swig(outdir, self.name, 'python') is None:
                 return None
-            out_file = _buildtools.opt(outdir, outpath + '.bc') 
+            out_file = _buildtools.opt(outdir, outpath + '.bc')
             if out_file is None:
                 return None
-            out_file = _buildtools.llc(outdir, out_file, target) 
+            out_file = _buildtools.llc(outdir, out_file, target)
             if out_file is None:
                 return None
             return self.create_cmake_file(target)
@@ -121,8 +121,6 @@ class PretrainedModel:
             shutil.copyfile(os.path.join(pkg_dir, 'OpenBLASSetup.cmake'), 'OpenBLASSetup.cmake')
             if not os.path.exists('include'):
                 shutil.copytree(os.path.join(pkg_dir, 'include'), 'include')
-            if not os.path.exists('tcc'):
-                shutil.copytree(os.path.join(pkg_dir, 'tcc'), 'tcc')
             if _is_windows(target):
                 _buildtools.run(['cmake', '-G', 'Visual Studio 14 2015 Win64', '-DPROCESSOR_HINT=haswell', '.'], shell=True)
                 _buildtools.run(['cmake', '--build', '.', '--config', 'Release'], shell=True)
@@ -136,7 +134,7 @@ class PretrainedModel:
         cmake_template = os.path.join(self.deploy_dir, 'CMakeLists.python.txt.in')
         with open(cmake_template) as f:
             template = f.read()
-        
+
         template = template.replace("@ELL_outdir@", self.name)
         template = template.replace("@ELL_model@", self.name)
         template = template.replace("@ELL_model_name@", self.name)

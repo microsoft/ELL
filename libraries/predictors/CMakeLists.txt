@@ -22,14 +22,6 @@ set(include
     include/SingleElementThresholdPredictor.h
 )
 
-set(tcc
-    tcc/ForestPredictor.tcc
-    tcc/LinearPredictor.tcc
-    tcc/NeuralNetworkPredictor.tcc
-    tcc/Normalizer.tcc
-    tcc/SignPredictor.tcc
-)
-
 set(neural_include
     neural/include/Activation.h
     neural/include/ActivationLayer.h
@@ -57,38 +49,12 @@ set(neural_include
 set(neural_src
     neural/src/Activation.cpp)
 
-set(neural_tcc
-    neural/tcc/Activation.tcc
-    neural/tcc/ActivationLayer.tcc
-    neural/tcc/BatchNormalizationLayer.tcc
-    neural/tcc/BiasLayer.tcc
-    neural/tcc/BinaryConvolutionalLayer.tcc
-    neural/tcc/ConvolutionalLayer.tcc
-    neural/tcc/FullyConnectedLayer.tcc
-    neural/tcc/HardSigmoidActivation.tcc
-    neural/tcc/InputLayer.tcc
-    neural/tcc/Layer.tcc
-    neural/tcc/LeakyReLUActivation.tcc
-    neural/tcc/MaxPoolingFunction.tcc
-    neural/tcc/MeanPoolingFunction.tcc
-    neural/tcc/ParametricReLUActivation.tcc
-    neural/tcc/PoolingLayer.tcc
-    neural/tcc/ReLUActivation.tcc
-    neural/tcc/RegionDetectionLayer.tcc
-    neural/tcc/ScalingLayer.tcc
-    neural/tcc/SigmoidActivation.tcc
-    neural/tcc/SoftmaxLayer.tcc
-    neural/tcc/TanhActivation.tcc
-)
-
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 source_group("neural\\include" FILES ${neural_include})
 source_group("neural\\src" FILES ${neural_src})
-source_group("neural\\tcc" FILES ${neural_tcc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${neural_src} ${neural_include} ${neural_tcc})
+add_library(${library_name} ${src} ${include} ${neural_src} ${neural_include})
 target_include_directories(${library_name} PRIVATE include neural/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} data dsp math utilities)
 
@@ -113,16 +79,10 @@ set(test_include
     test/include/ProtoNNPredictorTests.h
 )
 
-set(test_tcc
-    test/tcc/LinearPredictorTests.tcc
-    test/tcc/NeuralNetworkPredictorTests.tcc
-)
-
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
-source_group("tcc" FILES ${test_tcc})
 
-add_executable(${test_name} ${test_src} ${test_include} ${test_tcc})
+add_executable(${test_name} ${test_src} ${test_include})
 target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 
 target_link_libraries(${test_name} common data predictors testing )

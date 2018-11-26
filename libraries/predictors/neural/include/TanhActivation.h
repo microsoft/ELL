@@ -48,4 +48,27 @@ namespace predictors
 } // namespace predictors
 } // namespace ell
 
-#include "../tcc/TanhActivation.tcc"
+#pragma region implementation
+
+namespace ell
+{
+namespace predictors
+{
+    namespace neural
+    {
+        template <typename ElementType>
+        ElementType TanhActivation<ElementType>::Apply(const ElementType input) const
+        {
+            return std::tanh(input);
+        }
+
+        template <typename ElementType>
+        std::unique_ptr<ActivationImpl<ElementType>> TanhActivation<ElementType>::Copy() const
+        {
+            return std::make_unique<TanhActivation<ElementType>>();
+        }
+    } // namespace neural
+} // namespace predictors
+} // namespace ell
+
+#pragma endregion implementation

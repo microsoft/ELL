@@ -36,14 +36,6 @@ foreach(src ${_sources})
     list(APPEND INTERFACE_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/${src}")
 endforeach()
 
-set(_sources
-    common/tcc/CallbackInterface.tcc
-    common/tcc/ModelInterface.tcc
-)
-foreach(src ${_sources})
-    list(APPEND INTERFACE_TCC "${CMAKE_CURRENT_LIST_DIR}/${src}")
-endforeach()
-
 set(INTERFACE_MAIN "${CMAKE_CURRENT_LIST_DIR}/common/ell.i")
 
 set(_sources
@@ -112,7 +104,7 @@ set(INTERFACE_DEPENDENCIES
 
 # Add ELL library include directories
 include_directories(common/include)
-include_directories(../libraries/)
+include_directories(../libraries)
 
 add_subdirectory(common)
 add_subdirectory(python)

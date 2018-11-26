@@ -21,7 +21,6 @@ endif()
 # Variables assumed to have been set in parent scope:
 # INTERFACE_SRC
 # INTERFACE_INCLUDE
-# INTERFACE_TCC
 # INTERFACE_MAIN  (the main .i file)
 # INTERFACE_FILES (the other .i files)
 # INTERFACE_DEPENDENCIES
@@ -57,12 +56,11 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
 
   source_group("src" FILES ${INTERFACE_SRC})
   source_group("include" FILES ${INTERFACE_INCLUDE})
-  source_group("tcc" FILES ${INTERFACE_TCC})
   source_group("interface" FILES ${INTERFACE_MAIN} ${INTERFACE_FILES})
 
   if(${language} STREQUAL "common")
     find_file(THIS_FILE_PATH CommonInterfaces.cmake PATHS ${CMAKE_MODULE_PATH})
-    add_custom_target(${module_name} DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC} ${INTERFACE_MAIN} ${INTERFACE_FILES} ${THIS_FILE_PATH})
+    add_custom_target(${module_name} DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} ${THIS_FILE_PATH})
 
     # Make interface code be dependent on all libraries
     add_dependencies(${module_name} ${INTERFACE_DEPENDENCIES})
@@ -71,7 +69,7 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
 
     include_directories(${EXTRA_INCLUDE_PATHS})
 
-    foreach(file ${INTERFACE_FILES} ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC})
+    foreach(file ${INTERFACE_FILES} ${INTERFACE_SRC} ${INTERFACE_INCLUDE})
         configure_file(${file} ${file} COPYONLY)
     endforeach()
 
@@ -94,13 +92,13 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
       add_definitions(-DSWIG_DIRECTOR_NO_UEH)
     endif()
 
-    set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC} ${EXTRA_INTERFACE})
+    set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
 
     foreach(file ${INTERFACE_INCLUDE} ${INTERFACE_SRC})
       set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${file})
     endforeach()
 
-    foreach(file ${INTERFACE_INCLUDE} ${INTERFACE_TCC})
+    foreach(file ${INTERFACE_INCLUDE})
       set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${file})
     endforeach()
 
@@ -153,7 +151,6 @@ endmacro() # generate_interface_module
 # Variables assumed to have been set in parent scope:
 # INTERFACE_SRC
 # INTERFACE_INCLUDE
-# INTERFACE_TCC
 # INTERFACE_MAIN  (the main .i file)
 # INTERFACE_FILES (the other .i files)
 # INTERFACE_DEPENDENCIES
@@ -162,5 +159,3 @@ endmacro() # generate_interface_module
 macro(generate_interface LANGUAGE_NAME MODULE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INTERFACE)
   generate_interface_module("ELL_${LANGUAGE_NAME}" "${MODULE_NAME}" "${LANGUAGE_NAME}" "${LANGUAGE_DIR}" "${LANGUAGE_LIBRARIES}" "${EXTRA_INTERFACE}")
 endmacro()
-
-#

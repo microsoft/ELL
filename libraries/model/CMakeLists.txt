@@ -56,25 +56,6 @@ set(include
     include/SpliceNode.h
 )
 
-set(tcc
-    tcc/InputNode.tcc
-    tcc/InputPort.tcc
-    tcc/IRCompiledMap.tcc
-    tcc/IRMapCompiler.tcc
-    tcc/Map.tcc
-    tcc/MapCompiler.tcc
-    tcc/Model.tcc
-    tcc/ModelBuilder.tcc
-    tcc/ModelTransformer.tcc
-    tcc/NodeMap.tcc
-    tcc/OutputNode.tcc
-    tcc/OutputPort.tcc
-    tcc/Port.tcc
-    tcc/PortElements.tcc
-    tcc/SliceNode.tcc
-    tcc/SpliceNode.tcc
-)
-
 set(doc
     doc/CompileAsFunction.md
     doc/Metadata.md
@@ -94,22 +75,17 @@ set(optimizer_include
     optimizer/include/OptimizationPassRegistry.h
 )
 
-set(optimizer_tcc
-)
-
 set(optimizer_doc
 )
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 source_group("optimizer\\include" FILES ${optimizer_include})
 source_group("optimizer\\src" FILES ${optimizer_src})
-source_group("optimizer\\tcc" FILES ${optimizer_tcc})
 source_group("optimizer\\doc" FILES ${optimizer_doc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${doc} ${optimizer_src} ${optimizer_include} ${optimizer_tcc} ${optimizer_doc})
+add_library(${library_name} ${src} ${include} ${doc} ${optimizer_src} ${optimizer_include} ${optimizer_doc})
 target_include_directories(${library_name} PRIVATE include optimizer/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} utilities data emitters)
 
@@ -138,9 +114,6 @@ set(test_include
     test/include/Model_test.h
     test/include/ModelTransformerTest.h
     test/include/PortElements_test.h
-)
-
-set(test_tcc
 )
 
 source_group("src" FILES ${test_src})
@@ -178,17 +151,10 @@ set(compiler_test_include
     test/include/PerformanceCountersTest.h
 )
 
-set(compiler_test_tcc
-    test/tcc/CompilableNodesTest.tcc
-    test/tcc/CompilerTest.tcc
-    test/tcc/ModelMaker.tcc
-)
-
 source_group("src" FILES ${compiler_test_src})
 source_group("include" FILES ${compiler_test_include})
-source_group("tcc" FILES ${compiler_test_tcc})
 
-add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include} ${compiler_test_tcc})
+add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include})
 target_include_directories(${compiler_test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${compiler_test_name} common model nodes passes testing model_testing utilities)
 copy_shared_libraries(${compiler_test_name})

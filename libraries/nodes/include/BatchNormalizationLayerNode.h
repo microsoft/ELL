@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include "NeuralNetworkLayerNode.h"
 #include <model/include/IRMapCompiler.h>
 #include <model/include/ModelTransformer.h>
-#include "NeuralNetworkLayerNode.h"
 #include <model/include/PortElements.h>
 
 #include <predictors/neural/include/BatchNormalizationLayer.h>

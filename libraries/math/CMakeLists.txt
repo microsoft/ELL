@@ -25,22 +25,13 @@ set(include include/BlasWrapper.h
              include/VectorOperations.h
 )
 
-set(tcc tcc/Matrix.tcc
-         tcc/MatrixOperations.tcc
-         tcc/Tensor.tcc
-         tcc/TensorOperations.tcc
-         tcc/Vector.tcc
-         tcc/VectorOperations.tcc
-)
-
 set(doc doc/README.md)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${doc})
+add_library(${library_name} ${src} ${include} ${doc})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_include_directories(${library_name} SYSTEM PUBLIC ${BLAS_INCLUDE_DIRS})
 target_link_libraries(${library_name} utilities ${BLAS_LIBS})
@@ -64,16 +55,10 @@ set(test_include test/include/math_profile.h
                   test/include/Tensor_test.h
                   test/include/Vector_test.h)
 
-set(test_tcc test/tcc/math_profile.tcc
-              test/tcc/Matrix_test.tcc
-              test/tcc/Tensor_test.tcc
-              test/tcc/Vector_test.tcc)
-
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
-source_group("tcc" FILES ${test_tcc})
 
-add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${include})
+add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} math testing)
 copy_shared_libraries(${test_name})
@@ -93,13 +78,10 @@ set(profile_src test/src/math_profile_main.cpp)
 
 set(profile_include test/include/math_profile.h)
 
-set(profile_tcc test/tcc/math_profile.tcc)
-
 source_group("src" FILES ${profile_src})
 source_group("include" FILES ${profile_include})
-source_group("tcc" FILES ${profile_tcc})
 
-add_executable(${profile_name} ${profile_src} ${profile_include} ${profile_tcc} ${include})
+add_executable(${profile_name} ${profile_src} ${profile_include} ${include})
 target_include_directories(${profile_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${profile_name} math testing)
 copy_shared_libraries(${profile_name})

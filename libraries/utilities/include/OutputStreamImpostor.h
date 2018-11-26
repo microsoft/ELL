@@ -80,4 +80,19 @@ namespace utilities
 } // namespace utilities
 } // namespace ell
 
-#include "../tcc/OutputStreamImpostor.tcc"
+#pragma region implementation
+
+namespace ell
+{
+namespace utilities
+{
+    template <typename T>
+    std::ostream& OutputStreamImpostor::operator<<(T&& value)
+    {
+        _outputStream.get() << value;
+        return _outputStream;
+    }
+} // namespace utilities
+} // namespace ell
+
+#pragma endregion implementation

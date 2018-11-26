@@ -18,18 +18,14 @@ set(include
     include/StandardPasses.h
 )
 
-set(tcc
-)
-
 set(doc
 )
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${doc})
+add_library(${library_name} ${src} ${include} ${doc})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} model nodes)
 
@@ -48,9 +44,6 @@ set(test_src
 
 set(test_include
     test/include/ModelOptimizerTest.h
-)
-
-set(test_tcc
 )
 
 source_group("src" FILES ${test_src})

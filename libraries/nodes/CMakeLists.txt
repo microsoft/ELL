@@ -103,48 +103,10 @@ set(include
     include/WinogradConvolutionNode.h
 )
 
-set (tcc
-    tcc/AccumulatorNode.tcc
-    tcc/BinaryFunctionNode.tcc
-    tcc/BinaryOperationNode.tcc
-    tcc/BinaryPredicateNode.tcc
-    tcc/BroadcastFunctionNode.tcc
-    tcc/BufferNode.tcc
-    tcc/ConcatenationNode.tcc
-    tcc/ConstantNode.tcc
-    tcc/DTWDistanceNode.tcc
-    tcc/DebugSinkNode.tcc
-    tcc/DelayNode.tcc
-    tcc/DemultiplexerNode.tcc
-    tcc/DotProductNode.tcc
-    tcc/ExtremalValueNode.tcc
-    tcc/ForestPredictorNode.tcc
-    tcc/HammingWindowNode.tcc
-    tcc/L2NormSquaredNode.tcc
-    tcc/LinearPredictorNode.tcc
-    tcc/MatrixVectorProductNode.tcc
-    tcc/MovingAverageNode.tcc
-    tcc/MovingVarianceNode.tcc
-    tcc/MultiplexerNode.tcc
-    tcc/NeuralNetworkLayerNode.tcc
-    tcc/NeuralNetworkPredictorNode.tcc
-    tcc/ReceptiveFieldMatrixNode.tcc
-    tcc/ReorderDataNode.tcc
-    tcc/SinkNode.tcc
-    tcc/SourceNode.tcc
-    tcc/SquaredEuclideanDistanceNode.tcc
-    tcc/SumNode.tcc
-    tcc/TypeCastNode.tcc
-    tcc/UnaryOperationNode.tcc
-    tcc/VoiceActivityDetectorNode.tcc
-    tcc/ValueSelectorNode.tcc
-)
-
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include})
 
 target_include_directories(${library_name}
     PRIVATE

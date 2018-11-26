@@ -86,21 +86,6 @@ set (include
     include/VectorVariable.h
 )
 
-set (tcc
-    tcc/CompilableIRFunction.tcc
-    tcc/EmitterTypes.tcc
-    tcc/IREmitter.tcc
-    tcc/IRFunctionEmitter.tcc
-    tcc/IRLocalScalar.tcc
-    tcc/IRModuleEmitter.tcc
-    tcc/IRRuntime.tcc
-    tcc/IRVectorUtilities.tcc
-    tcc/ScalarVariable.tcc
-    tcc/SymbolTable.tcc
-    tcc/VectorVariable.tcc
-    tcc/Variable.tcc
-)
-
 set (templates
     templates/CppPredictWrapper.in
     templates/SwigModule.in
@@ -110,10 +95,9 @@ set (templates
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 source_group("templates" FILES ${templates})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${templates})
+add_library(${library_name} ${src} ${include} ${templates})
 target_include_directories(${library_name} PRIVATE include templates ${ELL_LIBRARIES_DIR})
 target_include_directories(${library_name} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_link_libraries(${library_name} math utilities ${LLVM_LIBS})

@@ -1,14 +1,13 @@
 # Embedded Learning Library (ELL) style guide
 
-## Python 
+## Python
 
 We use [PEP 8](https://www.python.org/dev/peps/pep-0008/) with one exception, we extend the 80 char line limit to 120.
 
-## C++ 
+## C++
 
 ### File names and extensions
-Header files use the extension ".h". Source code files use the extension ".cpp" if they are compiled into a .lib or .exe, and ".tcc" if they
-contain templated source code.  Each file should typically contain a single class and its name should match the class name.
+Header files use the extension ".h". Definitions of functions that must be in the header should be moved to the end of the header file in a region surrounded by `#pragma region implementation`/`#pragma endregion implementation` blocks. Source code files use the extension ".cpp" if they are compiled into a .lib or .exe.  Each file should typically contain a single class and its name should match the class name.
 
 ### Projects
 A project is a set of source files that compile into a single executable or library, or that implement a single template library.
@@ -27,7 +26,6 @@ Each project is contained in a directory. The directory contains a CMakeLists.tx
 
 * "include", for h files
 * "src" for cpp files (unless the project defines a template library without cpp files)
-* "tcc" for tcc files (these define implementations of template classes)
 * "test" for source files that define unit tests, invoked via ctest
 * "doc" for documentation that does not fit in the source files themselves. For example, complex math algorithms may require detailed documentation in a LaTeX file, which would live in the doc directory
 
@@ -108,14 +106,14 @@ in a comment after the `#endif`:
     #endif // MATRIX_H
 
 ### Function implementations
-Almost all function implementations belong in .cpp and .tcc files. The exception is short single-instruction implementations of
+Almost all function implementations belong in .cpp and in the implementation region of .h files. The exception is short single-instruction implementations of
 parameterless functions, which should appear in the .h file on the same line as the function declaration. For example:
 
     double GetValue() const { return _value; }  // inline implementation in .h file
 
-    double SetValue(double value);  // function has parameters - implementation belongs in .cpp or .tcc file
+    double SetValue(double value);  // function has parameters - implementation belongs in .cpp or the implementation region of the .h file
 
-    void Next() { _iterator++; _count++; }  // wrong: multi-instruction implementations belong in .cpp or .tcc files
+    void Next() { _iterator++; _count++; }  // wrong: multi-instruction implementations belong in .cpp or the implementation region of the .h files
 
     int GetIndex()  // wrong: inline implementation should occupy a single line
     {
@@ -158,6 +156,6 @@ three slashes (///) and the first line in a documentation block should contain a
 
 ### Error Handling
 
-The c "assert" function usually results in immediate termination of the program, so this should only be used in cases where it should never happen unless there is a logic error in our code.  To this end assert documents the existing invariants, preconditions and post conditions in the code.  
+The c "assert" function usually results in immediate termination of the program, so this should only be used in cases where it should never happen unless there is a logic error in our code.  To this end assert documents the existing invariants, preconditions and post conditions in the code.
 
 Bad input parameters from our public API or bad data read from a file should not result in this kind of assert termination because it is hard to debug, and it provides no useful information to the caller.   Instead, throw the appropriate type of exception as defined in ~/libraries/utilities/include/Exception.h.  This includes the notImplemented case, which you can raise using throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);

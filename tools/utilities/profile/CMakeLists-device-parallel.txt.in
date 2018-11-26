@@ -28,7 +28,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Compiled profiler that spits out per-node profiling information
 #
 
-set (src 
+set (src
   CompiledProfile_main.cpp
   ProfileReport.cpp
   )
@@ -39,29 +39,28 @@ set (include
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 find_package(Threads REQUIRED)
 
 # Version using ELL's native object file output
-add_executable(profile ${src} ${include} ${tcc})
+add_executable(profile ${src} ${include})
 target_link_libraries(profile ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLAS_LIBS} Threads::Threads)
 target_compile_definitions(profile PUBLIC COMPILED_ELL_PROFILER)
 
 # Version with LLVM's opt tool optimizing ELL's IR output and then compiling with llc
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o)
-  add_executable(profile_opt ${src} ${include} ${tcc})
+  add_executable(profile_opt ${src} ${include})
   target_link_libraries(profile_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS} Threads::Threads)
   target_compile_definitions(profile_opt PUBLIC COMPILED_ELL_PROFILER)
 endif()
 
 #
-# Simple program that just exercises the model and exits. Used with low-level system profiling and timing tools 
+# Simple program that just exercises the model and exits. Used with low-level system profiling and timing tools
 #
 
-set (src 
+set (src
   CompiledExerciseModel_main.cpp
   )
 
@@ -70,14 +69,13 @@ set (include
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 
 # Version using ELL's native object file output
-add_executable(exercise_model ${src} ${include} ${tcc})
+add_executable(exercise_model ${src} ${include})
 target_link_libraries(exercise_model ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLAS_LIBS} Threads::Threads)
 
 # Version with LLVM's opt tool optimizing ELL's IR output and then compiling with llc
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o)
-  add_executable(exercise_model_opt ${src} ${include} ${tcc})
+  add_executable(exercise_model_opt ${src} ${include})
   target_link_libraries(exercise_model_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS} Threads::Threads)
 endif()

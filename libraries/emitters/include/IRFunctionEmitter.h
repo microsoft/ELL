@@ -1747,4 +1747,173 @@ namespace emitters
 } // namespace emitters
 } // namespace ell
 
-#include "../tcc/IRFunctionEmitter.tcc"
+#pragma region implementation
+
+namespace ell
+{
+namespace emitters
+{
+    template <typename ValueType, utilities::IsFundamental<ValueType>>
+    IRLocalScalar IRFunctionEmitter::LocalScalar(ValueType value)
+    {
+        return IRLocalScalar(*this, Literal(value));
+    }
+
+    template <typename ValueType>
+    LLVMValue IRFunctionEmitter::Literal(ValueType value)
+    {
+        return _pEmitter->Literal(value);
+    }
+
+    template <typename ValueType>
+    LLVMValue IRFunctionEmitter::Pointer(ValueType* value)
+    {
+        return _pEmitter->Pointer(value);
+    }
+
+    template <typename OutputType>
+    LLVMValue IRFunctionEmitter::CastValue(LLVMValue pValue)
+    {
+        return _pEmitter->CastValue<OutputType>(pValue);
+    }
+
+    template <typename OutputType>
+    LLVMValue IRFunctionEmitter::CastUnsignedValue(LLVMValue pValue)
+    {
+        return _pEmitter->CastValue<OutputType>(pValue);
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::VectorOperator(TypedOperator type, size_t size, ValueType leftValue, LLVMValue pRightValue, std::function<void(LLVMValue, LLVMValue)> aggregator)
+    {
+        assert(pRightValue != nullptr);
+
+        LLVMValue pLeftItem = Literal(leftValue);
+        For(size, [pLeftItem, pRightValue, type, aggregator](IRFunctionEmitter& fn, LLVMValue i) {
+            LLVMValue pRightItem = fn.ValueAt(pRightValue, i);
+            LLVMValue pTemp = fn.Operator(type, pLeftItem, pRightItem);
+            aggregator(i, pTemp);
+        });
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::VectorOperator(TypedOperator type, size_t size, LLVMValue pLeftValue, ValueType rightValue, std::function<void(LLVMValue, LLVMValue)> aggregator)
+    {
+        assert(pLeftValue != nullptr);
+
+        LLVMValue pRightItem = Literal(rightValue);
+        For(size, [pLeftValue, pRightItem, type, aggregator](IRFunctionEmitter& fn, LLVMValue i) {
+            LLVMValue pLeftItem = fn.ValueAt(pLeftValue, i);
+            LLVMValue pTemp = fn.Operator(type, pLeftItem, pRightItem);
+            aggregator(i, pTemp);
+        });
+    }
+
+    template <typename ValueType>
+    LLVMValue IRFunctionEmitter::Malloc(int64_t size)
+    {
+        return Malloc(GetVariableType<ValueType>(), size);
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::MemoryMove(LLVMValue pPointer, int sourceOffset, int destinationOffset, int count)
+    {
+        assert(pPointer != nullptr);
+        auto pSource = PointerOffset(pPointer, Literal(sourceOffset));
+        auto pDestination = PointerOffset(pPointer, Literal(destinationOffset));
+        int byteCount = count * sizeof(ValueType);
+        _pEmitter->MemoryMove(pSource, pDestination, Literal(byteCount));
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::MemoryCopy(LLVMValue pSourcePointer, LLVMValue pDestinationPointer, int count)
+    {
+        auto pSource = PointerOffset(pSourcePointer, 0);
+        auto pDestination = PointerOffset(pDestinationPointer, 0);
+        auto byteCount = count * sizeof(ValueType);
+        _pEmitter->MemoryCopy(pSource, pDestination, Literal<int>(byteCount));
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::MemoryCopy(LLVMValue pSourcePointer, LLVMValue pDestinationPointer, LLVMValue count)
+    {
+        auto pSource = PointerOffset(pSourcePointer, 0);
+        auto pDestination = PointerOffset(pDestinationPointer, 0);
+        auto byteCount = Operator(emitters::TypedOperator::multiply, count, Literal<int>(sizeof(ValueType)));
+        _pEmitter->MemoryCopy(pSource, pDestination, byteCount);
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::MemoryCopy(LLVMValue pSourcePointer, int sourceOffset, LLVMValue pDestinationPointer, int destinationOffset, int count)
+    {
+        auto pSource = PointerOffset(pSourcePointer, Literal(sourceOffset));
+        auto pDestination = PointerOffset(pDestinationPointer, Literal(destinationOffset));
+        int byteCount = count * sizeof(ValueType);
+        _pEmitter->MemoryCopy(pSource, pDestination, Literal(byteCount));
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::MemoryCopy(LLVMValue pSourcePointer, LLVMValue sourceOffset, LLVMValue pDestinationPointer, LLVMValue destinationOffset, LLVMValue count)
+    {
+        auto pSource = PointerOffset(pSourcePointer, sourceOffset);
+        auto pDestination = PointerOffset(pDestinationPointer, destinationOffset);
+        auto byteCount = Operator(emitters::TypedOperator::multiply, count, Literal<int>(sizeof(ValueType)));
+        _pEmitter->MemoryCopy(pSource, pDestination, byteCount);
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::MemorySet(LLVMValue pDestinationPointer, int destinationOffset, LLVMValue value, int count)
+    {
+        auto pDestination = PointerOffset(pDestinationPointer, Literal(destinationOffset));
+        int byteCount = count * sizeof(ValueType);
+        _pEmitter->MemorySet(pDestination, value, Literal(byteCount));
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::MemorySet(LLVMValue pDestinationPointer, LLVMValue pDestinationOffset, LLVMValue value, int count)
+    {
+        auto pDestination = PointerOffset(pDestinationPointer, pDestinationOffset);
+        int byteCount = count * sizeof(ValueType);
+        _pEmitter->MemorySet(pDestination, value, Literal(byteCount));
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::MemorySet(LLVMValue pDestinationPointer, LLVMValue pDestinationOffset, LLVMValue value, LLVMValue count)
+    {
+        auto pDestination = PointerOffset(pDestinationPointer, pDestinationOffset);
+        auto byteCount = Operator(emitters::TypedOperator::multiply, count, Literal<int>(sizeof(ValueType)));
+        _pEmitter->MemorySet(pDestination, value, byteCount);
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::ShiftAndUpdate(LLVMValue buffer, int bufferSize, int shiftCount, LLVMValue pNewData, LLVMValue pShiftedData)
+    {
+        assert(buffer != nullptr);
+        assert(shiftCount <= bufferSize);
+
+        if (pShiftedData != nullptr)
+        {
+            MemoryCopy<ValueType>(buffer, 0, pShiftedData, 0, shiftCount);
+        }
+        if (shiftCount < bufferSize)
+        {
+            MemoryMove<ValueType>(buffer, shiftCount, 0, (bufferSize - shiftCount));
+        }
+        MemoryCopy<ValueType>(pNewData, 0, buffer, (bufferSize - shiftCount), shiftCount);
+    }
+
+    template <typename ArgsListType>
+    void IRFunctionEmitter::RegisterFunctionArgs(const ArgsListType& args)
+    {
+        auto argumentsIterator = Arguments().begin();
+        for (size_t i = 0; i < args.size(); ++i)
+        {
+            auto arg = &(*argumentsIterator);
+            _locals.Add(args[i].first, arg);
+            ++argumentsIterator;
+        }
+    }
+} // namespace emitters
+} // namespace ell
+
+#pragma endregion implementation

@@ -84,37 +84,10 @@ set(include
   include/XmlArchiver.h
 )
 
-set(tcc
-  tcc/AbstractInvoker.tcc
-  tcc/AnyIterator.tcc
-  tcc/Archiver.tcc
-  tcc/CommandLineParser.tcc
-  tcc/CStringParser.tcc
-  tcc/Exception.tcc
-  tcc/Format.tcc
-  tcc/FunctionUtils.tcc
-  tcc/JsonArchiver.tcc
-  tcc/ObjectArchive.tcc
-  tcc/ObjectArchiver.tcc
-  tcc/Optional.tcc
-  tcc/OutputStreamImpostor.tcc
-  tcc/ParallelTransformIterator.tcc
-  tcc/PropertyBag.tcc
-  tcc/RingBuffer.tcc
-  tcc/StlContainerIterator.tcc
-  tcc/StlStridedIterator.tcc
-  tcc/TransformIterator.tcc
-  tcc/TypeFactory.tcc
-  tcc/TypeName.tcc
-  tcc/Variant.tcc
-  tcc/XmlArchiver.tcc
-)
-
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
-source_group("tcc" FILES ${tcc})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} Threads::Threads)
 

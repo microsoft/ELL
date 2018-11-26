@@ -42,4 +42,33 @@ namespace trainers
 } // namespace trainers
 } // namespace ell
 
-#include "../tcc/L2Regularizer.tcc"
+#pragma region implementation
+
+namespace ell
+{
+namespace trainers
+{
+    namespace optimization
+    {
+        template <typename SolutionType>
+        double L2Regularizer::Value(const SolutionType& w)
+        {
+            return 0.5 * Norm2Squared(w);
+        }
+
+        template <typename SolutionType>
+        double L2Regularizer::Conjugate(const SolutionType& v)
+        {
+            return 0.5 * Norm2Squared(v);
+        }
+
+        template <typename SolutionType>
+        void L2Regularizer::ConjugateGradient(const SolutionType& v, SolutionType& w)
+        {
+            w = v;
+        }
+    } // namespace optimization
+} // namespace trainers
+} // namespace ell
+
+#pragma endregion implementation
