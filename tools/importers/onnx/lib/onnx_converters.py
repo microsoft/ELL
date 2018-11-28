@@ -698,9 +698,11 @@ class OnnxConcatConverter(OnnxNodeConverter):
         return node
 
     def get_attributes(self, attrs: Attributes):
+        # The attrs["axis"] includes the batch dimension as 0, so remove it
+        axis = max(0, attrs["axis"] - 1)
         attributes = {            
             "dimension_to_stack": "channel",
-            "axis": attrs["axis"]
+            "axis": axis
         }
         return attributes
         
@@ -709,7 +711,7 @@ class OnnxConcatConverter(OnnxNodeConverter):
         node = self.node
         dims = []
         
-        axis = node.attributes['axis']
+        axis = node.attributes["axis"]
 
         inputs = []
         input_shapes = []

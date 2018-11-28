@@ -1428,15 +1428,33 @@ class ConvertSplice(ConvertBase):
         pre_order = [0,1,2]
         post_order = [0,1,2]
         if self.importer_node.attributes["dimension_to_stack"] == "channel":
-            # When output from nodes are concatenated together in the this
+            # When output from nodes are concatenated together in the
             # order (channel, row, column), they effectively stack in the
             # channel dimension.
             pre_order = [2,0,1]
             # The final order must put the elements back into row, column,
             # channel order.
             post_order = [1,2,0]
+        elif self.importer_node.attributes["dimension_to_stack"] == "row":
+            # When output from nodes are concatenated together in the
+            # order (row, column, channel), they effectively stack in the
+            # row dimension.
+            pre_order = [0,1,2]
+            # The final order must put the elements back into row, column,
+            # channel order.
+            post_order = [0,1,2]
+            # NOTE: The ReorderDataNodes that are inserted will be removed by the
+            # optimizer since they'll be redundant
+        elif self.importer_node.attributes["dimension_to_stack"] == "column":
+            # When output from nodes are concatenated together in the
+            # order (column, row, channel), they effectively stack in the
+            # column dimension.
+            pre_order = [1,0,2]
+            # The final order must put the elements back into row, column,
+            # channel order.
+            post_order = [1,0,2]
         else:
-            raise Exception("Splice does not yet support stacking along dimension {}".format(self.required_attributes["dimension_to_stack"]))
+            raise Exception("Splice does not yet support stacking along dimension {}, just row, column or channel".format(self.required_attributes["dimension_to_stack"]))
 
         # Loop over all inputs and for each, insert a reorder node to
         # put into specified order.
