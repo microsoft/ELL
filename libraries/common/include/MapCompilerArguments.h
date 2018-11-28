@@ -39,6 +39,7 @@ namespace common
         bool optimize = true;
         bool useBlas = false;
         bool fuseLinearOperations = true;
+        bool optimizeReorderDataNodes = true;
         bool enableVectorization = true;
         int vectorWidth = 4;
         bool parallelize = true;

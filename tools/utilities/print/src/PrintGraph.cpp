@@ -23,22 +23,60 @@
 #include <string>
 
 using namespace ell::utilities;
+using namespace ell::model;
 
 namespace ell
 {
 extern std::string PaddingSchemeToString(ell::predictors::neural::PaddingScheme scheme);
 
-void PrintGraph(const model::Model& model, const std::string& outputFormat, std::ostream& out, bool includeNodeId)
+std::string PrintActiveSize(const Port* port)
+{
+    std::string shape;
+    if (port != nullptr)
+    {
+        auto layout = port->GetMemoryLayout();
+        auto memoryShape = layout.GetActiveSize().ToVector();
+        for (int i : memoryShape)
+        {
+            if (shape.size() > 0)
+            {
+                shape += ",";
+            }
+            shape += std::to_string(i);
+        }
+    }
+    return shape;
+}
+
+std::vector<NameValue> InspectNodeProperties(const Node& node)
+{
+    std::vector<NameValue> result;
+    utilities::PropertyBag properties = node.GetMetadata();
+    for (auto key : properties.Keys())
+    {
+        std::string value = properties[key].ToString();
+        result.push_back(NameValue{ key, value });
+    }
+    if (node.NumInputPorts() > 0) 
+    {
+        std::string inputShape = PrintActiveSize(node.GetInputPort(0));
+        result.push_back(NameValue{ "input", inputShape });
+    }
+    if (node.NumOutputPorts() > 0) 
+    {
+        std::string outputShape = PrintActiveSize(node.GetOutputPort(0));
+        result.push_back(NameValue{ "output", outputShape });
+    }
+    return result;
+}
+
+void PrintGraph(const Model& model, const std::string& outputFormat, std::ostream& out, bool includeNodeId)
 {
     // dump DGML graph of model
     Graph graph;
-    model.Visit([&](const model::Node& node) {
+    model.Visit([&](const Node& node) {
         std::string typeName = node.GetRuntimeTypeName();
         std::string label = typeName;
-        if (includeNodeId)
-        {
-            label.insert(0, "<id:" + to_string(node.GetId()) + ">");
-        }
         GraphNode& childNode = graph.GetOrCreateNode(to_string(node.GetId()), label);
 
         if (typeName == "NeuralNetworkPredictorNode<float>")
@@ -66,17 +104,20 @@ void PrintGraph(const model::Model& model, const std::string& outputFormat, std:
         }
         else
         {
+            std::vector<NameValue> result = InspectNodeProperties(node);
+            for (auto ptr = result.begin(), end = result.end(); ptr != end; ptr++)
+            {
+                NameValue nv = *ptr;
+                childNode.SetProperty(nv.name, nv.value);
+            }
+
             auto dependencies = node.GetDependentNodes();
             for (auto ptr = dependencies.begin(), end = dependencies.end(); ptr != end; ptr++)
             {
-                const model::Node* upstream = *ptr;
+                const Node* upstream = *ptr;
                 if (upstream != nullptr)
                 {
                     label = upstream->GetRuntimeTypeName();
-                    if (includeNodeId)
-                    {
-                        label.insert(0, "<id:" + to_string(upstream->GetId()) + ">");
-                    }
                     GraphNode& nextNode = graph.GetOrCreateNode(to_string(upstream->GetId()), label);
                     graph.GetOrCreateLink(childNode, nextNode, "");
                 }

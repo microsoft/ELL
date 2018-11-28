@@ -55,6 +55,7 @@ class ModuleBuilder:
                   "profile"             : {"short": "p",                    "default":False,     "help": "enable profiling functions in the ELL module"},
                   "blas"                : {"short": "b",                    "default":"true",    "help": "enable or disable the use of Blas on the target device (default 'true')"},
                   "no_fuse_linear_ops"  : {"short": "no_fuse_linear_ops",   "default":False,     "help": "disable the fusing of sequences of linear operations"},
+                  "no_optimize_reorder" : {"short": "no_optimize_reorder",  "default":False,     "help": "disable the optimization of reorder data nodes"},
                   "no_opt_tool"         : {"short": "no_opt_tool",          "default":False,     "help": "disable the use of LLVM's opt tool"},
                   "no_llc_tool"         : {"short": "no_llc_tool",          "default":False,     "help": "disable the use of LLVM's llc tool"},
                   "no_optimize"         : {"short": "no_opt",               "default":False,     "help": "disable ELL's compiler from optimizing emitted code"},
@@ -78,6 +79,7 @@ class ModuleBuilder:
         self.optimize = True
         self.optimization_level = None
         self.fuse_linear_ops = True
+        self.optimize_reorder = True
         self.debug = False
         self.model_name = ""
         self.func_name = "Predict"
@@ -142,6 +144,7 @@ class ModuleBuilder:
         self.no_llc_tool = args.no_llc_tool
         self.optimize = not args.no_optimize
         self.fuse_linear_ops = not args.no_fuse_linear_ops
+        self.optimize_reorder = not args.no_optimize_reorder
         self.debug = args.debug
         self.blas = self.str2bool(args.blas)
         self.swig = self.language != "cpp"
@@ -222,6 +225,7 @@ class ModuleBuilder:
             output_dir=self.output_dir,
             use_blas=self.blas,
             fuse_linear_ops=self.fuse_linear_ops,
+            optimize_reorder_data_nodes = self.optimize_reorder,
             profile=self.profile,
             llvm_format=self.llvm_format,
             optimize=self.optimize,

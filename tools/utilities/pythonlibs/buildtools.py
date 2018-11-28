@@ -191,7 +191,7 @@ class EllBuildTools:
         return out_file
 
     def compile(self, model_file, func_name, model_name, target, output_dir, 
-                use_blas=False, fuse_linear_ops=True, profile=False, llvm_format="bc",
+                use_blas=False, fuse_linear_ops=True, optimize_reorder_data_nodes=True, profile=False, llvm_format="bc",
                 optimize=True, debug=False, is_model_file=False, swig=True, header=False, 
                 objext=".o", extra_options=[]):
         file_arg = "-imf" if is_model_file else "-imap"
@@ -216,7 +216,8 @@ class EllBuildTools:
                 format_flag,
                 "--target", target,
                 "-od", output_dir,
-                "--fuseLinearOps", str(fuse_linear_ops)
+                "--fuseLinearOps", str(fuse_linear_ops),
+                "--optimizeReorderDataNodes", str(optimize_reorder_data_nodes)
                 ]
         if swig:
             args.append("--swig")

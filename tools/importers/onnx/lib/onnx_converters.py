@@ -146,8 +146,8 @@ class OnnxNodeConverter(object):
     def get_tensor(self, id: str):
         return self.converter.get_tensor(id)
 
-    def add_tensor(self, id: str, tensor):
-        return self.converter.add_tensor(id, tensor)
+    def add_tensor(self, id: str, tensor, order=None):
+        return self.converter.add_tensor(id, tensor, order)
 
     def get_input_tensors(self):
         tensor_inputs = [x for x in list(self.node.inputs) if self.is_tensor(x)]
@@ -265,10 +265,16 @@ class OnnxConstantConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Constant")
 
+    def convert(self, node: NodeProto):
+        node = super().convert(node)
+        self.add_tensor(node.id, node.attributes["tensor"])
+        return node    
+
     def get_attributes(self, attrs: Attributes):
         attributes = {
             "tensor": attrs['value']
         }
+        self.add_tensor(self.node.id, attributes['tensor'])
         return attributes
         
     def get_output_shapes(self):
@@ -316,9 +322,18 @@ class OnnxConstantFillConverter(OnnxNodeConverter):
 
         if "value" in attrs:
             attributes["value"] = attrs["value"]
+        else:
+            attributes["value"] = 0
 
         return attributes
         
+    def convert(self, node: NodeProto):
+        node = super().convert(node)
+        if self.is_constant_input(node):
+            self.node.operation_type = "Skip"
+            self.constant_fill(node) # do it!
+        return node
+
     def get_output_shapes(self):
         # return the un-transposed shape
         if "input_as_shape" in self.node.attributes:
@@ -329,6 +344,16 @@ class OnnxConstantFillConverter(OnnxNodeConverter):
             shape = self.node.attributes["shape"]
 
         return [(shape, self.get_order(shape))]
+
+    def constant_fill(self, node):
+        if node.attributes["input_as_shape"] :
+            t = self.get_input_tensors()[0][1]
+            shape = tuple(t)
+            t = np.zeros(shape)
+            self.add_tensor(node.id, t)
+        else:
+            raise Exception("constant_fill not implemented")
+
 
 class OnnxTransposeConverter(OnnxNodeConverter):
     def __init__(self, converter):
@@ -400,7 +425,12 @@ class OnnxUnsqueezeConverter(OnnxNodeConverter):
         input_tensors = self.get_input_tensors()        
         tensor = input_tensors[0][1]
         axis = node.attributes["axes"][0]
-        tensor = np.expand_dims(tensor, axis)
+        if input_tensors[0][2] == "scalar":
+            # ah, this is a special case created by OnnxGatherConverter, the tensor has
+            # already been unsqueezed.
+            pass
+        else:
+            tensor = np.expand_dims(tensor, axis)
         # turn the node into a constant tensor and the node will be skipped.
         self.add_tensor(node.id, tensor)
         return node
@@ -427,7 +457,9 @@ class OnnxSqueezeConverter(OnnxNodeConverter):
         input_shape = node.input_shapes[0]
         s = list(input_shape[0])
         axis = node.attributes["axes"][0]
-        s.insert(axis, 1)
+        # numpy squeeze only works on a dimension whose size is 1.
+        if len(s) > axis and s[axis] == 1:
+            del s[axis]
         s = tuple(s)
         return [(s, self.get_order(s))]
 
@@ -435,7 +467,9 @@ class OnnxSqueezeConverter(OnnxNodeConverter):
         input_tensors = self.get_input_tensors()        
         tensor = input_tensors[0][1]
         axis = self.node.attributes["axes"][0]
-        tensor = np.squeeze(tensor, axis)
+        # Only squeeze along axis whose dimension is 1
+        if tensor.shape[axis] == 1:
+            tensor = np.squeeze(tensor, axis)
         # turn the node into a constant tensor and the node will be skipped.
         self.add_tensor(node.id, tensor)
         return node
@@ -443,6 +477,16 @@ class OnnxSqueezeConverter(OnnxNodeConverter):
 class OnnxGatherConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Passthrough")
+
+    def get_attributes(self, attrs: Attributes):
+        attributes = {
+        }
+        if "axis" in attrs:            
+            attributes["axis"] = attrs["axis"]
+        else:
+            attributes["axis"] = 0
+
+        return attributes
 
     def get_output_shapes(self):
         # Given data tensor of rank r >= 1, and indices tensor of rank q, gather entries of the axis 
@@ -459,7 +503,46 @@ class OnnxGatherConverter(OnnxNodeConverter):
         input_shape = self.node.input_shapes[0][0]
         indices_shape = self.node.input_shapes[1][0]
         output_shape = tuple(list(indices_shape) + [input_shape[-1]])
+
+        if self.is_constant_input(self.node):
+            t = self.gather_tensor(self.node) # actually do it...
+            return [(t.shape, self.get_order(t.shape))]
+
         return [(output_shape, self.get_order(output_shape))]
+
+    
+    def gather_tensor(self, node):
+        # turn the node into a constant tensor and the node will be skipped.   
+        self.node.operation_type = "Skip"     
+        dim = self.node.attributes["axis"]
+        input_tensors = self.get_input_tensors()        
+        tensor = input_tensors[0][1]
+        indices = input_tensors[1][1]
+
+        if len(tensor.shape) == 1:
+            # then we are picking a single value out of a vector
+            if len(indices.shape) == 0:
+                index = int(indices)
+            else:
+                index = indices[0]
+            if index >= len(tensor):
+                v = 0  # out of bounds
+            else:
+                v = tensor[index]
+            # we really need to publish a "constant scalar" here but our
+            # only way of publishing constant values is as a tensor, so we turn
+            # it into a tensor and remember this fact by providing a special
+            # order called "scalar" so the next node can determine this fact.
+            t = np.array([v]) 
+            self.add_tensor(node.id, t, "scalar")
+        else:
+            import torch
+            tensor = torch.tensor(tensor)
+            indices = torch.tensor(indices).long()
+            g = torch.gather(tensor, dim, indices)        
+            t = g.numpy()
+            self.add_tensor(node.id, t)
+        return t
 
 
 class OnnxFlattenConverter(OnnxNodeConverter):
@@ -493,9 +576,10 @@ class OnnxShapeConverter(OnnxNodeConverter):
         super().init(converter, "Passthrough")
 
     def get_output_shapes(self):
-        input_shape = self.node.input_shapes[0]
-        # Takes a tensor as input and outputs an 1D int64 tensor containing the shape of the input tensor.
-        return [input_shape]
+        input_shape = self.node.input_shapes[0][0]
+        output_shape = self.add_tensor(self.node.outputs[0], np.array(input_shape))
+        # Since this shape is known now, it can also be treated as a constant.
+        return [(input_shape, self.get_order(input_shape))]
 
 
 class OnnxSliceConverter(OnnxNodeConverter):
@@ -578,7 +662,7 @@ class OnnxLSTMConverter(OnnxNodeConverter):
         tensors = self.get_input_tensors()
         result = {}
 
-        if len(tensors) != 3:
+        if len(tensors) < 3:
             raise Exception("Expecting 2 weight tensors and a bias tensor on LSTM node but found {}".format(len(tensors)))
 
         # stacked set of (input, forget, cell, output) weights to be applied to the input
@@ -636,7 +720,7 @@ class OnnxGRUConverter(OnnxNodeConverter):
         tensors = self.get_input_tensors()
         result = {}
 
-        if len(tensors) != 3:
+        if len(tensors) < 3:
             raise Exception("Expecting 3 weight tensors on GRU node but found {}".format(len(tensors)))
 
         # stacked set of update, reset, hidden weights to be applied to the input
@@ -1055,6 +1139,7 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP  = {
     "Slice"                   : OnnxSliceConverter, # "Slice", 
     "Shape"                   : OnnxShapeConverter, # "Passthrough",
     "Passthrough"             : OnnxPassthroughConverter, # "Passthrough",
+    "Pad"                     : OnnxPassthroughConverter, # "Passthrough",
     "Unsqueeze"               : OnnxUnsqueezeConverter, # "Passthrough", # Temp: not implemented
     "Squeeze"                 : OnnxSqueezeConverter, # "Passthrough", # Temp: Not implemented,
     "ImageScaler"             : "ImageScaler", 
@@ -1105,8 +1190,11 @@ class OnnxConverter:
             return None
         return ONNX_OP_TYPE_TO_CONVERTER_MAP[name](self).op_type
 
-    def add_tensor(self, id, tensor):
-        return self.model.add_tensor(id, tensor, self.get_order(tensor.shape))
+    def add_tensor(self, id, tensor, order=None):
+        if order is None:
+            order = self.get_order(tensor.shape)
+        return self.model.add_tensor(id, tensor, order)
+     
      
     def load_model(self, path):
         """ Return a list of ONNX nodes """

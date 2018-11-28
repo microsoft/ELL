@@ -1158,6 +1158,8 @@ class ConvertPassthrough(ConvertBase):
         """
         lookup_table = conversion_parameters["lookup_table"]
         # Set owner of this output to be the Passthrough node's input node
+        if len(self.importer_node.inputs) == 0:
+            raise Exception("### Passthrough node {}({}) has no inputs".format(self.importer_node.operation_type, self.importer_node.id))
         input_owner = lookup_table.get_owning_node_for_output(self.importer_node.inputs[0])
         lookup_table.add_imported_ell_node(self.importer_node, input_owner, set_group_id=False)
 

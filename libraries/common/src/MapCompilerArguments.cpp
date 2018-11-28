@@ -58,6 +58,13 @@ namespace common
             true);
 
         parser.AddOption(
+            optimizeReorderDataNodes,
+            "optimizeReorderDataNodes",
+            "",
+            "Optimize sequences of reordering nodes",
+            true);
+
+        parser.AddOption(
             convolutionMethod,
             "convolutionMethod",
             "",
@@ -203,6 +210,7 @@ namespace common
         settings.compilerSettings.parallelize = parallelize;
         settings.compilerSettings.vectorWidth = vectorWidth;
         settings.optimizerSettings.fuseLinearFunctionNodes = fuseLinearOperations;
+        settings.optimizerSettings.optimizeReorderDataNodes = optimizeReorderDataNodes;
         settings.optimizerSettings.preferredConvolutionMethod = convolutionMethod;
         settings.profile = profile;
         settings.compilerSettings.profile = profile;

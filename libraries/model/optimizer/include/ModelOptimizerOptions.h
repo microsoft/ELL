@@ -32,6 +32,7 @@ namespace model
     {
         // individual optimization settings
         bool fuseLinearFunctionNodes = true;
+        bool optimizeReorderDataNodes = true;
 
         PreferredConvolutionMethod preferredConvolutionMethod = PreferredConvolutionMethod::automatic;
 
