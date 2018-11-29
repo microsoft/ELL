@@ -243,7 +243,7 @@ category describing the object.
 ```python
         predictions = np.reshape(
             predictions,
-            (output_shape.rows, output_shape.columns, output_shape.channels))
+            (13, 13, 125))
 ```
 
 The reshaped predictions can now be used to get a list of detected regions by

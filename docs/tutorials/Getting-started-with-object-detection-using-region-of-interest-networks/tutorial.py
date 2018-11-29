@@ -66,7 +66,7 @@ def main():
         # expected shape
         predictions = np.reshape(
             predictions,
-            (output_shape.rows, output_shape.columns, output_shape.channels))
+            (13, 13, 125))
 
         # Do some post-processing to extract the regions from the output of
         # the model
