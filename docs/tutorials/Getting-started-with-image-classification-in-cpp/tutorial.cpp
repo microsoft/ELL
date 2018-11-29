@@ -53,7 +53,7 @@ static std::vector<std::string> ReadLinesFromFile(const std::string& filename)
 
 int main(int argc, char** argv)
 {
-    model_PredictWrapper wrapper;
+    ModelWrapper wrapper;
 
     // Open the video camera. To use a different camera, change the camera index.
     cv::VideoCapture camera(0);
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 
         // Send the image to the compiled model and fill the predictions vector with scores, measure how long it takes
         auto start = std::chrono::steady_clock::now();
-        wrapper.Predict(input, predictions);
+        predictions = wrapper.Predict(input);
         auto end = std::chrono::steady_clock::now();
 
         // Get the value of the top 5 predictions

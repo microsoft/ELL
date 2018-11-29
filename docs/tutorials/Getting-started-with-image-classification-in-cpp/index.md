@@ -155,11 +155,13 @@ static std::vector<std::string> ReadLinesFromFile(const std::string& filename)
 }
 ```
 
-Define the **main** function and start the camera.
+Define the **main** function, create a model wrapper object, and start the camera.
 
 ```cpp
 int main(int argc, char** argv)
 {
+    ModelWrapper wrapper;
+
     cv::VideoCapture camera(0);
 ```
 
@@ -172,14 +174,13 @@ The argument **0** in the function call above selects the default camera. If you
 The model expects its input in a certain shape. Get this shape and store it for use later on.
 
 ```cpp
-    TensorShape inputShape;
-    model_GetInputShape(0, &inputShape);
+    TensorShape inputShape = wrapper.GetInputShape();
 ```
 
 Allocate a vector to store the model's output.
 
 ```cpp
-    std::vector<float> predictions(model_GetOutputSize());
+    std::vector<float> predictions(wrapper.GetOutputSize());
 ```
 
 Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user presses any key. At the start of each loop iteration, read an image from the camera, as follows.
@@ -196,10 +197,10 @@ The image stored in the **image** variable cannot be sent to the model as-is, be
         auto input = tutorialHelpers::PrepareImageForModel(image, inputShape.columns, inputShape.rows);
 ```
 
-With the processed image input handy, call the **predict** method to invoke the model.
+With the processed image input handy, call the **Predict** method to invoke the model.
 
 ```cpp
-        model_Predict(input, predictions);
+        predictions = wrapper.Predict(input);
 ```
 
 The **predict** method fills the **predictions** vector with the model output. Each element of this array corresponds to one of the 1,000 image classes recognized by the model. Extract the top five predicted categories by calling the helper function **GetTopN**.
