@@ -43,11 +43,21 @@ namespace value
     template <typename T>
     Value Cast(Value value);
 
-    template <typename CastType, typename ViewType>
+    template <typename CastType, typename ViewType, std::enable_if_t<std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>, void*> = nullptr>
     ViewType Cast(ViewType value)
     {
         return Cast<CastType>(value.GetValue());
     }
+
+    template <typename ViewType, std::enable_if_t<std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>, void*> = nullptr>
+    ViewType Cast(ViewType value, ValueType type)
+    {
+        return Cast(value.GetValue(), type);
+    }
+
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
+    Scalar Cast(T t, ValueType type);
+
 
 } // namespace value
 } // namespace ell

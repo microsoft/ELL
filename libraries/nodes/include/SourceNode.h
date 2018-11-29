@@ -15,7 +15,6 @@
 #include <model/include/InputNodeBase.h>
 #include <model/include/ModelTransformer.h>
 
-// nodes
 #include "ClockNode.h" // for TimeTickType
 
 #include <emitters/include/IRMetadata.h>

@@ -15,7 +15,6 @@
 
 #include <evaluators/include/Evaluator.h>
 
-//stl
 #include <memory>
 #include <random>
 #include <string>

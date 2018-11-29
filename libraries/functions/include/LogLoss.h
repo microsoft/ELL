@@ -8,7 +8,6 @@
 
 #pragma once
 
-// stl
 #include <cstddef> // size_t
 
 namespace ell

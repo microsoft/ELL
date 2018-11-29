@@ -358,7 +358,7 @@ namespace utilities
 
         /// <summary> Returns the number of active elements in this memory layout </summary>
         ///
-        /// <returns> The number of elements </summary>
+        /// <returns> The number of elements </returns>
         size_t NumElements() const;
 
         /// <summary> Returns the number of total (active plus extra extent) elements in this memory layout </summary>

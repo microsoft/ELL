@@ -17,6 +17,17 @@ using namespace utilities;
 
 namespace value
 {
+   Scalar Accumulate(Tensor tensor, Scalar initialValue)
+   {
+       Scalar result = initialValue;
+
+       For(tensor, [&](auto row, auto column, auto channel)
+       {
+           result += tensor(row, column, channel);
+       });
+
+       return result;
+   }
 
     void For(Tensor tensor, std::function<void(Scalar, Scalar, Scalar)> fn)
     {

@@ -17,6 +17,31 @@ using namespace utilities;
 
 namespace value
 {
+    Scalar Accumulate(Vector input, Scalar initalValue)
+    {
+        Scalar result = initalValue;
+
+        For(input, [&](auto index) { result += input(index); });
+
+        return result;
+    }
+
+    Scalar Dot(Vector v1, Vector v2)
+    {
+        if (v1.Size() != v2.Size())
+        {
+            throw InputException(InputExceptionErrors::sizeMismatch);
+        }
+        if (v1.GetType() != v2.GetType())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        Scalar result;
+        For(v1, [&](auto index) { result += v1[index] * v2[index]; });
+
+        return result;
+    }
 
     void For(Vector v, std::function<void(Scalar)> fn)
     {

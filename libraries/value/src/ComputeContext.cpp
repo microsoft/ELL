@@ -109,7 +109,6 @@ namespace value
             using VectorType = std::vector<typename T::Type>;
             return VectorType(data.begin(), data.end());
         }
-
     } // namespace
 
     ComputeContext::ComputeContext(std::string moduleName) :
@@ -117,6 +116,44 @@ namespace value
     {
         // we always have at least one stack space, in case the top level function needs to return something
         _stack.push({});
+    }
+
+    const ConstantData& ComputeContext::GetConstantData(Value value) const
+    {
+        if (!ValidateValue(value))
+        {
+            throw InputException(InputExceptionErrors::invalidArgument);
+        }
+
+        using Iterator = ConstantDataList::const_iterator;
+
+        auto it =
+            std::visit(VariantVisitor{ [](Undefined) -> Iterator { return {}; },
+                                       [](Emittable) -> Iterator { return {}; },
+                                       [this](auto&& data) -> Iterator {
+                                           using Type = std::decay_t<decltype(data)>;
+                                           using RealType = std::remove_pointer_t<Type>;
+                                           using VectorType = std::vector<RealType>;
+
+                                           const auto& frame = GetTopFrame();
+                                           auto it =
+                                               std::find_if(frame.second.begin(),
+                                                            frame.second.end(),
+                                                            [data](const ConstantData& constData) {
+                                                                if (auto ptr = std::get_if<VectorType>(&constData))
+                                                                {
+                                                                    return ptr->data() <= data &&
+                                                                           data < (ptr->data() + ptr->size());
+                                                                }
+
+                                                                return false;
+                                                            });
+
+                                           return it;
+                                       } },
+                       value.GetUnderlyingData());
+
+        return *it;
     }
 
     Value ComputeContext::AllocateImpl(ValueType type, MemoryLayout layout)
@@ -171,7 +208,7 @@ namespace value
     {
         Value value = ConstantDataToValue(data);
 
-        _stack.top().second.push_front(std::move(data));
+        GetTopFrame().second.push_front(std::move(data));
         return value;
     }
 
@@ -218,30 +255,68 @@ namespace value
     ComputeContext::ConstantData ComputeContext::ExtractConstantData(Value value)
     {
         ConstantData movedOutOfScope;
-        const auto& scope = _stack.top();
 
         std::visit(VariantVisitor{ [](Undefined) {},
                                    [](Emittable) {},
-                                   [&movedOutOfScope, &scope](auto&& data) {
+                                   [&movedOutOfScope, this](auto&& data) {
                                        using Type = std::decay_t<decltype(data)>;
                                        using RealType = std::remove_pointer_t<Type>;
                                        using VectorType = std::vector<RealType>;
 
-                                       for (auto& constData : scope.second)
+                                       const auto& frame = GetTopFrame();
+                                       if (auto stackFrameIt =
+                                               std::find_if(frame.second.begin(),
+                                                            frame.second.end(),
+                                                            [data](const ConstantData& constData) {
+                                                                if (auto ptr = std::get_if<VectorType>(&constData))
+                                                                {
+                                                                    return ptr->data() <= data &&
+                                                                           data < (ptr->data() + ptr->size());
+                                                                }
+
+                                                                return false;
+                                                            });
+                                           stackFrameIt == frame.second.end())
                                        {
-                                           auto ptr = std::get_if<VectorType>(&constData);
-                                           if (ptr != nullptr)
-                                           {
-                                               if (ptr->data() == data)
-                                               {
-                                                   movedOutOfScope = std::move(constData);
-                                               }
-                                           }
+                                           throw LogicException(LogicExceptionErrors::illegalState,
+                                                                "Could not extract expected data");
+                                       }
+                                       else
+                                       {
+                                           movedOutOfScope = std::move(*stackFrameIt);
                                        }
                                    } },
                    value.GetUnderlyingData());
 
         return movedOutOfScope;
+    }
+
+    bool ComputeContext::IsGlobalValue(Value value)
+    {
+        return std::visit(VariantVisitor{ [](Undefined) -> bool {
+                                             throw LogicException(LogicExceptionErrors::illegalState);
+                                         },
+                                          [](Emittable) -> bool {
+                                              throw LogicException(LogicExceptionErrors::illegalState);
+                                          },
+                                          [this](auto&& data) -> bool {
+                                              using Type = std::decay_t<decltype(data)>;
+                                              using RealType = std::remove_pointer_t<Type>;
+                                              using VectorType = std::vector<RealType>;
+
+                                              return std::find_if(_globals.begin(),
+                                                                  _globals.end(),
+                                                                  [data](const auto& kvp) {
+                                                                      if (auto ptr = std::get_if<VectorType>(
+                                                                              &kvp.second.first))
+                                                                      {
+                                                                          return ptr->data() <= data &&
+                                                                                 data < (ptr->data() + ptr->size());
+                                                                      }
+                                                                      return false;
+                                                                  }) != _globals.end();
+                                          } },
+                          value.GetUnderlyingData());
     }
 
     std::pair<ValueType, int> ComputeContext::GetTypeImpl(Emittable)
@@ -261,16 +336,32 @@ namespace value
     {
         return [fn = std::move(fn), fnName = std::move(fnName), this, expectedReturn]() {
             ConstantData movedOutOfScope;
+            std::optional<Value> maybeGlobal;
+
             {
                 FunctionScope scope(*this, fnName);
 
                 Value returnValue = expectedReturn;
                 returnValue = fn();
+                if (IsGlobalValue(returnValue))
+                {
+                    maybeGlobal = returnValue;
+                }
 
-                movedOutOfScope = ExtractConstantData(returnValue);
+                if (!maybeGlobal)
+                {
+                    movedOutOfScope = ExtractConstantData(returnValue);
+                }
             }
-            _stack.top().second.push_front(std::move(movedOutOfScope));
-            return ConstantDataToValue(_stack.top().second.front(), expectedReturn.GetLayout());
+            if (!maybeGlobal)
+            {
+                GetTopFrame().second.push_front(std::move(movedOutOfScope));
+                return ConstantDataToValue(GetTopFrame().second.front(), expectedReturn.GetLayout());
+            }
+            else
+            {
+                return *maybeGlobal;
+            }
         };
     }
 
@@ -290,7 +381,7 @@ namespace value
 
                 fn(args);
             }
-            _stack.top().second.push_front(std::move(movedOutOfScope));
+            GetTopFrame().second.push_front(std::move(movedOutOfScope));
         };
     }
 
@@ -307,6 +398,7 @@ namespace value
                 expectedArgs = std::move(expectedArgs)](std::vector<Value> args) {
             assert(expectedArgs.size() == args.size());
             ConstantData movedOutOfScope;
+            std::optional<Value> maybeGlobal;
             {
                 FunctionScope scope(*this, fnName);
                 auto fnArgs = expectedArgs;
@@ -314,12 +406,25 @@ namespace value
 
                 Value returnValue = expectedReturn;
                 returnValue = fn(args);
+                if (IsGlobalValue(returnValue))
+                {
+                    maybeGlobal = returnValue;
+                }
 
-                movedOutOfScope = ExtractConstantData(returnValue);
+                if (!maybeGlobal)
+                {
+                    movedOutOfScope = ExtractConstantData(returnValue);
+                }
             }
-            _stack.top().second.push_front(std::move(movedOutOfScope));
-
-            return ConstantDataToValue(_stack.top().second.front(), expectedReturn.GetLayout());
+            if (!maybeGlobal)
+            {
+                GetTopFrame().second.push_front(std::move(movedOutOfScope));
+                return ConstantDataToValue(GetTopFrame().second.front(), expectedReturn.GetLayout());
+            }
+            else
+            {
+                return *maybeGlobal;
+            }
         };
     }
 
@@ -660,12 +765,38 @@ namespace value
         return { std::make_unique<ComputeContext::IfContextImpl>(state) };
     }
 
-    bool ComputeContext::ValidateValue(Value value)
+    Value ComputeContext::CallImpl(std::string fnName, Value retValue, std::vector<Value> args)
+    {
+        static std::map<std::string, std::function<Value(std::vector<Value>)>> fnMap{
+            { "abs",
+              [](std::vector<Value> args) -> Value {
+                  if (args.size() != 1)
+                  {
+                      throw InputException(InputExceptionErrors::invalidArgument);
+                  }
+                  return std::visit([](auto&&) { return Value{}; }, args[0].GetUnderlyingData());
+              } }
+        };
+
+        if (!std::all_of(args.begin(), args.end(), [this](const Value& value) { return ValidateValue(value); }))
+        {
+            throw LogicException(LogicExceptionErrors::illegalState);
+        }
+
+        if (auto it = fnMap.find(fnName); it != fnMap.end())
+        {
+            return it->second(args);
+        }
+
+        throw LogicException(LogicExceptionErrors::notImplemented);
+    }
+
+    bool ComputeContext::ValidateValue(Value value) const
     {
         return value.IsDefined() && !value.IsEmpty() && value.IsConstant();
     }
 
-    bool ComputeContext::TypeCompatible(Value value1, Value value2)
+    bool ComputeContext::TypeCompatible(Value value1, Value value2) const
     {
         return value1.GetBaseType() == value2.GetBaseType() && value1.PointerLevel() == value2.PointerLevel();
     }
@@ -690,8 +821,12 @@ namespace value
         // Our stack always has one empty "scope" pushed to it, which we
         // can use to create our global prefix.
 
-        return GetGlobalScopedName(_stack.top().first + "_" + name);
+        return GetGlobalScopedName(GetTopFrame().first + "_" + name);
     }
+
+    ComputeContext::Frame& ComputeContext::GetTopFrame() { return _stack.top(); }
+
+    const ComputeContext::Frame& ComputeContext::GetTopFrame() const { return _stack.top(); }
 
 } // namespace value
 } // namespace ell

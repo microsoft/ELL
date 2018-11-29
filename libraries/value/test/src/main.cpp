@@ -33,7 +33,10 @@ int main()
             Matrix_test2();
             Tensor_test1();
             Tensor_test2();
+            Tensor_slice_test1();
             Casting_test1();
+            Accumulate_test();
+            Dot_test();
         }
     }
     catch (const Exception& exception)

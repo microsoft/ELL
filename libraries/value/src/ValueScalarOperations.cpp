@@ -12,6 +12,8 @@
 
 namespace ell
 {
+using namespace utilities;
+
 namespace value
 {
 
@@ -45,64 +47,88 @@ namespace value
         return copy %= s2;
     }
 
-    Scalar operator++(Scalar s) { return s += 1; }
+    Scalar operator++(Scalar s)
+    {
+        if (!s.GetValue().IsIntegral() && !s.GetValue().IsIntegralPointer())
+        {
+            throw LogicException(LogicExceptionErrors::illegalState);
+        }
+
+        return s += Cast(1, s.GetType());
+    }
 
     Scalar operator++(Scalar s, int)
     {
+        if (!s.GetValue().IsIntegral() && !s.GetValue().IsIntegralPointer())
+        {
+            throw LogicException(LogicExceptionErrors::illegalState);
+        }
+
         Scalar copy = s.Copy();
-        s += 1;
+        s += Cast(1, s.GetType());
         return copy;
     }
 
-    Scalar operator--(Scalar s) { return s -= 1; }
+    Scalar operator--(Scalar s)
+    {
+        if (!s.GetValue().IsIntegral() && !s.GetValue().IsIntegralPointer())
+        {
+            throw LogicException(LogicExceptionErrors::illegalState);
+        }
+
+        return s -= Cast(1, s.GetType());
+    }
 
     Scalar operator--(Scalar s, int)
     {
+        if (!s.GetValue().IsIntegral() && !s.GetValue().IsIntegralPointer())
+        {
+            throw LogicException(LogicExceptionErrors::illegalState);
+        }
+
         Scalar copy = s.Copy();
-        s -= 1;
+        s -= Cast(1, s.GetType());
         return copy;
     }
 
     Scalar operator==(Scalar s1, Scalar s2)
     {
-        return GetContext().LogicalOperation(ValueLogicalOperation::equality,
-                                             s1.GetValue(),
-                                             s2.GetValue());
+        return GetContext().LogicalOperation(ValueLogicalOperation::equality, s1.GetValue(), s2.GetValue());
     }
 
     Scalar operator!=(Scalar s1, Scalar s2)
     {
-        return GetContext().LogicalOperation(ValueLogicalOperation::inequality,
-                                             s1.GetValue(),
-                                             s2.GetValue());
+        return GetContext().LogicalOperation(ValueLogicalOperation::inequality, s1.GetValue(), s2.GetValue());
     }
 
     Scalar operator<=(Scalar s1, Scalar s2)
     {
-        return GetContext().LogicalOperation(ValueLogicalOperation::lessthanorequal,
-                                             s1.GetValue(),
-                                             s2.GetValue());
+        return GetContext().LogicalOperation(ValueLogicalOperation::lessthanorequal, s1.GetValue(), s2.GetValue());
     }
 
     Scalar operator<(Scalar s1, Scalar s2)
     {
-        return GetContext().LogicalOperation(ValueLogicalOperation::lessthan,
-                                             s1.GetValue(),
-                                             s2.GetValue());
+        return GetContext().LogicalOperation(ValueLogicalOperation::lessthan, s1.GetValue(), s2.GetValue());
     }
 
     Scalar operator>=(Scalar s1, Scalar s2)
     {
-        return GetContext().LogicalOperation(ValueLogicalOperation::greaterthanorequal,
-                                             s1.GetValue(),
-                                             s2.GetValue());
+        return GetContext().LogicalOperation(ValueLogicalOperation::greaterthanorequal, s1.GetValue(), s2.GetValue());
     }
 
     Scalar operator>(Scalar s1, Scalar s2)
     {
-        return GetContext().LogicalOperation(ValueLogicalOperation::greaterthan,
-                                             s1.GetValue(),
-                                             s2.GetValue());
+        return GetContext().LogicalOperation(ValueLogicalOperation::greaterthan, s1.GetValue(), s2.GetValue());
+    }
+
+    Scalar operator&&(Scalar s1, Scalar s2)
+    {
+        return GetContext().BinaryOperation(ValueBinaryOperation::logicalAnd, s1.GetValue(), s2.GetValue());
+    }
+
+    Scalar operator||(Scalar s1, Scalar s2)
+    {
+        return GetContext().BinaryOperation(ValueBinaryOperation::logicalOr, s1.GetValue(), s2.GetValue());
     }
 
 } // namespace value

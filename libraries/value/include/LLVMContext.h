@@ -43,8 +43,10 @@ namespace value
 
         std::optional<Value> GetGlobalValue(GlobalAllocationScope scope, std::string name) override;
 
-        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout) override;
-        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout) override;
+        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data,
+                                 MemoryLayout layout) override;
+        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type,
+                                 MemoryLayout layout) override;
 
         std::pair<ValueType, int> GetTypeImpl(Emittable emittable) override;
 
@@ -76,6 +78,8 @@ namespace value
 
         IfContext IfImpl(Scalar test, std::function<void()> fn) override;
 
+        Value CallImpl(std::string fnName, Value retValue, std::vector<Value> args) override;
+
         bool TypeCompatible(Value value1, Value value2);
 
         std::string GetScopeAdjustedName(GlobalAllocationScope scope, std::string name) const;
@@ -84,8 +88,21 @@ namespace value
 
         emitters::IRFunctionEmitter& GetFnEmitter() const;
 
+        struct PromotedConstantDataDescription
+        {
+            const ConstantData* data;
+            Emittable realValue;
+        };
+
+        Value PromoteConstantData(Value value);
+        std::optional<PromotedConstantDataDescription> HasBeenPromoted(Value value);
+        Value Realize(Value value);
+        Value EnsureEmittable(Value value);
+
         class IfContextImpl;
         struct FunctionScope;
+
+        std::stack<std::vector<PromotedConstantDataDescription>> _promotedConstantStack;
 
         emitters::IRModuleEmitter& _emitter;
 

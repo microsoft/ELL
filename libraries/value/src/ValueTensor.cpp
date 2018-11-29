@@ -21,7 +21,6 @@ using namespace utilities;
 
 namespace value
 {
-
     Tensor::Tensor() = default;
 
     Tensor::Tensor(Value value) :

@@ -162,7 +162,6 @@ namespace predictors
 
 #pragma region implementation
 
-//stl
 #include <iostream>
 
 namespace ell

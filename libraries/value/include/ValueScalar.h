@@ -67,3 +67,39 @@ namespace value
 
 } // namespace value
 } // namespace ell
+
+#pragma region implementation
+
+namespace ell
+{
+namespace value
+{
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*>>
+    Scalar Cast(T t, ValueType type)
+    {
+        switch (type)
+        {
+        case ValueType::Boolean:
+            return Scalar(static_cast<utilities::Boolean>(t));
+        case ValueType::Byte:
+            return Scalar(static_cast<uint8_t>(t));
+        case ValueType::Char8:
+            return Scalar(static_cast<char>(t));
+        case ValueType::Int16:
+            return Scalar(static_cast<int16_t>(t));
+        case ValueType::Int32:
+            return Scalar(static_cast<int32_t>(t));
+        case ValueType::Int64:
+            return Scalar(static_cast<int64_t>(t));
+        case ValueType::Float:
+            return Scalar(static_cast<float>(t));
+        case ValueType::Double:
+            return Scalar(static_cast<double>(t));
+        default:
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
+        }
+    }
+} // namespace value
+} // namespace ell
+
+#pragma endregion implementation

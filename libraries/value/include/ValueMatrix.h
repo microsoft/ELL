@@ -31,15 +31,6 @@ namespace value
         /// <param name="value"> The Value instance to wrap </param>
         Matrix(Value value);
 
-        /// <summary> Constructs an allocated instance with the specified dimensions </summary>
-        /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
-        /// <param name="rows"> The number of rows of the allocated matrix </param>
-        /// <param name="columns"> The number of columns of the allocated matrix </param>
-        template <typename T>
-        Matrix(int rows, int columns) :
-            Matrix(Allocate<T>(utilities::MemoryLayout({ rows, columns })))
-        {}
-
         /// <summary> Constructs an instance from a std::vector based representation of the matrix </summary>
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="data"> The data represented as a std::vector of std::vectors, in canonical row-major layout </param>
@@ -92,6 +83,16 @@ namespace value
     private:
         Value _value;
     };
+
+    /// <summary> Constructs an allocated instance with the specified dimensions </summary>
+    /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
+    /// <param name="rows"> The number of rows of the allocated matrix </param>
+    /// <param name="columns"> The number of columns of the allocated matrix </param>
+    template <typename T>
+    Matrix MakeMatrix(int rows, int columns)
+    {
+        return Matrix(Allocate<T>(utilities::MemoryLayout({ rows, columns })));
+    }
 
 } // namespace value
 } // namespace ell

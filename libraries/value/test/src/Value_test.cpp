@@ -25,8 +25,10 @@
 
 #include <testing/include/testing.h>
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
+#include <numeric>
 #include <type_traits>
 #include <vector>
 
@@ -100,6 +102,15 @@ void PrintIR(TestLLVMContext& context)
 
 namespace ell
 {
+
+std::vector<std::unique_ptr<EmitterContext>> GetContexts()
+{
+    std::vector<std::unique_ptr<EmitterContext>> contexts;
+    contexts.push_back(std::make_unique<ComputeContext>("Value_test"));
+    contexts.push_back(
+        std::make_unique<TestLLVMContext>(std::make_unique<IRModuleEmitter>("Value_test", CompilerOptions{})));
+    return contexts;
+}
 
 void VarGetTests()
 {
@@ -217,15 +228,6 @@ void Vector_test1()
     });
 
     InvokeForContext<TestLLVMContext>(PrintIR);
-}
-
-std::vector<std::unique_ptr<EmitterContext>> GetContexts()
-{
-    std::vector<std::unique_ptr<EmitterContext>> contexts;
-    contexts.push_back(std::make_unique<ComputeContext>("Value_test"));
-    contexts.push_back(
-        std::make_unique<TestLLVMContext>(std::make_unique<IRModuleEmitter>("Value_test", CompilerOptions{})));
-    return contexts;
 }
 
 namespace
@@ -450,6 +452,201 @@ void Tensor_test2()
     });
 }
 
+void Tensor_slice_test1()
+{
+    InvokeForContext<ComputeContext>([](auto&) {
+        auto input =
+            std::vector<double>{ 11, 22, 33, 44, 55, 66, 77, 88, 99, 111, 222, 333, 444, 555, 666, 777, 888, 999 };
+        /*
+            channel major order:
+            input[:, :, ch] will be in canonical order row-major matrix order
+            input[:, :, 0] =
+                [[11, 22, 33],
+                [44, 55, 66],
+                [77, 88, 99]]
+            input[:, :, 1] =
+                [[111, 222, 333],
+                [444, 555, 666],
+                [777, 888, 999]]
+            */
+
+        constexpr int rows = 3, cols = 3, chs = 2;
+        Tensor inputTensor({ input, MemoryLayout({ chs, rows, cols }, DimensionOrder(ChannelMajorTensorOrder)) });
+        math::ColumnRowChannelTensor<double> mathTensor(cols, rows, chs, input);
+
+        const double* mathFirstElement = &mathTensor(0, 0, 0);
+        const double* valueFirstElement = inputTensor(0, 0, 0).GetValue().Get<double*>();
+
+        {
+            bool ok = true;
+            For(inputTensor, [&](Scalar row, Scalar col, Scalar ch) {
+                int rowInt = row.Get<int>(), colInt = col.Get<int>(), chInt = ch.Get<int>();
+                const double* mathElement = &mathTensor(rowInt, colInt, chInt);
+                const double* valueElement = inputTensor(row, col, ch).GetValue().Get<double*>();
+                ok &= testing::IsEqual(*mathElement, *valueElement);
+                auto mathElementDifference = mathElement - mathFirstElement;
+                auto valueElementDifference = valueElement - valueFirstElement;
+                ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
+            });
+            testing::ProcessTest("Tensor_slice_test1 channel-major order", ok);
+        }
+
+        {
+            {
+                auto mathMatrix = mathTensor.GetSlice<Dimension::column, Dimension::row>(0);
+                auto matrix = inputTensor.Slice(Slice::All, Slice::All, 0);
+
+                testing::ProcessTest("Tensor row-column GetSlice dimension",
+                                     mathMatrix.NumColumns() == matrix.Columns() &&
+                                         mathMatrix.NumRows() == matrix.Rows());
+            }
+
+            for (int ch = 0; ch < chs; ++ch)
+            {
+                auto mathMatrix = mathTensor.GetSlice<Dimension::row, Dimension::column>(ch);
+                auto matrix = inputTensor.Slice(Slice::All, Slice::All, ch);
+
+                bool ok = true;
+                For(matrix, [&](Scalar row, Scalar col) {
+                    auto rowInt = row.Get<int>(), colInt = col.Get<int>();
+
+                    const double* mathElement = &mathMatrix(rowInt, colInt);
+                    const double* valueElement = matrix(row, col).GetValue().Get<double*>();
+                    ok &= testing::IsEqual(*mathElement, *valueElement);
+
+                    auto mathElementDifference = mathElement - mathFirstElement;
+                    auto valueElementDifference = valueElement - valueFirstElement;
+                    ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
+                });
+
+                testing::ProcessTest("Tensor row-column GetSlice", ok);
+            }
+        }
+
+        {
+            {
+                auto mathMatrix = mathTensor.GetSlice<Dimension::column, Dimension::channel>(0);
+                auto matrix = inputTensor.Slice(0, Slice::All, Slice::All);
+
+                testing::ProcessTest("Tensor column-channel GetSlice dimension",
+                                     mathMatrix.NumColumns() == matrix.Columns() &&
+                                         mathMatrix.NumRows() == matrix.Rows());
+            }
+
+            for (int row = 0; row < rows; ++row)
+            {
+                auto mathMatrix = mathTensor.GetSlice<Dimension::column, Dimension::channel>(row);
+                auto matrix = inputTensor.Slice(row, Slice::All, Slice::All);
+
+                bool ok = true;
+                For(matrix, [&](Scalar row, Scalar col) {
+                    auto rowInt = row.Get<int>(), colInt = col.Get<int>();
+
+                    const double* mathElement = &mathMatrix(rowInt, colInt);
+                    const double* valueElement = matrix(row, col).GetValue().Get<double*>();
+                    ok &= testing::IsEqual(*mathElement, *valueElement);
+
+                    auto mathElementDifference = mathElement - mathFirstElement;
+                    auto valueElementDifference = valueElement - valueFirstElement;
+                    ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
+                });
+
+                testing::ProcessTest("Tensor column-channel GetSlice", ok);
+            }
+        }
+
+        {
+            {
+                auto mathVector = mathTensor.GetSlice<Dimension::channel>(0, 0);
+                auto vector = inputTensor.Slice(0, 0, Slice::All);
+
+                testing::ProcessTest("Tensor channel GetSlice length", mathVector.Size() == vector.Size());
+            }
+            for (int row = 0; row < static_cast<int>(mathTensor.NumRows()); ++row)
+            {
+                for (int col = 0; col < static_cast<int>(mathTensor.NumColumns()); ++col)
+                {
+                    auto mathVector = mathTensor.GetSlice<Dimension::channel>(row, col);
+                    auto vector = inputTensor.Slice(row, col, Slice::All);
+
+                    bool ok = true;
+                    For(vector, [&](Scalar index) {
+                        auto indexInt = index.Get<int>();
+                        const double* mathElement = &mathVector[indexInt];
+                        const double* valueElement = vector(index).GetValue().Get<double*>();
+                        ok &= testing::IsEqual(*mathElement, *valueElement);
+                        auto mathElementDifference = mathElement - mathFirstElement;
+                        auto valueElementDifference = valueElement - valueFirstElement;
+                        ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
+                    });
+
+                    testing::ProcessTest("Tensor channel GetSlice", ok);
+                }
+            }
+        }
+
+        {
+            {
+                auto mathVector = mathTensor.GetSlice<Dimension::column>(0, 0);
+                auto vector = inputTensor.Slice(0, Slice::All, 0);
+
+                testing::ProcessTest("Tensor column GetSlice length", mathVector.Size() == vector.Size());
+            }
+            for (int row = 0; row < static_cast<int>(mathTensor.NumRows()); ++row)
+            {
+                for (int ch = 0; ch < static_cast<int>(mathTensor.NumChannels()); ++ch)
+                {
+                    auto mathVector = mathTensor.GetSlice<Dimension::column>(row, ch);
+                    auto vector = inputTensor.Slice(row, Slice::All, ch);
+
+                    bool ok = true;
+                    For(vector, [&](Scalar index) {
+                        auto indexInt = index.Get<int>();
+                        const double* mathElement = &mathVector[indexInt];
+                        const double* valueElement = vector(index).GetValue().Get<double*>();
+                        ok &= testing::IsEqual(*mathElement, *valueElement);
+                        auto mathElementDifference = mathElement - mathFirstElement;
+                        auto valueElementDifference = valueElement - valueFirstElement;
+                        ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
+                    });
+
+                    testing::ProcessTest("Tensor column GetSlice", ok);
+                }
+            }
+        }
+
+        {
+            {
+                auto mathVector = mathTensor.GetSlice<Dimension::row>(0, 0);
+                auto vector = inputTensor.Slice(Slice::All, 0, 0);
+
+                testing::ProcessTest("Tensor row GetSlice length", mathVector.Size() == vector.Size());
+            }
+            for (int col = 0; col < static_cast<int>(mathTensor.NumColumns()); ++col)
+            {
+                for (int ch = 0; ch < static_cast<int>(mathTensor.NumChannels()); ++ch)
+                {
+                    auto mathVector = mathTensor.GetSlice<Dimension::row>(col, ch);
+                    auto vector = inputTensor.Slice(Slice::All, col, ch);
+
+                    bool ok = true;
+                    For(vector, [&](Scalar index) {
+                        auto indexInt = index.Get<int>();
+                        const double* mathElement = &mathVector[indexInt];
+                        const double* valueElement = vector(index).GetValue().Get<double*>();
+                        ok &= testing::IsEqual(*mathElement, *valueElement);
+                        auto mathElementDifference = mathElement - mathFirstElement;
+                        auto valueElementDifference = valueElement - valueFirstElement;
+                        ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
+                    });
+
+                    testing::ProcessTest("Tensor row GetSlice", ok);
+                }
+            }
+        }
+    });
+}
+
 void Casting_test1()
 {
     InvokeForContext<ComputeContext>([](auto&) {
@@ -485,6 +682,52 @@ void If_test1()
             testing::ProcessTest("Testing basic If/ElseIf/Else expression ", testing::IsEqual(s1.Get<int>(), 0));
         })(); // invoke function
     });
+}
+
+void Accumulate_test()
+{
+    auto fn = CreateFunction("Accumulate_test", []() -> void {
+        bool ok = true;
+        for (int i = 1; i < 10; ++i)
+        {
+            Vector v = MakeVector<float>(i);
+            std::vector<float> reference(i);
+            std::iota(reference.begin(), reference.end(), 0);
+
+            v = reference;
+
+            Scalar result = Accumulate(v, Cast(0, v.GetType()));
+            If(result != std::accumulate(reference.begin(), reference.end(), 0.f),
+               [&] { InvokeForContext<ComputeContext>([&](auto&) { ok = false; }); });
+        }
+        testing::ProcessTest("Accumulate test", ok);
+    });
+
+    InvokeForContext<ComputeContext>([&](auto&) { fn(); });
+}
+
+void Dot_test()
+{
+    auto fn = CreateFunction("Dot_test", []() -> void {
+        bool ok = true;
+        for (int i = 1; i < 10; ++i)
+        {
+            Vector v1 = MakeVector<float>(i), v2 = MakeVector<float>(i);
+            std::vector<float> reference1(i), reference2(i);
+            std::iota(reference1.begin(), reference1.end(), 0);
+            std::iota(reference2.begin(), reference2.end(), reference1.back());
+
+            v1 = reference1;
+            v2 = reference2;
+
+            Scalar result = Dot(v1, v2);
+            If(result != std::inner_product(reference1.begin(), reference1.end(), reference2.begin(), 0.f),
+               [&] { InvokeForContext<ComputeContext>([&](auto&) { ok = false; }); });
+        }
+        testing::ProcessTest("Dot test", ok);
+    });
+
+    InvokeForContext<ComputeContext>([&](auto&) { fn(); });
 }
 
 } // namespace ell

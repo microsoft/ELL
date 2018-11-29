@@ -112,7 +112,6 @@ void TestTensorVectorScaleAddUpdate();
 
 #include <testing/include/testing.h>
 
-// stl
 #include <cstdlib> // rand
 
 template <typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>

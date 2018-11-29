@@ -16,6 +16,11 @@ namespace value
 {
     using namespace utilities;
 
+    void ForSequence(Scalar end, std::function<void(Scalar)> fn)
+    {
+        throw LogicException(LogicExceptionErrors::notImplemented);
+    }
+
     void For(MemoryLayout layout, std::function<void(Scalar)> fn)
     {
         GetContext().For(layout, [&layout, fn = std::move(fn)](std::vector<Scalar> coords) {
@@ -23,7 +28,15 @@ namespace value
         });
     }
 
-    Value Cast(Value value, ValueType type) { return GetContext().Cast(value, type); }
+    Value Cast(Value value, ValueType type)
+    {
+        if (value.GetBaseType() == type)
+        {
+            return value;
+        }
+
+        return GetContext().Cast(value, type);
+    }
 
 } // namespace value
 } // namespace ell

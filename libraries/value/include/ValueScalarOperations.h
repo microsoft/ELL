@@ -36,5 +36,8 @@ namespace value
     Scalar operator>(Scalar, Scalar);
     Scalar operator>=(Scalar, Scalar);
 
+    Scalar operator&&(Scalar, Scalar);
+    Scalar operator||(Scalar, Scalar);
+
 } // namespace value
 } // namespace ell

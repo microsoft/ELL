@@ -27,16 +27,6 @@ namespace value
         /// <param name="value"> The Value instance to wrap </param>
         Tensor(Value value);
 
-        /// <summary> Constructs an allocated instance with the specified dimensions </summary>
-        /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
-        /// <param name="rows"> The number of rows of the allocated tensor </param>
-        /// <param name="columns"> The number of columns of the allocated tensor </param>
-        /// <param name="channels"> The number of columns of the allocated tensor </param>
-        template <typename T>
-        Tensor(int rows, int columns, int channels) :
-            Tensor(Allocate<T>(utilities::MemoryLayout({ rows, columns, channels })))
-        {}
-
         /// <summary> Constructs an instance from a std::vector based representation of the tensor </summary>
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="data"> The data represented in canonical row-major layout </param>
@@ -126,6 +116,17 @@ namespace value
     private:
         Value _value;
     };
+
+    /// <summary> Constructs an allocated instance with the specified dimensions </summary>
+    /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
+    /// <param name="rows"> The number of rows of the allocated tensor </param>
+    /// <param name="columns"> The number of columns of the allocated tensor </param>
+    /// <param name="channels"> The number of columns of the allocated tensor </param>
+    template <typename T>
+    Tensor MakeTensor(int rows, int columns, int channels)
+    {
+        return Tensor(Allocate<T>(utilities::MemoryLayout({ rows, columns, channels })));
+    }
 
 } // namespace value
 } // namespace ell

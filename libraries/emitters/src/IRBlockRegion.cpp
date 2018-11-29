@@ -8,7 +8,6 @@
 
 #include "IRBlockRegion.h"
 
-// llvm
 #include <llvm/IR/Function.h> // This include is necessary because of forward declarations in LLVM
 
 namespace ell

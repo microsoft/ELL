@@ -8,7 +8,6 @@
 
 #pragma once
 
-// STL
 #include <cstddef> // size_t
 #include <limits>
 

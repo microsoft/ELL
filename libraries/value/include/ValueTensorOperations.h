@@ -26,6 +26,8 @@ namespace value
         All
     };
 
+   Scalar Accumulate(Tensor tensor, Scalar initialValue);
+
     /// <summary> Creates a for loop over the tensor </summary>
     /// <param name="tensor"> The instance of Tensor that references the data over which to iterate </param>
     /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>

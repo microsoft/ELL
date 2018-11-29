@@ -70,7 +70,7 @@ All source code files should start with a header that specifies project name, fi
 .h files should indicate `#pragma once` immediately after the header
 
 Next, indicate all `#include` statements. First, include files from the local project. Second, include files from other projects, grouping
-by project and adding the project name as a comment. Finally, include standard libraries.
+by project, ideally in an alphabetical order. Next include third-party library headers, like LLVM. Finally, include standard libraries.
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -84,14 +84,11 @@ by project and adding the project name as a comment. Finally, include standard l
 
     #include "OtherClassFromThisProject.h"
 
-    // proj1
-    #include "ClassFromProjectProj1.h"
-    #include "AnotherClassFromProj1.h"
+    #include <proj1/include/ClassFromProjectProj1.h>
+    #include <proj1/include/AnotherClassFromProj1.h>
 
-    // proj2
-    #include "ClassFromProj2.h"
+    #include <proj2/include/ClassFromProj2.h>
 
-    // stl
     #include <vector>
     #include <string>
 
@@ -114,11 +111,6 @@ parameterless functions, which should appear in the .h file on the same line as 
     double SetValue(double value);  // function has parameters - implementation belongs in .cpp or the implementation region of the .h file
 
     void Next() { _iterator++; _count++; }  // wrong: multi-instruction implementations belong in .cpp or the implementation region of the .h files
-
-    int GetIndex()  // wrong: inline implementation should occupy a single line
-    {
-        return _index;
-    }
 
 ### Virtual functions
 `virtual` functions declared in derived classes should use the `override` or `final` keywords, not `virtual`. This is because `override` and

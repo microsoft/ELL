@@ -167,10 +167,10 @@ namespace value
 
         /// <summary> Creates a callable function </summary>
         /// <param name="fnName"> The string identifier for this particular function </param>
-        /// <param name="argValues"> A vector of Values describing the types of the arguments and their memory layout expected by the function </param>
+        /// <param name="argTypes"> A vector of Values describing the types of the arguments and their memory layout expected by the function </param>
         /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
         /// <returns> A callable function that executes the body described by fn </returns>
-        std::function<void(std::vector<Value>)> CreateFunction(std::string fnName, std::vector<Value> argValues, std::function<void(std::vector<Value>)> fn);
+        std::function<void(std::vector<Value>)> CreateFunction(std::string fnName, std::vector<Value> argTypes, std::function<void(std::vector<Value>)> fn);
 
         /// <summary> Creates a callable function </summary>
         /// <param name="fnName"> The string identifier for this particular function </param>
@@ -182,10 +182,10 @@ namespace value
         /// <summary> Creates a callable function </summary>
         /// <param name="fnName"> The string identifier for this particular function </param>
         /// <param name="returnValue"> A Value instance describing type of the value that is expected and its memory layout to be returned by the function </param>
-        /// <param name="argValues"> A vector of Values describing the types of the arguments and their memory layout expected by the function </param>
+        /// <param name="argTypes"> A vector of Values describing the types of the arguments and their memory layout expected by the function </param>
         /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
         /// <returns> A callable function that executes the body described by fn </returns>
-        std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argValues, std::function<Value(std::vector<Value>)> fn);
+        std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argTypes, std::function<Value(std::vector<Value>)> fn);
 
         /// <summary> Stores data known ahead of time in the form of a std::vector of one of the fundamental types </summary>
         /// <param name="data"> The data that is to be stored by the context instance </param>
@@ -241,6 +241,8 @@ namespace value
 
         IfContext If(Scalar test, std::function<void()> fn);
 
+        Value Call(std::string fnName, Value retValue, std::vector<Value> args);
+
     private:
         virtual Value AllocateImpl(ValueType, MemoryLayout) = 0;
 
@@ -280,6 +282,8 @@ namespace value
         virtual Value CastImpl(Value value, ValueType type) = 0;
 
         virtual IfContext IfImpl(Scalar test, std::function<void()> fn) = 0;
+
+        virtual Value CallImpl(std::string fnName, Value retValue, std::vector<Value> args) = 0;
     };
 
     /// <summary> Returns the global instance of EmitterContext </summary>
@@ -413,6 +417,12 @@ namespace value
     /// <param name="layout"> The layout of the data </param>
     Value GlobalAllocate(std::string name, ValueType type, utilities::MemoryLayout layout);
 
+    template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
+    Value GlobalAllocate(std::string name, utilities::MemoryLayout layout)
+    {
+        return GlobalAllocate(name, GetValueType<T>(), layout);
+    }
+
     /// <summary> Allocates global data </summary>
     /// <param name="name"> The name of the variable </param>
     /// <param name="data"> The data </param>
@@ -435,6 +445,8 @@ namespace value
     }
 
     EmitterContext::IfContext If(Scalar test, std::function<void()> fn);
+
+    Value Call(std::string fnName, Value retValue, std::vector<Value> args);
 
 } // namespace value
 } // namespace ell

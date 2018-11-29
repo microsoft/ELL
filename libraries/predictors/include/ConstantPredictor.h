@@ -12,7 +12,6 @@
 
 #include <utilities/include/IArchivable.h>
 
-//stl
 #include <ostream>
 
 namespace ell

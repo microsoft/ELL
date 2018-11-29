@@ -34,6 +34,8 @@ namespace value
 
     Scalar Dot(Vector, Vector);
 
+    Scalar Accumulate(Vector input, Scalar initialValue);
+
     /// <summary> Creates a for loop over the vector </summary>
     /// <param name="vector"> The instance of Vector that references the data over which to iterate </param>
     /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>

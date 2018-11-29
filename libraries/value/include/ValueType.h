@@ -61,6 +61,8 @@ namespace value
         divide,
         /// <summary> Remainder operation </summary>
         modulus,
+        logicalAnd,
+        logicalOr
     };
 
     enum class ValueLogicalOperation

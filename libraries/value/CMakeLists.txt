@@ -49,7 +49,7 @@ source_group("doc" FILES ${doc})
 add_library(${library_name} ${src} ${include} ${doc})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_include_directories(${library_name} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
-target_link_libraries(${library_name} ${LLVM_LIBS} emitters utilities)
+target_link_libraries(${library_name} PUBLIC ${LLVM_LIBS} emitters utilities)
 target_compile_options(${library_name} PUBLIC ${LLVM_COMPILE_OPTIONS})
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")

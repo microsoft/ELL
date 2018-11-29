@@ -87,7 +87,7 @@ namespace dsp
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> internal use only: used for testing </summary>
-        std::vector<double> getWeights() const;
+        const std::vector<double>& getWeights() const;
 
         /// <summary> Get the sample rate provided to constructor </summary>
         double getSampleRate() const;

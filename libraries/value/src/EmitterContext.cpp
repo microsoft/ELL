@@ -115,24 +115,18 @@ namespace value
         return CreateFunctionImpl(fnName, fn);
     }
 
+    std::function<void(std::vector<Value>)> EmitterContext::CreateFunction(std::string fnName, std::vector<Value> argTypes, std::function<void(std::vector<Value>)> fn)
+    {
+        return CreateFunctionImpl(fnName, argTypes, fn);
+    }
+
     std::function<Value()> EmitterContext::CreateFunction(std::string fnName, Value returnValue, std::function<Value()> fn)
     {
-        if (!returnValue.IsEmpty())
-        {
-            throw InputException(InputExceptionErrors::invalidArgument);
-        }
-
         return CreateFunctionImpl(fnName, returnValue, fn);
     }
 
     std::function<Value(std::vector<Value>)> EmitterContext::CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argTypes, std::function<Value(std::vector<Value>)> fn)
     {
-        if (std::any_of(argTypes.begin(), argTypes.end(), [](auto value) { return !value.IsEmpty(); }) ||
-            !returnValue.IsEmpty())
-        {
-            throw InputException(InputExceptionErrors::invalidArgument);
-        }
-
         return CreateFunctionImpl(fnName, returnValue, argTypes, fn);
     }
 
@@ -140,6 +134,11 @@ namespace value
 
     void EmitterContext::For(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn)
     {
+        if (layout.NumElements() == 0)
+        {
+            return;
+        }
+
         return ForImpl(layout, fn);
     }
 
@@ -199,6 +198,11 @@ namespace value
         return IfImpl(test, fn);
     }
 
+    Value EmitterContext::Call(std::string fnName, Value retValue, std::vector<Value> args)
+    {
+        return CallImpl(fnName, retValue, args);
+    }
+
     namespace
     {
         EmitterContext* s_context = nullptr;
@@ -252,6 +256,11 @@ namespace value
     }
 
     EmitterContext::IfContext If(Scalar test, std::function<void()> fn) { return GetContext().If(test, fn); }
+
+    Value Call(std::string fnName, Value retValue, std::vector<Value> args)
+    {
+        return GetContext().Call(fnName, retValue, args);
+    }
 
 } // namespace value
 } // namespace ell

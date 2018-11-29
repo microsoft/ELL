@@ -23,10 +23,8 @@
 %{
 #include "LLVMInclude.h" // LLVM headers must be included before Windows headers (which are included by node.h)
 
-// stl
-#include <node.h>
-
 // Javascript engine includes
+#include <node.h>
 #include <v8.h>
 #include <nan.h>
 %}
@@ -39,41 +37,41 @@
 %include "unique_ptr.i"
 %include "exception.i"
 #endif
- 
+
 // Add ELL exception handling
-%exception 
+%exception
 {
-    try 
+    try
     {
-	    $action
-    } 
-    catch(const ell::utilities::LogicException& e) 
-    {
-	    SWIG_exception(SWIG_RuntimeError, e.GetMessage().c_str());
+        $action
     }
-    catch(const ell::utilities::SystemException& e) 
+    catch(const ell::utilities::LogicException& e)
     {
-	    SWIG_exception(SWIG_SystemError, e.GetMessage().c_str());
-    } 
-    catch(const ell::utilities::NumericException& e) 
-    {
-	    SWIG_exception(SWIG_ValueError, e.GetMessage().c_str());
-    } 
-    catch(const ell::utilities::InputException& e) 
-    {
-	    SWIG_exception(SWIG_ValueError, e.GetMessage().c_str());
+        SWIG_exception(SWIG_RuntimeError, e.GetMessage().c_str());
     }
-    catch(const ell::utilities::Exception& e) 
+    catch(const ell::utilities::SystemException& e)
     {
-	    SWIG_exception(SWIG_RuntimeError, e.GetMessage().c_str());
+        SWIG_exception(SWIG_SystemError, e.GetMessage().c_str());
+    }
+    catch(const ell::utilities::NumericException& e)
+    {
+        SWIG_exception(SWIG_ValueError, e.GetMessage().c_str());
+    }
+    catch(const ell::utilities::InputException& e)
+    {
+        SWIG_exception(SWIG_ValueError, e.GetMessage().c_str());
+    }
+    catch(const ell::utilities::Exception& e)
+    {
+        SWIG_exception(SWIG_RuntimeError, e.GetMessage().c_str());
     }
     catch(const std::exception& e)
     {
-	    SWIG_exception(SWIG_RuntimeError, e.what());
+        SWIG_exception(SWIG_RuntimeError, e.what());
     }
 }
 
-// ELL APIs 
+// ELL APIs
 %include "functions.i"
 %include "math.i"
 %include "callback.i"

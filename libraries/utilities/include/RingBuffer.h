@@ -8,7 +8,6 @@
 
 #pragma once
 
-// stl
 #include <cstring> // for size_t
 #include <vector>
 

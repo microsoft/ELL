@@ -48,14 +48,6 @@ namespace value
             _value(std::vector<T>(data))
         {}
 
-        /// <summary> Constructs an allocated instance of the specified size </summary>
-        /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
-        /// <param name="size"> The size of the allocated vector </param>
-        template <typename T>
-        Vector(size_t size) :
-            Vector(Allocate<T>(size))
-        {}
-
         /// <summary> Returns a Scalar value that represents the data at the specified index within the vector </summary>
         /// <param name="index"> The value by which to offset into the vector and return the specified value </param>
         /// <returns> The Scalar value wrapping the value that is at the specified index within the vector </return>
@@ -90,6 +82,15 @@ namespace value
     private:
         Value _value;
     };
+
+    /// <summary> Constructs an allocated instance of the specified size </summary>
+    /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
+    /// <param name="size"> The size of the allocated vector </param>
+    template <typename T>
+    Vector MakeVector(size_t size)
+    {
+        return Vector(Allocate<T>(size));
+    }
 
 } // namespace value
 } // namespace ell

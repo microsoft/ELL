@@ -19,7 +19,6 @@
 
 #include <testing/include/testing.h>
 
-// stl
 #include <algorithm> // for std::transform
 #include <cmath>
 #include <iostream>

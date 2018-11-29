@@ -16,7 +16,6 @@
 
 #include <utilities/include/TypeTraits.h>
 
-// stl
 #include <algorithm> // for std::swap
 #include <cstddef>
 #include <memory>

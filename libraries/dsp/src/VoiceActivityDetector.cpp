@@ -182,7 +182,7 @@ namespace dsp
             return y1 + (y2 - y1) * proportion;
         }
 
-        std::vector<double> getWeights()
+        const std::vector<double>& getWeights() const
         {
             return _weights;
         }
@@ -319,7 +319,7 @@ namespace dsp
         return signal;
     }
 
-    std::vector<double> VoiceActivityDetector::getWeights() const
+    const std::vector<double>& VoiceActivityDetector::getWeights() const
     {
         return _impl->_cmw.getWeights();
     }
