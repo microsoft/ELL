@@ -31,22 +31,7 @@ namespace model
     class InputPortBase : public Port
     {
     public:
-        /// <summary> Constructor </summary>
-        ///
-        /// <param name="owningNode"> The node that contains this port </param>
-        /// <param name="input"> The port to fetch input values from </param>
-        /// <param name="name"> The name of this port </param>
-        template <typename ValueType>
-        InputPortBase(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name);
-
-        /// <summary> Constructor </summary>
-        ///
-        /// <param name="owningNode"> The node that contains this port </param>
-        /// <param name="input"> The port to fetch input values from </param>
-        /// <param name="name"> The name of this port </param>
-        InputPortBase(const Node* owningNode, const OutputPortBase& input, const std::string& name);
-
-        ~InputPortBase() override = default;
+        ~InputPortBase() override;
 
         /// <summary> Returns the list of nodes this input port gets values from </summary>
         ///
@@ -88,15 +73,25 @@ namespace model
         /// <returns> The element at the specified index </returns>
         PortElementBase GetInputElement(size_t index) const;
 
+        /// <summary> Internal method used to register this port with the port it references. </summary>
+        void UpdateReferencedPort();
+
     protected:
+        InputPortBase(const InputPortBase& other) = delete;
+        InputPortBase(InputPortBase&& other) = delete;
+        template <typename ValueType>
+        InputPortBase(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name);
+        InputPortBase(const Node* owningNode, const OutputPortBase& input, const std::string& name);
         InputPortBase(Port::PortType portType);
-        const OutputPortBase* _referencedPort;
+        void SetReferencedPort(const OutputPortBase* referencedPort);
+        void ClearReferencedPort();
 
     private:
         friend class ModelEditor;
         friend class ModelTransformer;
+        friend class OutputPortBase;
 
-        void SetInput(const OutputPortBase* input);
+        const OutputPortBase* _referencedPort = nullptr;
     };
 
     template <typename ValueType>
@@ -111,12 +106,6 @@ namespace model
         /// <param name="owningNode"> The node this port belongs to </param>
         /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
         InputPort(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name);
-
-        /// <summary> Assignment operator </summary>
-        ///
-        /// <param name="other"> The port to assign to this one </param>
-        /// <returns> A reference to this port </returns>
-        InputPort& operator=(const InputPort& other);
 
         /// <summary> Returns the PortElements containing the referenced locations this port gets its values from </summary>
         ///
@@ -173,8 +162,7 @@ namespace model
     //
     template <typename ValueType>
     InputPortBase::InputPortBase(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name) :
-        Port(owningNode, name, Port::GetPortType<ValueType>()),
-        _referencedPort(&input)
+        InputPortBase(owningNode, static_cast<const OutputPortBase&>(input), name)
     {
     }
 
@@ -191,13 +179,6 @@ namespace model
     InputPort<ValueType>::InputPort(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name) :
         InputPortBase(owningNode, input, name)
     {
-    }
-
-    template <typename ValueType>
-    InputPort<ValueType>& InputPort<ValueType>::operator=(const InputPort<ValueType>& other)
-    {
-        _referencedPort = other._referencedPort;
-        return *this;
     }
 
     template <typename ValueType>
@@ -248,7 +229,7 @@ namespace model
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: empty input port.");
         }
 
-        return static_cast<const OutputPort<ValueType>&>(*_referencedPort);
+        return static_cast<const OutputPort<ValueType>&>(InputPortBase::GetReferencedPort());
     }
 
     template <typename ValueType>
@@ -271,11 +252,11 @@ namespace model
             auto& context = archiver.GetContext();
             ModelSerializationContext& modelContext = dynamic_cast<ModelSerializationContext&>(context);
             const auto& newInput = modelContext.GetModel()->AddRoutingNodes(input);
-            _referencedPort = &newInput;
+            SetReferencedPort(&newInput);
         }
         else
         {
-            _referencedPort = input.GetRanges()[0].ReferencedPort();
+            SetReferencedPort(input.GetRanges()[0].ReferencedPort());
         }
     }
 } // namespace model

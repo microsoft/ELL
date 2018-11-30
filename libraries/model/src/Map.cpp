@@ -7,9 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Map.h"
-#include "ModelOptimizer.h"
 #include "ModelTransformer.h"
 #include "OutputNode.h"
+
+#include <model/optimizer/include/ModelOptimizer.h>
 
 #include <utilities/include/Exception.h>
 

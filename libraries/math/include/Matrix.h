@@ -747,7 +747,11 @@ namespace math
     ElementType ConstMatrixReference<ElementType, layout>::operator()(size_t rowIndex, size_t columnIndex) const
     {
         using namespace std::string_literals;
-        DEBUG_THROW(rowIndex >= this->NumRows() || columnIndex >= this->NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "("s + std::to_string(rowIndex) + ", " + std::to_string(columnIndex) + ") exceeds matrix dimensions (" + std::to_string(this->NumRows()) + " x " + std::to_string(this->NumColumns()) + "."));
+        using std::to_string;
+        DEBUG_THROW(rowIndex >= this->NumRows() || columnIndex >= this->NumColumns(),
+                    utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange,
+                                              "("s + to_string(rowIndex) + ", " + to_string(columnIndex) + ") exceeds matrix dimensions (" +
+                                                  to_string(this->NumRows()) + " x " + to_string(this->NumColumns()) + ")."));
 
         return GetConstDataPointer()[rowIndex * this->GetRowIncrement() + columnIndex * this->GetColumnIncrement()];
     }
@@ -897,7 +901,11 @@ namespace math
     ElementType& MatrixReference<ElementType, layout>::operator()(size_t rowIndex, size_t columnIndex)
     {
         using namespace std::string_literals;
-        DEBUG_THROW(rowIndex >= this->NumRows() || columnIndex >= this->NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "("s + std::to_string(rowIndex) + ", " + std::to_string(columnIndex) + ") exceeds matrix dimensions (" + std::to_string(this->NumRows()) + " x " + std::to_string(this->NumColumns()) + "."));
+        using std::to_string;
+        DEBUG_THROW(rowIndex >= this->NumRows() || columnIndex >= this->NumColumns(),
+                    utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange,
+                                              "("s + to_string(rowIndex) + ", " + to_string(columnIndex) + ") exceeds matrix dimensions (" +
+                                                  to_string(this->NumRows()) + " x " + to_string(this->NumColumns()) + ")."));
 
         return GetDataPointer()[rowIndex * this->GetRowIncrement() + columnIndex * this->GetColumnIncrement()];
     }

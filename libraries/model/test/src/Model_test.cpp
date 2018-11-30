@@ -246,7 +246,7 @@ void TestNodeIterator_Middle()
     testing::ProcessQuietTest("Found last node", lastNode != nullptr);
     const auto& lastOutput = lastNode->output;
 
-    size_t expectedSubgraphSize = 3;
+    size_t expectedSubmodelSize = 3;
     auto iter = model.GetNodeIterator({ &firstInput }, { &lastOutput });
     while (iter.IsValid())
     {
@@ -265,9 +265,9 @@ void TestNodeIterator_Middle()
         visitedNodeIds.Add(node->GetId());
     }
 
-    auto success = testing::ProcessTest("Testing NodeIterator count over model subgraph", visitedNodeIds.Size() == expectedSubgraphSize);
+    auto success = testing::ProcessTest("Testing NodeIterator count over model subgraph", visitedNodeIds.Size() == expectedSubmodelSize);
     if (!success)
-        std::cout << "Expected size: " << expectedSubgraphSize << ", got: " << visitedNodeIds.Size() << std::endl;
+        std::cout << "Expected size: " << expectedSubmodelSize << ", got: " << visitedNodeIds.Size() << std::endl;
 }
 
 void TestReverseNodeIterator()

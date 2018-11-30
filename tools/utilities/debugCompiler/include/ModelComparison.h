@@ -10,8 +10,6 @@
 
 #include "VectorStatistics.h"
 
-#include <utilities/include/Graph.h>
-
 #include <common/include/LoadModel.h>
 #include <common/include/ModelLoadArguments.h>
 
@@ -24,6 +22,8 @@
 
 #include <nodes/include/DebugSinkNode.h>
 #include <nodes/include/NeuralNetworkLayerNode.h>
+
+#include <utilities/include/Graph.h>
 
 #include <map>
 #include <ostream>

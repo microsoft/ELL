@@ -98,7 +98,6 @@ namespace common
 #include <model/include/IRCompiledMap.h>
 #include <model/include/IRMapCompiler.h>
 
-// nodes
 #include <nodes/include/ClockNode.h> // for nodes::TimeTickType
 
 namespace ell

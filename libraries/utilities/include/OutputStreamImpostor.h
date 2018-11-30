@@ -70,6 +70,29 @@ namespace utilities
         template <typename T>
         std::ostream& operator<<(T&& value);
 
+        /// <summary> Returns the current floating-point precision setting for the stream </summary>
+        std::streamsize precision() const;
+
+        /// <summary> Sets the floating-point precision setting for the stream </summary>
+        ///
+        /// <returns> The previous floating-point precision setting for the stream </summary>
+        std::streamsize precision(std::streamsize prec);
+
+        /// <summary> Sets the specified format flags for the stream to on</summary>
+        ///
+        /// <param name="fmtfl"> The flags to set. Only flags with a `1` set are modified. </param>
+        ///
+        /// <returns> The previous format flags for the stream </returns>
+        std::ios_base::fmtflags setf(std::ios_base::fmtflags fmtfl);
+
+        /// <summary> Sets or clears the specified format flags for the stream, depending on a mask </summary>
+        ///
+        /// <param name="fmtfl"> The values to set the flags to (`0` or `1`). Only flags with a `1` in the corresponding mask bitfield are modified. </param>
+        /// <param name="mask"> A bitmask indicating the flags to modify. Only flags with a `1` set in the mask are modified. </param>
+        ///
+        /// <returns> The previous format flags for the stream </returns>
+        std::ios_base::fmtflags setf(std::ios_base::fmtflags fmtfl, std::ios_base::fmtflags mask);
+
     private:
         std::shared_ptr<std::ofstream> _fileStream;
 

@@ -15,12 +15,12 @@
 
 #include <dsp/include/FilterBank.h>
 
+#include <math/include/Tensor.h>
+
 #include <model/include/InputNode.h>
 #include <model/include/InputNodeBase.h>
 #include <model/include/ModelEditor.h>
 #include <model/include/OutputNode.h>
-
-#include <math/include/Tensor.h>
 
 #include <nodes/include/BinaryOperationNode.h>
 #include <nodes/include/BufferNode.h>

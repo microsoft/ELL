@@ -37,6 +37,8 @@ namespace model
     class NodeIterator : public utilities::IIterator<const Node*>
     {
     public:
+        NodeIterator() = default;
+
         /// <summary> Returns true if the iterator is currently pointing to a valid node. </summary>
         ///
         /// <returns> true if valid, false if not. </returns>
@@ -49,7 +51,6 @@ namespace model
 
     protected:
         friend class Model;
-        NodeIterator() = default;
         NodeIterator(const Model* model);
         void SetNodeVisited(const Node* node);
         void SetSubmodelInputs(const std::vector<const InputPortBase*>& inputs);
@@ -107,6 +108,8 @@ namespace model
     private:
         friend class Model;
         ReverseNodeIterator(const Model* model);
+        ReverseNodeIterator(const Model* model, const std::vector<const OutputPortBase*>& outputs);
+        ReverseNodeIterator(const Model* model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs);
     };
 
     /// <summary> Model class. Represents a graph of computation </summary>
@@ -267,6 +270,31 @@ namespace model
         /// its outputs have first been visited.
         /// </summary>
         ReverseNodeIterator GetReverseNodeIterator() const;
+
+        /// <summary>
+        /// Gets an iterator over the nodes in the model necessary to compute the given output. Visits the nodes
+        /// in reverse dependency order. No nodes will be visited until all its outputs have first been visited.
+        /// </summary>
+        ///
+        /// <param name="output"> The output to use for deciding which nodes to visit </param>
+        ReverseNodeIterator GetReverseNodeIterator(const OutputPortBase* output) const;
+
+        /// <summary>
+        /// Gets an iterator over the nodes in the model necessary to compute the given outputs. Visits the nodes
+        /// in reverse dependency order. No nodes will be visited until all its outputs have first been visited.
+        /// </summary>
+        ///
+        /// <param name="outputs"> The outputs to use for deciding which nodes to visit </param>
+        ReverseNodeIterator GetReverseNodeIterator(const std::vector<const OutputPortBase*>& outputs) const;
+
+        /// <summary>
+        /// Gets an iterator over the nodes in the model necessary to compute the outputs of the given nodes. Visits the nodes
+        /// in reverse dependency order. No nodes will be visited until all its outputs have first been visited.
+        /// </summary>
+        ///
+        /// <param name="inputs"> The ports to use for deciding which nodes to visit --- nodes that are strictly inputs to these ports won't be visited.</param>
+        /// <param name="outputs"> The outputs to use for deciding which nodes to visit </param>
+        ReverseNodeIterator GetReverseNodeIterator(const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -7,7 +7,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "CompilableNodesTest.h"
 #include "../clang/DotProductIR.h"
 
 #include <common/include/LoadModel.h> // for RegisterNodeTypes
@@ -20,7 +19,6 @@
 #include <emitters/include/EmitterException.h>
 #include <emitters/include/EmitterTypes.h>
 #include <emitters/include/IREmitter.h>
-
 #include <model/include/CompiledMap.h>
 #include <model/include/IRCompiledMap.h>
 #include <model/include/IRMapCompiler.h>
@@ -2421,7 +2419,7 @@ void TestConvolutionalLayerNode3(ConvolutionMethod convolutionMethod, size_t inp
     LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
     auto actualConvolutionMethod = ConvolutionMethod::unrolled;
     ConvolutionalParameters convolutionalParams{ 3, 1, actualConvolutionMethod, 2 }; // 2 == batch size
-    TensorType weights(convolutionalParams.receptiveField * numFilters, convolutionalParams.receptiveField, 1);
+    TensorType weights(convolutionalParams.receptiveField * numFilters, convolutionalParams.receptiveField, numChannels);
     weights.Fill(1.0);
     for (size_t rowIndex = 0; rowIndex < convolutionalParams.receptiveField * numFilters; ++rowIndex)
     {

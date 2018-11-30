@@ -154,7 +154,22 @@ namespace model
 
     ReverseNodeIterator Model::GetReverseNodeIterator() const
     {
-        return ReverseNodeIterator(this);
+        return GetReverseNodeIterator(std::vector<const OutputPortBase*>{});
+    }
+
+    ReverseNodeIterator Model::GetReverseNodeIterator(const OutputPortBase* output) const
+    {
+        return GetReverseNodeIterator(std::vector<const OutputPortBase*>{ output });
+    }
+
+    ReverseNodeIterator Model::GetReverseNodeIterator(const std::vector<const OutputPortBase*>& outputs) const
+    {
+        return ReverseNodeIterator(this, outputs);
+    }
+
+    ReverseNodeIterator Model::GetReverseNodeIterator(const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs) const
+    {
+        return ReverseNodeIterator(this, inputs, outputs);
     }
 
     utilities::ArchiveVersion Model::GetArchiveVersion() const
@@ -242,7 +257,7 @@ namespace model
     {
         std::shared_ptr<Node> sharedNode(std::move(node));
         EnsureNodeHasUniqueId(*sharedNode);
-        sharedNode->RegisterDependencies();
+        sharedNode->UpdateInputPorts();
         _data->idToNodeMap[sharedNode->GetId()] = sharedNode;
         return sharedNode.get();
     }
@@ -545,15 +560,30 @@ namespace model
     }
 
     // ReverseNodeIterator
-    ReverseNodeIterator::ReverseNodeIterator(const Model* model) :
+    ReverseNodeIterator::ReverseNodeIterator(const Model* model, const std::vector<const OutputPortBase*>& outputs) :
         NodeIterator(model)
     {
-        // Just push everything on the stack
-        for (auto node : _model->_data->idToNodeMap)
+        if (_model->Size() == 0)
         {
-            _nodesToVisit.push_back(node.second.get());
+            return;
         }
 
+        SetOutputPortsToVisit(outputs);
+        AddRemainingValidOutputs();
+        Next();
+    }
+
+    ReverseNodeIterator::ReverseNodeIterator(const Model* model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs) :
+        NodeIterator(model)
+    {
+        if (_model->Size() == 0)
+        {
+            return;
+        }
+
+        SetSubmodelInputs(inputs);
+        SetOutputPortsToVisit(outputs);
+        AddRemainingValidOutputs();
         Next();
     }
 

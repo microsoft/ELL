@@ -6,7 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// neural network predictor
 #include "NeuralNetworkPredictorInterface.h"
 #include "MathInterface.h"
 #include "ModelBuilderInterface.h"

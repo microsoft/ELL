@@ -17,18 +17,26 @@ namespace model
     //
     InputPortBase::InputPortBase(Port::PortType portType) :
         Port(nullptr, "", portType)
-    {
-    }
+    {}
 
     InputPortBase::InputPortBase(const Node* owningNode, const OutputPortBase& input, const std::string& name) :
-        Port(owningNode, name, input.GetType()),
-        _referencedPort(&input)
+        Port(owningNode, name, input.GetType())
     {
+        SetReferencedPort(&input);
+    }
+
+    InputPortBase::~InputPortBase()
+    {
+        if (_referencedPort)
+        {
+            _referencedPort->RemoveReference(this);
+        }
     }
 
     std::vector<const Node*> InputPortBase::GetParentNodes() const
     {
-        return _referencedPort == nullptr ? std::vector<const Node*>() : std::vector<const Node*>{ _referencedPort->GetNode() };
+        return _referencedPort == nullptr ? std::vector<const Node*>()
+                                          : std::vector<const Node*>{ _referencedPort->GetNode() };
     }
 
     PortElementBase InputPortBase::GetInputElement(size_t index) const
@@ -71,9 +79,30 @@ namespace model
         return _referencedPort != nullptr;
     }
 
-    void InputPortBase::SetInput(const OutputPortBase* input)
+    void InputPortBase::SetReferencedPort(const OutputPortBase* input)
     {
+        if (_referencedPort)
+        {
+            _referencedPort->RemoveReference(this);
+        }
+        if (input)
+        {
+            input->AddReference(this);
+        }
         _referencedPort = input;
+    }
+
+    void InputPortBase::ClearReferencedPort()
+    {
+        _referencedPort = nullptr;
+    }
+    
+    void InputPortBase::UpdateReferencedPort()
+    {
+        if (!_referencedPort->HasReference(this))
+        {
+            _referencedPort->AddReference(this);
+        }
     }
 } // namespace model
 } // namespace ell

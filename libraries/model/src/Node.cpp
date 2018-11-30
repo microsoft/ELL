@@ -165,25 +165,17 @@ namespace model
         return std::vector<const Node*>{ nodes.begin(), nodes.end() };
     }
 
-    void Node::AddDependent(const Node* dependent) const
+    std::vector<const Node*> Node::GetDependentNodes() const
     {
-        _dependentNodes.push_back(dependent);
-    }
-
-    void Node::RegisterDependencies() const
-    {
-        for (const auto& input : _inputs)
+        std::unordered_set<const Node*> nodes;
+        for (const auto& port : _outputs)
         {
-            for (const auto& node : input->GetParentNodes())
+            for (const auto& referencingPort : port->GetReferences())
             {
-                node->AddDependent(this);
-            }
-
-            if (input->IsValid())
-            {
-                input->GetReferencedPort().ReferencePort();
+                nodes.insert(referencingPort->GetNode());
             }
         }
+        return std::vector<const Node*>{ nodes.begin(), nodes.end() };
     }
 
     bool Node::InvokeRefine(ModelTransformer& transformer) const
@@ -235,6 +227,14 @@ namespace model
             }
         }
         os << ")" << std::endl;
+    }
+
+    void Node::UpdateInputPorts()
+    {
+        for (auto input : _inputs)
+        {
+            input->UpdateReferencedPort();
+        }
     }
 
     utilities::ArchiveVersion Node::GetArchiveVersion() const

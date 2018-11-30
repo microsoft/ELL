@@ -9,17 +9,31 @@
 ##
 ####################################################################################################
 
+import argparse
+import enum
+import math
 import os
 import sys
-import argparse
+import time
+
 import cv2
 import numpy as np
-import time
-import math
+
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../pythonlibs'))
 import modelHelpers
 
-def get_example_list_from_file(file_name, categories_name):
+class ColumnOrder(enum.Enum):
+    LABEL_FIRST = enum.auto()
+    FILE_FIRST = enum.auto()
+
+def parse_column_order(s: str):
+    if s == "labelfirst":
+        return ColumnOrder.LABEL_FIRST
+    elif s == "filefirst":
+        return ColumnOrder.FILE_FIRST
+    raise ValueError("Couldn't parse ColumnOrder name{}".format(s))
+    
+def get_example_list_from_file(file_name, categories_name, column_order=ColumnOrder.LABEL_FIRST):
     """
     Parses an example file. Each line in the example file is of the following 
     format:
@@ -45,11 +59,14 @@ def get_example_list_from_file(file_name, categories_name):
     for line in lines:
         line_number = line_number + 1
         line = line.strip()
-        line = line.replace("\t", " ")
-        strings = line.split(" ", 1)
+        strings = line.split(None, 1)
         if len(strings) > 1:
-            label_number = strings[0]
-            image_name = strings[1].strip()
+            if column_order == ColumnOrder.LABEL_FIRST:
+                label_number = strings[0]
+                image_name = strings[1]
+            else:
+                label_number = strings[1]
+                image_name = strings[0]
             examples.append((label_number, image_name, label_number))
         else:
             raise ValueError("Couldn't parse line number {} in {}".format(line_number, file_name))
@@ -118,7 +135,7 @@ def set_binary_labels(input_examples, positive_label):
             examples.append(("-1.0", example[1]))            
     return examples
 
-def write_examples_to_dataset_file(example_list, categories, width, height, use_bgr_ordering, output_dataset):
+def write_examples_to_dataset_file(example_list, categories, width, height, use_bgr_ordering, output_dataset, verbose=False):
     """
     Saves an array of examples to a dataset file.
     """
@@ -129,23 +146,32 @@ def write_examples_to_dataset_file(example_list, categories, width, height, use_
             dataset_file.write("# Category labels\n")
             for i, category in enumerate(categories):
                 dataset_file.write("# {} : {}\n".format(i, category))
+        
+        count = 0
         for example in example_list:
             # Try to read this as an image
             image = cv2.imread(example[1])
             if image is not None:
+                if verbose:
+                    print("Processing {0[0]} | {0[1]}".format(example))
+                
                 # Write label
                 dataset_file.write("{}".format(example[0]))
-                print("Processing {0[0]} | {0[1]}".format(example))
-                resized = modelHelpers.prepare_image_for_model(image, width, height, not use_bgr_ordering)
+                
                 # Write image data
-                valuesWritten = 0
-                for value in resized:
-                    dataset_file.write("\t{}".format(value))
-                    valuesWritten = valuesWritten + 1
+                resized = modelHelpers.prepare_image_for_model(image, width, height, not use_bgr_ordering, convert_to_float=False)
+                dataset_file.write("\t")
+                resized.tofile(dataset_file, sep="\t", format="%s")
                 # Write label, source file as comment
                 dataset_file.write("\t# class={0[2]}, source={0[1]}".format(example))
                 dataset_file.write("\n")
-                print("    Wrote {} data values".format(valuesWritten))
+                
+                if verbose:
+                    print("    Wrote {} data values".format(len(resized)))
+                else:
+                    if (count+1) % 1000 == 0:
+                        print(".", sep="", end="")
+                count += 1
             else:
                 print("Skipping {}, could not open as an image".format(example[1]))
 
@@ -190,10 +216,14 @@ def main(argv):
     arg_parser.add_argument("--bgr", help="specify True if output data should be in BGR format (default True)", default=True)
     arg_parser.add_argument("--positiveCategory", help="if examples define a binary classification (e.g. A, not A), specifies which class category is the positive label.", default=None)
     arg_parser.add_argument("--categories", help="if examples define a multi-class classification (e.g. A, B, C), specifies the class category index file.", default=None)
+    
     # mutually exclusive options for specifying examples
     group = arg_parser.add_mutually_exclusive_group()
-    group.add_argument("--exampleList", help="path to the file containing list of examples, where each line is a label number followed by whitespace path to image", default=None)
     group.add_argument("--folder", help="path to a folder, with sub-folders containing images. Each sub-folder is a class and the images inside are the examples of that class", default=None)
+    group.add_argument("--exampleList", help="path to the file containing list of examples, where each line is a label number followed by whitespace path to image", default=None)
+    arg_parser.add_argument("--exampleOrder", help="the order of the columns in the example list", choices=['labelfirst', 'filefirst'], default="labelfirst")
+    
+    arg_parser.add_argument("--verbose", help="print info for each file processed", action="store_true")
 
     args = arg_parser.parse_args(argv)
 
@@ -202,7 +232,8 @@ def main(argv):
     start = time.time()
     if args.exampleList:
         # parse the input file to get list of examples
-        examples, categories = get_example_list_from_file(args.exampleList, args.categories)
+        column_order = parse_column_order(args.exampleOrder)
+        examples, categories = get_example_list_from_file(args.exampleList, args.categories, column_order)
     elif args.folder:
         # walk the folders looking for image examples
         examples, categories = get_example_list_from_folder(args.folder, args.categories, args.positiveCategory)
@@ -211,7 +242,7 @@ def main(argv):
         return
 
     # process the examples
-    write_examples_to_dataset_file(examples, categories, width, height, args.bgr, args.outputDataset)
+    write_examples_to_dataset_file(examples, categories, width, height, args.bgr, args.outputDataset, verbose=args.verbose)
     end = time.time()
     print("Total time to create dataset: {:.1f} seconds".format(end - start))
 

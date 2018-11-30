@@ -23,6 +23,7 @@ namespace ell
 namespace model
 {
     class Node;
+    class InputPortBase;
 
     /// <summary> Base class for output ports </summary>
     class OutputPortBase : public Port
@@ -48,10 +49,7 @@ namespace model
         /// <param name="layout"> The memory layout of the port's output. </param>
         OutputPortBase(const Node* node, std::string name, PortType type, const PortMemoryLayout& layout);
 
-        ~OutputPortBase() override = default;
-
-        /// <summary> Notify this port that it is being referenced </summary>
-        void ReferencePort() const { _isReferenced = true; }
+        ~OutputPortBase() override;
 
         /// <summary> Returns the size of the output </summary>
         ///
@@ -76,7 +74,12 @@ namespace model
         /// <summary> Indicate if this port is referenced. </summary>
         ///
         /// <returns> Returns true if the port is referenced by another node. </returns>
-        bool IsReferenced() const { return _isReferenced; }
+        bool IsReferenced() const;
+
+        /// <summary> Get the ports that are referencing this port. </summary>
+        ///
+        /// <returns> The ports that are referencing this port. </returns>
+        const std::vector<const InputPortBase*>& GetReferences() const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -101,13 +104,18 @@ namespace model
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
+        friend class InputPortBase;
+
+        void AddReference(const InputPortBase* reference) const;
+        void RemoveReference(const InputPortBase* reference) const;
+        bool HasReference(const InputPortBase* reference) const;
         utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         PortMemoryLayout _layout;
-        mutable bool _isReferenced = false;
+        mutable std::vector<const InputPortBase*> _references;
     };
 
     /// <summary> Represents an output from a node </summary>

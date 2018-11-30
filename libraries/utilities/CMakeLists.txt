@@ -21,6 +21,7 @@ set(src
   src/JsonArchiver.cpp
   src/Logger.cpp
   src/MemoryLayout.cpp
+  src/MillisecondTimer.cpp
   src/ObjectArchive.cpp
   src/ObjectArchiver.cpp
   src/OutputStreamImpostor.cpp

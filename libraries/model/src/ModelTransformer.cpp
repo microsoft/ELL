@@ -14,6 +14,8 @@
 #include <utilities/include/Exception.h>
 #include <utilities/include/StringUtil.h>
 
+#include <algorithm>
+
 namespace ell
 {
 namespace model
@@ -187,9 +189,9 @@ namespace model
         return result;
     }
 
-    const OutputPortBase& ModelTransformer::CopySubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const OutputPortBase& sourceOutput, Model& destModel, const std::vector<const OutputPortBase*>& destInputs, const TransformContext& context)
+    const OutputPortBase& ModelTransformer::CopySubmodelOnto(const Model& sourceModel, const OutputPortBase& sourceOutput, Model& destModel, const std::vector<PortCorrespondence>& portCorrespondences, const TransformContext& context)
     {
-        auto result = CopySubmodelOnto(sourceModel, sourceInputs, { &sourceOutput }, destModel, destInputs, context);
+        auto result = CopySubmodelOnto(sourceModel, { &sourceOutput }, destModel, portCorrespondences, context);
         if (result.size() != 1)
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: expected submodel output to be a single port");
@@ -197,10 +199,10 @@ namespace model
         return *(result[0]);
     }
 
-    std::vector<const OutputPortBase*> ModelTransformer::CopySubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const std::vector<const OutputPortBase*>& sourceOutputs, Model& destModel, const std::vector<const OutputPortBase*>& destInputs, const TransformContext& context)
+    std::vector<const OutputPortBase*> ModelTransformer::CopySubmodelOnto(const Model& sourceModel, const std::vector<const OutputPortBase*>& sourceOutputs, Model& destModel, const std::vector<PortCorrespondence>& portCorrespondences, const TransformContext& context)
     {
         _elementsMap.Clear();
-        auto result = TransformSubmodelOnto(sourceModel, sourceInputs, sourceOutputs, destModel, destInputs, context, [](const Node& node, ModelTransformer& transformer) {
+        auto result = TransformSubmodelOnto(sourceModel, sourceOutputs, destModel, portCorrespondences, context, [](const Node& node, ModelTransformer& transformer) {
             if (transformer.ShouldCopyNode(node))
             {
                 transformer.CopyNode(node);
@@ -265,9 +267,9 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "maxIterations must be positive");
         }
 
-        _context = context;
         _elementsMap.Clear();
         _model = CopyModel(oldModel, context);
+        _context = context;
 
         // Refine until all nodes are compilable according to context.IsNodeCompilable(), until
         // the model is fully refined, or until the maximum number of iterations is reached.
@@ -284,19 +286,8 @@ namespace model
             // Do one refinement pass
             // Note: as a side-effect, _elementsMap may be modified
             bool didRefineAny = false;
-            currentModel.Visit([this, &context, &didRefineAny](const Node& node) {
-                bool didRefineNode = false;
-                auto action = context.GetNodeAction(node);
-                // If the node action is "refine" or the default, try to refine the node, otherwise leave it alone
-                if (action == NodeAction::refine || action == NodeAction::abstain)
-                {
-                    didRefineNode = node.InvokeRefine(*this);
-                    AssignNodeAncestor(node);
-                }
-                else
-                {
-                    CopyNode(node);
-                }
+            currentModel.Visit([this, &didRefineAny](const Node& node) {
+                bool didRefineNode = RefineNode(node);
                 didRefineAny |= didRefineNode;
             });
 
@@ -324,19 +315,14 @@ namespace model
         return (source->Size() == dest->Size()) && (source->GetType() == dest->GetType());
     }
 
-    void ModelTransformer::MapCorrespondingInputs(const std::vector<const InputPortBase*>& sourceInputs, const std::vector<const OutputPortBase*>& destInputs)
+    void ModelTransformer::MapCorrespondingInputs(const std::vector<PortCorrespondence>& correspondences)
     {
         // Set up port mapping between the given source inputs and their corresponding destination inputs
         // throw an exception if the inputs are ill-formed
-        if (sourceInputs.size() != destInputs.size())
+        for (size_t i = 0; i < correspondences.size(); ++i)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Different number of source and destination inputs");
-        }
-
-        for (size_t i = 0; i < sourceInputs.size(); ++i)
-        {
-            auto source = sourceInputs[i];
-            auto dest = destInputs[i];
+            auto source = correspondences[i].source;
+            auto dest = correspondences[i].destination;
             if (!Compatible(source, dest))
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible source and destination inputs");
@@ -354,18 +340,18 @@ namespace model
     Model ModelTransformer::TransformSubmodel(const Model& model, const std::vector<const OutputPortBase*>& outputs, const TransformContext& context, const NodeTransformFunction& transformFunction)
     {
         Model newModel;
-        TransformSubmodelOnto(model, {}, outputs, newModel, {}, context, transformFunction);
+        TransformSubmodelOnto(model, outputs, newModel, {}, context, transformFunction);
         return newModel;
     }
 
     std::vector<const OutputPortBase*> ModelTransformer::TransformSubmodelInPlace(Model& model, const std::vector<const OutputPortBase*>& outputs, const TransformContext& context, const std::function<void(const Node&, ModelTransformer&)>& transformFunction)
     {
-        return TransformSubmodelOnto(model, {}, outputs, model, {}, context, transformFunction);
+        return TransformSubmodelOnto(model, outputs, model, {}, context, transformFunction);
     }
 
-    const OutputPortBase& ModelTransformer::TransformSubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const OutputPortBase& sourceOutput, Model& destModel, const std::vector<const OutputPortBase*>& destInputs, const TransformContext& context, const NodeTransformFunction& transformFunction)
+    const OutputPortBase& ModelTransformer::TransformSubmodelOnto(const Model& sourceModel, const OutputPortBase& sourceOutput, Model& destModel, const std::vector<PortCorrespondence>& portCorrespondences, const TransformContext& context, const NodeTransformFunction& transformFunction)
     {
-        auto result = TransformSubmodelOnto(sourceModel, sourceInputs, { &sourceOutput }, destModel, destInputs, context, transformFunction);
+        auto result = TransformSubmodelOnto(sourceModel, { &sourceOutput }, destModel, portCorrespondences, context, transformFunction);
         if (result.size() != 1)
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error: expected submodel output to be a single port");
@@ -373,7 +359,7 @@ namespace model
         return *result[0];
     }
 
-    std::vector<const OutputPortBase*> ModelTransformer::TransformSubmodelOnto(const Model& sourceModel, const std::vector<const InputPortBase*>& sourceInputs, const std::vector<const OutputPortBase*>& sourceOutputs, Model& destModel, const std::vector<const OutputPortBase*>& destInputs, const TransformContext& context, const NodeTransformFunction& transformFunction)
+    std::vector<const OutputPortBase*> ModelTransformer::TransformSubmodelOnto(const Model& sourceModel, const std::vector<const OutputPortBase*>& sourceOutputs, Model& destModel, const std::vector<PortCorrespondence>& portCorrespondences, const TransformContext& context, const NodeTransformFunction& transformFunction)
     {
         _context = context;
         _model = destModel.ShallowCopy();
@@ -381,7 +367,9 @@ namespace model
         auto previousElementMap = std::move(_elementsMap);
         _elementsMap.Clear();
 
-        MapCorrespondingInputs(sourceInputs, destInputs);
+        MapCorrespondingInputs(portCorrespondences);
+        std::vector<const InputPortBase*> sourceInputs;
+        std::transform(portCorrespondences.begin(), portCorrespondences.end(), std::back_inserter(sourceInputs), [](auto& c) { return c.source; });
         sourceModel.VisitSubmodel(sourceInputs, sourceOutputs, [this, transformFunction](const Node& node) {
             transformFunction(node, *this);
             AssignNodeAncestor(node);
@@ -510,6 +498,24 @@ namespace model
                 }
             }
         }
+    }
+
+    bool ModelTransformer::RefineNode(const Node& node)
+    {
+        // If the node action is "refine" or the default, try to refine the node, otherwise leave it alone
+        auto action = GetContext().GetNodeAction(node);
+        if (action == NodeAction::refine || action == NodeAction::abstain)
+        {
+            auto didRefineNode = node.InvokeRefine(*this);
+            AssignNodeAncestor(node);
+            return didRefineNode;
+        }
+        else
+        {
+            CopyNode(node);
+        }
+
+        return false;
     }
 
     std::vector<const Node*> ModelTransformer::FindUncompilableNodes(const Model& model, const TransformContext& context) const

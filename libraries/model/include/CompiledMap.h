@@ -60,7 +60,7 @@ namespace model
 
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
-        /// <param name="streawm"> The stream to write the prototype to </param>
+        /// <param name="stream"> The stream to write the prototype to </param>
         /// <param name="format"> The format to write out (cHeader or Swig interface) </param>
         virtual void WriteCodeHeader(std::ostream& stream, emitters::ModuleOutputFormat format) const = 0;
 

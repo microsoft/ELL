@@ -46,5 +46,8 @@ namespace dsp
     /// <returns> A tensor with the result of the convolution `input` (*) `filter`
     template <typename ValueType>
     math::ChannelColumnRowTensor<ValueType> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int stride);
+
+    template <typename ValueType>
+    void ReceptiveFieldToColumns(math::ConstChannelColumnRowTensorReference<ValueType> input, int filterSize, int stride, math::RowMatrix<ValueType>& shapedInput);
 } // namespace dsp
 } // namespace ell

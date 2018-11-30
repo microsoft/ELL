@@ -12,8 +12,6 @@
 
 #include <dsp/include/FilterBank.h>
 
-#include "CepstrumTestData.h"
-
 #include <testing/include/testing.h>
 
 #include <iostream>

@@ -28,18 +28,18 @@
 
 // Helper to define a value that is exposed as read-only in the API, but is not
 // const from the underlying code side.
-#ifdef SWIG
-// clang-format breaks SWIG because clang-format likes to put a space after %
 // clang-format off
+// clang-format breaks SWIG because clang-format likes to put a space after %
+#ifdef SWIG
 #define API_READONLY(statement) \
-    %immutable;                \
+    %immutable;                 \
     statement;                  \
     %mutable
-// clang-format on
 #else
 #define API_READONLY(statement) \
     statement;
 #endif
+// clang-format on
 
 namespace ell
 {

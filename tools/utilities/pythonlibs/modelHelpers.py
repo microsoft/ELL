@@ -24,7 +24,7 @@ sys.path.append(os.path.join(script_path, 'build/Release'))
 
 
 def prepare_image_for_model(image, requiredWidth, requiredHeight,
-                            reorder_to_rgb=False):
+                            reorder_to_rgb=False, convert_to_float=True):
     """ Prepare an image for use with a model. Typically, this involves:
         - Resize and center crop to the required width and height while
         preserving the image's aspect ratio. Simple resize may result in a
@@ -52,8 +52,11 @@ def prepare_image_for_model(image, requiredWidth, requiredHeight,
     # Re-order if needed
     if reorder_to_rgb:
         resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
-    # Return as a vector of floats
-    result = resized.astype(np.float).ravel()
+    if convert_to_float:
+        # Return as a vector of floats
+        result = resized.astype(np.float).ravel()
+    else:
+        result = resized.ravel()
     return result
 
 def get_top_n_predictions(predictions, N = 5, threshold = 0.20):

@@ -26,42 +26,65 @@ namespace ell
 {
 namespace utilities
 {
-    std::ifstream OpenIfstream(const std::string& filepath)
+    namespace
     {
-#ifdef WIN32
-        auto path = fs::u8path(filepath);
-#else
-        const auto& path = filepath;
-#endif
-        // open file
-        auto stream = std::ifstream(path);
-
-        // check that it opened
-        if (!stream.is_open())
+        std::ifstream OpenIfstream(const std::string& filepath, std::ios_base::openmode mode)
         {
-            throw utilities::InputException(InputExceptionErrors::invalidArgument, "error opening file " + filepath);
+#ifdef WIN32
+            auto path = fs::u8path(filepath);
+#else
+            const auto& path = filepath;
+#endif
+            // open file
+            auto stream = std::ifstream(path, mode);
+
+            // check that it opened
+            if (!stream.is_open())
+            {
+                throw utilities::InputException(InputExceptionErrors::invalidArgument, "error opening file " + filepath);
+            }
+
+            return stream;
         }
 
-        return stream;
+        std::ofstream OpenOfstream(const std::string& filepath, std::ios_base::openmode mode)
+        {
+#ifdef WIN32
+            auto path = fs::u8path(filepath);
+#else
+            const auto& path = filepath;
+#endif
+            // open file
+            std::ofstream stream(path, mode);
+
+            // check that it opened
+            if (!stream.is_open())
+            {
+                throw utilities::InputException(InputExceptionErrors::invalidArgument, "error opening file " + filepath);
+            }
+
+            return stream;
+        }
+    } // namespace
+
+    std::ifstream OpenIfstream(const std::string& filepath)
+    {
+        return OpenIfstream(filepath, std::ios_base::in);
+    }
+
+    std::ifstream OpenBinaryIfstream(const std::string& filepath)
+    {
+        return OpenIfstream(filepath, std::ios_base::in | std::ios_base::binary);
     }
 
     std::ofstream OpenOfstream(const std::string& filepath)
     {
-#ifdef WIN32
-        auto path = fs::u8path(filepath);
-#else
-        const auto& path = filepath;
-#endif
-        // open file
-        std::ofstream stream(path);
+        return OpenOfstream(filepath, std::ios_base::out);
+    }
 
-        // check that it opened
-        if (!stream.is_open())
-        {
-            throw utilities::InputException(InputExceptionErrors::invalidArgument, "error opening file " + filepath);
-        }
-
-        return stream;
+    std::ofstream OpenBinaryOfstream(const std::string& filepath)
+    {
+        return OpenOfstream(filepath, std::ios_base::out | std::ios_base::binary);
     }
 
     bool IsFileReadable(const std::string& filepath)
@@ -269,7 +292,6 @@ namespace utilities
 
     void EnsureDirectoryExists(const std::string& path)
     {
-
         if (!DirectoryExists(path))
         {
 

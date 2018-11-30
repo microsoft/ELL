@@ -14,18 +14,18 @@
 #include <common/include/MapLoadArguments.h>
 #include <common/include/RegisterNodeCreators.h>
 
-#include <emitters/include/ModuleEmitter.h>
-
-#include <utilities/include/JsonArchiver.h>
-#include <utilities/include/StringUtil.h>
-
 #include <data/include/DenseDataVector.h>
 
 #include <dsp/include/FilterBank.h>
 
+#include <emitters/include/ModuleEmitter.h>
+
 #include <model/include/InputNode.h>
 #include <model/include/Map.h>
 #include <model/include/OutputNode.h>
+
+#include <utilities/include/JsonArchiver.h>
+#include <utilities/include/StringUtil.h>
 
 #include <algorithm>
 
@@ -535,11 +535,6 @@ PortMemoryLayout OutputPort::GetMemoryLayout() const
 std::string OutputPort::GetName()
 {
     return _port->GetName();
-}
-
-void OutputPort::ReferencePort()
-{
-    _port->ReferencePort();
 }
 
 //

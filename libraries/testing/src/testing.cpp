@@ -22,6 +22,11 @@ namespace testing
     {
     }
 
+    TestNotImplementedException::TestNotImplementedException(const std::string& testDescription) :
+        std::runtime_error(std::string("TestNotImplementedException: ") + testDescription)
+    {
+    }
+
     //
     // vectors
     //
@@ -149,11 +154,11 @@ namespace testing
     {
         if (!success)
         {
-            TestFailed(testDescription + " ... Failed");
+            TestFailed(testDescription);
         }
         else
         {
-            TestSucceeded(testDescription + " ... Success");
+            TestSucceeded(testDescription);
         }
 
         return success;
@@ -163,7 +168,7 @@ namespace testing
     {
         if (!success)
         {
-            TestFailed(testDescription + " ... Failed");
+            TestFailed(testDescription);
         }
 
         return success;
@@ -179,18 +184,23 @@ namespace testing
 
     void TestFailed(const std::string& message)
     {
-        std::cout << message << std::endl;
+        std::cout << message << " ... Failed" << std::endl;
         testFailedFlag = true;
     }
 
     void TestSucceeded(const std::string& message)
     {
-        std::cout << message << std::endl;
+        std::cout << message << " ... Success" << std::endl;
     }
 
     bool DidTestFail()
     {
         return testFailedFlag;
+    }
+
+    int GetExitCode()
+    {
+        return DidTestFail() ? 1 : 0;
     }
 
     EnableLoggingHelper::EnableLoggingHelper()

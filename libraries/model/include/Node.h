@@ -148,7 +148,7 @@ namespace model
         /// <summary> Get all nodes that depend (directly) on us </summary>
         ///
         /// <returns> a vector of all the nodes that depend on this node </summary>
-        const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
+        std::vector<const Node*> GetDependentNodes() const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -204,8 +204,7 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const = 0;
 
         void SetId(Node::NodeId id);
-        void AddDependent(const Node* dependent) const;
-        void RegisterDependencies() const;
+        void UpdateInputPorts();
         bool InvokeRefine(ModelTransformer& transformer) const;
 
         NodeId _id;

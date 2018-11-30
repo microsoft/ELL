@@ -49,8 +49,9 @@ void TestTransformSubmodelInPlace_Modify();
 
 namespace
 {
-const std::vector<const InputPortBase*> noInput;
-const std::vector<const OutputPortBase*> noOutput;
+const std::vector<const InputPortBase*> noInput = {};
+const std::vector<const OutputPortBase*> noOutput = {};
+const std::vector<PortCorrespondence> noCorrespondences = {};
 } // namespace
 
 // Transform functions
@@ -164,7 +165,7 @@ void TestTransformSubmodelOnto_CopyInPlace()
     TransformContext context;
     ModelTransformer transformer;
 
-    transformer.TransformSubmodelOnto(srcModel, noInput, noOutput, srcModel, noOutput, context, CopyNode);
+    transformer.TransformSubmodelOnto(srcModel, noOutput, srcModel, noCorrespondences, context, CopyNode);
     ProcessTest("CopyTestTransformSubmodelOnto_CopyInPlace", srcModel.Size() == oldSize);
 }
 
@@ -177,7 +178,7 @@ void TestTransformSubmodelOnto_CopyOutOfPlace()
     TransformContext context;
     ModelTransformer transformer;
 
-    transformer.TransformSubmodelOnto(srcModel, noInput, noOutput, destModel, noOutput, context, CopyNode);
+    transformer.TransformSubmodelOnto(srcModel, noOutput, destModel, noCorrespondences, context, CopyNode);
     ProcessTest("TestTransformSubmodelOnto_CopyOutOfPlace", destModel.Size() == oldSize);
 }
 
@@ -190,7 +191,7 @@ void TestTransformSubmodelOnto_CopyPrefixInPlace()
     ModelTransformer transformer;
 
     auto branchPoint = &FindDebugNode(srcModel, 1)->output;
-    transformer.TransformSubmodelOnto(srcModel, {}, { branchPoint }, srcModel, {}, context, CopyNode);
+    transformer.TransformSubmodelOnto(srcModel, { branchPoint }, srcModel, noCorrespondences, context, CopyNode);
     ProcessTest("TestTransformSubmodelOnto_CopyPrefixInPlace", srcModel.Size() == oldSize);
 }
 
@@ -204,7 +205,7 @@ void TestTransformSubmodelOnto_CopyPrefixOutOfPlace()
     ModelTransformer transformer;
     auto branchPoint = &FindDebugNode(srcModel, 1)->output;
 
-    transformer.TransformSubmodelOnto(srcModel, {}, { branchPoint }, destModel, {}, context, CopyNode);
+    transformer.TransformSubmodelOnto(srcModel, { branchPoint }, destModel, noCorrespondences, context, CopyNode);
     ProcessTest("TestTransformSubmodelOnto_CopyPrefixOutOfPlace", destModel.Size() == oldSize - 1);
 }
 
@@ -216,7 +217,7 @@ void TestTransformSubmodelOnto_ModifyInPlace()
     TransformContext context;
     ModelTransformer transformer;
 
-    transformer.TransformSubmodelOnto(srcModel, noInput, noOutput, srcModel, noOutput, context, ModifyFirstDebugNode);
+    transformer.TransformSubmodelOnto(srcModel, noOutput, srcModel, noCorrespondences, context, ModifyFirstDebugNode);
     ProcessTest("TestTransformSubmodelOnto_ModifyInPlace", srcModel.Size() == oldSize + 2);
 }
 
@@ -229,7 +230,7 @@ void TestTransformSubmodelOnto_ModifyOutOfPlace()
     TransformContext context;
     ModelTransformer transformer;
 
-    transformer.TransformSubmodelOnto(srcModel, noInput, noOutput, destModel, noOutput, context, ModifyFirstDebugNode);
+    transformer.TransformSubmodelOnto(srcModel, noOutput, destModel, noCorrespondences, context, ModifyFirstDebugNode);
     ProcessTest("TestTransformSubmodelOnto_ModifyOutOfPlace", destModel.Size() == oldSize);
 }
 

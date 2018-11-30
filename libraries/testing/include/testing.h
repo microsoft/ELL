@@ -27,6 +27,16 @@ namespace testing
         TestFailureException(const std::string& testDescription);
     };
 
+    /// <summary> Exception due to test not implemented. </summary>
+    class TestNotImplementedException : public std::runtime_error
+    {
+    public:
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="testDescription"> A description of the test that wasn't implemented. </param>
+        TestNotImplementedException(const std::string& testDescription);
+    };
+
     /// <summary> Checks if a value is true </summary>
     ///
     /// <param name="a"> The value to check </param>
@@ -168,6 +178,11 @@ namespace testing
     ///
     /// <returns> true if one of the tests failed. </returns>
     bool DidTestFail();
+
+    /// <summary> Get the exit code to return from main. </summary>
+    ///
+    /// <returns> 1 if any of the tests failed, otherwise 0. </returns>
+    int GetExitCode();
 
     /// <summary> Call a function, registering a test failure if an exception is thrown, and continue execution. </summary>
     ///

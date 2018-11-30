@@ -14,7 +14,9 @@
 #include <math/include/Matrix.h>
 
 #include <cstddef>
+#include <fstream>
 #include <memory>
+#include <sstream>
 
 namespace ell
 {
@@ -45,19 +47,6 @@ namespace trainers
 } // namespace ell
 
 #pragma region implementation
-
-#pragma once
-
-#include "ProtoNNTrainerUtils.h"
-
-#include <data/include/Dataset.h>
-#include <data/include/Example.h>
-
-#include <cstddef>
-#include <memory>
-
-#include <fstream>
-#include <sstream>
 
 namespace ell
 {

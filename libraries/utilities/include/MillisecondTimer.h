@@ -18,50 +18,30 @@ namespace utilities
     class MillisecondTimer
     {
     public:
-        /// <summary></summary>
-        MillisecondTimer() :
-            _start(std::chrono::system_clock::now()),
-            _running(true) {}
+        /// <summary> Create a timer object. The timer is running when created. </summary>
+        MillisecondTimer();
 
-        /// <summary></summary>
-        void Start()
-        {
-            // STYLE discrepancy
-            _start = std::chrono::system_clock::now();
-            _running = true;
-        }
+        /// <summary> Start the timer, resetting elapsed time to zero. </summary>
+        void Start();
 
-        /// <summary></summary>
-        void Stop()
-        {
-            // STYLE discrepancy
-            _end = std::chrono::system_clock::now();
-            _running = false;
-        }
+        /// <summary> Stop the timer, but remember the elapsed time. </summary>
+        void Stop();
 
-        /// <summary></summary>
-        void Reset()
-        {
-            // STYLE discrepancy
-            _start = std::chrono::system_clock::now();
-            _end = _start;
-        }
+        /// <summary> Start the timer, accumulating any elapsed time. </summary>
+        void Restart();
 
-        /// <summary></summary>
-        std::chrono::milliseconds::rep Elapsed()
-        {
-            // STYLE discrepancy
-            if (_running)
-            {
-                _end = std::chrono::system_clock::now();
-            }
+        /// <summary> Reset the timer to zero. </summary>
+        void Reset();
 
-            return std::chrono::duration_cast<std::chrono::milliseconds>(_end - _start).count();
-        }
+        /// <summary> Return the amount of elapsed time. </summary>
+        std::chrono::milliseconds::rep Elapsed();
 
     private:
+        std::chrono::system_clock::time_point Now();
+        std::chrono::system_clock::duration TimeSinceStart();
+
         std::chrono::system_clock::time_point _start;
-        std::chrono::system_clock::time_point _end;
+        std::chrono::system_clock::duration _elapsedTime;
         bool _running;
     };
 } // namespace utilities

@@ -11,10 +11,10 @@
 #include "CompilableNode.h"
 #include "Node.h"
 #include "OutputPort.h"
+#include "PortMemoryLayout.h"
 
 #include <utilities/include/ArchiveVersion.h>
 #include <utilities/include/IArchivable.h>
-#include <utilities/include/MemoryLayout.h>
 
 #include <string>
 

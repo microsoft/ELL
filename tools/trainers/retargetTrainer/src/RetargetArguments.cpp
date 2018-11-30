@@ -38,25 +38,29 @@ void ParsedRetargetArguments::AddArgs(utilities::CommandLineParser& parser)
                      "The port elements of the pre-trained model to use as input to the subsequent linear predictor e.g. \"1115.output\" to use the full output from Node 1115",
                      "");
 
+    parser.AddOption(print,
+                     "print",
+                     "",
+                     "Print the model.",
+                     false);
+
     parser.AddOption(removeLastLayers,
                      "removeLastLayers",
                      "rem",
                      "Instead of using a node id, a neural network model can be retargeted by removing the last N layers",
                      0);
 
-    parser.AddOption(
-        inputDataFilename,
-        "inputDataFilename",
-        "idf",
-        "Path to the input dataset file",
-        "");
+    parser.AddOption(inputDataFilename,
+                     "inputDataFilename",
+                     "idf",
+                     "Path to the input dataset file",
+                     "");
 
-    parser.AddOption(
-        multiClass,
-        "multiClass",
-        "mc",
-        "Indicates whether the input dataset is multi-class or binary.",
-        false);
+    parser.AddOption(multiClass,
+                     "multiClass",
+                     "mc",
+                     "Indicates whether the input dataset is multi-class or binary.",
+                     false);
 
     parser.AddOption(normalize,
                      "normalize",
@@ -94,26 +98,23 @@ void ParsedRetargetArguments::AddArgs(utilities::CommandLineParser& parser)
                      "The random seed string",
                      "ABCDEFG");
 
-    parser.AddOption(
-        verbose,
-        "verbose",
-        "v",
-        "Print diagnostic output during the execution of the tool to stdout",
-        false);
+    parser.AddOption(verbose,
+                     "verbose",
+                     "v",
+                     "Print diagnostic output during the execution of the tool to stdout",
+                     false);
 
-    parser.AddOption(
-        lossFunctionArguments.lossFunction,
-        "lossFunction",
-        "lf",
-        "Choice of loss function",
-        { { "squared", LossFunctionArguments::LossFunction::squared }, { "log", LossFunctionArguments::LossFunction::log }, { "smoothHinge", LossFunctionArguments::LossFunction::smoothHinge } },
-        "log");
+    parser.AddOption(lossFunctionArguments.lossFunction,
+                     "lossFunction",
+                     "lf",
+                     "Choice of loss function",
+                     { { "squared", LossFunctionArguments::LossFunction::squared }, { "log", LossFunctionArguments::LossFunction::log }, { "smoothHinge", LossFunctionArguments::LossFunction::smoothHinge } },
+                     "log");
 
-    parser.AddOption(
-        useBlas,
-        "blas",
-        "",
-        "Emit code that calls BLAS, used when compiling the input model to create mapped datasets",
-        true);
+    parser.AddOption(useBlas,
+                     "blas",
+                     "",
+                     "Emit code that calls BLAS, used when compiling the input model to create mapped datasets",
+                     true);
 }
 } // namespace ell

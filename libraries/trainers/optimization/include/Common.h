@@ -33,6 +33,9 @@ namespace trainers
             /// <summary> Returns the message. </summary>
             virtual const std::string& GetMessage() const { return _message; }
 
+            /// <summary> Gets the message (for std::exception compatibility). </summary>
+            const char* what() const noexcept override { return GetMessage().c_str(); }
+
         private:
             std::string _message;
         };

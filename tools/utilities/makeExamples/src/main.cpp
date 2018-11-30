@@ -18,8 +18,13 @@
 
 using namespace ell;
 
-void SaveModels(const std::string& ext, const std::string& outputPath)
+void SaveModels(const std::string& ext, std::string outputPath)
 {
+    if (outputPath.empty())
+    {
+        outputPath = ".";
+    }
+    
     ell::utilities::EnsureDirectoryExists(outputPath);
 
     common::SaveModel(GenerateIdentityModel(3), outputPath + "/identity." + ext);

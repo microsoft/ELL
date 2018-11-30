@@ -12,6 +12,7 @@
 
 #include <predictors/include/SingleElementThresholdPredictor.h>
 
+#include <algorithm>
 #include <vector>
 
 namespace ell
@@ -64,8 +65,6 @@ namespace trainers
 } // namespace ell
 
 #pragma region implementation
-
-#include <algorithm>
 
 namespace ell
 {

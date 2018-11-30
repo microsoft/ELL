@@ -551,7 +551,7 @@ class OnnxFlattenConverter(OnnxNodeConverter):
 
     def get_attributes(self, attrs: Attributes):
         attributes = {
-            "axes": attrs["axes"]
+            "axis": attrs.get("axis", 1)
         }
         return attributes
 
@@ -559,15 +559,14 @@ class OnnxFlattenConverter(OnnxNodeConverter):
         input_shape = self.node.input_shapes[0]
         # Flattens the input tensor into a 2D matrix. If input tensor has shape (d_0, d_1, ... d_n)
         # then the output will have shape (d_0 X d_1 ... d_(axis-1), d_axis X d_(axis+1) ... X dn).
-        axis = self.node.attributes['axes'][0]
+        axis = self.node.attributes["axis"]
         s = list(input_shape[0])
-        d0 = s[0]
         d_axis = s[axis]
-        lower = s[:,axis]
-        upper = s[axis+1,:]
-        x = d0 * np.product(lower)
+        lower = s[:axis]
+        upper = s[axis+1:]
+        x = np.product(lower)
         y = d_axis * np.product(upper)
-        s = (x,y)
+        s = (int(x), int(y))
         return [(s, self.get_order(s))]
 
 

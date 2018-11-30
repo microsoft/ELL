@@ -23,12 +23,26 @@ namespace utilities
     /// <returns> The stream. </returns>
     std::ifstream OpenIfstream(const std::string& filepath);
 
+    /// <summary> Opens an std::ifstream in binary mode and throws an exception if a problem occurs. </summary>
+    ///
+    /// <param name="filepath"> The path. </param>
+    ///
+    /// <returns> The stream. </returns>
+    std::ifstream OpenBinaryIfstream(const std::string& filepath);
+
     /// <summary> Opens an std::ofstream and throws an exception if a problem occurs. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> The stream. </returns>
     std::ofstream OpenOfstream(const std::string& filepath);
+
+    /// <summary> Opens an std::ofstream in binary mode and throws an exception if a problem occurs. </summary>
+    ///
+    /// <param name="filepath"> The path. </param>
+    ///
+    /// <returns> The stream. </returns>
+    std::ofstream OpenBinaryOfstream(const std::string& filepath);
 
     /// <summary> Returns true if the file exists and can be opened for reading. </summary>
     ///

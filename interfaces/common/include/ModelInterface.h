@@ -313,7 +313,6 @@ public:
     Node GetNode();
     std::string GetName();
     PortType GetOutputType();
-    void ReferencePort();
     bool IsReferenced() const;
     std::vector<double> GetDoubleOutput();
     double GetDoubleOutput(int index);

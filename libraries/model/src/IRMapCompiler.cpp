@@ -11,13 +11,13 @@
 #include "CompilableNodeUtilities.h"
 #include "IRModelProfiler.h"
 #include "Model.h"
-#include "ModelOptimizer.h"
-#include "OptimizationPassRegistry.h"
 #include "OutputNode.h"
 
-#include <emitters/include/IRMetadata.h>
+#include <model/optimizer/include/ModelOptimizer.h>
+#include <model/optimizer/include/OptimizationPassRegistry.h>
 
 #include <emitters/include/EmitterException.h>
+#include <emitters/include/IRMetadata.h>
 #include <emitters/include/LLVMUtilities.h>
 #include <emitters/include/Variable.h>
 

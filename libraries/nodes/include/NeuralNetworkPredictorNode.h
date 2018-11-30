@@ -8,10 +8,6 @@
 
 #pragma once
 
-#include <model/include/Model.h>
-#include <model/include/ModelTransformer.h>
-#include <model/include/Node.h>
-
 #include "ActivationLayerNode.h"
 #include "BatchNormalizationLayerNode.h"
 #include "BiasLayerNode.h"
@@ -22,6 +18,10 @@
 #include "RegionDetectionLayerNode.h"
 #include "ScalingLayerNode.h"
 #include "SoftmaxLayerNode.h"
+
+#include <model/include/Model.h>
+#include <model/include/ModelTransformer.h>
+#include <model/include/Node.h>
 
 #include <predictors/include/NeuralNetworkPredictor.h>
 
@@ -38,6 +38,7 @@
 #include <functional>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 namespace ell
 {

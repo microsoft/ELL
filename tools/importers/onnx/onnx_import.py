@@ -51,7 +51,7 @@ def convert(model, output=None, zip_ell_model=None, step_interval=None, lag_thre
         zipper.zip_file(model_file_name, model_file_name + ".zip")
         os.remove(model_file_name)
 
-def main(argv):
+def main():
     parser = argparse.ArgumentParser(description="Converts ONNX model to ELL model\n" 
         "Example:\n"
         "onnx_import.py model.onnx\n"
@@ -86,4 +86,5 @@ def main(argv):
     convert(args.input, args.output_directory, args.zip_ell_model, args.step_interval, args.lag_threshold)
 
 if __name__ == "__main__":
-    main(sys.argv[1:]) # skip the first argument(program name)
+    main()
+    

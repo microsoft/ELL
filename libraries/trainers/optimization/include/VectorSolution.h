@@ -106,6 +106,14 @@ namespace trainers
         /// <summary> vector-solution product. </summary>
         template <typename IOElementType, bool isBiased>
         double operator*(math::ConstRowVectorReference<IOElementType> input, const VectorSolution<IOElementType, isBiased>& solution);
+
+        /// <summary> An unbiased vector solution that applies to vector inputs and scalar outputs. </summary>
+        template <typename IOElementType>
+        using UnbiasedVectorSolution = VectorSolution<IOElementType, false>;
+
+        /// <summary> A biased vector solution that applies to vector inputs and scalar outputs. </summary>
+        template <typename IOElementType>
+        using BiasedVectorSolution = VectorSolution<IOElementType, true>;
     } // namespace optimization
 } // namespace trainers
 } // namespace ell

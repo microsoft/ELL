@@ -19,37 +19,6 @@ namespace dsp
     namespace
     {
         template <typename ValueType>
-        void ReceptiveFieldToColumns(math::ConstChannelColumnRowTensorReference<ValueType> input, int filterSize, int stride, math::RowMatrix<ValueType>& shapedInput)
-        {
-            const auto numChannels = static_cast<int>(input.NumChannels());
-            const auto fieldVolumeSize = filterSize * filterSize * numChannels;
-            const auto numOutputRows = (static_cast<int>(input.NumRows()) - filterSize + 1) / stride;
-            const auto numOutputColumns = (static_cast<int>(input.NumColumns()) - filterSize + 1) / stride;
-
-            for (int f = 0; f < fieldVolumeSize; f++)
-            {
-                const auto fieldDepth = f % numChannels;
-                const auto fieldColumn = (f / numChannels) % filterSize;
-                const auto fieldRow = (f / numChannels) / filterSize;
-
-                int rowOffset = 0;
-                for (int h = 0; h < numOutputRows; h++)
-                {
-                    int colOffset = 0;
-                    for (int w = 0; w < numOutputColumns; w++)
-                    {
-                        auto input_row = rowOffset + fieldRow;
-                        auto input_col = colOffset + fieldColumn;
-
-                        shapedInput(f, h * numOutputColumns + w) = input(input_row, input_col, fieldDepth);
-                        colOffset += stride;
-                    }
-                    rowOffset += stride;
-                }
-            }
-        }
-
-        template <typename ValueType>
         math::RowMatrix<ValueType> ComputeWeightsMatrix(const math::ConstChannelColumnRowTensorReference<ValueType>& weightsTensor)
         {
             const auto numChannels = weightsTensor.NumChannels();
@@ -127,6 +96,41 @@ namespace dsp
         return output;
     }
 
+    template <typename ValueType>
+    void ReceptiveFieldToColumns(math::ConstChannelColumnRowTensorReference<ValueType> input, int filterSize, int stride, math::RowMatrix<ValueType>& shapedInput)
+    {
+        const auto numChannels = static_cast<int>(input.NumChannels());
+        const auto fieldVolumeSize = filterSize * filterSize * numChannels;
+        const auto numOutputRows = (static_cast<int>(input.NumRows()) - filterSize + 1) / stride;
+        const auto numOutputColumns = (static_cast<int>(input.NumColumns()) - filterSize + 1) / stride;
+        if (static_cast<int>(shapedInput.NumRows()) != fieldVolumeSize || static_cast<int>(shapedInput.NumColumns()) != numOutputRows * numOutputColumns)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "shapedInput matrix must be of dimension (filterSize*filterSize*numChannels) x (outputRows*outputColumns)");
+        }
+
+        for (int f = 0; f < fieldVolumeSize; f++)
+        {
+            const auto fieldDepth = f % numChannels;
+            const auto fieldColumn = (f / numChannels) % filterSize;
+            const auto fieldRow = (f / numChannels) / filterSize;
+
+            int rowOffset = 0;
+            for (int h = 0; h < numOutputRows; h++)
+            {
+                int colOffset = 0;
+                for (int w = 0; w < numOutputColumns; w++)
+                {
+                    auto input_row = rowOffset + fieldRow;
+                    auto input_col = colOffset + fieldColumn;
+
+                    shapedInput(f, h * numOutputColumns + w) = input(input_row, input_col, fieldDepth);
+                    colOffset += stride;
+                }
+                rowOffset += stride;
+            }
+        }
+    }
+
     // Basic entry points
     template math::RowVector<float> Convolve1DUnrolled(const math::RowVector<float>& input, const math::RowVector<float>& filter);
     template math::RowVector<double> Convolve1DUnrolled(const math::RowVector<double>& input, const math::RowVector<double>& filter);
@@ -136,5 +140,8 @@ namespace dsp
 
     template math::ChannelColumnRowTensor<float> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int stride);
     template math::ChannelColumnRowTensor<double> Convolve2DUnrolled(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int stride);
+
+    template void ReceptiveFieldToColumns(math::ConstChannelColumnRowTensorReference<float> input, int filterSize, int stride, math::RowMatrix<float>& shapedInput);
+    template void ReceptiveFieldToColumns(math::ConstChannelColumnRowTensorReference<double> input, int filterSize, int stride, math::RowMatrix<double>& shapedInput);
 } // namespace dsp
 } // namespace ell

@@ -21,6 +21,7 @@ struct RetargetArguments
     std::string outputModelFilename;
     std::string inputDataFilename;
     std::string targetPortElements;
+    bool print;
     size_t removeLastLayers;
     double desiredPrecision;
     size_t maxEpochs;

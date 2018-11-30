@@ -48,5 +48,25 @@ namespace utilities
         _fileStream(std::make_shared<std::ofstream>(OpenOfstream(filename))),
         _outputStream(*_fileStream)
     {}
+
+    std::streamsize OutputStreamImpostor::precision() const
+    {
+        return _outputStream.get().precision();
+    }
+
+    std::streamsize OutputStreamImpostor::precision(std::streamsize prec)
+    {
+        return _outputStream.get().precision(prec);
+    }
+
+    std::ios_base::fmtflags OutputStreamImpostor::setf(std::ios_base::fmtflags fmtfl)
+    {
+        return _outputStream.get().setf(fmtfl);
+    }
+
+    std::ios_base::fmtflags OutputStreamImpostor::setf(std::ios_base::fmtflags fmtfl, std::ios_base::fmtflags mask)
+    {
+        return _outputStream.get().setf(fmtfl, mask);
+    }
 } // namespace utilities
 } // namespace ell
