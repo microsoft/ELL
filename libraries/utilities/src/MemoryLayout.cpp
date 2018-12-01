@@ -397,13 +397,9 @@ namespace utilities
 
     MemoryLayout MemoryLayout::ReorderedCopy(const DimensionOrder& newOrder) const
     {
-        if (!IsCanonicalOrder())
-        {
-            throw LogicException(LogicExceptionErrors::notImplemented, "Not implemented... yet.");
-        }
-        MemoryLayout result{ Permute(GetActiveSize(), newOrder),
-                             Permute(GetExtent(), newOrder),
-                             Permute(GetOffset(), newOrder),
+        MemoryLayout result{ Permute(GetLogicalDimensionActiveSize(), newOrder),
+                             Permute(GetLogicalDimensionExtent(), newOrder),
+                             Permute(GetLogicalDimensionOffset(), newOrder),
                              newOrder };
         return result;
     }

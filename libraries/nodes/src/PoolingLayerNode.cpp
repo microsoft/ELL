@@ -411,12 +411,12 @@ namespace nodes
 
         // Input / output memory layouts
         const auto& inputLayout = this->GetInputMemoryLayout();
-        const auto& inputSize = inputLayout.GetActiveSize();
-        const auto& inputOffset = inputLayout.GetOffset();
+        const auto& inputSize = inputLayout.GetLogicalDimensionActiveSize();
+        const auto& inputOffset = inputLayout.GetLogicalDimensionOffset();
 
         const auto& outputLayout = this->GetOutputMemoryLayout();
-        const auto& outputSize = outputLayout.GetActiveSize();
-        const auto& outputOffset = outputLayout.GetOffset();
+        const auto& outputSize = outputLayout.GetLogicalDimensionActiveSize();
+        const auto& outputOffset = outputLayout.GetLogicalDimensionOffset();
 
         // Calculate cumulative increment for each dimension
         model::MemoryShape inputIncrement = inputLayout.GetCumulativeIncrement();

@@ -1640,6 +1640,14 @@ namespace dsp
 
     // filters is a numFilters x filterSize x filterSize tensor
     template <typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, WinogradFilterOrder order)
+    {
+        const int tileSize = 2;
+        return Convolve2DWinogradDepthwiseSeparable(input, filters, numFilters, tileSize, order);
+    }
+
+    // filters is a numFilters x filterSize x filterSize tensor
+    template <typename ValueType>
     math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, int tileSize, WinogradFilterOrder order)
     {
         const auto filterSize = static_cast<int>(filters.NumColumns());
@@ -1697,8 +1705,10 @@ namespace dsp
     template math::ChannelColumnRowTensor<double> Convolve2DWinogradPretransformed(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order);
 
     // Depthwise-separable versions
+    template math::ChannelColumnRowTensor<float> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, WinogradFilterOrder order);
     template math::ChannelColumnRowTensor<float> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& filters, int numFilters, int tileSize, WinogradFilterOrder order);
     template math::ChannelColumnRowTensor<float> Convolve2DWinogradDepthwiseSeparablePretransformed(const math::ConstChannelColumnRowTensorReference<float>& input, const math::ConstChannelColumnRowTensorReference<float>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order);
+    template math::ChannelColumnRowTensor<double> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, WinogradFilterOrder order);
     template math::ChannelColumnRowTensor<double> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& filters, int numFilters, int tileSize, WinogradFilterOrder order);
     template math::ChannelColumnRowTensor<double> Convolve2DWinogradDepthwiseSeparablePretransformed(const math::ConstChannelColumnRowTensorReference<double>& input, const math::ConstChannelColumnRowTensorReference<double>& transformedFilters, int numFilters, int tileSize, int filterSize, WinogradFilterOrder order);
 

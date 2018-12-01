@@ -41,7 +41,7 @@ namespace nodes
         _filterSize(filterWeights.NumColumns()),
         _stride(stride)
     {
-        _isDepthwiseSeparable = (filterWeights.NumChannels() == 1) && (inputMemoryLayout.GetActiveSize()[2] > 1);
+        _isDepthwiseSeparable = (filterWeights.NumChannels() == 1) && (inputMemoryLayout.GetLogicalDimensionActiveSize(2) > 1);
         _filterWeights = GetWeightsMatrix(filterWeights);
     }
 
@@ -60,15 +60,15 @@ namespace nodes
         _filterSize(filterSize),
         _stride(stride)
     {
-        _isDepthwiseSeparable = (static_cast<int>(filterWeights.NumColumns()) == (filterSize * filterSize)) && (inputMemoryLayout.GetActiveSize()[2] > static_cast<int>(1));
+        _isDepthwiseSeparable = (static_cast<int>(filterWeights.NumColumns()) == (filterSize * filterSize)) && (inputMemoryLayout.GetLogicalDimensionActiveSize(2) > static_cast<int>(1));
     }
 
     template <typename ValueType>
     typename UnrolledConvolutionNode<ValueType>::MatrixType UnrolledConvolutionNode<ValueType>::GetWeightsMatrix(const ConstTensorReferenceType& weightsTensor) const
     {
         const size_t filterWidth = weightsTensor.NumColumns();
-        const size_t inputDepth = _isDepthwiseSeparable ? 1 : GetInputMemoryLayout().GetActiveSize(2);
-        const size_t numFilters = GetOutputMemoryLayout().GetActiveSize(2);
+        const size_t inputDepth = _isDepthwiseSeparable ? 1 : GetInputMemoryLayout().GetLogicalDimensionActiveSize(2);
+        const size_t numFilters = GetOutputMemoryLayout().GetLogicalDimensionActiveSize(2);
 
         // Reshape the weights
         MatrixType weightsMatrix{ numFilters, filterWidth * filterWidth * inputDepth };
@@ -118,15 +118,15 @@ namespace nodes
         const auto inputLayout = this->GetInputMemoryLayout();
         const auto outputLayout = this->GetOutputMemoryLayout();
 
-        const auto inputHeight = inputLayout.GetActiveSize(0);
-        const auto inputWidth = inputLayout.GetActiveSize(1);
-        const auto inputDepth = inputLayout.GetActiveSize(2);
-        const auto inputPadding = inputLayout.GetOffset(0);
+        const auto inputHeight = inputLayout.GetLogicalDimensionActiveSize(0);
+        const auto inputWidth = inputLayout.GetLogicalDimensionActiveSize(1);
+        const auto inputDepth = inputLayout.GetLogicalDimensionActiveSize(2);
+        const auto inputPadding = inputLayout.GetLogicalDimensionOffset(0);
 
-        const auto outputImageHeight = outputLayout.GetActiveSize(0);
-        const auto outputImageWidth = outputLayout.GetActiveSize(1);
-        const auto outputPadding = outputLayout.GetOffset(0);
-        const auto numFilters = outputLayout.GetActiveSize(2);
+        const auto outputImageHeight = outputLayout.GetLogicalDimensionActiveSize(0);
+        const auto outputImageWidth = outputLayout.GetLogicalDimensionActiveSize(1);
+        const auto outputPadding = outputLayout.GetLogicalDimensionOffset(0);
+        const auto numFilters = outputLayout.GetLogicalDimensionActiveSize(2);
         const auto outputRows = outputImageWidth * outputImageHeight;
         const auto filterSize = _filterSize;
         const auto& newInput = transformer.GetCorrespondingInputs(this->input);
@@ -205,13 +205,13 @@ namespace nodes
 
         // Input / output memory layouts
         const auto& inputLayout = this->GetInputMemoryLayout();
-        const auto& inputOffset = inputLayout.GetOffset();
+        const auto& inputOffset = inputLayout.GetLogicalDimensionOffset();
         UNUSED(inputOffset);
 
         const auto& outputLayout = this->GetOutputMemoryLayout();
-        const auto numFilters = outputLayout.GetActiveSize(2);
-        const auto& outputSize = outputLayout.GetActiveSize();
-        const auto& outputOffset = outputLayout.GetOffset();
+        const auto numFilters = outputLayout.GetLogicalDimensionActiveSize(2);
+        const auto& outputSize = outputLayout.GetLogicalDimensionActiveSize();
+        const auto& outputOffset = outputLayout.GetLogicalDimensionOffset();
 
         // Calculate cumulative increment for each dimension
         model::MemoryShape inputIncrement = inputLayout.GetCumulativeIncrement();

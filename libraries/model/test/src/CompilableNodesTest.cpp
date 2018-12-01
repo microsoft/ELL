@@ -1277,11 +1277,11 @@ void TestIRNode()
 
 // Helper function
 template <typename ElementType>
-void VerifyLayerMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename Layer<ElementType>::TensorType& inputWithPadding, const typename Layer<ElementType>::ConstTensorReferenceType& output)
+void VerifyLayerMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename Layer<ElementType>::TensorType& inputWithPadding, const typename Layer<ElementType>::ConstTensorReferenceType& output, const std::string& additionalMessage = "")
 {
     std::vector<std::vector<ElementType>> signal = { inputWithPadding.ToArray() };
     std::vector<std::vector<ElementType>> expectedOutput = { output.ToArray() };
-    VerifyMapOutput(map, signal, expectedOutput, computeNode->GetRuntimeTypeName());
+    VerifyMapOutput(map, signal, expectedOutput, computeNode->GetRuntimeTypeName(), additionalMessage);
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.useBlas = true;
@@ -1289,11 +1289,11 @@ void VerifyLayerMap(const ell::model::Map& map, const ell::model::Node* computeN
     auto compiledMap = compiler.Compile(map);
 
     // compare output
-    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
+    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName(), additionalMessage);
 }
 
 template <typename ElementType>
-void VerifyArchiveAndUnarchivingMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename Layer<ElementType>::TensorType& inputWithPadding, const typename Layer<ElementType>::ConstTensorReferenceType& output)
+void VerifyArchiveAndUnarchivingMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename Layer<ElementType>::TensorType& inputWithPadding, const typename Layer<ElementType>::ConstTensorReferenceType& output, const std::string& additionalMessage = "")
 {
     // Test archiving / unarchiving produces same result as map before
     // archiving.
@@ -1307,7 +1307,7 @@ void VerifyArchiveAndUnarchivingMap(const ell::model::Map& map, const ell::model
     model::Map unarchivedMap;
     unarchiver >> unarchivedMap;
 
-    VerifyLayerMap<ElementType>(unarchivedMap, computeNode, inputWithPadding, output);
+    VerifyLayerMap<ElementType>(unarchivedMap, computeNode, inputWithPadding, output, additionalMessage + " ArchiveAndUnarchivingMap");
 }
 
 void TestNeuralNetworkPredictorNode1()
@@ -1929,7 +1929,7 @@ void TestNeuralNetworkPredictorNode7()
     // compare output
     double epsilon = 0.0001;
     std::vector<std::vector<double>> signal = { input };
-    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_7", epsilon);
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName(), "_7", epsilon);
 }
 
 void TestInputLayerNode(size_t outputPadding)
@@ -2306,10 +2306,12 @@ void TestConvolutionalLayerNode(ConvolutionMethod convolutionMethod, size_t inpu
     auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<double>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
-    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+    const auto info = "(TestConvolutionalLayerNode1, method = " + std::to_string(int(convolutionMethod)) + ")";
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output, info);
 
     // Test archiving / unarchiving produces same result
-    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output, info);
 }
 
 void TestConvolutionalLayerNode2(ConvolutionMethod convolutionMethod, size_t inputPaddingSize, size_t outputPaddingSize)
@@ -2375,17 +2377,17 @@ void TestConvolutionalLayerNode2(ConvolutionMethod convolutionMethod, size_t inp
     auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<double>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
-    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+    const auto info = "(TestConvolutionalLayerNode2, method = " + std::to_string(int(convolutionMethod)) + ")";
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output, info);
 
     // Test archiving / unarchiving produces same result
-    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output, info);
 }
 
 // Test separable convolutions
 void TestConvolutionalLayerNode3(ConvolutionMethod convolutionMethod, size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    UNUSED(convolutionMethod);
-
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -2417,7 +2419,7 @@ void TestConvolutionalLayerNode3(ConvolutionMethod convolutionMethod, size_t inp
     Shape outputShape = { numRows + 2 * outputPaddingSize, numCols + 2 * outputPaddingSize, numFilters };
 
     LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
-    auto actualConvolutionMethod = ConvolutionMethod::unrolled;
+    auto actualConvolutionMethod = convolutionMethod;
     ConvolutionalParameters convolutionalParams{ 3, 1, actualConvolutionMethod, 2 }; // 2 == batch size
     TensorType weights(convolutionalParams.receptiveField * numFilters, convolutionalParams.receptiveField, numChannels);
     weights.Fill(1.0);
@@ -2445,10 +2447,12 @@ void TestConvolutionalLayerNode3(ConvolutionMethod convolutionMethod, size_t inp
     auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<double>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
-    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+    const auto info = "(TestConvolutionalLayerNode3 - depthwise separable, method = " + std::to_string(int(convolutionMethod)) + ")";
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output, info);
 
     // Test archiving / unarchiving produces same result
-    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output);
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output, info);
 }
 
 void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
@@ -2830,6 +2834,6 @@ void TestRegionDetectionNode()
 
         // compare computed vs. compiled output
         std::vector<std::vector<ElementType>> signal = { input.ToArray() };
-        VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName(), 1e-5);
+        VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
     }
 }

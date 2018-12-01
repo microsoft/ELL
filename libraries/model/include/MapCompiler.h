@@ -165,7 +165,7 @@ namespace model
         emitters::Variable* pVar = GetVariableForPort(port);
         if (pVar == nullptr)
         {
-            pVar = AllocatePortVariable(port);
+            pVar = AllocatePortVariable(port, initialValue);
         }
         assert(pVar != nullptr);
         return pVar;

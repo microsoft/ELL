@@ -98,13 +98,13 @@ template <typename InputType>
 void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name);
 
 template <typename InputType, typename OutputType>
-std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon = 1e-5);
+std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage = "", double epsilon = 1e-5);
 
 template <typename InputType>
-void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon = 1e-5);
+void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage = "", double epsilon = 1e-5);
 
 template <typename InputType, typename OutputType>
-void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name);
+void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage = "");
 
 void PrintDiagnostics(emitters::IRDiagnosticHandler& handler);
 
@@ -291,7 +291,7 @@ void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& comp
 }
 
 template <typename InputType, typename OutputType>
-void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name)
+void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage)
 {
     bool ok = true;
     // compare output
@@ -309,11 +309,11 @@ void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>&
             std::cout << computedResult << " \t" << output << std::endl;
         }
     }
-    testing::ProcessTest(std::string("Testing map " + name + " compute"), ok);
+    testing::ProcessTest(std::string("Testing map " + name + additionalMessage + " (compute)"), ok);
 }
 
 template <typename InputType, typename OutputType>
-std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
+std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage, double epsilon)
 {
     bool ok = true;
     std::vector<OutputType> computedResult;
@@ -335,29 +335,29 @@ std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model:
             std::cout << "Largest difference: " << LargestDifference(computedResult, compiledResult) << ", epsilon: " << epsilon << std::endl;
         }
     }
-    testing::ProcessTest(std::string("Testing compiled " + name + " compute"), ok);
+    testing::ProcessTest(std::string("Testing compiled " + name + additionalMessage + " (jitted)"), ok);
     return computedResult;
 }
 
 template <typename InputType>
-void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
+void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage, double epsilon)
 {
     switch (map.GetOutput(0).GetPortType())
     {
     case model::Port::PortType::boolean:
-        VerifyCompiledOutput<InputType, bool>(map, compiledMap, signal, name, epsilon);
+        VerifyCompiledOutput<InputType, bool>(map, compiledMap, signal, name, additionalMessage, epsilon);
         break;
     case model::Port::PortType::integer:
-        VerifyCompiledOutput<InputType, int>(map, compiledMap, signal, name, epsilon);
+        VerifyCompiledOutput<InputType, int>(map, compiledMap, signal, name, additionalMessage, epsilon);
         break;
     case model::Port::PortType::bigInt:
-        VerifyCompiledOutput<InputType, int64_t>(map, compiledMap, signal, name, epsilon);
+        VerifyCompiledOutput<InputType, int64_t>(map, compiledMap, signal, name, additionalMessage, epsilon);
         break;
     case model::Port::PortType::smallReal:
-        VerifyCompiledOutput<InputType, float>(map, compiledMap, signal, name, epsilon);
+        VerifyCompiledOutput<InputType, float>(map, compiledMap, signal, name, additionalMessage, epsilon);
         break;
     case model::Port::PortType::real:
-        VerifyCompiledOutput<InputType, double>(map, compiledMap, signal, name, epsilon);
+        VerifyCompiledOutput<InputType, double>(map, compiledMap, signal, name, additionalMessage, epsilon);
         break;
     default:
         throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);

@@ -37,32 +37,32 @@ namespace nodes
             // output is a (w+2p) x (h+2p) x f array
 
             // Model parameters
-            const auto inputPadding = inputLayout.GetOffset(0);
+            const auto inputPadding = inputLayout.GetLogicalDimensionOffset(0);
             DEBUG_USED(inputPadding);
             assert((inputPadding == filterSize / 2) && "Input padding must be filterSize/2");
 
             auto inputMemoryIncrements = inputLayout.GetCumulativeIncrement();
 
             // For each filter
-            const auto numFilters = outputLayout.GetActiveSize(2);
+            const auto numFilters = outputLayout.GetLogicalDimensionActiveSize(2);
             function.ParallelFor(numFilters, { input, filterWeights, result }, [inputLayout, outputLayout, inputMemoryIncrements, filterSize, stride](IRFunctionEmitter& function, IRLocalScalar filterIndex, const std::vector<LLVMValue>& capturedValues) {
                 auto input = capturedValues[0];
                 auto filterWeights = capturedValues[1];
                 auto result = capturedValues[2];
-                auto outputTensor = function.LocalTensor(result, outputLayout.GetExtent().ToVector(), RowMajorTensorLayout);
+                auto outputTensor = function.LocalTensor(result, outputLayout.GetLogicalDimensionExtent().ToVector(), RowMajorTensorLayout);
 
                 // For each output row
-                const auto outputRows = outputLayout.GetActiveSize(0);
+                const auto outputRows = outputLayout.GetLogicalDimensionActiveSize(0);
                 function.For(outputRows, [filterIndex, input, filterWeights, inputLayout, outputLayout, inputMemoryIncrements, outputTensor, filterSize, stride](IRFunctionEmitter& function, LLVMValue loopIndex2) {
                     auto outputRow = function.LocalScalar(loopIndex2);
 
                     // For each output column
-                    const auto outputColumns = outputLayout.GetActiveSize(1);
+                    const auto outputColumns = outputLayout.GetLogicalDimensionActiveSize(1);
                     function.For(outputColumns, [outputRow, filterIndex, input, filterWeights, inputLayout, inputMemoryIncrements, outputTensor, filterSize, stride](IRFunctionEmitter& function, LLVMValue loopIndex3) {
                         auto outputColumn = function.LocalScalar(loopIndex3);
 
-                        const bool canCombineColumns = (inputLayout.GetActiveSize(1) == inputLayout.GetExtent(1)) && (stride == 1);
-                        const auto inputDepth = inputLayout.GetActiveSize(2);
+                        const bool canCombineColumns = (inputLayout.GetLogicalDimensionActiveSize(1) == inputLayout.GetLogicalDimensionExtent(1)) && (stride == 1);
+                        const auto inputDepth = inputLayout.GetLogicalDimensionActiveSize(2);
 
                         // The filters are typically small, so we unroll the loops here
                         auto val = function.LocalScalar(ValueType{ 0 });
@@ -105,35 +105,33 @@ namespace nodes
         template <typename ValueType>
         void EmitSimpleDepthwiseSeparableConvolutionCode(IRFunctionEmitter& function, LLVMValue input, LLVMValue filterWeights, const PortMemoryLayout& inputLayout, const PortMemoryLayout& outputLayout, int filterSize, int stride, LLVMValue result)
         {
-            const auto inputDepth = inputLayout.GetActiveSize(2);
-            const auto inputPadding = inputLayout.GetOffset(0);
+            const auto inputDepth = inputLayout.GetLogicalDimensionActiveSize(2);
+            const auto inputPadding = inputLayout.GetLogicalDimensionOffset(0);
             DEBUG_USED(inputPadding, inputDepth);
             assert((inputPadding == filterSize / 2) && "Input padding must be filterSize/2");
 
             // output data parameters
-            // const auto outputRows = outputLayout.GetActiveSize(0);
-            // const auto outputColumns = outputLayout.GetActiveSize(1);
-            const auto numFilters = outputLayout.GetActiveSize(2);
+            const auto numFilters = outputLayout.GetLogicalDimensionActiveSize(2);
             assert(numFilters == inputDepth);
             DEBUG_USED(numFilters);
 
             // For each filter
             // For each output row
-            const auto outputRows = outputLayout.GetActiveSize(0);
+            const auto outputRows = outputLayout.GetLogicalDimensionActiveSize(0);
             function.ParallelFor(outputRows, { input, filterWeights, result }, [inputLayout, outputLayout, filterSize, stride](IRFunctionEmitter& function, auto outputRow, const std::vector<LLVMValue>& capturedValues) {
                 auto input = capturedValues[0];
                 auto filterWeights = capturedValues[1];
                 auto result = capturedValues[2];
 
-                auto inputTensor = function.LocalTensor(input, inputLayout.GetExtent().ToVector(), RowMajorTensorLayout);
-                auto outputTensor = function.LocalTensor(result, outputLayout.GetExtent().ToVector(), RowMajorTensorLayout);
-                auto filter = function.LocalMultidimArray(filterWeights, { inputLayout.GetExtent(2), filterSize, filterSize });
+                auto inputTensor = function.LocalTensor(input, inputLayout.GetLogicalDimensionExtent().ToVector(), ChannelMajorTensorLayout);
+                auto outputTensor = function.LocalTensor(result, outputLayout.GetLogicalDimensionExtent().ToVector(), ChannelMajorTensorLayout);
+                auto filter = function.LocalTensor(filterWeights, { filterSize, filterSize, inputLayout.GetLogicalDimensionExtent(2) }, ChannelMajorTensorLayout);
 
                 // For each output column
-                const auto outputColumns = outputLayout.GetActiveSize(1);
+                const auto outputColumns = outputLayout.GetLogicalDimensionActiveSize(1);
                 function.For(outputColumns, [outputLayout, outputRow, inputTensor, filter, outputTensor, filterSize, stride](IRFunctionEmitter& function, auto outputColumn) {
                     // For each filter
-                    const auto numFilters = outputLayout.GetActiveSize(2);
+                    const auto numFilters = outputLayout.GetLogicalDimensionActiveSize(2);
                     function.For(numFilters, [outputRow, outputColumn, inputTensor, filter, outputTensor, filterSize, stride](IRFunctionEmitter& function, auto filterIndex) {
                         // The filters are typically small, so we unroll the loops here
                         auto val = function.LocalScalar(ValueType{ 0 });
@@ -148,7 +146,7 @@ namespace nodes
                                 auto filterColumn = function.LocalScalar(windowColumn);
 
                                 auto inputVal = inputTensor({ inputRow + windowRow, inputColumn + windowColumn, filterIndex });
-                                auto filterVal = filter({ filterIndex, filterRow, filterColumn });
+                                auto filterVal = filter({ filterRow, filterColumn, filterIndex });
 
                                 val += inputVal * filterVal;
                             }
@@ -185,7 +183,7 @@ namespace nodes
         _filterWeights(filterWeights),
         _stride(static_cast<int>(stride))
     {
-        _isDepthwiseSeparable = (filterWeights.NumChannels() == 1) && (inputMemoryLayout.GetActiveSize()[2] > 1);
+        _isDepthwiseSeparable = (filterWeights.NumChannels() == 1) && (inputMemoryLayout.GetLogicalDimensionActiveSize(2) > 1);
     }
 
     template <typename ValueType>
@@ -240,7 +238,7 @@ namespace nodes
         archiver["stride"] >> _stride;
         math::TensorArchiver::Read(_filterWeights, "weights", archiver);
 
-        _isDepthwiseSeparable = (_filterWeights.NumChannels() == 1) && (_inputMemoryLayout.GetActiveSize()[2] > 1);
+        _isDepthwiseSeparable = (_filterWeights.NumChannels() == 1) && (_inputMemoryLayout.GetLogicalDimensionActiveSize(2) > 1);
     }
 
     //
@@ -312,7 +310,7 @@ namespace nodes
         // Model parameters
         const auto inputLayout = this->GetInputMemoryLayout();
         const auto outputLayout = this->GetOutputMemoryLayout();
-        const auto inputPadding = inputLayout.GetOffset(0);
+        const auto inputPadding = inputLayout.GetLogicalDimensionOffset(0);
         DEBUG_USED(inputPadding);
         assert((inputPadding == _filterSize / 2) && "Input padding must be filterSize/2");
 
@@ -322,6 +320,9 @@ namespace nodes
         }
         else
         {
+            // Verify correct ordering
+            assert((inputLayout.GetLogicalDimensionOrder() == utilities::DimensionOrder({ 2, 0, 1 })));
+            assert((outputLayout.GetLogicalDimensionOrder() == utilities::DimensionOrder({ 2, 0, 1 })));
             EmitSimpleDepthwiseSeparableConvolutionCode<ValueType>(function, pInput, pWeights, inputLayout, outputLayout, _filterSize, _stride, pOutput);
         }
     }

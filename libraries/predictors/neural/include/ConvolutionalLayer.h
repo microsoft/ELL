@@ -313,7 +313,7 @@ namespace predictors
                 break;
                 case ConvolutionMethod::winograd:
                 {
-                    auto result = dsp::Convolve2DWinogradDepthwiseSeparable(inputChannelTensor, weights, numFilters, stride);
+                    auto result = dsp::Convolve2DWinogradDepthwiseSeparable(inputChannelTensor, weights, numFilters); // Stide of 1 is assumed
                     outputChannelTensor.CopyFrom(result);
                 }
                 break;

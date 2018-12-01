@@ -60,7 +60,7 @@ namespace nodes
         predictors::neural::PaddingParameters GetRequestedInputPadding() const { return GetLayerParameters().inputPaddingParameters; }
 
         /// <summary> Get the output padding requested by the layer </summary>
-        predictors::neural::PaddingParameters GetRequestedOutputPadding() const { return GetLayerParameters().inputPaddingParameters; }
+        predictors::neural::PaddingParameters GetRequestedOutputPadding() const { return GetLayerParameters().outputPaddingParameters; }
 
         /// <summary> Get the size of the output port </summary>
         size_t GetOutputSize() const { return _output.Size(); }

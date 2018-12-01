@@ -298,6 +298,34 @@ def verify_ell_nodes_in_vision_model(ell_map, cntk_model, cntk_nodes, ordered_im
         raise exception
     _logger.info("Verification of model nodes complete\n")
 
+def get_output_from_cntk_model(cntk_model, cntk_input_tensor, testing_info):
+    # Get output from CNTK model
+    _logger.info("Getting CNTK results")
+    if (len(cntk_model.arguments) > 1):
+        arg1_output = np.zeros(cntk_model.arguments[1].shape).astype(np.float32)
+        cntk_output = cntk_model.eval({cntk_model.arguments[0]:[cntk_input_tensor], cntk_model.arguments[1]:arg1_output})
+    else:
+        cntk_output = cntk_model.eval({cntk_model.arguments[0]:[cntk_input_tensor]})
+    size = 0
+    if isinstance(cntk_output,dict):
+        for key in cntk_model.outputs:
+            shape = key.shape
+            if len(shape) > 0:
+                s = np.max(shape)
+                if (s > size):
+                    size = s
+                    cntk_output = cntk_output[key][0]
+    else:
+        cntk_output = cntk_output[0]
+
+    # Check whether softmax needs to be applied or not.
+    if testing_info["apply_softmax"]:
+        cntk_output = softmax(cntk_output).eval()
+
+    # Reorder cntk node output
+    cntk_output = get_node_output_in_ell_order(cntk_output)
+    return cntk_output
+
 def verify_ell_output_in_vision_model(ell_map, cntk_model, testing_info):
     _logger.info("Verification of model output starting")
     try:
@@ -305,26 +333,7 @@ def verify_ell_output_in_vision_model(ell_map, cntk_model, testing_info):
         ell_input_tensor = memory_shapes.get_tensor_in_ell_order(cntk_input_tensor, "channel_row_column").ravel().astype(np.float32)
 
         # Get output from CNTK model
-        _logger.info("Getting CNTK results")
-        if (len(cntk_model.arguments) > 1):
-            arg1_output = np.zeros(cntk_model.arguments[1].shape).astype(np.float32)
-            cntk_output = cntk_model.eval({cntk_model.arguments[0]:[cntk_input_tensor], cntk_model.arguments[1]:arg1_output})
-        else:
-            cntk_output = cntk_model.eval({cntk_model.arguments[0]:[cntk_input_tensor]})
-        size = 0
-        if isinstance(cntk_output,dict):
-            for key in cntk_model.outputs:
-                shape = key.shape
-                if len(shape) > 0:
-                    s = np.max(shape)
-                    if (s > size):
-                        size = s
-                        cntk_output = cntk_output[key][0]
-        else:
-            cntk_output = cntk_output[0]
-        # Check whether softmax needs to be applied or not.
-        if testing_info["apply_softmax"]:
-            cntk_output = softmax(cntk_output).eval()
+        cntk_output = get_output_from_cntk_model(cntk_model, cntk_input_tensor, testing_info)
 
         # Get computed ELL result
         _logger.info("Getting computed ELL results")
@@ -375,6 +384,109 @@ def verify_ell_output_in_vision_model(ell_map, cntk_model, testing_info):
 
     _logger.info("Verification of model output complete")
 
+def verify_compiled_ell_nodes_in_vision_model(modelFile, cntk_model, model_cntk_nodes, ordered_importer_nodes, step_interval_msec=0, lag_threshold_msec=0, plot_model=False, verify_model={"audio": False, "vision": False}):
+
+    # For convenient lookup, map from the cntk intermediate node to the
+    # importer node
+    cntk_nodes_map = {}
+    for cntk_node in model_cntk_nodes:
+        cntk_nodes_map[cntk_node.uid] = cntk_node
+
+    cntk_input_tensor = np.random.random((cntk_model.arguments[0].shape)).astype(np.float32) * 255
+    ell_input_tensor = cntk_input_tensor
+    if len(cntk_model.arguments[0].shape) == 1:
+        ell_input_tensor = cntk_input_tensor.reshape((1,1,cntk_model.arguments[0].shape[0]))
+    ell_input_tensor = memory_shapes.get_tensor_in_ell_order(ell_input_tensor, "channel_row_column").ravel().astype(np.float32)
+
+    cntk_nodes = [cntk_nodes_map[ordered_importer_nodes[0].id]]
+    for i in range(1, len(ordered_importer_nodes)):
+        cntk_node = cntk_nodes_map[ordered_importer_nodes[i].id]
+        cntk_nodes.append(cntk_node)
+
+        try:
+            _logger.info("---- Testing compiled ELL nodes using prefix of {} CNTK nodes ----".format(i + 1))
+            _logger.info("Last CNTK node in chain: {}".format(cntk_nodes[i].uid))
+            # Create an ImporterModel from the CNTK nodes
+            importer_model = import_nodes(cntk_nodes)
+            if len(importer_model.nodes) > 0:
+                # Use the common importer engine to drive conversion of the 
+                # ImporterModel to ELL layers
+                importer_engine = common.importer.ImporterEngine(step_interval_msec=step_interval_msec, lag_threshold_msec=lag_threshold_msec)
+                ell_map = importer_engine.convert_nodes(importer_model)
+
+                prefix_ordered_importer_nodes, _ = importer_engine.get_importer_node_to_ell_mapping()
+                if prefix_ordered_importer_nodes[-1].id != ordered_importer_nodes[i].id:
+                    _logger.info("Skipping..., can't test output of node {} yet".format(ordered_importer_nodes[i].id))
+                    continue
+            else:
+                _logger.info("Skipping...")
+                continue
+
+            # Feed input to the ELL model
+            _logger.info("Getting computed ELL results")
+            ell_map.Compute(ell_input_tensor, dtype=np.float32)
+            model_clone = None
+            if cntk_node.op_name != "UserFunction":
+                model_clone = cntk_node.clone(CloneMethod.clone)
+            if not model_clone:
+                print("Skipping...")
+                continue
+
+            if verify_model["audio"]:
+                _logger.info("Verification of audio models is not supported at this time, skipping verification")
+            elif verify_model["vision"]:
+                testing_info = {"apply_softmax": False }
+                try:
+                    # Get output from CNTK model
+                    cntk_output = get_output_from_cntk_model(model_clone, cntk_input_tensor, testing_info)
+
+                    # Get compiled ELL result
+                    _logger.info("Getting compiled ELL results")
+                    compiler_options = ell.model.MapCompilerOptions()
+                    compiler_options.useBlas = True
+                    compiled_ell_map = ell_map.Compile("host", "model", "predict", compilerOptions=compiler_options, dtype=np.float32)
+
+                    result_from_compiled = np.array(compiled_ell_map.Compute(ell_input_tensor, dtype=np.float32))
+                    output_shape = cntk_output.shape
+                    if (len(output_shape) == 3):
+                        if cntk_output.size == result_from_compiled.size:
+                            result_from_compiled = result_from_compiled.reshape(output_shape)
+                        else:
+                            padding = ordered_importer_nodes[i].output_padding["size"]
+                            output_shape_with_padding = (output_shape[0] + 2*padding,
+                                                        output_shape[1] + 2*padding,
+                                                        output_shape[2])
+                            result_from_compiled = result_from_compiled.reshape(output_shape_with_padding)
+                            # Remove padding and look at active region only
+                            result_from_compiled = result_from_compiled[padding:output_shape[0]+padding,padding:output_shape[1]+padding,:]
+
+                    # Compare results. Some layers have large numbers (e.g > 500.734) and some small numbers
+                    # (e.g. 0.0038453). To make the comparison more resilient and meaningful for large numbers,
+                    # normalize before comparing, since comparison is being done on significant digits.
+                    max = cntk_output.max()
+                    if max > 100:
+                        cntk_output = cntk_output / max
+                        result_from_compiled = result_from_compiled / max
+
+                    # Verify the compiled result  against the cntk result
+                    np.testing.assert_array_almost_equal(
+                        cntk_output, result_from_compiled, decimal=4, err_msg=(
+                            'results for compiled ELL nodes do not match CNTK output!'))
+                    _logger.info("---- passed ----")
+                    _logger.info("")
+
+                except BaseException as exception:
+                    _logger.error("Error occurred verifying compiled ELL nodes of imported model")
+                    basename, ext = os.path.splitext(modelFile)
+                    ell_map.Save(basename + ".ell.compiled_node_verification_failed")
+                    raise exception
+
+        except BaseException as exception:
+            _logger.error("Error occurred attempting to convert cntk layers to ELL model using nodes: " + str(exception))
+            raise exception
+
+
+
 def map_from_cntk_model_using_new_engine(modelFile, step_interval_msec=0, lag_threshold_msec=0, plot_model=False, verify_model={"audio": False, "vision": False}):
     """
     Loads a CNTK model and returns an ell.model.Map
@@ -412,6 +524,7 @@ def map_from_cntk_model_using_new_engine(modelFile, step_interval_msec=0, lag_th
         try:
             ordered_importer_nodes, node_mapping = importer_engine.get_importer_node_to_ell_mapping()
             verify_ell_nodes_in_vision_model(ell_map, cntk_model, cntk_nodes, ordered_importer_nodes, node_mapping, testing_info)
+            verify_compiled_ell_nodes_in_vision_model(modelFile, cntk_model, cntk_nodes, ordered_importer_nodes, verify_model=verify_model)
             verify_ell_output_in_vision_model(ell_map, cntk_model, testing_info)            
         except BaseException as exception:
             _logger.error("Error occurred verifying imported model")

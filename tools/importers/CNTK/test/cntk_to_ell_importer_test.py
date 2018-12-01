@@ -618,6 +618,8 @@ class CntkToEllFullModelTestBase(common_importer_test.EllImporterTestBase):
     CATEGORIES_URL = 'models/ILSVRC2012/categories.txt'
     MODEL_URLS = [
         'models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.cntk.zip'
+        #'models/ILSVRC2012/BrazilianGuava/BrazilianGuava.cntk.zip',
+        #'models/ILSVRC2012/Coconut/Coconut.cntk.zip'
     ]
 
     def setUp(self):

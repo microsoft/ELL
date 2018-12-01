@@ -100,6 +100,17 @@ namespace dsp
     ///
     /// <param name="input"> The input image: a (r x c x d) tensor. </param>
     /// <param name="filters"> The filters to convolve with. A (fr x fc x d) tensor. </param>
+    /// <param name="numFilters"> The number of filters in the `filters` argument. </param>
+    /// <param name="order"> The ordering to use for the transformed filters. </param>
+    ///
+    /// <returns> A tensor with the result of the convolution `input` (*) `filter`
+    template <typename ValueType>
+    math::ChannelColumnRowTensor<ValueType> Convolve2DWinogradDepthwiseSeparable(const math::ConstChannelColumnRowTensorReference<ValueType>& input, const math::ConstChannelColumnRowTensorReference<ValueType>& filters, int numFilters, WinogradFilterOrder order = WinogradFilterOrder::tilesFirst);
+
+    /// <summary> Convolve a set of 2D images with a corresponding set of 2D filters. </summary>
+    ///
+    /// <param name="input"> The input image: a (r x c x d) tensor. </param>
+    /// <param name="filters"> The filters to convolve with. A (fr x fc x d) tensor. </param>
     /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
     /// <param name="order"> The ordering to use for the transformed filters. </param>
     ///
