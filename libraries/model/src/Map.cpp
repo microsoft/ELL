@@ -219,6 +219,7 @@ namespace model
         swap(a._outputElements, b._outputElements);
         swap(a._outputNames, b._outputNames);
         swap(a._outputElementsMap, b._outputElementsMap);
+        swap(a._metadata, b._metadata);
     }
 
     std::vector<const Node*> Map::GetAllOutputNodes() const
