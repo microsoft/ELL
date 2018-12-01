@@ -51,6 +51,7 @@ set(include
   include/Files.h
   include/Format.h
   include/FunctionUtils.h
+  include/Hash.h
   include/IArchivable.h
   include/IIterator.h
   include/IndentedTextWriter.h
@@ -108,6 +109,7 @@ set(test_src
   test/src/Format_test.cpp
   test/src/FunctionUtils_test.cpp
   test/src/Archiver_test.cpp
+  test/src/Hash_test.cpp
   test/src/Iterator_test.cpp
   test/src/MemoryLayout_test.cpp
   test/src/ObjectArchive_test.cpp
@@ -122,6 +124,7 @@ set(test_include
   test/include/Format_test.h
   test/include/FunctionUtils_test.h
   test/include/Archiver_test.h
+  test/include/Hash_test.h
   test/include/Iterator_test.h
   test/include/MemoryLayout_test.h
   test/include/ObjectArchive_test.h

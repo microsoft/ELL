@@ -11,6 +11,7 @@
 #include "Node.h"
 
 #include <utilities/include/Exception.h>
+#include <utilities/include/Hash.h>
 #include <utilities/include/Tokenizer.h>
 
 #include <sstream>
@@ -753,31 +754,28 @@ namespace model
 //
 std::hash<ell::model::PortElementBase>::result_type std::hash<ell::model::PortElementBase>::operator()(const argument_type& element) const
 {
-    auto hash1 = std::hash<const ell::model::OutputPortBase*>()(element.ReferencedPort());
-    auto hash2 = std::hash<size_t>()(element.GetIndex());
-    return hash1 ^ (hash2 << 1);
+    using ::ell::utilities::HashCombine;
+
+    size_t hash = 0;
+    HashCombine(hash, element.ReferencedPort());
+    HashCombine(hash, element.GetIndex());
+
+    return hash;
 }
 
 std::hash<ell::model::PortRange>::result_type std::hash<ell::model::PortRange>::operator()(const argument_type& range) const
 {
-    auto hash1 = std::hash<const ell::model::OutputPortBase*>()(range.ReferencedPort());
-    auto hash2 = std::hash<size_t>()(range.Size());
-    auto hash3 = std::hash<size_t>()(range.GetStartIndex());
-    return hash1 ^ ((hash2 ^ (hash3 << 1)) << 1);
+    using ::ell::utilities::HashCombine;
+
+    size_t hash = 0;
+    HashCombine(hash, range.ReferencedPort());
+    HashCombine(hash, range.Size());
+    HashCombine(hash, range.GetStartIndex());
+
+    return hash;
 }
 
 std::hash<ell::model::PortElementsBase>::result_type std::hash<ell::model::PortElementsBase>::operator()(const argument_type& elements) const
 {
-    if (elements.NumRanges() == 0)
-    {
-        return 0;
-    }
-
-    auto hash = 0;
-    const auto& ranges = elements.GetRanges();
-    for (const auto& range : ranges)
-    {
-        hash = std::hash<ell::model::PortRange>()(range) ^ (hash << 1);
-    }
-    return hash;
+    return ::ell::utilities::HashValue(elements.GetRanges());
 }

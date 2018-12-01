@@ -10,6 +10,7 @@
 #include "Files_test.h"
 #include "Format_test.h"
 #include "FunctionUtils_test.h"
+#include "Hash_test.h"
 #include "Iterator_test.h"
 #include "MemoryLayout_test.h"
 #include "ObjectArchive_test.h"
@@ -43,6 +44,9 @@ int main(int argc, char* argv[])
 
         // Format tests
         TestMatchFormat();
+
+        // Hash tests
+        Hash_test1();
 
         // Iterator tests
         TestIteratorAdapter();

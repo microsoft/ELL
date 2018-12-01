@@ -114,14 +114,6 @@ namespace utilities
     template <typename FunctionType>
     FunctionArgTypes<FunctionType> GetFunctionArgTuple(FunctionType& function);
 
-    /// <summary> Calls the given function with the given arguments </summary>
-    template <typename FunctionType, typename... Args>
-    auto ApplyFunction(const FunctionType& function, Args... args) -> FunctionReturnType<FunctionType>;
-
-    /// <summary> Calls the given function with the given arguments </summary>
-    template <typename FunctionType, typename... Args>
-    auto ApplyFunction(const FunctionType& function, std::tuple<Args...>&& args) -> FunctionReturnType<FunctionType>;
-
     /// <summary> Converts a vector to a specified tuple of Args... types </summary>
     template <typename... Args, typename T>
     std::tuple<Args...> VectorToTuple(std::vector<T>);
