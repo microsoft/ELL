@@ -47,21 +47,29 @@ def show_profile(profile):
             logger.info("\n\t{}:".format(r))
             performance = p["result"][r]
             if performance is not None:
-                logger.info("\t\t{}{}{}{}{}".format("name".ljust(15), "type".ljust(65), "average_time_ms".ljust(10), "total_time_ms".rjust(15), "count".rjust(7)))
+                logger.info("\t\t{}{}{}{}{}".format("name".ljust(20), "type".ljust(70), "average_time_ms".ljust(10), "total_time_ms".rjust(15), "count".rjust(7)))
                 if "node" in performance.keys():
-                    logger.verbose("\t\t-----------------------------------------------------------------------------------------------------------------------")
-                    for n in performance["node"]:
-                        logger.verbose("\t\t{}{}{}{}{}".format(
-                            n["name"].ljust(15),
-                            n["type"].ljust(65),
-                            format(n["time_ms"] / n["count"], ".3f").rjust(10),
-                            format(n["time_ms"], ".3f").rjust(15),
-                            str(n["count"]).rjust(10)))
+                    logger.verbose("\t\t-------------------------------------------------------------------------------------------------------------------------------")
+                    ancestors = sorted(list(performance["node"].keys()))
+                    for a in ancestors:
+                        ancestor = performance["node"][a]
+                        logger.verbose("\n\t\t{}{}{}{}".format(
+                            a.ljust(90),
+                            format(ancestor["time_ms"] / ancestor["count"], ".4f").rjust(10),
+                            format(ancestor["time_ms"], ".4f").rjust(15),
+                            str(ancestor["count"]).rjust(10)))
+                        for n in ancestor["descendents"]:
+                            logger.verbose("\t\t     {}{}{}{}{}".format(
+                                n["name"].ljust(15),
+                                n["type"].ljust(70),
+                                format(n["time_ms"] / n["count"], ".4f").rjust(10),
+                                format(n["time_ms"], ".4f").rjust(15),
+                                str(n["count"]).rjust(10)))
                 if "model" in performance.keys():
-                    logger.info("\t\t-----------------------------------------------------------------------------------------------------------------------")
+                    logger.info("\n\t\t-------------------------------------------------------------------------------------------------------------------------------")
                     logger.info("\t\tModel Total: {}{}{}".format(
-                        format(performance["model"]["time_ms"] / performance["model"]["count"], ".3f").rjust(77),
-                        format(performance["model"]["time_ms"], ".3f").rjust(15),
+                        format(performance["model"]["time_ms"] / performance["model"]["count"], ".4f").rjust(87),
+                        format(performance["model"]["time_ms"], ".4f").rjust(15),
                         str(performance["model"]["count"]).rjust(10)))
             else:
                 logger.warning("\t\tno performance result")
@@ -123,11 +131,26 @@ def options_to_profile(option):
 def parse_performance_log(log):
     result = {}
     for line in log:
-        node = parse.parse("{}:\ttype: {}\ttime: {:f} ms\tcount: {:d}", line)
+        node = parse.parse("{}:\ttype: {}\ttime: {:f} ms\tcount: {:d}\tancestor: {}", line)
         if node:
             if "node" not in result.keys():
-                result["node"] = []
-            result["node"].append({ "name":node[0], "type":node[1], "time_ms":node[2], "count":node[3] })
+                result["node"] = {}
+
+            id = "node["+node[4]+"]"
+            if id not in result["node"].keys():
+                ancestor = { "time_ms":0, "count":0 }
+                result["node"][id] = ancestor
+            ancestor = result["node"][id]
+
+            if "descendents" not in ancestor:
+                ancestor["descendents"] = []
+                ancestor["count"] = node[3]
+
+            if ancestor["count"] != node[3]:
+                raise ValueError("number of count does not match.")
+            ancestor["descendents"].append({ "name":node[0], "type":node[1], "time_ms":node[2], "count":node[3] })
+            ancestor["time_ms"] = ancestor["time_ms"] + node[2]
+
         else:
             model = parse.parse("Total time: {:f} ms\tcount: {:d}", line)
             if model:
@@ -229,7 +252,7 @@ if __name__ == '__main__':
 
     if args.log:
         logger_file_handler = logging.FileHandler(args.log)
-        logger_file_handler.setLevel(verbosity)
+        logger_file_handler.setLevel(args.verbosity)
         logger.addHandler(logger_file_handler)
 
     if args.profile_options:

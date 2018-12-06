@@ -45,13 +45,20 @@ namespace model
         // Allocate global storage for node info
         auto nodeName = to_string(_node->GetId());
         auto nodeTypeName = _node->GetRuntimeTypeName();
+        auto nodeAncestor = nodeName;
+        if (_node->GetMetadata().HasEntry("ancestor"))
+        {
+            nodeAncestor = _node->GetMetadata().GetEntry<std::string>("ancestor");
+        }
 
         // Add NodeInfo field global initialization
         auto namePtr = irBuilder.CreateInBoundsGEP(_nodeInfoType, _nodeInfoPtr, { emitter.Literal(0), emitter.Literal(0) });
         auto typePtr = irBuilder.CreateInBoundsGEP(_nodeInfoType, _nodeInfoPtr, { emitter.Literal(0), emitter.Literal(1) });
+        auto ancestorPtr = irBuilder.CreateInBoundsGEP(_nodeInfoType, _nodeInfoPtr, { emitter.Literal(0), emitter.Literal(2) });
 
         function.Store(namePtr, function.Literal(nodeName));
         function.Store(typePtr, function.Literal(nodeTypeName));
+        function.Store(ancestorPtr, function.Literal(nodeAncestor));
     }
 
     //
@@ -184,7 +191,7 @@ namespace model
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
 
         // NodeInfo struct fields
-        emitters::NamedLLVMTypeList infoFields = { { "nodeName", int8PtrType }, { "nodeType", int8PtrType } };
+        emitters::NamedLLVMTypeList infoFields = { { "nodeName", int8PtrType }, { "nodeType", int8PtrType }, { "nodeAncestor", int8PtrType } };
         _nodeInfoType = _module->GetOrCreateStruct(GetNamespacePrefix() + "_NodeInfo", infoFields);
         _module->IncludeTypeInHeader(_nodeInfoType->getName());
 
@@ -458,10 +465,11 @@ namespace model
             // Print some stuff
             auto namePtr = irBuilder.CreateGEP(nodeInfoPtr, { emitter.Literal(0), emitter.Literal(0) });
             auto typePtr = irBuilder.CreateGEP(nodeInfoPtr, { emitter.Literal(0), emitter.Literal(1) });
+            auto ancestorPtr = irBuilder.CreateGEP(nodeInfoPtr, { emitter.Literal(0), emitter.Literal(2) });
 
             auto countPtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
             auto totalTimePtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(1) });
-            function.Printf("Node[%s]:\ttype: %s\ttime: %f ms\tcount: %d\n", { function.Load(namePtr), function.Load(typePtr), function.Load(totalTimePtr), function.Load(countPtr) });
+            function.Printf("Node[%s]:\ttype: %s\ttime: %f ms\tcount: %d\tancestor: %s\n", { function.Load(namePtr), function.Load(typePtr), function.Load(totalTimePtr), function.Load(countPtr), function.Load(ancestorPtr) });
         });
 
         _module->EndFunction();

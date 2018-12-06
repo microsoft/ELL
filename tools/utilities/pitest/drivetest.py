@@ -380,7 +380,8 @@ class DriveTest:
                             "--compiled_model", self.output_dir,
                             "--model_name", self.model_name,
                             "--image", os.path.join(current_path, "coffeemug.jpg"),
-                            "--nogui"]
+                            "--nogui",
+                            "--iterations", str(self.iterations)]
                     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
                     output = []
                     while True:
