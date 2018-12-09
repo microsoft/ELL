@@ -371,8 +371,8 @@ namespace model
         Model(const Model& other) = delete;
 
         template <typename ValueType>
-        const OutputPort<ValueType>& AddRoutingNodes(const PortElements<ValueType>& elements);
-        const OutputPortBase& AddRoutingNodes(const PortElementsBase& elements);
+        const OutputPort<ValueType>& SimplifyOutputs(const PortElements<ValueType>& elements);
+        const OutputPortBase& SimplifyOutputs(const PortElementsBase& elements);
         const OutputPortBase& AddSliceNode(const PortRange& inputRange);
         const OutputPortBase& AddSpliceNode(const std::vector<const OutputPortBase*>& outputPorts);
         Node* AddExistingNode(std::unique_ptr<Node> node);
@@ -452,14 +452,14 @@ namespace model
             static auto& ConvertPortElementsArgImpl(Model& model, T&& arg, std::true_type, std::false_type)
             {
                 // should not use initializer list
-                return model.AddRoutingNodes(std::forward<T>(arg));
+                return model.SimplifyOutputs(std::forward<T>(arg));
             }
 
             template <typename T>
             static auto ConvertPortElementsArgImpl(Model& model, T&& arg, std::true_type, std::true_type)
             {
                 // should use initializer list
-                return model.AddRoutingNodes({ std::forward<T>(arg) });
+                return model.SimplifyOutputs({ std::forward<T>(arg) });
             }
 
             template <typename T>
@@ -494,9 +494,9 @@ namespace model
     }
 
     template <typename ValueType>
-    const OutputPort<ValueType>& Model::AddRoutingNodes(const PortElements<ValueType>& elements)
+    const OutputPort<ValueType>& Model::SimplifyOutputs(const PortElements<ValueType>& elements)
     {
-        const OutputPortBase& port = AddRoutingNodes(static_cast<const PortElementsBase&>(elements));
+        const OutputPortBase& port = SimplifyOutputs(static_cast<const PortElementsBase&>(elements));
         return static_cast<const OutputPort<ValueType>&>(port);
     }
 

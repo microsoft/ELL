@@ -202,7 +202,7 @@ namespace model
     void Map::AddOutput(const std::string& outputName, PortElementsBase outputElements)
     {
         // Add concat/splice nodes to ensure output is a single port
-        const auto& newOutputPort = _model.AddRoutingNodes(outputElements);
+        const auto& newOutputPort = _model.SimplifyOutputs(outputElements);
         PortElementsBase newOutputElements{ newOutputPort };
         _outputElements.push_back({ newOutputPort });
         _outputNames.push_back(outputName);
@@ -363,7 +363,8 @@ namespace model
                 outputPorts.push_back(port);
             }
         }
-        auto minimalModel = transformer.CopySubmodel(_model, outputPorts, context);
+        Submodel m(_model, {}, outputPorts);
+        auto minimalModel = transformer.CopySubmodel(m, context);
         FixTransformedIO(transformer);
         _model = std::move(minimalModel);
     }
@@ -523,8 +524,14 @@ namespace model
         _model = std::move(optimizedModel);
         Prune();
     }
+    
+    void Map::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction)
+    {
+        TransformContext context;
+        Transform(context, transformFunction);
+    }
 
-    void Map::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
+    void Map::Transform(const TransformContext& context, const std::function<void(const Node&, ModelTransformer&)>& transformFunction)
     {
         ModelTransformer transformer;
         auto refinedModel = transformer.TransformModel(_model, context, transformFunction);

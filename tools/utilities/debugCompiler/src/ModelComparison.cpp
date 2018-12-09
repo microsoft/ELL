@@ -266,7 +266,7 @@ void ModelComparison::SetUpReferenceMap(model::Map& map)
             AddDebugOutputNode(transformer, node);
         }
     };
-    _referenceMap.Transform(transformFunc, addSinkNodeContext);
+    _referenceMap.Transform(addSinkNodeContext, transformFunc);
 }
 
 void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerOptions& settings)
@@ -297,7 +297,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
         }
     };
 
-    reference.Transform(transformFunc, context);
+    reference.Transform(context, transformFunc);
 
     // Initialize pass registry
     passes::AddStandardPassesToRegistry();

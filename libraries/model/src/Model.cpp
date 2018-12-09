@@ -301,7 +301,7 @@ namespace model
         return _data->idToNodeMap;
     }
 
-    const OutputPortBase& Model::AddRoutingNodes(const PortElementsBase& elements)
+    const OutputPortBase& Model::SimplifyOutputs(const PortElementsBase& elements)
     {
         const auto numRanges = elements.NumRanges();
         if (numRanges == 0)

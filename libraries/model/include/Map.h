@@ -187,8 +187,13 @@ namespace model
         /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
         ///
         /// <param name="transformFunction"> The function to apply on each node </param>
+        void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction);
+
+        /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
+        ///
         /// <param name="context"> The TransformContext to use during the transformation </param>
-        void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
+        /// <param name="transformFunction"> The function to apply on each node </param>
+        void Transform(const TransformContext& context, const std::function<void(const Node&, ModelTransformer&)>& transformFunction);
 
         /// <summary> Renames the model callbacks in this map. </summary>
         ///

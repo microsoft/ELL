@@ -190,7 +190,8 @@ namespace nodes
             outputElements.Append(ifNode->output);
         }
 
-        transformer.MapNodeOutput(output, outputElements);
+        const auto& newOutput = transformer.SimplifyOutputs(outputElements);
+        transformer.MapNodeOutput(output, newOutput);
         return true;
     }
 } // namespace nodes

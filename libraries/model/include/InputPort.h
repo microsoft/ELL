@@ -251,7 +251,7 @@ namespace model
             // Back-compat: if this port has a non-simple PortElements, add nodes to the model as needed to simplify.
             auto& context = archiver.GetContext();
             ModelSerializationContext& modelContext = dynamic_cast<ModelSerializationContext&>(context);
-            const auto& newInput = modelContext.GetModel()->AddRoutingNodes(input);
+            const auto& newInput = modelContext.GetModel()->SimplifyOutputs(input);
             SetReferencedPort(&newInput);
         }
         else

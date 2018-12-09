@@ -25,6 +25,7 @@ set(src
     src/Port.cpp
     src/PortElements.cpp
     src/PortMemoryLayout.cpp
+    src/Submodel.cpp
 )
 
 set(include
@@ -54,6 +55,7 @@ set(include
     include/PortMemoryLayout.h
     include/SliceNode.h
     include/SpliceNode.h
+    include/Submodel.h
 )
 
 set(doc

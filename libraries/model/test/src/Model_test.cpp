@@ -548,8 +548,8 @@ public:
         auto newNode2 = transformer.AddNode<model::OutputNode<ValueType>>(in2);
         model::PortElements<ValueType> elem1(newNode1->output);
         model::PortElements<ValueType> elem2(newNode2->output);
-        model::PortElements<ValueType> newOutput({ elem1, elem2 });
-
+        model::PortElements<ValueType> combinedOutput({ elem1, elem2 });
+        const auto& newOutput = transformer.SimplifyOutputs(combinedOutput);
         transformer.MapNodeOutput(output, newOutput);
         return true;
     }

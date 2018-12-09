@@ -233,6 +233,7 @@ namespace nodes
         }
         // collect the individual entries for the indicator vector into a single PortElements object
         model::PortElements<bool> edgeIndicatorVectorElements(edgeIndicatorSubModels);
+        const auto& edgeIndicatorVectorElementsOutput = transformer.SimplifyOutputs(edgeIndicatorVectorElements);
 
         // collect the sub-models that represent the trees of the forest
         model::PortElements<double> treeSubModels;
@@ -240,6 +241,7 @@ namespace nodes
         {
             treeSubModels.Append(interiorNodeSubModels[rootIndex]);
         }
+        const auto& treeSubModelsOutput = transformer.SimplifyOutputs(treeSubModels);
 
         // Make a copy and add the bias term
         auto treesPlusBias = treeSubModels;
@@ -251,8 +253,8 @@ namespace nodes
 
         // Map all the outputs from the original node to the refined model outputs
         transformer.MapNodeOutput(output, sumNode->output);
-        transformer.MapNodeOutput(treeOutputs, treeSubModels);
-        transformer.MapNodeOutput(edgeIndicatorVector, edgeIndicatorVectorElements);
+        transformer.MapNodeOutput(treeOutputs, treeSubModelsOutput);
+        transformer.MapNodeOutput(edgeIndicatorVector, edgeIndicatorVectorElementsOutput);
         return true;
     }
 
