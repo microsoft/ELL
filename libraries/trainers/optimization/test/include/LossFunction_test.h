@@ -29,7 +29,7 @@ void TestConjugateProx(LossFunctionType loss, Range thetaRange, Range zRange, Ra
 
 #include <testing/include/testing.h>
 
-#include <trainers/optimization/include/GoldenSectionMinimizer.h>
+#include <trainers/optimization/include/GoldenSectionSearch.h>
 
 #include <algorithm>
 #include <cmath>
@@ -74,7 +74,8 @@ void TestDerivative(LossFunctionType loss, Range predictionRange, Range outputRa
 template <typename LossFunctionType>
 bool TestConjugate(LossFunctionType loss, double v, double output, double lower, double upper)
 {
-    const double tolerance = 1.0e-6;
+    const double argTolerance = 1.0e-8;
+    const double valueTolerance = 1.0e-4;
 
     double conjugate = loss.Conjugate(v, output);
     if (std::isinf(conjugate))
@@ -83,12 +84,14 @@ bool TestConjugate(LossFunctionType loss, double v, double output, double lower,
     }
 
     auto objective = [&](double x) { return conjugate - x * v + loss.Value(x, output); };
-    auto minimizer = GoldenSectionMinimizer(objective, lower, upper);
-    minimizer.MinimizeToPrecision(tolerance);
-    if (minimizer.GetMinUpperBound() < tolerance && minimizer.GetMinLowerBound() > -tolerance)
+    auto minimizer = GoldenSectionSearch(objective, { { lower, upper }, argTolerance });
+    minimizer.Update(50);
+    if (std::abs(minimizer.GetBestValue()) <= valueTolerance)
     {
         return true;
     }
+
+    // test failed
     return false;
 }
 
@@ -116,18 +119,21 @@ void TestConjugate(LossFunctionType loss, Range vRange, Range outputRange, doubl
 template <typename LossFunctionType>
 bool TestConjugateProx(LossFunctionType loss, double theta, double z, double output, double lower, double upper)
 {
-    const double tolerance = 1.0e-6;
+    const double argTolerance = 1.0e-8;
+    const double valueTolerance = 1.0e-4;
 
     double conjugateProx = loss.ConjugateProx(theta, z, output);
     double conjugateProxValue = theta * loss.Conjugate(conjugateProx, output) + 0.5 * (conjugateProx - z) * (conjugateProx - z);
     auto objective = [&](double x) { return theta * loss.Conjugate(x, output) + 0.5 * (x - z) * (x - z) - conjugateProxValue; };
 
-    auto minimizer = GoldenSectionMinimizer(objective, lower, upper);
-    minimizer.MinimizeToPrecision(tolerance);
-    if (minimizer.GetMinUpperBound() < tolerance && minimizer.GetMinLowerBound() > -tolerance)
+    auto minimizer = GoldenSectionSearch(objective, { { lower, upper }, argTolerance });
+    minimizer.Update(50);
+    if (std::abs(minimizer.GetBestValue()) <= valueTolerance)
     {
         return true;
     }
+
+    // test failed
     return false;
 }
 

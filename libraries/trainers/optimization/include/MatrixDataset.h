@@ -1,13 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     MatrixExampleSet.h (optimization)
+//  File:     MatrixDataset.h (optimization)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "Common.h"
 #include "IndexedContainer.h"
 #include "OptimizationExample.h"
 
@@ -21,13 +20,13 @@ namespace trainers
     {
         /// <summary> An example set stored as a pair of matrices, one for input and the other for output. </summary>
         template <typename ElementType>
-        class MatrixExampleSet : public IndexedContainer<Example<math::ConstRowVectorReference<ElementType>, math::ConstRowVectorReference<ElementType>>>
+        class MatrixDataset : public IndexedContainer<Example<math::ConstRowVectorReference<ElementType>, math::ConstRowVectorReference<ElementType>>>
         {
         public:
             using ExampleType = Example<math::ConstRowVectorReference<ElementType>, math::ConstRowVectorReference<ElementType>>;
 
             /// <summary> Constructor. </summary>
-            MatrixExampleSet(math::RowMatrix<ElementType> input, math::RowMatrix<ElementType> output);
+            MatrixDataset(math::RowMatrix<ElementType> input, math::RowMatrix<ElementType> output);
 
             /// <summary> Returns the number of elements in the container </summary>
             size_t Size() const override { return _input.NumRows(); }
@@ -45,6 +44,8 @@ namespace trainers
 
 #pragma region implementation
 
+#include "Common.h"
+
 namespace ell
 {
 namespace trainers
@@ -52,7 +53,7 @@ namespace trainers
     namespace optimization
     {
         template <typename ElementType>
-        MatrixExampleSet<ElementType>::MatrixExampleSet(math::RowMatrix<ElementType> input, math::RowMatrix<ElementType> output) :
+        MatrixDataset<ElementType>::MatrixDataset(math::RowMatrix<ElementType> input, math::RowMatrix<ElementType> output) :
             _input(std::move(input)),
             _output(std::move(output))
         {
@@ -63,7 +64,7 @@ namespace trainers
         }
 
         template <typename ElementType>
-        auto MatrixExampleSet<ElementType>::Get(size_t index) const -> ExampleType
+        auto MatrixDataset<ElementType>::Get(size_t index) const -> ExampleType
         {
             return ExampleType(_input.GetRow(index), _output.GetRow(index));
         }

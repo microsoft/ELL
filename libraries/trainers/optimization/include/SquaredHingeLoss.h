@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "Common.h"
-
 #include <math/include/Vector.h>
 
 namespace ell
@@ -69,6 +67,8 @@ namespace trainers
 } // namespace ell
 
 #pragma region implementation
+
+#include "Common.h"
 
 namespace ell
 {

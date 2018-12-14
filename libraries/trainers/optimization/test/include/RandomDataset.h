@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     RandomExampleSet.h (optimization_test)
+//  File:     RandomDataset.h (optimization_test)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,14 +21,26 @@ using namespace ell;
 using namespace ell::trainers::optimization;
 
 template <typename ElementType, typename VectorExampleType, typename IndexedContainerExampleType>
-std::shared_ptr<VectorIndexedContainer<VectorExampleType, IndexedContainerExampleType>> GetRandomExampleSet(size_t count, size_t randomVectorSize, std::default_random_engine& randomEngine, size_t numConstantFeatures = 0);
+std::shared_ptr<VectorIndexedContainer<VectorExampleType, IndexedContainerExampleType>> GetRandomDataset(size_t count, size_t randomVectorSize, std::default_random_engine& randomEngine, size_t numConstantFeatures = 0);
 
 using VectorExampleType = Example<math::RowVector<double>, double>;
 using ContainerExampleType = Example<math::ConstRowVectorReference<double>, double>;
 
-std::shared_ptr<VectorIndexedContainer<VectorExampleType, ContainerExampleType>> GetClassificationExampleSet(size_t count, double marginMean, double marginVariance, const VectorSolution<double, true>& solution, std::default_random_engine& randomEngine);
+std::shared_ptr<VectorIndexedContainer<VectorExampleType, ContainerExampleType>> GetClassificationDataset(size_t count, double marginMean, double marginVariance, const VectorSolution<double, true>& solution, std::default_random_engine& randomEngine);
 
-std::shared_ptr<VectorIndexedContainer<VectorExampleType, ContainerExampleType>> GetRegressionExampleSet(size_t count, double inputVariance, double outputVariance, const VectorSolution<double, true>& solution, std::default_random_engine& randomEngine);
+std::shared_ptr<VectorIndexedContainer<VectorExampleType, ContainerExampleType>> GetRegressionDataset(size_t count, double inputVariance, double outputVariance, const VectorSolution<double, true>& solution, std::default_random_engine& randomEngine);
+
+template <typename T>
+using VectorScalarExampleType = Example<math::RowVector<T>, T>;
+
+template <typename T>
+using VectorRefScalarExampleType = Example<math::ConstRowVectorReference<T>, T>;
+
+template <typename T>
+using VectorVectorExampleType = Example<math::RowVector<T>, math::RowVector<T>>;
+
+template <typename T>
+using VectorRefVectorRefExampleType = Example<math::ConstRowVectorReference<T>, math::ConstRowVectorReference<T>>;
 
 #pragma region implementation
 
@@ -53,7 +65,7 @@ ExampleType GetRandomExample(size_t randomVectorSize, std::default_random_engine
 }
 
 template <typename ElementType, typename VectorExampleType, typename IndexedContainerExampleType>
-std::shared_ptr<VectorIndexedContainer<VectorExampleType, IndexedContainerExampleType>> GetRandomExampleSet(size_t count, size_t randomVectorSize, std::default_random_engine& randomEngine, size_t numConstantFeatures)
+std::shared_ptr<VectorIndexedContainer<VectorExampleType, IndexedContainerExampleType>> GetRandomDataset(size_t count, size_t randomVectorSize, std::default_random_engine& randomEngine, size_t numConstantFeatures)
 {
     auto exampleSet = std::make_shared<VectorIndexedContainer<VectorExampleType, IndexedContainerExampleType>>();
     exampleSet->reserve(count);

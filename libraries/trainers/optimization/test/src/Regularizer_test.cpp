@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Regularizer_test.h"
-#include "RandomExampleSet.h"
+#include "RandomDataset.h"
 
 #include <trainers/optimization/include/ElasticNetRegularizer.h>
 #include <trainers/optimization/include/HuberLoss.h>
@@ -24,9 +24,6 @@
 
 using namespace ell::trainers::optimization;
 
-using VectorScalarExampleType = Example<math::RowVector<double>, double>;
-using VectorRefScalarExampleType = Example<math::ConstRowVectorReference<double>, double>;
-
 void TestRegularizerEquivalence(double regularizationParameter)
 {
     std::string randomSeedString = "54321blastoff";
@@ -37,21 +34,21 @@ void TestRegularizerEquivalence(double regularizationParameter)
     const size_t numExamples = 20;
     const size_t exampleSize = 10;
 
-    auto examples = GetRandomExampleSet<double, VectorScalarExampleType, VectorRefScalarExampleType>(numExamples, exampleSize, randomEngine);
+    auto examples = GetRandomDataset<double, VectorScalarExampleType<double>, VectorRefScalarExampleType<double>>(numExamples, exampleSize, randomEngine);
 
     // setup three equivalent optimizers
     auto optimizer1 = MakeSDCAOptimizer<VectorSolution<double>>(examples, HuberLoss{}, L2Regularizer{}, { regularizationParameter });
-    optimizer1.PerformEpochs();
+    optimizer1.Update();
     const auto& solution1 = optimizer1.GetSolution();
     const auto& vector1 = solution1.GetVector();
 
     auto optimizer2 = MakeSDCAOptimizer<VectorSolution<double>>(examples, HuberLoss{}, ElasticNetRegularizer{ 0 }, { regularizationParameter });
-    optimizer2.PerformEpochs();
+    optimizer2.Update();
     const auto& solution2 = optimizer2.GetSolution();
     const auto& vector2 = solution2.GetVector();
 
     auto optimizer3 = MakeSDCAOptimizer<VectorSolution<double>>(examples, HuberLoss{}, MaxRegularizer{ 0 }, { regularizationParameter });
-    optimizer3.PerformEpochs();
+    optimizer3.Update();
     const auto& solution3 = optimizer3.GetSolution();
     const auto& vector3 = solution3.GetVector();
 

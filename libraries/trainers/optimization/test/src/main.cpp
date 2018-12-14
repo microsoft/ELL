@@ -10,27 +10,31 @@
 #include "Optimizer_test.h"
 #include "Other_test.h"
 #include "Regularizer_test.h"
+#include "Search_test.h"
 #include "Solution_test.h"
 
 #include <testing/include/testing.h>
 
+// optimization
+
 // solutions
 #include <trainers/optimization/include/MatrixSolution.h>
 #include <trainers/optimization/include/VectorSolution.h>
-
-// regularizers
-#include <trainers/optimization/include/ElasticNetRegularizer.h>
-#include <trainers/optimization/include/L2Regularizer.h>
-#include <trainers/optimization/include/MaxRegularizer.h>
 
 // loss functions
 #include <trainers/optimization/include/AbsoluteLoss.h>
 #include <trainers/optimization/include/HingeLoss.h>
 #include <trainers/optimization/include/HuberLoss.h>
 #include <trainers/optimization/include/LogisticLoss.h>
+#include <trainers/optimization/include/MultivariateLoss.h>
 #include <trainers/optimization/include/SmoothedHingeLoss.h>
 #include <trainers/optimization/include/SquareLoss.h>
 #include <trainers/optimization/include/SquaredHingeLoss.h>
+
+// regularizers
+#include <trainers/optimization/include/ElasticNetRegularizer.h>
+#include <trainers/optimization/include/L2Regularizer.h>
+#include <trainers/optimization/include/MaxRegularizer.h>
 
 using namespace ell;
 using namespace ell::trainers::optimization;
@@ -84,48 +88,52 @@ int main()
 
     // Test convergence of SDCA on a synthetic regression problem
 
-    TestSDCARegressionConvergence(AbsoluteLoss{}, L2Regularizer{}, { .5, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(HuberLoss{}, L2Regularizer{}, { .01, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(SquareLoss{}, L2Regularizer{}, { .1, 1.0e-4, true }, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(AbsoluteLoss{}, L2Regularizer{}, { .5, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(HuberLoss{}, L2Regularizer{}, { .01, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(SquareLoss{}, L2Regularizer{}, { .1, true }, 1.0e-4, 1.0, 1.0, 1.0);
 
-    TestSDCARegressionConvergence(AbsoluteLoss{}, ElasticNetRegularizer{ 0 }, { .5, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(AbsoluteLoss{}, ElasticNetRegularizer{ .1 }, { .5, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(HuberLoss{}, ElasticNetRegularizer{ 0 }, { .01, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(HuberLoss{}, ElasticNetRegularizer{ 5 }, { .01, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(SquareLoss{}, ElasticNetRegularizer{ 0 }, { .1, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(SquareLoss{}, ElasticNetRegularizer{ .5 }, { .1, 1.0e-4, true }, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(AbsoluteLoss{}, ElasticNetRegularizer{ 0 }, { .5, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(AbsoluteLoss{}, ElasticNetRegularizer{ .1 }, { .5, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(HuberLoss{}, ElasticNetRegularizer{ 0 }, { .01, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(HuberLoss{}, ElasticNetRegularizer{ 5 }, { .01, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(SquareLoss{}, ElasticNetRegularizer{ 0 }, { .1, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(SquareLoss{}, ElasticNetRegularizer{ .5 }, { .1, true }, 1.0e-4, 1.0, 1.0, 1.0);
 
-    TestSDCARegressionConvergence(AbsoluteLoss{}, MaxRegularizer{ 0 }, { .5, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(AbsoluteLoss{}, MaxRegularizer{ 2 }, { .5, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(HuberLoss{}, MaxRegularizer{ 0 }, { .01, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(HuberLoss{}, MaxRegularizer{ 20 }, { .01, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(SquareLoss{}, MaxRegularizer{ 0 }, { .1, 1.0e-4, true }, 1.0, 1.0, 1.0);
-    TestSDCARegressionConvergence(SquareLoss{}, MaxRegularizer{ 1 }, { 1, 1.0e-4, true }, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(AbsoluteLoss{}, MaxRegularizer{ 0 }, { .5, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(AbsoluteLoss{}, MaxRegularizer{ 2 }, { .5, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(HuberLoss{}, MaxRegularizer{ 0 }, { .01, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(HuberLoss{}, MaxRegularizer{ 20 }, { .01, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(SquareLoss{}, MaxRegularizer{ 0 }, { .1, true }, 1.0e-4, 1.0, 1.0, 1.0);
+    TestSDCARegressionConvergence(SquareLoss{}, MaxRegularizer{ 1 }, { 1, true }, 1.0e-4, 1.0, 1.0, 1.0);
 
     // Test convergence of SDCA on a synthetic classification problem
 
-    TestSDCAClassificationConvergence(HingeLoss{}, L2Regularizer{}, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(LogisticLoss{}, L2Regularizer{}, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(SmoothedHingeLoss{}, L2Regularizer{}, { .01, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(SquaredHingeLoss{}, L2Regularizer{}, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(HingeLoss{}, L2Regularizer{}, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(LogisticLoss{}, L2Regularizer{}, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(SmoothedHingeLoss{}, L2Regularizer{}, { .01, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(SquaredHingeLoss{}, L2Regularizer{}, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
 
-    TestSDCAClassificationConvergence(HingeLoss{}, ElasticNetRegularizer{ 0 }, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(HingeLoss{}, ElasticNetRegularizer{ .5 }, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(LogisticLoss{}, ElasticNetRegularizer{ 0 }, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(LogisticLoss{}, ElasticNetRegularizer{ .5 }, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(SmoothedHingeLoss{}, ElasticNetRegularizer{ 0 }, { .01, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(SmoothedHingeLoss{}, ElasticNetRegularizer{ 5 }, { .01, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(SquaredHingeLoss{}, ElasticNetRegularizer{ 0 }, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(SquaredHingeLoss{}, ElasticNetRegularizer{ .5 }, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(HingeLoss{}, ElasticNetRegularizer{ 0 }, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(HingeLoss{}, ElasticNetRegularizer{ .5 }, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(LogisticLoss{}, ElasticNetRegularizer{ 0 }, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(LogisticLoss{}, ElasticNetRegularizer{ .5 }, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(SmoothedHingeLoss{}, ElasticNetRegularizer{ 0 }, { .01, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(SmoothedHingeLoss{}, ElasticNetRegularizer{ 5 }, { .01, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(SquaredHingeLoss{}, ElasticNetRegularizer{ 0 }, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(SquaredHingeLoss{}, ElasticNetRegularizer{ .5 }, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
 
-    TestSDCAClassificationConvergence(HingeLoss{}, MaxRegularizer{ 0 }, { .5, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(HingeLoss{}, MaxRegularizer{ 1 }, { .5, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(LogisticLoss{}, MaxRegularizer{ 0 }, { .5, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(LogisticLoss{}, MaxRegularizer{ 0.2 }, { .5, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(SmoothedHingeLoss{}, MaxRegularizer{ 0 }, { .01, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(SmoothedHingeLoss{}, MaxRegularizer{ 20 }, { .01, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(SquaredHingeLoss{}, MaxRegularizer{ 0 }, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
-    TestSDCAClassificationConvergence(SquaredHingeLoss{}, MaxRegularizer{ 2 }, { .1, 1.0e-6, true }, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(HingeLoss{}, MaxRegularizer{ 0 }, { .5, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(HingeLoss{}, MaxRegularizer{ 1 }, { .5, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(LogisticLoss{}, MaxRegularizer{ 0 }, { .5, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(LogisticLoss{}, MaxRegularizer{ 0.2 }, { .5, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(SmoothedHingeLoss{}, MaxRegularizer{ 0 }, { .01, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(SmoothedHingeLoss{}, MaxRegularizer{ 20 }, { .01, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(SquaredHingeLoss{}, MaxRegularizer{ 0 }, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
+    TestSDCAClassificationConvergence(SquaredHingeLoss{}, MaxRegularizer{ 2 }, { .1, true }, 1.0e-4, 1.0, 1.0, 3.0);
+
+    // SDCA Reset
+    TestSDCAReset(SquaredHingeLoss{}, L2Regularizer{});
+    TestGetSparseSolution(SmoothedHingeLoss{}, 0.01);
 
     // SGD solution equivalence tests, confirms that the four solution types behave identically when given equivalent problems
 
@@ -187,6 +195,12 @@ int main()
     TestSolutionEquivalenceSDCA<double, SquaredHingeLoss, L2Regularizer>(10);
     TestSolutionEquivalenceSDCA<int, SquaredHingeLoss, L2Regularizer>(10);
 
+    // search techniques
+
+    TestExponentialSearch();
+    TestBinarySearch();
+    TestGoldenSectionSearch();
+
     // Other tests
     TestRegularizerEquivalence(1.0e-1);
     TestRegularizerEquivalence(1.0e-2);
@@ -194,7 +208,7 @@ int main()
     TestRegularizerEquivalence(1.0e-4);
     TestL1Prox();
     TestLInfinityProx();
-    TestMatrixExampleSet();
+    TestMatrixDataset();
 
     return testing::DidTestFail();
 }

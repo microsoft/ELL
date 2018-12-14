@@ -2,38 +2,46 @@
 # cmake file
 #
 
-set (library_name optimization)
+set(library_name optimization)
 
-set (src src/NormProx.cpp)
+set(src
+    src/Interval.cpp
+    src/NormProx.cpp
+)
 
-set (include include/AbsoluteLoss.h
-             include/Common.h
-             include/ElasticNetRegularizer.h
-             include/Expression.h
-             include/GoldenSectionMinimizer.h
-             include/HingeLoss.h
-             include/HuberLoss.h
-             include/IndexedContainer.h
-             include/L2Regularizer.h
-             include/LogisticLoss.h
-             include/MatrixExampleSet.h
-             include/MatrixSolution.h
-             include/MaxRegularizer.h
-             include/MultivariateLoss.h
-             include/NormProx.h
-             include/OptimizationExample.h
-             include/SmoothedHingeLoss.h
-             include/SquaredHingeLoss.h
-             include/SquareLoss.h
-             include/SDCAOptimizer.h
-             include/SGDOptimizer.h
-             include/VectorSolution.h
+set(include
+    include/AbsoluteLoss.h
+    include/BinarySearch.h
+    include/Common.h
+    include/ElasticNetRegularizer.h
+    include/ExponentialSearch.h
+    include/Expression.h
+    include/GetSparseSolution.h
+    include/GoldenSectionSearch.h
+    include/HingeLoss.h
+    include/HuberLoss.h
+    include/IndexedContainer.h
+    include/Interval.h
+    include/L2Regularizer.h
+    include/LogisticLoss.h
+    include/MatrixDataset.h
+    include/MatrixSolution.h
+    include/MaxRegularizer.h
+    include/MultivariateLoss.h
+    include/NormProx.h
+    include/OptimizationExample.h
+    include/SmoothedHingeLoss.h
+    include/SquaredHingeLoss.h
+    include/SquareLoss.h
+    include/SDCAOptimizer.h
+    include/SGDOptimizer.h
+    include/VectorSolution.h
 )
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 
-add_library(${library_name} ${src} ${include} ${doc})
+add_library(${library_name} ${src} ${include} ${tcc} ${doc})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${library_name} math)
 
@@ -49,24 +57,30 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 # test project
 #
 
-set (test_name ${library_name}_test)
+set(test_name ${library_name}_test)
 
-set (test_src test/src/main.cpp
-              test/src/RandomExampleSet.cpp
-              test/src/Regularizer_test.cpp
-              test/src/Other_test.cpp)
+set(test_src
+    test/src/main.cpp
+    test/src/RandomDataset.cpp
+    test/src/Regularizer_test.cpp
+    test/src/Search_test.cpp
+    test/src/Other_test.cpp
+)
 
-set (test_include test/include/LossFunction_test.h
-                  test/include/Optimizer_test.h
-                  test/include/Other_test.h
-                  test/include/RandomExampleSet.h
-                  test/include/Regularizer_test.h
-                  test/include/Solution_test.h)
+set(test_include
+    test/include/LossFunction_test.h
+    test/include/Optimizer_test.h
+    test/include/Other_test.h
+    test/include/RandomDataset.h
+    test/include/Regularizer_test.h
+    test/include/Search_test.h
+    test/include/Solution_test.h
+)
 
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
-add_executable(${test_name} ${test_src} ${test_include} ${include})
+add_executable(${test_name} ${test_src} ${test_include} ${test_tcc})
 target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} optimization testing)
 copy_shared_libraries(${test_name})

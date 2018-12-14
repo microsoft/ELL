@@ -18,7 +18,7 @@ void TestSolutionEquivalenceSDCA(double regularizationParameter);
 
 #pragma region implementation
 
-#include "RandomExampleSet.h"
+#include "../include/RandomDataset.h"
 
 #include <trainers/optimization/include/IndexedContainer.h>
 #include <trainers/optimization/include/MatrixSolution.h>
@@ -38,18 +38,6 @@ void TestSolutionEquivalenceSDCA(double regularizationParameter);
 using namespace ell;
 using namespace ell::trainers::optimization;
 
-template <typename T>
-using VectorScalarExampleType = Example<math::RowVector<T>, T>;
-
-template <typename T>
-using VectorRefScalarExampleType = Example<math::ConstRowVectorReference<T>, T>;
-
-template <typename T>
-using VectorVectorExampleType = Example<math::RowVector<T>, math::RowVector<T>>;
-
-template <typename T>
-using VectorRefVectorRefExampleType = Example<math::ConstRowVectorReference<T>, math::ConstRowVectorReference<T>>;
-
 // Run the SGD trainer with four different solution types and confirm that the result is identical
 template <typename RealType, typename LossFunctionType, typename RegularizerType>
 void TestSolutionEquivalenceSGD(double regularizationParameter)
@@ -62,35 +50,35 @@ void TestSolutionEquivalenceSGD(double regularizationParameter)
     const size_t exampleSize = 12;
 
     randomEngine.seed(seed);
-    auto examples1 = GetRandomExampleSet<RealType, VectorScalarExampleType<RealType>, VectorRefScalarExampleType<RealType>>(numExamples, exampleSize, randomEngine, 1);
+    auto examples1 = GetRandomDataset<RealType, VectorScalarExampleType<RealType>, VectorRefScalarExampleType<RealType>>(numExamples, exampleSize, randomEngine, 1);
 
     randomEngine.seed(seed);
-    auto examples2 = GetRandomExampleSet<RealType, VectorScalarExampleType<RealType>, VectorRefScalarExampleType<RealType>>(numExamples, exampleSize, randomEngine, 0);
+    auto examples2 = GetRandomDataset<RealType, VectorScalarExampleType<RealType>, VectorRefScalarExampleType<RealType>>(numExamples, exampleSize, randomEngine, 0);
 
     randomEngine.seed(seed);
-    auto examples3 = GetRandomExampleSet<RealType, VectorVectorExampleType<RealType>, VectorRefVectorRefExampleType<RealType>>(numExamples, exampleSize, randomEngine, 1);
+    auto examples3 = GetRandomDataset<RealType, VectorVectorExampleType<RealType>, VectorRefVectorRefExampleType<RealType>>(numExamples, exampleSize, randomEngine, 1);
 
     randomEngine.seed(seed);
-    auto examples4 = GetRandomExampleSet<RealType, VectorVectorExampleType<RealType>, VectorRefVectorRefExampleType<RealType>>(numExamples, exampleSize, randomEngine, 0);
+    auto examples4 = GetRandomDataset<RealType, VectorVectorExampleType<RealType>, VectorRefVectorRefExampleType<RealType>>(numExamples, exampleSize, randomEngine, 0);
 
     // setup four equivalent optimizers
     auto optimizer1 = MakeSGDOptimizer<VectorSolution<RealType>>(examples1, LossFunctionType{}, { regularizationParameter });
-    optimizer1.PerformEpochs();
+    optimizer1.Update();
     const auto& solution1 = optimizer1.GetSolution();
     const auto& vector1 = solution1.GetVector();
 
     auto optimizer2 = MakeSGDOptimizer<VectorSolution<RealType, true>>(examples2, LossFunctionType{}, { regularizationParameter });
-    optimizer2.PerformEpochs();
+    optimizer2.Update();
     const auto& solution2 = optimizer2.GetSolution();
     const auto& vector2 = solution2.GetVector();
 
     auto optimizer3 = MakeSGDOptimizer<MatrixSolution<RealType>>(examples3, MultivariateLoss<LossFunctionType>{}, { regularizationParameter });
-    optimizer3.PerformEpochs();
+    optimizer3.Update();
     const auto& solution3 = optimizer3.GetSolution();
     const auto& vector3 = solution3.GetMatrix().GetColumn(0);
 
     auto optimizer4 = MakeSGDOptimizer<MatrixSolution<RealType, true>>(examples4, MultivariateLoss<LossFunctionType>{}, { regularizationParameter });
-    optimizer4.PerformEpochs();
+    optimizer4.Update();
     const auto& solution4 = optimizer4.GetSolution();
     const auto& vector4 = solution4.GetMatrix().GetColumn(0);
 
@@ -120,35 +108,35 @@ void TestSolutionEquivalenceSDCA(double regularizationParameter)
     const size_t exampleSize = 7;
 
     randomEngine.seed(seed);
-    auto examples1 = GetRandomExampleSet<RealType, VectorScalarExampleType<RealType>, VectorRefScalarExampleType<RealType>>(numExamples, exampleSize, randomEngine, 1);
+    auto examples1 = GetRandomDataset<RealType, VectorScalarExampleType<RealType>, VectorRefScalarExampleType<RealType>>(numExamples, exampleSize, randomEngine, 1);
 
     randomEngine.seed(seed);
-    auto examples2 = GetRandomExampleSet<RealType, VectorScalarExampleType<RealType>, VectorRefScalarExampleType<RealType>>(numExamples, exampleSize, randomEngine, 0);
+    auto examples2 = GetRandomDataset<RealType, VectorScalarExampleType<RealType>, VectorRefScalarExampleType<RealType>>(numExamples, exampleSize, randomEngine, 0);
 
     randomEngine.seed(seed);
-    auto examples3 = GetRandomExampleSet<RealType, VectorVectorExampleType<RealType>, VectorRefVectorRefExampleType<RealType>>(numExamples, exampleSize, randomEngine, 1);
+    auto examples3 = GetRandomDataset<RealType, VectorVectorExampleType<RealType>, VectorRefVectorRefExampleType<RealType>>(numExamples, exampleSize, randomEngine, 1);
 
     randomEngine.seed(seed);
-    auto examples4 = GetRandomExampleSet<RealType, VectorVectorExampleType<RealType>, VectorRefVectorRefExampleType<RealType>>(numExamples, exampleSize, randomEngine, 0);
+    auto examples4 = GetRandomDataset<RealType, VectorVectorExampleType<RealType>, VectorRefVectorRefExampleType<RealType>>(numExamples, exampleSize, randomEngine, 0);
 
     // setup four equivalent optimizers
     auto optimizer1 = MakeSDCAOptimizer<VectorSolution<RealType>>(examples1, LossFunctionType{}, RegularizerType{}, { regularizationParameter });
-    optimizer1.PerformEpochs();
+    optimizer1.Update();
     const auto& solution1 = optimizer1.GetSolution();
     const auto& vector1 = solution1.GetVector();
 
     auto optimizer2 = MakeSDCAOptimizer<VectorSolution<RealType, true>>(examples2, LossFunctionType{}, RegularizerType{}, { regularizationParameter });
-    optimizer2.PerformEpochs();
+    optimizer2.Update();
     const auto& solution2 = optimizer2.GetSolution();
     const auto& vector2 = solution2.GetVector();
 
     auto optimizer3 = MakeSDCAOptimizer<MatrixSolution<RealType>>(examples3, MultivariateLoss<LossFunctionType>{}, RegularizerType{}, { regularizationParameter });
-    optimizer3.PerformEpochs();
+    optimizer3.Update();
     const auto& solution3 = optimizer3.GetSolution();
     const auto& vector3 = solution3.GetMatrix().GetColumn(0);
 
     auto optimizer4 = MakeSDCAOptimizer<MatrixSolution<RealType, true>>(examples4, MultivariateLoss<LossFunctionType>{}, RegularizerType{}, { regularizationParameter });
-    optimizer4.PerformEpochs();
+    optimizer4.Update();
     const auto& solution4 = optimizer4.GetSolution();
     const auto& vector4 = solution4.GetMatrix().GetColumn(0);
 

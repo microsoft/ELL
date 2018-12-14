@@ -9,7 +9,7 @@
 #include "Other_test.h"
 
 #include <trainers/optimization/include/L2Regularizer.h>
-#include <trainers/optimization/include/MatrixExampleSet.h>
+#include <trainers/optimization/include/MatrixDataset.h>
 #include <trainers/optimization/include/MatrixSolution.h>
 #include <trainers/optimization/include/MultivariateLoss.h>
 #include <trainers/optimization/include/NormProx.h>
@@ -108,7 +108,7 @@ void TestLInfinityProx()
     testing::ProcessTest("TestLInfinityProx", test1 && test2 && test3 && test4 && test5 && test6);
 }
 
-void TestMatrixExampleSet()
+void TestMatrixDataset()
 {
     size_t numRows = 10;
     size_t numInputColumns = 7;
@@ -125,9 +125,9 @@ void TestMatrixExampleSet()
     output.Generate([&]() { return normal(randomEngine); });
 
     // use the two matrices to create an example set
-    auto examples = std::make_shared<MatrixExampleSet<double>>(std::move(input), std::move(output));
+    auto examples = std::make_shared<MatrixDataset<double>>(std::move(input), std::move(output));
 
     // train an SGD optimizer on the example set
     auto optimizer = MakeSGDOptimizer<MatrixSolution<double>>(examples, MultivariateLoss<SquareLoss>{}, { 0.0001 });
-    optimizer.PerformEpochs();
+    optimizer.Update();
 }

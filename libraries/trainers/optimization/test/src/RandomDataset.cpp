@@ -1,18 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     RandomExampleSet.cpp (optimization_test)
+//  File:     RandomDataset.cpp (optimization_test)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "RandomExampleSet.h"
+#include "RandomDataset.h"
 
 #include <cassert>
 
 using namespace ell;
 
-std::shared_ptr<VectorIndexedContainer<VectorExampleType, ContainerExampleType>> GetClassificationExampleSet(size_t count, double marginMean, double marginVariance, const VectorSolution<double, true>& solution, std::default_random_engine& randomEngine)
+std::shared_ptr<VectorIndexedContainer<VectorExampleType, ContainerExampleType>> GetClassificationDataset(size_t count, double marginMean, double marginVariance, const VectorSolution<double, true>& solution, std::default_random_engine& randomEngine)
 {
     size_t size = solution.GetVector().Size();
 
@@ -59,7 +59,7 @@ std::shared_ptr<VectorIndexedContainer<VectorExampleType, ContainerExampleType>>
     return exampleSet;
 }
 
-std::shared_ptr<VectorIndexedContainer<VectorExampleType, ContainerExampleType>> GetRegressionExampleSet(size_t count, double inputVariance, double outputVariance, const VectorSolution<double, true>& solution, std::default_random_engine& randomEngine)
+std::shared_ptr<VectorIndexedContainer<VectorExampleType, ContainerExampleType>> GetRegressionDataset(size_t count, double inputVariance, double outputVariance, const VectorSolution<double, true>& solution, std::default_random_engine& randomEngine)
 {
     size_t size = solution.GetVector().Size();
 

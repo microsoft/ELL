@@ -9,7 +9,6 @@
 #pragma once
 
 #include "MatrixSolution.h"
-#include "NormProx.h"
 #include "VectorSolution.h"
 
 namespace ell
@@ -53,6 +52,8 @@ namespace trainers
 } // namespace ell
 
 #pragma region implementation
+
+#include "NormProx.h"
 
 namespace ell
 {

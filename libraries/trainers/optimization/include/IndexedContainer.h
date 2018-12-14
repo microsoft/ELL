@@ -48,8 +48,6 @@ namespace trainers
 
 #pragma region implementation
 
-#pragma once
-
 namespace ell
 {
 namespace trainers

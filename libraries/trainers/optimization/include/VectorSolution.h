@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "Common.h"
 #include "Expression.h"
 #include "IndexedContainer.h"
 #include "OptimizationExample.h"
@@ -32,14 +31,20 @@ namespace trainers
             using OutputType = IOElementType;
             using AuxiliaryDoubleType = double;
             using ExampleType = Example<InputType, OutputType>;
-            using ExampleSetType = IndexedContainer<ExampleType>;
+            using DatasetType = IndexedContainer<ExampleType>;
 
+            /// <summary> Default constructor. </summary>
             VectorSolution() = default;
+
+            /// <summary> Constructs a solution of a given size. </summary>
             VectorSolution(size_t size) :
                 _weights(size) {}
 
             /// <summary> Resize the solution to match the sizes of an input and an output. </summary>
             void Resize(const InputType& inputExample, OutputType);
+
+            /// <summary> Resets the solution to zero. </summary>
+            void Reset();
 
             /// <summary> Returns a reference to the vector. </summary>
             math::ColumnVectorReference<double> GetVector() { return _weights; }
@@ -120,6 +125,10 @@ namespace trainers
 
 #pragma region implementation
 
+#include "Common.h"
+
+#include <math/include/VectorOperations.h>
+
 namespace ell
 {
 namespace trainers
@@ -134,6 +143,17 @@ namespace trainers
             if constexpr (!isDouble)
             {
                 _doubleInput.Resize(inputExample.Size());
+            }
+        }
+
+        template <typename IOElementType, bool isBiased>
+        void VectorSolution<IOElementType, isBiased>::Reset()
+        {
+            _weights.Reset();
+
+            if constexpr (isBiased)
+            {
+                _bias = 0;
             }
         }
 

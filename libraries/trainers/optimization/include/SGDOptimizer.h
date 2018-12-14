@@ -7,14 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "Common.h"
-
-#include <algorithm>
 #include <cstddef>
 #include <memory>
-#include <numeric>
 #include <random>
-#include <vector>
 
 namespace ell
 {
@@ -25,7 +20,7 @@ namespace trainers
         /// <summary> Parameters for the stochastic gradient descent optimizer. </summary>
         struct SGDOptimizerParameters
         {
-            double regularization;
+            double regularizationParameter;
             std::string randomSeedString = "abc123";
         };
 
@@ -38,19 +33,19 @@ namespace trainers
         {
         public:
             using ExampleType = typename SolutionType::ExampleType;
-            using ExampleSetType = typename SolutionType::ExampleSetType;
+            using DatasetType = typename SolutionType::DatasetType;
 
             /// <summary> Constructor </summary>
             ///
             /// <param name="examples"> The set of examples. </param>
             /// <param name="parameters"> Optimizer parameters. </param>
             /// <param name="lossFunction"> The loss function. </param>
-            SGDOptimizer(std::shared_ptr<const ExampleSetType> examples, LossFunctionType lossFunction, SGDOptimizerParameters parameters);
+            SGDOptimizer(std::shared_ptr<const DatasetType> examples, LossFunctionType lossFunction, SGDOptimizerParameters parameters);
 
             /// <summary> Perform one or more epochs on the examples. </summary>
             ///
-            /// <param name="count"> The number of epochs to perform. </param>
-            void PerformEpochs(size_t count = 1);
+            /// <param name="epochs"> The number of epochs to perform. </param>
+            void Update(size_t epochs = 1);
 
             /// <summary> Returns the current solution to the optimization problem. </summary>
             const SolutionType& GetSolution() const { return _averagedW; }
@@ -58,7 +53,7 @@ namespace trainers
         private:
             void Step(ExampleType example);
 
-            std::shared_ptr<const ExampleSetType> _examples;
+            std::shared_ptr<const DatasetType> _examples;
             LossFunctionType _lossFunction;
             std::default_random_engine _randomEngine;
             SolutionType _lastW;
@@ -69,13 +64,20 @@ namespace trainers
 
         /// <summary> Convenience function for constructing an SGD optimizer. </summary>
         template <typename SolutionType, typename LossFunctionType>
-        SGDOptimizer<SolutionType, LossFunctionType> MakeSGDOptimizer(std::shared_ptr<const typename SolutionType::ExampleSetType> examples, LossFunctionType lossFunction, SGDOptimizerParameters parameters);
+        SGDOptimizer<SolutionType, LossFunctionType> MakeSGDOptimizer(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, SGDOptimizerParameters parameters);
 
     } // namespace optimization
 } // namespace trainers
 } // namespace ell
 
 #pragma region implementation
+
+#include "Common.h"
+
+#include <algorithm>
+#include <numeric>
+#include <random>
+#include <vector>
 
 namespace ell
 {
@@ -85,12 +87,12 @@ namespace trainers
     {
         /// <summary> </summary>
         template <typename SolutionType, typename LossFunctionType>
-        SGDOptimizer<SolutionType, LossFunctionType>::SGDOptimizer(std::shared_ptr<const ExampleSetType> examples, LossFunctionType lossFunction, SGDOptimizerParameters parameters) :
+        SGDOptimizer<SolutionType, LossFunctionType>::SGDOptimizer(std::shared_ptr<const DatasetType> examples, LossFunctionType lossFunction, SGDOptimizerParameters parameters) :
             _examples(examples),
             _lossFunction(std::move(lossFunction)),
-            _lambda(parameters.regularization)
+            _lambda(parameters.regularizationParameter)
         {
-            if (!examples || examples->Size() == 0)
+            if (examples.get() == nullptr || examples->Size() == 0)
             {
                 throw OptimizationException("Empty dataset");
             }
@@ -116,18 +118,13 @@ namespace trainers
         }
 
         template <typename SolutionType, typename LossFunctionType>
-        void SGDOptimizer<SolutionType, LossFunctionType>::PerformEpochs(size_t count)
+        void SGDOptimizer<SolutionType, LossFunctionType>::Update(size_t epochs)
         {
-            if (_examples == nullptr)
-            {
-                throw OptimizationException("Call SetExamples before calling Epoch");
-            }
-
             std::vector<size_t> permutation(_examples->Size());
             std::iota(permutation.begin(), permutation.end(), 0);
 
             // epochs
-            for (size_t e = 0; e < count; ++e)
+            for (size_t e = 0; e < epochs; ++e)
             {
                 // generate random permutation
                 std::shuffle(permutation.begin(), permutation.end(), _randomEngine);
@@ -163,7 +160,7 @@ namespace trainers
         }
 
         template <typename SolutionType, typename LossFunctionType>
-        SGDOptimizer<SolutionType, LossFunctionType> MakeSGDOptimizer(std::shared_ptr<const typename SolutionType::ExampleSetType> examples, LossFunctionType lossFunction, SGDOptimizerParameters parameters)
+        SGDOptimizer<SolutionType, LossFunctionType> MakeSGDOptimizer(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, SGDOptimizerParameters parameters)
         {
             return SGDOptimizer<SolutionType, LossFunctionType>(examples, lossFunction, parameters);
         }

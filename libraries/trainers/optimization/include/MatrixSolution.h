@@ -7,13 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "Common.h"
 #include "Expression.h"
 #include "IndexedContainer.h"
 #include "OptimizationExample.h"
 
 #include <math/include/Matrix.h>
-#include <math/include/MatrixOperations.h>
 #include <math/include/Vector.h>
 #include <math/include/VectorOperations.h>
 
@@ -32,10 +30,13 @@ namespace trainers
             using OutputType = math::ConstRowVectorReference<IOElementType>;
             using AuxiliaryDoubleType = math::RowVector<double>;
             using ExampleType = Example<InputType, OutputType>;
-            using ExampleSetType = IndexedContainer<ExampleType>;
+            using DatasetType = IndexedContainer<ExampleType>;
 
             /// <summary> Resize the solution to match the sizes of an input and an output. </summary>
             void Resize(const InputType& inputExample, const OutputType& outputExample);
+
+            /// <summary> Resets the solution to zero. </summary>
+            void Reset();
 
             /// <summary> Returns the matrix. </summary>
             math::ConstColumnMatrixReference<double> GetMatrix() const { return _weights; }
@@ -115,6 +116,11 @@ namespace trainers
 
 #pragma region implementation
 
+#include "Common.h"
+
+#include <math/include/MatrixOperations.h>
+#include <math/include/VectorOperations.h>
+
 namespace ell
 {
 namespace trainers
@@ -135,6 +141,17 @@ namespace trainers
             if constexpr (isBiased)
             {
                 _bias.Resize(outputExample.Size());
+            }
+        }
+
+        template <typename IOElementType, bool isBiased>
+        void MatrixSolution<IOElementType, isBiased>::Reset()
+        {
+            _weights.Reset();
+
+            if constexpr (isBiased)
+            {
+                _bias.Reset();
             }
         }
 
