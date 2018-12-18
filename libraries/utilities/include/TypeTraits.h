@@ -85,6 +85,9 @@ namespace utilities
         using Type = T;
     };
 
+    template <typename T>
+    using IdentityTypeT = typename IdentityType<T>::Type;
+
     namespace detail
     {
         template <typename T, bool = std::is_pointer_v<T>>
@@ -120,5 +123,28 @@ namespace utilities
     // deduction guide
     template <typename... T>
     VariantVisitor(T...)->VariantVisitor<T...>;
+
+    namespace detail
+    {
+        template <typename T, typename... Ts>
+        struct IsOneOf : std::disjunction<std::is_same<T, Ts>...>
+        {};
+    } // namespace detail
+
+    /// <summary> Compile time check for ensuring type `T` is in the set of `TypesToCheckAgainst` </summary>
+    template <typename T, typename... TypesToCheckAgainst>
+    inline constexpr bool IsOneOf = detail::IsOneOf<T, TypesToCheckAgainst...>::value;
+
+    namespace detail
+    {
+        template <typename T1, typename... Ts>
+        struct AllSame : std::conjunction<std::is_same<T1, Ts>...>
+        {};
+    }
+
+    /// <summary> Compile time check for ensuring that all types provided are the same </summary>
+    template <typename T, typename... RestOfTypes>
+    inline constexpr bool AllSame = detail::AllSame<T, RestOfTypes...>::value;
+
 } // namespace utilities
 } // namespace ell

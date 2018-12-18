@@ -182,4 +182,17 @@ void TestDimensionOrder()
     testing::ProcessTest("MemoryLayout::GetLogicalDimension", ok);
 }
 
+void TestScalarLayout()
+{
+    bool ok = true;
+    ok &= ScalarLayout.GetMemorySize() == 1u;
+    ok &= ScalarLayout.HasPadding() == false;
+    ok &= ScalarLayout.IsCanonicalOrder() == true;
+    ok &= ScalarLayout.IsContiguous() == true;
+    ok &= ScalarLayout.NumDimensions() == 0;
+    ok &= ScalarLayout.NumElements() == 1u;
+
+    testing::ProcessTest("ScalarLayout test", ok);
+}
+
 } // namespace ell

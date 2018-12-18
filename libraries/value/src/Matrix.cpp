@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueMatrix.cpp (value)
+//  File:     Matrix.cpp (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ValueMatrix.h"
+#include "Matrix.h"
 #include "EmitterContext.h"
 
 #include <utilities/include/Exception.h>
@@ -100,6 +100,100 @@ namespace value
     size_t Matrix::Columns() const { return static_cast<size_t>(_value.GetLayout().GetLogicalDimensionActiveSize(1)); }
 
     ValueType Matrix::Type() const { return _value.GetBaseType(); }
+
+    Matrix& Matrix::operator+=(Matrix m)
+    {
+        if (m.Rows() != Rows() && m.Columns() != Columns())
+        {
+            throw InputException(InputExceptionErrors::sizeMismatch);
+        }
+
+        if (m.Type() != Type())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        For(m, [this, &m](Scalar row, Scalar column) {
+            (*this)(row, column) += m(row, column);
+        });
+
+        return *this;
+    }
+
+    Matrix& Matrix::operator-=(Matrix m)
+    {
+        if (m.Rows() != Rows() && m.Columns() != Columns())
+        {
+            throw InputException(InputExceptionErrors::sizeMismatch);
+        }
+
+        if (m.Type() != Type())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        For(m, [this, &m](Scalar row, Scalar column) {
+            (*this)(row, column) -= m(row, column);
+        });
+
+        return *this;
+    }
+
+    Matrix& Matrix::operator+=(Scalar s)
+    {
+        if (s.GetType() != Type())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        For(*this, [this, &s](Scalar row, Scalar column) {
+            (*this)(row, column) += s;
+        });
+
+        return *this;
+    }
+
+    Matrix& Matrix::operator-=(Scalar s)
+    {
+        if (s.GetType() != Type())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        For(*this, [this, &s](Scalar row, Scalar column) {
+            (*this)(row, column) -= s;
+        });
+
+        return *this;
+    }
+
+    Matrix& Matrix::operator*=(Scalar s)
+    {
+        if (s.GetType() != Type())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        For(*this, [this, &s](Scalar row, Scalar column) {
+            (*this)(row, column) *= s;
+        });
+
+        return *this;
+    }
+
+    Matrix& Matrix::operator/=(Scalar s)
+    {
+        if (s.GetType() != Type())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        For(*this, [this, &s](Scalar row, Scalar column) {
+            (*this)(row, column) /= s;
+        });
+
+        return *this;
+    }
 
 } // namespace value
 } // namespace ell

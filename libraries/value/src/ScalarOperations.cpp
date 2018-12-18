@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueScalarOperations.cpp (value)
+//  File:     ScalarOperations.cpp (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ValueScalarOperations.h"
+#include "ScalarOperations.h"
 #include "EmitterContext.h"
-#include "ValueScalar.h"
+#include "Scalar.h"
 
 namespace ell
 {
@@ -45,6 +45,11 @@ namespace value
     {
         Scalar copy = s1.Copy();
         return copy %= s2;
+    }
+
+    Scalar operator-(Scalar s)
+    {
+        return Cast(0, s.GetType()) - s;
     }
 
     Scalar operator++(Scalar s)

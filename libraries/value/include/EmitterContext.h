@@ -9,8 +9,8 @@
 #pragma once
 
 #include "Emittable.h"
+#include "Scalar.h"
 #include "Value.h"
-#include "ValueScalar.h"
 #include "ValueType.h"
 
 #include <utilities/include/Boolean.h>
@@ -32,6 +32,9 @@ namespace value
     {
         Scalar CalculateOffset(const utilities::MemoryLayout& layout, std::vector<Scalar> coordinates);
     }
+
+    class FunctionDeclaration;
+    class Vector;
 
     /// <summary> An interface describing the global context that's used by the Value library </summary>
     /// <remarks> This class employs the non-virtual interface pattern to provide an easy to use API while
@@ -57,13 +60,17 @@ namespace value
         };
 
     public:
+        using DefinedFunction = std::function<std::optional<Value>(std::vector<Value>)>;
+
         class IfContext
         {
         public:
             IfContext(std::unique_ptr<IfContextImpl> impl);
+            IfContext(const IfContext&) = delete;
+            IfContext(IfContext&&) = delete;
 
-            IfContext& ElseIf(Scalar, std::function<void()>);
-            void Else(std::function<void()>);
+            IfContext&& ElseIf(Scalar, std::function<void()>) &&;
+            void Else(std::function<void()>) &&;
 
         private:
             std::unique_ptr<IfContextImpl> _impl;
@@ -157,35 +164,13 @@ namespace value
         /// <summary> Gets the type information contained in an instance of Emittable </summary>
         /// <param name="emittable"> The instance of Emittable to be queried </param>
         /// <returns> A std::pair instance describing the fundamental type of data, along with the number of pointers </returns>
-        std::pair<ValueType, int> GetType(Emittable emittable);
+        detail::ValueTypeDescription GetType(Emittable emittable);
 
         /// <summary> Creates a callable function </summary>
-        /// <param name="fnName"> The string identifier for this particular function </param>
+        /// <param name="decl"> The function declaration describing the function </param>
         /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
         /// <returns> A callable function that executes the body described by fn </returns>
-        std::function<void()> CreateFunction(std::string fnName, std::function<void()> fn);
-
-        /// <summary> Creates a callable function </summary>
-        /// <param name="fnName"> The string identifier for this particular function </param>
-        /// <param name="argTypes"> A vector of Values describing the types of the arguments and their memory layout expected by the function </param>
-        /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
-        /// <returns> A callable function that executes the body described by fn </returns>
-        std::function<void(std::vector<Value>)> CreateFunction(std::string fnName, std::vector<Value> argTypes, std::function<void(std::vector<Value>)> fn);
-
-        /// <summary> Creates a callable function </summary>
-        /// <param name="fnName"> The string identifier for this particular function </param>
-        /// <param name="returnValue"> A Value instance describing type of the value that is expected and its memory layout to be returned by the function </param>
-        /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
-        /// <returns> A callable function that executes the body described by fn </returns>
-        std::function<Value()> CreateFunction(std::string fnName, Value returnValue, std::function<Value()> fn);
-
-        /// <summary> Creates a callable function </summary>
-        /// <param name="fnName"> The string identifier for this particular function </param>
-        /// <param name="returnValue"> A Value instance describing type of the value that is expected and its memory layout to be returned by the function </param>
-        /// <param name="argTypes"> A vector of Values describing the types of the arguments and their memory layout expected by the function </param>
-        /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
-        /// <returns> A callable function that executes the body described by fn </returns>
-        std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argTypes, std::function<Value(std::vector<Value>)> fn);
+        DefinedFunction CreateFunction(FunctionDeclaration decl, DefinedFunction fn);
 
         /// <summary> Stores data known ahead of time in the form of a std::vector of one of the fundamental types </summary>
         /// <param name="data"> The data that is to be stored by the context instance </param>
@@ -241,7 +226,10 @@ namespace value
 
         IfContext If(Scalar test, std::function<void()> fn);
 
-        Value Call(std::string fnName, Value retValue, std::vector<Value> args);
+        std::optional<Value> Call(FunctionDeclaration func, std::vector<Value> args);
+
+    protected:
+        const std::vector<std::reference_wrapper<FunctionDeclaration>>& GetIntrinsics() const;
 
     private:
         virtual Value AllocateImpl(ValueType, MemoryLayout) = 0;
@@ -250,19 +238,9 @@ namespace value
         virtual Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout) = 0;
         virtual Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout) = 0;
 
-        virtual std::pair<ValueType, int> GetTypeImpl(Emittable) = 0;
+        virtual detail::ValueTypeDescription GetTypeImpl(Emittable) = 0;
 
-        virtual std::function<void()> CreateFunctionImpl(std::string fnName, std::function<void()> fn) = 0;
-        virtual std::function<Value()> CreateFunctionImpl(std::string fnName, Value returnValue, std::function<Value()> fn) = 0;
-        virtual std::function<void(std::vector<Value>)> CreateFunctionImpl(
-            std::string fnName,
-            std::vector<Value> argValues,
-            std::function<void(std::vector<Value>)> fn) = 0;
-        virtual std::function<Value(std::vector<Value>)> CreateFunctionImpl(
-            std::string fnName,
-            Value returnValue,
-            std::vector<Value> argValues,
-            std::function<Value(std::vector<Value>)> fn) = 0;
+        virtual DefinedFunction CreateFunctionImpl(FunctionDeclaration decl, DefinedFunction fn) = 0;
 
         virtual Value StoreConstantDataImpl(ConstantData data) = 0;
 
@@ -283,7 +261,7 @@ namespace value
 
         virtual IfContext IfImpl(Scalar test, std::function<void()> fn) = 0;
 
-        virtual Value CallImpl(std::string fnName, Value retValue, std::vector<Value> args) = 0;
+        virtual std::optional<Value> CallImpl(FunctionDeclaration func, std::vector<Value> args) = 0;
     };
 
     /// <summary> Returns the global instance of EmitterContext </summary>
@@ -300,9 +278,10 @@ namespace value
 
     /// <summary> Invokes the provided function object if the GlobalContext is of the provided ContextType </summary>
     /// <typeparam name="ContextType"> The specific context derived from EmitterContext </typeparam>
-    /// <param name="nn"> The function object to call, which takes a lvalue-reference of ContextType </param>
-    template <typename ContextType, typename Fn>
-    void InvokeForContext(Fn&& fn);
+    /// <param name="fn"> The function object to call, which takes a lvalue-reference of ContextType </param>
+    /// <returns> The return value of `fn`, wrapped in a `std::optional` </returns>
+    template <typename ContextType, typename Fn, typename ReturnType = std::invoke_result_t<Fn, ContextType&>>
+    auto InvokeForContext(Fn&& fn) -> std::conditional_t<std::is_same_v<ReturnType, void>, void, std::optional<ReturnType>>;
 
     /// <summary> A helper RAII class to set a particular EmitterContext instance as the global context and unset it at the end of scope </summary>
     struct ContextGuard
@@ -319,38 +298,6 @@ namespace value
         ContextGuard& operator=(const ContextGuard&) = delete;
         ContextGuard& operator=(ContextGuard&&) = delete;
     };
-
-    /// <summary> Creates a callable function </summary>
-    /// <param name="fnName"> The string identifier for this particular function </param>
-    /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
-    /// <returns> A callable function that executes the body described by fn </returns>
-    template <typename Fn>
-    auto CreateFunction(std::string fnName, Fn&& fn);
-
-    /// <summary> Creates a callable function </summary>
-    /// <param name="fnName"> The string identifier for this particular function </param>
-    /// <param name="returnValue"> A Value instance describing type of the value that is expected and its memory layout to be returned by the function </param>
-    /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
-    /// <returns> A callable function that executes the body described by fn </returns>
-    template <typename Fn>
-    auto CreateFunction(std::string fnName, Value returnValue, Fn&& fn);
-
-    /// <summary> Creates a callable function </summary>
-    /// <param name="fnName"> The string identifier for this particular function </param>
-    /// <param name="argValues"> A vector of Values describing the types of the arguments and their memory layout expected by the function </param>
-    /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
-    /// <returns> A callable function that executes the body described by fn </returns>
-    template <typename Fn>
-    auto CreateFunction(std::string fnName, std::vector<Value> argValues, Fn&& fn);
-
-    /// <summary> Creates a callable function </summary>
-    /// <param name="fnName"> The string identifier for this particular function </param>
-    /// <param name="returnValue"> A Value instance describing type of the value that is expected and its memory layout to be returned by the function </param>
-    /// <param name="argValues"> A vector of Values describing the types of the arguments and their memory layout expected by the function </param>
-    /// <param name="fn"> The function that defines the function body to be executed when the callable function is called </param>
-    /// <returns> A callable function that executes the body described by fn </returns>
-    template <typename Fn>
-    auto CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argValues, Fn&& fn);
 
     /// <summary> Allocates data with the specified type and size </summary>
     /// <param name="type"> The type of the data to allocate </param>
@@ -446,7 +393,38 @@ namespace value
 
     EmitterContext::IfContext If(Scalar test, std::function<void()> fn);
 
-    Value Call(std::string fnName, Value retValue, std::vector<Value> args);
+    extern FunctionDeclaration AbsFunctionDeclaration;
+    extern FunctionDeclaration CosFunctionDeclaration;
+    extern FunctionDeclaration ExpFunctionDeclaration;
+    extern FunctionDeclaration LogFunctionDeclaration;
+    extern FunctionDeclaration MaxNumFunctionDeclaration;
+    extern FunctionDeclaration MinNumFunctionDeclaration;
+    extern FunctionDeclaration PowFunctionDeclaration;
+    extern FunctionDeclaration SinFunctionDeclaration;
+    extern FunctionDeclaration SqrtFunctionDeclaration;
+    extern FunctionDeclaration TanhFunctionDeclaration;
+
+    Scalar Abs(Scalar s);
+    Scalar Cos(Scalar s);
+    Scalar Exp(Scalar s);
+    Scalar Log(Scalar s);
+    Scalar Max(Scalar s1, Scalar s2);
+    Scalar Min(Scalar s1, Scalar s2);
+    Scalar Pow(Scalar base, Scalar exp);
+    Scalar Sin(Scalar s);
+    Scalar Sqrt(Scalar s);
+    Scalar Tanh(Scalar s);
+
+    Vector Abs(Vector v);
+    Vector Cos(Vector v);
+    Vector Exp(Vector v);
+    Vector Log(Vector v);
+    Scalar Max(Vector v);
+    Scalar Min(Vector v);
+    Vector Pow(Vector bases, Scalar exp);
+    Vector Sin(Vector v);
+    Vector Sqrt(Vector v);
+    Vector Tanh(Vector v);
 
 } // namespace value
 } // namespace ell
@@ -457,162 +435,21 @@ namespace ell
 {
 namespace value
 {
-    namespace detail
-    {
-        // Until MacOS's compiler has proper std::function deduction guides
-#if defined(__APPLE__)
-        template <typename Fn>
-        struct Function : public std::function<Fn>
-        {
-            using std::function<Fn>::function;
-        };
 
-        template <typename>
-        struct StdFunctionDeductionGuideHelper
-        {};
-
-        template <typename ReturnT, typename Class, bool IsNoExcept, typename... Args>
-        struct StdFunctionDeductionGuideHelper<ReturnT (Class::*)(Args...) noexcept(IsNoExcept)>
-        {
-            using Type = ReturnT(Args...);
-        };
-
-        template <typename ReturnT, typename Class, bool IsNoExcept, typename... Args>
-        struct StdFunctionDeductionGuideHelper<ReturnT (Class::*)(Args...) & noexcept(IsNoExcept)>
-        {
-            using Type = ReturnT(Args...);
-        };
-
-        template <typename ReturnT, typename Class, bool IsNoExcept, typename... Args>
-        struct StdFunctionDeductionGuideHelper<ReturnT (Class::*)(Args...) const noexcept(IsNoExcept)>
-        {
-            using Type = ReturnT(Args...);
-        };
-
-        template <typename ReturnT, typename Class, bool IsNoExcept, typename... Args>
-        struct StdFunctionDeductionGuideHelper<ReturnT (Class::*)(Args...) const& noexcept(IsNoExcept)>
-        {
-            using Type = ReturnT(Args...);
-        };
-
-        template <typename ReturnT, typename... Args>
-        Function(ReturnT (*)(Args...))->Function<ReturnT(Args...)>;
-
-        template <typename Functor,
-                  typename Signature = typename StdFunctionDeductionGuideHelper<decltype(&Functor::operator())>::Type>
-        Function(Functor)->Function<Signature>;
-#endif // defined(__APPLE__)
-
-        std::function<void()> CreateFunction(std::string fnName, std::function<void()> fn);
-
-        template <typename ReturnT>
-        std::function<ReturnT()> CreateFunction(std::string fnName, Value returnValue, std::function<ReturnT()> fn)
-        {
-            auto createdFn = GetContext().CreateFunction(fnName, returnValue, [fn = std::move(fn)]() -> Value {
-                ReturnT r = fn();
-                return r.GetValue();
-            });
-
-            return [createdFn = std::move(createdFn)]() -> ReturnT { return ReturnT(createdFn()); };
-        }
-
-        template <typename... Args>
-        std::function<void(Args...)> CreateFunction(std::string fnName, std::vector<Value> argValues, std::function<void(Args...)> fn)
-        {
-            constexpr auto argSize = sizeof...(Args);
-            if (argValues.size() != argSize)
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidSize);
-            }
-
-            auto createdFn =
-                GetContext().CreateFunction(fnName, argValues, [fn = std::move(fn)](std::vector<Value> args) -> void {
-                    std::tuple<Args...> tupleArgs = utilities::VectorToTuple<Args...>(args);
-                    std::apply(fn, tupleArgs);
-                });
-
-            return [createdFn = std::move(createdFn)](Args&&... args) -> void {
-                constexpr auto argSize = sizeof...(Args);
-                std::vector<Value> argValues;
-                argValues.reserve(argSize);
-                (argValues.push_back(args.GetValue()), ...);
-
-                createdFn(argValues);
-            };
-        }
-
-        template <typename ReturnT, typename... Args>
-        std::function<ReturnT(Args...)> CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argValues, std::function<ReturnT(Args...)> fn)
-        {
-            constexpr auto argSize = sizeof...(Args);
-            if (argValues.size() != argSize)
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidSize);
-            }
-
-            auto createdFn = GetContext().CreateFunction(fnName,
-                                                         returnValue,
-                                                         argValues,
-                                                         [fn = std::move(fn)](std::vector<Value> args) -> Value {
-                                                             std::tuple<Args...> tupleArgs =
-                                                                 utilities::VectorToTuple<Args...>(args);
-                                                             ReturnT r = std::apply(fn, tupleArgs);
-                                                             return r.GetValue();
-                                                         });
-
-            return [createdFn = std::move(createdFn)](Args&&... args) -> ReturnT {
-                constexpr auto argSize = sizeof...(Args);
-                std::vector<Value> argValues;
-                argValues.reserve(argSize);
-                (argValues.push_back(args.GetValue()), ...);
-
-                return ReturnT(createdFn(argValues));
-            };
-        }
-
-    } // namespace detail
-
-#if defined(__APPLE__)
-#define FUNCTION_TYPE detail::Function
-#else
-#define FUNCTION_TYPE std::function
-#endif // defined(__APPLE__)
-
-    template <typename Fn>
-    auto CreateFunction(std::string fnName, Fn&& fn)
-    {
-        return detail::CreateFunction(fnName, FUNCTION_TYPE(fn));
-    }
-
-    template <typename Fn>
-    auto CreateFunction(std::string fnName, Value returnValue, Fn&& fn)
-    {
-        return detail::CreateFunction(fnName, returnValue, FUNCTION_TYPE(fn));
-    }
-
-    template <typename Fn>
-    auto CreateFunction(std::string fnName, std::vector<Value> argValues, Fn&& fn)
-    {
-        return detail::CreateFunction(fnName, argValues, FUNCTION_TYPE(fn));
-    }
-
-    template <typename Fn>
-    auto CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argValues, Fn&& fn)
-    {
-        return detail::CreateFunction(fnName, returnValue, argValues, FUNCTION_TYPE(fn));
-    }
-
-#undef FUNCTION_TYPE
-
-    template <typename ContextType, typename Fn>
-    void InvokeForContext(Fn&& fn)
+    template <typename ContextType, typename Fn, typename ReturnType>
+    auto InvokeForContext(Fn&& fn) -> std::conditional_t<std::is_same_v<ReturnType, void>, void, std::optional<ReturnType>>
     {
         static_assert(std::is_base_of_v<EmitterContext, std::decay_t<ContextType>>,
                       "ContextType must be derived from EmitterContext");
 
         if (auto ptr = dynamic_cast<ContextType*>(&GetContext()); ptr != nullptr)
         {
-            fn(*ptr);
+            return fn(*ptr);
+        }
+
+        if constexpr (!std::is_same_v<ReturnType, void>)
+        {
+            return std::nullopt;
         }
     }
 

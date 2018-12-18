@@ -22,10 +22,11 @@
 
 #include <value/include/ComputeContext.h>
 #include <value/include/LLVMContext.h>
+#include <value/include/FunctionDeclaration.h>
+#include <value/include/Matrix.h>
+#include <value/include/Tensor.h>
 #include <value/include/Value.h>
-#include <value/include/ValueMatrix.h>
-#include <value/include/ValueTensor.h>
-#include <value/include/ValueVector.h>
+#include <value/include/Vector.h>
 
 #include <iostream>
 #include <memory>
@@ -54,13 +55,13 @@ void test_simpleDepthwiseSeparableConvolve2D()
 
     math::ColumnRowChannelTensor<double> expectedTensor(2, 2, 2, expected);
 
-    auto convolve2D = CreateFunction("testSimpleDepthwiseSeparableConvolve2D",
-                                     { inputTensor.GetValue(),
-                                       filterTensor.GetValue(),
-                                       Value(ValueType::Int32, ScalarLayout),
-                                       Value(ValueType::Int32, ScalarLayout),
-                                       outputTensor.GetValue() },
-                                     SimpleDepthwiseSeparableConvolve2D);
+    auto convolve2D = DeclareFunction("testSimpleDepthwiseSeparableConvolve2D")
+                          .Parameters(inputTensor.GetValue(),
+                                      filterTensor.GetValue(),
+                                      Value(ValueType::Int32, ScalarLayout),
+                                      Value(ValueType::Int32, ScalarLayout),
+                                      outputTensor.GetValue())
+                          .Define(SimpleDepthwiseSeparableConvolve2D);
 
     InvokeForContext<ComputeContext>([&](auto&) {
         bool ok = true;

@@ -9,7 +9,7 @@
 #include "IIRFilter.h"
 
 #include <value/include/EmitterContext.h>
-#include <value/include/ValueVector.h>
+#include <value/include/Vector.h>
 
 namespace ell
 {

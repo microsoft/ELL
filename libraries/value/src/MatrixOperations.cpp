@@ -1,15 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueMatrixOperations.h (value)
+//  File:     MatrixOperations.h (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ValueMatrixOperations.h"
+#include "MatrixOperations.h"
 #include "EmitterContext.h"
-#include "ValueMatrix.h"
-#include "ValueScalar.h"
+#include "Matrix.h"
+#include "Scalar.h"
 
 namespace ell
 {
@@ -17,17 +17,16 @@ using namespace utilities;
 
 namespace value
 {
-   Scalar Accumulate(Matrix matrix, Scalar initialValue)
-   {
-       Scalar result = initialValue;
+    Scalar Accumulate(Matrix matrix, Scalar initialValue)
+    {
+        Scalar result = initialValue;
 
-       For(matrix, [&](auto row, auto column)
-       {
-           result += matrix(row, column);
-       });
+        For(matrix, [&](auto row, auto column) {
+            result += matrix(row, column);
+        });
 
-       return result;
-   }
+        return result;
+    }
 
     void For(Matrix matrix, std::function<void(Scalar, Scalar)> fn)
     {
@@ -46,6 +45,41 @@ namespace value
     Matrix GEMM(Matrix m1, Matrix m2) { throw LogicException(LogicExceptionErrors::notImplemented); }
 
     Vector GEMV(Matrix m, Vector v) { throw LogicException(LogicExceptionErrors::notImplemented); }
+
+    Matrix operator+(Matrix m1, Matrix m2)
+    {
+        Matrix copy = m1.Copy();
+        return copy += m2;
+    }
+
+    Matrix operator+(Matrix m, Scalar s)
+    {
+        Matrix copy = m.Copy();
+        return copy += s;
+    }
+
+    Matrix operator-(Matrix m1, Matrix m2)
+    {
+        Matrix copy = m1.Copy();
+        return copy -= m2;
+    }
+    Matrix operator-(Matrix m, Scalar s)
+    {
+        Matrix copy = m.Copy();
+        return copy -= s;
+    }
+
+    Matrix operator*(Matrix m, Scalar s)
+    {
+        Matrix copy = m.Copy();
+        return copy *= s;
+    }
+
+    Matrix operator/(Matrix m, Scalar s)
+    {
+        Matrix copy = m.Copy();
+        return copy /= s;
+    }
 
 } // namespace value
 } // namespace ell

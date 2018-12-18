@@ -14,5 +14,6 @@ namespace ell
 void TestDimensionOrder();
 void TestMemoryLayoutCtors();
 void TestMemoryLayoutSlice();
+void TestScalarLayout();
 
 } // namespace ell

@@ -6,8 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Emittable_functions_util.h"
 #include "IIRFilter_test.h"
+#include "Emittable_functions_util.h"
 
 #include <emitters/include/IRModuleEmitter.h>
 
@@ -17,10 +17,10 @@
 
 #include <value/include/ComputeContext.h>
 #include <value/include/LLVMContext.h>
+#include <value/include/Matrix.h>
+#include <value/include/Tensor.h>
 #include <value/include/Value.h>
-#include <value/include/ValueMatrix.h>
-#include <value/include/ValueTensor.h>
-#include <value/include/ValueVector.h>
+#include <value/include/Vector.h>
 
 using namespace ell::emitters;
 using namespace ell::utilities;
@@ -58,14 +58,14 @@ void TestIIRFilter(std::vector<double> signal, std::vector<double> b, std::vecto
     int signalSize = (int)signal.size();
     int aSize = (int)a.size();
     int bSize = (int)b.size();
-    auto filter1D = CreateFunction("TestIIRFilter",
-                                   Value{ valueType, MemoryLayout({ resultSize }) },
-                                   { Value{ valueType, MemoryLayout({ signalSize }) },
-                                     Value{ valueType, MemoryLayout({ bSize }) },
-                                     Value{ valueType, MemoryLayout({ aSize }) } },
-                                   [](Vector signal, Vector b, Vector a) {
-                                       return FilterSamples(signal, { b, a });
-                                   });
+    auto filter1D = DeclareFunction("TestIIRFilter")
+                        .Returns(Value{ valueType, MemoryLayout({ resultSize }) })
+                        .Parameters(Value{ valueType, MemoryLayout({ signalSize }) },
+                                    Value{ valueType, MemoryLayout({ bSize }) },
+                                    Value{ valueType, MemoryLayout({ aSize }) })
+                        .Define([](Vector signal, Vector b, Vector a) {
+                            return FilterSamples(signal, { b, a });
+                        });
 
     InvokeForContext<ComputeContext>([&](auto&) {
         bool ok = true;

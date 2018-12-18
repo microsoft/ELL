@@ -46,10 +46,10 @@ void TestVoiceActivityDetectorInternal(const std::string& filename, VoiceActivit
     auto valueType = GetValueType<typename decltype(data)::value_type>();
     Vector temp = data;
 
-    auto vadfn = CreateFunction("ProcessTest",
-                                Value{ GetValueType<int>(), ScalarLayout },
-                                { Value{ valueType, MemoryLayout({ (int)data.size() }) } },
-                                [&vad](Vector data) -> Scalar { return vad.Process(data); });
+    auto vadfn = DeclareFunction("ProcessTest")
+                     .Returns(Value{ GetValueType<int>(), ScalarLayout })
+                     .Parameters(Value{ valueType, MemoryLayout({ (int)data.size() }) })
+                     .Define([&vad](Vector data) -> Scalar { return vad.Process(data); });
 
     int errors = 0;
     // load the dataset

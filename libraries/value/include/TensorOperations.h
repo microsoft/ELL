@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueTensorOperations.h (value)
+//  File:     TensorOperations.h (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include "ValueScalar.h"
+#include "Scalar.h"
 
 #include <utilities/include/MemoryLayout.h>
 
@@ -26,12 +26,17 @@ namespace value
         All
     };
 
-   Scalar Accumulate(Tensor tensor, Scalar initialValue);
+    Scalar Accumulate(Tensor tensor, Scalar initialValue);
 
     /// <summary> Creates a for loop over the tensor </summary>
     /// <param name="tensor"> The instance of Tensor that references the data over which to iterate </param>
     /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
     void For(Tensor tensor, std::function<void(Scalar, Scalar, Scalar)> fn);
+
+    Tensor operator+(Tensor, Scalar);
+    Tensor operator-(Tensor, Scalar);
+    Tensor operator*(Tensor, Scalar);
+    Tensor operator/(Tensor, Scalar);
 
 } // namespace value
 } // namespace ell

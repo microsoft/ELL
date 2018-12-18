@@ -579,3 +579,30 @@ namespace utilities
     std::ostream& operator<<(std::ostream& out, const utilities::MemoryLayout& layout);
 } // namespace utilities
 } // namespace ell
+
+namespace std
+{
+
+template <>
+struct hash<::ell::utilities::DimensionVector>
+{
+    using Type = ::ell::utilities::DimensionVector;
+
+    /// <summary> Computes a hash of the input value. </summary>
+    ///
+    /// <returns> A hash value for the given input. </returns>
+    [[nodiscard]] size_t operator()(const Type& value) const noexcept;
+};
+
+template <>
+struct hash<::ell::utilities::MemoryLayout>
+{
+    using Type = ::ell::utilities::MemoryLayout;
+
+    /// <summary> Computes a hash of the input value. </summary>
+    ///
+    /// <returns> A hash value for the given input. </returns>
+    [[nodiscard]] size_t operator()(const Type& value) const noexcept;
+};
+
+} // namespace std

@@ -7,19 +7,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ComputeContext.h"
+#include "FunctionDeclaration.h"
+#include "Scalar.h"
 #include "Value.h"
-#include "ValueScalar.h"
 
 #include <utilities/include/TypeTraits.h>
 
+#include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <string>
 
 namespace ell
 {
 namespace value
 {
-
     using namespace detail;
     using namespace utilities;
 
@@ -109,12 +111,219 @@ namespace value
             using VectorType = std::vector<typename T::Type>;
             return VectorType(data.begin(), data.end());
         }
+
+        // Intrinsics helper function objects
+        struct MaxFn
+        {
+            template <typename T>
+            constexpr auto operator()(const T& n1, const IdentityTypeT<T>& n2) const noexcept
+            {
+                return std::max(n1, n2);
+            }
+        };
+
+        struct MinFn
+        {
+            template <typename T>
+            constexpr auto operator()(const T& n1, const IdentityTypeT<T>& n2) const noexcept
+            {
+                return std::min(n1, n2);
+            }
+        };
+
+        // Essentially a refactored lambda which returns a function that defines
+        // the functionality for a particular intrinsic.
+        // If the intrinsic is called with too many args, throw
+        // If the arg is empty, boolean, or is Emittable, throw
+        // Finally, if all conditions are met, a vector is created for the return values
+        // and is filled in by calling std::transform with the proper STL function being
+        // the transformation function
+        struct SimpleNumericalFunctionIntrinsic
+        {
+            template <typename Fn>
+            auto operator()(Fn&& fn) const -> std::function<Value(std::vector<Value>)>
+            {
+                return [fn](std::vector<Value> args) -> Value {
+                    if (args.size() != 1)
+                    {
+                        throw InputException(InputExceptionErrors::invalidSize);
+                    }
+
+                    const auto& value = args[0];
+                    return std::visit(
+                        [&value, fn](auto&& data) -> Value {
+                            using Type = std::decay_t<decltype(data)>;
+                            using DataType = std::remove_pointer_t<Type>;
+
+                            if constexpr (IsOneOf<DataType, Undefined, Emittable, Boolean>)
+                            {
+                                throw InputException(InputExceptionErrors::invalidArgument);
+                            }
+                            else
+                            {
+                                auto dataBegin = data;
+                                auto dataEnd = data + (value.IsConstrained() ? value.GetLayout().GetMemorySize() : 1u);
+                                std::vector returnData(dataBegin, dataEnd);
+
+                                std::transform(returnData.begin(), returnData.end(), returnData.begin(), fn);
+
+                                return Value(returnData, value.IsConstrained() ? std::optional{value.GetLayout()} : std::optional<MemoryLayout>{std::nullopt});
+                            }
+                        },
+                        value.GetUnderlyingData());
+                };
+            }
+        };
+
+        struct SimpleMinMaxNumFunctionIntrinsic
+        {
+            template <typename Fn>
+            auto operator()(Fn&& fn) const -> std::function<Value(std::vector<Value>)>
+            {
+                return [fn](std::vector<Value> args) -> Value {
+                    if (args.size() == 1)
+                    {
+                        const auto& value = args[0];
+                        return std::visit(
+                            [&value, fn](auto&& data) -> Value {
+                                using Type = std::decay_t<decltype(data)>;
+                                using DataType = std::remove_pointer_t<Type>;
+                                if constexpr (IsOneOf<DataType, Undefined, Emittable, Boolean>)
+                                {
+                                    throw InputException(InputExceptionErrors::invalidArgument);
+                                }
+                                else
+                                {
+                                    auto& valueLayout = value.GetLayout();
+                                    auto maxCoordinate = valueLayout.GetActiveSize().ToVector();
+                                    decltype(maxCoordinate) coordinate(maxCoordinate.size());
+
+                                    DataType returnValue =
+                                        fn(std::numeric_limits<DataType>::max(), std::numeric_limits<DataType>::lowest()) ==
+                                                std::numeric_limits<DataType>::max()
+                                            ? std::numeric_limits<DataType>::lowest()
+                                            : std::numeric_limits<DataType>::max();
+
+                                    do
+                                    {
+                                        auto logicalCoordinates = valueLayout.GetLogicalCoordinates(coordinate);
+                                        auto valueOffset = valueLayout.GetLogicalEntryOffset(logicalCoordinates);
+                                        returnValue = fn(returnValue, data[valueOffset]);
+                                    } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+
+                                    return Value(returnValue);
+                                }
+                            },
+                            value.GetUnderlyingData());
+                    }
+                    else if (args.size() == 2)
+                    {
+                        const auto& value1 = args[0];
+                        const auto& value2 = args[1];
+                        if ((value1.IsConstrained() && value1.GetLayout() != ScalarLayout) ||
+                            (value2.IsConstrained() && value2.GetLayout() != ScalarLayout))
+                        {
+                            throw InputException(InputExceptionErrors::invalidSize);
+                        }
+                        return std::visit(
+                            [fn](auto&& data1, auto&& data2) -> Value {
+                                using Type1 = std::decay_t<decltype(data1)>;
+                                using Type2 = std::decay_t<decltype(data2)>;
+                                using DataType1 = std::remove_pointer_t<Type1>;
+                                using DataType2 = std::remove_pointer_t<Type2>;
+
+                                if constexpr (IsOneOf<DataType1, Undefined, Emittable, Boolean> ||
+                                              IsOneOf<DataType2, Undefined, Emittable, Boolean>)
+                                {
+                                    throw InputException(InputExceptionErrors::invalidArgument);
+                                }
+                                else
+                                {
+                                    return Value(fn(*data1, *data2));
+                                }
+                            },
+                            value1.GetUnderlyingData(),
+                            value2.GetUnderlyingData());
+                    }
+                    else
+                    {
+                        throw InputException(InputExceptionErrors::invalidSize);
+                    }
+                };
+            }
+        };
+
+        struct AbsFunctionIntrinsic
+        {
+            template <typename T>
+            constexpr auto operator()(T n) const noexcept
+            {
+                if constexpr (std::is_unsigned_v<T>)
+                {
+                    return n;
+                }
+                else
+                {
+                    return std::abs(n);
+                }
+            }
+        };
+
+        struct PowFunctionIntrinsic
+        {
+            auto operator()(std::vector<Value> args) const -> Value
+            {
+                if (args.size() != 2)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                auto& base = args[0];
+                auto& exp = args[1];
+                if (exp.IsConstrained() && exp.GetLayout() != ScalarLayout)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+                return std::visit(
+                    [&base](auto&& data1, auto&& data2) -> Value {
+                        using Type1 = std::decay_t<decltype(data1)>;
+                        using Type2 = std::decay_t<decltype(data2)>;
+                        using DataType1 = std::remove_pointer_t<Type1>;
+                        using DataType2 = std::remove_pointer_t<Type2>;
+
+                        if constexpr (IsOneOf<DataType1, Undefined, Emittable, Boolean> ||
+                                      IsOneOf<DataType2, Undefined, Emittable, Boolean>)
+                        {
+                            throw InputException(InputExceptionErrors::invalidArgument);
+                        }
+                        else if constexpr (!std::is_same_v<DataType1, DataType2>)
+                        {
+                            throw InputException(InputExceptionErrors::typeMismatch);
+                        }
+                        else
+                        {
+                            auto data1Begin = data1;
+                            auto data1End = data1 + (base.IsConstrained() ? base.GetLayout().GetMemorySize() : 1u);
+                            std::vector returnData(data1Begin, data1End);
+
+                            std::transform(returnData.begin(), returnData.end(), returnData.begin(), [exp = *data2](auto n) {
+                                return std::pow(n, exp);
+                            });
+
+                            return Value(returnData, base.IsConstrained() ? std::optional{ base.GetLayout() } : std::optional<MemoryLayout>{ std::nullopt });
+                        }
+                    },
+                    base.GetUnderlyingData(),
+                    exp.GetUnderlyingData());
+            }
+        };
+
     } // namespace
 
     ComputeContext::ComputeContext(std::string moduleName) :
         _moduleName(std::move(moduleName))
     {
-        // we always have at least one stack space, in case the top level function needs to return something
+        // we always have at least one stack entry, in case the top level function needs to return something
         _stack.push({});
     }
 
@@ -319,113 +528,80 @@ namespace value
                           value.GetUnderlyingData());
     }
 
-    std::pair<ValueType, int> ComputeContext::GetTypeImpl(Emittable)
+    detail::ValueTypeDescription ComputeContext::GetTypeImpl(Emittable)
     {
         throw LogicException(LogicExceptionErrors::notImplemented);
     }
 
-    std::function<void()> ComputeContext::CreateFunctionImpl(std::string fnName, std::function<void()> fn)
+    EmitterContext::DefinedFunction ComputeContext::CreateFunctionImpl(FunctionDeclaration decl, EmitterContext::DefinedFunction fn)
     {
-        return [fn = std::move(fn), fnName = std::move(fnName), this] {
-            FunctionScope scope(*this, fnName);
-            fn();
-        };
-    }
+        if (const auto& intrinsics = GetIntrinsics();
+            std::find(intrinsics.begin(), intrinsics.end(), decl) != intrinsics.end())
+        {
+            throw InputException(InputExceptionErrors::invalidArgument, "Specified function is an intrinsic");
+        }
 
-    std::function<Value()> ComputeContext::CreateFunctionImpl(std::string fnName, Value expectedReturn, std::function<Value()> fn)
-    {
-        return [fn = std::move(fn), fnName = std::move(fnName), this, expectedReturn]() {
-            ConstantData movedOutOfScope;
-            std::optional<Value> maybeGlobal;
+        if (auto it = _definedFunctions.find(decl); it != _definedFunctions.end())
+        {
+            return it->second;
+        }
 
+        DefinedFunction returnFn = [fn = std::move(fn),
+                                    decl,
+                                    this](std::vector<Value> args) -> std::optional<Value> {
+            const auto& expectedArgs = decl.GetParameterTypes();
+            const auto& fnName = decl.GetFunctionName();
+            assert(expectedArgs.size() == args.size());
+
+            if (const auto& returnType = decl.GetReturnType(); returnType)
             {
-                FunctionScope scope(*this, fnName);
+                Value expectedReturn = *returnType;
 
-                Value returnValue = expectedReturn;
-                returnValue = fn();
-                if (IsGlobalValue(returnValue))
+                ConstantData movedOutOfScope;
+                std::optional<Value> maybeGlobal;
                 {
-                    maybeGlobal = returnValue;
-                }
+                    FunctionScope scope(*this, fnName);
+                    auto fnArgs = expectedArgs;
+                    std::copy(args.begin(), args.end(), fnArgs.begin());
 
+                    Value returnValue = expectedReturn;
+                    auto fnReturn = fn(args);
+                    if (!fnReturn)
+                    {
+                        throw LogicException(LogicExceptionErrors::illegalState, "Function definition was expected to return a value, but optional was empty");
+                    }
+                    returnValue = *fnReturn;
+                    if (IsGlobalValue(returnValue))
+                    {
+                        maybeGlobal = returnValue;
+                    }
+
+                    if (!maybeGlobal)
+                    {
+                        movedOutOfScope = ExtractConstantData(returnValue);
+                    }
+                }
                 if (!maybeGlobal)
                 {
-                    movedOutOfScope = ExtractConstantData(returnValue);
+                    GetTopFrame().second.push_front(std::move(movedOutOfScope));
+                    return ConstantDataToValue(GetTopFrame().second.front(), expectedReturn.GetLayout());
                 }
-            }
-            if (!maybeGlobal)
-            {
-                GetTopFrame().second.push_front(std::move(movedOutOfScope));
-                return ConstantDataToValue(GetTopFrame().second.front(), expectedReturn.GetLayout());
+                else
+                {
+                    return *maybeGlobal;
+                }
             }
             else
             {
-                return *maybeGlobal;
+                // equivalent of a void return type
+                (void)fn(args);
+
+                return std::nullopt;
             }
         };
-    }
 
-    std::function<void(std::vector<Value>)> ComputeContext::CreateFunctionImpl(
-        std::string fnName,
-        std::vector<Value> expectedArgs,
-        std::function<void(std::vector<Value>)> fn)
-    {
-        return [fn = std::move(fn), fnName = std::move(fnName), this, expectedArgs = std::move(expectedArgs)](
-                   std::vector<Value> args) {
-            assert(expectedArgs.size() == args.size());
-            ConstantData movedOutOfScope;
-            {
-                FunctionScope scope(*this, fnName);
-                auto fnArgs = expectedArgs;
-                std::copy(args.begin(), args.end(), fnArgs.begin());
-
-                fn(args);
-            }
-            GetTopFrame().second.push_front(std::move(movedOutOfScope));
-        };
-    }
-
-    std::function<Value(std::vector<Value>)> ComputeContext::CreateFunctionImpl(
-        std::string fnName,
-        Value expectedReturn,
-        std::vector<Value> expectedArgs,
-        std::function<Value(std::vector<Value>)> fn)
-    {
-        return [fn = std::move(fn),
-                fnName = std::move(fnName),
-                this,
-                expectedReturn,
-                expectedArgs = std::move(expectedArgs)](std::vector<Value> args) {
-            assert(expectedArgs.size() == args.size());
-            ConstantData movedOutOfScope;
-            std::optional<Value> maybeGlobal;
-            {
-                FunctionScope scope(*this, fnName);
-                auto fnArgs = expectedArgs;
-                std::copy(args.begin(), args.end(), fnArgs.begin());
-
-                Value returnValue = expectedReturn;
-                returnValue = fn(args);
-                if (IsGlobalValue(returnValue))
-                {
-                    maybeGlobal = returnValue;
-                }
-
-                if (!maybeGlobal)
-                {
-                    movedOutOfScope = ExtractConstantData(returnValue);
-                }
-            }
-            if (!maybeGlobal)
-            {
-                GetTopFrame().second.push_front(std::move(movedOutOfScope));
-                return ConstantDataToValue(GetTopFrame().second.front(), expectedReturn.GetLayout());
-            }
-            else
-            {
-                return *maybeGlobal;
-            }
-        };
+        _definedFunctions[decl] = returnFn;
+        return returnFn;
     }
 
     void ComputeContext::CopyDataImpl(const Value& source, Value& destination)
@@ -765,30 +941,50 @@ namespace value
         return { std::make_unique<ComputeContext::IfContextImpl>(state) };
     }
 
-    Value ComputeContext::CallImpl(std::string fnName, Value retValue, std::vector<Value> args)
+    std::optional<Value> ComputeContext::CallImpl(FunctionDeclaration func, std::vector<Value> args)
     {
-        static std::map<std::string, std::function<Value(std::vector<Value>)>> fnMap{
-            { "abs",
-              [](std::vector<Value> args) -> Value {
-                  if (args.size() != 1)
-                  {
-                      throw InputException(InputExceptionErrors::invalidArgument);
-                  }
-                  return std::visit([](auto&&) { return Value{}; }, args[0].GetUnderlyingData());
-              } }
-        };
-
         if (!std::all_of(args.begin(), args.end(), [this](const Value& value) { return ValidateValue(value); }))
         {
             throw LogicException(LogicExceptionErrors::illegalState);
         }
 
-        if (auto it = fnMap.find(fnName); it != fnMap.end())
+        const auto& intrinsics = GetIntrinsics();
+        if (intrinsics.end() != std::find(intrinsics.begin(), intrinsics.end(), func))
+        {
+            return IntrinsicCall(func, args);
+        }
+
+        if (auto it = _definedFunctions.find(func); it != _definedFunctions.end())
         {
             return it->second(args);
         }
 
-        throw LogicException(LogicExceptionErrors::notImplemented);
+        throw InputException(InputExceptionErrors::invalidArgument, "Specified function is not defined for this context");
+    }
+
+    Value ComputeContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)
+    {
+        static std::unordered_map<FunctionDeclaration, std::function<Value(std::vector<Value>)>> intrinsics = {
+            { AbsFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}(AbsFunctionIntrinsic{}) },
+            { CosFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::cos(n); }) },
+            { ExpFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::exp(n); }) },
+            { LogFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::log(n); }) },
+            { MaxNumFunctionDeclaration, SimpleMinMaxNumFunctionIntrinsic{}(MaxFn{}) },
+            { MinNumFunctionDeclaration, SimpleMinMaxNumFunctionIntrinsic{}(MinFn{}) },
+            { PowFunctionDeclaration, PowFunctionIntrinsic{} },
+            { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::sin(n); }) },
+            { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::sqrt(n); }) },
+            { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::tanh(n); }) }
+        };
+
+        if (auto it = intrinsics.find(intrinsic); it != intrinsics.end())
+        {
+            return it->second(args);
+        }
+        else
+        {
+            throw LogicException(LogicExceptionErrors::notImplemented);
+        }
     }
 
     bool ComputeContext::ValidateValue(Value value) const

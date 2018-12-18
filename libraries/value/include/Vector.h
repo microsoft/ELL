@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueVector.h (value)
+//  File:     Vector.h (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,9 +9,9 @@
 #pragma once
 
 #include "EmitterContext.h"
+#include "Scalar.h"
 #include "Value.h"
-#include "ValueScalar.h"
-#include "ValueVectorOperations.h"
+#include "VectorOperations.h"
 
 #include <utilities/include/MemoryLayout.h>
 
@@ -78,6 +78,14 @@ namespace value
         /// <summary> Retrieves the type of data stored in the wrapped Value instance </summary>
         /// <returns> The type </returns>
         ValueType GetType() const;
+
+        Vector& operator+=(Scalar);
+        Vector& operator-=(Scalar);
+        Vector& operator*=(Scalar);
+        Vector& operator/=(Scalar);
+
+        Vector& operator+=(Vector);
+        Vector& operator-=(Vector);
 
     private:
         Value _value;

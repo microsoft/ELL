@@ -8,7 +8,7 @@
 
 #include "ValueOperations.h"
 #include "EmitterContext.h"
-#include "ValueScalar.h"
+#include "Scalar.h"
 
 namespace ell
 {

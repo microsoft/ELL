@@ -29,14 +29,19 @@ int main()
             Value_test1();
             Scalar_test1();
             Vector_test1();
+            Vector_test2();
             Matrix_test1();
             Matrix_test2();
+            Matrix_test3();
             Tensor_test1();
             Tensor_test2();
+            Tensor_test3();
             Tensor_slice_test1();
             Casting_test1();
             Accumulate_test();
             Dot_test();
+            Intrinsics_test1();
+            Intrinsics_test2();
         }
     }
     catch (const Exception& exception)

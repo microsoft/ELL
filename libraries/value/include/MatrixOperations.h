@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueMatrixOperations.h (value)
+//  File:     MatrixOperations.h (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include "ValueScalar.h"
+#include "Scalar.h"
 
 #include <utilities/include/MemoryLayout.h>
 
@@ -32,6 +32,16 @@ namespace value
     Matrix GEMM(Matrix m1, Matrix m2);
 
     Vector GEMV(Matrix m, Vector v);
+
+    Matrix operator+(Matrix, Matrix);
+    Matrix operator+(Matrix, Scalar);
+
+    Matrix operator-(Matrix, Matrix);
+    Matrix operator-(Matrix, Scalar);
+
+    Matrix operator*(Matrix, Scalar);
+
+    Matrix operator/(Matrix, Scalar);
 
 } // namespace value
 } // namespace ell

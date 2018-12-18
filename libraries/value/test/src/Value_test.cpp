@@ -9,11 +9,12 @@
 #include "Value_test.h"
 
 #include <value/include/ComputeContext.h>
+#include <value/include/FunctionDeclaration.h>
 #include <value/include/LLVMContext.h>
+#include <value/include/Matrix.h>
+#include <value/include/Tensor.h>
 #include <value/include/Value.h>
-#include <value/include/ValueMatrix.h>
-#include <value/include/ValueTensor.h>
-#include <value/include/ValueVector.h>
+#include <value/include/Vector.h>
 
 #include <emitters/include/IRModuleEmitter.h>
 
@@ -26,7 +27,9 @@
 #include <testing/include/testing.h>
 
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <numeric>
 #include <type_traits>
@@ -98,10 +101,107 @@ void PrintIR(TestLLVMContext& context)
 #endif // PRINT_IR
 }
 
+template <
+    typename T1,
+    typename T2,
+    typename T3 = std::conditional_t<sizeof(T1) >= sizeof(T2), T1, T2>>
+inline std::enable_if_t<std::is_floating_point<T1>::value && std::is_floating_point<T2>::value, T3>
+RelativeDifference(T1 a, T2 b)
+{
+    return std::fabs((a - b) / std::min<T3>(a, b));
+}
+
 } // namespace
 
 namespace ell
 {
+
+namespace
+{
+    template <typename T = void>
+    bool Verify(Vector actual, Vector expected)
+    {
+        bool ok = true;
+        For(actual, [&](Scalar index) {
+            if constexpr (std::is_same_v<T, void>)
+            {
+                If(actual(index) == expected(index), [&] {
+                    InvokeForContext<ComputeContext>([&](ComputeContext&) {
+                        ok &= true;
+                    });
+                })
+                    .Else([&] {
+                        InvokeForContext<ComputeContext>([&](ComputeContext&) {
+                            ok &= false;
+                        });
+                    });
+            }
+            else
+            {
+                InvokeForContext<ComputeContext>([&](ComputeContext&) {
+                    ok &= testing::IsEqual(actual(index).Get<T>(), expected(index).Get<T>());
+                });
+            }
+        });
+        return ok;
+    }
+
+    template <typename T = void>
+    bool Verify(Matrix actual, Matrix expected)
+    {
+        bool ok = true;
+        For(actual, [&](Scalar row, Scalar col) {
+            if constexpr (std::is_same_v<T, void>)
+            {
+                If(actual(row, col) == expected(row, col), [&] {
+                    InvokeForContext<ComputeContext>([&](ComputeContext&) {
+                        ok &= true;
+                    });
+                })
+                    .Else([&] {
+                        InvokeForContext<ComputeContext>([&](ComputeContext&) {
+                            ok &= false;
+                        });
+                    });
+            }
+            else
+            {
+                InvokeForContext<ComputeContext>([&](ComputeContext&) {
+                    ok &= testing::IsEqual(actual(row, col).Get<T>(), expected(row, col).Get<T>());
+                });
+            }
+        });
+        return ok;
+    }
+
+    template <typename T = void>
+    bool Verify(Tensor actual, Tensor expected)
+    {
+        bool ok = true;
+        For(actual, [&](Scalar row, Scalar col, Scalar ch) {
+            if constexpr (std::is_same_v<T, void>)
+            {
+                If(actual(row, col, ch) == expected(row, col, ch), [&] {
+                    InvokeForContext<ComputeContext>([&](ComputeContext&) {
+                        ok &= true;
+                    });
+                })
+                    .Else([&] {
+                        InvokeForContext<ComputeContext>([&](ComputeContext&) {
+                            ok &= false;
+                        });
+                    });
+            }
+            else
+            {
+                InvokeForContext<ComputeContext>([&](ComputeContext&) {
+                    ok &= testing::IsEqual(actual(row, col, ch).Get<T>(), expected(row, col, ch).Get<T>());
+                });
+            }
+        });
+        return ok;
+    }
+} // namespace
 
 std::vector<std::unique_ptr<EmitterContext>> GetContexts()
 {
@@ -112,7 +212,7 @@ std::vector<std::unique_ptr<EmitterContext>> GetContexts()
     return contexts;
 }
 
-void VarGetTests()
+void ValueGetTests()
 {
     using namespace std;
     // Value::Get<IsArithmetic<T>> -> T*
@@ -158,7 +258,7 @@ void VarGetTests()
 
 void Value_test1()
 {
-    CreateFunction("Value_test1", [] {
+    DeclareFunction("Value_test1").Define([] {
         Value v(std::vector<int>{ 1, 2, 3, 4 });
         For(v, [&](Scalar index) {
             InvokeForContext<ComputeContext>([&](auto&) { std::cout << *v.Offset(index).Get<int*>() << " "; });
@@ -171,7 +271,7 @@ void Value_test1()
 
 void Scalar_test1()
 {
-    CreateFunction("Scalar_test1", [] {
+    DeclareFunction("Scalar_test1").Define([] {
         bool ok = true;
         Scalar s1 = 1;
         InvokeForContext<ComputeContext>([&](auto&) { ok &= testing::IsEqual(s1.Get<int>(), 1); });
@@ -211,11 +311,13 @@ void Vector_test1()
     auto filter = Get1DReferenceFilter();
     auto referenceResult = Get1DReferenceConvolutionResult();
     auto valueType = GetValueType<decltype(signal)::value_type>();
-    auto convolve1D = CreateFunction("testConvolve1D",
-                                     Value{ valueType, MemoryLayout({ (int)referenceResult.size() }) },
-                                     { Value{ valueType, MemoryLayout({ (int)signal.size() }) },
-                                       Value{ valueType, MemoryLayout({ (int)filter.size() }) } },
-                                     testConvolve1D);
+
+    auto convolve1D = DeclareFunction("testConvolve1D")
+                          .Returns({ valueType, MemoryLayout({ (int)referenceResult.size() }) })
+                          .Parameters(
+                              Value{ valueType, MemoryLayout({ (int)signal.size() }) },
+                              Value{ valueType, MemoryLayout({ (int)filter.size() }) })
+                          .Define(testConvolve1D);
 
     InvokeForContext<ComputeContext>([&](auto&) {
         bool ok = true;
@@ -226,6 +328,57 @@ void Vector_test1()
         });
         testing::ProcessTest("Testing 1D convolution with Vector", ok);
     });
+
+    InvokeForContext<TestLLVMContext>(PrintIR);
+}
+
+void Vector_test2()
+{
+    auto fn = DeclareFunction("Vector_test2")
+                  .Parameters(Value{ ValueType::Float, MemoryLayout{ { 2 } } })
+                  .Define([](Vector v) {
+                      bool ok = true;
+                      v = std::vector<float>{ 1.2f, 2.3f };
+                      Vector testVector(std::vector<float>{ 0.1f, 1.2f });
+                      Scalar testScalar{ 3.4f };
+
+                      {
+                          Vector expected(std::vector<float>{ 4.6f, 5.7f });
+                          Vector actual = v + testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Vector expected(std::vector<float>{ -2.2f, -1.1f });
+                          Vector actual = v - testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Vector expected(std::vector<float>{ 4.08f, 7.82f });
+                          Vector actual = v * testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Vector expected(std::vector<float>{ 1.2f / 3.4f, 2.3f / 3.4f });
+                          Vector actual = v / testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+
+                      // Vector +- Vector -> Vector
+                      {
+                          Vector expected(std::vector<float>{ 1.3f, 3.5f });
+                          Vector actual = v + testVector;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Vector expected(std::vector<float>{ 1.1f, 1.1f });
+                          Vector actual = v - testVector;
+                          ok &= Verify<float>(actual, expected);
+                      }
+
+                      InvokeForContext<ComputeContext>([&](auto&) { testing::ProcessTest("Vector binary operations", ok); });
+                  });
+
+    InvokeForContext<ComputeContext>([&](auto&) { fn(MakeVector<float>(2)); });
 
     InvokeForContext<TestLLVMContext>(PrintIR);
 }
@@ -303,7 +456,7 @@ void Matrix_test1()
 {
     // Test only enabled for ComputeContext for now
     InvokeForContext<ComputeContext>([](auto&) {
-        CreateFunction("Matrix_test1", []() -> void {
+        DeclareFunction("Matrix_test1").Define([]() -> void {
             ApplyToEach([](auto layout) { Matrix_test1Impl(layout); },
                         LayoutType<MatrixLayout::rowMajor>{},
                         LayoutType<MatrixLayout::columnMajor>{});
@@ -326,11 +479,79 @@ void Matrix_test2()
     });
 }
 
+void Matrix_test3()
+{
+    auto fn = DeclareFunction("Matrix_test3")
+                  .Parameters(Value{ ValueType::Float, MemoryLayout{ { 2, 2 } } })
+                  .Define([](Matrix m) {
+                      bool ok = true;
+                      m = std::vector<std::vector<float>>{
+                          std::vector<float>{ 1.2f, 2.3f },
+                          std::vector<float>{ 3.4f, 4.5f }
+                      };
+                      Matrix testMatrix(std::vector<std::vector<float>>{
+                          std::vector<float>{ 0.1f, 1.2f },
+                          std::vector<float>{ 2.3f, 3.4f } });
+                      Scalar testScalar{ 3.4f };
+
+                      {
+                          Matrix expected(std::vector<std::vector<float>>{
+                              std::vector<float>{ 4.6f, 5.7f },
+                              std::vector<float>{ 6.8f, 7.9f } });
+                          Matrix actual = m + testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Matrix expected(std::vector<std::vector<float>>{
+                              std::vector<float>{ -2.2f, -1.1f },
+                              std::vector<float>{ 0.f, 1.1f } });
+                          Matrix actual = m - testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Matrix expected(std::vector<std::vector<float>>{
+                              std::vector<float>{ 4.08f, 7.82f },
+                              std::vector<float>{ 11.56f, 15.3f } });
+                          Matrix actual = m * testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Matrix expected(std::vector<std::vector<float>>{
+                              std::vector<float>{ 1.2f / 3.4f, 2.3f / 3.4f },
+                              std::vector<float>{ 3.4f / 3.4f, 4.5f / 3.4f } });
+                          Matrix actual = m / testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+
+                      // Vector +- Vector -> Vector
+                      {
+                          Matrix expected(std::vector<std::vector<float>>{
+                              std::vector<float>{ 1.3f, 3.5f },
+                              std::vector<float>{ 5.7f, 7.9f } });
+                          Matrix actual = m + testMatrix;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Matrix expected(std::vector<std::vector<float>>{
+                              std::vector<float>{ 1.1f, 1.1f },
+                              std::vector<float>{ 1.1f, 1.1f } });
+                          Matrix actual = m - testMatrix;
+                          ok &= Verify<float>(actual, expected);
+                      }
+
+                      InvokeForContext<ComputeContext>([&](auto&) { testing::ProcessTest("Matrix binary operations", ok); });
+                  });
+
+    InvokeForContext<ComputeContext>([&](auto&) { fn(MakeMatrix<float>(2, 2)); });
+
+    InvokeForContext<TestLLVMContext>(PrintIR);
+}
+
 void Tensor_test1()
 {
     // Test only enabled for ComputeContext for now
     InvokeForContext<ComputeContext>([](auto&) {
-        CreateFunction("Tensor_test1", []() -> void {
+        DeclareFunction("Tensor_test1").Define([]() -> void {
             constexpr int rows = 3, columns = 5, channels = 7;
             std::vector<int> tensorData(rows * columns * channels);
             std::generate(tensorData.begin(), tensorData.end(), [i = 0]() mutable { return ++i; });
@@ -450,6 +671,80 @@ void Tensor_test2()
                                  testing::IsEqual(t.Channels(), 3u) &&
                                  testing::IsEqual(t(1, 0, 2).Get<int>(), data[1][0][2]));
     });
+}
+
+void Tensor_test3()
+{
+    auto fn = DeclareFunction("Tensor_test3")
+                  .Parameters(Value{ ValueType::Float, MemoryLayout{ { 2, 2, 2 } } })
+                  .Define([](Tensor t) {
+                      bool ok = true;
+                      t =
+                          std::vector<std::vector<std::vector<float>>>{
+                              std::vector<std::vector<float>>{
+                                  std::vector<float>{ 1.2f, 2.3f },
+                                  std::vector<float>{ 3.4f, 4.5f } },
+                              std::vector<std::vector<float>>{
+                                  std::vector<float>{ 5.4f, 4.3f },
+                                  std::vector<float>{ 3.2f, 2.1f } },
+                          };
+                      Scalar testScalar{ 3.4f };
+
+                      {
+                          Tensor expected(
+                              std::vector<std::vector<std::vector<float>>>{
+                                  std::vector<std::vector<float>>{
+                                      std::vector<float>{ 4.6f, 5.7f },
+                                      std::vector<float>{ 6.8f, 7.9f } },
+                                  std::vector<std::vector<float>>{
+                                      std::vector<float>{ 8.8f, 7.7f },
+                                      std::vector<float>{ 6.6f, 5.5f } } });
+                          Tensor actual = t + testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Tensor expected(
+                              std::vector<std::vector<std::vector<float>>>{
+                                  std::vector<std::vector<float>>{
+                                      std::vector<float>{ -2.2f, -1.1f },
+                                      std::vector<float>{ 0.f, 1.1f } },
+                                  std::vector<std::vector<float>>{
+                                      std::vector<float>{ 2.f, 0.9f },
+                                      std::vector<float>{ -0.2f, -1.3f } } });
+                          Tensor actual = t - testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Tensor expected(
+                              std::vector<std::vector<std::vector<float>>>{
+                                  std::vector<std::vector<float>>{
+                                      std::vector<float>{ 4.08f, 7.82f },
+                                      std::vector<float>{ 11.56f, 15.3f } },
+                                  std::vector<std::vector<float>>{
+                                      std::vector<float>{ 18.36f, 14.62f },
+                                      std::vector<float>{ 10.88f, 7.14f } } });
+                          Tensor actual = t * testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+                      {
+                          Tensor expected(
+                              std::vector<std::vector<std::vector<float>>>{
+                                  std::vector<std::vector<float>>{
+                                      std::vector<float>{ 1.2f / 3.4f, 2.3f / 3.4f },
+                                      std::vector<float>{ 3.4f / 3.4f, 4.5f / 3.4f } },
+                                  std::vector<std::vector<float>>{
+                                      std::vector<float>{ 5.4f / 3.4f, 4.3f / 3.4f },
+                                      std::vector<float>{ 3.2f / 3.4f, 2.1f / 3.4f } } });
+                          Tensor actual = t / testScalar;
+                          ok &= Verify<float>(actual, expected);
+                      }
+
+                      InvokeForContext<ComputeContext>([&](auto&) { testing::ProcessTest("Tensor binary operations", ok); });
+                  });
+
+    InvokeForContext<ComputeContext>([&](auto&) { fn(MakeTensor<float>(2, 2, 2)); });
+
+    InvokeForContext<TestLLVMContext>(PrintIR);
 }
 
 void Tensor_slice_test1()
@@ -665,7 +960,7 @@ void Casting_test1()
 void If_test1()
 {
     InvokeForContext<ComputeContext>([](auto&) {
-        CreateFunction("If_test1", []() -> void {
+        DeclareFunction("If_test1").Define([]() -> void {
             Scalar s1 = 1;
             If(s1 == 1, [&s1]() { s1 = 0; });
 
@@ -686,7 +981,7 @@ void If_test1()
 
 void Accumulate_test()
 {
-    auto fn = CreateFunction("Accumulate_test", []() -> void {
+    auto fn = DeclareFunction("Accumulate_test").Define([]() -> void {
         bool ok = true;
         for (int i = 1; i < 10; ++i)
         {
@@ -708,7 +1003,7 @@ void Accumulate_test()
 
 void Dot_test()
 {
-    auto fn = CreateFunction("Dot_test", []() -> void {
+    auto fn = DeclareFunction("Dot_test").Define([]() -> void {
         bool ok = true;
         for (int i = 1; i < 10; ++i)
         {
@@ -728,6 +1023,148 @@ void Dot_test()
     });
 
     InvokeForContext<ComputeContext>([&](auto&) { fn(); });
+}
+
+namespace
+{
+    const std::vector<float> intrinsics_data{ 0.1f, 1.2f, 2.3f, 3.4f, 4.5f, 5.6f, 6.7f, 7.8f, 8.9f, 9.10f };
+
+    template <typename Tuple, typename Idx = std::integral_constant<size_t, 0>>
+    void Intrinsics_test1_impl(Tuple tuple, Idx = {})
+    {
+        constexpr auto index = Idx::value;
+        if constexpr (index < std::tuple_size_v<Tuple>)
+        {
+            auto& element = std::get<index>(tuple);
+            auto fnName = std::string{ "Intrinsics_test1_" } + std::to_string(index);
+            auto fn = DeclareFunction(fnName)
+                          .Parameters(Value(ValueType::Float, MemoryLayout{ { 10 } }))
+                          .Returns(Value(ValueType::Float, MemoryLayout{ { 10 } }))
+                          .Define([f = element.first](Vector v) -> Vector {
+                              v = intrinsics_data;
+                              return f(v);
+                          });
+
+            InvokeForContext<ComputeContext>([&](ComputeContext&) {
+                std::vector<float> expected(intrinsics_data.size());
+                std::transform(intrinsics_data.begin(), intrinsics_data.end(), expected.begin(), [f = element.second](float n) { return f(n); });
+                auto result = fn(MakeVector<float>(intrinsics_data.size()));
+                auto ok = true;
+                // have to explicitly capture because vc++ has issues
+                For(result, [&result, &ok, &expected](Scalar index) {
+                    auto expectedValue = expected[index.Get<int>()];
+                    auto computedValue = result(index).template Get<float>();
+
+                    // We can't use absolute difference because VC++'s math functions
+                    // are optimized for 6 digits of precision, which can result in differences
+                    // that are relatively negligible, but absolutely greater than the epsilon
+                    // used by the testing library
+                    auto difference = RelativeDifference(expectedValue, computedValue);
+                    auto testResult = difference < 1e-6f;
+                    if (!testResult)
+                    {
+                        auto precision = std::cerr.precision();
+
+                        std::cerr << std::setprecision(std::numeric_limits<float>::digits10 + 1)
+                                  << "Computed: " << computedValue << "\tExpected: " << expectedValue
+                                  << "\tDifference: " << (expectedValue - computedValue) << std::endl
+                                  << std::setprecision(precision);
+                    }
+                    ok &= testResult;
+                });
+                testing::ProcessTest(fnName, ok);
+            });
+
+            InvokeForContext<TestLLVMContext>(PrintIR);
+
+            Intrinsics_test1_impl(tuple, std::integral_constant<size_t, index + 1>{});
+        }
+    }
+} // namespace
+
+void Intrinsics_test1()
+{
+    Intrinsics_test1_impl(
+        std::tuple{
+            std::pair{
+                [](Vector v) { return Abs(v); },
+                [](float f) { return std::abs(f); } },
+            std::pair{
+                [](Vector v) { return Cos(v); },
+                [](float f) { return std::cos(f); } },
+            std::pair{
+                [](Vector v) { return Exp(v); },
+                [](float f) { return std::exp(f); } },
+            std::pair{
+                [](Vector v) { return Log(v); },
+                [](float f) { return std::log(f); } },
+            std::pair{
+                [](Vector v) { return Pow(v, 3.14f); },
+                [](float f) { return std::pow(f, 3.14f); } },
+            std::pair{
+                [](Vector v) { return Sin(v); },
+                [](float f) { return std::sin(f); } },
+            std::pair{
+                [](Vector v) { return Sqrt(v); },
+                [](float f) { return std::sqrt(f); } },
+            std::pair{
+                [](Vector v) { return Tanh(v); },
+                [](float f) { return std::tanh(f); } },
+        });
+}
+
+namespace
+{
+    template <typename Tuple, typename Idx = std::integral_constant<size_t, 0>>
+    void Intrinsics_test2_impl(Tuple tuple, Idx = {})
+    {
+        constexpr auto index = Idx::value;
+        if constexpr (index < std::tuple_size_v<Tuple>)
+        {
+            auto& element = std::get<index>(tuple);
+            auto fnName = std::string{ "Intrinsics_test2_" } + std::to_string(index);
+
+            auto fn = DeclareFunction(fnName)
+                          .Parameters(Value(ValueType::Float, MemoryLayout{ { 10 } }))
+                          .Returns(Value(ValueType::Float, ScalarLayout))
+                          .Define([f = element.first](Vector v) {
+                              v = intrinsics_data;
+                              return f(v);
+                          });
+
+            InvokeForContext<ComputeContext>([&](auto&) {
+                auto f = element.second;
+                auto expected = *f(intrinsics_data);
+                auto result = fn(MakeVector<float>(intrinsics_data.size()));
+                auto ok = result.template Get<float>() == expected;
+                testing::ProcessTest(fnName, ok);
+            });
+
+            InvokeForContext<TestLLVMContext>(PrintIR);
+
+            Intrinsics_test2_impl(tuple, std::integral_constant<size_t, index + 1>{});
+        }
+    }
+
+} // namespace
+
+void Intrinsics_test2()
+{
+    Intrinsics_test2_impl(
+        std::tuple{
+            std::pair{
+                [](Vector v) { return Max(v); },
+                [](const std::vector<float>& v) { return std::max_element(v.begin(), v.end()); } },
+            std::pair{
+                [](Vector v) { return Min(v); },
+                [](const std::vector<float>& v) { return std::min_element(v.begin(), v.end()); } },
+            std::pair{
+                [](Vector v) { return Max(v[0], v[1]); },
+                [](const std::vector<float>& v) { return std::max_element(v.begin(), v.begin() + 2); } },
+            std::pair{
+                [](Vector v) { return Min(v[0], v[1]); },
+                [](const std::vector<float>& v) { return std::min_element(v.begin(), v.begin() + 2); } },
+        });
 }
 
 } // namespace ell

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueScalarOperations.h (value)
+//  File:     ScalarOperations.h (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,6 +23,8 @@ namespace value
     Scalar operator-(Scalar, Scalar);
     Scalar operator/(Scalar, Scalar);
     Scalar operator%(Scalar, Scalar);
+
+    Scalar operator-(Scalar);
 
     Scalar operator++(Scalar);
     Scalar operator++(Scalar, int);

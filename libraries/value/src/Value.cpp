@@ -8,7 +8,9 @@
 
 #include "Value.h"
 #include "EmitterContext.h"
-#include "ValueScalar.h"
+#include "Scalar.h"
+
+#include <utilities/include/Hash.h>
 
 namespace ell
 {
@@ -191,8 +193,14 @@ namespace value
     {}
 
     Value::Value(ValueType type, std::optional<MemoryLayout> layout) :
-        _type({ type, 0 }),
-        _layout(layout) {}
+        _type({ type, 1 }),
+        _layout(layout)
+    {}
+
+    Value::Value(detail::ValueTypeDescription typeDescription, std::optional<MemoryLayout> layout) noexcept :
+        _type(typeDescription),
+        _layout(layout)
+    {}
 
     void Value::Reset()
     {
@@ -342,3 +350,24 @@ namespace value
 
 } // namespace value
 } // namespace ell
+
+size_t std::hash<::ell::value::Value>::operator()(const ::ell::value::Value& value) const noexcept
+{
+    using ::ell::utilities::HashCombine;
+
+    size_t hash = 0;
+    HashCombine(hash, value.GetBaseType());
+    HashCombine(hash, value.PointerLevel());
+
+    if (value.IsConstrained())
+    {
+        HashCombine(hash, value.GetLayout());
+    }
+    else
+    {
+        // Special random value for an unconstrained Value
+        HashCombine(hash, 0x87654321);
+    }
+
+    return hash;
+}

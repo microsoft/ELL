@@ -52,6 +52,12 @@ namespace emitters
         template <typename ValueType>
         LLVMFunction GetExpFunction();
 
+        /// <summary> Get the pow function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
+        template <typename ValueType>
+        LLVMFunction GetPowFunction();
+
         /// <summary> Get the log function </summary>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
@@ -80,6 +86,7 @@ namespace emitters
         LLVMFunction GetSqrtFunction(VariableType argType);
         LLVMFunction GetAbsFunction(VariableType argType);
         LLVMFunction GetExpFunction(VariableType argType);
+        LLVMFunction GetPowFunction(VariableType argType);
         LLVMFunction GetLogFunction(VariableType argType);
         LLVMFunction GetTanhFunction(VariableType argType);
         LLVMFunction GetSinFunction(VariableType argType);
@@ -89,6 +96,7 @@ namespace emitters
         LLVMFunction GetSqrtFunction(LLVMType argType);
         LLVMFunction GetAbsFunction(LLVMType argType);
         LLVMFunction GetExpFunction(LLVMType argType);
+        LLVMFunction GetPowFunction(LLVMType argType);
         LLVMFunction GetLogFunction(LLVMType argType);
         LLVMFunction GetSinFunction(LLVMType argType);
         LLVMFunction GetCosFunction(LLVMType argType);
@@ -202,6 +210,12 @@ namespace emitters
     LLVMFunction IRRuntime::GetExpFunction()
     {
         return GetExpFunction(GetVariableType<ValueType>());
+    }
+
+    template <typename ValueType>
+    LLVMFunction IRRuntime::GetPowFunction()
+    {
+        return GetPowFunction(GetVariableType<ValueType>());
     }
 
     template <typename ValueType>

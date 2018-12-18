@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "MemoryLayout.h"
-
 #include "Exception.h"
+#include "Hash.h"
 #include "Unused.h"
 
 #include <cassert>
@@ -576,3 +576,22 @@ namespace utilities
 
 } // namespace utilities
 } // namespace ell
+
+size_t std::hash<::ell::utilities::DimensionVector>::operator()(const ::ell::utilities::DimensionVector& v) const noexcept
+{
+    return ::ell::utilities::HashValue(v.ToVector());
+}
+
+size_t std::hash<::ell::utilities::MemoryLayout>::operator()(const ::ell::utilities::MemoryLayout& v) const noexcept
+{
+    using ::ell::utilities::HashCombine;
+
+    size_t hash = 0;
+    HashCombine(hash, v.GetActiveSize().ToVector());
+    HashCombine(hash, v.GetExtent().ToVector());
+    HashCombine(hash, v.GetOffset().ToVector());
+    HashCombine(hash, v.GetCumulativeIncrement().ToVector());
+    HashCombine(hash, v.GetLogicalDimensionOrder().ToVector());
+
+    return hash;
+}

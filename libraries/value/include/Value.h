@@ -38,6 +38,10 @@ namespace value
 
         using Undefined = std::monostate;
 
+        // ValueType is the base type, the int represents how many
+        // pointer levels there are
+        using ValueTypeDescription = std::pair<ValueType, int>;
+
         Value StoreConstantData(ConstantData);
     } // namespace detail
 
@@ -89,7 +93,7 @@ namespace value
         using GetT = typename ReturnValueHelper<T>::Type;
 
         template <typename T>
-        static constexpr std::pair<ValueType, int> GetValueTypeAndPointerLevel()
+        static constexpr detail::ValueTypeDescription GetValueTypeAndPointerLevel()
         {
             return { GetValueType<T>(), utilities::CountOfPointers<T> };
         }
@@ -207,6 +211,12 @@ namespace value
             _type(GetValueTypeAndPointerLevel<T>()),
             _layout(layout)
         {}
+
+        /// <summary> Constructor that creates an instance which serves as a placeholder for data that matches the full type description and layout specified </summary>
+        /// <param name="typeDescription"> The full type description to be the basis of this instance </typeparam>
+        /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the eventual data to be stored. If
+        /// MemoryLayout is not provided, the Value instance is considered unconstrained </param>
+        Value(detail::ValueTypeDescription typeDescription, std::optional<MemoryLayout> layout = {}) noexcept;
 
         /// <summary> Sets the data on an empty Value instance </summary>
         /// <param name="value"> The Value instance from which to get the data </param>
@@ -377,12 +387,25 @@ namespace value
     private:
         UnderlyingDataType _data;
 
-        std::pair<ValueType, int> _type{ ValueType::Undefined, 0 };
+        detail::ValueTypeDescription _type{ ValueType::Undefined, 0 };
         std::optional<MemoryLayout> _layout = {};
     };
 
 } // namespace value
 } // namespace ell
+
+namespace std
+{
+/// <summary> Hash specializaiton for Value </summary>
+/// <remarks> Two Value containers of the same type and layout will have the same hash, regardless of actual contents </remarks>
+template <>
+struct hash<::ell::value::Value>
+{
+    using Type = ::ell::value::Value;
+
+    [[nodiscard]] size_t operator()(const Type& value) const noexcept;
+};
+} // namespace std
 
 #pragma region implementation
 

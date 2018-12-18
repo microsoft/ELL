@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueMatrix.h (value)
+//  File:     Matrix.h (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,8 +9,8 @@
 #pragma once
 
 #include "EmitterContext.h"
-#include "ValueMatrixOperations.h"
-#include "ValueVector.h"
+#include "MatrixOperations.h"
+#include "Vector.h"
 
 #include <utilities/include/MemoryLayout.h>
 
@@ -79,6 +79,16 @@ namespace value
         /// <summary> Retrieves the type of data stored in the wrapped Value instance </summary>
         /// <returns> The type </returns>
         ValueType Type() const;
+
+        Matrix& operator+=(Scalar);
+        Matrix& operator+=(Matrix);
+
+        Matrix& operator-=(Scalar);
+        Matrix& operator-=(Matrix);
+
+        Matrix& operator*=(Scalar);
+
+        Matrix& operator/=(Scalar);
 
     private:
         Value _value;

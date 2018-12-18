@@ -10,7 +10,7 @@
 
 #include <value/include/ComputeContext.h>
 #include <value/include/EmitterContext.h>
-#include <value/include/ValueTensor.h>
+#include <value/include/Tensor.h>
 
 #include <iostream>
 

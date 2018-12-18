@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <value/include/ValueTensor.h>
+#include <value/include/Tensor.h>
 
 namespace ell
 {

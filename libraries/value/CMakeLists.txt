@@ -8,35 +8,37 @@ set(src
     src/ComputeContext.cpp
     src/Emittable.cpp
     src/EmitterContext.cpp
+    src/FunctionDeclaration.cpp
     src/LLVMContext.cpp
-    src/ValueMatrix.cpp
-    src/ValueMatrixOperations.cpp
-    src/ValueScalar.cpp
-    src/ValueScalarOperations.cpp
-    src/ValueTensor.cpp
-    src/ValueTensorOperations.cpp
+    src/Matrix.cpp
+    src/MatrixOperations.cpp
+    src/Scalar.cpp
+    src/ScalarOperations.cpp
+    src/Tensor.cpp
+    src/TensorOperations.cpp
     src/Value.cpp
     src/ValueOperations.cpp
-    src/ValueVector.cpp
-    src/ValueVectorOperations.cpp
+    src/Vector.cpp
+    src/VectorOperations.cpp
 )
 
 set(include
     include/ComputeContext.h
     include/Emittable.h
     include/EmitterContext.h
+    include/FunctionDeclaration.h
     include/LLVMContext.h
-    include/ValueMatrix.h
-    include/ValueMatrixOperations.h
-    include/ValueScalar.h
-    include/ValueScalarOperations.h
-    include/ValueTensor.h
-    include/ValueTensorOperations.h
+    include/Matrix.h
+    include/MatrixOperations.h
+    include/Scalar.h
+    include/ScalarOperations.h
+    include/Tensor.h
+    include/TensorOperations.h
     include/Value.h
     include/ValueOperations.h
     include/ValueType.h
-    include/ValueVector.h
-    include/ValueVectorOperations.h
+    include/Vector.h
+    include/VectorOperations.h
 )
 
 set(doc

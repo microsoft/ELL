@@ -39,8 +39,7 @@ int main(int argc, char* argv[])
         {
             value::ContextGuard guard(*context);
 
-            // disabled until we have function name mangling
-            // TestVoiceActivityDetector<float>(path);
+            TestVoiceActivityDetector<float>(path);
             TestVoiceActivityDetector<double>(path);
 
             TestIIRFilter();

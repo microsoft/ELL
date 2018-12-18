@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueTensor.h (value)
+//  File:     Tensor.h (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,8 +9,8 @@
 #pragma once
 
 #include "EmitterContext.h"
-#include "ValueMatrix.h"
-#include "ValueTensorOperations.h"
+#include "Matrix.h"
+#include "TensorOperations.h"
 
 namespace ell
 {
@@ -112,6 +112,11 @@ namespace value
         /// <summary> Retrieves the type of data stored in the wrapped Value instance </summary>
         /// <returns> The type </returns>
         ValueType Type() const;
+
+        Tensor& operator+=(Scalar);
+        Tensor& operator-=(Scalar);
+        Tensor& operator*=(Scalar);
+        Tensor& operator/=(Scalar);
 
     private:
         Value _value;

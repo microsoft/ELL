@@ -1,15 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueTensorOperations.cpp (value)
+//  File:     TensorOperations.cpp (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ValueTensorOperations.h"
+#include "TensorOperations.h"
 #include "EmitterContext.h"
-#include "ValueScalar.h"
-#include "ValueTensor.h"
+#include "Scalar.h"
+#include "Tensor.h"
 
 namespace ell
 {
@@ -17,17 +17,16 @@ using namespace utilities;
 
 namespace value
 {
-   Scalar Accumulate(Tensor tensor, Scalar initialValue)
-   {
-       Scalar result = initialValue;
+    Scalar Accumulate(Tensor tensor, Scalar initialValue)
+    {
+        Scalar result = initialValue;
 
-       For(tensor, [&](auto row, auto column, auto channel)
-       {
-           result += tensor(row, column, channel);
-       });
+        For(tensor, [&](auto row, auto column, auto channel) {
+            result += tensor(row, column, channel);
+        });
 
-       return result;
-   }
+        return result;
+    }
 
     void For(Tensor tensor, std::function<void(Scalar, Scalar, Scalar)> fn)
     {
@@ -41,6 +40,30 @@ namespace value
         GetContext().For(layout, [fn = std::move(fn)](std::vector<Scalar> coordinates) {
             fn(coordinates[0], coordinates[1], coordinates[2]);
         });
+    }
+
+    Tensor operator+(Tensor t, Scalar s)
+    {
+        Tensor copy = t.Copy();
+        return copy += s;
+    }
+
+    Tensor operator-(Tensor t, Scalar s)
+    {
+        Tensor copy = t.Copy();
+        return copy -= s;
+    }
+
+    Tensor operator*(Tensor t, Scalar s)
+    {
+        Tensor copy = t.Copy();
+        return copy *= s;
+    }
+
+    Tensor operator/(Tensor t, Scalar s)
+    {
+        Tensor copy = t.Copy();
+        return copy /= s;
     }
 
 } // namespace value

@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueTensor.cpp (value)
+//  File:     Tensor.cpp (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ValueTensor.h"
+#include "Tensor.h"
 #include "EmitterContext.h"
 
 #include <utilities/include/Exception.h>
@@ -151,6 +151,62 @@ namespace value
     size_t Tensor::Channels() const { return static_cast<size_t>(_value.GetLayout().GetLogicalDimensionActiveSize(2)); }
 
     ValueType Tensor::Type() const { return _value.GetBaseType(); }
+
+    Tensor& Tensor::operator+=(Scalar s)
+    {
+        if (s.GetType() != Type())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        For(*this, [&, this](Scalar row, Scalar column, Scalar channel) {
+            (*this)(row, column, channel) += s;
+        });
+
+        return *this;
+    }
+
+    Tensor& Tensor::operator-=(Scalar s)
+    {
+        if (s.GetType() != Type())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        For(*this, [&, this](Scalar row, Scalar column, Scalar channel) {
+            (*this)(row, column, channel) -= s;
+        });
+
+        return *this;
+    }
+
+    Tensor& Tensor::operator*=(Scalar s)
+    {
+        if (s.GetType() != Type())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        For(*this, [&, this](Scalar row, Scalar column, Scalar channel) {
+            (*this)(row, column, channel) *= s;
+        });
+
+        return *this;
+    }
+
+    Tensor& Tensor::operator/=(Scalar s)
+    {
+        if (s.GetType() != Type())
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        For(*this, [&, this](Scalar row, Scalar column, Scalar channel) {
+            (*this)(row, column, channel) /= s;
+        });
+
+        return *this;
+    }
 
 } // namespace value
 } // namespace ell

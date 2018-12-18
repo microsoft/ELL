@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <value/include/ValueVector.h>
+#include <value/include/Vector.h>
 
 namespace ell
 {

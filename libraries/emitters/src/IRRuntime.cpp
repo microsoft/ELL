@@ -377,6 +377,11 @@ namespace emitters
         return _module.GetIntrinsic(llvm::Intrinsic::exp, { argType });
     }
 
+    LLVMFunction IRRuntime::GetPowFunction(VariableType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::pow, { argType, argType });
+    }
+
     LLVMFunction IRRuntime::GetLogFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::log, { argType });
@@ -425,6 +430,11 @@ namespace emitters
     LLVMFunction IRRuntime::GetExpFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::exp, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetPowFunction(LLVMType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::pow, { argType, argType });
     }
 
     LLVMFunction IRRuntime::GetLogFunction(LLVMType argType)

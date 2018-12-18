@@ -82,7 +82,7 @@ namespace testing
         typename T2,
         typename T3 = std::conditional_t<sizeof(T1) >= sizeof(T2), T1, T2>>
     inline std::enable_if_t<std::is_floating_point<T1>::value && std::is_floating_point<T2>::value, bool>
-    IsEqual(T1 a, T2 b, T3 tolerance = 1.0e-8)
+    IsEqual(T1 a, T2 b, T3 tolerance = std::is_same_v<float, T3> ? 1.0e-6f : 1.0e-8)
     {
         return (a - b < tolerance && b - a < tolerance);
     }

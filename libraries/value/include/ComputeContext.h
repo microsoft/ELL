@@ -9,7 +9,8 @@
 #pragma once
 
 #include "EmitterContext.h"
-#include "ValueScalar.h"
+#include "FunctionDeclaration.h"
+#include "Scalar.h"
 
 #include <forward_list>
 #include <map>
@@ -36,21 +37,12 @@ namespace value
 
         std::optional<Value> GetGlobalValue(GlobalAllocationScope scope, std::string name) override;
 
-        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data,
-                                 MemoryLayout layout) override;
-        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type,
-                                 MemoryLayout layout) override;
+        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout) override;
+        Value GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout) override;
 
-        std::pair<ValueType, int> GetTypeImpl(Emittable emittable) override;
+        detail::ValueTypeDescription GetTypeImpl(Emittable emittable) override;
 
-        std::function<void()> CreateFunctionImpl(std::string fnName, std::function<void()> fn) override;
-        std::function<Value()> CreateFunctionImpl(std::string fnName, Value returnValue, std::function<Value()> fn) override;
-        std::function<void(std::vector<Value>)> CreateFunctionImpl(std::string fnName, std::vector<Value> argValues, std::function<void(std::vector<Value>)> fn) override;
-        std::function<Value(std::vector<Value>)> CreateFunctionImpl(
-            std::string fnName,
-            Value returnValue,
-            std::vector<Value> argValues,
-            std::function<Value(std::vector<Value>)> fn) override;
+        DefinedFunction CreateFunctionImpl(FunctionDeclaration decl, DefinedFunction fn) override;
 
         Value StoreConstantDataImpl(ConstantData data) override;
 
@@ -72,7 +64,9 @@ namespace value
 
         IfContext IfImpl(Scalar test, std::function<void()> fn) override;
 
-        Value CallImpl(std::string fnName, Value retValue, std::vector<Value> args) override;
+        std::optional<Value> CallImpl(FunctionDeclaration func, std::vector<Value> args) override;
+
+        Value IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args);
 
         bool ValidateValue(Value value) const;
         bool TypeCompatible(Value value1, Value value2) const;
@@ -95,6 +89,7 @@ namespace value
 
         std::stack<Frame> _stack;
         std::map<std::string, std::pair<ConstantData, MemoryLayout>> _globals;
+        std::unordered_map<FunctionDeclaration, DefinedFunction> _definedFunctions;
         std::string _moduleName;
     };
 

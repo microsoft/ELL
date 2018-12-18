@@ -58,6 +58,5 @@ namespace value
     template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, void*> = nullptr>
     Scalar Cast(T t, ValueType type);
 
-
 } // namespace value
 } // namespace ell

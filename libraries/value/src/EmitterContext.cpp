@@ -7,8 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "EmitterContext.h"
+#include "FunctionDeclaration.h"
+#include "Scalar.h"
 #include "Value.h"
-#include "ValueScalar.h"
+#include "Vector.h"
 
 #include <utilities/include/Exception.h>
 
@@ -39,13 +41,6 @@ namespace value
             return result;
         }
 
-        std::function<void()> CreateFunction(std::string fnName, std::function<void()> fn)
-        {
-            auto createdFn = GetContext().CreateFunction(fnName, [fn = std::move(fn)]() -> void { fn(); });
-
-            return [createdFn = std::move(createdFn)]() -> void { createdFn(); };
-        }
-
     } // namespace detail
 
     EmitterContext::IfContextImpl::~IfContextImpl() = default;
@@ -54,7 +49,7 @@ namespace value
         _impl(std::move(impl))
     {}
 
-    EmitterContext::IfContext& EmitterContext::IfContext::ElseIf(Scalar test, std::function<void()> fn)
+    EmitterContext::IfContext&& EmitterContext::IfContext::ElseIf(Scalar test, std::function<void()> fn) &&
     {
         if (test.GetType() != ValueType::Boolean)
         {
@@ -63,10 +58,10 @@ namespace value
 
         _impl->ElseIf(test, fn);
 
-        return *this;
+        return std::move(*this);
     }
 
-    void EmitterContext::IfContext::Else(std::function<void()> fn) { _impl->Else(fn); }
+    void EmitterContext::IfContext::Else(std::function<void()> fn) && { _impl->Else(fn); }
 
     EmitterContext::~EmitterContext() = default;
 
@@ -108,26 +103,11 @@ namespace value
         return GlobalAllocateImpl(GlobalAllocationScope::Global, name, type, layout);
     }
 
-    std::pair<ValueType, int> EmitterContext::GetType(Emittable emittable) { return GetTypeImpl(emittable); }
+    detail::ValueTypeDescription EmitterContext::GetType(Emittable emittable) { return GetTypeImpl(emittable); }
 
-    std::function<void()> EmitterContext::CreateFunction(std::string fnName, std::function<void()> fn)
+    EmitterContext::DefinedFunction EmitterContext::CreateFunction(FunctionDeclaration decl, EmitterContext::DefinedFunction fn)
     {
-        return CreateFunctionImpl(fnName, fn);
-    }
-
-    std::function<void(std::vector<Value>)> EmitterContext::CreateFunction(std::string fnName, std::vector<Value> argTypes, std::function<void(std::vector<Value>)> fn)
-    {
-        return CreateFunctionImpl(fnName, argTypes, fn);
-    }
-
-    std::function<Value()> EmitterContext::CreateFunction(std::string fnName, Value returnValue, std::function<Value()> fn)
-    {
-        return CreateFunctionImpl(fnName, returnValue, fn);
-    }
-
-    std::function<Value(std::vector<Value>)> EmitterContext::CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argTypes, std::function<Value(std::vector<Value>)> fn)
-    {
-        return CreateFunctionImpl(fnName, returnValue, argTypes, fn);
+        return CreateFunctionImpl(decl, fn);
     }
 
     Value EmitterContext::StoreConstantData(ConstantData data) { return StoreConstantDataImpl(data); }
@@ -198,9 +178,27 @@ namespace value
         return IfImpl(test, fn);
     }
 
-    Value EmitterContext::Call(std::string fnName, Value retValue, std::vector<Value> args)
+    std::optional<Value> EmitterContext::Call(FunctionDeclaration func, std::vector<Value> args)
     {
-        return CallImpl(fnName, retValue, args);
+        return CallImpl(func, args);
+    }
+
+    const std::vector<std::reference_wrapper<FunctionDeclaration>>& EmitterContext::GetIntrinsics() const
+    {
+        static std::vector intrinsics = {
+            std::ref(AbsFunctionDeclaration),
+            std::ref(CosFunctionDeclaration),
+            std::ref(ExpFunctionDeclaration),
+            std::ref(LogFunctionDeclaration),
+            std::ref(MaxNumFunctionDeclaration),
+            std::ref(MinNumFunctionDeclaration),
+            std::ref(PowFunctionDeclaration),
+            std::ref(SinFunctionDeclaration),
+            std::ref(SqrtFunctionDeclaration),
+            std::ref(TanhFunctionDeclaration)
+        };
+
+        return intrinsics;
     }
 
     namespace
@@ -226,26 +224,6 @@ namespace value
 
     ContextGuard::~ContextGuard() { ClearContext(); }
 
-    std::function<void()> CreateFunction(std::string fnName, std::function<void()> fn)
-    {
-        return GetContext().CreateFunction(fnName, fn);
-    }
-
-    std::function<Value()> CreateFunction(std::string fnName, Value returnValue, std::function<Value()> fn)
-    {
-        return GetContext().CreateFunction(fnName, returnValue, fn);
-    }
-
-    std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue, std::vector<Value> argTypes, std::function<Value(std::vector<Value>)> fn)
-    {
-        return GetContext().CreateFunction(fnName, returnValue, argTypes, fn);
-    }
-
-    std::function<Value(std::vector<Value>)> CreateFunction(std::string fnName, Value returnValue, std::initializer_list<Value> argTypes, std::function<Value(std::vector<Value>)> fn)
-    {
-        return CreateFunction(fnName, returnValue, std::vector<Value>(argTypes), fn);
-    }
-
     Value Allocate(ValueType type, size_t size) { return GetContext().Allocate(type, size); }
 
     Value Allocate(ValueType type, MemoryLayout layout) { return GetContext().Allocate(type, layout); }
@@ -257,9 +235,104 @@ namespace value
 
     EmitterContext::IfContext If(Scalar test, std::function<void()> fn) { return GetContext().If(test, fn); }
 
-    Value Call(std::string fnName, Value retValue, std::vector<Value> args)
+    Scalar Abs(Scalar s)
     {
-        return GetContext().Call(fnName, retValue, args);
+        return *GetContext().Call(AbsFunctionDeclaration, { s.GetValue() });
+    }
+
+    Scalar Cos(Scalar s)
+    {
+        return *GetContext().Call(CosFunctionDeclaration, { s.GetValue() });
+    }
+
+    Scalar Exp(Scalar s)
+    {
+        return *GetContext().Call(ExpFunctionDeclaration, { s.GetValue() });
+    }
+
+    Scalar Log(Scalar s)
+    {
+        return *GetContext().Call(LogFunctionDeclaration, { s.GetValue() });
+    }
+
+    Scalar Max(Scalar s1, Scalar s2)
+    {
+        return *GetContext().Call(MaxNumFunctionDeclaration, { s1.GetValue(), s2.GetValue() });
+    }
+
+    Scalar Min(Scalar s1, Scalar s2)
+    {
+        return *GetContext().Call(MinNumFunctionDeclaration, { s1.GetValue(), s2.GetValue() });
+    }
+
+    Scalar Pow(Scalar base, Scalar exp)
+    {
+        return *GetContext().Call(PowFunctionDeclaration, { base.GetValue(), exp.GetValue() });
+    }
+
+    Scalar Sin(Scalar s)
+    {
+        return *GetContext().Call(SinFunctionDeclaration, { s.GetValue() });
+    }
+
+    Scalar Sqrt(Scalar s)
+    {
+        return *GetContext().Call(SqrtFunctionDeclaration, { s.GetValue() });
+    }
+
+    Scalar Tanh(Scalar s)
+    {
+        return *GetContext().Call(TanhFunctionDeclaration, { s.GetValue() });
+    }
+
+    Vector Abs(Vector v)
+    {
+        return *GetContext().Call(AbsFunctionDeclaration, { v.GetValue() });
+    }
+
+    Vector Cos(Vector v)
+    {
+        return *GetContext().Call(CosFunctionDeclaration, { v.GetValue() });
+    }
+
+    Vector Exp(Vector v)
+    {
+        return *GetContext().Call(ExpFunctionDeclaration, { v.GetValue() });
+    }
+
+    Vector Log(Vector v)
+    {
+        return *GetContext().Call(LogFunctionDeclaration, { v.GetValue() });
+    }
+
+    Scalar Max(Vector v)
+    {
+        return *GetContext().Call(MaxNumFunctionDeclaration, { v.GetValue() });
+    }
+
+    Scalar Min(Vector v)
+    {
+        return *GetContext().Call(MinNumFunctionDeclaration, { v.GetValue() });
+    }
+
+    Vector Pow(Vector bases, Scalar exp)
+    {
+        return *GetContext().Call(PowFunctionDeclaration, { bases.GetValue(), exp.GetValue() });
+    }
+
+    Vector Sin(Vector v)
+    {
+        return *GetContext().Call(SinFunctionDeclaration, { v.GetValue() });
+    }
+
+    Vector Sqrt(Vector v)
+    {
+        return *GetContext().Call(SqrtFunctionDeclaration, { v.GetValue() });
+    }
+
+    Vector Tanh(Vector v)
+    {
+        return *GetContext().Call(TanhFunctionDeclaration, { v.GetValue() });
     }
 
 } // namespace value

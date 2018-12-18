@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ValueVectorOperations.h (value)
+//  File:     VectorOperations.h (value)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +40,20 @@ namespace value
     /// <param name="vector"> The instance of Vector that references the data over which to iterate </param>
     /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
     void For(Vector vector, std::function<void(Scalar)> fn);
+
+    Vector operator+(Scalar s, Vector v);
+    Vector operator+(Vector v, Scalar s);
+    Vector operator+(Vector v1, Vector v2);
+
+    Vector operator-(Scalar s, Vector v);
+    Vector operator-(Vector v, Scalar s);
+    Vector operator-(Vector v1, Vector v2);
+
+    Vector operator*(Scalar s, Vector v);
+    Vector operator*(Vector v, Scalar s);
+
+    Vector operator/(Scalar s, Vector v);
+    Vector operator/(Vector v, Scalar s);
 
 } // namespace value
 } // namespace ell
