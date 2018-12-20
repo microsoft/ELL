@@ -12,7 +12,7 @@ This tutorial will show you how to train a keyword spotter using PyTorch.  A key
 Since it is always listening there is good reason to find a keyword spotter that can run on a very small low-power co-processor so the main computer can sleep until
 a word is recognized.  The ELL compiler makes that possible.  In this tutorial you will train a keyword spotter using the the [speech commands dataset](http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz) which contains 65,000 recordings of 30 different keywords (_bed, bird, cat, dog, down, eight, five, four, go, happy, house, left, marvin, nine, no, off, on, one, right, seven, sheila, six, stop, three, tree, two, up, wow, yes, zero_) each about one second long.  
 
-This is the dataset used to train the models in the [speech commands model gallery](/ELL/gallery/speech_commands_v0.01/).  The [Getting started with keyword spotting on the Raspberry Pi](/ELL/tutorials/Getting-started-with-keyword-spotting-on-the-Raspberry-Pi/) tutorial uses these models.
+This is the dataset used to train the models in the [speech commands model gallery](/ELL/gallery/speech_commands_v0.01/).  The [Getting started with keyword spotting on the Raspberry Pi](/ELL/tutorials/Getting-started-with-audio-keyword-spotting-on-the-Raspberry-Pi/) tutorial uses these models.
 Once you learn how to train a model you can then train your own custom model that responds to different keywords, or even random sounds, or perhaps you want just a subset of the 30 keywords for your application.  This tutorial shows you how to do that.
 
 ## Before you begin
