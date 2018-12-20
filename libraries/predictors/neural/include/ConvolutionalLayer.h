@@ -374,7 +374,7 @@ namespace predictors
                 throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Input and output channel sizes must match for a depthwise-separable convolutional layer");
             }
 
-            if ((_weights.NumRows() != _output.NumChannels() * _convolutionalParameters.receptiveField) || (_weights.NumColumns() != _convolutionalParameters.receptiveField) || (_weights.NumChannels() != _layerParameters.input.NumChannels()))
+            if ((_weights.NumRows() != _output.NumChannels() * _convolutionalParameters.receptiveField) || (_weights.NumColumns() != _convolutionalParameters.receptiveField) || (!IsDepthwiseSeparable() && (_weights.NumChannels() != _layerParameters.input.NumChannels())))
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Weights tensor size mismatch");
             }
