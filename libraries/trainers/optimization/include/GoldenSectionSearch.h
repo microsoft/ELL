@@ -11,6 +11,10 @@
 #include "Common.h"
 #include "Interval.h"
 
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+
 namespace ell
 {
 namespace trainers
@@ -71,9 +75,6 @@ namespace trainers
 } // namespace ell
 
 #pragma region implementation
-
-#include <algorithm>
-#include <cassert>
 
 namespace ell
 {
@@ -157,7 +158,7 @@ namespace trainers
         template <typename FunctionType>
         Interval GoldenSectionSearch<FunctionType>::GetCurrentInterval() const
         {
-            return Interval { _boundary1, _boundary2 };
+            return Interval{ _boundary1, _boundary2 };
         }
     } // namespace optimization
 } // namespace trainers

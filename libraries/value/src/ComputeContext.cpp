@@ -163,11 +163,11 @@ namespace value
                             {
                                 auto dataBegin = data;
                                 auto dataEnd = data + (value.IsConstrained() ? value.GetLayout().GetMemorySize() : 1u);
-                                std::vector returnData(dataBegin, dataEnd);
+                                std::vector<DataType> returnData(dataBegin, dataEnd);
 
                                 std::transform(returnData.begin(), returnData.end(), returnData.begin(), fn);
 
-                                return Value(returnData, value.IsConstrained() ? std::optional{value.GetLayout()} : std::optional<MemoryLayout>{std::nullopt});
+                                return Value(returnData, value.IsConstrained() ? std::optional<MemoryLayout>{value.GetLayout()} : std::optional<MemoryLayout>{std::nullopt});
                             }
                         },
                         value.GetUnderlyingData());
@@ -304,13 +304,13 @@ namespace value
                         {
                             auto data1Begin = data1;
                             auto data1End = data1 + (base.IsConstrained() ? base.GetLayout().GetMemorySize() : 1u);
-                            std::vector returnData(data1Begin, data1End);
+                            std::vector<DataType1> returnData(data1Begin, data1End);
 
                             std::transform(returnData.begin(), returnData.end(), returnData.begin(), [exp = *data2](auto n) {
                                 return std::pow(n, exp);
                             });
 
-                            return Value(returnData, base.IsConstrained() ? std::optional{ base.GetLayout() } : std::optional<MemoryLayout>{ std::nullopt });
+                            return Value(returnData, base.IsConstrained() ? std::optional<MemoryLayout>{ base.GetLayout() } : std::optional<MemoryLayout>{ std::nullopt });
                         }
                     },
                     base.GetUnderlyingData(),
