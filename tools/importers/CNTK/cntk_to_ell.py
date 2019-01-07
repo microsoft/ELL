@@ -487,7 +487,7 @@ def verify_compiled_ell_nodes_in_vision_model(modelFile, cntk_model, model_cntk_
 
 
 
-def map_from_cntk_model_using_new_engine(modelFile, step_interval_msec=0, lag_threshold_msec=0, plot_model=False, verify_model={"audio": False, "vision": False}):
+def map_from_cntk_model_using_new_engine(modelFile, step_interval_msec=None, lag_threshold_msec=None, plot_model=False, verify_model={"audio": False, "vision": False}):
     """
     Loads a CNTK model and returns an ell.model.Map
     """
