@@ -22,7 +22,7 @@ The [CTest](https://cmake.org/cmake/help/v3.9/manual/ctest.1.html) tool comes wi
 
 ```shell
     cd build
-    ctest 
+    ctest --build-config Release 
 ```
 If tests fail, add the `-VV` option to get verbose output from each test, to narrow down the problem.  The `-R` option is also handy in this case to run only those tests that have a matching name.
 
