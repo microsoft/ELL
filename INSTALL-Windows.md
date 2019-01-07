@@ -16,7 +16,12 @@ ELL requires a C++ compiler. On Windows, you can use *Visual Studio 2017 with C+
 
 ### CMake 3.8
 
-ELL uses the [*CMake*](https://cmake.org/) build system, version 3.8 or newer. A version of CMake that satisfies this requirement is already provided with Visual Studio 2017. You may also download and install it from <https://cmake.org/download/>.
+ELL uses the [*CMake*](https://cmake.org/) build system and requires version 3.8 or newer. A version of CMake that satisfies this requirement is already provided with Visual Studio 2017. You can find it if you 
+use the "Developer Command Prompt' that is installed by Visual Studio.  It lives here:
+```
+c:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe
+```  
+You may also download new versions of cmake from <https://cmake.org/download/> if you want to.
 
 ### LLVM 6.0, SWIG 3.0.12, OpenBLAS 0.2.19.3, and Doxygen 1.8.13 via NuGet
 

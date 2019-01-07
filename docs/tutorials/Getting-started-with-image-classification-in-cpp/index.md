@@ -183,10 +183,10 @@ Allocate a vector to store the model's output.
     std::vector<float> predictions(wrapper.GetOutputSize());
 ```
 
-Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user presses any key. At the start of each loop iteration, read an image from the camera, as follows.
+Next, set up a loop that keeps going until the user presses the ESC key. At the start of each loop iteration, read an image from the camera, as follows.
 
 ```cpp
-    while ((cv::waitKey(1) & 0xFF) == 0xFF)
+    while ((cv::waitKey(1) & 0xFF) != 27)
     {
         cv::Mat image = GetImageFromCamera(camera);
 ```
@@ -293,10 +293,45 @@ You'll see a window similar to the screenshot that appears at the beginning of t
 
 If you copied the full **tutorial.cpp** file from [here](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/tutorial.cpp), you will also see the average time (in milliseconds) it takes the model to process a frame.
 
+## Classify a static image
+
+You can modify the tutorial.cpp code to process a static image  instead of live video.  First, comment out this line:
+```cpp
+//cv::VideoCapture camera(0);
+```
+and change this line:
+```cpp
+cv::Mat image = GetImageFromCamera(camera);
+```
+to this:
+```cpp
+cv::Mat image = GetImageFromFile(argv[1]);
+```
+And run the tutorial code passing the image file name on the command line, for example:
+```
+./build/tutorial Screenshot.png
+```
+
 ## Next steps
 
 The [ELL gallery](/ELL/gallery/) offers different models for image classification. Some are slow and accurate, while others are faster and less accurate. Different models can even lead to different power draw on the Raspberry Pi device. Repeat the steps above with different models.
 
 ## Troubleshooting
 
-Look for troubleshooting tips at the end of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup).
+**Found OpenCV Windows Pack but it has no binaries compatible with your configuration**  
+
+This means you are missing the full OpenCV C++ SDK.  On Windows you will need to download the OpenCV binaries from [sourceforge](https://sourceforge.net/projects/opencvlibrary/files/opencv-win/3.4.3/) then modify the tutorial CMakeLists.txt file to point to your installed OpenCV build folder.
+
+**..\model\model.o : fatal error LNK1136: invalid or corrupt file**
+
+This usually means the model was compiled for a different --target than the one you are compiling on.
+For example, if you use --target pi3, then try and compile it on an Intel PC you will get this error.
+
+**The code execution cannot proceed because opencv_world343.dll was not found.**
+
+Your PATH environment needs to point to your OpenCV binary install location, something like this:
+```
+set path=%PATH%;c:\OpenCV\build\x64\vc15\bin
+```
+
+**Look for more troubleshooting tips** at the end of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup).
