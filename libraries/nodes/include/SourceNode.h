@@ -161,6 +161,10 @@ namespace nodes
         _output(this, defaultOutputPortName, layout),
         _source(source == nullptr ? [](auto&) { return false; } : source)
     {
+        if (!layout.IsCanonicalOrder())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "SourceNode must be in canonical order");
+        }
         _bufferedSample.resize(layout.NumElements());
     }
 
@@ -246,7 +250,7 @@ namespace nodes
     void SourceNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<SourceNode<ValueType>>(newPortElements, GetShape(), GetCallbackName(), _source);
+        auto newNode = transformer.AddNode<SourceNode<ValueType>>(newPortElements, _output.GetMemoryLayout(), GetCallbackName(), _source);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

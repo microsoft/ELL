@@ -160,7 +160,7 @@ namespace nodes
     template <typename ValueType>
     void ConstantNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values, _output.GetMemoryLayout().GetActiveSize());
+        auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values, _output.GetMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 
