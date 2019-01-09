@@ -15,6 +15,8 @@
 
 #include <model/include/Map.h>
 
+#include <utilities/include/StringUtil.h>
+
 #include <istream>
 #include <string>
 
@@ -198,14 +200,45 @@ namespace common
 
         // Unlike reference maps, compiled maps receive the current time as the parameter input and
         // values through the input callback.
-        detail::ResolveInputCallback(map, module, compiledMap.GetJitter());
-
-        return input.template Transform<ExampleType>([&compiledMap, &dataContext](const ExampleType& example) {
-            dataContext.inputValues = example.GetDataVector().ToArray();
-            compiledMap.SetInputValue(0, std::vector<nodes::TimeTickType>({ 0 /*currentTime*/ }));
-            auto transformedDataVector = compiledMap.template ComputeOutput<typename ExampleType::DataVectorType>(0);
-            return ExampleType(std::move(transformedDataVector), example.GetMetadata());
-        });
+        if (map.GetSourceNodes().size() > 0)
+        {
+            detail::ResolveInputCallback(map, module, compiledMap.GetJitter());
+            return input.template Transform<ExampleType>([&compiledMap, &dataContext](const ExampleType& example) {
+                dataContext.inputValues = example.GetDataVector().ToArray();
+                compiledMap.SetInputValue(0, std::vector<nodes::TimeTickType>({ 0 /*currentTime*/ }));
+                auto transformedDataVector = compiledMap.template ComputeOutput<typename ExampleType::DataVectorType>(0);
+                return ExampleType(std::move(transformedDataVector), example.GetMetadata());
+            });
+        }
+        else
+        {
+            auto type = map.GetInputType();
+            switch (type)
+            {
+            case model::Port::PortType::smallReal:
+            {
+                return input.template Transform<ExampleType>([&compiledMap](const ExampleType& example) {
+                    auto data = example.GetDataVector().ToArray();
+                    std::vector<float> smallData(data.size());
+                    std::transform(data.begin(), data.end(), smallData.begin(), [](double val) { return static_cast<float>(val); });
+                    compiledMap.SetInputValue(0, smallData);
+                    auto transformedDataVector = compiledMap.template ComputeOutput<typename ExampleType::DataVectorType>(0);
+                    return ExampleType(std::move(transformedDataVector), example.GetMetadata());
+                });
+            }
+            case model::Port::PortType::real:
+            {
+                return input.template Transform<ExampleType>([&compiledMap](const ExampleType& example) {
+                    compiledMap.SetInputValue(0, example.GetDataVector().ToArray());
+                    auto transformedDataVector = compiledMap.template ComputeOutput<typename ExampleType::DataVectorType>(0);
+                    return ExampleType(std::move(transformedDataVector), example.GetMetadata());
+                });
+            }
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch,
+                    utilities::FormatString("Unexpected input type %d, expecting float or double", type));
+            }
+        }
     }
 } // namespace common
 } // namespace ell

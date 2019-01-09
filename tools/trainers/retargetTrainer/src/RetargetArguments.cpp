@@ -41,7 +41,7 @@ void ParsedRetargetArguments::AddArgs(utilities::CommandLineParser& parser)
     parser.AddOption(print,
                      "print",
                      "",
-                     "Print the model.",
+                     "Print the model and exit.",
                      false);
 
     parser.AddOption(removeLastLayers,

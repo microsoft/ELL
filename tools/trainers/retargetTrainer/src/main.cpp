@@ -97,6 +97,12 @@ bool RedirectNeuralNetworkOutputByLayer(model::Map& map, size_t numLayersFromEnd
     return found;
 }
 
+void PrintModel(model::Map& map, size_t refineIterations)
+{
+    map.Refine(refineIterations);
+    map.GetModel().Print(std::cout);
+}
+
 bool RedirectModelOutputByPortElements(model::Map& map, const std::string& targetPortElements, size_t refineIterations)
 {
     // Refine the model
@@ -393,6 +399,12 @@ int main(int argc, char* argv[])
         auto map = common::LoadMap(retargetArguments.inputModelFilename);
         if (retargetArguments.verbose) std::cout << "(" << _timer.Elapsed() << " ms)" << std::endl;
 
+        if (retargetArguments.print)
+        {
+            PrintModel(map, retargetArguments.refineIterations);
+            return 0;
+        }
+
         // Create a map by redirecting a layer or node to be output
         bool redirected = false;
         if (retargetArguments.removeLastLayers > 0)
@@ -400,13 +412,12 @@ int main(int argc, char* argv[])
             if (map.GetOutputType() == model::Port::PortType::smallReal)
             {
                 redirected = RedirectNeuralNetworkOutputByLayer<float>(map, retargetArguments.removeLastLayers);
-                std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
             }
             else
             {
                 redirected = RedirectNeuralNetworkOutputByLayer<double>(map, retargetArguments.removeLastLayers);
-                std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
             }
+            std::cout << "Removed last " << retargetArguments.removeLastLayers << " layers from neural network" << std::endl;
         }
         else if (retargetArguments.targetPortElements.length() > 0)
         {
@@ -424,6 +435,10 @@ int main(int argc, char* argv[])
             std::cerr << "Could not splice model, exiting" << std::endl;
             return 1;
         }
+
+        auto output = map.GetOutput(0);
+        auto node = output.GetElement(0).ReferencedPort()->GetNode();
+        std::cout << "Using output from node of type " << node->GetRuntimeTypeName() << std::endl;
 
         // load dataset and map the output
         if (retargetArguments.verbose) std::cout << "Loading data ...";

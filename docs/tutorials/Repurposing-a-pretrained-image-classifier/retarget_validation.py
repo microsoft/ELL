@@ -97,7 +97,9 @@ def main(args):
             prediction_times, end - start)
         predicted = np.argmax(predictions)
         expected = int(example.GetLabel())
-        print("Predict {}, expected {}".format(predicted, expected))
+        predicted_label = categories[predicted]
+        expected_label = categories[expected]
+        print("Predict {}, expected {}".format(predicted_label, expected_label))
         confusion_matrix[predicted, expected] += 1
         if predicted == expected:
             num_correct += 1

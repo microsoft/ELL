@@ -95,12 +95,24 @@ int main(int argc, char* argv[])
             model::Map map = LoadMap(mapLoadArguments);
             if (printArguments.refine > 0)
             {
-                model::TransformContext context;
-                map.Refine(context, printArguments.refine);
+                // this ensures what is printed matches what retargetTrainer expects.
+                {
+                    model::TransformContext context;
+                    model::ModelTransformer transformer;
+                    model = transformer.RefineModel(map.GetModel(), context, printArguments.refine);
+                }
+                {
+                    model::TransformContext context;
+                    model::ModelTransformer transformer;
+                    model = transformer.CopyModel(model, context);
+                }
             }
-            model::TransformContext context;
-            model::ModelTransformer transformer;
-            model = transformer.CopyModel(map.GetModel(), context);
+            else
+            {
+                model::TransformContext context;
+                model::ModelTransformer transformer;
+                model = transformer.CopyModel(map.GetModel(), context);
+            }
         }
 
         // print model
