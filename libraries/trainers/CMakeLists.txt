@@ -2,8 +2,6 @@
 # cmake file
 #
 
-add_subdirectory(optimization)
-
 set (library_name trainers)
 
 set (src src/ForestTrainer.cpp
