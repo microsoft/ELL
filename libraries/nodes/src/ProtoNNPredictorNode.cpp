@@ -10,7 +10,6 @@
 
 #include "BinaryOperationNode.h"
 #include "ConstantNode.h"
-#include "DotProductNode.h"
 #include "ExtremalValueNode.h"
 #include "L2NormSquaredNode.h"
 #include "MatrixVectorProductNode.h"
@@ -83,18 +82,18 @@ namespace nodes
         auto m = _predictor.GetNumPrototypes();
 
         std::vector<double> multiplier(m, _predictor.GetGamma() * _predictor.GetGamma() * -1);
-        auto gammaNode = transformer.AddNode<ConstantNode<double>>(multiplier);
+        const auto& gamma = AppendConstant(transformer, multiplier);
 
         // Distance to each prototype
         math::RowMatrixReference<double> prototypesMatrix = prototypes.Transpose();
         auto squareDistanceNode = transformer.AddNode<SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInputNode->output, prototypesMatrix);
 
         // Similarity to each prototype
-        auto scaledDistanceNode = transformer.AddNode<BinaryOperationNode<double>>(squareDistanceNode->output, gammaNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-        auto expDistanceNode = transformer.AddNode<UnaryOperationNode<double>>(scaledDistanceNode->output, emitters::UnaryOperationType::exp);
+        const auto& scaledDistance = AppendBinaryOperation(transformer, squareDistanceNode->output, gamma, nodes::BinaryOperationType::coordinatewiseMultiply);
+        const auto& expDistance = AppendUnaryOperation(transformer, scaledDistance, UnaryOperationType::exp);
 
         // Get the prediction label
-        auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(expDistanceNode->output, _predictor.GetLabelEmbeddings());
+        auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(expDistance, _predictor.GetLabelEmbeddings());
 
         transformer.MapNodeOutput(output, labelScoresNode->output);
 

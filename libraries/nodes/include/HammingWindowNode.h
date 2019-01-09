@@ -121,9 +121,9 @@ namespace nodes
     bool HammingWindowNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto constantNode = transformer.AddNode<ConstantNode<ValueType>>(dsp::HammingWindow<ValueType>(_input.Size()));
-        auto multiplyNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newPortElements, constantNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-        transformer.MapNodeOutput(output, multiplyNode->output);
+        const auto& windowValue = AppendConstant(transformer, dsp::HammingWindow<ValueType>(_input.Size()));
+        const auto& product = AppendBinaryOperation(transformer, newPortElements, windowValue, nodes::BinaryOperationType::coordinatewiseMultiply);
+        transformer.MapNodeOutput(output, product);
         return true;
     }
 

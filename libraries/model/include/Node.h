@@ -24,6 +24,7 @@ namespace model
 {
     class InputPortBase;
     class MapCompiler;
+    class Model;
     class ModelTransformer;
     class OutputPortBase;
     class Port;
@@ -207,6 +208,7 @@ namespace model
         void UpdateInputPorts();
         bool InvokeRefine(ModelTransformer& transformer) const;
 
+        Model* _model = nullptr;
         NodeId _id;
         std::vector<InputPortBase*> _inputs;
         std::vector<OutputPortBase*> _outputs;

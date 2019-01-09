@@ -26,13 +26,14 @@ namespace nodes
         const auto& newInput = transformer.GetCorrespondingInputs(this->input);
         auto biasValues = this->_layer.GetBias().ToArray();
         auto scaleValuesNode = transformer.AddNode<ConstantNode<ValueType>>(); // nothing
-        auto biasValuesNode = transformer.AddNode<ConstantNode<ValueType>>(biasValues);
+        const auto& scaleValuesOut = scaleValuesNode->output;
+        const auto& biasValuesOut = AppendConstant(transformer, biasValues);
 
         const size_t channelDimension = 2;
         auto computeNode = transformer.AddNode<BroadcastLinearFunctionNode<ValueType>>(newInput,
                                                                                        this->GetInputMemoryLayout(),
-                                                                                       scaleValuesNode->output,
-                                                                                       biasValuesNode->output,
+                                                                                       scaleValuesOut,
+                                                                                       biasValuesOut,
                                                                                        channelDimension,
                                                                                        this->GetOutputMemoryLayout());
         transformer.MapNodeOutput(this->output, computeNode->output);

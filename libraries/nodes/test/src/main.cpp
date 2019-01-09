@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "AppendNodesTests.h"
 #include "NodesTests.h"
 
 #include <testing/include/testing.h>
@@ -26,6 +27,7 @@ int main(int argc, char** argv)
     try
     {
         TestNodes();
+        TestAppendNodes();
     }
     catch (const utilities::Exception& exception)
     {

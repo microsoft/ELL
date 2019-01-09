@@ -88,6 +88,15 @@ namespace model
         std::vector<ValueType> _inputValues;
         OutputPort<ValueType> _output;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="layout"> The input node's output memory layout </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ModelLikeType, typename ValueType>
+    const OutputPort<ValueType>& AppendInput(ModelLikeType& model, const PortMemoryLayout& layout);
 } // namespace model
 } // namespace ell
 
@@ -195,6 +204,14 @@ namespace model
         {
             SetShape({ shapeVector });
         }
+    }
+
+    template <typename ModelLikeType, typename ValueType>
+    const OutputPort<ValueType>& AppendInput(Model& model, const PortMemoryLayout& layout)
+    {
+        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        auto node = model.template AddNode<InputNode<ValueType>>(layout);
+        return node->output;
     }
 } // namespace model
 } // namespace ell

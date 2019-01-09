@@ -140,11 +140,13 @@ set(test_name ${library_name}_test)
 
 set(test_src
     test/src/main.cpp
+    test/src/AppendNodesTests.cpp
     test/src/NodesTests.cpp
     test/src/NodesTestData.cpp
 )
 
 set(test_include
+    test/include/AppendNodesTests.h
     test/include/NodesTests.h
     test/include/NodesTestData.h
 )

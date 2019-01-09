@@ -137,10 +137,10 @@ namespace nodes
         // Maybe... in reality, dot product will likely want to be computed as in Compute() above
         const auto& newInput1 = transformer.GetCorrespondingInputs(_input1);
         const auto& newInput2 = transformer.GetCorrespondingInputs(_input2);
-        auto multNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, emitters::BinaryOperationType::coordinatewiseMultiply);
-        auto sumNode = transformer.AddNode<SumNode<ValueType>>(multNode->output);
+        const auto& product = AppendBinaryOperation(transformer, newInput1, newInput2, nodes::BinaryOperationType::coordinatewiseMultiply);
+        const auto& sum = AppendSum(transformer, product);
 
-        transformer.MapNodeOutput(output, sumNode->output);
+        transformer.MapNodeOutput(output, sum);
         return true;
     }
 

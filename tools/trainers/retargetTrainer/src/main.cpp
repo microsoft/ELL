@@ -310,7 +310,7 @@ model::Map GetMultiClassMapFromBinaryPredictors(std::vector<PredictorType>& bina
     auto concatenationNode = model.AddNode<model::OutputNode<ElementType>>(mapOutput);
     auto matrixMultiplyNode = model.AddNode<nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::rowMajor>>(concatenationNode->output, weights);
     auto biasNode = model.AddNode<nodes::ConstantNode<ElementType>>(bias.ToArray());
-    auto addNode = model.AddNode<nodes::BinaryOperationNode<ElementType>>(matrixMultiplyNode->output, biasNode->output, emitters::BinaryOperationType::add);
+    auto addNode = model.AddNode<nodes::BinaryOperationNode<ElementType>>(matrixMultiplyNode->output, biasNode->output, nodes::BinaryOperationType::add);
 
     // Apply a sigmoid function so that output can be treated as a probability or
     // confidence score.

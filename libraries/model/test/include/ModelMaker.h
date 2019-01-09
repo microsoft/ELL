@@ -113,25 +113,25 @@ model::OutputNode<T>* ModelMaker::Outputs(const model::OutputPort<T>& x)
 template <typename T>
 nodes::BinaryOperationNode<T>* ModelMaker::Add(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
-    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, emitters::BinaryOperationType::add);
+    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationType::add);
 }
 
 template <typename T>
 nodes::BinaryOperationNode<T>* ModelMaker::Subtract(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
-    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, emitters::BinaryOperationType::subtract);
+    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationType::subtract);
 }
 
 template <typename T>
 nodes::BinaryOperationNode<T>* ModelMaker::Multiply(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
-    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, emitters::BinaryOperationType::coordinatewiseMultiply);
+    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationType::coordinatewiseMultiply);
 }
 
 template <typename T>
 nodes::BinaryOperationNode<T>* ModelMaker::Divide(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
-    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, emitters::BinaryOperationType::coordinatewiseDivide);
+    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationType::coordinatewiseDivide);
 }
 
 template <typename T>
@@ -168,7 +168,7 @@ nodes::MultiplexerNode<T, S>* ModelMaker::Select(const model::OutputPort<T>& elt
 template <typename T>
 nodes::UnaryOperationNode<T>* ModelMaker::Sqrt(const model::OutputPort<T>& x)
 {
-    return _model.AddNode<nodes::UnaryOperationNode<T>>(x, emitters::UnaryOperationType::sqrt);
+    return _model.AddNode<nodes::UnaryOperationNode<T>>(x, nodes::UnaryOperationType::sqrt);
 }
 
 template <typename T>

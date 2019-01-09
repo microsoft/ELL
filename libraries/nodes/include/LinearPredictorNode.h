@@ -160,14 +160,14 @@ namespace nodes
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
 
-        auto weightsNode = transformer.AddNode<ConstantNode<ElementType>>(_predictor.GetWeights().ToArray());
-        auto dotProductNode = transformer.AddNode<DotProductNode<ElementType>>(weightsNode->output, newPortElements);
-        auto coordinatewiseMultiplyNode = transformer.AddNode<BinaryOperationNode<ElementType>>(weightsNode->output, newPortElements, emitters::BinaryOperationType::coordinatewiseMultiply);
-        auto biasNode = transformer.AddNode<ConstantNode<ElementType>>(_predictor.GetBias());
-        auto addNode = transformer.AddNode<BinaryOperationNode<ElementType>>(dotProductNode->output, biasNode->output, emitters::BinaryOperationType::add);
+        const auto& weights = AppendConstant(transformer, _predictor.GetWeights().ToArray());
+        const auto& scaledInput = AppendBinaryOperation(transformer, weights, newPortElements, nodes::BinaryOperationType::coordinatewiseMultiply);
+        auto dotProductNode = transformer.AddNode<DotProductNode<ElementType>>(weights, newPortElements);
+        const auto& bias = AppendConstant(transformer, _predictor.GetBias());
+        const auto& sum = AppendBinaryOperation(transformer, dotProductNode->output, bias, nodes::BinaryOperationType::add);
 
-        transformer.MapNodeOutput(output, addNode->output);
-        transformer.MapNodeOutput(weightedElements, coordinatewiseMultiplyNode->output);
+        transformer.MapNodeOutput(output, sum);
+        transformer.MapNodeOutput(weightedElements, scaledInput);
         return true;
     }
 

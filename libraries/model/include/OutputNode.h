@@ -32,8 +32,8 @@ namespace model
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* shapeName = "shape";
-        const model::InputPort<ValueType>& input = _input;
-        const model::OutputPort<ValueType>& output = _output;
+        const InputPort<ValueType>& input = _input;
+        const OutputPort<ValueType>& output = _output;
         /// @}
 
         /// <summary> Default Constructor </summary>
@@ -42,13 +42,13 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The port to get the input data from </param>
-        OutputNode(const model::OutputPort<ValueType>& input);
+        OutputNode(const OutputPort<ValueType>& input);
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The port to get the input data from </param>
         /// <param name="shape"> The shape of the output data </param>
-        OutputNode(const model::OutputPort<ValueType>& input, const MemoryShape& shape);
+        OutputNode(const OutputPort<ValueType>& input, const MemoryShape& shape);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -71,6 +71,15 @@ namespace model
     private:
         void Copy(ModelTransformer& transformer) const override;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="input"> The port to get the input data from </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ModelLikeType, typename ValueType>
+    const OutputPort<ValueType>& AppendOutput(ModelLikeType& model, const OutputPort<ValueType>& input);
 } // namespace model
 } // namespace ell
 
@@ -90,7 +99,7 @@ namespace model
     }
 
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::OutputPort<ValueType>& input) :
+    OutputNode<ValueType>::OutputNode(const OutputPort<ValueType>& input) :
         OutputNodeBase(_input, _output, MemoryShape{ static_cast<int>(input.Size()) }),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, input.Size())
@@ -99,7 +108,7 @@ namespace model
     }
 
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::OutputPort<ValueType>& input, const MemoryShape& shape) :
+    OutputNode<ValueType>::OutputNode(const OutputPort<ValueType>& input, const MemoryShape& shape) :
         OutputNodeBase(_input, _output, shape),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, input.Size())
@@ -149,6 +158,14 @@ namespace model
         {
             SetShape({ shapeVector });
         }
+    }
+
+    template <typename ModelLikeType, typename ValueType>
+    const OutputPort<ValueType>& AppendOutput(ModelLikeType& model, const OutputPort<ValueType>& input)
+    {
+        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        auto node = model.template AddNode<OutputNode<ValueType>>(input);
+        return node->output;
     }
 } // namespace model
 } // namespace ell

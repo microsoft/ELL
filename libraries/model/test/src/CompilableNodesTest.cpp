@@ -340,7 +340,7 @@ void TestCompilableUnaryOperationNode()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto testNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, emitters::UnaryOperationType::sqrt);
+    auto testNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, nodes::UnaryOperationType::sqrt);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -354,7 +354,7 @@ void TestCompilableUnaryOperation_square_Node()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto testNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, emitters::UnaryOperationType::square);
+    auto testNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, nodes::UnaryOperationType::square);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
@@ -412,7 +412,7 @@ void TestCompilableBinaryOperationNode()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
-    auto testNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantNode->output, emitters::BinaryOperationType::add);
+    auto testNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantNode->output, nodes::BinaryOperationType::add);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -436,7 +436,7 @@ void TestCompilableBinaryOperationNode2()
 
     auto inputNode = model.AddNode<model::InputNode<double>>(input1Shape.GetMemorySize());
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0 });
-    auto testNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, input1Shape, constantNode->output, input2Shape, outputShape, emitters::BinaryOperationType::add, 0.0);
+    auto testNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, input1Shape, constantNode->output, input2Shape, outputShape, nodes::BinaryOperationType::add, 0.0);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;

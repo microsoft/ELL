@@ -111,9 +111,10 @@ namespace nodes
         {
             return false;
         }
+
         // Add the weights as matrix inside a ConstantNode in (row, column), channel order:
         auto weightsValues = _filterWeights.ToArray();
-        auto weightsNode = transformer.AddNode<ConstantNode<ValueType>>(weightsValues);
+        const auto& weights = AppendConstant(transformer, weightsValues);
 
         const auto inputLayout = this->GetInputMemoryLayout();
         const auto outputLayout = this->GetOutputMemoryLayout();
@@ -154,7 +155,7 @@ namespace nodes
         if (dataOrder == rcdOrder) // don't reorder input -- use old method
         {
             auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(newInput, inputLayout, filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
-            auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
+            auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weights, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
 
             if (outputPadding != 0)
             {
@@ -179,7 +180,7 @@ namespace nodes
             auto reorderInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, inputLayout, transposedInputLayout);
 
             auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(reorderInputNode->output, reorderInputNode->GetOutputMemoryLayout(), _filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
-            auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
+            auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weights, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
 
             if (outputPadding != 0)
             {

@@ -61,10 +61,10 @@ namespace nodes
         model::PortElements<double> element{ newPortElements, _predictor.GetElementIndex() };
 
         // get the threshold.
-        auto thresholdNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetThreshold());
+        const auto& threshold = AppendConstant(transformer, _predictor.GetThreshold());
 
         // create a predicate that implements the split rule
-        auto binaryPredicateNode = transformer.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, emitters::BinaryPredicateType::greater);
+        auto binaryPredicateNode = transformer.AddNode<BinaryPredicateNode<double>>(element, threshold, emitters::BinaryPredicateType::greater);
 
         transformer.MapNodeOutput(output, binaryPredicateNode->output);
         return true;

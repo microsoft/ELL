@@ -724,7 +724,7 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
     auto sumNode = model.AddNode<nodes::SumNode<double>>(sourceNode1->output);
     auto minusNode = model.AddNode<nodes::BinaryOperationNode<double>>(sumNode->output,
                                                                        sourceNode2->output,
-                                                                       emitters::BinaryOperationType::subtract);
+                                                                       nodes::BinaryOperationType::subtract);
     auto conditionNode = model.AddNode<nodes::ConstantNode<bool>>(true);
     auto sinkNode1 = model.AddNode<nodes::SinkNode<double>>(sumNode->output, conditionNode->output, "ResultsCallback_Scalar");
     auto sinkNode2 = model.AddNode<nodes::SinkNode<double>>(model::PortElements<double>{ minusNode->output, sumNode->output },

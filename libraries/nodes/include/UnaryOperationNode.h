@@ -29,6 +29,8 @@ namespace ell
 {
 namespace nodes
 {
+    using UnaryOperationType = emitters::UnaryOperationType;
+
     /// <summary> A node that represents a unary function of its input </summary>
     template <typename ValueType>
     class UnaryOperationNode : public model::CompilableNode
@@ -47,7 +49,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to process. </param>
         /// <param name="operation"> The function to use to process the signal. </param>
-        UnaryOperationNode(const model::OutputPort<ValueType>& input, emitters::UnaryOperationType operation);
+        UnaryOperationNode(const model::OutputPort<ValueType>& input, UnaryOperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -62,7 +64,7 @@ namespace nodes
         /// <summary> Gets the operation performed by this node </summary>
         ///
         /// <returns> The operation </returns>
-        emitters::UnaryOperationType GetOperation() const { return _operation; }
+        UnaryOperationType GetOperation() const { return _operation; }
 
     protected:
         void Compute() const override;
@@ -88,8 +90,18 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         // Operation
-        emitters::UnaryOperationType _operation;
+        UnaryOperationType _operation;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="input"> The port to get the input data from </param>
+    /// <param name="operation"> The function to use to process the signal. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ModelLikeType, typename ValueType>
+    const model::OutputPort<ValueType>& AppendUnaryOperation(ModelLikeType& model, const model::OutputPort<ValueType>& input, UnaryOperationType operation);
 } // namespace nodes
 } // namespace ell
 
@@ -107,33 +119,33 @@ namespace nodes
 {
     namespace UnaryOperations
     {
-        inline std::string to_string(emitters::UnaryOperationType op)
+        inline std::string to_string(UnaryOperationType op)
         {
             switch (op)
             {
-                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, none);
-                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, sqrt);
-                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, logicalNot);
-                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, tanh);
-                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, exp);
-                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, square);
-                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, log);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, none);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, sqrt);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, logicalNot);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, tanh);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, exp);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, square);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, log);
 
             default:
                 throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
             }
         }
 
-        inline emitters::UnaryOperationType from_string(std::string name)
+        inline UnaryOperationType from_string(std::string name)
         {
             BEGIN_FROM_STRING;
-            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, none);
-            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, sqrt);
-            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, logicalNot);
-            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, tanh);
-            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, exp);
-            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, square);
-            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, log);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, none);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, sqrt);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, logicalNot);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, tanh);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, exp);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, square);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, log);
 
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
         }
@@ -216,12 +228,12 @@ namespace nodes
         CompilableNode({ &_input }, { &_output }),
         _input(this, {}, defaultInputPortName),
         _output(this, defaultOutputPortName, 0),
-        _operation(emitters::UnaryOperationType::none)
+        _operation(UnaryOperationType::none)
     {
     }
 
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPort<ValueType>& input, emitters::UnaryOperationType operation) :
+    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPort<ValueType>& input, UnaryOperationType operation) :
         CompilableNode({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, _input.Size()),
@@ -247,22 +259,22 @@ namespace nodes
         std::vector<ValueType> output;
         switch (_operation)
         {
-        case emitters::UnaryOperationType::sqrt:
+        case UnaryOperationType::sqrt:
             output = ComputeOutput(UnaryOperations::Sqrt<ValueType>);
             break;
-        case emitters::UnaryOperationType::logicalNot:
+        case UnaryOperationType::logicalNot:
             output = ComputeOutput(UnaryOperations::LogicalNot<ValueType>);
             break;
-        case emitters::UnaryOperationType::exp:
+        case UnaryOperationType::exp:
             output = ComputeOutput(UnaryOperations::Exp<ValueType>);
             break;
-        case emitters::UnaryOperationType::tanh:
+        case UnaryOperationType::tanh:
             output = ComputeOutput(UnaryOperations::Tanh<ValueType>);
             break;
-        case emitters::UnaryOperationType::square:
+        case UnaryOperationType::square:
             output = ComputeOutput(UnaryOperations::Square<ValueType>);
             break;
-        case emitters::UnaryOperationType::log:
+        case UnaryOperationType::log:
             output = ComputeOutput(UnaryOperations::Log<ValueType>);
             break;
         default:
@@ -284,13 +296,13 @@ namespace nodes
     {
         switch (this->GetOperation())
         {
-        case emitters::UnaryOperationType::sqrt:
+        case UnaryOperationType::sqrt:
             return function.GetModule().GetRuntime().GetSqrtFunction<ValueType>();
-        case emitters::UnaryOperationType::exp:
+        case UnaryOperationType::exp:
             return function.GetModule().GetRuntime().GetExpFunction<ValueType>();
-        case emitters::UnaryOperationType::log:
+        case UnaryOperationType::log:
             return function.GetModule().GetRuntime().GetLogFunction<ValueType>();
-        case emitters::UnaryOperationType::logicalNot:
+        case UnaryOperationType::logicalNot:
         {
             auto& module = function.GetModule();
             auto& f = module.BeginFunction("logicalNot", emitters::GetVariableType<bool>(), { { "value", emitters::GetVariableType<ValueType>() } });
@@ -300,7 +312,7 @@ namespace nodes
             module.EndFunction();
             return f.GetFunction();
         }
-        case emitters::UnaryOperationType::square:
+        case UnaryOperationType::square:
         {
             auto& module = function.GetModule();
             auto& f = module.BeginFunction("square", emitters::GetVariableType<ValueType>(), { { "value", emitters::GetVariableType<ValueType>() } });
@@ -310,9 +322,9 @@ namespace nodes
             module.EndFunction();
             return f.GetFunction();
         }
-        case emitters::UnaryOperationType::tanh:
+        case UnaryOperationType::tanh:
             return function.GetModule().GetRuntime().GetTanhFunction<ValueType>();
-        case emitters::UnaryOperationType::none:
+        case UnaryOperationType::none:
         default:
             throw emitters::EmitterException(emitters::EmitterError::unaryOperationNotSupported);
         }
@@ -376,6 +388,14 @@ namespace nodes
         archiver["operation"] >> operation;
         _operation = UnaryOperations::from_string(operation);
         _output.SetSize(_input.Size());
+    }
+
+    template <typename ModelLikeType, typename ValueType>
+    const model::OutputPort<ValueType>& AppendUnaryOperation(ModelLikeType& model, const model::OutputPort<ValueType>& input, UnaryOperationType operation)
+    {
+        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        auto node = model.template AddNode<UnaryOperationNode<ValueType>>(input, operation);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

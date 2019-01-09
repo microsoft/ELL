@@ -51,19 +51,19 @@ namespace nodes
         /// Constructor for a vector constant
         ///
         /// <param name="value"> The vector value </param>
-        ConstantNode(const std::vector<ValueType>& values);
+        ConstantNode(const std::vector<ValueType>& value);
 
         /// Constructor for an arbitrary-shaped array constant
         ///
         /// <param name="value"> The vector value </param>
         /// <param name="shape"> The shape of the output data </param>
-        ConstantNode(const std::vector<ValueType>& values, const model::MemoryShape& shape);
+        ConstantNode(const std::vector<ValueType>& value, const model::MemoryShape& shape);
 
         /// Constructor for an arbitrary-shaped array constant
         ///
         /// <param name="value"> The vector value </param>
         /// <param name="layout"> The memory layout of the output data </param>
-        ConstantNode(const std::vector<ValueType>& values, const model::PortMemoryLayout& layout);
+        ConstantNode(const std::vector<ValueType>& value, const model::PortMemoryLayout& layout);
 
         /// <summary> Gets the values contained in this node </summary>
         ///
@@ -99,6 +99,44 @@ namespace nodes
         // Constant value
         std::vector<ValueType> _values;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="value"> The scalar value </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType, typename ModelLikeType>
+    const model::OutputPort<ValueType>& AppendConstant(ModelLikeType& model, ValueType value);
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="value"> The vector value </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType, typename ModelLikeType>
+    const model::OutputPort<ValueType>& AppendConstant(ModelLikeType& model, const std::vector<ValueType>& value);
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="value"> The vector value </param>
+    /// <param name="shape"> The shape of the output data </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType, typename ModelLikeType>
+    const model::OutputPort<ValueType>& AppendConstant(ModelLikeType& model, const std::vector<ValueType>& value, const model::MemoryShape& shape);
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="value"> The vector value </param>
+    /// <param name="layout"> The memory layout of the output data </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType, typename ModelLikeType>
+    const model::OutputPort<ValueType>& AppendConstant(ModelLikeType& model, const std::vector<ValueType>& value, const model::PortMemoryLayout& layout);
 
     /// <summary> Adds a constant node (which represents a constant predictor) to a model transformer. </summary>
     ///
@@ -208,6 +246,38 @@ namespace nodes
         {
             _output.SetSize(_values.size());
         }
+    }
+
+    template <typename ValueType, typename ModelLikeType>
+    const model::OutputPort<ValueType>& AppendConstant(ModelLikeType& model, ValueType value)
+    {
+        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        auto node = model.template AddNode<ConstantNode<ValueType>>(value);
+        return node->output;
+    }
+
+    template <typename ValueType, typename ModelLikeType>
+    const model::OutputPort<ValueType>& AppendConstant(ModelLikeType& model, const std::vector<ValueType>& values)
+    {
+        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        auto node = model.template AddNode<ConstantNode<ValueType>>(values);
+        return node->output;
+    }
+
+    template <typename ValueType, typename ModelLikeType>
+    const model::OutputPort<ValueType>& AppendConstant(ModelLikeType& model, const std::vector<ValueType>& values, const model::MemoryShape& shape)
+    {
+        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        auto node = model.template AddNode<ConstantNode<ValueType>>(values, shape);
+        return node->output;
+    }
+
+    template <typename ValueType, typename ModelLikeType>
+    const model::OutputPort<ValueType>& AppendConstant(ModelLikeType& model, const std::vector<ValueType>& values, const model::PortMemoryLayout& layout)
+    {
+        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        auto node = model.template AddNode<ConstantNode<ValueType>>(values, layout);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

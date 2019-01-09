@@ -143,12 +143,12 @@ namespace nodes
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto delayNode = transformer.AddNode<DelayNode<ValueType>>(newPortElements, _windowSize);
-        auto subtractNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newPortElements, delayNode->output, emitters::BinaryOperationType::subtract);
-        auto accumNode = transformer.AddNode<AccumulatorNode<ValueType>>(subtractNode->output);
+        const auto& difference = AppendBinaryOperation(transformer, newPortElements, delayNode->output, nodes::BinaryOperationType::subtract);
+        auto accumNode = transformer.AddNode<AccumulatorNode<ValueType>>(difference);
         std::vector<ValueType> literalN(newPortElements.Size(), (ValueType)_windowSize);
-        auto constNode = transformer.AddNode<ConstantNode<ValueType>>(literalN);
-        auto divideNode = transformer.AddNode<BinaryOperationNode<ValueType>>(accumNode->output, constNode->output, emitters::BinaryOperationType::coordinatewiseDivide);
-        transformer.MapNodeOutput(output, divideNode->output);
+        const auto& denominator = AppendConstant(transformer, literalN);
+        const auto& quotient = AppendBinaryOperation(transformer, accumNode->output, denominator, nodes::BinaryOperationType::coordinatewiseDivide);
+        transformer.MapNodeOutput(output, quotient);
         return true;
     }
 

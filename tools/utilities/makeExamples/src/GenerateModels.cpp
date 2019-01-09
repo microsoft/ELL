@@ -59,7 +59,7 @@ model::Model GenerateTimesTwoModel(size_t dimension)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
     auto constantTwoNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 2.0));
-    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
+    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, nodes::BinaryOperationType::coordinatewiseMultiply);
     model.AddNode<model::OutputNode<double>>(timesNode->output);
     return model;
 }
@@ -101,8 +101,8 @@ model::Model GenerateMultiOutModel(size_t dimension)
     auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
     auto constantTwoNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 2.0));
     auto constantTenNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 10.0));
-    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-    auto plusNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTenNode->output, emitters::BinaryOperationType::add);
+    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, nodes::BinaryOperationType::coordinatewiseMultiply);
+    auto plusNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTenNode->output, nodes::BinaryOperationType::add);
 
     model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ { timesNode->output }, { plusNode->output } });
     return model;
@@ -146,7 +146,7 @@ model::Model GenerateModel2()
     auto mean2 = model.AddNode<nodes::MovingAverageNode<double>>(mag2->output, 8);
 
     // combine them
-    model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, emitters::BinaryOperationType::subtract);
+    model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationType::subtract);
     return model;
 }
 
@@ -156,7 +156,7 @@ model::Model GenerateModel3()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
     auto lowpass = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 16);
-    auto highpass = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, lowpass->output, emitters::BinaryOperationType::subtract);
+    auto highpass = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, lowpass->output, nodes::BinaryOperationType::subtract);
 
     auto delay1 = model.AddNode<nodes::DelayNode<double>>(highpass->output, 4);
     auto delay2 = model.AddNode<nodes::DelayNode<double>>(highpass->output, 8);
@@ -164,7 +164,7 @@ model::Model GenerateModel3()
     auto dot1 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay1->output);
     auto dot2 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay2->output);
 
-    model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, emitters::BinaryOperationType::subtract);
+    model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationType::subtract);
     return model;
 }
 

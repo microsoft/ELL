@@ -1166,7 +1166,7 @@ namespace nodes
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "WinogradConvolutionNode: illegal value for _order");
         }
 
-        auto weightsNode = transformer.AddNode<ConstantNode<ValueType>>(weightsValues, weightsShape);
+        const auto& weights = AppendConstant(transformer, weightsValues, weightsShape);
         const auto numFilterChannels = _order == FilterOrder::tilesFirst ? _filterWeights.NumChannels() : _filterWeights.NumColumns();
         auto convInputLayout = _inputMemoryLayout;
         if (numFilterChannels == 1 && _order == FilterOrder::filtersFirst)
@@ -1177,7 +1177,7 @@ namespace nodes
             newInput = &reorderNode->output;
             convInputLayout = reorderNode->GetOutputMemoryLayout();
         }
-        auto convNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(*newInput, weightsNode->output, convInputLayout, GetOutputMemoryLayout(), _stride, _tileSize, _filterSize, _order, static_cast<int>(numFilterChannels));
+        auto convNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(*newInput, weights, convInputLayout, GetOutputMemoryLayout(), _stride, _tileSize, _filterSize, _order, static_cast<int>(numFilterChannels));
         transformer.MapNodeOutput(this->output, convNode->output);
         return true;
     }

@@ -63,8 +63,8 @@ namespace nodes
         auto n = weights.NumColumns();
         auto lda = weights.GetIncrement();
         auto weightsValues = weights.ToArray();
-        auto weightsNode = transformer.AddNode<ConstantNode<ValueType>>(weightsValues);
-        auto matrixMultiplyNode = transformer.AddNode<MatrixVectorMultiplyNode<ValueType>>(weightsNode->output, m, n, lda, newInput);
+        const auto& weightsOut = AppendConstant(transformer, weightsValues);
+        auto matrixMultiplyNode = transformer.AddNode<MatrixVectorMultiplyNode<ValueType>>(weightsOut, m, n, lda, newInput);
 
         // TODO: add a reorder node here that adds padding to the output, if necessary
 

@@ -25,12 +25,15 @@
 #include <utilities/include/TypeName.h>
 
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace ell
 {
 namespace nodes
 {
+    using BinaryOperationType = emitters::BinaryOperationType;
+
     /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs. </summary>
     template <typename ValueType>
     class BinaryOperationNode : public model::CompilableNode
@@ -53,7 +56,9 @@ namespace nodes
         /// <param name="operation"> The type of operation to perform. </param>
         ///
         /// Note: the output will use the same memory layout as input1
-        BinaryOperationNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryOperationType operation);
+        BinaryOperationNode(const model::OutputPort<ValueType>& input1,
+                            const model::OutputPort<ValueType>& input2,
+                            BinaryOperationType operation);
 
         /// <summary> Constructor. </summary>
         ///
@@ -65,7 +70,7 @@ namespace nodes
         BinaryOperationNode(const model::OutputPort<ValueType>& input1,
                             const model::OutputPort<ValueType>& input2,
                             const model::PortMemoryLayout& layout,
-                            emitters::BinaryOperationType operation,
+                            BinaryOperationType operation,
                             ValueType padding = 0);
 
         /// <summary> Constructor. </summary>
@@ -82,7 +87,7 @@ namespace nodes
                             const model::OutputPort<ValueType>& input2,
                             const model::PortMemoryLayout& inputLayout2,
                             const model::PortMemoryLayout& outputLayout,
-                            emitters::BinaryOperationType operation,
+                            BinaryOperationType operation,
                             ValueType padding = 0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -98,7 +103,7 @@ namespace nodes
         /// <summary> Gets the operation performed by this node </summary>
         ///
         /// <returns> The operation </returns>
-        emitters::BinaryOperationType GetOperation() const { return _operation; }
+        BinaryOperationType GetOperation() const { return _operation; }
 
     protected:
         void Compute() const override;
@@ -143,11 +148,26 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         // Operation
-        emitters::BinaryOperationType _operation;
+        BinaryOperationType _operation;
 
         // Padding
         ValueType _paddingValue;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
+    /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
+    /// <param name="operation"> The type of operation to perform. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    /// Note: the output will use the same memory layout as input1
+    template <typename ModelLikeType, typename ValueType>
+    const model::OutputPort<ValueType>& AppendBinaryOperation(ModelLikeType& model,
+                                                              const model::OutputPort<ValueType>& input1,
+                                                              const model::OutputPort<ValueType>& input2,
+                                                              BinaryOperationType operation);
 } // namespace nodes
 } // namespace ell
 
@@ -165,34 +185,34 @@ namespace nodes
 {
     namespace BinaryOperations
     {
-        inline std::string to_string(emitters::BinaryOperationType op)
+        inline std::string to_string(BinaryOperationType op)
         {
             switch (op)
             {
-                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, none);
-                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, add);
-                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, subtract);
-                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, coordinatewiseMultiply);
-                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, coordinatewiseDivide);
-                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, logicalAnd);
-                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, logicalOr);
-                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, logicalXor);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, none);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, add);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, subtract);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, coordinatewiseMultiply);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, coordinatewiseDivide);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalAnd);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalOr);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalXor);
             default:
                 throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
             }
         }
 
-        inline emitters::BinaryOperationType from_string(std::string name)
+        inline BinaryOperationType from_string(std::string name)
         {
             BEGIN_FROM_STRING;
-            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, none);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, add);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, subtract);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, coordinatewiseMultiply);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, coordinatewiseDivide);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, logicalAnd);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, logicalOr);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, logicalXor);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, none);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, add);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, subtract);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, coordinatewiseMultiply);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, coordinatewiseDivide);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalAnd);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalOr);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalXor);
 
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
         }
@@ -291,12 +311,12 @@ namespace nodes
         _input1(this, {}, defaultInput1PortName),
         _input2(this, {}, defaultInput2PortName),
         _output(this, defaultOutputPortName, 0),
-        _operation(emitters::BinaryOperationType::none)
+        _operation(BinaryOperationType::none)
     {
     }
 
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryOperationType operation) :
+    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, BinaryOperationType operation) :
         CompilableNode({ &_input1, &_input2 }, { &_output }),
         _input1(this, input1, defaultInput1PortName),
         _inputLayout1(input1.GetMemoryLayout()),
@@ -316,7 +336,7 @@ namespace nodes
     BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPort<ValueType>& input1,
                                                         const model::OutputPort<ValueType>& input2,
                                                         const model::PortMemoryLayout& layout,
-                                                        emitters::BinaryOperationType operation,
+                                                        BinaryOperationType operation,
                                                         ValueType padding) :
         CompilableNode({ &_input1, &_input2 }, { &_output }),
         _input1(this, input1, defaultInput1PortName),
@@ -335,7 +355,7 @@ namespace nodes
                                                         const model::OutputPort<ValueType>& input2,
                                                         const model::PortMemoryLayout& inputLayout2,
                                                         const model::PortMemoryLayout& outputLayout,
-                                                        emitters::BinaryOperationType operation,
+                                                        BinaryOperationType operation,
                                                         ValueType padding) :
         CompilableNode({ &_input1, &_input2 }, { &_output }),
         _input1(this, input1, defaultInput1PortName),
@@ -378,25 +398,25 @@ namespace nodes
         std::vector<ValueType> output;
         switch (_operation)
         {
-        case emitters::BinaryOperationType::add:
+        case BinaryOperationType::add:
             output = ComputeOutput(BinaryOperations::Add<ValueType>);
             break;
-        case emitters::BinaryOperationType::subtract:
+        case BinaryOperationType::subtract:
             output = ComputeOutput(BinaryOperations::Subtract<ValueType>);
             break;
-        case emitters::BinaryOperationType::coordinatewiseMultiply:
+        case BinaryOperationType::coordinatewiseMultiply:
             output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
             break;
-        case emitters::BinaryOperationType::coordinatewiseDivide:
+        case BinaryOperationType::coordinatewiseDivide:
             output = ComputeOutput(BinaryOperations::Divide<ValueType>);
             break;
-        case emitters::BinaryOperationType::logicalAnd:
+        case BinaryOperationType::logicalAnd:
             output = ComputeOutput(BinaryOperations::LogicalAnd<ValueType>);
             break;
-        case emitters::BinaryOperationType::logicalOr:
+        case BinaryOperationType::logicalOr:
             output = ComputeOutput(BinaryOperations::LogicalOr<ValueType>);
             break;
-        case emitters::BinaryOperationType::logicalXor:
+        case BinaryOperationType::logicalXor:
             output = ComputeOutput(BinaryOperations::LogicalXor<ValueType>);
             break;
         default:
@@ -658,6 +678,17 @@ namespace nodes
         archiver["outputLayout"] >> outputLayout;
         _output.SetMemoryLayout(outputLayout);
         archiver["padding"] >> _paddingValue;
+    }
+
+    template <typename ModelLikeType, typename ValueType>
+    const model::OutputPort<ValueType>& AppendBinaryOperation(ModelLikeType& model,
+                                                              const model::OutputPort<ValueType>& input1,
+                                                              const model::OutputPort<ValueType>& input2,
+                                                              BinaryOperationType operation)
+    {
+        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        auto node = model.template AddNode<BinaryOperationNode<ValueType>>(input1, input2, operation);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

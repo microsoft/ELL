@@ -76,6 +76,15 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="input"> The port to get the input data from </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ModelLikeType, typename ValueType>
+    const model::OutputPort<ValueType>& AppendSum(ModelLikeType& model, const model::OutputPort<ValueType>& input);
 } // namespace nodes
 } // namespace ell
 
@@ -258,6 +267,14 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
+    }
+
+    template <typename ModelLikeType, typename ValueType>
+    const model::OutputPort<ValueType>& AppendSum(ModelLikeType& model, const model::OutputPort<ValueType>& input)
+    {
+        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        auto node = model.template AddNode<SumNode<ValueType>>(input);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

@@ -271,15 +271,15 @@ namespace nodes
                                                                                                           convParams,
                                                                                                           inputLayout,
                                                                                                           outputLayout);
-        auto paddingMasksNode = transformer.AddNode<ConstantNode<PackedBitsType>>(compressedPaddingMasks);
-        auto paddingMaskSumsNode = transformer.AddNode<ConstantNode<int>>(paddingMaskSums);
-        auto filterWeightsNode = transformer.AddNode<ConstantNode<PackedBitsType>>(compressedFilterWeights);
-        auto filterMeansNode = transformer.AddNode<ConstantNode<ValueType>>(filterMeans);
+        const auto& paddingMasksOut = AppendConstant(transformer, compressedPaddingMasks);
+        const auto& paddingMaskSumsOut = AppendConstant(transformer, paddingMaskSums);
+        const auto& filterWeightsOut = AppendConstant(transformer, compressedFilterWeights);
+        const auto& filterMeansOut = AppendConstant(transformer, filterMeans);
         auto xnorNode = transformer.AddNode<BinaryXnorNode<ValueType, PackedBitsType>>(reshapeNode->output,
-                                                                                       paddingMasksNode->output,
-                                                                                       paddingMaskSumsNode->output,
-                                                                                       filterWeightsNode->output,
-                                                                                       filterMeansNode->output,
+                                                                                       paddingMasksOut,
+                                                                                       paddingMaskSumsOut,
+                                                                                       filterWeightsOut,
+                                                                                       filterMeansOut,
                                                                                        convParams,
                                                                                        layerParams.inputPaddingParameters,
                                                                                        inputLayout,

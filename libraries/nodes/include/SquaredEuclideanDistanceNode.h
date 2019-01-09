@@ -10,7 +10,6 @@
 
 #include "BinaryOperationNode.h"
 #include "ConstantNode.h"
-#include "DotProductNode.h"
 #include "L2NormSquaredNode.h"
 #include "MatrixVectorProductNode.h"
 #include "SquaredEuclideanDistanceNode.h"
@@ -182,8 +181,8 @@ namespace nodes
             inputNorm2SquaredNodeOutputs.Append(inputNorm2SquaredNode->output);
 
             auto matrixRow = _vectorsAsMatrix.GetRow(index);
-            auto rowNorm2SquaredConstantNode = transformer.AddNode<ConstantNode<ValueType>>(matrixRow.Norm2Squared());
-            vectorNorm2SquaredConstantNodeOutputs.Append(rowNorm2SquaredConstantNode->output);
+            const auto& rowNorm2Squared = AppendConstant(transformer, static_cast<ValueType>(matrixRow.Norm2Squared()));
+            vectorNorm2SquaredConstantNodeOutputs.Append(rowNorm2Squared);
         }
 
         // Add the three node outputs:
@@ -191,12 +190,12 @@ namespace nodes
         //   * vectorNorm2SquaredConstantNodeOutputs (B)
         //   * productNode->output (C)
         // and map it to output node
-        auto& A = inputNorm2SquaredNodeOutputs;
-        auto& B = vectorNorm2SquaredConstantNodeOutputs;
+        auto& A = transformer.SimplifyOutputs(inputNorm2SquaredNodeOutputs);
+        auto& B = transformer.SimplifyOutputs(vectorNorm2SquaredConstantNodeOutputs);
         auto& C = productNode->output;
-        auto aPlusB = transformer.AddNode<BinaryOperationNode<double>>(A, B, emitters::BinaryOperationType::add);
-        auto aPlusBPlusC = transformer.AddNode<BinaryOperationNode<double>>(aPlusB->output, C, emitters::BinaryOperationType::add);
-        transformer.MapNodeOutput(output, aPlusBPlusC->output);
+        const auto& aPlusB = AppendBinaryOperation(transformer, A, B, nodes::BinaryOperationType::add);
+        const auto& aPlusBPlusC = AppendBinaryOperation(transformer, aPlusB, C, nodes::BinaryOperationType::add);
+        transformer.MapNodeOutput(output, aPlusBPlusC);
 
         return true;
     }

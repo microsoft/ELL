@@ -179,14 +179,14 @@ namespace nodes
         const auto& newSelector = transformer.GetCorrespondingInputs(_selector);
         const auto& newSelectorInt = CastIfNecessary(newSelector, transformer);
 
-        auto defaultNode = transformer.AddNode<ConstantNode<ValueType>>(_defaultValue);
+        const auto& defaultOutput = AppendConstant(transformer, _defaultValue);
         model::PortElements<ValueType> outputElements;
         auto size = _output.Size();
         for (size_t index = 0; index < size; ++index)
         {
-            auto indexNode = transformer.AddNode<ConstantNode<int>>(static_cast<int>(index));
-            auto isEqualNode = transformer.AddNode<BinaryPredicateNode<int>>(newSelectorInt, indexNode->output, emitters::BinaryPredicateType::equal);
-            auto ifNode = transformer.AddNode<nodes::MultiplexerNode<ValueType, bool>>(model::PortElements<ValueType>{ defaultNode->output, newInput }, isEqualNode->output);
+            const auto& indexValue = AppendConstant(transformer, static_cast<int>(index));
+            auto isEqualNode = transformer.AddNode<BinaryPredicateNode<int>>(newSelectorInt, indexValue, emitters::BinaryPredicateType::equal);
+            auto ifNode = transformer.AddNode<nodes::MultiplexerNode<ValueType, bool>>(model::PortElements<ValueType>{ defaultOutput, newInput }, isEqualNode->output);
             outputElements.Append(ifNode->output);
         }
 

@@ -210,7 +210,7 @@ void TestVariantAddBinaryOpNode()
     testing::ProcessTest("AddNode(string)", in != nullptr);
 
     model::PortElementsProxy proxy(model::PortRangeProxy{ in->GetId(), "output", model::Port::PortType::real, 0, 3 });
-    auto op = emitters::BinaryOperationType::add;
+    auto op = nodes::BinaryOperationType::add;
     auto out = mb.AddNode(model, "BinaryOperationNode<double>", { utilities::Variant(proxy), utilities::Variant(proxy), utilities::Variant(op) });
     testing::ProcessTest("AddNode(string)", out != nullptr);
 

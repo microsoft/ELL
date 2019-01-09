@@ -8,6 +8,7 @@
 
 #include "Node.h"
 #include "InputPort.h"
+#include "Model.h"
 #include "ModelTransformer.h"
 #include "OutputPort.h"
 

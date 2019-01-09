@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "ConstantNode.h"
+
 #include <model/include/CompilableNode.h>
 #include <model/include/IRMapCompiler.h>
 #include <model/include/ModelTransformer.h>
@@ -110,6 +112,15 @@ namespace nodes
 
         SinkFunction<ValueType> _sink;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="onto"> The output port to use as the input for the new node. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ModelLikeType, typename ValueType>
+    const model::OutputPort<ValueType>& AppendSink(ModelLikeType& model, const model::OutputPort<ValueType>& onto);
 } // namespace nodes
 } // namespace ell
 
@@ -287,6 +298,14 @@ namespace nodes
             emitters::LLVMValue value = compiler.LoadPortElementVariable(input.GetInputElement(i));
             function.SetValueAt(pOutput, function.Literal(static_cast<int>(i)), value);
         }
+    }
+
+    template <typename ModelLikeType, typename ValueType>
+    const model::OutputPort<ValueType>& AppendSink(ModelLikeType& model, const model::OutputPort<ValueType>& output)
+    {
+        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        auto sinkNode = model.template AddNode<SinkNode<ValueType>>(output, AppendConstant(model, true), "OutputCallback");
+        return sinkNode->output;
     }
 } // namespace nodes
 } // namespace ell

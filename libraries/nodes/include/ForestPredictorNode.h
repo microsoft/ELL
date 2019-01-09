@@ -180,8 +180,8 @@ namespace nodes
                 {
                     model::PortElements<double> elements = interiorNodeSubModels[edges[j].GetTargetNodeIndex()];
 
-                    auto sumNode = transformer.AddNode<BinaryOperationNode<double>>(edgePredictorNode->output, elements, emitters::BinaryOperationType::add);
-                    edgeOutputs.Append(sumNode->output);
+                    const auto& edgeSum = AppendBinaryOperation(transformer, edgePredictorNode->output, transformer.SimplifyOutputs(elements), nodes::BinaryOperationType::add);
+                    edgeOutputs.Append(edgeSum);
                 }
                 else // target node is a leaf
                 {
@@ -199,7 +199,7 @@ namespace nodes
         }
 
         // Now compute the edge indicator vector
-        auto trueNode = transformer.AddNode<ConstantNode<bool>>(true); // the constant 'true'
+        const auto& trueValue = AppendConstant(transformer, true); // the constant 'true'
         std::vector<model::PortElements<bool>> edgeIndicatorSubModels(_forest.NumEdges());
 
         // Vector with index of the incoming edge for each internal node (with sentinel value of -1 for tree roots)
@@ -212,7 +212,7 @@ namespace nodes
             const auto& node = interiorNodes[nodeIndex];
             const auto& childEdges = node.GetOutgoingEdges();
             auto numChildren = childEdges.size();
-            model::PortElements<bool> parentIndicator = isRoot ? trueNode->output : edgeIndicatorSubModels[parentEdgeIndex];
+            model::PortElements<bool> parentIndicator = isRoot ? trueValue : edgeIndicatorSubModels[parentEdgeIndex];
 
             // The Demultiplexer node computes the indicator value for all the children at once, by copying its input value (a '1' if it's the root)
             // to the selected child.
@@ -245,14 +245,14 @@ namespace nodes
 
         // Make a copy and add the bias term
         auto treesPlusBias = treeSubModels;
-        auto biasNode = transformer.AddNode<ConstantNode<double>>(_forest.GetBias());
-        treesPlusBias.Append(biasNode->output);
+        const auto& bias = AppendConstant(transformer, _forest.GetBias());
+        treesPlusBias.Append(bias);
 
         // Sum all of the trees
-        auto sumNode = transformer.AddNode<SumNode<double>>(treesPlusBias);
+        const auto& treeSum = AppendSum(transformer, transformer.SimplifyOutputs(treesPlusBias));
 
         // Map all the outputs from the original node to the refined model outputs
-        transformer.MapNodeOutput(output, sumNode->output);
+        transformer.MapNodeOutput(output, treeSum);
         transformer.MapNodeOutput(treeOutputs, treeSubModelsOutput);
         transformer.MapNodeOutput(edgeIndicatorVector, edgeIndicatorVectorElementsOutput);
         return true;

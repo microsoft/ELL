@@ -209,9 +209,9 @@ namespace predictors
             /// <returns> Shape of the output tensor. </returns>
             virtual Shape GetOutputShapeMinusPadding() const;
 
-            /// <summary> Indicates if a layer is a specific type. </summary>
+            /// <summary> Indicates if a layer is of a specific type. </summary>
             ///
-            /// <returns> `true` if the layer is of the queried layer type. </returns>
+            /// <returns> `true` if the layer is an instance of the queried type. </returns>
             template <class LayerType>
             bool IsA() const
             {
@@ -224,7 +224,7 @@ namespace predictors
             template <class LayerType>
             LayerType& As()
             {
-                return *(dynamic_cast<LayerType*>(this));
+                return dynamic_cast<LayerType&>(*this);
             }
 
             /// <summary> Computes the output of the layer via a forward feed of the configured input.

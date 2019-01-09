@@ -172,16 +172,15 @@ namespace nodes
 
         // Make sure we have a RowMatrix (because that's what MatrixVectorMultiplyNode wants)
         math::RowMatrix<ValueType> projectionMatrix(_w);
-        auto projectionMatrixValue = projectionMatrix.ToArray();
-        auto projectionMatrixNode = transformer.AddNode<ConstantNode<ValueType>>(projectionMatrixValue);
         auto m = projectionMatrix.NumRows();
         auto n = projectionMatrix.NumColumns();
         auto matrixStride = projectionMatrix.GetIncrement();
-        if (matrixStride == 0 || matrixStride < m)
+        if (matrixStride == 0 || matrixStride < n)
         {
-            utilities::InputException(utilities::InputExceptionErrors::badData, "Matrix has an invalid stride");
+            throw utilities::InputException(utilities::InputExceptionErrors::badData, "Matrix has an invalid stride");
         }
-        auto matrixMultiplyNode = transformer.AddNode<MatrixVectorMultiplyNode<ValueType>>(projectionMatrixNode->output, m, n, matrixStride, newInput);
+        const auto& projectionMatrixOutput = AppendConstant(transformer, projectionMatrix.ToArray());
+        auto matrixMultiplyNode = transformer.AddNode<MatrixVectorMultiplyNode<ValueType>>(projectionMatrixOutput, m, n, matrixStride, newInput);
         transformer.MapNodeOutput(output, matrixMultiplyNode->output);
         return true;
     }
