@@ -20,6 +20,7 @@
 
 #include <utilities/include/RandomEngines.h>
 
+#include <functional>
 #include <iostream>
 #include <random>
 #include <string>
@@ -77,6 +78,13 @@ const DebugNode<double, int>* FindDebugNode(const model::Model& model, int tag);
 void SetVerbose(bool verbose);
 bool IsVerbose();
 
+// Runs a few iterations of an arbitrary test on a map (the `testBody` function), serializing and
+// deserializing the map inbetween
+//
+// filenameBase is the base name of the file to use for serialization (an iteration value and ".json" extension are added)
+// testBody takes the map to test and an iteration number.
+void TestWithSerialization(ell::model::Map& map, std::string filenameBase, std::function<void(ell::model::Map& map, int)> testBody);
+
 template <typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T>& v);
 
@@ -102,6 +110,9 @@ std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model:
 
 template <typename InputType>
 void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage = "", double epsilon = 1e-5);
+
+template <typename InputType, typename OutputType>
+bool VerifyCompiledOutputAndResult(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage = "", double epsilon = 1e-5);
 
 template <typename InputType, typename OutputType>
 void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage = "");
@@ -363,6 +374,52 @@ void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& com
         throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
     }
 }
+
+
+///<summary> Verify the compiled output matches the computed output, and also verify computed output matches a given expected output </summary>
+template <typename InputType, typename OutputType>
+bool VerifyCompiledOutputAndResult(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal,
+    const std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage, double epsilon)
+{
+    bool ok = true;
+    std::vector<OutputType> computedResult;
+    // compare output
+    for (int i = 0, n = signal.size(); i < n; i++)
+    {
+        const auto& input = signal[i];
+        map.SetInputValue(0, input);
+        computedResult = map.ComputeOutput<OutputType>(0);
+
+        // test computed result is correct.
+        std::vector<OutputType> expected = expectedOutput[i];
+        bool match = IsEqual(expected, computedResult, static_cast<OutputType>(epsilon));
+        if (IsVerbose() || !match)
+        {
+            ok &= match;
+            std::cout << "compute versus expected: " << std::endl;
+            std::cout << "   computed: " << computedResult << std::endl;
+            std::cout << "   expected: " << expected << std::endl;
+            std::cout << "   Largest difference: " << LargestDifference(computedResult, expected) << ", epsilon: " << epsilon << std::endl;
+        }
+
+        compiledMap.SetInputValue(0, input);
+        auto compiledResult = compiledMap.ComputeOutput<OutputType>(0);
+        match = IsEqual(computedResult, compiledResult, static_cast<OutputType>(epsilon));
+
+        if (IsVerbose() || !match)
+        {
+            ok &= match;
+            std::cout << "compiled versus compute" << std::endl;
+            std::cout << "  computed: " << computedResult << std::endl;
+            std::cout << "  compiled: " << compiledResult << std::endl;
+            std::cout << "  Largest difference: " << LargestDifference(computedResult, compiledResult) << ", epsilon: " << epsilon << std::endl;
+        }
+    }
+
+    testing::ProcessTest(std::string("Testing compiled " + name + additionalMessage + " (jitted)"), ok);
+    return ok;
+}
+
 
 template <typename ValueType>
 class Uniform

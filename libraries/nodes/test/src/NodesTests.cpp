@@ -256,7 +256,7 @@ static void TestUnaryOperationNodeCompute(nodes::UnaryOperationType op, double (
         for (size_t d = 0; d < inputValue.size(); ++d)
         {
             auto expectedOutput = expectedTransform(inputValue[d]);
-            testing::ProcessTest("Testing UnaryOperationNode compute for " + UnaryOperations::to_string(op),
+            testing::ProcessTest("Testing UnaryOperationNode compute for " + ell::nodes::operations::to_string(op),
                                  testing::IsEqual(outputVec[d], expectedOutput));
         }
     }
@@ -280,7 +280,7 @@ static void TestUnaryOperationNodeCompute(nodes::UnaryOperationType op, bool (*e
         for (size_t d = 0; d < inputValue.size(); ++d)
         {
             auto expectedOutput = expectedTransform(inputValue[d]);
-            testing::ProcessTest("Testing UnaryOperationNode compute for " + UnaryOperations::to_string(op),
+            testing::ProcessTest("Testing UnaryOperationNode compute for " + ell::nodes::operations::to_string(op),
                                  testing::IsEqual(outputVec[d], expectedOutput));
         }
     }
@@ -288,12 +288,16 @@ static void TestUnaryOperationNodeCompute(nodes::UnaryOperationType op, bool (*e
 
 static void TestUnaryOperationNodeCompute()
 {
-    TestUnaryOperationNodeCompute(nodes::UnaryOperationType::exp, std::exp);
-    TestUnaryOperationNodeCompute(nodes::UnaryOperationType::log, std::log);
-    TestUnaryOperationNodeCompute(nodes::UnaryOperationType::sqrt, std::sqrt);
-    TestUnaryOperationNodeCompute(nodes::UnaryOperationType::logicalNot, [](bool b) { return !b; });
-    TestUnaryOperationNodeCompute(nodes::UnaryOperationType::square, [](double d) { return d * d; });
-    TestUnaryOperationNodeCompute(nodes::UnaryOperationType::tanh, std::tanh);
+    TestUnaryOperationNodeCompute(UnaryOperationType::abs, std::abs);
+    TestUnaryOperationNodeCompute(UnaryOperationType::cos, std::cos);
+    TestUnaryOperationNodeCompute(UnaryOperationType::exp, std::exp);
+    TestUnaryOperationNodeCompute(UnaryOperationType::log, std::log);
+    TestUnaryOperationNodeCompute(UnaryOperationType::sqrt, std::sqrt);
+    TestUnaryOperationNodeCompute(UnaryOperationType::logicalNot, [](bool b) { return !b; });
+    TestUnaryOperationNodeCompute(UnaryOperationType::sin, std::sin);
+    TestUnaryOperationNodeCompute(UnaryOperationType::sqrt, std::sqrt);
+    TestUnaryOperationNodeCompute(UnaryOperationType::square, [](double d) { return d * d; });
+    TestUnaryOperationNodeCompute(UnaryOperationType::tanh, std::tanh);
 }
 
 static void TestBinaryOperationNodeCompute()

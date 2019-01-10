@@ -269,11 +269,22 @@ void TestCombineOutputMap()
 
     testing::ProcessTest("Testing TestCombineOutputMap IsValid", testing::IsEqual(compiledMap.IsValid(), true));
 
-    // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-    auto result = VerifyCompiledOutput<double, double>(map, compiledMap, signal, "TestCombineOutputMap");
+    std::vector<double> expected = { 5, 2, 1, 42, 48, 49 };
+    std::vector<double> result = VerifyCompiledOutput<double, double>(map, compiledMap, signal, "TestCombineOutputMap");
 
-    testing::ProcessTest("Testing TestCombineOutputMap accumulated result", testing::IsEqual(result, { 5, 2, 1, 42, 48, 49 }));
+    // compare final output
+    double epsilon = 1e-5;
+    bool ok = IsEqual(result, expected, epsilon);
+    if (IsVerbose() || !ok)
+    {
+        std::cout << "result versus expected: " << std::endl;
+        std::cout << "  result:   " << result << std::endl;
+        std::cout << "  expected: " << expected << std::endl;
+        std::cout << "  Largest difference: " << LargestDifference(result, expected) << std::endl;
+    }
+
+    testing::ProcessTest("TestCombineOutputMap matches expected result", ok);
 }
 
 void TestMultiOutputMap()

@@ -161,7 +161,7 @@ namespace nodes
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
 
         const auto& weights = AppendConstant(transformer, _predictor.GetWeights().ToArray());
-        const auto& scaledInput = AppendBinaryOperation(transformer, weights, newPortElements, nodes::BinaryOperationType::coordinatewiseMultiply);
+        const auto& scaledInput = AppendBinaryOperation(transformer, weights, newPortElements, nodes::BinaryOperationType::multiply);
         auto dotProductNode = transformer.AddNode<DotProductNode<ElementType>>(weights, newPortElements);
         const auto& bias = AppendConstant(transformer, _predictor.GetBias());
         const auto& sum = AppendBinaryOperation(transformer, dotProductNode->output, bias, nodes::BinaryOperationType::add);

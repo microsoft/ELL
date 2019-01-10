@@ -46,6 +46,8 @@ namespace value
     /// <summary> An enumeration of unary operations supported by the value library </summary>
     enum class ValueUnaryOperation
     {
+        ///<summary> Logical negation </summary>
+        LogicalNot,
     };
 
     /// <summary> An enumeration of binary operations supported by the value library </summary>

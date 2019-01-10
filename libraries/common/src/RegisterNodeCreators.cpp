@@ -56,9 +56,10 @@ namespace common
         builder.RegisterNodeCreator<nodes::AccumulatorNode<int>, const model::PortElements<int>&>();
         builder.RegisterNodeCreator<nodes::AccumulatorNode<double>, const model::PortElements<double>&>();
 
-        builder.RegisterNodeCreator<nodes::BinaryOperationNode<bool>, const model::PortElements<bool>&, const model::PortElements<bool>&, emitters::BinaryOperationType>();
-        builder.RegisterNodeCreator<nodes::BinaryOperationNode<int>, const model::PortElements<int>&, const model::PortElements<int>&, emitters::BinaryOperationType>();
-        builder.RegisterNodeCreator<nodes::BinaryOperationNode<double>, const model::PortElements<double>&, const model::PortElements<double>&, emitters::BinaryOperationType>();
+        builder.RegisterNodeCreator<nodes::BinaryOperationNode<bool>, const model::PortElements<bool>&, const model::PortElements<bool>&, nodes::BinaryOperationType>();
+        builder.RegisterNodeCreator<nodes::BinaryOperationNode<int>, const model::PortElements<int>&, const model::PortElements<int>&, nodes::BinaryOperationType>();
+        builder.RegisterNodeCreator<nodes::BinaryOperationNode<double>, const model::PortElements<double>&, const model::PortElements<double>&, nodes::BinaryOperationType>();
+        builder.RegisterNodeCreator<nodes::BinaryOperationNode<float>, const model::PortElements<float>&, const model::PortElements<float>&, nodes::BinaryOperationType>();
 
         builder.RegisterNodeCreator<nodes::BinaryPredicateNode<int>, const model::PortElements<int>&, const model::PortElements<int>&, emitters::BinaryPredicateType>();
         builder.RegisterNodeCreator<nodes::BinaryPredicateNode<double>, const model::PortElements<double>&, const model::PortElements<double>&, emitters::BinaryPredicateType>();
@@ -123,8 +124,8 @@ namespace common
         builder.RegisterNodeCreator<nodes::TypeCastNode<bool, int>, const model::PortElements<bool>&>();
         builder.RegisterNodeCreator<nodes::TypeCastNode<int, double>, const model::PortElements<int>&>();
 
-        builder.RegisterNodeCreator<nodes::UnaryOperationNode<bool>, const model::PortElements<bool>&, emitters::UnaryOperationType>();
-        builder.RegisterNodeCreator<nodes::UnaryOperationNode<double>, const model::PortElements<double>&, emitters::UnaryOperationType>();
+        builder.RegisterNodeCreator<nodes::UnaryOperationNode<bool>, const model::PortElements<bool>&, nodes::UnaryOperationType>();
+        builder.RegisterNodeCreator<nodes::UnaryOperationNode<double>, const model::PortElements<double>&, nodes::UnaryOperationType>();
 
         builder.RegisterNodeCreator<nodes::ValueSelectorNode<bool>, const model::PortElements<bool>&, const model::PortElements<bool>&, const model::PortElements<bool>&>();
         builder.RegisterNodeCreator<nodes::ValueSelectorNode<int>, const model::PortElements<bool>&, const model::PortElements<int>&, const model::PortElements<int>&>();

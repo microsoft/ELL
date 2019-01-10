@@ -47,13 +47,17 @@ def get_ell_port_memory_layout(shape: tuple, order: str, padding: int = 0):
         channels = shape[0]
         rows = shape[1]
         columns = shape[2]
+    elif order == "row_column":
+        # just flatten it for now
+        channels = shape[0] * shape[1]
+        rows = 1
+        columns = 1
     elif order == "channel":
         channels = shape[0]
         rows = 1
         columns = 1
     else:
-        raise NotImplementedError(
-            "Unsupported input shape order: {}".format(order))
+        raise NotImplementedError("Unsupported input shape order: {}".format(order))
     
     return ell.model.PortMemoryLayout([rows, columns, channels], [padding, padding, 0])
 

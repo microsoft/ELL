@@ -1,53 +1,26 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     CompiledActivationFunctions.cpp (nodes)
+//  File:     ActivationFunctions.cpp (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "CompiledActivationFunctions.h"
+#include "ActivationFunctions.h"
+#include "UnaryOperationNode.h"
 
 #include <predictors/neural/include/Activation.h>
 
 #include <emitters/include/IRLocalValue.h>
+#include <emitters/include/IRMath.h>
+
+#include <value/include/Emittable.h>
+
 
 namespace ell
 {
 namespace nodes
 {
-    //
-    // Helper functions to convert predictors::neural activation functions into compilable node activation functions
-    //
-    template <typename ValueType>
-    std::unique_ptr<ActivationFunction<ValueType>> GetNodeActivationFunction(const predictors::neural::Activation<ValueType>& f)
-    {
-        const predictors::neural::ActivationImpl<ValueType>* ptr = f.GetImpl();
-
-        auto hardSigmoid = dynamic_cast<const predictors::neural::HardSigmoidActivation<ValueType>*>(ptr);
-        if (hardSigmoid) return std::make_unique<HardSigmoidActivationFunction<ValueType>>();
-
-        auto leakyReLU = dynamic_cast<const predictors::neural::LeakyReLUActivation<ValueType>*>(ptr);
-        if (leakyReLU) return std::make_unique<LeakyReLUActivationFunction<ValueType>>(leakyReLU->GetLeakyFactor());
-
-        auto sigmoid = dynamic_cast<const predictors::neural::SigmoidActivation<ValueType>*>(ptr);
-        if (sigmoid) return std::make_unique<SigmoidActivationFunction<ValueType>>();
-
-        auto relu = dynamic_cast<const predictors::neural::ReLUActivation<ValueType>*>(ptr);
-        if (relu) return std::make_unique<ReLUActivationFunction<ValueType>>();
-
-        auto tanh = dynamic_cast<const predictors::neural::TanhActivation<ValueType>*>(ptr);
-        if (tanh) return std::make_unique<TanhActivationFunction<ValueType>>();
-
-        auto prelu = dynamic_cast<const predictors::neural::ParametricReLUActivation<ValueType>*>(ptr);
-        if (prelu)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "GetNodeActivationFunction cannot be used on ParametricReLUActivations");
-        }
-
-        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                                        std::string("GetNodeActivationFunction given a new Activation type it doesn't recognize: ") + typeid(*f.GetImpl()).name());
-    }
 
     //
     // Hard sigmoid activation function
@@ -59,27 +32,32 @@ namespace nodes
         //   = scale * (clip x to [a, b]) + bias, where scale*a+bias = 0, scale*b+bias = 1; so, a = -bias/scale, b = (1-bias)/scale
         constexpr auto scale = static_cast<ValueType>(0.2);
         constexpr auto bias = static_cast<ValueType>(0.5);
-        constexpr auto lowBound = -bias / scale;
-        constexpr auto highBound = (1 - bias) / scale;
+        auto lowBound = -bias / scale;
+        auto highBound = (1 - bias) / scale;
         return x < lowBound ? 0 : x > highBound ? 1 : (scale * x) + bias;
     }
 
     template <typename ValueType>
     emitters::LLVMValue HardSigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue xValue) const
     {
+        emitters::IRLocalScalar x{ function,xValue };
+        return Compile(x).value;
+    }
+
+    template <typename ValueType>
+    emitters::IRLocalScalar HardSigmoidActivationFunction<ValueType>::Compile(emitters::IRLocalScalar x) const
+    {
         // y = clip (scale*x + bias) to [0,1]
         //   = scale * (clip x to [a, b]) + bias, where scale*a+bias = 0, scale*b+bias = 1; so, a = -bias/scale, b = (1-bias)/scale
-        auto x = function.LocalScalar(xValue);
+        auto function = x.function;
         const auto zero = function.Literal(ValueType{ 0 });
-        const auto one = function.Literal(static_cast<ValueType>(1));
+        const auto one = emitters::IRLocalScalar(function, function.Literal(static_cast<ValueType>(1)));
         constexpr auto scale = static_cast<ValueType>(0.2);
         constexpr auto bias = static_cast<ValueType>(0.5);
-        constexpr auto lowBound = -bias / scale;
-        constexpr auto highBound = (1 - bias) / scale;
-
+        auto lowBound = -bias / scale;
+        auto highBound = (one - bias) / scale;
         auto result = function.Select(x <= lowBound, zero, function.Select(x >= highBound, one, (scale * x) + bias));
-
-        return result;
+        return { function, result };
     }
 
     //
@@ -139,8 +117,21 @@ namespace nodes
     template <typename ValueType>
     emitters::LLVMValue SigmoidActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue xValue) const
     {
-        auto x = function.LocalScalar(xValue);
-        return emitters::Sigmoid<ValueType>(x);
+        emitters::IRLocalScalar x{ function,xValue };
+        return Compile(x).value;
+    }
+
+    template <typename ValueType>
+    emitters::IRLocalScalar SigmoidActivationFunction<ValueType>::Compile(emitters::IRLocalScalar x) const
+    {
+        auto function = x.function;
+        const auto zero = emitters::IRLocalScalar(function, function.Literal(ValueType{ 0.0 }));
+        const auto one = emitters::IRLocalScalar(function, function.Literal(static_cast<ValueType>(1.0)));
+        auto a = one / (emitters::Exp(x * -one) + one);
+        auto b = emitters::Exp(x);
+        auto c = b / (b + one);
+        auto result = function.Select(x >= zero, a, c);
+        return { function, result };
     }
 
     //
@@ -189,9 +180,6 @@ namespace nodes
     template class SigmoidActivationFunction<double>;
     template class TanhActivationFunction<float>;
     template class TanhActivationFunction<double>;
-
-    template std::unique_ptr<ActivationFunction<float>> GetNodeActivationFunction<float>(const predictors::neural::Activation<float>& f);
-    template std::unique_ptr<ActivationFunction<double>> GetNodeActivationFunction<double>(const predictors::neural::Activation<double>& f);
 
 } // namespace nodes
 } // namespace ell

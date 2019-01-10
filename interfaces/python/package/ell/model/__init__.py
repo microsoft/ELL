@@ -15,3 +15,20 @@ from ..ell_py import \
     ModelOptimizerOptions,\
     PortMemoryLayout
 
+
+# Provide correct behavior of != and == on PortMemoryLayouts.
+PortMemoryLayout.__eq__ = PortMemoryLayout.IsEqual 
+
+def PortMemoryLayoutNotEqual(a,b):
+    return not a.IsEqual(b)
+
+PortMemoryLayout.__ne__ = PortMemoryLayoutNotEqual 
+
+del PortMemoryLayoutNotEqual
+
+def PortMemoryLayoutToString(m):
+    return "size: {}, padding: {}, offset: {}, order: {}".format(list(m.size), list(m.padding), list(m.offset), list(m.order))
+
+PortMemoryLayout.ToString = PortMemoryLayoutToString
+
+del PortMemoryLayoutToString

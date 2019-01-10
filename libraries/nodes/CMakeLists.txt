@@ -5,12 +5,12 @@
 set(library_name nodes)
 
 set(src
+    src/ActivationFunctions.cpp
     src/ActivationLayerNode.cpp
     src/BatchNormalizationLayerNode.cpp
     src/BiasLayerNode.cpp
     src/BinaryConvolutionalLayerNode.cpp
     src/ClockNode.cpp
-    src/CompiledActivationFunctions.cpp
     src/ConstantNode.cpp
     src/ConvolutionalLayerNode.cpp
     src/DCTNode.cpp
@@ -33,6 +33,7 @@ set(src
     src/SimpleConvolutionNode.cpp
     src/SingleElementThresholdNode.cpp
     src/SoftmaxLayerNode.cpp
+    src/UnaryOperationNode.cpp
     src/UnrolledConvolutionNode.cpp
     src/VoiceActivityDetectorNode.cpp
     src/WinogradConvolutionNode.cpp
@@ -40,6 +41,7 @@ set(src
 
 set(include
     include/AccumulatorNode.h
+    include/ActivationFunctions.h
     include/ActivationLayerNode.h
     include/BatchNormalizationLayerNode.h
     include/BiasLayerNode.h
@@ -51,7 +53,6 @@ set(include
     include/BufferNode.h
     include/ClockNode.h
     include/ConcatenationNode.h
-    include/CompiledActivationFunctions.h
     include/ConstantNode.h
     include/ConvolutionalLayerNode.h
     include/DCTNode.h
@@ -86,6 +87,7 @@ set(include
     include/ReceptiveFieldMatrixNode.h
     include/RNNNode.h
     include/RegionDetectionLayerNode.h
+    include/ReinterpretLayoutNode.h
     include/ReorderDataNode.h
     include/ScalingLayerNode.h
     include/SimpleConvolutionNode.h
@@ -149,6 +151,7 @@ set(test_include
     test/include/AppendNodesTests.h
     test/include/NodesTests.h
     test/include/NodesTestData.h
+    test/include/NodesTestUtilities.h
 )
 
 source_group("src" FILES ${test_src})
@@ -169,6 +172,7 @@ target_link_libraries(${test_name}
     common
     data
     model
+    model_testing
     nodes
     testing
     utilities
@@ -243,6 +247,7 @@ set(test_src
 set(test_include
     test/include/NeuralNetworkLayerNodesTests.h
     test/include/NodesTestData.h
+    test/include/NodesTestUtilities.h
 )
 
 source_group("src" FILES ${test_src})

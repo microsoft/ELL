@@ -27,6 +27,7 @@ set (src
     src/IRLocalScalar.cpp
     src/IRLocalValue.cpp
     src/IRLoopEmitter.cpp
+    src/IRMath.cpp
     src/IRMetadata.cpp
     src/IRModuleEmitter.cpp
     src/IROptimizer.cpp
@@ -65,6 +66,7 @@ set (include
     include/IRLocalScalar.h
     include/IRLocalValue.h
     include/IRLoopEmitter.h
+    include/IRMath.h
     include/IRMetadata.h
     include/IRModuleEmitter.h
     include/IROptimizer.h
@@ -137,7 +139,7 @@ set (test_include
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
-add_executable(${test_name} ${test_src} ${test_include} ${include})
+add_executable(${test_name} ${test_src} ${test_include})
 target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${test_name} testing utilities emitters)
 copy_shared_libraries(${test_name})

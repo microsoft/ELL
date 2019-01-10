@@ -33,6 +33,8 @@ void TestIR()
     TestLogicalAnd();
     TestLogicalOr();
     TestLogicalNot();
+    TestBinaryOperations();
+    TestBinaryLogicalOperations();
     TestForLoop();
     TestWhileLoopWithVariableCondition();
     TestWhileLoopWithFunctionCondition();

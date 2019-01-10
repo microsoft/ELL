@@ -8,9 +8,11 @@
 
 #include "RegionDetectionLayerNode.h"
 #include "ActivationLayerNode.h"
-#include "CompiledActivationFunctions.h"
+#include "ActivationFunctions.h"
 
-#include <predictors/neural/include/SigmoidActivation.h>
+#include <emitters/include/IRMath.h>
+
+#include "ActivationFunctions.h"
 
 namespace ell
 {
@@ -113,7 +115,9 @@ namespace nodes
                         output({ i, j, boxOffset + anchorIndex }) = input({ i, j, boxOffset + anchorIndex });
                     }
 
-                    output({ i, j, confidenceOffset }) = emitters::Sigmoid<ValueType>(input({ i, j, confidenceOffset }));
+                    SigmoidActivationFunction<ValueType> sigmoid;
+                    emitters::IRLocalScalar e = input({ i, j, confidenceOffset });
+                    output({ i, j, confidenceOffset }) = sigmoid.Compile(fn, e);
 
                     // output[classProbabilityOffset : classProbabilityOffset + numClasses] = softmax(input[classProbabilityOffset : classProbabilityOffset + numClasses])
                     if (params.applySoftmax)

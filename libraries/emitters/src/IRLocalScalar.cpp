@@ -60,7 +60,7 @@ namespace emitters
         VerifyArgTypesCompatible(*this, rhs);
 
         auto type = this->value->getType();
-        auto op = GetOperator(type, emitters::BinaryOperationType::add);
+        auto op = GetOperator(type, emitters::BinaryOperatorType::add);
 
         value = function.Operator(op, value, rhs);
 
@@ -72,7 +72,7 @@ namespace emitters
         VerifyArgTypesCompatible(*this, rhs);
 
         auto type = this->value->getType();
-        auto op = GetOperator(type, emitters::BinaryOperationType::subtract);
+        auto op = GetOperator(type, emitters::BinaryOperatorType::subtract);
 
         value = function.Operator(op, value, rhs);
 
@@ -84,7 +84,7 @@ namespace emitters
         VerifyArgTypesCompatible(*this, rhs);
 
         auto type = this->value->getType();
-        auto op = GetOperator(type, emitters::BinaryOperationType::coordinatewiseMultiply);
+        auto op = GetOperator(type, emitters::BinaryOperatorType::multiply);
 
         value = function.Operator(op, value, rhs);
 
@@ -96,7 +96,7 @@ namespace emitters
         VerifyArgTypesCompatible(*this, rhs);
 
         auto type = this->value->getType();
-        auto op = GetOperator(type, emitters::BinaryOperationType::coordinatewiseDivide);
+        auto op = GetOperator(type, emitters::BinaryOperatorType::divide);
 
         value = function.Operator(op, value, rhs);
 
@@ -190,7 +190,7 @@ namespace emitters
     {
         auto type = a.value->getType();
         auto zero = a.function.GetEmitter().Zero(type);
-        auto op = GetOperator(type, emitters::BinaryOperationType::subtract);
+        auto op = GetOperator(type, emitters::BinaryOperatorType::subtract);
         return { a.function, a.function.Operator(op, zero, a) };
     }
 
@@ -400,57 +400,5 @@ namespace emitters
         return a >= IRLocalScalar(a.function, b);
     }
 
-    //
-    // Math functions
-    //
-    IRLocalScalar Abs(IRLocalScalar a)
-    {
-        auto f = a.function.GetModule().GetRuntime().GetAbsFunction((a.value)->getType());
-        return { a.function, a.function.Call(f, { a }) };
-    }
-
-    IRLocalScalar Sqrt(IRLocalScalar a)
-    {
-        auto f = a.function.GetModule().GetRuntime().GetSqrtFunction((a.value)->getType());
-        return { a.function, a.function.Call(f, { a }) };
-    }
-
-    IRLocalScalar Exp(IRLocalScalar a)
-    {
-        auto f = a.function.GetModule().GetRuntime().GetExpFunction((a.value)->getType());
-        return { a.function, a.function.Call(f, { a }) };
-    }
-
-    IRLocalScalar Log(IRLocalScalar a)
-    {
-        auto f = a.function.GetModule().GetRuntime().GetLogFunction((a.value)->getType());
-        return { a.function, a.function.Call(f, { a }) };
-    }
-
-    IRLocalScalar Sin(IRLocalScalar a)
-    {
-        auto f = a.function.GetModule().GetRuntime().GetSinFunction((a.value)->getType());
-        return { a.function, a.function.Call(f, { a }) };
-    }
-
-    IRLocalScalar Cos(IRLocalScalar a)
-    {
-        auto f = a.function.GetModule().GetRuntime().GetCosFunction((a.value)->getType());
-        return { a.function, a.function.Call(f, { a }) };
-    }
-
-    IRLocalScalar Min(IRLocalScalar a, IRLocalScalar b)
-    {
-        VerifyArgTypesCompatible(a, b);
-        LLVMValue result = a.function.Select(a < b, a, b);
-        return { a.function, result };
-    }
-
-    IRLocalScalar Max(IRLocalScalar a, IRLocalScalar b)
-    {
-        VerifyArgTypesCompatible(a, b);
-        LLVMValue result = a.function.Select(a >= b, a, b);
-        return { a.function, result };
-    }
 } // namespace emitters
 } // namespace ell

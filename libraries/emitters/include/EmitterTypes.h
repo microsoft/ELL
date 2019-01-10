@@ -63,27 +63,20 @@ namespace emitters
     };
 
     /// <summary> Untyped unary operations. </summary>
-    enum class UnaryOperationType
+    enum class UnaryOperatorType
     {
         none,
-        exp, // real only
-        log, // real only
-        sqrt, // real only
         logicalNot, // bool only
-        tanh, // real only
-        square, // real only
-        sin, // real only
-        cos, // real only
     };
 
     /// <summary> Untyped binary operations. </summary>
-    enum class BinaryOperationType
+    enum class BinaryOperatorType
     {
         none,
         add,
         subtract,
-        coordinatewiseMultiply, // coordinatewise multiplication
-        coordinatewiseDivide, // coordinatewise division
+        multiply,
+        divide,
         logicalAnd,
         logicalOr,
         logicalXor,
@@ -177,7 +170,7 @@ namespace emitters
     ///
     /// <returns> The typed version of the operation for the given type. </param>
     template <typename T>
-    TypedOperator GetOperator(emitters::UnaryOperationType operation);
+    TypedOperator GetOperator(emitters::UnaryOperatorType operation);
 
     /// <summary> Translate the binary operation operator into a strongly typed operator for LLVM </summary>
     ///
@@ -186,21 +179,28 @@ namespace emitters
     ///
     /// <returns> The typed version of the operation for the given type. </param>
     template <typename T>
-    TypedOperator GetOperator(emitters::BinaryOperationType operation);
+    TypedOperator GetOperator(emitters::BinaryOperatorType operation);
 
     /// <summary> Translate the binary operation operator into a strongly typed operator for LLVM </summary>
     ///
     /// <param name="operation"> The (untyped) binary operation. </param>
     ///
     /// <returns> The typed version of the operation for floating-point types. </param>
-    TypedOperator GetFloatOperator(emitters::BinaryOperationType operation);
+    TypedOperator GetFloatOperator(emitters::BinaryOperatorType operation);
 
     /// <summary> Translate the binary operation operator into a strongly typed operator for LLVM </summary>
     ///
     /// <param name="operation"> The (untyped) binary operation. </param>
     ///
     /// <returns> The typed version of the operation for integral types. </param>
-    TypedOperator GetIntegerOperator(emitters::BinaryOperationType operation);
+    TypedOperator GetIntegerOperator(emitters::BinaryOperatorType operation);
+
+    /// <summary> Translate the boolean binary operation operator into a strongly typed operator for LLVM </summary>
+    ///
+    /// <param name="operation"> The (untyped) binary operation. </param>
+    ///
+    /// <returns> The typed version of the boolean operation for boolean types. </param>
+    TypedOperator GetBooleanOperator(emitters::BinaryOperatorType operation);
 
     /// <summary> Translate the binary predicate operator into a more strongly typed operator for LLVM </summary>
     ///

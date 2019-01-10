@@ -21,7 +21,7 @@
 #include <nodes/include/BroadcastFunctionNode.h>
 #include <nodes/include/BufferNode.h>
 #include <nodes/include/ClockNode.h>
-#include <nodes/include/CompiledActivationFunctions.h>
+#include <nodes/include/ActivationFunctions.h>
 #include <nodes/include/ConcatenationNode.h>
 #include <nodes/include/DCTNode.h>
 #include <nodes/include/DTWDistanceNode.h>
@@ -39,6 +39,7 @@
 #include <nodes/include/LSTMNode.h>
 #include <nodes/include/LinearPredictorNode.h>
 #include <nodes/include/MatrixMatrixMultiplyNode.h>
+#include <nodes/include/MatrixVectorMultiplyNode.h>
 #include <nodes/include/MatrixVectorProductNode.h>
 #include <nodes/include/MovingAverageNode.h>
 #include <nodes/include/MovingVarianceNode.h>
@@ -47,6 +48,7 @@
 #include <nodes/include/ProtoNNPredictorNode.h>
 #include <nodes/include/RNNNode.h>
 #include <nodes/include/ReceptiveFieldMatrixNode.h>
+#include <nodes/include/ReinterpretLayoutNode.h>
 #include <nodes/include/ReorderDataNode.h>
 #include <nodes/include/SimpleConvolutionNode.h>
 #include <nodes/include/SinkNode.h>
@@ -118,11 +120,13 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::rowMajor>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::columnMajor>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixMatrixMultiplyNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorMultiplyNode<ElementType>>();        
         context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ReceptiveFieldMatrixNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ReinterpretLayoutNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::RNNNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<ElementType>>();
@@ -235,7 +239,16 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<float, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<double, bool>>();
 
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<bool, int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<int, int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<int64_t, int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<float, int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<double, int>>();
+
         context.GetTypeFactory().AddType<model::Node, nodes::ProtoNNPredictorNode>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::ReinterpretLayoutNode<int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ReinterpretLayoutNode<bool>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestPredictorNode>();
 

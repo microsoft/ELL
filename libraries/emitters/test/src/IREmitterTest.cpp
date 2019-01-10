@@ -20,6 +20,7 @@
 #include <testing/include/testing.h>
 
 #include <utilities/include/Unused.h>
+#include <utilities/include/StringUtil.h>
 
 #include <llvm/IR/TypeBuilder.h>
 
@@ -442,12 +443,125 @@ void TestLogicalNot()
     testing::ProcessTest("Testing logical NOT", success);
 }
 
+template<typename ValueType>
+void TestBinaryNumericOperations()
+{
+    std::string functionName = utilities::FormatString("BinaryOperations_%s", typeid(ValueType).name());
+    // (((1 + 5) - 3) * 2) / 3 = 2
+    ValueType input = 1;
+    ValueType expectedResult = 2;
+    ValueType inputs[] = { 5, 3, 2, 3 };
+    BinaryOperatorType ops[] = { BinaryOperatorType::add, BinaryOperatorType::subtract, BinaryOperatorType::multiply, BinaryOperatorType::divide };
+
+    auto module = MakeHostModuleEmitter("module_" + functionName);
+    {
+        auto varType = emitters::GetVariableType<ValueType>();
+        auto fn = module.BeginFunction(functionName, varType, NamedVariableTypeList{ { "input", emitters::GetVariableType<ValueType>() } });
+
+        auto arguments = fn.Arguments().begin();
+        auto x = &(*arguments++);
+        auto result = fn.Variable(varType);
+        fn.Store(result, x);
+
+        for (int i = 0, n = sizeof(inputs) / sizeof(ValueType); i < n; i++)
+        {
+            auto op = GetOperator<ValueType>(ops[i]);
+            fn.Store(result, fn.Operator(op, fn.Load(result), fn.template Literal<ValueType>(inputs[i])));
+        }
+
+        fn.Return(fn.Load(result));
+        module.EndFunction();
+        fn.Verify();
+    }
+
+    IRExecutionEngine jit(std::move(module));
+    auto jittedFunction = jit.GetFunction<ValueType(ValueType)>(functionName);
+    ValueType result = jittedFunction(input);
+    auto prompt = "Testing " + functionName;
+    testing::ProcessTest(prompt, result == expectedResult);
+}
+
+void TestBinaryOperations()
+{
+    TestBinaryNumericOperations<int>();
+    TestBinaryNumericOperations<float>();
+    TestBinaryNumericOperations<double>();
+}
+
+void AddLogicalOperator(emitters::IRModuleEmitter& module, std::string name, emitters::BinaryOperatorType op)
+{
+    auto varType = emitters::GetVariableType<bool>();
+    auto fn = module.BeginFunction(name, varType, NamedVariableTypeList{ { "a", emitters::GetVariableType<bool>() }, { "b", emitters::GetVariableType<bool>() } });
+    auto arguments = fn.Arguments().begin();
+    auto a = &(*arguments++);
+    auto b = &(*arguments++);
+    auto result = fn.Variable(varType);
+    fn.Store(result, fn.Operator(GetOperator<bool>(op), a, b));
+    fn.Return(fn.Load(result));
+    module.EndFunction();
+    fn.Verify();
+}
+
+void TestBinaryLogicalOperations()
+{
+    std::string functionName = "BinaryLogicalOperations";
+
+    bool input1[] = { false, false, true, true };
+    bool input2[] = { false, true, false, true };
+
+    bool andTable[] = { false, false, false, true };
+    bool orTable[] = { false, true, true, true };
+    bool xorTable[] = { false, true, true, false };
+
+    auto module = MakeHostModuleEmitter("module_" + functionName);
+    AddLogicalOperator(module, "LogicalOr", emitters::BinaryOperatorType::logicalOr);
+    AddLogicalOperator(module, "LogicalAnd", emitters::BinaryOperatorType::logicalAnd);
+    AddLogicalOperator(module, "LogicalXor", emitters::BinaryOperatorType::logicalXor);
+
+    IRExecutionEngine jit(std::move(module));
+    auto jittedOr = jit.GetFunction<bool(bool,bool)>("LogicalOr");
+    auto jittedAnd = jit.GetFunction<bool(bool, bool)>("LogicalAnd");
+    auto jittedXor = jit.GetFunction<bool(bool, bool)>("LogicalXor");
+
+    int errors = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        bool a = input1[i];
+        bool b = input2[i];
+        bool r = jittedOr(a, b);
+        bool e = orTable[i];
+        if (r != e)
+        {
+            std::cout << "Logical Or failed with inputs " << a << "," << b << ", we got " << r << " but expected " << e << std::endl;
+            errors++;
+        }
+
+        r = jittedAnd(a, b);
+        e = andTable[i];
+        if (r != e)
+        {
+            std::cout << "Logical And failed with inputs " << a << "," << b << ", we got " << r << " but expected " << e << std::endl;
+            errors++;
+        }
+
+        r = jittedXor(a, b);
+        e = xorTable[i];
+        if (r != e)
+        {
+            std::cout << "Logical Xor failed with inputs " << a << "," << b << ", we got " << r << " but expected " << e << std::endl;
+            errors++;
+        }
+    }
+
+    testing::ProcessTest("Testing Logical Operations", errors == 0);
+}
+
 void TestForLoop()
 {
     auto module = MakeHostModuleEmitter("ForLoop");
     const int numIter = 10;
 
-    auto add = GetOperator<int32_t>(BinaryOperationType::add);
+    auto add = GetOperator<int32_t>(BinaryOperatorType::add);
     auto varType = VariableType::Int32;
 
     auto fn = module.BeginFunction("TestForLoop", varType, NamedVariableTypeList{});

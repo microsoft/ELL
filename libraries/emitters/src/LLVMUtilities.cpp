@@ -10,6 +10,7 @@
 #include "EmitterException.h"
 
 #include <llvm/IR/Type.h>
+#include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Value.h>
 
 namespace ell
@@ -30,9 +31,13 @@ namespace emitters
         return result;
     }
 
-    emitters::TypedOperator GetOperator(LLVMType type, BinaryOperationType operation)
+    emitters::TypedOperator GetOperator(LLVMType type, BinaryOperatorType operation)
     {
-        if (type->isIntegerTy())
+        if (type->isIntegerTy() && type->getIntegerBitWidth() == 1)
+        {
+            return GetBooleanOperator(operation);
+        }
+        else if (type->isIntegerTy())
         {
             return GetIntegerOperator(operation);
         }

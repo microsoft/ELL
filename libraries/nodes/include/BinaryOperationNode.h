@@ -31,8 +31,19 @@
 namespace ell
 {
 namespace nodes
-{
-    using BinaryOperationType = emitters::BinaryOperationType;
+    {
+    /// <summary> Binary operations supported by BinaryOperationNode. </summary>
+    enum class BinaryOperationType
+    {
+        none,
+        add,
+        subtract,
+        multiply,
+        divide,
+        logicalAnd,
+        logicalOr,
+        logicalXor
+    };
 
     /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs. </summary>
     template <typename ValueType>
@@ -192,8 +203,8 @@ namespace nodes
                 ADD_TO_STRING_ENTRY(BinaryOperationType, none);
                 ADD_TO_STRING_ENTRY(BinaryOperationType, add);
                 ADD_TO_STRING_ENTRY(BinaryOperationType, subtract);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, coordinatewiseMultiply);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, coordinatewiseDivide);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, multiply);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, divide);
                 ADD_TO_STRING_ENTRY(BinaryOperationType, logicalAnd);
                 ADD_TO_STRING_ENTRY(BinaryOperationType, logicalOr);
                 ADD_TO_STRING_ENTRY(BinaryOperationType, logicalXor);
@@ -208,8 +219,8 @@ namespace nodes
             ADD_FROM_STRING_ENTRY(BinaryOperationType, none);
             ADD_FROM_STRING_ENTRY(BinaryOperationType, add);
             ADD_FROM_STRING_ENTRY(BinaryOperationType, subtract);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, coordinatewiseMultiply);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, coordinatewiseDivide);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, multiply);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, divide);
             ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalAnd);
             ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalOr);
             ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalXor);
@@ -404,10 +415,10 @@ namespace nodes
         case BinaryOperationType::subtract:
             output = ComputeOutput(BinaryOperations::Subtract<ValueType>);
             break;
-        case BinaryOperationType::coordinatewiseMultiply:
+        case BinaryOperationType::multiply:
             output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
             break;
-        case BinaryOperationType::coordinatewiseDivide:
+        case BinaryOperationType::divide:
             output = ComputeOutput(BinaryOperations::Divide<ValueType>);
             break;
         case BinaryOperationType::logicalAnd:
@@ -471,7 +482,7 @@ namespace nodes
         emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
         auto count = input1.Size();
-        function.VectorOperator(emitters::GetOperator<ValueType>(GetOperation()), count, pInput1, pInput2, [&pResult, &function](emitters::LLVMValue i, emitters::LLVMValue pValue) {
+        function.VectorOperator(emitters::GetOperator<ValueType>(static_cast<emitters::BinaryOperatorType>(GetOperation())), count, pInput1, pInput2, [&pResult, &function](emitters::LLVMValue i, emitters::LLVMValue pValue) {
             function.SetValueAt(pResult, i, pValue);
         });
     }
@@ -486,7 +497,7 @@ namespace nodes
         {
             emitters::LLVMValue inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
             emitters::LLVMValue inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
-            emitters::LLVMValue pOpResult = function.Operator(emitters::GetOperator<ValueType>(GetOperation()), inputValue1, inputValue2);
+            emitters::LLVMValue pOpResult = function.Operator(emitters::GetOperator<ValueType>(static_cast<emitters::BinaryOperatorType>(GetOperation())), inputValue1, inputValue2);
             function.SetValueAt(pResult, function.Literal<int>(i), pOpResult);
         }
     }
@@ -627,7 +638,7 @@ namespace nodes
                 // We're in the innermost loop --- compute the value
                 auto value1 = function.ValueAt(input1, thisInput1DimensionOffset);
                 auto value2 = function.ValueAt(input2, thisInput2DimensionOffset);
-                auto outputValue = function.Operator(emitters::GetOperator<ValueType>(GetOperation()), value1, value2);
+                auto outputValue = function.Operator(emitters::GetOperator<ValueType>(static_cast<emitters::BinaryOperatorType>(GetOperation())), value1, value2);
                 function.SetValueAt(output, thisOutputDimensionOffset, outputValue);
             }
         });

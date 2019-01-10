@@ -9,12 +9,15 @@
 #include "ActivationLayerNode.h"
 #include "BinaryFunctionNode.h"
 #include "BroadcastFunctionNode.h"
-#include "CompiledActivationFunctions.h"
+#include "ActivationFunctions.h"
 #include "ConstantNode.h"
 
 #include <predictors/neural/include/LeakyReLUActivation.h>
+#include <predictors/neural/include/ParametricReLUActivation.h>
 #include <predictors/neural/include/ReLUActivation.h>
 #include <predictors/neural/include/SigmoidActivation.h>
+#include <predictors/neural/include/HardSigmoidActivation.h>
+#include <predictors/neural/include/TanhActivation.h>
 
 namespace ell
 {

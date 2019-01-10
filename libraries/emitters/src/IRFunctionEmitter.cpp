@@ -354,9 +354,9 @@ namespace emitters
         return _pEmitter->Return(value);
     }
 
-    LLVMValue IRFunctionEmitter::Operator(UnaryOperationType type, LLVMValue value)
+    LLVMValue IRFunctionEmitter::Operator(UnaryOperatorType type, LLVMValue value)
     {
-        return _pEmitter->UnaryOperation(type, value);
+        return _pEmitter->UnaryOperator(type, value);
     }
 
     LLVMValue IRFunctionEmitter::Operator(TypedOperator type, LLVMValue pLeftValue, LLVMValue pRightValue)

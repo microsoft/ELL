@@ -7,7 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "RNNNode.h"
-#include "CompiledActivationFunctions.h"
+#include "ActivationFunctions.h"
+
+#include <emitters/include/IRMath.h>
 
 #include <math/include/MatrixOperations.h>
 

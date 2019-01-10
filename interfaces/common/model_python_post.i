@@ -31,52 +31,51 @@ del PortType_smallReal
 # Python friendly class for UnaryOperationType
 class UnaryOperationType:
     none = UnaryOperationType_none
-    exp = UnaryOperationType_exp
-    log = UnaryOperationType_log
-    sqrt = UnaryOperationType_sqrt
-    logicalNot = UnaryOperationType_logicalNot
-    tanh = UnaryOperationType_tanh
-    square = UnaryOperationType_square
-    sin = UnaryOperationType_sin
+    abs =  UnaryOperationType_abs
     cos = UnaryOperationType_cos
+    exp = UnaryOperationType_exp
+    hardSigmoid = UnaryOperationType_hardSigmoid
+    log = UnaryOperationType_log
+    logicalNot = UnaryOperationType_logicalNot
+    sigmoid = UnaryOperationType_sigmoid
+    sin = UnaryOperationType_sin
+    sqrt = UnaryOperationType_sqrt
+    square = UnaryOperationType_square
+    tanh = UnaryOperationType_tanh
 
 # Remove flat defines so callers only see the class above
 del UnaryOperationType_none
-del UnaryOperationType_exp
-del UnaryOperationType_log
-del UnaryOperationType_sqrt
-del UnaryOperationType_logicalNot
-del UnaryOperationType_tanh
-del UnaryOperationType_square
-del UnaryOperationType_sin
+del UnaryOperationType_abs
 del UnaryOperationType_cos
+del UnaryOperationType_exp
+del UnaryOperationType_hardSigmoid
+del UnaryOperationType_log
+del UnaryOperationType_logicalNot
+del UnaryOperationType_sigmoid
+del UnaryOperationType_sin
+del UnaryOperationType_sqrt
+del UnaryOperationType_square
+del UnaryOperationType_tanh
 
-
-# Python friendly class for BinaryOperationType
+# Python friendly class for BinaryOperationType enum
 class BinaryOperationType:
     none = BinaryOperationType_none
     add = BinaryOperationType_add
     subtract = BinaryOperationType_subtract
-    coordinatewiseMultiply = BinaryOperationType_coordinatewiseMultiply
-    coordinatewiseDivide = BinaryOperationType_coordinatewiseDivide
+    multiply = BinaryOperationType_multiply
+    divide = BinaryOperationType_divide
     logicalAnd = BinaryOperationType_logicalAnd
     logicalOr = BinaryOperationType_logicalOr
     logicalXor = BinaryOperationType_logicalXor
-    shiftLeft = BinaryOperationType_shiftLeft
-    logicalShiftRight = BinaryOperationType_logicalShiftRight
-    arithmeticShiftRight = BinaryOperationType_arithmeticShiftRight
 
 del BinaryOperationType_none
 del BinaryOperationType_add
 del BinaryOperationType_subtract
-del BinaryOperationType_coordinatewiseMultiply
-del BinaryOperationType_coordinatewiseDivide
+del BinaryOperationType_multiply
+del BinaryOperationType_divide
 del BinaryOperationType_logicalAnd
 del BinaryOperationType_logicalOr
 del BinaryOperationType_logicalXor
-del BinaryOperationType_shiftLeft
-del BinaryOperationType_logicalShiftRight
-del BinaryOperationType_arithmeticShiftRight
     
 import numpy as np
 

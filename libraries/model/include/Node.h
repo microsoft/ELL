@@ -157,7 +157,7 @@ namespace model
         static std::string GetTypeName() { return "Node"; }
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
-        virtual bool IsCompilable(const MapCompiler* compiler) const { return false; }
+        virtual bool IsCompilable(const MapCompiler* compiler) const { UNUSED(compiler); return false; }
 
         /// <summary> Print a human-readable representation of the Node. </summary>
         ///

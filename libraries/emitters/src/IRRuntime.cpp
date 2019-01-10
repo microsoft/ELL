@@ -400,21 +400,9 @@ namespace emitters
     LLVMFunction IRRuntime::GetTanhFunction(VariableType argType)
     {
         // This assumes a standard C runtime library is linked
-        switch (argType)
-        {
-        case VariableType::Float:
-        case VariableType::Double:
-            break;
-        default:
-            throw EmitterException(EmitterError::functionNotFound);
-        }
-
         auto& emitter = _module.GetIREmitter();
-        const char* funcName = argType == VariableType::Double ? "tanh" : "tanhf";
         auto valueType = emitter.Type(argType);
-        auto tanhProto = llvm::FunctionType::get(valueType, { valueType }, false);
-        _module.DeclareFunction(funcName, tanhProto);
-        return _module.GetFunction(funcName);
+        return GetTanhFunction(valueType);
     }
 
     LLVMFunction IRRuntime::GetSqrtFunction(LLVMType argType)
@@ -440,6 +428,27 @@ namespace emitters
     LLVMFunction IRRuntime::GetLogFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::log, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetTanhFunction(LLVMType valueType)
+    {
+        // This assumes a standard C runtime library is linked
+        const char* funcName = "";
+        if (valueType->isDoubleTy())
+        {
+            funcName = "tanh";
+        }
+        else if (valueType->isFloatTy())
+        {
+            funcName = "tanhf";
+        }
+        else
+        {
+            throw EmitterException(EmitterError::functionNotFound);
+        }
+        auto tanhProto = llvm::FunctionType::get(valueType, { valueType }, false);
+        _module.DeclareFunction(funcName, tanhProto);
+        return _module.GetFunction(funcName);
     }
 
     LLVMFunction IRRuntime::GetSinFunction(LLVMType argType)

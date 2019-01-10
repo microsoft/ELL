@@ -74,8 +74,11 @@ class ImporterNode:
         self.metadata = metadata
 
     def __repr__(self):
+        attrs = dict((k,self.attributes[k]) for k in self.attributes)
+        if "tensor" in attrs:
+            attrs["tensor"] = "..."
         _print_line = ""
-        _print_line += "{} {}: {} -> {}, attributes {}\n".format(self.operation_type, self.id, self.inputs, self.outputs, self.attributes)
+        _print_line += "{} {}: {} -> {}, attributes {}\n".format(self.operation_type, self.id, self.inputs, self.outputs, attrs)
         _print_line += "    input_shape {}\n".format(self.input_shapes)
         _print_line += "    output_shape {}\n".format(self.output_shapes)
         _print_line += "    padding {}\n".format(self.padding)
@@ -1164,12 +1167,13 @@ class ConvertPassthrough(ConvertBase):
         lookup_table.add_imported_ell_node(self.importer_node, input_owner, set_group_id=False)
 
 
-class ConvertPlus(ConvertBase):
+class ConvertBinaryOperation(ConvertBase):
     """
-    Converter for Plus
+    Converter for Binary Operations
     """
-    def __init__(self, node: ImporterNode):
+    def __init__(self, node: ImporterNode, op: ell.nodes.BinaryOperationType):
         super().__init__(node)
+        self.operator = op
         self.required_weights = []
         self.required_attributes = []
 
@@ -1178,6 +1182,18 @@ class ConvertPlus(ConvertBase):
         Return the appropriate ELL node
         """
         return None
+
+    def add_reinterpret_node(self, builder, model, input_elements, memory_layout):
+        node = builder.AddReinterpretLayoutNode(model, input_elements, memory_layout)
+        return (ell.nodes.PortElements(node.GetOutputPort("output")), node)
+
+    def reinterpret_input(self, builder, model, input_elements, memory_layout):
+        input_layout = input_elements.GetMemoryLayout()
+        if not input_layout == memory_layout:
+            if np.product(list(input_layout.size)) != np.product(list(memory_layout.size)):
+                 raise Exception("Binary operation {} does not yet support broadcasting".format(self.operator))
+            return self.add_reinterpret_node(builder, model, input_elements, memory_layout)
+        return (input_elements, None)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1199,15 +1215,51 @@ class ConvertPlus(ConvertBase):
             output_shape_tuple[0],
             output_shape_tuple[1],
             self.importer_node.output_padding["size"])
+
+        # see if the shapes match
+        input1_port_elements, _ = self.reinterpret_input(builder, model, input1_port_elements, input1_port_memory_layout)
+        input2_port_elements, _ = self.reinterpret_input(builder, model, input2_port_elements, input2_port_memory_layout)
+
         # Add the BinaryOperationNode to the model.
-        ell_node = builder.AddBinaryOperationNodeWithMemoryLayout(
+        ell_node = builder.AddBinaryOperationNode(
             model,
-            input1_port_elements, input1_port_memory_layout,
-            input2_port_elements, input2_port_memory_layout,
-            output_port_memory_layout,
-            ell.nodes.BinaryOperationType.add)
+            input1_port_elements, 
+            input2_port_elements,             
+            self.operator)
+
+        output_elements = ell.nodes.PortElements(ell_node.GetOutputPort("output"))
+        output_port_elements, new_output_node = self.reinterpret_input(builder, model, output_elements, output_port_memory_layout)
+        if new_output_node is not None:
+            ell_node = new_output_node
+
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
+
+class ConvertPlus(ConvertBinaryOperation):
+    """
+    Converter for Plus
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.BinaryOperationType.add)
+
+
+class ConvertSubtract(ConvertBinaryOperation):
+
+    """
+    Converter for Subtract which is subtracting one output from another.
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.BinaryOperationType.subtract)
+
+
+class ConvertCoordinatewiseMultiply(ConvertBinaryOperation):
+
+    """
+    Converter for CoordinatewiseMultiply which is doing element-wise multiplication of two inputs.
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.BinaryOperationType.multiply)
 
 
 class ConvertPooling(ConvertBase):
@@ -1321,6 +1373,7 @@ class ConvertRegion(ConvertBase):
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
+
 class ConvertScaling(ConvertBase):
     """
     Converter for Scaling
@@ -1398,6 +1451,119 @@ class ConvertSoftmax(ConvertBase):
         ell_node = builder.AddSoftmaxLayerNode(model, input_port_elements, softmax_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
+
+class ConvertUnaryOperation(ConvertBase):
+    """
+    Converter for Unary Operators
+    """
+    def __init__(self, node: ImporterNode, op: ell.nodes.UnaryOperationType):
+        super().__init__(node)
+        self.operator = op
+        self.required_weights = []
+        self.required_attributes = []
+
+    def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Return the appropriate ELL node
+        """
+        return None
+
+    def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Derived classes override to convert the importer node to appropriate ELL node(s)
+        and insert into the model
+        """
+        model = conversion_parameters["model"]
+        builder = conversion_parameters["builder"]
+        lookup_table = conversion_parameters["lookup_table"]
+
+        input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
+            
+        # Add the UnaryOperationNode to the model.
+        ell_node = builder.AddUnaryOperationNode(model, input_port_elements, self.operator)
+        # Register the mapping
+        lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
+
+class ConvertSigmoid(ConvertUnaryOperation):
+    """
+    Converter for Sigmoid operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.sigmoid)
+
+
+class ConvertHardSigmoid(ConvertUnaryOperation):
+    """
+    Converter for Sigmoid operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.hardSigmoid)
+
+
+class ConvertTanh(ConvertUnaryOperation):
+    """
+    Converter for tanh operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.tanh)
+
+
+class ConvertAbs(ConvertUnaryOperation):
+    """
+    Converter for Abs operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.abs)
+
+
+class ConvertSqrt(ConvertUnaryOperation):
+    """
+    Converter for Sqrt operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.sqrt)
+
+
+class ConvertSquare(ConvertUnaryOperation):
+    """
+    Converter for Sqrt operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.square)
+
+
+class ConvertSin(ConvertUnaryOperation):
+    """
+    Converter for Sqrt operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.sin)
+
+
+class ConvertCos(ConvertUnaryOperation):
+    """
+    Converter for Sqrt operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.cos)
+
+
+class ConvertExp(ConvertUnaryOperation):
+    """
+    Converter for Sigmoid operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.exp)
+
+
+class ConvertLog(ConvertUnaryOperation):
+    """
+    Converter for Sigmoid operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.log)
 
 
 class ConvertSplice(ConvertBase):

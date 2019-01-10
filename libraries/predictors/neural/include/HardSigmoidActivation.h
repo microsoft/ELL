@@ -12,6 +12,8 @@
 
 #include <math/include/Tensor.h>
 
+#include <nodes/include/ActivationFunctions.h>
+
 namespace ell
 {
 namespace predictors
@@ -60,8 +62,8 @@ namespace predictors
         template <typename ElementType>
         ElementType HardSigmoidActivation<ElementType>::Apply(const ElementType input) const
         {
-            ElementType output = (static_cast<ElementType>(0.2) * input) + static_cast<ElementType>(0.5);
-            return output < static_cast<ElementType>(0) ? static_cast<ElementType>(0) : (output > static_cast<ElementType>(1) ? static_cast<ElementType>(1) : output);
+            ell::nodes::HardSigmoidActivationFunction<ElementType> hardSigmoid;
+            return hardSigmoid.Compute(input);
         }
 
         template <typename ElementType>

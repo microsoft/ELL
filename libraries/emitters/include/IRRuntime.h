@@ -98,6 +98,7 @@ namespace emitters
         LLVMFunction GetExpFunction(LLVMType argType);
         LLVMFunction GetPowFunction(LLVMType argType);
         LLVMFunction GetLogFunction(LLVMType argType);
+        LLVMFunction GetTanhFunction(LLVMType argType);
         LLVMFunction GetSinFunction(LLVMType argType);
         LLVMFunction GetCosFunction(LLVMType argType);
 

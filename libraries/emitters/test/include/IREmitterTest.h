@@ -23,6 +23,8 @@ void TestMixedLevelNestedIf();
 void TestLogicalAnd();
 void TestLogicalOr();
 void TestLogicalNot();
+void TestBinaryOperations();
+void TestBinaryLogicalOperations();
 void TestForLoop();
 void TestWhileLoopWithVariableCondition();
 void TestWhileLoopWithFunctionCondition();

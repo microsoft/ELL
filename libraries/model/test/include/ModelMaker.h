@@ -125,13 +125,13 @@ nodes::BinaryOperationNode<T>* ModelMaker::Subtract(const model::OutputPort<T>& 
 template <typename T>
 nodes::BinaryOperationNode<T>* ModelMaker::Multiply(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
-    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationType::coordinatewiseMultiply);
+    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationType::multiply);
 }
 
 template <typename T>
 nodes::BinaryOperationNode<T>* ModelMaker::Divide(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
-    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationType::coordinatewiseDivide);
+    return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationType::divide);
 }
 
 template <typename T>

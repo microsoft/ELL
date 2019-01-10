@@ -367,11 +367,11 @@ namespace emitters
 
         /// <summary> Emit a unary operator with a scalar argument. </summary>
         ///
-        /// <param name="type"> The operator type. </param>
+        /// <param name="type"> The unary operator type. </param>
         /// <param name="value"> The argument of the operator. </param>
         ///
         /// <returns> Pointer to the return value of the operator. </returns>
-        LLVMValue Operator(UnaryOperationType type, LLVMValue value);
+        LLVMValue Operator(UnaryOperatorType type, LLVMValue value);
 
         /// <summary> Emit a binary operator with 2 scalar arguments. </summary>
         ///

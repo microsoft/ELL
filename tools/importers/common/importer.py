@@ -43,6 +43,7 @@ _logger = logging.getLogger(__name__)
 #       - a Convolution followed by bias
 #       - a Convolution
 operation_map = {
+    "Abs": ConvertAbs,
     "Activation": ConvertActivation,
     "AveragePooling": ConvertAveragePooling,
     "BatchNormalization": [ConvertBatchNormalization, OptionalConvertScaling, OptionalConvertBias],
@@ -50,11 +51,16 @@ operation_map = {
     "BinaryConvolution": [ConvertBinaryConvolution, OptionalConvertBias, OptionalConvertActivation],
     "Convolution": [ConvertConvolution, OptionalConvertBias, OptionalConvertActivation],
     "Constant": ConvertConstant,
+    "Cos": ConvertCos,
     "ElementTimes": ConvertScaling,
+    "ElementwiseMul": ConvertCoordinatewiseMultiply,
+    "Exp": ConvertExp,
     "FullyConnected": [ConvertFullyConnected, OptionalConvertBias, OptionalConvertActivation],
     "GRU": ConvertGRU,
+    "HardSigmoid": ConvertHardSigmoid,
     "Input": ConvertInput,
     "LeakyReLU": ConvertLeakyReLU,
+    "Log": ConvertLog,
     "LSTM": ConvertLSTM,
     "MaxPooling": ConvertMaxPooling,
     "Minus": ConvertMinus,
@@ -66,7 +72,13 @@ operation_map = {
     "Region": ConvertRegion,
     "Reshape": ConvertReshape,
     "Softmax": ConvertSoftmax,
+    "Sigmoid": ConvertSigmoid,
+    "Sin": ConvertSin,
     "Splice": ConvertSplice,
+    "Square": ConvertSquare,
+    "Sqrt": ConvertSqrt,
+    "Subtract": ConvertSubtract,
+    "Tanh": ConvertTanh,
     "VAD": ConvertVAD,
     }
 

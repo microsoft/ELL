@@ -47,6 +47,7 @@ class InputPort;
 class Node;
 class NodeIterator;
 class OutputPort;
+class PortMemoryLayout;
 struct MapCompilerOptions;
 struct ModelOptimizerOptions;
 
@@ -76,6 +77,8 @@ public:
     std::string GetRuntimeTypeName();
     PortType GetOutputType();
     int Size();
+    PortMemoryLayout GetMemoryLayout();
+
 #ifndef SWIG
     Port(const ell::model::Port* other);
     const ell::model::Port& GetPort() const { return *_port; }
@@ -96,11 +99,11 @@ public:
     void Next();
     InputPort Get();
 #ifndef SWIG
-    InputPortIterator(std::vector<ell::model::InputPortBase*> ports);
+    InputPortIterator(const std::vector<const ell::model::InputPortBase*>& ports);
 #endif
 private:
     size_t _i = 0;
-    std::vector<ell::model::InputPortBase*> _ports;
+    std::vector<const ell::model::InputPortBase*> _ports;
 };
 
 //
@@ -115,11 +118,11 @@ public:
     void Next();
     OutputPort Get();
 #ifndef SWIG
-    OutputPortIterator(std::vector<ell::model::OutputPortBase*> ports);
+    OutputPortIterator(const std::vector<const ell::model::OutputPortBase*>& ports);
 #endif
 private:
     size_t _i = 0;
-    std::vector<ell::model::OutputPortBase*> _ports;
+    std::vector<const ell::model::OutputPortBase*> _ports;
 };
 
 //
@@ -133,7 +136,7 @@ public:
     void Next();
     Node Get();
 #ifndef SWIG
-    NodeIterator(std::vector<const ell::model::Node*> nodes);
+    NodeIterator(const std::vector<const ell::model::Node*>& nodes);
     NodeIterator(ell::model::ForwardNodeIterator& other);
 #endif
 private:
@@ -159,6 +162,8 @@ public:
                      const std::vector<int>& offset = {},
                      const std::vector<int>& order = {});
 
+    bool IsEqual(const PortMemoryLayout& other);
+
 #ifndef SWIG
     const ell::model::PortMemoryLayout& Get() const
     {
@@ -166,6 +171,7 @@ public:
     }
 
     PortMemoryLayout(const ell::model::PortMemoryLayout& layout);
+
 #endif
 private:
     ell::model::PortMemoryLayout _layout;
@@ -281,47 +287,37 @@ private:
 // InputPort
 //
 
-class InputPort
+class InputPort : public Port
 {
 public:
     InputPort() = default;
-    int Size() const;
-    PortMemoryLayout GetMemoryLayout() const;
-    Node GetNode();
-    std::string GetName();
-    PortType GetOutputType();
-    std::string GetRuntimeTypeName();
     NodeIterator GetParentNodes();
     OutputPort GetReferencedPort();
 #ifndef SWIG
     InputPort(const ell::model::InputPortBase* other);
-    const ell::model::InputPortBase& GetPort() const { return *_port; }
+    const ell::model::InputPortBase& GetInputPort() const { return *_input_port; }
 #endif
 private:
-    const ell::model::InputPortBase* _port = nullptr;
+    const ell::model::InputPortBase* _input_port = nullptr;
 };
 
 //
 // OutputPort
 //
-class OutputPort
+class OutputPort : public Port
 {
 public:
     OutputPort() = default;
-    int Size() const;
-    PortMemoryLayout GetMemoryLayout() const;
-    Node GetNode();
-    std::string GetName();
-    PortType GetOutputType();
     bool IsReferenced() const;
+    InputPortIterator GetReferences();
     std::vector<double> GetDoubleOutput();
     double GetDoubleOutput(int index);
 #ifndef SWIG
     OutputPort(const ell::model::OutputPortBase* other);
-    const ell::model::OutputPortBase& GetPort() const { return *_port; }
+    const ell::model::OutputPortBase& GetOutputPort() const { return *_output_port; }
 #endif
 private:
-    const ell::model::OutputPortBase* _port = nullptr;
+    const ell::model::OutputPortBase* _output_port = nullptr;
 };
 
 //

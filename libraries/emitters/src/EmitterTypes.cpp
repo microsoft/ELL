@@ -13,35 +13,50 @@ namespace ell
 {
 namespace emitters
 {
-    TypedOperator GetFloatOperator(BinaryOperationType operation)
+    TypedOperator GetFloatOperator(BinaryOperatorType operation)
     {
         switch (operation)
         {
-        case BinaryOperationType::add:
+        case BinaryOperatorType::add:
             return TypedOperator::addFloat;
-        case BinaryOperationType::subtract:
+        case BinaryOperatorType::subtract:
             return TypedOperator::subtractFloat;
-        case BinaryOperationType::coordinatewiseMultiply:
+        case BinaryOperatorType::multiply:
             return TypedOperator::multiplyFloat;
-        case BinaryOperationType::coordinatewiseDivide:
+        case BinaryOperatorType::divide:
             return TypedOperator::divideFloat;
         default:
             throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
         }
     }
 
-    TypedOperator GetIntegerOperator(BinaryOperationType operation)
+    TypedOperator GetIntegerOperator(BinaryOperatorType operation)
     {
         switch (operation)
         {
-        case BinaryOperationType::add:
+        case BinaryOperatorType::add:
             return TypedOperator::add;
-        case BinaryOperationType::subtract:
+        case BinaryOperatorType::subtract:
             return TypedOperator::subtract;
-        case BinaryOperationType::coordinatewiseMultiply:
+        case BinaryOperatorType::multiply:
             return TypedOperator::multiply;
-        case BinaryOperationType::coordinatewiseDivide:
+        case BinaryOperatorType::divide:
             return TypedOperator::divideSigned;
+        default:
+            throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
+        }
+    }
+
+    TypedOperator GetBooleanOperator(BinaryOperatorType operation)
+    {
+        switch (operation)
+        {
+        case BinaryOperatorType::logicalAnd:
+            return TypedOperator::logicalAnd;
+        case BinaryOperatorType::logicalOr:
+            return TypedOperator::logicalOr;
+        case BinaryOperatorType::logicalXor:
+            return TypedOperator::logicalXor;
         default:
             throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
         }
@@ -90,43 +105,33 @@ namespace emitters
     }
 
     template <>
-    TypedOperator GetOperator<float>(BinaryOperationType operation)
+    TypedOperator GetOperator<float>(BinaryOperatorType operation)
     {
         return GetFloatOperator(operation);
     }
 
     template <>
-    TypedOperator GetOperator<double>(BinaryOperationType operation)
+    TypedOperator GetOperator<double>(BinaryOperatorType operation)
     {
         return GetFloatOperator(operation);
     }
 
     template <>
-    TypedOperator GetOperator<int>(BinaryOperationType operation)
+    TypedOperator GetOperator<int>(BinaryOperatorType operation)
     {
         return GetIntegerOperator(operation);
     }
 
     template <>
-    TypedOperator GetOperator<int64_t>(BinaryOperationType operation)
+    TypedOperator GetOperator<int64_t>(BinaryOperatorType operation)
     {
         return GetIntegerOperator(operation);
     }
 
     template <>
-    TypedOperator GetOperator<bool>(BinaryOperationType operation)
+    TypedOperator GetOperator<bool>(BinaryOperatorType operation)
     {
-        switch (operation)
-        {
-        case BinaryOperationType::logicalAnd:
-            return TypedOperator::logicalAnd;
-        case BinaryOperationType::logicalOr:
-            return TypedOperator::logicalOr;
-        case BinaryOperationType::logicalXor:
-            return TypedOperator::logicalXor;
-        default:
-            throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
-        }
+        return GetBooleanOperator(operation);
     }
 
     template <>

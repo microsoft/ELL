@@ -59,7 +59,7 @@ model::Model GenerateTimesTwoModel(size_t dimension)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
     auto constantTwoNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 2.0));
-    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, nodes::BinaryOperationType::coordinatewiseMultiply);
+    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, nodes::BinaryOperationType::multiply);
     model.AddNode<model::OutputNode<double>>(timesNode->output);
     return model;
 }
@@ -101,7 +101,7 @@ model::Model GenerateMultiOutModel(size_t dimension)
     auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
     auto constantTwoNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 2.0));
     auto constantTenNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 10.0));
-    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, nodes::BinaryOperationType::coordinatewiseMultiply);
+    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, nodes::BinaryOperationType::multiply);
     auto plusNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTenNode->output, nodes::BinaryOperationType::add);
 
     model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ { timesNode->output }, { plusNode->output } });

@@ -122,7 +122,7 @@ namespace nodes
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         const auto& windowValue = AppendConstant(transformer, dsp::HammingWindow<ValueType>(_input.Size()));
-        const auto& product = AppendBinaryOperation(transformer, newPortElements, windowValue, nodes::BinaryOperationType::coordinatewiseMultiply);
+        const auto& product = AppendBinaryOperation(transformer, newPortElements, windowValue, nodes::BinaryOperationType::multiply);
         transformer.MapNodeOutput(output, product);
         return true;
     }

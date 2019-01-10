@@ -40,7 +40,7 @@ source_group("doc" FILES ${doc})
 
 add_library(${library_name} ${src} ${include} ${doc})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
-target_link_libraries(${library_name} utilities evaluators predictors)
+target_link_libraries(${library_name} utilities evaluators predictors nodes)
 
 # MSVC emits warnings incorrectly when mixing inheritance, templates,
 # and member function definitions outside of class definitions

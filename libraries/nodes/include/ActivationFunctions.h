@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     CompiledActivationFunctions.h (nodes)
+//  File:     ActivationFunctions.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,14 +13,9 @@
 #include <emitters/include/IRFunctionEmitter.h>
 #include <emitters/include/LLVMUtilities.h>
 
-#include <predictors/neural/include/HardSigmoidActivation.h>
-#include <predictors/neural/include/LeakyReLUActivation.h>
-#include <predictors/neural/include/ParametricReLUActivation.h>
-#include <predictors/neural/include/ReLUActivation.h>
-#include <predictors/neural/include/SigmoidActivation.h>
-#include <predictors/neural/include/TanhActivation.h>
-
 #include <utilities/include/TypeName.h>
+
+#include <string>
 
 namespace ell
 {
@@ -133,6 +128,13 @@ namespace nodes
         emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
+        /// <summary> Emits IR to compute the sigmoid activation function </summary>
+        ///
+        /// <param name="x"> The value </param>
+        /// <returns> The value of the function Sigmoid(x) </returns>
+        ///
+        emitters::IRLocalScalar Compile(emitters::IRLocalScalar a) const;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -164,6 +166,13 @@ namespace nodes
         /// <returns> The value of the function Sigmoid(x) </returns>
         emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
+
+        /// <summary> Emits IR to compute the hard sigmoid activation function </summary>
+        ///
+        /// <param name="x"> The value </param>
+        ///
+        /// <returns> The value of the function Sigmoid(x) </returns>
+        emitters::IRLocalScalar Compile(emitters::IRLocalScalar a) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -237,12 +246,6 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const { return GetTypeName(); }
     };
-
-    //
-    // Helper function (cannot be used for ParametricReLUActivations because that has two arguments to Compute).
-    //
-    template <typename ValueType>
-    std::unique_ptr<ActivationFunction<ValueType>> GetNodeActivationFunction(const predictors::neural::Activation<ValueType>& f);
 
 } // namespace nodes
 } // namespace ell

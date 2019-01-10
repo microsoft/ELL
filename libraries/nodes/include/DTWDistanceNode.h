@@ -11,6 +11,9 @@
 #include "SumNode.h"
 
 #include "BinaryOperationNode.h"
+
+#include <emitters/include/IRMath.h>
+
 #include <model/include/CompilableNode.h>
 #include <model/include/IRMapCompiler.h>
 #include <model/include/InputPort.h>
@@ -142,12 +145,6 @@ namespace nodes
         _output(this, defaultOutputPortName, 1),
         _prototype(prototype)
     {
-        _sampleDimension = input.Size();
-        _prototypeLength = prototype.size();
-        _d.resize(_prototypeLength + 1);
-        _s.resize(_prototypeLength + 1);
-
-        _prototypeVariance = DTWDistanceNodeImpl::Variance(_prototype);
         // _threshold = std::sqrt(-2 * std::log(confidenceThreshold)) * _prototypeVariance;
         Reset();
     }
@@ -155,6 +152,12 @@ namespace nodes
     template <typename ValueType>
     void DTWDistanceNode<ValueType>::Reset()
     {
+        _sampleDimension = _input.Size();
+        _prototypeLength = _prototype.size();
+        _d.resize(_prototypeLength + 1);
+        _s.resize(_prototypeLength + 1);
+
+        _prototypeVariance = DTWDistanceNodeImpl::Variance(_prototype);
         std::fill(_d.begin() + 1, _d.end(), std::numeric_limits<ValueType>::max());
         _d[0] = 0.0;
         std::fill(_s.begin(), _s.end(), 0);
@@ -346,9 +349,7 @@ namespace nodes
         {
             _prototype.emplace_back(temp.GetRow(i).ToArray());
         }
-        _prototypeLength = _prototype.size();
-        _d.resize(_prototypeLength + 1);
-        _s.resize(_prototypeLength + 1);
+        Reset();
     }
 } // namespace nodes
 } // namespace ell

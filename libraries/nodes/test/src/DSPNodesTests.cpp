@@ -645,25 +645,6 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
     }
 }
 
-void TestWithSerialization(model::Map& map, std::string name, std::function<void(model::Map& map, int)> body)
-{
-    // 3 iterations is important, because it finds bugs in reserialization of the deserialized model.
-    for (int iteration = 0; iteration < 3; iteration++)
-    {
-        body(map, iteration);
-
-        auto filename = utilities::FormatString("%s%d.json", name.c_str(), iteration);
-
-        std::cout << "TestWithSerialization: saving map to: " << filename << "\n";
-
-        // archive the model
-        common::SaveMap(map, filename);
-
-        // unarchive the model
-        map = common::LoadMap(filename);
-    }
-}
-
 //
 // Recurrent layer nodes (Recurrent, GRU, LSTM)
 //
@@ -736,12 +717,10 @@ void TestRNNNode()
         {
             ConstVectorReference expectedOutput(h_t[i], sizeof(h_1) / sizeof(double));
 
-            // compare computed vs. compiled output
-            computedResult = VerifyCompiledOutput<ElementType, ElementType>(map, compiledMap, signal, name);
+            std::string message = name + utilities::FormatString(" iteration %d row %d", iteration, i);
 
-            // verify compute output
-            auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
-            testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %d", name.c_str(), iteration, i), ok);
+            // compare computed vs. compiled output
+            VerifyCompiledOutputAndResult<ElementType, ElementType>(map, compiledMap, signal, { expectedOutput.ToArray() }, message);
         }
     });
 }
@@ -816,19 +795,10 @@ void TestGRUNode()
         {
             ConstVectorReference expectedOutput(h_t[i], sizeof(h_1) / sizeof(double));
 
+            std::string message = name + utilities::FormatString(" iteration %d row %d", iteration, i);
+
             // compare computed vs. compiled output
-            computedResult = VerifyCompiledOutput<ElementType, ElementType>(map, compiledMap, signal, name);
-
-            // verify compute output
-            auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
-
-            if (!ok)
-            {
-                std::cout << "  Test " << name.c_str() << " compute versus expected output mismatch on iteration " << iteration << " and row " << i << "\n";
-                std::cout << "  " << computedResult << "\n";
-                std::cout << "  " << expectedOutput.ToArray() << "\n";
-            }
-            testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %zu", name.c_str(), iteration, i), ok);
+            VerifyCompiledOutputAndResult<ElementType, ElementType>(map, compiledMap, signal, { expectedOutput.ToArray() }, message);
         }
     });
 }
@@ -901,18 +871,10 @@ void TestLSTMNode()
         {
             ConstVectorReference expectedOutput(h_t[i], sizeof(h_1) / sizeof(double));
 
-            // compare computed vs. compiled output
-            computedResult = VerifyCompiledOutput<ElementType, ElementType>(map, compiledMap, signal, name);
+            std::string message = name + utilities::FormatString(" iteration %d row %d", iteration, i);
 
-            // compute output
-            auto ok = IsEqual(computedResult, expectedOutput.ToArray(), static_cast<double>(epsilon));
-            if (!ok)
-            {
-                std::cout << "  Test " << name.c_str() << " compute versus expected output mismatch on iteration " << iteration << " and row " << i << "\n";
-                std::cout << "  " << computedResult << "\n";
-                std::cout << "  " << expectedOutput.ToArray() << "\n";
-            }
-            testing::ProcessTest(utilities::FormatString("Testing %s compute versus expected output on iteration %d row %zu", name.c_str(), iteration, i), ok);
+            // compare computed vs. compiled output
+            VerifyCompiledOutputAndResult<ElementType, ElementType>(map, compiledMap, signal, { expectedOutput.ToArray() }, message);
         }
     });
 }

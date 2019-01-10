@@ -112,6 +112,11 @@ int Port::Size()
     return static_cast<int>(_port->Size());
 }
 
+PortMemoryLayout Port::GetMemoryLayout()
+{
+    return PortMemoryLayout(_port->GetMemoryLayout());
+}
+
 //
 // InputPortIterator
 //
@@ -134,7 +139,7 @@ InputPort InputPortIterator::Get()
     return InputPort(_ports[_i]);
 }
 
-InputPortIterator::InputPortIterator(std::vector<ell::model::InputPortBase*> ports) :
+InputPortIterator::InputPortIterator(const std::vector<const ell::model::InputPortBase*>& ports) :
     _i(0),
     _ports(ports)
 {
@@ -162,7 +167,7 @@ OutputPort OutputPortIterator::Get()
     return OutputPort(_ports[_i]);
 }
 
-OutputPortIterator::OutputPortIterator(std::vector<ell::model::OutputPortBase*> ports) :
+OutputPortIterator::OutputPortIterator(const std::vector<const ell::model::OutputPortBase*>& ports) :
     _i(0),
     _ports(ports)
 {
@@ -211,7 +216,7 @@ Node NodeIterator::Get()
     }
 }
 
-NodeIterator::NodeIterator(std::vector<const ell::model::Node*> nodes) :
+NodeIterator::NodeIterator(const std::vector<const ell::model::Node*>& nodes) :
     _i(0),
     _isVector(true),
     _nodes(nodes),
@@ -284,12 +289,16 @@ Port Node::GetPort(const std::string& portName)
 
 OutputPortIterator Node::GetOutputPorts()
 {
-    return OutputPortIterator(_node->GetOutputPorts());
+    auto ports = _node->GetOutputPorts();
+    std::vector<const ell::model::OutputPortBase*> constPorts(ports.begin(), ports.end());
+    return OutputPortIterator(constPorts);
 }
 
 InputPortIterator Node::GetInputPorts()
 {
-    return InputPortIterator(_node->GetInputPorts());
+    auto ports = _node->GetInputPorts();
+    std::vector<const ell::model::InputPortBase*> constPorts(ports.begin(), ports.end());
+    return InputPortIterator(constPorts);
 }
 
 std::string Node::GetRuntimeTypeName()
@@ -412,7 +421,7 @@ PortElements::PortElements(const ell::model::PortElementsBase& other) :
 }
 
 PortElements::PortElements(const OutputPort& port) :
-    _elements(port.GetPort())
+    _elements(port.GetOutputPort())
 {
 }
 
@@ -445,123 +454,86 @@ PortElement PortElements::GetElement(int index) const
 //
 
 InputPort::InputPort(const ell::model::InputPortBase* other) :
-    _port(other)
+    Port(other),
+    _input_port(other)
 {
-}
-
-PortType InputPort::GetOutputType()
-{
-    return static_cast<PortType>(_port->GetType());
-}
-
-Node InputPort::GetNode()
-{
-    return Node(_port->GetNode());
-}
-
-int InputPort::Size() const
-{
-    return (int)_port->Size();
-}
-
-PortMemoryLayout InputPort::GetMemoryLayout() const
-{
-    return { _port->GetMemoryLayout() };
-}
-
-std::string InputPort::GetName()
-{
-    return _port->GetName();
-}
-
-std::string InputPort::GetRuntimeTypeName()
-{
-    return _port->GetRuntimeTypeName();
 }
 
 NodeIterator InputPort::GetParentNodes()
 {
-    return NodeIterator(_port->GetParentNodes());
+    return NodeIterator(_input_port->GetParentNodes());
 }
 
 OutputPort InputPort::GetReferencedPort()
 {
-    return OutputPort(&_port->GetReferencedPort());
+    return OutputPort(&_input_port->GetReferencedPort());
 }
 
 //
 // OutputPort
 //
 OutputPort::OutputPort(const ell::model::OutputPortBase* other) :
-    _port(other)
+    Port(other),
+    _output_port(other)
 {
 }
 
 bool OutputPort::IsReferenced() const
 {
-    return _port->IsReferenced();
+    return _output_port->IsReferenced();
 }
 
-PortType OutputPort::GetOutputType()
+InputPortIterator OutputPort::GetReferences()
 {
-    return static_cast<PortType>(_port->GetType());
+    return InputPortIterator(_output_port->GetReferences());
 }
 
 std::vector<double> OutputPort::GetDoubleOutput()
 {
-    return _port->GetDoubleOutput();
+    return _output_port->GetDoubleOutput();
 }
 
 double OutputPort::GetDoubleOutput(int index)
 {
-    return _port->GetDoubleOutput((size_t)index);
-}
-
-Node OutputPort::GetNode()
-{
-    return Node(_port->GetNode());
-}
-
-int OutputPort::Size() const
-{
-    return (int)_port->Size();
-}
-
-PortMemoryLayout OutputPort::GetMemoryLayout() const
-{
-    return { _port->GetMemoryLayout() };
-}
-
-std::string OutputPort::GetName()
-{
-    return _port->GetName();
+    return _output_port->GetDoubleOutput((size_t)index);
 }
 
 //
 // PortMemoryLayout
 //
-PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<int>& p, const std::vector<int>& o, const std::vector<int>& order) :
-    size(s),
-    padding(p),
-    offset(o),
-    order(order)
+
+bool IsAllZeros(const std::vector<int>& p)
 {
-    if (padding.size() == 0 && offset.size() == 0)
+    if (p.size() == 0) 
     {
-        _layout = ell::model::PortMemoryLayout(ell::model::MemoryShape{ size });
+        return true;
     }
-    else if (offset.size() == 0)
+    return std::all_of(p.begin(), p.end(), [](const int& value) { return value == 0; });
+}
+
+ell::model::PortMemoryLayout GetPortMemoryLayout(const std::vector<int>& size, const std::vector<int>& padding, const std::vector<int>& offset, const std::vector<int>& order)
+{
+    if (IsAllZeros(padding) && IsAllZeros(offset))
     {
-        _layout = ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding });
+        return ell::model::PortMemoryLayout(ell::model::MemoryShape{ size });
     }
-    else if (order.size() == 0)
+    else if (IsAllZeros(offset))
     {
-        _layout = ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding }, ell::model::MemoryShape{ offset });
+        return ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding });
+    }
+    else if (IsAllZeros(order))
+    {
+        return ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding }, ell::model::MemoryShape{ offset });
     }
     else
     {
-        _layout = ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding }, ell::model::MemoryShape{ offset }, ell::model::DimensionOrder{ order });
+        return ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding }, ell::model::MemoryShape{ offset }, ell::model::DimensionOrder{ order });
     }
+}
+
+PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<int>& p, const std::vector<int>& o, const std::vector<int>& order) :
+    PortMemoryLayout(GetPortMemoryLayout(s,p,o,order))
+{
 }
 
 PortMemoryLayout::PortMemoryLayout(const ell::model::PortMemoryLayout& layout) :
@@ -571,6 +543,11 @@ PortMemoryLayout::PortMemoryLayout(const ell::model::PortMemoryLayout& layout) :
     order(layout.GetLogicalDimensionOrder().ToVector()),
     _layout(layout)
 {
+}
+
+bool PortMemoryLayout::IsEqual(const PortMemoryLayout& other)
+{
+    return _layout == other._layout;
 }
 
 //

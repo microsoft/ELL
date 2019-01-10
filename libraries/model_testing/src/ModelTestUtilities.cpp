@@ -8,6 +8,8 @@
 
 #include "ModelTestUtilities.h"
 
+#include <common/include/LoadModel.h>
+
 #include <model/include/InputNode.h>
 #include <model/include/InputPort.h>
 #include <model/include/Model.h>
@@ -43,6 +45,26 @@ void SetVerbose(bool verbose)
 bool IsVerbose()
 {
     return g_isVerbose;
+}
+
+void TestWithSerialization(ell::model::Map& map, std::string name, std::function<void(ell::model::Map& map, int)> body)
+{
+    // 3 iterations is important, because it finds bugs in reserialization of the deserialized model.
+    for (int iteration = 0; iteration < 3; iteration++)
+    {
+        if (iteration > 0)
+        {
+            auto filename = utilities::FormatString("%s%d.json", name.c_str(), iteration);
+
+            // archive the model
+            common::SaveMap(map, filename);
+
+            // unarchive the model
+            map = common::LoadMap(filename);
+        }
+
+        body(map, iteration);
+    }
 }
 
 void PrintMap(const model::Map& map)

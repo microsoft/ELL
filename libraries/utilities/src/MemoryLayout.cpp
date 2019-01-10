@@ -459,9 +459,6 @@ namespace utilities
 
     void MemoryLayout::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        auto clearVector = [](auto& v) { std::fill(v.begin(), v.end(), -1); };
-        auto isSet = [](auto& v) -> bool { return std::any_of(v.begin(), v.end(), [](auto i) { return i != -1; }); };
-
         std::vector<int> temp;
         archiver["size"] >> temp;
         _size = { temp };
@@ -469,16 +466,16 @@ namespace utilities
         // Try to read the extent field. If successful, check and make sure the old stride field doesn't exist.
         // If the extent field doesn't exist, then the stride field does need to exist.
         temp.resize(_size.NumDimensions());
-        clearVector(temp);
+        temp.clear();
         archiver.OptionalProperty("extent") >> temp;
-        if (isSet(temp))
+        if (!temp.empty())
         {
             _extent = { temp };
-            clearVector(temp);
+            temp.clear();
             archiver.OptionalProperty("stride") >> temp;
-            if (isSet(temp))
+            if (!temp.empty())
             {
-                throw InputException(InputExceptionErrors::badData, "Corrupt data -- found incompatible fields");
+                throw InputException(InputExceptionErrors::badData, "MemoryLayout cannot contain 'extent' and 'stride' information");
             }
         }
         else
@@ -494,7 +491,7 @@ namespace utilities
         archiver.OptionalProperty("order") >> temp;
         _dimensionOrder = { temp };
 
-        clearVector(temp);
+        temp.clear();
         archiver.OptionalProperty("increment", ContiguousCumulativeIncrement(_extent).ToVector()) >> temp;
         _increment = { temp };
     }
@@ -540,7 +537,7 @@ namespace utilities
     bool MemoryLayoutsEqual(const MemoryLayout& layout1, const MemoryLayout& layout2)
     {
         return (layout1.GetExtent() == layout2.GetExtent()) && (layout1.GetActiveSize() == layout2.GetActiveSize()) &&
-               (layout1.GetOffset() == layout2.GetOffset());
+               (layout1.GetOffset() == layout2.GetOffset() && layout1.GetLogicalDimensionOrder() == layout2.GetLogicalDimensionOrder());
     }
 
     bool operator==(const MemoryLayout& layout1, const MemoryLayout& layout2)

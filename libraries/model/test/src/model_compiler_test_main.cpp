@@ -23,6 +23,9 @@ using namespace ell::predictors::neural;
 
 void TestIRCompiler()
 {
+    TestReinterpretLayoutNode();
+    TestBroadcastLinearFunctionNode();
+
     TestNodeMetadata();
     TestMultiOutputMap();
     TestCombineOutputMap();
@@ -90,7 +93,6 @@ void TestIRCompiler()
     TestCompilableScalarOutputNode();
     TestCompilableVectorOutputNode();
     TestCompilableAccumulatorNode();
-    TestCompilableConstantNode();
     TestCompilableDotProductNode();
     TestCompilableDelayNode();
     TestCompilableDTWDistanceNode();

@@ -52,13 +52,13 @@ namespace emitters
     /// <returns> The types for the given values. </returns>
     LLVMTypeList GetLLVMTypes(const std::vector<LLVMValue>& values);
 
-    /// <summary> Get the typed version of a BinaryOperationType for a given LLVM type. </summary>
+    /// <summary> Get the typed version of a BinaryOperatorType for a given LLVM type. </summary>
     ///
     /// <param name="type"> The LLVM type of the values to operate on. </param>
-    /// <param name="operation"> The (untyped) BinaryOperationType of the operation. </param>
+    /// <param name="operation"> The (untyped) BinaryOperatorType of the operation. </param>
     ///
     /// <returns> The TypedOperator for operating on values of the given type. </returns>
-    emitters::TypedOperator GetOperator(LLVMType type, BinaryOperationType operation);
+    emitters::TypedOperator GetOperator(LLVMType type, BinaryOperatorType operation);
 
     /// <summary> Get the typed version of a BinaryPredicateType for a given LLVM type. </summary>
     ///

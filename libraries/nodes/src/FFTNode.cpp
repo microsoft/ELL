@@ -11,6 +11,7 @@
 #include <emitters/include/EmitterException.h>
 #include <emitters/include/EmitterTypes.h>
 #include <emitters/include/IRLocalValue.h>
+#include <emitters/include/IRMath.h>
 #include <emitters/include/LLVMUtilities.h>
 
 #include <math/include/MathConstants.h>

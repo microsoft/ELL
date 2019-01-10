@@ -21,3 +21,15 @@ PortElements,\
 PortElementsList,\
 PortType,\
 UnaryOperationType
+
+
+def IteratorHelper(iter):
+    while iter.IsValid():
+        yield iter.Get()
+        iter.Next()
+
+NodeIterator.__iter__ = IteratorHelper
+InputPortIterator.__iter__ = IteratorHelper
+OutputPortIterator.__iter__ = IteratorHelper
+
+del IteratorHelper

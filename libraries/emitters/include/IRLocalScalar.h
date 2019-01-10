@@ -177,31 +177,6 @@ namespace emitters
     template <typename ValueType, utilities::IsFundamental<ValueType> = true>
     IRLocalScalar operator>=(IRLocalScalar a, ValueType b);
 
-    // Common math functions
-    IRLocalScalar Abs(IRLocalScalar a);
-    IRLocalScalar Sqrt(IRLocalScalar a);
-    IRLocalScalar Exp(IRLocalScalar a);
-    IRLocalScalar Log(IRLocalScalar a);
-    IRLocalScalar Sin(IRLocalScalar a);
-    IRLocalScalar Cos(IRLocalScalar a);
-
-    template <typename ValueType>
-    IRLocalScalar Sigmoid(IRLocalScalar a);
-
-    template <typename ValueType>
-    IRLocalScalar Tanh(IRLocalScalar a);
-
-    IRLocalScalar Min(IRLocalScalar a, IRLocalScalar b);
-    template <typename ValueType, utilities::IsFundamental<ValueType> = true>
-    IRLocalScalar Min(ValueType a, IRLocalScalar b);
-    template <typename ValueType, utilities::IsFundamental<ValueType> = true>
-    IRLocalScalar Min(IRLocalScalar a, ValueType b);
-
-    IRLocalScalar Max(IRLocalScalar a, IRLocalScalar b);
-    template <typename ValueType, utilities::IsFundamental<ValueType> = true>
-    IRLocalScalar Max(ValueType a, IRLocalScalar b);
-    template <typename ValueType, utilities::IsFundamental<ValueType> = true>
-    IRLocalScalar Max(IRLocalScalar a, ValueType b);
 } // namespace emitters
 } // namespace ell
 
@@ -412,53 +387,6 @@ namespace emitters
         return a >= b;
     }
 
-    //
-    // Math functions
-    //
-    template <typename ValueType>
-    IRLocalScalar Sigmoid(IRLocalScalar a)
-    {
-        auto& fn = a.function;
-        auto& emitter = detail::GetEmitter(fn);
-
-        auto expInput = Exp(a);
-        constexpr auto one = static_cast<ValueType>(1);
-        auto result = emitter.Select(a > ValueType{ 0 }, one / (Exp(-a) + one), expInput / (expInput + one));
-        return { fn, result };
-    }
-
-    template <typename ValueType>
-    IRLocalScalar Tanh(IRLocalScalar a)
-    {
-        // tanh(x) === (exp(x) - exp(-x)) / (exp(x) + exp(-x))
-        //         = 2*sigmoid(2*x) - 1
-        auto two = static_cast<ValueType>(2.0);
-        return (two * Sigmoid<ValueType>(two * a)) - static_cast<ValueType>(1);
-    }
-
-    template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
-    IRLocalScalar Min(ValueType value, IRLocalScalar b)
-    {
-        return Min(detail::ToIRLocalScalar(b.function, value), b);
-    }
-
-    template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
-    IRLocalScalar Min(IRLocalScalar a, ValueType value)
-    {
-        return Min(value, a);
-    }
-
-    template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
-    IRLocalScalar Max(ValueType value, IRLocalScalar b)
-    {
-        return Max(detail::ToIRLocalScalar(b.function, value), b);
-    }
-
-    template <typename ValueType, utilities::IsFundamental<ValueType> /* = true*/>
-    IRLocalScalar Max(IRLocalScalar a, ValueType value)
-    {
-        return Max(value, a);
-    }
 } // namespace emitters
 } // namespace ell
 

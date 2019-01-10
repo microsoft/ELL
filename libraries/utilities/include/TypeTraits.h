@@ -30,6 +30,10 @@ namespace utilities
     template <typename ValueType>
     using IsBoolean = std::enable_if_t<std::is_same<std::decay_t<ValueType>, bool>::value, bool>;
 
+    /// <summary> Enabled if ValueType is not a boolean. </summary>
+    template <typename ValueType>
+    using IsNotBoolean = std::enable_if_t<!std::is_same<std::decay_t<ValueType>, bool>::value, bool>;
+
     /// <summary> Enabled if the two classes are different. </summary>
     template <typename T, typename S>
     using IsDifferent = std::enable_if_t<!std::is_same<T, S>::value, bool>;
@@ -41,6 +45,10 @@ namespace utilities
     /// <summary> Enabled if ValueType is an floating point type. </summary>
     template <typename ValueType>
     using IsFloatingPoint = std::enable_if_t<std::is_floating_point<std::decay_t<ValueType>>::value, bool>;
+
+    /// <summary> Enabled if ValueType is not a floating point type. </summary>
+    template <typename ValueType>
+    using IsNotFloatingPoint = std::enable_if_t<!std::is_floating_point<std::decay_t<ValueType>>::value, bool>;
 
     /// <summary> Enabled if ValueType is a fundamental type. </summary>
     template <typename ValueType>

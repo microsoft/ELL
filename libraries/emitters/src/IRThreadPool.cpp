@@ -235,13 +235,13 @@ namespace emitters
         auto workAvailableCondVar = GetWorkAvailableConditionVariablePointer(function);
 
         LockQueueMutex(function);
-        function.Store(isEmptyVar, function.Operator(TypedOperator::logicalAnd, IsEmpty(function), function.Operator(UnaryOperationType::logicalNot, GetShutdownFlag(function))));
+        function.Store(isEmptyVar, function.Operator(TypedOperator::logicalAnd, IsEmpty(function), function.Operator(UnaryOperatorType::logicalNot, GetShutdownFlag(function))));
         function.While(isEmptyVar, [=](auto& function) {
             // Wait on the condition variable
             function.PthreadCondWait(workAvailableCondVar, queueMutex);
 
             // update while loop exit condition
-            function.Store(isEmptyVar, function.Operator(TypedOperator::logicalAnd, this->IsEmpty(function), function.Operator(UnaryOperationType::logicalNot, this->GetShutdownFlag(function))));
+            function.Store(isEmptyVar, function.Operator(TypedOperator::logicalAnd, this->IsEmpty(function), function.Operator(UnaryOperatorType::logicalNot, this->GetShutdownFlag(function))));
         });
 
         // At loop exit, mutex is locked. Now decrement _count, unlock mutex, and return task at index _count
@@ -289,10 +289,10 @@ namespace emitters
         auto workFinishedCondVar = GetWorkFinishedConditionVariablePointer(function);
 
         LockQueueMutex(function);
-        function.Store(isNotDoneVar, function.Operator(UnaryOperationType::logicalNot, IsFinished(function)));
+        function.Store(isNotDoneVar, function.Operator(UnaryOperatorType::logicalNot, IsFinished(function)));
         function.While(isNotDoneVar, [=](auto& function) {
             function.PthreadCondWait(workFinishedCondVar, mutex);
-            function.Store(isNotDoneVar, function.Operator(UnaryOperationType::logicalNot, this->IsFinished(function))); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
+            function.Store(isNotDoneVar, function.Operator(UnaryOperatorType::logicalNot, this->IsFinished(function))); // STYLE gcc bug requires `this->` inside generic lambda (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67274)
         });
         UnlockQueueMutex(function);
     }

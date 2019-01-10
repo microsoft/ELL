@@ -13,7 +13,7 @@ def GetNodeIndex(index, node): return index[GetName(node)]
 def GetNodes(model):
     '''Return an array holding all the Node objects of the model.
 The output will we of the form [node_1, node_2, ..., node_v]'''
-    return [n for n in GetNodeGenerator(model.GetNodes())]
+    return [n for n in model.GetNodes()]
 
 
 def GetNodeDictionary(nodes):
@@ -57,12 +57,6 @@ def CheckAdjacencyList(adj):
             k = adj[j].index(i)
 
 
-def GetNodeGenerator(iter):
-    while iter.IsValid():
-        yield iter.Get()
-        iter.Next()
-
-
 def GetAdjacencyList(nodes, index):
     def GetIndex(node): return GetNodeIndex(index, node)
 
@@ -70,14 +64,14 @@ def GetAdjacencyList(nodes, index):
         if node == None:
             return []
         else:
-            parents = GetNodeGenerator(node.GetParents())
+            parents = list(node.GetParents())
             return [GetIndex(p) for p in parents]
 
     def GetDependents(node):
         if node == None:
             return []
         else:
-            children = GetNodeGenerator(node.GetDependents())
+            children = list(node.GetDependents())
             return [GetIndex(c) for c in children]
     parentList = [GetParents(n) for n in nodes]
     dependentList = [GetDependents(n) for n in nodes]
@@ -171,9 +165,30 @@ def GetGraphStats(adj):
             E = E1
     return stats
 
+def testPortIteration(model):
+    # test that we can iterate all the input and output ports of the model and that they reference nodes in the model
+    node_map = dict((n.GetId(), n) for n in model.GetNodes())
+    errors = 0
+    for n in model.GetNodes():
+        for p in n.GetInputPorts():
+            r = p.GetReferencedPort().GetNode()
+            if not r.GetId() in node_map:
+                print("### Node {} referenced by input port of node {} not found in model".format(r.GetId(), n.GetId()))
+                errors += 1
+        for o in n.GetOutputPorts():
+            for r in o.GetReferences():
+                q = r.GetNode()
+                if not q.GetId() in node_map:
+                    print("### Node {} referenced by output port of node {} not found in model".format(q.GetId(), n.GetId()))
+                    errors += 1
+
+    if errors > 0:
+        raise Exception("testPortIteration test failed")
+
 
 def testModel(filename):
     model = ell.model.Model(filename)
+    testPortIteration(model)
     nodes, index = GetNodesAndIndex(model)
     adj = GetAdjacencyList(nodes, index)
     print(filename, end="\t")

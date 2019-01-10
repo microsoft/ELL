@@ -33,7 +33,7 @@
 
 #include <nodes/include/BinaryOperationNode.h>
 #include <nodes/include/BroadcastFunctionNode.h>
-#include <nodes/include/CompiledActivationFunctions.h>
+#include <nodes/include/ActivationFunctions.h>
 #include <nodes/include/ConstantNode.h>
 #include <nodes/include/LinearPredictorNode.h>
 #include <nodes/include/MatrixVectorProductNode.h>

@@ -35,6 +35,7 @@
 #include <nodes/include/IIRFilterNode.h>
 #include <nodes/include/LSTMNode.h>
 #include <nodes/include/NeuralNetworkPredictorNode.h>
+#include <nodes/include/ReinterpretLayoutNode.h>
 #include <nodes/include/ReorderDataNode.h>
 #include <nodes/include/TypeCastNode.h>
 #include <nodes/include/UnaryOperationNode.h>
@@ -306,11 +307,49 @@ Node ModelBuilder::AddConcatenationNode(Model model, const ell::api::math::Tenso
     return Node(newNode);
 }
 
+Node ModelBuilder::AddReinterpretLayoutNode(Model model, PortElements input, PortMemoryLayout outputMemoryLayout)
+{
+    auto elements = input.GetPortElements();
+    auto type = input.GetType();
+
+    ell::utilities::MemoryLayout outputLayout = outputMemoryLayout.Get();
+    if (elements.GetMemoryLayout().GetActiveSize().NumElements() != outputLayout.GetActiveSize().NumElements())
+    {
+        throw std::invalid_argument("Error: ReinterpretLayoutNode can only reinterpret shapes that have the same number of elements");
+    }
+
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::nodes::ReinterpretLayoutNode<bool>>(ell::model::PortElements<bool>(elements), outputLayout);
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::nodes::ReinterpretLayoutNode<int>>(ell::model::PortElements<int>(elements), outputLayout);
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::ReinterpretLayoutNode<double>>(ell::model::PortElements<double>(elements), outputLayout);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::ReinterpretLayoutNode<float>>(ell::model::PortElements<float>(elements), outputLayout);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create ReinterpretLayoutNode of the requested type");
+    }
+    return Node(newNode);
+}
+
 Node ModelBuilder::AddReorderDataNode(Model model, PortElements input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order, double outputPaddingValue)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
     ell::model::Node* newNode = nullptr;
+    if (order.size() == 0)
+    {
+        // provide default sequential ordering
+        order = std::vector<int>(outputMemoryLayout.size.size());
+        std::iota(order.begin(), order.end(), 0);
+    }
     switch (type)
     {
     case PortType::real:
@@ -486,7 +525,7 @@ Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, cons
 
 Node ModelBuilder::AddUnaryOperationNode(Model model, PortElements input, UnaryOperationType op)
 {
-    auto operation = static_cast<ell::emitters::UnaryOperationType>(op);
+    auto operation = static_cast<ell::nodes::UnaryOperationType>(op);
 
     auto type = input.GetType();
     auto elements = input.GetPortElements();
@@ -513,7 +552,7 @@ Node ModelBuilder::AddUnaryOperationNode(Model model, PortElements input, UnaryO
 
 Node ModelBuilder::AddBinaryOperationNode(Model model, PortElements input1, PortElements input2, BinaryOperationType op)
 {
-    auto operation = static_cast<ell::emitters::BinaryOperationType>(op);
+    auto operation = static_cast<ell::nodes::BinaryOperationType>(op);
 
     auto type = input1.GetType();
     if (type != input2.GetType())
@@ -522,6 +561,13 @@ Node ModelBuilder::AddBinaryOperationNode(Model model, PortElements input1, Port
     }
     auto elements1 = input1.GetPortElements();
     auto elements2 = input2.GetPortElements();
+
+    if (elements1.GetMemoryLayout().GetActiveSize().NumElements() != elements2.GetMemoryLayout().GetActiveSize().NumElements())
+    {
+        // then perhaps we need to do some broadcasting...
+        throw std::invalid_argument("Error: BinaryOperationNode does not yet support broadcasting");
+    }
+
     ell::model::Node* newNode = nullptr;
     switch (type)
     {
@@ -536,38 +582,6 @@ Node ModelBuilder::AddBinaryOperationNode(Model model, PortElements input1, Port
         break;
     case PortType::smallReal:
         newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<float>>(ell::model::PortElements<float>(elements1), ell::model::PortElements<float>(elements2), operation);
-        break;
-    default:
-        throw std::invalid_argument("Error: could not create BinaryOperationNode of the requested type");
-    }
-    return Node(newNode);
-}
-
-Node ModelBuilder::AddBinaryOperationNodeWithMemoryLayout(Model model, PortElements input1, PortMemoryLayout input1Layout, PortElements input2, PortMemoryLayout input2Layout, PortMemoryLayout outputLayout, BinaryOperationType op)
-{
-    auto operation = static_cast<ell::emitters::BinaryOperationType>(op);
-
-    auto type = input1.GetType();
-    if (type != input2.GetType())
-    {
-        throw std::invalid_argument("Error: BinaryOperationNode requires both arguments to be of the same type");
-    }
-    auto elements1 = input1.GetPortElements();
-    auto elements2 = input2.GetPortElements();
-    ell::model::Node* newNode = nullptr;
-    switch (type)
-    {
-    case PortType::boolean:
-        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<bool>>(ell::model::PortElements<bool>(elements1), input1Layout.Get(), ell::model::PortElements<bool>(elements2), input2Layout.Get(), outputLayout.Get(), operation);
-        break;
-    case PortType::integer:
-        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<int>>(ell::model::PortElements<int>(elements1), input1Layout.Get(), ell::model::PortElements<int>(elements2), input2Layout.Get(), outputLayout.Get(), operation);
-        break;
-    case PortType::real:
-        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<double>>(ell::model::PortElements<double>(elements1), input1Layout.Get(), ell::model::PortElements<double>(elements2), input2Layout.Get(), outputLayout.Get(), operation);
-        break;
-    case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<float>>(ell::model::PortElements<float>(elements1), input1Layout.Get(), ell::model::PortElements<float>(elements2), input2Layout.Get(), outputLayout.Get(), operation);
         break;
     default:
         throw std::invalid_argument("Error: could not create BinaryOperationNode of the requested type");

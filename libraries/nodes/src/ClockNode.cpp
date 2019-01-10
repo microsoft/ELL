@@ -17,8 +17,8 @@ namespace nodes
     constexpr TimeTickType UninitializedIntervalTime = -1;
 
     // Useful aliases for operators
-    const auto plusTime = emitters::GetOperator<TimeTickType>(emitters::BinaryOperationType::add);
-    const auto minusTime = emitters::GetOperator<TimeTickType>(emitters::BinaryOperationType::subtract);
+    const auto plusTime = emitters::GetOperator<TimeTickType>(emitters::BinaryOperatorType::add);
+    const auto minusTime = emitters::GetOperator<TimeTickType>(emitters::BinaryOperatorType::subtract);
 
     // comparisons
     const auto equalTime = emitters::GetComparison<TimeTickType>(emitters::BinaryPredicateType::equal);

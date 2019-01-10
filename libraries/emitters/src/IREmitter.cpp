@@ -558,13 +558,13 @@ namespace emitters
     //
     // Native LLVM operations / comparisons
     //
-    LLVMValue IREmitter::UnaryOperation(const UnaryOperationType type, LLVMValue value, const std::string& variableName)
+    LLVMValue IREmitter::UnaryOperator(const UnaryOperatorType type, LLVMValue value, const std::string& variableName)
     {
         assert(value != nullptr);
 
         switch (type)
         {
-        case UnaryOperationType::logicalNot:
+        case UnaryOperatorType::logicalNot:
             return _irBuilder.CreateNot(value, variableName);
         default:
             throw EmitterException(EmitterError::operatorTypeNotSupported, "Unsupported unary operator");

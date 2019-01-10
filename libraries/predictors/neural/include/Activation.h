@@ -10,6 +10,8 @@
 
 #include <utilities/include/IArchivable.h>
 
+#include <nodes/include/ActivationFunctions.h>
+
 #include <math/include/Tensor.h>
 #include <math/include/Vector.h>
 
@@ -249,7 +251,15 @@ namespace predictors
         {
             archiver["activation"] >> _impl;
         }
+
+        //
+        // Helper function (cannot be used for ParametricReLUActivations because that has two arguments to Compute).
+        //
+        template <typename ValueType>
+        std::unique_ptr<ell::nodes::ActivationFunction<ValueType>> GetNodeActivationFunction(const Activation<ValueType>& f);
+
     } // namespace neural
+
 } // namespace predictors
 } // namespace ell
 

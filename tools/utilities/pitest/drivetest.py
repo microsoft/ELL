@@ -228,7 +228,7 @@ class DriveTest:
         os.chdir(cwd)
         return files
 
-    def get_bash_files(self):
+    def get_test_files(self):
         """Copies demo files needed to run the test"""
         self.copy_files( 
             [ os.path.join(self.ell_root, "tools/utilities/pitest/coffeemug.jpg"),
@@ -307,14 +307,15 @@ class DriveTest:
         found = False
         profile_log = False
         prediction_time = 0
-        prompt = "Average prediction time:"
-        previous = None
-        prediction = "not found"
+        prediction_prefix = "Last prediction:"
+        time_prefix = "Average prediction time:"
+        prediction = ""
         for line in output:
-            if prompt in line:
-                prediction_time = float(line[len(prompt):])
+            if prediction_prefix in line:
+                prediction = line[len(prediction_prefix):].strip()
+            if time_prefix in line:
+                prediction_time = float(line[len(time_prefix):])
                 self.prediction_time = prediction_time
-                prediction = previous
             elif "socket.timeout" in line:
                 raise Exception("### Test failed due to timeout")
             elif "==== Profile ====" in line:
@@ -322,7 +323,6 @@ class DriveTest:
                 profile_log = True
             elif profile_log:
                 self.profile_log.append(line)
-            previous = line
 
         if self.expected:
             found = (self.expected in prediction)
@@ -349,9 +349,10 @@ class DriveTest:
                 self.get_model() 
                 self.wrap_project()
                 if self.target != "host":
-                    self.get_bash_files()
+                    self.get_test_files()
                 self.remove_bitcode()
 
+            output = []
             if self.test:
                 start_time = time.time()
 
@@ -383,7 +384,6 @@ class DriveTest:
                             "--nogui",
                             "--iterations", str(self.iterations)]
                     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-                    output = []
                     while True:
                         line = proc.stdout.readline()
                         if line != b"":

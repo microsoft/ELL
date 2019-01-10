@@ -55,9 +55,11 @@ call openblas.cmd
 
 if "%RPI_CLUSTER%"=="" goto :test
 echo ===================================== CMAKE with additional options ==================================
+if "%TEST_MODELS_REPO%"=="" set TEST_MODELS_REPO=https://github.com/Microsoft/ell-test-models
 echo cmake .. -DRPI_CLUSTER=%RPI_CLUSTER% -DRPI_PASSWORD=%RPI_PASSWORD% -DRPI_KEY=%RPI_APIKEY% -DTEST_MODELS_REPO=%TEST_MODELS_REPO% -DCNTK=%CNTK% -DONNX=%ONNX% 
 cmake .. -DRPI_CLUSTER=%RPI_CLUSTER% -DRPI_PASSWORD=%RPI_PASSWORD% -DRPI_KEY=%RPI_APIKEY% -DTEST_MODELS_REPO=%TEST_MODELS_REPO% -DCNTK=%CNTK% -DONNX=%ONNX% 
 if ERRORLEVEL 1 exit /B 1
+goto :test
 
 :test
 echo ===================================== TEST ==================================
@@ -65,7 +67,13 @@ if "%SUBSET%"=="" goto :fulltest
 
 ctest . --build-config release -R %SUBSET% -VV
 if ERRORLEVEL 1 exit /B 1
+
+if not EXIST .\tools\utilities\pitest\test\pi3 goto :pitesterror
 goto :done
+
+:pitesterror
+echo ### Error: it looks like the pitest didn't run...
+exit /B 1
 
 :fulltest
 ctest . --build-config release -VV

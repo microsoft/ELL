@@ -123,6 +123,7 @@ def main():
             # Show the new frame
             helper.show_image(frameToShow, save)
 
+    print("Last prediction: " + lastPrediction)
     helper.report_times()
 
 if __name__ == "__main__":

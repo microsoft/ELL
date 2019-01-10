@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "CompiledActivationFunctions.h"
+#include "ActivationFunctions.h"
 
 #include <predictors/neural/include/Activation.h>
 

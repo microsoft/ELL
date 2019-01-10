@@ -1220,7 +1220,7 @@ namespace nodes
 
         if (std::max(secondaryInput1.Size(), secondaryInput2.Size()) != static_cast<size_t>(inputLayout.GetActiveSize(dimension)))
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Broadcast vector size doesn't match input") + "_" + std::to_string(secondaryInput1.Size()) + "_" + std::to_string(secondaryInput2.Size()) + "_" + std::to_string(inputLayout.GetActiveSize(dimension)));
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Broadcast vector size doesn't match input, max(") + std::to_string(secondaryInput1.Size()) + ", " + std::to_string(secondaryInput2.Size()) + ") != " + std::to_string(inputLayout.GetActiveSize(dimension)));
         }
 
         if (secondaryInput1.Size() != secondaryInput2.Size() && secondaryInput1.Size() > 0 && secondaryInput2.Size() > 0)

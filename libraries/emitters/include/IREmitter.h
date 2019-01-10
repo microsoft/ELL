@@ -527,12 +527,12 @@ namespace emitters
 
         /// <summary> Emit a unary operation, with an optional name for the result. </summary>
         ///
-        /// <param name="type"> The operator type. </param>
+        /// <param name="type"> The unary operator type. </param>
         /// <param name="pValue"> Pointer to an llvm::Value that represents the value in the operation. </param>
         /// <param name="variableName"> Name of the result. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the operation result. </returns>
-        LLVMValue UnaryOperation(const UnaryOperationType type, LLVMValue pValue, const std::string& variableName = "");
+        LLVMValue UnaryOperator(const UnaryOperatorType type, LLVMValue pValue, const std::string& variableName = "");
 
         /// <summary> Emit a binary operation, with an optional name for the result. </summary>
         ///

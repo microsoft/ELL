@@ -12,7 +12,8 @@
 #include "ModelInterface.h"
 #include "NeuralNetworkPredictorInterface.h"
 
-#include <emitters/include/EmitterTypes.h>
+#include <nodes/include/BinaryOperationNode.h>
+#include <nodes/include/UnaryOperationNode.h>
 
 #include <math/include/Tensor.h>
 
@@ -30,34 +31,37 @@ namespace ELL_API
 {
 
 //
-// Operation types for operation nodes
+// Operation types for unary operation nodes
 //
 enum class UnaryOperationType
 {
-    none = (int)ell::emitters::UnaryOperationType::none,
-    exp = (int)ell::emitters::UnaryOperationType::exp,
-    log = (int)ell::emitters::UnaryOperationType::log,
-    sqrt = (int)ell::emitters::UnaryOperationType::sqrt,
-    logicalNot = (int)ell::emitters::UnaryOperationType::logicalNot,
-    tanh = (int)ell::emitters::UnaryOperationType::tanh,
-    square = (int)ell::emitters::UnaryOperationType::square,
-    sin = (int)ell::emitters::UnaryOperationType::sin,
-    cos = (int)ell::emitters::UnaryOperationType::cos
+    none = (int)ell::nodes::UnaryOperationType::none,
+    abs = (int)ell::nodes::UnaryOperationType::abs,
+    exp = (int)ell::nodes::UnaryOperationType::exp,
+    hardSigmoid = (int)ell::nodes::UnaryOperationType::hardSigmoid,
+    log = (int)ell::nodes::UnaryOperationType::log,
+    logicalNot = (int)ell::nodes::UnaryOperationType::logicalNot,
+    sin = (int)ell::nodes::UnaryOperationType::sin,
+    sigmoid = (int)ell::nodes::UnaryOperationType::sigmoid,
+    square = (int)ell::nodes::UnaryOperationType::square,
+    cos = (int)ell::nodes::UnaryOperationType::cos,
+    sqrt = (int)ell::nodes::UnaryOperationType::sqrt,
+    tanh = (int)ell::nodes::UnaryOperationType::tanh
 };
 
+//
+// Operation types for binary operation nodes
+//
 enum class BinaryOperationType
 {
-    none = (int)ell::emitters::BinaryOperationType::none,
-    add = (int)ell::emitters::BinaryOperationType::add,
-    subtract = (int)ell::emitters::BinaryOperationType::subtract,
-    coordinatewiseMultiply = (int)ell::emitters::BinaryOperationType::coordinatewiseMultiply,
-    coordinatewiseDivide = (int)ell::emitters::BinaryOperationType::coordinatewiseDivide,
-    logicalAnd = (int)ell::emitters::BinaryOperationType::logicalAnd,
-    logicalOr = (int)ell::emitters::BinaryOperationType::logicalOr,
-    logicalXor = (int)ell::emitters::BinaryOperationType::logicalXor,
-    shiftLeft = (int)ell::emitters::BinaryOperationType::shiftLeft,
-    logicalShiftRight = (int)ell::emitters::BinaryOperationType::logicalShiftRight,
-    arithmeticShiftRight = (int)ell::emitters::BinaryOperationType::arithmeticShiftRight
+    none = (int)ell::nodes::BinaryOperationType::none,
+    add = (int)ell::nodes::BinaryOperationType::add,
+    subtract = (int)ell::nodes::BinaryOperationType::subtract,
+    multiply = (int)ell::nodes::BinaryOperationType::multiply,
+    divide = (int)ell::nodes::BinaryOperationType::divide,
+    logicalAnd = (int)ell::nodes::BinaryOperationType::logicalAnd,
+    logicalOr = (int)ell::nodes::BinaryOperationType::logicalOr,
+    logicalXor = (int)ell::nodes::BinaryOperationType::logicalXor
 };
 
 //
@@ -73,7 +77,6 @@ public:
 
     // Specific methods per node type
     Node AddBinaryOperationNode(Model model, PortElements input1, PortElements input2, BinaryOperationType operation);
-    Node AddBinaryOperationNodeWithMemoryLayout(Model model, PortElements input1, PortMemoryLayout input1Layout, PortElements input2, PortMemoryLayout input2Layout, PortMemoryLayout outputLayout, BinaryOperationType operation);
     Node AddBufferNode(Model model, PortElements input, int windowSize);
     Node AddTypeCastNode(Model model, PortElements input, PortType outputType);
     Node AddClockNode(Model model, PortElements input, double interval, double lagThreshold, const std::string& lagNotificationName);
@@ -89,7 +92,8 @@ public:
     Node AddLinearFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse);
     Node AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse);
     OutputNode AddOutputNode(Model model, const ell::api::math::TensorShape& shape, PortElements input);
-    Node AddReorderDataNode(Model model, PortElements input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order, double outputPaddingValue = 0.0);
+    Node AddReinterpretLayoutNode(Model model, PortElements input, PortMemoryLayout outputMemoryLayout);
+    Node AddReorderDataNode(Model model, PortElements input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order = {}, double outputPaddingValue = 0.0);
     Node AddSinkNode(Model model, PortElements input, const ell::api::math::TensorShape& shape, const std::string& sinkFunctionName, PortElements trigger = PortElements());
     Node AddSourceNode(Model model, PortElements input, PortType outputType, const ell::api::math::TensorShape& shape, const std::string& sourceFunctionName);
     Node AddUnaryOperationNode(Model model, PortElements input, UnaryOperationType operation);
@@ -159,6 +163,7 @@ private:
 
     template <typename ElementType>
     void InternalResetInput(Node node, PortElements input, std::string input_port_name);
+
 #endif
 
     ell::model::ModelBuilder _modelBuilder;
