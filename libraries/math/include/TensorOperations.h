@@ -232,7 +232,7 @@ namespace math
 
 #pragma region implementation
 
-#include "../include/MatrixOperations.h"
+#include "MatrixOperations.h"
 
 #include <utilities/include/Logger.h>
 

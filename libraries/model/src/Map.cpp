@@ -366,7 +366,7 @@ namespace model
         Submodel m(_model, {}, outputPorts);
         auto minimalModel = transformer.CopySubmodel(m, context);
         FixTransformedIO(transformer);
-        _model = std::move(minimalModel);
+        _model = std::move(minimalModel.GetModel());
     }
 
     size_t Map::GetNumInputs() const

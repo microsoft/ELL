@@ -20,31 +20,72 @@ namespace ell
 {
 namespace common
 {
+    // DataLoadArguments
+    std::string DataLoadArguments::GetDataFilePath() const
+    {
+        return inputDataDirectory.empty() ? inputDataFilename : utilities::JoinPaths(inputDataDirectory, inputDataFilename);
+    }
+
+    // ParsedDataLoadArguments
     void ParsedDataLoadArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
             inputDataFilename,
-            "inputDataFilename",
-            "idf",
+            _filenameOptionString,
+            _shortFilenameOptionString,
             "Path to the input data file",
             "");
 
-        parser.AddOption(
-            dataDimension,
-            "dataDimension",
-            "dd",
-            "Number of elements to read from each data vector",
-            "");
+        if (!_directoryOptionString.empty())
+        {
+            parser.AddOption(
+                inputDataDirectory,
+                _directoryOptionString,
+                _shortDirectoryOptionString,
+                "Directory for the input data file",
+                "");
+        }
+
+        if (!_dimensionOptionString.empty())
+        {
+            parser.AddOption(
+                dataDimension,
+                _dimensionOptionString,
+                _shortDimensionOptionString,
+                "Number of elements to read from each data vector",
+                "");
+        }
+    }
+
+    ParsedDataLoadArguments::ParsedDataLoadArguments(std::optional<OptionName> filenameOption, std::optional<OptionName> directoryOption, std::optional<OptionName> dimensionOption)
+    {
+        if (filenameOption)
+        {
+            _filenameOptionString = filenameOption->longName;
+            _shortFilenameOptionString = filenameOption->shortName;
+        }
+
+        if (directoryOption)
+        {
+            _directoryOptionString = directoryOption->longName;
+            _shortDirectoryOptionString = directoryOption->shortName;
+        }
+
+        if (dimensionOption)
+        {
+            _dimensionOptionString = dimensionOption->longName;
+            _shortDimensionOptionString = dimensionOption->shortName;
+        }
     }
 
     utilities::CommandLineParseResult ParsedDataLoadArguments::PostProcess(const utilities::CommandLineParser& parser)
     {
         std::vector<std::string> parseErrorMessages;
         bool isFileReadable = false;
-        // inputDataFilename
-        if (inputDataFilename != "")
+
+        if (!inputDataFilename.empty())
         {
-            isFileReadable = utilities::IsFileReadable(inputDataFilename);
+            isFileReadable = utilities::IsFileReadable(GetDataFilePath());
         }
 
         // dataDimension
@@ -57,7 +98,7 @@ namespace common
                 return parseErrorMessages;
             }
 
-            auto stream = utilities::OpenIfstream(inputDataFilename);
+            auto stream = utilities::OpenIfstream(GetDataFilePath());
             auto exampleIterator = GetAutoSupervisedExampleIterator(stream);
             while (exampleIterator.IsValid())
             {

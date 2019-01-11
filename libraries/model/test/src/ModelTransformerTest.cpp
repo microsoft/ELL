@@ -122,7 +122,7 @@ void TestCopySubmodel_Full(const Model& model)
 
     Submodel submodel(model, noInput, noOutput);
     auto newModel = transformer.CopySubmodel(submodel, context);
-    ProcessTest("TestCopySubmodel_Full", newModel.Size() == model.Size());
+    ProcessTest("TestCopySubmodel_Full", newModel.Size() == static_cast<int>(model.Size()));
 }
 
 void TestCopySubmodel_Prefix(const Model& model)

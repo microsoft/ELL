@@ -239,18 +239,19 @@ namespace model
     Model ModelTransformer::CopyModel(const Model& oldModel)
     {
         TransformContext context;
-        std::vector<const OutputPortBase*> nothing;
         Submodel m(oldModel, {}, {});
-        return CopySubmodel(m, context);
+        auto result = CopySubmodel(m, context);
+        return std::move(result.GetModel());
     }
 
     Model ModelTransformer::CopyModel(const Model& oldModel, const TransformContext& context)
     {
         Submodel m(oldModel, {}, {});
-        return CopySubmodel(m, context);
+        auto result = CopySubmodel(m, context);
+        return std::move(result.GetModel());
     }
 
-    Model ModelTransformer::CopySubmodel(const Submodel& submodel, const TransformContext& context)
+    Submodel ModelTransformer::CopySubmodel(const Submodel& submodel, const TransformContext& context)
     {
         Model destModel;
         _elementsMap.Clear();
@@ -259,7 +260,7 @@ namespace model
         });
 
         ResetContext();
-        return destModel;
+        return result;
     }
 
     Submodel ModelTransformer::CopySubmodelOnto(const Submodel& submodel, Model& destModel, const std::vector<const OutputPortBase*>& onto, const TransformContext& context)

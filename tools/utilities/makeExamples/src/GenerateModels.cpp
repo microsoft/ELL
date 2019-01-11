@@ -210,7 +210,6 @@ model::Model GenerateRefinedTreeModel(size_t numSplits)
     auto refinedModel = transformer.RefineModel(model, context);
     return refinedModel;
 }
-
 // explicit instantiations
 template model::Model GenerateBroadcastTimesTwoModel<int>(size_t dimension);
 

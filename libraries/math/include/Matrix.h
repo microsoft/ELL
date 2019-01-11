@@ -651,7 +651,7 @@ namespace math
 
 #pragma region implementation
 
-#include "../include/VectorOperations.h"
+#include "VectorOperations.h"
 
 #include <utilities/include/Debug.h>
 #include <utilities/include/Exception.h>

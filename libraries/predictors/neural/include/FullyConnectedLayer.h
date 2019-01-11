@@ -113,7 +113,7 @@ namespace predictors
             if (_weights.NumRows() != GetOutputMinusPadding().Size())
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                                                ell::utilities::FormatString("FullyConnectedLayer weights has %d row, but expecting %d based on output size minus padding",
+                                                ell::utilities::FormatString("FullyConnectedLayer weights has %d rows, but expecting %d based on output size minus padding",
                                                                              _weights.NumRows(),
                                                                              GetOutputMinusPadding().Size()));
             }

@@ -102,7 +102,7 @@ namespace model
 
 #pragma region implementation
 
-#include "../include/ModelTransformer.h"
+#include "ModelTransformer.h"
 
 #include <utilities/include/StringUtil.h>
 

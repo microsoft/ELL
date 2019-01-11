@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "../../pythonPlugins/include/InvokePython.h"
 #include "ProfileArguments.h"
 #include "ProfileReport.h"
 #include "ReplaceSourceAndSinkNodesPass.h"

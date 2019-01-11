@@ -10,9 +10,9 @@
 
 #include "ClockNode.h" // for TimeTickType
 
-#include <emitters/include/LLVMUtilities.h>
 #include <emitters/include/IRMetadata.h>
 #include <emitters/include/IRModuleEmitter.h>
+#include <emitters/include/LLVMUtilities.h>
 
 #include <model/include/CompilableNode.h>
 #include <model/include/IRMapCompiler.h>

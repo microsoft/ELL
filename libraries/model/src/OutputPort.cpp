@@ -6,8 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InputPort.h"
 #include "OutputPort.h"
+#include "InputPort.h"
 
 #include <utilities/include/Exception.h>
 
@@ -31,7 +31,7 @@ namespace model
 
     OutputPortBase::~OutputPortBase()
     {
-        for(const InputPortBase* ref: _references)
+        for (const InputPortBase* ref : _references)
         {
             const_cast<InputPortBase*>(ref)->ClearReferencedPort();
         }
@@ -48,7 +48,7 @@ namespace model
 
     void OutputPortBase::RemoveReference(const InputPortBase* reference) const
     {
-       auto it = std::find(_references.begin(), _references.end(), reference);
+        auto it = std::find(_references.begin(), _references.end(), reference);
         if (it == _references.end())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Trying to remove a nonexistent reference from an output port");

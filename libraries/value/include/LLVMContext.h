@@ -14,6 +14,7 @@
 #include "Scalar.h"
 
 #include <functional>
+#include <optional>
 #include <stack>
 
 namespace ell

@@ -1,0 +1,5 @@
+*.onnx
+*.pth
+*.pty
+*.gsdf
+*.ell

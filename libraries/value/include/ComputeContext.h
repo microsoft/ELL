@@ -14,6 +14,7 @@
 
 #include <forward_list>
 #include <map>
+#include <optional>
 #include <stack>
 #include <string>
 

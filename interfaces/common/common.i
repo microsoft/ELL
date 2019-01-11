@@ -7,28 +7,26 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 %{
-#include "DataLoadArguments.h"
-#include "MapLoadArguments.h"
-#include "LoadModel.h"
-
-#include "TrainerArguments.h"
-#include "SGDIncrementalTrainerArguments.h"
-#include "ForestTrainerArguments.h"
-#include "MultiEpochIncrementalTrainerArguments.h"
-
+#include <common/include/DataLoadArguments.h>
+#include <common/include/MapLoadArguments.h>
+#include <common/include/LoadModel.h>
+#include <common/include/TrainerArguments.h>
+#include <common/include/SGDIncrementalTrainerArguments.h>
+#include <common/include/ForestTrainerArguments.h>
+#include <common/include/MultiEpochIncrementalTrainerArguments.h>
 %}
 
 %ignore ell::common::GetDataset;
 
-%include "ModelLoadArguments.h"
-%include "MapLoadArguments.h"
-%include "LoadModel.h"
+%include <common/include/ModelLoadArguments.h>
+%include <common/include/MapLoadArguments.h>
+%include <common/include/LoadModel.h>
 
 // Trainer arguments
-%include "TrainerArguments.h"
-%include "SGDIncrementalTrainerArguments.h"
-%include "ForestTrainerArguments.h"
-%include "MultiEpochIncrementalTrainerArguments.h"
+%include <common/include/TrainerArguments.h>
+%include <common/include/SGDIncrementalTrainerArguments.h>
+%include <common/include/ForestTrainerArguments.h>
+%include <common/include/MultiEpochIncrementalTrainerArguments.h>
 
 #if defined(SWIGJAVASCRIPT)
 %include "loadModelAsync.i"

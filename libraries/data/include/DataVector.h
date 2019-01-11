@@ -435,10 +435,10 @@ namespace data
 
 #pragma region implementation
 
-#include "../include/DenseDataVector.h"
-#include "../include/SparseBinaryDataVector.h"
-#include "../include/SparseDataVector.h"
-#include "../include/TransformingIndexValueIterator.h"
+#include "DenseDataVector.h"
+#include "SparseBinaryDataVector.h"
+#include "SparseDataVector.h"
+#include "TransformingIndexValueIterator.h"
 
 namespace ell
 {

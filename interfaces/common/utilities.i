@@ -66,18 +66,18 @@ public:
 
 
 // utilities
-%include "TypeFactory.h"
-%include "CompressedIntegerList.h"
-%include "Archiver.h"
-%include "Variant.h"
-%include "ObjectArchive.h"
-%include "IArchivable.h"
-%include "JsonArchiver.h"
-%include "XmlArchiver.h"
-%include "UniqueId.h"
-%include "Variant.h"
-%include "AnyIterator.h"
-%include "RandomEngines.h"
+%include <utilities/include/TypeFactory.h>
+%include <utilities/include/CompressedIntegerList.h>
+%include <utilities/include/Archiver.h>
+%include <utilities/include/Variant.h>
+%include <utilities/include/ObjectArchive.h>
+%include <utilities/include/IArchivable.h>
+%include <utilities/include/JsonArchiver.h>
+%include <utilities/include/XmlArchiver.h>
+%include <utilities/include/UniqueId.h>
+%include <utilities/include/Variant.h>
+%include <utilities/include/AnyIterator.h>
+%include <utilities/include/RandomEngines.h>
 
 // wrap print
 WRAP_OSTREAM_OUT_TO_STR(ell::utilities::UniqueId)

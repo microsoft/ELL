@@ -125,7 +125,7 @@ namespace model
         /// <param name="context"> The context. </param>
         ///
         /// <returns> A copy of the requested portion of the model. </returns>
-        Model CopySubmodel(const Submodel& submodel, const TransformContext& context);
+        Submodel CopySubmodel(const Submodel& submodel, const TransformContext& context);
 
         /// <summary>
         /// Copies part of a source model onto a specified place in a destination model. If the source

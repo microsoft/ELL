@@ -174,6 +174,11 @@ namespace testing
     /// <param name="message"> A message to print. </param>
     void TestSucceeded(const std::string& message);
 
+    /// <summary> Note a test warning. </summary>
+    ///
+    /// <param name="message"> A message to print. </param>
+    void TestWarning(const std::string& message);
+
     /// <summary> Checks if one of the tests failed. </summary>
     ///
     /// <returns> true if one of the tests failed. </returns>
@@ -208,7 +213,32 @@ namespace testing
         return false;
     }
 
-    /// <summary> RAII helper to turn on logging for a sepcific test/scope
+    /// <summary> Call a test function, but register success if a "TestNotImplemented" exception is thrown. </summary>
+    ///
+    /// <param name="function"> The test function to call. </param>
+    /// <param name="args"> Aguments to pass to the test function. </param>
+    template <typename FunctionType, typename... Args>
+    bool NoFailOnUnimplemented(FunctionType&& function, Args&&... args)
+    {
+        using namespace std::literals::string_literals;
+        try
+        {
+            function(std::forward<Args>(args)...);
+            return true;
+        }
+        catch (const TestNotImplementedException& exception)
+        {
+            TestWarning("Skipping unimplemented test: "s + exception.what());
+            return true;
+        }
+        catch (...)
+        {
+            throw;
+        }
+        return false;
+    }
+
+    /// <summary> RAII helper to turn on logging for a specific test/scope
     ///
     /// Example:
     /// ```

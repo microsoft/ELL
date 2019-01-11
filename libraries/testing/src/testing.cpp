@@ -193,6 +193,11 @@ namespace testing
         std::cout << message << " ... Success" << std::endl;
     }
 
+    void TestWarning(const std::string& message)
+    {
+        std::cout << "[Warning]\t" << message << std::endl;
+    }
+
     bool DidTestFail()
     {
         return testFailedFlag;

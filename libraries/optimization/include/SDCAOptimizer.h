@@ -120,7 +120,7 @@ namespace optimization
 
     /// <summary> Convenience function for constructing an SDCA optimizer. </summary>
     template <typename SolutionType, typename LossFunctionType, typename RegularizerType>
-    SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType> MakeSDCAOptimizer(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters);
+    SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType> MakeSDCAOptimizer(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters, std::string randomSeedString = "abc123");
 } // namespace optimization
 } // namespace ell
 
@@ -324,9 +324,9 @@ namespace optimization
     }
 
     template <typename SolutionType, typename LossFunctionType, typename RegularizerType>
-    SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType> MakeSDCAOptimizer(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters)
+    SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType> MakeSDCAOptimizer(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters, std::string randomSeedString)
     {
-        return SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType>(examples, lossFunction, regularizer, parameters);
+        return SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType>(examples, lossFunction, regularizer, parameters, randomSeedString);
     }
 } // namespace optimization
 } // namespace ell
