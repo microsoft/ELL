@@ -22,8 +22,14 @@ The [CTest](https://cmake.org/cmake/help/v3.9/manual/ctest.1.html) tool comes wi
 
 ```shell
     cd build
+    ctest
+```
+If (Missing "-C "?) error for each test is returned then type:
+```shell
     ctest --build-config Release 
 ```
+This extra argument is needed when building with Visual Studio.
+
 If tests fail, add the `-VV` option to get verbose output from each test, to narrow down the problem.  The `-R` option is also handy in this case to run only those tests that have a matching name.
 
 ## Generating Code Documentation with Doxygen
