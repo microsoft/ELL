@@ -114,7 +114,7 @@ class PretrainedModel:
             cmake_file = self.compile(target)
             if cmake_file is None:
                 return None
-            print('building...', flush=True);
+            print('building...', flush=True)
             os.chdir(os.path.dirname(cmake_file))
             import shutil
             pkg_dir = self.deploy_dir
@@ -122,7 +122,7 @@ class PretrainedModel:
             if not os.path.exists('include'):
                 shutil.copytree(os.path.join(pkg_dir, 'include'), 'include')
             if _is_windows(target):
-                _buildtools.run(['cmake', '-G', 'Visual Studio 14 2015 Win64', '-DPROCESSOR_HINT=haswell', '.'], shell=True)
+                _buildtools.run(['cmake', '-G', 'Visual Studio 15 2017 Win64', '-DPROCESSOR_HINT=haswell', '.'], shell=True)
                 _buildtools.run(['cmake', '--build', '.', '--config', 'Release'], shell=True)
             else:
                 _buildtools.run('cmake .', shell=True)

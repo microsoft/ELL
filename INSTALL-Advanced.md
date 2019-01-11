@@ -4,9 +4,9 @@
 
 CMake automatically determines your processor architecture and chooses the right version of OpenBLAS. To override this, use the `-DPROCESSOR_HINT` CMake command line option. For example, for the Intel Haswell processor architecture, add the command line argument `-DPROCESSOR_HINT=haswell`.
 
-## Testing ELL 
+## Testing ELL
 
-There are some optional components that you can build and test depending on 
+There are some optional components that you can build and test depending on
 whether you have installed these python modules:
 
     1. CNTK, install using `pip install cntk`
@@ -22,7 +22,8 @@ The [CTest](https://cmake.org/cmake/help/v3.9/manual/ctest.1.html) tool comes wi
 
 ```shell
     cd build
-    ctest 
+    [Linux/macOS] ctest
+    [Windows] ctest -C Release
 ```
 If tests fail, add the `-VV` option to get verbose output from each test, to narrow down the problem.  The `-R` option is also handy in this case to run only those tests that have a matching name.
 
@@ -31,10 +32,6 @@ If tests fail, add the `-VV` option to get verbose output from each test, to nar
 To create code documentation using *Doxygen*, build the project named `doc`.
 
 ```
-[Linux]
-make doc
-
-[Windows]
 cmake --build . --target doc
 ```
 
@@ -53,6 +50,6 @@ Advanced users can compile OpenCV with CUDA support. To do so, clone the OpenCV 
     set PYTHON3_NUMPY_INCLUDE_DIRS=d:\Continuum\Anaconda2.7\envs\py35\lib\site-packages\numpy\core\include
     set PYTHON3_PACKAGES_PATH=d:\Continuum\Anaconda2.7\envs\py35\lib\site-packages
 
-    cmake  -G "Visual Studio 14 2015 Win64" -D CMAKE_BUILD_TYPE=Release -D WITH_CUDA=1  -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF ..
+    cmake  -G "Visual Studio 15 2017 Win64" -D CMAKE_BUILD_TYPE=Release -D WITH_CUDA=1  -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF ..
     if ERRORLEVEL 1 goto :eof
     cmake --build . --config Release

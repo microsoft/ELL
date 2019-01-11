@@ -8,12 +8,12 @@ permalink: /tutorials/Repurposing-a-pretrained-image-classifier/
 
 *by Byron Changuion*
 
-This tutorial provides instructions on how to repurpose a pretrained image classifier to understand transfer learning. Repurposing or retargeting a pretrained neural network is one example of transfer learning. In the example used here, the original neural network was trained on the 1000 class ILSVRC2012 ImageNet dataset. By taking output from one of the layers near the output of the network, you can leverage (or transfer) the pretrained model's ability to recognize general features and use it as a featurizer to another predictor. This predictor only needs to learn how to map those features onto the new classes that you want it to recognize. Putting it all together results in a new model that has been repurposed from the original 1,000 classes to recognize a different set of classes. 
+This tutorial provides instructions on how to repurpose a pretrained image classifier to understand transfer learning. Repurposing or retargeting a pretrained neural network is one example of transfer learning. In the example used here, the original neural network was trained on the 1000 class ILSVRC2012 ImageNet dataset. By taking output from one of the layers near the output of the network, you can leverage (or transfer) the pretrained model's ability to recognize general features and use it as a featurizer to another predictor. This predictor only needs to learn how to map those features onto the new classes that you want it to recognize. Putting it all together results in a new model that has been repurposed from the original 1,000 classes to recognize a different set of classes.
 
 In this tutorial, you will complete the following:
 * Download a pretrained image classification model from the [ELL gallery](/ELL/gallery/) to a laptop or desktop computer
-* Repurpose the model to predict a different set of specified classes. 
-* Compile the new model and wrap it in a Python module. 
+* Repurpose the model to predict a different set of specified classes.
+* Compile the new model and wrap it in a Python module.
 * Write a simple Python script that runs a validation dataset through the model and prints the results.
 
 In addition to being very quick to train, the model in this tutorial is also much more accurate than the original, because it has been specialized with significantly fewer output classes.
@@ -54,7 +54,7 @@ Download this [compressed ELL model file](https://github.com/Microsoft/ELL-model
 curl --location -o pretrained.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dsf_I64x64x3CCMCCMCCMCMCMC1AS/dsf_I64x64x3CCMCCMCCMCMCMC1AS.ell.zip
 ```
 
-Now, unzip the compressed file. 
+Now, unzip the compressed file.
 
 **Note** On Windows, the `unzip` utility is distributed as part of Git. For example, in `\Program Files\Git\usr\bin`. On Linux computers, you can install unzip using the **apt-get install unzip** command.
 
@@ -201,7 +201,7 @@ For this tutorial, you'll use output from the ReLU activation node that comes af
 Run the `retargetTrainer`, taking output from the node id you have identified in the pretrained model, and produce a retargeted model using the `fruit_train.gsdf` dataset.  Notice below that the name of the output of node `1516` is simply specified as `1516.output`.
 
 ```shell
-[Linux/macOS] $ELL_root/build/bin/retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --verbose --inputModelFilename pretrained.ell --targetPortElements 1516.output --inputDataFilename fruit_train.gsdf --outputModelFilename model.ell 
+[Linux/macOS] $ELL_root/build/bin/retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --verbose --inputModelFilename pretrained.ell --targetPortElements 1516.output --inputDataFilename fruit_train.gsdf --outputModelFilename model.ell
 
 [Windows] %ELL_root%\build\bin\release\retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --inputModelFilename pretrained.ell --targetPortElements 1516.output --inputDataFilename fruit_train.gsdf --outputModelFilename model.ell
 ```
@@ -250,7 +250,7 @@ Run `wrap` as follows.
 python <ELL-root>/tools/wrap/wrap.py --model_file model.ell --language python --target host
 ```
 
-**Note** The `wrap` in this case includes the command line option *--target host*, which tells it to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi. 
+**Note** The `wrap` in this case includes the command line option *--target host*, which tells it to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi.
 
 The following output appears.
 
@@ -274,7 +274,7 @@ To finish creating the Python wrapper, build the CMake project.
 
 ```shell
 [Linux/macOS] cmake .. -DCMAKE_BUILD_TYPE=Release && make && cd ../..
-[Windows] cmake -G "Visual Studio 14 2015 Win64" .. && cmake --build . --config release && cd ..\..
+[Windows] cmake -G "Visual Studio 15 2017 Win64" .. && cmake --build . --config release && cd ..\..
 ```
 
 You have just created a Python module named **model**. This module provides functions that report the shapes of the model's input and output as well as the **predict** function, which invokes the retargeted model you created earlier.
@@ -307,9 +307,9 @@ import numpy as np
 import tutorial_helpers as helpers
 ```
 
-Import the helper code that you copied over. 
+Import the helper code that you copied over.
 
-**Note** The helper code helps find the compiled model files, so make sure to import it before importing the model. 
+**Note** The helper code helps find the compiled model files, so make sure to import it before importing the model.
 
 ```python
 import tutorial_helpers as helpers
@@ -321,7 +321,7 @@ Import the Python wrapper for the compiled ELL model.
 import model
 ```
 
-The main ELL Python module includes functionality that makes it easier to process the dataset. Rather than copying this module, use the `find_ell` helper function to find it. 
+The main ELL Python module includes functionality that makes it easier to process the dataset. Rather than copying this module, use the `find_ell` helper function to find it.
 
 ```python
 helpers.find_ell()
@@ -331,7 +331,7 @@ import ell
 Create a function to save the results in the form of a `confusion matrix`. This is a good way to visualize the difference between what the model predicted and what the model was expected to predict. The predicted values are the rows and the expected values are the columns. The diagonal is where the predicted class and expected class are the same. You can read more about the confusion matrix presentation [here](https://en.wikipedia.org/wiki/Confusion_matrix).
 
 ```python
-def save_confusion_matrix(categories, confusion_matrix_filename, 
+def save_confusion_matrix(categories, confusion_matrix_filename,
         confusion_matrix, num_correct, num_total,
         mean_time_to_predict = None):
     with open(confusion_matrix_filename, "w") as f:
@@ -446,7 +446,7 @@ lemon       0           0       0           0           0       0       9       
 lime        1           0       0           0           0       0       0       8       0       0
 orange      0           0       0           0           0       0       0       0       9       0
 raspberry   0           0       0           0           2       0       1       0       0       10
-										
+
 Mean prediction time:   160ms/frame
 Accuracy:               86/100 = 86.0%
 ```

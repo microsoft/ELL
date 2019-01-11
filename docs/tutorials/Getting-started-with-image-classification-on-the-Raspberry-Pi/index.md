@@ -47,7 +47,7 @@ Download this [compressed ELL model file](https://github.com/Microsoft/ELL-model
 curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip
 ```
 
-Unzip the compressed file. 
+Unzip the compressed file.
 
 **Note** On Windows computers, the unzip utility is distributed as part of Git. For example, in `\Program Files\Git\usr\bin`. On Linux computers, you can install unzip using the **apt-get install unzip** command.
 
@@ -104,7 +104,7 @@ Finally, use CMake to finish building the Python wrapper.
 
 ```shell
 [Linux/macOS] cmake .. -DCMAKE_BUILD_TYPE=Release && make && cd ../..
-[Windows] cmake -G "Visual Studio 14 2015 Win64" .. && cmake --build . --config release && cd ..\..
+[Windows] cmake -G "Visual Studio 15 2017 Win64" .. && cmake --build . --config release && cd ..\..
 ```
 
 This creates a Python module named **model**. This module provides functions that report the shapes of the model's input and output as well as the **predict** function, which invokes the model.
@@ -125,7 +125,7 @@ import cv2
 import numpy as np
 ```
 
-Import the helper code that you copied over. 
+Import the helper code that you copied over.
 
 **Note** Do this before importing the model because it helps find the requisite compiled model files.
 
@@ -179,7 +179,7 @@ Invoke the model by calling its **predict** method.
 predictions = model.predict(input_data)
 ```
 
-The `predict` method returns a `predictions` array with non-negative scores that sum to 1. Each element of this array corresponds to one of the 1000 image categories recognized by the model and represents the model's confidence that the image contains an object from that category. For example, recall that category 504 is **coffee mug** - the value of `predictions[504]` is the model's confidence that the image contains a coffee mug. 
+The `predict` method returns a `predictions` array with non-negative scores that sum to 1. Each element of this array corresponds to one of the 1000 image categories recognized by the model and represents the model's confidence that the image contains an object from that category. For example, recall that category 504 is **coffee mug** - the value of `predictions[504]` is the model's confidence that the image contains a coffee mug.
 
 Print the index of the highest confidence category.
 
@@ -226,9 +226,9 @@ import time
 import cv2
 ```
 
-Import the helper code that you copied over. 
+Import the helper code that you copied over.
 
-**Note** The helper code helps find the compiled model files, so make sure to import it before importing the model. 
+**Note** The helper code helps find the compiled model files, so make sure to import it before importing the model.
 
 ```python
 import tutorial_helpers as helpers
