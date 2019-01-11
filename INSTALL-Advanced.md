@@ -24,7 +24,7 @@ The [CTest](https://cmake.org/cmake/help/v3.9/manual/ctest.1.html) tool comes wi
     cd build
     ctest
 ```
-If (Missing "-C "?) error for each test is returned then type:
+If "Test not available without configuration.  (Missing "-C <config>"?)" error for each test case is shown and test fails for each case then type:
 ```shell
     ctest --build-config Release 
 ```
