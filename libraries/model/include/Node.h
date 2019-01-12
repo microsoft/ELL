@@ -37,6 +37,7 @@ namespace model
         static constexpr const char* defaultInputPortName = "input";
         static constexpr const char* defaultInput1PortName = "input1";
         static constexpr const char* defaultInput2PortName = "input2";
+        static constexpr const char* defaultInput3PortName = "input3";
 
         Node() = default;
         ~Node() override = default;
@@ -52,12 +53,12 @@ namespace model
         /// <summary> Returns the number of input ports for this node </summary>
         ///
         /// <returns> The number of input ports </returns>
-        size_t NumInputPorts() const { return _inputs.size(); }
+        int NumInputPorts() const { return static_cast<int>(_inputs.size()); }
 
         /// <summary> Returns the number of output ports for this node </summary>
         ///
         /// <returns> The number of output ports </returns>
-        size_t NumOutputPorts() const { return _outputs.size(); }
+        int NumOutputPorts() const { return static_cast<int>(_outputs.size()); }
 
         /// <summary> Returns the input ports for this node </summary>
         ///

@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "UnaryOperationNode.h"
+#include "NodeOperations.h"
 
 #include <emitters/include/IRMath.h>
 
@@ -26,49 +27,6 @@ namespace ell
 {
 namespace nodes
 {
-namespace operations
-{
-inline std::string to_string(UnaryOperationType op)
-{
-    switch (op)
-    {
-        ADD_TO_STRING_ENTRY(UnaryOperationType, none);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, abs);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, exp);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, hardSigmoid);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, log);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, logicalNot);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, sigmoid);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, sqrt);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, square);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, sin);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, cos);
-        ADD_TO_STRING_ENTRY(UnaryOperationType, tanh);
-
-    default:
-        throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
-    }
-}
-
-inline UnaryOperationType from_string(std::string name)
-{
-    BEGIN_FROM_STRING;
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, none);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, abs);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, exp);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, hardSigmoid);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, log);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, logicalNot);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, sigmoid);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, sqrt);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, square);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, sin);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, cos);
-    ADD_FROM_STRING_ENTRY(UnaryOperationType, tanh);
-
-    throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
-}
-} // namespace operations
 
 template <typename ValueType>
 UnaryOperationNode<ValueType>::UnaryOperationNode() :
@@ -113,27 +71,27 @@ std::vector<ValueType> ComputeOutput(std::vector<ValueType> input, UnaryOperatio
     switch (operation)
     {
     case UnaryOperationType::abs:
-        return ComputeLoop<ValueType>(input, operations::Abs<ValueType>);
+        return ComputeLoop<ValueType>(input, Abs<ValueType>);
     case UnaryOperationType::sqrt:
-        return ComputeLoop<ValueType>(input, operations::Sqrt<ValueType>);
+        return ComputeLoop<ValueType>(input, Sqrt<ValueType>);
     case UnaryOperationType::logicalNot:
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Cannot perform logicalNot operation on numeric inputs");
     case UnaryOperationType::exp:
-        return ComputeLoop<ValueType>(input, operations::Exp<ValueType>);
+        return ComputeLoop<ValueType>(input, Exp<ValueType>);
     case UnaryOperationType::sin:
-        return ComputeLoop<ValueType>(input, operations::Sin<ValueType>);
+        return ComputeLoop<ValueType>(input, Sin<ValueType>);
     case UnaryOperationType::cos:
-        return ComputeLoop<ValueType>(input, operations::Cos<ValueType>);
+        return ComputeLoop<ValueType>(input, Cos<ValueType>);
     case UnaryOperationType::tanh:
-        return ComputeLoop<ValueType>(input, operations::Tanh<ValueType>);
+        return ComputeLoop<ValueType>(input, Tanh<ValueType>);
     case UnaryOperationType::square:
-        return ComputeLoop<ValueType>(input, operations::Square<ValueType>);
+        return ComputeLoop<ValueType>(input, Square<ValueType>);
     case UnaryOperationType::log:
-        return ComputeLoop<ValueType>(input, operations::Log<ValueType>);
+        return ComputeLoop<ValueType>(input, Log<ValueType>);
     case UnaryOperationType::sigmoid:
-        return ComputeLoop<ValueType>(input, operations::Sigmoid<ValueType>);
+        return ComputeLoop<ValueType>(input, Sigmoid<ValueType>);
     case UnaryOperationType::hardSigmoid:
-        return ComputeLoop<ValueType>(input, operations::HardSigmoid<ValueType>);
+        return ComputeLoop<ValueType>(input, HardSigmoid<ValueType>);
     default:
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
     }
@@ -298,7 +256,7 @@ void UnaryOperationNode<ValueType>::WriteToArchive(utilities::Archiver& archiver
 {
     Node::WriteToArchive(archiver);
     archiver[defaultInputPortName] << _input;
-    archiver["operation"] << operations::to_string(_operation);
+    archiver["operation"] << ToString(_operation);
 }
 
 template <typename ValueType>
@@ -308,7 +266,7 @@ void UnaryOperationNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archi
     archiver[defaultInputPortName] >> _input;
     std::string operation;
     archiver["operation"] >> operation;
-    _operation = operations::from_string(operation);
+    _operation = FromString<UnaryOperationType>(operation);
     _output.SetSize(_input.Size());
 }
 

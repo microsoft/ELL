@@ -39,8 +39,10 @@ private:
     bool _oldVerbose;
 };
 
-// Helpful node for use in debugging model transformations
+void SetVerbose(bool verbose);
+bool IsVerbose();
 
+// Helpful node for use in debugging model transformations
 template <typename ValueType, typename InfoType>
 class DebugNode : public model::Node
 {
@@ -74,8 +76,12 @@ model::Model GetLinearDebugNodeModel(int numDebugNodes); //  in -> node1 -> node
 
 const DebugNode<double, int>* FindDebugNode(const model::Model& model, int tag);
 
-void SetVerbose(bool verbose);
-bool IsVerbose();
+// Runs a few iterations of an arbitrary test on a map (the `testBody` function), serializing and
+// deserializing the map inbetween
+//
+// filenameBase is the base name of the file to use for serialization (an iteration value and ".json" extension are added)
+// testBody takes the map to test and an iteration number.
+void TestWithSerialization(ell::model::Map& map, std::string filenameBase, std::function<void(ell::model::Map& map, int)> testBody);
 
 // Runs a few iterations of an arbitrary test on a map (the `testBody` function), serializing and
 // deserializing the map inbetween

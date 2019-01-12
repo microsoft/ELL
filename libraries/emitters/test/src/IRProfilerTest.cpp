@@ -42,7 +42,7 @@ void TestProfileRegion()
     CompilerOptions options;
     options.optimize = false;
     options.profile = true;
-    std::string moduleName = "CompilableIRFunction";
+    std::string moduleName = "CompilableFunction";
     IRModuleEmitter module(moduleName, options);
     module.DeclarePrintf();
 

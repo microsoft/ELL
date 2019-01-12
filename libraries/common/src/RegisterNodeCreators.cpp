@@ -61,8 +61,8 @@ namespace common
         builder.RegisterNodeCreator<nodes::BinaryOperationNode<double>, const model::PortElements<double>&, const model::PortElements<double>&, nodes::BinaryOperationType>();
         builder.RegisterNodeCreator<nodes::BinaryOperationNode<float>, const model::PortElements<float>&, const model::PortElements<float>&, nodes::BinaryOperationType>();
 
-        builder.RegisterNodeCreator<nodes::BinaryPredicateNode<int>, const model::PortElements<int>&, const model::PortElements<int>&, emitters::BinaryPredicateType>();
-        builder.RegisterNodeCreator<nodes::BinaryPredicateNode<double>, const model::PortElements<double>&, const model::PortElements<double>&, emitters::BinaryPredicateType>();
+        builder.RegisterNodeCreator<nodes::BinaryPredicateNode<int>, const model::PortElements<int>&, const model::PortElements<int>&, nodes::BinaryPredicateType>();
+        builder.RegisterNodeCreator<nodes::BinaryPredicateNode<double>, const model::PortElements<double>&, const model::PortElements<double>&, nodes::BinaryPredicateType>();
 
         builder.RegisterNodeCreator<nodes::BufferNode<float>, const model::PortElements<float>&, size_t>();
         builder.RegisterNodeCreator<nodes::BufferNode<double>, const model::PortElements<double>&, size_t>();

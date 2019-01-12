@@ -8,5 +8,5 @@
 #pragma once
 
 void TestIRAddFunction();
-void TestCompilableIRFunction();
+void TestCompilableFunction();
 void TestStringCompareFunction();

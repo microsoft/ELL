@@ -10,6 +10,7 @@ set(src
     src/BatchNormalizationLayerNode.cpp
     src/BiasLayerNode.cpp
     src/BinaryConvolutionalLayerNode.cpp
+    src/BroadcastOperationNodes.cpp
     src/ClockNode.cpp
     src/ConstantNode.cpp
     src/ConvolutionalLayerNode.cpp
@@ -50,6 +51,7 @@ set(include
     include/BinaryOperationNode.h
     include/BinaryPredicateNode.h
     include/BroadcastFunctionNode.h
+    include/BroadcastOperationNodes.h
     include/BufferNode.h
     include/ClockNode.h
     include/ConcatenationNode.h
@@ -82,6 +84,7 @@ set(include
     include/MultiplexerNode.h
     include/NeuralNetworkLayerNode.h
     include/NeuralNetworkPredictorNode.h
+    include/NodeOperations.h
     include/PoolingLayerNode.h
     include/ProtoNNPredictorNode.h
     include/ReceptiveFieldMatrixNode.h
@@ -143,11 +146,13 @@ set(test_name ${library_name}_test)
 set(test_src
     test/src/main.cpp
     test/src/AppendNodesTests.cpp
+    test/src/BasicMathNodesTests.cpp
     test/src/NodesTests.cpp
     test/src/NodesTestData.cpp
 )
 
 set(test_include
+    test/include/BasicMathNodesTests.h
     test/include/AppendNodesTests.h
     test/include/NodesTests.h
     test/include/NodesTestData.h

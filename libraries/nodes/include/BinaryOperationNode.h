@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "NodeOperations.h"
+
 #include <model/include/CompilableNode.h>
 #include <model/include/CompilableNodeUtilities.h>
 #include <model/include/IRMapCompiler.h>
@@ -16,7 +18,6 @@
 #include <model/include/Node.h>
 #include <model/include/PortMemoryLayout.h>
 
-#include <emitters/include/EmitterTypes.h>
 #include <emitters/include/LLVMUtilities.h>
 
 #include <utilities/include/ArchiveVersion.h>
@@ -28,23 +29,12 @@
 #include <type_traits>
 #include <vector>
 
+#include "NodeOperations.h"
+
 namespace ell
 {
 namespace nodes
-    {
-    /// <summary> Binary operations supported by BinaryOperationNode. </summary>
-    enum class BinaryOperationType
-    {
-        none,
-        add,
-        subtract,
-        multiply,
-        divide,
-        logicalAnd,
-        logicalOr,
-        logicalXor
-    };
-
+{
     /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs. </summary>
     template <typename ValueType>
     class BinaryOperationNode : public model::CompilableNode
@@ -184,50 +174,12 @@ namespace nodes
 
 #pragma region implementation
 
-#define ADD_TO_STRING_ENTRY(NAMESPACE, OPERATOR) \
-    case NAMESPACE::OPERATOR:                    \
-        return #OPERATOR;
-#define BEGIN_FROM_STRING if (false)
-#define ADD_FROM_STRING_ENTRY(NAMESPACE, OPERATOR) else if (name == #OPERATOR) return NAMESPACE::OPERATOR
-
 namespace ell
 {
 namespace nodes
 {
-    namespace BinaryOperations
+    inline namespace BinaryOperations
     {
-        inline std::string to_string(BinaryOperationType op)
-        {
-            switch (op)
-            {
-                ADD_TO_STRING_ENTRY(BinaryOperationType, none);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, add);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, subtract);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, multiply);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, divide);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalAnd);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalOr);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalXor);
-            default:
-                throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
-            }
-        }
-
-        inline BinaryOperationType from_string(std::string name)
-        {
-            BEGIN_FROM_STRING;
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, none);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, add);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, subtract);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, multiply);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, divide);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalAnd);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalOr);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalXor);
-
-            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
-        }
-
         template <typename ValueType>
         ValueType Add(ValueType a, ValueType b)
         {
@@ -410,25 +362,25 @@ namespace nodes
         switch (_operation)
         {
         case BinaryOperationType::add:
-            output = ComputeOutput(BinaryOperations::Add<ValueType>);
+            output = ComputeOutput(Add<ValueType>);
             break;
         case BinaryOperationType::subtract:
-            output = ComputeOutput(BinaryOperations::Subtract<ValueType>);
+            output = ComputeOutput(Subtract<ValueType>);
             break;
         case BinaryOperationType::multiply:
-            output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
+            output = ComputeOutput(Multiply<ValueType>);
             break;
         case BinaryOperationType::divide:
-            output = ComputeOutput(BinaryOperations::Divide<ValueType>);
+            output = ComputeOutput(Divide<ValueType>);
             break;
         case BinaryOperationType::logicalAnd:
-            output = ComputeOutput(BinaryOperations::LogicalAnd<ValueType>);
+            output = ComputeOutput(LogicalAnd<ValueType>);
             break;
         case BinaryOperationType::logicalOr:
-            output = ComputeOutput(BinaryOperations::LogicalOr<ValueType>);
+            output = ComputeOutput(LogicalOr<ValueType>);
             break;
         case BinaryOperationType::logicalXor:
-            output = ComputeOutput(BinaryOperations::LogicalXor<ValueType>);
+            output = ComputeOutput(LogicalXor<ValueType>);
             break;
         default:
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
@@ -482,7 +434,7 @@ namespace nodes
         emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
 
         auto count = input1.Size();
-        function.VectorOperator(emitters::GetOperator<ValueType>(static_cast<emitters::BinaryOperatorType>(GetOperation())), count, pInput1, pInput2, [&pResult, &function](emitters::LLVMValue i, emitters::LLVMValue pValue) {
+        function.VectorOperator(emitters::GetOperator<ValueType>(ToEmitterType(GetOperation())), count, pInput1, pInput2, [&pResult, &function](emitters::LLVMValue i, emitters::LLVMValue pValue) {
             function.SetValueAt(pResult, i, pValue);
         });
     }
@@ -497,7 +449,7 @@ namespace nodes
         {
             emitters::LLVMValue inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
             emitters::LLVMValue inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
-            emitters::LLVMValue pOpResult = function.Operator(emitters::GetOperator<ValueType>(static_cast<emitters::BinaryOperatorType>(GetOperation())), inputValue1, inputValue2);
+            emitters::LLVMValue pOpResult = function.Operator(emitters::GetOperator<ValueType>(ToEmitterType(GetOperation())), inputValue1, inputValue2);
             function.SetValueAt(pResult, function.Literal<int>(i), pOpResult);
         }
     }
@@ -638,7 +590,7 @@ namespace nodes
                 // We're in the innermost loop --- compute the value
                 auto value1 = function.ValueAt(input1, thisInput1DimensionOffset);
                 auto value2 = function.ValueAt(input2, thisInput2DimensionOffset);
-                auto outputValue = function.Operator(emitters::GetOperator<ValueType>(static_cast<emitters::BinaryOperatorType>(GetOperation())), value1, value2);
+                auto outputValue = function.Operator(emitters::GetOperator<ValueType>(ToEmitterType(GetOperation())), value1, value2);
                 function.SetValueAt(output, thisOutputDimensionOffset, outputValue);
             }
         });
@@ -668,7 +620,7 @@ namespace nodes
         archiver[defaultInput2PortName] << _input2;
         archiver["inputLayout1"] << _inputLayout1;
         archiver["inputLayout2"] << _inputLayout2;
-        archiver["operation"] << BinaryOperations::to_string(_operation);
+        archiver["operation"] << ToString(_operation);
         auto outputLayout = _output.GetMemoryLayout();
         archiver["outputLayout"] << outputLayout;
         archiver["padding"] << _paddingValue;
@@ -684,7 +636,7 @@ namespace nodes
         archiver["inputLayout2"] >> _inputLayout2;
         std::string operation;
         archiver["operation"] >> operation;
-        _operation = BinaryOperations::from_string(operation);
+        _operation = FromString<BinaryOperationType>(operation);
         model::PortMemoryLayout outputLayout;
         archiver["outputLayout"] >> outputLayout;
         _output.SetMemoryLayout(outputLayout);

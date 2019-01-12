@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "NodeOperations.h"
+
 #include <model/include/CompilableNode.h>
 #include <model/include/CompilableNodeUtilities.h>
 #include <model/include/IRMapCompiler.h>
@@ -48,7 +50,7 @@ namespace nodes
         /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
         /// <param name="predicate"> The type of predicate to apply. </param>
-        BinaryPredicateNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryPredicateType predicate);
+        BinaryPredicateNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, BinaryPredicateType predicate);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -63,7 +65,7 @@ namespace nodes
         /// <summary> Gets the predicate performed by this node </summary>
         ///
         /// <returns> The predicate </returns>
-        emitters::BinaryPredicateType GetPredicate() const { return _predicate; }
+        BinaryPredicateType GetPredicate() const { return _predicate; }
 
     protected:
         void Compute() const override;
@@ -90,55 +92,19 @@ namespace nodes
         model::OutputPort<bool> _output;
 
         // Operation
-        emitters::BinaryPredicateType _predicate;
+        BinaryPredicateType _predicate;
     };
 } // namespace nodes
 } // namespace ell
 
 #pragma region implementation
 
-#define ADD_TO_STRING_ENTRY(NAMESPACE, OPERATOR) \
-    case NAMESPACE::OPERATOR:                    \
-        return #OPERATOR;
-#define BEGIN_FROM_STRING if (false)
-#define ADD_FROM_STRING_ENTRY(NAMESPACE, OPERATOR) else if (name == #OPERATOR) return NAMESPACE::OPERATOR
-
 namespace ell
 {
 namespace nodes
 {
-    namespace BinaryPredicates
+    inline namespace BinaryPredicates
     {
-        inline std::string to_string(emitters::BinaryPredicateType op)
-        {
-            switch (op)
-            {
-                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, none);
-                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, equal);
-                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, less);
-                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, greater);
-                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, notEqual);
-                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, lessOrEqual);
-                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, greaterOrEqual);
-            default:
-                throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary predicate");
-            }
-        }
-
-        inline emitters::BinaryPredicateType from_string(std::string name)
-        {
-            BEGIN_FROM_STRING;
-            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, none);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, equal);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, less);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, greater);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, notEqual);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, lessOrEqual);
-            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, greaterOrEqual);
-
-            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary predicate");
-        }
-
         template <typename ValueType>
         bool Equal(ValueType a, ValueType b)
         {
@@ -182,12 +148,12 @@ namespace nodes
         _input1(this, {}, defaultInput1PortName),
         _input2(this, {}, defaultInput2PortName),
         _output(this, defaultOutputPortName, 0),
-        _predicate(emitters::BinaryPredicateType::none)
+        _predicate(BinaryPredicateType::none)
     {
     }
 
     template <typename ValueType>
-    BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, emitters::BinaryPredicateType predicate) :
+    BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, BinaryPredicateType predicate) :
         CompilableNode({ &_input1, &_input2 }, { &_output }),
         _input1(this, input1, defaultInput1PortName),
         _input2(this, input2, defaultInput2PortName),
@@ -219,22 +185,22 @@ namespace nodes
         std::vector<bool> output;
         switch (_predicate)
         {
-        case emitters::BinaryPredicateType::equal:
+        case BinaryPredicateType::equal:
             output = ComputeOutput(BinaryPredicates::Equal<ValueType>);
             break;
-        case emitters::BinaryPredicateType::less:
+        case BinaryPredicateType::less:
             output = ComputeOutput(BinaryPredicates::Less<ValueType>);
             break;
-        case emitters::BinaryPredicateType::greater:
+        case BinaryPredicateType::greater:
             output = ComputeOutput(BinaryPredicates::Greater<ValueType>);
             break;
-        case emitters::BinaryPredicateType::notEqual:
+        case BinaryPredicateType::notEqual:
             output = ComputeOutput(BinaryPredicates::NotEqual<ValueType>);
             break;
-        case emitters::BinaryPredicateType::lessOrEqual:
+        case BinaryPredicateType::lessOrEqual:
             output = ComputeOutput(BinaryPredicates::LessOrEqual<ValueType>);
             break;
-        case emitters::BinaryPredicateType::greaterOrEqual:
+        case BinaryPredicateType::greaterOrEqual:
             output = ComputeOutput(BinaryPredicates::GreaterOrEqual<ValueType>);
             break;
         default:
@@ -271,7 +237,7 @@ namespace nodes
         emitters::LLVMValue pInput1 = compiler.EnsurePortEmitted(input1);
         emitters::LLVMValue pInput2 = compiler.EnsurePortEmitted(input2);
         emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
-        emitters::TypedComparison cmp = emitters::GetComparison<ValueType>(GetPredicate());
+        emitters::TypedComparison cmp = emitters::GetComparison<ValueType>(ToEmitterType(GetPredicate()));
 
         function.For(input1.Size(), [pInput1, pInput2, pResult, cmp](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
             emitters::LLVMValue inputValue1 = function.ValueAt(pInput1, i);
@@ -292,7 +258,7 @@ namespace nodes
         {
             emitters::LLVMValue inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
             emitters::LLVMValue inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
-            emitters::LLVMValue pOpResult = function.Comparison(emitters::GetComparison<ValueType>(GetPredicate()), inputValue1, inputValue2);
+            emitters::LLVMValue pOpResult = function.Comparison(emitters::GetComparison<ValueType>(ToEmitterType(GetPredicate())), inputValue1, inputValue2);
             function.SetValueAt(pResult, function.Literal((int)i), function.CastBoolToByte(pOpResult));
         }
     }
@@ -303,7 +269,7 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[defaultInput1PortName] << _input1;
         archiver[defaultInput2PortName] << _input2;
-        archiver["predicate"] << BinaryPredicates::to_string(_predicate);
+        archiver["predicate"] << ToString(_predicate);
     }
 
     template <typename ValueType>
@@ -314,7 +280,7 @@ namespace nodes
         archiver[defaultInput2PortName] >> _input2;
         std::string predicate;
         archiver["predicate"] >> predicate;
-        _predicate = BinaryPredicates::from_string(predicate);
+        _predicate = FromString<BinaryPredicateType>(predicate);
         _output.SetSize(_input1.Size());
     }
 } // namespace nodes

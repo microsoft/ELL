@@ -69,6 +69,11 @@ void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas);
 void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas);
 void TestOrderedMatrixMatrixMultiplyNode(int m, int n, int k, bool transposeA, bool transposeB, bool transposeC, bool useBlas);
 
+void TestBroadcasUnaryOperationNodeCompile();
+void TestBroadcasBinaryOperationNodeCompileAdd();
+void TestBroadcasBinaryOperationNodeCompileSubtract();
+void TestBroadcasBinaryOperationNodeCompileWithOrdering();
+
 //
 // NN layer nodes
 //

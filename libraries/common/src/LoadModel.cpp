@@ -19,6 +19,7 @@
 #include <nodes/include/BinaryOperationNode.h>
 #include <nodes/include/BinaryPredicateNode.h>
 #include <nodes/include/BroadcastFunctionNode.h>
+#include <nodes/include/BroadcastOperationNodes.h>
 #include <nodes/include/BufferNode.h>
 #include <nodes/include/ClockNode.h>
 #include <nodes/include/ActivationFunctions.h>
@@ -101,6 +102,9 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::ReLUActivationFunction<ElementType>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::SigmoidActivationFunction<ElementType>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryOperationNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastBinaryOperationNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastTernaryOperationNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConcatenationNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<ElementType>>();

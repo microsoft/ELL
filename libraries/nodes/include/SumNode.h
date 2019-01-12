@@ -258,7 +258,7 @@ namespace nodes
     template <typename ValueType>
     void SumNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::WriteToArchive(archiver);
+        CompilableNode::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
     }
 

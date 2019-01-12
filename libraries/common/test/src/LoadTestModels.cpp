@@ -20,6 +20,7 @@
 #include <nodes/include/LinearPredictorNode.h>
 #include <nodes/include/MovingAverageNode.h>
 #include <nodes/include/MovingVarianceNode.h>
+#include <nodes/include/NodeOperations.h>
 
 #include <predictors/include/ForestPredictor.h>
 #include <predictors/include/LinearPredictor.h>

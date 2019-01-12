@@ -143,6 +143,18 @@ namespace testing
     /// <returns> true if equal, false if not. </returns>
     bool IsEqual(const std::vector<std::string>& a, const std::vector<std::string>& b);
 
+    /// <summary> Checks if two values are not equal (using the default tolerance for floating-point values). </summary>
+    ///
+    /// <param name="a"> The first value. </param>
+    /// <param name="b"> The second value. </param>
+    ///
+    /// <returns> true if not equal, true if equal. </returns>
+    template <typename T1, typename T2>
+    inline bool IsNotEqual(T1 t1, T2 t2)
+    {
+        return !IsEqual(t1, t2);
+    }
+
     /// <summary> Process the test. </summary>
     ///
     /// <param name="testDescription"> Information describing the test. </param>

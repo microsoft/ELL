@@ -18,6 +18,7 @@
 #include <nodes/include/DelayNode.h>
 #include <nodes/include/DotProductNode.h>
 #include <nodes/include/MultiplexerNode.h>
+#include <nodes/include/NodeOperations.h>
 #include <nodes/include/SumNode.h>
 #include <nodes/include/UnaryOperationNode.h>
 
@@ -143,19 +144,19 @@ nodes::DotProductNode<T>* ModelMaker::DotProduct(const model::OutputPort<T>& x, 
 template <typename T>
 nodes::BinaryPredicateNode<T>* ModelMaker::Equals(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
-    return _model.AddNode<nodes::BinaryPredicateNode<T>>(x, y, emitters::BinaryPredicateType::equal);
+    return _model.AddNode<nodes::BinaryPredicateNode<T>>(x, y, nodes::BinaryPredicateType::equal);
 }
 
 template <typename T>
 nodes::BinaryPredicateNode<T>* ModelMaker::Lt(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
-    return _model.AddNode<nodes::BinaryPredicateNode<T>>(x, y, emitters::BinaryPredicateType::less);
+    return _model.AddNode<nodes::BinaryPredicateNode<T>>(x, y, nodes::BinaryPredicateType::less);
 }
 
 template <typename T>
 nodes::BinaryPredicateNode<T>* ModelMaker::Gt(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
-    return _model.AddNode<nodes::BinaryPredicateNode<T>>(x, y, emitters::BinaryPredicateType::greater);
+    return _model.AddNode<nodes::BinaryPredicateNode<T>>(x, y, nodes::BinaryPredicateType::greater);
 }
 
 template <typename T, typename S>

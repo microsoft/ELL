@@ -143,11 +143,11 @@ namespace nodes
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto delayNode = transformer.AddNode<DelayNode<ValueType>>(newPortElements, _windowSize);
-        const auto& difference = AppendBinaryOperation(transformer, newPortElements, delayNode->output, nodes::BinaryOperationType::subtract);
+        const auto& difference = AppendBinaryOperation(transformer, newPortElements, delayNode->output, BinaryOperationType::subtract);
         auto accumNode = transformer.AddNode<AccumulatorNode<ValueType>>(difference);
         std::vector<ValueType> literalN(newPortElements.Size(), (ValueType)_windowSize);
         const auto& denominator = AppendConstant(transformer, literalN);
-        const auto& quotient = AppendBinaryOperation(transformer, accumNode->output, denominator, nodes::BinaryOperationType::divide);
+        const auto& quotient = AppendBinaryOperation(transformer, accumNode->output, denominator, BinaryOperationType::divide);
         transformer.MapNodeOutput(output, quotient);
         return true;
     }

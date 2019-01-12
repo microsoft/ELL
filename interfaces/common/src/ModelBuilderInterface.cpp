@@ -35,6 +35,7 @@
 #include <nodes/include/IIRFilterNode.h>
 #include <nodes/include/LSTMNode.h>
 #include <nodes/include/NeuralNetworkPredictorNode.h>
+#include <nodes/include/NodeOperations.h>
 #include <nodes/include/ReinterpretLayoutNode.h>
 #include <nodes/include/ReorderDataNode.h>
 #include <nodes/include/TypeCastNode.h>

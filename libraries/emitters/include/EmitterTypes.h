@@ -97,6 +97,13 @@ namespace emitters
         greaterOrEqual
     };
 
+    /// <summary> Untyped ternary operations. </summary>
+    enum class TernaryOperationType
+    {
+        none,
+        fma // fused multiply-add
+    };
+
     ///<summary> An enumeration of strongly-typed operations on numbers </summary>
     enum class TypedOperator
     {

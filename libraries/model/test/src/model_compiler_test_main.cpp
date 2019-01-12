@@ -237,6 +237,12 @@ void TestIRCompiler()
     TestRegionDetectionNode();
 
     TestMatrixVectorProductNodeCompile();
+
+    TestBroadcasUnaryOperationNodeCompile();
+    TestBroadcasBinaryOperationNodeCompileAdd();
+    TestBroadcasBinaryOperationNodeCompileSubtract();
+    TestBroadcasBinaryOperationNodeCompileAdd();
+    TestBroadcasBinaryOperationNodeCompileWithOrdering();
 }
 
 int main(int argc, char* argv[])

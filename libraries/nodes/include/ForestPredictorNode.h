@@ -180,7 +180,7 @@ namespace nodes
                 {
                     model::PortElements<double> elements = interiorNodeSubModels[edges[j].GetTargetNodeIndex()];
 
-                    const auto& edgeSum = AppendBinaryOperation(transformer, edgePredictorNode->output, transformer.SimplifyOutputs(elements), nodes::BinaryOperationType::add);
+                    const auto& edgeSum = AppendBinaryOperation(transformer, edgePredictorNode->output, transformer.SimplifyOutputs(elements), BinaryOperationType::add);
                     edgeOutputs.Append(edgeSum);
                 }
                 else // target node is a leaf

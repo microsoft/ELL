@@ -81,7 +81,7 @@ model::Model GenerateIsEqualModel()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(2);
-    auto predicateNode = model.AddNode<nodes::BinaryPredicateNode<double>>(model::PortElements<double>{ inputNode->output, 0 }, model::PortElements<double>{ inputNode->output, 1 }, emitters::BinaryPredicateType::equal);
+    auto predicateNode = model.AddNode<nodes::BinaryPredicateNode<double>>(model::PortElements<double>{ inputNode->output, 0 }, model::PortElements<double>{ inputNode->output, 1 }, nodes::BinaryPredicateType::equal);
     model.AddNode<model::OutputNode<bool>>(predicateNode->output);
     return model;
 }

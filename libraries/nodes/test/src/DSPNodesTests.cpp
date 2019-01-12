@@ -1234,7 +1234,7 @@ void TestDSPNodes(const std::string& path)
     TestConvolutionNodeCompileVsReference<float>({ 5, 5, 1 }, { 1, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>({ 5, 5, 2 }, { 2, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>({ 5, 5, 1 }, { 1, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::simple);
-	// Non-square inputs not supported in simple depthwise separable yet
+    // Non-square inputs not supported in simple depthwise separable yet
     //TestConvolutionNodeCompileVsReference<float>({ 5, 15, 4 }, { 4, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>({ 8, 8, 1 }, { 1, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::simple);
     TestConvolutionNodeCompileVsReference<float>({ 32, 32, 8 }, { 8, 3, 3, 1 }, 1, dsp::ConvolutionMethodOption::simple);

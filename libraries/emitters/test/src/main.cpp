@@ -58,7 +58,7 @@ void TestIR()
 void TestIRFunction()
 {
     TestIRAddFunction();
-    TestCompilableIRFunction();
+    TestCompilableFunction();
 }
 
 void TestAsyncEmitter()

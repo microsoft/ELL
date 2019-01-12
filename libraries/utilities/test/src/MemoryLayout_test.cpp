@@ -195,4 +195,64 @@ void TestScalarLayout()
     testing::ProcessTest("ScalarLayout test", ok);
 }
 
+void TestInflateMemoryLayout()
+{
+    // Test with a 3-dimensional input layout
+    MemoryLayout layout({ 7, 5, 3 }, ChannelMajorTensorOrder);
+    MemoryLayout layout2 = layout.CopyWithExtraDimensions(0); // should be the same
+    MemoryLayout layout3 = layout.CopyWithExtraDimensions(2); // should be the same
+
+    bool ok = true;
+    ok &= testing::IsEqual(layout.GetActiveSize(), layout2.GetActiveSize());
+    ok &= testing::IsEqual(layout.GetExtent(), layout2.GetExtent());
+    ok &= testing::IsEqual(layout.GetOffset(), layout2.GetOffset());
+    ok &= testing::IsEqual(layout.GetCumulativeIncrement(), layout2.GetCumulativeIncrement());
+    ok &= testing::IsEqual(layout.GetLogicalDimensionOrder(), layout2.GetLogicalDimensionOrder());
+    testing::ProcessTest("MemoryLayout::CopyWithExtraDimensions(0)", ok);
+
+    ok = true;
+    ok &= testing::IsNotEqual(layout.GetActiveSize(), layout3.GetActiveSize());
+    ok &= testing::IsNotEqual(layout.GetExtent(), layout3.GetExtent());
+    ok &= testing::IsNotEqual(layout.GetOffset(), layout3.GetOffset());
+    ok &= testing::IsNotEqual(layout.GetCumulativeIncrement(), layout3.GetCumulativeIncrement());
+    ok &= testing::IsNotEqual(layout.GetLogicalDimensionOrder(), layout3.GetLogicalDimensionOrder());
+    ok &= testing::IsEqual(layout.NumElements(), layout3.NumElements());
+    ok &= testing::IsEqual(layout.GetMemorySize(), layout3.GetMemorySize());
+    ok &= testing::IsEqual(layout.NumDimensions(), layout3.NumDimensions() - 2);
+    ok &= testing::IsEqual(layout.GetEntryOffset({ 1, 2, 3 }), layout3.GetEntryOffset({ 0, 0, 1, 2, 3 }));
+    ok &= testing::IsEqual(layout.GetEntryOffset({ 3, 2, 1 }), layout3.GetEntryOffset({ 0, 0, 3, 2, 1 }));
+    testing::ProcessTest("MemoryLayout::CopyWithExtraDimensions(2)", ok);
+}
+
+void TestInflateNullMemoryLayout()
+{
+    // Test with a 3-dimensional input layout
+    MemoryLayout layout{};
+    MemoryLayout layout2 = layout.CopyWithExtraDimensions(0); // should be the same ({})
+    MemoryLayout layout3 = layout.CopyWithExtraDimensions(2); // should not be the same ({1, 1})
+
+    bool ok = true;
+    ok &= testing::IsEqual(layout.GetActiveSize(), layout2.GetActiveSize());
+    ok &= testing::IsEqual(layout.GetExtent(), layout2.GetExtent());
+    ok &= testing::IsEqual(layout.GetOffset(), layout2.GetOffset());
+    ok &= testing::IsEqual(layout.GetCumulativeIncrement(), layout2.GetCumulativeIncrement());
+    ok &= testing::IsEqual(layout.GetLogicalDimensionOrder(), layout2.GetLogicalDimensionOrder());
+    testing::ProcessTest("Null MemoryLayout::CopyWithExtraDimensions(0)", ok);
+
+    ok = true;
+    ok &= testing::IsNotEqual(layout.GetActiveSize(), layout3.GetActiveSize());
+    ok &= testing::IsNotEqual(layout.GetExtent(), layout3.GetExtent());
+    ok &= testing::IsNotEqual(layout.GetOffset(), layout3.GetOffset());
+    ok &= testing::IsNotEqual(layout.GetCumulativeIncrement(), layout3.GetCumulativeIncrement());
+    ok &= testing::IsNotEqual(layout.GetLogicalDimensionOrder(), layout3.GetLogicalDimensionOrder());
+    ok &= testing::IsEqual(layout.NumElements(), layout3.NumElements());
+    ok &= testing::IsEqual(layout.GetMemorySize(), layout3.GetMemorySize());
+    ok &= testing::IsEqual(layout.NumDimensions(), layout3.NumDimensions() - 2);
+    ok &= testing::IsEqual(layout3.GetActiveSize(), MemoryShape{ 1, 1 });
+    ok &= testing::IsEqual(layout3.GetExtent(), MemoryShape{ 1, 1 });
+    ok &= testing::IsEqual(layout3.GetOffset(), MemoryShape{ 0, 0 });
+    ok &= testing::IsEqual(layout3.GetCumulativeIncrement(), MemoryShape{ 1, 1 });
+    ok &= testing::IsEqual(layout3.GetLogicalDimensionOrder(), DimensionOrder{ 0, 1 });
+    testing::ProcessTest("Null MemoryLayout::CopyWithExtraDimensions(2)", ok);
+}
 } // namespace ell

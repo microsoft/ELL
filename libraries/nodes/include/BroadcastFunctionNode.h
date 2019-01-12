@@ -526,7 +526,13 @@ namespace nodes
         BroadcastLinearFunctionNode();
 
         /// <summary></summary>
-        BroadcastLinearFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout, const model::OutputPort<ValueType>& scaleInput, const model::OutputPort<ValueType>& biasInput, size_t secondaryInputDimension, const model::PortMemoryLayout& outputLayout, ValueType padding = 0);
+        BroadcastLinearFunctionNode(const model::OutputPort<ValueType>& primaryInput,
+                                    const model::PortMemoryLayout& inputLayout,
+                                    const model::OutputPort<ValueType>& scaleInput,
+                                    const model::OutputPort<ValueType>& biasInput,
+                                    size_t secondaryInputDimension,
+                                    const model::PortMemoryLayout& outputLayout,
+                                    ValueType padding = 0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

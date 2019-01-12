@@ -279,9 +279,15 @@ namespace utilities
         return _increment[index];
     }
 
-    size_t MemoryLayout::NumElements() const { return static_cast<size_t>(_size.NumElements()); }
+    size_t MemoryLayout::NumElements() const
+    {
+        return static_cast<size_t>(_size.NumElements());
+    }
 
-    size_t MemoryLayout::GetMemorySize() const { return static_cast<size_t>(_extent.NumElements()); }
+    size_t MemoryLayout::GetMemorySize() const
+    {
+        return static_cast<size_t>(_extent.NumElements());
+    }
 
     size_t MemoryLayout::GetDataOffset() const
     {
@@ -306,6 +312,13 @@ namespace utilities
             result += increment[index] * (physicalCoordinates[index] + offset[index]);
         }
         return result;
+    }
+
+    size_t MemoryLayout::GetFirstEntryOffset() const
+    {
+        const auto numDimensions = NumDimensions();
+        MemoryCoordinates firstEntry(std::vector<int>(numDimensions, 0));
+        return GetEntryOffset(firstEntry);
     }
 
     MemoryCoordinates MemoryLayout::GetLogicalCoordinates(const MemoryCoordinates& physicalCoordinates) const
@@ -448,6 +461,42 @@ namespace utilities
                  DimensionOrder{ order } };
     }
 
+    MemoryLayout MemoryLayout::CopyWithExtraDimensions(int addedDimensions) const
+    {
+        if (addedDimensions < 0)
+        {
+            throw InputException(InputExceptionErrors::invalidArgument,
+                                 "Number of dimensions to add must be non-negative.");
+        }
+
+        // Create prefixes of new layout properties
+        std::vector<int> size(addedDimensions, 1);
+        std::vector<int> extent(addedDimensions, 1);
+        std::vector<int> offset(addedDimensions, 0);
+        std::vector<int> increment(addedDimensions, static_cast<int>(GetMemorySize()));
+        std::vector<int> order(addedDimensions);
+        std::iota(order.begin(), order.end(), 0);
+
+        // Append existing layout properties
+        size.insert(size.end(), _size.begin(), _size.end());
+        extent.insert(extent.end(), _extent.begin(), _extent.end());
+        offset.insert(offset.end(), _offset.begin(), _offset.end());
+        increment.insert(increment.end(), _increment.begin(), _increment.end());
+        order.insert(order.end(), _dimensionOrder.begin(), _dimensionOrder.end());
+
+        // Fix up order
+        auto start = order.begin() + addedDimensions;
+        std::transform(start, order.end(), start, [addedDimensions](auto x) {
+            return x + addedDimensions;
+        });
+
+        return { MemoryShape{ size },
+                 MemoryShape{ extent },
+                 MemoryShape{ offset },
+                 MemoryShape{ increment },
+                 DimensionOrder{ order } };
+    }
+
     void MemoryLayout::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["size"] << _size.ToVector();
@@ -552,11 +601,18 @@ namespace utilities
 
     std::ostream& operator<<(std::ostream& out, const utilities::MemoryShape& shape)
     {
-        out << shape[0];
-        auto numDimensions = shape.NumDimensions();
-        for (int index = 1; index < numDimensions; ++index)
+        if (shape.NumDimensions() == 0)
         {
-            out << " x " << shape[index];
+            out << "{}";
+        }
+        else
+        {
+            out << shape[0];
+            auto numDimensions = shape.NumDimensions();
+            for (int index = 1; index < numDimensions; ++index)
+            {
+                out << " x " << shape[index];
+            }
         }
         return out;
     }

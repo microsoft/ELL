@@ -8,7 +8,7 @@
 
 #include "IRFunctionTest.h"
 
-#include <emitters/include/CompilableIRFunction.h>
+#include <emitters/include/CompilableFunction.h>
 #include <emitters/include/CompilerOptions.h>
 #include <emitters/include/EmitterException.h>
 #include <emitters/include/EmitterTypes.h>
@@ -16,6 +16,7 @@
 #include <emitters/include/IREmitter.h>
 #include <emitters/include/IRExecutionEngine.h>
 #include <emitters/include/IRFunctionEmitter.h>
+#include <emitters/include/IRLocalScalar.h>
 #include <emitters/include/IRModuleEmitter.h>
 #include <emitters/include/Variable.h>
 
@@ -32,7 +33,7 @@ using namespace ell::emitters;
 //
 // Helpers
 //
-class CompilablePlusFiveFunction : public CompilableIRFunction<double, double>
+class CompilablePlusFiveFunction : public CompilableFunction<double(double)>
 {
 public:
     double Compute(double x) const override
@@ -40,10 +41,9 @@ public:
         return x + 5.0;
     }
 
-    LLVMValue Compile(IRFunctionEmitter& function, LLVMValue x) const override
+    IRLocalScalar Compile(IRFunctionEmitter& function, IRLocalScalar x) const override
     {
-        LLVMValue sum = function.Operator(emitters::GetAddForValueType<double>(), x, function.Literal<double>(5.0));
-        return sum;
+        return x + 5.0;
     }
 
     std::string GetRuntimeTypeName() const override { return "PlusFive"; }
@@ -69,8 +69,8 @@ void TestIRAddFunction()
     args.push_back({ "y", VariableType::Double });
     auto function = module.BeginFunction(functionName, VariableType::Double, args);
 
-    LLVMValue xArg = function.GetFunctionArgument("x");
-    LLVMValue yArg = function.GetFunctionArgument("y");
+    IRLocalScalar xArg = function.LocalScalar(function.GetFunctionArgument("x"));
+    IRLocalScalar yArg = function.LocalScalar(function.GetFunctionArgument("y"));
     auto result = func.Compile(function, xArg, yArg);
     function.Return(result);
     module.EndFunction();
@@ -91,10 +91,10 @@ void TestIRAddFunction()
     testing::ProcessTest("Testing compilable add function", testing::IsEqual(computedResult, compiledResult));
 }
 
-void TestCompilableIRFunction()
+void TestCompilableFunction()
 {
     CompilerOptions options;
-    IRModuleEmitter module("CompilableIRFunction", options);
+    IRModuleEmitter module("CompilableFunction", options);
 
     CompilablePlusFiveFunction func;
 
@@ -104,7 +104,7 @@ void TestCompilableIRFunction()
     args.push_back({ "x", VariableType::Double });
     auto function = module.BeginFunction(functionName, VariableType::Double, args);
 
-    LLVMValue arg = function.GetFunctionArgument("x");
+    IRLocalScalar arg = function.LocalScalar(function.GetFunctionArgument("x"));
     auto result = func.Compile(function, arg);
     function.Return(result);
     module.EndFunction();

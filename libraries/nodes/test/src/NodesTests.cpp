@@ -12,7 +12,6 @@
 #include <nodes/include/AccumulatorNode.h>
 #include <nodes/include/BatchNormalizationLayerNode.h>
 #include <nodes/include/BiasLayerNode.h>
-#include <nodes/include/BinaryOperationNode.h>
 #include <nodes/include/BufferNode.h>
 #include <nodes/include/ClockNode.h>
 #include <nodes/include/ConcatenationNode.h>
@@ -34,7 +33,6 @@
 #include <nodes/include/SourceNode.h>
 #include <nodes/include/SquaredEuclideanDistanceNode.h>
 #include <nodes/include/TypeCastNode.h>
-#include <nodes/include/UnaryOperationNode.h>
 
 #include <math/include/MathConstants.h>
 #include <math/include/Tensor.h>
@@ -236,115 +234,6 @@ static void TestMovingVarianceNodeCompute()
         outputVec = model.ComputeOutput(outputNode->output);
     }
     testing::ProcessTest("Testing MovingVarianceNode compute", testing::IsEqual(outputVec[0], expectedOutput));
-}
-
-static void TestUnaryOperationNodeCompute(nodes::UnaryOperationType op, double (*expectedTransform)(double))
-{
-    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
-
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
-    auto outputNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, op);
-
-    for (size_t index = 0; index < data.size(); ++index)
-    {
-        auto inputValue = data[index];
-
-        inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
-
-        for (size_t d = 0; d < inputValue.size(); ++d)
-        {
-            auto expectedOutput = expectedTransform(inputValue[d]);
-            testing::ProcessTest("Testing UnaryOperationNode compute for " + ell::nodes::operations::to_string(op),
-                                 testing::IsEqual(outputVec[d], expectedOutput));
-        }
-    }
-}
-
-static void TestUnaryOperationNodeCompute(nodes::UnaryOperationType op, bool (*expectedTransform)(bool))
-{
-    std::vector<std::vector<bool>> data = { { true }, { false } };
-
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<bool>>(data[0].size());
-    auto outputNode = model.AddNode<nodes::UnaryOperationNode<bool>>(inputNode->output, op);
-
-    for (size_t index = 0; index < data.size(); ++index)
-    {
-        auto inputValue = data[index];
-
-        inputNode->SetInput(inputValue);
-        std::vector<bool> outputVec = model.ComputeOutput(outputNode->output);
-
-        for (size_t d = 0; d < inputValue.size(); ++d)
-        {
-            auto expectedOutput = expectedTransform(inputValue[d]);
-            testing::ProcessTest("Testing UnaryOperationNode compute for " + ell::nodes::operations::to_string(op),
-                                 testing::IsEqual(outputVec[d], expectedOutput));
-        }
-    }
-}
-
-static void TestUnaryOperationNodeCompute()
-{
-    TestUnaryOperationNodeCompute(UnaryOperationType::abs, std::abs);
-    TestUnaryOperationNodeCompute(UnaryOperationType::cos, std::cos);
-    TestUnaryOperationNodeCompute(UnaryOperationType::exp, std::exp);
-    TestUnaryOperationNodeCompute(UnaryOperationType::log, std::log);
-    TestUnaryOperationNodeCompute(UnaryOperationType::sqrt, std::sqrt);
-    TestUnaryOperationNodeCompute(UnaryOperationType::logicalNot, [](bool b) { return !b; });
-    TestUnaryOperationNodeCompute(UnaryOperationType::sin, std::sin);
-    TestUnaryOperationNodeCompute(UnaryOperationType::sqrt, std::sqrt);
-    TestUnaryOperationNodeCompute(UnaryOperationType::square, [](double d) { return d * d; });
-    TestUnaryOperationNodeCompute(UnaryOperationType::tanh, std::tanh);
-}
-
-static void TestBinaryOperationNodeCompute()
-{
-    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
-
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
-    auto outputNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, inputNode->output, nodes::BinaryOperationType::add);
-
-    for (size_t index = 0; index < data.size(); ++index)
-    {
-        auto inputValue = data[index];
-
-        inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
-
-        for (size_t d = 0; d < inputValue.size(); ++d)
-        {
-            auto expectedOutput = 2 * inputValue[d];
-            testing::ProcessTest("Testing BinaryOperationNode compute", testing::IsEqual(outputVec[d], expectedOutput));
-        }
-    }
-}
-
-static void TestBinaryOperationNodeCompute2()
-{
-    model::Model model;
-    int numRows = 2;
-    int numColumns = 2;
-    int numChannels = 2;
-    int padding = 1;
-
-    model::PortMemoryLayout input1Shape(model::MemoryShape{ numRows, numColumns, numChannels }, model::MemoryShape{ padding, padding, 0 });
-    model::PortMemoryLayout input2Shape(model::MemoryShape{ numRows, numColumns, numChannels });
-    model::PortMemoryLayout outputShape(model::MemoryShape{ numRows, numColumns, numChannels });
-
-    auto input1Node = model.AddNode<model::InputNode<double>>(input1Shape.GetMemorySize());
-    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0 });
-    auto outputNode = model.AddNode<nodes::BinaryOperationNode<double>>(input1Node->output, input1Shape, constantNode->output, input2Shape, outputShape, nodes::BinaryOperationType::add, 0);
-    auto map = model::Map(model, { { "input", input1Node } }, { { "output", outputNode->output } });
-
-    std::vector<double> expected{ 2, 4, 6, 8, 10, 12, 14, 16 };
-    std::vector<double> input{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0, 0.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-
-    auto result = map.Compute<double>(input);
-    testing::ProcessTest("TestBinaryOperationNodeCompute2", testing::IsEqual(result, expected));
 }
 
 template <typename ElementType>
@@ -918,8 +807,6 @@ void TestNodes()
     // Compute tests
     //
     TestAccumulatorNodeCompute();
-    TestBinaryOperationNodeCompute();
-    TestBinaryOperationNodeCompute2();
     TestClockNodeCompute();
     TestConcatenationNodeCompute();
     TestDemultiplexerNodeCompute();
@@ -931,7 +818,6 @@ void TestNodes()
     TestSinkNodeCompute();
     TestSourceNodeCompute();
     TestSquaredEuclideanDistanceNodeCompute();
-    TestUnaryOperationNodeCompute();
 
     //
     // Refine tests

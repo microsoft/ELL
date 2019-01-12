@@ -19,6 +19,7 @@
 #include <emitters/include/EmitterException.h>
 #include <emitters/include/EmitterTypes.h>
 #include <emitters/include/IREmitter.h>
+
 #include <model/include/CompiledMap.h>
 #include <model/include/IRCompiledMap.h>
 #include <model/include/IRMapCompiler.h>
@@ -35,6 +36,7 @@
 #include <nodes/include/BiasLayerNode.h>
 #include <nodes/include/BinaryOperationNode.h>
 #include <nodes/include/BinaryPredicateNode.h>
+#include <nodes/include/BroadcastOperationNodes.h>
 #include <nodes/include/ClockNode.h>
 #include <nodes/include/ConcatenationNode.h>
 #include <nodes/include/ConstantNode.h>
@@ -51,6 +53,7 @@
 #include <nodes/include/MatrixVectorProductNode.h>
 #include <nodes/include/MultiplexerNode.h>
 #include <nodes/include/NeuralNetworkPredictorNode.h>
+#include <nodes/include/NodeOperations.h>
 #include <nodes/include/PoolingLayerNode.h>
 #include <nodes/include/ReceptiveFieldMatrixNode.h>
 #include <nodes/include/RegionDetectionLayerNode.h>
@@ -104,12 +107,13 @@ using namespace ell;
 using namespace ell::predictors;
 using namespace ell::predictors::neural;
 using namespace ell::logging;
+using namespace ell::nodes;
 
 void TestCompileIsEqual()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(2);
-    auto predicateNode = model.AddNode<nodes::BinaryPredicateNode<double>>(model::PortElements<double>{ inputNode->output, 0 }, model::PortElements<double>{ inputNode->output, 1 }, emitters::BinaryPredicateType::equal);
+    auto predicateNode = model.AddNode<BinaryPredicateNode<double>>(model::PortElements<double>{ inputNode->output, 0 }, model::PortElements<double>{ inputNode->output, 1 }, BinaryPredicateType::equal);
     auto outputNode = model.AddNode<model::OutputNode<bool>>(predicateNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
 
@@ -165,7 +169,7 @@ void TestCompilableAccumulatorNode()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
+    auto accumNode = model.AddNode<AccumulatorNode<double>>(inputNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", accumNode->output } });
 
     std::string name = "AccumulatorNode";
@@ -185,9 +189,9 @@ void TestCompilableConcatenationNode()
     model::Model model;
 
     auto inputNode = model.AddNode<model::InputNode<double>>(5);
-    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 6, 7, 8 });
+    auto constantNode = model.AddNode<ConstantNode<double>>(std::vector<double>{ 6, 7, 8 });
     auto concatenationInputs = model::PortElements<double>({ inputNode->output, constantNode->output });
-    auto outputNode = model.AddNode<nodes::ConcatenationNode<double>>(concatenationInputs, model::MemoryShape{ 1, 1, 8 });
+    auto outputNode = model.AddNode<ConcatenationNode<double>>(concatenationInputs, model::MemoryShape{ 1, 1, 8 });
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
 
     std::string name = "ConcatenationNode";
@@ -206,8 +210,8 @@ void TestCompilableDotProductNode()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
-    auto dotNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
+    auto constantNode = model.AddNode<ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
+    auto dotNode = model.AddNode<DotProductNode<double>>(inputNode->output, constantNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", dotNode->output } });
 
     std::string name = "DotProductNode";
@@ -226,7 +230,7 @@ void TestCompilableDelayNode()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto delayNode = model.AddNode<nodes::DelayNode<double>>(inputNode->output, 8);
+    auto delayNode = model.AddNode<DelayNode<double>>(inputNode->output, 8);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", delayNode->output } });
 
     std::string name = "DelayNode";
@@ -246,7 +250,7 @@ void TestCompilableDTWDistanceNode()
     model::Model model;
     std::vector<std::vector<double>> prototype = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto dtwNode = model.AddNode<nodes::DTWDistanceNode<double>>(inputNode->output, prototype);
+    auto dtwNode = model.AddNode<DTWDistanceNode<double>>(inputNode->output, prototype);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", dtwNode->output } });
 
     std::string name = "DTWDistanceNode";
@@ -286,7 +290,7 @@ model::Map GenerateMulticlassDTWClassifier(const std::vector<LabeledPrototype>& 
     auto inputNode = model.AddNode<ell::model::InputNode<double>>(dim);
 
     std::vector<double> labels = { 0.0 };
-    auto threshNode = model.AddNode<ell::nodes::ConstantNode<double>>(5.0);
+    auto threshNode = model.AddNode<ConstantNode<double>>(5.0);
     ell::model::PortElements<double> dtwOutputs(threshNode->output);
 
     std::vector<std::pair<int, ell::model::Node*>> dtwNodes;
@@ -294,13 +298,13 @@ model::Map GenerateMulticlassDTWClassifier(const std::vector<LabeledPrototype>& 
     {
         auto label = prototype.Label();
         labels.push_back(static_cast<double>(label));
-        auto dtwNode = model.AddNode<ell::nodes::DTWDistanceNode<double>>(inputNode->output, prototype.Prototype());
+        auto dtwNode = model.AddNode<DTWDistanceNode<double>>(inputNode->output, prototype.Prototype());
         dtwNodes.emplace_back(label, dtwNode);
         dtwOutputs.Append(dtwNode->output);
     }
-    auto labelsNode = model.AddNode<ell::nodes::ConstantNode<double>>(labels);
-    auto argMinNode = model.AddNode<ell::nodes::ArgMinNode<double>>(dtwOutputs); // val, argVal
-    auto selectNode = model.AddNode<ell::nodes::MultiplexerNode<double, int>>(labelsNode->output, argMinNode->argVal);
+    auto labelsNode = model.AddNode<ConstantNode<double>>(labels);
+    auto argMinNode = model.AddNode<ArgMinNode<double>>(dtwOutputs); // val, argVal
+    auto selectNode = model.AddNode<MultiplexerNode<double, int>>(labelsNode->output, argMinNode->argVal);
     auto combinedNode = model.AddNode<ell::model::SpliceNode<double>>(std::vector<const ell::model::OutputPortBase*>{ &selectNode->output, &argMinNode->val });
 
     model::Map result(model, { { "input", inputNode } }, { { "output", ell::model::PortElements<double>{ combinedNode->output } } });
@@ -336,7 +340,7 @@ void TestCompilableScalarSumNode()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto sumNode = model.AddNode<nodes::SumNode<double>>(inputNode->output);
+    auto sumNode = model.AddNode<SumNode<double>>(inputNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", sumNode->output } });
 
     std::string name = "SumNode_Scalar";
@@ -357,7 +361,7 @@ void TestCompilableSumNode()
     std::vector<std::vector<ElementType>> expected = { { 21 }, { 36 }, { 16 }, { 21 }, { 37 }, { 24 } };
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(signal[0].size());
-    auto sumNode = model.AddNode<nodes::SumNode<ElementType>>(inputNode->output);
+    auto sumNode = model.AddNode<SumNode<ElementType>>(inputNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", sumNode->output } });
 
     std::string name = "SumNode_Vector";
@@ -372,10 +376,10 @@ void TestCompilableSumNode()
     });
 }
 
-std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std::vector<double>> signal, nodes::UnaryOperationType op)
+std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std::vector<double>> signal, UnaryOperationType op)
 {
-    ell::nodes::SigmoidActivationFunction<double> sigmoid;
-    ell::nodes::HardSigmoidActivationFunction<double> hardSigmoid;
+    SigmoidActivationFunction<double> sigmoid;
+    HardSigmoidActivationFunction<double> hardSigmoid;
 
     std::vector<std::vector<double>> result;
     for (auto v : signal)
@@ -385,34 +389,34 @@ std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std
         {
             switch (op)
             {
-            case ell::nodes::UnaryOperationType::abs:
+            case UnaryOperationType::abs:
                 d = std::abs(d);
                 break;
-            case ell::nodes::UnaryOperationType::exp:
+            case UnaryOperationType::exp:
                 d = std::exp(d);
                 break;
-            case ell::nodes::UnaryOperationType::hardSigmoid:
+            case UnaryOperationType::hardSigmoid:
                 d = hardSigmoid.Compute(d);
                 break;
-            case ell::nodes::UnaryOperationType::log:
+            case UnaryOperationType::log:
                 d = std::log(d);
                 break;
-            case ell::nodes::UnaryOperationType::sin:
+            case UnaryOperationType::sin:
                 d = std::sin(d);
                 break;
-            case ell::nodes::UnaryOperationType::sigmoid:
+            case UnaryOperationType::sigmoid:
                 d = sigmoid.Compute(d);
                 break;
-            case ell::nodes::UnaryOperationType::square:
+            case UnaryOperationType::square:
                 d *= d;
                 break;
-            case ell::nodes::UnaryOperationType::cos:
+            case UnaryOperationType::cos:
                 d = std::cos(d);
                 break;
-            case ell::nodes::UnaryOperationType::sqrt:
+            case UnaryOperationType::sqrt:
                 d = std::sqrt(d);
                 break;
-            case ell::nodes::UnaryOperationType::tanh:
+            case UnaryOperationType::tanh:
                 d = std::tanh(d);
                 break;
             default:
@@ -443,11 +447,11 @@ void TestCompilableUnaryOperationNode()
     };
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    for (auto op : std::vector<nodes::UnaryOperationType>{ nodes::UnaryOperationType::abs, nodes::UnaryOperationType::cos, nodes::UnaryOperationType::exp,
-        nodes::UnaryOperationType::hardSigmoid, nodes::UnaryOperationType::log, nodes::UnaryOperationType::sigmoid, nodes::UnaryOperationType::sin,
-        nodes::UnaryOperationType::sqrt, nodes::UnaryOperationType::square, nodes::UnaryOperationType::tanh })
+    for (auto op : std::vector<UnaryOperationType>{ UnaryOperationType::abs, UnaryOperationType::cos, UnaryOperationType::exp,
+        UnaryOperationType::hardSigmoid, UnaryOperationType::log, UnaryOperationType::sigmoid, UnaryOperationType::sin,
+        UnaryOperationType::sqrt, UnaryOperationType::square, UnaryOperationType::tanh })
     {
-        auto testNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, op);
+        auto testNode = model.AddNode<UnaryOperationNode<double>>(inputNode->output, op);
         auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
         std::string name = "UnaryOperationNode_" + opnames[static_cast<int>(op)];
@@ -467,7 +471,7 @@ void TestL2NormSquaredNodeCompiled()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto testNode = model.AddNode<nodes::L2NormSquaredNode<double>>(inputNode->output);
+    auto testNode = model.AddNode<L2NormSquaredNode<double>>(inputNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     std::string name = "L2NormSquaredNode";
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
@@ -509,7 +513,7 @@ void TestMatrixVectorProductNodeCompile()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto testNode = model.AddNode<nodes::MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
+    auto testNode = model.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
     auto outputNode = model.AddNode<model::OutputNode<double>>(testNode->output, model::MemoryShape{ 1, 4, 1 });
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
 
@@ -527,7 +531,7 @@ void TestMatrixVectorProductNodeCompile()
     });
 }
 
-std::vector<std::vector<double>> GetExpectedBinaryOperationResult(std::vector<std::vector<double>> signal, std::vector<double> input, nodes::BinaryOperationType op)
+std::vector<std::vector<double>> GetExpectedBinaryOperationResult(std::vector<std::vector<double>> signal, std::vector<double> input, BinaryOperationType op)
 {
     std::vector<std::vector<double>> result;
     for (auto v: signal)
@@ -540,16 +544,16 @@ std::vector<std::vector<double>> GetExpectedBinaryOperationResult(std::vector<st
             double d = 0;
             switch (op)
             {
-            case ell::nodes::BinaryOperationType::add:
+            case BinaryOperationType::add:
                 d = a + b;
                 break;
-            case ell::nodes::BinaryOperationType::subtract:
+            case BinaryOperationType::subtract:
                 d = a - b;
                 break;
-            case ell::nodes::BinaryOperationType::multiply:
+            case BinaryOperationType::multiply:
                 d = a * b;
                 break;
-            case ell::nodes::BinaryOperationType::divide:
+            case BinaryOperationType::divide:
                 d = a / b;
                 break;
             default:
@@ -575,14 +579,14 @@ void TestCompilableBinaryOperationNode()
         "logicalXor"
     };
 
-    for (auto op : std::vector<nodes::BinaryOperationType>{ nodes::BinaryOperationType::add, nodes::BinaryOperationType::subtract, nodes::BinaryOperationType::multiply,
-        nodes::BinaryOperationType::divide})
+    for (auto op : std::vector<BinaryOperationType>{ BinaryOperationType::add, BinaryOperationType::subtract, BinaryOperationType::multiply,
+        BinaryOperationType::divide})
     {
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
         auto input = std::vector<double>{ 1.0, 2.0, 3.0 };
-        auto constantNode = model.AddNode<nodes::ConstantNode<double>>(input);
-        auto testNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantNode->output, op);
+        auto constantNode = model.AddNode<ConstantNode<double>>(input);
+        auto testNode = model.AddNode<BinaryOperationNode<double>>(inputNode->output, constantNode->output, op);
         auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
         std::string name = "BinaryOperationNode_" + opnames[static_cast<int>(op)];
@@ -611,8 +615,8 @@ void TestCompilableBinaryOperationNode2()
     model::PortMemoryLayout outputShape(model::MemoryShape{ numRows, numColumns, numChannels });
 
     auto inputNode = model.AddNode<model::InputNode<double>>(input1Shape.GetMemorySize());
-    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0 });
-    auto testNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, input1Shape, constantNode->output, input2Shape, outputShape, nodes::BinaryOperationType::add, 0.0);
+    auto constantNode = model.AddNode<ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0 });
+    auto testNode = model.AddNode<BinaryOperationNode<double>>(inputNode->output, input1Shape, constantNode->output, input2Shape, outputShape, BinaryOperationType::add, 0.0);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
@@ -629,7 +633,7 @@ void TestCompilableBinaryOperationNode2()
     VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, "BinaryOperationNode");
 }
 
-std::vector<std::vector<bool>> GetExpectedBinaryPredicateOutput(std::vector<std::vector<double>> signal, std::vector<double> input, emitters::BinaryPredicateType op)
+std::vector<std::vector<bool>> GetExpectedBinaryPredicateOutput(std::vector<std::vector<double>> signal, std::vector<double> input, BinaryPredicateType op)
 {
     std::vector<std::vector<bool>> result;
     for (auto v : signal)
@@ -642,22 +646,22 @@ std::vector<std::vector<bool>> GetExpectedBinaryPredicateOutput(std::vector<std:
             bool d = 0;
             switch (op)
             {
-            case ell::emitters::BinaryPredicateType::equal:
+            case BinaryPredicateType::equal:
                 d = (a == b);
                 break;
-            case ell::emitters::BinaryPredicateType::less:
+            case BinaryPredicateType::less:
                 d = (a < b);
                 break;
-            case ell::emitters::BinaryPredicateType::greater:
+            case BinaryPredicateType::greater:
                 d = (a > b);
                 break;
-            case ell::emitters::BinaryPredicateType::notEqual:
+            case BinaryPredicateType::notEqual:
                 d = (a != b);
                 break;
-            case ell::emitters::BinaryPredicateType::lessOrEqual:
+            case BinaryPredicateType::lessOrEqual:
                 d = (a <= b);
                 break;
-            case ell::emitters::BinaryPredicateType::greaterOrEqual:
+            case BinaryPredicateType::greaterOrEqual:
                 d = (a >= b);
                 break;
             default:
@@ -683,13 +687,13 @@ std::string BinaryPredicateTypeNames[] = {
 // Problem: memory corruption for BinaryPredicateNode (probably because of bool foolishness)
 void TestCompilableScalarBinaryPredicateNode()
 {
-    for (auto op : std::vector<emitters::BinaryPredicateType>())
+    for (auto op : std::vector<BinaryPredicateType>())
     {
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(1);
         auto input = std::vector<double>{ 2 };
-        auto constantNode = model.AddNode<nodes::ConstantNode<double>>(input);
-        auto testNode = model.AddNode<nodes::BinaryPredicateNode<double>>(inputNode->output, constantNode->output, emitters::BinaryPredicateType::equal);
+        auto constantNode = model.AddNode<ConstantNode<double>>(input);
+        auto testNode = model.AddNode<BinaryPredicateNode<double>>(inputNode->output, constantNode->output, BinaryPredicateType::equal);
         auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
         std::string name = "BinaryPredicateNode_Scalar" + BinaryPredicateTypeNames[static_cast<int>(op)];
@@ -708,13 +712,13 @@ void TestCompilableScalarBinaryPredicateNode()
 // Problem: memory corruption for BinaryPredicateNode (probably because of bool foolishness)
 void TestCompilableBinaryPredicateNode()
 {
-    for (auto op : std::vector<emitters::BinaryPredicateType>())
+    for (auto op : std::vector<BinaryPredicateType>())
     {
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
         auto input = std::vector<double>{ 1.0, 2.0, 3.0 };
-        auto constantNode = model.AddNode<nodes::ConstantNode<double>>(input);
-        auto testNode = model.AddNode<nodes::BinaryPredicateNode<double>>(inputNode->output, constantNode->output, emitters::BinaryPredicateType::equal);
+        auto constantNode = model.AddNode<ConstantNode<double>>(input);
+        auto testNode = model.AddNode<BinaryPredicateNode<double>>(inputNode->output, constantNode->output, BinaryPredicateType::equal);
         auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
         std::string name = "BinaryPredicateNode_Vector" + BinaryPredicateTypeNames[static_cast<int>(op)];
@@ -735,8 +739,8 @@ void TestCompilableMultiplexerNode()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<int>>(1);
-    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
-    auto testNode = model.AddNode<nodes::MultiplexerNode<double, int>>(constantNode->output, inputNode->output);
+    auto constantNode = model.AddNode<ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
+    auto testNode = model.AddNode<MultiplexerNode<double, int>>(constantNode->output, inputNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -750,7 +754,7 @@ void TestCompilableTypeCastNode(size_t dimension)
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<int>>(dimension);
-    auto testNode = model.AddNode<nodes::TypeCastNode<int, double>>(inputNode->output);
+    auto testNode = model.AddNode<TypeCastNode<int, double>>(inputNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
     std::string name = "TypeCastNode";
@@ -782,13 +786,13 @@ void TestReinterpretLayoutNode()
 
     // create two inputs that are deliberately different shapes (but same # elements).
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(model::MemoryShape{ 1, 1, size });
-    auto constantNode = model.AddNode<ell::nodes::ConstantNode<ElementType>>(constants, model::MemoryShape{ size, 1, 1 });
+    auto constantNode = model.AddNode<ConstantNode<ElementType>>(constants, model::MemoryShape{ size, 1, 1 });
 
     // now re-interpret the contantNode so it's shape matches the input node.
-    auto reinterpret = model.AddNode<ell::nodes::ReinterpretLayoutNode<ElementType>>(constantNode->output, model::MemoryShape{ 1, 1, size });
+    auto reinterpret = model.AddNode<ReinterpretLayoutNode<ElementType>>(constantNode->output, model::MemoryShape{ 1, 1, size });
 
     // And do a binary operation on the input (binary operation would complain if the shapes don't match).
-    auto addition = model.AddNode<ell::nodes::BinaryOperationNode<ElementType>>(inputNode->output, reinterpret->output, ell::nodes::BinaryOperationType::add);
+    auto addition = model.AddNode<BinaryOperationNode<ElementType>>(inputNode->output, reinterpret->output, BinaryOperationType::add);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", addition->output } });
     std::string name = "TestReinterpretLayoutNode";
@@ -825,7 +829,7 @@ void TestReorderDataNode1()
 
     size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
-    auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout);
+    auto testNode = model.AddNode<ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -866,7 +870,7 @@ void TestReorderDataNode2()
 
     size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
-    auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout, std::vector<int>{ 2, 0, 1 });
+    auto testNode = model.AddNode<ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout, std::vector<int>{ 2, 0, 1 });
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -906,7 +910,7 @@ void TestReorderDataNode3()
 
     size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
-    auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout);
+    auto testNode = model.AddNode<ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -991,7 +995,7 @@ void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape)
     size_t inputSize = inputMemoryLayout.GetExtent().NumElements();
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
-    auto testNode = model.AddNode<nodes::ReceptiveFieldMatrixNode<ElementType>>(inputNode->output,
+    auto testNode = model.AddNode<ReceptiveFieldMatrixNode<ElementType>>(inputNode->output,
                                                                                 inputMemoryLayout,
                                                                                 filterWidth,
                                                                                 stride,
@@ -1035,12 +1039,12 @@ void TestCompilableAccumulatorNodeFunction()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto accumNode1 = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
-    auto constNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1, 2, 3 });
-    auto accumNode2 = model.AddNode<nodes::AccumulatorNode<double>>(accumNode1->output);
-    auto accumNode3 = model.AddNode<nodes::AccumulatorNode<double>>(constNode->output);
-    auto dotNode2 = model.AddNode<nodes::DotProductNode<double>>(accumNode2->output, accumNode3->output);
-    auto accumNode4 = model.AddNode<nodes::AccumulatorNode<double>>(dotNode2->output);
+    auto accumNode1 = model.AddNode<AccumulatorNode<double>>(inputNode->output);
+    auto constNode = model.AddNode<ConstantNode<double>>(std::vector<double>{ 1, 2, 3 });
+    auto accumNode2 = model.AddNode<AccumulatorNode<double>>(accumNode1->output);
+    auto accumNode3 = model.AddNode<AccumulatorNode<double>>(constNode->output);
+    auto dotNode2 = model.AddNode<DotProductNode<double>>(accumNode2->output, accumNode3->output);
+    auto accumNode4 = model.AddNode<AccumulatorNode<double>>(dotNode2->output);
     auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ accumNode4->output, dotNode2->output });
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
@@ -1083,8 +1087,8 @@ void TestCompilableSourceNode()
 {
     TestCompilableSourceNodeContext context{ 0, 5 };
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(2);
-    auto testNode = model.AddNode<nodes::SourceNode<double>>(
+    auto inputNode = model.AddNode<model::InputNode<TimeTickType>>(2);
+    auto testNode = model.AddNode<SourceNode<double>>(
         inputNode->output,
         context.inputSize,
         "CompiledSourceNode_InputCallback");
@@ -1101,8 +1105,8 @@ void TestCompilableSourceNode()
         settings.compilerSettings.optimize = true;
 
         // the Compute callback function cannot be serialized, so we set it here.
-        const nodes::SourceNode<double>* constSourceNode = static_cast<const nodes::SourceNode<double>*>(map.GetSourceNodes()[0]);
-        nodes::SourceNode<double>* sourceNode = const_cast<nodes::SourceNode<double>*>(constSourceNode);
+        const SourceNode<double>* constSourceNode = static_cast<const SourceNode<double>*>(map.GetSourceNodes()[0]);
+        SourceNode<double>* sourceNode = const_cast<SourceNode<double>*>(constSourceNode);
         sourceNode->SetSourceFunction(
             [context](auto& input) {
             input.assign(context.inputSize, 42.0);
@@ -1147,8 +1151,8 @@ void TestCompilableSinkNode(size_t inputSize, bool triggerValue)
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputSize);
-    auto condition = model.AddNode<nodes::ConstantNode<bool>>(triggerValue);
-    auto testNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output, condition->output, sinkFunctionName);
+    auto condition = model.AddNode<ConstantNode<bool>>(triggerValue);
+    auto testNode = model.AddNode<SinkNode<double>>(inputNode->output, condition->output, sinkFunctionName);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
 
@@ -1203,7 +1207,7 @@ void TestFloatNode()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<float>>(3);
-    auto accumNode1 = model.AddNode<nodes::AccumulatorNode<float>>(inputNode->output);
+    auto accumNode1 = model.AddNode<AccumulatorNode<float>>(inputNode->output);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", accumNode1->output } });
     model::MapCompilerOptions settings;
@@ -1291,9 +1295,9 @@ void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas)
 
     model::Model model;
     auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(m * n);
-    auto inputVectorNode = model.AddNode<nodes::ConstantNode<ValueType>>(vectorVals);
+    auto inputVectorNode = model.AddNode<ConstantNode<ValueType>>(vectorVals);
 
-    auto matVecMultNode = model.AddNode<nodes::MatrixVectorMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, n, inputVectorNode->output);
+    auto matVecMultNode = model.AddNode<MatrixVectorMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, n, inputVectorNode->output);
 
     auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matVecMultNode->output } });
 
@@ -1320,13 +1324,13 @@ void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
 
     model::Model model;
     auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(m * k);
-    auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals);
+    auto matrixBNode = model.AddNode<ConstantNode<ValueType>>(matrixBVals);
 
     int lda = k;
     int ldb = n;
     int ldc = n;
 
-    auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, k, lda, matrixBNode->output, ldb, ldc);
+    auto matMatMultNode = model.AddNode<MatrixMatrixMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, k, lda, matrixBNode->output, ldb, ldc);
 
     auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
 
@@ -1357,14 +1361,14 @@ void TestOrderedMatrixMatrixMultiplyNode(int m, int n, int k, bool transposeA, b
 
     model::Model model;
     auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(model::MemoryShape{ m, k });
-    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, orderA);
+    auto reorderedInputMatrixNode = model.AddNode<ReorderDataNode<ValueType>>(inputMatrixNode->output, orderA);
 
     std::vector<ValueType> matrixBVals(k * n);
     FillVector(matrixBVals);
-    auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals, model::MemoryShape{ k, n });
-    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(matrixBNode->output, orderB);
+    auto matrixBNode = model.AddNode<ConstantNode<ValueType>>(matrixBVals, model::MemoryShape{ k, n });
+    auto reorderedMatrixBNode = model.AddNode<ReorderDataNode<ValueType>>(matrixBNode->output, orderB);
 
-    auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode->output, reorderedMatrixBNode->output, outputLayout);
+    auto matMatMultNode = model.AddNode<MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode->output, reorderedMatrixBNode->output, outputLayout);
 
     auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
 
@@ -1401,18 +1405,18 @@ TESTING_FORCE_DEFINE_SYMBOL(Test_ClockNode_LagNotificationCallback, void, void*,
 
 void TestCompilableClockNode()
 {
-    using GetTicksUntilNextInterval = nodes::TimeTickType(nodes::TimeTickType);
-    using GetLagThreshold = nodes::TimeTickType();
-    using GetStepInterval = nodes::TimeTickType();
+    using GetTicksUntilNextInterval = TimeTickType(TimeTickType);
+    using GetLagThreshold = TimeTickType();
+    using GetStepInterval = TimeTickType();
 
-    constexpr nodes::TimeTickType lagThreshold = 125;
-    constexpr nodes::TimeTickType interval = 50;
-    constexpr nodes::TimeTickType start = 1511889201834.5767; // timestamp from python: time.time() * 1000
+    constexpr TimeTickType lagThreshold = 125;
+    constexpr TimeTickType interval = 50;
+    constexpr TimeTickType start = 1511889201834.5767; // timestamp from python: time.time() * 1000
 
     model::Model model;
 
-    auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1);
-    auto clockNote = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold, "ClockNode_LagNotificationCallback");
+    auto inputNode = model.AddNode<model::InputNode<TimeTickType>>(1);
+    auto clockNote = model.AddNode<ClockNode>(inputNode->output, interval, lagThreshold, "ClockNode_LagNotificationCallback");
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", clockNote->output } });
 
     model::MapCompilerOptions settings;
@@ -1433,7 +1437,7 @@ void TestCompilableClockNode()
     auto getTicksFunction = reinterpret_cast<GetTicksUntilNextInterval*>(jitter.ResolveFunctionAddress("Test_GetTicksUntilNextInterval"));
 
     // compare output
-    std::vector<std::vector<nodes::TimeTickType>> signal =
+    std::vector<std::vector<TimeTickType>> signal =
         {
             { start },
             { start + interval * 1 + lagThreshold / 2 }, // within threshold
@@ -1443,8 +1447,8 @@ void TestCompilableClockNode()
             { start + interval * 5 } // on time
         };
 
-    std::vector<nodes::TimeTickType> getTicksResults;
-    std::vector<nodes::TimeTickType> expectedGetTicksResults =
+    std::vector<TimeTickType> getTicksResults;
+    std::vector<TimeTickType> expectedGetTicksResults =
         {
             interval,
             interval - lagThreshold / 2,
@@ -1458,7 +1462,7 @@ void TestCompilableClockNode()
     for (const auto& input : signal)
     {
         // interleave calls to the map and getTicks, so that we can test updates to the last interval state
-        VerifyCompiledOutput(map, compiledMap, std::vector<std::vector<nodes::TimeTickType>>{ input }, "ClockNode");
+        VerifyCompiledOutput(map, compiledMap, std::vector<std::vector<TimeTickType>>{ input }, "ClockNode");
         getTicksResults.push_back(getTicksFunction(input[0]));
     }
     testing::ProcessTest("Testing compiled GetTicksUntilNextInterval", testing::IsEqual(getTicksResults, expectedGetTicksResults));
@@ -1471,7 +1475,7 @@ void TestCompilableFFTNode()
     const int N = 8;
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ValueType>>(N);
-    auto fftNode = model.AddNode<nodes::FFTNode<ValueType>>(inputNode->output);
+    auto fftNode = model.AddNode<FFTNode<ValueType>>(inputNode->output);
 
     std::vector<ValueType> input1(N, 1.0); // DC
     std::vector<ValueType> input2(N, 0); // impulse
@@ -1497,7 +1501,7 @@ void TestCompilableFFTNode()
     });
 }
 
-class BinaryFunctionIRNode : public nodes::IRNode
+class BinaryFunctionIRNode : public IRNode
 {
 public:
     /// @name Input and Output Ports
@@ -1554,13 +1558,13 @@ void TestIRNode()
 
     model::Model dotNodeModel;
     auto inputNode1 = dotNodeModel.AddNode<model::InputNode<double>>(dimension);
-    auto constantNode1 = dotNodeModel.AddNode<nodes::ConstantNode<double>>(constValue);
-    auto dotNode = dotNodeModel.AddNode<nodes::DotProductNode<double>>(inputNode1->output, constantNode1->output);
+    auto constantNode1 = dotNodeModel.AddNode<ConstantNode<double>>(constValue);
+    auto dotNode = dotNodeModel.AddNode<DotProductNode<double>>(inputNode1->output, constantNode1->output);
     auto dotNodeMap = model::Map(dotNodeModel, { { "input", inputNode1 } }, { { "output", dotNode->output } });
 
     model::Model irNodeModel;
     auto inputNode2 = irNodeModel.AddNode<model::InputNode<double>>(dimension);
-    auto constantNode2 = irNodeModel.AddNode<nodes::ConstantNode<double>>(constValue);
+    auto constantNode2 = irNodeModel.AddNode<ConstantNode<double>>(constValue);
     std::vector<model::PortElementsBase> inputs{ inputNode2->output, constantNode2->output };
     emitters::NamedVariableTypeList extraArgs{ { "count", emitters::VariableType::Int32 } };
 
@@ -1660,7 +1664,7 @@ void TestNeuralNetworkPredictorNode1()
     model::Model model;
 #if 1
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto predictorNode = model.AddNode<NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
@@ -1691,12 +1695,12 @@ void TestNeuralNetworkPredictorNode1()
     auto inputNode = model.AddNode<model::InputNode<double>>(model::MemoryShape{ 1, 1, 3 });
     std::vector<ElementType> singleChannelInput = { 2 };
     std::vector<ElementType> allChannelsInput = { 2, 1, 0 };
-    auto scaleValuesNode = model.AddNode<nodes::ConstantNode<ElementType>>(allChannelsInput);
-    auto scaleValuesNode2 = model.AddNode<nodes::ConstantNode<ElementType>>(allChannelsInput);
-    auto biasValuesNode = model.AddNode<nodes::ConstantNode<ElementType>>(); // nothing
+    auto scaleValuesNode = model.AddNode<ConstantNode<ElementType>>(allChannelsInput);
+    auto scaleValuesNode2 = model.AddNode<ConstantNode<ElementType>>(allChannelsInput);
+    auto biasValuesNode = model.AddNode<ConstantNode<ElementType>>(); // nothing
 
     const size_t channelDimension = 2;
-    auto computeNode = model.AddNode<nodes::BroadcastLinearFunctionNode<ElementType>>(inputNode->output,
+    auto computeNode = model.AddNode<BroadcastLinearFunctionNode<ElementType>>(inputNode->output,
                                                                                       inputNode->output.GetMemoryLayout(),
                                                                                       scaleValuesNode->output,
                                                                                       biasValuesNode->output,
@@ -1728,11 +1732,11 @@ void TestBroadcastLinearFunctionNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(model::MemoryShape{ rows, cols });
 
     std::vector<ElementType> scaleValues = { 1, 2, 3, 4, 5 };
-    auto scaleValuesNode = model.AddNode<nodes::ConstantNode<ElementType>>(scaleValues, model::MemoryShape{ rows });
-    auto biasValuesNode = model.AddNode<nodes::ConstantNode<ElementType>>(); // nothing
+    auto scaleValuesNode = model.AddNode<ConstantNode<ElementType>>(scaleValues, model::MemoryShape{ rows });
+    auto biasValuesNode = model.AddNode<ConstantNode<ElementType>>(); // nothing
 
     const size_t secondaryInputDimension = 0; // broadcast the scale vector across our input "rows".
-    auto computeNode = model.AddNode<nodes::BroadcastLinearFunctionNode<ElementType>>(inputNode->output,
+    auto computeNode = model.AddNode<BroadcastLinearFunctionNode<ElementType>>(inputNode->output,
                                                                                       inputNode->output.GetMemoryLayout(),
                                                                                       scaleValuesNode->output,
                                                                                       biasValuesNode->output,
@@ -1829,7 +1833,7 @@ void TestNeuralNetworkPredictorNode2()
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto predictorNode = model.AddNode<NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerOptions settings;
@@ -1889,7 +1893,7 @@ void TestNeuralNetworkPredictorNode3()
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto predictorNode = model.AddNode<NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerOptions settings;
@@ -1955,7 +1959,7 @@ void TestNeuralNetworkPredictorNode4()
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto predictorNode = model.AddNode<NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerOptions settings;
@@ -2036,7 +2040,7 @@ void TestNeuralNetworkPredictorNode5()
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
+    auto predictorNode = model.AddNode<NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerOptions settings;
@@ -2132,7 +2136,7 @@ void TestNeuralNetworkPredictorNode6()
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto predictorNode = model.AddNode<NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerOptions settings;
@@ -2303,7 +2307,7 @@ void TestNeuralNetworkPredictorNode7()
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto predictorNode = model.AddNode<NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerOptions settings;
@@ -2347,7 +2351,7 @@ void TestInputLayerNode(size_t outputPadding)
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
+    auto predictorNode = model.AddNode<NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerOptions settings;
@@ -2385,7 +2389,7 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize, 
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::ActivationLayerNode<ElementType>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<ActivationLayerNode<ElementType>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -2445,7 +2449,7 @@ void TestParametricReLUActivationLayerNode(size_t inputPaddingSize, size_t outpu
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::ParametricReLUActivationLayerNode<ElementType>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<ParametricReLUActivationLayerNode<ElementType>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 
@@ -2485,7 +2489,7 @@ void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddi
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::BatchNormalizationLayerNode<double>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<BatchNormalizationLayerNode<double>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
@@ -2526,7 +2530,7 @@ void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::BiasLayerNode<double>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<BiasLayerNode<double>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
@@ -2569,7 +2573,7 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::BinaryConvolutionalLayerNode<ElementType>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<BinaryConvolutionalLayerNode<ElementType>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     // Compile it
@@ -2688,7 +2692,7 @@ void TestConvolutionalLayerNode(ConvolutionMethod convolutionMethod, size_t inpu
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<double>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<ConvolutionalLayerNode<double>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     const auto info = "(TestConvolutionalLayerNode1, method = " + std::to_string(int(convolutionMethod)) + ")";
@@ -2759,7 +2763,7 @@ void TestConvolutionalLayerNode2(ConvolutionMethod convolutionMethod, size_t inp
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<double>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<ConvolutionalLayerNode<double>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     const auto info = "(TestConvolutionalLayerNode2, method = " + std::to_string(int(convolutionMethod)) + ")";
@@ -2829,7 +2833,7 @@ void TestConvolutionalLayerNode3(ConvolutionMethod convolutionMethod, size_t inp
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<double>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<ConvolutionalLayerNode<double>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     const auto info = "(TestConvolutionalLayerNode3 - depthwise separable, method = " + std::to_string(int(convolutionMethod)) + ")";
@@ -2877,7 +2881,7 @@ void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSi
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::FullyConnectedLayerNode<double>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<FullyConnectedLayerNode<double>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
@@ -2912,7 +2916,7 @@ void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::PoolingLayerNode<ElementType, PoolingFunction>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<PoolingLayerNode<ElementType, PoolingFunction>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
@@ -2973,7 +2977,7 @@ void TestScalingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::ScalingLayerNode<ElementType>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<ScalingLayerNode<ElementType>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
@@ -3007,7 +3011,7 @@ void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::SoftmaxLayerNode<ElementType>>(inputNode->output, layer);
+    auto computeNode = model.AddNode<SoftmaxLayerNode<ElementType>>(inputNode->output, layer);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
@@ -3063,7 +3067,7 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto predictorNode = model.AddNode<NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerOptions settings;
@@ -3202,7 +3206,7 @@ void TestRegionDetectionNode()
         // Create model
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
-        auto computeNode = model.AddNode<nodes::RegionDetectionLayerNode<ElementType>>(inputNode->output, detectionLayer);
+        auto computeNode = model.AddNode<RegionDetectionLayerNode<ElementType>>(inputNode->output, detectionLayer);
         auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
         // Make a copy to ensure remaining tests aren't affected
@@ -3221,4 +3225,149 @@ void TestRegionDetectionNode()
         std::vector<std::vector<ElementType>> signal = { input.ToArray() };
         VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
     }
+}
+
+void TestBroadcasUnaryOperationNodeCompile()
+{
+    model::Model model;
+    int numRows = 2;
+    int numColumns = 3;
+    int numChannels = 4;
+
+    model::PortMemoryLayout inputLayout({ numRows, numColumns, numChannels });
+    model::PortMemoryLayout outputLayout({ numRows, numColumns, numChannels });
+
+    // clang-format off
+    std::vector<double> inputVals{ 1, -2, -1, 2,    -1, -2, 1, 2,    1, -2, 1, 2,        3, -4, 3, -4,    3, -4, 3, 4,    3, -4, 3, 4 };
+    std::vector<double>  expected{ 1,  2,  1, 2,     1,  2, 1, 2,    1,  2, 1, 2,        3,  4, 3,  4,    3,  4, 3, 4,    3,  4, 3, 4 };
+    // clang-format on
+
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputLayout);
+    auto op = BroadcastUnaryOperationNode<double>::OperationType::abs;
+    auto outputNode = model.AddNode<BroadcastUnaryOperationNode<double>>(inputNode->output, op);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+
+    // Compile model
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    auto computed = compiledMap.Compute<double>(inputVals);
+    testing::ProcessTest("TestBroadcastUnaryOperationNodeCompile", testing::IsEqual(computed, expected));
+}
+
+void TestBroadcasBinaryOperationNodeCompileAdd()
+{
+    model::Model model;
+    int numRows = 2;
+    int numColumns = 3;
+    int numChannels = 4;
+
+    model::PortMemoryLayout input1Layout({ numRows, numColumns, numChannels });
+    model::PortMemoryLayout input2Layout({ 1, numColumns, 1 });
+    model::PortMemoryLayout input3Layout({ 1, numColumns, 1 });
+    model::PortMemoryLayout outputLayout({ numRows, numColumns, numChannels });
+
+    // clang-format off
+    std::vector<double> input1Vals{ 1, 2, 1, 2,    1, 2, 1, 2,    1, 2, 1, 2,        3, 4, 3, 4,    3, 4, 3, 4,    3, 4, 3, 4 };
+    std::vector<double> input2Vals{ 2, 4, 6 }; 
+    // broadcasts to:             { 2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6,        2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6 }
+    std::vector<double>   expected{ 3, 4, 3, 4,    5, 6, 5, 6,    7, 8, 7, 8,        5, 6, 5, 6,    7, 8, 7, 8,    9, 10, 9, 10 };
+    // clang-format on
+
+    auto input1Node = model.AddNode<model::InputNode<double>>(input1Layout);
+    auto input2Node = model.AddNode<ConstantNode<double>>(input2Vals, input2Layout);
+    auto op = BroadcastBinaryOperationNode<double>::OperationType::add;
+    auto outputNode = model.AddNode<BroadcastBinaryOperationNode<double>>(input1Node->output,
+                                                                                 input2Node->output,
+                                                                                 op);
+    auto map = model::Map(model, { { "input", input1Node } }, { { "output", outputNode->output } });
+
+    // Compile model
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    auto computed = compiledMap.Compute<double>(input1Vals);
+    testing::ProcessTest("TestBroadcastBinaryOperationNodeCompileAdd", testing::IsEqual(computed, expected));
+}
+
+void TestBroadcasBinaryOperationNodeCompileSubtract()
+{
+    model::Model model;
+    int numRows = 2;
+    int numColumns = 3;
+    int numChannels = 4;
+
+    model::PortMemoryLayout input1Layout({ numRows, numColumns, numChannels });
+    model::PortMemoryLayout input2Layout({ 1, numColumns, 1 });
+    model::PortMemoryLayout input3Layout({ 1, numColumns, 1 });
+    model::PortMemoryLayout outputLayout({ numRows, numColumns, numChannels });
+
+    // clang-format off
+    std::vector<double> input1Vals{ 1, 2, 1, 2,      1, 2, 1, 2,      1, 2, 1, 2,            3, 4, 3, 4,    3, 4, 3, 4,    3, 4, 3, 4 };
+    std::vector<double> input2Vals{ 2, 4, 6 }; 
+    // broadcasts to:             { 2, 2, 2, 2,      4, 4, 4, 4,      6, 6, 6, 6,            2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6 }
+    std::vector<double>   expected{ -1, 0, -1, 0,    -3, -2, -3, -2,    -5, -4, -5, -4,      1, 2, 1, 2,   -1, 0, -1, 0,  -3, -2, -3, -2 };
+    // clang-format on
+
+    auto input1Node = model.AddNode<model::InputNode<double>>(input1Layout);
+    auto input2Node = model.AddNode<ConstantNode<double>>(input2Vals, input2Layout);
+    auto op = BroadcastBinaryOperationNode<double>::OperationType::subtract;
+    auto outputNode = model.AddNode<BroadcastBinaryOperationNode<double>>(input1Node->output,
+                                                                                 input2Node->output,
+                                                                                 op);
+    auto map = model::Map(model, { { "input", input1Node } }, { { "output", outputNode->output } });
+
+    // Compile model
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    auto computed = compiledMap.Compute<double>(input1Vals);
+    testing::ProcessTest("TestBroadcastBinaryOperationNodeCompileSubtract", testing::IsEqual(computed, expected));
+}
+
+void TestBroadcasBinaryOperationNodeCompileWithOrdering()
+{
+    model::Model model;
+    int numRows = 2;
+    int numColumns = 3;
+
+    model::PortMemoryLayout input1Layout({ numRows, numColumns });
+    model::PortMemoryLayout input2Layout = input1Layout.ReorderedCopy({ 1, 0 });
+    model::PortMemoryLayout outputLayout({ numRows, numColumns });
+
+    // clang-format off
+    std::vector<double> input1Vals{ 1, 2, 3,
+                                    4, 5, 6 };
+    // std::vector<double> input1Vals{ 10, 20, 30,
+    //                                 40, 50, 60 };
+    // transposed to:
+    std::vector<double> input2Vals{ 10, 40, 
+                                    20, 50,
+                                    30, 60 };
+    std::vector<double>   expected{ 11, 22, 33,
+                                    44, 55, 66 };
+    // clang-format on
+
+    auto input1Node = model.AddNode<model::InputNode<double>>(input1Layout);
+    auto input2Node = model.AddNode<ConstantNode<double>>(input2Vals, input2Layout);
+    auto op = BroadcastBinaryOperationNode<double>::OperationType::add;
+    auto outputNode = model.AddNode<BroadcastBinaryOperationNode<double>>(input1Node->output,
+                                                                                 input2Node->output,
+                                                                                 op);
+    auto map = model::Map(model, { { "input", input1Node } }, { { "output", outputNode->output } });
+
+    // Compile model
+    model::MapCompilerOptions settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    auto computed = compiledMap.Compute<double>(input1Vals);
+    testing::ProcessTest("TestBroadcastBinaryOperationNodeCompileWithOrdering", testing::IsEqual(computed, expected));
 }

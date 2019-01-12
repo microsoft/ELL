@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "BasicMathNodesTests.h"
 #include "AppendNodesTests.h"
 #include "NodesTests.h"
 
@@ -17,6 +18,7 @@
 #include <iostream>
 
 using namespace ell;
+using namespace ell::testing;
 
 /// Runs all tests
 ///
@@ -26,8 +28,9 @@ int main(int argc, char** argv)
     UNUSED(argv);
     try
     {
-        TestNodes();
-        TestAppendNodes();
+        FailOnException(TestNodes);
+        FailOnException(TestAppendNodes);
+        FailOnException(TestBasicMathNodes);
     }
     catch (const utilities::Exception& exception)
     {
@@ -35,10 +38,5 @@ int main(int argc, char** argv)
         throw;
     }
 
-    if (testing::DidTestFail())
-    {
-        return 1;
-    }
-
-    return 0;
+    return GetExitCode();
 }

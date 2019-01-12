@@ -372,6 +372,11 @@ namespace utilities
         /// <returns> The offset to the entry (from the beginning of memory) </returns>
         size_t GetEntryOffset(const MemoryCoordinates& physicalCoordinates) const;
 
+        /// <summary> Gets the offset into memory for the first active entry </summary>
+        ///
+        /// <returns> The offset to the first active entry (from the beginning of memory) </returns>
+        size_t GetFirstEntryOffset() const;
+
         /// <summary> Transforms the given logic coordinates into a physical set of indices for the current layout. </summary>
         MemoryCoordinates GetPhysicalCoordinates(const MemoryCoordinates& logicalCoordinates) const;
 
@@ -497,6 +502,16 @@ namespace utilities
         /// of the physical dimensions, and provides the correctly adjusted extents and increments for the
         /// sliced layout. </remarks>
         MemoryLayout GetSliceLayout(int physicalDimension) const;
+
+        /// <summary> Creates a new MemoryLayout by adding empty dimensions. </summary>
+        ///
+        /// <param name="addedDimensions"> The number of dimensions to add. </param>
+        /// <returns> A new memory layout that matches this one, but with extra leading "empty" dimensions. </returns>
+        /// <remarks> 
+        /// The new layout is created by appending dimensions of size (and extent) `1` and offset `0`.
+        /// For instance, calling `CopyWithExtraDimensions(2)` on a layout of size `{2,3,4}` would result
+        /// in a layout of size `{1,1,2,3,4}.`
+        MemoryLayout CopyWithExtraDimensions(int addedDimensions) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

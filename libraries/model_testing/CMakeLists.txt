@@ -16,6 +16,6 @@ source_group("include" FILES ${include})
 
 add_library(${library_name} ${src} ${include})
 target_include_directories(${library_name} PRIVATE include ${ELL_LIBRARIES_DIR})
-target_link_libraries(${library_name} utilities model nodes emitters testing common)
+target_link_libraries(${library_name} common utilities model nodes emitters testing)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
