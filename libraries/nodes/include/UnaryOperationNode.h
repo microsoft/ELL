@@ -91,13 +91,12 @@ namespace nodes
 
     /// <summary> Convenience function for adding a node to a model. </summary>
     ///
-    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
     /// <param name="input"> The port to get the input data from </param>
     /// <param name="operation"> The function to use to process the signal. </param>
     ///
     /// <returns> The output of the new node. </returns>
-    template <typename ModelLikeType, typename ValueType>
-    const model::OutputPort<ValueType>& AppendUnaryOperation(ModelLikeType& model, const model::OutputPort<ValueType>& input, UnaryOperationType operation);
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& AppendUnaryOperation(const model::OutputPort<ValueType>& input, UnaryOperationType operation);
 
     inline namespace operations
     {
@@ -290,11 +289,15 @@ namespace nodes
         }
     } // namespace operations
 
-    template <typename ModelLikeType, typename ValueType>
-    const model::OutputPort<ValueType>& AppendUnaryOperation(ModelLikeType& model, const model::OutputPort<ValueType>& input, UnaryOperationType operation)
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& AppendUnaryOperation(const model::OutputPort<ValueType>& input, UnaryOperationType operation)
     {
-        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
-        auto node = model.template AddNode<UnaryOperationNode<ValueType>>(input, operation);
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<UnaryOperationNode<ValueType>>(input, operation);
         return node->output;
     }
 } // namespace nodes

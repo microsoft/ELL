@@ -237,9 +237,6 @@ namespace model
                                        const TransformContext& context,
                                        const NodeTransformFunction& transformFunction);
 
-        /// <summary> Resets the internal state of the transformer </summary>
-        void Reset();
-
         // for debugging
         bool IsEmpty() const { return _elementsMap.IsEmpty(); }
 
@@ -359,6 +356,7 @@ namespace model
         /// <returns> The context in use by the transformer. </returns>
         const TransformContext& GetContext() const { return _context; }
 
+        /// <summary> Get the destination model being transformed into. </summary>
         Model& GetModel() { return _model; }
 
     private:
@@ -385,6 +383,7 @@ namespace model
         bool IsInputNode(const Node& node) const;
         static bool Compatible(const InputPortBase* source, const OutputPortBase* dest);
         void MapCorrespondingInputs(const std::vector<const InputPortBase*>& sources, const std::vector<const OutputPortBase*>& destinations);
+        bool IsModelCompilable() const;
         bool IsInPlace() const;
 
         template <typename NodeType>
@@ -405,7 +404,6 @@ namespace model
         Model _model;
         TransformContext _context;
         PortOutputsMap _elementsMap;
-        bool _isModelCompilable = false;
         bool _isInPlace = false;
     };
 } // namespace model
@@ -471,9 +469,7 @@ namespace model
     template <typename NodeType, typename... Args>
     NodeType* ModelTransformer::AddNode(Args&&... args)
     {
-        auto newNode = _model.AddNode<NodeType>(std::forward<Args>(args)...);
-        _isModelCompilable &= _context.IsNodeCompilable(*newNode);
-        return newNode;
+        return _model.AddNode<NodeType>(std::forward<Args>(args)...);
     }
 
     template <typename ValueType>

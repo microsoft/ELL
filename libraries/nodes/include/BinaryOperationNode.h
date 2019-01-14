@@ -157,18 +157,40 @@ namespace nodes
 
     /// <summary> Convenience function for adding a node to a model. </summary>
     ///
-    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
     /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
     /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
     /// <param name="operation"> The type of operation to perform. </param>
     ///
     /// <returns> The output of the new node. </returns>
     /// Note: the output will use the same memory layout as input1
-    template <typename ModelLikeType, typename ValueType>
-    const model::OutputPort<ValueType>& AppendBinaryOperation(ModelLikeType& model,
-                                                              const model::OutputPort<ValueType>& input1,
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& AppendBinaryOperation(const model::OutputPort<ValueType>& input1,
                                                               const model::OutputPort<ValueType>& input2,
                                                               BinaryOperationType operation);
+
+    inline namespace BinaryOperations
+    {
+        template <typename ValueType>
+        ValueType Add(ValueType a, ValueType b);
+
+        template <typename ValueType>
+        ValueType Subtract(ValueType a, ValueType b);
+
+        template <typename ValueType>
+        ValueType Multiply(ValueType a, ValueType b);
+
+        template <typename ValueType>
+        ValueType Divide(ValueType a, ValueType b);
+
+        template <typename ValueType>
+        ValueType LogicalAnd(ValueType a, ValueType b);
+
+        template <typename ValueType>
+        ValueType LogicalOr(ValueType a, ValueType b);
+
+        template <typename ValueType>
+        ValueType LogicalXor(ValueType a, ValueType b);
+    } // namespace BinaryOperations
 } // namespace nodes
 } // namespace ell
 
@@ -643,14 +665,22 @@ namespace nodes
         archiver["padding"] >> _paddingValue;
     }
 
-    template <typename ModelLikeType, typename ValueType>
-    const model::OutputPort<ValueType>& AppendBinaryOperation(ModelLikeType& model,
-                                                              const model::OutputPort<ValueType>& input1,
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& AppendBinaryOperation(const model::OutputPort<ValueType>& input1,
                                                               const model::OutputPort<ValueType>& input2,
                                                               BinaryOperationType operation)
     {
-        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
-        auto node = model.template AddNode<BinaryOperationNode<ValueType>>(input1, input2, operation);
+        model::Model* model = input1.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        if (*model != *(input2.GetNode()->GetModel()))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Inputs not part of the same model");
+        }
+
+        auto node = model->AddNode<BinaryOperationNode<ValueType>>(input1, input2, operation);
         return node->output;
     }
 } // namespace nodes

@@ -152,6 +152,9 @@ namespace model
         /// <returns> a vector of all the nodes that depend on this node </summary>
         std::vector<const Node*> GetDependentNodes() const;
 
+        /// <summary> Returns the model this node is part of </summary>
+        Model* GetModel() const { return _model.get(); }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -206,10 +209,11 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const = 0;
 
         void SetId(Node::NodeId id);
+        void SetModel(Model* model);
         void UpdateInputPorts();
         bool InvokeRefine(ModelTransformer& transformer) const;
 
-        Model* _model = nullptr;
+        std::unique_ptr<Model> _model;
         NodeId _id;
         std::vector<InputPortBase*> _inputs;
         std::vector<OutputPortBase*> _outputs;

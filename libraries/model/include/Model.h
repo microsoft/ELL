@@ -377,6 +377,10 @@ namespace model
         const OutputPortBase& AddSpliceNode(const std::vector<const OutputPortBase*>& outputPorts);
         Node* AddExistingNode(std::unique_ptr<Node> node);
         void EnsureNodeHasUniqueId(Node& node);
+        void Verify() const;
+        void VerifyNodes() const;
+        void VerifyInputs() const;
+        void VerifyInputs(const Node& node) const;
         Node::NodeId GetUniqueId(const Node::NodeId& desiredId);
         static Node::NodeId GetNextId(Node::NodeId id);
         const IDToNodeMap& GetNodeMap() const;

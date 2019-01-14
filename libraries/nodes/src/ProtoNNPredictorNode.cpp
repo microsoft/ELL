@@ -89,8 +89,8 @@ namespace nodes
         auto squareDistanceNode = transformer.AddNode<SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInputNode->output, prototypesMatrix);
 
         // Similarity to each prototype
-        const auto& scaledDistance = AppendBinaryOperation(transformer, squareDistanceNode->output, gamma, BinaryOperationType::multiply);
-        const auto& expDistance = AppendUnaryOperation(transformer, scaledDistance, UnaryOperationType::exp);
+        const auto& scaledDistance = AppendBinaryOperation(squareDistanceNode->output, gamma, BinaryOperationType::multiply);
+        const auto& expDistance = AppendUnaryOperation(scaledDistance, UnaryOperationType::exp);
 
         // Get the prediction label
         auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(expDistance, _predictor.GetLabelEmbeddings());

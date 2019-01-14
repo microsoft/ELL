@@ -62,7 +62,10 @@ namespace model
             }
 
             auto compilableNode = const_cast<CompilableNode*>(dynamic_cast<const CompilableNode*>(&node));
-            assert(compilableNode != nullptr && "Got null compilable node");
+            if (!compilableNode)
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Encountered null comilable node");
+            }
 
             Log() << "Now compiling node " << DiagnosticString(node) << EOL;
             OnBeginCompileNode(node);

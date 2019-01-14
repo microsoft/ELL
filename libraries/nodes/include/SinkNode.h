@@ -17,6 +17,8 @@
 
 #include <emitters/include/IRMetadata.h>
 
+#include <utilities/include/TypeTraits.h>
+
 #include <functional>
 #include <string>
 #include <vector>
@@ -303,7 +305,7 @@ namespace nodes
     template <typename ModelLikeType, typename ValueType>
     const model::OutputPort<ValueType>& AppendSink(ModelLikeType& model, const model::OutputPort<ValueType>& output)
     {
-        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        static_assert(utilities::IsOneOf<ModelLikeType, model::Model, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
         auto sinkNode = model.template AddNode<SinkNode<ValueType>>(output, AppendConstant(model, true), "OutputCallback");
         return sinkNode->output;
     }

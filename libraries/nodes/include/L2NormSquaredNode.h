@@ -121,8 +121,8 @@ namespace nodes
     bool L2NormSquaredNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        const auto& squaredInput = AppendUnaryOperation(transformer, newPortElements, UnaryOperationType::square);
-        const auto& sum = AppendSum(transformer, squaredInput);
+        const auto& squaredInput = AppendUnaryOperation(newPortElements, UnaryOperationType::square);
+        const auto& sum = AppendSum(squaredInput);
 
         transformer.MapNodeOutput(output, sum);
         return true;

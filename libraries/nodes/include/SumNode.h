@@ -19,6 +19,7 @@
 
 #include <emitters/include/IRVectorUtilities.h>
 
+#include <utilities/include/Exception.h>
 #include <utilities/include/TypeName.h>
 
 #include <string>
@@ -79,12 +80,11 @@ namespace nodes
 
     /// <summary> Convenience function for adding a node to a model. </summary>
     ///
-    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
     /// <param name="input"> The port to get the input data from </param>
     ///
     /// <returns> The output of the new node. </returns>
-    template <typename ModelLikeType, typename ValueType>
-    const model::OutputPort<ValueType>& AppendSum(ModelLikeType& model, const model::OutputPort<ValueType>& input);
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& AppendSum(const model::OutputPort<ValueType>& input);
 } // namespace nodes
 } // namespace ell
 
@@ -269,11 +269,15 @@ namespace nodes
         archiver[defaultInputPortName] >> _input;
     }
 
-    template <typename ModelLikeType, typename ValueType>
-    const model::OutputPort<ValueType>& AppendSum(ModelLikeType& model, const model::OutputPort<ValueType>& input)
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& AppendSum(const model::OutputPort<ValueType>& input)
     {
-        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
-        auto node = model.template AddNode<SumNode<ValueType>>(input);
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<SumNode<ValueType>>(input);
         return node->output;
     }
 } // namespace nodes

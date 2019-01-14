@@ -52,7 +52,6 @@ model::IRCompiledMap GetCompiledMapWithCallbacks(
     auto conditionNode = model.AddNode<nodes::ConstantNode<bool>>(true);
     auto sumNode = model.AddNode<nodes::SumNode<ElementType>>(sourceNode->output);
     auto sinkNode = model.AddNode<nodes::SinkNode<ElementType>>(sumNode->output, conditionNode->output, "MyResultsCallback");
-
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
     auto map = model::Map(model, { { "time", inputNode } }, { { "output", outputNode->output } });
 

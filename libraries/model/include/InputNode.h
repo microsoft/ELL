@@ -15,6 +15,7 @@
 
 #include <utilities/include/IArchivable.h>
 #include <utilities/include/TypeName.h>
+#include <utilities/include/TypeTraits.h>
 
 #include <string>
 #include <vector>
@@ -89,7 +90,7 @@ namespace model
         OutputPort<ValueType> _output;
     };
 
-    /// <summary> Convenience function for adding a node to a model. </summary>
+    /// <summary> Convenience function for adding an InputNode to a model. </summary>
     ///
     /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
     /// <param name="layout"> The input node's output memory layout </param>
@@ -207,9 +208,9 @@ namespace model
     }
 
     template <typename ModelLikeType, typename ValueType>
-    const OutputPort<ValueType>& AppendInput(Model& model, const PortMemoryLayout& layout)
+    const OutputPort<ValueType>& AppendInput(ModelLikeType& model, const PortMemoryLayout& layout)
     {
-        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        static_assert(utilities::IsOneOf<ModelLikeType, model::Model, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
         auto node = model.template AddNode<InputNode<ValueType>>(layout);
         return node->output;
     }

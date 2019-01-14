@@ -257,7 +257,9 @@ namespace model
     {
         std::shared_ptr<Node> sharedNode(std::move(node));
         EnsureNodeHasUniqueId(*sharedNode);
+        sharedNode->SetModel(this);
         sharedNode->UpdateInputPorts();
+        VerifyInputs(*sharedNode);
         _data->idToNodeMap[sharedNode->GetId()] = sharedNode;
         return sharedNode.get();
     }
@@ -267,6 +269,51 @@ namespace model
         if (NodeIdExists(node.GetId()))
         {
             node.SetId(GetUniqueId(node.GetId()));
+        }
+    }
+
+    void Model::Verify() const
+    {
+        VerifyNodes();
+        VerifyInputs();
+    }
+    
+    void Model::VerifyNodes() const
+    {
+        for (auto it: _data->idToNodeMap)
+        {
+            const Model* otherModel = it.second->GetModel();
+            if ((*otherModel) != (*this))
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model input validation error: nodes come from a different model");
+            }
+        }
+
+        Visit([this](const Node& node) {
+            const Model* otherModel = node.GetModel();
+            if ((*otherModel) != (*this))
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model input validation error: nodes come from a different model");
+            }
+        });
+    }
+
+    void Model::VerifyInputs() const
+    {
+        Visit([this](const Node& node) {
+            VerifyInputs(node);
+        });
+    }
+
+    void Model::VerifyInputs(const Node& node) const
+    {
+        for (auto it : node.GetInputPorts())
+        {
+            const Model* otherModel = it->GetReferencedPort().GetNode()->GetModel();
+            if ((*otherModel) != (*this))
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model input validation error: inputs come from a different model");
+            }
         }
     }
 
@@ -440,7 +487,7 @@ namespace model
 
     void NodeIterator::AddRemainingValidOutputs()
     {
-        if (ShouldAddAllValidOutputs()) // "empty" means "visit full model"
+        if (ShouldAddAllValidOutputs())
         {
             // Add everything except inputs on submodelInputs list (and their inputs)
             for (auto node : _model->GetNodeMap())
@@ -456,7 +503,7 @@ namespace model
 
     bool NodeIterator::ShouldAddAllValidOutputs() const
     {
-        return _nodesToVisit.empty();
+        return _nodesToVisit.empty(); // "empty" means "visit full model"
     }
 
     bool NodeIterator::ShouldAddNodeToValidOutputs(const Node* node) const

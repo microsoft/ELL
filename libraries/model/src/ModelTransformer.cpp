@@ -274,6 +274,20 @@ namespace model
         return result;
     }
 
+    bool ModelTransformer::IsModelCompilable() const
+    {
+        auto iter = _model.GetNodeIterator();
+        while (iter.IsValid())
+        {
+            if (!_context.IsNodeCompilable(*iter.Get()))
+            {
+                return false;
+            }
+            iter.Next();
+        }
+        return true;
+    }
+
     bool ModelTransformer::IsInPlace() const
     {
         return _isInPlace;
@@ -281,13 +295,9 @@ namespace model
 
     bool ModelTransformer::ShouldCopyNode(const Node& node) const
     {
+        // Always copy if we're not in in-place mode
         if (!IsInPlace())
             return true;
-
-        if (IsInputNode(node))
-        {
-            return false;
-        }
 
         const auto& inputs = node.GetInputPorts();
         for (auto in : inputs)
@@ -298,7 +308,7 @@ namespace model
             }
         }
 
-        return !IsInPlace(); // no inputs, but not an InputNode --- copy if we're in out-of-place mode
+        return false;
     }
 
     void ModelTransformer::MapNodeOutput(const OutputPortBase& oldPort, const OutputPortBase& newPort)
@@ -342,8 +352,6 @@ namespace model
             auto previousElementMap = std::move(_elementsMap);
             _elementsMap.Clear();
 
-            _isModelCompilable = true;
-
             // Do one refinement pass
             // Note: as a side-effect, _elementsMap may be modified
             bool didRefineAny = false;
@@ -361,7 +369,7 @@ namespace model
             }
 
             // check for early end condition
-            if (!didRefineAny || _isModelCompilable)
+            if (!didRefineAny || IsModelCompilable())
             {
                 break;
             }
@@ -425,9 +433,8 @@ namespace model
             auto newElementsMap = PortOutputsMap::ConcatenateMaps(previousElementMap, _elementsMap);
             _elementsMap = newElementsMap;
         }
-        ResetContext();
 
-        _model = Model();
+        ResetContext();
 
         auto newOutputs = GetCorrespondingOutputs(submodel.GetOutputPorts());
 
@@ -476,14 +483,6 @@ namespace model
     {
         auto destModel = submodel.GetModel().ShallowCopy();
         return TransformSubmodelOnto(submodel, destModel, onto, context, transformFunction);
-    }
-
-    void ModelTransformer::Reset()
-    {
-        ResetContext();
-        _model = Model();
-        _elementsMap.Clear();
-        _isModelCompilable = false;
     }
 
     void ModelTransformer::ResetContext()

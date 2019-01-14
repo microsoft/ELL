@@ -13,6 +13,7 @@
 #include "OutputPort.h"
 
 #include <utilities/include/IArchivable.h>
+#include <utilities/include/TypeTraits.h>
 
 #include <memory>
 #include <string>
@@ -72,7 +73,7 @@ namespace model
         void Copy(ModelTransformer& transformer) const override;
     };
 
-    /// <summary> Convenience function for adding a node to a model. </summary>
+    /// <summary> Convenience function for adding an OutputNode to a model. </summary>
     ///
     /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
     /// <param name="input"> The port to get the input data from </param>
@@ -163,7 +164,7 @@ namespace model
     template <typename ModelLikeType, typename ValueType>
     const OutputPort<ValueType>& AppendOutput(ModelLikeType& model, const OutputPort<ValueType>& input)
     {
-        static_assert(std::is_same_v<ModelLikeType, model::Model> || std::is_same_v<ModelLikeType, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        static_assert(utilities::IsOneOf<ModelLikeType, model::Model, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
         auto node = model.template AddNode<OutputNode<ValueType>>(input);
         return node->output;
     }

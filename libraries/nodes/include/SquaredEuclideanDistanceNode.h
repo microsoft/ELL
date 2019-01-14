@@ -193,8 +193,8 @@ namespace nodes
         auto& A = transformer.SimplifyOutputs(inputNorm2SquaredNodeOutputs);
         auto& B = transformer.SimplifyOutputs(vectorNorm2SquaredConstantNodeOutputs);
         auto& C = productNode->output;
-        const auto& aPlusB = AppendBinaryOperation(transformer, A, B, BinaryOperationType::add);
-        const auto& aPlusBPlusC = AppendBinaryOperation(transformer, aPlusB, C, BinaryOperationType::add);
+        const auto& aPlusB = AppendBinaryOperation(A, B, BinaryOperationType::add);
+        const auto& aPlusBPlusC = AppendBinaryOperation(aPlusB, C, BinaryOperationType::add);
         transformer.MapNodeOutput(output, aPlusBPlusC);
 
         return true;

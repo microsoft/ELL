@@ -32,7 +32,9 @@ namespace model
     Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) :
         _id(NodeId()),
         _inputs(inputs),
-        _outputs(outputs){};
+        _outputs(outputs)
+    {
+    }
 
     void Node::AddInputPort(InputPortBase* input)
     {
@@ -279,6 +281,15 @@ namespace model
     void Node::SetId(Node::NodeId id)
     {
         _id = id;
+    }
+
+    void Node::SetModel(Model* model)
+    {
+        if (_model)
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Setting model on a node already assigned to a model");
+        }
+        _model = std::make_unique<Model>(model->ShallowCopy());
     }
 } // namespace model
 } // namespace ell

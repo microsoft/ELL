@@ -15,19 +15,12 @@
 
 #include <cmath>
 
-#define ADD_TO_STRING_ENTRY(NAMESPACE, OPERATOR) \
-    case NAMESPACE::OPERATOR:                    \
-        return #OPERATOR;
-#define BEGIN_FROM_STRING if (false)
-#define ADD_FROM_STRING_ENTRY(NAMESPACE, OPERATOR) else if (name == #OPERATOR) return NAMESPACE::OPERATOR
-
 using namespace ell;
 
 namespace ell
 {
 namespace nodes
 {
-
 template <typename ValueType>
 UnaryOperationNode<ValueType>::UnaryOperationNode() :
     CompilableNode({ &_input }, { &_output }),

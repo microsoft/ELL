@@ -391,9 +391,7 @@ namespace common
         {
             model::Model model;
             auto inputNode = model.AddNode<model::InputNode<double>>(mapLoadArguments.defaultInputSize);
-            model::PortElements<double> outputElements(inputNode->output);
-
-            return { model, { { "input", inputNode } }, { { "output", outputElements } } };
+            return { model, { { "input", inputNode } }, { { "output", inputNode->output } } };
         }
     }
 

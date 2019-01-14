@@ -37,10 +37,8 @@ namespace common
     template <typename PredictorNodeType, typename PredictorType>
     model::Model AppendNodeToModel(const model::Map& map, const PredictorType& predictor)
     {
-        model::TransformContext context;
-        model::ModelTransformer transformer;
-        auto model = transformer.CopyModel(map.GetModel(), context);
-        auto mapOutput = map.GetOutputElements<double>(0);
+        auto model = map.GetModel().ShallowCopy();
+        const auto& mapOutput = map.GetOutputElements<double>(0);
         model.AddNode<PredictorNodeType>(mapOutput, predictor);
         return model;
     }

@@ -32,7 +32,7 @@ void TestAppenBinaryOperation()
     Model model;
     auto inputNode1 = model.AddNode<InputNode<double>>(8);
     auto inputNode2 = model.AddNode<InputNode<double>>(8);
-    [[maybe_unused]] const auto& exp = AppendBinaryOperation(model, inputNode1->output, inputNode2->output, BinaryOperationType::add);
+    [[maybe_unused]] const auto& exp = AppendBinaryOperation(inputNode1->output, inputNode2->output, BinaryOperationType::add);
     ProcessTest("TestAppendBinaryOperation", model.Size() == 3);
 }
 
@@ -47,7 +47,7 @@ void TestAppendSum()
 {
     Model model;
     auto inputNode = model.AddNode<InputNode<double>>(8);
-    [[maybe_unused]] const auto& s = AppendSum(model, inputNode->output);
+    [[maybe_unused]] const auto& s = AppendSum(inputNode->output);
     ProcessTest("TestAppendSum", model.Size() == 2);
 }
 
@@ -55,6 +55,6 @@ void TestAppenUnaryOperation()
 {
     Model model;
     auto inputNode = model.AddNode<InputNode<double>>(8);
-    [[maybe_unused]] const auto& exp = AppendUnaryOperation(model, inputNode->output, UnaryOperationType::exp);
+    [[maybe_unused]] const auto& exp = AppendUnaryOperation(inputNode->output, UnaryOperationType::exp);
     ProcessTest("TestAppendUnaryOperation", model.Size() == 2);
 }

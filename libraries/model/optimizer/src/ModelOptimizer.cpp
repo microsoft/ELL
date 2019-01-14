@@ -81,7 +81,6 @@ namespace model
 
     Model ModelOptimizer::OptimizeModel(const Model& model, ModelOptimizerContext& context) const
     {
-        context.GetTransformer().Reset();
         TransformContext transformContext;
         Model result = context.GetTransformer().CopyModel(model, transformContext);
 

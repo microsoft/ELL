@@ -18,7 +18,6 @@ namespace nodes
 {
     inline namespace operations
     {
-
         /// <summary> Unary operations supported by UnaryOperationNode / BroadcastUnaryOperationNode. </summary>
         enum class UnaryOperationType
         {

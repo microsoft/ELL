@@ -36,11 +36,10 @@ namespace model
         TransformContext context;
         ModelTransformer transformer;
         _model = transformer.CopyModel(model, context);
-
+        
         for (const auto& input : inputs)
         {
-            auto newInput = transformer.GetCorrespondingInputNode(input.second);
-            AddInput(input.first, newInput);
+            AddInput(input.first, transformer.GetCorrespondingInputNode(input.second));
         }
 
         for (const auto& output : outputs)
@@ -49,13 +48,11 @@ namespace model
             {
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Map constructor requires full output ports (IsFullPortOutput()==true)");
             }
-            PortElementsBase newOutputs = transformer.GetCorrespondingOutputs(output.second);
-            AddOutput(output.first, newOutputs);
+            AddOutput(output.first, transformer.GetCorrespondingOutputs(output.second));
         }
 
-        // Important: we don't need to call FixTransformedIO here we already mapped the inputs and
-        // outputs correctly in the code above.
-        Prune();
+        Prune();        
+        _model.Verify();
     }
 
     Map::Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs) :
@@ -71,9 +68,8 @@ namespace model
             AddOutput(output.first, output.second);
         }
 
-        // Important: we don't need to call FixTransformedIO here because we do it in the call to Prune
-        // FixTransformedIO(transformer);
         Prune();
+        _model.Verify();
     }
 
     Map::Map(const Map& other)
@@ -83,15 +79,15 @@ namespace model
         _model = transformer.CopyModel(other._model, context);
         for (const auto& input : other._inputNodeMap)
         {
-            AddInput(input.first, input.second);
+            AddInput(input.first, transformer.GetCorrespondingInputNode(input.second));
         }
 
         for (const auto& output : other._outputElementsMap)
         {
-            AddOutput(output.first, output.second);
+            AddOutput(output.first, transformer.GetCorrespondingOutputs(output.second));
         }
 
-        FixTransformedIO(transformer);
+        _model.Verify();
     }
 
     Map& Map::operator=(Map other)
@@ -239,7 +235,6 @@ namespace model
 
     std::vector<const Node*> Map::GetDebugSinkNodes() const
     {
-        // gather DebugSinkNode
         std::unordered_set<const Node*> sinkNodes;
         for (const Node* node : GetMatchingNodesByType("DebugSinkNode"))
         {
@@ -265,7 +260,7 @@ namespace model
 
     std::vector<const Node*> Map::GetMatchingNodesByType(const std::string name) const
     {
-        // gather nodes whose runtime type name contains the given sub string.
+        // gather nodes whose runtime type name contains the given substring.
         std::unordered_set<const Node*> result;
         _model.Visit([&](const Node& node) {
             if (node.GetRuntimeTypeName().find(name) != std::string::npos)
@@ -337,9 +332,6 @@ namespace model
 
     void Map::Prune()
     {
-        TransformContext context;
-        ModelTransformer transformer;
-
         auto outputNodes = GetAllOutputNodes();
         auto debugSinkNodes = GetDebugSinkNodes();
         outputNodes.insert(outputNodes.end(), debugSinkNodes.begin(), debugSinkNodes.end());
@@ -364,9 +356,14 @@ namespace model
             }
         }
         Submodel m(_model, {}, outputPorts);
+
+        TransformContext context;
+        ModelTransformer transformer;
         auto minimalModel = transformer.CopySubmodel(m, context);
+        
         FixTransformedIO(transformer);
-        _model = std::move(minimalModel.GetModel());
+        _model = minimalModel.GetModel().ShallowCopy();
+        _model.Verify();
     }
 
     size_t Map::GetNumInputs() const

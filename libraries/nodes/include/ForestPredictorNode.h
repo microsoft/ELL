@@ -180,7 +180,7 @@ namespace nodes
                 {
                     model::PortElements<double> elements = interiorNodeSubModels[edges[j].GetTargetNodeIndex()];
 
-                    const auto& edgeSum = AppendBinaryOperation(transformer, edgePredictorNode->output, transformer.SimplifyOutputs(elements), BinaryOperationType::add);
+                    const auto& edgeSum = AppendBinaryOperation(edgePredictorNode->output, transformer.SimplifyOutputs(elements), BinaryOperationType::add);
                     edgeOutputs.Append(edgeSum);
                 }
                 else // target node is a leaf
@@ -249,7 +249,7 @@ namespace nodes
         treesPlusBias.Append(bias);
 
         // Sum all of the trees
-        const auto& treeSum = AppendSum(transformer, transformer.SimplifyOutputs(treesPlusBias));
+        const auto& treeSum = AppendSum(transformer.SimplifyOutputs(treesPlusBias));
 
         // Map all the outputs from the original node to the refined model outputs
         transformer.MapNodeOutput(output, treeSum);
