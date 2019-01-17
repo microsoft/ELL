@@ -1,21 +1,21 @@
 ###################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     microphone.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     microphone.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ###################################################################################################
 
 import audioop
 import math
-import signal
 import sys
 from threading import Thread, Lock, Condition
 
 import numpy as np
 import pyaudio
+
 
 def list_devices():
     audio = pyaudio.PyAudio()
@@ -25,10 +25,11 @@ def list_devices():
         if info["maxInputChannels"] > 0:
             print("  {}. {}".format(i, info["name"]))
 
+
 class Microphone:
     """ This class wraps the pyaudio library and it's input stream callback providing a simple to
     use Microphone class that you can simply read from """
-    def __init__(self, console=True):        
+    def __init__(self, console=True):
         """ Create Microphone object.
         console - specifies whether you are running from console app, if so this will listen for
         stdin "x" so user can tell you app to close the microphone """
@@ -41,12 +42,12 @@ class Microphone:
         self.console = console
         self.stdin_thread = None
         self.input_stream = None
-    
+
     def open(self, sample_size, sample_rate, num_channels, input_device=None):
         """ Open the microphone so it returns chunks of audio samples of the given sample_size
         where audio is converted to the expected sample_rate and num_channels
         and then scaled to floating point numbers between -1 and 1.
-        
+
         sample_size - number of samples to return from read method
         audio_scale_factor - audio is converted to floating point using this scale
         sample_rate - the expected sample rate (e.g. 16000)
@@ -65,28 +66,28 @@ class Microphone:
         self.mic_rate = int(info['defaultSampleRate'])
         buffer_size = int(math.ceil(sample_size * self.mic_rate / sample_rate))
         self.input_stream = self.audio.open(format=pyaudio.paInt16,
-                        channels=num_channels,
-                        rate=self.mic_rate, 
-                        input=True,
-                        frames_per_buffer=buffer_size,
-                        stream_callback=self._on_recording_callback)    
+                                            channels=num_channels,
+                                            rate=self.mic_rate,
+                                            input=True,
+                                            frames_per_buffer=buffer_size,
+                                            stream_callback=self._on_recording_callback)
         self.audio_scale_factor = 1 / 32768  # since we are using pyaudio.paInt16.
         self.closed = False
         if self.console:
             # since our read call blocks the UI we use a separate thread to monitor user input
-            self.stdin_thread = Thread(target=self.monitor_input, args=(sys.stdin,))        
+            self.stdin_thread = Thread(target=self.monitor_input, args=(sys.stdin,))
             self.stdin_thread.daemon = True
             self.stdin_thread.start()
-    
-    def _on_recording_callback(self, data, frame_count, time_info, status): 
+
+    def _on_recording_callback(self, data, frame_count, time_info, status):
         # convert the incoming audio to the desired recording rate
-        result, self.cvstate = audioop.ratecv(data, 2, 
-            self.num_channels, self.mic_rate, self.sample_rate, self.cvstate)
-            
+        result, self.cvstate = audioop.ratecv(data, 2, self.num_channels, self.mic_rate, self.sample_rate,
+                                              self.cvstate)
+
         # protect access to the shared state
         self.cv.acquire()
-        try:    
-            self.read_buffer += [ result ]
+        try:
+            self.read_buffer += [result]
             if len(self.read_buffer) == 1:
                 self.cv.notify()
         except:
@@ -97,19 +98,19 @@ class Microphone:
     def read(self):
         """ Read the next audio chunk. This method blocks until the audio is available """
         while not self.closed:
-            # block until microphone data is ready...         
-            result = None            
-            self.cv.acquire()            
-            try:    
+            # block until microphone data is ready...
+            result = None
+            self.cv.acquire()
+            try:
                 while len(self.read_buffer) == 0:
                     if self.closed:
                         return None
-                    self.cv.wait(0.1)             
+                    self.cv.wait(0.1)
                 result = self.read_buffer.pop(0)
             except:
                 pass
             self.cv.release()
-            
+
             if result is not None:
                 # convert int16 data to scaled floats
                 data = np.frombuffer(result, dtype=np.int16)
@@ -117,10 +118,10 @@ class Microphone:
                 if len(data) < self.sample_size:
                     # pad the last record with zeros so it is valid input also.
                     bigger = np.zeros((self.sample_size))
-                    bigger[:len(data)] = data 
+                    bigger[:len(data)] = data
                     data = bigger
                 elif len(data) > self.sample_size:
-                    data = data[:self.sample_size] # just truncate it, might be off by 1 due to rounding errors
+                    data = data[:self.sample_size]  # just truncate it, might be off by 1 due to rounding errors
 
                 return data * self.audio_scale_factor
         return None
@@ -135,7 +136,6 @@ class Microphone:
         """ return true if the microphone is closed """
         return self.closed
 
-
     def monitor_input(self, stream):
         """ monitor stdin since our read call is blocking, this way user can type 'x' to quit """
         try:
@@ -143,7 +143,7 @@ class Microphone:
                 out = stream.readline()
                 if out:
                     msg = out.rstrip('\n')
-                    if msg == "exit" or msg == "quit" or msg == "x":                        
+                    if msg == "exit" or msg == "quit" or msg == "x":
                         print("closing microphone...")
                         self.closed = True
                 else:

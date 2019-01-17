@@ -1,17 +1,15 @@
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     remoterunner.py
-##  Authors:  Chris Lovett, Chuck Jacobs
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     remoterunner.py
+#  Authors:  Chris Lovett, Chuck Jacobs
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
-
 import io
 import os
 import sys
-from threading import Thread
 
 import paramiko
 
@@ -20,17 +18,16 @@ import picluster
 import logger
 import logging
 
-
-#
 # If no source_dir or source_files, don't copy
 # If no target_dir, don't copy
 # If no command, copy only
 
+
 class RemoteRunner:
     def __init__(self, cluster=None, ipaddress=None, username=None, password=None,
-        source_dir=None, target_dir=None, copyback_files=None, copyback_dir=None,
-        command=None, logfile=None, verbose=True, start_clean=True, cleanup=True,
-        timeout=None, all=None, source_files=None, apikey=None):
+                 source_dir=None, target_dir=None, copyback_files=None, copyback_dir=None,
+                 command=None, logfile=None, verbose=True, start_clean=True, cleanup=True,
+                 timeout=None, all=None, source_files=None, apikey=None):
 
         self.cluster = cluster
         if isinstance(cluster, str):
@@ -85,7 +82,7 @@ class RemoteRunner:
         return self.ipaddress
 
     def free_machine(self):
-        if self.machine != None:
+        if self.machine is not None:
             self.print("Unlocking machine at " + self.machine.ip_address)
             f = self.cluster.unlock(self.machine.ip_address)
             if f.current_user_name:
@@ -107,7 +104,7 @@ class RemoteRunner:
                 out = stream.readline()
                 if out:
                     msg = out.rstrip('\n')
-                    output += [ msg ]
+                    output += [msg]
                     self.print(msg)
                 else:
                     break
@@ -135,7 +132,8 @@ class RemoteRunner:
                 if status == 0:
                     break
                 else:
-                    print("Error, status code {} returned from remote, attempt {} of {}".format(status, r + 1, max_attempts))
+                    msg = "Error, status code {} returned from remote, attempt {} of {}"
+                    print(msg.format(status, r + 1, max_attempts))
                     if (r + 1) < max_attempts:
                         print("Retrying...")
 
@@ -153,7 +151,7 @@ class RemoteRunner:
 
     def linux_join(self, path, name):
         # on windows os.path.join uses backslashes which doesn't work on the pi!
-        return os.path.join(path, name).replace("\\","/")
+        return os.path.join(path, name).replace("\\", "/")
 
     # TODO: make this recursive to deal with multi-level directories
     def safe_mkdir(self, sftp, newdir):
@@ -179,7 +177,7 @@ class RemoteRunner:
                 src_file = os.path.join(dirname, filename)
                 dest_relative_src_file = src_file[len(src) + 1:]
             else:
-                src_file = filename # assume absolute path
+                src_file = filename  # assume absolute path
                 dest_relative_src_file = os.path.basename(filename)
 
             if os.path.isfile(src_file):
@@ -195,7 +193,7 @@ class RemoteRunner:
             with paramiko.SFTPClient.from_transport(self.ssh.get_transport()) as sftp:
                 self.safe_mkdir(sftp, self.target_dir)
                 self.sftp_copy_files(sftp, src=None, dirname=None,
-                    filenames=self.source_files, dest=self.target_dir)
+                                     filenames=self.source_files, dest=self.target_dir)
 
     def copy_files(self):
         if self.target_dir and self.copyback_files:
@@ -207,7 +205,7 @@ class RemoteRunner:
                     self.print("Copying remote file from {} to {}".format(src_file, dest_file))
                     try:
                         sftp.get(src_file, dest_file)
-                    except: 
+                    except:
                         self.print("Failed to copy remote file from {} to {}".format(src_file, dest_file))
                         pass
 
@@ -243,8 +241,8 @@ class RemoteRunner:
             msg = "### Exception: %s: %s" % (str(errorType), str(value) + "\n" + str(traceback))
             self.print(msg)
             if self.buffer:
-                output += [ self.buffer.getvalue().split('\n') ]
-            output += [ msg ]
+                output += [self.buffer.getvalue().split('\n')]
+            output += [msg]
         finally:
             self.free_machine()
         return output
@@ -272,11 +270,12 @@ if __name__ == "__main__":
     arg_parser.add_argument("--username", help="Username for logon to remote machine", default=None)
     arg_parser.add_argument("--password", help="Password for logon to remote machine", default=None)
     arg_parser.add_argument("--command", help="The command to run on the remote machine", default=None)
-    arg_parser.add_argument("--timeout", type=int, help="Timeout for the command in seconds (default 300 seconds)", default=300)
+    arg_parser.add_argument("--timeout", type=int, default=300,
+                            help="Timeout for the command in seconds (default 300 seconds)")
 
     args = arg_parser.parse_args()
 
-    runner = RemoteRunner(ipaddress = args.ipaddress, cluster=args.cluster, username=args.username, password=args.password,
-        command=args.command, verbose=True, timeout=args.timeout, apikey=args.apikey)
+    runner = RemoteRunner(ipaddress=args.ipaddress, cluster=args.cluster, username=args.username,
+                          password=args.password, command=args.command, verbose=True,
+                          timeout=args.timeout, apikey=args.apikey)
     runner.run_command()
-

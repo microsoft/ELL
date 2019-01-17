@@ -1,25 +1,28 @@
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     buildtools.py
-##  Authors:  Chris Lovett, Kern Handa
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     buildtools.py
+#  Authors:  Chris Lovett, Kern Handa
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
 import json
 import os
 import sys
-sys.path += [os.path.dirname(os.path.abspath(__file__)) ]
-import logger
 import subprocess
 from threading import Thread, Lock
+
+sys.path += [os.path.dirname(os.path.abspath(__file__))]
+import logger
+
 
 class EllBuildToolsRunException(Exception):
     def __init__(self, cmd, output=""):
         Exception.__init__(self, cmd)
         self.cmd = cmd
         self.output = output
+
 
 class EllBuildTools:
     def __init__(self, ell_root, verbose=False):
@@ -82,8 +85,8 @@ class EllBuildTools:
                     self.lock.acquire()
                     try:
                         self.output += out
-                        msg = out.rstrip('\n')   
-                        if self.verbose:                
+                        msg = out.rstrip('\n')
+                        if self.verbose:
                             self.logger.info(msg)
                     finally:
                         self.lock.release()
@@ -92,7 +95,7 @@ class EllBuildTools:
         except:
             errorType, value, traceback = sys.exc_info()
             msg = "### Exception: %s: %s" % (str(errorType), str(value))
-            if not "closed file" in msg:
+            if "closed file" not in msg:
                 self.logger.info(msg)
 
     def run(self, command, print_output=True, shell=False):
@@ -100,11 +103,10 @@ class EllBuildTools:
         if self.verbose:
             self.logger.info(cmdstr)
         try:
-            with subprocess.Popen(
-                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0, universal_newlines = True, shell=shell
-            ) as proc:
+            with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0,
+                                  universal_newlines=True, shell=shell) as proc:
                 self.output = ''
-                    
+
                 stdout_thread = Thread(target=self.logstream, args=(proc.stdout,))
                 stderr_thread = Thread(target=self.logstream, args=(proc.stderr,))
 
@@ -115,7 +117,7 @@ class EllBuildTools:
                     pass
 
                 proc.wait()
-                
+
                 if proc.returncode:
                     self.logger.error("command {} failed with error code {}".format(command[0], proc.returncode))
                     raise EllBuildToolsRunException(cmdstr, self.output)
@@ -125,17 +127,15 @@ class EllBuildTools:
 
     def swig_header_dirs(self):
         return [os.path.join(self.ell_root, d) for d in [
-            'interfaces/common',
-            'interfaces/common/include',
-            'libraries/emitters/include'
-            ]]
+                'interfaces/common',
+                'interfaces/common/include',
+                'libraries/emitters/include']]
 
     def swig(self, output_dir, model_name, language):
-        # swig -python -modern -c++ -Fmicrosoft -py3 -outdir . -c++ -I%ELL_ROOT%/interfaces/common/include -I%ELL_ROOT%/interfaces/common -I%ELL_ROOT%/libraries/emitters/include -o _darknetReferencePYTHON_wrap.cxx darknetReference.i
         args = [self.swigexe,
-            '-' + language,
-            '-c++',
-            '-Fmicrosoft']
+                '-' + language,
+                '-c++',
+                '-Fmicrosoft']
         if language == "python":
             args = args + ["-py3"]
         if language == "javascript":
@@ -150,15 +150,15 @@ class EllBuildTools:
     def get_llc_options(self, target):
         common = ["-filetype=obj"]
         # arch processing
-        if target == "pi3": # Raspberry Pi 3
+        if target == "pi3":  # Raspberry Pi 3
             return common + ["-mtriple=armv7-linux-gnueabihf", "-mcpu=cortex-a53", "-relocation-model=pic"]
-        if target == "orangepi0": # Orange Pi Zero
+        if target == "orangepi0":  # Orange Pi Zero
             return common + ["-mtriple=armv7-linux-gnueabihf", "-mcpu=cortex-a7", "-relocation-model=pic"]
-        elif target == "pi0": # Raspberry Pi Zero
+        elif target == "pi0":  # Raspberry Pi Zero
             return common + ["-mtriple=arm-linux-gnueabihf", "-mcpu=arm1176jzf-s", "-relocation-model=pic"]
-        elif target == "aarch64" or target == "pi3_64": # arm64 Linux
+        elif target == "aarch64" or target == "pi3_64":  # arm64 Linux
             return common + ["-mtriple=aarch64-unknown-linux-gnu", "-relocation-model=pic"]
-        else: # host
+        else:  # host
             return common + ["-relocation-model=pic"]
 
     def log_command_arguments(self, args, log_dir):
@@ -169,7 +169,6 @@ class EllBuildTools:
             f.write(" ".join(args))
 
     def llc(self, output_dir, input_file, target, optimization_level="3", objext=".o"):
-        # llc -filetype=obj _darknetReference.ll -O3 -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53 -relocation-model=pic
         model_name = os.path.splitext(os.path.basename(input_file))[0]
         if model_name.endswith('.opt'):
             model_name = model_name[:-4]
@@ -195,8 +194,7 @@ class EllBuildTools:
         args = [self.optexe,
                 input_file,
                 "-o", out_file,
-                "-O" + optimization_level
-            ]
+                "-O" + optimization_level]
         # Save the parameters passed to opt. This is used for archiving purposes.
         self.log_command_arguments(args, log_dir=output_dir)
 
@@ -204,9 +202,9 @@ class EllBuildTools:
         self.run(args)
         return out_file
 
-    def compile(self, model_file, func_name, model_name, target, output_dir, 
+    def compile(self, model_file, func_name, model_name, target, output_dir,
                 use_blas=False, fuse_linear_ops=True, optimize_reorder_data_nodes=True, profile=False, llvm_format="bc",
-                optimize=True, debug=False, is_model_file=False, swig=True, header=False, 
+                optimize=True, debug=False, is_model_file=False, swig=True, header=False,
                 objext=".o", extra_options=[]):
         file_arg = "-imf" if is_model_file else "-imap"
         format_flag = {
@@ -252,7 +250,7 @@ class EllBuildTools:
 
         if profile:
             args.append("--profile")
-        
+
         args += extra_options
 
         # Save the parameters passed to compile. This is used for archiving purposes.
@@ -261,4 +259,3 @@ class EllBuildTools:
         self.logger.info("compiling model...")
         self.run(args)
         return out_file
-

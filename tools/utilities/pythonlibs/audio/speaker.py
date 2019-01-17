@@ -1,14 +1,15 @@
 ###################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     speaker.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     speaker.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ###################################################################################################
 
 import pyaudio
+
 
 class Speaker:
     def __init__(self):
@@ -16,13 +17,13 @@ class Speaker:
         self.audio = pyaudio.PyAudio()
 
     def open(self, audio_format, num_channels, rate):
-        
+
         # open speakers so we can hear what it is processing...
         self.output_stream = self.audio.open(format=audio_format,
-                        channels=num_channels,
-                        rate=rate,
-                        output=True)
-    
+                                             channels=num_channels,
+                                             rate=rate,
+                                             output=True)
+
     def write(self, data):
         if self.output_stream:
             self.output_stream.write(data)

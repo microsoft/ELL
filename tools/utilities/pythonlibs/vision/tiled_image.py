@@ -1,11 +1,11 @@
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     tiled_image.py
-##  Authors:  Byron Changuion
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     tiled_image.py
+#  Authors:  Byron Changuion
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
 
 import math
@@ -13,15 +13,16 @@ import math
 import cv2
 import numpy as np
 
+
 class TiledImage:
     def __init__(self, num_images=2, output_shape=(600, 800)):
         """ Helper class to create a tiled image out of many smaller images.
-        The class calculates how many horizontal and vertical blocks are needed to fit the requested number of images 
+        The class calculates how many horizontal and vertical blocks are needed to fit the requested number of images
         and fills in unused blocks as blank. For example, to fit 4 images, the number of tiles is 2x2, to fit 5 images,
         the number of tiles is 3x2, with the last tile being blank.
         num_images - the maximum number of images that need to be composed into the tiled image. Note that the
                     actual number of tiles is equal to or larger than this number.
-        output_shape - a tuple contaiing rows and columns of the output image. The output tiled image 
+        output_shape - a tuple contaiing rows and columns of the output image. The output tiled image
                             is a composition of sub images.
         """
         self.composed_image_shape = self.get_composed_image_shape(num_images)
@@ -29,10 +30,11 @@ class TiledImage:
         self.output_height_and_width = output_shape
         self.images = None
         self.window_name = 'ELL side by side'
-        cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL) # Ensure the window is resizable
+        cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)  # Ensure the window is resizable
         # The aspect ratio of the composed image is now self.composed_image_shape[0] : self.composed_image_shape[1]
         # Adjust the height of the window to account for this, else images will look distorted
-        cv2.resizeWindow(self.window_name, output_shape[1], int(output_shape[0] * (self.composed_image_shape[0] / self.composed_image_shape[1])))
+        height = int(output_shape[0] * (self.composed_image_shape[0] / self.composed_image_shape[1]))
+        cv2.resizeWindow(self.window_name, output_shape[1], height)
 
     def get_composed_image_shape(self, num_images):
         """Returns a tuple indicating the (rows,cols) of the required number of tiles to hold num_images."""
@@ -62,7 +64,7 @@ class TiledImage:
             for horizontal_index in range(self.composed_image_shape[1]):
                 current_index = vertical_index * self.composed_image_shape[1] + horizontal_index
                 x_elements.append(self.images[current_index])
-            # np.hstack only works if the images are the same height 
+            # np.hstack only works if the images are the same height
             x_elements = self.resize_to_same_height(x_elements)
             horizontal_image = np.hstack(tuple(x_elements))
             y_elements.append(horizontal_image)
@@ -79,11 +81,14 @@ class TiledImage:
         for vertical_index in range(1, self.composed_image_shape[0]):
             cv2.line(composed_image, (0, y), (composed_image.shape[1], y), (0, 0, 0), 3)
             y = y + yStep
-        
+
         return composed_image
 
     def set_image_at(self, image_index, frame):
-        """Sets the image at the specified index. Once all images have been set, the tiled image result can be retrieved with `compose`."""
+        """
+        Sets the image at the specified index.
+        Once all images have been set, the tiled image result can be retrieved with `compose`.
+        """
         # Ensure self.images is initialized.
         if self.images is None:
             self.images = [None] * self.number_of_tiles
@@ -97,7 +102,10 @@ class TiledImage:
         return False
 
     def show(self):
-        """Shows the final result of the tiled image. Returns True if the user indicates they are done viewing by pressing `Esc`. """
+        """
+        Shows the final result of the tiled image.
+        Returns True if the user indicates they are done viewing by pressing `Esc`.
+        """
         # Compose the tiled image
         image = self.compose()
         # Show the tiled image

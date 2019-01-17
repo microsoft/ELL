@@ -1,30 +1,31 @@
 ###################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     featurizer.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     featurizer.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ###################################################################################################
 import os
 import time
 
 import numpy as np
 
+
 class AudioTransform:
     """ The AudioTransform class encapsulates a compiled ELL model that is designed
-    to preprocess audio data before passing to a Classifier """ 
+    to preprocess audio data before passing to a Classifier """
     def __init__(self, model_path, output_window_size):
         """
         Construct a featurizer from the given ELL model.
-        The featurizer will ensure it returns an even number of 
+        The featurizer will ensure it returns an even number of
         frames to ensure it files the given output_window_size.
 
         model_path - the path to the ELL compiled model
         output_window_size - the classifier window size
         """
-        self.using_map = False        
+        self.using_map = False
         if os.path.splitext(model_path)[1] == ".ell":
             import compute_ell_model as ell
             self.model = ell.ComputeModel(model_path)
@@ -32,11 +33,11 @@ class AudioTransform:
         else:
             import compiled_ell_model as ell
             self.model = ell.CompiledModel(model_path)
-            
+
         self.logfile = None
         self.output_window_size = output_window_size
         ts = self.model.input_shape
-        self.input_shape = (ts.rows, ts.columns, ts.channels)        
+        self.input_shape = (ts.rows, ts.columns, ts.channels)
         ts = self.model.output_shape
         self.output_shape = (ts.rows, ts.columns, ts.channels)
         self.input_size = int(self.model.input_shape.Size())
@@ -67,23 +68,23 @@ class AudioTransform:
 
         if self.logfile:
             self.logfile.write("{}\n".format(",".join([str(x) for x in data])))
-        self.frame_count += 1 
+        self.frame_count += 1
 
         start_time = time.time()
         result = self.model.transform(data)
-        
+
         now = time.time()
         diff = now - start_time
         self.total_time += diff
         return result
-    
+
     def close(self):
         self.audio_source.close()
 
     def avg_time(self):
         if self.frame_count == 0:
             self.frame_count = 1
-        return self.total_time /  self.frame_count
+        return self.total_time / self.frame_count
 
     def reset(self):
         self.frame_count = 0

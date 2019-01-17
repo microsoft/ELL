@@ -1,11 +1,11 @@
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     download_helper.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     download_helper.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
 
 """
@@ -18,11 +18,12 @@ import requests
 import subprocess
 import ziptools
 import logging
-from shutil import copyfile, rmtree
+from shutil import copyfile
 
 _logger = logging.getLogger(__name__)
 script_dir = os.path.dirname(os.path.abspath(__file__))
 _cloned_repos = {}
+
 
 def download_file(url, local_folder=None):
     """Downloads file pointed to by `url`.
@@ -61,8 +62,6 @@ def download_and_extract_model(url, model_extension='.cntk', local_folder=None):
         model_name, _ = os.path.splitext(model_filename)
         return model_name
 
-    model_name = get_model_name(url)
-
     # Download the file
     filename = download_file(url, local_folder)
     _logger.info("Extracting zipped model: " + filename)
@@ -97,6 +96,7 @@ def _run(args):
     if proc.returncode != 0:
         raise Exception("Command failed: {}".format(" ".join(args)))
 
+
 def get_home_path():
     """ get location of the current user's home path """
     home = os.getenv("HOME")
@@ -112,10 +112,11 @@ def get_home_path():
 
     return home
 
-def clone_repo(url, target_directory):    
+
+def clone_repo(url, target_directory):
     """ Clone the given git repo into the target_directory """
     global _cloned_repos
-    
+
     repo_name = os.path.basename(url)
 
     saved = os.getcwd()
@@ -143,4 +144,3 @@ def clone_repo(url, target_directory):
     _cloned_repos[url] = result
 
     return result
-    

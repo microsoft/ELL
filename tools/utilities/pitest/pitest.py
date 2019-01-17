@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     pitest.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     pitest.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
 import argparse
 import sys
@@ -27,7 +27,8 @@ targets = ["pi3", "pi0"]
 log = logger.get()
 gitrepo = None
 
-class PiTestBase(unittest.TestCase):    
+
+class PiTestBase(unittest.TestCase):
     def setUp(self):
         global SkipTests
         if SkipTests:
@@ -37,15 +38,15 @@ class PiTestBase(unittest.TestCase):
         global cluster
         for target in targets:
             log.info("=============== Testing platform: {} ===================".format(target))
-            with drivetest.DriveTest(cluster=cluster, target=target,
-                target_dir="/home/pi/" + target, username="pi", password=password,
-                expected="coffee mug", timeout=300, apikey=key, gitrepo=gitrepo) as driver:
+            with drivetest.DriveTest(cluster=cluster, target=target, target_dir="/home/pi/" + target,
+                                     username="pi", password=password, expected="coffee mug", timeout=300, apikey=key,
+                                     gitrepo=gitrepo) as driver:
                 driver.run_test()
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format="%(message)s")
-    
+
     parser = argparse.ArgumentParser(
         description="ELL python unit tests for Raspberry Pi",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -68,5 +69,5 @@ if __name__ == '__main__':
     if args.targets:
         targets = [x.strip() for x in args.targets.split(',')]
     key = args.key
-    
+
     unittest.main(argv=[sys.argv[0]] + argv)

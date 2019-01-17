@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
 ###################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     cpuinfo.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     cpuinfo.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ###################################################################################################
 import subprocess
 import os
 import platform
+
 
 class CpuInfo:
     def __init__(self):
         if os.name == 'nt':
             self.processors = 0
             self.cores = None
-            self.model_name = platform.processor() 
+            self.model_name = platform.processor()
             self.platform = self.model_name
         else:
-            proc = subprocess.Popen(
-                ["cat", "/proc/cpuinfo"],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                universal_newlines = True)
+            proc = subprocess.Popen(["cat", "/proc/cpuinfo"],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    universal_newlines=True)
             try:
                 output, errors = proc.communicate()
             except subprocess.TimeoutExpired:
@@ -49,7 +49,7 @@ class CpuInfo:
 
             if self.cores is None:
                 self.cores = self.processors
-            
+
             self.platform = "{} ({} cores) {}".format(self.model_name, self.cores, self.hardware)
             self.platform = self.platform.strip()
 
@@ -57,5 +57,3 @@ class CpuInfo:
 if __name__ == "__main__":
     ci = CpuInfo()
     print(ci.platform)
-
-

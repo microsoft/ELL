@@ -1,12 +1,12 @@
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     demoHelper.py
-##  Authors:  Chris Lovett
-##            Byron Changuion
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     demoHelper.py
+#  Authors:  Chris Lovett
+#            Byron Changuion
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
 
 import os
@@ -14,11 +14,10 @@ import sys
 import cv2
 import numpy as np
 import time
-import math
 
 script_path = os.path.dirname(os.path.abspath(__file__))
+sys.path += [os.path.join(script_path, "..")]
 
-sys.path += [ os.path.join(script_path, "..") ]
 
 class EllModel:
     """ this is the base class for interacting with ELL models """
@@ -64,22 +63,23 @@ class CompiledModel(EllModel):
                 sys.path.append(model_path)
 
             if not os.path.isdir(os.path.join(module_directory, 'build')):
-                raise Exception("you don't have a 'build' directory in '" + module_directory + "', have you compiled this project yet?")
+                raise Exception("you don't have a 'build' directory in '" + module_directory + "',\
+have you compiled this project yet?")
 
         try:
             import importlib
             if self.model_name_override:
-                sys.path += [ self.compiled_module_path ]
-                sys.path += [ os.path.join(self.compiled_module_path, "build") ]
-                sys.path += [ os.path.join(self.compiled_module_path, "build", "release") ]
+                sys.path += [self.compiled_module_path]
+                sys.path += [os.path.join(self.compiled_module_path, "build")]
+                sys.path += [os.path.join(self.compiled_module_path, "build", "release")]
                 self.compiled_module = importlib.import_module(self.model_name)
             elif module_directory == ".":
                 # we are inside the directory that contains __init__.py, which means we can't execute __init__.py.
-                sys.path += [ os.path.join(os.getcwd(), "build") ]
-                sys.path += [ os.path.join(os.getcwd(), "build", "release") ]
+                sys.path += [os.path.join(os.getcwd(), "build")]
+                sys.path += [os.path.join(os.getcwd(), "build", "release")]
                 self.compiled_module = importlib.import_module(self.model_name)
             else:
-                sys.path += [ os.getcwd() ]
+                sys.path += [os.getcwd()]
                 self.compiled_module = getattr(importlib.import_module(module_directory), self.model_name)
 
             inputShapeGetter = getattr(self.compiled_module, "get_default_input_shape")
@@ -91,12 +91,13 @@ class CompiledModel(EllModel):
                 self.compiled_func = getattr(self.compiled_module, self.func_name)
             except AttributeError:
                 raise Exception(self.func_name + " function not found in compiled module")
-        except:    
+        except:
             errorType, value, traceback = sys.exc_info()
             print("### Exception: " + str(errorType) + ": " + str(value))
             print("====================================================================")
             print("Compiled ELL python module is not loading")
-            print("It is possible that you need to add LibOpenBLAS to your system path (See Install-*.md) from root of this repo")
+            print("It is possible that you need to add LibOpenBLAS to your system path (See Install-*.md) from root of\
+ this repo")
             raise Exception("Compiled model failed to load")
 
     def predict(self, data):
@@ -113,6 +114,7 @@ class CompiledModel(EllModel):
         if node_level:
             if hasattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo"):
                 getattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo")()
+
 
 class ReferenceModel(EllModel):
     """ this class encapsulates a reference ELL model """
@@ -132,18 +134,19 @@ class ReferenceModel(EllModel):
 
     def load_ell(self):
         # this is the "interpreted" model route, so we need the ELL python module.
-        import find_ell
+        import find_ell  # noqa: F401
         import ell
         return ell
 
     def predict(self, data):
         return self.model.Compute(data, dtype=np.float32)
 
+
 class ImageStream:
     def __init__(self):
         self.new_frame = False
         self.frame = None
-    
+
     def load_next_image(self):
         """ advance to next image in the stream """
         return None
@@ -152,13 +155,14 @@ class ImageStream:
         """ return the current image """
         return np.copy(self.frame)
 
+
 class VideoStream(ImageStream):
     def __init__(self, camera):
         super(VideoStream, self).__init__()
         self.camera = camera
         self.capture_device = cv2.VideoCapture(self.camera)
         self.load_next_image()
-    
+
     def get_next_frame(self):
         ret, self.frame = self.capture_device.read()
         if (not ret):
@@ -169,6 +173,7 @@ class VideoStream(ImageStream):
         # the video stream is live, no need to "advance" to the next frame
         pass
 
+
 class FolderStream(ImageStream):
     def __init__(self, image_folder):
         super(FolderStream, self).__init__()
@@ -177,7 +182,7 @@ class FolderStream(ImageStream):
         self.image_pos = 0
         self.image_filename = None
         self.load_next_image()
-        
+
     def load_next_image(self):
         frame = None
         while frame is None and self.image_pos < len(self.images):
@@ -186,11 +191,12 @@ class FolderStream(ImageStream):
             frame = cv2.imread(filename)
             if frame is None:
                 print("Error loading image: {}".format(filename))
-            else:                
+            else:
                 self.new_frame = True
                 self.frame = frame
             self.image_pos += 1
         return frame
+
 
 class StaticImage(ImageStream):
     def __init__(self, image_filename):
@@ -199,11 +205,12 @@ class StaticImage(ImageStream):
         self.frame = cv2.imread(self.image_filename)
         if self.frame is None:
             raise Exception('image from %s failed to load' % (self.image_filename))
-        else:                
+        else:
             self.new_frame = True
 
     def load_next_image(self):
         return None
+
 
 class StaticImageList(ImageStream):
     def __init__(self, image_list):
@@ -227,8 +234,9 @@ class StaticImageList(ImageStream):
             self.image_pos += 1
         return frame
 
-# Helper class that interfaces with ELL models to get predictions and provides handy conversion from opencv to ELL buffers and 
-# rendering utilities
+
+# Helper class that interfaces with ELL models to get predictions and provides handy conversion from opencv to ELL
+# buffers and rendering utilities
 class DemoHelper:
     def __init__(self, threshold=0.15):
         """ Helper class to help load and run predictions over images using a compiled
@@ -256,7 +264,7 @@ class DemoHelper:
         self.new_frame = False
         self.window_shown = False
 
-    def set_input(self, camera_id = 0, image_folder = None, image_list = None, image_filename = None):
+    def set_input(self, camera_id=0, image_folder=None, image_list=None, image_filename=None):
         # process image source options
         if image_filename:
             self.source = StaticImage(image_filename)
@@ -269,20 +277,20 @@ class DemoHelper:
                 camera_id = 0
             self.source = VideoStream(camera_id)
 
-    def load_model(self, labels_file, model_file = None, compiled_model = None):
+    def load_model(self, labels_file, model_file=None, compiled_model=None):
         # called after parse_args to extract args from the arg_parser.
         # process required arguments
-        
-        # process options 
+
+        # process options
         if self.nogui and self.iterations is None:
             self.iterations = 1
 
         self.current = self.iterations
-        
+
         # load the labels
         self.labels_file = labels_file
         self.labels = self.load_labels(self.labels_file)
-        
+
         # process model options and load the model
         if model_file:
             self.model = ReferenceModel(model_file)
@@ -291,18 +299,18 @@ class DemoHelper:
 
         # now load the model
         self.model.load()
-            
-        self.input_size = (self.model.input_shape.rows, self.model.input_shape.columns)        
+
+        self.input_size = (self.model.input_shape.rows, self.model.input_shape.columns)
 
     def show_image(self, frameToShow, save):
         try:
             self.window_shown = True
             cv2.imshow('frame', frameToShow)
-            
-        except cv2.error as e:
+
+        except cv2.error:
             # OpenCV may not have been built with GTK or Carbon support
             pass
-            
+
         if save and self.save_images:
             name = 'frame' + str(self.image_index) + ".png"
             cv2.imwrite(name, frameToShow)
@@ -316,7 +324,7 @@ class DemoHelper:
         return labels
 
     def predict(self, data):
-        if self.current != None and self.current > -1:
+        if self.current is not None and self.current > -1:
             self.current = self.current - 1
         start = time.time()
         self.results = self.model.predict(data)
@@ -337,7 +345,7 @@ class DemoHelper:
         """Returns the average prediction time, if available."""
         average_time = None
         if self.time_count > 0:
-            average_time = self.total_time/self.time_count
+            average_time = self.total_time / self.time_count
         return average_time
 
     def report_times(self, node_level=True):
@@ -348,12 +356,12 @@ class DemoHelper:
 
         self.model.print_profile_info(node_level)
 
-    def get_top_n_predictions(self, predictions, N = 5):
+    def get_top_n_predictions(self, predictions, N=5):
         """Return at most the top N predictions as a list of tuples that meet the threshold.
-        The first of element of each tuple represents the index or class of the prediction and the second 
+        The first of element of each tuple represents the index or class of the prediction and the second
         element represents that probability or confidence value.
         """
-        map = [(i,predictions[i]) for i in range(len(predictions)) if predictions[i] >= self.threshold]
+        map = [(i, predictions[i]) for i in range(len(predictions)) if predictions[i] >= self.threshold]
         map.sort(key=lambda tup: tup[1], reverse=True)
         result = map[:N]
         return result
@@ -377,15 +385,17 @@ class DemoHelper:
         run_llc(path + '.ll')
 
     def save_ell_predictor_to_file(self, predictor, filePath, intervalMs=0):
-        """Saves an ELL predictor to file so that it can be compiled to run on a device, with an optional stepInterval in milliseconds"""
+        """
+        Saves an ELL predictor to file so that it can be compiled to run on a device, with an optional stepInterval
+        in milliseconds
+        """
         ell_map = self.get_predictor_map(predictor, intervalMs)
         ell_map.Save(filePath)
-    
+
     def get_next_frame(self):
         return self.source.get_next_frame()
 
     def resize_image(self, image, newSize):
-        # Shape: [rows, cols, channels]
         """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order."""
         if image.shape[0] > image.shape[1]:  # Tall (more rows than cols)
             rowStart = int((image.shape[0] - image.shape[1]) / 2)
@@ -403,7 +413,7 @@ class DemoHelper:
         return resized
 
     def prepare_image_for_predictor(self, image):
-        """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order."""        
+        """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order."""
         resized = self.resize_image(image, self.input_size)
         if not self.bgr:
             resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
@@ -415,14 +425,15 @@ class DemoHelper:
         self.draw_header(image, label)
 
     def draw_header(self, image, text):
-        """Helper to draw header text block onto an image"""        
+        """Helper to draw header text block onto an image"""
         self.draw_text_block(image, text, (0, 0), (50, 200, 50))
 
     def draw_footer(self, image, text):
         """Helper to draw footer text block onto an image"""
         self.draw_text_block(image, text, (0, image.shape[0] - 40), (200, 100, 100))
 
-    def draw_text_block(self, image, text, blockTopLeft=(0,0), blockColor=(50, 200, 50), blockHeight=40, fontScale=0.7):
+    def draw_text_block(self, image, text, blockTopLeft=(0, 0), blockColor=(50, 200, 50), blockHeight=40,
+                        fontScale=0.7):
         """Helper to draw a filled rectangle with text onto an image"""
         cv2.rectangle(
             image, blockTopLeft, (image.shape[1], blockTopLeft[1] + blockHeight), blockColor, cv2.FILLED)
@@ -445,7 +456,6 @@ class DemoHelper:
         labelSize, baseline = cv2.getTextSize(
             label, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)
         width = image.shape[1]
-        height = image.shape[0]
         pos = (width - labelSize[0] - 5, labelSize[1] + 5)
         cv2.putText(image, label, pos, cv2.FONT_HERSHEY_SIMPLEX,
                     0.4, (0, 0, 128), 1, cv2.LINE_AA)
@@ -461,7 +471,7 @@ class DemoHelper:
 
     def done(self):
         if self.current is not None and self.current > 0:
-            # here we are measuring fps on the same image for --iterations iterations, so 
+            # here we are measuring fps on the same image for --iterations iterations, so
             # we do not advance the frame here until the iterations is reached.
             return False
 
@@ -473,7 +483,7 @@ class DemoHelper:
                     self.current = self.iterations
                     return False
                 return True
-                
+
             for i in range(self.get_wait()):
                 key = cv2.waitKey(1) & 0xFF
                 if key == 27:
@@ -482,7 +492,7 @@ class DemoHelper:
                 if key == ord(' '):
                     # for folder input this advances the image to next frame.
                     self.source.load_next_image()
-        except cv2.error as e:
+        except cv2.error:
             # OpenCV may not have been built with GTK or Carbon support
             pass
 

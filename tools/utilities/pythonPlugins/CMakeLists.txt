@@ -32,3 +32,6 @@ if(${PYTHON_ENABLED})
 else()
     message(WARNING "Python build is disabled, so the pythonPlugin will not function, it will just be a stub")
 endif()  # PYTHON_ENABLED
+
+# run flake8
+flake8(pythonPlugins "${CMAKE_CURRENT_SOURCE_DIR}/../pythonlibs/flake.ini")

@@ -1,11 +1,11 @@
 ###################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     wav_reader.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     wav_reader.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ###################################################################################################
 import audioop
 import math
@@ -13,6 +13,7 @@ import wave
 
 import numpy as np
 import pyaudio
+
 
 class WavReader:
     def __init__(self, sample_rate=16000, channels=1):
@@ -29,9 +30,9 @@ class WavReader:
         self.sample_width = 0
         self.read_size = None
         self.dtype = None
-    
+
     def open(self, filename, buffer_size, speaker=None):
-        """ open a wav file for reading 
+        """ open a wav file for reading
         buffersize   Number of audio samples to return on each read() call
         speaker      Optional output speaker to send converted audio to so you can hear it.
         """
@@ -44,7 +45,7 @@ class WavReader:
         self.actual_rate = self.wav_file.getframerate()
         self.sample_width = self.wav_file.getsampwidth()
         # assumes signed integer used in raw audio, so for example, the max for 16bit is 2^15 (32768)
-        self.audio_scale_factor = 1 / pow(2, (8*self.sample_width) - 1)
+        self.audio_scale_factor = 1 / pow(2, (8 * self.sample_width) - 1)
         if self.requested_rate == 0:
             raise Exception("Requested rate cannot be zero")
         self.buffer_size = int(math.ceil((self.read_size * self.actual_rate) / self.requested_rate))
@@ -57,7 +58,8 @@ class WavReader:
         elif self.sample_width == 4:
             self.dtype = np.int32
         else:
-            raise Exception("Unexpected sample width {}, can only handle 1, 2 or 4 byte audio".format(self.sample_width))
+            msg = "Unexpected sample width {}, can only handle 1, 2 or 4 byte audio"
+            raise Exception(msg.format(self.sample_width))
 
         if speaker:
             # configure output stream to match what we are resampling to...
@@ -72,7 +74,7 @@ class WavReader:
 
         if self.wav_file is None:
             return None
-        data = self.wav_file.readframes(self.buffer_size)   
+        data = self.wav_file.readframes(self.buffer_size)
         if len(data) == 0:
             return None
 
@@ -81,12 +83,12 @@ class WavReader:
                 data = audioop.tomono(data, self.sample_width, 1, 1)
             else:
                 raise Exception("Target number of channels must be 1")
-                        
+
         if self.actual_rate != self.requested_rate:
             # convert the audio to the desired recording rate
-            data, self.cvstate = audioop.ratecv(data, self.sample_width, self.requested_channels, 
-                self.actual_rate, self.requested_rate, self.cvstate)
-            
+            data, self.cvstate = audioop.ratecv(data, self.sample_width, self.requested_channels, self.actual_rate,
+                                                self.requested_rate, self.cvstate)
+
         if self.speaker:
             self.speaker.write(data)
 
@@ -99,17 +101,17 @@ class WavReader:
         data_size = len(data)
         if data_size < self.read_size:
             bigger = np.zeros((self.read_size))
-            bigger[:data_size] = data 
+            bigger[:data_size] = data
             data = bigger
         elif data_size > self.read_size:
-            data = data[:self.read_size] # truncate
+            data = data[:self.read_size]  # truncate
 
         return data * self.audio_scale_factor
-    
+
     def close(self):
         if self.wav_file:
             self.wav_file.close()
             self.wav_file = None
-    
+
     def is_closed(self):
         return self.wav_file is None

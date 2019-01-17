@@ -1,13 +1,12 @@
 ###################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     compute_ell_model.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     compute_ell_model.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ###################################################################################################
-import importlib
 import os
 import sys
 
@@ -21,12 +20,12 @@ except:
     ell_root = os.getenv("ELL_ROOT")
     if not ell_root:
         raise Exception("Please set your ELL_ROOT environment variable")
-    sys.path += [ os.path.join(ell_root, "build", "interfaces", "python", "package")]
+    sys.path += [os.path.join(ell_root, "build", "interfaces", "python", "package")]
     import ell
 
 
 class ComputeModel:
-    """ This class wraps a .ell model, exposing the model compute function as a 
+    """ This class wraps a .ell model, exposing the model compute function as a
     transform method """
     def __init__(self, model_path):
 

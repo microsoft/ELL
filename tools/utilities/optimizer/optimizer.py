@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     optimizer.py
-##  Authors:  Ying Guo
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     optimizer.py
+#  Authors:  Ying Guo
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
 import argparse
 import glob
@@ -14,17 +14,20 @@ import json
 import logging
 import numpy
 import os
-import sys
 
 LOG_LEVEL_VERBOSE = 1
-logging.addLevelName(LOG_LEVEL_VERBOSE, "VERBOSE")
+
+
 def verbose(self, message, *args, **kws):
     if self.isEnabledFor(LOG_LEVEL_VERBOSE):
         self._log(LOG_LEVEL_VERBOSE, message, args, **kws)
-logging.Logger.verbose = verbose
 
+
+logging.addLevelName(LOG_LEVEL_VERBOSE, "VERBOSE")
+logging.Logger.verbose = verbose
 logger = logging.getLogger(__name__)
 logger_console_handler = logging.StreamHandler()
+
 
 def optimize(profiles, output):
 
@@ -52,7 +55,8 @@ def optimize(profiles, output):
                         if "model" in perf.keys() and "node" in perf.keys():
                             if len(best) == 0:
                                 best = perf
-                            elif best["model"]["time_ms"] / best["model"]["count"] > perf["model"]["time_ms"] / perf["model"]["count"]:
+                            elif best["model"]["time_ms"] / best["model"]["count"] > \
+                                    perf["model"]["time_ms"] / perf["model"]["count"]:
                                 best = perf
                 if len(best) > 0:
                     logger.verbose("Found valid profile!")
@@ -121,7 +125,6 @@ def optimize(profiles, output):
     return modified
 
 
-
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
@@ -129,13 +132,18 @@ if __name__ == '__main__':
         description="ELL optimier script for optimizing model based on profiles.\n")
 
     verbosity = parser.add_mutually_exclusive_group()
-    verbosity.add_argument("--verbosity", "-v", help="Turn on verbosity logging level. Available levels are {}".format(list(logging._levelToName.values())), choices=list(logging._levelToName.values()), default="INFO")
+    verbose_help = "Turn on verbosity logging level. Available levels are {}".format(
+        list(logging._levelToName.values()))
+    verbosity.add_argument("--verbosity", "-v", help=verbose_help, choices=list(logging._levelToName.values()),
+                           default="INFO")
     verbosity.add_argument("--quiet", "-q", help="Turn off logging.", action="store_true", default=False)
     parser.add_argument("--log", "-l", help="Store output to log file.", default=None)
 
     source = parser.add_mutually_exclusive_group(required=True)
-    source.add_argument("--file", "-f", help="ELL model profiles. Multiple files are allowed, each seperated by space.", nargs="+", default=None)
-    source.add_argument("--dir", "-d", help="Directory that contains ELL model profiles. Wildcard * is allowed.", default=None)
+    source.add_argument("--file", "-f", nargs="+", default=None,
+                        help="ELL model profiles. Multiple files are allowed, each seperated by space.")
+    source.add_argument("--dir", "-d", default=None,
+                        help="Directory that contains ELL model profiles. Wildcard * is allowed.")
 
     parser.add_argument("--output", "-o", help="Output optimized ELL model.", default="model.ell")
 

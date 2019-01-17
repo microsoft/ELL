@@ -6,7 +6,7 @@ if(${PYTHON_ENABLED})
 
     set(module_name "pythonlibs-audio")
 
-    set(lib_src 
+    set(lib_src
         classifier.py
         compiled_ell_model.py
         compute_ell_model.py
@@ -26,7 +26,7 @@ if(${PYTHON_ENABLED})
     add_dependencies(${module_name} pythonlibs)
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/utilities/audio")
-    
+
     # copy files
     copy_newer_files(${module_name} lib_src)
 

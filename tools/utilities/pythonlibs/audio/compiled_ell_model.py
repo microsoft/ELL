@@ -1,11 +1,11 @@
 ###################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     compiled_ell_model.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     compiled_ell_model.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ###################################################################################################
 import importlib
 import os
@@ -13,8 +13,9 @@ import sys
 
 import numpy as np
 
+
 class CompiledModel:
-    """ This class wraps a compiled ELL module, exposing the compiled predict function as a 
+    """ This class wraps a compiled ELL module, exposing the compiled predict function as a
     transform method """
     def __init__(self, model_path):
         self.path = model_path
@@ -29,7 +30,7 @@ class CompiledModel:
             self.module = getattr(self.module, model_name)
         self.input_shape = self.module.get_default_input_shape()
         self.output_shape = self.module.get_default_output_shape()
-        sys.path = saved 
+        sys.path = saved
 
     def __del__(self):
         del self.module
@@ -39,7 +40,7 @@ class CompiledModel:
         in_vec = np.array(x).astype(np.float).ravel()
 
         if np.any(np.isnan(in_vec)):
-            np.nan_to_num(in_vec, copy = False)
+            np.nan_to_num(in_vec, copy=False)
 
         # Send the input to the predict function and return the prediction result
         return self.module.predict(in_vec)

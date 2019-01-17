@@ -1,18 +1,17 @@
 ###################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     dataset.py
-##  Authors:  Chris Lovett, Chuck Jacobs
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     dataset.py
+#  Authors:  Chris Lovett, Chuck Jacobs
+#
+#  Requires: Python 3.x
+#
 ###################################################################################################
-
-import os
 
 import numpy as np
 
 NULL_LABEL_NAME = "<null>"
+
 
 class Dataset(object):
     """
@@ -35,17 +34,17 @@ class Dataset(object):
 
         self.file_name = None
         self.features = features
-        self.labels = None # computable labels ([0,1] for binary classification, 1-hot vector for multiclass)
-        self.raw_labels = None # numeric labels ([0, num_classes])
-        self.label_names = label_names # textual labels 
-        self.categories = None # map from textual -> numeric label
-        self.category_names = None # map from numeric -> textual label
+        self.labels = None  # computable labels ([0,1] for binary classification, 1-hot vector for multiclass)
+        self.raw_labels = None  # numeric labels ([0, num_classes])
+        self.label_names = label_names  # textual labels
+        self.categories = None  # map from textual -> numeric label
+        self.category_names = None  # map from numeric -> textual label
         self.class_weights = None
         self.class_distribution = None
         self.parameters = parameters
 
         self._init()
-    
+
     def _init(self):
 
         # Process features
@@ -62,14 +61,11 @@ class Dataset(object):
     @staticmethod
     def load(filename):
         """ Load a dataset from a numpy file.  """
-        if format is None and os.path.splitext(filename)[1] == ".npz":
-            format = "numpy"
-
         with np.load(filename) as data:
             features = data["features"]
             label_names = data["labels"]
             parameters = data["parameters"]
-        
+
         result = Dataset(features, label_names, parameters)
         result.file_name = filename
         return result
@@ -79,7 +75,7 @@ class Dataset(object):
         self.file_name = filename
         np.savez(filename, features=self.features, labels=self.label_names, parameters=self.parameters)
 
-    def _process_labels(self):        
+    def _process_labels(self):
         self.valid_classes = sorted(set(self.label_names))
 
         # Get valid category names
@@ -87,9 +83,9 @@ class Dataset(object):
             self.valid_classes.remove(NULL_LABEL_NAME)
 
         # Generate map from name -> label value, starting with index 1 (reserving 0 for 'null')
-        self.categories = {item[0]:item[1]+1 for item in zip(self.valid_classes, range(len(self.valid_classes)))}
+        self.categories = {item[0]: item[1] + 1 for item in zip(self.valid_classes, range(len(self.valid_classes)))}
         self.categories[NULL_LABEL_NAME] = 0
-        self.category_names = {d[1]:d[0] for d in self.categories.items()} # map from label value -> name
+        self.category_names = {d[1]: d[0] for d in self.categories.items()}  # map from label value -> name
         self.num_classes = len(self.categories)
 
         # Replace bad label names with NULL_LABEL_NAME
@@ -104,13 +100,13 @@ class Dataset(object):
             self.labels = self.to_categorical(self.raw_labels, self.num_classes)
 
     def _compute_class_weights(self):
-        total_entries = len(self.raw_labels)            
+        total_entries = len(self.raw_labels)
         unique_labels = set(self.raw_labels)
-        self.class_distribution = {l:0 for l in set(unique_labels)}  # init to zero
+        self.class_distribution = {l: 0 for l in set(unique_labels)}  # init to zero
         for label in self.raw_labels:
             self.class_distribution[label] += 1
         self.class_weights = {label: (total_entries / self.class_distribution[label]) for label in unique_labels}
-        
+
     def _compute_sample_weights(self):
         self.sample_weights = np.zeros(len(self.raw_labels))
         for index in range(len(self.raw_labels)):
@@ -118,7 +114,7 @@ class Dataset(object):
 
     def normalize(self):
         """ Normalize the dataset by subtracting the mean and dividing by the standard deviation """
-        self.features = (self.features-self.mean) / self.std
+        self.features = (self.features - self.mean) / self.std
 
     def to_categorical(self, labels, num_categories):
         """
@@ -130,4 +126,3 @@ class Dataset(object):
         result = np.zeros((num_rows, num_categories))
         result[np.arange(num_rows), labels_arr] = 1
         return result
-        

@@ -53,6 +53,9 @@ if(${PYTHON_ENABLED})
 
     file(TO_NATIVE_PATH "${BLAS_DLL_DIR}" OPENBLAS_DLL_DIR)
     file(WRITE "${OUTPUT_DIR}/openblas.cmd" "set PATH=%PATH%;${OPENBLAS_DLL_DIR}")
+    
+    # run flake8
+    flake8(${module_name} "${CMAKE_CURRENT_SOURCE_DIR}/../utilities/pythonlibs/flake.ini")
 
 
 endif()  # PYTHON_ENABLED

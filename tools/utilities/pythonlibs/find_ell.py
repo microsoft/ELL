@@ -1,19 +1,20 @@
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     find_ell.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     find_ell.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
 import sys
 import os
 
 __this_file_directory = os.path.dirname(os.path.abspath(__file__))
 
-# find the root of the ELL git repo
+
 def get_ell_root():
+    """ find the root of the ELL git repo """
     expected_dir = "external"
     root_dir = __this_file_directory
     while not os.path.isdir(os.path.join(root_dir, expected_dir)):
@@ -23,19 +24,20 @@ def get_ell_root():
         root_dir = parent
     return root_dir
 
-# find the ELL build directory relative to this file
+
 def find_ell_build():
+    """ find the ELL build directory relative to this file """
     build_dir = ""
-    head,tail = os.path.split(__this_file_directory)
+    head, tail = os.path.split(__this_file_directory)
     while (tail != ""):
         # find a file that is unique to the ELL build folder
         # (this works if our search started somewhere in the build folder)
-        test = os.path.join(head,"ell_build_tools.json")
+        test = os.path.join(head, "ell_build_tools.json")
         if (os.path.isfile(test)):
             return head
 
         # find a file that is unique to the ELL repo root.
-        test = os.path.join(head,"StyleGuide.md")
+        test = os.path.join(head, "StyleGuide.md")
         if (os.path.isfile(test)):
             # this happens if we are searching from outside the build folder, so in
             # order to support different named build folders, like 'build_gcc' or 'build_clang'
@@ -44,14 +46,15 @@ def find_ell_build():
                 dd = os.path.join(head, d)
                 if d.startswith("build") and os.path.isdir(dd):
                     return dd
-            raise Exception("ELL build folder not found in {}\nFound:{}".format(head,os.listdir(head)))
+            raise Exception("ELL build folder not found in {}\nFound:{}".format(head, os.listdir(head)))
 
-        head,tail = os.path.split(head)
+        head, tail = os.path.split(head)
     return build_dir
-    
+
+
 ell_build_dir = find_ell_build()
 if not ell_build_dir:
-  ell_build_dir = os.path.join(os.getenv("ELL_ROOT"),"build")
+  ell_build_dir = os.path.join(os.getenv("ELL_ROOT"), "build")
 ell_py_dir = os.path.join(ell_build_dir, "interfaces", "python", "package")
 if ell_py_dir is None:
     raise ImportError("Could not find ell package, did you follow the ELL Python Binding build instructions?")

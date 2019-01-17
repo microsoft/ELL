@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     test.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     test.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
 tests = []
 
@@ -18,15 +18,12 @@ try:
     script_path = os.path.dirname(os.path.abspath(__file__))
     sys.path += [
         os.path.join(script_path, '..', '..', '..', 'tools', 'utilities',
-            'pythonlibs'),
-        '.',
-        '..']
-    import find_ell
-    import ell
+                     'pythonlibs'), '.', '..']
+
     import wrap_test
 
-    tests = [        
-        (wrap_test.test, "wrap_test") 
+    tests = [
+        (wrap_test.test, "wrap_test")
     ]
 except ImportError as err:
     if "Could not find ell package" in str(err):
@@ -34,6 +31,7 @@ except ImportError as err:
         SkipTests = True
     else:
         raise err
+
 
 def run_test():
     rc = 0
@@ -51,6 +49,6 @@ def run_test():
             rc = 1
     sys.exit(rc)
 
+
 if not SkipTests:
     run_test()
-

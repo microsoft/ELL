@@ -1,5 +1,5 @@
 @echo off
-
+pushd %~dp0
 set ext_path=%~dp0external
 set skip_update=false
 set dev_cmd=false
@@ -46,21 +46,23 @@ echo.
 
 :FinishChecking
 
-echo == Activate python ===
-
 REM Check for python version
 for /f "tokens=1 delims= " %%G in ('powershell "conda info --envs"') do (
     if "%%G" equ "py36" (
         endlocal
+        echo == Activate conda py36 environment ===
         call activate.bat py36
         goto Python36Available
     )
 )
-echo creating py36 environment...
-conda create -n py36 python=3.6
-endlocal
+
+echo === Creating py36 environment ===
+call conda.bat create -n py36 pip python=3.6 -y
+
+echo == Activate conda py36 environment ===
 call activate.bat py36
-conda install -c conda-forge opencv
+echo Activated, now running pip...
+pip install -r requirements.txt
 
 :Python36Available
 python --version

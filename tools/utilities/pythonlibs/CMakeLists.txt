@@ -6,16 +6,16 @@ if(${PYTHON_ENABLED})
 
     set(module_name "pythonlibs")
 
-    set(lib_src 
-        buildtools.py 
-        cpuinfo.py 
+    set(lib_src
+        buildtools.py
+        cpuinfo.py
         dependency_installer.py
         download_helper.py
-        find_ell.py 
+        find_ell.py
         logger.py
         modelHelpers.py
         picluster.py
-        procmon.py 
+        procmon.py
         remoterunner.py
         ziptools.py)
 
@@ -25,8 +25,11 @@ if(${PYTHON_ENABLED})
     add_custom_target(${module_name} DEPENDS SOURCES ${lib_src})
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/utilities")
-    
+
     # copy files
     copy_newer_files(${module_name} lib_src)
 
-endif()  # PYTHON_ENABLED
+    # run flake8
+    flake8(${module_name} "flake.ini")
+
+endif()

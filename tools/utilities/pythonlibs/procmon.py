@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     procmon.py
-##  Authors:  Lisa Ong
-##
-##  Requires: Python 3.4+, psutil (pip install psutil)
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     procmon.py
+#  Authors:  Lisa Ong
+#
+#  Requires: Python 3.4+, psutil (pip install psutil)
+#
 ####################################################################################################
-import os
-import sys
 import argparse
 import json
 import psutil
-import statistics # requires Python 3.4
+import statistics
 from time import sleep
+
 
 class ProcessMonitor:
     def __init__(self, process_id, output_file, interval):
@@ -65,8 +64,7 @@ class ProcessMonitor:
         summary["mean_cpu_percent"] = statistics.mean([x['cpu_percent'] for x in stats])
         summary["mean_num_threads"] = statistics.mean([x['num_threads'] for x in stats])
         summary["mean_system_cpu_percent"] = [
-            statistics.mean([x['system_cpu_percent'][y] for x in stats])
-                for y in range(0, psutil.cpu_count())
+            statistics.mean([x['system_cpu_percent'][y] for x in stats]) for y in range(0, psutil.cpu_count())
         ]
 
         summary["user_cpu_time_s"] = stats[-1]['cpu_times'].user
@@ -77,6 +75,7 @@ class ProcessMonitor:
         summary["mean_virtual_memory_b"] = statistics.mean([x['memory_info'].vms for x in stats])
 
         return summary
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

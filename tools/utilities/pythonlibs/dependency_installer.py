@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     dependency_installer.py
-##  Authors:  Lisa Ong
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     dependency_installer.py
+#  Authors:  Lisa Ong
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
 
 import argparse
 import json
 import pip
 import subprocess
+
 
 class PackageInstaller:
     def __init__(self, requested_packages, verbose=False):
@@ -29,15 +30,14 @@ class PackageInstaller:
             else:
                 print("All packages are already installed")
 
+
 class PipPackageInstaller(PackageInstaller):
 
     def find_missing_packages(self):
         """Finds the list of packages that are not yet installed"""
         listed = pip.get_installed_distributions()
-        installed = dict.fromkeys([package for package in listed \
-            if package.project_name in self.requested_packages])
-        self.missing_packages = [package for package in self.requested_packages.keys() \
-            if package not in installed]
+        installed = dict.fromkeys([package for package in listed if package.project_name in self.requested_packages])
+        self.missing_packages = [package for package in self.requested_packages.keys() if package not in installed]
         self.print_missing_packages()
 
     def install_missing_packages(self):
@@ -49,6 +49,7 @@ class PipPackageInstaller(PackageInstaller):
             pip.main(["install", "--upgrade", package])
             if self.verbose:
                 print("{}", package)
+
 
 class CondaPackageInstaller(PackageInstaller):
     def __init__(self, requested_packages, verbose=False, environment="py34"):
@@ -78,10 +79,8 @@ class CondaPackageInstaller(PackageInstaller):
 
         # TODO: check package versions (currently we just check names)
         listed_names = [package.split("-", 1)[0] for package in listed]
-        installed = dict.fromkeys([package for package in listed_names \
-            if package in self.requested_packages])
-        self.missing_packages = [package for package in self.requested_packages.keys() \
-            if package not in installed]
+        installed = dict.fromkeys([package for package in listed_names if package in self.requested_packages])
+        self.missing_packages = [package for package in self.requested_packages.keys() if package not in installed]
         self.print_missing_packages()
 
     def install_missing_packages(self):
@@ -91,8 +90,7 @@ class CondaPackageInstaller(PackageInstaller):
                 print("Installing missing packages....")
 
             proc = subprocess.Popen(
-                ["conda", "install", "--name", self.environment, "--json", "--yes"] + \
-                    self.missing_packages,
+                ["conda", "install", "--name", self.environment, "--json", "--yes"] + self.missing_packages,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 bufsize=0, universal_newlines=True)
             try:
@@ -107,6 +105,7 @@ class CondaPackageInstaller(PackageInstaller):
 
             if proc.returncode != 0:
                 raise Exception("Failed to install one or more packages: {}".format(outs))
+
 
 class DependencyInstaller:
     """Installs requested Anaconda and Pip packages"""
@@ -134,9 +133,11 @@ class DependencyInstaller:
         self._find_missing_packages()
         self._install_missing_packages()
 
+
 if __name__ == "__main__":
 
-    arg_parser = argparse.ArgumentParser("Installs dependencies through pip or Anaconda\n"
+    arg_parser = argparse.ArgumentParser(
+        "Installs dependencies through pip or Anaconda\n"
         "Example: python dependency_installer.py --pip_packages 'psutil>=5'\n"
         "Example: python dependency_installer.py --conda_packages paramiko\n")
 
@@ -147,6 +148,5 @@ if __name__ == "__main__":
 
     args = arg_parser.parse_args()
 
-    installer = DependencyInstaller(args.environment, args.pip_packages,
-        args.conda_packages, verbose=args.verbose)
+    installer = DependencyInstaller(args.environment, args.pip_packages, args.conda_packages, verbose=args.verbose)
     installer.run()

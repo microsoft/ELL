@@ -1,0 +1,19 @@
+cntk
+configparser
+opencv-python
+dask
+flake8
+python-dateutil
+librosa
+matplotlib
+numpy
+onnx
+paramiko
+parse
+psutil
+pyaudio
+requests
+serial
+# optional (very large):
+# https://download.pytorch.org/whl/cu90/torch-1.0.0-cp36-cp36m-win_amd64.whl
+# torchvision

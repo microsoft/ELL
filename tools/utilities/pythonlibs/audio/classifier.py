@@ -1,22 +1,23 @@
 ###################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     classifier.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     classifier.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ###################################################################################################
 import os
 import time
 
 import numpy as np
 
+
 class AudioClassifier:
     """
     This class wraps an ELL audio classifier model and adds some nice features, like mapping the
-    predictions to a string label, any categorry starting with "_" will be ignored.  It also 
-    does some optional posterior smoothing on the predictions since audio model outputs 
+    predictions to a string label, any categorry starting with "_" will be ignored.  It also
+    does some optional posterior smoothing on the predictions since audio model outputs
     tend to be rather noisy. It also supports a threshold value so any prediction less than this
     probability is ignored.
     """
@@ -65,7 +66,7 @@ class AudioClassifier:
     def predict(self, feature_data):
         """ process the given feature_data using the classifier model, and smooth
         the output.  It returns a tuple containing (prediction, probability, label) """
-        
+
         start_time = time.time()
         output = self.model.transform(feature_data)
         now = time.time()
@@ -78,7 +79,7 @@ class AudioClassifier:
 
         if self.smoothing_delay:
             output = self._smooth(output)
-        
+
         prediction = self._get_prediction(output)
         if prediction and prediction not in self.ignore_list:
             label = ""
@@ -113,19 +114,18 @@ class AudioClassifier:
         if self.start_time is None or now > self.start_time + 1:
             self.start_time = now
             self.items = []
-                
+
         # trim to our delay window
-        new_items = [x for x in self.items if x[0] + self.smoothing_delay >= now ]
-        new_items += [ (now, predictions) ] # add our new item
+        new_items = [x for x in self.items if x[0] + self.smoothing_delay >= now]
+        new_items += [(now, predictions)]  # add our new item
         self.items = new_items
 
         # compute summed probabilities over this new sliding window
         sum = np.sum([p[1] for p in new_items], axis=0)
         return sum / len(new_items)
 
-
     def avg_time(self):
         """ get the average prediction time """
         if self.count == 0:
             self.count = 1
-        return self.total_time /  self.count
+        return self.total_time / self.count

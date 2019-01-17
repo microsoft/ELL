@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 ###################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     record.py
-##  Authors:  Chris Lovett
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     record.py
+#  Authors:  Chris Lovett
+#
+#  Requires: Python 3.x
+#
 ###################################################################################################
 import argparse
 import time
 import wave
-import sys
 
 import numpy as np
 import microphone
 
+
 def main(rate, channels, duration):
-    sample_width = 2 # 16 bit
+    sample_width = 2  # 16 bit
 
     mic = microphone.Microphone()
     mic.open(512, rate, channels)
@@ -32,7 +32,7 @@ def main(rate, channels, duration):
         writer.setframerate(rate)
         while time.time() < start + duration:
             buffer = mic.read()
-            buffer *= 32768 # unscale it back to int16
+            buffer *= 32768  # unscale it back to int16
             int16 = buffer.astype(np.int16)
             writer.writeframes(int16)
 
