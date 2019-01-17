@@ -64,21 +64,5 @@ namespace utilities
     /// <returns> A single string with the given strings separated by the given separator character. </returns>
     std::string Join(const std::vector<std::string>& strings, const std::string& separator);
 
-    /// <summary> A templatized helper method that converts a given typed value to a string. </summary>
-    ///
-    /// <typeparam name="ValueType"> The type of the object </typeparam>
-    /// <param name="value"> The typed value to convert. </param>
-    /// <returns> A string. </returns>
-    template <typename T>
-    std::string ToString(T value);
-
-    /// <summary> A templatized helper method that converts a string to given typed value. </summary>
-    ///
-    /// <typeparam name="ValueType"> The type of the object </typeparam>
-    /// <param name="s"> The string to convert. </param>
-    /// <returns> A typed value. </returns>
-    template <typename T>
-    T FromString(const std::string& s);
-
 } // namespace utilities
 } // namespace ell
