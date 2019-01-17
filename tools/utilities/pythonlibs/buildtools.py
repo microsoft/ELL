@@ -22,7 +22,7 @@ class EllBuildToolsRunException(Exception):
         self.output = output
 
 class EllBuildTools:
-    def __init__(self, ell_root, verbose = False):
+    def __init__(self, ell_root, verbose=False):
         self.verbose = verbose
         self.ell_root = ell_root
         self.build_root = None
@@ -161,6 +161,13 @@ class EllBuildTools:
         else: # host
             return common + ["-relocation-model=pic"]
 
+    def log_command_arguments(self, args, log_dir):
+        # Log the command executable and arguments. Filename is the name of the executable without
+        # an extension + ".log".
+        filename = os.path.join(log_dir, os.path.basename(os.path.splitext(args[0])[0]) + ".log")
+        with open(filename, "w") as f:
+            f.write(" ".join(args))
+
     def llc(self, output_dir, input_file, target, optimization_level="3", objext=".o"):
         # llc -filetype=obj _darknetReference.ll -O3 -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53 -relocation-model=pic
         model_name = os.path.splitext(os.path.basename(input_file))[0]
@@ -173,8 +180,12 @@ class EllBuildTools:
                 "-O" + optimization_level
                 ]
         args = args + self.get_llc_options(target)
+        # Save the parameters passed to llc. This is used for archiving purposes.
+        self.log_command_arguments(args, log_dir=output_dir)
+
         self.logger.info("running llc ...")
         self.run(args)
+
         return out_file
 
     def opt(self, output_dir, input_file, optimization_level="3"):
@@ -186,6 +197,9 @@ class EllBuildTools:
                 "-o", out_file,
                 "-O" + optimization_level
             ]
+        # Save the parameters passed to opt. This is used for archiving purposes.
+        self.log_command_arguments(args, log_dir=output_dir)
+
         self.logger.info("running opt ...")
         self.run(args)
         return out_file
@@ -240,6 +254,9 @@ class EllBuildTools:
             args.append("--profile")
         
         args += extra_options
+
+        # Save the parameters passed to compile. This is used for archiving purposes.
+        self.log_command_arguments(args, log_dir=output_dir)
 
         self.logger.info("compiling model...")
         self.run(args)
