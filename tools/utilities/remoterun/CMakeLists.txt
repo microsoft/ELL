@@ -14,5 +14,6 @@ if(${PYTHON_ENABLED})
     
     # copy files
     copy_newer_files(${module_name} src)
-  
+
+    flake8(${module_name})
 endif()  # PYTHON_ENABLED

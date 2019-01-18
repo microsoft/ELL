@@ -123,13 +123,14 @@ class RemoteRunner:
                 output = []
                 _transport = self.ssh.get_transport()
                 _channel = _transport.open_session()
-                _channel.get_pty()
                 _channel.set_combine_stderr(True)
+                _channel.get_pty()
                 with _channel.makefile() as f_out:
                     _channel.exec_command(cmd)
                     output = self.logstream(f_out)
-                status = _channel.recv_exit_status()
-                if status == 0:
+                status = _channel.exit_status
+                print("Status code {} returned from remote".format(status))
+                if status <= 0:
                     break
                 else:
                     msg = "Error, status code {} returned from remote, attempt {} of {}"
@@ -147,7 +148,7 @@ class RemoteRunner:
     def clean_target(self):
         if self.target_dir:
             self.print("cleaning target folder: " + os.path.basename(self.target_dir))
-            self.exec_remote_command("rm -rf {}".format(os.path.basename(self.target_dir)))
+            self.exec_remote_command("rm -rf {}".format(self.target_dir))
 
     def linux_join(self, path, name):
         # on windows os.path.join uses backslashes which doesn't work on the pi!
@@ -183,7 +184,22 @@ class RemoteRunner:
             if os.path.isfile(src_file):
                 dest_file = self.linux_join(dest, dest_relative_src_file)
                 self.print("copying {} to {}".format(src_file, dest_file))
-                sftp.put(src_file, dest_file)
+                self.sftp_copy_file(sftp, src_file, dest_file)
+
+    def sftp_copy_file(self, sftp, src=None, dest=None):
+        retries = 5
+        error = []
+        while retries > 0:
+            try:
+                sftp.put(src, dest)
+                return
+            except:
+                import traceback
+                errorType, value, stack = sys.exc_info()
+                error = traceback.format_tb(stack)
+                retries -= 1
+        print("### Error in sftp copy file: {} to {}".format(src, dest))
+        [print(line.strip()) for line in error]
 
     def publish_bits(self):
         if self.source_dir:
@@ -226,10 +242,10 @@ class RemoteRunner:
             if self.command:
                 if self.target_dir:
                     self.exec_remote_command("cd {} && chmod u+x ./{}".format(
-                        self.target_dir, self.command.split(" ")[0]))
+                        self.target_dir, self.command.split(" ")[0]), max_attempts=max_attempts)
 
                     output = self.exec_remote_command("cd {} && ./{}".format(
-                        self.target_dir, self.command))
+                        self.target_dir, self.command), max_attempts=max_attempts)
                 else:
                     output = self.exec_remote_command(self.command, max_attempts=max_attempts)
             self.copy_files()

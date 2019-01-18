@@ -17,4 +17,5 @@ if(${PYTHON_ENABLED})
     # put this project in the tools/utilities folder in the IDE 
     set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")
 
+    flake8(${tool_name})
 endif()

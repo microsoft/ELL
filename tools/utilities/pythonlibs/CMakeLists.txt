@@ -30,6 +30,6 @@ if(${PYTHON_ENABLED})
     copy_newer_files(${module_name} lib_src)
 
     # run flake8
-    flake8(${module_name} "flake.ini")
+    flake8(${module_name})
 
 endif()

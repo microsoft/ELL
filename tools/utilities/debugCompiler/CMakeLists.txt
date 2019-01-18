@@ -32,3 +32,5 @@ target_link_libraries(${tool_name} common math model nodes passes utilities pyth
 copy_shared_libraries(${tool_name})
 
 set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")
+
+flake8(${tool_name})

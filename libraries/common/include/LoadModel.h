@@ -86,20 +86,13 @@ namespace common
     template <typename UnarchiverType>
     model::Map LoadArchivedMap(std::istream& stream)
     {
-        try
-        {
-            utilities::SerializationContext context;
-            RegisterNodeTypes(context);
-            RegisterMapTypes(context);
-            UnarchiverType unarchiver(stream, context);
-            model::Map map;
-            unarchiver.Unarchive(map);
-            return map;
-        }
-        catch (const ell::utilities::Exception& ex)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read file: " + ex.GetMessage());
-        }
+        utilities::SerializationContext context;
+        RegisterNodeTypes(context);
+        RegisterMapTypes(context);
+        UnarchiverType unarchiver(stream, context);
+        model::Map map;
+        unarchiver.Unarchive(map);
+        return map;
     }
 } // namespace common
 } // namespace ell

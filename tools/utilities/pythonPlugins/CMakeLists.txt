@@ -34,4 +34,4 @@ else()
 endif()  # PYTHON_ENABLED
 
 # run flake8
-flake8(pythonPlugins "${CMAKE_CURRENT_SOURCE_DIR}/../pythonlibs/flake.ini")
+flake8(pythonPlugins)

@@ -16,13 +16,13 @@
 #include <model/include/SpliceNode.h>
 
 #include <nodes/include/AccumulatorNode.h>
+#include <nodes/include/ActivationFunctions.h>
 #include <nodes/include/BinaryOperationNode.h>
 #include <nodes/include/BinaryPredicateNode.h>
 #include <nodes/include/BroadcastFunctionNode.h>
 #include <nodes/include/BroadcastOperationNodes.h>
 #include <nodes/include/BufferNode.h>
 #include <nodes/include/ClockNode.h>
-#include <nodes/include/ActivationFunctions.h>
 #include <nodes/include/ConcatenationNode.h>
 #include <nodes/include/DCTNode.h>
 #include <nodes/include/DTWDistanceNode.h>
@@ -86,7 +86,7 @@ namespace ell
 namespace common
 {
     template <typename ElementType>
-    void RegisterRealNodeTypes(utilities::SerializationContext& context)
+    void RegisterRealNodeTypes(SerializationContext& context)
     {
         context.GetTypeFactory().AddType<model::Node, model::InputNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<ElementType>>();
@@ -124,7 +124,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::rowMajor>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::columnMajor>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MatrixMatrixMultiplyNode<ElementType>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorMultiplyNode<ElementType>>();        
+        context.GetTypeFactory().AddType<model::Node, nodes::MatrixVectorMultiplyNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<ElementType>>();
@@ -177,7 +177,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",ParametricReLUActivation>");
     }
 
-    void RegisterNodeTypes(utilities::SerializationContext& context)
+    void RegisterNodeTypes(SerializationContext& context)
     {
         RegisterRealNodeTypes<float>(context);
         RegisterRealNodeTypes<double>(context);
@@ -282,7 +282,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, int64_t>>();
     }
 
-    void RegisterMapTypes(utilities::SerializationContext& context)
+    void RegisterMapTypes(SerializationContext& context)
     {
         context.GetTypeFactory().AddType<model::Map, model::Map>();
     }
@@ -290,7 +290,7 @@ namespace common
     template <typename UnarchiverType>
     model::Model LoadArchivedModel(std::istream& stream)
     {
-        utilities::SerializationContext context;
+        SerializationContext context;
         RegisterNodeTypes(context);
         UnarchiverType unarchiver(stream, context);
         model::Model model;
@@ -307,28 +307,28 @@ namespace common
 
     model::Model LoadModel(const std::string& filename)
     {
-        if (!utilities::IsFileReadable(filename))
+        if (!IsFileReadable(filename))
         {
-            throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound);
+            throw SystemException(SystemExceptionErrors::fileNotFound);
         }
 
-        auto filestream = utilities::OpenIfstream(filename);
-        return LoadArchivedModel<utilities::JsonUnarchiver>(filestream);
+        auto filestream = OpenIfstream(filename);
+        return LoadArchivedModel<JsonUnarchiver>(filestream);
     }
 
     void SaveModel(const model::Model& model, const std::string& filename)
     {
-        if (!utilities::IsFileWritable(filename))
+        if (!IsFileWritable(filename))
         {
-            throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotWritable);
+            throw SystemException(SystemExceptionErrors::fileNotWritable);
         }
-        auto filestream = utilities::OpenOfstream(filename);
+        auto filestream = OpenOfstream(filename);
         SaveModel(model, filestream);
     }
 
     void SaveModel(const model::Model& model, std::ostream& outStream)
     {
-        SaveArchivedObject<utilities::JsonArchiver>(model, outStream);
+        SaveArchivedObject<JsonArchiver>(model, outStream);
     }
 
     //
@@ -350,7 +350,7 @@ namespace common
                 inputNode = mapLoadArguments.GetInput(model);
                 if (inputNode == nullptr)
                 {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find input node");
+                    throw InputException(InputExceptionErrors::invalidArgument, "Can't find input node");
                 }
             }
             else // look for first input node
@@ -358,7 +358,7 @@ namespace common
                 auto inputNodes = model.GetNodesByType<model::InputNodeBase>();
                 if (inputNodes.size() == 0)
                 {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find input node");
+                    throw InputException(InputExceptionErrors::invalidArgument, "Can't find input node");
                 }
                 inputNode = inputNodes[0];
             }
@@ -372,13 +372,13 @@ namespace common
                 auto outputNodes = model.GetNodesByType<model::OutputNodeBase>();
                 if (outputNodes.size() == 0)
                 {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output node");
+                    throw InputException(InputExceptionErrors::invalidArgument, "Can't find output node");
                 }
                 auto outputNode = outputNodes[0];
                 auto outputPorts = outputNode->GetOutputPorts();
                 if (outputPorts.size() == 0)
                 {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output port");
+                    throw InputException(InputExceptionErrors::invalidArgument, "Can't find output port");
                 }
 
                 auto outputPort = outputPorts[0]; // ptr to port base
@@ -402,28 +402,36 @@ namespace common
             return model::Map{};
         }
 
-        if (!utilities::IsFileReadable(filename))
+        if (!IsFileReadable(filename))
         {
-            throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound);
+            throw SystemException(SystemExceptionErrors::fileNotFound);
         }
 
-        auto filestream = utilities::OpenIfstream(filename);
-        return LoadArchivedMap<utilities::JsonUnarchiver>(filestream);
+        auto filestream = OpenIfstream(filename);
+
+        try
+        {
+            return LoadArchivedMap<JsonUnarchiver>(filestream);
+        }
+        catch (const std::exception& ex)
+        {
+            throw InputException(InputExceptionErrors::badData, "Error: reading ELL map: " + filename + ": " + ex.what());
+        }
     }
 
     void SaveMap(const model::Map& map, const std::string& filename)
     {
-        if (!utilities::IsFileWritable(filename))
+        if (!IsFileWritable(filename))
         {
-            throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotWritable);
+            throw SystemException(SystemExceptionErrors::fileNotWritable);
         }
-        auto filestream = utilities::OpenOfstream(filename);
+        auto filestream = OpenOfstream(filename);
         SaveMap(map, filestream);
     }
 
     void SaveMap(const model::Map& map, std::ostream& outStream)
     {
-        SaveArchivedObject<utilities::JsonArchiver>(map, outStream);
+        SaveArchivedObject<JsonArchiver>(map, outStream);
     }
 } // namespace common
 } // namespace ell

@@ -1,24 +1,27 @@
 ####################################################################################################
-##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     train_test_model.py
-##  Authors:  Chuck Jacobs
-##
-##  Requires: Python 3.x
-##
+#
+#  Project:  Embedded Learning Library (ELL)
+#  File:     train_test_model.py
+#  Authors:  Chuck Jacobs
+#
+#  Requires: Python 3.x
+#
 ####################################################################################################
+import os
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.onnx
+import torch.onnx  # noqa: F401
 import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
+
 def get_mnist(root):
     return torchvision.datasets.mnist.MNIST(root=root, transform=transforms.ToTensor())
+
 
 def write_ell_dataset(dataset, filename):
     with open(filename, "w") as outfile:
@@ -28,10 +31,11 @@ def write_ell_dataset(dataset, filename):
             row = str(label) + '\t' + '\t'.join([str(x) for x in datavector]) + '\n'
             outfile.write(row)
 
+
 class TwoLayer(nn.Module):
     def __init__(self, inputSize, hiddenSize, outputSize):
-        super(TwoLayer, self).__init__()        
-        
+        super(TwoLayer, self).__init__()
+
         self.fc1 = nn.Linear(inputSize, hiddenSize)
         self.fc2 = nn.Linear(hiddenSize, outputSize)
 
@@ -42,8 +46,9 @@ class TwoLayer(nn.Module):
 
         return x
 
+
 def train(model, dataset, numepochs, device=None):
-    
+
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
@@ -65,12 +70,12 @@ def train(model, dataset, numepochs, device=None):
             optimizer.step()
 
             running_loss += loss.item()
-            if (i+1) % 2000 == 0:    # print every 2000 mini-batches
-                print('[%d, %5d] loss: %.3f' %
-                    (epoch + 1, i + 1, running_loss / 2000))
+            if (i + 1) % 2000 == 0:  # print every 2000 mini-batches
+                print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
                 running_loss = 0.0
 
     print('Finished Training')
+
 
 def write_weights(model, path):
     layer1_weights = model.fc1.weight.detach().numpy()

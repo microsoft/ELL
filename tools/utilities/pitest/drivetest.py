@@ -361,7 +361,7 @@ class DriveTest:
                                           target_dir=self.target_dir,
                                           command="runtest.sh",
                                           verbose=self.verbose,
-                                          start_clean=not self.test,
+                                          start_clean=True,
                                           timeout=self.timeout,
                                           cleanup=False)
                     output = runner.run_command()

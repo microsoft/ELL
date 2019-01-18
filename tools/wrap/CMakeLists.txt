@@ -55,7 +55,6 @@ if(${PYTHON_ENABLED})
     file(WRITE "${OUTPUT_DIR}/openblas.cmd" "set PATH=%PATH%;${OPENBLAS_DLL_DIR}")
     
     # run flake8
-    flake8(${module_name} "${CMAKE_CURRENT_SOURCE_DIR}/../utilities/pythonlibs/flake.ini")
-
+    flake8(${module_name})
 
 endif()  # PYTHON_ENABLED

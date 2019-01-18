@@ -155,3 +155,5 @@ add_test(NAME make_profiler_test
     -P ${CMAKE_CURRENT_SOURCE_DIR}/make_profiler_test.cmake
 )
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
+
+flake8(${tool_name})

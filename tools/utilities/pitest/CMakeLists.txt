@@ -23,7 +23,9 @@ if(${PYTHON_ENABLED})
                                             --cluster ${RPI_CLUSTER} 
                                             --password ${RPI_PASSWORD}
                                             --key ${RPI_KEY}
-                                            --gitrepo ${TEST_MODELS_REPO})
+                                            --gitrepo ${TEST_MODELS_REPO})                                            
     endif()
+    
+    flake8(${module_name})
 
 endif()  # PYTHON_ENABLED

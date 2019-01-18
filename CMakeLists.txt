@@ -38,6 +38,8 @@ option(DISABLE_PYTHON "Explicitly disable building python modules" OFF)
 option(CNTK "Enable CNTK importer and related unit tests (requires CNTK python module)" OFF)
 option(ONNX "Enable ONNX importer and related unit tests (requires PyTorch and ONNX python modules)" OFF)
 
+set(ELL_ROOT "${CMAKE_SOURCE_DIR}")
+set(FLAKE8_CONFIG "${CMAKE_SOURCE_DIR}/.flake8")
 set(TEST_MODELS_REPO "https://github.com/Microsoft/ell-test-models" CACHE DOCUMENTATION "URL to the git repo containing test models" )
 message(STATUS "Configuring tests to use TEST_MODELS_REPO at: ${TEST_MODELS_REPO}")
 set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
@@ -68,13 +70,14 @@ else()
   endforeach()
 
   if(${PYTHONLIBS_FOUND})
-    set(PYTHON_ENABLED ON)    
-    include(Flake8)
+    set(PYTHON_ENABLED ON)
   else()
     set(PYTHON_ENABLED OFF)
     message(STATUS "### Python 3.6 or later not found, so python features will be disabled")
   endif()
 endif()
+    
+include(Flake8)
 
 # Turn on ability to create folders to organize projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
