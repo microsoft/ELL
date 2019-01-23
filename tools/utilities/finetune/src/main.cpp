@@ -39,10 +39,16 @@ int main(int argc, char* argv[])
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
+        std::cout << exception.GetHelpText() << std::endl;
         return 0;
     }
     catch (const utilities::CommandLineParserErrorException& exception)
     {
+        std::cerr << "Command line parse error:" << std::endl;
+        for (const auto& error : exception.GetParseErrors())
+        {
+            std::cerr << error.GetMessage() << std::endl;
+        }
         return 1;
     }
     catch (const utilities::Exception& exception)

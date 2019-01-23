@@ -62,16 +62,16 @@ MultiClassDataContainer LoadTrivialConvDataContainer2()
 UnlabeledDataContainer GetSimpleStatsDataset()
 {
     std::vector<std::vector<float>> rawData = {
-        { 8.7, 7.8, 0.6, 8.8 },
-        { 8.3, 0.7, 4., 4. },
-        { 6.6, 1.1, 7.1, 0.1 },
-        { 6.8, 2.7, 7.7, 6.9 },
-        { 5.4, 6.6, 2.9, 1.1 },
-        { 9.3, 4.6, 8.4, 2.8 },
-        { 9.5, 7.7, 0.1, 2.1 },
-        { 9., 6.7, 4.3, 7. },
-        { 1.1, 6.3, 2.3, 3.7 },
-        { 5.4, 3., 3., 0. }
+        { 8.7f, 7.8f, 0.6f, 8.8f },
+        { 8.3f, 0.7f, 4.0f, 4.0f },
+        { 6.6f, 1.1f, 7.1f, 0.1f },
+        { 6.8f, 2.7f, 7.7f, 6.9f },
+        { 5.4f, 6.6f, 2.9f, 1.1f },
+        { 9.3f, 4.6f, 8.4f, 2.8f },
+        { 9.5f, 7.7f, 0.1f, 2.1f },
+        { 9.0f, 6.7f, 4.3f, 7.0f },
+        { 1.1f, 6.3f, 2.3f, 3.7f },
+        { 5.4f, 3.0f, 3.0f, 0.0f }
     };
 
     UnlabeledDataContainer result;

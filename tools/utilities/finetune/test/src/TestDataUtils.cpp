@@ -48,9 +48,9 @@ BinaryLabelDataContainer GetBinaryLabelDataContainer()
 UnlabeledDataContainer GetBinaryPredictions()
 {
     UnlabeledDataContainer data;
-    data.Add({ 0.2 }); // correct
-    data.Add({ -0.5 }); // correct
-    data.Add({ -0.1 }); // incorrect
+    data.Add({ 0.2f }); // correct
+    data.Add({ -0.5f }); // correct
+    data.Add({ -0.1f }); // incorrect
     return data;
 }
 
@@ -66,18 +66,18 @@ MultiClassDataContainer GetMultiClassDataContainer()
 UnlabeledDataContainer GetMultiClassPredictions()
 {
     UnlabeledDataContainer data;
-    data.Add({ 1.1, 0.3, -0.5 }); // correct
-    data.Add({ 0.4, 0.3, -0.5 }); // incorrect
-    data.Add({ -0.2, 0.1, -0.5 }); // incorrect
+    data.Add({ 1.1f, 0.3f, -0.5f }); // correct
+    data.Add({ 0.4f, 0.3f, -0.5f }); // incorrect
+    data.Add({ -0.2f, 0.1f, -0.5f }); // incorrect
     return data;
 }
 
 VectorLabelDataContainer GetVectorLabelDataContainer()
 {
     VectorLabelDataContainer data;
-    data.push_back({ { 1.0f, 2.0f, 3.0f, 4.0f }, { 0.0, 1.0 } });
-    data.push_back({ { 2.0f, 3.0f, 4.0f, 5.0f }, { 1.0, 2.0 } });
-    data.push_back({ { 2.0f, 4.0f, 6.0f, 8.0f }, { 2.0, 4.0 } });
+    data.push_back({ { 1.0f, 2.0f, 3.0f, 4.0f }, { 0.0f, 1.0f } });
+    data.push_back({ { 2.0f, 3.0f, 4.0f, 5.0f }, { 1.0f, 2.0f } });
+    data.push_back({ { 2.0f, 4.0f, 6.0f, 8.0f }, { 2.0f, 4.0f } });
     return data;
 }
 
