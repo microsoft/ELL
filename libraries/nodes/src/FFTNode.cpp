@@ -262,6 +262,8 @@ namespace nodes
             std::string functionName = GetFFTFunctionName<ValueType>(length);
             auto argumentTypes = detail::GetFFTFunctionArguments<ValueType>(module);
             emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+            function.SetAttributeForArguments(emitters::IRFunctionEmitter::Attributes::NoAlias);
+
             return function;
         }
 
@@ -274,6 +276,8 @@ namespace nodes
             std::string functionName = GetRealFFTFunctionName<ValueType>(length);
             auto argumentTypes = detail::GetRealFFTFunctionArguments<ValueType>(module);
             emitters::IRFunctionEmitter function = module.BeginFunction(functionName, voidType, argumentTypes);
+            function.SetAttributeForArguments(emitters::IRFunctionEmitter::Attributes::NoAlias);
+
             return function;
         }
 

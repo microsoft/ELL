@@ -785,6 +785,10 @@ namespace nodes
         argTypes.insert(argTypes.end(), 2, int32Type); // begin, end
 
         auto taskFunction = function.GetModule().BeginFunction(utilities::to_string(GetId()) + "_task", voidType, argTypes);
+        std::vector<size_t> indices(argTypes.size() - 2);
+        std::iota(indices.begin(), indices.end(), 0);
+        taskFunction.SetAttributeForArguments(indices, emitters::IRFunctionEmitter::Attributes::NoAlias);
+
         {
             // get stuff from arguments
             auto arguments = taskFunction.Arguments().begin();

@@ -26,19 +26,21 @@ namespace emitters
         LLVMFunction EmitGEMVFunction(IRModuleEmitter& module, const std::string& functionName, const NamedVariableTypeList& argTypes)
         {
             auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);
+            function.SetAttributeForArguments({ 5, 7, 10 }, IRFunctionEmitter::Attributes::NoAlias);
+
             auto arguments = function.Arguments().begin();
-            auto order = &(*arguments++);
-            auto transpose = &(*arguments++);
-            auto m = function.LocalScalar(&(*arguments++));
-            auto n = function.LocalScalar(&(*arguments++));
-            auto alpha = function.LocalScalar(&(*arguments++));
-            auto A = function.LocalArray(&(*arguments++));
-            auto lda = function.LocalScalar(&(*arguments++));
-            auto x = function.LocalArray(&(*arguments++));
-            auto incx = function.LocalScalar(&(*arguments++));
-            auto beta = function.LocalScalar(&(*arguments++));
-            auto y = function.LocalArray(&(*arguments++));
-            auto incy = function.LocalScalar(&(*arguments++));
+            auto order = &(*arguments++); // 0
+            auto transpose = &(*arguments++); // 1
+            auto m = function.LocalScalar(&(*arguments++)); // 2
+            auto n = function.LocalScalar(&(*arguments++)); // 3
+            auto alpha = function.LocalScalar(&(*arguments++)); // 4
+            auto A = function.LocalArray(&(*arguments++)); // 5
+            auto lda = function.LocalScalar(&(*arguments++)); // 6
+            auto x = function.LocalArray(&(*arguments++)); // 7
+            auto incx = function.LocalScalar(&(*arguments++)); // 8
+            auto beta = function.LocalScalar(&(*arguments++)); // 9
+            auto y = function.LocalArray(&(*arguments++)); // 10
+            auto incy = function.LocalScalar(&(*arguments++)); // 11
             UNUSED(order, transpose, alpha, beta);
 
             LLVMValue accum = function.Variable(emitters::GetVariableType<ValueType>(), "accum");
@@ -70,21 +72,23 @@ namespace emitters
             const auto CblasTrans = 112;
 
             auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);
+            function.SetAttributeForArguments({ 7, 9, 12 }, IRFunctionEmitter::Attributes::NoAlias);
+
             auto arguments = function.Arguments().begin();
-            auto order = &(*arguments++);
-            auto transposeA = function.LocalScalar(&(*arguments++)) == CblasTrans;
-            auto transposeB = function.LocalScalar(&(*arguments++)) == CblasTrans;
-            auto m = function.LocalScalar(&(*arguments++));
-            auto n = function.LocalScalar(&(*arguments++));
-            auto k = function.LocalScalar(&(*arguments++));
-            auto alpha = function.LocalScalar(&(*arguments++));
-            auto A = function.LocalArray(&(*arguments++));
-            auto lda = function.LocalScalar(&(*arguments++));
-            auto B = function.LocalArray(&(*arguments++));
-            auto ldb = function.LocalScalar(&(*arguments++));
-            auto beta = function.LocalScalar(&(*arguments++));
-            auto C = function.LocalArray(&(*arguments++));
-            auto ldc = function.LocalScalar(&(*arguments++));
+            auto order = &(*arguments++); // 0
+            auto transposeA = function.LocalScalar(&(*arguments++)) == CblasTrans; // 1
+            auto transposeB = function.LocalScalar(&(*arguments++)) == CblasTrans; // 2
+            auto m = function.LocalScalar(&(*arguments++)); // 3
+            auto n = function.LocalScalar(&(*arguments++)); // 4
+            auto k = function.LocalScalar(&(*arguments++)); // 5
+            auto alpha = function.LocalScalar(&(*arguments++)); // 6
+            auto A = function.LocalArray(&(*arguments++)); // 7
+            auto lda = function.LocalScalar(&(*arguments++)); // 8
+            auto B = function.LocalArray(&(*arguments++)); // 9
+            auto ldb = function.LocalScalar(&(*arguments++)); // 10
+            auto beta = function.LocalScalar(&(*arguments++)); // 11
+            auto C = function.LocalArray(&(*arguments++)); // 12
+            auto ldc = function.LocalScalar(&(*arguments++)); // 13
             UNUSED(CblasNoTrans, order, alpha, beta);
 
             // C = A x B, A: mxk, B: kxn, C: mxn
@@ -163,6 +167,8 @@ namespace emitters
                                            { rVectorName, VariableType::DoublePointer },
                                            { resultName, VariableType::DoublePointer } };
         auto function = _module.BeginFunction(functionName, VariableType::Void, argTypes);
+        function.SetAttributeForArguments({ 1, 2, 3 }, IRFunctionEmitter::Attributes::NoAlias);
+
         function.IncludeInHeader();
 
         auto arguments = function.Arguments().begin();
@@ -185,6 +191,8 @@ namespace emitters
                                            { rVectorName, VariableType::Int32Pointer },
                                            { resultName, VariableType::Int32Pointer } };
         auto function = _module.BeginFunction(functionName, VariableType::Void, argTypes);
+        function.SetAttributeForArguments({ 1, 2, 3 }, IRFunctionEmitter::Attributes::NoAlias);
+
         function.IncludeInHeader();
 
         auto arguments = function.Arguments().begin();

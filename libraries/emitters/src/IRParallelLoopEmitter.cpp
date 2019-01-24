@@ -80,6 +80,7 @@ namespace emitters
         auto capturedTypes = GetLLVMTypes(capturedValues);
         std::copy(capturedTypes.begin(), capturedTypes.end(), std::back_inserter(argTypes));
         auto taskFunction = _functionEmitter.GetModule().BeginFunction(name, returnType, argTypes);
+
         {
             auto arguments = taskFunction.Arguments().begin();
             auto blockStart = &(*arguments++);

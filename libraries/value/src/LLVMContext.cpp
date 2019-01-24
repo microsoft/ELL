@@ -586,6 +586,8 @@ namespace value
         {
             ValueType returnValueType = returnValue ? returnValue->GetBaseType() : ValueType::Void;
             FunctionScope scope(*this, fnName, ValueTypeToVariableType(returnValueType), variableArgTypes);
+            GetFnEmitter().SetAttributeForArguments(IRFunctionEmitter::Attributes::NoAlias);
+
             auto functionArgs = GetFnEmitter().Arguments();
             auto argValuesCopy = argValues;
             auto returnValueCopy = returnValue;

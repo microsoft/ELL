@@ -111,6 +111,19 @@ namespace emitters
                 });
             }
         }
+
+        constexpr llvm::Attribute::AttrKind ToLLVMAttr(IRFunctionEmitter::Attributes attr)
+        {
+            switch (attr)
+            {
+            default:
+                [[fallthrough]];
+            case IRFunctionEmitter::Attributes::None:
+                return llvm::Attribute::AttrKind::None;
+            case IRFunctionEmitter::Attributes::NoAlias:
+                return llvm::Attribute::AttrKind::NoAlias;
+            }
+        }
     } // namespace
 
     //
@@ -674,6 +687,27 @@ namespace emitters
     IRFunctionEmitter::EntryBlockScope::~EntryBlockScope()
     {
         _function.SetCurrentInsertPoint(_oldPos);
+    }
+
+    void IRFunctionEmitter::SetAttributeForArgument(size_t index, IRFunctionEmitter::Attributes attribute)
+    {
+        (_pFunction->arg_begin() + index)->addAttr(ToLLVMAttr(attribute));
+    }
+
+    void IRFunctionEmitter::SetAttributeForArguments(IRFunctionEmitter::Attributes attribute)
+    {
+        for (auto& argument : Arguments())
+        {
+            argument.addAttr(ToLLVMAttr(attribute));
+        }
+    }
+
+    void IRFunctionEmitter::SetAttributeForArguments(std::vector<size_t> indices, IRFunctionEmitter::Attributes attribute)
+    {
+        for (auto index : indices)
+        {
+            SetAttributeForArgument(index, attribute);
+        }
     }
 
     llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type)

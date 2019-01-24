@@ -362,6 +362,8 @@ namespace nodes
 
         auto argTypes = emitters::GetLLVMTypes({ inputTemp, outputTemp, function.Literal<int32_t>(0), function.Literal<int32_t>(0) });
         emitters::IRFunctionEmitter taskFunction = function.GetModule().BeginFunction(utilities::to_string(GetId()) + "_task", voidType, argTypes);
+        taskFunction.SetAttributeForArguments({ 0, 1 }, emitters::IRFunctionEmitter::Attributes::NoAlias);
+
         {
             auto arguments = taskFunction.Arguments().begin();
             auto pInput = &(*arguments++);
@@ -711,6 +713,10 @@ namespace nodes
         // TODO: get types in a way that doesn't require emitting these variables
         auto argTypes = emitters::GetLLVMTypes({ pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums, pOutput, function.Literal<int32_t>(0), function.Literal<int32_t>(0) });
         emitters::IRFunctionEmitter taskFunction = function.GetModule().BeginFunction(utilities::to_string(GetId()) + "_task", voidType, argTypes);
+        std::vector<size_t> indices(argTypes.size() - 2);
+        std::iota(indices.begin(), indices.end(), 0);
+        taskFunction.SetAttributeForArguments(indices, emitters::IRFunctionEmitter::Attributes::NoAlias);
+
         {
             auto arguments = taskFunction.Arguments().begin();
             auto pInput = &(*arguments++);

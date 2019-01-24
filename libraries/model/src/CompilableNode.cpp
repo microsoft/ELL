@@ -76,6 +76,8 @@ namespace model
                 else
                 {
                     auto function = moduleEmitter.BeginFunction(functionName, emitters::VariableType::Void, args);
+                    function.SetAttributeForArguments(emitters::IRFunctionEmitter::Attributes::NoAlias);
+
                     irCompiler->NewNodeRegion(*this);
                     Compile(*irCompiler, function);
                     irCompiler->TryMergeNodeRegion(*this);

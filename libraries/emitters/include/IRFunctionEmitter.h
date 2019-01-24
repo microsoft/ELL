@@ -51,6 +51,14 @@ namespace emitters
     class IRFunctionEmitter
     {
     public:
+        /// <summary> Attributes that can be applied to function parameters </summary>
+        enum class Attributes
+        {
+            None = 0,
+            /// <summary> Suppress alias analysis </summary>
+            NoAlias
+        };
+
         /// <summary> Query if this IRFunctionEmitter is valid. </summary>
         ///
         /// <returns> True if valid, false if not. </returns>
@@ -683,6 +691,23 @@ namespace emitters
         ///
         /// <returns> A llvm::iterator_range over the function's arguments. </returns>
         llvm::iterator_range<llvm::Function::arg_iterator> Arguments() { return _pFunction->args(); }
+
+        /// <summary> Sets an attribute for the argument at the given index </summary>
+        ///
+        /// <param name="index"> The index of the argument </param>
+        /// <param name="attribute"> The attribute </param>
+        void SetAttributeForArgument(size_t index, Attributes attribute);
+
+        /// <summary> Sets an attribute for all arguments </summary>
+        ///
+        /// <param name="attribute"> The attribute </summary>
+        void SetAttributeForArguments(Attributes attribute);
+
+        /// <summary> Sets an attribute for arguments at the specified indices </summary>
+        ///
+        /// <param name="indices"> The indices of the arguments </param>
+        /// <param name="attribute"> The attribute </param>
+        void SetAttributeForArguments(std::vector<size_t> indices, Attributes attribute);
 
         /// <summary> Emit a stack variable. </summary>
         ///

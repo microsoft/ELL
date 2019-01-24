@@ -249,6 +249,7 @@ namespace emitters
     void IRModuleEmitter::BeginMapPredictFunction(const std::string& functionName, NamedVariableTypeList& args)
     {
         IRFunctionEmitter& function = BeginFunction(functionName, VariableType::Void, args);
+        function.SetAttributeForArguments(IRFunctionEmitter::Attributes::NoAlias);
 
         // store context variable so the callbacks can find it later.
         auto context = function.GetFunctionArgument("context");
