@@ -47,7 +47,7 @@ def make_project(target_dir):
 
     current_path = os.getcwd()
     os.chdir(build_dir)
-    cmd = buildtools.EllBuildTools(find_ell.get_ell_root(), verbose=True)
+    cmd = buildtools.EllBuildTools(find_ell.get_ell_root())
     cmake = ["cmake", ".."]
     if os.name == 'nt':
         cmake = ["cmake", "-G", "Visual Studio 15 2017 Win64", ".."]
@@ -237,7 +237,7 @@ def test_cpp(model_path, target_path):
         return 1
 
     # execute the compiled tutorial.exe binary and check the output
-    cmd = buildtools.EllBuildTools(find_ell.get_ell_root(), verbose=True)
+    cmd = buildtools.EllBuildTools(find_ell.get_ell_root())
     output = cmd.run([binary], print_output=True)
     if "Prediction=1, 2, 3, 4, 5, 6, 7, 8, 9, 10" not in output:
         print("### FAILED: wrap_test cpp binary did not print the expected results, got the following:\n{}"

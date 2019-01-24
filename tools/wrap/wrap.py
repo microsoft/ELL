@@ -169,7 +169,7 @@ If '0' or 'g', opt is not run (default '3')",
         self.model_name = ""
         self.func_name = "Predict"
         self.objext = "o"
-        self.logger = logger.get()
+        self.logger = None
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
@@ -211,7 +211,10 @@ The supported target platforms are:
             index = args.index('--')
             compile_args = args[index + 1:]
             args = args[:index]
+
+        logger.add_logging_args(arg_parser)
         args = arg_parser.parse_args(args)
+        self.logger = logger.setup(args)
 
         self.model_file = args.model_file
         _, tail = os.path.split(self.model_file)
@@ -229,7 +232,7 @@ The supported target platforms are:
             raise Exception("You have a python module named '{}', which will conflict with the --outdir of '{}'. \
 Please specify a different outdir.".format(self.output_dir + ".py", self.output_dir))
         self.profile = args.profile
-        self.verbose = args.verbose
+        self.verbose = self.logger.getVerbose() or args.verbose
         self.llvm_format = args.llvm_format
         self.optimization_level = args.optimization_level
         self.no_opt_tool = args.no_opt_tool or self.optimization_level in ['0', 'g']
@@ -303,7 +306,7 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
     def run(self):
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)
-        self.tools = buildtools.EllBuildTools(self.ell_root, self.verbose)
+        self.tools = buildtools.EllBuildTools(self.ell_root)
         self.find_files()
         self.copy_files(self.files, "")
         self.copy_files(self.includes, "include")

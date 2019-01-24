@@ -25,8 +25,7 @@ class EllBuildToolsRunException(Exception):
 
 
 class EllBuildTools:
-    def __init__(self, ell_root, verbose=False):
-        self.verbose = verbose
+    def __init__(self, ell_root):
         self.ell_root = ell_root
         self.build_root = None
         self.compiler = None
@@ -35,6 +34,7 @@ class EllBuildTools:
         self.optexe = None
         self.blas = None
         self.logger = logger.get()
+        self.verbose = self.logger.getVerbose()
         self.output = None
         self.lock = Lock()
         self.find_tools()
@@ -85,7 +85,7 @@ class EllBuildTools:
                     self.lock.acquire()
                     try:
                         self.output += out
-                        msg = out.rstrip('\n')
+                        msg = out.rstrip('\r\n')
                         if self.verbose:
                             self.logger.info(msg)
                     finally:

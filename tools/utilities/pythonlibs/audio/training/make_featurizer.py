@@ -157,7 +157,7 @@ higher speed classifier that might be better at spotting word boundaries, at the
     arg_parser.add_argument("--iir", help="Include IIR prefilter", action="store_true")
     arg_parser.add_argument("--log", help="Include a LOG node on the output", action="store_true")
     arg_parser.add_argument("--dct", help="Add DCT of output", action="store_true")
-    arg_parser.add_argument("--verbose", "-v", help="Verbose mode", action="store_true")
+
     args = arg_parser.parse_args()
 
     make_featurizer(args.output_filename, args.sample_rate, args.window_size, args.input_buffer_size,

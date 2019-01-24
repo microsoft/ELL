@@ -16,11 +16,13 @@ import sys
 import time
 
 sys.path += [os.path.join(os.path.dirname(__file__), "..")]
+sys.path += [os.path.join(os.path.dirname(__file__), "..", "..")]
 import numpy as np
 
 import classifier
 import featurizer
 import wav_reader
+import logger
 
 THRESHOLD = 0.01
 SMOOTHING = 0  # no smoothing window on classifier output
@@ -50,13 +52,14 @@ class AudioModelTester:
     to be featurized.
     """
 
-    def __init__(self, verbose, reset, silent=False):
+    def __init__(self, reset):
         """ Initialize the AudioModelTester with optional verbose and reset flags """
         self.passed = 0
         self.failed = 0
         self.rate = 0
-        self.verbose = verbose
-        self.silent = silent
+        self.logger = logger.get()
+        self.verbose = self.logger.getVerbose()
+        self.silent = self.logger.getSilent()
         self.reset = reset
         self.best_time = None
 
@@ -80,12 +83,12 @@ class AudioModelTester:
                 eof = True
             else:
                 predictor.total_time = 0
-                prediction, probability, label = predictor.predict(feature_data)
+                _, probability, label = predictor.predict(feature_data)
                 elapsed = predictor.total_time * 1000
                 if elapsed != 0:  # hmmm, sometimes python time.time() lies?
                     if self.best_time is None or elapsed < self.best_time:
                         self.best_time = elapsed
-                        print("best time={}".format(self.best_time))
+                        self.logger.info("best time={}".format(self.best_time))
 
                 if probability is not None and probability > best_probability:
                     best_probability = probability
@@ -101,17 +104,18 @@ class AudioModelTester:
             self.passed += 1
             self.rate = self.passed / (self.passed + self.failed)
             if self.verbose:
-                print("PASSED {:.2f}%: {} in {} with confidence {:.2f}%".format(self.rate * 100, expected, name,
-                                                                                confidence * 100))
+                self.logger.info("PASSED {:.2f}%: {} in {} with confidence {:.2f}%".format(
+                    self.rate * 100, expected, name, confidence * 100))
             elif not self.silent:
-                print("PASSED {:.2f}%: {}".format(self.rate * 100, expected))
+                self.logger.info("PASSED {:.2f}%: {}".format(self.rate * 100, expected))
         else:
             self.failed += 1
             self.rate = self.passed / (self.passed + self.failed)
             if self.verbose:
-                print("FAILED {:.2f}%: expected {}, got {} in {}".format(self.rate * 100, expected, prediction, name))
+                self.logger.error("FAILED {:.2f}%: expected {}, got {} in {}".format(
+                    self.rate * 100, expected, prediction, name))
             elif not self.silent:
-                print("FAILED: {}, expecting {}, path={}".format(prediction, expected, name))
+                self.logger.error("FAILED: {}, expecting {}, path={}".format(prediction, expected, name))
 
     def run_test(self, featurizer_model, classifier_model, list_file, max_tests, dataset, categories, sample_rate):
         """
@@ -125,10 +129,10 @@ class AudioModelTester:
         transform = featurizer.AudioTransform(featurizer_model, predictor.input_size)
 
         if not self.silent:
-            print("Evaluation with transform input size {}, output size {}".format(transform.input_size,
-                                                                                   transform.output_size))
-            print("Evaluation with classifier input size {}, output size {}".format(predictor.input_size,
-                                                                                    predictor.output_size))
+            self.logger.info("Evaluation with transform input size {}, output size {}".format(
+                transform.input_size, transform.output_size))
+            self.logger.info("Evaluation with classifier input size {}, output size {}".format(
+                predictor.input_size, predictor.output_size))
 
         if transform.using_map != predictor.using_map:
             raise Exception("cannot mix .ell and compiled models")
@@ -152,7 +156,7 @@ class AudioModelTester:
                 reader = wav_reader.WavReader(sample_rate)
                 reader.open(wav_file, transform.input_size, None)
                 transform.open(reader)
-                prediction, confidence, label, elapsed = self.get_prediction(name, transform, predictor)
+                prediction, confidence, _, elapsed = self.get_prediction(name, transform, predictor)
                 self.process_prediction(name, prediction, expected, confidence)
                 if self.best_time is None or elapsed < self.best_time:
                     self.best_time = elapsed
@@ -174,7 +178,7 @@ class AudioModelTester:
                 expected = labels[index]
                 reader = FeatureReader(f, predictor.input_size)
                 name = "row " + str(index)
-                prediction, confidence, label, elapsed = self.get_prediction(name, reader, predictor)
+                prediction, confidence, _, elapsed = self.get_prediction(name, reader, predictor)
                 self.process_prediction(name, prediction, expected, confidence)
                 if self.best_time is None or elapsed < self.best_time:
                     self.best_time = elapsed
@@ -185,15 +189,16 @@ class AudioModelTester:
         end = time.time()
         seconds = end - start
 
-        print("Test completed in {:.2f} seconds".format(seconds))
-        print("{} passed, {} failed, pass rate of {:.2f} %".format(self.passed, self.failed, self.rate * 100))
-        print("Best prediction time was {} seconds".format(self.best_time))
+        self.logger.info("Test completed in {:.2f} seconds".format(seconds))
+        self.logger.info("{} passed, {} failed, pass rate of {:.2f} %".format(
+            self.passed, self.failed, self.rate * 100))
+        self.logger.info("Best prediction time was {} seconds".format(self.best_time))
         return self.rate, self.best_time
 
 
 def verify_file_exists(name, path):
     if not os.path.isfile(path):
-        print("Could not find {} at: {}".format(name, path))
+        logger.get().error("Could not find {} at: {}".format(name, path))
         sys.exit(1)
 
 
@@ -208,13 +213,14 @@ if __name__ == "__main__":
     parser.add_argument("--categories", "-cat", help="specify path to categories file", required=True)
     parser.add_argument("--sample_rate", "-s", help="specify audio sample rate (default 16000)", default=16000,
                         type=int)
-    parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
     parser.add_argument("--reset", "-r", help="do a GRU reset between each test file", action="store_true")
     parser.add_argument("--max_tests", type=int, help="maximum number of words chosen at random from each word list",
                         default=None)
-    parser.add_argument("--silent", help="stop all incremental output", action="store_true")
 
+    logger.add_logging_args(parser)
     args = parser.parse_args()
+    log = logger.setup(args)
+
     sample_rate = args.sample_rate
 
     if args.list_file:
@@ -222,9 +228,9 @@ if __name__ == "__main__":
     elif args.dataset:
         verify_file_exists("dataset", args.dataset)
     else:
-        print("Expecting one of --list_file or --dataset")
+        log.error("Expecting one of --list_file or --dataset")
         sys.exit(1)
 
-    test = AudioModelTester(args.verbose, args.reset, args.silent)
+    test = AudioModelTester(args.reset)
     test.run_test(args.featurizer, args.classifier, args.list_file, args.max_tests, args.dataset, args.categories,
                   sample_rate)

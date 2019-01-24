@@ -26,7 +26,7 @@ import logging
 class RemoteRunner:
     def __init__(self, cluster=None, ipaddress=None, username=None, password=None,
                  source_dir=None, target_dir=None, copyback_files=None, copyback_dir=None,
-                 command=None, logfile=None, verbose=True, start_clean=True, cleanup=True,
+                 command=None, logfile=None, start_clean=True, cleanup=True,
                  timeout=None, all=None, source_files=None, apikey=None):
 
         self.cluster = cluster
@@ -41,7 +41,6 @@ class RemoteRunner:
         self.copyback_files = copyback_files
         self.copyback_dir = copyback_dir
         self.command = command
-        self.verbose = verbose
         self.start_clean = start_clean
         self.cleanup = cleanup
         self.logfile = logfile
@@ -57,7 +56,10 @@ class RemoteRunner:
         # will be formatted differently with "ThreadId: " prefix so user can
         # make sense of the combined output when remote commands are running in
         # parallel.
-        self.logger = logger.get(self.logfile)
+        if self.logfile:
+            self.logger = logger.setup(self.logfile)
+        else:
+            self.logger = logger.get()
 
         if not cluster and not ipaddress:
             raise Exception("Error: required ipaddress or cluster or both")
@@ -103,7 +105,7 @@ class RemoteRunner:
             while True:
                 out = stream.readline()
                 if out:
-                    msg = out.rstrip('\n')
+                    msg = out.rstrip('\r\n')
                     output += [msg]
                     self.print(msg)
                 else:
@@ -116,32 +118,33 @@ class RemoteRunner:
 
     def exec_remote_command(self, cmd, max_attempts=1):
         self.print("remote: " + cmd)
-        output = None
+        output = []
         self.buffer = io.StringIO()
         try:
             for r in range(max_attempts):
-                output = []
                 _transport = self.ssh.get_transport()
                 _channel = _transport.open_session()
                 _channel.set_combine_stderr(True)
                 _channel.get_pty()
                 with _channel.makefile() as f_out:
                     _channel.exec_command(cmd)
-                    output = self.logstream(f_out)
+                    output += self.logstream(f_out)
                 status = _channel.exit_status
                 print("Status code {} returned from remote".format(status))
                 if status <= 0:
                     break
                 else:
                     msg = "Error, status code {} returned from remote, attempt {} of {}"
-                    print(msg.format(status, r + 1, max_attempts))
+                    self.print(msg.format(status, r + 1, max_attempts))
+                    output += [msg]
                     if (r + 1) < max_attempts:
-                        print("Retrying...")
+                        self.print("Retrying...")
 
         except:
             errorType, value, traceback = sys.exc_info()
             msg = "### Exception: %s: %s" % (str(errorType), str(value))
             self.print(msg)
+            output = [msg]
 
         return output
 
@@ -226,8 +229,7 @@ class RemoteRunner:
                         pass
 
     def print(self, output):
-        if self.verbose:
-            self.logger.info(output)
+        self.logger.info(output)
         if self.buffer:
             self.buffer.write(output + "\n")
 
@@ -289,9 +291,11 @@ if __name__ == "__main__":
     arg_parser.add_argument("--timeout", type=int, default=300,
                             help="Timeout for the command in seconds (default 300 seconds)")
 
+    logger.add_logging_args(arg_parser)
     args = arg_parser.parse_args()
+    logger.setup(args)
 
     runner = RemoteRunner(ipaddress=args.ipaddress, cluster=args.cluster, username=args.username,
-                          password=args.password, command=args.command, verbose=True,
+                          password=args.password, command=args.command,
                           timeout=args.timeout, apikey=args.apikey)
     runner.run_command()

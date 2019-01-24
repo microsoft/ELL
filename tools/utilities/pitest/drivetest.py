@@ -40,9 +40,9 @@ COMPILE_FULL = 2
 
 class DriveTest:
     def __init__(self, ipaddress=None, cluster=None, outdir=None, profile=False,
-                 model=None, labels=None, target="pi3", target_dir="/home/pi/pi3",
+                 model=None, labels=None, target="pi3", target_dir="/home/pi/test",
                  username="pi", password="raspberry", iterations=1, expected=None,
-                 blas=True, compile=COMPILE_INCREMENTAL, test=True, verbose=True, timeout=None, apikey=None,
+                 blas=True, compile=COMPILE_INCREMENTAL, test=True, timeout=None, apikey=None,
                  gitrepo=None, wrap_options=None):
         self.ipaddress = ipaddress
         self.build_root = find_ell.find_ell_build()
@@ -62,7 +62,6 @@ class DriveTest:
         self.profile_log = None
         self.compile = compile
         self.test = test
-        self.verbose = verbose
         self.prediction_time = None
         self.logger = logger.get()
         self.rePlatform = "ARMv7.*"
@@ -195,8 +194,7 @@ class DriveTest:
             dest = os.path.join(target_dir, file_name)
             if os.path.isfile(dest) and os.path.getmtime(path) < os.path.getmtime(dest):
                 continue  # this file already up to date
-            if self.verbose:
-                self.logger.info("Copying file: " + path + " to " + target_dir)
+            self.logger.info("Copying file: " + path + " to " + target_dir)
             if not os.path.isfile(path):
                 raise Exception("expected file not found: " + path)
             copyfile(path, dest)
@@ -290,8 +288,8 @@ class DriveTest:
         else:
             builder_args = ["--model_file", self.ell_model, "--target", self.target, "--outdir",
                             self.output_dir, "--blas", str(self.blas)]
-            if self.verbose:
-                builder_args.append("--verbose")
+            builder_args.append("--verbosity")
+            builder_args.append(self.logger.getVerbosity())
             if self.profile:
                 builder_args.append("--profile")
         builder.parse_command_line(builder_args)
@@ -360,7 +358,6 @@ class DriveTest:
                                           source_dir=self.output_dir,
                                           target_dir=self.target_dir,
                                           command="runtest.sh",
-                                          verbose=self.verbose,
                                           start_clean=True,
                                           timeout=self.timeout,
                                           cleanup=False)
@@ -433,7 +430,7 @@ used as the model name")
     arg_parser.add_argument("--target", choices=["pi0", "pi3", "pi3_64", "aarch64", "host"], default="pi3",
                             help="the target platform.\n"
                             "Choices are pi3 (Raspberry Pi 3) and aarch64 (Dragonboard)",)
-    arg_parser.add_argument("--target_dir", default="/home/pi/pi3",
+    arg_parser.add_argument("--target_dir", default="/home/pi/test",
                             help="the directory on the target device for running the test")
     arg_parser.add_argument("--username", default=os.getenv("RPI_USERNAME", "pi"),
                             help="the username for the target device")
@@ -445,12 +442,13 @@ used as the model name")
                             help="the string to search for to verify test passed (default '')")
     arg_parser.add_argument("--blas", default="True",
                             help="enable or disable the use of Blas on the target device (default 'True')")
-    arg_parser.add_argument("--verbose", help="enable or disable verbose print output (default 'True')", default="True")
     arg_parser.add_argument("--timeout", help="set remote test run timeout in seconds (default '300')", default="300")
 
-    argv = sys.argv
-    argv.pop(0)
-    args = arg_parser.parse_args(argv)
+    logger.add_logging_args(arg_parser)
+    args = arg_parser.parse_args()
+    logger.setup(args)
+
+    args = arg_parser.parse_args()
 
     def str2bool(v):
         """Converts a string to a bool"""
@@ -459,5 +457,5 @@ used as the model name")
     with DriveTest(args.ipaddress, args.cluster, args.outdir, args.profile,
                    args.model, args.labels, args.target, args.target_dir, args.username,
                    args.password, args.iterations, args.expected, str2bool(args.blas),
-                   str2bool(args.compile), str2bool(args.test), str2bool(args.verbose), args.timeout) as tester:
+                   str2bool(args.compile), str2bool(args.test), args.timeout) as tester:
                    tester.run_test()

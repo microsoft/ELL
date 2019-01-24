@@ -3,6 +3,8 @@ if [ -f "/home/pi/miniconda3/bin/activate" ]; then
   export PATH="/home/pi/miniconda3/bin:$PATH"
   source activate py34 > /dev/null 2>&1
 fi
+export TERM=xterm-mono
+
 cd @TARGET_DIR@
 if [ -d "build" ]; then
     rm -rf build

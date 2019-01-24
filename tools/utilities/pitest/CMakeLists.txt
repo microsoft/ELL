@@ -23,7 +23,9 @@ if(${PYTHON_ENABLED})
                                             --cluster ${RPI_CLUSTER} 
                                             --password ${RPI_PASSWORD}
                                             --key ${RPI_KEY}
-                                            --gitrepo ${TEST_MODELS_REPO})                                            
+                                            --gitrepo ${TEST_MODELS_REPO})
+    else()
+        message(STATUS "Skipping pitest because one of RPI_CLUSTER, RPI_PASSWORD, RPI_KEY, TEST_MODELS_REPO is missing")
     endif()
     
     flake8(${module_name})

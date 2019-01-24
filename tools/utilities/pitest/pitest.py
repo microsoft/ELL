@@ -24,7 +24,6 @@ cluster = None
 password = None
 key = None
 targets = ["pi3", "pi0"]
-log = logger.get()
 gitrepo = None
 
 
@@ -36,9 +35,10 @@ class PiTestBase(unittest.TestCase):
 
     def test_raspberryPi(self):
         global cluster
+        log = logger.get()
         for target in targets:
             log.info("=============== Testing platform: {} ===================".format(target))
-            with drivetest.DriveTest(cluster=cluster, target=target, target_dir="/home/pi/" + target,
+            with drivetest.DriveTest(cluster=cluster, target=target, target_dir="/home/pi/test",
                                      username="pi", password=password, expected="coffee mug", timeout=300, apikey=key,
                                      gitrepo=gitrepo) as driver:
                 driver.run_test()
@@ -62,7 +62,10 @@ if __name__ == '__main__':
     parser.add_argument(
         '--targets', help='The raspberry pi targets (pi3, pi0, etc)', default="pi0,pi3")
 
+    logger.add_logging_args(parser)
     args, argv = parser.parse_known_args()
+    logger.setup(args)
+
     cluster = args.cluster
     password = args.password
     gitrepo = args.gitrepo
