@@ -873,7 +873,7 @@ namespace emitters
         assert(pSource != nullptr);
         assert(pDestination != nullptr);
         assert(pCountBytes != nullptr);
-        return _irBuilder.CreateMemMove(pDestination, pSource, pCountBytes, 0, true);
+        return _irBuilder.CreateMemMove(pDestination, pSource, pCountBytes, 0);
     }
 
     llvm::CallInst* IREmitter::MemoryCopy(LLVMValue pSource, LLVMValue pDestination, LLVMValue pCountBytes)
@@ -881,14 +881,14 @@ namespace emitters
         assert(pSource != nullptr);
         assert(pDestination != nullptr);
         assert(pCountBytes != nullptr);
-        return _irBuilder.CreateMemCpy(pDestination, pSource, pCountBytes, 0, true);
+        return _irBuilder.CreateMemCpy(pDestination, pSource, pCountBytes, 0);
     }
 
     llvm::CallInst* IREmitter::MemorySet(LLVMValue pDestination, LLVMValue value, LLVMValue size)
     {
         assert(pDestination != nullptr);
         assert(value != nullptr);
-        return _irBuilder.CreateMemSet(pDestination, value, size, 0, true);
+        return _irBuilder.CreateMemSet(pDestination, value, size, 0);
     }
 
     LLVMFunction IREmitter::GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const VariableTypeList& arguments)
