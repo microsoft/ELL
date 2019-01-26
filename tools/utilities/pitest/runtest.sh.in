@@ -1,4 +1,14 @@
 #!/bin/bash
+x=$(pgrep -x "runtest.sh" | wc -l)
+if [ "$x" -gt "2" ]; then
+    echo "### runtest.sh is already running!!"
+    exit 1
+fi
+x=$(pgrep -x "validate.sh" | wc -l)
+if [ "$x" -gt "2" ]; then
+    echo "### validate.sh is running!!"
+    exit 1
+fi
 if [ -f "/home/pi/miniconda3/bin/activate" ]; then
   export PATH="/home/pi/miniconda3/bin:$PATH"
   source activate py34 > /dev/null 2>&1
