@@ -1104,16 +1104,16 @@ namespace emitters
     };
 
     // Helper function to dump the LLVM module to stderr for debugging
-    void DebugDump(llvm::Module* module);
+    void DebugDump(llvm::Module* module, llvm::raw_ostream* stream = nullptr);
 
     // Helper function to dump the LLVM type to stderr for debugging
-    void DebugDump(llvm::Type* type);
+    void DebugDump(llvm::Type* type, llvm::raw_ostream* stream = nullptr);
 
     // Helper function to dump the LLVM value to stderr for debugging
-    void DebugDump(llvm::Value* value);
+    void DebugDump(llvm::Value* value, llvm::raw_ostream* stream = nullptr);
 
     // Helper function to dump the LLVM function to stderr for debugging
-    void DebugDump(llvm::Function* function);
+    void DebugDump(llvm::Function* function, llvm::raw_ostream* stream = nullptr);
 } // namespace emitters
 } // namespace ell
 

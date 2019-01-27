@@ -122,6 +122,9 @@ std::string EmitStruct(const char* moduleName)
 
     const emitters::NamedVariableTypeList parameters = { { "index", emitters::GetVariableType<int>() } };
     auto function = module.BeginFunction("Dummy", shapeType, parameters);
+    auto shapeVariable = function.Variable(shapeType, 1);
+    auto shape = function.ValueAt(shapeVariable, 0);
+    function.Return(shape);
     function.IncludeInHeader();
     module.EndFunction();
 
@@ -595,13 +598,13 @@ void TestWhileLoopWithVariableCondition()
         auto conditionVar = fn.Variable(int8Type, "cond");
         auto i = fn.Variable(int32Type);
         fn.Store(i, fn.Literal<int>(5));
-        fn.Store(conditionVar, fn.TrueBit());
+        fn.Store(conditionVar, fn.CastBoolToByte(fn.TrueBit()));
         fn.While(conditionVar, [conditionVar, i](IRFunctionEmitter& fn) {
             // i++
             fn.OperationAndUpdate(i, TypedOperator::add, fn.Literal<int>(1)); // i++
 
             // update conditionVar (i != 10)
-            fn.Store(conditionVar, fn.Comparison(TypedComparison::notEquals, fn.Load(i), fn.Literal<int>(10)));
+            fn.Store(conditionVar, fn.CastBoolToByte(fn.Comparison(TypedComparison::notEquals, fn.Load(i), fn.Literal<int>(10))));
         });
 
         fn.Return(fn.Load(i));
@@ -1130,7 +1133,7 @@ void TestCastToConditionalBool()
         auto arguments = fn.Arguments().begin();
         auto x = fn.LocalScalar(&(*arguments++));
         auto result = fn.CastToConditionalBool(x);
-        fn.Return(result);
+        fn.Return(fn.CastBoolToByte(result));
     }
     module.EndFunction();
 

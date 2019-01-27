@@ -60,7 +60,8 @@ void TestPthreadSelf()
     // Regular function
     //
     std::string functionName = "TestSelf";
-    auto func = module.BeginFunction(functionName, VariableType::Int32);
+    auto returnType = module.GetTargetDataLayout().getPointerSizeInBits() == 32 ? VariableType::Int32 : VariableType::Int64;
+    auto func = module.BeginFunction(functionName, returnType);
     auto selfVal = func.PthreadSelf();
     func.Printf("Self = %x\n", { selfVal });
     func.Return(selfVal);
@@ -97,11 +98,13 @@ void TestPthreadCreate()
     auto taskFunction = module.BeginFunction(taskFunctionName, VariableType::BytePointer, { { "context", VariableType::BytePointer } });
     auto taskSelfVal = taskFunction.PthreadSelf();
     taskFunction.Printf("Task self = %x\n", { taskSelfVal });
+    taskFunction.Return(taskFunction.NullPointer(int8PtrType));
     module.EndFunction();
 
     // Main function
     std::string mainFunctionName = "TestTask";
-    auto mainFunction = module.BeginFunction(mainFunctionName, VariableType::Int32);
+    auto returnType = module.GetTargetDataLayout().getPointerSizeInBits() == 32 ? VariableType::Int32 : VariableType::Int64;
+    auto mainFunction = module.BeginFunction(mainFunctionName, returnType);
     auto selfVal = mainFunction.PthreadSelf();
     mainFunction.Printf("Main begin, self = %x\n", { selfVal });
     llvm::AllocaInst* threadVar1 = mainFunction.Variable(pthreadType, "thread1");

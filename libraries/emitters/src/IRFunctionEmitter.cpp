@@ -22,6 +22,8 @@
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/raw_os_ostream.h>
 
+#include <sstream>
+
 namespace ell
 {
 namespace emitters
@@ -229,7 +231,17 @@ namespace emitters
 
     void IRFunctionEmitter::Verify()
     {
-        llvm::verifyFunction(*_pFunction);
+        std::stringstream sstr;
+        llvm::raw_os_ostream out(sstr);
+
+        if (llvm::verifyFunction(*_pFunction, &out))
+        {
+            out << "\n******** Function dump ********\n\n";
+
+            emitters::DebugDump(_pFunction, &out);
+
+            throw emitters::EmitterException(emitters::EmitterError::badFunctionDefinition, "Function verification failed for function" + _name + ":\n" + sstr.str());
+        }
     }
 
     LLVMValue IRFunctionEmitter::LoadArgument(llvm::Argument& argument)

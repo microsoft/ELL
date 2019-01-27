@@ -1217,28 +1217,32 @@ namespace emitters
         return _pZeroLiteral;
     }
 
-    void DebugDump(llvm::Module* module)
+    void DebugDump(llvm::Module* module, llvm::raw_ostream* stream)
     {
-        module->print(llvm::errs(), nullptr, /*ShouldPreserveUseListOrder*/ false, /*IsForDebug*/ true);
-        llvm::errs() << '\n';
+        auto& targetStream = stream != nullptr ? *stream : llvm::errs();
+        module->print(targetStream, nullptr, /*ShouldPreserveUseListOrder*/ false, /*IsForDebug*/ true);
+        targetStream << '\n';
     }
 
-    void DebugDump(llvm::Type* type)
+    void DebugDump(llvm::Type* type, llvm::raw_ostream* stream)
     {
-        type->print(llvm::errs(), /*IsForDebug*/ true);
-        llvm::errs() << '\n';
+        auto& targetStream = stream != nullptr ? *stream : llvm::errs();
+        type->print(targetStream, /*IsForDebug*/ true);
+        targetStream << '\n';
     }
 
-    void DebugDump(llvm::Value* value)
+    void DebugDump(llvm::Value* value, llvm::raw_ostream* stream)
     {
-        value->print(llvm::errs(), /*IsForDebug*/ true);
-        llvm::errs() << '\n';
+        auto& targetStream = stream != nullptr ? *stream : llvm::errs();
+        value->print(targetStream, /*IsForDebug*/ true);
+        targetStream << '\n';
     }
 
-    void DebugDump(llvm::Function* function)
+    void DebugDump(llvm::Function* function, llvm::raw_ostream* stream)
     {
-        function->print(llvm::errs(), nullptr, false, /*IsForDebug*/ true);
-        llvm::errs() << '\n';
+        auto& targetStream = stream != nullptr ? *stream : llvm::errs();
+        function->print(targetStream, nullptr, false, /*IsForDebug*/ true);
+        targetStream << '\n';
     }
 } // namespace emitters
 } // namespace ell
