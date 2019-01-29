@@ -344,6 +344,22 @@ class OnnxLeakyReLuConverter(OnnxNodeConverter):
 class OnnxMulConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "ElementwiseMul")
+
+    def get_output_shapes(self):             
+        input_shapes = self.node.input_shapes
+        if len(input_shapes) != 2:
+            raise Exception("ElementwiseMul requires 2 inputs")
+        # output shape depends on behavior of broadcasting.
+        if input_shapes[0] == input_shapes[1]:
+            return [ input_shapes[0] ]
+        else:
+            # use numpy to compute broadcast result
+            a = np.zeros(input_shapes[0][0])
+            b = np.zeros(input_shapes[1][0])
+            c = np.matmul(a,b)
+            s = c.shape
+            return [(s, self.get_order(s))]
+
     
 class OnnxConstantConverter(OnnxNodeConverter):
     def __init__(self, converter):

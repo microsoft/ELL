@@ -23,6 +23,7 @@
 #include <model/include/OutputNode.h>
 
 #include <nodes/include/BinaryOperationNode.h>
+#include <nodes/include/BroadcastOperationNodes.h>
 #include <nodes/include/BufferNode.h>
 #include <nodes/include/ClockNode.h>
 #include <nodes/include/ConcatenationNode.h>
@@ -563,29 +564,44 @@ Node ModelBuilder::AddBinaryOperationNode(Model model, PortElements input1, Port
     auto elements1 = input1.GetPortElements();
     auto elements2 = input2.GetPortElements();
 
+    ell::model::Node* newNode = nullptr;
     if (elements1.GetMemoryLayout().GetActiveSize().NumElements() != elements2.GetMemoryLayout().GetActiveSize().NumElements())
     {
-        // then perhaps we need to do some broadcasting...
-        throw std::invalid_argument("Error: BinaryOperationNode does not yet support broadcasting");
+        // then we need to do some broadcasting...
+        switch (type)
+        {
+        case PortType::integer:
+            newNode = model.GetModel().AddNode<ell::nodes::BroadcastBinaryOperationNode<int>>(ell::model::PortElements<int>(elements1), ell::model::PortElements<int>(elements2), operation);
+            break;
+        case PortType::real:
+            newNode = model.GetModel().AddNode<ell::nodes::BroadcastBinaryOperationNode<double>>(ell::model::PortElements<double>(elements1), ell::model::PortElements<double>(elements2), operation);
+            break;
+        case PortType::smallReal:
+            newNode = model.GetModel().AddNode<ell::nodes::BroadcastBinaryOperationNode<float>>(ell::model::PortElements<float>(elements1), ell::model::PortElements<float>(elements2), operation);
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create BroadcastBinaryOperationNode of the requested type");
+        }
     }
-
-    ell::model::Node* newNode = nullptr;
-    switch (type)
+    else
     {
-    case PortType::boolean:
-        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<bool>>(ell::model::PortElements<bool>(elements1), ell::model::PortElements<bool>(elements2), operation);
-        break;
-    case PortType::integer:
-        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<int>>(ell::model::PortElements<int>(elements1), ell::model::PortElements<int>(elements2), operation);
-        break;
-    case PortType::real:
-        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<double>>(ell::model::PortElements<double>(elements1), ell::model::PortElements<double>(elements2), operation);
-        break;
-    case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<float>>(ell::model::PortElements<float>(elements1), ell::model::PortElements<float>(elements2), operation);
-        break;
-    default:
-        throw std::invalid_argument("Error: could not create BinaryOperationNode of the requested type");
+        switch (type)
+        {
+        case PortType::boolean:
+            newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<bool>>(ell::model::PortElements<bool>(elements1), ell::model::PortElements<bool>(elements2), operation);
+            break;
+        case PortType::integer:
+            newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<int>>(ell::model::PortElements<int>(elements1), ell::model::PortElements<int>(elements2), operation);
+            break;
+        case PortType::real:
+            newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<double>>(ell::model::PortElements<double>(elements1), ell::model::PortElements<double>(elements2), operation);
+            break;
+        case PortType::smallReal:
+            newNode = model.GetModel().AddNode<ell::nodes::BinaryOperationNode<float>>(ell::model::PortElements<float>(elements1), ell::model::PortElements<float>(elements2), operation);
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create BinaryOperationNode of the requested type");
+        }
     }
     return Node(newNode);
 }
