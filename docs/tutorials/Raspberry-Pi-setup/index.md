@@ -138,10 +138,10 @@ Raspberry Pi devices weren't designed to run AI workloads. Many AI workloads, li
 
 ### Disable Energy Star and Screensaver
 
-Edit the file `~/.config/lxsession/LXDE-pi/autostart`, for example, by typing the following.
+Edit the file `~/.config/lxsession/LXDE/autostart`, for example, by typing the following.
 
 ```shell
-nano ~/.config/lxsession/LXDE-pi/autostart
+nano ~/.config/lxsession/LXDE/autostart
 ```
 
 Add the following lines to this file.
