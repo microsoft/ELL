@@ -1,6 +1,8 @@
 u8R"(%module(directors="1") @@MODULE@@
 %feature("autodoc", "3");
 
+// stl
+%include "stdint.i"
 %include "vector.i"
 
 // Propagate python callback exceptions

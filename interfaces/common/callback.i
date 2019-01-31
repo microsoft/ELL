@@ -12,9 +12,10 @@
     %include "callback_python_pre.i"
 #elif SWIGJAVASCRIPT
     %include "callback_javascript_pre.i"
-#endif
+#endif // SWIGPYTHON
 
 // stl
+%include "stdint.i"
 %include "vector.i"
 
 // ELL API
@@ -47,7 +48,7 @@
     %include "callback_python_post.i"
 #elif SWIGJAVASCRIPT
     %include "callback_javascript_post.i"
-#endif
+#endif // SWIGPYTHON
 
 // Macros for wrapping language-specific callables so that they can act like callbacks
 #if defined(SWIGPYTHON)
@@ -80,7 +81,7 @@
 
         if not isinstance(callback, CallbackClass) and callable(callback):
             callback = OutputCallableWrapper(callback)
-        self.output_wrapper = callback # keep it alive 
+        self.output_wrapper = callback # keep it alive
     %}
 %enddef
 
@@ -112,7 +113,7 @@
     %}
 %enddef
 
-#else
+#else // defined(SWIGPYTHON)
 
 %define WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(InputCallbackClass, OutputCallbackClass, ElementType)
 %enddef

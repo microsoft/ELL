@@ -12,7 +12,7 @@
     %include "ELL_python_pre.i"
 #elif SWIGJAVASCRIPT
     %include "ELL_javascript_pre.i"
-#endif
+#endif // SWIGPYTHON
 
 %module(directors="1") "ell"
 
@@ -28,15 +28,17 @@
 #include <v8.h>
 #include <nan.h>
 %}
-#endif
+#endif // SWIGJAVASCRIPT
 
+// stl
+%include "stdint.i"
 %include "vector.i"
 
 #ifndef SWIGXML
 //%include typemaps.i
 %include "unique_ptr.i"
 %include "exception.i"
-#endif
+#endif // SWIGXML
 
 // Add ELL exception handling
 %exception
@@ -89,4 +91,4 @@
     %include "ELL_python_post.i"
 #elif SWIGJAVASCRIPT
     %include "ELL_javascript_post.i"
-#endif
+#endif // SWIGPYTHON
