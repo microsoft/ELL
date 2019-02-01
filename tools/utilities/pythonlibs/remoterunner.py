@@ -128,12 +128,12 @@ class RemoteRunner:
                 _channel.get_pty()
                 with _channel.makefile() as f_out:
                     _channel.exec_command(cmd)
-                    output += self.logstream(f_out)
-                status = _channel.exit_status
+                    output = self.logstream(f_out)
+                status = _channel.recv_exit_status()
                 print("Status code {} returned from remote".format(status))
-                if status <= 0:
+                if status == 0:
                     break
-                else:
+                elif max_attempts > 1:
                     msg = "Error, status code {} returned from remote, attempt {} of {}"
                     self.print(msg.format(status, r + 1, max_attempts))
                     output += [msg]
