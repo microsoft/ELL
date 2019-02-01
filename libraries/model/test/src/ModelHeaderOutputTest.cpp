@@ -46,12 +46,14 @@ model::IRCompiledMap GetCompiledMapWithCallbacks(
 
     model::Model model;
 
-    auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1 /*currentTime*/);
+    auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1);
+    inputNode->GetMetadata().SetEntry("name", std::string("currentTime")); // this input is a clock tick!
     auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold, "MyLagNotificationCallback");
     auto sourceNode = model.AddNode<nodes::SourceNode<ElementType>>(clockNode->output, inputSize, "MyDataCallback");
     auto conditionNode = model.AddNode<nodes::ConstantNode<bool>>(true);
     auto sumNode = model.AddNode<nodes::SumNode<ElementType>>(sourceNode->output);
     auto sinkNode = model.AddNode<nodes::SinkNode<ElementType>>(sumNode->output, conditionNode->output, "MyResultsCallback");
+    sinkNode->GetMetadata().SetEntry("name", std::string("sum")); // to test that header emit can pick this up.
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
     auto map = model::Map(model, { { "time", inputNode } }, { { "output", outputNode->output } });
 
@@ -142,10 +144,10 @@ void TestCppHeader()
     std::string typeString = ToTypeString<ElementType>();
     std::string timeTypeString = ToTypeString<nodes::TimeTickType>();
 
-    testing::ProcessTest("Testing C predict function", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_Predict(void* context, ") + timeTypeString + "* input0, " + typeString + "* output0);")));
+    testing::ProcessTest("Testing C predict function", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_Predict(void* context, ") + timeTypeString + "* currentTime, " + typeString + "* output);")));
     testing::ProcessTest("Testing C++ wrapper 1", testing::IsTrue(std::string::npos != result.find("class TestModuleWrapper")));
-    testing::ProcessTest("Testing C++ wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_MyDataCallback(void* context, ") + typeString + "*")));
-    testing::ProcessTest("Testing C++ wrapper 3", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_MyResultsCallback(void* context, ") + typeString + "*")));
+    testing::ProcessTest("Testing C++ wrapper 2", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_MyDataCallback(void* context, ") + typeString + "* input)")));
+    testing::ProcessTest("Testing C++ wrapper 3", testing::IsTrue(std::string::npos != result.find(std::string("void TestModule_MyResultsCallback(void* context, ") + typeString + "* sum)")));
     testing::ProcessTest("Testing C++ wrapper 4", testing::IsTrue(std::string::npos != result.find("TestModule_Predict(this, &time, nullptr);")));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));

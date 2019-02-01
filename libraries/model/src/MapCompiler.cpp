@@ -31,18 +31,27 @@ namespace model
 
     void MapCompiler::CompileMap(Map& map, const std::string& functionName)
     {
+        using namespace std::string_literals;
         auto pModuleEmitter = GetModuleEmitter();
 
+        Log() << "Creating 'predict' function" << EOL;
         emitters::NamedVariableTypeList mainFunctionArguments = AllocateMapFunctionArguments(map, *pModuleEmitter);
         pModuleEmitter->BeginMapPredictFunction(functionName, mainFunctionArguments);
 
-        Log() << "Creating 'predict' function" << EOL;
-        auto inputSize = map.GetInput(0)->Size();
-        auto outputSize = map.GetOutput(0).Size();
-        pModuleEmitter->GetFunctionDeclaration(functionName).GetComments() = {
-            std::string("Input size: ") + std::to_string(inputSize),
-            std::string("Output size: ") + std::to_string(outputSize)
-        };
+        std::vector<std::string> comments;
+        auto numInputs = map.GetNumInputs();
+        for (size_t i = 0; i < numInputs; ++i)
+        {
+            comments.emplace_back("Input "s + std::to_string(i) + " ('" + map.GetInputName(i) + "') size: "s + std::to_string(map.GetInput(i)->Size()));
+        }
+
+        auto numOutputs = map.GetNumOutputs();
+        for (size_t i = 0; i < numOutputs; ++i)
+        {
+            comments.emplace_back("Output "s + std::to_string(i) + " ('" + map.GetOutputName(i) + "') size: "s + std::to_string(map.GetOutput(i).Size()));
+        }
+
+        pModuleEmitter->GetFunctionDeclaration(functionName).GetComments() = comments;
 
         OnBeginCompileModel(map.GetModel());
         CompileNodes(map.GetModel());
@@ -64,7 +73,7 @@ namespace model
             auto compilableNode = const_cast<CompilableNode*>(dynamic_cast<const CompilableNode*>(&node));
             if (!compilableNode)
             {
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Encountered null comilable node");
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Encountered null compilable node");
             }
 
             Log() << "Now compiling node " << DiagnosticString(node) << EOL;
@@ -107,40 +116,46 @@ namespace model
         // context parameter
         functionArguments.push_back({ "context", emitters::VariableType::VoidPointer });
 
+        utilities::UniqueNameList list;
         // Allocate variables for inputs
         for (auto inputNode : map.GetInputs())
         {
-            auto argVar = AllocatePortFunctionArgument(module, inputNode->GetOutputPort(), ArgType::input);
+            auto argVar = AllocatePortFunctionArgument(module, inputNode->GetOutputPort(), ArgType::input, list);
             functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
         }
 
-        // Allocate variables for outputs -- scalar outputs treated the same as vector
+        // Allocate variables for outputs -- scalar outputs are treated the same as vectors
         for (auto outputElements : map.GetOutputs())
         {
             assert(outputElements.NumRanges() == 1);
 
             // TODO: can we use an array type here?
-            auto argVar = AllocatePortFunctionArgument(module, *outputElements.GetRanges()[0].ReferencedPort(), ArgType::output);
+            auto argVar = AllocatePortFunctionArgument(module, *outputElements.GetRanges()[0].ReferencedPort(), ArgType::output, list);
             functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
         }
         return functionArguments;
     }
 
-    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const OutputPortBase& port, ArgType argType)
+    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const OutputPortBase& port, ArgType argType, ell::utilities::UniqueNameList& list)
     {
         emitters::VariableType varType = PortTypeToVariableType(port.GetType());
         emitters::VariableScope scope = argType == ArgType::input ? emitters::VariableScope::input : emitters::VariableScope::output;
 
         // outputs are modelled as Vectors
         emitters::Variable* pVar = module.Variables().AddVectorVariable(scope, varType, port.Size());
+
+        std::string defaultName = argType == ArgType::input ? "input" : "output";
+        std::string friendlyName = list.Add(port.GetVariableName(defaultName));
+        pVar->SetEmittedName(friendlyName);
+        
         module.AllocateVariable(*pVar);
         SetVariableForPort(port, pVar);
         return pVar;
     }
 
-    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const PortElementBase& element, ArgType argType)
+    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const PortElementBase& element, ArgType argType, ell::utilities::UniqueNameList& list)
     {
-        return AllocatePortFunctionArgument(module, *element.ReferencedPort(), argType);
+        return AllocatePortFunctionArgument(module, *element.ReferencedPort(), argType, list);
     }
 
     void MapCompiler::PushScope()

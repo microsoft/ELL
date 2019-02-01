@@ -32,6 +32,7 @@ set(src
   src/Tokenizer.cpp
   src/TypeName.cpp
   src/UniqueId.cpp
+  src/UniqueNameList.cpp
   src/Variant.cpp
   src/XmlArchiver.cpp
 )
@@ -81,6 +82,7 @@ set(include
   include/TypeName.h
   include/TypeTraits.h
   include/UniqueId.h
+  include/UniqueNameList.h
   include/Unused.h
   include/Variant.h
   include/XmlArchiver.h

@@ -331,6 +331,7 @@ namespace predictors
 
 #pragma region implementation
 
+#ifndef SWIG
 #include <limits>
 #include <ostream>
 #include <type_traits>
@@ -566,5 +567,5 @@ namespace predictors
     } // namespace neural
 } // namespace predictors
 } // namespace ell
-
+#endif // #ifndef SWIG
 #pragma endregion implementation

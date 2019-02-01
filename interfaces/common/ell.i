@@ -30,7 +30,6 @@
 %}
 #endif // SWIGJAVASCRIPT
 
-// stl
 %include "stdint.i"
 %include "vector.i"
 

@@ -8,6 +8,7 @@ ELL nodes
 
 from ..ell_py import BinaryOperationType,\
 InputNode,\
+InputNodeList,\
 InputPort,\
 InputPortIterator, \
 Node,\

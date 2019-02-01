@@ -9,6 +9,10 @@
 #include "Port.h"
 #include "Node.h"
 
+#include <utilities/include/StringUtil.h>
+
+#include <cctype>
+
 namespace ell
 {
 namespace model
@@ -53,6 +57,33 @@ namespace model
     Port::PortType Port::GetPortType<bool>()
     {
         return Port::PortType::boolean;
+    }
+
+    std::string Port::GetVariableName(const std::string& defaultName) const
+    {
+        // Find a friendly name in the node's metadata.  If the user bothered to name the node in
+        // the model then this name probably has semantic significance worthy of reflecting in this port
+        // friendly name and then emitting in generated function parameters.
+        std::string name = this->GetNode()->GetFriendlyName();
+        if (!name.empty())
+        {
+            if (std::isdigit(name[0]))
+            {
+                // not a valid identifier, so use the defaultName instead.
+                name = defaultName;
+            }
+        }
+        else 
+        {
+            name = defaultName;
+        }
+        // If this port has an interesting non-default name then append it. This can happen 
+        // in the case where a node has multiple ports with interesting names.
+        if (this->_name != Node::defaultOutputPortName && this->_name != Node::defaultInputPortName)
+        {
+            name += "_" + this->_name;
+        }
+        return utilities::MakeValidIdentifier(name);
     }
 
     utilities::ArchiveVersion Port::GetArchiveVersion() const

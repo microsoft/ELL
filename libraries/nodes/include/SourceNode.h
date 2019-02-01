@@ -202,6 +202,12 @@ namespace nodes
         compiler.EnsurePortEmitted(output);
         auto& module = function.GetModule();
 
+        std::string name = this->GetFriendlyName();
+        if (name.empty())
+        {
+            name = "input";
+        }
+
         // Globals
         emitters::Variable* pBufferedSampleTimeVar = module.Variables().AddVariable<emitters::InitializedScalarVariable<TimeTickType>>(emitters::VariableScope::global, _bufferedSampleTime);
         emitters::Variable* pBufferedSampleVar = module.Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, output.Size());
@@ -212,7 +218,7 @@ namespace nodes
 
         // Callback function
         const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer },
-                                                             { "input", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
+                                                             { name, emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
         module.DeclareFunction(prefixedName, emitters::GetVariableType<bool>(), parameters);
         module.IncludeInCallbackInterface(prefixedName, "SourceNode");

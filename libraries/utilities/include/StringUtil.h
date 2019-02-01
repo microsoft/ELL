@@ -64,5 +64,11 @@ namespace utilities
     /// <returns> A single string with the given strings separated by the given separator character. </returns>
     std::string Join(const std::vector<std::string>& strings, const std::string& separator);
 
+    /// <summary> Modify a given string so it becomes a valid C language identifier. </summary>
+    ///
+    /// <param name="s"> The string to valiate. </param>
+    /// <returns> A valid C language identifier or empty string if there are no valid chars. </returns>
+    std::string MakeValidIdentifier(const std::string& s);
+
 } // namespace utilities
 } // namespace ell

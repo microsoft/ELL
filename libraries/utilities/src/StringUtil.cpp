@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <sstream>
+#include <cctype>
 
 namespace ell
 {
@@ -81,5 +82,19 @@ namespace utilities
         }
         return stream.str();
     }
+
+    std::string MakeValidIdentifier(const std::string& s)
+    {
+        std::string result;
+        for (char c : s)
+        {
+            if (std::isalnum(c) || c == '_')
+            {
+                result.push_back(c);
+            }
+        }
+        return result;
+    }
+
 } // namespace utilities
 } // namespace ell

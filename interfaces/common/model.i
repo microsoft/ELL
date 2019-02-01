@@ -54,6 +54,7 @@ WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(FloatCallbackBase, FloatCallbackBase, f
 %include "std_vector.i"
 
 %template(PortElementsList) std::vector<ELL_API::PortElements*>;
+%template(InputNodeList) std::vector<ELL_API::InputNode*>;
 
 #endif
 

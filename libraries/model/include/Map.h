@@ -86,7 +86,7 @@ namespace model
         ///
         /// <param name="inputValues"> The input to the map </param>
         /// <returns> A vector of output values </returns>
-        template <typename OutputType, typename InputType, utilities::IsFundamental<OutputType> OutputConcept = 1, utilities::IsFundamental<InputType> InputConcept = 1>
+        template <typename OutputType, typename InputType, utilities::IsFundamental<OutputType> OutputConcept = true, utilities::IsFundamental<InputType> InputConcept = true>
         std::vector<OutputType> Compute(const std::vector<InputType>& inputValues) const;
 
         /// <summary> Computes the map's output from input values </summary>
@@ -217,9 +217,15 @@ namespace model
 
         /// <summary> Returns an input node </summary>
         ///
-        /// <param name="index"> The name of the input </param>
+        /// <param name="inputName"> The name of the input </param>
         /// <returns> The input node </returns>
         InputNodeBase* GetInput(const std::string& inputName) const;
+
+        /// <summary> Returns the name of a map input </summary>
+        ///
+        /// <param name="index"> The index of the input </param>
+        /// <returns> The name the map uses for this input </returns>
+        std::string GetInputName(size_t index = 0) const;
 
         /// <summary> Returns the input nodes </summary>
         ///
@@ -257,11 +263,17 @@ namespace model
         /// <returns> The output </returns>
         PortElementsBase GetOutput(size_t index = 0) const;
 
-        /// <summary> Returns an outputs </summary>
+        /// <summary> Returns an output </summary>
         ///
         /// <param name="outputName"> The name of the output </param>
         /// <returns> The output </returns>
         PortElementsBase GetOutput(const std::string& outputName) const;
+
+        /// <summary> Returns the name of an output </summary>
+        ///
+        /// <param name="index"> The index of the output </param>
+        /// <returns> The name the map uses for this output </returns>
+        std::string GetOutputName(size_t index = 0) const;
 
         /// <summary> Returns an sink node </summary>
         ///
@@ -484,6 +496,10 @@ namespace model
     template <typename OutputType, typename InputType, utilities::IsFundamental<OutputType>, utilities::IsFundamental<InputType>>
     std::vector<OutputType> Map::Compute(const std::vector<InputType>& inputValues) const
     {
+        if (GetNumInputs() != 1)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Map::Compute can only be called on maps with a single input");
+        }
         SetInputValue(0, inputValues);
         return ComputeOutput<OutputType>(GetOutput(0));
     }
@@ -491,7 +507,11 @@ namespace model
     template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType>, data::IsDataVector<InputVectorType>>
     OutputVectorType Map::Compute(const InputVectorType& inputValues) const
     {
-        SetInputValue(GetInput(0), inputValues);
+        if (GetNumInputs() != 1)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Map::Compute can only be called on maps with a single input");
+        }
+        SetInputValue(0, inputValues);
         return ComputeOutput<OutputVectorType>(GetOutput(0));
     }
 

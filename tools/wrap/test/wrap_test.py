@@ -188,6 +188,18 @@ def test_python(model_path, target_dir):
         print("### FAILED lag notification callback never happened")
         return 1
 
+    # make sure we can call the helper functions.
+    try:
+        print("GetInputShape={}".format(wrapper.GetInputShape(0)))
+        print("GetInputSize={}".format(wrapper.GetInputSize(0)))
+        print("GetOutputShape={}".format(wrapper.GetOutputShape(0)))
+        print("GetOutputSize={}".format(wrapper.GetOutputSize(0)))
+        print("Reset={}".format(wrapper.Reset()))
+        print("GetMetadata={}".format(wrapper.GetMetadata("Id")))
+    except:
+        print("### FAILED wrap_test python failed to call helper methods")
+        return 1
+
     # make sure we don't leak.
     before = 0
     after = 0

@@ -93,10 +93,16 @@ namespace model
         /// <returns> A const reference to the PropertyBag containing the metadata for this object. </returns>
         const utilities::PropertyBag& GetMetadata() const { return _metadata; }
 
+        /// <summary> Get a valid variable name for this port that can be emitted in code. </summary>
+        ///
+        /// <param name="defaultName"> The default name to use </param>
+        /// <returns> A name that is a valid identifier</returns>
+        std::string GetVariableName(const std::string& defaultName) const;
+
     protected:
-        Port(const Node* node, std::string name, PortType type) :
+        Port(const Node* node, std::string defaultName, PortType type) :
             _node(node),
-            _name(name),
+            _name(defaultName),
             _type(type) {}
         ~Port() override = default;
 

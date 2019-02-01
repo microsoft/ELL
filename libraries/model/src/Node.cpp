@@ -291,5 +291,16 @@ namespace model
         }
         _model = std::make_unique<Model>(model->ShallowCopy());
     }
+
+    std::string Node::GetFriendlyName() const
+    {
+        auto& meta = this->GetMetadata();
+        if (meta.HasEntry("name"))
+        {
+            return meta.GetEntry<std::string>("name");
+        }
+        return "";
+    }
+
 } // namespace model
 } // namespace ell

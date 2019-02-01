@@ -100,7 +100,7 @@ class OnnxNodeConverter(object):
                                         operation_type = self.op_type,
                                         inputs = list(id for id in onnx_node.input if id != ''),
                                         outputs = list(id for id in onnx_node.output if id != ''),
-                                        metadata = { "op_type": self.op_type, "id": name } 
+                                        metadata = { "op_type": self.op_type, "name": name }
                                         ) 
         self.node = node
 

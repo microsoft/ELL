@@ -131,6 +131,7 @@ namespace emitters
             std::string inputType;
             std::string inputElementType;
             std::string returnType;
+            std::vector<std::string> argNames;
             bool inputIsScalar;
         };
 

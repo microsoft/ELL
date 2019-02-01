@@ -197,6 +197,7 @@ public:
     std::string GetRuntimeTypeName();
     std::string GetMetadataValue(const std::string& key);
     void SetMetadataValue(const std::string& key, const std::string& value);
+    void CopyMetadataFrom(const Node& other);
 #ifndef SWIG
     Node(const ell::model::Node* other);
     const ell::model::Node* GetNode() const { return _node; }
@@ -353,6 +354,7 @@ public:
     Map();
     Map(const Map& other) = default;
     Map(Model model, InputNode inputNode, PortElements output);
+    Map(Model model, const std::vector<InputNode*> inputNodes, const std::vector<PortElements*> outputs);
     Map(const std::string& filename);
 #ifndef SWIG
     Map(std::shared_ptr<ell::model::Map>& map);

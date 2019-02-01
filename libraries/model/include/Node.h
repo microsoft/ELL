@@ -184,6 +184,11 @@ namespace model
         /// <returns> A const reference to the PropertyBag containing the metadata for this object. </returns>
         const utilities::PropertyBag& GetMetadata() const { return _metadata; }
 
+        /// <summary> Get a friendly name for this node from the metadata key "name". </summary>
+        ///
+        /// <returns> A friendly name or empty string if none was defined. </returns>
+        std::string GetFriendlyName() const;
+
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 

@@ -355,7 +355,7 @@ namespace model
                 outputPorts.push_back(port);
             }
         }
-        Submodel m(_model, {}, outputPorts);
+                Submodel m(_model, {}, outputPorts);
 
         TransformContext context;
         ModelTransformer transformer;
@@ -655,6 +655,16 @@ namespace model
         return iter->second;
     }
 
+    std::string Map::GetInputName(size_t index) const
+    {
+        if (index >= _inputNames.size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+
+        return _inputNames[index];
+    }
+
     PortElementsBase Map::GetOutput(size_t index) const
     {
         if (index >= _outputElements.size())
@@ -674,6 +684,16 @@ namespace model
         }
 
         return iter->second;
+    }
+
+    std::string Map::GetOutputName(size_t index) const
+    {
+        if (index >= _outputElements.size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+
+        return _outputNames[index];
     }
 
     //

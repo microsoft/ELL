@@ -238,11 +238,12 @@ class ImporterEngine:
 
         output_node = self.ell_model_builder.AddOutputNode(
             self.ell_model, ell_output_shape, ell.nodes.PortElements(last_ell_node.GetOutputPort("output")))
+        output_node.CopyMetadataFrom(last_ell_node)
         self.lookup_table.add_ell_output(output_node)
 
         # Create the map
-        self.final_ell_map = ell.model.Map(self.ell_model, self.lookup_table.get_ell_inputs()[0],
-            ell.nodes.PortElements(self.lookup_table.get_ell_outputs()[0].GetOutputPort("output")))
+        output_list = [ell.nodes.PortElements(e.GetOutputPort("output")) for e in self.lookup_table.get_ell_outputs()]
+        self.final_ell_map = ell.model.Map(self.ell_model, ell.nodes.InputNodeList(self.lookup_table.get_ell_inputs()), ell.nodes.PortElementsList(output_list))
 
         # Print out the nodes and where they came from
         self.final_mapping = self.get_node_group_mapping(self.final_ell_map.GetModel())

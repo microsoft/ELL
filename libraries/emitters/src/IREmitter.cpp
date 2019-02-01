@@ -715,7 +715,9 @@ namespace emitters
     {
         auto types = BindArgumentTypes(arguments);
         auto functionType = llvm::FunctionType::get(Type(returnType), types, false);
-        return DeclareFunction(pModule, name, functionType);
+        LLVMFunction pFunction = DeclareFunction(pModule, name, functionType);
+        BindArgumentNames(pFunction, arguments);
+        return pFunction;
     }
 
     LLVMFunction IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, llvm::FunctionType* type)

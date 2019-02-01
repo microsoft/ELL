@@ -34,15 +34,15 @@
 #endif
 
 %inline %{
-	SGDTrainerProxy GetSGDIncrementalTrainer(size_t dim, const ell::common::LossArguments& lossArguments, const ell::common::SGDIncrementalTrainerArguments& trainerArguments)
-	{
-		auto trainer = ell::common::MakeSGDIncrementalTrainer(dim, lossArguments, trainerArguments);
-		return SGDTrainerProxy(trainer);
-	}
+    SGDTrainerProxy GetSGDIncrementalTrainer(size_t dim, const ell::common::LossArguments& lossArguments, const ell::common::SGDIncrementalTrainerArguments& trainerArguments)
+    {
+        auto trainer = ell::common::MakeSGDIncrementalTrainer(dim, lossArguments, trainerArguments);
+        return SGDTrainerProxy(trainer);
+    }
 
-	SortingForestTrainerProxy GetForestTrainer(const ell::common::LossArguments& lossArguments, const ell::common::ForestTrainerArguments& trainerArguments)
-	{
-		auto trainer = ell::common::MakeSortingForestTrainer(lossArguments, trainerArguments);
-		return SortingForestTrainerProxy(trainer);
-	}
+    SortingForestTrainerProxy GetForestTrainer(const ell::common::LossArguments& lossArguments, const ell::common::ForestTrainerArguments& trainerArguments)
+    {
+        auto trainer = ell::common::MakeSortingForestTrainer(lossArguments, trainerArguments);
+        return SortingForestTrainerProxy(trainer);
+    }
 %}

@@ -764,7 +764,7 @@ void TestHeaderStruct()
 
     std::string result = out.str();
     auto structPos = result.find("typedef struct Shape");
-    auto funcPos = result.find("Shape Test_GetInputShape(int32_t");
+    auto funcPos = result.find("Shape Test_GetInputShape(int");
     auto commentPos = result.find("This is a really fun function");
     testing::ProcessTest("Testing header generation with structs", structPos != std::string::npos && funcPos != std::string::npos && commentPos != std::string::npos);
 }

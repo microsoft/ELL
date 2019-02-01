@@ -134,6 +134,8 @@ class LookupTable:
         if set_group_id:
             # Set the node's metadata to show where this node came from
             ell_node.SetMetadataValue("GroupId", importer_node.id)
+            # Also use this as the node's friendly name (by default)
+            ell_node.SetMetadataValue("name", importer_node.id)
         
         # concatenate any importer_node metadata provided by importer 
         if importer_node.metadata != None:

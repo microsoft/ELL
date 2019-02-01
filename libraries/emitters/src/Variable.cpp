@@ -55,7 +55,7 @@ namespace emitters
 
     void Variable::SetEmittedName(std::string name)
     {
-        _emittedName = std::move(name);
+        _emittedName = name;
     }
 
     bool Variable::TestFlags(int flags) const

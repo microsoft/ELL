@@ -184,15 +184,20 @@ namespace nodes
         std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
         auto& module = function.GetModule();
         auto triggerValue = function.ValueAt(pTrigger, 0);
+        std::string name = this->GetFriendlyName();
+        if (name.empty())
+        {
+            name = "output";
+        }
 
-        function.If(emitters::TypedComparison::equals, triggerValue, function.Literal(true), [prefixedName, pInput, &module, &compiler](emitters::IRFunctionEmitter& function) {
+        function.If(emitters::TypedComparison::equals, triggerValue, function.Literal(true), [prefixedName, pInput, &module, &compiler, &name](emitters::IRFunctionEmitter& function) {
             // look up our global context object
             auto context = module.GlobalPointer(compiler.GetNamespacePrefix() + "_context", emitters::VariableType::Byte);
             auto globalContext = function.Load(context);
 
             // Callback signature: void SinkFunction(void* context, ValueType* array)
             const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer },
-                                                                 { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
+                                                                 { name, emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
             module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
 
             emitters::LLVMFunction pSinkFunction = module.GetFunction(prefixedName);

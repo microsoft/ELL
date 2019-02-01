@@ -16,6 +16,7 @@
 
 #include <utilities/include/Logger.h>
 #include <utilities/include/UniqueId.h>
+#include <utilities/include/UniqueNameList.h>
 
 #include <algorithm>
 #include <functional>
@@ -167,12 +168,13 @@ namespace model
     {
         emitters::IRModuleEmitter& module = compiler.GetModule();
         emitters::NamedVariableTypeList args;
+        utilities::UniqueNameList list;
         for (auto port : GetInputPorts())
         {
             auto varType = PortTypeToVariableType(port->GetType());
             auto ptrType = emitters::GetPointerType(varType);
 
-            auto var = compiler.AllocatePortFunctionArgument(module, port->GetReferencedPort(), MapCompiler::ArgType::input);
+            auto var = compiler.AllocatePortFunctionArgument(module, port->GetReferencedPort(), MapCompiler::ArgType::input, list);
             auto varName = var->EmittedName();
             args.emplace_back(varName, ptrType);
         };
@@ -189,7 +191,7 @@ namespace model
             auto varType = PortTypeToVariableType(port->GetType());
             auto ptrType = emitters::GetPointerType(varType);
 
-            auto var = compiler.AllocatePortFunctionArgument(module, *port, MapCompiler::ArgType::output);
+            auto var = compiler.AllocatePortFunctionArgument(module, *port, MapCompiler::ArgType::output, list);
             auto varName = var->EmittedName();
             args.emplace_back(varName, ptrType);
         };

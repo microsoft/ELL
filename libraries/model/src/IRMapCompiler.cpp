@@ -58,33 +58,6 @@ namespace model
         _nodeRegions.emplace_back();
     }
 
-    // EnsureValidMap fixes up the model if necessary and checks that inputs/outputs are compilable
-    void IRMapCompiler::EnsureValidMap(Map& map)
-    {
-        if (map.NumInputPorts() != 1)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Compiled maps must have a single input");
-        }
-
-        if (map.NumOutputPorts() != 1)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Compiled maps must have a single output");
-        }
-
-        Log() << "Ensuring map is valid..." << EOL;
-
-        // if output isn't a simple port, add an output node to model
-        // TODO: remove this in favor of normalizing pass
-        auto out = map.GetOutput(0);
-        MemoryShape shape{ static_cast<int>(out.Size()) }; // default shape from PortElementsBase::Size()
-        auto outNodes = map.GetOutputNodes();
-        if (!outNodes.empty())
-        {
-            shape = outNodes[0]->GetShape();
-            Log() << "Output nodes present. Setting shape to first output node" << EOL;
-        }
-    }
-
     std::string IRMapCompiler::GetNamespacePrefix() const
     {
         return GetModule().GetModuleName();
@@ -105,8 +78,6 @@ namespace model
     {
         // phases of compilation / refinement / optimization
         //
-        // Fix map outputs (EnsureValidMap)
-        //
         // pre-refinement phase:
         // Refine 1 (refine NN predictor nodes)
         // Optimize 1 (set preferred conv type)
@@ -121,8 +92,6 @@ namespace model
         // IR optimization
 
         Log() << "Compile called for map" << EOL;
-
-        EnsureValidMap(map);
 
         //
         // Temporary special-purpose code to allow the "SetConvolutionMethod" optimization pass to work.

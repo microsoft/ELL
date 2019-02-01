@@ -17,6 +17,8 @@
 #include <emitters/include/ModuleEmitter.h>
 #include <emitters/include/Variable.h>
 
+#include <utilities/include/UniqueNameList.h>
+
 #include <cassert>
 #include <stack>
 #include <string>
@@ -120,8 +122,8 @@ namespace model
         friend class CompilableNode;
 
         void CompileNodes(Model& model);
-        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const OutputPortBase& port, ArgType argType);
-        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const PortElementBase& element, ArgType argType);
+        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const OutputPortBase& port, ArgType argType, ell::utilities::UniqueNameList& list);
+        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const PortElementBase& element, ArgType argType, ell::utilities::UniqueNameList& list);
 
         MapCompilerOptions _parameters;
         // map from ports to runtime variables, for all ports in the model

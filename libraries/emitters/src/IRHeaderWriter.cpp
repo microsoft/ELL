@@ -19,6 +19,7 @@
 
 #include <utilities/include/Debug.h>
 #include <utilities/include/StringUtil.h>
+#include <utilities/include/UniqueNameList.h>
 
 #include <sstream>
 #include <string>
@@ -310,16 +311,6 @@ namespace emitters
         return s;
     }
 
-    std::string SwiggifyType(std::string type)
-    {
-        if (type == "int32_t")
-        {
-            // SWIG has a bug if we use int32_t then IntVector doesn't work properly.
-            return "int";
-        }
-        return type;
-    }
-
     struct CppWrapperInfo
     {
         std::string moduleName;
@@ -341,13 +332,14 @@ namespace emitters
 
     static void WriteSourceNodeCallbacks(ModuleCallbackDefinitions& moduleCallbacks, CppWrapperInfo& info)
     {
+        utilities::UniqueNameList list;
         int sourceIndex = 0;
         for (auto cb : moduleCallbacks.sources)
         {
-            std::string inputType = SwiggifyType(cb.inputType);
+            std::string inputType = cb.inputType;
             std::string callbackFunction = cb.functionName;
             std::string callbackMethod = TrimPrefix(callbackFunction, info.moduleName + "_");
-            std::string argName = utilities::FormatString("input%d", sourceIndex);
+            std::string argName = cb.argNames[1];
 
             // setup an internal method for the callback in our Wrapper class and delegate to
             // a virtual method that can be implemented in another language (via SWIG)
@@ -438,10 +430,10 @@ namespace emitters
             int sinkIndex = 0;
             for (auto cb : moduleCallbacks.sinks)
             {
-                std::string outputType = SwiggifyType(cb.inputType);
+                std::string outputType = cb.inputType;
                 std::string callbackFunction = cb.functionName;
                 std::string callbackMethod = TrimPrefix(callbackFunction, info.moduleName + "_");
-                std::string argName = utilities::FormatString("sinkOutput%d", sinkIndex);
+                std::string argName = cb.argNames[1];
 
                 // setup an internal method for the callback in our Wrapper class and delegate to
                 // a virtual method that can be implemented in another language (via SWIG)
@@ -498,7 +490,7 @@ namespace emitters
             {
                 std::stringstream ss;
                 WriteLLVMType(ss, arg->getType()->getPointerElementType());
-                std::string argType = SwiggifyType(ss.str());
+                std::string argType = ss.str();
                 bool passArgument = false;
                 if (argName.find("output") != std::string::npos)
                 {
@@ -723,7 +715,9 @@ namespace emitters
         {
             std::ostringstream os;
             auto ptr = function.args().begin();
+            argNames.push_back(ptr->getName());
             ptr++; // first argument is now a void* context, second argument has the type info we need.
+            argNames.push_back(ptr->getName());
             auto& argument = *ptr;
             auto type = argument.getType();
             if (type->isPointerTy())

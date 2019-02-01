@@ -336,6 +336,8 @@ def train(epochs=30, hidden_units=128, learning_rate=1e-3, weight_decay=1e-5, ba
         device = torch.device("cuda")
         if model and device:
             model.cuda()  # move the processing to GPU
+    else:
+        print("### CUDA not available!!")
 
     if not evaluate_only:
         print("Loading {}...".format(training_file))
