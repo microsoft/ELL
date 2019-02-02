@@ -17,9 +17,9 @@ namespace ell
 {
 namespace model
 {
+
     OutputPortBase::OutputPortBase(const Node* node, std::string name, PortType type, size_t size) :
-        Port(node, name, type),
-        _layout({ static_cast<int>(size) })
+        OutputPortBase(node, name, type, PortMemoryLayout({ static_cast<int>(size) }))
     {
     }
 
@@ -27,6 +27,7 @@ namespace model
         Port(node, name, type),
         _layout(layout)
     {
+        InitializeCachedOutput();
     }
 
     OutputPortBase::~OutputPortBase()
@@ -34,6 +35,38 @@ namespace model
         for (const InputPortBase* ref : _references)
         {
             const_cast<InputPortBase*>(ref)->ClearReferencedPort();
+        }
+    }
+
+    std::vector<double> OutputPortBase::GetDoubleOutput() const
+    {
+        if (auto doubleVector = std::get_if<std::vector<double>>(&_cachedOutput); doubleVector != nullptr)
+        {
+            return *doubleVector;
+        }
+        else
+        {
+            return std::visit(
+                [](auto&& value) -> std::vector<double> {
+                    return std::vector<double>(value.begin(), value.end());
+                },
+                _cachedOutput);
+        }
+    }
+
+    double OutputPortBase::GetDoubleOutput(size_t index) const
+    {
+        if (auto doubleVector = std::get_if<std::vector<double>>(&_cachedOutput); doubleVector != nullptr)
+        {
+            return (*doubleVector)[index];
+        }
+        else
+        {
+            return std::visit(
+                [index](auto&& value) -> double {
+                    return static_cast<double>(value[index]);
+                },
+                _cachedOutput);
         }
     }
 
@@ -104,6 +137,37 @@ namespace model
         int size = 0;
         archiver.OptionalProperty("size", 0) >> size;
         archiver.OptionalProperty("layout", PortMemoryLayout({ size })) >> _layout;
+        InitializeCachedOutput();
     }
+
+    void OutputPortBase::InitializeCachedOutput()
+    {
+        switch (GetType())
+        {
+        case PortType::bigInt:
+            _cachedOutput = std::vector<int64_t>{};
+            break;
+        case PortType::boolean:
+            _cachedOutput = std::vector<bool>{};
+            break;
+        case PortType::integer:
+            _cachedOutput = std::vector<int32_t>{};
+            break;
+        case PortType::real:
+            _cachedOutput = std::vector<double>{};
+            break;
+        case PortType::smallReal:
+            _cachedOutput = std::vector<float>{};
+            break;
+        case PortType::categorical:
+            [[fallthrough]];
+        case PortType::none:
+            [[fallthrough]];
+        default:
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
+        }
+    }
+
+    static_assert(sizeof(OutputPortBase) == sizeof(OutputPort<double>), "OutputPort<T> must have the same layout as OutputPortBase");
 } // namespace model
 } // namespace ell

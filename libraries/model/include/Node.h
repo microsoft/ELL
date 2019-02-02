@@ -40,10 +40,9 @@ namespace model
         static constexpr const char* defaultInput3PortName = "input3";
 
         Node() = default;
-        ~Node() override = default;
 
         /// <summary> Type to use for our node id </summary>
-        typedef utilities::UniqueId NodeId;
+        using NodeId = utilities::UniqueId;
 
         /// <summary> Returns the unique ID for this node </summary>
         ///

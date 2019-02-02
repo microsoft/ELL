@@ -169,8 +169,8 @@ namespace model
         ///
         /// <param name="submodel"> The submodel to copy. There must not be any free input ports in the submodel. </param>
         /// <param name="destModel"> The model to append transformed nodes into. </param>
-        /// <param name="onto"> 
-        ///     The output ports in the destination model to graft the copied submodel's inputs onto. 
+        /// <param name="onto">
+        ///     The output ports in the destination model to graft the copied submodel's inputs onto.
         ///     The "onto" ports must be in the same order as the corresponding inputs in the source submodel.
         ///  </param>
         /// <param name="context"> The context. </param>
@@ -207,8 +207,8 @@ namespace model
         ///
         /// <param name="submodel"> The submodel to transform. </param>
         /// <param name="destModel"> The model to append transformed nodes into. </param>
-        /// <param name="onto"> 
-        ///     The output ports in the destination model to graft the transformed submodel's inputs onto. 
+        /// <param name="onto">
+        ///     The output ports in the destination model to graft the transformed submodel's inputs onto.
         ///     The "onto" ports must be in the same order as the corresponding inputs in the source submodel.
         ///  </param>
         /// <param name="context"> The TransformContext to use during the transformation. </param>
@@ -224,8 +224,8 @@ namespace model
         /// <summary> Transforms part of a model in-place by applying a transformation function to each node, putting the result into a given place in the model. </summary>
         ///
         /// <param name="submodel"> The submodel to transform. </param>
-        /// <param name="onto"> 
-        ///     The output ports in the destination model to graft the transformed submodel's inputs onto. 
+        /// <param name="onto">
+        ///     The output ports in the destination model to graft the transformed submodel's inputs onto.
         ///     The "onto" ports must be in the same order as the corresponding inputs in the source submodel.
         ///  </param>
         /// <param name="context"> The TransformContext to use during the transformation. </param>
@@ -346,6 +346,12 @@ namespace model
         template <typename ValueType>
         void MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort);
 
+        /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
+        ///
+        /// <param name="oldPort"> The port in the old model to map to the new model. </param>
+        /// <param name="newPort"> The port in the new model to be mapped from the old model. </param>
+        void MapNodeOutput(const OutputPortBase& oldPort, const OutputPortBase& newPort);
+
         /// <summary> Get the context used by the transformer. Called by node implementors </summary>
         ///
         /// <returns> The context in use by the transformer. </returns>
@@ -376,7 +382,6 @@ namespace model
             std::unordered_map<const OutputPortBase*, const OutputPortBase*> _outputPortMap;
         };
 
-        void MapNodeOutput(const OutputPortBase& oldPort, const OutputPortBase& newPort);
         bool ShouldCopyNode(const Node& node) const;
         bool IsInputMapped(const InputPortBase& input) const;
         bool IsOutputMapped(const OutputPortBase& output) const;

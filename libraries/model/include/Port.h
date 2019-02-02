@@ -127,7 +127,7 @@ namespace model
     template <Port::PortType portType>
     struct PortTypeToValueType
     {
-        typedef int value_type;
+        using value_type = int;
     };
 
     template <Port::PortType portType>

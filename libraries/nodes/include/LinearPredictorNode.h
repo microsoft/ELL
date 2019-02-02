@@ -13,8 +13,6 @@
 #include "DotProductNode.h"
 #include "LinearPredictorNode.h"
 
-#include <utilities/include/Exception.h>
-
 #include <data/include/DenseDataVector.h>
 
 #include <model/include/Model.h>
@@ -22,6 +20,8 @@
 #include <model/include/Node.h>
 
 #include <predictors/include/LinearPredictor.h>
+
+#include <utilities/include/Exception.h>
 
 #include <string>
 #include <vector>
@@ -177,7 +177,22 @@ namespace nodes
         using DataVectorType = typename LinearPredictorType::DataVectorType;
         auto inputDataVector = DataVectorType(_input.GetValue());
         _output.SetOutput({ _predictor.Predict(inputDataVector) });
-        _weightedElements.SetOutput(_predictor.GetWeightedElements(inputDataVector).ToArray());
+        auto weightedData = _predictor.GetWeightedElements(inputDataVector).ToArray();
+        if constexpr (std::is_same_v<ElementType, double>)
+        {
+            _weightedElements.SetOutput(weightedData);
+        }
+        else if constexpr (std::is_same_v<ElementType, float>)
+        {
+            std::vector<float> castedData;
+            castedData.reserve(weightedData.size());
+            std::transform(weightedData.begin(), weightedData.end(), std::back_inserter(castedData), [](double d) { return static_cast<float>(d); });
+            _weightedElements.SetOutput(castedData);
+        }
+        else
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        }
     }
 
     template <typename ElementType>

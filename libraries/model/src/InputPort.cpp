@@ -96,7 +96,7 @@ namespace model
     {
         _referencedPort = nullptr;
     }
-    
+
     void InputPortBase::UpdateReferencedPort()
     {
         if (!_referencedPort->HasReference(this))
@@ -104,5 +104,7 @@ namespace model
             _referencedPort->AddReference(this);
         }
     }
+
+    static_assert(sizeof(InputPortBase) == sizeof(InputPort<double>), "InputPort<T> must have the same layout as InputPortBase");
 } // namespace model
 } // namespace ell

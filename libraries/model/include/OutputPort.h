@@ -15,6 +15,7 @@
 #include <utilities/include/IArchivable.h>
 
 #include <memory>
+#include <variant>
 #include <vector>
 
 namespace ell
@@ -81,27 +82,62 @@ namespace model
         /// <returns> The ports that are referencing this port. </returns>
         const std::vector<const InputPortBase*>& GetReferences() const;
 
-        /// <summary> Gets the name of this type (for serialization). </summary>
+        /// <summary> Returns the cached output from this port </summary>
         ///
-        /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "OutputPortBase"; }
+        /// <returns> The cached output from this port </returns>
+        template <typename ValueType>
+        const std::vector<ValueType>& GetOutput() const;
+
+        /// <summary> Returns one element of the cached output from this port </summary>
+        ///
+        /// <param name="index"> The index of the element to return </param>
+        /// <returns> The cached output for the element </returns>
+        template <typename ValueType>
+        ValueType GetOutput(size_t index) const;
 
         /// <summary> Gets the output of this port, converted to `double`. </summary>
         ///
         /// <returns> The output of this port, converted to `double`. </returns>
-        virtual std::vector<double> GetDoubleOutput() const { return {}; };
+        std::vector<double> GetDoubleOutput() const;
 
         /// <summary> Gets the output of an element, converted to a `double`. </summary>
         ///
         /// <param name="index"> The index of the element to return. </param>
         ///
         /// <returns> The output element, converted to a `double`. </returns>
-        virtual double GetDoubleOutput(size_t index) const { return 0.0; };
+        double GetDoubleOutput(size_t index) const;
+
+        /// <summary> Sets the cached output from this port </summary>
+        ///
+        /// <param name=values> The values this port should output </param>
+        /// <typeparam name="ValueType"> The fundamental type used by values </typeparam>
+        template <typename ValueType>
+        void SetOutput(std::initializer_list<ValueType>&& values) const;
+
+        /// <summary> Sets the cached output from this port </summary>
+        ///
+        /// <param name=values> The values this port should output </param>
+        /// <typeparam name="ContainerType"> The container type that holds the values </typeparam>
+        template <typename ContainerType>
+        void SetOutput(ContainerType&& values) const;
+
+        /// <summary> Sets the cached output from this port </summary>
+        ///
+        /// <param name=begin> The iterator representing the start value </param>
+        /// <param name=end> The iterator representing the end value  </param>
+        /// <typeparam name="IteratorType"> The iterator type </typeparam>
+        template <typename IteratorType>
+        void SetOutput(IteratorType begin, IteratorType end) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "OutputPortBase"; }
 
     protected:
         friend class InputPortBase;
@@ -116,6 +152,16 @@ namespace model
 
         PortMemoryLayout _layout;
         mutable std::vector<const InputPortBase*> _references;
+
+    private:
+        void InitializeCachedOutput();
+
+        mutable std::variant<std::vector<double>,
+                             std::vector<float>,
+                             std::vector<int64_t>,
+                             std::vector<int32_t>,
+                             std::vector<bool>>
+            _cachedOutput;
     };
 
     /// <summary> Represents an output from a node </summary>
@@ -143,47 +189,13 @@ namespace model
         /// <summary> Returns the cached output from this port </summary>
         ///
         /// <returns> The cached output from this port </returns>
-        const std::vector<ValueType>& GetOutput() const { return _cachedOutput; }
+        const std::vector<ValueType>& GetOutput() const { return OutputPortBase::GetOutput<ValueType>(); }
 
         /// <summary> Returns one element of the cached output from this port </summary>
         ///
         /// <param name="index"> The index of the element to return </param>
         /// <returns> The cached output for the element </returns>
         ValueType GetOutput(size_t index) const;
-
-        /// <summary> Gets the output of this port, converted to `double`. </summary>
-        ///
-        /// <returns> The output of this port, converted to `double`. </returns>
-        std::vector<double> GetDoubleOutput() const override;
-
-        /// <summary> Gets the output of an element, converted to a `double`. </summary>
-        ///
-        /// <param name="index"> The index of the element to return. </param>
-        ///
-        /// <returns> The output element, converted to a `double`. </returns>
-        double GetDoubleOutput(size_t index) const override;
-
-        /// <summary> Sets the cached output from this port </summary>
-        ///
-        /// <param name=values> The values this port should output </param>
-        /// <typeparam name="U"> The fundamental type used by values </typeparam>
-        template <typename U>
-        void SetOutput(std::initializer_list<U>&& values) const;
-
-        /// <summary> Sets the cached output from this port </summary>
-        ///
-        /// <param name=values> The values this port should output </param>
-        /// <typeparam name="C"> The container type that holds the values </typeparam>
-        template <typename C>
-        void SetOutput(C&& values) const;
-
-        /// <summary> Sets the cached output from this port </summary>
-        ///
-        /// <param name=begin> The iterator representing the start value </param>
-        /// <param name=end> The iterator representing the end value  </param>
-        /// <typeparam name="U"> The iterator type </typeparam>
-        template <typename It>
-        void SetOutput(It begin, It end) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -198,9 +210,6 @@ namespace model
     protected:
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
-    private:
-        mutable std::vector<ValueType> _cachedOutput;
     };
 } // namespace model
 } // namespace ell
@@ -211,6 +220,41 @@ namespace ell
 {
 namespace model
 {
+    //
+    // OutputPortBase
+    //
+    template <typename ValueType>
+    const std::vector<ValueType>& OutputPortBase::GetOutput() const
+    {
+        return std::get<std::vector<ValueType>>(_cachedOutput);
+    }
+
+    template <typename ValueType>
+    ValueType OutputPortBase::GetOutput(size_t index) const
+    {
+        return GetOutput<ValueType>()[index];
+    }
+
+    template <typename ValueType>
+    void OutputPortBase::SetOutput(std::initializer_list<ValueType>&& values) const
+    {
+        SetOutput(std::begin(values), std::end(values));
+    }
+
+    template <typename ContainerType>
+    void OutputPortBase::SetOutput(ContainerType&& values) const
+    {
+        SetOutput(std::begin(values), std::end(values));
+    }
+
+    template <typename IteratorType>
+    void OutputPortBase::SetOutput(IteratorType begin, IteratorType end) const
+    {
+        using ValueType = typename std::iterator_traits<IteratorType>::value_type;
+        using VectorType = std::vector<ValueType>;
+        std::get<VectorType>(_cachedOutput).assign(begin, end);
+    }
+
     //
     // OutputPort
     //
@@ -229,42 +273,7 @@ namespace model
     template <typename ValueType>
     ValueType OutputPort<ValueType>::GetOutput(size_t index) const
     {
-        return _cachedOutput[index];
-    }
-
-    template <typename ValueType>
-    std::vector<double> OutputPort<ValueType>::GetDoubleOutput() const
-    {
-        std::vector<double> result(_cachedOutput.size());
-        std::copy(_cachedOutput.begin(), _cachedOutput.end(), result.begin());
-        return result;
-    }
-
-    template <typename ValueType>
-    double OutputPort<ValueType>::GetDoubleOutput(size_t index) const
-    {
-        return static_cast<double>(_cachedOutput[index]);
-    }
-
-    template <typename ValueType>
-    template <typename U>
-    void OutputPort<ValueType>::SetOutput(std::initializer_list<U>&& values) const
-    {
-        this->SetOutput(std::begin(values), std::end(values));
-    }
-
-    template <typename ValueType>
-    template <typename C>
-    void OutputPort<ValueType>::SetOutput(C&& values) const
-    {
-        this->SetOutput(std::begin(values), std::end(values));
-    }
-
-    template <typename ValueType>
-    template <typename It>
-    void OutputPort<ValueType>::SetOutput(It begin, It end) const
-    {
-        _cachedOutput.assign(begin, end);
+        return OutputPortBase::GetOutput<ValueType>(index);
     }
 
     template <typename ValueType>

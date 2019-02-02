@@ -31,6 +31,26 @@ namespace model
     class InputPortBase : public Port
     {
     public:
+        /// <summary> Creates an input port </summary>
+        ///
+        /// <param name="owningNode"> The node this port belongs to </param>
+        /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
+        /// <param name="name"> Name of the port </param>
+        template <typename ValueType>
+        InputPortBase(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name);
+
+        /// <summary> Creates an input port </summary>
+        ///
+        /// <param name="owningNode"> The node this port belongs to </param>
+        /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
+        /// <param name="name"> Name of the port </param>
+        InputPortBase(const Node* owningNode, const OutputPortBase& input, const std::string& name);
+
+        InputPortBase(const InputPortBase& other) = delete;
+        InputPortBase(InputPortBase&& other) = delete;
+        InputPortBase& operator=(const InputPortBase&) = delete;
+        InputPortBase& operator=(InputPortBase&&) = delete;
+
         ~InputPortBase() override;
 
         /// <summary> Returns the list of nodes this input port gets values from </summary>
@@ -77,11 +97,6 @@ namespace model
         void UpdateReferencedPort();
 
     protected:
-        InputPortBase(const InputPortBase& other) = delete;
-        InputPortBase(InputPortBase&& other) = delete;
-        template <typename ValueType>
-        InputPortBase(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name);
-        InputPortBase(const Node* owningNode, const OutputPortBase& input, const std::string& name);
         InputPortBase(Port::PortType portType);
         void SetReferencedPort(const OutputPortBase* referencedPort);
         void ClearReferencedPort();
@@ -105,6 +120,7 @@ namespace model
         ///
         /// <param name="owningNode"> The node this port belongs to </param>
         /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
+        /// <param name="name"> Name of the port </param>
         InputPort(const Node* owningNode, const OutputPort<ValueType>& input, const std::string& name);
 
         /// <summary> Returns the PortElements containing the referenced locations this port gets its values from </summary>
