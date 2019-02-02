@@ -31,8 +31,8 @@ namespace model
 
     IRCompiledMap::IRCompiledMap(IRCompiledMap&& other) :
         CompiledMap(std::move(other), other._functionName, other._compilerOptions),
+        _module(other._module),
         _moduleName(std::move(other._moduleName)),
-        _module(std::move(other._module)),
         _executionEngine(std::move(other._executionEngine)),
         _verifyJittedModule(other._verifyJittedModule),
         _computeFunctionDefined(false)
@@ -40,18 +40,18 @@ namespace model
     }
 
     // private constructor:
-    IRCompiledMap::IRCompiledMap(Map map, const std::string& functionName, const MapCompilerOptions& options, std::unique_ptr<emitters::IRModuleEmitter> module, bool verifyJittedModule) :
+    IRCompiledMap::IRCompiledMap(Map map, const std::string& functionName, const MapCompilerOptions& options, emitters::IRModuleEmitter& module, bool verifyJittedModule) :
         CompiledMap(std::move(map), functionName, options),
-        _module(std::move(module)),
+        _module(module),
+        _moduleName(_module.GetModuleName()),
         _verifyJittedModule(verifyJittedModule),
         _computeFunctionDefined(false)
     {
-        _moduleName = _module->GetModuleName();
     }
 
     bool IRCompiledMap::IsValid() const
     {
-        return _module != nullptr && _module->IsValid();
+        return _module.IsValid() && !_moduleName.empty();
     }
 
     emitters::IRExecutionEngine& IRCompiledMap::GetJitter()
@@ -64,7 +64,7 @@ namespace model
     {
         if (!_executionEngine)
         {
-            auto moduleClone = std::unique_ptr<llvm::Module>(llvm::CloneModule(_module->GetLLVMModule()));
+            auto moduleClone = std::unique_ptr<llvm::Module>(llvm::CloneModule(_module.GetLLVMModule()));
             _executionEngine = std::make_unique<emitters::IRExecutionEngine>(std::move(moduleClone), _verifyJittedModule);
         }
     }
@@ -232,17 +232,17 @@ namespace model
 
     void IRCompiledMap::WriteCode(const std::string& filePath) const
     {
-        _module->WriteToFile(filePath);
+        _module.WriteToFile(filePath);
     }
 
     void IRCompiledMap::WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format) const
     {
-        _module->WriteToFile(filePath, format);
+        _module.WriteToFile(filePath, format);
     }
 
     void IRCompiledMap::WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const
     {
-        _module->WriteToFile(filePath, format, options);
+        _module.WriteToFile(filePath, format, options);
     }
 
     void IRCompiledMap::WriteCodeHeader(const std::string& filePath, emitters::ModuleOutputFormat format) const
@@ -253,17 +253,17 @@ namespace model
 
     void IRCompiledMap::WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format) const
     {
-        _module->WriteToStream(stream, format);
+        _module.WriteToStream(stream, format);
     }
 
     void IRCompiledMap::WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const
     {
-        _module->WriteToStream(stream, format, options);
+        _module.WriteToStream(stream, format, options);
     }
 
     void IRCompiledMap::WriteCodeHeader(std::ostream& stream, emitters::ModuleOutputFormat format) const
     {
-        _module->WriteToStream(stream, format);
+        _module.WriteToStream(stream, format);
     }
 
     std::string IRCompiledMap::GetCodeHeaderString() const

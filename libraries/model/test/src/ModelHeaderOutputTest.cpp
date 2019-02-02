@@ -13,6 +13,7 @@
 #include <model/include/InputNode.h>
 #include <model/include/Map.h>
 #include <model/include/Model.h>
+#include <model/optimizer/include/OptimizationPass.h>
 #include <model/include/OutputNode.h>
 
 #include <emitters/include/IRHeaderWriter.h>
@@ -34,10 +35,21 @@
 using namespace ell;
 using namespace ell::emitters;
 
+namespace
+{
+
+model::IRMapCompiler CreateMapCompiler(const std::string& moduleName, const std::string& mapFunctionName)
+{
+    model::MapCompilerOptions settings;
+    settings.moduleName = moduleName;
+    settings.mapFunctionName = mapFunctionName;
+    settings.compilerSettings.optimize = true;
+
+    return model::IRMapCompiler(settings);
+}
+
 template <typename ElementType>
-model::IRCompiledMap GetCompiledMapWithCallbacks(
-    const std::string& moduleName,
-    const std::string& mapFunctionName)
+model::IRCompiledMap GetCompiledMapWithCallbacks(model::IRMapCompiler& compiler)
 {
     // Create the map
     constexpr nodes::TimeTickType lagThreshold = 200;
@@ -57,19 +69,11 @@ model::IRCompiledMap GetCompiledMapWithCallbacks(
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
     auto map = model::Map(model, { { "time", inputNode } }, { { "output", outputNode->output } });
 
-    model::MapCompilerOptions settings;
-    settings.moduleName = moduleName;
-    settings.mapFunctionName = mapFunctionName;
-    settings.compilerSettings.optimize = true;
-
-    model::IRMapCompiler compiler(settings);
     return compiler.Compile(map);
 }
 
 template <typename ElementType>
-model::IRCompiledMap GetCompiledMapNoCallbacks(
-    const std::string& moduleName,
-    const std::string& mapFunctionName)
+model::IRCompiledMap GetCompiledMapNoCallbacks(model::IRMapCompiler& compiler)
 {
     // Create the map
     constexpr size_t inputSize = 1000;
@@ -81,12 +85,6 @@ model::IRCompiledMap GetCompiledMapNoCallbacks(
     auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sumNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
 
-    model::MapCompilerOptions settings;
-    settings.moduleName = moduleName;
-    settings.mapFunctionName = mapFunctionName;
-    settings.compilerSettings.optimize = true;
-
-    model::IRMapCompiler compiler(settings);
     return compiler.Compile(map);
 }
 
@@ -133,7 +131,8 @@ const char* ToTypeString<CallbackBase<float>>()
 template <typename ElementType>
 void TestCppHeader()
 {
-    auto compiledMap = GetCompiledMapWithCallbacks<ElementType>("TestModule", "TestModule_Predict");
+    auto mapCompiler = CreateMapCompiler("TestModule", "TestModule_Predict");
+    auto compiledMap = GetCompiledMapWithCallbacks<ElementType>(mapCompiler);
     auto& module = compiledMap.GetModule();
 
     std::stringstream ss;
@@ -167,7 +166,8 @@ void TestCppHeader()
 template <typename ElementType>
 void TestSwigCallbackInterfaces()
 {
-    auto compiledMap = GetCompiledMapWithCallbacks<ElementType>("TestModuleWithCallbacks", "step");
+    auto mapCompiler = CreateMapCompiler("TestModuleWithCallbacks", "step");
+    auto compiledMap = GetCompiledMapWithCallbacks<ElementType>(mapCompiler);
     auto& module = compiledMap.GetModule();
 
     std::stringstream ss;
@@ -190,7 +190,7 @@ void TestSwigCallbackInterfaces()
 
     if (testing::DidTestFail())
     {
-        std::cout << result << std::endl;
+       std::cout << result << std::endl;
     }
 }
 
@@ -203,7 +203,8 @@ void TestSwigCallbackInterfaces()
 template <typename ElementType>
 void TestSwigNoCallbackInterfaces()
 {
-    auto compiledMap = GetCompiledMapNoCallbacks<ElementType>("TestModule", "TestModule_predict");
+    auto mapCompiler = CreateMapCompiler("TestModule", "TestModule_predict");
+    auto compiledMap = GetCompiledMapNoCallbacks<ElementType>(mapCompiler);
     auto& module = compiledMap.GetModule();
 
     std::stringstream ss;
@@ -217,7 +218,7 @@ void TestSwigNoCallbackInterfaces()
 
     if (testing::DidTestFail())
     {
-        std::cout << result << std::endl;
+       std::cout << result << std::endl;
     }
 }
 
@@ -226,6 +227,8 @@ void TestSwigNoCallbackInterfaces()
     TestSwigNoCallbackInterfaces<double>();
     TestSwigNoCallbackInterfaces<float>();
 }
+
+} // namespace
 
 //
 // Invoke all the tests

@@ -138,16 +138,17 @@ std::string EmitStruct(const char* moduleName)
 // Just test that IREmitter doesn't crash
 void TestIREmitter()
 {
-    llvm::LLVMContext context;
-    IREmitter emitter(context);
+    {
+        IRModuleEmitter module("Module1", CompilerOptions{});
+        auto& emitter = module.GetIREmitter();
+        emitter.DeclareFunction(module.GetLLVMModule(), "foobar");
+    }
 
-    // Create a module
-    auto module1 = emitter.CreateModule("Module1");
-    emitter.DeclareFunction(module1.get(), "foobar");
-
-    // Create another module
-    auto module2 = emitter.CreateModule("Module1");
-    emitter.DeclareFunction(module2.get(), "foobar");
+    {
+        IRModuleEmitter module("Module2", CompilerOptions{});
+        auto& emitter = module.GetIREmitter();
+        emitter.DeclareFunction(module.GetLLVMModule(), "foobar");
+    }
 }
 
 // Just another test that IREmitter doesn't crash

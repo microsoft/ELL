@@ -49,12 +49,14 @@ namespace emitters
     public:
         /// <summary> Construct a new module emitter to output a new named module. </summary>
         ///
-        /// <param name="emitter"> An IREmitter. </param>
         /// <param name="moduleName"> Name of the module. </param>
+        /// <param name="parameters"> Options for the compiler </param>
         IRModuleEmitter(const std::string& moduleName, const CompilerOptions& parameters);
 
-        IRModuleEmitter(IRModuleEmitter&& other) = default;
-        ~IRModuleEmitter() override = default;
+        IRModuleEmitter(const IRModuleEmitter&) = delete;
+        IRModuleEmitter(IRModuleEmitter&&) = default;
+        IRModuleEmitter& operator=(const IRModuleEmitter&) = delete;
+        IRModuleEmitter& operator=(IRModuleEmitter&&) = default;
 
         //
         // Properties of the module
@@ -63,7 +65,7 @@ namespace emitters
         /// <summary> Returns the module's name. </summary>
         ///
         /// <returns> The module's name. </returns>
-        std::string GetModuleName() const { return _pModule->getName(); }
+        std::string GetModuleName() const { return _llvmModule->getName(); }
 
         //
         // Getting state
@@ -97,7 +99,7 @@ namespace emitters
         /// <summary> Can this module emitter still be used to add functions to the module? </summary>
         ///
         /// <returns> true if active, false if not. </returns>
-        bool IsValid() const { return (_pModule != nullptr); }
+        bool IsValid() const { return (_llvmModule != nullptr); }
 
         //
         // Creating functions
@@ -576,7 +578,7 @@ namespace emitters
         /// <summary> Gets a pointer to the underlying llvm::Module. </summary>
         ///
         /// <returns> Pointer to the underlying llvm::Module. </returns>
-        llvm::Module* GetLLVMModule() const { return _pModule.get(); }
+        llvm::Module* GetLLVMModule() const { return _llvmModule.get(); }
 
         /// <summary> Gets the LLVM data layout object for the current module. </summary>
         const llvm::DataLayout& GetTargetDataLayout() const;
@@ -584,7 +586,7 @@ namespace emitters
         /// <summary> Can this module emitter still be used to add functions to the module? </summary>
         ///
         /// <returns> true if active, false if not. </returns>
-        bool IsActive() const { return (_pModule != nullptr); }
+        bool IsActive() const { return (_llvmModule != nullptr); }
 
         /// <summary> Gets a reference to the underlying llvm context. </summary>
         ///
@@ -737,6 +739,7 @@ namespace emitters
         // Data members
         //
         std::unique_ptr<llvm::LLVMContext> _llvmContext; // LLVM global context
+        std::unique_ptr<llvm::Module> _llvmModule; // The LLVM Module being emitted
         std::unique_ptr<IRDiagnosticHandler> _diagnosticHandler = nullptr;
         IREmitter _emitter;
         std::stack<std::pair<IRFunctionEmitter, llvm::IRBuilder<>::InsertPoint>> _functionStack; // contains the location we were emitting code into when we paused to emit a new function
@@ -746,7 +749,6 @@ namespace emitters
         IRRuntime _runtime; // Manages emission of runtime functions
         IRThreadPool _threadPool; // A pool of worker threads -- gets initialized the first time it's used (?)
         IRProfiler _profiler;
-        std::unique_ptr<llvm::Module> _pModule; // The LLVM Module being emitted
 
         // Info to modify how code is written out
         std::vector<std::pair<std::string, std::string>> _preprocessorDefinitions;

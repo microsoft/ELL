@@ -434,7 +434,11 @@ public:
 
 #ifndef SWIG
     CompiledMap() = default;
-    CompiledMap(ell::model::IRCompiledMap map, ell::api::math::TensorShape inputShape, ell::api::math::TensorShape outputShape);
+    CompiledMap(
+        std::shared_ptr<ell::model::IRMapCompiler> compiler,
+        std::shared_ptr<ell::model::IRCompiledMap> map,
+        ell::api::math::TensorShape inputShape,
+        ell::api::math::TensorShape outputShape);
 
     template <typename ElementType>
     bool InvokeSourceCallback(ElementType* input);
@@ -455,6 +459,7 @@ private:
     template <typename ElementType>
     ell::api::CallbackForwarder<ElementType, ElementType>& GetCallbackForwarder();
 
+    std::shared_ptr<ell::model::IRMapCompiler> _compiler;
     std::shared_ptr<ell::model::IRCompiledMap> _map;
     ell::api::math::TensorShape _inputShape;
     ell::api::math::TensorShape _outputShape;

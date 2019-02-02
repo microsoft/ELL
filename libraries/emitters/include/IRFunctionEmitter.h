@@ -150,19 +150,19 @@ namespace emitters
         /// <summary> Convenience function for returning a single-bit LLVM boolean true value. </summary>
         ///
         /// <returns> An llvm i1 type representing `true`. </returns>
-        LLVMValue TrueBit() { return _pEmitter->TrueBit(); }
+        LLVMValue TrueBit() { return GetEmitter().TrueBit(); }
 
         /// <summary> Convenience function for returning a single-bit LLVM boolean false value. </summary>
         ///
         /// <returns> An llvm i1 type representing `false`. </returns>
-        LLVMValue FalseBit() { return _pEmitter->FalseBit(); }
+        LLVMValue FalseBit() { return GetEmitter().FalseBit(); }
 
         /// <summary> Convenience function for returning a null pointer constant. </summary>
         ///
         /// <param name="pointerType"> The llvm type of the pointer to return. </param>
         ///
         /// <returns> Pointer to an llvm::ConstantPointerNull that represents a null pointer of the given pointer type. </returns>
-        llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType) { return _pEmitter->NullPointer(pointerType); } // STYLE discrepancy
+        llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType) { return GetEmitter().NullPointer(pointerType); } // STYLE discrepancy
 
         /// <summary> Emit an instruction to load a function argument. </summary>
         ///
@@ -546,12 +546,12 @@ namespace emitters
         /// <summary> Gets the current code block that code is being emitted into. </summary>
         ///
         /// <returns> The current block. </returns>
-        llvm::BasicBlock* GetCurrentBlock() { return _pEmitter->GetCurrentBlock(); }
+        llvm::BasicBlock* GetCurrentBlock() { return GetEmitter().GetCurrentBlock(); }
 
         /// <summary> Gets the current insert point that code is being emitted into. </summary>
         ///
         /// <returns> The current insert point for new instructions. </returns>
-        llvm::IRBuilder<>::InsertPoint GetCurrentInsertPoint() { return _pEmitter->GetCurrentInsertPoint(); }
+        llvm::IRBuilder<>::InsertPoint GetCurrentInsertPoint() { return GetEmitter().GetCurrentInsertPoint(); }
 
         /// <summary> Set the block that subsequent code will go into. </summary>
         ///
@@ -1666,9 +1666,9 @@ namespace emitters
     private:
         friend class IRModuleEmitter;
 
-        IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, LLVMFunction pFunction, const std::string& name);
-        IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, LLVMFunction pFunction, const NamedVariableTypeList& arguments, const std::string& name);
-        IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, LLVMFunction pFunction, const NamedLLVMTypeList& arguments, const std::string& name);
+        IRFunctionEmitter(IRModuleEmitter* pModule, LLVMFunction pFunction, const std::string& name);
+        IRFunctionEmitter(IRModuleEmitter* pModule, LLVMFunction pFunction, const NamedVariableTypeList& arguments, const std::string& name);
+        IRFunctionEmitter(IRModuleEmitter* pModule, LLVMFunction pFunction, const NamedLLVMTypeList& arguments, const std::string& name);
 
         class EntryBlockScope
         {
@@ -1710,7 +1710,6 @@ namespace emitters
         IRValueTable _locals; // Symbol table: name -> LLVMValue (stack variables or function arguments)
 
         IRModuleEmitter* _pModuleEmitter = nullptr;
-        IREmitter* _pEmitter = nullptr;
         IRBlockRegionList _regions;
         IRBlockRegion* _pCurRegion = nullptr;
         LLVMFunction _pFunction = nullptr;
@@ -1787,25 +1786,25 @@ namespace emitters
     template <typename ValueType>
     LLVMValue IRFunctionEmitter::Literal(ValueType value)
     {
-        return _pEmitter->Literal(value);
+        return GetEmitter().Literal(value);
     }
 
     template <typename ValueType>
     LLVMValue IRFunctionEmitter::Pointer(ValueType* value)
     {
-        return _pEmitter->Pointer(value);
+        return GetEmitter().Pointer(value);
     }
 
     template <typename OutputType>
     LLVMValue IRFunctionEmitter::CastValue(LLVMValue pValue)
     {
-        return _pEmitter->CastValue<OutputType>(pValue);
+        return GetEmitter().CastValue<OutputType>(pValue);
     }
 
     template <typename OutputType>
     LLVMValue IRFunctionEmitter::CastUnsignedValue(LLVMValue pValue)
     {
-        return _pEmitter->CastValue<OutputType>(pValue);
+        return GetEmitter().CastValue<OutputType>(pValue);
     }
 
     template <typename ValueType>
@@ -1847,7 +1846,7 @@ namespace emitters
         auto pSource = PointerOffset(pPointer, Literal(sourceOffset));
         auto pDestination = PointerOffset(pPointer, Literal(destinationOffset));
         int byteCount = count * sizeof(ValueType);
-        _pEmitter->MemoryMove(pSource, pDestination, Literal(byteCount));
+        GetEmitter().MemoryMove(pSource, pDestination, Literal(byteCount));
     }
 
     template <typename ValueType>
@@ -1856,7 +1855,7 @@ namespace emitters
         auto pSource = PointerOffset(pSourcePointer, 0);
         auto pDestination = PointerOffset(pDestinationPointer, 0);
         auto byteCount = count * sizeof(ValueType);
-        _pEmitter->MemoryCopy(pSource, pDestination, Literal<int>(byteCount));
+        GetEmitter().MemoryCopy(pSource, pDestination, Literal<int>(byteCount));
     }
 
     template <typename ValueType>
@@ -1865,7 +1864,7 @@ namespace emitters
         auto pSource = PointerOffset(pSourcePointer, 0);
         auto pDestination = PointerOffset(pDestinationPointer, 0);
         auto byteCount = Operator(emitters::TypedOperator::multiply, count, Literal<int>(sizeof(ValueType)));
-        _pEmitter->MemoryCopy(pSource, pDestination, byteCount);
+        GetEmitter().MemoryCopy(pSource, pDestination, byteCount);
     }
 
     template <typename ValueType>
@@ -1874,7 +1873,7 @@ namespace emitters
         auto pSource = PointerOffset(pSourcePointer, Literal(sourceOffset));
         auto pDestination = PointerOffset(pDestinationPointer, Literal(destinationOffset));
         int byteCount = count * sizeof(ValueType);
-        _pEmitter->MemoryCopy(pSource, pDestination, Literal(byteCount));
+        GetEmitter().MemoryCopy(pSource, pDestination, Literal(byteCount));
     }
 
     template <typename ValueType>
@@ -1883,7 +1882,7 @@ namespace emitters
         auto pSource = PointerOffset(pSourcePointer, sourceOffset);
         auto pDestination = PointerOffset(pDestinationPointer, destinationOffset);
         auto byteCount = Operator(emitters::TypedOperator::multiply, count, Literal<int>(sizeof(ValueType)));
-        _pEmitter->MemoryCopy(pSource, pDestination, byteCount);
+        GetEmitter().MemoryCopy(pSource, pDestination, byteCount);
     }
 
     template <typename ValueType>
@@ -1891,7 +1890,7 @@ namespace emitters
     {
         auto pDestination = PointerOffset(pDestinationPointer, Literal(destinationOffset));
         int byteCount = count * sizeof(ValueType);
-        _pEmitter->MemorySet(pDestination, value, Literal(byteCount));
+        GetEmitter().MemorySet(pDestination, value, Literal(byteCount));
     }
 
     template <typename ValueType>
@@ -1899,7 +1898,7 @@ namespace emitters
     {
         auto pDestination = PointerOffset(pDestinationPointer, pDestinationOffset);
         int byteCount = count * sizeof(ValueType);
-        _pEmitter->MemorySet(pDestination, value, Literal(byteCount));
+        GetEmitter().MemorySet(pDestination, value, Literal(byteCount));
     }
 
     template <typename ValueType>
@@ -1907,7 +1906,7 @@ namespace emitters
     {
         auto pDestination = PointerOffset(pDestinationPointer, pDestinationOffset);
         auto byteCount = Operator(emitters::TypedOperator::multiply, count, Literal<int>(sizeof(ValueType)));
-        _pEmitter->MemorySet(pDestination, value, byteCount);
+        GetEmitter().MemorySet(pDestination, value, byteCount);
     }
 
     template <typename ValueType>

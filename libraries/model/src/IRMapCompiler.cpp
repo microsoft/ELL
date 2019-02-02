@@ -136,32 +136,30 @@ namespace model
         // Finish any profiling stuff we need to do and emit functions
         _profiler.EmitModelProfilerFunctions();
 
-        auto module = std::make_unique<emitters::IRModuleEmitter>(std::move(_moduleEmitter));
-
         if (GetMapCompilerOptions().compilerSettings.optimize)
         {
             // Save callback declarations in case they get optimized away
             std::vector<std::tuple<std::string, llvm::FunctionType*, std::vector<std::string>>> savedCallbacks;
-            auto callbacks = emitters::GetFunctionsWithTag(*module, emitters::c_callbackFunctionTagName);
+            auto callbacks = emitters::GetFunctionsWithTag(_moduleEmitter, emitters::c_callbackFunctionTagName);
             for (auto& callbackInfo : callbacks)
             {
                 savedCallbacks.emplace_back(callbackInfo.function->getName(), callbackInfo.function->getFunctionType(), callbackInfo.values);
             }
 
-            emitters::IROptimizer optimizer(*module);
+            emitters::IROptimizer optimizer(_moduleEmitter);
             optimizer.AddStandardPasses();
-            module->Optimize(optimizer);
+            _moduleEmitter.Optimize(optimizer);
 
             // Reinsert callback declarations after optimization
             for (const auto& savedCallback : savedCallbacks)
             {
                 auto functionName = std::get<0>(savedCallback);
-                module->DeclareFunction(functionName, std::get<1>(savedCallback));
-                module->IncludeInCallbackInterface(functionName, std::get<2>(savedCallback)[0]);
+                _moduleEmitter.DeclareFunction(functionName, std::get<1>(savedCallback));
+                _moduleEmitter.IncludeInCallbackInterface(functionName, std::get<2>(savedCallback)[0]);
             }
         }
 
-        return IRCompiledMap(std::move(map), GetMapCompilerOptions().mapFunctionName, GetMapCompilerOptions(), std::move(module), GetMapCompilerOptions().verifyJittedModule);
+        return IRCompiledMap(std::move(map), GetMapCompilerOptions().mapFunctionName, GetMapCompilerOptions(), _moduleEmitter, GetMapCompilerOptions().verifyJittedModule);
     }
 
     void IRMapCompiler::EmitModelAPIFunctions(const Map& map)

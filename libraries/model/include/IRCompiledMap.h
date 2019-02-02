@@ -40,12 +40,10 @@ namespace model
         using Boolean = utilities::Boolean;
 
     public:
-        /// <summary> Move Constructor. </summary>
-        ///
-        /// <param name="other"> The compiled map being moved. </param>
+        IRCompiledMap(const IRCompiledMap&) = delete;
         IRCompiledMap(IRCompiledMap&& other);
-
-        ~IRCompiledMap() override = default;
+        IRCompiledMap& operator=(const IRCompiledMap&) = delete;
+        //IRCompiledMap& operator=(IRCompiledMap&& other);
 
         /// <summary> Output the compiled model to the given file </summary>
         ///
@@ -99,7 +97,7 @@ namespace model
         /// <summary> Gets a reference to the underlying IRModuleEmitter. </summary>
         ///
         /// <returns> Reference to an IRModuleEmitter. </returns>
-        emitters::IRModuleEmitter& GetModule() { return *_module; }
+        emitters::IRModuleEmitter& GetModule() { return _module; }
 
         /// <summary> Gets a reference to the underlying jitter. </summary>
         ///
@@ -210,7 +208,7 @@ namespace model
     private:
         friend class IRMapCompiler;
 
-        IRCompiledMap(Map map, const std::string& functionName, const MapCompilerOptions& options, std::unique_ptr<emitters::IRModuleEmitter> module, bool verifyJittedModule);
+        IRCompiledMap(Map map, const std::string& functionName, const MapCompilerOptions& options, emitters::IRModuleEmitter& module, bool verifyJittedModule);
 
         void EnsureExecutionEngine() const;
         void SetComputeFunction() const;
@@ -220,8 +218,8 @@ namespace model
         template <typename InputType>
         using ComputeFunction = std::function<void(void*, const InputType*)>;
 
-        std::string _moduleName = "ELL";
-        std::unique_ptr<emitters::IRModuleEmitter> _module;
+        emitters::IRModuleEmitter& _module;
+        std::string _moduleName;
 
         mutable std::unique_ptr<emitters::IRExecutionEngine> _executionEngine;
         bool _verifyJittedModule = false;

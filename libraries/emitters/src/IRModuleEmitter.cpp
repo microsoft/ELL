@@ -74,16 +74,15 @@ namespace emitters
     //
 
     IRModuleEmitter::IRModuleEmitter(const std::string& moduleName, const CompilerOptions& parameters) :
-        _llvmContext(new llvm::LLVMContext()),
-        _emitter(*_llvmContext),
+        _llvmContext(std::make_unique<llvm::LLVMContext>()),
+        _llvmModule(std::make_unique<llvm::Module>(moduleName, *_llvmContext)),
+        _emitter(*this, *_llvmContext),
         _runtime(*this),
         _threadPool(*this),
         _profiler(*this, parameters.profile)
     {
         InitializeLLVM();
         InitializeGlobalPassRegistry();
-
-        _pModule = _emitter.CreateModule(moduleName);
 
         SetCompilerOptions(parameters);
         if (GetCompilerOptions().includeDiagnosticInfo)
@@ -96,9 +95,10 @@ namespace emitters
 
     void IRModuleEmitter::SetCompilerOptions(const CompilerOptions& parameters)
     {
-        // Call base class implementation
         auto params = parameters;
         CompleteCompilerOptions(params);
+
+        // Call base class implementation
         ModuleEmitter::SetCompilerOptions(params);
 
         // Set IR-specific parameters
@@ -411,7 +411,7 @@ namespace emitters
         }
 
         std::vector<std::vector<std::string>> values;
-        const llvm::NamedMDNode* metadata = _pModule->getNamedMetadata(tag);
+        const llvm::NamedMDNode* metadata = _llvmModule->getNamedMetadata(tag);
         for (const auto& op : metadata->operands()) // op is an MDNode*
         {
             std::vector<std::string> opValues;
@@ -446,7 +446,7 @@ namespace emitters
     // Module metadata
     bool IRModuleEmitter::HasMetadata(const std::string& tag)
     {
-        return (_pModule->getNamedMetadata(tag) != nullptr);
+        return (_llvmModule->getNamedMetadata(tag) != nullptr);
     }
 
     // Function metadata
@@ -470,7 +470,7 @@ namespace emitters
         }
 
         auto metadataNode = llvm::MDNode::get(_emitter.GetContext(), metadataElements);
-        auto metadata = _pModule->getOrInsertNamedMetadata(tag);
+        auto metadata = _llvmModule->getOrInsertNamedMetadata(tag);
         metadata->addOperand(metadataNode);
     }
 
@@ -577,8 +577,8 @@ namespace emitters
     // This function has the actual implementation for all the above Global/GlobalArray() methods
     llvm::GlobalVariable* IRModuleEmitter::AddGlobal(const std::string& name, LLVMType pType, llvm::Constant* pInitial, bool isConst)
     {
-        _pModule->getOrInsertGlobal(name, pType);
-        auto global = _pModule->getNamedGlobal(name);
+        _llvmModule->getOrInsertGlobal(name, pType);
+        auto global = _llvmModule->getNamedGlobal(name);
         global->setInitializer(pInitial);
         global->setConstant(isConst);
         global->setExternallyInitialized(false);
@@ -636,7 +636,7 @@ namespace emitters
         }
         // TODO: put the above IREmitter call in the IRFunctionEmitter constructor
 
-        return IRFunctionEmitter(this, &_emitter, pFunction, arguments, name);
+        return IRFunctionEmitter(this, pFunction, arguments, name);
     }
 
     IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, LLVMType returnType, const NamedVariableTypeList& arguments, bool isPublic)
@@ -648,7 +648,7 @@ namespace emitters
         }
         // TODO: put the above IREmitter call in the IRFunctionEmitter constructor
 
-        return IRFunctionEmitter(this, &_emitter, pFunction, arguments, name);
+        return IRFunctionEmitter(this, pFunction, arguments, name);
     }
 
     IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, const VariableTypeList* pArguments, bool isPublic)
@@ -658,7 +658,7 @@ namespace emitters
         {
             throw EmitterException(EmitterError::functionNotFound);
         }
-        return IRFunctionEmitter(this, &_emitter, pFunction, name);
+        return IRFunctionEmitter(this, pFunction, name);
     }
 
     IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, LLVMType returnType, const std::vector<LLVMType>& argTypes, bool isPublic)
@@ -668,7 +668,7 @@ namespace emitters
         {
             throw EmitterException(EmitterError::functionNotFound);
         }
-        return IRFunctionEmitter(this, &_emitter, pFunction, name);
+        return IRFunctionEmitter(this, pFunction, name);
     }
 
     IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, LLVMType returnType, const NamedLLVMTypeList& arguments, bool isPublic)
@@ -678,7 +678,7 @@ namespace emitters
         {
             throw EmitterException(EmitterError::functionNotFound);
         }
-        return IRFunctionEmitter(this, &_emitter, pFunction, name);
+        return IRFunctionEmitter(this, pFunction, name);
     }
 
     bool IRModuleEmitter::HasFunction(const std::string& name)
@@ -972,13 +972,13 @@ namespace emitters
 
     bool IRModuleEmitter::CheckForErrors()
     {
-        return llvm::verifyModule(*_pModule);
+        return llvm::verifyModule(*_llvmModule);
     }
 
     bool IRModuleEmitter::CheckForErrors(std::ostream& stream)
     {
         llvm::raw_os_ostream out(stream);
-        return llvm::verifyModule(*_pModule, &out);
+        return llvm::verifyModule(*_llvmModule, &out);
     }
 
     void IRModuleEmitter::DebugDump() const
@@ -1023,8 +1023,8 @@ namespace emitters
 
     std::unique_ptr<llvm::Module> IRModuleEmitter::TransferOwnership()
     {
-        auto result = std::move(_pModule);
-        _pModule = nullptr;
+        auto result = std::move(_llvmModule);
+        _llvmModule = nullptr;
         return result;
     }
 

@@ -132,27 +132,25 @@ namespace emitters
     // IRFunctionEmitter methods
     //
 
-    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, LLVMFunction pFunction, const std::string& name) :
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, LLVMFunction pFunction, const std::string& name) :
         _pModuleEmitter(pModuleEmitter),
-        _pEmitter(pEmitter),
         _pFunction(pFunction),
         _name(name)
     {
         assert(_pModuleEmitter != nullptr);
-        assert(_pEmitter != nullptr);
         assert(_pFunction != nullptr);
         SetUpFunction();
     }
 
-    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, LLVMFunction pFunction, const NamedVariableTypeList& arguments, const std::string& name) :
-        IRFunctionEmitter(pModuleEmitter, pEmitter, pFunction, name)
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, LLVMFunction pFunction, const NamedVariableTypeList& arguments, const std::string& name) :
+        IRFunctionEmitter(pModuleEmitter, pFunction, name)
     {
         // Note: already called other constructor
         RegisterFunctionArgs(arguments);
     }
 
-    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, LLVMFunction pFunction, const NamedLLVMTypeList& arguments, const std::string& name) :
-        IRFunctionEmitter(pModuleEmitter, pEmitter, pFunction, name)
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, LLVMFunction pFunction, const NamedLLVMTypeList& arguments, const std::string& name) :
+        IRFunctionEmitter(pModuleEmitter, pFunction, name)
     {
         // Note: already called other constructor
         RegisterFunctionArgs(arguments);
@@ -169,7 +167,7 @@ namespace emitters
         // We may add additional annotations here
         auto pBlock = Block("entry");
         AddRegion(pBlock);
-        _pEmitter->SetCurrentBlock(pBlock); // if/when we get our own IREmitter, this statefulness won't be so objectionable
+        GetEmitter().SetCurrentBlock(pBlock); // if/when we get our own IREmitter, this statefulness won't be so objectionable
         _entryBlock = pBlock;
     }
 
@@ -238,7 +236,7 @@ namespace emitters
         {
             out << "\n******** Function dump ********\n\n";
 
-            emitters::DebugDump(_pFunction, &out);
+            emitters::DebugDump(_pFunction, "", &out);
 
             throw emitters::EmitterException(emitters::EmitterError::badFunctionDefinition, "Function verification failed for function" + _name + ":\n" + sstr.str());
         }
@@ -246,77 +244,77 @@ namespace emitters
 
     LLVMValue IRFunctionEmitter::LoadArgument(llvm::Argument& argument)
     {
-        return _pEmitter->Load(&argument);
+        return GetEmitter().Load(&argument);
     }
 
     LLVMValue IRFunctionEmitter::CastValue(LLVMValue pValue, VariableType valueType)
     {
-        return _pEmitter->CastValue(pValue, valueType);
+        return GetEmitter().CastValue(pValue, valueType);
     }
 
     LLVMValue IRFunctionEmitter::CastValue(LLVMValue pValue, LLVMType valueType)
     {
-        return _pEmitter->CastValue(pValue, valueType);
+        return GetEmitter().CastValue(pValue, valueType);
     }
 
     LLVMValue IRFunctionEmitter::CastUnsignedValue(LLVMValue pValue, VariableType valueType)
     {
-        return _pEmitter->CastUnsignedValue(pValue, valueType);
+        return GetEmitter().CastUnsignedValue(pValue, valueType);
     }
 
     LLVMValue IRFunctionEmitter::CastUnsignedValue(LLVMValue pValue, LLVMType valueType)
     {
-        return _pEmitter->CastUnsignedValue(pValue, valueType);
+        return GetEmitter().CastUnsignedValue(pValue, valueType);
     }
 
     LLVMValue IRFunctionEmitter::BitCast(LLVMValue pValue, VariableType valueType)
     {
-        return _pEmitter->BitCast(pValue, valueType);
+        return GetEmitter().BitCast(pValue, valueType);
     }
 
     LLVMValue IRFunctionEmitter::BitCast(LLVMValue pValue, LLVMType valueType)
     {
-        return _pEmitter->BitCast(pValue, valueType);
+        return GetEmitter().BitCast(pValue, valueType);
     }
 
     LLVMValue IRFunctionEmitter::CastPointer(LLVMValue pValue, VariableType valueType)
     {
-        return _pEmitter->CastPointer(pValue, valueType);
+        return GetEmitter().CastPointer(pValue, valueType);
     }
 
     LLVMValue IRFunctionEmitter::CastPointer(LLVMValue pValue, LLVMType valueType)
     {
-        return _pEmitter->CastPointer(pValue, valueType);
+        return GetEmitter().CastPointer(pValue, valueType);
     }
 
     LLVMValue IRFunctionEmitter::CastIntToPointer(LLVMValue pValue, VariableType valueType)
     {
-        return _pEmitter->CastIntToPointer(pValue, valueType);
+        return GetEmitter().CastIntToPointer(pValue, valueType);
     }
 
     LLVMValue IRFunctionEmitter::CastIntToPointer(LLVMValue pValue, LLVMType valueType)
     {
-        return _pEmitter->CastIntToPointer(pValue, valueType);
+        return GetEmitter().CastIntToPointer(pValue, valueType);
     }
 
     LLVMValue IRFunctionEmitter::CastPointerToInt(LLVMValue pValue, VariableType destinationType)
     {
-        return _pEmitter->CastPointerToInt(pValue, destinationType);
+        return GetEmitter().CastPointerToInt(pValue, destinationType);
     }
 
     LLVMValue IRFunctionEmitter::CastPointerToInt(LLVMValue pValue, LLVMType destinationType)
     {
-        return _pEmitter->CastPointerToInt(pValue, destinationType);
+        return GetEmitter().CastPointerToInt(pValue, destinationType);
     }
 
     LLVMValue IRFunctionEmitter::CastBoolToByte(LLVMValue pValue)
     {
-        return _pEmitter->CastBoolToByte(pValue);
+        return GetEmitter().CastBoolToByte(pValue);
     }
 
     LLVMValue IRFunctionEmitter::CastToConditionalBool(LLVMValue pValue)
     {
-        return _pEmitter->CastToConditionalBool(pValue);
+        return GetEmitter().CastToConditionalBool(pValue);
     }
 
     LLVMValue IRFunctionEmitter::Call(const std::string& name, LLVMValue pArgument)
@@ -324,14 +322,14 @@ namespace emitters
         LLVMFunction function = ResolveFunction(name);
         if (pArgument == nullptr)
         {
-            return _pEmitter->Call(function);
+            return GetEmitter().Call(function);
         }
-        return _pEmitter->Call(function, pArgument);
+        return GetEmitter().Call(function, pArgument);
     }
 
     LLVMValue IRFunctionEmitter::Call(const std::string& name, const IRValueList& arguments)
     {
-        return _pEmitter->Call(ResolveFunction(name), arguments);
+        return GetEmitter().Call(ResolveFunction(name), arguments);
     }
 
     LLVMValue IRFunctionEmitter::Call(const std::string& name, std::vector<IRLocalScalar> arguments)
@@ -341,52 +339,52 @@ namespace emitters
 
     LLVMValue IRFunctionEmitter::Call(const std::string& name, std::initializer_list<LLVMValue> arguments)
     {
-        return _pEmitter->Call(ResolveFunction(name), arguments);
+        return GetEmitter().Call(ResolveFunction(name), arguments);
     }
 
     LLVMValue IRFunctionEmitter::Call(IRFunctionEmitter& function, std::vector<LLVMValue> arguments)
     {
         assert(function.GetFunction() != nullptr);
-        return _pEmitter->Call(function.GetFunction(), arguments);
+        return GetEmitter().Call(function.GetFunction(), arguments);
     }
 
     LLVMValue IRFunctionEmitter::Call(LLVMFunction pFunction, std::initializer_list<LLVMValue> arguments)
     {
         assert(pFunction != nullptr);
-        return _pEmitter->Call(pFunction, arguments);
+        return GetEmitter().Call(pFunction, arguments);
     }
 
     LLVMValue IRFunctionEmitter::Call(LLVMFunction pFunction, std::vector<LLVMValue> arguments)
     {
         assert(pFunction != nullptr);
-        return _pEmitter->Call(pFunction, arguments);
+        return GetEmitter().Call(pFunction, arguments);
     }
 
     LLVMValue IRFunctionEmitter::Call(LLVMFunction pFunction, std::vector<IRLocalScalar> arguments)
     {
         assert(pFunction != nullptr);
         std::vector<LLVMValue> llvmArgs(arguments.begin(), arguments.end());
-        return _pEmitter->Call(pFunction, llvmArgs);
+        return GetEmitter().Call(pFunction, llvmArgs);
     }
 
     void IRFunctionEmitter::Return()
     {
-        _pEmitter->ReturnVoid();
+        GetEmitter().ReturnVoid();
     }
 
     LLVMValue IRFunctionEmitter::Return(LLVMValue value)
     {
-        return _pEmitter->Return(value);
+        return GetEmitter().Return(value);
     }
 
     LLVMValue IRFunctionEmitter::Operator(UnaryOperatorType type, LLVMValue value)
     {
-        return _pEmitter->UnaryOperator(type, value);
+        return GetEmitter().UnaryOperator(type, value);
     }
 
     LLVMValue IRFunctionEmitter::Operator(TypedOperator type, LLVMValue pLeftValue, LLVMValue pRightValue)
     {
-        return _pEmitter->BinaryOperation(type, pLeftValue, pRightValue);
+        return GetEmitter().BinaryOperation(type, pLeftValue, pRightValue);
     }
 
     LLVMValue IRFunctionEmitter::Operator(TypedOperator type, llvm::iterator_range<llvm::Function::arg_iterator>& arguments)
@@ -443,12 +441,12 @@ namespace emitters
     void IRFunctionEmitter::Branch(llvm::BasicBlock* pDestinationBlock)
     {
         assert(pDestinationBlock != nullptr);
-        _pEmitter->Branch(pDestinationBlock);
+        GetEmitter().Branch(pDestinationBlock);
     }
 
     void IRFunctionEmitter::Branch(LLVMValue pConditionValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
     {
-        _pEmitter->Branch(pConditionValue, pThenBlock, pElseBlock);
+        GetEmitter().Branch(pConditionValue, pThenBlock, pElseBlock);
     }
 
     void IRFunctionEmitter::Branch(TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
@@ -459,7 +457,7 @@ namespace emitters
 
     void IRFunctionEmitter::Branch(LLVMValue pValue, bool testValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
     {
-        return Branch(_pEmitter->Comparison(pValue, testValue), pThenBlock, pElseBlock);
+        return Branch(GetEmitter().Comparison(pValue, testValue), pThenBlock, pElseBlock);
     }
 
     LLVMValue IRFunctionEmitter::LogicalAnd(LLVMValue pTestValue1, LLVMValue pTestValue2)
@@ -479,7 +477,7 @@ namespace emitters
     LLVMValue IRFunctionEmitter::LogicalNot(LLVMValue pTestValue)
     {
         assert(pTestValue != nullptr);
-        return _pEmitter->IsFalse(pTestValue);
+        return GetEmitter().IsFalse(pTestValue);
     }
 
     void IRFunctionEmitter::DeleteTerminatingBranch()
@@ -493,31 +491,31 @@ namespace emitters
 
     LLVMValue IRFunctionEmitter::Comparison(TypedComparison type, LLVMValue pValue, LLVMValue pTestValue)
     {
-        return _pEmitter->Comparison(type, pValue, pTestValue);
+        return GetEmitter().Comparison(type, pValue, pTestValue);
     }
 
     LLVMValue IRFunctionEmitter::Select(LLVMValue pCmp, LLVMValue pTrueValue, LLVMValue pFalseValue)
     {
-        return _pEmitter->Select(pCmp, pTrueValue, pFalseValue);
+        return GetEmitter().Select(pCmp, pTrueValue, pFalseValue);
     }
 
     llvm::BasicBlock* IRFunctionEmitter::BlockBefore(llvm::BasicBlock* pBlock, llvm::BasicBlock* pNewBlock)
     {
         assert(pNewBlock != nullptr);
         pNewBlock->removeFromParent();
-        return _pEmitter->BlockBefore(_pFunction, pBlock, pNewBlock);
+        return GetEmitter().BlockBefore(_pFunction, pBlock, pNewBlock);
     }
 
     llvm::BasicBlock* IRFunctionEmitter::BlockAfter(llvm::BasicBlock* pBlock, const std::string& label)
     {
-        return _pEmitter->BlockAfter(_pFunction, pBlock, label);
+        return GetEmitter().BlockAfter(_pFunction, pBlock, label);
     }
 
     llvm::BasicBlock* IRFunctionEmitter::BlockAfter(llvm::BasicBlock* pBlock, llvm::BasicBlock* pNewBlock)
     {
         assert(pNewBlock != nullptr);
         pNewBlock->removeFromParent();
-        return _pEmitter->BlockAfter(_pFunction, pBlock, pNewBlock);
+        return GetEmitter().BlockAfter(_pFunction, pBlock, pNewBlock);
     }
 
     void IRFunctionEmitter::BlocksAfter(llvm::BasicBlock* pBlock, const std::vector<llvm::BasicBlock*>& blocks)
@@ -548,18 +546,18 @@ namespace emitters
     llvm::BasicBlock* IRFunctionEmitter::SetCurrentBlock(llvm::BasicBlock* pBlock)
     {
         llvm::BasicBlock* pCurrentBlock = GetCurrentBlock();
-        _pEmitter->SetCurrentBlock(pBlock);
+        GetEmitter().SetCurrentBlock(pBlock);
         return pCurrentBlock;
     }
 
     void IRFunctionEmitter::SetCurrentInsertPoint(llvm::IRBuilder<>::InsertPoint position)
     {
-        _pEmitter->SetCurrentInsertPoint(position);
+        GetEmitter().SetCurrentInsertPoint(position);
     }
 
     void IRFunctionEmitter::SetCurrentInsertPoint(llvm::Instruction* position)
     {
-        _pEmitter->SetCurrentInsertPoint(position);
+        GetEmitter().SetCurrentInsertPoint(position);
     }
 
     llvm::BasicBlock* IRFunctionEmitter::BeginBlock(const std::string& label, bool shouldConcatenate)
@@ -575,12 +573,12 @@ namespace emitters
 
     llvm::BasicBlock* IRFunctionEmitter::Block(const std::string& label)
     {
-        return _pEmitter->Block(_pFunction, label);
+        return GetEmitter().Block(_pFunction, label);
     }
 
     llvm::BasicBlock* IRFunctionEmitter::BlockBefore(llvm::BasicBlock* pBlock, const std::string& label)
     {
-        return _pEmitter->BlockBefore(_pFunction, pBlock, label);
+        return GetEmitter().BlockBefore(_pFunction, pBlock, label);
     }
 
     void IRFunctionEmitter::ConcatenateBlocks(std::vector<llvm::BasicBlock*> blocks)
@@ -602,7 +600,7 @@ namespace emitters
         assert(pTopBlock != nullptr && pBottomBlock != nullptr);
 
         pBottomBlock->removeFromParent();
-        _pEmitter->BlockAfter(_pFunction, pTopBlock, pBottomBlock);
+        GetEmitter().BlockAfter(_pFunction, pTopBlock, pBottomBlock);
         auto pPrevCurBlock = SetCurrentBlock(pTopBlock);
         {
             auto termInst = pTopBlock->getTerminator();
@@ -725,7 +723,7 @@ namespace emitters
     llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type)
     {
         EntryBlockScope scope(*this);
-        return _pEmitter->StackAllocate(type);
+        return GetEmitter().StackAllocate(type);
     }
 
     llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, const std::string& namePrefix)
@@ -734,7 +732,7 @@ namespace emitters
 
         // don't do this for emitted variables!
         auto name = _locals.GetUniqueName(namePrefix);
-        auto result = _pEmitter->StackAllocate(type, name);
+        auto result = GetEmitter().StackAllocate(type, name);
         _locals.Add(name, result);
         return result;
     }
@@ -743,7 +741,7 @@ namespace emitters
     {
         EntryBlockScope scope(*this);
         auto name = _locals.GetUniqueName(namePrefix);
-        auto result = _pEmitter->StackAllocate(type, name);
+        auto result = GetEmitter().StackAllocate(type, name);
         _locals.Add(name, result);
         return result;
     }
@@ -751,7 +749,7 @@ namespace emitters
     llvm::AllocaInst* IRFunctionEmitter::EmittedVariable(VariableType type, const std::string& name)
     {
         EntryBlockScope scope(*this);
-        auto result = _pEmitter->StackAllocate(type, name);
+        auto result = GetEmitter().StackAllocate(type, name);
         _locals.Add(name, result);
         return result;
     }
@@ -759,36 +757,36 @@ namespace emitters
     llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int size)
     {
         EntryBlockScope scope(*this);
-        return _pEmitter->StackAllocate(type, size);
+        return GetEmitter().StackAllocate(type, size);
     }
 
     llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int rows, int columns)
     {
         EntryBlockScope scope(*this);
-        return _pEmitter->StackAllocate(type, rows, columns);
+        return GetEmitter().StackAllocate(type, rows, columns);
     }
 
     llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, int size)
     {
         EntryBlockScope scope(*this);
-        return _pEmitter->StackAllocate(type, size);
+        return GetEmitter().StackAllocate(type, size);
     }
 
     llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, int rows, int columns)
     {
         EntryBlockScope scope(*this);
-        return _pEmitter->StackAllocate(type, rows, columns);
+        return GetEmitter().StackAllocate(type, rows, columns);
     }
 
     LLVMValue IRFunctionEmitter::Load(LLVMValue pPointer)
     {
-        auto result = _pEmitter->Load(pPointer);
+        auto result = GetEmitter().Load(pPointer);
         return result;
     }
 
     LLVMValue IRFunctionEmitter::Load(LLVMValue pPointer, const std::string& name)
     {
-        return _pEmitter->Load(pPointer, name);
+        return GetEmitter().Load(pPointer, name);
     }
 
     LLVMValue IRFunctionEmitter::Store(LLVMValue pPointer, LLVMValue pValue)
@@ -800,12 +798,12 @@ namespace emitters
         if (pointedType->isArrayTy())
         {
             auto valueType = pointedType->getArrayElementType();
-            auto dereferencedPointer = _pEmitter->DereferenceGlobalPointer(pPointer);
+            auto dereferencedPointer = GetEmitter().DereferenceGlobalPointer(pPointer);
             auto castPointer = CastPointer(dereferencedPointer, valueType->getPointerTo());
             return SetValueAt(castPointer, 0, pValue);
         }
 
-        return _pEmitter->Store(pPointer, pValue);
+        return GetEmitter().Store(pPointer, pValue);
     }
 
     LLVMValue IRFunctionEmitter::StoreZero(LLVMValue pPointer, int numElements /* = 1 */)
@@ -836,7 +834,7 @@ namespace emitters
             auto int8Type = llvm::Type::getInt8Ty(GetLLVMContext());
             auto bytePointer = CastPointer(pPointer, int8Type->getPointerTo());
             auto zero = llvm::ConstantInt::get(int8Type, 0);
-            returnValue = _pEmitter->MemorySet(bytePointer, zero, Literal(byteCount));
+            returnValue = GetEmitter().MemorySet(bytePointer, zero, Literal(byteCount));
         }
 
         return returnValue;
@@ -851,32 +849,32 @@ namespace emitters
 
     LLVMValue IRFunctionEmitter::PtrOffsetA(LLVMValue pointer, int offset)
     {
-        return _pEmitter->PointerOffset(pointer, Literal(offset));
+        return GetEmitter().PointerOffset(pointer, Literal(offset));
     }
 
     LLVMValue IRFunctionEmitter::PtrOffsetA(LLVMValue pointer, LLVMValue pOffset, const std::string& name)
     {
-        return _pEmitter->PointerOffset(pointer, pOffset, name);
+        return GetEmitter().PointerOffset(pointer, pOffset, name);
     }
 
     LLVMValue IRFunctionEmitter::ValueAtA(LLVMValue pointer, int offset)
     {
-        return _pEmitter->Load(PtrOffsetA(pointer, offset));
+        return GetEmitter().Load(PtrOffsetA(pointer, offset));
     }
 
     LLVMValue IRFunctionEmitter::ValueAtA(LLVMValue pointer, LLVMValue pOffset)
     {
-        return _pEmitter->Load(PtrOffsetA(pointer, pOffset));
+        return GetEmitter().Load(PtrOffsetA(pointer, pOffset));
     }
 
     LLVMValue IRFunctionEmitter::SetValueAtA(LLVMValue pPointer, int offset, LLVMValue pValue)
     {
-        return _pEmitter->Store(PtrOffsetA(pPointer, offset), pValue);
+        return GetEmitter().Store(PtrOffsetA(pPointer, offset), pValue);
     }
 
     LLVMValue IRFunctionEmitter::SetValueAtA(LLVMValue pPointer, LLVMValue pOffset, LLVMValue pValue)
     {
-        return _pEmitter->Store(PtrOffsetA(pPointer, pOffset), pValue);
+        return GetEmitter().Store(PtrOffsetA(pPointer, pOffset), pValue);
     }
 
     void IRFunctionEmitter::FillStruct(LLVMValue structPtr, const std::vector<LLVMValue>& fieldValues)
@@ -898,42 +896,42 @@ namespace emitters
     LLVMValue IRFunctionEmitter::PtrOffsetH(LLVMValue pointer, LLVMValue pOffset)
     {
         assert(pointer != nullptr);
-        return _pEmitter->PointerOffset(Load(pointer), pOffset);
+        return GetEmitter().PointerOffset(Load(pointer), pOffset);
     }
 
     LLVMValue IRFunctionEmitter::ValueAtH(LLVMValue pointer, int offset)
     {
-        return _pEmitter->Load(PtrOffsetH(pointer, offset));
+        return GetEmitter().Load(PtrOffsetH(pointer, offset));
     }
 
     LLVMValue IRFunctionEmitter::ValueAtH(LLVMValue pointer, LLVMValue pOffset)
     {
-        return _pEmitter->Load(PtrOffsetH(pointer, pOffset));
+        return GetEmitter().Load(PtrOffsetH(pointer, pOffset));
     }
 
     LLVMValue IRFunctionEmitter::SetValueAtH(LLVMValue pPointer, int offset, LLVMValue pValue)
     {
-        return _pEmitter->Store(PtrOffsetH(pPointer, offset), pValue);
+        return GetEmitter().Store(PtrOffsetH(pPointer, offset), pValue);
     }
 
     LLVMValue IRFunctionEmitter::PointerOffset(llvm::GlobalVariable* pGlobal, LLVMValue pOffset)
     {
-        return _pEmitter->PointerOffset(pGlobal, pOffset);
+        return GetEmitter().PointerOffset(pGlobal, pOffset);
     }
 
     LLVMValue IRFunctionEmitter::PointerOffset(llvm::GlobalVariable* pGlobal, int offset)
     {
-        return _pEmitter->PointerOffset(pGlobal, Literal(offset));
+        return GetEmitter().PointerOffset(pGlobal, Literal(offset));
     }
 
     LLVMValue IRFunctionEmitter::PointerOffset(llvm::GlobalVariable* pGlobal, LLVMValue pOffset, LLVMValue pFieldOffset)
     {
-        return _pEmitter->PointerOffset(pGlobal, pOffset, pFieldOffset);
+        return GetEmitter().PointerOffset(pGlobal, pOffset, pFieldOffset);
     }
 
     LLVMValue IRFunctionEmitter::ExtractStructField(LLVMValue structValue, size_t fieldIndex)
     {
-        return _pEmitter->ExtractStructField(structValue, fieldIndex);
+        return GetEmitter().ExtractStructField(structValue, fieldIndex);
     }
 
     LLVMValue IRFunctionEmitter::GetStructFieldValue(LLVMValue structPtr, size_t fieldIndex)
@@ -943,22 +941,22 @@ namespace emitters
 
     LLVMValue IRFunctionEmitter::GetStructFieldPointer(LLVMValue structPtr, size_t fieldIndex)
     {
-        return _pEmitter->GetStructFieldPointer(structPtr, fieldIndex);
+        return GetEmitter().GetStructFieldPointer(structPtr, fieldIndex);
     }
 
     LLVMValue IRFunctionEmitter::ValueAt(llvm::GlobalVariable* pGlobal, LLVMValue pOffset)
     {
-        return Load(_pEmitter->PointerOffset(pGlobal, pOffset));
+        return Load(GetEmitter().PointerOffset(pGlobal, pOffset));
     }
 
     LLVMValue IRFunctionEmitter::ValueAt(llvm::GlobalVariable* pGlobal, int offset)
     {
-        return Load(_pEmitter->PointerOffset(pGlobal, Literal(offset)));
+        return Load(GetEmitter().PointerOffset(pGlobal, Literal(offset)));
     }
 
     LLVMValue IRFunctionEmitter::ValueAt(llvm::GlobalVariable* pGlobal)
     {
-        return Load(_pEmitter->DereferenceGlobalPointer(pGlobal));
+        return Load(GetEmitter().DereferenceGlobalPointer(pGlobal));
     }
 
     LLVMValue IRFunctionEmitter::PointerOffset(LLVMValue pPointer, LLVMValue pOffset)
@@ -1011,7 +1009,7 @@ namespace emitters
         if (pointedType->isArrayTy())
         {
             auto valueType = pointedType->getArrayElementType();
-            auto dereferencedPointer = _pEmitter->DereferenceGlobalPointer(pPointer);
+            auto dereferencedPointer = GetEmitter().DereferenceGlobalPointer(pPointer);
             auto castPointer = CastPointer(dereferencedPointer, valueType->getPointerTo());
             return SetValueAtA(castPointer, pOffset, pValue);
         }
@@ -1338,7 +1336,7 @@ namespace emitters
     {
         EnsurePrintf();
         IRValueList callArgs;
-        callArgs.push_back(_pEmitter->Literal(format));
+        callArgs.push_back(GetEmitter().Literal(format));
         callArgs.insert(callArgs.end(), arguments);
         return Call(PrintfFnName, callArgs);
     }
@@ -1347,7 +1345,7 @@ namespace emitters
     {
         EnsurePrintf();
         IRValueList callArgs;
-        callArgs.push_back(_pEmitter->Literal(format));
+        callArgs.push_back(GetEmitter().Literal(format));
         callArgs.insert(callArgs.end(), arguments.begin(), arguments.end());
         return Call(PrintfFnName, callArgs);
     }
@@ -1704,7 +1702,7 @@ namespace emitters
 
     IREmitter& IRFunctionEmitter::GetEmitter()
     {
-        return *_pEmitter;
+        return _pModuleEmitter->GetIREmitter();
     }
 
     //

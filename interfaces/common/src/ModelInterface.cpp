@@ -509,7 +509,7 @@ double OutputPort::GetDoubleOutput(int index)
 
 bool IsAllZeros(const std::vector<int>& p)
 {
-    if (p.size() == 0) 
+    if (p.size() == 0)
     {
         return true;
     }
@@ -537,7 +537,7 @@ ell::model::PortMemoryLayout GetPortMemoryLayout(const std::vector<int>& size, c
 }
 
 PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<int>& p, const std::vector<int>& o, const std::vector<int>& order) :
-    PortMemoryLayout(GetPortMemoryLayout(s,p,o,order))
+    PortMemoryLayout(GetPortMemoryLayout(s, p, o, order))
 {
 }
 
@@ -824,26 +824,30 @@ CompiledMap Map::Compile(const std::string& targetDevice,
     settings.compilerSettings.useBlas = compilerSettings.useBlas;
     settings.optimizerSettings.fuseLinearFunctionNodes = optimizerSettings.fuseLinearFunctionNodes;
 
-    ell::model::IRMapCompiler compiler(settings);
+    auto compiler = std::make_shared<ell::model::IRMapCompiler>(settings);
 
-    auto module = compiler.GetModule().GetLLVMModule();
-    auto compiledMap = compiler.Compile(*_map);
+    auto module = compiler->GetModule().GetLLVMModule();
+    auto compiledMap = std::make_shared<ell::model::IRCompiledMap>(compiler->Compile(*_map));
     if (!sourceFunctionName.empty() || !sinkFunctionName.empty())
     {
-        resolveCallbacks(module, compiledMap.GetJitter());
+        resolveCallbacks(module, compiledMap->GetJitter());
     }
-    return CompiledMap(std::move(compiledMap), GetInputShape(), GetOutputShape());
+    return CompiledMap(std::move(compiler), std::move(compiledMap), GetInputShape(), GetOutputShape());
 }
 
 //
 // CompiledMap
 //
-CompiledMap::CompiledMap(ell::model::IRCompiledMap map, ell::api::math::TensorShape inputShape, ell::api::math::TensorShape outputShape) :
+CompiledMap::CompiledMap(
+    std::shared_ptr<ell::model::IRMapCompiler> compiler,
+    std::shared_ptr<ell::model::IRCompiledMap> map,
+    ell::api::math::TensorShape inputShape,
+    ell::api::math::TensorShape outputShape) :
+    _compiler(std::move(compiler)),
+    _map(std::move(map)),
     _inputShape(inputShape),
     _outputShape(outputShape)
-{
-    _map = std::make_shared<ell::model::IRCompiledMap>(std::move(map));
-}
+{}
 
 CompiledMap::~CompiledMap()
 {

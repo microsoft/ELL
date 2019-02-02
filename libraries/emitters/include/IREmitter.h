@@ -25,6 +25,9 @@ namespace ell
 {
 namespace emitters
 {
+    // forward declaration
+    class IRModuleEmitter;
+
     /// <summary> A list of LLVM IR Value* </summary>
     using IRValueList = std::vector<LLVMValue>;
 
@@ -46,15 +49,18 @@ namespace emitters
     class IREmitter
     {
     public:
-        /// <summary> Construct a new emitter </summary>
-        IREmitter(llvm::LLVMContext& context);
+        IREmitter(const IREmitter&) = delete;
+        IREmitter(IREmitter&&) = default;
+        IREmitter& operator=(const IREmitter&) = delete;
+        IREmitter& operator=(IREmitter&&) = default;
+        ~IREmitter() = default;
 
         /// <summary> Get the LLVM Type information for a VariableType. </summary>
         ///
         /// <param name="type"> The VariableType. </param>
         ///
         /// <returns> Pointer to an llvm::Type object that corresponds to the given VariableType. </returns>
-        LLVMType Type(VariableType type);
+        LLVMType Type(VariableType type) const;
 
         /// <summary> Get the LLVM Type information for a pointer to a VariableType. </summary>
         ///
@@ -1032,13 +1038,6 @@ namespace emitters
         /// <returns> Pointer to a llvm::StructType that represents the declared struct. </returns>
         llvm::StructType* GetStruct(const std::string& name);
 
-        /// <summary> Emits a new module with a given name. </summary>
-        ///
-        /// <param name="name"> The module name. </param>
-        ///
-        /// <returns> A unique pointer to the new module. </returns>
-        std::unique_ptr<llvm::Module> CreateModule(const std::string& name);
-
         /// <summary> Emits a memmove instruction. </summary>
         ///
         /// <param name="pSource"> Pointer to the value that holds the source address. </param>
@@ -1082,9 +1081,31 @@ namespace emitters
         /// <returns> A LLVMTypeList with the corresponding LLVM types. </returns>
         LLVMTypeList GetLLVMTypes(const VariableTypeList& types);
 
+        /// <summary> Returns the offset in bytes between successive objects of the specified type, including alignment padding. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type </typeparam>
+        /// <returns> The size of the type in bytes, including alignment padding. </returns>
+        template <typename ValueType>
+        uint64_t SizeOf() const;
+
+        /// <summary> Returns the offset in bytes between successive objects of the specified type, including alignment padding. </summary>
+        ///
+        /// <param name="type"> The type </param>
+        /// <returns> The size of the type in bytes, including alignment padding. </returns>
+        uint64_t SizeOf(LLVMType type) const;
+
+        /// <summary> Returns the offset in bytes between successive objects of the specified type, including alignment padding. </summary>
+        ///
+        /// <param name="type"> The type </param>
+        /// <returns> The size of the type in bytes, including alignment padding. </returns>
+        uint64_t SizeOf(VariableType type) const;
+
     private:
-        LLVMType GetBaseVariableType(VariableType type);
-        int SizeOf(VariableType type);
+        friend class IRModuleEmitter;
+
+        IREmitter(IRModuleEmitter& moduleEmitter, llvm::LLVMContext& context);
+
+        LLVMType GetBaseVariableType(VariableType type) const;
         llvm::Constant* Integer(VariableType type, const size_t value);
 
         std::vector<LLVMType> BindArgumentTypes(const NamedVariableTypeList& arguments);
@@ -1096,24 +1117,25 @@ namespace emitters
         LLVMFunction CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pFunctionType);
         LLVMValue Zero();
 
+        IRModuleEmitter& _moduleEmitter;
         llvm::LLVMContext& _llvmContext; // LLVM global context
-        llvm::IRBuilder<> _irBuilder; // IRBuilder API
+        mutable llvm::IRBuilder<> _irBuilder; // IRBuilder API
         IRValueTable _stringLiterals; // String literals are emitted as constants. We have to track them ourselves to prevent dupes.
         LLVMValue _pZeroLiteral = nullptr;
         std::unordered_map<std::string, llvm::StructType*> _structs;
     };
 
     // Helper function to dump the LLVM module to stderr for debugging
-    void DebugDump(llvm::Module* module, llvm::raw_ostream* stream = nullptr);
+    void DebugDump(llvm::Module* module, const std::string& tag = "", llvm::raw_ostream* stream = nullptr);
 
     // Helper function to dump the LLVM type to stderr for debugging
-    void DebugDump(llvm::Type* type, llvm::raw_ostream* stream = nullptr);
+    void DebugDump(llvm::Type* type, const std::string& tag = "", llvm::raw_ostream* stream = nullptr);
 
     // Helper function to dump the LLVM value to stderr for debugging
-    void DebugDump(llvm::Value* value, llvm::raw_ostream* stream = nullptr);
+    void DebugDump(llvm::Value* value, const std::string& tag = "", llvm::raw_ostream* stream = nullptr);
 
     // Helper function to dump the LLVM function to stderr for debugging
-    void DebugDump(llvm::Function* function, llvm::raw_ostream* stream = nullptr);
+    void DebugDump(llvm::Function* function, const std::string& tag = "", llvm::raw_ostream* stream = nullptr);
 } // namespace emitters
 } // namespace ell
 
@@ -1153,6 +1175,12 @@ namespace emitters
         {
             argument.setName(arguments[i++].first);
         }
+    }
+
+    template <typename ValueType>
+    uint64_t IREmitter::SizeOf() const
+    {
+        return SizeOf(GetVariableType<ValueType>());
     }
 } // namespace emitters
 } // namespace ell

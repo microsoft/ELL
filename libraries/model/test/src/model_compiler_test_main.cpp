@@ -251,14 +251,9 @@ int main(int argc, char* argv[])
     {
         TestIRCompiler();
     }
-    catch (const utilities::Exception& exception)
-    {
-        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
-        return 1;
-    }
     catch (const std::exception& exception)
     {
-        std::cerr << "ERROR, got unhandled exception. Message: " << exception.what() << std::endl;
+        std::cerr << "ERROR, got exception. Message: " << exception.what() << std::endl;
         return 1;
     }
 

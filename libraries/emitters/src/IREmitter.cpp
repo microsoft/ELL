@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IREmitter.h"
+#include "IRModuleEmitter.h"
 #include "EmitterException.h"
 #include "LLVMUtilities.h"
 
@@ -73,11 +74,13 @@ namespace emitters
     //
     // IREmitter implementation
     //
-    IREmitter::IREmitter(llvm::LLVMContext& context) :
+    IREmitter::IREmitter(IRModuleEmitter& moduleEmitter, llvm::LLVMContext& context) :
+        _moduleEmitter(moduleEmitter),
         _llvmContext(context),
-        _irBuilder(context) {}
+        _irBuilder(context)
+    {}
 
-    LLVMType IREmitter::Type(VariableType type)
+    LLVMType IREmitter::Type(VariableType type) const
     {
         switch (type)
         {
@@ -681,14 +684,6 @@ namespace emitters
     }
 
     //
-    // CreateModule
-    //
-    std::unique_ptr<llvm::Module> IREmitter::CreateModule(const std::string& name)
-    {
-        return std::make_unique<llvm::Module>(name, _llvmContext);
-    }
-
-    //
     // Functions
     //
     LLVMFunction IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name)
@@ -1103,7 +1098,17 @@ namespace emitters
 
     llvm::StructType* IREmitter::GetStruct(const std::string& name) { return _structs[name]; }
 
-    LLVMType IREmitter::GetBaseVariableType(VariableType type)
+    uint64_t IREmitter::SizeOf(LLVMType type) const
+    {
+        return _moduleEmitter.GetTargetDataLayout().getTypeAllocSize(type);
+    }
+
+    uint64_t IREmitter::SizeOf(VariableType type) const
+    {
+        return SizeOf(Type(type));
+    }
+
+    LLVMType IREmitter::GetBaseVariableType(VariableType type) const
     {
         switch (type)
         {
@@ -1130,33 +1135,9 @@ namespace emitters
         }
     }
 
-    int IREmitter::SizeOf(VariableType type)
-    {
-        switch (type)
-        {
-        // Are these correct for the int types??
-        case VariableType::Byte:
-            return 8;
-        case VariableType::Int16:
-            return 16;
-        case VariableType::Int32:
-            return 32;
-        case VariableType::Int64:
-            return 64;
-        case VariableType::Float:
-            return 4;
-        case VariableType::Double:
-            return 8;
-        case VariableType::Char8:
-            return 8;
-        default:
-            throw EmitterException(EmitterError::valueTypeNotSupported);
-        }
-    }
-
     llvm::Constant* IREmitter::Integer(VariableType type, const size_t value)
     {
-        return llvm::ConstantInt::get(_llvmContext, llvm::APInt(SizeOf(type), value, true));
+        return llvm::ConstantInt::get(_llvmContext, llvm::APInt(SizeOf(type) * 8, value, true));
     }
 
     LLVMTypeList IREmitter::GetLLVMTypes(const VariableTypeList& types)
@@ -1219,31 +1200,47 @@ namespace emitters
         return _pZeroLiteral;
     }
 
-    void DebugDump(llvm::Module* module, llvm::raw_ostream* stream)
+    void DebugDump(llvm::Module* module, const std::string& tag, llvm::raw_ostream* stream)
     {
         auto& targetStream = stream != nullptr ? *stream : llvm::errs();
         module->print(targetStream, nullptr, /*ShouldPreserveUseListOrder*/ false, /*IsForDebug*/ true);
+        if (!tag.empty())
+        {
+            targetStream << " [tag = " << tag << "]";
+        }
         targetStream << '\n';
     }
 
-    void DebugDump(llvm::Type* type, llvm::raw_ostream* stream)
+    void DebugDump(llvm::Type* type, const std::string& tag, llvm::raw_ostream* stream)
     {
         auto& targetStream = stream != nullptr ? *stream : llvm::errs();
         type->print(targetStream, /*IsForDebug*/ true);
+        if (!tag.empty())
+        {
+            targetStream << " [tag = " << tag << "]";
+        }
         targetStream << '\n';
     }
 
-    void DebugDump(llvm::Value* value, llvm::raw_ostream* stream)
+    void DebugDump(llvm::Value* value, const std::string& tag, llvm::raw_ostream* stream)
     {
         auto& targetStream = stream != nullptr ? *stream : llvm::errs();
         value->print(targetStream, /*IsForDebug*/ true);
+        if (!tag.empty())
+        {
+            targetStream << " [tag = " << tag << "]";
+        }
         targetStream << '\n';
     }
 
-    void DebugDump(llvm::Function* function, llvm::raw_ostream* stream)
+    void DebugDump(llvm::Function* function, const std::string& tag, llvm::raw_ostream* stream)
     {
         auto& targetStream = stream != nullptr ? *stream : llvm::errs();
         function->print(targetStream, nullptr, false, /*IsForDebug*/ true);
+        if (!tag.empty())
+        {
+            targetStream << " [tag = " << tag << "]";
+        }
         targetStream << '\n';
     }
 } // namespace emitters
