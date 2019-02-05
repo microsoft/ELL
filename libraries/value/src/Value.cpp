@@ -102,6 +102,7 @@ namespace value
                             throw InputException(InputExceptionErrors::sizeMismatch);
                         }
                         _data = other._data;
+                        _type = other._type;
                     }
                     else
                     {
@@ -169,6 +170,7 @@ namespace value
                             throw InputException(InputExceptionErrors::sizeMismatch);
                         }
                         _data = std::move(other._data);
+                        _type = other._type;
                     }
                     else
                     {

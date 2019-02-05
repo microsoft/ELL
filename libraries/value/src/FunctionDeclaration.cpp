@@ -17,38 +17,45 @@ namespace value
     using namespace ell::utilities;
 
     FunctionDeclaration::FunctionDeclaration(std::string name) :
-        _originalFunctionName(name) {}
+        _originalFunctionName(name),
+        _isEmpty(false) 
+    {}
 
     FunctionDeclaration& FunctionDeclaration::Returns(Value returnType)
     {
+        CheckNonEmpty();
+
         _returnType = returnType;
         return *this;
     }
 
-    FunctionDeclaration& FunctionDeclaration::ParametersImpl(std::vector<Value> paramTypes)
+    FunctionDeclaration& FunctionDeclaration::Parameters(std::vector<Value> paramTypes)
     {
+        CheckNonEmpty();
+
         _paramTypes = paramTypes;
         return *this;
     }
 
     FunctionDeclaration& FunctionDeclaration::Decorated(FunctionDecorated shouldDecorate)
     {
+        CheckNonEmpty();
+
         _isDecorated = shouldDecorate == FunctionDecorated::Yes;
         return *this;
     }
 
     std::optional<Value> FunctionDeclaration::Call(std::vector<Value> arguments) const
     {
-        return GetContext().Call(*this, arguments);
-    }
+        CheckNonEmpty();
 
-    FunctionDeclaration DeclareFunction(std::string name)
-    {
-        return FunctionDeclaration(name);
+        return GetContext().Call(*this, arguments);
     }
 
     const std::string& FunctionDeclaration::GetFunctionName() const
     {
+        CheckNonEmpty();
+
         if (_isDecorated)
         {
             if (!_decoratedFunctionName)
@@ -66,9 +73,41 @@ namespace value
         }
     }
 
-    const std::vector<Value>& FunctionDeclaration::GetParameterTypes() const { return _paramTypes; }
+    const std::vector<Value>& FunctionDeclaration::GetParameterTypes() const
+    {
+        CheckNonEmpty();
 
-    const std::optional<Value>& FunctionDeclaration::GetReturnType() const { return _returnType; }
+        return _paramTypes;
+    }
+
+    const std::optional<Value>& FunctionDeclaration::GetReturnType() const
+    {
+        CheckNonEmpty();
+
+        return _returnType;
+    }
+
+    bool FunctionDeclaration::IsDefined() const
+    {
+        CheckNonEmpty();
+
+        return GetContext().IsFunctionDefined(*this);
+    }
+
+    bool FunctionDeclaration::IsEmpty() const { return _isEmpty; }
+
+    void FunctionDeclaration::CheckNonEmpty() const
+    {
+        if (_isEmpty)
+        {
+            throw LogicException(LogicExceptionErrors::notInitialized, "FunctionDeclaration is empty");
+        }
+    }
+
+    FunctionDeclaration DeclareFunction(std::string name)
+    {
+        return FunctionDeclaration(name);
+    }
 
     /*extern*/ FunctionDeclaration AbsFunctionDeclaration = DeclareFunction("Abs");
     /*extern*/ FunctionDeclaration CosFunctionDeclaration = DeclareFunction("Cos");

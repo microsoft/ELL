@@ -28,6 +28,29 @@ namespace value
         }
     }
 
+    Scalar::~Scalar() = default;
+    Scalar::Scalar(const Scalar&) = default;
+    Scalar::Scalar(Scalar&&) noexcept = default;
+
+    Scalar& Scalar::operator=(const Scalar& other)
+    {
+        if (this != &other)
+        {
+            _value = other._value;
+        }
+        return *this;
+    }
+
+    Scalar& Scalar::operator=(Scalar&& other)
+    {
+        if (this != &other)
+        {
+            _value = std::move(other._value);
+            other._value = Value();
+        }
+        return *this;
+    }
+
     Value Scalar::GetValue() const { return _value; }
 
     Scalar Scalar::Copy() const

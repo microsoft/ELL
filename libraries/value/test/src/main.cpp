@@ -22,7 +22,7 @@ int main()
     {
         for (const auto& context : GetContexts())
         {
-            value::ContextGuard guard(*context);
+            value::ContextGuard<> guard(*context);
 
             // Value tests
             If_test1();
@@ -44,9 +44,9 @@ int main()
             Intrinsics_test2();
         }
     }
-    catch (const Exception& exception)
+    catch (const std::exception& exception)
     {
-        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
+        std::cerr << "ERROR, got exception. Message: " << exception.what() << std::endl;
         throw;
     }
 

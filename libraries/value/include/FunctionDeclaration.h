@@ -34,6 +34,9 @@ namespace value
     class [[nodiscard]] FunctionDeclaration
     {
     public:
+        /// <summary> Default constructor. Creates an empty function declaration </summary>
+        FunctionDeclaration() = default;
+
         /// <summary> Constructor </summary>
         /// <param name="name"> The name of the function </param>
         FunctionDeclaration(std::string name);
@@ -65,9 +68,13 @@ namespace value
         /// <returns> A reference to this instance </returns>
         /// <remarks> If this function is not called, the instance defaults to taking no arguments </remarks>
         template <typename... Types>
-        FunctionDeclaration& Parameters(Types&&... paramTypes) {
-            return ParametersImpl(std::vector<Value>{ std::forward<Types>(paramTypes)... });
+        FunctionDeclaration& Parameters(Types&& ... paramTypes)
+        {
+            static_assert(utilities::AllSame<Value, std::decay_t<Types>...>);
+            return Parameters(std::vector<Value>{ std::forward<Types>(paramTypes)... });
         }
+
+        [[nodiscard]] FunctionDeclaration& Parameters(std::vector<Value> parameters);
 
         /// <summary> Emits a call to the function declaration </summary>
         /// <param name="arguments"> A vector of Value instances that hold the arguments for the function call </param>
@@ -85,17 +92,24 @@ namespace value
         /// Otherwise, the std::optional instance is empty </summary>
         const std::optional<Value>& GetReturnType() const;
 
-    private:
-        [[nodiscard]] FunctionDeclaration& ParametersImpl(std::vector<Value> paramTypes);
+        /// <summary> Returns true if function is defined for current context, false otherwise </summary>
+        [[nodiscard]] bool IsDefined() const;
 
+        /// <summary> Returns true if the instance is an empty function declaration </summary>
+        [[nodiscard]] bool IsEmpty() const;
+
+    private:
         template <typename ReturnT, typename... Args>
         [[maybe_unused]] std::function<ReturnT(Args...)> DefineImpl(std::function<ReturnT(Args...)> fn);
+
+        void CheckNonEmpty() const;
 
         std::string _originalFunctionName;
         mutable std::optional<std::string> _decoratedFunctionName;
         std::optional<Value> _returnType;
         std::vector<Value> _paramTypes;
         bool _isDecorated = true;
+        bool _isEmpty = true;
     };
 
     inline bool operator==(const FunctionDeclaration& decl1, const FunctionDeclaration& decl2)
@@ -189,8 +203,7 @@ namespace value
 #undef FUNCTION_TYPE
 
     template <typename ReturnT, typename... Args>
-    [[maybe_unused]] std::function<ReturnT(Args...)> FunctionDeclaration::DefineImpl(std::function<ReturnT(Args...)> fn)
-    {
+    [[maybe_unused]] std::function<ReturnT(Args...)> FunctionDeclaration::DefineImpl(std::function<ReturnT(Args...)> fn) {
         if constexpr (std::is_same_v<ReturnT, void>)
         {
             if (_returnType.has_value())

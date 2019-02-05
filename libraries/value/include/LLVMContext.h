@@ -51,6 +51,7 @@ namespace value
         detail::ValueTypeDescription GetTypeImpl(Emittable emittable) override;
 
         DefinedFunction CreateFunctionImpl(FunctionDeclaration decl, DefinedFunction fn) override;
+        bool IsFunctionDefinedImpl(FunctionDeclaration decl) const override;
 
         Value StoreConstantDataImpl(ConstantData data) override;
 
@@ -73,6 +74,8 @@ namespace value
 
         std::optional<Value> CallImpl(FunctionDeclaration func, std::vector<Value> args) override;
 
+        void DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const override;
+
         Value IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args);
 
         std::optional<Value> EmitExternalCall(FunctionDeclaration func, std::vector<Value> args);
@@ -92,8 +95,8 @@ namespace value
         };
 
         Value PromoteConstantData(Value value);
-        std::optional<PromotedConstantDataDescription> HasBeenPromoted(Value value);
-        Value Realize(Value value);
+        std::optional<PromotedConstantDataDescription> HasBeenPromoted(Value value) const;
+        Value Realize(Value value) const;
         Value EnsureEmittable(Value value);
 
         class IfContextImpl;

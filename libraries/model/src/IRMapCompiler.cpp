@@ -24,6 +24,9 @@
 #include <utilities/include/Logger.h>
 #include <utilities/include/StringUtil.h>
 
+#include <value/include/EmitterContext.h>
+#include <value/include/LLVMContext.h>
+
 #include <tuple>
 
 namespace ell
@@ -126,9 +129,13 @@ namespace model
         _profiler = { GetModule(), map.GetModel(), GetMapCompilerOptions().profile };
         _profiler.EmitInitialization();
 
-        // Now we have the refined map, compile it
-        Log() << "Compiling map..." << EOL;
-        CompileMap(map, GetPredictFunctionName());
+        {
+            value::ContextGuard<value::LLVMContext> guard(_moduleEmitter);
+
+            // Now we have the refined map, compile it
+            Log() << "Compiling map..." << EOL;
+            CompileMap(map, GetPredictFunctionName());
+        }
 
         // Emit runtime model APIs
         EmitModelAPIFunctions(map);

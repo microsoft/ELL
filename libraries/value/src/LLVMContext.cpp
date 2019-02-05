@@ -15,6 +15,8 @@
 
 #include <utilities/include/StringUtil.h>
 
+#include <llvm/Support/raw_os_ostream.h>
+
 using namespace std::string_literals;
 
 namespace ell
@@ -478,7 +480,12 @@ namespace value
     Value LLVMContext::AllocateImpl(ValueType type, MemoryLayout layout)
     {
         auto llvmType = ValueTypeToLLVMType(GetFnEmitter().GetEmitter(), { type, 0 });
-        return { Emittable{ GetFnEmitter().Variable(llvmType, layout.GetMemorySize()) }, layout };
+        auto allocatedVariable = GetFnEmitter().Variable(llvmType, layout.GetMemorySize());
+
+        auto& fn = GetFnEmitter();
+        auto& irEmitter = fn.GetEmitter();
+        irEmitter.MemorySet(allocatedVariable, irEmitter.Zero(llvm::Type::getInt8Ty(fn.GetLLVMContext())), irEmitter.Literal(static_cast<int64_t>(layout.GetMemorySize() * irEmitter.SizeOf(llvmType))));
+        return { Emittable{ allocatedVariable }, layout };
     }
 
     std::optional<Value> LLVMContext::GetGlobalValue(GlobalAllocationScope scope, std::string name)
@@ -526,7 +533,7 @@ namespace value
             data);
         auto dereferencedGlobal = _emitter.GetIREmitter().PointerOffset(global, _emitter.GetIREmitter().Literal(0));
 
-        Emittable emittable{dereferencedGlobal};
+        Emittable emittable{ dereferencedGlobal };
         _globals[adjustedName] = { emittable, layout };
 
         return Value(emittable, layout);
@@ -543,12 +550,12 @@ namespace value
         }
 
         auto global = _emitter.GlobalArray(adjustedName,
-                                                   ValueTypeToLLVMType(_emitter.GetIREmitter(), { type, 0 }),
-                                                   layout.GetMemorySize());
+                                           ValueTypeToLLVMType(_emitter.GetIREmitter(), { type, 0 }),
+                                           layout.GetMemorySize());
 
         auto dereferencedGlobal = _emitter.GetIREmitter().PointerOffset(global, _emitter.GetIREmitter().Literal(0));
 
-        Emittable emittable{dereferencedGlobal};
+        Emittable emittable{ dereferencedGlobal };
         _globals[adjustedName] = { emittable, layout };
 
         return Value(emittable, layout);
@@ -594,13 +601,18 @@ namespace value
 
             for (std::pair idx{ 0u, functionArgs.begin() }; idx.first < argValuesCopy.size(); ++idx.first, ++idx.second)
             {
+                idx.second->setName(std::string{ "arg" } + std::to_string(idx.first));
                 argValuesCopy[idx.first].SetData(Emittable{ idx.second });
             }
 
             returnValueCopy = fn(argValuesCopy);
             if (returnValueCopy)
             {
-                GetFnEmitter().Return(EnsureEmittable(*returnValueCopy).Get<Emittable>().GetDataAs<LLVMValue>());
+                _emitter.EndFunction(EnsureEmittable(*returnValueCopy).Get<Emittable>().GetDataAs<LLVMValue>());
+            }
+            else
+            {
+                _emitter.EndFunction();
             }
         }
 
@@ -637,6 +649,17 @@ namespace value
         _definedFunctions[decl] = returnFn;
 
         return returnFn;
+    }
+
+    bool LLVMContext::IsFunctionDefinedImpl(FunctionDeclaration decl) const
+    {
+        if (const auto& intrinsics = GetIntrinsics();
+            std::find(intrinsics.begin(), intrinsics.end(), decl) != intrinsics.end())
+        {
+            return true;
+        }
+
+        return _definedFunctions.find(decl) != _definedFunctions.end();
     }
 
     Value LLVMContext::StoreConstantDataImpl(ConstantData data) { return _computeContext.StoreConstantData(data); }
@@ -677,10 +700,12 @@ namespace value
         }
         else
         {
-            // if (!TypeCompatible(destination, source))
-            // {
-            //     throw InputException(InputExceptionErrors::typeMismatch);
-            // }
+            if (!TypeCompatible(destination, source) &&
+                (destination.PointerLevel() == source.PointerLevel() ||
+                 destination.PointerLevel() == (1 + source.PointerLevel())))
+            {
+                throw InputException(InputExceptionErrors::typeMismatch);
+            }
 
             auto& irEmitter = _emitter.GetIREmitter();
             auto destValue = ToLLVMValue(destination);
@@ -688,32 +713,47 @@ namespace value
             {
                 // we're only copying active areas below. should we copy padded too?
                 auto& layout = source.GetLayout();
-                std::visit(VariantVisitor{ [](Undefined) {},
-                                           [](Emittable) {},
-                                           [destValue, &irEmitter, &layout](auto&& data) {
-                                               auto maxCoordinate = layout.GetActiveSize().ToVector();
-                                               decltype(maxCoordinate) coordinate(maxCoordinate.size());
+                std::visit(
+                    VariantVisitor{ [](Undefined) {},
+                                    [](Emittable) {},
+                                    [destValue, &irEmitter, &layout](auto&& data) {
+                                        auto maxCoordinate = layout.GetActiveSize().ToVector();
+                                        decltype(maxCoordinate) coordinate(maxCoordinate.size());
 
-                                               do
-                                               {
-                                                   auto srcAtOffset =
-                                                       irEmitter.Literal(*(data + layout.GetEntryOffset(coordinate)));
-                                                   auto destOffset = irEmitter.Literal(
-                                                       static_cast<int>(layout.GetEntryOffset(coordinate)));
-                                                   auto destAtOffset = irEmitter.PointerOffset(destValue, destOffset);
-                                                   (void)irEmitter.Store(destAtOffset, srcAtOffset);
-                                               } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
-                                           } },
-                           source.GetUnderlyingData());
+                                        do
+                                        {
+                                            auto srcAtOffset =
+                                                irEmitter.Literal(*(data + layout.GetEntryOffset(coordinate)));
+                                            auto destOffset = irEmitter.Literal(
+                                                static_cast<int>(layout.GetEntryOffset(coordinate)));
+                                            auto destAtOffset = irEmitter.PointerOffset(destValue, destOffset);
+                                            (void)irEmitter.Store(destAtOffset, srcAtOffset);
+                                        } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+                                    } },
+                    source.GetUnderlyingData());
             }
             else
             {
                 auto srcValue = ToLLVMValue(source);
+                if (srcValue == destValue)
+                {
+                    return;
+                }
                 if (auto& layout = source.GetLayout(); layout.IsContiguous())
                 {
-                    irEmitter.MemoryCopy(srcValue,
-                                         destValue,
-                                         irEmitter.Literal(static_cast<int64_t>(layout.GetMemorySize())));
+                    if (destination.PointerLevel() == source.PointerLevel())
+                    {
+                        irEmitter.MemoryCopy(srcValue,
+                                             destValue,
+                                             irEmitter.Literal(
+                                                 static_cast<int64_t>(
+                                                     layout.GetMemorySize() * irEmitter.SizeOf(srcValue->getType()))));
+                    }
+                    else
+                    {
+                        auto destAtOffset = irEmitter.PointerOffset(destValue, irEmitter.Zero(VariableType::Int32));
+                        irEmitter.Store(destAtOffset, srcValue);
+                    }
                 }
                 else
                 {
@@ -726,7 +766,7 @@ namespace value
                         auto srcAtOffset = irEmitter.PointerOffset(srcValue, offset);
                         auto destAtOffset = irEmitter.PointerOffset(destValue, offset);
 
-                        (void)irEmitter.Store(destAtOffset, irEmitter.Load(srcAtOffset));
+                        [[maybe_unused]] auto storeInst = irEmitter.Store(destAtOffset, irEmitter.Load(srcAtOffset));
 
                     } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
                 }
@@ -777,10 +817,10 @@ namespace value
             destination = Allocate(source.GetBaseType(), source.GetLayout());
         }
 
-        // if (!TypeCompatible(destination, source))
-        // {
-        //     throw InputException(InputExceptionErrors::typeMismatch);
-        // }
+        if (!TypeCompatible(destination, source))
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
 
         if (destination.GetLayout() != source.GetLayout())
         {
@@ -1119,6 +1159,21 @@ namespace value
         return EmitExternalCall(func, args);
     }
 
+    void LLVMContext::DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const
+    {
+        auto realizedValue = Realize(value);
+        if (realizedValue.IsConstant())
+        {
+            _computeContext.DebugDump(realizedValue, tag, &stream);
+        }
+        else
+        {
+            llvm::raw_os_ostream llvmStream(stream);
+            auto llvmValue = std::get<Emittable>(value.GetUnderlyingData()).GetDataAs<LLVMValue>();
+            emitters::DebugDump(llvmValue, tag, &llvmStream);
+        }
+    }
+
     Value LLVMContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)
     {
         static std::unordered_map<FunctionDeclaration, std::function<Value(std::vector<Value>)>> intrinsics =
@@ -1235,7 +1290,7 @@ namespace value
 
     bool LLVMContext::TypeCompatible(Value value1, Value value2)
     {
-        return value1.GetBaseType() == value2.GetBaseType() && value1.PointerLevel() == value2.PointerLevel();
+        return value1.GetBaseType() == value2.GetBaseType();
     }
 
     std::string LLVMContext::GetScopeAdjustedName(GlobalAllocationScope scope, std::string name) const
@@ -1304,7 +1359,10 @@ namespace value
                 else
                 {
                     auto& fn = GetFnEmitter();
-                    llvm::Constant* constant = nullptr;
+
+                    std::string globalName = GetCurrentFunctionScopedName("_"s + std::to_string(_promotedConstantStack.top().size()));
+
+                     /*   llvm::Constant* constant = nullptr;
                     if constexpr (std::is_same_v<DataType, Boolean>)
                     {
                         constant = fn.GetEmitter().Literal(std::vector<uint8_t>(data.begin(), data.end()));
@@ -1312,13 +1370,28 @@ namespace value
                     else
                     {
                         constant = fn.GetEmitter().Literal(data);
+                    }*/
+
+                    llvm::GlobalVariable* globalVariable = nullptr;
+                    if constexpr (std::is_same_v<DataType, Boolean>)
+                    {
+                        globalVariable =
+                            _emitter.GlobalArray(globalName, std::vector<uint8_t>(data.begin(), data.end()));
+                    }
+                    else
+                    {
+                        globalVariable = _emitter.GlobalArray(globalName, data);
                     }
 
                     auto varType =
                         GetVariableType<std::conditional_t<std::is_same_v<DataType, Boolean>, bool, DataType>>();
 
                     LLVMValue newValue = fn.Variable(varType, data.size());
-                    fn.MemoryCopy<DataType>(constant, newValue, static_cast<int>(data.size()));
+                    fn.MemoryCopy<DataType>(globalVariable, newValue, static_cast<int>(data.size()));
+                    /*for (auto dataIndex = 0; static_cast<size_t>(dataIndex) < data.size(); ++dataIndex)
+                    {
+                        fn.SetValueAt(newValue, dataIndex, fn.ValueAt(constant, dataIndex));
+                    }*/
 
                     return newValue;
                 }
@@ -1344,7 +1417,7 @@ namespace value
         return newValue;
     }
 
-    std::optional<LLVMContext::PromotedConstantDataDescription> LLVMContext::HasBeenPromoted(Value value)
+    std::optional<LLVMContext::PromotedConstantDataDescription> LLVMContext::HasBeenPromoted(Value value) const
     {
         if (!value.IsDefined() || value.IsEmpty() || !value.IsConstant())
         {
@@ -1367,7 +1440,7 @@ namespace value
         }
     }
 
-    Value LLVMContext::Realize(Value value)
+    Value LLVMContext::Realize(Value value) const
     {
         if (auto desc = HasBeenPromoted(value); !desc)
         {

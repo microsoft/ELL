@@ -12,8 +12,11 @@
 #include "Value.h"
 #include "Vector.h"
 
+#include <emitters/include/IREmitter.h>
+
 #include <utilities/include/Exception.h>
 
+#include <iostream>
 #include <tuple>
 #include <utility>
 
@@ -110,6 +113,11 @@ namespace value
         return CreateFunctionImpl(decl, fn);
     }
 
+    bool EmitterContext::IsFunctionDefined(FunctionDeclaration decl) const
+    {
+        return IsFunctionDefinedImpl(decl);
+    }
+
     Value EmitterContext::StoreConstantData(ConstantData data) { return StoreConstantDataImpl(data); }
 
     void EmitterContext::For(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn)
@@ -183,6 +191,25 @@ namespace value
         return CallImpl(func, args);
     }
 
+    void EmitterContext::DebugDump(Value value, std::string tag, std::ostream* stream) const
+    {
+        std::ostream& outStream = stream != nullptr ? *stream : std::cerr;
+
+        if (value.IsDefined())
+        {
+            DebugDumpImpl(value, tag, outStream);
+        }
+        else
+        {
+            outStream << "Value is undefined";
+            if (!tag.empty())
+            {
+                outStream << "[tag = " << tag << "]";
+            }
+            outStream << "\n";
+        }
+    }
+
     const std::vector<std::reference_wrapper<FunctionDeclaration>>& EmitterContext::GetIntrinsics() const
     {
         static std::vector intrinsics = {
@@ -220,9 +247,9 @@ namespace value
 
     void ClearContext() noexcept { s_context = nullptr; }
 
-    ContextGuard::ContextGuard(EmitterContext& context) { SetContext(context); }
+    ContextGuard<>::ContextGuard(EmitterContext& context) { SetContext(context); }
 
-    ContextGuard::~ContextGuard() { ClearContext(); }
+    ContextGuard<>::~ContextGuard() { ClearContext(); }
 
     Value Allocate(ValueType type, size_t size) { return GetContext().Allocate(type, size); }
 
@@ -234,6 +261,11 @@ namespace value
     }
 
     EmitterContext::IfContext If(Scalar test, std::function<void()> fn) { return GetContext().If(test, fn); }
+
+    void DebugDump(Value value, std::string tag, std::ostream* stream)
+    {
+        GetContext().DebugDump(value, tag, stream);
+    }
 
     Scalar Abs(Scalar s)
     {

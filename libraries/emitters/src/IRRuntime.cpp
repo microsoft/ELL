@@ -387,7 +387,7 @@ namespace emitters
 
     LLVMFunction IRRuntime::GetPowFunction(VariableType argType)
     {
-        return _module.GetIntrinsic(llvm::Intrinsic::pow, { argType, argType });
+        return _module.GetIntrinsic(llvm::Intrinsic::pow, { argType });
     }
 
     LLVMFunction IRRuntime::GetLogFunction(VariableType argType)

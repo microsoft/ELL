@@ -37,6 +37,12 @@ namespace value
         template <typename T>
         Matrix(const std::vector<std::vector<T>>& data);
 
+        Matrix(const Matrix&);
+        Matrix(Matrix&&) noexcept;
+        Matrix& operator=(const Matrix&);
+        Matrix& operator=(Matrix&&);
+        ~Matrix();
+
         /// <summary> Matrix element access operator. </summary>
         /// <returns> The Scalar value wrapping the value that is at the specified index within the matrix </return>
         Scalar operator()(Scalar rowIndex, Scalar columnIndex);

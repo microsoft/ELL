@@ -259,20 +259,22 @@ void ValueGetTests()
 
 void Value_test1()
 {
-    DeclareFunction("Value_test1").Define([] {
+    auto fn = DeclareFunction("Value_test1").Define([] {
         Value v(std::vector<int>{ 1, 2, 3, 4 });
         For(v, [&](Scalar index) {
             InvokeForContext<ComputeContext>([&](auto&) { std::cout << *v.Offset(index).Get<int*>() << " "; });
         });
-
-        InvokeForContext<ComputeContext>([](auto&) { std::cout << std::endl; });
-        InvokeForContext<TestLLVMContext>(PrintIR);
-    })();
+    });
+    InvokeForContext<ComputeContext>([&](auto&) {
+        fn();
+        std::cout << std::endl;
+    });
+    InvokeForContext<TestLLVMContext>(PrintIR);
 }
 
 void Scalar_test1()
 {
-    DeclareFunction("Scalar_test1").Define([] {
+    auto fn = DeclareFunction("Scalar_test1").Define([] {
         bool ok = true;
         Scalar s1 = 1;
         InvokeForContext<ComputeContext>([&](auto&) { ok &= testing::IsEqual(s1.Get<int>(), 1); });
@@ -284,9 +286,11 @@ void Scalar_test1()
         InvokeForContext<ComputeContext>([&](auto&) { ok &= testing::IsEqual(s1.Get<int>(), 3); });
         InvokeForContext<ComputeContext>([&](auto&) { ok &= testing::IsEqual(s2.Get<int>(), 6); });
 
-        InvokeForContext<TestLLVMContext>(PrintIR);
         testing::ProcessTest("Testing basic semantics for Scalar", ok);
-    })();
+    });
+
+    InvokeForContext<ComputeContext>([&](auto&) { fn(); });
+    InvokeForContext<TestLLVMContext>(PrintIR);
 }
 
 Vector testConvolve1D(Vector signal, Vector filter)

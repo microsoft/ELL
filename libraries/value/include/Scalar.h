@@ -34,6 +34,12 @@ namespace value
             Scalar(Value(t))
         {}
 
+        Scalar(const Scalar&);
+        Scalar(Scalar&&) noexcept;
+        Scalar& operator=(const Scalar&);
+        Scalar& operator=(Scalar&&);
+        ~Scalar();
+
         /// <summary> Gets the underlying wrapped Value instance </summary>
         Value GetValue() const;
 

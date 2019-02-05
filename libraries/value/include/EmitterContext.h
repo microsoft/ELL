@@ -18,9 +18,11 @@
 #include <utilities/include/MemoryLayout.h>
 
 #include <functional>
+#include <iosfwd>
 #include <memory>
 #include <optional>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <variant>
 
@@ -173,6 +175,10 @@ namespace value
         /// <returns> A callable function that executes the body described by fn </returns>
         DefinedFunction CreateFunction(FunctionDeclaration decl, DefinedFunction fn);
 
+        /// <summary> Returns true if function is defined for this context, false otherwise </summary>
+        /// <param name="decl"> The function declaration describing the function </param>
+        bool IsFunctionDefined(FunctionDeclaration decl) const;
+
         /// <summary> Stores data known ahead of time in the form of a std::vector of one of the fundamental types </summary>
         /// <param name="data"> The data that is to be stored by the context instance </param>
         /// <returns> An instance of Value that contains a referece to the allocated memory </returns>
@@ -229,6 +235,8 @@ namespace value
 
         std::optional<Value> Call(FunctionDeclaration func, std::vector<Value> args);
 
+        void DebugDump(Value value, std::string tag, std::ostream* stream) const;
+
     protected:
         const std::vector<std::reference_wrapper<FunctionDeclaration>>& GetIntrinsics() const;
 
@@ -242,6 +250,7 @@ namespace value
         virtual detail::ValueTypeDescription GetTypeImpl(Emittable) = 0;
 
         virtual DefinedFunction CreateFunctionImpl(FunctionDeclaration decl, DefinedFunction fn) = 0;
+        virtual bool IsFunctionDefinedImpl(FunctionDeclaration decl) const = 0;
 
         virtual Value StoreConstantDataImpl(ConstantData data) = 0;
 
@@ -263,6 +272,8 @@ namespace value
         virtual IfContext IfImpl(Scalar test, std::function<void()> fn) = 0;
 
         virtual std::optional<Value> CallImpl(FunctionDeclaration func, std::vector<Value> args) = 0;
+
+        virtual void DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const = 0;
     };
 
     /// <summary> Returns the global instance of EmitterContext </summary>
@@ -285,7 +296,11 @@ namespace value
     auto InvokeForContext(Fn&& fn) -> std::conditional_t<std::is_same_v<ReturnType, void>, void, std::optional<ReturnType>>;
 
     /// <summary> A helper RAII class to set a particular EmitterContext instance as the global context and unset it at the end of scope </summary>
-    struct ContextGuard
+    template <typename T = void, bool b = std::is_base_of_v<EmitterContext, T>>
+    struct ContextGuard;
+
+    template <>
+    struct ContextGuard<void, false>
     {
         /// <summary> Constructor </summary>
         /// <param name="context"> The instance of EmitterContext to set as the global context </param>
@@ -298,6 +313,21 @@ namespace value
         ContextGuard(ContextGuard&&) = delete;
         ContextGuard& operator=(const ContextGuard&) = delete;
         ContextGuard& operator=(ContextGuard&&) = delete;
+    };
+
+    template <typename T, bool b>
+    struct ContextGuard : private ContextGuard<>
+    {
+        template <typename... Args>
+        ContextGuard(Args&&... args) :
+            ContextGuard<>(_context),
+            _context(std::forward<Args>(args)...)
+        {}
+
+        T& GetContext() { return _context; }
+
+    private:
+        T _context;
     };
 
     /// <summary> Allocates data with the specified type and size </summary>
@@ -390,6 +420,14 @@ namespace value
         return GlobalAllocate(name,
                               std::vector<std::conditional_t<std::is_same_v<T, bool>, utilities::Boolean, T>>{ t },
                               utilities::ScalarLayout);
+    }
+
+    void DebugDump(Value value, std::string tag = "", std::ostream* stream = nullptr);
+
+    template <typename ViewType, std::enable_if_t<std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>, void*> = nullptr>
+    void DebugDump(ViewType value, std::string tag = "", std::ostream* stream = nullptr)
+    {
+        return DebugDump(value.GetValue(), tag, stream);
     }
 
     EmitterContext::IfContext If(Scalar test, std::function<void()> fn);

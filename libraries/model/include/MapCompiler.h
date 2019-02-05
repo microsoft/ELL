@@ -104,10 +104,10 @@ namespace model
         //
         // These methods may be implemented by specific compilers
         //
-        virtual void OnBeginCompileModel(const Model& model) {}
-        virtual void OnEndCompileModel(const Model& model) {}
-        virtual void OnBeginCompileNode(const Node& node) {}
-        virtual void OnEndCompileNode(const Node& node) {}
+        virtual void OnBeginCompileModel(const Model& /*model*/) {}
+        virtual void OnEndCompileModel(const Model& /*model*/) {}
+        virtual void OnBeginCompileNode(const Node& /*node*/) {}
+        virtual void OnEndCompileNode(const Node& /*node*/) {}
         virtual void PushScope();
         virtual void PopScope();
         virtual emitters::ModuleEmitter* GetModuleEmitter() = 0;

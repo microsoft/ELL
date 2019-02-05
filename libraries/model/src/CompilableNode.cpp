@@ -72,7 +72,7 @@ namespace model
                 else if (HasOwnFunction())
                 {
                     Log() << DiagnosticString(*this) << " has its own function" << EOL;
-                    EmitNodeFunction(moduleEmitter);
+                    EmitNodeFunction(*irCompiler);
                 }
                 else
                 {
@@ -136,7 +136,7 @@ namespace model
         return false;
     }
 
-    void CompilableNode::EmitNodeFunction(emitters::IRModuleEmitter& module)
+    void CompilableNode::EmitNodeFunction(IRMapCompiler& compiler)
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }

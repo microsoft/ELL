@@ -33,6 +33,12 @@ namespace value
         template <typename T>
         Tensor(const std::vector<std::vector<std::vector<T>>>& data);
 
+        Tensor(const Tensor&);
+        Tensor(Tensor&&) noexcept;
+        Tensor& operator=(const Tensor&);
+        Tensor& operator=(Tensor&&);
+        ~Tensor();
+
         /// <summary> Tensor element access operator. </summary>
         /// <returns> The Scalar value wrapping the value that is at the specified index within the tensor </return>
         Scalar operator()(Scalar rowIndex, Scalar columnIndex, Scalar channelIndex);

@@ -26,6 +26,29 @@ namespace value
         }
     }
 
+    Vector::~Vector() = default;
+    Vector::Vector(const Vector&) = default;
+    Vector::Vector(Vector&&) noexcept = default;
+
+    Vector& Vector::operator=(const Vector& other)
+    {
+        if (this != &other)
+        {
+            _value = other._value;
+        }
+        return *this;
+    }
+
+    Vector& Vector::operator=(Vector&& other)
+    {
+        if (this != &other)
+        {
+            _value = std::move(other._value);
+            other._value = Value();
+        }
+        return *this;
+    }
+
     Scalar Vector::operator[](Scalar index) { return (*this)(index); }
 
     Scalar Vector::operator()(Scalar index)

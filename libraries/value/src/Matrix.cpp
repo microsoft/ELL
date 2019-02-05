@@ -32,6 +32,29 @@ namespace value
         }
     }
 
+    Matrix::~Matrix() = default;
+    Matrix::Matrix(const Matrix&) = default;
+    Matrix::Matrix(Matrix&&) noexcept = default;
+
+    Matrix& Matrix::operator=(const Matrix& other)
+    {
+        if (this != &other)
+        {
+            _value = other._value;
+        }
+        return *this;
+    }
+
+    Matrix& Matrix::operator=(Matrix&& other)
+    {
+        if (this != &other)
+        {
+            _value = std::move(other._value);
+            other._value = Value();
+        }
+        return *this;
+    }
+
     Scalar Matrix::operator()(Scalar rowIndex, Scalar columnIndex)
     {
         Value indexedValue = GetContext().Offset(_value, { rowIndex, columnIndex });

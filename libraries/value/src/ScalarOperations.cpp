@@ -10,6 +10,8 @@
 #include "EmitterContext.h"
 #include "Scalar.h"
 
+#include <emitters/include/IREmitter.h>
+
 namespace ell
 {
 using namespace utilities;

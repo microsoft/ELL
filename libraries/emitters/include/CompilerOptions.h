@@ -43,7 +43,7 @@ namespace emitters
         bool debug = false;
         utilities::Optional<bool> positionIndependentCode;
 
-        TargetDevice targetDevice;
+        TargetDevice targetDevice = { "host" };
     };
 } // namespace emitters
 } // namespace ell

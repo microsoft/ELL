@@ -21,6 +21,9 @@
 #include <utilities/include/TypeName.h>
 #include <utilities/include/TypeTraits.h>
 
+#include <value/include/ComputeContext.h>
+#include <value/include/EmitterContext.h>
+
 #include <algorithm>
 #include <string>
 #include <unordered_map>
@@ -69,8 +72,6 @@ namespace model
         /// <param name="inputs"> A vector of name/value pairs for the inputs this map uses </param>
         /// <param name="outputs"> A vector of name/value pairs for the outputs this map generates </param>
         Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
-
-        ~Map() override = default;
 
         /// <summary> Gets the model wrapped by this map </summary>
         ///
@@ -609,6 +610,8 @@ namespace model
     template <typename OutputDataVectorType, typename ElementsValueType, data::IsDataVector<OutputDataVectorType>>
     OutputDataVectorType Map::ComputeOutput(const PortElementsBase& elements) const
     {
+        value::ContextGuard<value::ComputeContext> guard("map_compute");
+
         auto resultVector = ComputeOutput<ElementsValueType>(elements);
         auto resultVectorIterator = data::MakeVectorIndexValueIterator<data::IterationPolicy::skipZeros>(resultVector);
         return { resultVectorIterator };
@@ -617,6 +620,8 @@ namespace model
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
     DataVectorType Map::ComputeOutput(const PortElementsBase& elements) const
     {
+        value::ContextGuard<value::ComputeContext> guard("map_compute");
+
         switch (elements.GetPortType())
         {
         case Port::PortType::none:
@@ -649,12 +654,16 @@ namespace model
     template <typename ValueType, utilities::IsFundamental<ValueType>>
     std::vector<ValueType> Map::ComputeOutput(int index) const
     {
+        value::ContextGuard<value::ComputeContext> guard("map_compute");
+
         return ComputeOutput<ValueType>(GetOutput(index));
     }
 
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
     DataVectorType Map::ComputeOutput(int index) const
     {
+        value::ContextGuard<value::ComputeContext> guard("map_compute");
+
         return ComputeOutput<DataVectorType>(GetOutput(index));
     }
 
@@ -662,12 +671,16 @@ namespace model
     template <typename ValueType, utilities::IsFundamental<ValueType>>
     std::vector<ValueType> Map::ComputeOutput(const std::string& outputName) const
     {
+        value::ContextGuard<value::ComputeContext> guard("map_compute");
+
         return ComputeOutput<ValueType>(GetOutput(outputName));
     }
 
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
     DataVectorType Map::ComputeOutput(const std::string& outputName) const
     {
+        value::ContextGuard<value::ComputeContext> guard("map_compute");
+
         return ComputeOutput<DataVectorType>(GetOutput(outputName));
     }
 

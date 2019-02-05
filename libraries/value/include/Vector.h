@@ -48,6 +48,12 @@ namespace value
             _value(std::vector<T>(data))
         {}
 
+        Vector(const Vector&);
+        Vector(Vector&&) noexcept;
+        Vector& operator=(const Vector&);
+        Vector& operator=(Vector&&);
+        ~Vector();
+
         /// <summary> Returns a Scalar value that represents the data at the specified index within the vector </summary>
         /// <param name="index"> The value by which to offset into the vector and return the specified value </param>
         /// <returns> The Scalar value wrapping the value that is at the specified index within the vector </return>

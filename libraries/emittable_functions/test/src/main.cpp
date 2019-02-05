@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     {
         for (const auto& context : GetContexts())
         {
-            value::ContextGuard guard(*context);
+            value::ContextGuard<> guard(*context);
 
             TestVoiceActivityDetector<float>(path);
             TestVoiceActivityDetector<double>(path);

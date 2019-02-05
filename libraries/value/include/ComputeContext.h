@@ -44,6 +44,7 @@ namespace value
         detail::ValueTypeDescription GetTypeImpl(Emittable emittable) override;
 
         DefinedFunction CreateFunctionImpl(FunctionDeclaration decl, DefinedFunction fn) override;
+        bool IsFunctionDefinedImpl(FunctionDeclaration decl) const override;
 
         Value StoreConstantDataImpl(ConstantData data) override;
 
@@ -66,6 +67,8 @@ namespace value
         IfContext IfImpl(Scalar test, std::function<void()> fn) override;
 
         std::optional<Value> CallImpl(FunctionDeclaration func, std::vector<Value> args) override;
+
+        void DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const override;
 
         Value IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args);
 

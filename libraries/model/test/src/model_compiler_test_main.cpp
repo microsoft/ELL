@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "CompilableCodeNode_test.h"
 #include "CompilableNodesTest.h"
 #include "CompilerTest.h"
 #include "ModelHeaderOutputTest.h"
@@ -250,6 +251,8 @@ int main(int argc, char* argv[])
     try
     {
         TestIRCompiler();
+
+        CompilableCodeNode_test1();
     }
     catch (const std::exception& exception)
     {

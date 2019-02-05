@@ -5,6 +5,7 @@
 set(library_name model)
 
 set(src
+    src/CompilableCodeNode.cpp
     src/CompilableNode.cpp
     src/CompilableNodeUtilities.cpp
     src/CompiledMap.cpp
@@ -29,6 +30,7 @@ set(src
 )
 
 set(include
+    include/CompilableCodeNode.h
     include/CompilableNode.h
     include/CompilableNodeUtilities.h
     include/CompiledMap.h
@@ -89,7 +91,7 @@ source_group("optimizer\\doc" FILES ${optimizer_doc})
 
 add_library(${library_name} ${src} ${include} ${doc} ${optimizer_src} ${optimizer_include} ${optimizer_doc})
 target_include_directories(${library_name} PRIVATE include optimizer/include ${ELL_LIBRARIES_DIR})
-target_link_libraries(${library_name} utilities data emitters)
+target_link_libraries(${library_name} data emitters utilities value)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
@@ -138,6 +140,7 @@ set(compiler_test_name ${library_name}_compiler_test)
 
 set(compiler_test_src
     test/src/model_compiler_test_main.cpp
+    test/src/CompilableCodeNode_test.cpp
     test/src/CompilableNodesTest.cpp
     test/src/CompilerTest.cpp
     test/src/ModelHeaderOutputTest.cpp
@@ -146,6 +149,7 @@ set(compiler_test_src
 )
 
 set(compiler_test_include
+    test/include/CompilableCodeNode_test.h
     test/include/CompilableNodesTest.h
     test/include/CompilerTest.h
     test/include/ModelHeaderOutputTest.h

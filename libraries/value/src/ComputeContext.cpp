@@ -12,10 +12,12 @@
 #include "Value.h"
 
 #include <utilities/include/TypeTraits.h>
+#include <utilities/include/TypeName.h>
 
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <iostream>
 #include <string>
 
 namespace ell
@@ -167,7 +169,7 @@ namespace value
 
                                 std::transform(returnData.begin(), returnData.end(), returnData.begin(), fn);
 
-                                return Value(returnData, value.IsConstrained() ? std::optional<MemoryLayout>{value.GetLayout()} : std::optional<MemoryLayout>{std::nullopt});
+                                return Value(returnData, value.IsConstrained() ? std::optional<MemoryLayout>{ value.GetLayout() } : std::optional<MemoryLayout>{ std::nullopt });
                             }
                         },
                         value.GetUnderlyingData());
@@ -604,6 +606,17 @@ namespace value
         return returnFn;
     }
 
+    bool ComputeContext::IsFunctionDefinedImpl(FunctionDeclaration decl) const
+    {
+        if (const auto& intrinsics = GetIntrinsics();
+            std::find(intrinsics.begin(), intrinsics.end(), decl) != intrinsics.end())
+        {
+            return true;
+        }
+
+        return _definedFunctions.find(decl) != _definedFunctions.end();
+    }
+
     void ComputeContext::CopyDataImpl(const Value& source, Value& destination)
     {
         std::visit(VariantVisitor{ [](Undefined) {},
@@ -960,6 +973,30 @@ namespace value
         }
 
         throw InputException(InputExceptionErrors::invalidArgument, "Specified function is not defined for this context");
+    }
+
+    void ComputeContext::DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const
+    {
+        std::visit([&tag, &stream, &value](auto&& data)
+        {
+            using Type = std::decay_t<decltype(data)>;
+            if constexpr (utilities::IsOneOf<Type, Emittable, Undefined>)
+            {
+                return;
+            }
+            else
+            {
+                using DataTypeTemp = std::remove_pointer_t<Type>;
+                using DataType = std::conditional_t<std::is_same_v<DataTypeTemp, utilities::Boolean>, bool, DataTypeTemp>;
+                stream << utilities::TypeName<DataType>::GetName() << " (" << value.GetLayout() << ")";
+                if (!tag.empty())
+                {
+                    stream << " [tag = " << tag << "]";
+                }
+                stream << "\n";
+            }
+
+        }, value.GetUnderlyingData());
     }
 
     Value ComputeContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)

@@ -51,37 +51,36 @@ void TestVoiceActivityDetectorInternal(const std::string& filename, VoiceActivit
                      .Parameters(Value{ valueType, MemoryLayout({ (int)data.size() }) })
                      .Define([&vad](Vector data) -> Scalar { return vad.Process(data); });
 
-    int errors = 0;
-    // load the dataset
-    auto stream2 = utilities::OpenIfstream(filename);
-    int frame = 0;
-    data::AutoSupervisedExampleIterator exampleIterator = ell::common::GetAutoSupervisedExampleIterator(stream2);
-    while (exampleIterator.IsValid())
-    {
-        auto example = exampleIterator.Get();
-        std::vector<double> data = example.GetDataVector().ToArray();
-        std::vector<ValueType> buffer;
-        std::transform(data.begin(), data.end(), std::back_inserter(buffer), [](double x) {
-            return static_cast<ValueType>(x);
-        });
-        if (buffer.size() < static_cast<size_t>(frameSize))
+    InvokeForContext<ComputeContext>([&](auto&) {
+        int errors = 0;
+        // load the dataset
+        auto stream2 = utilities::OpenIfstream(filename);
+        int frame = 0;
+        data::AutoSupervisedExampleIterator exampleIterator = ell::common::GetAutoSupervisedExampleIterator(stream2);
+        while (exampleIterator.IsValid())
         {
-            buffer.resize(frameSize); // fix AutoDataVector possible compression
-        }
+            auto example = exampleIterator.Get();
+            std::vector<double> data = example.GetDataVector().ToArray();
+            std::vector<ValueType> buffer;
+            std::transform(data.begin(), data.end(), std::back_inserter(buffer), [](double x) {
+                return static_cast<ValueType>(x);
+            });
+            if (buffer.size() < static_cast<size_t>(frameSize))
+            {
+                buffer.resize(frameSize); // fix AutoDataVector possible compression
+            }
 
-        Scalar signal = vadfn(Vector(buffer));
+            Scalar signal = vadfn(Vector(buffer));
 
-        InvokeForContext<ComputeContext>([&](auto&) {
             If(signal != Cast<int>(example.GetMetadata().label), [&] {
                 std::cout << "### Error on line " << frame << "\n";
                 ++errors;
             });
-        });
-        frame++;
-        exampleIterator.Next();
-    }
 
-    InvokeForContext<ComputeContext>([&](auto&) {
+            frame++;
+            exampleIterator.Next();
+        }
+
         testing::ProcessTest(FormatString("Testing %s", typeid(VoiceActivityDetector).name()), errors == 0);
     });
 }

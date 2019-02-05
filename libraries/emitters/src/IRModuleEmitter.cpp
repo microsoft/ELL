@@ -103,6 +103,10 @@ namespace emitters
 
         // Set IR-specific parameters
         const auto& targetDevice = GetCompilerOptions().targetDevice;
+        if (targetDevice.triple.empty())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Target device triple is empty or could not be determined");
+        }
         SetTargetTriple(targetDevice.triple);
         llvm::DataLayout dataLayout(GetCompilerOptions().targetDevice.dataLayout);
         GetLLVMModule()->setDataLayout(dataLayout);
@@ -1035,6 +1039,7 @@ namespace emitters
 
     const llvm::DataLayout& IRModuleEmitter::GetTargetDataLayout() const
     {
+        assert(!GetLLVMModule()->getDataLayout().getStringRepresentation().empty());
         return GetLLVMModule()->getDataLayout();
     }
 

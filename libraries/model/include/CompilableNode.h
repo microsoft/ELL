@@ -64,7 +64,7 @@ namespace model
 
         // If `HasOwnFunction` returns true, this function must emit a function into the module.
         // The default implementation throws a `notImplemented` exception.
-        virtual void EmitNodeFunction(emitters::IRModuleEmitter& module);
+        virtual void EmitNodeFunction(IRMapCompiler& compiler);
 
         // Subclasses can override this function to indicate that they can return LLVM IR as their node function implementation.
         virtual bool HasPrecompiledIR() const;
@@ -75,7 +75,7 @@ namespace model
         // Returns an identifier that uniquely identifies the internal state that is implicitly compiled into the node function.
         // The default implementation returns nothing (the empty string) for nodes with no state (`HasState` returns false),
         // and a unqiue identifier (essentially, the Node's ID) for nodes with data (`HasState` returns true). This implies that each
-        // node with internal state gets its code compiled int a separate function.
+        // node with internal state gets its code compiled into a separate function.
         //
         // Subclasses can override this if there is some state that gets compiled into the node but is shared among different node instances.
         virtual std::string GetInternalStateIdentifier() const;

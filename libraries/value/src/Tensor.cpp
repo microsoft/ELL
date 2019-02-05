@@ -32,6 +32,29 @@ namespace value
         }
     }
 
+    Tensor::~Tensor() = default;
+    Tensor::Tensor(const Tensor&) = default;
+    Tensor::Tensor(Tensor&&) noexcept = default;
+
+    Tensor& Tensor::operator=(const Tensor& other)
+    {
+        if (this != &other)
+        {
+            _value = other._value;
+        }
+        return *this;
+    }
+
+    Tensor& Tensor::operator=(Tensor&& other)
+    {
+        if (this != &other)
+        {
+            _value = std::move(other._value);
+            other._value = Value();
+        }
+        return *this;
+    }
+
     Scalar Tensor::operator()(Scalar rowIndex, Scalar columnIndex, Scalar channelIndex)
     {
         Value indexedValue = GetContext().Offset(_value, { rowIndex, columnIndex, channelIndex });
