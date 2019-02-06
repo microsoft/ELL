@@ -469,7 +469,7 @@ namespace utilities
     inline bool CommandLineParser::ParseVal<bool>(std::string val, bool& result)
     {
         auto lowerval = ToLowercase(val);
-        result = (val == "true" || val == "t");
+        result = (lowerval == "true" || lowerval == "t");
         return true;
     }
 
