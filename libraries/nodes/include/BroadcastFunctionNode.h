@@ -788,7 +788,6 @@ namespace nodes
         std::vector<size_t> indices(argTypes.size() - 2);
         std::iota(indices.begin(), indices.end(), 0);
         taskFunction.SetAttributeForArguments(indices, emitters::IRFunctionEmitter::Attributes::NoAlias);
-
         {
             // get stuff from arguments
             auto arguments = taskFunction.Arguments().begin();
@@ -997,6 +996,7 @@ namespace nodes
                 std::vector<emitters::LLVMValue> args{ pPrimaryInput };
                 args.insert(args.end(), secondaryInputs.begin(), secondaryInputs.end());
                 args.insert(args.end(), { pOutput, begin, end });
+                taskArgs.push_back(args);
             }
             auto tasks = function.StartTasks(taskFunction, taskArgs);
             tasks.WaitAll(function);
