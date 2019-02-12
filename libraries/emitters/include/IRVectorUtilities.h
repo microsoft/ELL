@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "EmitterException.h"
 #include "EmitterTypes.h"
 #include "IRFunctionEmitter.h"
 #include "LLVMUtilities.h"
@@ -93,7 +94,10 @@ namespace emitters
         }
 
         llvm::VectorType* vecType = llvm::cast<llvm::VectorType>(type);
-        assert(vecType != nullptr);
+        if (vecType == nullptr)
+        {
+            throw EmitterException(EmitterError::valueTypeNotSupported);
+        }
 
         int vectorSize = vecType->getNumElements();
         IREmitter& emitter = function.GetEmitter();
@@ -105,10 +109,13 @@ namespace emitters
         }
 
         // Repeatedly split the vector into two halves, and add the two halves together
-        auto undef = llvm::UndefValue::get(type); // This undef is to tell LLVM we don't care what goes in the second operand of the shufflevector instruction
         while (vectorSize > 2)
         {
-            assert(vectorSize % 2 == 0); // vectorSize must be a power of 2
+            auto undef = llvm::UndefValue::get(vectorValue->getType()); // This undef is to tell LLVM we don't care what goes in the second operand of the shufflevector instruction
+            if (vectorSize % 2 != 0)
+            {
+                throw EmitterException(EmitterError::valueTypeNotSupported); // vectorSize must be a power of 2
+            }
             std::vector<uint32_t> elementIndices1;
             std::vector<uint32_t> elementIndices2;
             for (int index = 0; index < vectorSize / 2; ++index)
@@ -122,7 +129,10 @@ namespace emitters
             vectorSize /= 2;
         }
 
-        assert(vectorSize == 2);
+        if (vectorSize != 2)
+        {
+            throw EmitterException(EmitterError::valueTypeNotSupported);
+        }
         auto half1 = emitter.GetIRBuilder().CreateExtractElement(vectorValue, static_cast<uint64_t>(0));
         auto half2 = emitter.GetIRBuilder().CreateExtractElement(vectorValue, static_cast<uint64_t>(1));
         return function.Operator(emitters::GetAddForValueType<ValueType>(), half1, half2);
