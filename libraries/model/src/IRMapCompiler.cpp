@@ -11,7 +11,10 @@
 #include "CompilableNodeUtilities.h"
 #include "IRModelProfiler.h"
 #include "Model.h"
+#include "OptimizeModelTransformation.h"
 #include "OutputNode.h"
+#include "RefineAndOptimizeTransformation.h"
+#include "RefineTransformation.h"
 
 #include <model/optimizer/include/ModelOptimizer.h>
 #include <model/optimizer/include/OptimizationPassRegistry.h>
@@ -33,14 +36,6 @@ namespace ell
 {
 namespace model
 {
-    namespace
-    {
-        bool IsConvolutionalLayerNode(const Node& node)
-        {
-            return (node.GetRuntimeTypeName().find("ConvolutionalLayerNode") == 0);
-        }
-    } // namespace
-
     using namespace logging;
 
     IRMapCompiler::IRMapCompiler() :
@@ -96,23 +91,7 @@ namespace model
 
         Log() << "Compile called for map" << EOL;
 
-        //
-        // Temporary special-purpose code to allow the "SetConvolutionMethod" optimization pass to work.
-        // When refinement is an integrated part of optimization, then this special-case code will disappear.
-        //
-        Log() << "Refining the model..." << EOL;
-        model::TransformContext noRefineConvLayerNodesContext{ this, [this](const model::Node& node) { return IsConvolutionalLayerNode(node) || node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
-        map.Refine(noRefineConvLayerNodesContext);
-
-        Log() << "Optimizing the model..." << EOL;
-        map.Optimize(_optimizer);
-
-        Log() << "Refining the model again..." << EOL;
-        model::TransformContext refineContext{ this, [this](const model::Node& node) { return node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
-        map.Refine(refineContext);
-
-        Log() << "Optimizing the model again..." << EOL;
-        map.Optimize(_optimizer);
+        RefineAndOptimize(map);
 
         // Renaming callbacks based on map compiler parameters
         // Note: a more elegant solution is emit variables which get assigned to
@@ -140,9 +119,6 @@ namespace model
         // Emit runtime model APIs
         EmitModelAPIFunctions(map);
 
-        // Finish any profiling stuff we need to do and emit functions
-        _profiler.EmitModelProfilerFunctions();
-
         if (GetMapCompilerOptions().compilerSettings.optimize)
         {
             // Save callback declarations in case they get optimized away
@@ -169,6 +145,14 @@ namespace model
         return IRCompiledMap(std::move(map), GetMapCompilerOptions().mapFunctionName, GetMapCompilerOptions(), _moduleEmitter, GetMapCompilerOptions().verifyJittedModule);
     }
 
+    void IRMapCompiler::RefineAndOptimize(Map& map)
+    {
+        RefineAndOptimizeTransformation transformation(_optimizer);
+        TransformContext context(this);
+        map.Transform(transformation, context);
+        map.Prune();
+    }
+
     void IRMapCompiler::EmitModelAPIFunctions(const Map& map)
     {
         EmitGetInputSizeFunction(map);
@@ -180,6 +164,9 @@ namespace model
         EmitGetOutputShapeFunction(map);
         EmitGetSinkOutputShapeFunction(map);
         EmitGetMetadataFunction(map);
+
+        // Finish any profiling stuff we need to do and emit functions
+        _profiler.EmitModelProfilerFunctions();
     }
 
     void IRMapCompiler::EmitGetInputSizeFunction(const Map& map)

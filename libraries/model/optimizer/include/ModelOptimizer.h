@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ModelOptimizer.h (model)
+//  File:     ModelOptimizer.h (model/optimizer)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,8 +44,7 @@ namespace model
     class ModelOptimizerContext
     {
     public:
-        ModelOptimizerContext() = default;
-        ModelOptimizerContext(const ModelOptimizerContext& other) = delete;
+        explicit ModelOptimizerContext(ModelTransformer& transformer);
 
         /// <summary> Gets the `ModelTransformer` being used for transforming the dataset during this invocation of the optimizer. </summary>
         ModelTransformer& GetTransformer();
@@ -64,7 +63,7 @@ namespace model
         InputNodeBase* GetCorrespondingInputNode(const InputNodeBase* node);
 
     private:
-        ModelTransformer _transformer;
+        ModelTransformer& _transformer;
     };
 
     /// <summary>

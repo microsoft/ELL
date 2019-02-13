@@ -11,6 +11,8 @@
 #include "InputNode.h"
 #include "Node.h"
 #include "PortElements.h"
+#include "Submodel.h"
+#include "Transformation.h"
 
 #include <data/include/DataVector.h>
 #include <data/include/StlIndexValueIterator.h>
@@ -82,6 +84,9 @@ namespace model
         ///
         /// <returns> The `Model` </returns>
         Model& GetModel() { return _model; }
+
+        /// <summary> Gets the submodel wrapped by this map </summary>
+        Submodel GetSubmodel();
 
         /// <summary> Computes the map's output from input values </summary>
         ///
@@ -195,6 +200,17 @@ namespace model
         /// <param name="context"> The TransformContext to use during the transformation </param>
         /// <param name="transformFunction"> The function to apply on each node </param>
         void Transform(const TransformContext& context, const std::function<void(const Node&, ModelTransformer&)>& transformFunction);
+
+        /// <summary> Transforms the model wrapped by this map by applying a Transformation </summary>
+        ///
+        /// <param name="transformFunction"> The Transformation to apply to the model </param>
+        void Transform(optimizer::Transformation& transformation);
+
+        /// <summary> Transforms the model wrapped by this map by applying a Transformation </summary>
+        ///
+        /// <param name="transformFunction"> The Transformation to apply to the model </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
+        void Transform(optimizer::Transformation& transformation, const TransformContext& context);
 
         /// <summary> Renames the model callbacks in this map. </summary>
         ///

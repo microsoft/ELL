@@ -20,6 +20,8 @@
 #include <model/include/Node.h>
 #include <model/include/OutputNode.h>
 #include <model/include/OutputPort.h>
+#include <model/include/RefineTransformation.h>
+#include <model/include/Submodel.h>
 
 #include <nodes/include/ConstantNode.h>
 #include <nodes/include/DotProductNode.h>
@@ -587,7 +589,8 @@ void TestRefineSplitOutputs()
 
     model::TransformContext context;
     model::ModelTransformer transformer;
-    auto newModel = transformer.RefineModel(model, context);
+    model::RefineTransformation t;
+    auto newModel = t.TransformModel(model, transformer, context);
 
     // Now run data through the models and make sure they agree
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
@@ -615,14 +618,17 @@ void TestCustomRefine()
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0 });
     model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
 
-    model::ModelTransformer transformer;
+    model::ModelTransformer transformer1;
     model::TransformContext context1;
     context1.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::abstain : model::NodeAction::refine; });
-    auto model1 = transformer.RefineModel(model, context1);
+    model::RefineTransformation t;
 
+    auto model1 = t.TransformModel(model, transformer1, context1);
+
+    model::ModelTransformer transformer2;
     model::TransformContext context2;
     context2.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::abstain : model::NodeAction::compile; });
-    auto model2 = transformer.RefineModel(model, context2);
+    auto model2 = t.TransformModel(model, transformer2, context2);
     testing::ProcessTest("testing custom refine function", model1.Size() == 4 && model2.Size() == 3);
 }
 

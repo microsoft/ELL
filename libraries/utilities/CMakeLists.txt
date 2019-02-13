@@ -86,6 +86,7 @@ set(include
   include/Unused.h
   include/Variant.h
   include/XmlArchiver.h
+  include/ZipIterator.h
 )
 
 source_group("src" FILES ${src})

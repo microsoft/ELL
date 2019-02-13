@@ -448,6 +448,12 @@ namespace model
         }
     }
 
+    void swap(Model& a, Model& b)
+    {
+        using std::swap;
+        swap(a._data, b._data);
+    }
+
     //
     // NodeIterator implementations
     //

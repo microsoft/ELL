@@ -22,6 +22,7 @@
 #include <model/include/InputNode.h>
 #include <model/include/Model.h>
 #include <model/include/Node.h>
+#include <model/include/RefineTransformation.h>
 
 #include <predictors/include/NeuralNetworkPredictor.h>
 
@@ -195,8 +196,10 @@ static void TestArchiveNeuralNetworkLayerNodes()
     // Refine the model
     model::TransformContext transformContext;
     model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, transformContext, 1);
+    RefineTransformation t(1);
+    auto refinedModel = t.TransformModel(model, transformer, transformContext);
     auto numNodes = refinedModel.Size();
+    testing::ProcessTest("Testing NeuralNetworkLayerNodes refine (model size)", testing::IsEqual(numNodes, 3u));
 
     // Archive the model
     utilities::SerializationContext context;

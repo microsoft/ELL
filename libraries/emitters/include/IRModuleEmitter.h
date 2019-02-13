@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "CompilerOptions.h"
 #include "EmitterException.h"
 #include "IRAssemblyWriter.h"
 #include "IRDiagnosticHandler.h"

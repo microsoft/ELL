@@ -635,16 +635,15 @@ size_t std::hash<::ell::utilities::DimensionVector>::operator()(const ::ell::uti
     return ::ell::utilities::HashValue(v.ToVector());
 }
 
-size_t std::hash<::ell::utilities::MemoryLayout>::operator()(const ::ell::utilities::MemoryLayout& v) const noexcept
+std::size_t std::hash<::ell::utilities::MemoryLayout>::operator()(const ell::utilities::MemoryLayout& arg) const noexcept
 {
     using ::ell::utilities::HashCombine;
 
     size_t hash = 0;
-    HashCombine(hash, v.GetActiveSize().ToVector());
-    HashCombine(hash, v.GetExtent().ToVector());
-    HashCombine(hash, v.GetOffset().ToVector());
-    HashCombine(hash, v.GetCumulativeIncrement().ToVector());
-    HashCombine(hash, v.GetLogicalDimensionOrder().ToVector());
-
+    HashCombine(hash, arg.GetActiveSize().ToVector());
+    HashCombine(hash, arg.GetExtent().ToVector());
+    HashCombine(hash, arg.GetOffset().ToVector());
+    HashCombine(hash, arg.GetCumulativeIncrement().ToVector());
+    HashCombine(hash, arg.GetLogicalDimensionOrder().ToVector());
     return hash;
 }

@@ -335,7 +335,6 @@ public:
     size_t Size();
     NodeIterator GetNodes();
     std::string GetJson() const;
-    Model Refine(int maxIterations);
 #ifndef SWIG
     Model(ell::model::Model&& other);
     ell::model::Model& GetModel();

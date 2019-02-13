@@ -14,6 +14,7 @@
 #include <utilities/include/StlContainerIterator.h>
 #include <utilities/include/StlStridedIterator.h>
 #include <utilities/include/TransformIterator.h>
+#include <utilities/include/ZipIterator.h>
 
 #include <testing/include/testing.h>
 
@@ -149,5 +150,50 @@ void TestStlStridedIterator()
     {
         testing::ProcessTest("utilities::StlStridedIterator element access", *it == vec[2 * index]);
     }
+}
+
+void TestZipIterator()
+{
+    std::vector<double> vec1(20);
+    std::iota(std::begin(vec1), std::end(vec1), 1.0);
+
+    std::vector<int> vec2(20);
+    std::iota(std::begin(vec2), std::end(vec2), 101);
+
+    std::vector<int> vec3(30);
+    std::iota(std::begin(vec3), std::end(vec3), 101);
+
+    auto begin = utilities::MakeZipIterator(vec1.begin(), vec2.begin());
+    auto end = utilities::MakeZipIterator(vec1.end(), vec2.end());
+    bool ok = true;
+    size_t count = 0;
+    for (auto it = begin; it != end; ++it)
+    {
+        ok &= static_cast<double>(std::get<1>(*it)) == std::get<0>(*it) + 100.0;
+        ++count;
+    }
+    testing::ProcessTest("utilities::ZipIterator loop", ok && count == vec1.size());
+
+    // try with vectors of different sizes
+    begin = utilities::MakeZipIterator(vec1.begin(), vec3.begin());
+    end = utilities::MakeZipIterator(vec1.end(), vec3.end());
+    ok = true;
+    count = 0;
+    for (auto it = begin; it != end; ++it)
+    {
+        ok &= static_cast<double>(std::get<1>(*it)) == std::get<0>(*it) + 100.0;
+        ++count;
+    }
+    testing::ProcessTest("utilities::ZipIterator loop", ok && count == vec1.size());
+
+    auto range = utilities::MakeZipRange(vec1, vec2);
+    ok = true;
+    count = 0;
+    for (auto x : range)
+    {
+        ok &= static_cast<double>(std::get<1>(x)) == std::get<0>(x) + 100.0;
+        ++count;
+    }
+    testing::ProcessTest("utilities::ZipRange range-based for loop", ok && count == vec1.size());
 }
 } // namespace ell

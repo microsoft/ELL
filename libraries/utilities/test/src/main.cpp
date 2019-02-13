@@ -53,11 +53,13 @@ int main(int argc, char* argv[])
         TestTransformIterator();
         TestParallelTransformIterator();
         TestStlStridedIterator();
+        TestZipIterator();
 
         // MemoryLayout tests
         TestDimensionOrder();
         TestMemoryLayoutCtors();
         TestMemoryLayoutSlice();
+        TestMemoryLayoutHash();
         TestScalarLayout();
         TestInflateMemoryLayout();
         TestInflateNullMemoryLayout();

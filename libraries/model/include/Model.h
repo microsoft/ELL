@@ -20,6 +20,7 @@
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 namespace ell
@@ -126,6 +127,21 @@ namespace model
         /// <summary> Factory method used to create nodes and add them to the model. </summary>
         template <typename NodeType, typename... Args>
         NodeType* AddNode(Args&&... args);
+
+        /// <summary> Adds nodes to the model to represent "complex" outputs: the concatenation of arbitrary subsets of output ports </summary>
+        ///
+        /// <param name="elements"> The output port elements to simplify to a new output port. </param>
+        ///
+        /// <returns> An output port containing the values specified by the `elements` argument. </returns>
+        template <typename ValueType>
+        const OutputPort<ValueType>& SimplifyOutputs(const PortElements<ValueType>& elements);
+
+        /// <summary> Adds nodes to the model to represent "complex" outputs: the concatenation of arbitrary subsets of output ports </summary>
+        ///
+        /// <param name="elements"> The output port elements to simplify to a new output port. </param>
+        ///
+        /// <returns> An output port containing the values specified by the `elements` argument. </returns>
+        const OutputPortBase& SimplifyOutputs(const PortElementsBase& elements);
 
         /// <summary> Checks if a node with a given ID is present </summary>
         ///
@@ -356,6 +372,7 @@ namespace model
         friend class InputPort;
         friend class ModelTransformer;
         friend class Map;
+        friend void swap(Model& a, Model& b);
 
         using IDToNodeMap = std::map<Node::NodeId, std::shared_ptr<Node>, std::less<Node::NodeId>>;
         struct ModelData
@@ -370,9 +387,6 @@ namespace model
         Model(const std::shared_ptr<Model::ModelData>& data);
         Model(const Model& other) = delete;
 
-        template <typename ValueType>
-        const OutputPort<ValueType>& SimplifyOutputs(const PortElements<ValueType>& elements);
-        const OutputPortBase& SimplifyOutputs(const PortElementsBase& elements);
         const OutputPortBase& AddSliceNode(const PortRange& inputRange);
         const OutputPortBase& AddSpliceNode(const std::vector<const OutputPortBase*>& outputPorts);
         Node* AddExistingNode(std::unique_ptr<Node> node);

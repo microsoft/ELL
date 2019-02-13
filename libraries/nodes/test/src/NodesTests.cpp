@@ -42,6 +42,8 @@
 #include <model/include/Model.h>
 #include <model/include/Node.h>
 #include <model/include/OutputNode.h>
+#include <model/include/RefineTransformation.h>
+#include <model/include/Submodel.h>
 
 #include <predictors/include/LinearPredictor.h>
 #include <predictors/include/NeuralNetworkPredictor.h>
@@ -141,6 +143,13 @@ void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, El
 {
     Uniform<ElementType> rand(min, max);
     std::generate(vector.begin(), vector.end(), rand);
+}
+
+model::Model RefineModel(const model::Model& model, model::ModelTransformer& transformer)
+{
+    model::TransformContext context;
+    model::RefineTransformation t;
+    return t.TransformModel(model, transformer, context);
 }
 } // namespace
 
@@ -398,9 +407,8 @@ static void TestL2NormSquaredNodeRefine()
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
     auto l2NormSquaredNode = model.AddNode<nodes::L2NormSquaredNode<double>>(inputNode->output);
 
-    model::TransformContext context;
     model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedModel = RefineModel(model, transformer);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
     const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(l2NormSquaredNode->output);
     std::cout << "Original L2NormSquaredNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
@@ -425,9 +433,8 @@ static void TestMovingAverageNodeRefine()
 
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
-    model::TransformContext context;
     model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedModel = RefineModel(model, transformer);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
     const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(meanNode->output);
     std::cout << "Original MovingAverageNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
@@ -462,9 +469,8 @@ static void TestSimpleForestPredictorNodeRefine()
     auto simpleForestPredictorNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
 
     // refine
-    model::TransformContext context;
     model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedModel = RefineModel(model, transformer);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
     const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(simpleForestPredictorNode->output);
     const auto& refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(simpleForestPredictorNode->treeOutputs);
@@ -499,9 +505,8 @@ static void TestSquaredEuclideanDistanceNodeRefine()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(input.size());
     auto sqEuclideanDistanceNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
-    model::TransformContext context;
     model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedModel = RefineModel(model, transformer);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
     const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(sqEuclideanDistanceNode->output);
     std::cout << "Original SquaredEuclideanDistanceNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
@@ -529,9 +534,8 @@ static void TestLinearPredictorNodeRefine()
     auto linearPredictorNode = model.AddNode<nodes::LinearPredictorNode<ElementType>>(inputNode->output, predictor);
 
     // refine the model
-    model::TransformContext context;
     model::ModelTransformer transformer;
-    auto newModel = transformer.RefineModel(model, context);
+    auto newModel = RefineModel(model, transformer);
 
     // check for equality
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
@@ -552,9 +556,8 @@ static void TestDemultiplexerNodeRefine()
     auto muxNode = model.AddNode<nodes::DemultiplexerNode<double, bool>>(inputNode->output, selectorNode->output, 2);
 
     // refine the model
-    model::TransformContext context;
     model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedModel = RefineModel(model, transformer);
     std::cout << "Original DemultiplexerNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newSelectorNode = transformer.GetCorrespondingInputNode(selectorNode);
@@ -596,9 +599,8 @@ static void TestMatrixVectorProductRefine()
 
     auto matrixVectorProductNode = model.AddNode<nodes::MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, w);
 
-    model::TransformContext context;
     model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedModel = RefineModel(model, transformer);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
     const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(matrixVectorProductNode->output);
 
@@ -629,9 +631,8 @@ static void TestEuclideanDistanceNodeRefine()
 
     auto euclideanDistanceNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, v);
 
-    model::TransformContext context;
     model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedModel = RefineModel(model, transformer);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
     const auto& refinedOutputElements = transformer.GetCorrespondingOutputs(euclideanDistanceNode->output);
 
@@ -705,9 +706,8 @@ static void TestProtoNNPredictorNode()
 
     auto protonnPredictorNode = model.AddNode<nodes::ProtoNNPredictorNode>(inputNode->output, protonnPredictor);
 
-    model::TransformContext context;
     model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedModel = RefineModel(model, transformer);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
     const auto& refinedScoreOutputElements = transformer.GetCorrespondingOutputs(protonnPredictorNode->output);
 

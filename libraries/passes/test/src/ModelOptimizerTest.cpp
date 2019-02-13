@@ -18,11 +18,14 @@
 
 #include <nodes/include/BroadcastFunctionNode.h>
 #include <nodes/include/ConstantNode.h>
+#include <nodes/include/ConvolutionalLayerNode.h>
 #include <nodes/include/MatrixMatrixMultiplyNode.h>
 #include <nodes/include/ReorderDataNode.h>
 
 #include <passes/include/FuseLinearOperationsPass.h>
 #include <passes/include/StandardPasses.h>
+
+#include <predictors/neural/include/ConvolutionalLayer.h>
 
 #include <testing/include/testing.h>
 
@@ -49,6 +52,21 @@ void PrintMap(const model::Map& map)
     std::cout << "------ Map start ------" << std::endl;
     map.GetModel().Print(std::cout);
     std::cout << "------ Map end ------" << std::endl;
+}
+
+bool HasNodeWithTypeName(const model::Model& model, std::string typeName)
+{
+    auto iter = model.GetNodeIterator();
+    while (iter.IsValid())
+    {
+        auto node = iter.Get();
+        if (node->GetRuntimeTypeName() == typeName)
+        {
+            return true;
+        }
+        iter.Next();
+    }
+    return false;
 }
 
 template <typename ValueType>
@@ -170,7 +188,7 @@ void TestFuseLinearOpsPass(std::vector<std::pair<bool, bool>> functionInfos)
     testing::ProcessTest("Testing compiled result", testing::IsEqual(referenceOutput, compiledOutput));
 }
 
-void TestFuseLinearOpsPasses()
+void TestFuseLinearOpsPass()
 {
     std::pair<bool, bool> linear = { true, true };
     std::pair<bool, bool> scale = { true, false };
@@ -399,4 +417,71 @@ void TestOptimizeReorderDataNodes4()
 #endif
 
     testing::ProcessTest("Testing compiled model optimizer", oldSize == 9 && newSize == 4);
+}
+
+void TestSetConvolutionMethodPass(model::PreferredConvolutionMethod convolutionMethod, std::string expectedNodeTypeName)
+{
+    using namespace predictors::neural;
+
+    using ElementType = float;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
+    using Shape = typename Layer<ElementType>::Shape;
+
+    const size_t inputPaddingSize = 1;
+    const int outputPaddingSize = 0;
+    TensorType inputWithPadding(1 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor({ inputPaddingSize, inputPaddingSize, 0 }, { 1, 2, 2 });
+    inputWithPadding.Fill(0);
+    input(0, 0, 0) = 2;
+    input(0, 1, 0) = 1;
+    input(0, 0, 1) = 3;
+    input(0, 1, 1) = 2;
+    // Input channel 0: [2, 3], input channel 1: [1, 2]
+
+    Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
+
+    LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    ConvolutionalParameters convolutionalParams{ 3, 1, ConvolutionMethod::automatic, 2 };
+
+    TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
+    ConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<ElementType>>(inputNode->output, layer);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    //
+    // test pass
+    //
+
+#if PRINT_MODELS
+    PrintModel(map.GetModel());
+#endif
+
+    // Initialize pass registry
+    passes::AddStandardPassesToRegistry();
+
+    // Compile it
+    model::MapCompilerOptions settings;
+    settings.optimizerSettings.preferredConvolutionMethod = convolutionMethod;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+#if PRINT_MODELS
+    PrintModel(compiledMap.GetModel());
+#endif
+
+    testing::ProcessTest("Testing SetConvolutionMethodPass for " + expectedNodeTypeName, HasNodeWithTypeName(compiledMap.GetModel(), expectedNodeTypeName));
+}
+
+void TestSetConvolutionMethodPass()
+{
+    TestSetConvolutionMethodPass(model::PreferredConvolutionMethod::diagonal, "DiagonalConvolutionComputeNode<float>");
+    TestSetConvolutionMethodPass(model::PreferredConvolutionMethod::simple, "SimpleConvolutionComputeNode<float>");
+    TestSetConvolutionMethodPass(model::PreferredConvolutionMethod::winograd, "WinogradConvolutionComputeNode<float>");
+    TestSetConvolutionMethodPass(model::PreferredConvolutionMethod::unrolled, "ReceptiveFieldMatrixNode<float>");
 }

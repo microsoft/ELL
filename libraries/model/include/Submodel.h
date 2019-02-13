@@ -12,6 +12,7 @@
 #include "Model.h"
 #include "OutputPort.h"
 
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -19,6 +20,31 @@ namespace ell
 {
 namespace model
 {
+    class SubmodelInputs
+    {
+    public:
+        /// <summary> Constructor </summary>
+        SubmodelInputs(const InputPortBase* input);
+
+        /// <summary> Constructor </summary>
+        SubmodelInputs(const std::string& name, const InputPortBase* input);
+
+        /// <summary> Constructor </summary>
+        SubmodelInputs(const std::vector<InputPortBase*>& inputs);
+
+        /// <summary> Constructor </summary>
+        SubmodelInputs(const std::vector<const InputPortBase*>& inputs);
+
+        /// <summary> Constructor </summary>
+        SubmodelInputs(const std::vector<std::pair<std::string, InputPortBase*>>& inputs);
+
+        /// <summary> Constructor </summary>
+        SubmodelInputs(const std::vector<std::pair<std::string, const InputPortBase*>>& inputs);
+
+    private:
+        std::vector<std::pair<std::string, const InputPortBase*>> _inputs;
+    };
+
     /// <summary> A submodel represents a subset of a model that is able to compute a specified set of outputs. </summary>
     ///
     /// The inputs of a submodel are a set of input ports that are necessary to compute the outputs. If
@@ -34,7 +60,13 @@ namespace model
     {
     public:
         /// <summary> Constructor </summary>
+        Submodel(const Model& model);
+
+        /// <summary> Constructor </summary>
         Submodel(const Model& model, const std::vector<const OutputPortBase*>& outputs);
+
+        /// <summary> Constructor </summary>
+        Submodel(const Model& model, const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
         /// <summary> Constructor </summary>
         Submodel(const Model& model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs);

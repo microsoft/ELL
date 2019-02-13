@@ -19,6 +19,8 @@
 #include <model/include/Model.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
+#include <model/include/RefineTransformation.h>
+#include <model/include/Submodel.h>
 
 #include <nodes/include/NeuralNetworkPredictorNode.h>
 
@@ -87,7 +89,8 @@ int main(int argc, char* argv[])
             {
                 model::TransformContext context;
                 model::ModelTransformer transformer;
-                model = transformer.RefineModel(model, context, printArguments.refine);
+                model::RefineTransformation t;
+                model = t.TransformModel(model, transformer, context);
             }
         }
         else
@@ -99,7 +102,8 @@ int main(int argc, char* argv[])
                 {
                     model::TransformContext context;
                     model::ModelTransformer transformer;
-                    model = transformer.RefineModel(map.GetModel(), context, printArguments.refine);
+                    model::RefineTransformation t;
+                    model = t.TransformModel(model, transformer, context);
                 }
                 {
                     model::TransformContext context;

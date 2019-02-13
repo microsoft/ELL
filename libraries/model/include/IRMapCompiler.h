@@ -160,7 +160,6 @@ namespace model
         void PushScope() override;
         void PopScope() override;
         emitters::ModuleEmitter* GetModuleEmitter() override { return &_moduleEmitter; }
-        void EnsureValidMap(Map& map);
         virtual std::string GetPredictFunctionName() const;
         virtual void EmitModelAPIFunctions(const Map& map);
 
@@ -171,6 +170,7 @@ namespace model
     private:
         NodeMap<emitters::IRBlockRegion*>& GetCurrentNodeBlocks();
         const Node* GetUniqueParent(const Node& node);
+        void RefineAndOptimize(Map& map);
         bool TryMergeNodeIntoRegion(emitters::IRBlockRegion* pDestination, const Node& src);
 
         void EmitGetInputSizeFunction(const Map& map);

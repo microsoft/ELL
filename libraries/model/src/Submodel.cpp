@@ -14,9 +14,22 @@ namespace ell
 {
 namespace model
 {
+    Submodel::Submodel(const Model& model) :
+        Submodel(model, std::vector<const InputPortBase*>{}, std::vector<const OutputPortBase*>{})
+    {
+    }
+
     Submodel::Submodel(const Model& model, const std::vector<const OutputPortBase*>& outputs) :
         Submodel(model, {}, outputs)
     {
+    }
+
+    Submodel::Submodel(const Model& model, const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) :
+        _model(model.ShallowCopy()),
+        _inputs(inputs.begin(), inputs.end()),
+        _outputs(outputs.begin(), outputs.end())
+    {
+        VerifyInputs();
     }
 
     Submodel::Submodel(const Model& model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs) :
@@ -27,7 +40,8 @@ namespace model
         VerifyInputs();
     }
 
-    Submodel::Submodel(const Submodel& other) : Submodel(other._model, other._inputs, other._outputs)
+    Submodel::Submodel(const Submodel& other) :
+        Submodel(other._model, other._inputs, other._outputs)
     {
     }
 
@@ -48,7 +62,7 @@ namespace model
 
     void Submodel::VerifyInputs()
     {
-        // TODO: verify that each of the supplied inputs is necessary
+        // Verify each of the supplied inputs is necessary
         std::unordered_set<const InputPortBase*> inputs(_inputs.begin(), _inputs.end());
         std::unordered_set<const InputPortBase*> unseenInputs(_inputs.begin(), _inputs.end());
         for (const OutputPortBase* output : _outputs)
@@ -65,9 +79,9 @@ namespace model
     void Submodel::VerifyInputs(const OutputPortBase* output, const std::unordered_set<const InputPortBase*>& inputs, std::unordered_set<const InputPortBase*>& unseenInputs)
     {
         auto node = output->GetNode();
-        for (auto input: node->GetInputPorts())
+        for (auto input : node->GetInputPorts())
         {
-            if(inputs.find(input) != inputs.end())
+            if (inputs.find(input) != inputs.end())
             {
                 if (unseenInputs.find(input) != unseenInputs.end())
                 {

@@ -606,14 +606,6 @@ std::string Model::GetJson() const
     return stream.str();
 }
 
-Model Model::Refine(int maxIterations)
-{
-    ell::model::TransformContext context;
-    ell::model::ModelTransformer transformer;
-    ell::model::Model refinedModel = transformer.RefineModel(*_model, context, maxIterations);
-    return Model(std::move(refinedModel));
-}
-
 Model::Model(ell::model::Model&& other)
 {
     _model = std::make_shared<ell::model::Model>(std::move(other));

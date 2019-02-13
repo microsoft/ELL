@@ -49,6 +49,8 @@ namespace utilities
         /// <summary> Removes metadata for the given key. </summary>
         ///
         /// <param name="key"> The key to use for the metadata. </param>
+        ///
+        /// <returns> The entry that was removed, or an empty `Variant` if none was present. </returns>
         Variant RemoveEntry(const std::string& key);
 
         /// <summary> Checks if is a metadata entries for the given key. </summary>
@@ -111,6 +113,12 @@ namespace utilities
     void PropertyBag::SetEntry(const std::string& key, ValueType value)
     {
         _metadata[key] = Variant(value);
+    }
+
+    template <>
+    inline void PropertyBag::SetEntry(const std::string& key, const char* value)
+    {
+        _metadata[key] = Variant(std::string(value));
     }
 
     template <typename ValueType>

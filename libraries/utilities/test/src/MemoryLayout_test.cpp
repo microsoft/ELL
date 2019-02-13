@@ -182,6 +182,44 @@ void TestDimensionOrder()
     testing::ProcessTest("MemoryLayout::GetLogicalDimension", ok);
 }
 
+void TestMemoryLayoutHash()
+{
+    MemoryLayout layout1({ 7, 5, 3 }, ChannelMajorTensorOrder);
+    MemoryLayout layout2({ 7, 5, 3 }, ChannelMajorTensorOrder);
+    MemoryLayout layout3({ 7, 5, 3 }, RowMajorTensorOrder);
+    MemoryLayout layout4({ 7, 5, 3 }, { 1, 1, 0 }, ChannelMajorTensorOrder);
+
+    bool ok = true;
+    std::hash<MemoryLayout> layoutHash;
+    ok &= testing::IsEqual(layoutHash(layout1), layoutHash(layout2));
+    ok &= !testing::IsEqual(layoutHash(layout1), layoutHash(layout3));
+    ok &= !testing::IsEqual(layoutHash(layout1), layoutHash(layout4));
+    testing::ProcessTest("std::hash<MemoryLayout>", ok);
+
+    DimensionOrder order1({ 0, 1, 2, 3 });
+    DimensionOrder order2({ 0, 1, 2 });
+    MemoryCoordinates coords1({ 1, 2, 3 });
+    MemoryCoordinates coords2({ 1, 2 });
+    MemoryShape shape1({ 1, 2, 3 });
+    MemoryShape shape2({ 1, 2 });
+
+    ok = true;
+    std::hash<DimensionVector> dimHash;
+    ok &= testing::IsEqual(dimHash(order1), dimHash(order1));
+    ok &= !testing::IsEqual(dimHash(order1), dimHash(order2));
+    testing::ProcessTest("std::hash<DimensionVector> 1", ok);
+
+    ok = true;
+    ok &= testing::IsEqual(dimHash(coords1), dimHash(coords1));
+    ok &= !testing::IsEqual(dimHash(coords1), dimHash(coords2));
+    testing::ProcessTest("std::hash<DimensionVector> 2", ok);
+
+    ok = true;
+    ok &= testing::IsEqual(dimHash(shape1), dimHash(shape1));
+    ok &= !testing::IsEqual(dimHash(shape1), dimHash(shape2));
+    testing::ProcessTest("std::hash<DimensionVector> 3", ok);
+}
+
 void TestScalarLayout()
 {
     bool ok = true;

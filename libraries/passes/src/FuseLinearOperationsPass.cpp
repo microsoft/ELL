@@ -264,7 +264,7 @@ namespace passes
     {
         model::OptimizationPassInfo info = {
             "FuseLinearOperationsPass",
-            [](const model::ModelOptimizerOptions& settings) { return settings.phase == model::OptimizerPhase::optimize && settings.fuseLinearFunctionNodes; },
+            [](const model::ModelOptimizerOptions& settings) { return settings.fuseLinearFunctionNodes; },
             []() { return std::make_unique<FuseLinearOperationsPass>(); }
         };
         model::OptimizationPassRegistry::AddPass(info);

@@ -112,8 +112,7 @@ void TestMapRefine()
     auto map1 = model::Map(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
     auto map2 = model::Map(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
 
-    model::TransformContext context;
-    map2.Refine(context);
+    map2.Refine();
 
     auto input = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },
                                                    { 4.0, 5.0, 6.0 },

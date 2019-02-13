@@ -8,7 +8,9 @@
 
 #include "Map.h"
 #include "ModelTransformer.h"
+#include "OptimizeModelTransformation.h"
 #include "OutputNode.h"
+#include "RefineTransformation.h"
 
 #include <model/optimizer/include/ModelOptimizer.h>
 
@@ -94,6 +96,11 @@ namespace model
     {
         swap(*this, other);
         return *this;
+    }
+
+    Submodel Map::GetSubmodel()
+    {
+        return { _model };
     }
 
     void Map::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const
@@ -215,7 +222,6 @@ namespace model
         swap(a._outputElements, b._outputElements);
         swap(a._outputNames, b._outputNames);
         swap(a._outputElementsMap, b._outputElementsMap);
-        swap(a._metadata, b._metadata);
     }
 
     std::vector<const Node*> Map::GetAllOutputNodes() const
@@ -505,23 +511,18 @@ namespace model
             return;
         }
 
-        ModelTransformer transformer;
-        auto refinedModel = transformer.RefineModel(_model, context, maxIterations);
-        FixTransformedIO(transformer);
-        _model = std::move(refinedModel);
+        RefineTransformation t(maxIterations);
+        Transform(t);
         Prune();
     }
 
     void Map::Optimize(const ModelOptimizer& optimizer)
     {
-        ModelOptimizerContext context;
-        auto optimizedModel = optimizer.OptimizeModel(_model, context);
-
-        FixTransformedIO(context);
-        _model = std::move(optimizedModel);
+        OptimizeModelTransformation t(optimizer);
+        Transform(t);
         Prune();
     }
-    
+
     void Map::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction)
     {
         TransformContext context;
@@ -531,9 +532,25 @@ namespace model
     void Map::Transform(const TransformContext& context, const std::function<void(const Node&, ModelTransformer&)>& transformFunction)
     {
         ModelTransformer transformer;
-        auto refinedModel = transformer.TransformModel(_model, context, transformFunction);
+        auto newModel = transformer.TransformModel(_model, context, transformFunction);
         FixTransformedIO(transformer);
-        _model = std::move(refinedModel);
+        _model = std::move(newModel);
+    }
+
+    void Map::Transform(optimizer::Transformation& transformation)
+    {
+        TransformContext context;
+        Transform(transformation, context);
+    }
+
+    void Map::Transform(optimizer::Transformation& transformation, const TransformContext& context)
+    {
+        ModelTransformer transformer;
+        auto newModel = transformation.TransformModel(_model, transformer, context);
+
+        FixTransformedIO(transformer);
+
+        _model = newModel.ShallowCopy();
     }
 
     void Map::RenameCallbacks(const std::string& sourceCallbackName, const std::string& sinkCallbackName)

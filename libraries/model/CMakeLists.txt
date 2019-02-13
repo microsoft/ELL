@@ -21,12 +21,17 @@ set(src
     src/ModelEditor.cpp
     src/ModelTransformer.cpp
     src/Node.cpp
+    src/OptimizeModelTransformation.cpp
     src/OutputNodeBase.cpp
     src/OutputPort.cpp
     src/Port.cpp
     src/PortElements.cpp
     src/PortMemoryLayout.cpp
+    src/RefineAndOptimizeTransformation.cpp
+    src/RefineTransformation.cpp
     src/Submodel.cpp
+    src/Transformation.cpp
+    src/TransformContext.cpp
 )
 
 set(include
@@ -49,15 +54,20 @@ set(include
     include/ModelTransformer.h
     include/Node.h
     include/NodeMap.h
+    include/OptimizeModelTransformation.h
     include/OutputNode.h
     include/OutputNodeBase.h
     include/OutputPort.h
     include/Port.h
     include/PortElements.h
     include/PortMemoryLayout.h
+    include/RefineAndOptimizeTransformation.h
+    include/RefineTransformation.h
     include/SliceNode.h
     include/SpliceNode.h
     include/Submodel.h
+    include/Transformation.h
+    include/TransformContext.h
 )
 
 set(doc
@@ -139,10 +149,10 @@ set_test_library_path(${test_name})
 set(compiler_test_name ${library_name}_compiler_test)
 
 set(compiler_test_src
-    test/src/model_compiler_test_main.cpp
     test/src/CompilableCodeNode_test.cpp
     test/src/CompilableNodesTest.cpp
     test/src/CompilerTest.cpp
+    test/src/model_compiler_test_main.cpp
     test/src/ModelHeaderOutputTest.cpp
     test/src/ModelMaker.cpp
     test/src/PerformanceCountersTest.cpp
@@ -174,3 +184,72 @@ set_target_properties(
 
 add_test(NAME ${compiler_test_name} COMMAND ${compiler_test_name})
 set_test_library_path(${compiler_test_name})
+
+#
+# global optimizer-specific tests
+#
+set(global_optimizer_test_name global_optimizer_test)
+
+set(optimizer_test_src
+    optimizer/test/src/Cost.cpp
+    optimizer/test/src/CostDatabase.cpp
+    optimizer/test/src/CostModelTest.cpp
+    optimizer/test/src/CostTest.cpp
+    optimizer/test/src/Environment.cpp
+    optimizer/test/src/EnvironmentTest.cpp
+    optimizer/test/src/ExampleCostModels.cpp
+    optimizer/test/src/ExampleObjectives.cpp
+    optimizer/test/src/ExampleOptimizers.cpp
+    optimizer/test/src/ExampleTransformations.cpp
+    optimizer/test/src/FuseLinearOperationsTransformation.cpp
+    optimizer/test/src/GlobalOptimizer.cpp
+    optimizer/test/src/GlobalOptimizerOptions.cpp
+    optimizer/test/src/main.cpp
+    optimizer/test/src/ObjectiveTest.cpp
+    optimizer/test/src/OptimizerOptionsTest.cpp
+    optimizer/test/src/OptimizerTest.cpp
+    optimizer/test/src/OptimizerTestUtil.cpp
+    optimizer/test/src/SequentialOptimizer.cpp
+    optimizer/test/src/SetConvolutionMethodTransformation.cpp
+    optimizer/test/src/TransformationTest.cpp
+)
+
+
+set(optimizer_test_include
+    optimizer/test/include/Cost.h
+    optimizer/test/include/CostModel.h
+    optimizer/test/include/CostDatabase.h
+    optimizer/test/include/CostModelTest.h
+    optimizer/test/include/CostTest.h
+    optimizer/test/include/Environment.h
+    optimizer/test/include/EnvironmentTest.h
+    optimizer/test/include/ExampleCostModels.h
+    optimizer/test/include/ExampleObjectives.h
+    optimizer/test/include/ExampleOptimizers.h
+    optimizer/test/include/ExampleTransformations.h
+    optimizer/test/include/FuseLinearOperationsTransformation.h
+    optimizer/test/include/GlobalOptimizer.h
+    optimizer/test/include/GlobalOptimizerOptions.h
+    optimizer/test/include/Objective.h
+    optimizer/test/include/ObjectiveTest.h
+    optimizer/test/include/OptimizerOptionsTest.h
+    optimizer/test/include/OptimizerTest.h
+    optimizer/test/include/OptimizerTestUtil.h
+    optimizer/test/include/SequentialOptimizer.h
+    optimizer/test/include/SetConvolutionMethodTransformation.h
+    optimizer/test/include/TransformationTest.h
+)
+
+source_group("src" FILES ${optimizer_test_src})
+source_group("include" FILES ${optimizer_test_include})
+
+add_executable(${global_optimizer_test_name} ${optimizer_test_src} ${optimizer_test_include})
+target_include_directories(${global_optimizer_test_name} PRIVATE optimizer/test/include ${ELL_LIBRARIES_DIR})
+target_link_libraries(${global_optimizer_test_name} emitters model nodes testing utilities)
+
+copy_shared_libraries(${global_optimizer_test_name})
+
+set_property(TARGET ${global_optimizer_test_name} PROPERTY FOLDER "tests")
+
+add_test(NAME ${global_optimizer_test_name} COMMAND ${global_optimizer_test_name})
+set_test_library_path(${global_optimizer_test_name})

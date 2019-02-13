@@ -15,6 +15,7 @@
 #include "IRMetadata.h"
 #include "IRSwigInterfaceWriter.h"
 #include "LLVMUtilities.h"
+#include "TargetDevice.h"
 
 #include <utilities/include/Files.h>
 #include <utilities/include/Logger.h>
@@ -39,35 +40,6 @@ namespace emitters
 {
     using namespace utilities::logging;
     using utilities::logging::Log;
-
-    namespace
-    {
-        static const size_t c_defaultNumBits = 64;
-
-        // Triples
-        std::string c_macTriple = "x86_64-apple-macosx10.12.0"; // alternate: "x86_64-apple-darwin16.0.0"
-        std::string c_linuxTriple = "x86_64-pc-linux-gnu";
-        std::string c_windowsTriple = "x86_64-pc-win32";
-        std::string c_armv6Triple = "armv6--linux-gnueabihf"; // raspberry pi 0
-        std::string c_armv7Triple = "armv7--linux-gnueabihf"; // raspberry pi 3 and orangepi0
-        std::string c_arm64Triple = "aarch64-unknown-linux-gnu"; // DragonBoard
-        std::string c_iosTriple = "aarch64-apple-ios"; // alternates: "arm64-apple-ios7.0.0", "thumbv7-apple-ios7.0"
-
-        // CPUs
-        std::string c_pi0Cpu = "arm1136jf-s";
-        std::string c_pi3Cpu = "cortex-a53";
-        std::string c_orangePi0Cpu = "cortex-a7";
-
-        // clang settings:
-        // target=armv7-apple-darwin
-
-        std::string c_macDataLayout = "e-m:o-i64:64-f80:128-n8:16:32:64-S128";
-        std::string c_linuxDataLayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128";
-        std::string c_windowsDataLayout = "e-m:w-i64:64-f80:128-n8:16:32:64-S128";
-        std::string c_armDataLayout = "e-m:e-p:32:32-i64:64-v128:64:128-a:0:32-n32-S64";
-        std::string c_arm64DataLayout = "e-m:e-i64:64-i128:128-n32:64-S128"; // DragonBoard
-        std::string c_iosDataLayout = "e-m:o-i64:64-i128:128-n32:64-S128";
-    } // namespace
 
     //
     // Constructors
@@ -114,136 +86,7 @@ namespace emitters
 
     void IRModuleEmitter::CompleteCompilerOptions(CompilerOptions& parameters)
     {
-        if (parameters.targetDevice.numBits == 0)
-        {
-            parameters.targetDevice.numBits = c_defaultNumBits;
-        }
-
-        // Set low-level args based on target name (if present)
-        if (parameters.targetDevice.deviceName != "")
-        {
-            if (parameters.targetDevice.deviceName == "host")
-            {
-                auto hostTripleString = llvm::sys::getProcessTriple();
-                llvm::Triple hostTriple(hostTripleString);
-
-                parameters.targetDevice.triple = hostTriple.normalize();
-                parameters.targetDevice.architecture = llvm::Triple::getArchTypeName(hostTriple.getArch());
-                parameters.targetDevice.cpu = llvm::sys::getHostCPUName();
-
-                std::string error;
-                const llvm::Target* target = llvm::TargetRegistry::lookupTarget(parameters.targetDevice.triple, error);
-                if (target == nullptr)
-                {
-                    throw EmitterException(EmitterError::targetNotSupported, std::string("Couldn't create target ") + error);
-                }
-
-                const OutputRelocationModel relocModel = OutputRelocationModel::Static;
-                const llvm::CodeModel::Model codeModel = llvm::CodeModel::Small; // If this code gets executed during JIT, this might have to be medium/large
-                const llvm::TargetOptions options;
-                std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(parameters.targetDevice.triple,
-                                                                                               parameters.targetDevice.cpu,
-                                                                                               parameters.targetDevice.features,
-                                                                                               options,
-                                                                                               relocModel,
-                                                                                               codeModel,
-                                                                                               llvm::CodeGenOpt::Level::Default));
-
-                if (!targetMachine)
-                {
-                    throw EmitterException(EmitterError::targetNotSupported, "Unable to allocate host target machine");
-                }
-
-                llvm::DataLayout dataLayout(targetMachine->createDataLayout());
-                parameters.targetDevice.dataLayout = dataLayout.getStringRepresentation();
-            }
-            else if (parameters.targetDevice.deviceName == "mac")
-            {
-                parameters.targetDevice.triple = c_macTriple;
-                parameters.targetDevice.dataLayout = c_macDataLayout;
-            }
-            else if (parameters.targetDevice.deviceName == "linux")
-            {
-                parameters.targetDevice.triple = c_linuxTriple;
-                parameters.targetDevice.dataLayout = c_linuxDataLayout;
-            }
-            else if (parameters.targetDevice.deviceName == "windows")
-            {
-                parameters.targetDevice.triple = c_windowsTriple;
-                parameters.targetDevice.dataLayout = c_windowsDataLayout;
-            }
-            else if (parameters.targetDevice.deviceName == "pi0")
-            {
-                parameters.targetDevice.triple = c_armv6Triple;
-                parameters.targetDevice.dataLayout = c_armDataLayout;
-                parameters.targetDevice.numBits = 32;
-                parameters.targetDevice.cpu = c_pi0Cpu; // maybe not necessary
-            }
-            else if (parameters.targetDevice.deviceName == "pi3") // pi3 (Raspbian)
-            {
-                parameters.targetDevice.triple = c_armv7Triple;
-                parameters.targetDevice.dataLayout = c_armDataLayout;
-                parameters.targetDevice.numBits = 32;
-                parameters.targetDevice.cpu = c_pi3Cpu; // maybe not necessary
-            }
-            else if (parameters.targetDevice.deviceName == "orangepi0") // orangepi (Raspbian)
-            {
-                parameters.targetDevice.triple = c_armv7Triple;
-                parameters.targetDevice.dataLayout = c_armDataLayout;
-                parameters.targetDevice.numBits = 32;
-                parameters.targetDevice.cpu = c_orangePi0Cpu; // maybe not necessary
-            }
-            else if (parameters.targetDevice.deviceName == "pi3_64") // pi3 (openSUSE)
-            {
-                // need to set arch to aarch64?
-                parameters.targetDevice.triple = c_arm64Triple;
-                parameters.targetDevice.dataLayout = c_arm64DataLayout;
-                parameters.targetDevice.numBits = 64;
-                parameters.targetDevice.cpu = c_pi3Cpu;
-            }
-            else if (parameters.targetDevice.deviceName == "aarch64") // arm64 linux (DragonBoard)
-            {
-                // need to set arch to aarch64?
-                parameters.targetDevice.triple = c_arm64Triple;
-                parameters.targetDevice.dataLayout = c_arm64DataLayout;
-                parameters.targetDevice.numBits = 64;
-            }
-            else if (parameters.targetDevice.deviceName == "ios")
-            {
-                parameters.targetDevice.triple = c_iosTriple;
-                parameters.targetDevice.dataLayout = c_iosDataLayout;
-            }
-            else if (parameters.targetDevice.deviceName == "custom")
-            {
-                // perhaps it is a custom target where triple and cpu were set manually.
-                if (parameters.targetDevice.triple == "")
-                {
-                    throw EmitterException(EmitterError::badFunctionArguments, "Missing 'triple' information");
-                }
-                if (parameters.targetDevice.cpu == "")
-                {
-                    throw EmitterException(EmitterError::badFunctionArguments, "Missing 'cpu' information");
-                }
-            }
-            else
-            {
-                throw EmitterException(EmitterError::targetNotSupported, std::string("Unknown target device name: " + parameters.targetDevice.deviceName));
-            }
-        }
-        else
-        {
-            if (parameters.targetDevice.cpu == "cortex-m0")
-            {
-                parameters.targetDevice.triple = "armv6m-unknown-none-eabi";
-                parameters.targetDevice.features = "+armv6-m,+v6m";
-                parameters.targetDevice.architecture = "thumb";
-            }
-            else if (parameters.targetDevice.cpu == "cortex-m4")
-            {
-                parameters.targetDevice.triple = "arm-none-eabi";
-                parameters.targetDevice.features = "+armv7e-m,+v7,soft-float";
-            }
-        }
+        CompleteTargetDevice(parameters.targetDevice);
     }
 
     //

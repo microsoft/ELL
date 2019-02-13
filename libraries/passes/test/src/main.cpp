@@ -24,12 +24,14 @@ int main()
 {
     try
     {
-        TestFuseLinearOpsPasses();
+        TestFuseLinearOpsPass();
 
         TestOptimizeReorderDataNodes1();
         TestOptimizeReorderDataNodes2();
         TestOptimizeReorderDataNodes3();
         TestOptimizeReorderDataNodes4();
+
+        TestSetConvolutionMethodPass();
     }
     catch (const utilities::Exception& exception)
     {

@@ -10,6 +10,7 @@
 #include "InputNode.h"
 #include "Node.h"
 #include "OutputNode.h"
+#include "RefineTransformation.h"
 
 #include <utilities/include/Exception.h>
 #include <utilities/include/StringUtil.h>
@@ -79,50 +80,6 @@ namespace model
 
         model::OutputPort<ValueType> _output;
     };
-
-    //
-    // TransformContext implementation
-    //
-    TransformContext::TransformContext() :
-        _compiler(nullptr)
-    {
-    }
-
-    TransformContext::TransformContext(const NodeActionFunction& nodeActionFunction) :
-        _compiler(nullptr)
-    {
-        _nodeActionFunctions.emplace_back(nodeActionFunction);
-    }
-
-    TransformContext::TransformContext(const MapCompiler* compiler, const NodeActionFunction& nodeActionFunction) :
-        _compiler(compiler)
-    {
-        _nodeActionFunctions.emplace_back(nodeActionFunction);
-    }
-
-    bool TransformContext::IsNodeCompilable(const Node& node) const
-    {
-        return node.IsCompilable(_compiler);
-    }
-
-    void TransformContext::AddNodeActionFunction(const NodeActionFunction& nodeActionFunction)
-    {
-        _nodeActionFunctions.emplace_back(nodeActionFunction);
-    }
-
-    NodeAction TransformContext::GetNodeAction(const Node& node) const
-    {
-        for (auto iter = _nodeActionFunctions.rbegin(); iter != _nodeActionFunctions.rend(); ++iter)
-        {
-            auto& actionFunction = *iter;
-            auto action = actionFunction(node);
-            if (action != NodeAction::abstain)
-            {
-                return action;
-            }
-        }
-        return node.IsCompilable(_compiler) ? NodeAction::compile : NodeAction::refine;
-    }
 
     //
     // PortCorrespondences
@@ -239,14 +196,12 @@ namespace model
     Model ModelTransformer::CopyModel(const Model& oldModel)
     {
         TransformContext context;
-        Submodel m(oldModel, {}, {});
-        auto result = CopySubmodel(m, context);
-        return std::move(result.GetModel());
+        return CopyModel(oldModel, context);
     }
 
     Model ModelTransformer::CopyModel(const Model& oldModel, const TransformContext& context)
     {
-        Submodel m(oldModel, {}, {});
+        Submodel m(oldModel);
         auto result = CopySubmodel(m, context);
         return std::move(result.GetModel());
     }
@@ -254,7 +209,6 @@ namespace model
     Submodel ModelTransformer::CopySubmodel(const Submodel& submodel, const TransformContext& context)
     {
         Model destModel;
-        _elementsMap.Clear();
         auto result = TransformSubmodelOnto(submodel, destModel, {}, context, [](const Node& node, ModelTransformer& transformer) {
             transformer.CopyNode(node);
         });
@@ -265,7 +219,6 @@ namespace model
 
     Submodel ModelTransformer::CopySubmodelOnto(const Submodel& submodel, Model& destModel, const std::vector<const OutputPortBase*>& onto, const TransformContext& context)
     {
-        _elementsMap.Clear();
         auto result = TransformSubmodelOnto(submodel, destModel, {}, context, [](const Node& node, ModelTransformer& transformer) {
             transformer.CopyNode(node);
         });
@@ -274,9 +227,9 @@ namespace model
         return result;
     }
 
-    bool ModelTransformer::IsModelCompilable() const
+    bool ModelTransformer::IsModelCompilable(const Model& model) const
     {
-        auto iter = _model.GetNodeIterator();
+        auto iter = model.GetNodeIterator();
         while (iter.IsValid())
         {
             if (!_context.IsNodeCompilable(*iter.Get()))
@@ -331,54 +284,6 @@ namespace model
         return dynamic_cast<const InputNodeBase*>(&node) != nullptr;
     }
 
-    Model ModelTransformer::RefineModel(const Model& oldModel, const TransformContext& context, int maxIterations)
-    {
-        if (maxIterations <= 0)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "maxIterations must be positive");
-        }
-
-        _elementsMap.Clear();
-        _model = CopyModel(oldModel, context);
-        _context = context;
-
-        // Refine until all nodes are compilable according to context.IsNodeCompilable(), until
-        // the model is fully refined, or until the maximum number of iterations is reached.
-        for (int i = 0; i < maxIterations; ++i)
-        {
-            Model currentModel = std::move(_model);
-            _model = Model();
-
-            auto previousElementMap = std::move(_elementsMap);
-            _elementsMap.Clear();
-
-            // Do one refinement pass
-            // Note: as a side-effect, _elementsMap may be modified
-            bool didRefineAny = false;
-            currentModel.Visit([this, &didRefineAny](const Node& node) {
-                bool didRefineNode = RefineNode(node);
-                didRefineAny |= didRefineNode;
-            });
-
-            if (!previousElementMap.IsEmpty())
-            {
-                // Now we have 2 maps, the previous one mapping A->B, and a new one mapping B->C (in _elementsMap).
-                // Concatenate them to get a map A->C, and keep it.
-                auto newElementsMap = PortOutputsMap::ConcatenateMaps(previousElementMap, _elementsMap);
-                _elementsMap = newElementsMap;
-            }
-
-            // check for early end condition
-            if (!didRefineAny || IsModelCompilable())
-            {
-                break;
-            }
-        }
-
-        ResetContext();
-        return std::move(_model);
-    }
-
     bool ModelTransformer::Compatible(const InputPortBase* source, const OutputPortBase* dest)
     {
         return (source->Size() == dest->Size()) && (source->GetType() == dest->GetType());
@@ -404,7 +309,7 @@ namespace model
     Model ModelTransformer::TransformModel(const Model& model, const TransformContext& context, const NodeTransformFunction& transformFunction)
     {
         Model newModel;
-        Submodel submodel(model, {}, {});
+        Submodel submodel(model);
         auto result = TransformSubmodelOnto(submodel, newModel, {}, context, transformFunction);
         return result.GetModel().ShallowCopy();
     }
@@ -600,7 +505,7 @@ namespace model
         auto action = GetContext().GetNodeAction(node);
         if (action == NodeAction::refine || action == NodeAction::abstain)
         {
-            auto didRefineNode = node.InvokeRefine(*this);
+            auto didRefineNode = node.Refine(*this);
             AssignNodeAncestor(node);
             return didRefineNode;
         }

@@ -110,9 +110,8 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
     model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions(baseFilename);
     if (compileArguments.outputRefinedMap)
     {
-        model::TransformContext context;
         TimingOutputCollector timer(timingOutput, "Time to refine map", compileArguments.verbose);
-        map.Refine(context, compileArguments.maxRefinementIterations);
+        map.Refine(compileArguments.maxRefinementIterations);
         timer.Stop();
         common::SaveMap(map, baseFilename + "_refined.map");
     }

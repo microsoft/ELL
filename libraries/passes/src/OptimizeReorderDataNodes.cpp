@@ -146,7 +146,7 @@ namespace passes
     {
         model::OptimizationPassInfo info = {
             "OptimizeReorderDataNodes",
-            [](const model::ModelOptimizerOptions& settings) { return settings.phase == model::OptimizerPhase::optimize && settings.optimizeReorderDataNodes; },
+            [](const model::ModelOptimizerOptions& settings) { return settings.optimizeReorderDataNodes; },
             []() { return std::make_unique<OptimizeReorderDataNodes>(); }
         };
         model::OptimizationPassRegistry::AddPass(info);

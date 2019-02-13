@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ModelOptimizer.cpp (model)
+//  File:     ModelOptimizer.cpp (model/optimizer)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,6 +50,10 @@ namespace model
     //
     // ModelOptimizerContext
     //
+    ModelOptimizerContext::ModelOptimizerContext(ModelTransformer& transformer) :
+        _transformer(transformer)
+    {
+    }
 
     ModelTransformer& ModelOptimizerContext::GetTransformer()
     {

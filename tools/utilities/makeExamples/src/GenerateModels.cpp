@@ -11,6 +11,7 @@
 #include <model/include/InputNode.h>
 #include <model/include/Model.h>
 #include <model/include/OutputNode.h>
+#include <model/include/RefineTransformation.h>
 
 #include <nodes/include/ActivationLayerNode.h>
 #include <nodes/include/BiasLayerNode.h>
@@ -207,9 +208,10 @@ model::Model GenerateRefinedTreeModel(size_t numSplits)
     auto model = GenerateTreeModel(numSplits);
     model::TransformContext context;
     model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
-    return refinedModel;
+    model::RefineTransformation t;
+    return t.TransformModel(model, transformer, context);
 }
+
 // explicit instantiations
 template model::Model GenerateBroadcastTimesTwoModel<int>(size_t dimension);
 

@@ -11,6 +11,8 @@
 #include <model/include/InputNode.h>
 #include <model/include/Model.h>
 #include <model/include/OutputNode.h>
+#include <model/include/RefineTransformation.h>
+#include <model/include/Submodel.h>
 
 #include <nodes/include/BinaryOperationNode.h>
 #include <nodes/include/DelayNode.h>
@@ -135,10 +137,10 @@ namespace common
     model::Model GetRefinedTreeModel(size_t numSplits)
     {
         auto model = GetTreeModel(numSplits);
-        model::TransformContext context;
         model::ModelTransformer transformer;
-        auto refinedModel = transformer.RefineModel(model, context);
-        return refinedModel;
+        model::TransformContext context;
+        model::RefineTransformation t;
+        return t.TransformModel(model, transformer, context);
     }
 
     template <typename UnarchiverType>

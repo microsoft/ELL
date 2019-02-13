@@ -1662,7 +1662,6 @@ void TestNeuralNetworkPredictorNode1()
 
     // Create model
     model::Model model;
-#if 1
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
     auto predictorNode = model.AddNode<NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
@@ -1691,29 +1690,6 @@ void TestNeuralNetworkPredictorNode1()
     unarchiver >> unarchivedMap;
 
     VerifyCompiledOutput(unarchivedMap, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_1");
-#else
-    auto inputNode = model.AddNode<model::InputNode<double>>(model::MemoryShape{ 1, 1, 3 });
-    std::vector<ElementType> singleChannelInput = { 2 };
-    std::vector<ElementType> allChannelsInput = { 2, 1, 0 };
-    auto scaleValuesNode = model.AddNode<ConstantNode<ElementType>>(allChannelsInput);
-    auto scaleValuesNode2 = model.AddNode<ConstantNode<ElementType>>(allChannelsInput);
-    auto biasValuesNode = model.AddNode<ConstantNode<ElementType>>(); // nothing
-
-    const size_t channelDimension = 2;
-    auto computeNode = model.AddNode<BroadcastLinearFunctionNode<ElementType>>(inputNode->output,
-                                                                                      inputNode->output.GetMemoryLayout(),
-                                                                                      scaleValuesNode->output,
-                                                                                      biasValuesNode->output,
-                                                                                      channelDimension,
-                                                                                      inputNode->output.GetMemoryLayout());
-    // map.Refine();
-    utilities::JsonArchiver printer(std::cout);
-    printer << model;
-
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
-
-    throw 0;
-#endif
 }
 
 void TestBroadcastLinearFunctionNode()

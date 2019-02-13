@@ -8,9 +8,11 @@
 
 #pragma once
 
-void TestFuseLinearOpsPasses();
+void TestFuseLinearOpsPass();
 
 void TestOptimizeReorderDataNodes1();
 void TestOptimizeReorderDataNodes2();
 void TestOptimizeReorderDataNodes3();
 void TestOptimizeReorderDataNodes4();
+
+void TestSetConvolutionMethodPass();

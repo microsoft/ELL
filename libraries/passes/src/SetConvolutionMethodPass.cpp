@@ -10,6 +10,7 @@
 
 #include <model/include/ModelTransformer.h>
 
+#include <model/optimizer/include/ModelOptimizerOptions.h>
 #include <model/optimizer/include/OptimizationPassRegistry.h>
 
 #include <nodes/include/ConvolutionalLayerNode.h>
@@ -118,7 +119,7 @@ namespace passes
     {
         model::OptimizationPassInfo info = {
             "SetConvolutionMethodPass",
-            [](const model::ModelOptimizerOptions& settings) { return settings.phase == model::OptimizerPhase::optimize && settings.preferredConvolutionMethod != model::PreferredConvolutionMethod::automatic; },
+            [](const model::ModelOptimizerOptions& settings) { return settings.preferredConvolutionMethod != model::PreferredConvolutionMethod::automatic; },
             [] { return std::make_unique<SetConvolutionMethodPass>(); }
         };
         model::OptimizationPassRegistry::AddPass(info);

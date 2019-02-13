@@ -224,9 +224,8 @@ namespace testing
         }
         return false;
     }
-
+    
     /// <summary> Call a test function, but register success if a "TestNotImplemented" exception is thrown. </summary>
-    ///
     /// <param name="function"> The test function to call. </param>
     /// <param name="args"> Aguments to pass to the test function. </param>
     template <typename FunctionType, typename... Args>
@@ -249,6 +248,11 @@ namespace testing
         }
         return false;
     }
+
+    /// <summary> Get the exit code to return from main. </summary>
+    ///
+    /// <returns> 1 if any of the tests failed, otherwise 0. </returns>
+    int GetExitCode();
 
     /// <summary> RAII helper to turn on logging for a specific test/scope
     ///

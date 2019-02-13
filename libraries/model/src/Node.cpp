@@ -181,11 +181,6 @@ namespace model
         return std::vector<const Node*>{ nodes.begin(), nodes.end() };
     }
 
-    bool Node::InvokeRefine(ModelTransformer& transformer) const
-    {
-        return Refine(transformer);
-    }
-
     // Default implementation of Refine just copies and returns false
     bool Node::Refine(ModelTransformer& transformer) const
     {

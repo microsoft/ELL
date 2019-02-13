@@ -19,11 +19,11 @@ namespace ell
 {
 namespace passes
 {
-    /// <summary> An optimization pass that fuses sequential `BroadcastLinearFunctionNode`s into one. </summary>
+    /// <summary> An optimization pass that sets the convolution algorithm for a `ConvolutionalLayerNode`. </summary>
     class SetConvolutionMethodPass : public model::NodeLocalOptimizationPass
     {
     public:
-        /// <summary> Combine a linear function node with its predecessor if possible. </summary>
+        /// <summary> Set the convolution algorithm for a `ConvolutionalLayerNode` if possible. </summary>
         ///
         /// <param name="node"> The current node being visited. </param>
         /// <param name="transformer"> The transformer object operating on the model. </param>

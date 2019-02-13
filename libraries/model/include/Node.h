@@ -191,8 +191,6 @@ namespace model
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
-        virtual bool Refine(ModelTransformer& transformer) const;
-
         virtual bool HasState() const { return true; }
 
         void AddInputPort(InputPortBase* input);
@@ -211,18 +209,17 @@ namespace model
         friend class ModelTransformer;
 
         virtual void Copy(ModelTransformer& transformer) const = 0;
+        virtual bool Refine(ModelTransformer& transformer) const;
 
         void SetId(Node::NodeId id);
         void SetModel(Model* model);
         void UpdateInputPorts();
-        bool InvokeRefine(ModelTransformer& transformer) const;
 
         std::unique_ptr<Model> _model;
         NodeId _id;
         std::vector<InputPortBase*> _inputs;
         std::vector<OutputPortBase*> _outputs;
 
-        mutable std::vector<const Node*> _dependentNodes;
         utilities::PropertyBag _metadata;
     };
 } // namespace model
