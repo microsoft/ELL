@@ -32,7 +32,8 @@ namespace dsp
         /// <param name="centerBin"> The index of the "center point" of the filter --- the location of the filter's maximum value. </param>
         /// <param name="highBin"> The index of the end of the filter's nonzero support. </param>
         /// <param name="size"> The total size of this filter (including zero support). </param>
-        TriangleFilter(size_t lowBin, size_t centerBin, size_t highBin, size_t size);
+        /// <param name="offset"> A number between 0 and 1 and shifts the filter position slightly. </param>
+        TriangleFilter(size_t lowBin, size_t centerBin, size_t highBin, size_t size, double offset);
 
         /// <summary> Get the filter coefficient at the given index. </summary>
         ///
@@ -71,6 +72,7 @@ namespace dsp
         size_t _centerBin;
         size_t _highBin;
         size_t _size;
+        double _offset;
     };
 
     /// <summary> Base class for an arbitrary set of triangular filters. </summary>
@@ -126,6 +128,9 @@ namespace dsp
         /// <summary> Get the sample rate of the input signal. </summary>
         double GetSampleRate() const { return _sampleRate; }
 
+        /// <summary> Get the offset. </summary>
+        double GetOffset() const { return _offset; }
+
         /// <summary> Gets the name of this type. </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -138,9 +143,22 @@ namespace dsp
 
     protected:
         TriangleFilterBank() = default;
-        TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters);
-        TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse);
-        TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter);
+
+        /// <summary>The offset can be from 0 to 1 and shifts where we sample the triangle.  For example take this
+        /// triangle filter of width 2 centered on input index 3:
+        ///
+        /// |           ^               |
+        /// |          /|\              |
+        /// |         / | \             |
+        /// |        /  |  \            |
+        /// |       /   |   \           |
+        /// |---|---|-.-|-.-|-.-|---|---|
+        /// 0   1   2   3   4   5   6   7
+        /// 
+        /// with offset 0 the result would be (I3 * 1) but with offset 0.5 it would be (I2 * 0.5) + (I3 * 0.5).</summary>
+        TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters, double offset = 0);
+        TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse, double offset = 0);
+        TriangleFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter, double offset = 0);
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
         void SetBins(const std::vector<size_t>& bins);
@@ -152,6 +170,7 @@ namespace dsp
         size_t _beginFilter = 0; // index of first filter to use
         size_t _endFilter = 0; // index of last filter to use
         std::vector<size_t> _bins;
+        double _offset;
     };
 
     /// <summary> A set of linearly-spaced triangular filters. </summary>
@@ -165,7 +184,8 @@ namespace dsp
         /// <param name="windowSize"> The length of the signal to filter. </param>
         /// <param name="sampleRate"> The sample rate of the input signal. </param>
         /// <param name="numFilters"> The total number of filters in the filter bank. </param>
-        LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters);
+        /// <param name="offset"> The offset. </param>
+        LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters, double offset = 0);
 
         /// <summary> Constructor </summary>
         ///
@@ -173,7 +193,8 @@ namespace dsp
         /// <param name="sampleRate"> The sample rate of the input signal. </param>
         /// <param name="numFilters"> The total number of filters in the filter bank. </param>
         /// <param name="numFiltersToUse"> The number of active filters to use. The first N filters will be active. </param>
-        LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse);
+        /// <param name="offset"> The offset. </param>
+        LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse, double offset = 0);
 
         /// <summary> Constructor </summary>
         ///
@@ -182,7 +203,8 @@ namespace dsp
         /// <param name="numFilters"> The total number of filters in the filter bank. </param>
         /// <param name="beginFilter"> The index of the first active filter. </param>
         /// <param name="endFilter"> The index one beyond the last active filter. </param>
-        LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter);
+        /// <param name="offset"> The offset. </param>
+        LinearFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter, double offset = 0);
 
         /// <summary> Gets the name of this type. </summary>
         ///
@@ -212,7 +234,8 @@ namespace dsp
         /// <param name="windowSize"> The length of the signal to filter. </param>
         /// <param name="sampleRate"> The sample rate of the input signal. </param>
         /// <param name="numFilters"> The total number of filters in the filter bank. </param>
-        MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters);
+        /// <param name="offset"> The offset. </param>
+        MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, double offset = 0);
 
         /// <summary> Constructor </summary>
         ///
@@ -220,7 +243,8 @@ namespace dsp
         /// <param name="sampleRate"> The sample rate of the input signal. </param>
         /// <param name="numFilters"> The total number of filters in the filter bank. </param>
         /// <param name="numFiltersToUse"> The number of active filters to use. The first N filters will be active. </param>
-        MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse);
+        /// <param name="offset"> The offset. </param>
+        MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse, double offset = 0);
 
         /// <summary> Constructor </summary>
         ///
@@ -229,7 +253,8 @@ namespace dsp
         /// <param name="numFilters"> The total number of filters in the filter bank. </param>
         /// <param name="beginFilter"> The index of the first active filter. </param>
         /// <param name="endFilter"> The index one beyond the last active filter. </param>
-        MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter);
+        /// <param name="offset"> The offset. </param>
+        MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter, double offset = 0);
 
         /// <summary> Gets the name of this type. </summary>
         ///

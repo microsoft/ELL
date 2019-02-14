@@ -2,7 +2,7 @@
 # Example data files
 #
 
-set (DATA_FILES testData.txt tinyTestData.txt protonnTestData.txt)
+set (DATA_FILES testData.txt tinyTestData.txt protonnTestData.txt seven.wav)
 
 add_custom_target(dataFiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
 add_dependencies(dataFiles exampleModels)

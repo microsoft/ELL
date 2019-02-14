@@ -26,7 +26,13 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> A node that buffers the input and allows access to the buffer. </summary>
+    /// <summary> A node that buffers combines or more input buffers returning a larger window over that input.
+    /// On each new input the buffer is shifted left by the size of that input.  For example, if the input size
+    /// is 8 and the windowSize is 16 and the inputs are given in the sequence i1, i2, i3, i4 then the output 
+    /// of the buffer node will be [0 i1], [i1 i2], [i2, i3], [i3 i4].  So if you think of the input as a 
+    /// series of values over time (like audio signal) then the BufferNode provides a sliding window over that
+    /// input data.
+    /// </summary>
     template <typename ValueType>
     class BufferNode : public model::CompilableNode
     {
@@ -42,7 +48,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The input to buffer. </param>
-        /// <param name="windowSize"> The number of samples to accumulate in the buffer. </param>
+        /// <param name="windowSize"> The size of the output of this node which should not be smaller than the input size. </param>
         BufferNode(const model::OutputPort<ValueType>& input, size_t windowSize);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -119,14 +125,14 @@ namespace nodes
         auto offset = _samples.size() - inputSize;
         if (offset > 0)
         {
-            // Copy samples forward to make room for new samples
-            std::copy_n(_samples.begin() + offset, inputSize, _samples.begin());
+            // shift the buffer left by the input size to make room for new input
+            std::copy_n(_samples.begin() + inputSize, offset, _samples.begin());
         }
-        // Copy input samples to tail
-        for (size_t index = 0; index < inputSize; ++index)
-        {
-            _samples[index + offset] = _input[index];
-        }
+
+        // Copy input to right hand side of the buffer
+        const std::vector<ValueType>& input = _input.GetReferencedPort().GetOutput();
+        std::copy_n(input.begin(), inputSize, _samples.begin() + offset);
+
         _output.SetOutput(_samples);
     };
 
@@ -142,18 +148,24 @@ namespace nodes
     void BufferNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         int inputSize = input.Size();
-        size_t windowSize = this->GetWindowSize();
+        int windowSize = this->GetWindowSize();
+        if (inputSize > windowSize)
+        {
+            inputSize = windowSize;
+        }
         auto offset = windowSize - inputSize;
-
+       
         emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
         auto bufferVar = function.GetModule().Variables().AddVectorVariable<ValueType>(emitters::VariableScope::global, windowSize);
         function.GetModule().AllocateVariable(*bufferVar);
         emitters::LLVMValue buffer = function.GetModule().EnsureEmitted(*bufferVar);
 
-        // Copy samples forward to make room for new samples
-        function.MemoryMove<ValueType>(buffer, offset, 0, inputSize);
-
-        // Copy input samples to tail
+        if (offset > 0)
+        {
+            // shift the buffer left by the input size to make room for new input
+            function.MemoryMove<ValueType>(buffer, inputSize, 0, offset);
+        }
+        // Copy input to right hand side of the buffer
         function.MemoryCopy<ValueType>(pInput, 0, buffer, offset, inputSize);
 
         // Copy to output

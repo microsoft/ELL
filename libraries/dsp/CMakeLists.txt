@@ -60,7 +60,6 @@ set(test_src
   test/src/DSPTestUtilities.cpp
   test/src/FFTTest.cpp
   test/src/FilterTest.cpp
-  test/src/HammingWindowCoefficients.cpp
   test/src/MelTest.cpp
   test/src/VoiceActivityDetectorTest.cpp
   test/src/WindowTest.cpp
@@ -75,7 +74,6 @@ set(test_include
   test/include/DSPTestUtilities.h
   test/include/FFTTest.h
   test/include/FilterTest.h
-  test/include/HammingWindowCoefficients.h
   test/include/MelTest.h
   test/include/VoiceActivityDetectorTest.h
   test/include/WindowTest.h

@@ -64,16 +64,21 @@ namespace nodes
             centerBins.push_back(f.GetCenter());
             endBins.push_back(f.GetEnd());
         }
+        if (numFilters != startBins.size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input sizes must match");
+        }
         auto beginVar = module.ConstantArray("filterStart_"s + GetInternalStateIdentifier(), startBins);
         auto centerVar = module.ConstantArray("filterCenter_"s + GetInternalStateIdentifier(), centerBins);
         auto endVar = module.ConstantArray("filterEnd_"s + GetInternalStateIdentifier(), endBins);
 
-        auto half = function.LocalScalar<ValueType>(0.5);
+        auto offset = function.LocalScalar<ValueType>(_filters.GetOffset());
+        
         // Get port variables
         emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
         emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
-        function.For(numFilters, [pInput, pOutput, half, beginVar, centerVar, endVar](emitters::IRFunctionEmitter& function, auto filterIndex) {
+        function.For(numFilters, [pInput, pOutput, offset, beginVar, centerVar, endVar](emitters::IRFunctionEmitter& function, auto filterIndex) {
             auto sum = function.Variable(emitters::GetVariableType<ValueType>());
             auto begin = function.LocalScalar(function.ValueAt(beginVar, filterIndex));
             auto center = function.LocalScalar(function.ValueAt(centerVar, filterIndex));
@@ -81,22 +86,22 @@ namespace nodes
             function.StoreZero(sum);
 
             // for index in [begin, center)
-            function.For(begin, center, [pInput, half, sum, begin, center](emitters::IRFunctionEmitter& function, auto index) {
+            function.For(begin, center, [pInput, offset, sum, begin, center](emitters::IRFunctionEmitter& function, auto index) {
                 // sum += signal[i] * ((i-begin+0.5) / (center-begin))
                 auto inputVal = function.LocalScalar(function.ValueAt(pInput, index));
                 auto numer = index - begin;
                 auto denom = center - begin;
-                auto val = inputVal * ((function.LocalScalar(function.CastValue<ValueType>(numer)) + half) / function.LocalScalar(function.CastValue<ValueType>(denom)));
+                auto val = inputVal * ((function.LocalScalar(function.CastValue<ValueType>(numer)) + offset) / function.LocalScalar(function.CastValue<ValueType>(denom)));
                 function.Store(sum, function.LocalScalar(function.Load(sum)) + val);
             });
 
             // for index in [center, end)
-            function.For(center, end, [pInput, half, sum, center, end](emitters::IRFunctionEmitter& function, auto index) {
+            function.For(center, end, [pInput, offset, sum, center, end](emitters::IRFunctionEmitter& function, auto index) {
                 // sum += signal[i] * ((end-i-0.5) / (end-center))
                 auto inputVal = function.LocalScalar(function.ValueAt(pInput, index));
                 auto numer = end - index;
                 auto denom = end - center;
-                auto val = inputVal * ((function.LocalScalar(function.CastValue<ValueType>(numer)) - half) / function.LocalScalar(function.CastValue<ValueType>(denom)));
+                auto val = inputVal * ((function.LocalScalar(function.CastValue<ValueType>(numer)) - offset) / function.LocalScalar(function.CastValue<ValueType>(denom)));
                 function.Store(sum, function.LocalScalar(function.Load(sum)) + val);
             });
 

@@ -31,7 +31,33 @@ namespace ell
 namespace nodes
 {
     /// <summary>
-    /// Base class for nodes that perform elementwise multiply between a set of filters and the input frequency response
+    /// Base class for nodes that perform elementwise multiply between a set of triangular filters and the input frequency response.
+    /// This can be useful as a way to sample different frequency bands in an FFT output to form a type of spectrogram.
+    /// Each value in the FilterBankNode output is the result of convolving the FFT output with a triangular filter, with some width, 
+    /// centered at some location on the FFT output.  As an example, imagine we have a 10-element input, and a filter of width 6 centered
+    /// over the 6th input:
+    ///
+    /// |                   ^               |
+    /// |                  /|\              |
+    /// |                 / | \             |
+    /// |                /  |  \            |
+    /// |               /   |   \           |
+    /// |              /    |    \          |
+    /// |             /     |     \         |
+    /// |            /      |      \        |
+    /// |           /       |       \       |
+    /// |          /        |        \      |
+    /// |         /         |         \     |
+    /// |        /          |          \    |
+    /// |---|---|-.-|-.-|-.-|-.-|-.-|-.-|---|
+    /// 0   1   2   3   4   5   6   7   8   9   
+    ///
+    /// then the result from this one filter would be the following (where I is the input vector):
+    ///    (I[2] * 0) + (I[3] * 0.333...) + (I[4] * 0.666) + (I[5] * 1) + (I[6] * 0.666) + (I[7] * 0.333) + (I[8] * 0)
+    /// 
+    /// the idea then is the filters can overlap to create smooth samples of each band in the input, and the output then is sized to
+    /// the number of filters.  The implementation is optimized on the assumption that each triangle is a relatively small slice of 
+    /// the input such that it is faster to compute each triangle than to do a dot products for each filter against the entire input.
     /// </summary>
     template <typename ValueType>
     class FilterBankNode : public model::CompilableNode
@@ -44,8 +70,12 @@ namespace nodes
         /// @}
 
     protected:
+        /// <summary> Construct a FilterBankeNode from the given filters </summary>
         FilterBankNode(const dsp::TriangleFilterBank& filters);
+
+        /// <summary> Construct a FilterBankeNode from an output port, the given filters</summary>
         FilterBankNode(const model::OutputPort<ValueType>& input, const dsp::TriangleFilterBank& filters);
+
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
@@ -61,6 +91,7 @@ namespace nodes
     private:
         // FilterBank
         const dsp::TriangleFilterBank& _filters;
+        ValueType _offset;
     };
 
     /// <summary>

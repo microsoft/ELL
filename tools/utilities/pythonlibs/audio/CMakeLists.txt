@@ -5,22 +5,8 @@
 if(${PYTHON_ENABLED})
 
     set(module_name "pythonlibs-audio")
-
-    set(lib_src
-        classifier.py
-        compiled_ell_model.py
-        compute_ell_model.py
-        featurizer.py
-        microphone.py
-        play_audio.py
-        record.py
-        speaker.py
-        test_audio.py
-        vad.py
-        vad_test.py
-        view_audio.py
-        wav_reader.py
-    )
+    
+    file(GLOB lib_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
 
     add_custom_target(${module_name} ALL DEPENDS SOURCES ${lib_src})
     add_dependencies(${module_name} pythonlibs)
@@ -29,5 +15,13 @@ if(${PYTHON_ENABLED})
 
     # copy files
     copy_newer_files(${module_name} lib_src)
+    
+    add_subdirectory(training)
+
+    # unit test
+    if(${ONNX})
+        set (test_name ${module_name}_test)
+        add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} -m unittest audio_unittest.py)
+    endif() # ONNX
 
 endif()  # PYTHON_ENABLED

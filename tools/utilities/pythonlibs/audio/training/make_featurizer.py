@@ -137,6 +137,7 @@ def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size
     # print("Saving model {}".format(output_filename))
     map.Save(output_filename)
     print("Saved {}".format(output_filename))
+    return output_filename
 
 
 if __name__ == "__main__":

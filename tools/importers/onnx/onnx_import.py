@@ -50,6 +50,7 @@ def convert(model, output=None, zip_ell_model=None, step_interval=None, lag_thre
         zipper = ziptools.Zipper()
         zipper.zip_file(model_file_name, model_file_name + ".zip")
         os.remove(model_file_name)
+    return model_file_path
 
 def main():
     parser = argparse.ArgumentParser(description="Converts ONNX model to ELL model\n" 

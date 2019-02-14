@@ -692,7 +692,7 @@ Node ModelBuilder::AddFFTNode(Model model, PortElements input)
     return Node(newNode);
 }
 
-Node ModelBuilder::AddLinearFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse)
+Node ModelBuilder::AddLinearFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse, double offset)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
@@ -701,10 +701,10 @@ Node ModelBuilder::AddLinearFilterBankNode(Model model, PortElements input, doub
     switch (type)
     {
     case PortType::real:
-        newNode = model.GetModel().AddNode<ell::nodes::LinearFilterBankNode<double>>(ell::model::PortElements<double>(elements), ell::dsp::LinearFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse));
+        newNode = model.GetModel().AddNode<ell::nodes::LinearFilterBankNode<double>>(ell::model::PortElements<double>(elements), ell::dsp::LinearFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse, offset));
         break;
     case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::nodes::LinearFilterBankNode<float>>(ell::model::PortElements<float>(elements), ell::dsp::LinearFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse));
+        newNode = model.GetModel().AddNode<ell::nodes::LinearFilterBankNode<float>>(ell::model::PortElements<float>(elements), ell::dsp::LinearFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse, offset));
         break;
     default:
         throw std::invalid_argument("Error: could not create LinearFilterBankNode of the requested type");
@@ -712,7 +712,7 @@ Node ModelBuilder::AddLinearFilterBankNode(Model model, PortElements input, doub
     return Node(newNode);
 }
 
-Node ModelBuilder::AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse)
+Node ModelBuilder::AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse, double offset)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
@@ -721,10 +721,10 @@ Node ModelBuilder::AddMelFilterBankNode(Model model, PortElements input, double 
     switch (type)
     {
     case PortType::real:
-        newNode = model.GetModel().AddNode<ell::nodes::MelFilterBankNode<double>>(ell::model::PortElements<double>(elements), ell::dsp::MelFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse));
+        newNode = model.GetModel().AddNode<ell::nodes::MelFilterBankNode<double>>(ell::model::PortElements<double>(elements), ell::dsp::MelFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse, offset));
         break;
     case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::nodes::MelFilterBankNode<float>>(ell::model::PortElements<float>(elements), ell::dsp::MelFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse));
+        newNode = model.GetModel().AddNode<ell::nodes::MelFilterBankNode<float>>(ell::model::PortElements<float>(elements), ell::dsp::MelFilterBank(windowSize, sampleRate, numFilters, numFiltersToUse, offset));
         break;
     default:
         throw std::invalid_argument("Error: could not create MelFilterBankNode of the requested type");

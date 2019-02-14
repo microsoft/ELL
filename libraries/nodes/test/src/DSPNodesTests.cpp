@@ -379,12 +379,11 @@ static void TestMelFilterBankNode()
 template <typename ValueType>
 static void TestBufferNode()
 {
-    const ValueType epsilon = static_cast<ValueType>(1e-7);
     const size_t inputSize = 16;
-    const size_t windowSize = 32;
+    const size_t windowSize = 40;
 
     std::vector<std::vector<ValueType>> data;
-    const int numEntries = 8;
+    const int numEntries = 8; // 8 input buffers of consecutive numbers
     for (int index = 0; index < numEntries; ++index)
     {
         std::vector<ValueType> item(inputSize);
@@ -392,27 +391,34 @@ static void TestBufferNode()
         data.push_back(item);
     }
 
+    std::vector<ValueType> window(windowSize);
+
+    std::vector<std::vector<ValueType>> expected;
+    // compute the expected sliding buffer output by actually sliding the
+    // input through the window.
+    for (auto input : data)
+    {
+        auto shifted = windowSize - inputSize;
+        std::copy_n(window.begin() + inputSize, shifted, window.begin());
+        std::copy(input.begin(), input.end(), window.begin() + shifted);
+        expected.push_back(window);
+    }
+
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ValueType>>(inputSize);
     auto outputNode = model.AddNode<nodes::BufferNode<ValueType>>(inputNode->output, windowSize);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
-    model::MapCompilerOptions settings;
-    settings.compilerSettings.optimize = false;
-    model::IRMapCompiler compiler(settings);
-    auto compiledMap = compiler.Compile(map);
 
-    for (size_t index = 0; index < data.size(); ++index)
-    {
-        auto input = data[index];
+    TestWithSerialization(map, "TestBufferNode", [&](model::Map& map, int iteration) {
+        model::MapCompilerOptions settings;
+        settings.compilerSettings.optimize = false;
+        model::IRMapCompiler compiler(settings);
+        auto compiledMap = compiler.Compile(map);
 
-        map.SetInputValue(0, input);
-        auto computedResult = map.ComputeOutput<ValueType>(0);
-
-        compiledMap.SetInputValue(0, input);
-        auto compiledResult = compiledMap.ComputeOutput<ValueType>(0);
-        testing::ProcessTest("Testing BufferNode compile", testing::IsEqual(compiledResult, computedResult, epsilon));
-    }
+        auto message = utilities::FormatString("Testing BufferNode compile iteration %d", iteration);
+        VerifyCompiledOutputAndResult<ValueType, ValueType>(map, compiledMap, data, expected, message);
+    });
 }
 
 template <typename ValueType>
