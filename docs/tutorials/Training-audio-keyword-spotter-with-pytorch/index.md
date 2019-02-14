@@ -22,7 +22,7 @@ Complete the following steps before starting the tutorial.
 
 ## What you will need
 
-*  Laptop or desktop computer 
+*  Laptop or desktop computer with at least 16 GB of RAM.
 *  Optional NVidia Graphics Card that supports [CUDA](https://developer.nvidia.com/cuda-downloads).
 
 ## Overview
