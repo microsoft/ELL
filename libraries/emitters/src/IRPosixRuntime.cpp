@@ -86,7 +86,7 @@ namespace emitters
 
     LLVMType IRPosixRuntime::GetPthreadType()
     {
-        auto& targetDevice = _module.GetCompilerOptions().targetDevice;
+        auto targetDevice = _module.GetCompilerOptions().targetDevice;
         if (targetDevice.IsLinux())
         {
             return GetPointerSizedIntType();
@@ -109,7 +109,7 @@ namespace emitters
         auto int32Type = llvm::Type::getInt32Ty(context);
         auto int64Type = llvm::Type::getInt64Ty(context);
 
-        auto& targetDevice = _module.GetCompilerOptions().targetDevice;
+        auto targetDevice = _module.GetCompilerOptions().targetDevice;
         if (targetDevice.IsLinux())
         {
             auto triple = targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : targetDevice.triple;
@@ -167,7 +167,7 @@ namespace emitters
         auto int32Type = llvm::Type::getInt32Ty(context);
         auto int64Type = llvm::Type::getInt64Ty(context);
 
-        auto& targetDevice = _module.GetCompilerOptions().targetDevice;
+        auto targetDevice = _module.GetCompilerOptions().targetDevice;
         if (targetDevice.IsLinux())
         {
             auto triple = targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : targetDevice.triple;
@@ -216,7 +216,7 @@ namespace emitters
         auto& context = _module.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto& targetDevice = _module.GetCompilerOptions().targetDevice;
+        auto targetDevice = _module.GetCompilerOptions().targetDevice;
         if (targetDevice.IsLinux())
         {
             auto triple = targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : targetDevice.triple;

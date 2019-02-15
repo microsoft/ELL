@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "CompilerOptions.h"
 #include "EmitterTypes.h"
 #include "IRAsyncTask.h"
 #include "IRBlockRegion.h"
@@ -1628,6 +1629,16 @@ namespace emitters
         /// <summary> Adds an`IRBlockRegion` to the region list and sets it as the current region </summary>
         IRBlockRegion* AddRegion(llvm::BasicBlock* pBlock);
 
+        /// <summary> Get the compiler options for the function being emitted. </summary>
+        ///
+        /// <returns> A `CompilerOptions` object containing the options for this function. </returns>
+        const CompilerOptions& GetCompilerOptions() const;
+
+        /// <summary> Set the compiler options for the function being emitted. </summary>
+        ///
+        /// <param name=options> A `CompilerOptions` object containing the options to use for this function. </param]>
+        void SetCompilerOptions(const CompilerOptions& parameters);
+
         /// <summary> Get the current LLVM context. </summary>
         ///
         /// <returns> The LLVMContext being used. </returns>
@@ -1710,6 +1721,7 @@ namespace emitters
         IRValueTable _locals; // Symbol table: name -> LLVMValue (stack variables or function arguments)
 
         IRModuleEmitter* _pModuleEmitter = nullptr;
+        CompilerOptions _options;
         IRBlockRegionList _regions;
         IRBlockRegion* _pCurRegion = nullptr;
         LLVMFunction _pFunction = nullptr;

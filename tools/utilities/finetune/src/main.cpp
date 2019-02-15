@@ -68,6 +68,7 @@ void Run(const FineTuneArguments& args)
     Report report(reportStream, Report::ReportFormat::text);
 
     utilities::MillisecondTimer loadModelTimer;
+
     auto model = LoadInputModel(args);
     const auto& modelOutput = GetInputModelTargetOutput(model, args);
     loadModelTimer.Stop();
@@ -99,7 +100,7 @@ void Run(const FineTuneArguments& args)
     // Fine-tune the model and save it
     utilities::MillisecondTimer fineTuningTotalTimer;
     auto fineTunedOutputs = FineTuneNodesInSubmodel(model, modelOutput, trainingData, args);
-    const auto& fineTunedOutput = *fineTunedOutputs.fineTunedSubmodel.GetOutputPorts()[0];
+    const auto& fineTunedOutput = *fineTunedOutputs.fineTunedSubmodel.GetOutputs()[0];
     fineTuningTotalTimer.Stop();
 
     if (args.print)

@@ -814,9 +814,11 @@ CompiledMap Map::Compile(const std::string& targetDevice,
     settings.sinkFunctionName = sinkFunctionName;
     settings.compilerSettings.targetDevice.deviceName = targetDevice;
     settings.compilerSettings.useBlas = compilerSettings.useBlas;
-    settings.optimizerSettings.fuseLinearFunctionNodes = optimizerSettings.fuseLinearFunctionNodes;
 
-    auto compiler = std::make_shared<ell::model::IRMapCompiler>(settings);
+    ell::model::ModelOptimizerOptions optimizerOptions;
+    optimizerOptions["fuseLinearFunctionNodes"] = optimizerSettings.fuseLinearFunctionNodes;
+
+    auto compiler = std::make_shared<ell::model::IRMapCompiler>(settings, optimizerOptions);
 
     auto module = compiler->GetModule().GetLLVMModule();
     auto compiledMap = std::make_shared<ell::model::IRCompiledMap>(compiler->Compile(*_map));

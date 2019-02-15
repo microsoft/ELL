@@ -66,8 +66,6 @@
 #include <nodes/include/TypeCastNode.h>
 #include <nodes/include/UnaryOperationNode.h>
 
-#include <passes/include/StandardPasses.h>
-
 #include <predictors/include/NeuralNetworkPredictor.h>
 
 #include <predictors/neural/include/ActivationLayer.h>
@@ -327,9 +325,9 @@ void TestCompilableMulticlassDTW()
 
         // compare output
         std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-        std::vector<std::vector<double>> expected = { { 21, 0.6}, { 3, 1.35 }, { 3, 0 }, { 21, 0.9 }, { 21, 0.45 }, { 21, 1.05 }, { 21, 0.6 }, { 3, 1.35 }, { 3, 0 }, { 21, 1.05 }, { 21, 0.3 } };
+        std::vector<std::vector<double>> expected = { { 21, 0.6 }, { 3, 1.35 }, { 3, 0 }, { 21, 0.9 }, { 21, 0.45 }, { 21, 1.05 }, { 21, 0.6 }, { 3, 1.35 }, { 3, 0 }, { 21, 1.05 }, { 21, 0.3 } };
         // bug 1943: this model is not serializing properly so iteration 1 and 2 will fail here.
-        if (iteration == 0) 
+        if (iteration == 0)
         {
             VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
         }
@@ -368,7 +366,8 @@ void TestCompilableSumNode()
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
         model::MapCompilerOptions settings;
         settings.compilerSettings.allowVectorInstructions = true;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
 
         // compare output
@@ -385,7 +384,7 @@ std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std
     for (auto v : signal)
     {
         std::vector<double> r;
-        for (double d: v)
+        for (double d : v)
         {
             switch (op)
             {
@@ -447,9 +446,17 @@ void TestCompilableUnaryOperationNode()
     };
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    for (auto op : std::vector<UnaryOperationType>{ UnaryOperationType::abs, UnaryOperationType::cos, UnaryOperationType::exp,
-        UnaryOperationType::hardSigmoid, UnaryOperationType::log, UnaryOperationType::sigmoid, UnaryOperationType::sin,
-        UnaryOperationType::sqrt, UnaryOperationType::square, UnaryOperationType::tanh })
+    std::vector<UnaryOperationType> ops = { UnaryOperationType::abs,
+                                            UnaryOperationType::cos,
+                                            UnaryOperationType::exp,
+                                            UnaryOperationType::hardSigmoid,
+                                            UnaryOperationType::log,
+                                            UnaryOperationType::sigmoid,
+                                            UnaryOperationType::sin,
+                                            UnaryOperationType::sqrt,
+                                            UnaryOperationType::square,
+                                            UnaryOperationType::tanh };
+    for (auto op : ops)
     {
         auto testNode = model.AddNode<UnaryOperationNode<double>>(inputNode->output, op);
         auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
@@ -477,7 +484,7 @@ void TestL2NormSquaredNodeCompiled()
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
         model::MapCompilerOptions settings;
         settings.compilerSettings.optimize = true;
-        model::IRMapCompiler compiler(settings);
+        model::IRMapCompiler compiler(settings, {});
         auto compiledMap = compiler.Compile(map);
 
         // compare output
@@ -521,7 +528,8 @@ void TestMatrixVectorProductNodeCompile()
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
         model::MapCompilerOptions settings;
         settings.compilerSettings.optimize = false;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
 
         // compare output
@@ -534,7 +542,7 @@ void TestMatrixVectorProductNodeCompile()
 std::vector<std::vector<double>> GetExpectedBinaryOperationResult(std::vector<std::vector<double>> signal, std::vector<double> input, BinaryOperationType op)
 {
     std::vector<std::vector<double>> result;
-    for (auto v: signal)
+    for (auto v : signal)
     {
         std::vector<double> r;
         for (size_t i = 0, length = v.size(); i < length; i++)
@@ -579,8 +587,7 @@ void TestCompilableBinaryOperationNode()
         "logicalXor"
     };
 
-    for (auto op : std::vector<BinaryOperationType>{ BinaryOperationType::add, BinaryOperationType::subtract, BinaryOperationType::multiply,
-        BinaryOperationType::divide})
+    for (auto op : std::vector<BinaryOperationType>{ BinaryOperationType::add, BinaryOperationType::subtract, BinaryOperationType::multiply, BinaryOperationType::divide })
     {
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
@@ -629,7 +636,7 @@ void TestCompilableBinaryOperationNode2()
                                                  0.0, 0.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0,
                                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
     // clang-format on
-    std::vector<std::vector<double>> expected = { {2, 4, 6, 8, 10, 12, 14, 16} };
+    std::vector<std::vector<double>> expected = { { 2, 4, 6, 8, 10, 12, 14, 16 } };
     VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, "BinaryOperationNode");
 }
 
@@ -767,7 +774,8 @@ void TestCompilableTypeCastNode(size_t dimension)
         std::vector<std::vector<int>> signal;
         std::generate_n(std::back_inserter(signal), numEntries, [dimension] { return GetRandomVector<int>(dimension, 0, 100); });
         std::vector<std::vector<double>> expected;
-        for (auto v : signal) {
+        for (auto v : signal)
+        {
             std::vector<double> r(v.size());
             std::transform(v.begin(), v.end(), r.begin(), [](auto d) { return static_cast<double>(d); });
             expected.push_back(r);
@@ -996,13 +1004,13 @@ void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape)
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
     auto testNode = model.AddNode<ReceptiveFieldMatrixNode<ElementType>>(inputNode->output,
-                                                                                inputMemoryLayout,
-                                                                                filterWidth,
-                                                                                stride,
-                                                                                paddingSize,
-                                                                                dataOrder,
-                                                                                outputWidth,
-                                                                                outputHeight);
+                                                                         inputMemoryLayout,
+                                                                         filterWidth,
+                                                                         stride,
+                                                                         paddingSize,
+                                                                         dataOrder,
+                                                                         outputWidth,
+                                                                         outputHeight);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -1051,7 +1059,7 @@ void TestCompilableAccumulatorNodeFunction()
     model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = true;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::IRMapCompiler compiler(settings, {});
     auto compiledMap = compiler.Compile(map);
 
     // compare output
@@ -1103,17 +1111,18 @@ void TestCompilableSourceNode()
         model::MapCompilerOptions settings;
         settings.moduleName = "TestSourceNode";
         settings.compilerSettings.optimize = true;
+        model::ModelOptimizerOptions optimizerOptions;
 
         // the Compute callback function cannot be serialized, so we set it here.
         const SourceNode<double>* constSourceNode = static_cast<const SourceNode<double>*>(map.GetSourceNodes()[0]);
         SourceNode<double>* sourceNode = const_cast<SourceNode<double>*>(constSourceNode);
         sourceNode->SetSourceFunction(
             [context](auto& input) {
-            input.assign(context.inputSize, 42.0);
-            return true;
-        });
+                input.assign(context.inputSize, 42.0);
+                return true;
+            });
 
-        model::IRMapCompiler compiler(settings);
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
         compiledMap.SetContext(&context);
 
@@ -1155,10 +1164,8 @@ void TestCompilableSinkNode(size_t inputSize, bool triggerValue)
     auto testNode = model.AddNode<SinkNode<double>>(inputNode->output, condition->output, sinkFunctionName);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
-
     std::string name = "SourceNode";
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
-
         CallbackContext context;
         context.inputSize = inputSize;
         context.called = false;
@@ -1166,8 +1173,9 @@ void TestCompilableSinkNode(size_t inputSize, bool triggerValue)
         model::MapCompilerOptions settings;
         settings.moduleName = "TestSinkNode";
         settings.compilerSettings.optimize = true;
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
 
-        model::IRMapCompiler compiler(settings);
         auto compiledMap = compiler.Compile(map);
         compiledMap.SetContext(&context);
 
@@ -1216,7 +1224,7 @@ void TestFloatNode()
 
     std::string name = "AccumulatorNode_Float";
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
-        model::IRMapCompiler compiler(settings);
+        model::IRMapCompiler compiler(settings, {});
         auto compiledMap = compiler.Compile(map);
 
         // compare output
@@ -1305,7 +1313,8 @@ void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas)
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
         model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = useBlas;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
 
         // compare output
@@ -1343,7 +1352,8 @@ void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
 
         model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = useBlas;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
 
         VerifyCompiledOutput(map, compiledMap, signal, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
@@ -1381,12 +1391,13 @@ void TestOrderedMatrixMatrixMultiplyNode(int m, int n, int k, bool transposeA, b
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
         model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = useBlas;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
 
         std::stringstream id;
         id << std::boolalpha << "OrderedMatrixMatrixMultiplyNode(m = " << m << ", n = " << n << ", k = " << k << ", transposeA = "
-            << transposeA << ", transposeB = " << transposeB << ", transposeC = " << transposeC << ", useBlas = " << useBlas << ") iteration " << iteration;
+           << transposeA << ", transposeB = " << transposeB << ", transposeC = " << transposeC << ", useBlas = " << useBlas << ") iteration " << iteration;
         VerifyCompiledOutput(map, compiledMap, signal, id.str());
     });
 }
@@ -1422,8 +1433,8 @@ void TestCompilableClockNode()
     model::MapCompilerOptions settings;
     settings.moduleName = "Test";
     settings.compilerSettings.optimize = true;
-
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     auto& jitter = compiledMap.GetJitter();
@@ -1492,7 +1503,8 @@ void TestCompilableFFTNode()
     std::string name = "FFTNode";
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
         model::MapCompilerOptions settings;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
         // compiledMap.WriteCode("FFTNode.ll", emitters::ModuleOutputFormat::ir);
 
@@ -1610,7 +1622,8 @@ void VerifyLayerMap(const ell::model::Map& map, const ell::model::Node* computeN
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.useBlas = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // compare output
@@ -1667,7 +1680,8 @@ void TestNeuralNetworkPredictorNode1()
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
 #if PRINT_MODELS
@@ -1713,18 +1727,19 @@ void TestBroadcastLinearFunctionNode()
 
     const size_t secondaryInputDimension = 0; // broadcast the scale vector across our input "rows".
     auto computeNode = model.AddNode<BroadcastLinearFunctionNode<ElementType>>(inputNode->output,
-                                                                                      inputNode->output.GetMemoryLayout(),
-                                                                                      scaleValuesNode->output,
-                                                                                      biasValuesNode->output,
-                                                                                      secondaryInputDimension,
-                                                                                      inputNode->output.GetMemoryLayout());
+                                                                               inputNode->output.GetMemoryLayout(),
+                                                                               scaleValuesNode->output,
+                                                                               biasValuesNode->output,
+                                                                               secondaryInputDimension,
+                                                                               inputNode->output.GetMemoryLayout());
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.parallelize = false;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // compare output
@@ -1815,7 +1830,8 @@ void TestNeuralNetworkPredictorNode2()
     model::MapCompilerOptions settings;
     settings.compilerSettings.parallelize = false;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
 #if PRINT_MODELS
@@ -1874,7 +1890,8 @@ void TestNeuralNetworkPredictorNode3()
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // compare output
@@ -1940,7 +1957,8 @@ void TestNeuralNetworkPredictorNode4()
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // compare output
@@ -2022,7 +2040,8 @@ void TestNeuralNetworkPredictorNode5()
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
     settings.compilerSettings.useBlas = true; // !!! if BLAS is off, this fails
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // Create an input vector
@@ -2117,7 +2136,8 @@ void TestNeuralNetworkPredictorNode6()
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // compare output
@@ -2288,7 +2308,8 @@ void TestNeuralNetworkPredictorNode7()
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // compare output
@@ -2332,7 +2353,8 @@ void TestInputLayerNode(size_t outputPadding)
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // compare output
@@ -2558,7 +2580,8 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
     settings.compilerSettings.useBlas = true; // !!! if BLAS is off, this fails
     settings.compilerSettings.allowVectorInstructions = false;
     settings.compilerSettings.vectorWidth = 2;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     auto signal = std::vector<std::vector<ElementType>>{ inputWithPadding.ToArray() };
@@ -3048,8 +3071,11 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
-    settings.optimizerSettings.fuseLinearFunctionNodes = true;
-    model::IRMapCompiler compiler(settings);
+
+    model::ModelOptimizerOptions optimizerOptions;
+    optimizerOptions.SetEntry("fuseLinearFunctionNodes", true);
+
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // compare output
@@ -3194,7 +3220,8 @@ void TestRegionDetectionNode()
         // Compile model
         model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = true;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
 
         // compare computed vs. compiled output
@@ -3226,7 +3253,8 @@ void TestBroadcasUnaryOperationNodeCompile()
     // Compile model
     model::MapCompilerOptions settings;
     settings.compilerSettings.useBlas = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     auto computed = compiledMap.Compute<double>(inputVals);
@@ -3256,14 +3284,15 @@ void TestBroadcasBinaryOperationNodeCompileAdd()
     auto input2Node = model.AddNode<ConstantNode<double>>(input2Vals, input2Layout);
     auto op = BroadcastBinaryOperationNode<double>::OperationType::add;
     auto outputNode = model.AddNode<BroadcastBinaryOperationNode<double>>(input1Node->output,
-                                                                                 input2Node->output,
-                                                                                 op);
+                                                                          input2Node->output,
+                                                                          op);
     auto map = model::Map(model, { { "input", input1Node } }, { { "output", outputNode->output } });
 
     // Compile model
     model::MapCompilerOptions settings;
     settings.compilerSettings.useBlas = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     auto computed = compiledMap.Compute<double>(input1Vals);
@@ -3293,14 +3322,15 @@ void TestBroadcasBinaryOperationNodeCompileSubtract()
     auto input2Node = model.AddNode<ConstantNode<double>>(input2Vals, input2Layout);
     auto op = BroadcastBinaryOperationNode<double>::OperationType::subtract;
     auto outputNode = model.AddNode<BroadcastBinaryOperationNode<double>>(input1Node->output,
-                                                                                 input2Node->output,
-                                                                                 op);
+                                                                          input2Node->output,
+                                                                          op);
     auto map = model::Map(model, { { "input", input1Node } }, { { "output", outputNode->output } });
 
     // Compile model
     model::MapCompilerOptions settings;
     settings.compilerSettings.useBlas = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     auto computed = compiledMap.Compute<double>(input1Vals);
@@ -3334,14 +3364,15 @@ void TestBroadcasBinaryOperationNodeCompileWithOrdering()
     auto input2Node = model.AddNode<ConstantNode<double>>(input2Vals, input2Layout);
     auto op = BroadcastBinaryOperationNode<double>::OperationType::add;
     auto outputNode = model.AddNode<BroadcastBinaryOperationNode<double>>(input1Node->output,
-                                                                                 input2Node->output,
-                                                                                 op);
+                                                                          input2Node->output,
+                                                                          op);
     auto map = model::Map(model, { { "input", input1Node } }, { { "output", outputNode->output } });
 
     // Compile model
     model::MapCompilerOptions settings;
     settings.compilerSettings.useBlas = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     auto computed = compiledMap.Compute<double>(input1Vals);

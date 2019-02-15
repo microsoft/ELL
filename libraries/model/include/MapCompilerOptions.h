@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <model/optimizer/include/ModelOptimizerOptions.h>
-
 #include <emitters/include/CompilerOptions.h>
+
+#include <utilities/include/PropertyBag.h>
 
 #include <string>
 
@@ -18,26 +18,33 @@ namespace ell
 {
 namespace model
 {
-    class Map;
-    class Model;
-    class Node;
-
+    /// <summary> Map-specific compiler settings </summary>
     struct MapCompilerOptions
     {
-        // map-specific compiler settings
+        MapCompilerOptions() = default;
+
+        /// <summary> Constructor from a property bag </summary>
+        explicit MapCompilerOptions(const utilities::PropertyBag& properties);
+
+        /// <summary> Create a new `MapCompilerOptions` by adding or overriding the options in the given `PropertyBag` </summary>
+        [[nodiscard]] MapCompilerOptions AppendOptions(const utilities::PropertyBag& properties) const;
+
+        // global options
         std::string moduleName = "ELL";
         std::string mapFunctionName = "predict";
-        bool inlineNodes = false;
-        bool profile = false;
         std::string sourceFunctionName;
         std::string sinkFunctionName;
         bool verifyJittedModule = false;
+        bool profile = false;
 
-        // optimizations
-        ModelOptimizerOptions optimizerSettings;
+        // per-node options
+        bool inlineNodes = false;
 
         // lower-level emitters settings
         emitters::CompilerOptions compilerSettings;
+
+    private:
+        void AddOptions(const utilities::PropertyBag& properties);
     };
 } // namespace model
 } // namespace ell

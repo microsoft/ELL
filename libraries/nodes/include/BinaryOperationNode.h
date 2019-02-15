@@ -425,7 +425,7 @@ namespace nodes
     {
         if (_inputLayout1.GetMemorySize() == _inputLayout2.GetMemorySize())
         {
-            if (!compiler.GetCompilerOptions().unrollLoops)
+            if (!function.GetCompilerOptions().unrollLoops)
             {
                 CompileLoop(compiler, function);
             }

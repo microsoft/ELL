@@ -126,7 +126,7 @@ namespace nodes
             return;
         }
 
-        if (!compiler.GetCompilerOptions().unrollLoops)
+        if (!function.GetCompilerOptions().unrollLoops)
         {
             CompileLoop(compiler, function);
         }

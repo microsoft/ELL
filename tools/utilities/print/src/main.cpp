@@ -24,8 +24,6 @@
 
 #include <nodes/include/NeuralNetworkPredictorNode.h>
 
-#include <passes/include/StandardPasses.h>
-
 #include <utilities/include/CommandLineParser.h>
 #include <utilities/include/Exception.h>
 #include <utilities/include/OutputStreamImpostor.h>
@@ -74,8 +72,15 @@ int main(int argc, char* argv[])
         // if no input specified, print help and exit
         if (!mapLoadArguments.HasInputFilename())
         {
-            std::cout << commandLineParser.GetHelpString() << std::endl;
-            return 1;
+            if (commandLineParser.GetPositionalArgs().size() == 1)
+            {
+                mapLoadArguments.inputMapFilename = commandLineParser.GetPositionalArgs()[0];
+            }
+            else
+            {
+                std::cout << commandLineParser.GetHelpString() << std::endl;
+                return 1;
+            }
         }
 
         // Load model from file
@@ -93,29 +98,17 @@ int main(int argc, char* argv[])
                 model = t.TransformModel(model, transformer, context);
             }
         }
-        else
+        else // load a map
         {
             model::Map map = LoadMap(mapLoadArguments);
             if (printArguments.refine > 0)
             {
-                // this ensures what is printed matches what retargetTrainer expects.
-                {
-                    model::TransformContext context;
-                    model::ModelTransformer transformer;
-                    model::RefineTransformation t;
-                    model = t.TransformModel(model, transformer, context);
-                }
-                {
-                    model::TransformContext context;
-                    model::ModelTransformer transformer;
-                    model = transformer.CopyModel(model, context);
-                }
+                map.Refine(printArguments.refine);
+                model = map.GetModel().ShallowCopy();
             }
             else
             {
-                model::TransformContext context;
-                model::ModelTransformer transformer;
-                model = transformer.CopyModel(map.GetModel(), context);
+                model = map.GetModel().ShallowCopy();
             }
         }
 
@@ -128,7 +121,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-            PrintModel(model, out, printArguments.includeNodeId);
+            PrintModel(model, out, { printArguments.includeNodeId, printArguments.nodeDetails });
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

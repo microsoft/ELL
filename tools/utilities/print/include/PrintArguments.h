@@ -23,6 +23,7 @@ struct PrintArguments
     size_t refine;
     bool compile;
     bool includeNodeId;
+    bool nodeDetails;
     utilities::OutputStreamImpostor outputStream;
 };
 

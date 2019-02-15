@@ -31,7 +31,7 @@
 %ignore std::hash<ell::utilities::UniqueId>;
 
 %ignore ell::utilities::JsonUtilities;
-%ignore ell::utilites::Variant::Variant(ell::utilities::Variant&&);
+%ignore ell::utilities::Variant::Variant(ell::utilities::Variant&&);
 %ignore ell::utilities::CompressedIntegerList;
 
 namespace ell { namespace utilities {} };

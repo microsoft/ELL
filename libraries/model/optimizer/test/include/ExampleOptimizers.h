@@ -25,6 +25,6 @@ public:
 
 protected:
     bool IsDone() const override { return true; };
-    const ell::model::optimizer::Transformation& GetTransformation() override { throw ell::utilities::LogicException(ell::utilities::LogicExceptionErrors::notImplemented); };
+    const ell::model::Transformation& GetTransformation() override { throw ell::utilities::LogicException(ell::utilities::LogicExceptionErrors::notImplemented); };
     bool KeepTransformation(const ell::model::optimizer::Objective::ObjectiveValue& objectiveDelta) const override { return false; }
 };

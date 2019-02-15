@@ -148,7 +148,7 @@ namespace utilities
         template <typename T1, typename... Ts>
         struct AllSame : std::conjunction<std::is_same<T1, Ts>...>
         {};
-    }
+    } // namespace detail
 
     /// <summary> Compile time check for ensuring that all types provided are the same </summary>
     template <typename T, typename... RestOfTypes>

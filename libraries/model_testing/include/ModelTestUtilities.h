@@ -70,6 +70,11 @@ private:
 model::Model GetSimpleModel();
 model::Model GetComplexModel();
 
+// "two-output model":
+// in -> argmin -> moving_avg
+//   \-> argmax -> moving_avg
+model::Model GetTwoOutputModel();
+
 // Creates a model with an input node followed by the specified number of DebugNode<double, int>,
 // with the "info" field of the first debug node set to 1, the second to 2, and so on
 model::Model GetLinearDebugNodeModel(int numDebugNodes); //  in -> node1 -> node2 -> ... -> nodeN

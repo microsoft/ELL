@@ -17,4 +17,3 @@ void TestTransformations();
 void TestTrivialTransformation();
 void TestAddMetadataToOutputTransformation();
 void TestCombineNodesTransformation();
-void TestFuseLinearOperationsTransformation();

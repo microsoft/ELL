@@ -17,7 +17,6 @@ namespace ell
 {
 namespace utilities
 {
-
     //
     // ParsedArgSet class
     //
@@ -69,13 +68,13 @@ namespace utilities
     //
     // OptionInfo internal class
     //
-    CommandLineParser::OptionInfo::OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::string emptyValueString, std::function<bool(std::string)> set_value_callback) :
+    CommandLineParser::OptionInfo::OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::string emptyValueString, std::function<bool(std::string)> setValueCallback) :
         name(name),
         shortName(shortName),
         description(description),
         defaultValueString(defaultValue),
         emptyValueString(emptyValueString),
-        set_value_callbacks({ set_value_callback })
+        setValueCallbacks({ setValueCallback })
     {
     }
 
@@ -363,7 +362,7 @@ namespace utilities
 
     void CommandLineParser::AddOption(const OptionInfo& info)
     {
-        if (_options.find(info.name) != _options.end())
+        if (HasOption(info.name))
         {
             auto messageStr = std::string{ "Error: adding same option more than once (" } + info.name + ")";
             throw CommandLineParserInvalidOptionsException(messageStr.c_str());
@@ -432,7 +431,7 @@ namespace utilities
 
         bool ok = true;
         bool didEnableMoreParams = false;
-        for (auto setValueCb : _options[option_name].set_value_callbacks)
+        for (auto setValueCb : _options[option_name].setValueCallbacks)
         {
             ok = ok && setValueCb(option_val);
         }

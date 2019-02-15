@@ -10,11 +10,10 @@
 
 #include <model/include/ModelTransformer.h>
 
-#include <model/optimizer/include/OptimizationPassRegistry.h>
-
 #include <nodes/include/BroadcastFunctionNode.h>
 
 #include <utilities/include/Exception.h>
+#include <utilities/include/StlVectorUtil.h>
 
 using namespace ell;
 using namespace ell::model;
@@ -27,10 +26,7 @@ namespace
 template <typename Container, typename Function>
 auto Transform(const Container& container, Function fn)
 {
-    std::vector<decltype(fn(container[0]))> result;
-    result.reserve(container.size());
-    std::transform(container.begin(), container.end(), std::back_inserter(result), fn);
-    return result;
+    return utilities::TransformVector(container.begin(), container.end(), fn);
 }
 
 std::vector<const OutputPortBase*> GetReferencedPorts(const std::vector<const InputPortBase*>& inputs)
@@ -251,6 +247,18 @@ bool TryCombineLinearFunctionNodes(const model::Node& node, model::ModelTransfor
     return true;
 }
 
+// Variadic version that tries all of the given types and returns true for the first one that is accepted
+template <typename ValueType1, typename ValueType2, typename... Rest>
+bool TryCombineLinearFunctionNodes(const model::Node& node, model::ModelTransformer& transformer)
+{
+    if (TryCombineLinearFunctionNodes<ValueType1>(node, transformer))
+    {
+        return true;
+    }
+
+    return (TryCombineLinearFunctionNodes<ValueType2, Rest...>(node, transformer));
+}
+
 void CombineLinearFunctionNodes(const model::Node& node, model::ModelTransformer& transformer)
 {
     if (TryCombineLinearFunctionNodes<float>(node, transformer))
@@ -268,12 +276,33 @@ void CombineLinearFunctionNodes(const model::Node& node, model::ModelTransformer
 //
 // FuseLinearOperationsTransformation methods
 //
-Submodel FuseLinearOperationsTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
+namespace ell
 {
-    auto onto = GetReferencedPorts(submodel.GetInputPorts());
-    auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [](const Node& node, ModelTransformer& transformer) {
-        CombineLinearFunctionNodes(node, transformer);
-    });
+namespace passes
+{
+    Submodel FuseLinearOperationsTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
+    {
+        auto compiler = context.GetCompiler();
+        if (!compiler)
+        {
+            return submodel;
+        }
 
-    return result;
-}
+        auto onto = GetReferencedPorts(submodel.GetInputs());
+        auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [compiler](const Node& node, ModelTransformer& transformer) {
+            bool canFuseNodes = compiler->GetModelOptimizerOptions(node).GetEntry<bool>("fuseLinearFunctionNodes", true);
+
+            if (canFuseNodes)
+            {
+                CombineLinearFunctionNodes(node, transformer);
+            }
+            else
+            {
+                transformer.CopyNode(node);
+            }
+        });
+
+        return result;
+    }
+} // namespace passes
+} // namespace ell

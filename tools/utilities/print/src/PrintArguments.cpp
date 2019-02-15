@@ -19,6 +19,7 @@ void ParsedPrintArguments::AddArgs(utilities::CommandLineParser& parser)
     parser.AddOption(refine, "refineIterations", "ri", "If not 0, the model is refined using the specified the number of refinement iterations", 0);
     parser.AddOption(compile, "compile", "c", "If true, the model is compiled before being printed", false);
     parser.AddOption(includeNodeId, "includeNodeId", "incid", "Include the node id in the print", false);
+    parser.AddOption(nodeDetails, "nodeDetails", "", "Include node details", true);
 }
 
 utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilities::CommandLineParser& parser)

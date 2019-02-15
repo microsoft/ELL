@@ -9,33 +9,47 @@
 #include "SetConvolutionMethodTransformation.h"
 
 #include <model/include/ModelTransformer.h>
+#include <model/include/RefineTransformation.h>
 
 #include <nodes/include/ConvolutionalLayerNode.h>
 
 #include <predictors/neural/include/ConvolutionalLayer.h>
 
 #include <utilities/include/Exception.h>
+#include <utilities/include/Logger.h>
+#include <utilities/include/StlVectorUtil.h>
 
-using namespace ell::model;
+#include <vector>
 
 namespace ell
 {
 namespace passes
 {
+    using namespace model;
+    using namespace utilities::logging;
+    using utilities::logging::Log;
+
     namespace
     {
         template <typename Container, typename Function>
         auto Transform(const Container& container, Function fn)
         {
-            std::vector<decltype(fn(container[0]))> result;
-            result.reserve(container.size());
-            std::transform(container.begin(), container.end(), std::back_inserter(result), fn);
-            return result;
+            return utilities::TransformVector(container.begin(), container.end(), fn);
         }
 
         std::vector<const OutputPortBase*> GetReferencedPorts(const std::vector<const InputPortBase*>& inputs)
         {
             return Transform(inputs, [](auto input) { return &input->GetReferencedPort(); });
+        }
+
+        bool IsNeuralNetworkPredictorNode(const Node& node)
+        {
+            return (node.GetRuntimeTypeName().find("NeuralNetworkPredictorNode") == 0);
+        }
+
+        bool IsConvolutionalLayerNode(const Node& node)
+        {
+            return (node.GetRuntimeTypeName().find("ConvolutionalLayerNode") == 0);
         }
 
         predictors::neural::ConvolutionMethod GetConvolutionMethod(model::PreferredConvolutionMethod preferredMethod)
@@ -91,12 +105,16 @@ namespace passes
             convolutionalParameters.method = method;
             if (!IsMethodCompatible(method, convolutionalParameters))
             {
+                Log() << "Invalid convolution method: " << static_cast<int>(method) << " for node " << thisNode->GetId() << std::endl;
                 return false;
             }
             predictors::neural::ConvolutionalLayer<ValueType> newLayer = { layerParameters, convolutionalParameters, layer.GetWeights() };
 
+            // TODO: just copy the node and modify its layer
             auto newNode = transformer.AddNode<nodes::ConvolutionalLayerNode<ValueType>>(newInput, newLayer);
+            newNode->GetMetadata() = node.GetMetadata();
 
+            Log() << "Setting convolution method to " << static_cast<int>(method) << " for node " << thisNode->GetId() << std::endl;
             transformer.MapNodeOutput(thisNode->output, newNode->output);
             return true;
         }
@@ -119,66 +137,44 @@ namespace passes
         }
     } // namespace
 
-    // UseSimpleConvolutionTransformation
-    Submodel UseSimpleConvolutionTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
-    {
-        auto onto = GetReferencedPorts(submodel.GetInputPorts());
-        auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [](const Node& node, ModelTransformer& transformer) {
-            SetConvolutionMethod(node, transformer, PreferredConvolutionMethod::simple);
-        });
-
-        return result;
-    }
-
-    // UseUnrolledConvolutionTransformation
-    Submodel UseUnrolledConvolutionTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
-    {
-        auto onto = GetReferencedPorts(submodel.GetInputPorts());
-        auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [](const Node& node, ModelTransformer& transformer) {
-            SetConvolutionMethod(node, transformer, PreferredConvolutionMethod::unrolled);
-        });
-
-        return result;
-    }
-
-    // UseWinogradConvolutionTransformation
-    Submodel UseWinogradConvolutionTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
-    {
-        auto onto = GetReferencedPorts(submodel.GetInputPorts());
-        auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [](const Node& node, ModelTransformer& transformer) {
-            SetConvolutionMethod(node, transformer, PreferredConvolutionMethod::winograd);
-        });
-
-        return result;
-    }
-
-    // UseDiagonalConvolutionTransformation
-    Submodel UseDiagonalConvolutionTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
-    {
-        auto onto = GetReferencedPorts(submodel.GetInputPorts());
-        auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [](const Node& node, ModelTransformer& transformer) {
-            SetConvolutionMethod(node, transformer, PreferredConvolutionMethod::diagonal);
-        });
-
-        return result;
-    }
-
     //
     // SetConvolutionMethodTransformation methods
     //
     Submodel SetConvolutionMethodTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
     {
-        // TODO: traverse submodel
-        // for each ConvolutionalLayerNode:
-        //   get preferred algorithm from settings / metadata
-        //   copy node, setting preferred algorithm in node properties
+        // NOTE: this transformation could be taken care of in `ConvolutionalLayerNode::Refine`, if the preferred method is already encoded
+        // in the info that is seen by Refine anyway. Maybe just move it there, and just call Refine here. Then have a different transformation
+        // that sets the metadata.
 
-        // NOTE: this transformation could just be `Refine`, if the preferred method is already encoded
-        // in the info that is seen by Refine anyway. Move it there, and just call Refine here.
+        // First refine any NeuralNetworkPredictorNodes
+        auto refineNNPredictorFn = [](const model::Node& node) {
+            return IsNeuralNetworkPredictorNode(node) ? model::NodeAction::refine : model::NodeAction::compile;
+        };
+        model::TransformContext refineNNPredictorContext{ refineNNPredictorFn };
+        RefineTransformation refineTransformation;
+        auto result1 = refineTransformation.Transform(submodel, transformer, refineNNPredictorContext);
 
-        // auto preferredMethod = settings.optimizerSettings.preferredConvolutionMethod;
-        // SetConvolutionMethod(node, context.GetTransformer(), preferredMethod);
-        return submodel;
+        // Now set the method on any ConvolutionalLayerNodes, using an in-place transformation
+        auto onto = transformer.GetCorrespondingOutputs(GetReferencedPorts(result1.GetInputs()));
+        model::Model destModel = result1.GetModel().ShallowCopy();
+        auto result2 = transformer.TransformSubmodelOnto(result1, destModel, onto, context, [context](const Node& node, ModelTransformer& transformer) {
+            model::PreferredConvolutionMethod preferredMethod = model::PreferredConvolutionMethod::automatic;
+            auto compiler = context.GetCompiler();
+            if (compiler)
+            {
+                preferredMethod = compiler->GetModelOptimizerOptions(node).GetEntry<PreferredConvolutionMethod>("preferredConvolutionMethod", PreferredConvolutionMethod::automatic);
+            }
+
+            SetConvolutionMethod(node, transformer, preferredMethod);
+        });
+
+        // Finally, refine any ConvolutionalLayerNodes
+        auto refineConvLayerFn = [](const model::Node& node) {
+            return IsConvolutionalLayerNode(node) ? model::NodeAction::refine : model::NodeAction::compile;
+        };
+        model::TransformContext refineConvLayerContext{ refineConvLayerFn };
+        auto result3 = refineTransformation.Transform(result2, transformer, refineConvLayerContext);
+        return result3;
     }
 } // namespace passes
 } // namespace ell

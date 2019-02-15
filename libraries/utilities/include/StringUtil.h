@@ -15,6 +15,13 @@ namespace ell
 {
 namespace utilities
 {
+    /// <summary> Checks for a substring in a string (using case-sensitive comparison) </summary>
+    ///
+    /// <param name="s"> The string to search </param>
+    /// <param name="substring"> The substring to search for </param>
+    /// <returns> `true` if the substring is contained in the string (according to `std::string::find`) </returns>
+    bool Contains(const std::string& s, const std::string& substring);
+
     /// <summary> Returns copy of std::string with all lowercase characters </summary>
     ///
     /// <param name="s"> The string to convert to lowercase </param>
@@ -70,5 +77,33 @@ namespace utilities
     /// <returns> A valid C language identifier or empty string if there are no valid chars. </returns>
     std::string MakeValidIdentifier(const std::string& s);
 
+    /// <summary> A templatized helper method that converts a string to given typed value. </summary>
+    ///
+    /// <typeparam name="ValueType"> The type of the object </typeparam>
+    /// <param name="s"> The string to convert. </param>
+    /// <returns> A typed value. </returns>
+    template <typename T>
+    T FromString(const std::string& s);
+
+    template <>
+    bool FromString(const std::string& s);
+
+    template <>
+    int FromString(const std::string& s);
+
+    template <>
+    long FromString(const std::string& s);
+
+    template <>
+    unsigned long FromString(const std::string& s);
+
+    template <>
+    float FromString(const std::string& s);
+
+    template <>
+    double FromString(const std::string& s);
+
+    template <>
+    std::string FromString(const std::string& s);
 } // namespace utilities
 } // namespace ell

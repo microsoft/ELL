@@ -20,31 +20,6 @@ namespace ell
 {
 namespace model
 {
-    class SubmodelInputs
-    {
-    public:
-        /// <summary> Constructor </summary>
-        SubmodelInputs(const InputPortBase* input);
-
-        /// <summary> Constructor </summary>
-        SubmodelInputs(const std::string& name, const InputPortBase* input);
-
-        /// <summary> Constructor </summary>
-        SubmodelInputs(const std::vector<InputPortBase*>& inputs);
-
-        /// <summary> Constructor </summary>
-        SubmodelInputs(const std::vector<const InputPortBase*>& inputs);
-
-        /// <summary> Constructor </summary>
-        SubmodelInputs(const std::vector<std::pair<std::string, InputPortBase*>>& inputs);
-
-        /// <summary> Constructor </summary>
-        SubmodelInputs(const std::vector<std::pair<std::string, const InputPortBase*>>& inputs);
-
-    private:
-        std::vector<std::pair<std::string, const InputPortBase*>> _inputs;
-    };
-
     /// <summary> A submodel represents a subset of a model that is able to compute a specified set of outputs. </summary>
     ///
     /// The inputs of a submodel are a set of input ports that are necessary to compute the outputs. If
@@ -93,16 +68,16 @@ namespace model
         Model& GetModel() { return _model; }
 
         /// <summary> Returns the number of input ports for this submodel </summary>
-        int NumInputPorts() const { return _inputs.size(); }
+        int NumInputs() const { return _inputs.size(); }
 
         /// <summary> Returns the number of output ports for this submodel </summary>
-        int NumOutputPorts() const { return _outputs.size(); }
+        int NumOutputs() const { return _outputs.size(); }
 
         /// <summary> Returns the input ports for this submodel </summary>
-        const std::vector<const InputPortBase*>& GetInputPorts() const { return _inputs; }
+        const std::vector<const InputPortBase*>& GetInputs() const { return _inputs; }
 
         /// <summary> Returns the output ports for this submodel </summary>
-        const std::vector<const OutputPortBase*>& GetOutputPorts() const { return _outputs; }
+        const std::vector<const OutputPortBase*>& GetOutputs() const { return _outputs; }
 
     private:
         friend void swap(Submodel& a, Submodel& b);
@@ -122,6 +97,7 @@ namespace ell
 {
 namespace model
 {
+    // Submodel implementation
     template <typename Visitor>
     void Submodel::Visit(Visitor&& visitor) const
     {
@@ -129,3 +105,5 @@ namespace model
     }
 } // namespace model
 } // namespace ell
+
+#pragma endregion implementation

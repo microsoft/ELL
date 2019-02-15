@@ -392,7 +392,7 @@ const model::OutputPortBase& RemoveSourceAndSinkNodes(model::Model& model, const
         }
     });
 
-    return static_cast<const OutputPortBase&>(*submodel.GetOutputPorts()[0]);
+    return *submodel.GetOutputs()[0];
 }
 
 template <typename ElementType>

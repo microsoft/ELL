@@ -78,7 +78,8 @@ void TestLinearPredictor()
 
     model::MapCompilerOptions settings;
     settings.mapFunctionName = "TestLinear";
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     testing::ProcessTest("Testing IsValid of LinearPredictor map", testing::IsEqual(compiledMap.IsValid(), true));

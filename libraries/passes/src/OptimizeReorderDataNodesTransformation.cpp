@@ -1,16 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     OptimizeReorderDataNodes.cpp (passes)
+//  File:     OptimizeReorderDataNodesTransformation.cpp (passes)
 //  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "OptimizeReorderDataNodes.h"
+#include "OptimizeReorderDataNodesTransformation.h"
 
 #include <model/include/ModelTransformer.h>
-
-#include <model/optimizer/include/OptimizationPassRegistry.h>
 
 #include <nodes/include/ReorderDataNode.h>
 
@@ -27,7 +25,21 @@ using namespace utilities::logging;
 
 namespace passes
 {
-    struct OptimizeReorderDataNodes::State
+    namespace
+    {
+        template <typename Container, typename Function>
+        auto Transform(const Container& container, Function fn)
+        {
+            return TransformVector(container.begin(), container.end(), fn);
+        }
+
+        std::vector<const OutputPortBase*> GetReferencedPorts(const std::vector<const InputPortBase*>& inputs)
+        {
+            return Transform(inputs, [](auto input) { return &input->GetReferencedPort(); });
+        }
+    } // namespace
+
+    struct OptimizeReorderDataNodesTransformation::State
     {
         template <typename ValueType>
         bool TryOptimizeReorderNode(const Node& nodeToOptimize, ModelTransformer& transformer)
@@ -119,37 +131,42 @@ namespace passes
         std::vector<model::Node::NodeId> nodesToIgnore;
     };
 
-    OptimizeReorderDataNodes::OptimizeReorderDataNodes() :
-        _state(new OptimizeReorderDataNodes::State)
+    OptimizeReorderDataNodesTransformation::OptimizeReorderDataNodesTransformation() :
+        _state(new OptimizeReorderDataNodesTransformation::State)
     {
     }
 
-    OptimizeReorderDataNodes::~OptimizeReorderDataNodes() = default;
+    OptimizeReorderDataNodesTransformation::OptimizeReorderDataNodesTransformation(OptimizeReorderDataNodesTransformation&&) = default;
 
-    void OptimizeReorderDataNodes::OptimizeNode(const model::Node& node, const model::MapCompilerOptions& settings, model::ModelOptimizerContext& context) const
+    OptimizeReorderDataNodesTransformation::~OptimizeReorderDataNodesTransformation() = default;
+
+    model::Submodel OptimizeReorderDataNodesTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
     {
-        auto& transformer = context.GetTransformer();
+        auto onto = GetReferencedPorts(submodel.GetInputs());
+        auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [this, context](const Node& node, ModelTransformer& transformer) {
+            const model::MapCompiler* compiler = context.GetCompiler();
+            bool canOptimizeNode = true;
+            if (compiler)
+            {
+                model::ModelOptimizerOptions optimizerOptions = compiler->GetModelOptimizerOptions(node);
+                canOptimizeNode = optimizerOptions.GetEntry<bool>("optimizeReorderDataNodes", true);
+            }
+            if (canOptimizeNode)
+            {
+                if (_state->TryOptimizeReorderNode<float>(node, transformer))
+                {
+                    return;
+                }
+                if (_state->TryOptimizeReorderNode<double>(node, transformer))
+                {
+                    return;
+                }
+            }
 
-        if (_state->TryOptimizeReorderNode<float>(node, transformer))
-        {
-            return;
-        }
-        if (_state->TryOptimizeReorderNode<double>(node, transformer))
-        {
-            return;
-        }
+            transformer.CopyNode(node);
+        });
 
-        transformer.CopyNode(node);
-    }
-
-    void OptimizeReorderDataNodes::AddToRegistry()
-    {
-        model::OptimizationPassInfo info = {
-            "OptimizeReorderDataNodes",
-            [](const model::ModelOptimizerOptions& settings) { return settings.optimizeReorderDataNodes; },
-            []() { return std::make_unique<OptimizeReorderDataNodes>(); }
-        };
-        model::OptimizationPassRegistry::AddPass(info);
+        return result;
     }
 } // namespace passes
 } // namespace ell

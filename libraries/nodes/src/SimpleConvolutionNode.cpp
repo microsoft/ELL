@@ -205,6 +205,7 @@ namespace nodes
         const int filterSize = _filterWeights.NumColumns();
         const auto& weights = AppendConstant(transformer, weightsValues);
         auto convNode = transformer.AddNode<SimpleConvolutionComputeNode<ValueType>>(newInput, weights, _inputMemoryLayout, GetOutputMemoryLayout(), filterSize, _stride, _isDepthwiseSeparable);
+        convNode->GetMetadata() = GetMetadata();
         transformer.MapNodeOutput(this->output, convNode->output);
         return true;
     }
@@ -247,7 +248,7 @@ namespace nodes
 
     template <typename ValueType>
     SimpleConvolutionComputeNode<ValueType>::SimpleConvolutionComputeNode() :
-        CompilableNode({ &_input }, { &_output }),
+        CompilableNode({ &_input, &_filterWeights }, { &_output }),
         _input(this, {}, defaultInputPortName),
         _filterWeights(this, {}, filterWeightsPortName),
         _output(this, defaultOutputPortName, 0)
@@ -296,6 +297,13 @@ namespace nodes
     template <typename ValueType>
     void SimpleConvolutionComputeNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
+        auto defaultParallelizeValue = function.GetModule().GetCompilerOptions().parallelize;
+        auto parallelize = compiler.GetModelOptimizerOptions(*this).template GetEntry<bool>("parallelize", defaultParallelizeValue);
+
+        auto options = function.GetCompilerOptions();
+        options.parallelize = parallelize;
+        function.SetCompilerOptions(options);
+
         // input is a d x (w+2p) x (h+2p) array
         // reshaped, it's a d*(w+2p)) x (h+2p) array == d*(w+k-1) x (h+k-1)
         LLVMValue pInput = compiler.EnsurePortEmitted(this->input);
@@ -327,8 +335,39 @@ namespace nodes
         }
     }
 
+    template <typename ValueType>
+    void SimpleConvolutionComputeNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        model::CompilableNode::WriteToArchive(archiver);
+        archiver[defaultInputPortName] << _input;
+        archiver[filterWeightsPortName] << _filterWeights;
+        archiver["inputLayout"] << _inputMemoryLayout; // TODO: get rid of this
+        archiver["outputLayout"] << GetOutputMemoryLayout();
+        archiver["filterSize"] << _filterSize; // TODO: get this from weights layout
+        archiver["stride"] << _stride;
+        archiver["dw"] << _isDepthwiseSeparable;
+    }
+
+    template <typename ValueType>
+    void SimpleConvolutionComputeNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        model::CompilableNode::ReadFromArchive(archiver);
+        archiver[defaultInputPortName] >> _input;
+        archiver[filterWeightsPortName] >> _filterWeights;
+        archiver["inputLayout"] >> _inputMemoryLayout;
+        model::PortMemoryLayout outputMemoryLayout;
+        archiver["outputLayout"] >> outputMemoryLayout;
+        _output.SetMemoryLayout(outputMemoryLayout);
+        archiver["filterSize"] >> _filterSize;
+        archiver["stride"] >> _stride;
+        archiver["dw"] >> _isDepthwiseSeparable;
+        // _isDepthwiseSeparable = (_filterWeights.NumChannels() == 1) && (_inputMemoryLayout.GetLogicalDimensionActiveSize(2) > 1);
+    }
+
     // Explicit specializations
     template class SimpleConvolutionNode<float>;
     template class SimpleConvolutionNode<double>;
+    template class SimpleConvolutionComputeNode<float>;
+    template class SimpleConvolutionComputeNode<double>;
 } // namespace nodes
 } // namespace ell

@@ -110,6 +110,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DiagonalConvolutionNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DiagonalConvolutionComputeNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DTWDistanceNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<ElementType>>();
@@ -132,6 +133,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ReinterpretLayoutNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::RNNNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionComputeNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<ElementType>>();
@@ -145,6 +147,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::UnrolledConvolutionNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::VoiceActivityDetectorNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::WinogradConvolutionNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::WinogradConvolutionComputeNode<ElementType>>();
 
         // NN layer nodes
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>();

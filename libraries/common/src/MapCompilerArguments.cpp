@@ -8,6 +8,11 @@
 
 #include "MapCompilerArguments.h"
 
+#include <utilities/include/Archiver.h>
+#include <utilities/include/Files.h>
+#include <utilities/include/JsonArchiver.h>
+#include <utilities/include/StringUtil.h>
+
 namespace ell
 {
 namespace common
@@ -77,6 +82,20 @@ namespace common
             "auto");
 
         parser.AddOption(
+            modelOptions,
+            "modelOption",
+            "",
+            "Add a model-specific option",
+            std::vector<std::string>{});
+
+        parser.AddOption(
+            nodeOptions,
+            "nodeOption",
+            "",
+            "Add a node-specific option",
+            std::vector<std::string>{});
+
+        parser.AddOption(
             enableVectorization,
             "vectorize",
             "vec",
@@ -124,7 +143,7 @@ namespace common
             target,
             "target",
             "t",
-            "target name",
+            "Target name",
             { { "host" }, { "pi0" }, { "pi3" }, { "orangepi0" }, { "pi3_64" }, { "mac" }, { "linux" }, { "windows" }, { "ios" }, { "aarch64" }, { "custom" } },
             "host");
 
@@ -209,9 +228,6 @@ namespace common
         settings.compilerSettings.allowVectorInstructions = enableVectorization;
         settings.compilerSettings.parallelize = parallelize;
         settings.compilerSettings.vectorWidth = vectorWidth;
-        settings.optimizerSettings.fuseLinearFunctionNodes = fuseLinearOperations;
-        settings.optimizerSettings.optimizeReorderDataNodes = optimizeReorderDataNodes;
-        settings.optimizerSettings.preferredConvolutionMethod = convolutionMethod;
         settings.profile = profile;
         settings.compilerSettings.profile = profile;
         settings.compilerSettings.positionIndependentCode = positionIndependentCode;
@@ -246,7 +262,102 @@ namespace common
             settings.compilerSettings.targetDevice.numBits = numBits;
         }
 
+        // Now add any settings specified in the --modelOptions metadata
+        auto metadata = GetOptionsMetadata();
+        if (metadata.HasEntry("model"))
+        {
+            settings = settings.AppendOptions(metadata);
+        }
+
         return settings;
     }
+
+    model::ModelOptimizerOptions MapCompilerArguments::GetModelOptimizerOptions() const
+    {
+        model::ModelOptimizerOptions options;
+        options["fuseLinearFunctionNodes"] = fuseLinearOperations;
+        options["optimizeReorderDataNodes"] = optimizeReorderDataNodes;
+        options["preferredConvolutionMethod"] = convolutionMethod;
+
+        auto metadata = GetOptionsMetadata();
+        if (metadata.HasEntry("model"))
+        {
+            AppendMetadataToOptions(metadata.GetEntry<utilities::PropertyBag>("model"), options);
+        }
+
+        return options;
+    }
+
+    bool MapCompilerArguments::HasOptionsMetadata() const
+    {
+        return !nodeOptions.empty() || !modelOptions.empty();
+    }
+
+    utilities::PropertyBag MapCompilerArguments::GetOptionsMetadata() const
+    {
+        utilities::PropertyBag result;
+        utilities::PropertyBag modelMetadata = GetModelOptionsMetadata();
+        if (!modelMetadata.IsEmpty())
+        {
+            result["model"] = modelMetadata;
+        }
+
+        utilities::PropertyBag nodesMetadata = GetNodeOptionsMetadata();
+        if (!nodesMetadata.IsEmpty())
+        {
+            result["nodes"] = nodesMetadata;
+        }
+
+        return result;
+    }
+
+    utilities::PropertyBag MapCompilerArguments::GetModelOptionsMetadata() const
+    {
+        utilities::PropertyBag modelMetadata;
+        for (const auto& entry : modelOptions)
+        {
+            if (!entry.empty())
+            {
+                auto parts = utilities::Split(entry, ',');
+                if (parts.size() == 2u) // key, value
+                {
+                    // key, value
+                    modelMetadata[parts[0]] = parts[1];
+                }
+                else
+                {
+                    auto msg = "Model options must be in the format \"<option_name>,<option_value>\", got: " + entry;
+                    throw utilities::CommandLineParserInvalidOptionsException(msg.c_str());
+                }
+            }
+        }
+        return modelMetadata;
+    }
+
+    utilities::PropertyBag MapCompilerArguments::GetNodeOptionsMetadata() const
+    {
+        utilities::PropertyBag nodesMetadata;
+        for (const auto& entry : nodeOptions)
+        {
+            if (!entry.empty())
+            {
+                auto parts = utilities::Split(entry, ',');
+                if (parts.size() == 3u) // node id, key, value
+                {
+                    // node Id, key, value
+                    auto nodeMetadata = nodesMetadata.GetEntry(parts[0], utilities::PropertyBag{});
+                    nodeMetadata[parts[1]] = parts[2];
+                    nodesMetadata[parts[0]] = nodeMetadata;
+                }
+                else
+                {
+                    auto msg = "Node options must be in the format \"<node_id>,<option_name>,<option_value>\", got: " + entry;
+                    throw utilities::CommandLineParserInvalidOptionsException(msg.c_str());
+                }
+            }
+        }
+        return nodesMetadata;
+    }
+
 } // namespace common
 } // namespace ell

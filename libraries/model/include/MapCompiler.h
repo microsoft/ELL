@@ -10,6 +10,7 @@
 
 #include "CompilableNodeUtilities.h"
 #include "MapCompilerOptions.h"
+#include "ModelOptimizerOptions.h"
 #include "OutputPort.h"
 
 #include <emitters/include/CompilerOptions.h>
@@ -45,10 +46,39 @@ namespace model
         /// <param name="parameterNames"> The parameter names of the function to create. </param>
         void CompileMap(Map& map, const std::string& functionName);
 
+        /// <summary> Gets the global compiler parameters being used by the map compiler. </summary>
+        ///
+        /// <returns> The MapCompilerOptions struct used by the map compiler to control code generation. </returns>
+        MapCompilerOptions GetMapCompilerOptions() const;
+
         /// <summary> Gets the model-specific compiler parameters being used by the map compiler. </summary>
         ///
         /// <returns> The MapCompilerOptions struct used by the map compiler to control code generation. </returns>
-        const MapCompilerOptions& GetMapCompilerOptions() const { return _parameters; }
+        MapCompilerOptions GetMapCompilerOptions(const Model& model) const;
+
+        /// <summary> Gets the node-specific compiler parameters being used by the map compiler. </summary>
+        ///
+        /// <returns> The MapCompilerOptions struct used by the map compiler to control code generation. </returns>
+        MapCompilerOptions GetMapCompilerOptions(const Node& node) const;
+
+        /// <summary> Gets the global optimization parameters being used by the map compiler. </summary>
+        ///
+        /// <returns> The ModelOptimizerOptions struct used by the map compiler to control code generation. </returns>
+        ModelOptimizerOptions GetModelOptimizerOptions() const;
+
+        /// <summary> Gets the model-specific optimization parameters being used by the map compiler. </summary>
+        ///
+        /// <param name="model"> The model to get the options for. </param>
+        ///
+        /// <returns> The ModelOptimizerOptions struct used by the map compiler to control code generation. </returns>
+        ModelOptimizerOptions GetModelOptimizerOptions(const Model& model) const;
+
+        /// <summary> Gets the node-specific optimization parameters being used by the map compiler. </summary>
+        ///
+        /// <param name="node"> The node to get the options for. </param>
+        ///
+        /// <returns> The ModelOptimizerOptions struct used by the map compiler to control code generation. </returns>
+        ModelOptimizerOptions GetModelOptimizerOptions(const Node& node) const;
 
         //
         // Routines for Node implementers
@@ -78,11 +108,8 @@ namespace model
         /// <summary> Associate the given variable with the output port. </summary>
         void SetVariableForPort(const Port& port, emitters::Variable* pVar);
 
-        /// <summary> Associate the given variable with the output port element. </summary>
-        void SetVariableForElement(const PortElementBase& element, emitters::Variable* pVar);
-
     protected:
-        MapCompiler(const MapCompilerOptions& settings);
+        MapCompiler(const MapCompilerOptions& settings, const ModelOptimizerOptions& optimizerOptions);
 
         /// <summary>
         /// Create a variable to store computed output for the given output port. The variable
@@ -126,6 +153,8 @@ namespace model
         emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const PortElementBase& element, ArgType argType, ell::utilities::UniqueNameList& list);
 
         MapCompilerOptions _parameters;
+        ModelOptimizerOptions _optimizerOptions;
+
         // map from ports to runtime variables, for all ports in the model
         // stored as a stack, with the top of the stack being the innermost scope
         std::vector<std::unordered_map<const Port*, emitters::Variable*>> _portToVarMaps; // Do we need separate elementToVarMaps?

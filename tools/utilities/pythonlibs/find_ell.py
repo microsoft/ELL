@@ -44,7 +44,7 @@ def find_ell_build():
             # we match by "build" prefix.
             for d in os.listdir(head):
                 dd = os.path.join(head, d)
-                if d.startswith("build") and os.path.isdir(dd):
+                if (d.startswith("build") and os.path.isdir(dd) and os.path.isfile(os.path.join(dd, "ell_build_tools.json"))):  # noqa: E501
                     return dd
             raise Exception("ELL build folder not found in {}\nFound:{}".format(head, os.listdir(head)))
 

@@ -8,10 +8,6 @@
 
 #include "CompileArguments.h"
 
-#include <utilities/include/CommandLineParser.h>
-#include <utilities/include/Exception.h>
-#include <utilities/include/MillisecondTimer.h>
-
 #include <data/include/Dataset.h>
 
 #include <common/include/LoadModel.h>
@@ -22,8 +18,14 @@
 #include <model/include/IRMapCompiler.h>
 #include <model/include/Map.h>
 #include <model/include/OutputNode.h>
+#include <model/include/SetCompilerOptionsTransformation.h>
 
-#include <passes/include/StandardPasses.h>
+#include <passes/include/StandardTransformations.h>
+
+#include <utilities/include/CommandLineParser.h>
+#include <utilities/include/Exception.h>
+#include <utilities/include/Logger.h>
+#include <utilities/include/MillisecondTimer.h>
 
 #include <iostream>
 #include <sstream>
@@ -31,6 +33,8 @@
 #include <string>
 
 using namespace ell;
+using namespace utilities::logging;
+using utilities::logging::Log;
 
 typedef std::function<void(const double*, double*)> FnInputOutput;
 
@@ -108,15 +112,31 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
     }
 
     model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions(baseFilename);
+
+    // Add model/node-specific parameters to metadata
+    if (mapCompilerArguments.HasOptionsMetadata())
+    {
+        utilities::PropertyBag properties = mapCompilerArguments.GetOptionsMetadata();
+        model::SetCompilerOptionsTransformation setOptionsTranformation(properties);
+        map.Transform(setOptionsTranformation);
+    }
+
+    if (compileArguments.outputMapWithOptions)
+    {
+        common::SaveMap(map, baseFilename + "_options.ell");
+    }
+
     if (compileArguments.outputRefinedMap)
     {
         TimingOutputCollector timer(timingOutput, "Time to refine map", compileArguments.verbose);
         map.Refine(compileArguments.maxRefinementIterations);
         timer.Stop();
-        common::SaveMap(map, baseFilename + "_refined.map");
+        common::SaveMap(map, baseFilename + "_refined.ell");
     }
 
-    model::IRMapCompiler compiler(settings);
+    auto optimizerOptions = mapCompilerArguments.GetModelOptimizerOptions();
+
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     TimingOutputCollector timer(timingOutput, "Time to compile map", compileArguments.verbose);
 
     auto compiledMap = compiler.Compile(map);
@@ -125,7 +145,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
     if (compileArguments.outputCompiledMap)
     {
         TimingOutputCollector timer(timingOutput, "Time to save compiled map", compileArguments.verbose);
-        common::SaveMap(compiledMap, baseFilename + "_compiled.map");
+        common::SaveMap(compiledMap, baseFilename + "_compiled.ell");
     }
     if (compileArguments.outputHeader)
     {
@@ -194,15 +214,24 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
 
+        ShouldLog() = compileArguments.verbose;
+
         // if no input specified, print help and exit
         if (!mapLoadArguments.HasInputFilename())
         {
-            std::cout << commandLineParser.GetHelpString() << std::endl;
-            return 0;
+            if (commandLineParser.GetPositionalArgs().size() == 1)
+            {
+                mapLoadArguments.inputMapFilename = commandLineParser.GetPositionalArgs()[0];
+            }
+            else
+            {
+                std::cout << commandLineParser.GetHelpString() << std::endl;
+                return 1;
+            }
         }
 
-        // Initialize the pass registry
-        passes::AddStandardPassesToRegistry();
+        // Initialize the transformation registry
+        passes::AddStandardTransformationsToRegistry();
 
         // load map and produce the desired output
         TimingOutputCollector timer(timingOutput, "Time to load map", compileArguments.verbose);

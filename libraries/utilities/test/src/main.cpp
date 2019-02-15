@@ -113,6 +113,7 @@ int main(int argc, char* argv[])
 
         // PropertyBag tests
         TestPropertyBag();
+        TestRecursivePropertyBag();
     }
     catch (const utilities::Exception& exception)
     {

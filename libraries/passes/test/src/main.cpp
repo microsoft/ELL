@@ -11,6 +11,7 @@
 //
 
 #include "ModelOptimizerTest.h"
+#include "TransformationTest.h"
 
 #include <testing/include/testing.h>
 
@@ -32,6 +33,9 @@ int main()
         TestOptimizeReorderDataNodes4();
 
         TestSetConvolutionMethodPass();
+
+        // Test Transformations
+        TestTransformations();
     }
     catch (const utilities::Exception& exception)
     {

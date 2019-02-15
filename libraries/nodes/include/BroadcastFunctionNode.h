@@ -920,7 +920,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastFunctionNode<ValueType, FunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        const auto& compilerSettings = compiler.GetCompilerOptions();
+        const auto& compilerSettings = function.GetCompilerOptions();
 
         auto& module = function.GetModule();
         auto& emitter = module.GetIREmitter();

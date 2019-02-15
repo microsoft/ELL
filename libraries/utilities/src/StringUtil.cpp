@@ -7,16 +7,22 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "StringUtil.h"
+#include "Exception.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cstdio>
 #include <sstream>
-#include <cctype>
 
 namespace ell
 {
 namespace utilities
 {
+    bool Contains(const std::string& s, const std::string& substring)
+    {
+        return s.find(substring) != std::string::npos;
+    }
+
     std::string ToLowercase(const std::string& s)
     {
         std::string lower = s;
@@ -96,5 +102,55 @@ namespace utilities
         return result;
     }
 
+    template <>
+    bool FromString(const std::string& s)
+    {
+        auto str = ToLowercase(s);
+        if (str == "true")
+        {
+            return true;
+        }
+        else if (str == "false")
+        {
+            return false;
+        }
+        throw InputException(InputExceptionErrors::invalidArgument, "Error parsing \"" + s + "\" as a boolean");
+    }
+
+    template <>
+    int FromString(const std::string& s)
+    {
+        return std::stoi(s);
+    }
+
+    template <>
+    long FromString(const std::string& s)
+    {
+        return std::stol(s);
+    }
+
+    template <>
+    unsigned long FromString(const std::string& s)
+    {
+        return std::stoul(s);
+    }
+
+    template <>
+    float FromString(const std::string& s)
+    {
+        return std::stof(s);
+    }
+
+    template <>
+    double FromString(const std::string& s)
+    {
+        return std::stod(s);
+    }
+
+    template <>
+    std::string FromString(const std::string& s)
+    {
+        return s;
+    }
 } // namespace utilities
 } // namespace ell

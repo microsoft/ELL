@@ -148,7 +148,7 @@ namespace nodes
     void DotProductNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         static_assert(!std::is_same<ValueType, bool>(), "Cannot instantiate boolean dot product nodes");
-        if (!compiler.GetCompilerOptions().unrollLoops)
+        if (!function.GetCompilerOptions().unrollLoops)
         {
             CompileDotProductLoop(compiler, function);
         }
@@ -165,7 +165,7 @@ namespace nodes
         emitters::LLVMValue pRVector = compiler.EnsurePortEmitted(input2);
         int count = static_cast<int>(input1.Size());
         emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
-        if (compiler.GetCompilerOptions().inlineOperators)
+        if (function.GetCompilerOptions().inlineOperators)
         {
             function.DotProduct(count, pLVector, pRVector, pResult);
         }

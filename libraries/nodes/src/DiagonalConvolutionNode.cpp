@@ -65,6 +65,7 @@ namespace nodes
         int filterSize = _filterWeights.NumColumns();
         const auto& weights = AppendConstant(transformer, weightsValues);
         auto convNode = transformer.AddNode<DiagonalConvolutionComputeNode<ValueType>>(newInput, weights, _inputMemoryLayout, GetOutputMemoryLayout(), filterSize, _stride);
+        convNode->GetMetadata() = GetMetadata();
         transformer.MapNodeOutput(this->output, convNode->output);
         return true;
     }
@@ -167,7 +168,7 @@ namespace nodes
 
     template <typename ValueType>
     DiagonalConvolutionComputeNode<ValueType>::DiagonalConvolutionComputeNode() :
-        CompilableNode({ &_input }, { &_output }),
+        CompilableNode({ &_input, &_filterWeights }, { &_output }),
         _input(this, {}, defaultInputPortName),
         _filterWeights(this, {}, filterWeightsPortName),
         _output(this, defaultOutputPortName, 0)
@@ -362,8 +363,38 @@ namespace nodes
         });
     }
 
+    template <typename ValueType>
+    void DiagonalConvolutionComputeNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        model::CompilableNode::WriteToArchive(archiver);
+        archiver[defaultInputPortName] << _input;
+        archiver["weights"] << _filterWeights;
+        archiver["inputLayout"] << _inputMemoryLayout;
+        archiver["outputLayout"] << GetOutputMemoryLayout();
+        archiver["filterSize"] << _filterSize;
+        archiver["stride"] << _stride;
+        archiver["batchSize"] << _batchSize;
+    }
+
+    template <typename ValueType>
+    void DiagonalConvolutionComputeNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        model::CompilableNode::ReadFromArchive(archiver);
+        archiver[defaultInputPortName] >> _input;
+        archiver["weights"] >> _filterWeights;
+        archiver["inputLayout"] >> _inputMemoryLayout;
+        model::PortMemoryLayout outputMemoryLayout;
+        archiver["outputLayout"] >> outputMemoryLayout;
+        _output.SetMemoryLayout(outputMemoryLayout);
+        archiver["filterSize"] >> _filterSize;
+        archiver["stride"] >> _stride;
+        archiver["batchSize"] >> _batchSize;
+    }
+
     // Explicit specializations
     template class DiagonalConvolutionNode<float>;
     template class DiagonalConvolutionNode<double>;
+    template class DiagonalConvolutionComputeNode<float>;
+    template class DiagonalConvolutionComputeNode<double>;
 } // namespace nodes
 } // namespace ell

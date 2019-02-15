@@ -92,6 +92,16 @@ namespace utilities
         template <typename T, typename U>
         void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, const U& defaultValue, std::string emptyValueString = "true");
 
+        /// <summary> Adds a new option to the command-line parser </summary>
+        ///
+        /// <param name="optionValue"> [out] A reference to the variable to get filled in by the parser </param>
+        /// <param name="name"> The long name for the option. The option will be specified by '--' plus the long name (e.g., '--help') </param>
+        /// <param name="shortName"> [optional] The short name for the option. The option will be secified by '-' plus the short name (e.g., '-h') </param>
+        /// <param name="description"> The descriptive text that appears when help is requested </param>
+        /// <param name="defaultValue"> The default value for the option. The optionValue argument gets set to this if no value is specified on the command line </param>
+        template <typename T, typename U>
+        void AddOption(std::vector<T>& optionValue, std::string name, std::string shortName, std::string description, const std::vector<U>& defaultValue, std::string emptyValueString = "true");
+
         /// <summary> Adds a new enumerated-value option to the command-line parser </summary>
         ///
         /// <param name="optionValue"> [out] A reference to the variable to get filled in by the parser </param>
@@ -118,7 +128,7 @@ namespace utilities
         /// <param name="options"> The ParsedArgSet containing the options </param>
         void AddOptionSet(ParsedArgSet& options);
 
-        /// <summary> Adds a string that gets printed out help is requested </summary>
+        /// <summary> Adds a string that gets printed out if help is requested </summary>
         ///
         /// <param name="docString"> The string to be printed </param>
         virtual void AddDocumentationString(std::string docString);
@@ -173,6 +183,11 @@ namespace utilities
         /// <returns> true if the given short name has been registered </returns>
         bool HasShortName(std::string shortName);
 
+        /// <summary> Returns any unnamed ("positional") arguments </summary>
+        ///
+        /// <returns> The positional args </returns>
+        std::vector<std::string> GetPositionalArgs() { return _positionalArgs; }
+
         /// <summary> Returns any args after the "--" separator </summary>
         ///
         /// <returns> The passthrough args </returns>
@@ -218,14 +233,14 @@ namespace utilities
             std::vector<std::string> enumValues;
             bool enabled = true;
 
-            std::vector<std::function<bool(std::string)>> set_value_callbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
+            std::vector<std::function<bool(std::string)>> setValueCallbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
             std::vector<std::function<bool(std::string)>> didSetValueCallbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
 
             OptionInfo()
             {
             }
 
-            OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::string emptyValueString, std::function<bool(std::string)> set_value_callback);
+            OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::string emptyValueString, std::function<bool(std::string)> setValueCallback);
 
             std::string optionNameString() const;
             size_t optionNameHelpLength() const;
@@ -382,6 +397,23 @@ namespace utilities
         };
 
         OptionInfo info(name, shortName, description, ToString(defaultValue), emptyValueString, callback);
+        AddOption(info);
+    }
+
+    template <typename T, typename U>
+    void CommandLineParser::AddOption(std::vector<T>& option, std::string name, std::string shortName, std::string description, const std::vector<U>& defaultValue, std::string emptyValueString)
+    {
+        auto callback = [&option](std::string optionVal) {
+            T optionEntry;
+            bool didParse = ParseVal<T>(optionVal, optionEntry);
+            if (didParse)
+            {
+                option.emplace_back(optionEntry);
+            }
+            return didParse;
+        };
+
+        OptionInfo info(name, shortName, description, "", emptyValueString, callback);
         AddOption(info);
     }
 

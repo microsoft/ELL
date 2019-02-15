@@ -23,9 +23,29 @@ namespace utilities
         return static_cast<bool>(b1) == static_cast<bool>(b2);
     }
 
+    bool operator==(bool b1, Boolean b2)
+    {
+        return b1 == static_cast<bool>(b2);
+    }
+
+    bool operator==(Boolean b1, bool b2)
+    {
+        return static_cast<bool>(b1) == b2;
+    }
+
     bool operator!=(Boolean b1, Boolean b2)
     {
         return static_cast<bool>(b1) != static_cast<bool>(b2);
+    }
+
+    bool operator!=(bool b1, Boolean b2)
+    {
+        return b1 != static_cast<bool>(b2);
+    }
+
+    bool operator!=(Boolean b1, bool b2)
+    {
+        return static_cast<bool>(b1) != b2;
     }
 
 } // namespace utilities

@@ -38,12 +38,12 @@ namespace utilities
         /// <param name="token"> The token to return to the stream. </param>
         void PutBackToken(std::string token);
 
-        /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
+        /// <summary> Matches the next token from the input stream. Returns 'false' if token doesn't match. </summary>
         ///
         /// <param name="token"> The token to match. </param>
         bool TryMatchToken(std::string token);
 
-        /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
+        /// <summary> Matches the next token from the input stream. Returns 'false' if token doesn't match. </summary>
         ///
         /// <param name="token"> The token to match. </param>
         /// <param name="readToek"> The token actually read. </param>
@@ -89,7 +89,7 @@ namespace utilities
         char _currentStringDelimiter = '\0'; // '\0' if we're not currently parsing a string
     };
 
-    /// This helper class lets you peek random number of times and it restores all
+    /// This helper class lets you peek an arbitrary number of times, and it restores all
     /// those tokens when it goes out of scope.
     class PeekStack
     {

@@ -29,13 +29,12 @@ logger = logging.getLogger(__name__)
 logger_console_handler = logging.StreamHandler()
 
 
-def optimize(profiles, output):
-
-    # look through all the profiles
-    models = {}
-    for p in profiles:
+def read_profiles(profile_files):
+    # look through all the profile files
+    profiles = {}
+    for p in profile_files:
         if os.path.exists(p) and os.path.isfile(p) and p.endswith(".json"):
-            logger.verbose("Examing file {}...".format(p))
+            logger.verbose("Examining file {}...".format(p))
             profile = {}
             with open(file=p, mode='r', newline="\n") as f:
                 profile = json.load(f)
@@ -60,9 +59,14 @@ def optimize(profiles, output):
                                 best = perf
                 if len(best) > 0:
                     logger.verbose("Found valid profile!")
-                    models[profile["model"]] = best
-    if len(models) == 0:
+                    profiles[profile["model"]] = best
+    if len(profiles) == 0:
         raise ValueError("No valid profiles found!")
+    return profiles
+
+
+def optimize(profile_files, output):
+    profiles = read_profiles(profile_files)
 
     # build up options based on valid profiles
     base_model = {}
@@ -70,7 +74,7 @@ def optimize(profiles, output):
     options = {}
     model_choice = []
     model_path = []
-    for m in models.keys():
+    for m in profiles.keys():
         logger.verbose("Examing model {}...".format(m))
         if len(base_nodes) == 0:
             # set the first model as base model
@@ -79,7 +83,7 @@ def optimize(profiles, output):
                 base_model = json.load(f)
             for n in base_model["model"]["nodes"]:
                 base_nodes.add("node[" + n["id"] + "]")
-        if not set(models[m]["node"].keys()).issubset(base_nodes):
+        if not set(profiles[m]["node"].keys()).issubset(base_nodes):
             logger.warning("model {} is not compatible with base.".format(m))
         else:
             with open(file=m, mode="r", newline="\n") as f:
@@ -87,13 +91,15 @@ def optimize(profiles, output):
             # now build all options
             model_choice.append(model)
             model_path.append(m)
-            for n in models[m]["node"].keys():
+            for n in profiles[m]["node"].keys():
                 id = n[5:-1]
                 if id not in options.keys():
                     options[id] = []
-                options[id].append(models[m]["node"][n]["time_ms"] / models[m]["node"][n]["count"])
+                options[id].append(profiles[m]["node"][n]["time_ms"] / profiles[m]["node"][n]["count"])
     if len(model_choice) == 0:
         raise ValueError("No valid model choices!")
+
+    # NOTE: no longer need "profiles" object here
 
     # optimize model based on options
     optimized_model = base_model

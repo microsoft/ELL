@@ -14,6 +14,9 @@
 #include <model/include/Node.h>
 #include <model/include/OutputNode.h>
 
+#include <utilities/include/StlVectorUtil.h>
+
+using namespace ell;
 using namespace ell::model;
 
 namespace
@@ -21,10 +24,8 @@ namespace
 template <typename Container, typename Function>
 auto Transform(const Container& container, Function fn)
 {
-    std::vector<decltype(fn(container[0]))> result;
-    result.reserve(container.size());
-    std::transform(container.begin(), container.end(), std::back_inserter(result), fn);
-    return result;
+
+    return utilities::TransformVector(container.begin(), container.end(), fn);
 }
 
 bool IsOutputNode(const Node& node)
@@ -42,7 +43,7 @@ std::vector<const OutputPortBase*> GetReferencedPorts(const std::vector<const In
 Submodel AddMetadataToOutputTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
 {
     // Rewrite tree, copying all nodes but adding metadata to any OutputNodes
-    auto onto = GetReferencedPorts(submodel.GetInputPorts());
+    auto onto = GetReferencedPorts(submodel.GetInputs());
     auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [this](const Node& node, ModelTransformer& transformer) {
         if (IsOutputNode(node))
         {
@@ -91,7 +92,7 @@ void AddMetadataToOutputTransformation::CopyOutputNode(const OutputNode<T>* node
 Submodel CombineNodesTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
 {
     // Look for 2 consecutive nodes with metadata with the key "a", and replace them with a single node with the key "b"
-    auto onto = GetReferencedPorts(submodel.GetInputPorts());
+    auto onto = GetReferencedPorts(submodel.GetInputs());
     auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [this](const Node& node, ModelTransformer& transformer) {
         if (ShouldReplaceNode(node))
         {

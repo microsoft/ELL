@@ -9,6 +9,7 @@
 if [[ -d $build_dir ]]; then
     rm -rf build
 fi
+
 mkdir -p build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -16,22 +17,29 @@ make -s
 
 # export OPENBLAS_NUM_THREADS=1
 
+# Dump list of processes currently running (to check for runaway tests)
+/bin/bash -c "ps -e -o pid,%cpu,comm k -%cpu | tee ../processes.txt"
+
 # Run profile tool with arguments given on the command line
-echo "Running ELL profiler tool -- normal"
-/bin/bash -c "./profile 100 20"
+if [[ -f ./profile ]] ; then
+  echo "Running ELL profiler tool -- no opt" | tee -a ../profile_report_noopt.txt
+  /bin/bash -c "./profile 100 20 | tee -a ../profile_report_noopt.txt"
+fi
 
 if [[ -f ./profile_opt ]] ; then
-  echo "Running ELL profiler tool -- opt"
-  /bin/bash -c "./profile_opt 100 20"
+  echo "Running ELL profiler tool -- opt" | tee -a ../profile_report_opt.txt
+  /bin/bash -c "./profile_opt 100 20 | tee -a ../profile_report_opt.txt"
 fi
 
 # Run exercise_model tool with 10 iterations
-echo "Timing ELL exercise tool -- normal"
-/bin/bash -c "time ./exercise_model 100"
+if [[ -f ./exercise_model ]] ; then
+  echo "Timing ELL exercise tool -- no opt" | tee -a ../profile_report_noopt.txt
+  /bin/bash -c "time ./exercise_model 100" 2>&1 | tee -a ../profile_report_noopt.txt
+fi
 
-if [[ -f ./profile_opt ]] ; then
-  echo "Timing ELL exercise tool -- opt"
-  /bin/bash -c "time ./exercise_model_opt 100"
+if [[ -f ./exercise_model_opt ]] ; then
+  echo "Timing ELL exercise tool -- opt" | tee -a ../profile_report_opt.txt
+  /bin/bash -c "time ./exercise_model_opt 100" 2>&1 | tee -a ../profile_report_opt.txt
 fi
 
 # Run perf tool to get low-level events

@@ -15,11 +15,13 @@
 #include <model/include/OutputNode.h>
 
 #include <utilities/include/Exception.h>
+#include <utilities/include/StlVectorUtil.h>
 
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 
+using namespace ell;
 using namespace ell::model;
 
 namespace
@@ -27,10 +29,7 @@ namespace
 template <typename Container, typename Function>
 auto Transform(const Container& container, Function fn)
 {
-    std::vector<decltype(fn(container[0]))> result;
-    result.reserve(container.size());
-    std::transform(container.begin(), container.end(), std::back_inserter(result), fn);
-    return result;
+    return utilities::TransformVector(container.begin(), container.end(), fn);
 }
 
 template <typename T>

@@ -4,17 +4,22 @@
 # ==============================================================================
  
 # Make sure the binaries can be imported
+
 import os
 import sys
+
+
 sys.path.append(os.path.join(os.path.dirname(__file__), 'Release'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'RelWithDebInfo'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'Debug'))
 
 __this_file_directory = os.path.dirname(os.path.abspath(__file__))
 
+
 def package_dir():
     """Return the path containing this ell module """
-    return os.path.join(os.path.dirname(__file__))
+    return os.path.dirname(__file__)
+
 
 def ensure_openblas():
     import platform
@@ -27,7 +32,7 @@ def ensure_openblas():
         while (tail != ""):
             # find the build tools info
             tools = os.path.join(head,"ell_build_tools.json")
-            if (os.path.isfile(tools)):                
+            if (os.path.isfile(tools)):
                 import json
                 blas_libs = json.load(open(tools,"r"))["blas"] # ~/lib/libopenblas.dll.a
                 blas_bin = os.path.join(os.path.dirname(os.path.dirname(blas_libs)), "bin")

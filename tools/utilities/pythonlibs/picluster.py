@@ -11,7 +11,6 @@ import json
 import os
 import random
 import re
-import requests
 import socket
 import sys
 import time
@@ -20,6 +19,7 @@ import platform
 
 import cpuinfo
 import logger
+import requests
 
 
 class PiBoardEntity():

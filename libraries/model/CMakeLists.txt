@@ -16,9 +16,11 @@ set(src
     src/IRModelProfiler.cpp
     src/Map.cpp
     src/MapCompiler.cpp
+    src/MapCompilerOptions.cpp
     src/Model.cpp
     src/ModelBuilder.cpp
     src/ModelEditor.cpp
+    src/ModelOptimizerOptions.cpp
     src/ModelTransformer.cpp
     src/Node.cpp
     src/OptimizeModelTransformation.cpp
@@ -27,11 +29,12 @@ set(src
     src/Port.cpp
     src/PortElements.cpp
     src/PortMemoryLayout.cpp
-    src/RefineAndOptimizeTransformation.cpp
     src/RefineTransformation.cpp
+    src/SetCompilerOptionsTransformation.cpp
     src/Submodel.cpp
     src/Transformation.cpp
     src/TransformContext.cpp
+    src/TransformationRegistry.cpp
 )
 
 set(include
@@ -51,6 +54,7 @@ set(include
     include/Model.h
     include/ModelBuilder.h
     include/ModelEditor.h
+    include/ModelOptimizerOptions.h
     include/ModelTransformer.h
     include/Node.h
     include/NodeMap.h
@@ -61,12 +65,13 @@ set(include
     include/Port.h
     include/PortElements.h
     include/PortMemoryLayout.h
-    include/RefineAndOptimizeTransformation.h
     include/RefineTransformation.h
     include/SliceNode.h
     include/SpliceNode.h
+    include/SetCompilerOptionsTransformation.h
     include/Submodel.h
     include/Transformation.h
+    include/TransformationRegistry.h
     include/TransformContext.h
 )
 
@@ -77,16 +82,9 @@ set(doc
 )
 
 set(optimizer_src
-    optimizer/src/ModelOptimizer.cpp
-    optimizer/src/OptimizationPass.cpp
-    optimizer/src/OptimizationPassRegistry.cpp
 )
 
 set(optimizer_include
-    optimizer/include/ModelOptimizer.h
-    optimizer/include/ModelOptimizerOptions.h
-    optimizer/include/OptimizationPass.h
-    optimizer/include/OptimizationPassRegistry.h
 )
 
 set(optimizer_doc
@@ -114,20 +112,26 @@ set(test_name ${library_name}_test)
 set(test_src
     test/src/main.cpp
     test/src/Map_test.cpp
+    test/src/Metadata_test.cpp
     test/src/ModelBuilder_test.cpp
     test/src/ModelTransformerTest.cpp
     test/src/Model_test.cpp
+    test/src/ModelOptimizerOptions_test.cpp
     test/src/ModelTransformerTest.cpp
     test/src/PortElements_test.cpp
+    test/src/Submodel_test.cpp
 )
 
 set(test_include
     test/include/Map_test.h
+    test/include/Metadata_test.h
     test/include/ModelBuilder_test.h
     test/include/ModelTransformerTest.h
     test/include/Model_test.h
+    test/include/ModelOptimizerOptions_test.h
     test/include/ModelTransformerTest.h
     test/include/PortElements_test.h
+    test/include/Submodel_test.h
 )
 
 source_group("src" FILES ${test_src})
@@ -201,7 +205,6 @@ set(optimizer_test_src
     optimizer/test/src/ExampleObjectives.cpp
     optimizer/test/src/ExampleOptimizers.cpp
     optimizer/test/src/ExampleTransformations.cpp
-    optimizer/test/src/FuseLinearOperationsTransformation.cpp
     optimizer/test/src/GlobalOptimizer.cpp
     optimizer/test/src/GlobalOptimizerOptions.cpp
     optimizer/test/src/main.cpp
@@ -210,7 +213,6 @@ set(optimizer_test_src
     optimizer/test/src/OptimizerTest.cpp
     optimizer/test/src/OptimizerTestUtil.cpp
     optimizer/test/src/SequentialOptimizer.cpp
-    optimizer/test/src/SetConvolutionMethodTransformation.cpp
     optimizer/test/src/TransformationTest.cpp
 )
 
@@ -227,7 +229,6 @@ set(optimizer_test_include
     optimizer/test/include/ExampleObjectives.h
     optimizer/test/include/ExampleOptimizers.h
     optimizer/test/include/ExampleTransformations.h
-    optimizer/test/include/FuseLinearOperationsTransformation.h
     optimizer/test/include/GlobalOptimizer.h
     optimizer/test/include/GlobalOptimizerOptions.h
     optimizer/test/include/Objective.h
@@ -236,7 +237,6 @@ set(optimizer_test_include
     optimizer/test/include/OptimizerTest.h
     optimizer/test/include/OptimizerTestUtil.h
     optimizer/test/include/SequentialOptimizer.h
-    optimizer/test/include/SetConvolutionMethodTransformation.h
     optimizer/test/include/TransformationTest.h
 )
 

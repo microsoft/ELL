@@ -135,10 +135,10 @@ namespace nodes
     template <typename ValueType>
     void SumNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        if (!compiler.GetCompilerOptions().unrollLoops)
+        if (!function.GetCompilerOptions().unrollLoops)
         {
-            size_t vectorSize = compiler.GetCompilerOptions().vectorWidth;
-            bool vectorize = compiler.GetCompilerOptions().allowVectorInstructions && (input.Size() > vectorSize);
+            size_t vectorSize = function.GetCompilerOptions().vectorWidth;
+            bool vectorize = function.GetCompilerOptions().allowVectorInstructions && (input.Size() > vectorSize);
             if (vectorize)
             {
                 CompileVectorizedLoop(compiler, function);
@@ -200,7 +200,7 @@ namespace nodes
     void SumNode<ValueType>::CompileVectorizedLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         const int size = _input.Size();
-        const int vectorSize = compiler.GetCompilerOptions().vectorWidth;
+        const int vectorSize = function.GetCompilerOptions().vectorWidth;
         assert(size >= vectorSize);
 
         emitters::LLVMValue input = compiler.EnsurePortEmitted(_input);

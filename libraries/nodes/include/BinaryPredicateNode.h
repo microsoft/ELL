@@ -221,7 +221,7 @@ namespace nodes
     template <typename ValueType>
     void BinaryPredicateNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        if (!compiler.GetCompilerOptions().unrollLoops)
+        if (!function.GetCompilerOptions().unrollLoops)
         {
             CompileLoop(compiler, function);
         }

@@ -40,13 +40,15 @@ namespace model
 
         emitters::IRModuleEmitter& moduleEmitter = irCompiler->GetModule();
         auto& enclosingFunction = moduleEmitter.GetCurrentFunction();
-
-        if (ShouldCompileInline() || compiler.GetMapCompilerOptions().inlineNodes)
+        if (ShouldCompileInline() || compiler.GetMapCompilerOptions(*this).inlineNodes)
         {
             Log() << "Inlining node " << DiagnosticString(*this) << " into function " << enclosingFunction.GetFunctionName() << EOL;
 
             irCompiler->NewNodeRegion(*this);
+            auto oldOptions = enclosingFunction.GetCompilerOptions();
+            enclosingFunction.SetCompilerOptions(compiler.GetMapCompilerOptions(*this).compilerSettings);
             Compile(*irCompiler, enclosingFunction);
+            enclosingFunction.SetCompilerOptions(oldOptions);
             irCompiler->TryMergeNodeRegion(*this);
         }
         else
@@ -72,11 +74,15 @@ namespace model
                 else if (HasOwnFunction())
                 {
                     Log() << DiagnosticString(*this) << " has its own function" << EOL;
+                    auto oldOptions = enclosingFunction.GetCompilerOptions();
+                    enclosingFunction.SetCompilerOptions(compiler.GetMapCompilerOptions(*this).compilerSettings);
                     EmitNodeFunction(*irCompiler);
+                    enclosingFunction.SetCompilerOptions(oldOptions);
                 }
                 else
                 {
                     auto function = moduleEmitter.BeginFunction(functionName, emitters::VariableType::Void, args);
+                    function.SetCompilerOptions(compiler.GetMapCompilerOptions(*this).compilerSettings);
                     function.SetAttributeForArguments(emitters::IRFunctionEmitter::Attributes::NoAlias);
 
                     irCompiler->NewNodeRegion(*this);

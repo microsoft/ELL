@@ -30,7 +30,6 @@ namespace nodes
     bool ConvolutionalLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         using predictors::neural::ConvolutionMethod;
-
         auto originalInputLayout = this->GetInputMemoryLayout();
         const auto originalOutputLayout = this->GetOutputMemoryLayout();
         const auto convParams = this->GetLayer().GetConvolutionalParameters();
@@ -52,39 +51,43 @@ namespace nodes
         auto preConvReorderNode = transformer.AddNode<ReorderDataNode<ValueType>>(*newInput, originalInputLayout, convInputLayout);
         newInput = &preConvReorderNode->output;
 
-        model::PortElements<ValueType> convOutput;
+        // model::PortElements<ValueType> convOutput;
+        model::OutputPort<ValueType>* convOutput;
 
         switch (convParams.method)
         {
         case ConvolutionMethod::simple:
         {
             auto convNode = transformer.AddNode<SimpleConvolutionNode<ValueType>>(*newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
-            convOutput = convNode->output;
+            convOutput = static_cast<model::OutputPort<ValueType>*>(convNode->GetOutputPort(0));
         }
         break;
         case ConvolutionMethod::unrolled:
         {
             auto convNode = transformer.AddNode<UnrolledConvolutionNode<ValueType>>(*newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
-            convOutput = convNode->output;
+            convOutput = static_cast<model::OutputPort<ValueType>*>(convNode->GetOutputPort(0));
         }
         break;
         case ConvolutionMethod::diagonal:
         {
             auto convNode = transformer.AddNode<DiagonalConvolutionNode<ValueType>>(*newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
-            convOutput = convNode->output;
+            convOutput = static_cast<model::OutputPort<ValueType>*>(convNode->GetOutputPort(0));
         }
         break;
         case ConvolutionMethod::winograd:
         {
             auto convNode = transformer.AddNode<WinogradConvolutionNode<ValueType>>(*newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
-            convOutput = convNode->output;
+            convOutput = static_cast<model::OutputPort<ValueType>*>(convNode->GetOutputPort(0));
         }
         break;
         default:
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
 
-        auto postConvReorderNode = transformer.AddNode<ReorderDataNode<ValueType>>(convOutput, convOutputLayout, originalOutputLayout);
+        // Copy metadata
+        const_cast<model::Node*>(convOutput->GetNode())->GetMetadata() = this->GetMetadata();
+
+        auto postConvReorderNode = transformer.AddNode<ReorderDataNode<ValueType>>(*convOutput, convOutputLayout, originalOutputLayout);
         transformer.MapNodeOutput(this->output, postConvReorderNode->output);
 
         return true;

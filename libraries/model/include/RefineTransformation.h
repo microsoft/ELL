@@ -19,7 +19,7 @@ namespace ell
 namespace model
 {
     /// <summary> A transformation that refines the nodes in the given submodel. </summary>
-    class RefineTransformation : public model::optimizer::Transformation
+    class RefineTransformation : public model::Transformation
     {
     public:
         /// <summary> Constructor. </summary>
@@ -35,7 +35,7 @@ namespace model
 
         /// <summary> Gets the name of this type. </summary>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-    
+
     private:
         int _maxIterations;
     };

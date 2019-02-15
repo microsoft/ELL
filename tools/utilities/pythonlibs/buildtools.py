@@ -15,6 +15,19 @@ from threading import Thread, Lock
 
 sys.path += [os.path.dirname(os.path.abspath(__file__))]
 import logger
+import find_ell
+
+ELL_TOOLS_JSON = "ell_build_tools.json"
+
+
+def get_build_tool_locations():
+    build_root = find_ell.find_ell_build()
+    jsonPath = os.path.join(build_root, ELL_TOOLS_JSON)
+    if not os.path.isfile(jsonPath):
+        raise Exception("Could not find build output: " + jsonPath)
+
+    with open(jsonPath) as f:
+        return json.loads(f.read())
 
 
 class EllBuildToolsRunException(Exception):
@@ -50,29 +63,23 @@ class EllBuildTools:
         if not os.path.isdir(build_root):
             raise Exception("Could not find '%s', please make sure to build the ELL project first" % (build_root))
 
-        ell_tools_json = "ell_build_tools.json"
-        jsonPath = os.path.join(build_root, ell_tools_json)
-        if not os.path.isfile(jsonPath):
-            raise Exception("Could not find build output: " + jsonPath)
-
-        with open(jsonPath) as f:
-            self.tools = json.loads(f.read())
+        self.tools = get_build_tool_locations()
 
         self.compiler = self.tools['compile']
         if self.compiler == "":
-            raise Exception(ell_tools_json + " is missing compiler info")
+            raise Exception(ELL_TOOLS_JSON + " is missing compiler info")
 
         self.swigexe = self.tools['swig']
         if self.swigexe == "":
-            raise Exception(ell_tools_json + " is missing swig info")
+            raise Exception(ELL_TOOLS_JSON + " is missing swig info")
 
         self.llcexe = self.tools['llc']
         if self.llcexe == "":
-            raise Exception(ell_tools_json + " is missing llc info")
+            raise Exception(ELL_TOOLS_JSON + " is missing llc info")
 
         self.optexe = self.tools['opt']
         if self.optexe == "":
-            raise Exception(ell_tools_json + " is missing opt info")
+            raise Exception(ELL_TOOLS_JSON + " is missing opt info")
 
         if ("blas" in self.tools):
             self.blas = self.tools['blas']  # this one can be empty.

@@ -11,10 +11,13 @@
 //
 
 #include "Map_test.h"
+#include "Metadata_test.h"
 #include "ModelBuilder_test.h"
+#include "ModelOptimizerOptions_test.h"
 #include "ModelTransformerTest.h"
 #include "Model_test.h"
 #include "PortElements_test.h"
+#include "Submodel_test.h"
 
 #include <testing/include/testing.h>
 
@@ -33,7 +36,6 @@ int main()
         TestNodeIterator();
         TestReverseNodeIterator();
         TestModelSerialization();
-        TestModelMetadata();
         TestInputRouting();
 
         TestDenseCopyModel();
@@ -57,6 +59,9 @@ int main()
 
         TestCustomRefine();
 
+        // Metadata tests
+        TestModelMetadata();
+        
         // ModelBuilder tests
 
         // Test passthrough to Model::AddNode
@@ -84,6 +89,12 @@ int main()
         TestCopySubmodel();
         TestTransformSubmodelOnto();
         TestTransformSubmodelInPlace();
+
+        // Submodel tests
+        TestSubmodels();
+
+        // ModelOptimizerOptions tests
+        TestModelOptimizerOptions();
     }
     catch (const utilities::Exception& exception)
     {

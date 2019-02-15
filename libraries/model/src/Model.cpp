@@ -8,6 +8,7 @@
 
 #include "Model.h"
 #include "InputPort.h"
+#include "ModelTransformer.h"
 #include "Node.h"
 #include "Port.h"
 #include "SliceNode.h"
@@ -99,6 +100,12 @@ namespace model
     Model Model::ShallowCopy() const
     {
         return { _data };
+    }
+
+    Model Model::DeepCopy() const
+    {
+        ModelTransformer transformer;
+        return transformer.CopyModel(*this);
     }
 
     bool Model::NodeIdExists(Node::NodeId id) const
@@ -277,10 +284,10 @@ namespace model
         VerifyNodes();
         VerifyInputs();
     }
-    
+
     void Model::VerifyNodes() const
     {
-        for (auto it: _data->idToNodeMap)
+        for (auto it : _data->idToNodeMap)
         {
             const Model* otherModel = it.second->GetModel();
             if ((*otherModel) != (*this))

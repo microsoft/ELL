@@ -21,7 +21,6 @@ namespace ell
 {
 namespace model
 {
-
     // Represents a correspondence between two ports, as when a port is transformed or copied into another model
     struct PortCorrespondence
     {
@@ -144,13 +143,16 @@ namespace model
         return (_outputPortMap.find(queryPortPtr) != _outputPortMap.end());
     }
 
-    const OutputPortBase& ModelTransformer::PortOutputsMap::GetCorrespondingPort(const OutputPortBase& queryPort) const
+    const OutputPortBase& ModelTransformer::PortOutputsMap::GetCorrespondingPort(const OutputPortBase& queryPort, bool isInPlace) const
     {
-        using namespace std::string_literals;
         auto queryPortPtr = &queryPort;
-        if (_outputPortMap.find(queryPortPtr) == _outputPortMap.end())
+        if (!IsOutputMapped(queryPort))
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element "s + to_string(queryPort.GetNode()->GetId()) + "." + queryPort.GetName() + " in new model.");
+            // If we don't have a mapping from old->new for this port, it may be because we elided a copy
+            // during an in-place transformation.
+            // TODO: find a way to tell the differerence between a port that doesn't have a mapping because
+            //   of an in-place (elided) copy, and one that doesn't have a mapping because the query is in error
+            return queryPort;
         }
 
         auto targetPort = _outputPortMap.at(queryPortPtr);
@@ -173,12 +175,12 @@ namespace model
         _outputPortMap[oldPort] = newPort;
     }
 
-    ModelTransformer::PortOutputsMap ModelTransformer::PortOutputsMap::ConcatenateMaps(const PortOutputsMap& prevMap, const PortOutputsMap& newMap)
+    ModelTransformer::PortOutputsMap ModelTransformer::PortOutputsMap::ConcatenateMaps(const PortOutputsMap& prevMap, const PortOutputsMap& newMap, bool isInPlace)
     {
         PortOutputsMap result;
         for (const auto& entry : prevMap._outputPortMap)
         {
-            const auto& newMappedValue = newMap.GetCorrespondingPort(*entry.second);
+            const auto& newMappedValue = newMap.GetCorrespondingPort(*entry.second, isInPlace);
             result.MapNodeOutput(entry.first, &newMappedValue);
         }
 
@@ -209,6 +211,7 @@ namespace model
     Submodel ModelTransformer::CopySubmodel(const Submodel& submodel, const TransformContext& context)
     {
         Model destModel;
+        destModel.GetMetadata() = submodel.GetModel().GetMetadata();
         auto result = TransformSubmodelOnto(submodel, destModel, {}, context, [](const Node& node, ModelTransformer& transformer) {
             transformer.CopyNode(node);
         });
@@ -284,7 +287,7 @@ namespace model
         return dynamic_cast<const InputNodeBase*>(&node) != nullptr;
     }
 
-    bool ModelTransformer::Compatible(const InputPortBase* source, const OutputPortBase* dest)
+    bool ModelTransformer::ArePortsCompatible(const InputPortBase* source, const OutputPortBase* dest)
     {
         return (source->Size() == dest->Size()) && (source->GetType() == dest->GetType());
     }
@@ -298,7 +301,7 @@ namespace model
         {
             auto source = correspondence.source;
             auto dest = correspondence.destination;
-            if (!Compatible(source, dest))
+            if (!ArePortsCompatible(source, dest))
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible source and destination inputs");
             }
@@ -322,11 +325,11 @@ namespace model
         auto previousElementMap = std::move(_elementsMap);
         _elementsMap.Clear();
 
-        VerifyOntoCorrespondences(submodel.GetInputPorts(), onto);
+        VerifyOntoCorrespondences(submodel.GetInputs(), onto);
 
-        std::vector<const InputPortBase*> sourceInputs = submodel.GetInputPorts();
+        std::vector<const InputPortBase*> sourceInputs = submodel.GetInputs();
         MapCorrespondingInputs(sourceInputs, onto);
-        submodel.GetModel().VisitSubmodel(sourceInputs, submodel.GetOutputPorts(), [this, transformFunction](const Node& node) {
+        submodel.GetModel().VisitSubmodel(sourceInputs, submodel.GetOutputs(), [this, transformFunction](const Node& node) {
             transformFunction(node, *this);
             AssignNodeAncestor(node);
         });
@@ -335,16 +338,16 @@ namespace model
         {
             // Now we have 2 maps, the previous one mapping A->B, and a new one mapping B->C (in _elementsMap).
             // Concatenate them to get a map A->C, and keep it.
-            auto newElementsMap = PortOutputsMap::ConcatenateMaps(previousElementMap, _elementsMap);
+            auto newElementsMap = PortOutputsMap::ConcatenateMaps(previousElementMap, _elementsMap, IsInPlace());
             _elementsMap = newElementsMap;
         }
 
         ResetContext();
 
-        auto newOutputs = GetCorrespondingOutputs(submodel.GetOutputPorts());
+        auto newOutputs = GetCorrespondingOutputs(submodel.GetOutputs());
 
         // Now visit the new outputs until we encounter an input port referencing a port from the "onto" list. That will be one of the new inputs. We should encounter one for each of the "onto" items.
-        std::vector<const InputPortBase*> newInputs(submodel.GetInputPorts().size(), nullptr);
+        std::vector<const InputPortBase*> newInputs(submodel.GetInputs().size(), nullptr);
         std::unordered_map<const OutputPortBase*, int> ontoPortToIndexMap;
         for (int i = 0, size = (int)onto.size(); i < size; ++i)
         {
@@ -407,11 +410,7 @@ namespace model
 
     const OutputPortBase& ModelTransformer::GetCorrespondingOutputs(const OutputPortBase& port) const
     {
-        if (IsInPlace() && !IsOutputMapped(port))
-        {
-            return port;
-        }
-        return _elementsMap.GetCorrespondingPort(port);
+        return _elementsMap.GetCorrespondingPort(port, IsInPlace());
     }
 
     std::vector<const OutputPortBase*> ModelTransformer::GetCorrespondingOutputs(const std::vector<const OutputPortBase*>& ports) const
@@ -482,7 +481,12 @@ namespace model
 
     void ModelTransformer::CopyNode(const Node& node)
     {
-        if (ShouldCopyNode(node))
+        CopyNodeWithMetadata(node, {});
+    }
+
+    void ModelTransformer::CopyNodeWithMetadata(const Node& node, const utilities::PropertyBag& metadata)
+    {
+        if (ShouldCopyNode(node) || !metadata.IsEmpty())
         {
             node.Copy(*this);
 
@@ -494,6 +498,12 @@ namespace model
                 {
                     // copy metadata
                     newNode->GetMetadata() = node.GetMetadata();
+                }
+
+                // append supplied metadata
+                for (const auto& entry : metadata)
+                {
+                    newNode->GetMetadata()[entry.first] = entry.second;
                 }
             }
         }
@@ -515,23 +525,6 @@ namespace model
         }
 
         return false;
-    }
-
-    std::vector<const Node*> ModelTransformer::FindUncompilableNodes(const Model& model, const TransformContext& context) const
-    {
-        std::vector<const Node*> uncompilableNodes;
-
-        auto iter = model.GetNodeIterator();
-        while (iter.IsValid())
-        {
-            auto node = iter.Get();
-            if (!context.IsNodeCompilable(*node))
-            {
-                uncompilableNodes.push_back(node);
-            }
-            iter.Next();
-        }
-        return uncompilableNodes;
     }
 
     void ModelTransformer::AssignNodeAncestor(const Node& ancestorNode)
@@ -558,6 +551,5 @@ namespace model
             iter.Next();
         }
     }
-
 } // namespace model
 } // namespace ell

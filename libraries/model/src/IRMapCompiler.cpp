@@ -13,11 +13,7 @@
 #include "Model.h"
 #include "OptimizeModelTransformation.h"
 #include "OutputNode.h"
-#include "RefineAndOptimizeTransformation.h"
 #include "RefineTransformation.h"
-
-#include <model/optimizer/include/ModelOptimizer.h>
-#include <model/optimizer/include/OptimizationPassRegistry.h>
 
 #include <emitters/include/EmitterException.h>
 #include <emitters/include/IRMetadata.h>
@@ -27,10 +23,11 @@
 #include <utilities/include/Logger.h>
 #include <utilities/include/StringUtil.h>
 
-#include <value/include/EmitterContext.h>
 #include <value/include/LLVMContext.h>
 
+#include <memory>
 #include <tuple>
+#include <vector>
 
 namespace ell
 {
@@ -39,20 +36,16 @@ namespace model
     using namespace logging;
 
     IRMapCompiler::IRMapCompiler() :
-        IRMapCompiler(MapCompilerOptions{})
+        IRMapCompiler(MapCompilerOptions{}, ModelOptimizerOptions{})
     {
     }
 
-    IRMapCompiler::IRMapCompiler(const MapCompilerOptions& settings) :
-        MapCompiler(settings),
+    IRMapCompiler::IRMapCompiler(const MapCompilerOptions& settings, const ModelOptimizerOptions& optimizerOptions) :
+        MapCompiler(settings, optimizerOptions),
         _moduleEmitter(settings.moduleName, settings.compilerSettings),
-        _profiler(),
-        _optimizer(settings)
+        _profiler()
     {
         Log() << "Initializing IR map compiler" << EOL;
-        Log() << "Initializing optimizer" << EOL;
-        OptimizationPassRegistry::AddPassesToOptimizer(_optimizer, settings.optimizerSettings);
-
         _nodeRegions.emplace_back();
     }
 
@@ -74,21 +67,6 @@ namespace model
 
     IRCompiledMap IRMapCompiler::Compile(Map map)
     {
-        // phases of compilation / refinement / optimization
-        //
-        // pre-refinement phase:
-        // Refine 1 (refine NN predictor nodes)
-        // Optimize 1 (set preferred conv type)
-        //
-        // refinement phase:
-        // Refine 2
-        //
-        // post-refine phase:
-        // Optimize 2
-        //
-        // Compile
-        // IR optimization
-
         Log() << "Compile called for map" << EOL;
 
         RefineAndOptimize(map);
@@ -147,9 +125,14 @@ namespace model
 
     void IRMapCompiler::RefineAndOptimize(Map& map)
     {
-        RefineAndOptimizeTransformation transformation(_optimizer);
         TransformContext context(this);
-        map.Transform(transformation, context);
+        OptimizeModelTransformation optimizer;
+        map.Transform(optimizer, context);
+
+        // Add an extra refine here, in case the optimizer doesn't do it
+        RefineTransformation refiner;
+        map.Transform(refiner, context);
+
         map.Prune();
     }
 
@@ -179,7 +162,7 @@ namespace model
         function.IncludeInHeader();
 
         std::vector<int> sizes;
-        for (size_t i = 0, n = map.GetNumInputs(); i < n; ++i)
+        for (size_t i = 0, n = map.NumInputs(); i < n; ++i)
         {
             sizes.push_back(map.GetInputSize(i));
         }
@@ -197,7 +180,7 @@ namespace model
         function.IncludeInHeader();
 
         std::vector<int> sizes;
-        for (size_t i = 0, n = map.GetNumOutputs(); i < n; ++i)
+        for (size_t i = 0, n = map.NumOutputs(); i < n; ++i)
         {
             sizes.push_back(map.GetOutputSize(i));
         }
@@ -419,7 +402,7 @@ namespace model
         fn.IncludeInHeader();
 
         std::vector<MemoryShape> shapes;
-        for (size_t i = 0, n = map.GetNumInputs(); i < n; ++i)
+        for (size_t i = 0, n = map.NumInputs(); i < n; ++i)
         {
             shapes.push_back(map.GetInputShape(i));
         }
@@ -444,7 +427,7 @@ namespace model
         fn.IncludeInHeader();
 
         std::vector<MemoryShape> shapes;
-        for (size_t i = 0, n = map.GetNumOutputs(); i < n; ++i)
+        for (size_t i = 0, n = map.NumOutputs(); i < n; ++i)
         {
             shapes.push_back(map.GetOutputShape(i));
         }

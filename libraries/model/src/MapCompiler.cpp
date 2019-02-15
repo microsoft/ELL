@@ -16,6 +16,7 @@
 #include <emitters/include/EmitterException.h>
 
 #include <utilities/include/Logger.h>
+#include <utilities/include/PropertyBag.h>
 
 namespace ell
 {
@@ -23,10 +24,63 @@ namespace model
 {
     using namespace logging;
 
-    MapCompiler::MapCompiler(const MapCompilerOptions& settings) :
-        _parameters(settings)
+    MapCompiler::MapCompiler(const MapCompilerOptions& settings, const ModelOptimizerOptions& optimizerOptions) :
+        _parameters(settings),
+        _optimizerOptions(optimizerOptions)
     {
         PushScope();
+    }
+
+    MapCompilerOptions MapCompiler::GetMapCompilerOptions() const
+    {
+        return _parameters;
+    }
+
+    MapCompilerOptions MapCompiler::GetMapCompilerOptions(const Model& model) const
+    {
+        auto result = GetMapCompilerOptions();
+        if (model.GetMetadata().HasEntry("compileOptions"))
+        {
+            return result.AppendOptions(model.GetMetadata().GetEntry<utilities::PropertyBag>("compileOptions"));
+        }
+        return result;
+    }
+
+    MapCompilerOptions MapCompiler::GetMapCompilerOptions(const Node& node) const
+    {
+        auto result = GetMapCompilerOptions(*node.GetModel());
+        if (node.GetMetadata().HasEntry("compileOptions"))
+        {
+            return result.AppendOptions(node.GetMetadata().GetEntry<utilities::PropertyBag>("compileOptions"));
+        }
+        return result;
+    }
+
+    ModelOptimizerOptions MapCompiler::GetModelOptimizerOptions() const
+    {
+        return _optimizerOptions;
+    }
+
+    ModelOptimizerOptions MapCompiler::GetModelOptimizerOptions(const Model& model) const
+    {
+        ModelOptimizerOptions options = GetModelOptimizerOptions();
+        if (model.GetMetadata().HasEntry("compileOptions"))
+        {
+            auto optionsMetadata = model.GetMetadata().GetEntry<utilities::PropertyBag>("compileOptions");
+            AppendMetadataToOptions(optionsMetadata, options);
+        }
+        return options;
+    }
+
+    ModelOptimizerOptions MapCompiler::GetModelOptimizerOptions(const Node& node) const
+    {
+        ModelOptimizerOptions options = GetModelOptimizerOptions(*node.GetModel());
+        if (node.GetMetadata().HasEntry("compileOptions"))
+        {
+            auto optionsMetadata = node.GetMetadata().GetEntry<utilities::PropertyBag>("compileOptions");
+            AppendMetadataToOptions(optionsMetadata, options);
+        }
+        return options;
     }
 
     void MapCompiler::CompileMap(Map& map, const std::string& functionName)
@@ -39,13 +93,13 @@ namespace model
         pModuleEmitter->BeginMapPredictFunction(functionName, mainFunctionArguments);
 
         std::vector<std::string> comments;
-        auto numInputs = map.GetNumInputs();
+        auto numInputs = map.NumInputs();
         for (size_t i = 0; i < numInputs; ++i)
         {
             comments.emplace_back("Input "s + std::to_string(i) + " ('" + map.GetInputName(i) + "') size: "s + std::to_string(map.GetInput(i)->Size()));
         }
 
-        auto numOutputs = map.GetNumOutputs();
+        auto numOutputs = map.NumOutputs();
         for (size_t i = 0; i < numOutputs; ++i)
         {
             comments.emplace_back("Output "s + std::to_string(i) + " ('" + map.GetOutputName(i) + "') size: "s + std::to_string(map.GetOutput(i).Size()));
@@ -63,7 +117,16 @@ namespace model
 
     void MapCompiler::CompileNodes(Model& model)
     {
-        model.Visit([this](const Node& node) {
+        std::unordered_set<const Node*> visitedNodes;
+        model.Visit([this, &visitedNodes](const Node& node) {
+            for (const auto* inputPort : node.GetInputPorts())
+            {
+                const auto* dependent = inputPort->GetReferencedPort().GetNode();
+                if (visitedNodes.find(dependent) == visitedNodes.end())
+                {
+                    throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Visited node before all its descendants!");
+                }
+            }
             if (!node.IsCompilable(this))
             {
                 std::string typeName = node.GetRuntimeTypeName();
@@ -76,6 +139,7 @@ namespace model
                 throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Encountered null compilable node");
             }
 
+            visitedNodes.insert(&node);
             Log() << "Now compiling node " << DiagnosticString(node) << EOL;
             OnBeginCompileNode(node);
             compilableNode->CompileNode(*this);
@@ -147,7 +211,7 @@ namespace model
         std::string defaultName = argType == ArgType::input ? "input" : "output";
         std::string friendlyName = list.Add(port.GetVariableName(defaultName));
         pVar->SetEmittedName(friendlyName);
-        
+
         module.AllocateVariable(*pVar);
         SetVariableForPort(port, pVar);
         return pVar;
@@ -185,11 +249,6 @@ namespace model
     void MapCompiler::SetVariableForPort(const Port& port, emitters::Variable* pVar)
     {
         _portToVarMaps.back()[&port] = pVar;
-    }
-
-    void MapCompiler::SetVariableForElement(const PortElementBase& element, emitters::Variable* pVar)
-    {
-        SetVariableForPort(*element.ReferencedPort(), pVar);
     }
 } // namespace model
 } // namespace ell

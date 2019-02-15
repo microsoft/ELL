@@ -21,18 +21,18 @@ public:
     template <typename CostModelType, typename ObjectiveType>
     SequentialOptimizer(CostModelType costModel, ObjectiveType objective);
 
-    template <typename TransformationType, std::enable_if_t<std::is_base_of_v<ell::model::optimizer::Transformation, TransformationType>, void*> = nullptr>
+    template <typename TransformationType, std::enable_if_t<std::is_base_of_v<ell::model::Transformation, TransformationType>, void*> = nullptr>
     void AddTransformation(TransformationType transformation);
 
 protected:
     void Reset() override;
     bool IsDone() const override;
-    const ell::model::optimizer::Transformation& GetTransformation() override;
+    const ell::model::Transformation& GetTransformation() override;
     bool KeepTransformation(const ell::model::optimizer::Objective::ObjectiveValue& objectiveDelta) const override;
 
 private:
-    std::vector<std::unique_ptr<ell::model::optimizer::Transformation>> _transformations;
-    std::vector<std::unique_ptr<ell::model::optimizer::Transformation>>::iterator _currentTransformation;
+    std::vector<std::unique_ptr<ell::model::Transformation>> _transformations;
+    std::vector<std::unique_ptr<ell::model::Transformation>>::iterator _currentTransformation;
 };
 
 #pragma region implementation
@@ -42,7 +42,7 @@ SequentialOptimizer::SequentialOptimizer(CostModelType costModel, ObjectiveType 
     Optimizer(std::move(costModel), std::move(objective))
 {}
 
-template <typename TransformationType, std::enable_if_t<std::is_base_of_v<ell::model::optimizer::Transformation, TransformationType>, void*>>
+template <typename TransformationType, std::enable_if_t<std::is_base_of_v<ell::model::Transformation, TransformationType>, void*>>
 void SequentialOptimizer::AddTransformation(TransformationType transformation)
 {
     _transformations.emplace_back(std::make_unique<TransformationType>(std::move(transformation)));

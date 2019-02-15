@@ -20,6 +20,7 @@
 #include <utilities/include/Exception.h>
 #include <utilities/include/IArchivable.h>
 #include <utilities/include/PropertyBag.h>
+#include <utilities/include/StlVectorUtil.h>
 #include <utilities/include/TypeName.h>
 #include <utilities/include/TypeTraits.h>
 
@@ -36,8 +37,6 @@ namespace ell
 {
 namespace model
 {
-    class ModelOptimizer;
-    class ModelOptimizerContext;
     class ModelTransformer;
     class OutputNodeBase;
     class TransformContext;
@@ -108,7 +107,7 @@ namespace model
         /// <summary> Returns the number of inputs to the map </summary>
         ///
         /// <returns> The number of inputs to the map </returns>
-        size_t GetNumInputs() const;
+        size_t NumInputs() const;
 
         /// <summary> Returns the size of the given map's input </summary>
         ///
@@ -131,7 +130,7 @@ namespace model
         /// <summary> Returns the number of outputs from the map </summary>
         ///
         /// <returns> The number of outputs from the map </returns>
-        size_t GetNumOutputs() const;
+        size_t NumOutputs() const;
 
         /// <summary> Returns the size of the given map's output </summary>
         ///
@@ -185,11 +184,6 @@ namespace model
         /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
         void Refine(const TransformContext& context, int maxIterations = 10);
 
-        /// <summary> Optimizes the model wrapped by this map. </summary>
-        ///
-        /// <param name="optimizer"> The optimizer to use for optimizing the model. </param>
-        void Optimize(const ModelOptimizer& optimizer);
-
         /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
         ///
         /// <param name="transformFunction"> The function to apply on each node </param>
@@ -204,13 +198,13 @@ namespace model
         /// <summary> Transforms the model wrapped by this map by applying a Transformation </summary>
         ///
         /// <param name="transformFunction"> The Transformation to apply to the model </param>
-        void Transform(optimizer::Transformation& transformation);
+        void Transform(Transformation& transformation);
 
         /// <summary> Transforms the model wrapped by this map by applying a Transformation </summary>
         ///
         /// <param name="transformFunction"> The Transformation to apply to the model </param>
         /// <param name="context"> The TransformContext to use during the transformation </param>
-        void Transform(optimizer::Transformation& transformation, const TransformContext& context);
+        void Transform(Transformation& transformation, const TransformContext& context);
 
         /// <summary> Renames the model callbacks in this map. </summary>
         ///
@@ -222,9 +216,6 @@ namespace model
         // ELL-Internal routines for getting information about inputs / outputs of the map
         // and doing type-safe operations.
         //
-
-        /// <returns> The number of input nodes </returns>
-        size_t NumInputPorts() const { return _inputNodes.size(); }
 
         /// <summary> Returns an input node </summary>
         ///
@@ -268,11 +259,6 @@ namespace model
         ///
         /// <returns> The sink nodes </returns>
         std::vector<const Node*> GetSinkNodes() const;
-
-        /// <summary> Get the number of outputs </summary>
-        ///
-        /// <returns> The number of outputs </returns>
-        size_t NumOutputPorts() const { return _outputElements.size(); }
 
         /// <summary> Returns an output </summary>
         ///
@@ -474,7 +460,6 @@ namespace model
         std::vector<const Node*> GetDebugSinkNodes() const;
         std::vector<const Node*> GetMatchingNodesByType(const std::string name) const;
         void FixTransformedIO(ModelTransformer& transformer);
-        void FixTransformedIO(ModelOptimizerContext& context);
     };
 
     /// <summary> A serialization context used during Map deserialization. Wraps an existing `ModelSerializationContext` </summary>
@@ -513,7 +498,7 @@ namespace model
     template <typename OutputType, typename InputType, utilities::IsFundamental<OutputType>, utilities::IsFundamental<InputType>>
     std::vector<OutputType> Map::Compute(const std::vector<InputType>& inputValues) const
     {
-        if (GetNumInputs() != 1)
+        if (NumInputs() != 1)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Map::Compute can only be called on maps with a single input");
         }
@@ -524,7 +509,7 @@ namespace model
     template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType>, data::IsDataVector<InputVectorType>>
     OutputVectorType Map::Compute(const InputVectorType& inputValues) const
     {
-        if (GetNumInputs() != 1)
+        if (NumInputs() != 1)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Map::Compute can only be called on maps with a single input");
         }
@@ -540,8 +525,7 @@ namespace model
     {
         auto inputSize = node->GetOutputPort().Size();
         auto inputArray = inputValues.ToArray(inputSize);
-        std::vector<ElementsType> array(inputSize);
-        std::transform(inputArray.begin(), inputArray.end(), array.begin(), [](auto x) { return MapImpl::FromDouble<ElementsType>(x); });
+        std::vector<ElementsType> array = utilities::TransformVector(inputArray.begin(), inputArray.end(), [](auto x) { return MapImpl::FromDouble<ElementsType>(x); });
         auto typedNode = static_cast<InputNode<ElementsType>*>(node);
 
         SetNodeInput(typedNode, array);

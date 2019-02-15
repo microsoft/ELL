@@ -74,6 +74,7 @@ set(include
   include/RingBuffer.h
   include/StlContainerIterator.h
   include/StlStridedIterator.h
+  include/StlVectorUtil.h
   include/StringUtil.h
   include/Tokenizer.h
   include/TransformIterator.h

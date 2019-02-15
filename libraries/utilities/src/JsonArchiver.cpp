@@ -9,12 +9,16 @@
 #include "JsonArchiver.h"
 #include "Archiver.h"
 #include "IArchivable.h"
+#include "TypeTraits.h"
 #include "Unused.h"
 
 #include <cctype>
+#include <cstdlib>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <variant>
 
 namespace ell
 {
@@ -48,7 +52,7 @@ namespace utilities
         FinishPreviousLine();
         auto indent = GetCurrentIndent();
         _out << indent;
-        _out << "\"" << name << "\": null";
+        _out << std::quoted(name) << ": null";
     }
 
     // IArchivable
@@ -61,7 +65,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if (hasName)
         {
-            _out << "\"" << name << "\": ";
+            _out << std::quoted(name) << ": ";
         }
 
         if (value.ArchiveAsPrimitive())
@@ -84,10 +88,10 @@ namespace utilities
             DecrementIndent();
             auto indent = GetCurrentIndent();
             _out << indent << "}";
-        }
 
-        // need to output a comma if we're serializing a field (that is, if name != "")
-        SetEndOfLine(hasName ? ",\n" : "\n");
+            // need to output a comma if we're serializing a field (that is, if name != "")
+            SetEndOfLine(hasName ? ",\n" : "\n");
+        }
     }
 
     void JsonArchiver::EndArchiving()
@@ -117,7 +121,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out << "\"" << name << "\": ";
+            _out << std::quoted(name) << ": ";
         }
 
         _out << "[\n";
@@ -139,7 +143,7 @@ namespace utilities
     {
         FinishPreviousLine();
         auto indent = GetCurrentIndent();
-        _out << indent << "  \"_type\": \"" << GetArchivedTypeName(value) << "\"";
+        _out << indent << "  " << std::quoted("_type") << ": " << std::quoted(GetArchivedTypeName(value));
         SetEndOfLine(",\n");
     }
 
@@ -148,8 +152,24 @@ namespace utilities
         FinishPreviousLine();
         auto indent = GetCurrentIndent();
         auto version = GetArchiveVersion(value);
-        _out << indent << "  \"_version\": \"" << version.versionNumber << "\"";
+        _out << indent << "  " << std::quoted("_version") << ": " << std::quoted(std::to_string(version.versionNumber));
         SetEndOfLine(",\n");
+    }
+
+    void JsonArchiver::WriteScalarLiteral(const char* name, const std::string& value)
+    {
+        auto indent = GetCurrentIndent();
+        bool hasName = name != std::string("");
+        auto endOfLine = hasName ? ",\n" : "";
+
+        FinishPreviousLine();
+        _out << indent;
+        if (hasName)
+        {
+            _out << std::quoted(name) << ": ";
+        }
+        _out << value;
+        SetEndOfLine(endOfLine);
     }
 
     void JsonArchiver::Indent()

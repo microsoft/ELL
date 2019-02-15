@@ -108,6 +108,17 @@ model::Model GetComplexModel()
     return g;
 }
 
+model::Model GetTwoOutputModel()
+{
+    model::Model g;
+    auto in = g.AddNode<model::InputNode<double>>(3);
+    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
+    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
+    g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 8);
+    g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 8);
+    return g;
+}
+
 model::Model GetLinearDebugNodeModel(int numDebugNodes)
 {
     // in -> node1 -> node2 -> ... -> nodeN

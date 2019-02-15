@@ -29,18 +29,25 @@ class Log:
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(self.verbosity)
         self.logger_console_handler = None
-        if logfile:
-            self.logger_file_handler = logging.FileHandler(logfile, mode=logmode)
-            self.logger_file_handler.setFormatter(logging.Formatter(format))
-            self.logger_file_handler.setLevel(self.verbosity)
-            self.logger.addHandler(self.logger_file_handler)
-        else:
-            self.logger_file_handler = None
+        self.format = format
+        self.setLogfile(logfile)
 
     def __reduce__(self):
         return (Log, (self.verbosity, "", 'a'))
 
     def __exit__(self, type, value, traceback):
+        self.removeLogfile()
+
+    def setLogfile(self, logfile, logmode='a'):
+        if logfile:
+            self.logger_file_handler = logging.FileHandler(logfile, mode=logmode)
+            self.logger_file_handler.setFormatter(logging.Formatter(self.format))
+            self.logger_file_handler.setLevel(self.verbosity)
+            self.logger.addHandler(self.logger_file_handler)
+        else:
+            self.logger_file_handler = None
+
+    def removeLogfile(self):
         if self.logger_file_handler:
             self.logger.removeHandler(self.logger_file_handler)
         if self.logger_console_handler:
@@ -106,7 +113,7 @@ def init(verbosity="INFO", logfile=None, logmode='w', format="%(message)s"):
 
 def setup(args=None, format="%(message)s"):
     """
-    setup the logger given parsed command line args and a message format pattern.
+    set up the logger given parsed command line args and a message format pattern.
     The default pattern is "%(message)s" but more interesting patterns like this can
     help with multithreaded output: "%(asctime)s [%(thread)d]: %(message)s".
     """

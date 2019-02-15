@@ -641,9 +641,6 @@ namespace emitters
         /// <param name="forData"> Optional global constant that this function is for. If the data is optimized away, then the finalization function will be also. </param>
         void AddFinalizationFunction(IRFunctionEmitter& function, int priority = 65536, llvm::Constant* forData = nullptr);
 
-    protected:
-        void SetCompilerOptions(const CompilerOptions& parameters) override;
-
     private:
         friend class IRFunctionEmitter;
 
@@ -723,6 +720,7 @@ namespace emitters
         //
         // Lower-level internal functions
         //
+        void SetCompilerOptions(const CompilerOptions& parameters) override;
         llvm::GlobalVariable* AddGlobal(const std::string& name, LLVMType pType, llvm::Constant* pInitial, bool isConst);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const VariableTypeList* pArguments, bool isPublic);
         llvm::Function::LinkageTypes Linkage(bool isPublic);

@@ -9,9 +9,12 @@
 #pragma once
 
 #include "IArchivable.h"
+#include "StringUtil.h"
 #include "Variant.h"
 
+#include <functional>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <vector>
 
@@ -24,6 +27,8 @@ namespace utilities
     class PropertyBag : public IArchivable
     {
     public:
+        PropertyBag() = default;
+
         /// <summary> Adds a metadata entry for the given key. </summary>
         ///
         /// <param name="key"> The key to use for the metadata. </param>
@@ -35,11 +40,44 @@ namespace utilities
         ///
         /// <param name="key"> The key for the metadata. </param>
         ///
+        /// <returns> A const reference to the value for the given key, returned as a `Variant`. </returns>
+        const Variant& GetEntry(const std::string& key) const;
+
+        /// <summary> Get the metadata for a given key. </summary>
+        ///
+        /// <param name="key"> The key for the metadata. </param>
+        ///
         /// <returns> A const reference to the value for the given key. </returns>
         template <typename ValueType>
         const ValueType& GetEntry(const std::string& key) const;
 
-        /// <summary> Find the given key and return it's value (and add the key if it is not defined). </summary>
+        /// <summary> Get the metadata for a given key. </summary>
+        ///
+        /// <param name="key"> The key for the metadata. </param>
+        /// <param name="defaultValue"> The value to return if the key isn't present. </param>
+        ///
+        /// <returns> A const reference to the value for the given key. </returns>
+        template <typename ValueType>
+        const ValueType& GetEntry(const std::string& key, const ValueType& defaultValue) const;
+
+        /// <summary> Get the typed metadata for a given key, parsing the value if it is stored as a string. </summary>
+        ///
+        /// <param name="key"> The key for the metadata. </param>
+        ///
+        /// <returns> A const reference to the value for the given key. </returns>
+        template <typename ValueType>
+        ValueType GetOrParseEntry(const std::string& key, std::function<ValueType(const std::string&)> parse = FromString<ValueType>) const;
+
+        /// <summary> Get the typed metadata for a given key, parsing the value if it is stored as a string. </summary>
+        ///
+        /// <param name="key"> The key for the metadata. </param>
+        /// <param name="defaultValue"> The value to return if the key isn't present. </param>
+        ///
+        /// <returns> A const reference to the value for the given key. </returns>
+        template <typename ValueType>
+        ValueType GetOrParseEntry(const std::string& key, const ValueType& defaultValue, std::function<ValueType(const std::string&)> parse = FromString<ValueType>) const;
+
+        /// <summary> Find the given key and return its value (and add the key if it is not defined). </summary>
         ///
         /// <param name="key"> The key to add to the metadata. </param>
         ///
@@ -53,7 +91,7 @@ namespace utilities
         /// <returns> The entry that was removed, or an empty `Variant` if none was present. </returns>
         Variant RemoveEntry(const std::string& key);
 
-        /// <summary> Checks if is a metadata entries for the given key. </summary>
+        /// <summary> Checks if there is a metadata entry for the given key. </summary>
         ///
         /// <param name="key"> The key to check for. </param>
         ///
@@ -77,6 +115,18 @@ namespace utilities
         ///
         /// <returns> The list of keys. </returns>
         std::vector<std::string> Keys() const;
+
+        /// <summary> Returns an iterator to the first entry. </summary>
+        auto begin() { return _metadata.begin(); }
+
+        /// <summary> Returns an iterator to the first entry. </summary>
+        auto begin() const { return _metadata.cbegin(); }
+
+        /// <summary> Returns an iterator to a point just past the last entry. </summary>
+        auto end() { return _metadata.end(); }
+
+        /// <summary> Returns an iterator to a point just past the last entry. </summary>
+        auto end() const { return _metadata.cend(); }
 
     protected:
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
@@ -127,6 +177,37 @@ namespace utilities
         // This function throws an exception if there aren't any entries for the key, or if the underlying Variant doesn't contain a value of the correct type
         const auto& variant = _metadata.at(key);
         return variant.GetValue<ValueType>();
+    }
+
+    template <typename ValueType>
+    const ValueType& PropertyBag::GetEntry(const std::string& key, const ValueType& defaultValue) const
+    {
+        if (!HasEntry(key))
+        {
+            return defaultValue;
+        }
+        return GetEntry<ValueType>(key);
+    }
+
+    template <typename ValueType>
+    ValueType PropertyBag::GetOrParseEntry(const std::string& key, std::function<ValueType(const std::string&)> parse) const
+    {
+        const auto& variant = _metadata.at(key);
+        if (variant.IsType<std::string>() && !std::is_same_v<ValueType, std::string>)
+        {
+            return parse(variant.GetValue<std::string>());
+        }
+        return variant.GetValue<ValueType>();
+    }
+
+    template <typename ValueType>
+    ValueType PropertyBag::GetOrParseEntry(const std::string& key, const ValueType& defaultValue, std::function<ValueType(const std::string&)> parse) const
+    {
+        if (!HasEntry(key))
+        {
+            return defaultValue;
+        }
+        return GetOrParseEntry<ValueType>(key, parse);
     }
 } // namespace utilities
 } // namespace ell

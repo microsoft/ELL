@@ -21,7 +21,6 @@ import logging
 import math
 import os
 import re
-import requests
 import struct
 import time
 import traceback

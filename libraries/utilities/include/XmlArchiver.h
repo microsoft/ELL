@@ -43,6 +43,7 @@ namespace utilities
 #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_VALUE_OVERRIDE(t);
         ARCHIVABLE_TYPES_LIST
 #undef ARCHIVE_TYPE_OP
+
         void ArchiveValue(const char* name, const std::string& value) override;
 
 #define ARCHIVE_TYPE_OP(t) DECLARE_ARCHIVE_ARRAY_OVERRIDE(t);

@@ -57,6 +57,13 @@ void ParsedCompileArguments::AddArgs(utilities::CommandLineParser& parser)
         false);
 
     parser.AddOption(
+        outputMapWithOptions,
+        "mapWithOptions",
+        "",
+        "Write out map with compiler options encoded in its metadata",
+        false);
+
+    parser.AddOption(
         outputRefinedMap,
         "refinedMap",
         "",
@@ -92,6 +99,7 @@ void ParsedCompileArguments::AddArgs(utilities::CommandLineParser& parser)
         "mri",
         "The maximal number of refinement iterations (only valid if outputType is 'refinedMap')",
         10);
+
     parser.AddOption(
         verbose,
         "verbose",

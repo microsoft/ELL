@@ -120,7 +120,8 @@ void TestNodeMetadata()
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerOptions settings;
     settings.moduleName = "Model";
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     auto compiledFunction = compiledMap.GetJitter().GetFunction<char*(const char*)>("Model_GetMetadata");
@@ -140,7 +141,8 @@ void TestSimpleMap(bool optimize)
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", accumNode2->output } });
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = optimize;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     testing::ProcessTest("Testing IsValid of original map", testing::IsEqual(compiledMap.IsValid(), true));
@@ -165,7 +167,8 @@ void TestSqEuclideanDistanceMap()
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     testing::ProcessTest("Testing IsValid of original map", testing::IsEqual(compiledMap.IsValid(), true));
@@ -224,7 +227,8 @@ void TestProtoNNPredictorMap()
     settings.compilerSettings.optimize = false;
     settings.compilerSettings.includeDiagnosticInfo = true;
     settings.compilerSettings.inlineOperators = false;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     testing::ProcessTest("Testing IsValid of original map", testing::IsEqual(compiledMap.IsValid(), true));
@@ -264,7 +268,8 @@ void TestCombineOutputMap()
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerOptions settings;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     testing::ProcessTest("Testing TestCombineOutputMap IsValid", testing::IsEqual(compiledMap.IsValid(), true));
@@ -355,7 +360,8 @@ void TestBinaryVector(bool expanded, bool runJit)
     model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
     settings.mapFunctionName = modelFunctionName;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
 
     model::Map map{ mb.Model, { { "input", input1 } }, { { "output", multiplyNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
@@ -398,7 +404,8 @@ void TestBinaryScalar()
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     model::Map map{ mb.Model, { { "input", input1 } }, { { "output", addNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
@@ -414,7 +421,8 @@ void TestDotProduct(model::MapCompilerOptions& settings)
     auto dotProduct = mb.DotProduct(c1->output, input1->output);
     auto outputNode = mb.Outputs<double>(dotProduct->output);
 
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
@@ -448,7 +456,8 @@ void TestSimpleSum(bool expanded, bool optimized)
     model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
     settings.compilerSettings.optimize = optimized;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
 
     model::Map map{ mb.Model, { { "input", input1 } }, { { "output", sumNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
@@ -469,7 +478,8 @@ void TestSum(bool expanded, bool optimized)
     model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
     settings.compilerSettings.optimize = optimized;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     model::Map map{ mb.Model, { { "input", input1 } }, { { "output", sumNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
@@ -491,7 +501,8 @@ void TestAccumulator(bool expanded)
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
@@ -567,7 +578,8 @@ void TestSlidingAverage()
 
     model::MapCompilerOptions settings;
     settings.mapFunctionName = "TestSlidingAverage";
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
 
     model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
@@ -606,7 +618,8 @@ void TestDotProductOutput()
     auto dotProduct = mb.DotProduct(c1->output, input1->output);
     auto outputNode = mb.Outputs<double>(dotProduct->output);
 
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
 
@@ -635,7 +648,8 @@ void TestForest()
     settings.compilerSettings.optimize = true;
     settings.compilerSettings.includeDiagnosticInfo = false;
     settings.mapFunctionName = "TestForest";
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     auto& module = compiledMap.GetModule();
@@ -752,7 +766,8 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
     settings.compilerSettings.optimize = optimized;
     settings.compilerSettings.unrollLoops = expanded;
 
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // Compare output

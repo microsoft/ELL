@@ -8,6 +8,7 @@
 
 #include "PropertyBag.h"
 #include "Exception.h"
+#include "TypeTraits.h"
 
 namespace ell
 {
@@ -37,6 +38,11 @@ namespace utilities
     //
     // PropertyBag
     //
+    const Variant& PropertyBag::GetEntry(const std::string& key) const
+    {
+        return _metadata.at(key);
+    }
+
     Variant& PropertyBag::operator[](const std::string& key)
     {
         return _metadata[key];

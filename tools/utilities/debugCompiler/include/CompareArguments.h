@@ -21,7 +21,7 @@ namespace ell
 struct CompareArguments
 {
     // input options
-    std::string inputMapFile;
+    std::string inputMapFilename;
     std::string inputConverter;
 
     // output options

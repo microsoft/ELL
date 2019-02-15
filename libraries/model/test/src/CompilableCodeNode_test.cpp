@@ -106,7 +106,7 @@ void CompilableCodeNode_test1()
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 5.0, 5.0, 7.0, 3.0 });
     auto dotNode = model.AddNode<DotProductCodeNode>(inputNode->output, constantNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", dotNode->output } });
-    model::IRMapCompiler compiler(model::MapCompilerOptions{});
+    model::IRMapCompiler compiler(model::MapCompilerOptions{}, model::ModelOptimizerOptions{});
     auto compiledMap = compiler.Compile(map);
 
     // compare output

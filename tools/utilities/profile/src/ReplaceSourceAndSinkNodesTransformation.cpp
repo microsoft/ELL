@@ -1,28 +1,41 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ReplaceSourceAndSinkNodesPass.cpp (passes)
+//  File:     ReplaceSourceAndSinkNodesTransformation.cpp (profile)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ReplaceSourceAndSinkNodesPass.h"
+#include "ReplaceSourceAndSinkNodesTransformation.h"
 
 #include <model/include/InputNode.h>
+#include <model/include/InputPort.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/OutputNode.h>
+#include <model/include/OutputPort.h>
 
 #include <nodes/include/SinkNode.h>
 #include <nodes/include/SourceNode.h>
 
-#include <model/optimizer/include/OptimizationPassRegistry.h>
-
 #include <utilities/include/Exception.h>
+
+#include <vector>
 
 namespace ell
 {
 namespace
 {
+    template <typename Container, typename Function>
+    auto Transform(const Container& container, Function fn)
+    {
+        return utilities::TransformVector(container.begin(), container.end(), fn);
+    }
+
+    std::vector<const model::OutputPortBase*> GetReferencedPorts(const std::vector<const model::InputPortBase*>& inputs)
+    {
+        return Transform(inputs, [](auto input) { return &input->GetReferencedPort(); });
+    }
+
     // returns 'true' if we handled the situation, else 'false'. If we return 'false', keep trying other ValueTypes.
     template <typename ValueType>
     bool TryReplaceSourceNode(const model::Node& node, model::ModelTransformer& transformer)
@@ -82,20 +95,16 @@ namespace
 } // namespace
 
 //
-// ReplaceSourceAndSinkNodesPass methods
+// ReplaceSourceAndSinkNodesTransformation methods
 //
-void ReplaceSourceAndSinkNodesPass::OptimizeNode(const model::Node& node, const model::MapCompilerOptions& settings, model::ModelOptimizerContext& context) const
+model::Submodel ReplaceSourceAndSinkNodesTransformation::Transform(const model::Submodel& submodel, model::ModelTransformer& transformer, const model::TransformContext& context) const
 {
-    ReplaceSourceOrSinkNode(node, context.GetTransformer());
-}
-
-void ReplaceSourceAndSinkNodesPass::AddToRegistry()
-{
-    model::OptimizationPassInfo info = {
-        "ReplaceSourceAndSinkNodesPass",
-        [](const model::ModelOptimizerOptions& settings) { return true; },
-        [] { return std::make_unique<ReplaceSourceAndSinkNodesPass>(); }
-    };
-    model::OptimizationPassRegistry::AddPass(info);
+    // in-place transformation
+    auto onto = transformer.GetCorrespondingOutputs(GetReferencedPorts(submodel.GetInputs()));
+    model::Model destModel = submodel.GetModel().ShallowCopy();
+    auto result = transformer.TransformSubmodelOnto(submodel, destModel, onto, context, [](const model::Node& node, model::ModelTransformer& transformer) {
+        ReplaceSourceOrSinkNode(node, transformer);
+    });
+    return result;
 }
 } // namespace ell

@@ -401,7 +401,7 @@ namespace nodes
         emitters::LLVMValue pInput = compiler.EnsurePortEmitted(this->input);
         emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(this->output);
 
-        const auto& compilerSettings = compiler.GetCompilerOptions();
+        const auto& compilerSettings = function.GetCompilerOptions();
 
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
         auto elementSize = sizeof(PackedBitsType);
@@ -558,7 +558,7 @@ namespace nodes
     void BinaryXnorNode<ValueType, PackedBitsType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         // Get compiler settings
-        const auto& compilerSettings = compiler.GetCompilerOptions();
+        const auto& compilerSettings = function.GetCompilerOptions();
         const int vectorSize = compilerSettings.vectorWidth;
 
         // Get port variables
@@ -580,7 +580,7 @@ namespace nodes
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
         const auto storedElementSize = sizeof(PackedBitsType);
         const auto storedElementNumBits = 8 * storedElementSize;
-        const auto numBits = storedElementNumBits; // function.GetModule().GetCompilerOptions().numBits; // for Xnor, use 32 bits in 32-bit environment
+        const auto numBits = storedElementNumBits; // function.GetCompilerOptions().numBits; // for Xnor, use 32 bits in 32-bit environment
         const auto elementSize = numBits / 8;
         assert(elementSize <= storedElementSize);
         const auto filterWidth = _convolutionalParameters.receptiveField;
@@ -662,7 +662,7 @@ namespace nodes
         emitters::LLVMValue pInputPaddingMaskSums = compiler.EnsurePortEmitted(inputPaddingMaskSums);
         emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
-        const auto& compilerSettings = compiler.GetCompilerOptions();
+        const auto& compilerSettings = function.GetCompilerOptions();
 
         // Get LLVM types
         auto& module = function.GetModule();
@@ -681,7 +681,7 @@ namespace nodes
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
         const auto storedElementSize = sizeof(PackedBitsType);
         const auto storedElementNumBits = 8 * storedElementSize;
-        const auto numBits = storedElementNumBits; // function.GetModule().GetCompilerOptions().numBits; // for Xnor, use 32 bits in 32-bit environment
+        const auto numBits = storedElementNumBits; // function.GetCompilerOptions().numBits; // for Xnor, use 32 bits in 32-bit environment
         const auto elementSize = numBits / 8;
         assert(elementSize <= storedElementSize);
         const auto filterWidth = _convolutionalParameters.receptiveField;
@@ -777,7 +777,7 @@ namespace nodes
 
         const int storedElementSize = sizeof(PackedBitsType);
         const int storedElementNumBits = 8 * storedElementSize;
-        const int numBits = storedElementNumBits; // function.GetModule().GetCompilerOptions().numBits; // for Xnor, use 32 bits in 32-bit environment
+        const int numBits = storedElementNumBits; // function.GetCompilerOptions().numBits; // for Xnor, use 32 bits in 32-bit environment
         const int elementSize = numBits / 8;
         DEBUG_USED(elementSize);
         assert(elementSize <= storedElementSize);

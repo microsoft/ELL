@@ -221,7 +221,8 @@ static void TimeConvolutionNode(ImageShape inputShape, FiltersShape filterShape,
     settings.compilerSettings.useBlas = true;
     settings.compilerSettings.parallelize = false;
     settings.verifyJittedModule = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
 
     timer.Reset();
     auto compiledMap = compiler.Compile(map);

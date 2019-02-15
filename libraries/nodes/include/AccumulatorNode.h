@@ -133,7 +133,7 @@ namespace nodes
         emitters::Variable* pAccumulatorVar = function.GetModule().Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, output.Size());
         emitters::LLVMValue accumulator = function.GetModule().EnsureEmitted(*pAccumulatorVar);
 
-        if (!compiler.GetCompilerOptions().unrollLoops)
+        if (!function.GetCompilerOptions().unrollLoops)
         {
             CompileLoop(compiler, function, accumulator);
         }

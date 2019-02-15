@@ -71,13 +71,14 @@ void TestPerformanceCounters()
     settings.profile = true;
 
     // Create first map
-    model::IRMapCompiler compiler1(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler1(settings, optimizerOptions);
     auto compiledMap1 = compiler1.Compile(map);
 
     // Create second map
     settings.profile = true;
     settings.compilerSettings.useBlas = true;
-    model::IRMapCompiler compiler2(settings);
+    model::IRMapCompiler compiler2(settings, optimizerOptions);
     auto compiledMap2 = compiler2.Compile(map);
 
     for (const auto& input : matrix1Series)

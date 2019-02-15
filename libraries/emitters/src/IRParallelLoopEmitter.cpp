@@ -27,7 +27,7 @@ namespace emitters
         auto span = end - begin;
         auto numIterations = span > 0 ? (span - 1) / increment + 1 : 0;
 
-        auto& compilerSettings = _functionEmitter.GetModule().GetCompilerOptions();
+        auto compilerSettings = _functionEmitter.GetCompilerOptions();
         ParallelLoopOptions newOptions = options;
         if (newOptions.numTasks == 0)
         {
@@ -38,13 +38,13 @@ namespace emitters
 
     void IRParallelForLoopEmitter::EmitLoop(IRLocalScalar begin, IRLocalScalar end, IRLocalScalar increment, const ParallelLoopOptions& options, const std::vector<LLVMValue>& capturedValues, BodyFunction body)
     {
-        auto& compilerSettings = _functionEmitter.GetModule().GetCompilerOptions();
+        auto compilerSettings = _functionEmitter.GetCompilerOptions();
         const int numTasks = options.numTasks == 0 ? compilerSettings.maxThreads : options.numTasks;
         auto span = end - begin;
         auto numIterations = (span - 1) / increment + 1;
         // TODO: explicitly check for empty loop?
 
-        auto taskSize = Max(1, numIterations / numTasks);
+        auto taskSize = (numIterations - 1) / numTasks + 1;
         if (compilerSettings.parallelize && numTasks > 1)
         {
             auto taskFunction = GetTaskFunction(capturedValues, body);
@@ -63,7 +63,7 @@ namespace emitters
         }
         else
         {
-            // Normal for loop here
+            // Emit a normal for loop if we were only going to use 1 parallel task
             _functionEmitter.For(begin, end, increment, [capturedValues, body](IRFunctionEmitter& function, LLVMValue i) {
                 body(function, function.LocalScalar(i), capturedValues);
             });

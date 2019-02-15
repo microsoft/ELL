@@ -14,5 +14,10 @@
 
 namespace ell
 {
-void PrintModel(const model::Model& model, std::ostream& out, bool includeNodeId);
-}
+struct PrintModelOptions
+{
+    bool includeNodeId = false;
+    bool nodeDetails = true;
+};
+void PrintModel(const model::Model& model, std::ostream& out, const PrintModelOptions& options);
+} // namespace ell

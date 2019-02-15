@@ -11,6 +11,7 @@ if(NOT LLVM_FOUND)
 endif()
 
 set (src
+    src/CompilerOptions.cpp
     src/EmitterTypes.cpp
     src/IRAssemblyWriter.cpp
     src/IRAsyncTask.cpp

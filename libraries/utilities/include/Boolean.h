@@ -35,8 +35,12 @@ namespace utilities
                   std::is_swappable_v<Boolean>);
 
     bool operator==(Boolean b1, Boolean b2);
+    bool operator==(bool b1, Boolean b2);
+    bool operator==(Boolean b1, bool b2);
 
     bool operator!=(Boolean b1, Boolean b2);
+    bool operator!=(bool b1, Boolean b2);
+    bool operator!=(Boolean b1, bool b2);
 
 } // namespace utilities
 } // namespace ell

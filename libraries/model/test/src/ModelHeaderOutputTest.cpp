@@ -13,7 +13,6 @@
 #include <model/include/InputNode.h>
 #include <model/include/Map.h>
 #include <model/include/Model.h>
-#include <model/optimizer/include/OptimizationPass.h>
 #include <model/include/OutputNode.h>
 
 #include <emitters/include/IRHeaderWriter.h>
@@ -45,7 +44,7 @@ model::IRMapCompiler CreateMapCompiler(const std::string& moduleName, const std:
     settings.mapFunctionName = mapFunctionName;
     settings.compilerSettings.optimize = true;
 
-    return model::IRMapCompiler(settings);
+    return model::IRMapCompiler(settings, model::ModelOptimizerOptions{});
 }
 
 template <typename ElementType>
@@ -190,7 +189,7 @@ void TestSwigCallbackInterfaces()
 
     if (testing::DidTestFail())
     {
-       std::cout << result << std::endl;
+        std::cout << result << std::endl;
     }
 }
 
@@ -218,7 +217,7 @@ void TestSwigNoCallbackInterfaces()
 
     if (testing::DidTestFail())
     {
-       std::cout << result << std::endl;
+        std::cout << result << std::endl;
     }
 }
 

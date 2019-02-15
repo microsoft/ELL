@@ -128,7 +128,14 @@ ParsedFineTuneArguments ParseCommandLine(int argc, char* argv[])
         // if no input specified, print help and exit
         if (!args.mapLoadArguments.HasInputFilename())
         {
-            throw utilities::CommandLineParserPrintHelpException(commandLineParser.GetHelpString());
+            if (commandLineParser.GetPositionalArgs().size() == 1)
+            {
+                args.mapLoadArguments.inputMapFilename = commandLineParser.GetPositionalArgs()[0];
+            }
+            else
+            {
+                throw utilities::CommandLineParserPrintHelpException(commandLineParser.GetHelpString());
+            }
         }
 
         if (args.verbose)

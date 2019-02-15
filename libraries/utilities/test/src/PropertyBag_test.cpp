@@ -40,6 +40,9 @@ void TestPropertyBag()
     auto foo = metadata.GetEntry<std::string>("a");
     testing::ProcessTest("PropertyBag::SetEntry/GetEntries foo", testing::IsEqual(foo, "2"));
 
+    auto foo2 = metadata.GetEntry("a");
+    testing::ProcessTest("PropertyBag::SetEntry/GetEntries foo2", testing::IsTrue(foo2.IsType<std::string>() && foo2.GetValue<std::string>() == "2"));
+
     auto removedEntry = metadata.RemoveEntry("a");
     testing::ProcessTest("PropertyBag::RemoveEntry", testing::IsEqual(removedEntry.GetValue<std::string>(), "2"));
 
@@ -96,5 +99,37 @@ void TestPropertyBag()
     testing::ProcessTest("Deserialize PropertyBag", testing::IsEqual(metadata3.GetEntry<int>("c"), 4));
     testing::ProcessTest("Deserialize PropertyBag", testing::IsEqual(metadata3.GetEntry<std::vector<int>>("d"), { 5, 6, 7, 8 }));
     testing::ProcessTest("Deserialize PropertyBag", testing::IsEqual(metadata3.GetEntry<double>("e"), 5.0));
+}
+
+void TestRecursivePropertyBag()
+{
+    PropertyBag inner;
+    PropertyBag outer;
+
+    //
+    // Serialization tests
+    //
+    inner.Clear();
+    inner["a"] = std::string("foo");
+    inner["b"] = std::vector<std::string>{ "hello", "world" };
+    inner["c"] = 4;
+    inner["d"] = std::vector<int>{ 5, 6, 7, 8 };
+    inner["e"] = 5.0;
+
+    outer["inner"] = inner;
+
+    std::stringstream strstream;
+    {
+        JsonArchiver archiver(strstream);
+        archiver << outer;
+    }
+
+    std::cout << "Archived recursive property bag:" << std::endl;
+    std::cout << strstream.str() << std::endl;
+
+    SerializationContext context;
+    JsonUnarchiver unarchiver(strstream, context);
+    PropertyBag outer2;
+    unarchiver >> outer2;
 }
 } // namespace ell

@@ -163,7 +163,7 @@ std::unique_ptr<Map> GetMapForModel(Model& model, const OutputPort<ElementType>&
 
     Submodel submodel(newModel, {}, { &newNewOutput });
     auto prunedSubmodel = transformer.CopySubmodel(submodel, context);
-    const auto& prunedOutput = *prunedSubmodel.GetOutputPorts()[0];
+    const auto& prunedOutput = *prunedSubmodel.GetOutputs()[0];
 
     auto inputNode = GetInputNode<ElementType>(prunedSubmodel.GetModel(), prunedOutput);
     if (!inputNode)
@@ -181,8 +181,9 @@ std::unique_ptr<Map> GetMapForModel(Model& model, const OutputPort<ElementType>&
     settings.compilerSettings.targetDevice.deviceName = "host";
     settings.compilerSettings.allowVectorInstructions = true;
     settings.compilerSettings.optimize = true;
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
 
-    IRMapCompiler compiler(settings);
     return std::make_unique<IRCompiledMap>(compiler.Compile(map));
 }
 

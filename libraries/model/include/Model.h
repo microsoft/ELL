@@ -113,7 +113,8 @@ namespace model
         ReverseNodeIterator(const Model* model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs);
     };
 
-    /// <summary> Model class. Represents a graph of computation </summary>
+    /// <summary> Model class. Represents a computation graph, where each node represents a function,
+    /// and function composition is done by connecting node inputs to node outputs. </summary>
     class Model : public utilities::IArchivable
     {
     public:
@@ -121,8 +122,22 @@ namespace model
         Model(Model&& other) = default;
         Model& operator=(Model&& other) = default;
 
-        /// <summary> Explicit method to create a shallow copy </summary>
+        /// <summary> Explicit method to create a shallow copy of the model. </summary>
+        ///
+        /// <returns> 
+        /// A shallow copy of the model, containing the same nodes as the original. Any 
+        /// changes to the original model will be reflected in the copy, and vice-versa.
+        /// </returns>
         Model ShallowCopy() const;
+
+        /// <summary> Explicit method to create a deep copy of the model. </summary>
+        ///
+        /// <returns> 
+        /// A deep copy of the model. This is an entirely different model, constructed by
+        /// cloning each of the nodes in the original model. Any changes made in the original
+        /// model won't affect the copy (and vice-versa).
+        /// </returns>
+        Model DeepCopy() const;
 
         /// <summary> Factory method used to create nodes and add them to the model. </summary>
         template <typename NodeType, typename... Args>

@@ -8,12 +8,11 @@
 
 // #include "ModelTestUtilities.h"
 
-#include <model/optimizer/include/ModelOptimizer.h>
-
 #include <model/include/IRMapCompiler.h>
 #include <model/include/InputNode.h>
 #include <model/include/Map.h>
 #include <model/include/MapCompilerOptions.h>
+#include <model/include/OptimizeModelTransformation.h>
 #include <model/include/PortMemoryLayout.h>
 
 #include <nodes/include/BroadcastFunctionNode.h>
@@ -22,8 +21,9 @@
 #include <nodes/include/MatrixMatrixMultiplyNode.h>
 #include <nodes/include/ReorderDataNode.h>
 
-#include <passes/include/FuseLinearOperationsPass.h>
-#include <passes/include/StandardPasses.h>
+#include <passes/include/StandardTransformations.h>
+
+#include <predictors/neural/include/ConvolutionalLayer.h>
 
 #include <predictors/neural/include/ConvolutionalLayer.h>
 
@@ -76,7 +76,7 @@ auto Increment(ValueType start, ValueType inc = static_cast<ValueType>(1))
 }
 
 template <typename ValueType>
-model::Map GenerateTestModel(const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, std::vector<std::pair<bool, bool>> functionInfos)
+model::Map GenerateLinearOpsTestModel(const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, std::vector<std::pair<bool, bool>> functionInfos)
 {
     auto numRows = inputLayout.GetActiveSize(0);
     auto numColumns = inputLayout.GetActiveSize(1);
@@ -140,7 +140,7 @@ void TestFuseLinearOpsPass(std::vector<std::pair<bool, bool>> functionInfos)
     model::PortMemoryLayout inputLayout({ numRows, numColumns, numChannels });
     model::PortMemoryLayout outputLayout({ numRows, numColumns, numChannels });
 
-    auto map = GenerateTestModel<ValueType>(inputLayout, outputLayout, functionInfos);
+    auto map = GenerateLinearOpsTestModel<ValueType>(inputLayout, outputLayout, functionInfos);
     auto oldSize = map.GetModel().Size();
 
     // Generate test data
@@ -151,16 +151,20 @@ void TestFuseLinearOpsPass(std::vector<std::pair<bool, bool>> functionInfos)
     map.SetInputValue("input", testInput);
     auto referenceOutput = map.ComputeOutput<ValueType>("output");
 
-    // Initialize pass registry
-    passes::AddStandardPassesToRegistry();
+    // Initialize transformation registry
+    passes::AddStandardTransformationsToRegistry();
 
     // Optimize it
     model::MapCompilerOptions settings;
-    settings.optimizerSettings.fuseLinearFunctionNodes = true;
-    model::ModelOptimizer optimizer(settings);
-    optimizer.AddPass(std::make_unique<passes::FuseLinearOperationsPass>());
+    model::ModelOptimizerOptions optimizerOptions;
+    optimizerOptions["fuseLinearFunctionNodes"] = true;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
+
     model::Map optimizedMap(map);
-    optimizedMap.Optimize(optimizer);
+    model::TransformContext context(&compiler);
+    model::OptimizeModelTransformation optimizer;
+    optimizedMap.Transform(optimizer, context);
+    optimizedMap.Prune();
 
     auto newSize = optimizedMap.GetModel().Size();
     auto numLinearNodes = functionInfos.size();
@@ -176,8 +180,6 @@ void TestFuseLinearOpsPass(std::vector<std::pair<bool, bool>> functionInfos)
     //
 
     // Compile the model
-    settings.optimizerSettings.fuseLinearFunctionNodes = true;
-    model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
     auto newCompiledSize = compiledMap.GetModel().Size();
     testing::ProcessTest("Testing compiled linear ops count", newCompiledSize <= newSize);
@@ -250,12 +252,13 @@ void TestOptimizeReorderDataNodes1()
 #endif
 
     // Initialize pass registry
-    passes::AddStandardPassesToRegistry();
+    passes::AddStandardTransformationsToRegistry();
 
     // Compile it
     model::MapCompilerOptions settings;
-    settings.optimizerSettings.fuseLinearFunctionNodes = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    optimizerOptions["fuseLinearFunctionNodes"] = true;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
     auto newSize = compiledMap.GetModel().Size();
 
@@ -299,12 +302,13 @@ void TestOptimizeReorderDataNodes2()
 #endif
 
     // Initialize pass registry
-    passes::AddStandardPassesToRegistry();
+    passes::AddStandardTransformationsToRegistry();
 
     // Compile it
     model::MapCompilerOptions settings;
-    settings.optimizerSettings.fuseLinearFunctionNodes = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    optimizerOptions["fuseLinearFunctionNodes"] = true;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
     auto newSize = compiledMap.GetModel().Size();
 
@@ -348,12 +352,13 @@ void TestOptimizeReorderDataNodes3()
 #endif
 
     // Initialize pass registry
-    passes::AddStandardPassesToRegistry();
+    passes::AddStandardTransformationsToRegistry();
 
     // Compile it
     model::MapCompilerOptions settings;
-    settings.optimizerSettings.fuseLinearFunctionNodes = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    optimizerOptions["fuseLinearFunctionNodes"] = true;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
     auto newSize = compiledMap.GetModel().Size();
 
@@ -403,12 +408,13 @@ void TestOptimizeReorderDataNodes4()
 #endif
 
     // Initialize pass registry
-    passes::AddStandardPassesToRegistry();
+    passes::AddStandardTransformationsToRegistry();
 
     // Compile it
     model::MapCompilerOptions settings;
-    settings.optimizerSettings.fuseLinearFunctionNodes = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    optimizerOptions["fuseLinearFunctionNodes"] = true;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
     auto newSize = compiledMap.GetModel().Size();
 
@@ -463,12 +469,13 @@ void TestSetConvolutionMethodPass(model::PreferredConvolutionMethod convolutionM
 #endif
 
     // Initialize pass registry
-    passes::AddStandardPassesToRegistry();
+    passes::AddStandardTransformationsToRegistry();
 
     // Compile it
     model::MapCompilerOptions settings;
-    settings.optimizerSettings.preferredConvolutionMethod = convolutionMethod;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    optimizerOptions["preferredConvolutionMethod"] = convolutionMethod;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
 #if PRINT_MODELS

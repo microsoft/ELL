@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ModelComparison.cpp
+//  File:     ModelComparison.cpp (debugCompiler)
 //  Authors:  Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,7 @@
 #include <nodes/include/DebugSinkNode.h>
 #include <nodes/include/NeuralNetworkPredictorNode.h>
 
-#include <passes/include/StandardPasses.h>
+#include <passes/include/StandardTransformations.h>
 
 #include <utilities/include/Files.h>
 #include <utilities/include/Graph.h>
@@ -269,7 +269,7 @@ void ModelComparison::SetUpReferenceMap(model::Map& map)
     _referenceMap.Transform(addSinkNodeContext, transformFunc);
 }
 
-void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerOptions& settings)
+void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerOptions& settings, const model::ModelOptimizerOptions& optimizerOptions)
 {
     SetUpReferenceMap(reference);
     _addingReference = false;
@@ -300,9 +300,9 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     reference.Transform(context, transformFunc);
 
     // Initialize pass registry
-    passes::AddStandardPassesToRegistry();
+    passes::AddStandardTransformationsToRegistry();
 
-    model::IRMapCompiler compiler(settings);
+    model::IRMapCompiler compiler(settings, optimizerOptions);
 
     // Grab a pointer to the module before TransferOwnership nulls it out.
     llvm::Module* module = compiler.GetModule().GetLLVMModule();

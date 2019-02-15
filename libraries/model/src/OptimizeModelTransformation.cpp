@@ -7,25 +7,22 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "OptimizeModelTransformation.h"
-#include "ModelTransformer.h"
-
-#include <utilities/include/Exception.h>
+#include "TransformationRegistry.h"
 
 namespace ell
 {
 namespace model
 {
-    OptimizeModelTransformation::OptimizeModelTransformation(const ModelOptimizer& optimizer) :
-        _optimizer(optimizer)
-    {}
-
     Submodel OptimizeModelTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
     {
-        ModelOptimizerContext optimizerContext(transformer);
-        auto optimizedModel = _optimizer.OptimizeModel(submodel.GetModel(), optimizerContext);
+        Submodel result = submodel;
+        const auto& registry = TransformationRegistry::GetGlobalRegistry();
 
-        // TODO: get corresponding inputs/outputs in new model and return them in the result submodel
-        return { optimizedModel };
+        for (const auto& transformation : registry)
+        {
+            result = transformation->Transform(result, transformer, context);
+        }
+        return result;
     }
 } // namespace model
 } // namespace ell

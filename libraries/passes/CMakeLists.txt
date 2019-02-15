@@ -5,17 +5,17 @@
 set(library_name passes)
 
 set(src
-    src/FuseLinearOperationsPass.cpp
-    src/OptimizeReorderDataNodes.cpp
-    src/SetConvolutionMethodPass.cpp
-    src/StandardPasses.cpp
+    src/FuseLinearOperationsTransformation.cpp
+    src/OptimizeReorderDataNodesTransformation.cpp
+    src/SetConvolutionMethodTransformation.cpp
+    src/StandardTransformations.cpp
 )
 
 set(include
-    include/FuseLinearOperationsPass.h
-    include/OptimizeReorderDataNodes.h
-    include/SetConvolutionMethodPass.h
-    include/StandardPasses.h
+    include/FuseLinearOperationsTransformation.h
+    include/OptimizeReorderDataNodesTransformation.h
+    include/SetConvolutionMethodTransformation.h
+    include/StandardTransformations.h
 )
 
 set(doc
@@ -40,10 +40,12 @@ set(test_name ${library_name}_test)
 set(test_src
     test/src/main.cpp
     test/src/ModelOptimizerTest.cpp
+    test/src/TransformationTest.cpp
 )
 
 set(test_include
     test/include/ModelOptimizerTest.h
+    test/include/TransformationTest.h
 )
 
 source_group("src" FILES ${test_src})

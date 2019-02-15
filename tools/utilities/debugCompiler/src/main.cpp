@@ -8,7 +8,7 @@
 
 #include "CompareArguments.h"
 #include "ModelComparison.h"
-#include "ReplaceSourceAndSinkNodesPass.h"
+#include "ReplaceSourceAndSinkNodesTransformation.h"
 
 #include <pythonPlugins/include/InvokePython.h>
 
@@ -64,11 +64,10 @@ std::vector<InputType> GetInputVector(const model::MemoryShape& inputShape)
 
 void ReplaceSourceAndSinkNodes(model::Map& map)
 {
-    model::MapCompilerOptions settings;
-    model::ModelOptimizer optimizer(settings);
-    optimizer.AddPass(std::make_unique<ReplaceSourceAndSinkNodesPass>());
     map.RemoveInputs();
-    map.Optimize(optimizer);
+    ReplaceSourceAndSinkNodesTransformation replaceTransformation;
+    map.Transform(replaceTransformation);
+    map.Prune();
 
     // now put back inputs
     auto inputNodes = map.GetModel().GetNodesByType<model::InputNodeBase>();
@@ -117,24 +116,31 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(compileArguments);
         commandLineParser.Parse();
 
-        if (compareArguments.inputMapFile.empty())
+        if (compareArguments.inputMapFilename.empty())
         {
-            std::cout << "Model file not specified\n\n";
-            std::cout << commandLineParser.GetHelpString() << std::endl;
-            return 1;
+            if (commandLineParser.GetPositionalArgs().size() == 1)
+            {
+                compareArguments.inputMapFilename = commandLineParser.GetPositionalArgs()[0];
+            }
+            else
+            {
+                std::cout << "Model file not specified\n\n";
+                std::cout << commandLineParser.GetHelpString() << std::endl;
+                return 1;
+            }
         }
 
-        if (!ell::utilities::FileExists(compareArguments.inputMapFile))
+        if (!ell::utilities::FileExists(compareArguments.inputMapFilename))
         {
 
-            std::cout << "Model file not found: " << compareArguments.inputMapFile << std::endl;
+            std::cout << "Model file not found: " << compareArguments.inputMapFilename << std::endl;
             std::cout << commandLineParser.GetHelpString() << std::endl;
             return 1;
         }
 
         // load map file
         std::cout << "loading map..." << std::endl;
-        model::Map map = common::LoadMap(compareArguments.inputMapFile);
+        model::Map map = common::LoadMap(compareArguments.inputMapFilename);
 
         ReplaceSourceAndSinkNodes(map);
 
@@ -148,14 +154,15 @@ int main(int argc, char* argv[])
         ModelComparison comparison(compareArguments.outputDirectory);
 
         model::MapCompilerOptions settings = compileArguments.GetMapCompilerOptions("");
-        comparison.Compare(input, map, settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        comparison.Compare(input, map, settings, optimizerOptions);
 
         // Write summary report
         if (compareArguments.writeReport)
         {
             std::string reportFileName = utilities::JoinPaths(compareArguments.outputDirectory, "report.md");
             std::ofstream reportStream(reportFileName);
-            comparison.WriteReport(reportStream, compareArguments.inputMapFile, pluginArgs, compareArguments.writePrediction);
+            comparison.WriteReport(reportStream, compareArguments.inputMapFilename, pluginArgs, compareArguments.writePrediction);
         }
 
         // Write an annotated graph showing where differences occurred in the model

@@ -12,14 +12,11 @@ namespace ell
 {
 namespace model
 {
-    namespace optimizer
+    Model Transformation::TransformModel(const Model& model, ModelTransformer& transformer, const TransformContext& context) const
     {
-        Model Transformation::TransformModel(const Model& model, ModelTransformer& transformer, const TransformContext& context) const
-        {
-            model::Submodel oldSubmodel{ model };
-            auto newSubmodel = Transform(oldSubmodel, transformer, context);
-            return newSubmodel.GetModel().ShallowCopy();
-        }
-    } // namespace optimizer
+        model::Submodel oldSubmodel{ model };
+        auto newSubmodel = Transform(oldSubmodel, transformer, context);
+        return newSubmodel.GetModel().ShallowCopy();
+    }
 } // namespace model
 } // namespace ell

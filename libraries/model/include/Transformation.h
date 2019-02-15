@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <model/include/ModelTransformer.h>
-#include <model/include/Submodel.h>
-#include <model/include/TransformContext.h>
+#include "ModelTransformer.h"
+#include "Submodel.h"
+#include "TransformContext.h"
 
 #include <string>
 
@@ -18,24 +18,20 @@ namespace ell
 {
 namespace model
 {
-    namespace optimizer
+    /// <summary> Base class for a global model optimizer transformation </summary>
+    class Transformation
     {
-        /// <summary> Base class for a global model optimizer transformation </summary>
-        class Transformation
-        {
-        public:
-            virtual ~Transformation() = default;
+    public:
+        virtual ~Transformation() = default;
 
-            /// <summary> Transforms a submodel using the given transformer </summary>
-            virtual Submodel Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const = 0;
+        /// <summary> Transforms a submodel using the given transformer </summary>
+        virtual Submodel Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const = 0;
 
-            /// <summary> Transforms a model using the given transformer. </summary>
-            Model TransformModel(const Model& model, ModelTransformer& transformer, const TransformContext& context) const;
+        /// <summary> Transforms a model using the given transformer. </summary>
+        Model TransformModel(const Model& model, ModelTransformer& transformer, const TransformContext& context) const;
 
-            /// <summary> Gets the name of this type. </summary>
-            virtual std::string GetRuntimeTypeName() const = 0;
-        };
-
-    } // namespace optimizer
+        /// <summary> Gets the name of this type. </summary>
+        virtual std::string GetRuntimeTypeName() const = 0;
+    };
 } // namespace model
 } // namespace ell

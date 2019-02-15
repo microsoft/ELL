@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Variant.h"
+#include "PropertyBag.h"
 
 namespace ell
 {
@@ -170,6 +171,9 @@ namespace utilities
         RegisterArchivableVariantVectorType<float>(registry);
         RegisterArchivableVariantVectorType<double>(registry);
         RegisterArchivableVariantVectorType<std::string>(registry);
+
+        // PropertyBag
+        RegisterArchivableVariantType<PropertyBag>(registry);
     }
 
     //

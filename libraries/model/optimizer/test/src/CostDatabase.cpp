@@ -13,11 +13,13 @@
 #include <model/include/OutputNode.h>
 
 #include <utilities/include/Exception.h>
+#include <utilities/include/StlVectorUtil.h>
 
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 
+using namespace ell;
 using namespace ell::model;
 
 namespace
@@ -25,29 +27,26 @@ namespace
 template <typename Container, typename Function>
 auto Transform(const Container& container, Function fn)
 {
-    std::vector<decltype(fn(container[0]))> result;
-    result.reserve(container.size());
-    std::transform(container.begin(), container.end(), std::back_inserter(result), fn);
-    return result;
+    return utilities::TransformVector(container.begin(), container.end(), fn);
 }
 } // namespace
 
-PortDescription GetDescription(const ell::model::Port& port)
+PortDescription GetDescription(const model::Port& port)
 {
     return { port.GetType(), port.GetMemoryLayout() };
 }
 
-NodeDescription GetDescription(const ell::model::Node& node)
+NodeDescription GetDescription(const model::Node& node)
 {
     auto inputs = Transform(node.GetInputPorts(), [](InputPortBase* port) { return GetDescription(*port); });
     auto outputs = Transform(node.GetOutputPorts(), [](OutputPortBase* port) { return GetDescription(*port); });
     return { inputs, outputs, node.GetRuntimeTypeName() };
 }
 
-SubmodelDescription GetDescription(const ell::model::Submodel& submodel)
+SubmodelDescription GetDescription(const model::Submodel& submodel)
 {
-    auto inputs = Transform(submodel.GetInputPorts(), [](const InputPortBase* port) { return GetDescription(*port); });
-    auto outputs = Transform(submodel.GetOutputPorts(), [](const OutputPortBase* port) { return GetDescription(*port); });
+    auto inputs = Transform(submodel.GetInputs(), [](const InputPortBase* port) { return GetDescription(*port); });
+    auto outputs = Transform(submodel.GetOutputs(), [](const OutputPortBase* port) { return GetDescription(*port); });
     std::vector<NodeDescription> nodes;
     submodel.Visit([&nodes](const Node& node) {
         nodes.push_back(GetDescription(node));
@@ -55,7 +54,7 @@ SubmodelDescription GetDescription(const ell::model::Submodel& submodel)
     return { inputs, outputs, nodes };
 }
 
-EnvironmentDescription GetDescription(const ell::model::optimizer::Environment& environment)
+EnvironmentDescription GetDescription(const model::optimizer::Environment& environment)
 {
     return environment.GetTargetDevice().deviceName;
 }
@@ -76,32 +75,32 @@ bool operator==(const SubmodelDescription& a, const SubmodelDescription& b)
 }
 
 // CostDatabase
-bool CostDatabase::HasCostMeasurement(const ell::model::Submodel& submodel, const ell::model::optimizer::Environment& environment) const
+bool CostDatabase::HasCostMeasurement(const model::Submodel& submodel, const model::optimizer::Environment& environment) const
 {
     auto key = GetMeasurementKey(submodel, environment);
     return _measurements.find(key) != _measurements.end();
 }
 
-CostDatabase::Cost CostDatabase::GetCostMeasurement(const ell::model::Submodel& submodel, const ell::model::optimizer::Environment& environment) const
+CostDatabase::Cost CostDatabase::GetCostMeasurement(const model::Submodel& submodel, const model::optimizer::Environment& environment) const
 {
     if (!HasCostMeasurement(submodel, environment))
     {
-        throw ell::utilities::InputException(ell::utilities::InputExceptionErrors::invalidArgument);
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
     }
 
     auto key = GetMeasurementKey(submodel, environment);
     return _measurements.at(key);
 }
 
-void CostDatabase::AddCostMeasurement(const ell::model::Submodel& submodel, const ell::model::optimizer::Environment& environment, const Cost& cost)
+void CostDatabase::AddCostMeasurement(const model::Submodel& submodel, const model::optimizer::Environment& environment, const Cost& cost)
 {
     auto key = GetMeasurementKey(submodel, environment);
     _measurements[key] = cost;
 }
 
-CostDatabase::Key CostDatabase::GetMeasurementKey(const ell::model::Submodel& submodel, const ell::model::optimizer::Environment& environment) const
+CostDatabase::Key CostDatabase::GetMeasurementKey(const model::Submodel& submodel, const model::optimizer::Environment& environment) const
 {
-    if (!environment.HasTargetDevice() || submodel.NumOutputPorts() == 0)
+    if (!environment.HasTargetDevice() || submodel.NumOutputs() == 0)
     {
         return NullKey();
     }
@@ -118,7 +117,7 @@ CostDatabase::Key CostDatabase::NullKey() const
 
 size_t CostDatabase::KeyHash::operator()(const CostDatabase::Key& arg) const
 {
-    return ell::utilities::HashValue(arg);
+    return utilities::HashValue(arg);
 }
 
 namespace std

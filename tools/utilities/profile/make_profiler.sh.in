@@ -33,7 +33,7 @@ for arg in "${all_args[@]}"; do
         target=$arg
     fi
 
-    if [ "${arg}" == "--parallel" ] || [ "${arg}" == "-par" ]; then
+    if [ "${arg}" == "--parallelize" ] || [ "${arg}" == "-par" ]; then
         parallel=true
     fi
     prev_arg=$arg
@@ -104,11 +104,7 @@ cp ${script_dir}/../tools/utilities/profile/ProfileReport.cpp .
 cp ${script_dir}/../tools/utilities/profile/OpenBLASSetup.cmake .
 cp ${script_dir}/../tools/utilities/profile/build_and_run.sh .
 
-if [ ${parallel} == "true" ] ; then
-    cp ${script_dir}/../tools/utilities/profile/CMakeLists-device-parallel.txt.in ./CMakeLists.txt
-else
-    cp ${script_dir}/../tools/utilities/profile/CMakeLists-device.txt.in ./CMakeLists.txt
-fi
+cp ${script_dir}/../tools/utilities/profile/CMakeLists-device-parallel.txt.in ./CMakeLists.txt
 
 if [ "${cleanup}" == "true" ] ; then
     rm -rf ./*.ll

@@ -190,9 +190,10 @@ namespace common
     {
         ell::model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = useBlas;
+        ell::model::ModelOptimizerOptions optimizerOptions;
 
         detail::CallbackContext dataContext;
-        model::IRMapCompiler compiler(settings);
+        model::IRMapCompiler compiler(settings, optimizerOptions);
 
         auto module = compiler.GetModule().GetLLVMModule();
         auto compiledMap = compiler.Compile(map);

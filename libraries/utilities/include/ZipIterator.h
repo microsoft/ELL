@@ -114,7 +114,7 @@ namespace utilities
         {
             return ((std::get<Index>(a) == std::get<Index>(b)) || ...);
         }
-    } // namespace
+    } // namespace detail
 
     template <typename... IteratorTypes>
     ZipIterator<IteratorTypes...>::ZipIterator(IteratorTypes... iterators) :

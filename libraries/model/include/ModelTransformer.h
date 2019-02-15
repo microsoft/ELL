@@ -18,6 +18,7 @@
 #include "TransformContext.h"
 
 #include <utilities/include/Exception.h>
+#include <utilities/include/PropertyBag.h>
 
 #include <cassert>
 #include <exception>
@@ -161,9 +162,6 @@ namespace model
                                        const TransformContext& context,
                                        const NodeTransformFunction& transformFunction);
 
-        // for debugging
-        bool IsEmpty() const { return _elementsMap.IsEmpty(); }
-
         /// <summary> Returns the port from the new model corresponding to the given input port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or TransformModel </remarks>
         template <typename ValueType>
@@ -249,6 +247,12 @@ namespace model
         /// <param name="node"> The target node to copy in the new model </param>
         void CopyNode(const Node& node);
 
+        /// <summary> Copies the target node into the new model, appending the supplied metadata </summary>
+        ///
+        /// <param name="node"> The target node to copy in the new model </param>
+        /// <param name="metadata"> Metadata to append to the node </param>
+        void CopyNodeWithMetadata(const Node& node, const utilities::PropertyBag& metadata);
+
         /// <summary> Refines the target node in the new model </summary>
         ///
         /// <param name="node"> The target node to refine in the new model </param>
@@ -298,9 +302,9 @@ namespace model
             void Clear();
             bool IsEmpty() const;
             bool IsOutputMapped(const OutputPortBase& queryPort) const;
-            const OutputPortBase& GetCorrespondingPort(const OutputPortBase& port) const;
+            const OutputPortBase& GetCorrespondingPort(const OutputPortBase& port, bool isInPlace) const;
             void MapNodeOutput(const OutputPortBase* oldPort, const OutputPortBase* newPort);
-            static PortOutputsMap ConcatenateMaps(const PortOutputsMap& oldMap, const PortOutputsMap& newMap);
+            static PortOutputsMap ConcatenateMaps(const PortOutputsMap& oldMap, const PortOutputsMap& newMap, bool isInPlace);
 
         private:
             std::unordered_map<const OutputPortBase*, const OutputPortBase*> _outputPortMap;
@@ -310,7 +314,7 @@ namespace model
         bool IsInputMapped(const InputPortBase& input) const;
         bool IsOutputMapped(const OutputPortBase& output) const;
         bool IsInputNode(const Node& node) const;
-        static bool Compatible(const InputPortBase* source, const OutputPortBase* dest);
+        static bool ArePortsCompatible(const InputPortBase* source, const OutputPortBase* dest);
         void MapCorrespondingInputs(const std::vector<const InputPortBase*>& sources, const std::vector<const OutputPortBase*>& destinations);
         bool IsModelCompilable(const Model& model) const;
         bool IsInPlace() const;
@@ -319,7 +323,6 @@ namespace model
         NodeType* GetCorrespondingInputNodeAs(const NodeType* node) const;
 
         void ResetContext();
-        std::vector<const Node*> FindUncompilableNodes(const Model& model, const TransformContext& context) const;
 
         /// <summary>
         /// Assign ancestor to newly transformed or refined nodes. This maps relationship between nodes of original

@@ -220,7 +220,8 @@ static void TestIIRFilterNode1()
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerOptions settings;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     std::vector<std::vector<ValueType>> expectedOutput = { { static_cast<ValueType>(1.0) }, { static_cast<ValueType>(0.95) }, { static_cast<ValueType>(0.95 * 0.95) }, { static_cast<ValueType>(0.95 * 0.95 * 0.95) } };
@@ -252,7 +253,8 @@ static void TestIIRFilterNode2()
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerOptions settings;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     std::vector<std::vector<ValueType>> expectedOutput = { { static_cast<ValueType>(1.0), static_cast<ValueType>(0.95), static_cast<ValueType>(0.95 * 0.95), static_cast<ValueType>(0.95 * 0.95 * 0.95) } };
@@ -288,7 +290,8 @@ static void TestIIRFilterNode3()
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerOptions settings;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     for (size_t index = 0; index < data.size(); ++index)
@@ -320,7 +323,8 @@ static void TestIIRFilterNode4()
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerOptions settings;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     std::vector<std::vector<ValueType>> expectedOutput = { bCoeffs };
@@ -359,7 +363,8 @@ static void TestMelFilterBankNode()
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
     model::MapCompilerOptions settings;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     for (size_t index = 0; index < data.size(); ++index)
@@ -413,7 +418,8 @@ static void TestBufferNode()
     TestWithSerialization(map, "TestBufferNode", [&](model::Map& map, int iteration) {
         model::MapCompilerOptions settings;
         settings.compilerSettings.optimize = false;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
 
         auto message = utilities::FormatString("Testing BufferNode compile iteration %d", iteration);
@@ -487,7 +493,8 @@ static void TestConvolutionNodeCompile(dsp::ConvolutionMethodOption convolutionM
     settings.compilerSettings.optimize = false;
     settings.compilerSettings.useBlas = true;
     settings.verifyJittedModule = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
 
     // Check for errors in module
@@ -550,8 +557,8 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
     settings.compilerSettings.optimize = true;
     settings.compilerSettings.useBlas = true;
     settings.verifyJittedModule = true;
-
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
 
     // Create "test" model
     model::Model model;
@@ -700,7 +707,8 @@ void TestRNNNode()
         // Compile model
         model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = true;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
         auto name = rnnNode->GetRuntimeTypeName();
 
@@ -778,7 +786,8 @@ void TestGRUNode()
         // Compile model
         model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = true;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
         auto name = gruNode->GetRuntimeTypeName();
 
@@ -854,7 +863,8 @@ void TestLSTMNode()
         // Compile model
         model::MapCompilerOptions settings;
         settings.compilerSettings.useBlas = true;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
         auto name = lstmNode->GetRuntimeTypeName();
 
@@ -941,7 +951,8 @@ static void TestVoiceActivityDetectorNode(const std::string& path)
         settings.verifyJittedModule = true;
         settings.compilerSettings.optimize = false;
         settings.compilerSettings.debug = true;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
 
         // now test that it works.
@@ -1021,7 +1032,8 @@ void TestGRUNodeWithVADReset(const std::string& path)
         settings.verifyJittedModule = true;
         settings.compilerSettings.optimize = false;
         settings.compilerSettings.debug = true;
-        model::IRMapCompiler compiler(settings);
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
         int errors = 0;
 

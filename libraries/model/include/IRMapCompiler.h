@@ -15,8 +15,6 @@
 #include "NodeMap.h"
 #include "OutputPort.h"
 
-#include <model/optimizer/include/ModelOptimizer.h>
-
 #include <emitters/include/IRModuleEmitter.h>
 #include <emitters/include/LLVMUtilities.h>
 
@@ -46,8 +44,8 @@ namespace model
         /// <summary> Create a compiler to produce an LLVM module with the default name </summary>
         IRMapCompiler();
 
-        /// <summary> Create a compiler to produce an LLVM module with the default name and the given parameters </summary>
-        IRMapCompiler(const MapCompilerOptions& settings);
+        /// <summary> Create a compiler to produce an LLVM module with the default name and the given compiler and optimization options </summary>
+        IRMapCompiler(const MapCompilerOptions& settings, const ModelOptimizerOptions& optimizerOptions);
 
         /// <summary> Compile a map into a CompiledMap </summary>
         ///
@@ -58,10 +56,7 @@ namespace model
         /// <summary> Gets the compiler parameters being used by the IR emitter. </summary>
         ///
         /// <returns> The CompilerOptions struct used by the IR emitter to control code generation. </returns>
-        const emitters::CompilerOptions& GetCompilerOptions() const { return GetModule().GetCompilerOptions(); }
-
-        /// <summary> Get the optimizer used by this compiler. </summary>
-        ModelOptimizer& GetOptimizer() { return _optimizer; }
+        emitters::CompilerOptions GetCompilerOptions() const { return GetModule().GetCompilerOptions(); }
 
         //
         // Routines useful to Node implementers
@@ -165,7 +160,6 @@ namespace model
 
         emitters::IRModuleEmitter _moduleEmitter;
         ModelProfiler _profiler;
-        ModelOptimizer _optimizer;
 
     private:
         NodeMap<emitters::IRBlockRegion*>& GetCurrentNodeBlocks();

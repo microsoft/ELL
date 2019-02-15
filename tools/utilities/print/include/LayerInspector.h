@@ -124,7 +124,6 @@ std::vector<NameValue> InspectConvolutionalLayerParameters(const ell::predictors
     result.push_back(NameValue{ "stride", std::to_string(params.stride) });
     result.push_back(NameValue{ "method", ConvolutionMethodToString(params.method) });
     result.push_back(NameValue{ "receptiveField", std::to_string(params.receptiveField) });
-    result.push_back(NameValue{ "numFilters", std::to_string(params.numFiltersAtATime) });
     result.push_back(NameValue{ "isSeparable", std::to_string(weights.NumChannels() == 1) });
     return result;
 }
@@ -144,18 +143,23 @@ std::vector<NameValue> InspectLayerParameters(const ell::predictors::neural::Lay
 {
     std::vector<NameValue> result;
     auto params = layer.GetLayerParameters();
-    auto input = params.input;
-    auto shape = params.outputShape;
-
-    result.push_back(NameValue{ "shape", "[" + std::to_string(input.NumRows()) + "," + std::to_string(input.NumColumns()) + "," + std::to_string(input.NumChannels()) + "]->" + "[" + std::to_string(shape.NumRows()) + "," + std::to_string(shape.NumColumns()) + "," + std::to_string(shape.NumChannels()) + "]" });
 
     auto inputpadding = params.inputPaddingParameters;
     auto outputpadding = params.outputPaddingParameters;
-    if (inputpadding.paddingSize != 0)
+    if (inputpadding.paddingSize == 0)
+    {
+        result.push_back(NameValue{ "inputPadding", "none,0" });
+    }
+    else
     {
         result.push_back(NameValue{ "inputPadding", PaddingSchemeToString(inputpadding.paddingScheme) + "," + std::to_string(inputpadding.paddingSize) });
     }
-    if (outputpadding.paddingSize != 0)
+
+    if (outputpadding.paddingSize == 0)
+    {
+        result.push_back(NameValue{ "outputPadding", "none,0" });
+    }
+    else
     {
         result.push_back(NameValue{ "outputPadding", PaddingSchemeToString(outputpadding.paddingScheme) + "," + std::to_string(outputpadding.paddingSize) });
     }

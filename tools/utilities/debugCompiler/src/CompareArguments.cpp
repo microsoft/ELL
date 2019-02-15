@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     CompareArguments.cpp (print)
+//  File:     CompareArguments.cpp (debugCompiler)
 //  Authors:  Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,7 +13,7 @@ namespace ell
 void ParsedCompareArguments::AddArgs(utilities::CommandLineParser& parser)
 {
     parser.AddDocumentationString("Input options");
-    parser.AddOption(inputMapFile, "inputMapFile", "imap", "Path to the input *.map file", "");
+    parser.AddOption(inputMapFilename, "inputMapFile", "imap", "Path to the input *.map file", "");
     parser.AddOption(inputConverter, "inputConverter", "ic", "Path to python script for converting the input to valid input for the map", "");
 
     parser.AddDocumentationString("Output options");

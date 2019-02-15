@@ -45,7 +45,8 @@ public:
     /// <param name="input"> The data to evaluate the map with when comparing outputs. </param>
     /// <param name="reference"> The map to compare the reference vs. compiled versions of. </param>
     /// <param name="settings"> The compiler settings to use when compiling the map. </param>
-    void Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerOptions& settings);
+    /// <param name="optimizerOptions"> The model optimizer settings to use when compiling the map. </param>
+    void Compare(std::vector<float>& input, model::Map& reference, const model::MapCompilerOptions& settings, const model::ModelOptimizerOptions& optimizerOptions);
 
     /// <summary> Saves reference and compiled outputs to a file. </summary>
     ///

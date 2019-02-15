@@ -80,6 +80,8 @@ class DriveTest:
         self.gallery_url = "https://github.com/Microsoft/ELL-models/raw/master/"
         if gitrepo:
             self.gallery_url = download_helper.clone_repo(gitrepo, download_helper.get_home_path())
+        if wrap_options and type(wrap_options) is not list:
+            raise Exception("'wrap_options' should be a list")
         self.wrap_options = wrap_options
 
         # initialize state from the args
@@ -283,15 +285,16 @@ class DriveTest:
         sys.path.append(os.path.join(current_path, "..", "..", "wrap"))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
-        if self.wrap_options is not None and len(self.wrap_options) > 0:
-            builder_args = self.wrap_options
-        else:
-            builder_args = ["--model_file", self.ell_model, "--target", self.target, "--outdir",
-                            self.output_dir, "--blas", str(self.blas)]
-            builder_args.append("--verbosity")
-            builder_args.append(self.logger.getVerbosity())
-            if self.profile:
-                builder_args.append("--profile")
+        builder_args = ["--model_file", self.ell_model, "--target", self.target, "--outdir",
+                        self.output_dir, "--blas", str(self.blas)]
+        builder_args.append("--verbosity")
+        builder_args.append(self.logger.getVerbosity())
+        if self.profile:
+            builder_args.append("--profile")
+
+        if self.wrap_options:
+            builder_args += ['--'] + self.wrap_options
+
         builder.parse_command_line(builder_args)
         builder.run()
 
@@ -336,7 +339,8 @@ class DriveTest:
             raise Exception("### Test Failed")
 
     def run_test(self):
-        """Runs the test"""
+        """Runs the test and returns the total time"""
+
         try:
             if self.compile:
                 self.get_model()

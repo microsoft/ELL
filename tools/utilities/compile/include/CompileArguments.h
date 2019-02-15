@@ -30,6 +30,7 @@ struct CompileArguments
     bool outputAssembly = false;
     bool outputObjectCode = false;
     bool outputSwigInterface = false;
+    bool outputMapWithOptions = false;
     bool outputRefinedMap = false;
     bool outputCompiledMap = false;
     std::string outputDirectory;

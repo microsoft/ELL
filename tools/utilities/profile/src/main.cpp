@@ -9,7 +9,7 @@
 #include "../../pythonPlugins/include/InvokePython.h"
 #include "ProfileArguments.h"
 #include "ProfileReport.h"
-#include "ReplaceSourceAndSinkNodesPass.h"
+#include "ReplaceSourceAndSinkNodesTransformation.h"
 
 #include <pythonPlugins/include/InvokePython.h>
 
@@ -23,7 +23,7 @@
 #include <model/include/Map.h>
 #include <model/include/PortMemoryLayout.h>
 
-#include <passes/include/StandardPasses.h>
+#include <passes/include/StandardTransformations.h>
 
 #include <utilities/include/CommandLineParser.h>
 #include <utilities/include/Exception.h>
@@ -72,11 +72,10 @@ std::vector<InputType> GetInputVector(const model::MemoryShape& inputShape)
 
 void ReplaceSourceAndSinkNodes(model::Map& map)
 {
-    model::MapCompilerOptions settings;
-    model::ModelOptimizer optimizer(settings);
-    optimizer.AddPass(std::make_unique<ReplaceSourceAndSinkNodesPass>());
     map.RemoveInputs();
-    map.Optimize(optimizer);
+    ReplaceSourceAndSinkNodesTransformation replaceTransformation;
+    map.Transform(replaceTransformation);
+    map.Prune();
 
     // now put back inputs
     auto inputNodes = map.GetModel().GetNodesByType<model::InputNodeBase>();
@@ -243,15 +242,17 @@ void TimeModel(model::Map& map, const std::vector<InputType>& input, const Profi
 
     ReplaceSourceAndSinkNodes(map);
 
-    // Initialize pass registry
-    passes::AddStandardPassesToRegistry();
+    // Initialize the transformation registry
+    passes::AddStandardTransformationsToRegistry();
 
     // Compile map
     model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions("");
     settings.profile = false;
     settings.compilerSettings.profile = false;
-    settings.optimizerSettings.fuseLinearFunctionNodes = true;
-    model::IRMapCompiler compiler(settings);
+
+    model::ModelOptimizerOptions optimizerOptions;
+    optimizerOptions["fuseLinearFunctionNodes"] = true;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
 
     std::cout << "Compiling model" << std::endl;
     auto compiledMap = compiler.Compile(map);
@@ -296,7 +297,7 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
     std::vector<InputType> input = GetModelInput<InputType>(map, profileArguments, converterArgs);
 
     // Initialize the pass registry
-    passes::AddStandardPassesToRegistry();
+    passes::AddStandardTransformationsToRegistry();
 
     // In "summary only" mode, we don't compile the model with profiling enabled
     // (because we just want the overall run time), so we have a separate codepath
@@ -311,11 +312,12 @@ void ProfileModel(model::Map& map, const ProfileArguments& profileArguments, con
     model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions("");
     settings.profile = true;
     settings.compilerSettings.profile = true;
-    settings.optimizerSettings.fuseLinearFunctionNodes = true;
-    model::IRMapCompiler compiler(settings);
+    model::ModelOptimizerOptions optimizerOptions;
+    optimizerOptions["fuseLinearFunctionNodes"] = true;
+    model::IRMapCompiler compiler(settings, optimizerOptions);
 
     std::cout << "Compiling model" << std::endl;
-    std::cout << "Preferred convolution method: " << static_cast<int>(settings.optimizerSettings.preferredConvolutionMethod) << std::endl;
+    std::cout << "Preferred convolution method: " << ToString(optimizerOptions.GetEntry<model::PreferredConvolutionMethod>("preferredConvolutionMethod", model::PreferredConvolutionMethod::automatic)) << std::endl;
     auto compiledMap = compiler.Compile(map);
 
     auto numNodes = compiledMap.GetNumProfiledNodes();

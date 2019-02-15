@@ -507,7 +507,7 @@ namespace utilities
         ///
         /// <param name="addedDimensions"> The number of dimensions to add. </param>
         /// <returns> A new memory layout that matches this one, but with extra leading "empty" dimensions. </returns>
-        /// <remarks> 
+        /// <remarks>
         /// The new layout is created by appending dimensions of size (and extent) `1` and offset `0`.
         /// For instance, calling `CopyWithExtraDimensions(2)` on a layout of size `{2,3,4}` would result
         /// in a layout of size `{1,1,2,3,4}.`

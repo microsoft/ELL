@@ -3,19 +3,33 @@
 #
 
 # define project
-set (tool_name profile)
+set(tool_name profile)
 
-set (src
+set(src
   src/ProfileArguments.cpp
   src/ProfileReport.cpp
-  src/ReplaceSourceAndSinkNodesPass.cpp
+  src/ReplaceSourceAndSinkNodesTransformation.cpp
   src/main.cpp
   )
 
-  set (include
+set(extras
+    build_and_run.cmd.in
+    build_and_run.sh.in
+    CMakeLists-device-parallel.txt.in
+    CMakeLists-device.txt.in
+    make_profiler.cmd.in
+    make_profiler.py
+    make_profiler.sh.in
+    make_profiler_test.cmake
+    README.md
+    remote_test.cmd.in
+    remote_test.sh.in
+)
+
+set (include
   include/ProfileArguments.h
   include/ProfileReport.h
-  include/ReplaceSourceAndSinkNodesPass.h
+  include/ReplaceSourceAndSinkNodesTransformation.h
 )
 
 source_group("src" FILES ${src})
@@ -24,7 +38,7 @@ source_group("include" FILES ${include})
 # create executable in build/bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR})
-add_executable(${tool_name} ${src} ${include})
+add_executable(${tool_name} ${src} ${include} ${extras})
 target_include_directories(${tool_name} PRIVATE include ${ELL_LIBRARIES_DIR} ${CMAKE_CURRENT_LIST_DIR}/..)
 target_link_libraries(${tool_name} common emitters model nodes passes utilities pythonPlugins)
 copy_shared_libraries(${tool_name})

@@ -12,9 +12,8 @@
 #include "OutputNode.h"
 #include "RefineTransformation.h"
 
-#include <model/optimizer/include/ModelOptimizer.h>
-
 #include <utilities/include/Exception.h>
+#include <utilities/include/StlVectorUtil.h>
 
 #include <algorithm>
 #include <iomanip>
@@ -38,7 +37,7 @@ namespace model
         TransformContext context;
         ModelTransformer transformer;
         _model = transformer.CopyModel(model, context);
-        
+
         for (const auto& input : inputs)
         {
             AddInput(input.first, transformer.GetCorrespondingInputNode(input.second));
@@ -53,7 +52,7 @@ namespace model
             AddOutput(output.first, transformer.GetCorrespondingOutputs(output.second));
         }
 
-        Prune();        
+        Prune();
         _model.Verify();
     }
 
@@ -67,6 +66,10 @@ namespace model
 
         for (const auto& output : outputs)
         {
+            if (!output.second.IsFullPortOutput())
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Map constructor requires full output ports (IsFullPortOutput()==true)");
+            }
             AddOutput(output.first, output.second);
         }
 
@@ -307,35 +310,6 @@ namespace model
         }
     }
 
-    void Map::FixTransformedIO(ModelOptimizerContext& context)
-    {
-        for (auto& inputNode : _inputNodes)
-        {
-            auto refinedInput = context.GetCorrespondingInputNode(inputNode);
-            inputNode = refinedInput;
-        }
-
-        for (auto& inputNode : _inputNodeMap)
-        {
-            auto input = inputNode.second;
-            auto refinedInput = context.GetCorrespondingInputNode(input);
-            inputNode.second = refinedInput;
-        }
-
-        for (auto& outputElements : _outputElements)
-        {
-            const auto& refinedOutput = context.GetCorrespondingOutputs(outputElements);
-            outputElements = { refinedOutput };
-        }
-
-        for (auto& outputElements : _outputElementsMap)
-        {
-            auto output = outputElements.second;
-            const auto& refinedOutput = context.GetCorrespondingOutputs(output);
-            outputElements.second = { refinedOutput };
-        }
-    }
-
     void Map::Prune()
     {
         auto outputNodes = GetAllOutputNodes();
@@ -361,18 +335,17 @@ namespace model
                 outputPorts.push_back(port);
             }
         }
-                Submodel m(_model, {}, outputPorts);
 
         TransformContext context;
         ModelTransformer transformer;
-        auto minimalModel = transformer.CopySubmodel(m, context);
-        
+        Submodel submodel(_model, {}, outputPorts);
+        auto minimalModel = transformer.CopySubmodel(submodel, context);
         FixTransformedIO(transformer);
         _model = minimalModel.GetModel().ShallowCopy();
         _model.Verify();
     }
 
-    size_t Map::GetNumInputs() const
+    size_t Map::NumInputs() const
     {
         return _inputNodes.size();
     }
@@ -411,7 +384,7 @@ namespace model
         return _model.GetNodesByType<SourceNodeBase>();
     }
 
-    size_t Map::GetNumOutputs() const
+    size_t Map::NumOutputs() const
     {
         return _outputElements.size();
     }
@@ -501,7 +474,7 @@ namespace model
     void Map::Refine(int maxIterations)
     {
         TransformContext context;
-        return Refine(context, maxIterations);
+        Refine(context, maxIterations);
     }
 
     void Map::Refine(const TransformContext& context, int maxIterations)
@@ -511,15 +484,8 @@ namespace model
             return;
         }
 
-        RefineTransformation t(maxIterations);
-        Transform(t);
-        Prune();
-    }
-
-    void Map::Optimize(const ModelOptimizer& optimizer)
-    {
-        OptimizeModelTransformation t(optimizer);
-        Transform(t);
+        RefineTransformation refineTransformation(maxIterations);
+        Transform(refineTransformation, context);
         Prune();
     }
 
@@ -537,19 +503,17 @@ namespace model
         _model = std::move(newModel);
     }
 
-    void Map::Transform(optimizer::Transformation& transformation)
+    void Map::Transform(Transformation& transformation)
     {
         TransformContext context;
         Transform(transformation, context);
     }
 
-    void Map::Transform(optimizer::Transformation& transformation, const TransformContext& context)
+    void Map::Transform(Transformation& transformation, const TransformContext& context)
     {
         ModelTransformer transformer;
         auto newModel = transformation.TransformModel(_model, transformer, context);
-
         FixTransformedIO(transformer);
-
         _model = newModel.ShallowCopy();
     }
 
@@ -601,8 +565,8 @@ namespace model
         archiver["model"] << _model;
 
         // Archive the inputs
-        std::vector<utilities::UniqueId> inputIds(_inputNodes.size());
-        std::transform(_inputNodes.begin(), _inputNodes.end(), inputIds.begin(), [](InputNodeBase* node) { return node->GetId(); });
+        std::vector<utilities::UniqueId> inputIds = utilities::TransformVector(_inputNodes.begin(), _inputNodes.end(), [](InputNodeBase* node) { return node->GetId(); });
+
         archiver["inputNames"] << _inputNames;
         archiver["inputIds"] << inputIds;
 

@@ -10,6 +10,7 @@
 
 #include <utilities/include/Exception.h>
 
+using namespace ell::model;
 using namespace ell::model::optimizer;
 
 void SequentialOptimizer::Reset()

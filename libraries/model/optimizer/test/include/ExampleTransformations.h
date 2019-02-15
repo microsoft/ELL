@@ -16,14 +16,13 @@
 //
 // Example transformations for testing
 //
-class TrivialTransformation : public ell::model::optimizer::Transformation
+class TrivialTransformation : public ell::model::Transformation
 {
 public:
     ell::model::Submodel Transform(const ell::model::Submodel& submodel, ell::model::ModelTransformer& transformer, const ell::model::TransformContext& context) const override
     {
         return submodel;
     }
-
     /// <summary> Gets the name of this type. </summary>
     static std::string GetTypeName() { return "TrivialTransformation"; }
 
@@ -31,7 +30,7 @@ public:
     std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 };
 
-class AddMetadataToOutputTransformation : public ell::model::optimizer::Transformation
+class AddMetadataToOutputTransformation : public ell::model::Transformation
 {
 public:
     ell::model::Submodel Transform(const ell::model::Submodel& submodel, ell::model::ModelTransformer& transformer, const ell::model::TransformContext& context) const override;
@@ -48,7 +47,7 @@ private:
     void CopyOutputNode(const ell::model::OutputNode<T>* node, ell::model::ModelTransformer& transformer) const;
 };
 
-class CombineNodesTransformation : public ell::model::optimizer::Transformation
+class CombineNodesTransformation : public ell::model::Transformation
 {
 public:
     ell::model::Submodel Transform(const ell::model::Submodel& submodel, ell::model::ModelTransformer& transformer, const ell::model::TransformContext& context) const override;

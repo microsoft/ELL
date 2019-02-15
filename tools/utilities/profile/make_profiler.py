@@ -8,78 +8,71 @@
 #  Requires: Python 3.x
 #
 ####################################################################################################
+
 import argparse
 import datetime
 import glob
 import json
 import logging
 import os
-import parse
 import sys
+
+import parse
 
 __script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path += [os.path.join(__script_path, "..", "pitest")]
 sys.path += [os.path.join(__script_path, "..", "..", "wrap")]
+sys.path += [os.path.join(__script_path, "..", "pythonlibs")]
 
+import logger
 from drivetest import DriveTest, COMPILE_INCREMENTAL
 from wrap import ModuleBuilder
 
-LOG_LEVEL_VERBOSE = 1
-
-
-def verbose(self, message, *args, **kws):
-    if self.isEnabledFor(LOG_LEVEL_VERBOSE):
-        self._log(LOG_LEVEL_VERBOSE, message, args, **kws)
-
-
-logging.addLevelName(LOG_LEVEL_VERBOSE, "VERBOSE")
-logging.Logger.verbose = verbose
-logger = logging.getLogger(__name__)
-logger_console_handler = logging.StreamHandler()
+logger.setup()
+log = logger.get()
 
 
 def show_profile(profile):
-    logger.info("\nModel: {}".format(profile["model"]))
-    logger.info("Profile Count: {}".format(len(profile["profile"])))
+    log.info("\nModel: {}".format(profile["model"]))
+    log.info("Profile Count: {}".format(len(profile["profile"])))
     for i, p in enumerate(profile["profile"]):
-        logger.info("\nProfile {} with {} runs:\n".format(i, len(p["result"])))
-        logger.info("\tconfig:")
+        log.info("\nProfile {} with {} runs:\n".format(i, len(p["result"])))
+        log.info("\tconfig:")
         for arg in p["config"].keys():
-            logger.info("\t\t{}: {}".format(arg, str(p["config"][arg])))
+            log.info("\t\t{}: {}".format(arg, str(p["config"][arg])))
         runs = sorted(list(p["result"].keys()), reverse=True)
         for r in runs:
-            logger.info("\n\t{}:".format(r))
+            log.info("\n\t{}:".format(r))
             performance = p["result"][r]
             if performance is not None:
-                logger.info("\t\t{}{}{}{}{}".format("name".ljust(20), "type".ljust(70), "average_time_ms".ljust(10),
-                                                    "total_time_ms".rjust(15), "count".rjust(7)))
+                log.info("\t\t{}{}{}{}{}".format("name".ljust(20), "type".ljust(70), "average_time_ms".ljust(10),
+                                                 "total_time_ms".rjust(15), "count".rjust(7)))
+                banner = "-" * 127
                 if "node" in performance.keys():
-                    logger.verbose("\t\t------------------------------------------------------------------------------\
--------------------------------------------------")
+                    log.verbose("\t\t" + banner)
                     ancestors = sorted(list(performance["node"].keys()))
                     for a in ancestors:
                         ancestor = performance["node"][a]
-                        logger.verbose("\n\t\t{}{}{}{}".format(
+                        log.verbose("\n\t\t{}{}{}{}".format(
                             a.ljust(90),
                             format(ancestor["time_ms"] / ancestor["count"], ".4f").rjust(10),
                             format(ancestor["time_ms"], ".4f").rjust(15),
                             str(ancestor["count"]).rjust(10)))
                         for n in ancestor["descendents"]:
-                            logger.verbose("\t\t     {}{}{}{}{}".format(
+                            log.verbose("\t\t     {}{}{}{}{}".format(
                                 n["name"].ljust(15),
                                 n["type"].ljust(70),
                                 format(n["time_ms"] / n["count"], ".4f").rjust(10),
                                 format(n["time_ms"], ".4f").rjust(15),
                                 str(n["count"]).rjust(10)))
                 if "model" in performance.keys():
-                    logger.info("\n\t\t-------------------------------------------------------------------------------\
-------------------------------------------------")
-                    logger.info("\t\tModel Total: {}{}{}".format(
+                    log.info("\n\t\t" + banner)
+                    log.info("\t\tModel Total: {}{}{}".format(
                         format(performance["model"]["time_ms"] / performance["model"]["count"], ".4f").rjust(87),
                         format(performance["model"]["time_ms"], ".4f").rjust(15),
                         str(performance["model"]["count"]).rjust(10)))
             else:
-                logger.warning("\t\tno performance result")
+                log.warning("\t\tno performance result")
 
 
 def options_to_profile(option):
@@ -183,10 +176,6 @@ def run(args, options):
     else:
         raise ValueError("--target not found")
 
-    verbose = False
-    if "--verbose" in options:
-        verbose = True
-
     if "--profile" not in options:
         options = ["--profile"] + options
 
@@ -203,15 +192,21 @@ def run(args, options):
         argv = ["--outdir", os.path.join(output_dir, target)] + argv
 
     log = None
+
     # TODO - drivetest.py does not support "orangepi0"
     with DriveTest(model=model,  # TODO - no labels, no expected
-                   wrap_options=argv, iterations=args.iteration,
+                   wrap_options=argv,
+                   iterations=args.iteration,
                    outdir=output_dir,
-                   compile=COMPILE_INCREMENTAL, test=True,
-                   ipaddress=args.ip, cluster=args.cluster, apikey=args.key, username=args.username,
+                   compile=COMPILE_INCREMENTAL,
+                   test=True,
+                   ipaddress=args.ip,
+                   cluster=args.cluster,
+                   apikey=args.key,
+                   username=args.username,
                    password=args.password,
-                   target=target, target_dir="/home/pi/" + target,
-                   verbose=verbose,
+                   target=target,
+                   target_dir="/home/pi/" + target,
                    ) as driver:
         driver.run_test()
         log = driver.profile_log
@@ -225,9 +220,9 @@ def run(args, options):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description="""ELL python script for generate and view profiler.
-Options for profiling may be read from option files or pass in as arguments.
-Full argument are required when passing profile options in as arguments.
+        description="""ELL python script to generate and view profiler.
+Options for profiling may be read from option files or passed in as arguments.
+Full arguments are required when passing profile options in as arguments.
 Use --profile_options to review available options.""")
 
     verbosity = parser.add_mutually_exclusive_group()
@@ -245,7 +240,7 @@ Use --profile_options to review available options.""")
     parser.add_argument("--generate", "-g", action="store_true", default=False,
                         help="Generated profile option file from arguments only. Do not compile and profile.")
 
-    parser.add_argument("--iteration", "-i", help="Number of iteration to run each model.", type=int, default=1)
+    parser.add_argument("--iteration", "-i", help="Number of iterations to run each model.", type=int, default=1)
 
     # profile options
     source = parser.add_mutually_exclusive_group()
@@ -266,14 +261,8 @@ Multiple files are allowed, each seperated by space.")
 
     args, argv = parser.parse_known_args()
 
-    logger.setLevel(args.verbosity)
-    logger_console_handler.setLevel(args.verbosity)
-    logger.addHandler(logger_console_handler)
-
     if args.log:
-        logger_file_handler = logging.FileHandler(args.log)
-        logger_file_handler.setLevel(args.verbosity)
-        logger.addHandler(logger_file_handler)
+        log.setLogfile(args.log)
 
     if args.profile_options:
         # just display wrap options
@@ -299,32 +288,31 @@ Multiple files are allowed, each seperated by space.")
                     with open(file=file, mode='r', newline="\n") as f:
                         profile = json.load(f)
                     if "model" not in profile.keys() or "profile" not in profile.keys():
-                        logger.warning("file {} does not contain model or profile options.".format(file))
+                        log.warning("file {} does not contain model or profile options.".format(file))
                     elif len(profile["profile"]) == 0:
-                        logger.warning("file {} profile options are not available.".format(file))
+                        log.warning("file {} profile options are not available.".format(file))
                     else:
                         if args.show:
-                            logger.info("=============================================================================\
-==========================================================")
-                            logger.info("{}".format(file))
-                            logger.info("=============================================================================\
-==========================================================")
+                            banner = "=" * 135
+                            log.info(banner)
+                            log.info("{}".format(file))
+                            log.info(banner)
                             show_profile(profile)
-                            logger.info("\n")
+                            log.info("\n")
                         elif args.merge:
                             all_profile.append(profile)
                         else:
-                            logger.verbose("Run profile with {}".format(file))
+                            log.verbose("Run profile with {}".format(file))
                             for i, p in enumerate(profile["profile"]):
                                 if "args" not in p.keys():
-                                    logger.warning("file {} profile {} argument is not available.".format(file, i))
+                                    log.warning("file {} profile {} argument is not available.".format(file, i))
                                 else:
                                     if "result" not in p.keys():
                                         p["result"] = {}
                                     entry = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                                     p["result"][entry] = run(args, p["args"])
                             with open(file=file, mode='w', newline="\n") as f:
-                                logger.info("Save profile to {}".format(file))
+                                log.info("Save profile to {}".format(file))
                                 json.dump(profile, f)
             if args.merge and len(all_profile) > 0:
                 # merge profile files
@@ -357,7 +345,7 @@ Multiple files are allowed, each seperated by space.")
                         # write out merged profile
                         file = os.path.splitext(merged_profile["model"])[0] + "_merged.json"
                         with open(file=file, mode='w', newline="\n") as f:
-                            logger.info("Save merged profile to {}".format(file))
+                            log.info("Save merged profile to {}".format(file))
                             json.dump(merged_profile, f)
         else:
             # read option from argument
@@ -371,5 +359,5 @@ Multiple files are allowed, each seperated by space.")
             if not os.path.exists(out_dir) or not os.path.isdir(out_dir):
                 os.mkdir(out_dir)
             with open(file=out_file, mode='w', newline="\n") as f:
-                logger.info("Save profile to {}".format(out_file))
+                log.info("Save profile to {}".format(out_file))
                 json.dump(output, f)

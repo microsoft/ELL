@@ -52,6 +52,7 @@ namespace model
             didRefineAny = false;
             auto currentSubmodel = std::move(newSubmodel);
             Model newModel;
+            newModel.GetMetadata() = currentSubmodel.GetModel().GetMetadata();
             newSubmodel = transformer.TransformSubmodelOnto(currentSubmodel, newModel, {}, context, refineFunction);
 
             // check for early end condition

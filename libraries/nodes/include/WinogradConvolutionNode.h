@@ -215,15 +215,8 @@ namespace nodes
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        void WriteToArchive(utilities::Archiver& archiver) const override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
-
-        void ReadFromArchive(utilities::Unarchiver& archiver) override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
         bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
 
     private:
@@ -240,7 +233,6 @@ namespace nodes
 
         model::PortMemoryLayout _inputMemoryLayout;
 
-        int n_numFilters = 0;
         int _stride = 1;
 
         // Winograd-specific parameters

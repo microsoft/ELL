@@ -14,6 +14,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iomanip>
 #include <istream>
 #include <ostream>
 #include <sstream>
@@ -60,6 +61,8 @@ namespace utilities
 
     private:
         // Serialization
+        void WriteScalarLiteral(const char* name, const std::string& value);
+
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void WriteScalar(const char* name, const ValueType& value);
 
@@ -191,7 +194,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out << "\"" << name << "\": ";
+            _out << std::quoted(name) << ": ";
         }
         _out << value;
         SetEndOfLine(endOfLine);
@@ -201,51 +204,20 @@ namespace utilities
     template <>
     inline void JsonArchiver::WriteScalar(const char* name, const bool& value)
     {
-        auto indent = GetCurrentIndent();
-        bool hasName = name != std::string("");
-        auto endOfLine = hasName ? ",\n" : "";
-
-        FinishPreviousLine();
-        _out << indent;
-        if (hasName)
-        {
-            _out << "\"" << name << "\": ";
-        }
-        _out << (value ? "true" : "false");
-        SetEndOfLine(endOfLine);
+        WriteScalarLiteral(name, value ? "true" : "false");
     }
 
     // This function is inline just so it appears next to the other Write* functions
     inline void JsonArchiver::WriteScalar(const char* name, const char* value)
     {
-        auto indent = GetCurrentIndent();
-        bool hasName = name != std::string("");
-        auto endOfLine = hasName ? ",\n" : "";
-
-        FinishPreviousLine();
-        _out << indent;
-        if (hasName)
-        {
-            _out << "\"" << name << "\": ";
-        }
-        _out << "\"" << JsonUtilities::EncodeString(value) << "\"";
-        SetEndOfLine(endOfLine);
+        auto stringValue = "\"" + JsonUtilities::EncodeString(value) + "\"";
+        WriteScalarLiteral(name, stringValue);
     }
 
     inline void JsonArchiver::WriteScalar(const char* name, const std::string& value)
     {
-        auto indent = GetCurrentIndent();
-        bool hasName = name != std::string("");
-        auto endOfLine = hasName ? ",\n" : "";
-
-        FinishPreviousLine();
-        _out << indent;
-        if (hasName)
-        {
-            _out << "\"" << name << "\": ";
-        }
-        _out << "\"" << JsonUtilities::EncodeString(value) << "\"";
-        SetEndOfLine(endOfLine);
+        auto stringValue = "\"" + JsonUtilities::EncodeString(value) + "\"";
+        WriteScalarLiteral(name, stringValue);
     }
 
     template <typename ValueType>
@@ -259,7 +231,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out << "\"" << name << "\": ";
+            _out << std::quoted(name) << ": ";
         }
 
         _out << "[";

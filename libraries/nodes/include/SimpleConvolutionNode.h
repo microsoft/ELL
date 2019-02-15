@@ -174,15 +174,8 @@ namespace nodes
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        void WriteToArchive(utilities::Archiver& archiver) const override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
-
-        void ReadFromArchive(utilities::Unarchiver& archiver) override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
         bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
 
     private:
@@ -195,7 +188,7 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
 
-        model::PortMemoryLayout _inputMemoryLayout;
+        model::PortMemoryLayout _inputMemoryLayout;// TODO: get rid of this by using a ReinterpretLayoutNode if necessary
 
         int _filterSize = 0;
         int _stride = 1;

@@ -134,6 +134,7 @@ namespace emitters
 
     IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, LLVMFunction pFunction, const std::string& name) :
         _pModuleEmitter(pModuleEmitter),
+        _options(pModuleEmitter->GetCompilerOptions()),
         _pFunction(pFunction),
         _name(name)
     {
@@ -1274,7 +1275,7 @@ namespace emitters
 
     IRTaskArray IRFunctionEmitter::StartTasks(LLVMFunction taskFunction, const std::vector<std::vector<LLVMValue>>& arguments)
     {
-        auto& compilerSettings = GetModule().GetCompilerOptions();
+        auto compilerSettings = GetCompilerOptions();
         if (compilerSettings.parallelize && compilerSettings.useThreadPool && !compilerSettings.targetDevice.IsWindows())
         {
             auto& threadPool = GetModule().GetThreadPool();
@@ -1670,7 +1671,7 @@ namespace emitters
 
     LLVMValue IRFunctionEmitter::GetCpu()
     {
-        if (GetModule().GetCompilerOptions().targetDevice.IsLinux())
+        if (GetCompilerOptions().targetDevice.IsLinux())
         {
             // Signature: int sched_getcpu(void);
             auto& context = GetLLVMContext();
@@ -1693,6 +1694,16 @@ namespace emitters
     {
         _pCurRegion = _regions.Add(pBlock);
         return _pCurRegion;
+    }
+
+    const CompilerOptions& IRFunctionEmitter::GetCompilerOptions() const
+    {
+        return _options;
+    }
+
+    void IRFunctionEmitter::SetCompilerOptions(const CompilerOptions& options)
+    {
+        _options = options;
     }
 
     llvm::LLVMContext& IRFunctionEmitter::GetLLVMContext()
@@ -1757,7 +1768,7 @@ namespace emitters
 
     bool IRFunctionEmitter::CanUseBlas() const
     {
-        return GetModule().GetCompilerOptions().useBlas;
+        return GetCompilerOptions().useBlas;
     }
 
     //

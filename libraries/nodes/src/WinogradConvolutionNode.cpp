@@ -432,9 +432,23 @@ namespace nodes
             auto A = function.LocalArray(AMem);
             auto B = function.LocalArray(BMem);
             auto C = function.LocalArray(CMem);
-            function.For(numEntries, [A, B, C](emitters::IRFunctionEmitter& function, auto i) {
-                C[i] = A[i] * B[i];
-            });
+
+            const bool parallelize = false;
+            if (parallelize)
+            {
+                function.ParallelFor(numEntries, { A, B, C }, [](emitters::IRFunctionEmitter& function, emitters::IRLocalScalar i, const std::vector<emitters::LLVMValue>& capturedValues) {
+                    auto A = function.LocalArray(capturedValues[0]);
+                    auto B = function.LocalArray(capturedValues[1]);
+                    auto C = function.LocalArray(capturedValues[2]);
+                    C[i] = A[i] * B[i];
+                });
+            }
+            else
+            {
+                function.For(numEntries, [A, B, C](emitters::IRFunctionEmitter& function, auto i) {
+                    C[i] = A[i] * B[i];
+                });
+            }
         }
 
         void ElementwiseMultiplyAccumulate(emitters::IRFunctionEmitter& function, emitters::LLVMValue filterMem, emitters::LLVMValue inputMem, int numEntries, int filterDepth, int channelDepth, emitters::LLVMValue outputMem)
@@ -1177,7 +1191,9 @@ namespace nodes
             newInput = &reorderNode->output;
             convInputLayout = reorderNode->GetOutputMemoryLayout();
         }
+
         auto convNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(*newInput, weights, convInputLayout, GetOutputMemoryLayout(), _stride, _tileSize, _filterSize, _order, static_cast<int>(numFilterChannels));
+        convNode->GetMetadata() = GetMetadata();
         transformer.MapNodeOutput(this->output, convNode->output);
         return true;
     }
@@ -1226,7 +1242,7 @@ namespace nodes
 
     template <typename ValueType>
     WinogradConvolutionComputeNode<ValueType>::WinogradConvolutionComputeNode() :
-        CompilableNode({ &_input }, { &_output }),
+        CompilableNode({ &_input, &_filterWeights }, { &_output }),
         _input(this, {}, defaultInputPortName),
         _filterWeights(this, {}, filterWeightsPortName),
         _output(this, defaultOutputPortName, 0)
@@ -1405,9 +1421,12 @@ namespace nodes
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "WinogradConvolutionComputeNode: filters must be depthwise-separable or full-channel");
         }
 
-        const int separableBlockDepth = 8;
-        const int nonseparableFilterBlockDepth = 2;
-        const int nonseparableChannelDepth = 4;
+        const int defaultSeparableBlockDepth = 8;
+        const int defaultNonseparableFilterBlockDepth = 2;
+        const int defaultNonseparableChannelDepth = 4;
+        auto separableBlockDepth = compiler.GetModelOptimizerOptions(*this).template GetEntry<int>("separableBlockDepth", defaultSeparableBlockDepth);
+        auto nonseparableFilterBlockDepth = compiler.GetModelOptimizerOptions(*this).template GetEntry<int>("nonseparableFilterBlockDepth", defaultNonseparableFilterBlockDepth);
+        auto nonseparableChannelDepth = compiler.GetModelOptimizerOptions(*this).template GetEntry<int>("nonseparableChannelDepth", defaultNonseparableChannelDepth);
 
         const int maxFilterChannelBlockDepth = isSeparable ? 1 : nonseparableChannelDepth;
         const int maxFilterBlockDepth = isSeparable ? separableBlockDepth : nonseparableFilterBlockDepth;
@@ -1415,6 +1434,7 @@ namespace nodes
         const int maxOutputBlockDepth = maxFilterBlockDepth;
 
         // Temporaries
+        // TODO: allocate a set of temporaries per thread and parallelize the big outer loop
         WinogradScratchStorage scratch;
         const auto valueType = emitters::GetVariableType<ValueType>();
         const auto inputBlockElements = windowSize * windowSize * maxInputBlockDepth;
@@ -1472,8 +1492,44 @@ namespace nodes
         });
     }
 
+    template <typename ValueType>
+    void WinogradConvolutionComputeNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        model::CompilableNode::WriteToArchive(archiver);
+        archiver[defaultInputPortName] << _input;
+        archiver["weights"] << _filterWeights;
+        archiver["inputLayout"] << _inputMemoryLayout;
+        archiver["outputLayout"] << GetOutputMemoryLayout();
+        archiver["tileSize"] << _tileSize;
+        archiver["filterSize"] << _filterSize;
+        archiver["stride"] << _stride;
+        archiver["order"] << to_string(_order);
+        archiver["filterChannels"] << _numFilterChannels;
+    }
+
+    template <typename ValueType>
+    void WinogradConvolutionComputeNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        model::CompilableNode::ReadFromArchive(archiver);
+        archiver[defaultInputPortName] >> _input;
+        archiver["weights"] >> _filterWeights;
+        archiver["inputLayout"] >> _inputMemoryLayout;
+        model::PortMemoryLayout outputMemoryLayout;
+        archiver["outputLayout"] >> outputMemoryLayout;
+        _output.SetMemoryLayout(outputMemoryLayout);
+        archiver["tileSize"] >> _tileSize;
+        archiver["filterSize"] >> _filterSize;
+        archiver["stride"] >> _stride;
+        std::string orderName;
+        archiver["order"] >> orderName;
+        _order = filter_order_from_string(orderName);
+        archiver["filterChannels"] >> _numFilterChannels;
+    }
+
     // Explicit specializations
     template class WinogradConvolutionNode<float>;
     template class WinogradConvolutionNode<double>;
+    template class WinogradConvolutionComputeNode<float>;
+    template class WinogradConvolutionComputeNode<double>;
 } // namespace nodes
 } // namespace ell
