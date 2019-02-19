@@ -60,21 +60,21 @@ namespace dsp
             double thresholdDown,
             double levelThreshold);
 
-        /// <summary> destructor </summary>
+        /// <summary> Destructor </summary>
         ~VoiceActivityDetector();
 
-        /// <summary> reset the activity detector so it can be used on a new stream </summary>
-        void reset();
+        /// <summary> Reset the activity detector so it can be used on a new stream </summary>
+        void Reset();
 
-        /// <summary> process incoming audio stream, this data should already be floating point in the range[0 - 1].
+        /// <summary> Process incoming audio stream, this data should already be floating point in the range[0 - 1].
         /// This method returns 1 when it detects activity in the stream and 0 otherwise. </summary>
         ///
         /// <param name="data"> The input signal. </param>
         template <typename ValueType>
-        int process(const std::vector<ValueType>& data);
+        int Process(const std::vector<ValueType>& data);
 
-        /// <summary> return true if the two detectors have the same sample rate and window size </summary>
-        bool equals(const VoiceActivityDetector& other) const;
+        /// <summary> Return true if the two detectors have the same sample rate and window size </summary>
+        bool Equals(const VoiceActivityDetector& other) const;
 
         /// <summary> Gets the name of this type. </summary>
         ///
@@ -87,37 +87,37 @@ namespace dsp
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> internal use only: used for testing </summary>
-        const std::vector<double>& getWeights() const;
+        const std::vector<double>& GetWeights() const;
 
         /// <summary> Get the sample rate provided to constructor </summary>
-        double getSampleRate() const;
+        double GetSampleRate() const;
 
         /// <summary> Get the window size provided to constructor </summary>
-        double getWindowSize() const;
+        double GetWindowSize() const;
 
         /// <summary> Get the frame duration provided to constructor </summary>
-        double getFrameDuration() const;
+        double GetFrameDuration() const;
 
         /// <summary> Get the tauUp parameter provided to constructor </summary>
-        double getTauUp() const;
+        double GetTauUp() const;
 
         /// <summary> Get the tauDown parameter provided to constructor </summary>
-        double getTauDown() const;
+        double GetTauDown() const;
 
         /// <summary> Get the largeInput parameter provided to constructor </summary>
-        double getLargeInput() const;
+        double GetLargeInput() const;
 
         /// <summary> Get the gainAtt parameter provided to constructor </summary>
-        double getGainAtt() const;
+        double GetGainAtt() const;
 
         /// <summary> Get the thresholdUp parameter provided to constructor </summary>
-        double getThresholdUp() const;
+        double GetThresholdUp() const;
 
         /// <summary> Get the thresholdDown parameter provided to constructor </summary>
-        double getThresholdDown() const;
+        double GetThresholdDown() const;
 
         /// <summary> Get the levelThreshold parameter provided to constructor </summary>
-        double getLevelThreshold() const;
+        double GetLevelThreshold() const;
 
     protected:
         void WriteToArchive(utilities::Archiver& archiver) const override;

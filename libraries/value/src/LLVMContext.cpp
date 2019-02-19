@@ -1043,7 +1043,7 @@ namespace value
                     using Type = std::remove_pointer_t<std::decay_t<decltype(source1Data)>>;
                     using CastType = std::conditional_t<std::is_same_v<Type, Boolean>, bool, Type>;
 
-                    auto& fn = this->GetFnEmitter();
+                    auto& fn = GetFnEmitter();
                     auto result = fn.TrueBit();
                     auto llvmOp2 = std::get<Emittable>(source2Data).GetDataAs<LLVMValue>();
 
@@ -1080,11 +1080,19 @@ namespace value
         auto data = ToLLVMValue(value);
         auto& fn = GetFnEmitter();
 
-        auto casted = fn.CastPointer(data, ValueTypeToVariableType(type));
+        auto castedData = Allocate(type, value.IsConstrained() ? value.GetLayout() : ScalarLayout);
+        auto castedValue = ToLLVMValue(castedData);
+        for (size_t index = 0u; index < castedData.GetLayout().GetMemorySize(); ++index)
+        {
+            fn.SetValueAt(
+                castedValue,
+                static_cast<int>(index),
+                fn.CastValue(
+                    fn.ValueAt(data, static_cast<int>(index)),
+                    ValueTypeToLLVMType(fn.GetEmitter(), { type, 0 })));
+        }
 
-        return { casted,
-                 value.IsConstrained() ? std::optional<MemoryLayout>(value.GetLayout())
-                                       : std::optional<MemoryLayout>(std::nullopt) };
+        return castedData;
     }
 
     class LLVMContext::IfContextImpl : public EmitterContext::IfContextImpl
@@ -1362,16 +1370,6 @@ namespace value
 
                     std::string globalName = GetCurrentFunctionScopedName("_"s + std::to_string(_promotedConstantStack.top().size()));
 
-                     /*   llvm::Constant* constant = nullptr;
-                    if constexpr (std::is_same_v<DataType, Boolean>)
-                    {
-                        constant = fn.GetEmitter().Literal(std::vector<uint8_t>(data.begin(), data.end()));
-                    }
-                    else
-                    {
-                        constant = fn.GetEmitter().Literal(data);
-                    }*/
-
                     llvm::GlobalVariable* globalVariable = nullptr;
                     if constexpr (std::is_same_v<DataType, Boolean>)
                     {
@@ -1388,10 +1386,6 @@ namespace value
 
                     LLVMValue newValue = fn.Variable(varType, data.size());
                     fn.MemoryCopy<DataType>(globalVariable, newValue, static_cast<int>(data.size()));
-                    /*for (auto dataIndex = 0; static_cast<size_t>(dataIndex) < data.size(); ++dataIndex)
-                    {
-                        fn.SetValueAt(newValue, dataIndex, fn.ValueAt(constant, dataIndex));
-                    }*/
 
                     return newValue;
                 }

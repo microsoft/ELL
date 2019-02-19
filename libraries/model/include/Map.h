@@ -445,6 +445,11 @@ namespace model
         virtual std::vector<double> ComputeDoubleOutput(const PortElementsBase& outputs) const;
 
     private:
+        std::vector<const Node*> GetAllOutputNodes() const;
+        std::vector<const Node*> GetDebugSinkNodes() const;
+        std::vector<const Node*> GetMatchingNodesByType(const std::string name) const;
+        void FixTransformedIO(ModelTransformer& transformer);
+
         Model _model;
 
         std::vector<InputNodeBase*> _inputNodes;
@@ -456,10 +461,7 @@ namespace model
         std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
         utilities::PropertyBag _metadata;
 
-        std::vector<const Node*> GetAllOutputNodes() const;
-        std::vector<const Node*> GetDebugSinkNodes() const;
-        std::vector<const Node*> GetMatchingNodesByType(const std::string name) const;
-        void FixTransformedIO(ModelTransformer& transformer);
+        value::ComputeContext _computeContext{"map_compute"};
     };
 
     /// <summary> A serialization context used during Map deserialization. Wraps an existing `ModelSerializationContext` </summary>
@@ -610,7 +612,7 @@ namespace model
     template <typename OutputDataVectorType, typename ElementsValueType, data::IsDataVector<OutputDataVectorType>>
     OutputDataVectorType Map::ComputeOutput(const PortElementsBase& elements) const
     {
-        value::ContextGuard<value::ComputeContext> guard("map_compute");
+        value::ContextGuard<> guard(_computeContext);
 
         auto resultVector = ComputeOutput<ElementsValueType>(elements);
         auto resultVectorIterator = data::MakeVectorIndexValueIterator<data::IterationPolicy::skipZeros>(resultVector);
@@ -620,7 +622,7 @@ namespace model
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
     DataVectorType Map::ComputeOutput(const PortElementsBase& elements) const
     {
-        value::ContextGuard<value::ComputeContext> guard("map_compute");
+        value::ContextGuard<> guard(_computeContext);
 
         switch (elements.GetPortType())
         {
@@ -654,7 +656,7 @@ namespace model
     template <typename ValueType, utilities::IsFundamental<ValueType>>
     std::vector<ValueType> Map::ComputeOutput(int index) const
     {
-        value::ContextGuard<value::ComputeContext> guard("map_compute");
+        value::ContextGuard<> guard(_computeContext);
 
         return ComputeOutput<ValueType>(GetOutput(index));
     }
@@ -662,7 +664,7 @@ namespace model
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
     DataVectorType Map::ComputeOutput(int index) const
     {
-        value::ContextGuard<value::ComputeContext> guard("map_compute");
+        value::ContextGuard<> guard(_computeContext);
 
         return ComputeOutput<DataVectorType>(GetOutput(index));
     }
@@ -671,7 +673,7 @@ namespace model
     template <typename ValueType, utilities::IsFundamental<ValueType>>
     std::vector<ValueType> Map::ComputeOutput(const std::string& outputName) const
     {
-        value::ContextGuard<value::ComputeContext> guard("map_compute");
+        value::ContextGuard<> guard(_computeContext);
 
         return ComputeOutput<ValueType>(GetOutput(outputName));
     }
@@ -679,7 +681,7 @@ namespace model
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
     DataVectorType Map::ComputeOutput(const std::string& outputName) const
     {
-        value::ContextGuard<value::ComputeContext> guard("map_compute");
+        value::ContextGuard<> guard(_computeContext);
 
         return ComputeOutput<DataVectorType>(GetOutput(outputName));
     }

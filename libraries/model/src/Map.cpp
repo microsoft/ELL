@@ -159,30 +159,40 @@ namespace model
     template <>
     std::vector<bool> Map::ComputeOutput<bool>(const PortElementsBase& elements) const
     {
+        value::ContextGuard<> guard(_computeContext);
+
         return ComputeBoolOutput(elements);
     }
 
     template <>
     std::vector<int> Map::ComputeOutput<int>(const PortElementsBase& elements) const
     {
+        value::ContextGuard<> guard(_computeContext);
+
         return ComputeIntOutput(elements);
     }
 
     template <>
     std::vector<int64_t> Map::ComputeOutput<int64_t>(const PortElementsBase& elements) const
     {
+        value::ContextGuard<> guard(_computeContext);
+
         return ComputeInt64Output(elements);
     }
 
     template <>
     std::vector<float> Map::ComputeOutput<float>(const PortElementsBase& elements) const
     {
+        value::ContextGuard<> guard(_computeContext);
+
         return ComputeFloatOutput(elements);
     }
 
     template <>
     std::vector<double> Map::ComputeOutput<double>(const PortElementsBase& elements) const
     {
+        value::ContextGuard<> guard(_computeContext);
+
         return ComputeDoubleOutput(elements);
     }
 
@@ -225,6 +235,7 @@ namespace model
         swap(a._outputElements, b._outputElements);
         swap(a._outputNames, b._outputNames);
         swap(a._outputElementsMap, b._outputElementsMap);
+        swap(a._computeContext, b._computeContext);
     }
 
     std::vector<const Node*> Map::GetAllOutputNodes() const

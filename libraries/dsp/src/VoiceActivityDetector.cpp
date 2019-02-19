@@ -47,10 +47,10 @@ namespace dsp
             _thresholdDown(thresholdDown),
             _levelThreshold(levelThreshold)
         {
-            reset();
+            Reset();
         }
 
-        void reset()
+        void Reset()
         {
             _lastLevel = 0.1;
             _lastTime = 0;
@@ -58,47 +58,47 @@ namespace dsp
         }
 
         /// <summary> compute the next signal state given input time and power levels </summary>
-        int classify(double time, double level)
+        int Classify(double time, double level)
         {
-            double timeDelta = time - this->_lastTime;
-            double levelDelta = level - this->_lastLevel;
+            double timeDelta = time - _lastTime;
+            double levelDelta = level - _lastLevel;
 
-            if (level < this->_lastLevel)
+            if (level < _lastLevel)
             {
-                this->_lastLevel = this->_lastLevel + timeDelta / this->_tauDown * levelDelta;
-                if (this->_lastLevel < level)
+                _lastLevel = _lastLevel + timeDelta / _tauDown * levelDelta;
+                if (_lastLevel < level)
                 {
-                    this->_lastLevel = level;
+                    _lastLevel = level;
                 }
             }
-            else if (level > this->_largeInput * this->_lastLevel)
+            else if (level > _largeInput * _lastLevel)
             {
-                this->_lastLevel = this->_lastLevel + this->_gainAtt * timeDelta / this->_tauUp * levelDelta;
-                if (this->_lastLevel > level)
+                _lastLevel = _lastLevel + _gainAtt * timeDelta / _tauUp * levelDelta;
+                if (_lastLevel > level)
                 {
-                    this->_lastLevel = level;
+                    _lastLevel = level;
                 }
             }
             else
             {
-                this->_lastLevel = this->_lastLevel + timeDelta / this->_tauUp * levelDelta;
-                if (this->_lastLevel > level)
+                _lastLevel = _lastLevel + timeDelta / _tauUp * levelDelta;
+                if (_lastLevel > level)
                 {
-                    this->_lastLevel = level;
+                    _lastLevel = level;
                 }
             }
 
-            if ((level > this->_thresholdUp * this->_lastLevel) && (level > this->_levelThreshold))
+            if ((level > _thresholdUp * _lastLevel) && (level > _levelThreshold))
             {
-                this->_signal = 1;
+                _signal = 1;
             }
-            if (level < this->_thresholdDown * this->_lastLevel)
+            if (level < _thresholdDown * _lastLevel)
             {
-                this->_signal = 0;
+                _signal = 0;
             }
 
-            this->_lastTime = time;
-            return this->_signal;
+            _lastTime = time;
+            return _signal;
         };
     };
 
@@ -111,17 +111,26 @@ namespace dsp
     public:
         CMessageWeights(double sampleRate, double windowSize)
         {
-            this->generate(sampleRate, windowSize);
+            Generate(sampleRate, windowSize);
         }
 
-        double genWeight(double freq)
+        double GenWeight(double freq)
         {
-            static int freqMap[41] = {
-                60, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000
+            // clang-format off
+            static int freqMap[] = {
+                60, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100,
+                1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100,
+                2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100,
+                3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000
             };
-            static double msgWeights[41] = {
-                -54.65, -41.71, -25.17, -16.64, -11.29, -7.55, -4.75, -2.66, -1.19, -0.32, 0.03, 0.03, -0.17, -0.44, -0.71, -0.94, -1.12, -1.24, -1.32, -1.36, -1.38, -1.39, -1.41, -1.44, -1.50, -1.60, -1.76, -1.97, -2.26, -2.62, -3.09, -3.66, -4.35, -5.18, -6.18, -7.36, -8.75, -10.36, -12.12, -13.72, -14.43
+            static double msgWeights[] = {
+                -54.65, -41.71, -25.17, -16.64, -11.29, -7.55, -4.75, -2.66,
+                -1.19, -0.32, 0.03, 0.03, -0.17, -0.44, -0.71, -0.94, -1.12,
+                -1.24, -1.32, -1.36, -1.38, -1.39, -1.41, -1.44, -1.50, -1.60,
+                -1.76, -1.97, -2.26, -2.62, -3.09, -3.66, -4.35, -5.18, -6.18,
+                -7.36, -8.75, -10.36, -12.12, -13.72, -14.43
             };
+            // clang-format on
 
             size_t tableSize = sizeof(freqMap) / sizeof(int);
             size_t f = 0;
@@ -140,37 +149,37 @@ namespace dsp
             }
             else if (f > 0)
             {
-                cmessw = interpolate(freq, freqMap[f - 1], freqMap[f], msgWeights[f - 1], msgWeights[f]);
+                cmessw = Interpolate(freq, freqMap[f - 1], freqMap[f], msgWeights[f - 1], msgWeights[f]);
             }
             return cmessw;
         }
 
         /// <summary> generates a lookup table of size windowSize </summary>
-        void generate(double sampleRate, double windowSize)
+        void Generate(double sampleRate, double windowSize)
         {
-            this->_weights.resize(static_cast<int>(windowSize));
-            double div = sampleRate / this->_maxFreq;
+            _weights.resize(static_cast<int>(windowSize));
+            double div = sampleRate / _maxFreq;
             double freq_step = sampleRate / windowSize / div;
             for (int i = 0; i < windowSize; i++)
             {
-                double w = this->genWeight(i * freq_step);
+                double w = GenWeight(i * freq_step);
                 if (w != 0)
                 {
                     w = pow(10, w / 20);
-                    this->_weights[i] = w * w;
+                    _weights[i] = w * w;
                 }
             }
         }
 
         /// <summary> lookup the weight for given bin number out of windowSize bins </summary>
-        double getWeight(int bin)
+        double GetWeight(int bin)
         {
-            assert(bin < static_cast<int>(this->_weights.size()));
-            return this->_weights[bin];
+            assert(bin < static_cast<int>(_weights.size()));
+            return _weights[bin];
         }
 
         /// <summary> for x in the range [x1, x2], interpolate the corresponding value of y in the range [y1, y2]  </summary>
-        double interpolate(double x, double x1, double x2, double y1, double y2)
+        double Interpolate(double x, double x1, double x2, double y1, double y2)
         {
             const double epsilon = 1e-6;
             double diff = std::abs(x2 - x1);
@@ -182,7 +191,7 @@ namespace dsp
             return y1 + (y2 - y1) * proportion;
         }
 
-        const std::vector<double>& getWeights() const
+        const std::vector<double>& GetWeights() const
         {
             return _weights;
         }
@@ -211,17 +220,14 @@ namespace dsp
             _cmw(sampleRate, windowSize),
             _tracker(tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold)
         {
-            this->_sampleRate = sampleRate;
-            this->_windowSize = windowSize;
-            this->_frameDuration = frameDuration;
-            this->_time = 0;
+            _sampleRate = sampleRate;
+            _windowSize = windowSize;
+            _frameDuration = frameDuration;
+            _time = 0;
         }
     };
 
-    VoiceActivityDetector::VoiceActivityDetector()
-    {
-        // cannot use =default because VoiceActivityDetectorImpl is not defined to external callers.
-    }
+    VoiceActivityDetector::VoiceActivityDetector() = default;
 
     VoiceActivityDetector::VoiceActivityDetector(
         double sampleRate,
@@ -236,73 +242,68 @@ namespace dsp
         double levelThreshold) :
         _impl(std::make_unique<VoiceActivityDetectorImpl>(sampleRate, windowSize, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold))
     {
-        reset();
+        Reset();
     }
 
-    VoiceActivityDetector::~VoiceActivityDetector()
+    VoiceActivityDetector::~VoiceActivityDetector() = default;
+
+    void VoiceActivityDetector::Reset()
     {
-        // This is needed here because we are deleting a private VoiceActivityDetectorImpl object which
-        // external callers don't know about.
-        // The default destructor generates compile error: "can't delete an incomplete type".
+        _impl->_tracker.Reset();
     }
 
-    void VoiceActivityDetector::reset()
-    {
-        _impl->_tracker.reset();
-    }
-
-    double VoiceActivityDetector::getSampleRate() const
+    double VoiceActivityDetector::GetSampleRate() const
     {
         return _impl->_sampleRate;
     }
 
-    double VoiceActivityDetector::getWindowSize() const
+    double VoiceActivityDetector::GetWindowSize() const
     {
         return _impl->_windowSize;
     }
 
-    double VoiceActivityDetector::getFrameDuration() const
+    double VoiceActivityDetector::GetFrameDuration() const
     {
         return _impl->_frameDuration;
     }
 
-    double VoiceActivityDetector::getTauUp() const
+    double VoiceActivityDetector::GetTauUp() const
     {
         return _impl->_tracker._tauUp;
     }
 
-    double VoiceActivityDetector::getTauDown() const
+    double VoiceActivityDetector::GetTauDown() const
     {
         return _impl->_tracker._tauDown;
     }
 
-    double VoiceActivityDetector::getLargeInput() const
+    double VoiceActivityDetector::GetLargeInput() const
     {
         return _impl->_tracker._largeInput;
     }
 
-    double VoiceActivityDetector::getGainAtt() const
+    double VoiceActivityDetector::GetGainAtt() const
     {
         return _impl->_tracker._gainAtt;
     }
 
-    double VoiceActivityDetector::getThresholdUp() const
+    double VoiceActivityDetector::GetThresholdUp() const
     {
         return _impl->_tracker._thresholdUp;
     }
 
-    double VoiceActivityDetector::getThresholdDown() const
+    double VoiceActivityDetector::GetThresholdDown() const
     {
         return _impl->_tracker._thresholdDown;
     }
 
-    double VoiceActivityDetector::getLevelThreshold() const
+    double VoiceActivityDetector::GetLevelThreshold() const
     {
         return _impl->_tracker._levelThreshold;
     }
 
     template <typename ValueType>
-    int VoiceActivityDetector::process(const std::vector<ValueType>& data)
+    int VoiceActivityDetector::Process(const std::vector<ValueType>& data)
     {
         if (data.size() != static_cast<size_t>(_impl->_windowSize))
         {
@@ -311,20 +312,20 @@ namespace dsp
         double level = 0;
         for (int i = 0; i < _impl->_windowSize; i++)
         {
-            level += data[i] * _impl->_cmw.getWeight(i);
+            level += data[i] * _impl->_cmw.GetWeight(i);
         }
         level = level / _impl->_windowSize;
         double t = _impl->_time++ * _impl->_frameDuration;
-        int signal = _impl->_tracker.classify(t, level);
+        int signal = _impl->_tracker.Classify(t, level);
         return signal;
     }
 
-    const std::vector<double>& VoiceActivityDetector::getWeights() const
+    const std::vector<double>& VoiceActivityDetector::GetWeights() const
     {
-        return _impl->_cmw.getWeights();
+        return _impl->_cmw.GetWeights();
     }
 
-    bool VoiceActivityDetector::equals(const VoiceActivityDetector& other) const
+    bool VoiceActivityDetector::Equals(const VoiceActivityDetector& other) const
     {
         if (_impl.get() == nullptr)
         {
@@ -388,7 +389,7 @@ namespace dsp
     //
     // Explicit instantiations
     //
-    template int VoiceActivityDetector::process<float>(const std::vector<float>&);
-    template int VoiceActivityDetector::process<double>(const std::vector<double>&);
+    template int VoiceActivityDetector::Process<float>(const std::vector<float>&);
+    template int VoiceActivityDetector::Process<double>(const std::vector<double>&);
 } // namespace dsp
 } // namespace ell

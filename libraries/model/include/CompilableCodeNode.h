@@ -33,10 +33,14 @@ namespace model
 
         virtual void Define(value::FunctionDeclaration& fn) = 0;
 
+        virtual void DefineReset(value::FunctionDeclaration& fn) {}
+
     private:
         std::string GetRuntimeTypeName() const final;
 
         std::string GetCompiledFunctionName() const final;
+
+        void Reset() final;
 
         bool HasOwnFunction() const final;
 
@@ -48,6 +52,7 @@ namespace model
 
         std::string _name;
         mutable value::FunctionDeclaration _fn;
+        mutable value::FunctionDeclaration _resetFn;
     };
 } // namespace model
 } // namespace ell

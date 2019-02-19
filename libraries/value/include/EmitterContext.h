@@ -149,7 +149,7 @@ namespace value
             }
 
             auto optionalLayout = utilities::MemoryLayout({ static_cast<int>(data.size()) });
-            return GlobalAllocateImpl(GlobalAllocationScope::Function, name, data, layout.value_or(optionalLayout));
+            return GlobalAllocateImpl(GlobalAllocationScope::Global, name, data, layout.value_or(optionalLayout));
         }
 
         /// <summary> Allocates scalar global data </summary>
@@ -283,7 +283,7 @@ namespace value
 
     /// <summary> Sets the global instance of EmitterContext </summary>
     /// <param name="context"> The context to set as the global instance </param>
-    void SetContext(EmitterContext& context);
+    void SetContext(const EmitterContext& context);
 
     /// <summary> Clears the global instance of EmitterContext </summary>
     void ClearContext() noexcept;
@@ -304,7 +304,7 @@ namespace value
     {
         /// <summary> Constructor </summary>
         /// <param name="context"> The instance of EmitterContext to set as the global context </param>
-        ContextGuard(EmitterContext& context);
+        ContextGuard(const EmitterContext& context);
 
         /// <summary> Destructor for the instance. Sets the global context to nullptr </summary>
         ~ContextGuard();
@@ -313,6 +313,9 @@ namespace value
         ContextGuard(ContextGuard&&) = delete;
         ContextGuard& operator=(const ContextGuard&) = delete;
         ContextGuard& operator=(ContextGuard&&) = delete;
+
+    private:
+        EmitterContext* _oldContext;
     };
 
     template <typename T, bool b>

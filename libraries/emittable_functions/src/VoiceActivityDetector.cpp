@@ -28,13 +28,13 @@ namespace emittable_functions
         Scalar _signal;
 
     public:
-        double _tauUp;
-        double _tauDown;
-        double _largeInput;
-        double _gainAtt;
-        double _thresholdUp;
-        double _thresholdDown;
-        double _levelThreshold;
+        const double _tauUp;
+        const double _tauDown;
+        const double _largeInput;
+        const double _gainAtt;
+        const double _thresholdUp;
+        const double _thresholdDown;
+        const double _levelThreshold;
 
         ActivityTracker(double tauUp,
                         double tauDown,
@@ -52,18 +52,6 @@ namespace emittable_functions
             _levelThreshold(levelThreshold)
         {}
 
-        void BeginCompile()
-        {
-            _lastLevel.GetValue().Reset();
-            _lastTime.GetValue().Reset();
-            _signal.GetValue().Reset();
-
-            _lastLevel = GlobalAllocate("lastLevel", GetValueType<double>(), ScalarLayout);
-            _lastTime = GlobalAllocate("lastTime", GetValueType<double>(), ScalarLayout);
-            _signal = GlobalAllocate("signal", GetValueType<int>(), ScalarLayout);
-            Reset();
-        }
-
         void Reset()
         {
             _lastLevel = 0.1;
@@ -74,33 +62,56 @@ namespace emittable_functions
         /// <summary> compute the next signal state given input time and power levels </summary>
         Scalar Classify(Scalar time, Scalar inputLevel)
         {
-            Scalar level = Cast<double>(inputLevel);
-            Scalar timeDelta = time - this->_lastTime;
-            Scalar levelDelta = level - this->_lastLevel;
+            _lastLevel = StaticAllocate("lastLevel", 0.1);
+            _lastTime = StaticAllocate("lastTime", 0.0);
+            _signal = StaticAllocate("signal", 0);
 
-            If(level < this->_lastLevel,
-               [&]() {
-                   this->_lastLevel = this->_lastLevel + timeDelta / this->_tauDown * levelDelta;
-                   If(this->_lastLevel < level, [&]() { this->_lastLevel = level; });
+            Scalar level = Cast<double>(inputLevel);
+            Scalar timeDelta = time - _lastTime;
+            Scalar levelDelta = level - _lastLevel;
+
+            If(level < _lastLevel,
+               [&] {
+                   _lastLevel = _lastLevel + timeDelta / _tauDown * levelDelta;
+
+                   If(_lastLevel < level,
+                      [&] {
+                          _lastLevel = level;
+                      });
                })
-                .ElseIf(level > this->_largeInput * this->_lastLevel,
-                        [&]() {
-                            this->_lastLevel =
-                                this->_lastLevel + this->_gainAtt * timeDelta / this->_tauUp * levelDelta;
-                            If(this->_lastLevel > level, [&]() { this->_lastLevel = level; });
+                .ElseIf(level > _largeInput * _lastLevel,
+                        [&] {
+                            _lastLevel = _lastLevel + _gainAtt * timeDelta / _tauUp * levelDelta;
+
+                            If(_lastLevel > level,
+                               [&] {
+                                   _lastLevel = level;
+                               });
                         })
-                .Else([&]() {
-                    this->_lastLevel = this->_lastLevel + timeDelta / this->_tauUp * levelDelta;
-                    If(this->_lastLevel > level, [&]() { this->_lastLevel = level; });
+                .Else([&] {
+                    _lastLevel = _lastLevel + timeDelta / _tauUp * levelDelta;
+
+                    If(_lastLevel > level,
+                       [&] {
+                           _lastLevel = level;
+                       });
                 });
 
             // bugblug: need && operator
-            If(level > (this->_thresholdUp * this->_lastLevel),
-               [&]() { If(level > this->_levelThreshold, [&]() { this->_signal = 1; }); });
-            If(level < this->_thresholdDown * this->_lastLevel, [&]() { this->_signal = 0; });
+            If(level > (_thresholdUp * _lastLevel),
+               [&] {
+                   If(level > _levelThreshold, [&] {
+                       _signal = 1;
+                   });
+               });
 
-            this->_lastTime = time;
-            return this->_signal;
+            If(level < (_thresholdDown * _lastLevel),
+               [&] {
+                   _signal = 0;
+               });
+
+            _lastTime = time;
+            return _signal;
         };
     };
 
@@ -111,19 +122,21 @@ namespace emittable_functions
         std::vector<double> _weights;
 
     public:
-        CMessageWeights(double sampleRate, double windowSize) { this->Generate(sampleRate, windowSize); }
+        CMessageWeights(double sampleRate, double windowSize) { Generate(sampleRate, windowSize); }
 
         double GenWeight(double freq)
         {
-            static int freqMap[41] = { 60,   100,  200,  300,  400,  500,  600,  700,  800,  900,  1000,
-                                       1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100,
-                                       2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200,
-                                       3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000 };
-            static double msgWeights[41] = { -54.65, -41.71, -25.17, -16.64, -11.29, -7.55, -4.75, -2.66, -1.19,
-                                             -0.32,  0.03,   0.03,   -0.17,  -0.44,  -0.71, -0.94, -1.12, -1.24,
-                                             -1.32,  -1.36,  -1.38,  -1.39,  -1.41,  -1.44, -1.50, -1.60, -1.76,
-                                             -1.97,  -2.26,  -2.62,  -3.09,  -3.66,  -4.35, -5.18, -6.18, -7.36,
-                                             -8.75,  -10.36, -12.12, -13.72, -14.43 };
+            // clang-format off
+            static int freqMap[] = { 60,   100,  200,  300,  400,  500,  600,  700,  800,  900,  1000,
+                                     1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100,
+                                     2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200,
+                                     3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000 };
+            static double msgWeights[] = { -54.65, -41.71, -25.17, -16.64, -11.29, -7.55, -4.75, -2.66, -1.19,
+                                           -0.32,  0.03,   0.03,   -0.17,  -0.44,  -0.71, -0.94, -1.12, -1.24,
+                                           -1.32,  -1.36,  -1.38,  -1.39,  -1.41,  -1.44, -1.50, -1.60, -1.76,
+                                           -1.97,  -2.26,  -2.62,  -3.09,  -3.66,  -4.35, -5.18, -6.18, -7.36,
+                                           -8.75,  -10.36, -12.12, -13.72, -14.43 };
+            // clang-format on
 
             size_t tableSize = sizeof(freqMap) / sizeof(int);
             size_t f = 0;
@@ -150,16 +163,16 @@ namespace emittable_functions
         /// <summary> generates a lookup table of size windowSize </summary>
         void Generate(double sampleRate, double windowSize)
         {
-            this->_weights.resize(static_cast<int>(windowSize));
-            double div = sampleRate / this->_maxFreq;
+            _weights.resize(static_cast<int>(windowSize));
+            double div = sampleRate / _maxFreq;
             double freq_step = sampleRate / windowSize / div;
             for (int i = 0; i < windowSize; i++)
             {
-                double w = this->GenWeight(i * freq_step);
+                double w = GenWeight(i * freq_step);
                 if (w != 0)
                 {
                     w = pow(10, w / 20);
-                    this->_weights[i] = w * w;
+                    _weights[i] = w * w;
                 }
             }
         }
@@ -167,8 +180,8 @@ namespace emittable_functions
         /// <summary> lookup the weight for given bin number out of windowSize bins </summary>
         double GetWeight(int bin)
         {
-            assert(bin < static_cast<int>(this->_weights.size()));
-            return this->_weights[bin];
+            assert(bin < static_cast<int>(_weights.size()));
+            return _weights[bin];
         }
 
         /// <summary> for x in the range [x1, x2], interpolate the corresponding value of y in the range [y1, y2]  </summary>
@@ -191,9 +204,9 @@ namespace emittable_functions
     {
         CMessageWeights _cmw;
         ActivityTracker _tracker;
-        double _frameDuration;
-        double _sampleRate;
-        double _windowSize;
+        const double _frameDuration;
+        const double _sampleRate;
+        const double _windowSize;
         Scalar _time;
 
         VoiceActivityDetectorImpl(double sampleRate,
@@ -207,18 +220,14 @@ namespace emittable_functions
                                   double thresholdDown,
                                   double levelThreshold) :
             _cmw(sampleRate, windowSize),
-            _tracker(tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold)
-        {
-            this->_sampleRate = sampleRate;
-            this->_windowSize = windowSize;
-            this->_frameDuration = frameDuration;
-        }
+            _tracker(tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold),
+            _frameDuration(frameDuration),
+            _sampleRate(sampleRate),
+            _windowSize(windowSize)
+        {}
     };
 
-    VoiceActivityDetector::VoiceActivityDetector()
-    {
-        // cannot use =default because VoiceActivityDetectorImpl is not defined to external callers.
-    }
+    VoiceActivityDetector::VoiceActivityDetector() = default;
 
     VoiceActivityDetector::VoiceActivityDetector(double sampleRate,
                                                  double windowSize,
@@ -242,22 +251,13 @@ namespace emittable_functions
                                                           levelThreshold))
     {}
 
-    VoiceActivityDetector::~VoiceActivityDetector()
-    {
-        // This is needed here because we are deleting a private VoiceActivityDetectorImpl object which
-        // external callers don't know about.
-        // The default destructor generates compile error: "can't delete an incomplete type".
-    }
+    VoiceActivityDetector::~VoiceActivityDetector() = default;
 
-    void VoiceActivityDetector::BeginCompile()
+    void VoiceActivityDetector::Reset()
     {
-        _impl->_time.GetValue().Reset();
-        _impl->_time = GlobalAllocate("time", GetValueType<int64_t>(), ScalarLayout);
-        _impl->_time = Cast<int64_t>(0);
-        _impl->_tracker.BeginCompile();
+        _impl->_time = int64_t{ 0 };
+        _impl->_tracker.Reset();
     }
-
-    void VoiceActivityDetector::Reset() { _impl->_tracker.Reset(); }
 
     double VoiceActivityDetector::GetSampleRate() const { return _impl->_sampleRate; }
 
@@ -287,6 +287,8 @@ namespace emittable_functions
                                             "data length should match windowSize");
         }
 
+        _impl->_time = StaticAllocate("time", int64_t{ 0 });
+
         Vector weights = GetWeights();
         Scalar windowSize = _impl->_windowSize;
         Scalar frameDuration = _impl->_frameDuration;
@@ -296,7 +298,8 @@ namespace emittable_functions
 
         level /= Cast(windowSize, dataType);
 
-        Scalar t = Cast(_impl->_time, frameDuration.GetType()) * frameDuration;
+        Scalar castedTime = Cast(_impl->_time, frameDuration.GetType());
+        Scalar t = castedTime * frameDuration;
         ++_impl->_time;
 
         Scalar signal = _impl->_tracker.Classify(t, level);

@@ -1407,7 +1407,7 @@ static int lagNotificationCallbackCount = 0;
 extern "C" {
 void Test_ClockNode_LagNotificationCallback(void* context, double lag)
 {
-    testing::EnableLoggingHelper();
+    testing::EnableLoggingHelper helper;
     Log() << "ClockNode Lag Notification Callback " << lag << EOL;
     lagNotificationCallbackCount++;
 }
@@ -3275,7 +3275,7 @@ void TestBroadcasBinaryOperationNodeCompileAdd()
 
     // clang-format off
     std::vector<double> input1Vals{ 1, 2, 1, 2,    1, 2, 1, 2,    1, 2, 1, 2,        3, 4, 3, 4,    3, 4, 3, 4,    3, 4, 3, 4 };
-    std::vector<double> input2Vals{ 2, 4, 6 }; 
+    std::vector<double> input2Vals{ 2, 4, 6 };
     // broadcasts to:             { 2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6,        2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6 }
     std::vector<double>   expected{ 3, 4, 3, 4,    5, 6, 5, 6,    7, 8, 7, 8,        5, 6, 5, 6,    7, 8, 7, 8,    9, 10, 9, 10 };
     // clang-format on
@@ -3313,7 +3313,7 @@ void TestBroadcasBinaryOperationNodeCompileSubtract()
 
     // clang-format off
     std::vector<double> input1Vals{ 1, 2, 1, 2,      1, 2, 1, 2,      1, 2, 1, 2,            3, 4, 3, 4,    3, 4, 3, 4,    3, 4, 3, 4 };
-    std::vector<double> input2Vals{ 2, 4, 6 }; 
+    std::vector<double> input2Vals{ 2, 4, 6 };
     // broadcasts to:             { 2, 2, 2, 2,      4, 4, 4, 4,      6, 6, 6, 6,            2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6 }
     std::vector<double>   expected{ -1, 0, -1, 0,    -3, -2, -3, -2,    -5, -4, -5, -4,      1, 2, 1, 2,   -1, 0, -1, 0,  -3, -2, -3, -2 };
     // clang-format on
@@ -3353,7 +3353,7 @@ void TestBroadcasBinaryOperationNodeCompileWithOrdering()
     // std::vector<double> input1Vals{ 10, 20, 30,
     //                                 40, 50, 60 };
     // transposed to:
-    std::vector<double> input2Vals{ 10, 40, 
+    std::vector<double> input2Vals{ 10, 40,
                                     20, 50,
                                     30, 60 };
     std::vector<double>   expected{ 11, 22, 33,

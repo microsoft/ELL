@@ -243,13 +243,17 @@ namespace value
         return *s_context;
     }
 
-    void SetContext(EmitterContext& context) { s_context = &context; }
+    void SetContext(const EmitterContext& context) { s_context = &const_cast<EmitterContext&>(context); }
 
     void ClearContext() noexcept { s_context = nullptr; }
 
-    ContextGuard<>::ContextGuard(EmitterContext& context) { SetContext(context); }
+    ContextGuard<>::ContextGuard(const EmitterContext& context) :
+        _oldContext(s_context)
+    {
+        SetContext(context);
+    }
 
-    ContextGuard<>::~ContextGuard() { ClearContext(); }
+    ContextGuard<>::~ContextGuard() { _oldContext ? SetContext(*_oldContext) : ClearContext(); }
 
     Value Allocate(ValueType type, size_t size) { return GetContext().Allocate(type, size); }
 

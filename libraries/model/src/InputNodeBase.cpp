@@ -61,5 +61,6 @@ namespace model
     {
         return version >= currentArchiveVersion && CompilableNode::CanReadArchiveVersion(version);
     }
+
 } // namespace model
 } // namespace ell

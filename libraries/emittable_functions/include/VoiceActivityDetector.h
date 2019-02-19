@@ -57,9 +57,6 @@ namespace emittable_functions
         /// <summary> destructor </summary>
         ~VoiceActivityDetector();
 
-        /// <summary> allocate any global variables needed at compile time </summary>
-        void BeginCompile();
-
         /// <summary> reset the activity detector so it can be used on a new stream </summary>
         void Reset();
 

@@ -54,7 +54,7 @@ void TestVoiceActivityDetectorInternal(const std::string& filename, VoiceActivit
             buffer.resize(frameSize); // fix AutoDataVector possible compression
         }
 
-        int signal = vad.process<ValueType>(buffer);
+        int signal = vad.Process<ValueType>(buffer);
 
         if (signal != static_cast<int>(example.GetMetadata().label))
         {
@@ -104,7 +104,7 @@ void TestVoiceActivityDetector(const std::string& path)
         VoiceActivityDetector vad2;
         unarchiver.Unarchive("vad", vad2);
 
-        testing::ProcessTest(FormatString("Deserialize %s", typeid(VoiceActivityDetector).name()), vad.equals(vad2));
+        testing::ProcessTest(FormatString("Deserialize %s", typeid(VoiceActivityDetector).name()), vad.Equals(vad2));
 
         TestVoiceActivityDetectorInternal<ValueType>(filename, vad2, FrameSize);
     }

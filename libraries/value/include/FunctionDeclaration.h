@@ -80,7 +80,7 @@ namespace value
         /// <param name="arguments"> A vector of Value instances that hold the arguments for the function call </param>
         /// <returns> A std::optional instance that holds a Value instance with the return value of the call, if it is expected, otherwise empty </returns>
         /// <remarks> If the function is not defined and the context is capable of it, this will emit a call to an external function </remarks>
-        std::optional<Value> Call(std::vector<Value> arguments) const;
+        std::optional<Value> Call(std::vector<Value> arguments = {}) const;
 
         /// <summary> Gets the final function name, including any decoration if so applicable </summary>
         const std::string& GetFunctionName() const;

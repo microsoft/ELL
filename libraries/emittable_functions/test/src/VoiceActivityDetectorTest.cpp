@@ -40,8 +40,6 @@ namespace ell
 template <typename ValueType>
 void TestVoiceActivityDetectorInternal(const std::string& filename, VoiceActivityDetector& vad, int frameSize)
 {
-    vad.BeginCompile();
-
     std::vector<ValueType> data(40);
     auto valueType = GetValueType<typename decltype(data)::value_type>();
     Vector temp = data;
@@ -110,8 +108,9 @@ void TestVoiceActivityDetector(const std::string& path)
 
     // test serialization
 
-    SerializationContext context;
     {
+        value::ContextGuard<value::ComputeContext> contextGuard{"vad"};
+        SerializationContext context;
         std::stringstream strstream;
         {
             JsonArchiver archiver(strstream);

@@ -41,7 +41,6 @@ namespace model
     protected:
         CompilableNode(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) :
             Node(inputs, outputs) {}
-        ~CompilableNode() override = default;
 
         // Compile function necessary to override in subclasses
         virtual void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);

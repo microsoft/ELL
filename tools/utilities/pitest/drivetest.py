@@ -462,4 +462,4 @@ used as the model name")
                    args.model, args.labels, args.target, args.target_dir, args.username,
                    args.password, args.iterations, args.expected, str2bool(args.blas),
                    str2bool(args.compile), str2bool(args.test), args.timeout) as tester:
-                   tester.run_test()
+        tester.run_test()

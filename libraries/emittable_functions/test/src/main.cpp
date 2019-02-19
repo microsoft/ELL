@@ -31,8 +31,6 @@ int main(int argc, char* argv[])
     using namespace ell;
     using namespace utilities;
 
-    testing::EnableLoggingHelper enableLogging;
-
     try
     {
         for (const auto& context : GetContexts())

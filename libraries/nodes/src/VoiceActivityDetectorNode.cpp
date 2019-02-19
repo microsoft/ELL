@@ -24,34 +24,34 @@ namespace nodes
     template <typename ValueType>
     void VoiceActivityDetectorNode<ValueType>::Compute() const
     {
-        int signal = _vad.process(_input.GetValue());
+        int signal = _vad.Process(_input.GetValue());
         _output.SetOutput({ signal });
     };
 
     template <typename ValueType>
     void VoiceActivityDetectorNode<ValueType>::Reset()
     {
-        _vad.reset();
+        _vad.Reset();
     }
 
     template <typename ValueType>
     void VoiceActivityDetectorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<VoiceActivityDetectorNode<ValueType>>(newPortElements, _vad.getSampleRate(), _vad.getFrameDuration(), _vad.getTauUp(), _vad.getTauDown(), _vad.getLargeInput(), _vad.getGainAtt(), _vad.getThresholdUp(), _vad.getThresholdDown(), _vad.getLevelThreshold());
+        auto newNode = transformer.AddNode<VoiceActivityDetectorNode<ValueType>>(newPortElements, _vad.GetSampleRate(), _vad.GetFrameDuration(), _vad.GetTauUp(), _vad.GetTauDown(), _vad.GetLargeInput(), _vad.GetGainAtt(), _vad.GetThresholdUp(), _vad.GetThresholdDown(), _vad.GetLevelThreshold());
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
     void VoiceActivityDetectorNode<ValueType>::Compile(model::IRMapCompiler& compiler, IRFunctionEmitter& function)
     {
-        auto tauUpLiteral = function.template Literal<ValueType>(_vad.getTauUp());
-        auto tauDownLiteral = function.template Literal<ValueType>(_vad.getTauDown());
-        auto largeInputLiteral = function.template Literal<ValueType>(_vad.getLargeInput());
-        auto gainAttLiteral = function.template Literal<ValueType>(_vad.getGainAtt());
-        auto thresholdUpLiteral = function.template Literal<ValueType>(_vad.getThresholdUp());
-        auto thresholdDownLiteral = function.template Literal<ValueType>(_vad.getThresholdDown());
-        auto levelThresholdLiteral = function.template Literal<ValueType>(_vad.getLevelThreshold());
+        auto tauUpLiteral = function.template Literal<ValueType>(_vad.GetTauUp());
+        auto tauDownLiteral = function.template Literal<ValueType>(_vad.GetTauDown());
+        auto largeInputLiteral = function.template Literal<ValueType>(_vad.GetLargeInput());
+        auto gainAttLiteral = function.template Literal<ValueType>(_vad.GetGainAtt());
+        auto thresholdUpLiteral = function.template Literal<ValueType>(_vad.GetThresholdUp());
+        auto thresholdDownLiteral = function.template Literal<ValueType>(_vad.GetThresholdDown());
+        auto levelThresholdLiteral = function.template Literal<ValueType>(_vad.GetLevelThreshold());
 
         TypedOperator add = GetAddForValueType<ValueType>();
         TypedOperator addTick = GetAddForValueType<TickType>();
@@ -65,14 +65,14 @@ namespace nodes
         LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         const int inputSize = input.Size();
-        if (inputSize != _vad.getWindowSize())
+        if (inputSize != _vad.GetWindowSize())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input size must match VoiceActivityDetectorNode windowSize");
         }
 
         // assumes ValueType is either float or double.
-        auto windowSizeLiteral = function.template Literal<ValueType>(static_cast<ValueType>(_vad.getWindowSize()));
-        auto frameDurationLiteral = function.template Literal<ValueType>(static_cast<ValueType>(_vad.getFrameDuration()));
+        auto windowSizeLiteral = function.template Literal<ValueType>(static_cast<ValueType>(_vad.GetWindowSize()));
+        auto frameDurationLiteral = function.template Literal<ValueType>(static_cast<ValueType>(_vad.GetFrameDuration()));
 
         // Get LLVM types
         auto& module = function.GetModule();
@@ -84,7 +84,7 @@ namespace nodes
         }
 
         // Allocate global variable to hold the weights lookup table, first convert the weights to the rigth ValueType.
-        auto actualWeights = _vad.getWeights();
+        auto actualWeights = _vad.GetWeights();
         std::vector<ValueType> weights;
         std::transform(actualWeights.begin(), actualWeights.end(), std::back_inserter(weights), [](double x) { return static_cast<ValueType>(x); });
 

@@ -55,7 +55,8 @@ namespace model
     CompilableCodeNode::CompilableCodeNode(std::string name, const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) :
         CompilableNode(inputs, outputs),
         _name(name),
-        _fn(name + (HasState() ? "Code" + IdString(*this) : "") + "_")
+        _fn(name + (HasState() ? "Code" + IdString(*this) : "") + "_"),
+        _resetFn(_fn.GetFunctionName() + "_Reset")
     {
     }
 
@@ -90,6 +91,14 @@ namespace model
         return _fn.GetFunctionName();
     }
 
+    void CompilableCodeNode::Reset()
+    {
+        if (_resetFn.IsDefined())
+        {
+            _resetFn.Call();
+        }
+    }
+
     bool CompilableCodeNode::HasOwnFunction() const
     {
         return true;
@@ -100,6 +109,14 @@ namespace model
         if (!_fn.IsDefined())
         {
             Define(_fn);
+
+            DefineReset(_resetFn);
+            if (_resetFn.IsDefined())
+            {
+                auto& resetFn = compiler.GetModule().BeginResetFunction(_resetFn.GetFunctionName() + "_stub");
+                resetFn.Call(_resetFn.GetFunctionName());
+                compiler.GetModule().EndResetFunction();
+            }
         }
     }
 
@@ -198,6 +215,8 @@ namespace model
         if (!_fn.IsDefined())
         {
             const_cast<CompilableCodeNode*>(this)->Define(_fn);
+
+            const_cast<CompilableCodeNode*>(this)->DefineReset(_resetFn);
         }
 
         const auto& inputs = GetInputPorts();
