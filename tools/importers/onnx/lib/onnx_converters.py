@@ -927,7 +927,7 @@ class OnnxConcatConverter(OnnxNodeConverter):
             return [((1,),"channel")]
         
         if len(input_shapes) == 1:
-            return input_shapes[0]
+            return [input_shapes[0]]
 
         # we are sometimes asked to concat something like this:
         #   (1,), (1,1,1,40), (1,)
