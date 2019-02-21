@@ -1614,7 +1614,7 @@ void TestIRNode()
 
 // Helper function
 template <typename ElementType>
-void VerifyLayerMap(const ell::model::Map& map, const ell::model::Node* computeNode, const typename Layer<ElementType>::TensorType& inputWithPadding, const typename Layer<ElementType>::ConstTensorReferenceType& output, const std::string& additionalMessage = "")
+void VerifyLayerMap(ell::model::Map& map, const ell::model::Node* computeNode, const typename Layer<ElementType>::TensorType& inputWithPadding, const typename Layer<ElementType>::ConstTensorReferenceType& output, const std::string& additionalMessage = "")
 {
     std::vector<std::vector<ElementType>> signal = { inputWithPadding.ToArray() };
     std::vector<std::vector<ElementType>> expectedOutput = { output.ToArray() };

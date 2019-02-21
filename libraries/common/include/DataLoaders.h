@@ -119,9 +119,9 @@ namespace common
     }
 
     template <typename ExampleType, typename MapType>
-    auto TransformDataset(data::Dataset<ExampleType>& input, const MapType& map)
+    auto TransformDataset(data::Dataset<ExampleType>& input, MapType& map)
     {
-        return input.template Transform<ExampleType>([map](const ExampleType& example) {
+        return input.template Transform<ExampleType>([&map](const ExampleType& example) {
             auto transformedDataVector = map.template Compute<data::DoubleDataVector>(example.GetDataVector());
             return ExampleType(std::move(transformedDataVector), example.GetMetadata());
         });

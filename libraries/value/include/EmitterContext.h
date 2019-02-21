@@ -283,7 +283,7 @@ namespace value
 
     /// <summary> Sets the global instance of EmitterContext </summary>
     /// <param name="context"> The context to set as the global instance </param>
-    void SetContext(const EmitterContext& context);
+    void SetContext(EmitterContext& context);
 
     /// <summary> Clears the global instance of EmitterContext </summary>
     void ClearContext() noexcept;
@@ -304,7 +304,7 @@ namespace value
     {
         /// <summary> Constructor </summary>
         /// <param name="context"> The instance of EmitterContext to set as the global context </param>
-        ContextGuard(const EmitterContext& context);
+        ContextGuard(EmitterContext& context);
 
         /// <summary> Destructor for the instance. Sets the global context to nullptr </summary>
         ~ContextGuard();

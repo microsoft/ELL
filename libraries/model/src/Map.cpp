@@ -106,58 +106,58 @@ namespace model
         return { _model };
     }
 
-    void Map::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const
+    void Map::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues)
     {
         node->SetInput(inputValues);
     }
 
-    void Map::SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const
+    void Map::SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues)
     {
         node->SetInput(inputValues);
     }
 
-    void Map::SetNodeInput(InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const
+    void Map::SetNodeInput(InputNode<int64_t>* node, const std::vector<int64_t>& inputValues)
     {
         node->SetInput(inputValues);
     }
 
-    void Map::SetNodeInput(InputNode<float>* node, const std::vector<float>& inputValues) const
+    void Map::SetNodeInput(InputNode<float>* node, const std::vector<float>& inputValues)
     {
         node->SetInput(inputValues);
     }
 
-    void Map::SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues) const
+    void Map::SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues)
     {
         node->SetInput(inputValues);
     }
 
-    std::vector<bool> Map::ComputeBoolOutput(const PortElementsBase& outputs) const
+    std::vector<bool> Map::ComputeBoolOutput(const PortElementsBase& outputs)
     {
         return _model.ComputeOutput<bool>(outputs);
     }
 
-    std::vector<int> Map::ComputeIntOutput(const PortElementsBase& outputs) const
+    std::vector<int> Map::ComputeIntOutput(const PortElementsBase& outputs)
     {
         return _model.ComputeOutput<int>(outputs);
     }
 
-    std::vector<int64_t> Map::ComputeInt64Output(const PortElementsBase& outputs) const
+    std::vector<int64_t> Map::ComputeInt64Output(const PortElementsBase& outputs)
     {
         return _model.ComputeOutput<int64_t>(outputs);
     }
 
-    std::vector<float> Map::ComputeFloatOutput(const PortElementsBase& outputs) const
+    std::vector<float> Map::ComputeFloatOutput(const PortElementsBase& outputs)
     {
         return _model.ComputeOutput<float>(outputs);
     }
 
-    std::vector<double> Map::ComputeDoubleOutput(const PortElementsBase& outputs) const
+    std::vector<double> Map::ComputeDoubleOutput(const PortElementsBase& outputs)
     {
         return _model.ComputeOutput<double>(outputs);
     }
 
     template <>
-    std::vector<bool> Map::ComputeOutput<bool>(const PortElementsBase& elements) const
+    std::vector<bool> Map::ComputeOutput<bool>(const PortElementsBase& elements)
     {
         value::ContextGuard<> guard(_computeContext);
 
@@ -165,7 +165,7 @@ namespace model
     }
 
     template <>
-    std::vector<int> Map::ComputeOutput<int>(const PortElementsBase& elements) const
+    std::vector<int> Map::ComputeOutput<int>(const PortElementsBase& elements)
     {
         value::ContextGuard<> guard(_computeContext);
 
@@ -173,7 +173,7 @@ namespace model
     }
 
     template <>
-    std::vector<int64_t> Map::ComputeOutput<int64_t>(const PortElementsBase& elements) const
+    std::vector<int64_t> Map::ComputeOutput<int64_t>(const PortElementsBase& elements)
     {
         value::ContextGuard<> guard(_computeContext);
 
@@ -181,7 +181,7 @@ namespace model
     }
 
     template <>
-    std::vector<float> Map::ComputeOutput<float>(const PortElementsBase& elements) const
+    std::vector<float> Map::ComputeOutput<float>(const PortElementsBase& elements)
     {
         value::ContextGuard<> guard(_computeContext);
 
@@ -189,7 +189,7 @@ namespace model
     }
 
     template <>
-    std::vector<double> Map::ComputeOutput<double>(const PortElementsBase& elements) const
+    std::vector<double> Map::ComputeOutput<double>(const PortElementsBase& elements)
     {
         value::ContextGuard<> guard(_computeContext);
 

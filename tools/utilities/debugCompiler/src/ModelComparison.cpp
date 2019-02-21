@@ -178,7 +178,7 @@ bool IsNeuralNetworkLayerNode(const ell::model::Node* node)
 // Getting map output
 //
 template <typename InputType, typename OutputType>
-std::vector<float> GetMapOutput(const model::Map& map, const std::vector<float>& input)
+std::vector<float> GetMapOutput(model::Map& map, const std::vector<float>& input)
 {
     std::vector<InputType> typedInput(input.begin(), input.end());
     auto result = map.Compute<InputType>(typedInput);
@@ -186,7 +186,7 @@ std::vector<float> GetMapOutput(const model::Map& map, const std::vector<float>&
 }
 
 template <typename InputType>
-std::vector<float> GetMapOutput(const model::Map& map, const std::vector<float>& input)
+std::vector<float> GetMapOutput(model::Map& map, const std::vector<float>& input)
 {
     switch (map.GetOutputType())
     {
@@ -207,7 +207,7 @@ std::vector<float> GetMapOutput(const model::Map& map, const std::vector<float>&
     }
 }
 
-std::vector<float> GetMapOutput(const model::Map& map, const std::vector<float>& input)
+std::vector<float> GetMapOutput(model::Map& map, const std::vector<float>& input)
 {
     switch (map.GetInputType())
     {

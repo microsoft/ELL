@@ -60,7 +60,7 @@ namespace model
         return *_executionEngine;
     }
 
-    void IRCompiledMap::EnsureExecutionEngine() const
+    void IRCompiledMap::EnsureExecutionEngine()
     {
         if (!_executionEngine)
         {
@@ -69,13 +69,13 @@ namespace model
         }
     }
 
-    void IRCompiledMap::FinishJitting() const
+    void IRCompiledMap::FinishJitting()
     {
         EnsureExecutionEngine();
         SetComputeFunction();
     }
 
-    void IRCompiledMap::SetComputeFunction() const
+    void IRCompiledMap::SetComputeFunction()
     {
         switch (GetInput(0)->GetOutputPort().GetType())
         {
@@ -104,7 +104,7 @@ namespace model
         }
     }
 
-    void IRCompiledMap::SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues) const
+    void IRCompiledMap::SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues)
     {
         FinishJitting();
 
@@ -121,7 +121,7 @@ namespace model
         std::get<ComputeFunction<bool>>(_computeInputFunction)(GetContext(), (bool*)temp.data());
     }
 
-    void IRCompiledMap::SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) const
+    void IRCompiledMap::SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues)
     {
         FinishJitting();
 
@@ -133,7 +133,7 @@ namespace model
         std::get<ComputeFunction<int>>(_computeInputFunction)(GetContext(), inputValues.data());
     }
 
-    void IRCompiledMap::SetNodeInput(model::InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const
+    void IRCompiledMap::SetNodeInput(model::InputNode<int64_t>* node, const std::vector<int64_t>& inputValues)
     {
         FinishJitting();
 
@@ -145,7 +145,7 @@ namespace model
         std::get<ComputeFunction<int64_t>>(_computeInputFunction)(GetContext(), inputValues.data());
     }
 
-    void IRCompiledMap::SetNodeInput(model::InputNode<float>* node, const std::vector<float>& inputValues) const
+    void IRCompiledMap::SetNodeInput(model::InputNode<float>* node, const std::vector<float>& inputValues)
     {
         FinishJitting();
 
@@ -157,7 +157,7 @@ namespace model
         std::get<ComputeFunction<float>>(_computeInputFunction)(GetContext(), inputValues.data());
     }
 
-    void IRCompiledMap::SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues) const
+    void IRCompiledMap::SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues)
     {
         FinishJitting();
         if (GetInput(0)->GetOutputPort().GetType() != node->GetOutputPort().GetType())
@@ -172,7 +172,7 @@ namespace model
         std::get<ComputeFunction<double>>(_computeInputFunction)(GetContext(), inputValues.data());
     }
 
-    std::vector<bool> IRCompiledMap::ComputeBoolOutput(const model::PortElementsBase& outputs) const
+    std::vector<bool> IRCompiledMap::ComputeBoolOutput(const model::PortElementsBase& outputs)
     {
         FinishJitting();
 
@@ -186,7 +186,7 @@ namespace model
         return { vector.begin(), vector.end() };
     }
 
-    std::vector<int> IRCompiledMap::ComputeIntOutput(const model::PortElementsBase& outputs) const
+    std::vector<int> IRCompiledMap::ComputeIntOutput(const model::PortElementsBase& outputs)
     {
         EnsureExecutionEngine();
         if (GetOutput(0).GetPortType() != model::Port::PortType::integer)
@@ -197,7 +197,7 @@ namespace model
         return std::get<Vector<int>>(_cachedOutput);
     }
 
-    std::vector<int64_t> IRCompiledMap::ComputeInt64Output(const model::PortElementsBase& outputs) const
+    std::vector<int64_t> IRCompiledMap::ComputeInt64Output(const model::PortElementsBase& outputs)
     {
         FinishJitting();
         if (GetOutput(0).GetPortType() != model::Port::PortType::bigInt)
@@ -208,7 +208,7 @@ namespace model
         return std::get<Vector<int64_t>>(_cachedOutput);
     }
 
-    std::vector<float> IRCompiledMap::ComputeFloatOutput(const model::PortElementsBase& outputs) const
+    std::vector<float> IRCompiledMap::ComputeFloatOutput(const model::PortElementsBase& outputs)
     {
         FinishJitting();
         if (GetOutput(0).GetPortType() != model::Port::PortType::smallReal)
@@ -219,7 +219,7 @@ namespace model
         return std::get<Vector<float>>(_cachedOutput);
     }
 
-    std::vector<double> IRCompiledMap::ComputeDoubleOutput(const model::PortElementsBase& outputs) const
+    std::vector<double> IRCompiledMap::ComputeDoubleOutput(const model::PortElementsBase& outputs)
     {
         FinishJitting();
         if (GetOutput(0).GetPortType() != model::Port::PortType::real)

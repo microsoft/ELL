@@ -27,7 +27,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
-#include <tuple>
+#include <variant>
 #include <vector>
 
 namespace ell
@@ -181,7 +181,7 @@ namespace model
         //
 
         /// <summary> Force jitting to finish so you can time execution without jit cost. </summary>
-        void FinishJitting() const;
+        void FinishJitting();
 
         /// <summary> Set a context object to use in the predict call </summary>
         void SetContext(void* context) { _context = context; }
@@ -193,27 +193,27 @@ namespace model
         void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
         void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
 
-        void SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues) const override;
-        void SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) const override;
-        void SetNodeInput(model::InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const override;
-        void SetNodeInput(model::InputNode<float>* node, const std::vector<float>& inputValues) const override;
-        void SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues) const override;
+        void SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues) override;
+        void SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) override;
+        void SetNodeInput(model::InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) override;
+        void SetNodeInput(model::InputNode<float>* node, const std::vector<float>& inputValues) override;
+        void SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues) override;
 
-        std::vector<bool> ComputeBoolOutput(const model::PortElementsBase& outputs) const override;
-        std::vector<int> ComputeIntOutput(const model::PortElementsBase& outputs) const override;
-        std::vector<int64_t> ComputeInt64Output(const model::PortElementsBase& outputs) const override;
-        std::vector<float> ComputeFloatOutput(const model::PortElementsBase& outputs) const override;
-        std::vector<double> ComputeDoubleOutput(const model::PortElementsBase& outputs) const override;
+        std::vector<bool> ComputeBoolOutput(const model::PortElementsBase& outputs) override;
+        std::vector<int> ComputeIntOutput(const model::PortElementsBase& outputs) override;
+        std::vector<int64_t> ComputeInt64Output(const model::PortElementsBase& outputs) override;
+        std::vector<float> ComputeFloatOutput(const model::PortElementsBase& outputs) override;
+        std::vector<double> ComputeDoubleOutput(const model::PortElementsBase& outputs) override;
 
     private:
         friend class IRMapCompiler;
 
         IRCompiledMap(Map map, const std::string& functionName, const MapCompilerOptions& options, emitters::IRModuleEmitter& module, bool verifyJittedModule);
 
-        void EnsureExecutionEngine() const;
-        void SetComputeFunction() const;
+        void EnsureExecutionEngine();
+        void SetComputeFunction();
         template <typename InputType>
-        void SetComputeFunctionForInputType() const;
+        void SetComputeFunctionForInputType();
 
         template <typename InputType>
         using ComputeFunction = std::function<void(void*, const InputType*)>;
@@ -221,17 +221,16 @@ namespace model
         emitters::IRModuleEmitter& _module;
         std::string _moduleName;
 
-        mutable std::unique_ptr<emitters::IRExecutionEngine> _executionEngine;
+        std::unique_ptr<emitters::IRExecutionEngine> _executionEngine;
         bool _verifyJittedModule = false;
         void* _context = nullptr;
 
         template <typename T>
         using Vector = std::vector<std::conditional_t<std::is_same_v<bool, T>, Boolean, T>>;
 
-        // Only one of the entries in each of these tuples is active, depending on the input and output types of the map
-        mutable bool _computeFunctionDefined;
-        mutable std::tuple<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<int64_t>, ComputeFunction<float>, ComputeFunction<double>> _computeInputFunction;
-        mutable std::tuple<Vector<bool>, Vector<int>, Vector<int64_t>, Vector<float>, Vector<double>> _cachedOutput;
+        bool _computeFunctionDefined;
+        std::variant<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<int64_t>, ComputeFunction<float>, ComputeFunction<double>> _computeInputFunction;
+        std::variant<Vector<bool>, Vector<int>, Vector<int64_t>, Vector<float>, Vector<double>> _cachedOutput;
     };
 } // namespace model
 } // namespace ell
@@ -243,7 +242,7 @@ namespace ell
 namespace model
 {
     template <typename InputType>
-    void IRCompiledMap::SetComputeFunctionForInputType() const
+    void IRCompiledMap::SetComputeFunctionForInputType()
     {
         if (!_computeFunctionDefined)
         {
@@ -255,7 +254,7 @@ namespace model
             {
             case model::Port::PortType::boolean:
             {
-                std::get<Vector<bool>>(_cachedOutput).resize(outputSize);
+                _cachedOutput = Vector<bool>(outputSize);
                 auto fn = reinterpret_cast<void (*)(void*, const InputType*, bool*)>(functionPointer);
                 computeFunction = [this, fn](void* context, const InputType* input) {
                     fn(context, input, (bool*)std::get<Vector<bool>>(_cachedOutput).data());
@@ -265,7 +264,7 @@ namespace model
 
             case model::Port::PortType::integer:
             {
-                std::get<Vector<int>>(_cachedOutput).resize(outputSize);
+                _cachedOutput = Vector<int>(outputSize);
                 auto fn = reinterpret_cast<void (*)(void*, const InputType*, int*)>(functionPointer);
                 computeFunction = [this, fn](void* context, const InputType* input) {
                     fn(context, input, std::get<Vector<int>>(_cachedOutput).data());
@@ -275,7 +274,7 @@ namespace model
 
             case model::Port::PortType::bigInt:
             {
-                std::get<Vector<int64_t>>(_cachedOutput).resize(outputSize);
+                _cachedOutput = Vector<int64_t>(outputSize);
                 auto fn = reinterpret_cast<void (*)(void*, const InputType*, int64_t*)>(functionPointer);
                 computeFunction = [this, fn](void* context, const InputType* input) {
                     fn(context, input, std::get<Vector<int64_t>>(_cachedOutput).data());
@@ -285,7 +284,7 @@ namespace model
 
             case model::Port::PortType::smallReal:
             {
-                std::get<Vector<float>>(_cachedOutput).resize(outputSize);
+                _cachedOutput = Vector<float>(outputSize);
                 auto fn = reinterpret_cast<void (*)(void*, const InputType*, float*)>(functionPointer);
                 computeFunction = [this, fn](void* context, const InputType* input) {
                     fn(context, input, std::get<Vector<float>>(_cachedOutput).data());
@@ -295,7 +294,7 @@ namespace model
 
             case model::Port::PortType::real:
             {
-                std::get<Vector<double>>(_cachedOutput).resize(outputSize);
+                _cachedOutput = Vector<double>(outputSize);
                 auto fn = reinterpret_cast<void (*)(void*, const InputType*, double*)>(functionPointer);
                 computeFunction = [this, fn](void* context, const InputType* input) {
                     fn(context, input, std::get<Vector<double>>(_cachedOutput).data());
@@ -307,7 +306,7 @@ namespace model
                 throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
             }
 
-            std::get<ComputeFunction<InputType>>(_computeInputFunction) = computeFunction;
+            _computeInputFunction = computeFunction;
         }
     }
 

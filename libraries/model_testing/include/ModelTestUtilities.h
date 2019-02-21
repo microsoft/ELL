@@ -110,22 +110,22 @@ void PrintIR(emitters::IRModuleEmitter& module);
 void PrintIR(model::IRCompiledMap& compiledMap);
 
 template <typename InputType, typename OutputType>
-void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name);
+void PrintCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name);
 
 template <typename InputType>
-void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name);
+void PrintCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name);
 
 template <typename InputType, typename OutputType>
-std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage = "", double epsilon = 1e-5);
+std::vector<OutputType> VerifyCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage = "", double epsilon = 1e-5);
 
 template <typename InputType>
-void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage = "", double epsilon = 1e-5);
+void VerifyCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage = "", double epsilon = 1e-5);
 
 template <typename InputType, typename OutputType>
-bool VerifyCompiledOutputAndResult(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage = "", double epsilon = 1e-5);
+bool VerifyCompiledOutputAndResult(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage = "", double epsilon = 1e-5);
 
 template <typename InputType, typename OutputType>
-void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage = "");
+void VerifyMapOutput(model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage = "");
 
 void PrintDiagnostics(emitters::IRDiagnosticHandler& handler);
 
@@ -270,7 +270,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& v)
 }
 
 template <typename InputType, typename OutputType>
-void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name)
+void PrintCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
     if (!IsVerbose())
     {
@@ -287,7 +287,7 @@ void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& comp
 }
 
 template <typename InputType>
-void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name)
+void PrintCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
     switch (map.GetOutput(0).GetPortType())
     {
@@ -312,7 +312,7 @@ void PrintCompiledOutput(const model::Map& map, const model::IRCompiledMap& comp
 }
 
 template <typename InputType, typename OutputType>
-void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage)
+void VerifyMapOutput(model::Map& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage)
 {
     bool ok = true;
     // compare output
@@ -334,7 +334,7 @@ void VerifyMapOutput(const model::Map& map, std::vector<std::vector<InputType>>&
 }
 
 template <typename InputType, typename OutputType>
-std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage, double epsilon)
+std::vector<OutputType> VerifyCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage, double epsilon)
 {
     bool ok = true;
     std::vector<OutputType> computedResult;
@@ -361,7 +361,7 @@ std::vector<OutputType> VerifyCompiledOutput(const model::Map& map, const model:
 }
 
 template <typename InputType>
-void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage, double epsilon)
+void VerifyCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage, double epsilon)
 {
     switch (map.GetOutput(0).GetPortType())
     {
@@ -388,7 +388,7 @@ void VerifyCompiledOutput(const model::Map& map, const model::IRCompiledMap& com
 
 ///<summary> Verify the compiled output matches the computed output, and also verify computed output matches a given expected output </summary>
 template <typename InputType, typename OutputType>
-bool VerifyCompiledOutputAndResult(const model::Map& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal,
+bool VerifyCompiledOutputAndResult(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal,
     const std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage, double epsilon)
 {
     bool ok = true;
