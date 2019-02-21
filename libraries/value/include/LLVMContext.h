@@ -38,7 +38,9 @@ namespace value
     public:
         /// <summary> Constructor </summary>
         /// <param name="emitter"> A reference to an IRModuleEmitter that will be used to emit LLVM IR </param>
-        LLVMContext(emitters::IRModuleEmitter&);
+        LLVMContext(emitters::IRModuleEmitter& emitter);
+
+        const emitters::IRModuleEmitter& GetModuleEmitter() const;
 
     private:
         Value AllocateImpl(ValueType value, MemoryLayout layout) override;
@@ -86,7 +88,7 @@ namespace value
         std::string GetGlobalScopedName(std::string name) const;
         std::string GetCurrentFunctionScopedName(std::string name) const;
 
-        emitters::IRFunctionEmitter& GetFnEmitter() const;
+        emitters::IRFunctionEmitter& GetFunctionEmitter() const;
 
         struct PromotedConstantDataDescription
         {

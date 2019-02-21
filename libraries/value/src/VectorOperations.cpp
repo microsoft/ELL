@@ -14,6 +14,8 @@
 #include "Scalar.h"
 #include "Vector.h"
 
+#include <emitters/include/IRModuleEmitter.h>
+
 #include <math/include/BlasWrapper.h>
 
 namespace ell
@@ -41,6 +43,13 @@ namespace value
         {
             throw InputException(InputExceptionErrors::typeMismatch);
         }
+
+        auto defaultImpl = [](Vector v1, Vector v2) {
+            Scalar result;
+            For(v1, [&](auto index) { result += v1[index] * v2[index]; });
+
+            return result;
+        };
 
         if (v1.GetType() == ValueType::Float)
         {
@@ -71,16 +80,23 @@ namespace value
                 return *result;
             }
 
-            result = InvokeForContext<LLVMContext>([&](auto&) -> Scalar {
-                auto returnValue = fn.Decorated(FunctionDecorated::No)
-                                       .Call(
-                                           { static_cast<int>(v1.Size()),
-                                             v1.GetValue(),
-                                             static_cast<int>(v1.GetValue().GetLayout().GetCumulativeIncrement(0)),
-                                             v2.GetValue(),
-                                             static_cast<int>(v2.GetValue().GetLayout().GetCumulativeIncrement(0)) });
+            result = InvokeForContext<LLVMContext>([&](LLVMContext& context) -> Scalar {
+                if (context.GetModuleEmitter().GetCompilerOptions().useBlas)
+                {
+                    auto returnValue = fn.Decorated(FunctionDecorated::No)
+                                           .Call(
+                                               { static_cast<int>(v1.Size()),
+                                                 v1.GetValue(),
+                                                 static_cast<int>(v1.GetValue().GetLayout().GetCumulativeIncrement(0)),
+                                                 v2.GetValue(),
+                                                 static_cast<int>(v2.GetValue().GetLayout().GetCumulativeIncrement(0)) });
 
-                return *returnValue;
+                    return *returnValue;
+                }
+                else
+                {
+                    return defaultImpl(v1, v2);
+                }
             });
 
             return *result;
@@ -114,26 +130,30 @@ namespace value
                 return *result;
             }
 
-            result = InvokeForContext<LLVMContext>([&](auto&) -> Scalar {
-                auto returnValue = fn.Decorated(FunctionDecorated::No)
-                                       .Call(
-                                           { static_cast<int>(v1.Size()),
-                                             v1.GetValue(),
-                                             static_cast<int>(v1.GetValue().GetLayout().GetCumulativeIncrement(0)),
-                                             v2.GetValue(),
-                                             static_cast<int>(v2.GetValue().GetLayout().GetCumulativeIncrement(0)) });
+            result = InvokeForContext<LLVMContext>([&](LLVMContext& context) -> Scalar {
+                if (context.GetModuleEmitter().GetCompilerOptions().useBlas)
+                {
+                    auto returnValue = fn.Decorated(FunctionDecorated::No)
+                                           .Call(
+                                               { static_cast<int>(v1.Size()),
+                                                 v1.GetValue(),
+                                                 static_cast<int>(v1.GetValue().GetLayout().GetCumulativeIncrement(0)),
+                                                 v2.GetValue(),
+                                                 static_cast<int>(v2.GetValue().GetLayout().GetCumulativeIncrement(0)) });
 
-                return *returnValue;
+                    return *returnValue;
+                }
+                else
+                {
+                    return defaultImpl(v1, v2);
+                }
             });
 
             return *result;
         }
         else
         {
-            Scalar result;
-            For(v1, [&](auto index) { result += v1[index] * v2[index]; });
-
-            return result;
+            return defaultImpl(v1, v2);
         }
     }
 

@@ -477,12 +477,14 @@ namespace value
         _promotedConstantStack.push({});
     }
 
+    const IRModuleEmitter& LLVMContext::GetModuleEmitter() const { return _emitter; }
+
     Value LLVMContext::AllocateImpl(ValueType type, MemoryLayout layout)
     {
-        auto llvmType = ValueTypeToLLVMType(GetFnEmitter().GetEmitter(), { type, 0 });
-        auto allocatedVariable = GetFnEmitter().Variable(llvmType, layout.GetMemorySize());
+        auto llvmType = ValueTypeToLLVMType(GetFunctionEmitter().GetEmitter(), { type, 0 });
+        auto allocatedVariable = GetFunctionEmitter().Variable(llvmType, layout.GetMemorySize());
 
-        auto& fn = GetFnEmitter();
+        auto& fn = GetFunctionEmitter();
         auto& irEmitter = fn.GetEmitter();
         irEmitter.MemorySet(allocatedVariable, irEmitter.Zero(llvm::Type::getInt8Ty(fn.GetLLVMContext())), irEmitter.Literal(static_cast<int64_t>(layout.GetMemorySize() * irEmitter.SizeOf(llvmType))));
         return { Emittable{ allocatedVariable }, layout };
@@ -593,9 +595,9 @@ namespace value
         {
             ValueType returnValueType = returnValue ? returnValue->GetBaseType() : ValueType::Void;
             FunctionScope scope(*this, fnName, ValueTypeToVariableType(returnValueType), variableArgTypes);
-            GetFnEmitter().SetAttributeForArguments(IRFunctionEmitter::Attributes::NoAlias);
+            GetFunctionEmitter().SetAttributeForArguments(IRFunctionEmitter::Attributes::NoAlias);
 
-            auto functionArgs = GetFnEmitter().Arguments();
+            auto functionArgs = GetFunctionEmitter().Arguments();
             auto argValuesCopy = argValues;
             auto returnValueCopy = returnValue;
 
@@ -782,7 +784,7 @@ namespace value
         }
         else
         {
-            auto& fn = GetFnEmitter();
+            auto& fn = GetFunctionEmitter();
             Value emittableBegin = EnsureEmittable(begin);
             Value emittableIndex = EnsureEmittable(index);
 
@@ -827,7 +829,7 @@ namespace value
             throw InputException(InputExceptionErrors::sizeMismatch);
         }
 
-        auto& fn = GetFnEmitter();
+        auto& fn = GetFunctionEmitter();
         std::visit(
             [destination = EnsureEmittable(destination), op, &fn](auto&& sourceData) {
                 using SourceDataType = std::decay_t<decltype(sourceData)>;
@@ -975,7 +977,7 @@ namespace value
                                               [&, this](Emittable source2Data) -> Value {
                                                   auto maxCoordinate = source1Layout.GetActiveSize().ToVector();
                                                   decltype(maxCoordinate) coordinate(maxCoordinate.size());
-                                                  auto& fn = this->GetFnEmitter();
+                                                  auto& fn = this->GetFunctionEmitter();
                                                   auto result = fn.TrueBit();
                                                   auto llvmOp1 = source1Data.GetDataAs<LLVMValue>();
                                                   auto llvmOp2 = source2Data.GetDataAs<LLVMValue>();
@@ -1004,7 +1006,7 @@ namespace value
                                                       std::remove_pointer_t<std::decay_t<decltype(source2Data)>>;
                                                   using CastType =
                                                       std::conditional_t<std::is_same_v<Type, Boolean>, bool, Type>;
-                                                  auto& fn = this->GetFnEmitter();
+                                                  auto& fn = this->GetFunctionEmitter();
 
                                                   auto result = fn.TrueBit();
                                                   auto llvmOp1 = source1Data.GetDataAs<LLVMValue>();
@@ -1043,7 +1045,7 @@ namespace value
                     using Type = std::remove_pointer_t<std::decay_t<decltype(source1Data)>>;
                     using CastType = std::conditional_t<std::is_same_v<Type, Boolean>, bool, Type>;
 
-                    auto& fn = GetFnEmitter();
+                    auto& fn = GetFunctionEmitter();
                     auto result = fn.TrueBit();
                     auto llvmOp2 = std::get<Emittable>(source2Data).GetDataAs<LLVMValue>();
 
@@ -1078,7 +1080,7 @@ namespace value
         }
 
         auto data = ToLLVMValue(value);
-        auto& fn = GetFnEmitter();
+        auto& fn = GetFunctionEmitter();
 
         auto castedData = Allocate(type, value.IsConstrained() ? value.GetLayout() : ScalarLayout);
         auto castedValue = ToLLVMValue(castedData);
@@ -1130,7 +1132,7 @@ namespace value
 
     EmitterContext::IfContext LLVMContext::IfImpl(Scalar test, std::function<void()> fn)
     {
-        auto& fnEmitter = GetFnEmitter();
+        auto& fnEmitter = GetFunctionEmitter();
         LLVMValue testValue = nullptr;
         if (auto value = test.GetValue(); value.IsConstant())
         {
@@ -1186,16 +1188,16 @@ namespace value
     {
         static std::unordered_map<FunctionDeclaration, std::function<Value(std::vector<Value>)>> intrinsics =
             {
-                { AbsFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFnEmitter(), &IRRuntime::GetAbsFunction) },
-                { CosFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFnEmitter(), &IRRuntime::GetCosFunction) },
-                { ExpFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFnEmitter(), &IRRuntime::GetExpFunction) },
-                { LogFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFnEmitter(), &IRRuntime::GetLogFunction) },
-                { MaxNumFunctionDeclaration, MaxMinIntrinsicFunction(GetFnEmitter(), MaxMinIntrinsic::Max) },
-                { MinNumFunctionDeclaration, MaxMinIntrinsicFunction(GetFnEmitter(), MaxMinIntrinsic::Min) },
-                { PowFunctionDeclaration, PowFunctionIntrinsic(GetFnEmitter()) },
-                { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFnEmitter(), &IRRuntime::GetSinFunction) },
-                { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFnEmitter(), &IRRuntime::GetSqrtFunction) },
-                { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFnEmitter(), &IRRuntime::GetTanhFunction) }
+                { AbsFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetAbsFunction) },
+                { CosFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetCosFunction) },
+                { ExpFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetExpFunction) },
+                { LogFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetLogFunction) },
+                { MaxNumFunctionDeclaration, MaxMinIntrinsicFunction(GetFunctionEmitter(), MaxMinIntrinsic::Max) },
+                { MinNumFunctionDeclaration, MaxMinIntrinsicFunction(GetFunctionEmitter(), MaxMinIntrinsic::Min) },
+                { PowFunctionDeclaration, PowFunctionIntrinsic(GetFunctionEmitter()) },
+                { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetSinFunction) },
+                { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetSqrtFunction) },
+                { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetTanhFunction) }
             };
 
         if (std::all_of(args.begin(), args.end(), [](const auto& value) { return value.IsConstant(); }))
@@ -1225,7 +1227,7 @@ namespace value
         }
 
         auto& irEmitter = _emitter.GetIREmitter();
-        auto& fnEmitter = GetFnEmitter();
+        auto& fnEmitter = GetFunctionEmitter();
 
         const auto& returnType = externalFunc.GetReturnType();
         auto resultType = [&] {
@@ -1326,10 +1328,10 @@ namespace value
             throw LogicException(LogicExceptionErrors::illegalState);
         }
 
-        return GetGlobalScopedName(GetFnEmitter().GetFunctionName() + "_" + name);
+        return GetGlobalScopedName(GetFunctionEmitter().GetFunctionName() + "_" + name);
     }
 
-    IRFunctionEmitter& LLVMContext::GetFnEmitter() const { return _functionStack.top().get(); }
+    IRFunctionEmitter& LLVMContext::GetFunctionEmitter() const { return _functionStack.top().get(); }
 
     Value LLVMContext::PromoteConstantData(Value value)
     {
@@ -1366,7 +1368,7 @@ namespace value
                 }
                 else
                 {
-                    auto& fn = GetFnEmitter();
+                    auto& fn = GetFunctionEmitter();
 
                     std::string globalName = GetCurrentFunctionScopedName("_"s + std::to_string(_promotedConstantStack.top().size()));
 
@@ -1454,7 +1456,7 @@ namespace value
                 },
                 *promotionalDesc.data);
 
-            auto& fn = GetFnEmitter();
+            auto& fn = GetFunctionEmitter();
             auto emittable = promotionalDesc.realValue;
 
             Value newValue = value;
