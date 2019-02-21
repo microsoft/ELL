@@ -95,8 +95,8 @@ namespace common
         builder.RegisterNodeCreator<nodes::DotProductNode<int>, const model::PortElements<int>&, const model::PortElements<int>&>();
         builder.RegisterNodeCreator<nodes::DotProductNode<double>, const model::PortElements<double>&, const model::PortElements<double>&>();
 
-        builder.RegisterNodeCreator<nodes::FFTNode<float>, const model::PortElements<float>&>();
-        builder.RegisterNodeCreator<nodes::FFTNode<double>, const model::PortElements<double>&>();
+        builder.RegisterNodeCreator<nodes::FFTNode<float>, const model::PortElements<float>&, size_t>();
+        builder.RegisterNodeCreator<nodes::FFTNode<double>, const model::PortElements<double>&, size_t>();
 
         builder.RegisterNodeCreator<nodes::HammingWindowNode<float>, const model::PortElements<float>&>();
         builder.RegisterNodeCreator<nodes::HammingWindowNode<double>, const model::PortElements<double>&>();

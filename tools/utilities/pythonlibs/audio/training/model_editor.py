@@ -39,6 +39,7 @@ class ModelEditor:
                 input_port = rnn.GetInputPort("input")
                 input_node = input_port.GetParentNodes().Get()
                 port = ell.nodes.PortElements(input_node.GetOutputPort("output"))
+                # todo: add ReinterpretLayoutNode to ensure input to VAD node is a 1-D vector...
                 self.vad_node = self.builder.AddVoiceActivityDetectorNode(self.model, port, sample_rate,
                                                                           frame_duration, tau_up, tau_down,
                                                                           large_input, gain_att, threshold_up,

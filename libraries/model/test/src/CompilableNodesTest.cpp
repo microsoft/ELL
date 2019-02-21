@@ -1486,7 +1486,7 @@ void TestCompilableFFTNode()
     const int N = 8;
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ValueType>>(N);
-    auto fftNode = model.AddNode<FFTNode<ValueType>>(inputNode->output);
+    auto fftNode = model.AddNode<FFTNode<ValueType>>(inputNode->output, N);
 
     std::vector<ValueType> input1(N, 1.0); // DC
     std::vector<ValueType> input2(N, 0); // impulse

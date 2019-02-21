@@ -584,6 +584,11 @@ namespace model
         // Archive the outputs
         archiver["outputNames"] << _outputNames;
         archiver["outputElements"] << _outputElements;
+
+        if (!_metadata.IsEmpty())
+        {
+            archiver["metadata"] << _metadata;
+        }
     }
 
     void Map::ReadFromArchive(utilities::Unarchiver& archiver)
@@ -602,6 +607,11 @@ namespace model
         // Unarchive the outputs
         archiver["outputNames"] >> _outputNames;
         archiver["outputElements"] >> _outputElements;
+
+        if (archiver.HasNextPropertyName("metadata"))
+        {
+            archiver["metadata"] >> _metadata;
+        }
 
         // Reconstruct the input node map
         _inputNodeMap.clear();

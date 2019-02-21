@@ -287,7 +287,8 @@ namespace nodes
     FFTNode<ValueType>::FFTNode() :
         CompilableNode({ &_input }, { &_output }),
         _input(this, {}, defaultInputPortName),
-        _output(this, defaultOutputPortName, 0)
+        _output(this, defaultOutputPortName, 0),
+        _fftSize(0)
     {
     }
 
@@ -295,8 +296,26 @@ namespace nodes
     FFTNode<ValueType>::FFTNode(const model::OutputPort<ValueType>& input) :
         CompilableNode({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
-        _output(this, defaultOutputPortName, _input.Size() / 2)
+        _output(this, defaultOutputPortName, 0),
+        _fftSize(0)
     {
+        double nearestPowerOf2Size = std::pow(2, std::ceil(std::log2(input.Size())));
+        _fftSize = static_cast<size_t>(nearestPowerOf2Size);
+        _output.SetSize(_fftSize / 2);
+    }
+
+    template <typename ValueType>
+    FFTNode<ValueType>::FFTNode(const model::OutputPort<ValueType>& input, size_t fftSize) :
+        CompilableNode({ &_input }, { &_output }),
+        _input(this, input, defaultInputPortName),
+        _output(this, defaultOutputPortName, fftSize / 2),
+        _fftSize(fftSize)
+    {
+        double power = std::log2(fftSize);
+        if (std::floor(power) != power)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "fftSize must be a power of 2");
+        }
     }
 
     inline void Deinterleave(emitters::IRFunctionEmitter& function, emitters::LLVMValue array, emitters::LLVMValue halfLength, emitters::LLVMValue scratch)
@@ -625,6 +644,10 @@ namespace nodes
     void FFTNode<ValueType>::Compute() const
     {
         std::vector<ValueType> temp = _input.GetValue();
+        if (_fftSize != temp.size())
+        {
+            temp.resize(_fftSize);
+        }
         dsp::FFT(temp);
         temp.resize(output.Size());
         _output.SetOutput(temp);
@@ -634,7 +657,7 @@ namespace nodes
     void FFTNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<FFTNode<ValueType>>(newPortElements);
+        auto newNode = transformer.AddNode<FFTNode<ValueType>>(newPortElements, _fftSize);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -654,16 +677,22 @@ namespace nodes
         emitters::LLVMValue pOutput = compiler.EnsurePortEmitted(output);
 
         // Buffer for complex data
-        emitters::LLVMValue complexBuffer = function.Variable(complexType, inputSize);
+        emitters::LLVMValue complexBuffer = function.Variable(complexType, _fftSize);
+
+        if (inputSize > _fftSize)
+        {
+            // truncate input to _fftSize
+            inputSize = _fftSize;
+        }
 
 #if (USE_REAL_FFT)
 
-        emitters::LLVMValue scratch = function.Variable(valueType, inputSize / 2);
-        DoRealFFT(function, inputSize, pInput, scratch, complexBuffer);
+        emitters::LLVMValue scratch = function.Variable(valueType, _fftSize / 2);
+        DoRealFFT(function, _fftSize, pInput, scratch, complexBuffer);
 
 #else // Complex-input FFT
 
-        emitters::LLVMValue scratch = function.Variable(complexType, inputSize / 2);
+        emitters::LLVMValue scratch = function.Variable(complexType, _fftSize / 2);
         emitters::LLVMValue temp = function.Variable(complexType, "temp");
 
         // Convert real-valued data to complex
@@ -672,7 +701,17 @@ namespace nodes
             function.SetValueAt(complexBuffer, index, function.Load(temp));
         });
 
-        DoFFT(function, inputSize, complexBuffer, scratch);
+        if (_fftSize > inputSize)
+        {
+            // zero-pad up to _fftSize
+            emitters::LLVMValue zero_complex = function.Variable(complexType, "zero_complex");
+            function.FillStruct(zero_complex, { function.Literal<ValueType>(0), function.Literal<ValueType>(0) });
+            function.For(inputSize, _fftSize, [zero_complex, complexBuffer](emitters::IRFunctionEmitter& function, auto index) {
+                function.SetValueAt(complexBuffer, index, function.Load(zero_complex));
+            });
+        }
+
+        DoFFT(function, _fftSize, complexBuffer, scratch);
 
 #endif // USE_REAL_FFT
 
@@ -688,6 +727,10 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
+        if (_fftSize != _input.Size())
+        {
+            archiver["fftSize"] << _fftSize;
+        }
     }
 
     template <typename ValueType>
@@ -695,7 +738,15 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
-        _output.SetSize(_input.Size() / 2);
+        if (archiver.HasNextPropertyName("fftSize"))
+        {
+            archiver["fftSize"] >> _fftSize;
+        }
+        else
+        {
+            _fftSize = _input.Size();
+        }
+        _output.SetSize(_fftSize / 2);
     }
 
     // Explicit instantiations

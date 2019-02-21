@@ -147,6 +147,31 @@ InputNode ModelBuilder::AddInputNode(Model model, const ell::api::math::TensorSh
     return InputNode(newNode);
 }
 
+InputNode ModelBuilder::AddInputNode(Model model, const PortMemoryLayout& memoryLayout, PortType type)
+{
+    auto outputLayout = memoryLayout.Get();
+    using namespace std::string_literals;
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::model::InputNode<bool>>(outputLayout);
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::model::InputNode<int>>(outputLayout);
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::model::InputNode<double>>(outputLayout);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::model::InputNode<float>>(outputLayout);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create InputNode of the requested type");
+    }
+    return InputNode(newNode);
+}
+
 OutputNode ModelBuilder::AddOutputNode(Model model, const ell::api::math::TensorShape& tensorShape, PortElements input)
 {
     auto type = input.GetType();
@@ -165,6 +190,33 @@ OutputNode ModelBuilder::AddOutputNode(Model model, const ell::api::math::Tensor
         break;
     case PortType::smallReal:
         newNode = model.GetModel().AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements), tensorShape.ToMemoryShape());
+        break;
+    default:
+        throw std::invalid_argument(std::string("Error: could not create OutputNode of the requested type") + typeid(type).name());
+    }
+    return OutputNode(newNode);
+}
+
+OutputNode ModelBuilder::AddOutputNode(Model model, const PortMemoryLayout& memoryLayout, PortElements input)
+{
+    auto outputLayout = memoryLayout.Get();
+    auto outputShape = outputLayout.GetActiveSize();
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::model::OutputNode<bool>>(ell::model::PortElements<bool>(elements), outputShape);
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::model::OutputNode<int>>(ell::model::PortElements<int>(elements), outputShape);
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::model::OutputNode<double>>(ell::model::PortElements<double>(elements), outputShape);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements), outputShape);
         break;
     default:
         throw std::invalid_argument(std::string("Error: could not create OutputNode of the requested type") + typeid(type).name());
@@ -673,7 +725,7 @@ Node ModelBuilder::AddHammingWindowNode(Model model, PortElements input)
     return Node(newNode);
 }
 
-Node ModelBuilder::AddFFTNode(Model model, PortElements input)
+Node ModelBuilder::AddFFTNode(Model model, PortElements input, int nfft)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
@@ -681,10 +733,24 @@ Node ModelBuilder::AddFFTNode(Model model, PortElements input)
     switch (type)
     {
     case PortType::real:
-        newNode = model.GetModel().AddNode<ell::nodes::FFTNode<double>>(ell::model::PortElements<double>(elements));
+        if (nfft == 0)
+        {
+            newNode = model.GetModel().AddNode<ell::nodes::FFTNode<double>>(ell::model::PortElements<double>(elements));
+        }
+        else
+        {
+            newNode = model.GetModel().AddNode<ell::nodes::FFTNode<double>>(ell::model::PortElements<double>(elements), nfft);
+        }
         break;
     case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::nodes::FFTNode<float>>(ell::model::PortElements<float>(elements));
+        if (nfft == 0)
+        {
+            newNode = model.GetModel().AddNode<ell::nodes::FFTNode<float>>(ell::model::PortElements<float>(elements));
+        }
+        else
+        {
+            newNode = model.GetModel().AddNode<ell::nodes::FFTNode<float>>(ell::model::PortElements<float>(elements), nfft);
+        }
         break;
     default:
         throw std::invalid_argument("Error: could not create FFTNode of the requested type");

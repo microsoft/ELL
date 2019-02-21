@@ -88,10 +88,9 @@ namespace utilities
             DecrementIndent();
             auto indent = GetCurrentIndent();
             _out << indent << "}";
-
-            // need to output a comma if we're serializing a field (that is, if name != "")
-            SetEndOfLine(hasName ? ",\n" : "\n");
         }
+        // need to output a comma if we're serializing a field (that is, if name != "")
+        SetEndOfLine(hasName ? ",\n" : "\n");
     }
 
     void JsonArchiver::EndArchiving()

@@ -136,13 +136,21 @@ static void TestDelayNodeCompute()
     }
 }
 
-static void TestFFTNodeCompute()
+static void TestFFTNodeCompute(size_t N, size_t nfft)
 {
     using ValueType = double;
-    const size_t N = 32;
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ValueType>>(N);
-    auto fftNode = model.AddNode<nodes::FFTNode<ValueType>>(inputNode->output);
+    nodes::FFTNode<ValueType>* fftNode = nullptr;
+    if (nfft == 0)
+    {
+        nfft = pow(2, ceil(log2(N)));
+        fftNode = model.AddNode<nodes::FFTNode<ValueType>>(inputNode->output);
+    }
+    else
+    {
+        fftNode = model.AddNode<nodes::FFTNode<ValueType>>(inputNode->output, nfft);
+    }
 
     // FFT of constant value
     std::vector<ValueType> signal(N, 1.0);
@@ -151,7 +159,16 @@ static void TestFFTNodeCompute()
     for (size_t index = 0; index < computeOutput.size(); ++index)
     {
         auto x = computeOutput[index];
-        testing::ProcessTest("Testing real-valued FFT of DC signal", testing::IsEqual(x, static_cast<ValueType>(index == 0 ? N : 0)));
+        if (N >= nfft || index == 0) 
+        {
+            auto expected = (N > nfft) ? nfft : N;
+            testing::ProcessTest("Testing real-valued FFT of DC signal", testing::IsEqual(x, static_cast<ValueType>(index == 0 ? expected : 0)));
+        }
+        else 
+        {
+            // in the zero-padded case the ramp down from N is a bit smoother, it is not just a step function.
+            testing::ProcessTest("Testing real-valued FFT of DC signal", testing::IsTrue(x < N));
+        }
     }
 
     // FFT of impulse signal
@@ -174,11 +191,23 @@ static void TestFFTNodeCompute()
         }
         inputNode->SetInput(signal);
         computeOutput = model.ComputeOutput(fftNode->output);
-        for (size_t index = 0; index < computeOutput.size(); ++index)
+        if (N == nfft)
         {
-            auto x = computeOutput[index];
-            bool isPeak = (index == freq) || (index == (N - freq));
-            testing::ProcessTest("Testing real-valued FFT of sine wave", testing::IsEqual(x, static_cast<ValueType>(isPeak ? N / 2 : 0)));
+            for (size_t index = 0; index < computeOutput.size(); ++index)
+            {
+                auto x = computeOutput[index];
+                bool isPeak = (index == freq) || (index == (nfft - freq));
+                testing::ProcessTest("Testing real-valued FFT of sine wave", testing::IsEqual(x, static_cast<ValueType>(isPeak ? N / 2 : 0)));
+            }
+        }
+        else
+        {
+            // with zero-padding the output is smoother, but the argmax should still be at the given frequency band.
+            // but that frequence band is shifted because of the larger nfft value.
+            int expectedPeak = static_cast<int>(std::round(static_cast<ValueType>(freq) * static_cast<ValueType>(nfft) / static_cast<ValueType>(N)));
+            auto result = std::max_element(computeOutput.begin(), computeOutput.end());
+            int actualPeak = static_cast<int>(result - computeOutput.begin());
+            testing::ProcessTest("Testing real-valued FFT of sine wave", testing::IsTrue(actualPeak == expectedPeak || actualPeak == expectedPeak - 1));
         }
     }
 }
@@ -1102,7 +1131,10 @@ void TestDSPNodes(const std::string& path)
     //
     TestDelayNodeCompute();
     TestDTWDistanceNodeCompute();
-    TestFFTNodeCompute();
+    TestFFTNodeCompute(32, 32);
+    TestFFTNodeCompute(40, 64);
+    TestFFTNodeCompute(40, 32);
+    TestFFTNodeCompute(100, 0); // test default constructor with no fftSize parameter
 
     //
     // Combined tests

@@ -46,8 +46,16 @@ namespace nodes
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="input"> The signal to process. </param>
+        /// <param name="input"> The signal to process. The FFT size will be computed from the input.
+        /// The FFT size has to be a power of 2, so it rounds up the input size using
+        /// pow(2, ceil(log2(input.Size())). The output size of this node will be fftSize / 2.</param>
         FFTNode(const model::OutputPort<ValueType>& input);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="input"> The signal to process. </param>
+        /// <param name="fftSize"> The FFT size. The output size of this node will be fftSize/2. </param>
+        FFTNode(const model::OutputPort<ValueType>& input, size_t fftSize);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -92,6 +100,21 @@ namespace nodes
 
         // Output
         model::OutputPort<ValueType> _output;
+
+        size_t _fftSize;
     };
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& AppendFFT(const model::OutputPort<ValueType>& input, size_t fftSize)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<FFTNode<ValueType>>(input, fftSize);
+        return node->output;
+    }
+
 } // namespace nodes
 } // namespace ell

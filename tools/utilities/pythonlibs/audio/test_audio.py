@@ -66,6 +66,8 @@ def test_keyword_spotter(featurizer_model, classifier_model, categories, wav_fil
 
     average_time = predictor.avg_time() + transform.avg_time()
     print("Average processing time: {}".format(average_time))
+    if results is None:
+        raise Exception("test_keyword_spotter failed to find any predictions!")
     return tuple(list(results) + [average_time])
 
 

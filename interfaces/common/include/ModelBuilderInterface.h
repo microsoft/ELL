@@ -85,13 +85,15 @@ public:
     Node AddConstantNode(Model model, std::vector<double> values, const ell::api::math::TensorShape& outputShape, PortType type);
     Node AddDCTNode(Model model, PortElements input, int numFilters);
     Node AddNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor predictor);
-    Node AddFFTNode(Model model, PortElements input);
+    Node AddFFTNode(Model model, PortElements input, int nfft = 0);
     Node AddHammingWindowNode(Model model, PortElements input);
     Node AddIIRFilterNode(Model model, PortElements input, std::vector<double> bCoeffs, std::vector<double> aCoeffs);
-    InputNode AddInputNode(Model model, const ell::api::math::TensorShape& shape, PortType type);
+    InputNode AddInputNode(Model model, const ell::api::math::TensorShape& outputShape, PortType type);
+    InputNode AddInputNode(Model model, const PortMemoryLayout& memoryLayout, PortType type);
     Node AddLinearFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse, double offset = 0);
     Node AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse, double offset = 0);
-    OutputNode AddOutputNode(Model model, const ell::api::math::TensorShape& shape, PortElements input);
+    OutputNode AddOutputNode(Model model, const ell::api::math::TensorShape& outputShape, PortElements input);
+    OutputNode AddOutputNode(Model model, const PortMemoryLayout& memoryLayout, PortElements input);
     Node AddReinterpretLayoutNode(Model model, PortElements input, PortMemoryLayout outputMemoryLayout);
     Node AddReorderDataNode(Model model, PortElements input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order = {}, double outputPaddingValue = 0.0);
     Node AddSinkNode(Model model, PortElements input, const ell::api::math::TensorShape& shape, const std::string& sinkFunctionName, PortElements trigger = PortElements());

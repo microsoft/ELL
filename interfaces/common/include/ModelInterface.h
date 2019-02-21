@@ -335,6 +335,8 @@ public:
     size_t Size();
     NodeIterator GetNodes();
     std::string GetJson() const;
+    std::string GetMetadataValue(const std::string& key);
+    void SetMetadataValue(const std::string& key, const std::string& value);
 #ifndef SWIG
     Model(ell::model::Model&& other);
     ell::model::Model& GetModel();
@@ -372,6 +374,9 @@ public:
     // Return true if the model contains a SourceNode.  In this case you need
     // to register the callbacks via SetSourceCallback and SetSinkCallback.
     bool HasSourceNodes();
+
+    std::string GetMetadataValue(const std::string& key);
+    void SetMetadataValue(const std::string& key, const std::string& value);
 
     template <typename ElementType>
     void SetSourceCallback(ell::api::CallbackBase<ElementType>& callback, size_t index);

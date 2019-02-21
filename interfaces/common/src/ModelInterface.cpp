@@ -606,6 +606,21 @@ std::string Model::GetJson() const
     return stream.str();
 }
 
+std::string Model::GetMetadataValue(const std::string& key)
+{
+    std::string value;
+    if (_model->GetMetadata().HasEntry(key))
+    {
+        value = _model->GetMetadata().GetEntry<std::string>(key);
+    }
+    return value;
+}
+
+void Model::SetMetadataValue(const std::string& key, const std::string& value)
+{
+    _model->GetMetadata()[key] = value;
+}
+
 Model::Model(ell::model::Model&& other)
 {
     _model = std::make_shared<ell::model::Model>(std::move(other));
@@ -734,6 +749,21 @@ bool Map::HasSourceNodes()
         _sourceNodeState = sourceNodes.empty() ? TriState::No : TriState::Yes;
     }
     return _sourceNodeState == TriState::Yes;
+}
+
+std::string Map::GetMetadataValue(const std::string& key)
+{
+    std::string value;
+    if (_map->GetMetadata().HasEntry(key))
+    {
+        value = _map->GetMetadata().GetEntry<std::string>(key);
+    }
+    return value;
+}
+
+void Map::SetMetadataValue(const std::string& key, const std::string& value)
+{
+    _map->GetMetadata()[key] = value;
 }
 
 std::vector<double> Map::ComputeDouble(const AutoDataVector& inputData)

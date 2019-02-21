@@ -31,18 +31,12 @@ import ell
 
 
 def _get_tensor_shape(shape):
-    if (len(shape) == 1):
-        return ell.math.TensorShape(int(shape[0]), 1, 1)
-    elif (len(shape) == 2):
-        return ell.math.TensorShape(int(shape[0]), int(shape[1]), 1)
-    elif (len(shape) == 3):
-        return ell.math.TensorShape(int(shape[0]), int(shape[1]), int(shape[2]))
-    else:
-        raise Exception("Bad dimension for tensor shape: {}".format(len(shape)))
+    return ell.model.PortMemoryLayout(list(shape))
 
 
-def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, filterbank_size, iir_node=False,
-                  log_node=False, dct_node=False):
+def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, filterbank_size,
+                  nfft=None, iir_node=False, log_node=False, dct_node=False, power_spec=False,
+                  log_delta=1.0):
     builder = ell.model.ModelBuilder()
     ell_model = ell.model.Model()
 
@@ -70,14 +64,27 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
     last_node = builder.AddHammingWindowNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")))
 
     # Add FFT
-    last_node = builder.AddFFTNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")))
+    if nfft:
+        last_node = builder.AddFFTNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")), nfft)
+    else:
+        last_node = builder.AddFFTNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")))
+
+    if power_spec:
+        fft_size = last_node.GetOutputPort("output").Size()
+        square_node = builder.AddUnaryOperationNode(
+            ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")),
+            ell.nodes.UnaryOperationType.square)
+        denom = builder.AddConstantNode(ell_model, [fft_size], ell.nodes.PortType.smallReal)
+        last_node = builder.AddBinaryOperationNode(
+            ell_model, ell.nodes.PortElements(square_node.GetOutputPort("output")),
+            ell.nodes.PortElements(denom.GetOutputPort("output")),
+            ell.nodes.BinaryOperationType.divide)
 
     # Add filterbank
+    port = ell.nodes.PortElements(last_node.GetOutputPort("output"))
     if filterbank_type == "mel":
-        last_node = builder.AddMelFilterBankNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")),
-                                                 sample_rate, filterbank_size, num_filters)
+        last_node = builder.AddMelFilterBankNode(ell_model, port, sample_rate, filterbank_size, num_filters)
     elif filterbank_type == "linear":
-        port = ell.nodes.PortElements(last_node.GetOutputPort("output"))
         last_node = builder.AddLinearFilterBankNode(ell_model, port, sample_rate, filterbank_size, num_filters)
 
     last_node.SetMetadataValue("sample_rate", str(sample_rate))
@@ -87,7 +94,7 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
 
     # Add optional Log
     if log_node:
-        ones_node = builder.AddConstantNode(ell_model, [1.0] * num_filters, ell.nodes.PortType.smallReal)
+        ones_node = builder.AddConstantNode(ell_model, [log_delta] * num_filters, ell.nodes.PortType.smallReal)
         left_port = ell.nodes.PortElements(last_node.GetOutputPort("output"))
         right_port = ell.nodes.PortElements(ones_node.GetOutputPort("output"))
         last_node = builder.AddBinaryOperationNode(ell_model, left_port, right_port,
@@ -113,7 +120,8 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
 
 
 def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size, filterbank_type,
-                    filterbank_size, iir_node=False, log_node=False, dct_node=False):
+                    filterbank_size, nfft=None, iir_node=False, log_node=False, dct_node=False, power_spec=False,
+                    log_delta=1.0):
     """
     Create a new featurizer ELL model:
     output_filename     - the output ELL model file name
@@ -121,6 +129,7 @@ def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size
     window_size         - the featurizer input window size
     input_buffer_size   - the size of the buffer node to use
     filterbank_type     - the type of filter bank to use (e.g. 'mel', 'linear' or 'none')
+    nfft                - the size of the FFT (defaults to input size)
     filterbank_size     - the number of filters to use
     iir_node            - whether to insert an IIR filter node
     log_node            - whether to append a logarithm node
@@ -132,7 +141,7 @@ def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size
         os.makedirs(output_directory)
 
     map = _create_model(sample_rate, window_size, input_buffer_size, filterbank_type,
-                        filterbank_size, iir_node, log_node, dct_node)
+                        filterbank_size, nfft, iir_node, log_node, dct_node, power_spec, log_delta)
 
     # print("Saving model {}".format(output_filename))
     map.Save(output_filename)
@@ -155,11 +164,16 @@ higher speed classifier that might be better at spotting word boundaries, at the
     arg_parser.add_argument("--filterbank_type", "-t", help="Type of filterbank (mel, linear, none)", default="mel")
     arg_parser.add_argument("--filterbank_size", "-fs", help="Number of filters to use in filterbank", type=int,
                             default=40)
+    arg_parser.add_argument("--nfft", type=int, help="The size of the fft (defaults to input size)", default=None)
     arg_parser.add_argument("--iir", help="Include IIR prefilter", action="store_true")
     arg_parser.add_argument("--log", help="Include a LOG node on the output", action="store_true")
+    arg_parser.add_argument("--log_delta", type=float, default=1.0,
+                            help="Add this delta before applying the log function")
     arg_parser.add_argument("--dct", help="Add DCT of output", action="store_true")
+    arg_parser.add_argument("--power_spec", help="Add a power spectrum scaling of FFT output", action="store_true")
 
     args = arg_parser.parse_args()
 
     make_featurizer(args.output_filename, args.sample_rate, args.window_size, args.input_buffer_size,
-                    args.filterbank_type, args.filterbank_size, args.iir, args.log, args.dct)
+                    args.filterbank_type, args.filterbank_size, args.nfft, args.iir, args.log, args.dct,
+                    args.power_spec, args.log_delta)

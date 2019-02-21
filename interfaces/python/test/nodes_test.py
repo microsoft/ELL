@@ -1,8 +1,7 @@
-
+import json
 import math
 import os
 from testing import Testing
-
 import numpy as np
 import ell_helper  # noqa: F401
 import ell
@@ -15,6 +14,11 @@ def test_with_serialization(testing, map, test_name, callback):
         if i > 0:
             filename = "{}{}.json".format(test_name, i)
             map.Save(filename)
+            try:
+                with open(filename, "r") as f:
+                    json.load(f)
+            except Exception as e:
+                raise Exception("### ELL model is not valid json: {}".format(e))
             map = ell.model.Map(filename)
 
         callback(testing, map, i)
@@ -47,8 +51,8 @@ def test_voice_activity_node(testing):
     dataset = load_vad_data()
     size = dataset.NumFeatures()
 
-    input_shape = ell.math.TensorShape(1, 1, size)
-    output_shape = ell.math.TensorShape(1, 1, 1)
+    input_shape = ell.model.PortMemoryLayout([int(size)])
+    output_shape = ell.model.PortMemoryLayout([1])
 
     input_node = builder.AddInputNode(ell_model, input_shape, ell.nodes.PortType.real)
     vad_node = builder.AddVoiceActivityDetectorNode(
@@ -112,8 +116,8 @@ def test_gru_node_with_vad_reset(testing):
     dataset = load_vad_data()
     input_size = dataset.NumFeatures()
 
-    input_shape = ell.math.TensorShape(1, 1, input_size)
-    output_shape = ell.math.TensorShape(1, 1, hidden_units)
+    input_shape = ell.model.PortMemoryLayout([int(input_size)])
+    output_shape = ell.model.PortMemoryLayout([hidden_units])
     dataType = ell.nodes.PortType.smallReal
 
     input_node = builder.AddInputNode(ell_model, input_shape, dataType)
@@ -203,7 +207,8 @@ def hamming_callback(testing, map, iteration):
     compiled_map = map.CompileFloat("host", "hammingtest", "predict", compiler_settings, optimizer_options)
 
     compiled_output = compiled_map.ComputeDouble(input)
-    testing.ProcessTest("test_hamming_node compiled iteration {}".format(iteration), np.allclose(compiled_output, expected))    
+    testing.ProcessTest("test_hamming_node compiled iteration {}".format(iteration),
+                        np.allclose(compiled_output, expected))
 
 
 def test_hamming_node(testing):
@@ -212,8 +217,8 @@ def test_hamming_node(testing):
 
     size = 400
 
-    input_shape = ell.math.TensorShape(1, 1, size)
-    output_shape = ell.math.TensorShape(1, 1, size)
+    input_shape = ell.model.PortMemoryLayout([size])
+    output_shape = ell.model.PortMemoryLayout([size])
 
     input_node = mb.AddInputNode(model, input_shape, ell.nodes.PortType.real)
     hamming_node = mb.AddHammingWindowNode(model, ell.nodes.PortElements(input_node.GetOutputPort("output")))
@@ -230,7 +235,12 @@ def mel_filterbank_callback(testing, map, iteration):
     num_filters = 13
     sample_rate = 16000
 
-    from python_speech_features import get_filterbanks
+    try:
+        from python_speech_features import get_filterbanks
+    except:
+        print("### skiping test_mel_filterbank because 'python_speech_features' module is not available")
+        return
+
     fbanks = get_filterbanks(num_filters, window_size, sample_rate)
     input = np.array(range(size)).astype(np.float)
 
@@ -251,11 +261,6 @@ def mel_filterbank_callback(testing, map, iteration):
 
 
 def test_mel_filterbank(testing):
-    try:
-        import python_speech_features
-    except:
-        print("### skiping test_mel_filterbank because 'python_speech_features' module is not available")
-        return
 
     mb = ell.model.ModelBuilder()
     model = ell.model.Model()
@@ -264,8 +269,8 @@ def test_mel_filterbank(testing):
     num_filters = 13
     sample_rate = 16000
 
-    input_shape = ell.math.TensorShape(1, 1, size)
-    output_shape = ell.math.TensorShape(1, 1, num_filters)
+    input_shape = ell.model.PortMemoryLayout([size])
+    output_shape = ell.model.PortMemoryLayout([num_filters])
 
     input_node = mb.AddInputNode(model, input_shape, ell.nodes.PortType.real)
     filterbank_node = mb.AddMelFilterBankNode(model, ell.nodes.PortElements(input_node.GetOutputPort("output")),
@@ -274,23 +279,27 @@ def test_mel_filterbank(testing):
 
     map = ell.model.Map(model, input_node, ell.nodes.PortElements(outputNode.GetOutputPort("output")))
 
-    test_with_serialization(testing, map, "mel_filterbank", mel_filterbank_callback)
+    test_with_serialization(testing, map, "test_mel_filterbank", mel_filterbank_callback)
 
 
 def fftnode_callback(testing, map, iteration):
-    size = map.GetInputShape().Size()
-    a = np.array([float(i) * math.pi / 180 for i in range(size)])
+    inputSize = int(map.GetMetadataValue("inputSize"))
+    fftSize = int(map.GetMetadataValue("fftSize"))
+    if fftSize == 0:
+        fftSize = int(math.pow(2, math.ceil(math.log2(inputSize))))
+
+    a = np.array([float(i) * math.pi / 180 for i in range(inputSize)])
     y1 = np.sin(a * 10)
     y2 = np.sin(a * 20)
     y3 = np.sin(a * 50)
     signal = y1 + y2 + y3
 
-    hamming = np.hamming(len(signal)) * signal
-    expected = np.absolute([c.real for c in np.fft.rfft(hamming)])
+    expected = np.absolute(np.fft.rfft(signal, n=fftSize))
 
     output = map.ComputeDouble(signal)
     expected = expected[0:len(output)]  # ell returns size/2, numpy returns (size/2)+1
-
+    filename = "ffttest_{}_{}_{}.npz".format(inputSize, fftSize, iteration)
+    np.savez(filename, output=np.array(output), expected=np.array(expected))
     testing.ProcessTest("test_fftnode compute iteration {}".format(iteration), np.allclose(output, expected))
 
     compiler_settings = ell.model.MapCompilerOptions()
@@ -300,32 +309,49 @@ def fftnode_callback(testing, map, iteration):
 
     compiled_output = compiled_map.ComputeDouble(signal)
 
-    testing.ProcessTest("test_fftnode compiled iteration {}".format(iteration), np.allclose(compiled_output, expected))
+    testing.ProcessTest("test_fftnode compiled iteration {}".format(iteration), np.allclose(compiled_output, output))
 
 
-def test_fftnode(testing):
+def test_fftnode_size(testing, inputSize, fftSize):
     mb = ell.model.ModelBuilder()
     model = ell.model.Model()
 
-    size = 100
-    input_shape = ell.math.TensorShape(1, 1, size)
-    output_shape = ell.math.TensorShape(1, 1, int(size / 2))
+    input_shape = ell.model.PortMemoryLayout([inputSize])
 
     input_node = mb.AddInputNode(model, input_shape, ell.nodes.PortType.real)
-    hamming_node = mb.AddHammingWindowNode(model, ell.nodes.PortElements(input_node.GetOutputPort("output")))
-    fft_node = mb.AddFFTNode(model, ell.nodes.PortElements(hamming_node.GetOutputPort("output")))
+    if (fftSize == 0):
+        fft_node = mb.AddFFTNode(model, ell.nodes.PortElements(input_node.GetOutputPort("output")))
+    else:
+        fft_node = mb.AddFFTNode(model, ell.nodes.PortElements(input_node.GetOutputPort("output")), fftSize)
+    output_size = fft_node.GetOutputPort("output").Size()
+    output_shape = ell.model.PortMemoryLayout([output_size])
     outputNode = mb.AddOutputNode(model, output_shape, ell.nodes.PortElements(fft_node.GetOutputPort("output")))
 
     map = ell.model.Map(model, input_node, ell.nodes.PortElements(outputNode.GetOutputPort("output")))
+    map.SetMetadataValue("inputSize", str(inputSize))
+    map.SetMetadataValue("fftSize", str(fftSize))
 
-    test_with_serialization(testing, map, "test_fftnode", fftnode_callback)
+    test_with_serialization(testing, map, "test_fftnode ({})".format(fftSize), fftnode_callback)
+
+
+def test_fftnode(testing):
+    try:
+        test_fftnode_size(testing, 100, 100)
+        testing.ProcessTest("test_fftnode needs updating for sizes that are not a power of 2.", False)
+    except Exception as e:
+        testing.ProcessTest("test_fftnode: {}".format(e), True)
+
+    test_fftnode_size(testing, 64, 64)
+    test_fftnode_size(testing, 100, 128)
+    test_fftnode_size(testing, 20, 16)
+    test_fftnode_size(testing, 20, 0)
 
 
 def test():
     testing = Testing()
     test_voice_activity_node(testing)
     test_gru_node_with_vad_reset(testing)
-    test_hamming_node(testing)    
+    test_hamming_node(testing)
     test_mel_filterbank(testing)
     test_fftnode(testing)
     return 0
@@ -333,4 +359,3 @@ def test():
 
 if __name__ == "__main__":
     test()
-
