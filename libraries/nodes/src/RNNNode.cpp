@@ -25,7 +25,7 @@ namespace nodes
             { &_input, &_resetTrigger, &_inputWeights, &_hiddenWeights, &_inputBias, &_hiddenBias },
             { &_output }),
         _input(this, {}, defaultInputPortName),
-        _resetTrigger(this, {}, resetTriggerPortName),
+        _resetTrigger(this, resetTriggerPortName),
         _hiddenUnits(0),
         _inputWeights(this, {}, inputWeightsPortName),
         _hiddenWeights(this, {}, hiddenWeightsPortName),
@@ -37,7 +37,7 @@ namespace nodes
 
     template <typename ValueType>
     RNNNode<ValueType>::RNNNode(const model::OutputPort<ValueType>& input,
-                                const model::OutputPort<int>& resetTrigger,
+                                const model::OutputPortBase& resetTrigger,
                                 size_t hiddenUnits,
                                 const model::OutputPort<ValueType>& inputWeights,
                                 const model::OutputPort<ValueType>& hiddenWeights,
@@ -157,11 +157,12 @@ namespace nodes
     {
         // Helper function for Compute to use to figure out if node should be reset using the _resetTrigger input.
         bool result = false;
-        std::vector<int> resetValue = this->_resetTrigger.GetValue();
-        if (resetValue.size() > 0)
+        
+        if (this->_resetTrigger.Size() > 0)
         {
-            int vad = resetValue[0];
-            if (this->_lastResetValue == 1 && vad == 0)
+            auto triggerValue = this->_resetTrigger.GetInputElement(0).ReferencedPort()->GetDoubleOutput(0);
+            int vad = static_cast<int>(triggerValue);
+            if (this->_lastResetValue != 0 && vad == 0)
             {
                 result = true;
             }
@@ -273,8 +274,8 @@ namespace nodes
         // Allocate global variable to hold the previous trigger value so we can detect the change in state.
         auto lastSignal = module.Global<int>(compiler.GetGlobalName(*this, "lastSignal"), 0);
         auto lastSignalValue = function.LocalScalar(function.Load(lastSignal));
-        auto resetTriggerValue = function.LocalScalar(function.Load(resetTrigger));
-        function.If((resetTriggerValue == 0) && (lastSignalValue == 1), [resetFunctionName](emitters::IRFunctionEmitter& fn) {
+        auto resetTriggerValue = function.LocalScalar(function.CastValue<int>(function.Load(resetTrigger)));
+        function.If((resetTriggerValue == 0) && (lastSignalValue != 0), [resetFunctionName](emitters::IRFunctionEmitter& fn) {
             fn.Call(resetFunctionName);
         });
         function.Store(lastSignal, resetTriggerValue);

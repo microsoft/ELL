@@ -25,6 +25,11 @@ namespace model
         SetReferencedPort(&input);
     }
 
+    InputPortBase::InputPortBase(const Node* owningNode, const std::string& name) :
+        Port(owningNode, name, PortType::none)
+    {
+    }
+
     InputPortBase::~InputPortBase()
     {
         if (_referencedPort)
@@ -102,6 +107,32 @@ namespace model
         if (!_referencedPort->HasReference(this))
         {
             _referencedPort->AddReference(this);
+        }
+    }
+
+    void InputPortBase::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        Port::WriteToArchive(archiver);
+        auto portElements = PortElementsBase{ GetReferencedPort() };
+        archiver["input"] << portElements;
+    }
+
+    void InputPortBase::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        Port::ReadFromArchive(archiver);
+        PortElementsBase input;
+        archiver["input"] >> input;
+        if (!input.IsFullPortOutput())
+        {
+            // Back-compat: if this port has a non-simple PortElements, add nodes to the model as needed to simplify.
+            auto& context = archiver.GetContext();
+            ModelSerializationContext& modelContext = dynamic_cast<ModelSerializationContext&>(context);
+            const auto& newInput = modelContext.GetModel()->SimplifyOutputs(input);
+            SetReferencedPort(&newInput);
+        }
+        else
+        {
+            SetReferencedPort(input.GetRanges()[0].ReferencedPort());
         }
     }
 

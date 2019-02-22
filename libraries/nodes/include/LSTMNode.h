@@ -41,7 +41,7 @@ namespace nodes
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> The ports to get input data from. </param>
-        /// <param name="resetTrigger"> Port elements for the reset trigger. </param>
+        /// <param name="resetTrigger"> Port elements for the reset trigger, when the trigger goes from 1 to 0 the GRU state is reset. </param>
         /// <param name="hiddenUnits"> The number of hidden units. </param>
         /// <param name="inputWeights"> The weights to be applied to the input, must be a stack of 4 (input, forget, candidate, output). </param>
         /// <param name="hiddenWeights"> The weights to be applied to the hidden state, must be a stack of 4 (input, forget, candidate, output) </param>
@@ -51,7 +51,7 @@ namespace nodes
         /// <param name="recurrentActivation"> The recurrent activation function. </param>
         /// <param name="validateWeights"> Whether to check the size of the weights. </param>
         LSTMNode(const model::OutputPort<ValueType>& input,
-                 const model::OutputPort<int>& resetTrigger,
+                 const model::OutputPortBase& resetTrigger,
                  size_t hiddenUnits,
                  const model::OutputPort<ValueType>& inputWeights,
                  const model::OutputPort<ValueType>& hiddenWeights,

@@ -27,7 +27,7 @@ namespace nodes
 
     template <typename ValueType>
     GRUNode<ValueType>::GRUNode(const model::OutputPort<ValueType>& input,
-                                const model::OutputPort<int>& resetTrigger,
+                                const model::OutputPortBase& resetTrigger,
                                 size_t hiddenUnits,
                                 const model::OutputPort<ValueType>& inputWeights,
                                 const model::OutputPort<ValueType>& hiddenWeights,
@@ -267,7 +267,7 @@ namespace nodes
         // Allocate global variable to hold the previous trigger value so we can detect the change in state.
         auto lastSignal = module.Global<int>(compiler.GetGlobalName(*this, "lastSignal"), 0);
         auto lastSignalValue = function.LocalScalar(function.Load(lastSignal));
-        auto resetTriggerValue = function.LocalScalar(function.Load(resetTrigger));
+        auto resetTriggerValue = function.LocalScalar(function.CastValue<int>(function.Load(resetTrigger)));
         function.If((resetTriggerValue == 0) && (lastSignalValue == 1), [resetFunctionName](emitters::IRFunctionEmitter& fn) {
             fn.Call(resetFunctionName);
         });

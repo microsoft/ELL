@@ -120,11 +120,13 @@ target_include_directories(${library_name}
 )
 
 target_link_libraries(${library_name}
+    emittable_functions
     math
     model
     predictors
     dsp
     utilities
+    value
 )
 
 if(BLAS_FOUND)
@@ -181,6 +183,7 @@ target_link_libraries(${test_name}
     nodes
     testing
     utilities
+    value
 )
 
 copy_shared_libraries(${test_name})
@@ -194,6 +197,7 @@ set_test_library_path(${test_name})
 set(test_name dsp_${library_name}_test)
 
 set(test_src
+    test/src/DSPCodeNodesTests.cpp
     test/src/DSPNodesTest_main.cpp
     test/src/DSPNodesTests.cpp
     test/src/DSPNodesTiming.cpp
@@ -201,6 +205,7 @@ set(test_src
 )
 
 set(test_include
+    test/include/DSPCodeNodesTests.h
     test/include/DSPNodesTests.h
     test/include/DSPNodesTiming.h
     test/include/NodesTestData.h
@@ -229,6 +234,7 @@ target_link_libraries(${test_name}
     testing
     model_testing
     utilities
+    value
 )
 
 add_dependencies(${test_name} dspDataFiles)

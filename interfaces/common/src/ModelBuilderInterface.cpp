@@ -826,10 +826,10 @@ Node ModelBuilder::AddVoiceActivityDetectorNode(Model model, PortElements input,
     switch (type)
     {
     case PortType::real:
-        newNode = model.GetModel().AddNode<ell::nodes::VoiceActivityDetectorNode<double>>(ell::model::PortElements<double>(elements), sampleRate, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
+        newNode = model.GetModel().AddNode<ell::nodes::VoiceActivityDetectorNode>(ell::model::PortElements<double>(elements), sampleRate, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
         break;
     case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::nodes::VoiceActivityDetectorNode<float>>(ell::model::PortElements<float>(elements), sampleRate, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
+        newNode = model.GetModel().AddNode<ell::nodes::VoiceActivityDetectorNode>(ell::model::PortElements<float>(elements), sampleRate, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
         break;
     default:
         throw std::invalid_argument("Error: could not create BufferNode of the requested type");
@@ -1270,7 +1270,7 @@ Node ModelBuilder::AddRNNNode(Model model, PortElements input, PortElements rese
 
     ell::model::Node* newNode = model.GetModel().AddNode<ell::nodes::RNNNode<ElementType>>(
         ell::model::PortElements<ElementType>(input.GetPortElements()),
-        ell::model::PortElements<int>(reset.GetPortElements()),
+        reset.GetPortElements(),
         hiddenUnits,
         ell::model::PortElements<ElementType>(inputWeights.GetPortElements()),
         ell::model::PortElements<ElementType>(hiddenWeights.GetPortElements()),
@@ -1304,7 +1304,7 @@ Node ModelBuilder::AddGRUNode(Model model, PortElements input, PortElements rese
 
     ell::model::Node* newNode = model.GetModel().AddNode<ell::nodes::GRUNode<ElementType>>(
         ell::model::PortElements<ElementType>(input.GetPortElements()),
-        ell::model::PortElements<int>(reset.GetPortElements()),
+        reset.GetPortElements(),
         hiddenUnits,
         ell::model::PortElements<ElementType>(inputWeights.GetPortElements()),
         ell::model::PortElements<ElementType>(hiddenWeights.GetPortElements()),
@@ -1339,7 +1339,7 @@ Node ModelBuilder::AddLSTMNode(Model model, PortElements input, PortElements res
 
     ell::model::Node* newNode = model.GetModel().AddNode<ell::nodes::LSTMNode<ElementType>>(
         ell::model::PortElements<ElementType>(input.GetPortElements()),
-        ell::model::PortElements<int>(reset.GetPortElements()),
+        reset.GetPortElements(),
         hiddenUnits,
         ell::model::PortElements<ElementType>(inputWeights.GetPortElements()),
         ell::model::PortElements<ElementType>(hiddenWeights.GetPortElements()),

@@ -8,6 +8,8 @@
 
 #include "CompilableCodeNode_test.h"
 
+#include <common/include/LoadModel.h>
+
 #include <model/include/CompilableCodeNode.h>
 #include <model/include/IRMapCompiler.h>
 #include <model/include/InputNode.h>
@@ -23,6 +25,7 @@
 #include <testing/include/testing.h>
 
 #include <utilities/include/Logger.h>
+#include <utilities/include/StringUtil.h>
 
 #include <value/include/FunctionDeclaration.h>
 #include <value/include/Scalar.h>
@@ -33,7 +36,7 @@
 
 namespace ell
 {
-
+using namespace common;
 using namespace model;
 
 namespace detail
@@ -46,6 +49,14 @@ namespace detail
         const InputPortBase& input1 = _input1;
         const InputPortBase& input2 = _input2;
         const OutputPortBase& output = _output;
+
+        DotProductCodeNode() :
+            model::CompilableCodeNode("DotProduct", { &_input1, &_input2 }, { &_output }),
+            _input1(this, {}, defaultInput1PortName),
+            _input2(this, {}, defaultInput2PortName),
+            _output(this, defaultOutputPortName, ell::model::Port::PortType::real, utilities::ScalarLayout)
+        {
+        }
 
         DotProductCodeNode(const OutputPortBase& input1, const OutputPortBase& input2) :
             model::CompilableCodeNode("DotProduct", { &_input1, &_input2 }, { &_output }),
@@ -99,15 +110,16 @@ using ::ell::detail::DotProductCodeNode;
 
 void CompilableCodeNode_test1()
 {
-    testing::EnableLoggingHelper enableLogging;
-
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(4);
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 5.0, 5.0, 7.0, 3.0 });
     auto dotNode = model.AddNode<DotProductCodeNode>(inputNode->output, constantNode->output);
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", dotNode->output } });
-    model::IRMapCompiler compiler(model::MapCompilerOptions{}, model::ModelOptimizerOptions{});
-    auto compiledMap = compiler.Compile(map);
+
+    // make sure we can serialize it.
+    RegisterCustomTypeFactory([](utilities::SerializationContext& context) {
+        context.GetTypeFactory().AddType<model::Node, DotProductCodeNode>();
+    });
 
     // compare output
     std::vector<std::vector<double>> signal = {
@@ -123,7 +135,15 @@ void CompilableCodeNode_test1()
         { 7, 4, 2, 7 },
         { 5, 2, 1, 7 }
     };
-    VerifyCompiledOutput(map, compiledMap, signal, "DotProductCodeNode");
+
+    TestWithSerialization(map, "DotProductCodeNode", [&](model::Map& map, int iteration) {
+        model::IRMapCompiler compiler({}, {});
+        auto compiledMap = compiler.Compile(map);
+
+        VerifyCompiledOutput(map, compiledMap, signal, utilities::FormatString("DotProductCodeNode iteration %d", iteration));
+    });
+
+    RegisterCustomTypeFactory(nullptr);
 }
 
 } // namespace ell

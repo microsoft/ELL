@@ -13,6 +13,8 @@
 #include <model/include/Map.h>
 #include <model/include/Model.h>
 
+#include <functional>
+
 namespace ell
 {
 namespace common
@@ -68,6 +70,18 @@ namespace common
     /// <param name="map"> The map. </param>
     /// <param name="outStream"> The stream. </param>
     void SaveMap(const model::Map& map, std::ostream& outStream);
+
+    using CustomTypeFactoryFunction = std::function<void(utilities::SerializationContext&)>;
+
+    /// <summary> Register a function that can add custom node types to the SerializationContext.
+    /// There can only be one of these registered at a time for a given process and if you want to
+    /// unregister it then call this method with a nullptr. </summary>
+    void RegisterCustomTypeFactory(CustomTypeFactoryFunction func);
+
+    /// <summary> Add the custom types provided by the registered CustomTypeFactoryFunction provided
+    /// by RegisterCustomTypeFactory method. </summary>
+    void AddCustomTypes(utilities::SerializationContext& context);
+
 } // namespace common
 } // namespace ell
 
@@ -89,11 +103,13 @@ namespace common
         utilities::SerializationContext context;
         RegisterNodeTypes(context);
         RegisterMapTypes(context);
+        AddCustomTypes(context);
         UnarchiverType unarchiver(stream, context);
         model::Map map;
         unarchiver.Unarchive(map);
         return map;
     }
+
 } // namespace common
 } // namespace ell
 

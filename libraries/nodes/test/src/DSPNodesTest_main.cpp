@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DSPNodesTests.h"
+#include "DSPCodeNodesTests.h"
 
 #include <testing/include/testing.h>
 
@@ -28,6 +29,7 @@ int main(int argc, char** argv)
     std::cerr << "main argv[0]=" << path << "\n";
     try
     {
+        TestDSPCodeNodes(path);
         TestDSPNodes(path);
     }
     catch (const utilities::Exception& exception)

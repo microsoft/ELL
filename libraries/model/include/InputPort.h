@@ -46,6 +46,12 @@ namespace model
         /// <param name="name"> Name of the port </param>
         InputPortBase(const Node* owningNode, const OutputPortBase& input, const std::string& name);
 
+        /// <summary> Creates a disconnected input port (only used for serialization) </summary>
+        ///
+        /// <param name="owningNode"> The node this port belongs to </param>
+        /// <param name="name"> Name of the port </param>
+        InputPortBase(const Node* owningNode, const std::string& name);
+
         InputPortBase(const InputPortBase& other) = delete;
         InputPortBase(InputPortBase&& other) = delete;
         InputPortBase& operator=(const InputPortBase&) = delete;
@@ -100,6 +106,9 @@ namespace model
         InputPortBase(Port::PortType portType);
         void SetReferencedPort(const OutputPortBase* referencedPort);
         void ClearReferencedPort();
+
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         friend class ModelEditor;
@@ -159,10 +168,6 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-    protected:
-        void WriteToArchive(utilities::Archiver& archiver) const override;
-        void ReadFromArchive(utilities::Unarchiver& archiver) override;
     };
 } // namespace model
 } // namespace ell
@@ -248,33 +253,6 @@ namespace model
         return static_cast<const OutputPort<ValueType>&>(InputPortBase::GetReferencedPort());
     }
 
-    template <typename ValueType>
-    void InputPort<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
-    {
-        Port::WriteToArchive(archiver);
-        auto portElements = PortElements<ValueType>{ GetReferencedPort() };
-        archiver["input"] << portElements;
-    }
-
-    template <typename ValueType>
-    void InputPort<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
-    {
-        Port::ReadFromArchive(archiver);
-        PortElements<ValueType> input;
-        archiver["input"] >> input;
-        if (!input.IsFullPortOutput())
-        {
-            // Back-compat: if this port has a non-simple PortElements, add nodes to the model as needed to simplify.
-            auto& context = archiver.GetContext();
-            ModelSerializationContext& modelContext = dynamic_cast<ModelSerializationContext&>(context);
-            const auto& newInput = modelContext.GetModel()->SimplifyOutputs(input);
-            SetReferencedPort(&newInput);
-        }
-        else
-        {
-            SetReferencedPort(input.GetRanges()[0].ReferencedPort());
-        }
-    }
 } // namespace model
 } // namespace ell
 

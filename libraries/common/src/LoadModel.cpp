@@ -145,7 +145,6 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnrolledConvolutionNode<ElementType>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::VoiceActivityDetectorNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::WinogradConvolutionNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::WinogradConvolutionComputeNode<ElementType>>();
 
@@ -184,6 +183,9 @@ namespace common
     {
         RegisterRealNodeTypes<float>(context);
         RegisterRealNodeTypes<double>(context);
+
+        // Add type erased nodes.
+        context.GetTypeFactory().AddType<model::Node, nodes::VoiceActivityDetectorNode>();
 
         // additional non-real types, only for nodes that support that.
         context.GetTypeFactory().AddType<model::Node, model::InputNode<bool>>();
@@ -436,5 +438,21 @@ namespace common
     {
         SaveArchivedObject<JsonArchiver>(map, outStream);
     }
+
+    CustomTypeFactoryFunction _func;
+
+    void RegisterCustomTypeFactory(CustomTypeFactoryFunction func)
+    {
+        _func = func;
+    }
+
+    void AddCustomTypes(utilities::SerializationContext& context)
+    {
+        if (_func)
+        {
+            _func(context);
+        }
+    }
+
 } // namespace common
 } // namespace ell

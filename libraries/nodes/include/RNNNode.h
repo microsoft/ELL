@@ -43,10 +43,11 @@ namespace nodes
         const model::InputPort<ValueType>& hiddenWeights = _hiddenWeights;
         const model::InputPort<ValueType>& inputBias = _inputBias;
         const model::InputPort<ValueType>& hiddenBias = _hiddenBias;
-        const model::InputPort<int>& resetTrigger = _resetTrigger;
+        const model::InputPortBase& resetTrigger = _resetTrigger;
         const model::OutputPort<ValueType>& output = _output;
-        using ActivationType = predictors::neural::Activation<ValueType>;
         /// @}
+
+        using ActivationType = predictors::neural::Activation<ValueType>;
 
         /// <summary> Default contructor. </summary>
         RNNNode();
@@ -54,7 +55,7 @@ namespace nodes
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> The ports to get input data from. </param>
-        /// <param name="resetTrigger"> Port elements for the reset trigger. </param>
+        /// <param name="resetTrigger"> Port elements for the reset trigger, when the trigger goes from 1 to 0 the GRU state is reset. </param>
         /// <param name="hiddenUnits"> The number of hidden units. </param>
         /// <param name="inputWeights"> The weights to be applied to the input. </param>
         /// <param name="hiddenWeights"> The weights to be applied to the hidden state. </param>
@@ -64,7 +65,7 @@ namespace nodes
         /// <param name="recurrentActivation"> The recurrent activation function. </param>
         /// <param name="validateWeights"> Whether to check the size of the weights. </param>
         RNNNode(const model::OutputPort<ValueType>& input,
-                const model::OutputPort<int>& resetTrigger,
+                const model::OutputPortBase& resetTrigger,
                 size_t hiddenUnits,
                 const model::OutputPort<ValueType>& inputWeights,
                 const model::OutputPort<ValueType>& hiddenWeights,
@@ -96,7 +97,7 @@ namespace nodes
         void Copy(model::ModelTransformer& transformer) const override;
 
         model::InputPort<ValueType> _input;
-        model::InputPort<int> _resetTrigger;
+        model::InputPortBase _resetTrigger;
         size_t _hiddenUnits;
         model::InputPort<ValueType> _inputWeights;
         model::InputPort<ValueType> _hiddenWeights;
