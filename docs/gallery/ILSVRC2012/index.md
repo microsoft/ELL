@@ -5,20 +5,12 @@ permalink: /gallery/ILSVRC2012/
 datatable: true
 ---
 
-<h1>Pretrained Image Classification Models</h1>
-<h3>ILSVRC2012</h3>
-<p>We provide a collection of models trained on the dataset from the
-ImageNet Large Scale Visual Recognition Challenge (ILSVRC2012). These
-models use different neural network architectures on different size inputs
-to trade off accuracy and speed. The plot below shows how each of the
-models performs in terms of Top 1 accuracy (how often the most
-confident prediction is right) versus speed (seconds per
-frame). Click and drag to pan around. Zoom in and out with your
-mouse's scrollwheel.</p>
-<p>Here are the pretrained image classification models we provide. The
-table can be sorted by column. Each model name is a link to a page
-from which the model can be downloaded. </p>
- 
+# Image classification models trained on ImageNet (ILSVRC2012)
+
+This collection of image classification models is trained on the ImageNet Large Scale Visual Recognition Challenge dataset (ILSVRC2012). These models use different neural network architectures and different input sizes to trade off accuracy and speed. 
+
+The plot below summarizes the accuracy and speed of each model. The model's accuracy is measured in terms of its *top 1 error rate* - how often is the model's top prediction correct. The model's speed is measured in milliseconds per input on a Raspberry Pi 3B, running at 700MHz, using only the quad-core ARM CPU (and not the VideoCore GPU). See [config.txt](https://github.com/Microsoft/ELL-PiDataCenter/blob/master/PiDataCenter/config.txt) for the boot config file used to configure the Raspberry Pi test machines.
+
 <div id='plot'></div>
 
 <script>
@@ -145,6 +137,8 @@ from which the model can be downloaded. </p>
     }
 
 </script>
+
+The following table contains links to information pages that provide more detail about each model. Each information page includes a link to a `.ell` model file, which can be compiled and deployed using the ELL compiler. 
 
 <div class="table-responsive">
 <table id="tabledata" class="table table-striped table-bordered table-auto datatable" style="margin-left:auto;margin-right:auto;">

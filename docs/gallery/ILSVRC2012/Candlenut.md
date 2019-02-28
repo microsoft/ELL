@@ -6,12 +6,12 @@ permalink: /gallery/ILSVRC2012/Candlenut
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (54.39% top 1 accuracy, 78.02% top 5 accuracy, 0.166s/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
+## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (54.39% top 1 accuracy, 78.02% top 5 accuracy, 146ms/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Candlenut/Candlenut.ell.zip">Candlenut.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Candlenut/Candlenut_pi3.ell.zip">Candlenut_pi3.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/Candlenut
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.166s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 146ms/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
@@ -41,7 +41,7 @@ permalink: /gallery/ILSVRC2012/Candlenut
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Juan Lema using CNTK 2.3.1 </td>
+        <td colspan="3"> Trained by Byron Changuion using PyTorch 1.0.0 </td>
     </tr>
 </table>
 

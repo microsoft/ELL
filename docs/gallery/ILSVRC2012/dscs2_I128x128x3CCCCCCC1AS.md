@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/dscs2_I128x128x3CCCCCCC1AS
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (45.32% top 1 accuracy, 69.63% top 5 accuracy, 0.21s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (45.32% top 1 accuracy, 69.63% top 5 accuracy, 210ms/frame on Raspberry Pi 3)
 
 <table class="table table-striped table-bordered">
     <tr>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/dscs2_I128x128x3CCCCCCC1AS
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.21s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 210ms/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>

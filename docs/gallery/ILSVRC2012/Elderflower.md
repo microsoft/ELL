@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/Elderflower
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (49.32% top 1 accuracy, 73.99% top 5 accuracy, 0.109s/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
+## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (49.32% top 1 accuracy, 73.99% top 5 accuracy, 112ms/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/Elderflower
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.109s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 112ms/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>

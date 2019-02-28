@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/BrazilianGuava
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (44.01% top 1 accuracy, 68.64% top 5 accuracy, 0.08s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (44.01% top 1 accuracy, 68.64% top 5 accuracy, 80ms/frame on Raspberry Pi 3)
 
 <table class="table table-striped table-bordered">
     <tr>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/BrazilianGuava
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.08s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz : 80ms/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>

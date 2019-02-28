@@ -6,12 +6,12 @@ permalink: /gallery/ILSVRC2012/Ginger
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (62.33% top 1 accuracy, 84.14% top 5 accuracy, 0.210s/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
+## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (62.33% top 1 accuracy, 84.14% top 5 accuracy, 205ms/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Ginger/Ginger.ell.zip">Ginger.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Ginger/Ginger_pi3.ell.zip">Ginger_pi3.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/Ginger
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.210s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 205ms/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
@@ -41,7 +41,7 @@ permalink: /gallery/ILSVRC2012/Ginger
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Juan Lema using PyTorch 0.4.0 </td>
+        <td colspan="3"> Trained by Byron Changuion using PyTorch 1.0.0 </td>
     </tr>
 </table>
 

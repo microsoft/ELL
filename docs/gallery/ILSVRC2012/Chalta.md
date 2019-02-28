@@ -6,12 +6,12 @@ permalink: /gallery/ILSVRC2012/Chalta
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (58.74% top 1 accuracy, 81.59% top 5 accuracy, 0.219s/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
+## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (58.74% top 1 accuracy, 81.59% top 5 accuracy, 221ms/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Chalta/Chalta.ell.zip">Chalta.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Chalta/Chalta_pi3.ell.zip">Chalta_pi3.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/Chalta
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.219s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 221ms/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
@@ -41,7 +41,7 @@ permalink: /gallery/ILSVRC2012/Chalta
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Juan Lema using CNTK 2.3.1 </td>
+        <td colspan="3"> Trained by Byron Changuion using PyTorch 1.0.0 </td>
     </tr>
 </table>
 

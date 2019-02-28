@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/Mashua
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (64.59% top 1 accuracy, 85.50% top 5 accuracy, 0.804s/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
+## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (64.59% top 1 accuracy, 85.50% top 5 accuracy, 804ms/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/Mashua
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.804s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 804ms/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>

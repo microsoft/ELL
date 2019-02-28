@@ -6,12 +6,12 @@ permalink: /gallery/ILSVRC2012/Coconut
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (44.41% top 1 accuracy, 69.41% top 5 accuracy, 0.049s/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
+## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (44.41% top 1 accuracy, 69.41% top 5 accuracy, 46ms/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
-        <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Coconut/Coconut.ell.zip">Coconut.ell.zip</a></td>
+        <td> Download  </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Coconut/Coconut_pi3.ell.zip">Coconut_pi3.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/Coconut
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.049s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 46ms/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
@@ -41,7 +41,7 @@ permalink: /gallery/ILSVRC2012/Coconut
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Juan Lema using PyTorch 0.4.0 </td>
+        <td colspan="3"> Trained by Byron Changuion using PyTorch 1.0.0 </td>
     </tr>
 </table>
 
