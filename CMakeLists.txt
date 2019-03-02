@@ -10,6 +10,9 @@ include(CompilerCache)
 
 project(ELL)
 
+file(STRINGS "VERSION" ELL_VERSION)
+message(STATUS "ELL version ${ELL_VERSION}")
+
 # Define custom configuration types for Visual Studio
 if(CMAKE_CONFIGURATION_TYPES)
   # Copy important configuration info from Release config to new Documentation config
@@ -79,7 +82,7 @@ else()
     message(STATUS "### Python 3.6 or later not found, so python features will be disabled")
   endif()
 endif()
-    
+
 include(Flake8)
 
 # Turn on ability to create folders to organize projects
